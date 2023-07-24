@@ -284,8 +284,11 @@ mod tests {
         let obc = fixtures::ob_configuration::create(conn, &t.id, true);
         let uv = fixtures::vault::create_person(conn, true).into_inner();
         let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
-        let di = crate::models::decision_intent::DecisionIntent::get_or_create_onboarding_kyc(conn, &sv.id)
-            .unwrap();
+        let wf = fixtures::workflow::create(conn, &sv.id);
+        let di = crate::models::decision_intent::DecisionIntent::get_or_create_onboarding_kyc(
+            conn, &sv.id, &wf.id,
+        )
+        .unwrap();
         let ob = fixtures::onboarding::create(conn, sv.id.clone(), obc.id);
         let ob = Onboarding::lock(conn, &ob.id).unwrap();
 

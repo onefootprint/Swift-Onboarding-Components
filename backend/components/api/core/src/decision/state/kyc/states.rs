@@ -78,7 +78,7 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
 
     #[tracing::instrument("OnAction<Authorize, KycState>::on_commit", skip_all)]
     fn on_commit(self, tvc: TenantVendorControl, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
-        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id)?;
+        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id, &self.wf_id)?;
 
         Ok(KycState::from(KycVendorCalls {
             wf_id: self.wf_id,

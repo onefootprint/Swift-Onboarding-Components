@@ -64,6 +64,7 @@ pub fn setup_kyc_onboarding_vreqs(
     is_redo: bool,
     ob_id: &OnboardingId,
     sv_id: &ScopedVaultId,
+    wf_id: &WorkflowId,
 ) -> ApiResult<()> {
     let ob = Onboarding::lock(conn, ob_id)?;
     // redundant with new workflow state updates, will eventually remove when Onboarding is removed
@@ -75,7 +76,7 @@ pub fn setup_kyc_onboarding_vreqs(
         Onboarding::update(ob, conn, OnboardingUpdate::idv_reqs_initiated_and_is_authorized())?;
     }
     // TODO: create new DI if is_redo
-    let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id)?;
+    let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id, wf_id)?;
 
     let uvw = VaultWrapper::build(conn, VwArgs::Tenant(sv_id))?;
 

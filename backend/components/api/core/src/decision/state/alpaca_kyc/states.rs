@@ -101,7 +101,7 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
 
     #[tracing::instrument("OnAction<Authorize, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(self, tvc: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
-        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id)?;
+        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id, &self.wf_id)?;
 
         Ok(AlpacaKycState::from(AlpacaKycVendorCalls {
             wf_id: self.wf_id,
@@ -389,10 +389,11 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
     ) -> ApiResult<Self::AsyncRes> {
         // TODO: query for already complete (Vreq/Vres) for edge case where server crashes after `make_watchlist_result_call` but before `on_commit` commits
         let sv_id = self.sv_id.clone();
+        let wf_id = self.wf_id.clone();
         let (di, uv) = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &sv_id)?;
+                let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &sv_id, &wf_id)?;
                 let uv = Vault::get(conn, &sv_id)?;
                 Ok((di, uv))
             })

@@ -100,7 +100,7 @@ pub async fn setup_data(
 ) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
     // TODO: create sandbox vs demo vs real, diff sandbox fixues
     let is_live = matches!(user_kind, UserKind::Live | UserKind::Demo);
-    let (tenant, ob, _, _, _, obc) = test_helpers::create_user_and_onboarding(
+    let (tenant, ob, _, _, obc) = test_helpers::create_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         Some(vec![CDO::FullAddress]), // so we can meet min req for kyc vendor calls
@@ -304,8 +304,9 @@ pub fn save_vres_for_fixture_risk_signals(
     vault: &Vault,
     response: serde_json::Value,
     vendor_api: VendorAPI,
+    wf_id: &WorkflowId,
 ) -> Result<VerificationResult, ApiError> {
-    let di = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id)?;
+    let di = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id, wf_id)?;
     let vreq = VerificationRequest::create(conn, sv_id, &di.id, vendor_api)?;
     let e_response = vendor::verification_result::encrypt_verification_result_response(
         &response.clone().into(),
@@ -334,7 +335,7 @@ pub async fn mock_incode_doc_collection(
                 let args = NewDocumentRequestArgs {
                     scoped_vault_id: scoped_vault_id.clone(),
                     ref_id: None,
-                    workflow_id: Some(wf_id),
+                    workflow_id: Some(wf_id.clone()),
                     should_collect_selfie: false,
                     only_us: false,
                     doc_type_restriction: None,
@@ -351,6 +352,7 @@ pub async fn mock_incode_doc_collection(
                 )
                 .unwrap(),
                 VendorAPI::IncodeFetchScores,
+                &wf_id,
             )
             .unwrap();
 

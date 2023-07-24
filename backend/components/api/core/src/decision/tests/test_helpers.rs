@@ -1,7 +1,7 @@
 use db::{
     models::{
-        contact_info::ContactInfo, decision_intent::DecisionIntent, ob_configuration::ObConfiguration,
-        onboarding::Onboarding, scoped_vault::ScopedVault, tenant::Tenant, vault::Vault,
+        contact_info::ContactInfo, ob_configuration::ObConfiguration, onboarding::Onboarding,
+        scoped_vault::ScopedVault, tenant::Tenant, vault::Vault,
     },
     tests::fixtures,
     DbError, DbPool, TxnPgConn,
@@ -21,14 +21,7 @@ pub async fn create_user_and_onboarding(
     cip_kind: Option<CipKind>,
     is_live: bool,
     phone_suffix: Option<String>,
-) -> (
-    Tenant,
-    Onboarding,
-    Vault,
-    ScopedVault,
-    DecisionIntent,
-    ObConfiguration,
-) {
+) -> (Tenant, Onboarding, Vault, ScopedVault, ObConfiguration) {
     let (pk, tenant_e_key) = enclave_client.generate_sealed_keypair().await.unwrap();
     db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
@@ -46,12 +39,7 @@ pub async fn create_user_and_onboarding(
 
             let onboarding = fixtures::onboarding::create(conn, su.id.clone(), ob_config_id);
 
-            // TODO: should probably not have this create a DI by default here. Workflows will create their own DI so for test cases running WF's, we should rely on that.
-            // For other use cases that need to artificially make a DI, we should probably do that separately in another method
-            let decision_intent =
-                DecisionIntent::get_or_create_onboarding_kyc(conn, &onboarding.scoped_vault_id).unwrap();
-
-            Ok((tenant, onboarding, uv, su, decision_intent, ob_config))
+            Ok((tenant, onboarding, uv, su, ob_config))
         })
         .await
         .unwrap()

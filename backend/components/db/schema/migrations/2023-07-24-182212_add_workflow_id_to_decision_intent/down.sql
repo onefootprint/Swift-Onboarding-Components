@@ -1,0 +1,1 @@
+ALTER TABLE decision_intent DROP COLUMN workflow_id;

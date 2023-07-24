@@ -11,6 +11,7 @@ use crate::{decision, State};
 use api_core::auth::user::UserObAuthContext;
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
+use api_core::errors::workflow::WorkflowError;
 use api_core::types::JsonApiResponse;
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::DocumentResponse;
@@ -40,10 +41,11 @@ pub async fn post(
 ) -> JsonApiResponse<DocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
+    let wf = user_auth.workflow().ok_or(WorkflowError::AuthMissingWorkflow)?;
     let request = request.0;
 
     let su_id = user_auth.scoped_user.id.clone();
-    let wf_id = user_auth.workflow().map(|wf| wf.id.clone());
+    let wf_id = wf.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
     let (vault, doc_request, user_consent) = state
         .db_pool
@@ -51,7 +53,7 @@ pub async fn post(
             // If there's no pending doc requests, nothing to do here
             let identifier = DocRequestIdentifier {
                 sv_id: &su_id,
-                wf_id: wf_id.as_ref(),
+                wf_id: Some(&wf_id),
             };
             let doc_request = DbDocumentRequest::get(conn, identifier)?
                 .ok_or(OnboardingError::IdentityDocumentNotPending)?;
@@ -97,6 +99,7 @@ pub async fn post(
     let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
     let vault2 = vault.clone();
+    let wf_id = wf.id.clone();
     let (missing_sides, created_reqs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -150,7 +153,7 @@ pub async fn post(
             let result = if should_initiate_reqs {
                 // Initiate IDV reqs once and only once for this id_doc
                 let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
-                let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
+                let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id, &wf_id)?;
                 Some((decision_intent, doc_request, id_doc.id))
             } else {
                 if missing_sides.is_empty() {
@@ -167,6 +170,7 @@ pub async fn post(
                         conn,
                         &su_id,
                         &vault2,
+                        &wf_id,
                         serde_json::to_value(fake_score_response)?,
                     )?;
 
@@ -204,7 +208,7 @@ pub async fn post(
             .find(|s| missing_sides.contains(s));
         if next_side_to_collect.is_none() {
             // Save fixture VRes
-            save_incode_fixtures(&state, &user_auth.scoped_user.id.clone()).await?;
+            save_incode_fixtures(&state, &user_auth.scoped_user.id.clone(), &wf.id).await?;
         }
         DocumentResponse {
             next_side_to_collect,

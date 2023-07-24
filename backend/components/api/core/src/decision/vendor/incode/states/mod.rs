@@ -42,7 +42,7 @@ use super::state::IncodeStateTransition;
 use super::IncodeContext;
 use crate::decision::vendor;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
-use crate::errors::{ApiResult, AssertionError, ApiErrorKind};
+use crate::errors::{ApiErrorKind, ApiResult, AssertionError};
 use crate::utils::vault_wrapper::{TenantVw, VaultWrapper};
 use crate::{ApiError, State};
 use db::models::verification_result::{NewVerificationResult, VerificationResult};
@@ -52,7 +52,7 @@ use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DataIdentifier, IdDocKind, IdentityDataKind, IncodeFailureReason, IncodeVerificationSessionId,
     IncodeVerificationSessionKind, PiiJsonValue, ScopedVaultId, ScrubbedPiiJsonValue, ScrubbedPiiString,
-    VendorAPI,
+    VendorAPI, WorkflowId,
 };
 
 #[derive(Clone)]
@@ -146,14 +146,19 @@ fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
     ApiError::from(idv::Error::from(e))
 }
 
-pub async fn save_incode_fixtures(state: &State, scoped_vault_id: &ScopedVaultId) -> ApiResult<()> {
+pub async fn save_incode_fixtures(
+    state: &State,
+    scoped_vault_id: &ScopedVaultId,
+    wf_id: &WorkflowId,
+) -> ApiResult<()> {
     let suid = scoped_vault_id.clone();
     let suid2 = scoped_vault_id.clone();
+    let wf_id = wf_id.clone();
     let (decision_intent, uvw): (DecisionIntent, TenantVw) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let vw = VaultWrapper::build_for_tenant(conn, &suid)?;
-            let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &suid)?;
+            let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &suid, &wf_id)?;
 
             Ok((decision_intent, vw))
         })

@@ -246,7 +246,7 @@ impl WatchlistCheckTask {
         ) {
             (None, None)
         } else {
-            let di = DecisionIntent::create(conn, DecisionIntentKind::WatchlistCheck, sv_id)?;
+            let di = DecisionIntent::create(conn, DecisionIntentKind::WatchlistCheck, sv_id, None)?;
             let vreq = VerificationRequest::create(conn, sv_id, &di.id, VendorAPI::IdologyPa)?;
             (Some(di.id), Some(vreq))
         };

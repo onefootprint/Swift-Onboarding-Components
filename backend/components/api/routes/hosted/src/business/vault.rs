@@ -10,7 +10,7 @@ use api_core::errors::business::BusinessError;
 use api_core::errors::AssertionError;
 use api_core::types::ResponseData;
 use api_core::utils::vault_wrapper::{Person, TenantVw};
-use api_core::{ApiErrorKind};
+use api_core::ApiErrorKind;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::put_data_request::RawDataRequest;

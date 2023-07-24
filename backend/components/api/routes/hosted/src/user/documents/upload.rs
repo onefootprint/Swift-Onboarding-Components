@@ -10,6 +10,7 @@ use api_core::decision::vendor;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
 use api_core::decision::vendor::incode::{get_config_id, IncodeContext, IncodeStateMachine};
+use api_core::errors::workflow::WorkflowError;
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
 use api_core::utils::large_json::LargeJson;
@@ -30,6 +31,7 @@ use itertools::Itertools;
 use newtypes::{
     DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
     IdentityDocumentStatus, IncodeVerificationSessionState, PiiString, SealedVaultDataKey, TenantId, VaultId,
+    WorkflowId,
 };
 use newtypes::{S3Url, ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
@@ -47,7 +49,8 @@ pub async fn post(
 ) -> JsonApiResponse<DocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
-    let document_id = document_id.into_inner();
+    let wf = user_auth.workflow().ok_or(WorkflowError::AuthMissingWorkflow)?;
+    let document_id: IdentityDocumentId = document_id.into_inner();
     let request = request.0;
 
     let su_id = user_auth.scoped_user.id.clone();
@@ -95,6 +98,7 @@ pub async fn post(
     let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
     let vault2 = vault.clone();
+    let wf_id = wf.id.clone();
     let mime_type = request.mime_type;
     let (missing_sides, created_reqs) = state
         .db_pool
@@ -142,7 +146,7 @@ pub async fn post(
             let result = if should_initiate_reqs {
                 // Initiate IDV reqs once and only once for this id_doc
                 let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
-                let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id)?;
+                let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id, &wf_id)?;
                 Some((decision_intent, doc_request, id_doc.id))
             } else {
                 if missing_sides.is_empty() {
@@ -155,7 +159,7 @@ pub async fn post(
                     let fake_score_response =
                         idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE().unwrap();
                     let res = serde_json::to_value(fake_score_response)?;
-                    let vres = save_vres_for_fixture_risk_signals(conn, &su_id, &vault2, res)?;
+                    let vres = save_vres_for_fixture_risk_signals(conn, &su_id, &vault2, &wf_id, res)?;
 
                     // Enter the complete state
                     Complete::enter(
@@ -192,7 +196,7 @@ pub async fn post(
             .find(|s| missing_sides.contains(s));
         if next_side_to_collect.is_none() {
             // Save fixture VRes
-            save_incode_fixtures(&state, &user_auth.scoped_user.id.clone()).await?;
+            save_incode_fixtures(&state, &user_auth.scoped_user.id.clone(), &wf.id).await?;
         }
         DocumentResponse {
             next_side_to_collect,
@@ -326,9 +330,10 @@ pub(in crate::user) fn save_vres_for_fixture_risk_signals(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
     vault: &Vault,
+    wf_id: &WorkflowId,
     response: serde_json::Value,
 ) -> Result<VerificationResult, ApiError> {
-    let di = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id)?;
+    let di = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id, wf_id)?;
     let vreq = VerificationRequest::create(conn, sv_id, &di.id, VendorAPI::IncodeFetchScores)?;
     let e_response = vendor::verification_result::encrypt_verification_result_response(
         &response.clone().into(),

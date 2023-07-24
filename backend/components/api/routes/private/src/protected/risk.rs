@@ -93,8 +93,12 @@ async fn make_vendor_calls(
 
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
 
-            let decision_intent =
-                DecisionIntent::create(conn, newtypes::DecisionIntentKind::ManualRunKyc, &scoped_user.id)?;
+            let decision_intent = DecisionIntent::create(
+                conn,
+                newtypes::DecisionIntentKind::ManualRunKyc,
+                &scoped_user.id,
+                None,
+            )?;
             let requests = vendor::build_verification_requests_and_checkpoint(
                 conn,
                 &uvw,

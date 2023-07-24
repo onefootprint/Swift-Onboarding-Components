@@ -2,6 +2,7 @@ use chrono::Utc;
 use db::{
     models::{
         data_lifetime::DataLifetime,
+        decision_intent::DecisionIntent,
         document_request::{DocumentRequest, NewDocumentRequestArgs},
         document_upload::DocumentUpload,
         identity_document::IdentityDocument,
@@ -57,7 +58,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     } else {
         None
     };
-    let (tenant, ob, uv, su, di, _) = create_user_and_onboarding(
+    let (tenant, ob, uv, su, _) = create_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         must_collect_data,
@@ -69,9 +70,12 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
 
     // Needed for db constraints
     let su_id = su.id.clone();
-    let id_doc = state
+    let (di, id_doc) = state
         .db_pool
-        .db_transaction(move |conn| -> Result<IdentityDocument, DbError> {
+        .db_transaction(move |conn| -> Result<_, DbError> {
+            let wf = db::tests::fixtures::workflow::create(conn, &su_id);
+            let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id, &wf.id).unwrap();
+
             let args = NewDocumentRequestArgs {
                 scoped_vault_id: su_id,
                 ref_id: None,
@@ -86,9 +90,9 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id.unwrap(), note, false)?;
             }
 
-            Ok(db::tests::fixtures::identity_document::create(
-                conn,
-                Some(doc_request.id),
+            Ok((
+                di,
+                db::tests::fixtures::identity_document::create(conn, Some(doc_request.id)),
             ))
         })
         .await
@@ -294,7 +298,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
     } else {
         None
     };
-    let (tenant, ob, uv, su, di, _) = create_user_and_onboarding(
+    let (tenant, ob, uv, su, _) = create_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         must_collect_data,
@@ -306,9 +310,12 @@ async fn test_fail(state: &State, is_selfie: bool) {
 
     // Needed for db constraints
     let suid = su.id.clone();
-    let id_doc = state
+    let (di, id_doc) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
+            let wf = db::tests::fixtures::workflow::create(conn, &suid);
+            let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &suid, &wf.id).unwrap();
+
             let args = NewDocumentRequestArgs {
                 scoped_vault_id: suid,
                 ref_id: None,
@@ -325,7 +332,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
             let id_doc = db::tests::fixtures::identity_document::create(conn, Some(doc_request.id));
             assert!(!id_doc.images(conn, true)?.is_empty());
 
-            Ok(id_doc)
+            Ok((di, id_doc))
         })
         .await
         .unwrap();
