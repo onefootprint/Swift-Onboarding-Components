@@ -1,10 +1,13 @@
 mod accessors;
 mod build;
+mod bulk_decrypt;
 mod decrypt;
 mod decrypt_request;
 mod delete;
 
 use db::models::{onboarding::OnboardingAndConfig, scoped_vault::ScopedVault};
+
+pub use bulk_decrypt::*;
 pub use decrypt_request::DecryptRequest;
 
 use super::{Any, VaultWrapper};

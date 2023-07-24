@@ -1,7 +1,9 @@
+use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::access_event;
 use diesel::{Insertable, Queryable, RunQueryDsl};
+use itertools::Itertools;
 use newtypes::{
     AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedVaultId, TenantId,
 };
@@ -43,22 +45,22 @@ pub struct NewAccessEvent {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = access_event)]
-struct NewAccessEventWithInsight {
-    scoped_vault_id: ScopedVaultId,
-    insight_event_id: InsightEventId,
-    reason: Option<String>,
-    principal: DbActor,
-    kind: AccessEventKind,
-    targets: Vec<DataIdentifier>,
-    tenant_id: TenantId,
-    is_live: bool,
+pub struct NewAccessEventRow {
+    pub scoped_vault_id: ScopedVaultId,
+    pub insight_event_id: InsightEventId,
+    pub reason: Option<String>,
+    pub principal: DbActor,
+    pub kind: AccessEventKind,
+    pub targets: Vec<DataIdentifier>,
+    pub tenant_id: TenantId,
+    pub is_live: bool,
 }
 
 impl NewAccessEvent {
     #[tracing::instrument("NewAccessEvent::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> Result<(), crate::DbError> {
+    pub fn create(self, conn: &mut PgConn) -> DbResult<()> {
         let insight_ev = self.insight.insert_with_conn(conn)?;
-        let event = NewAccessEventWithInsight {
+        let event = NewAccessEventRow {
             scoped_vault_id: self.scoped_vault_id,
             insight_event_id: insight_ev.id,
             reason: self.reason,
@@ -69,8 +71,19 @@ impl NewAccessEvent {
             is_live: self.is_live,
         };
 
-        diesel::insert_into(db_schema::schema::access_event::table)
+        diesel::insert_into(access_event::table)
             .values(event)
+            .execute(conn)?;
+
+        Ok(())
+    }
+}
+
+impl AccessEvent {
+    pub fn bulk_create(conn: &mut PgConn, rows: Vec<NewAccessEventRow>) -> DbResult<()> {
+        let rows = rows.into_iter().filter(|r| r.targets.len() > 1).collect_vec();
+        diesel::insert_into(access_event::table)
+            .values(rows)
             .execute(conn)?;
 
         Ok(())

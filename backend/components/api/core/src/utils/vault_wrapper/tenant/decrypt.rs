@@ -9,9 +9,9 @@ use std::collections::HashMap;
 impl<Type> TenantVw<Type> {
     /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
     /// don't allow the tenant to know if data is set without having permission for the the value
-    pub fn check_ob_config_access(&self, ids: &[DataIdentifier]) -> ApiResult<()> {
+    pub fn check_ob_config_access(&self, ids: Vec<&DataIdentifier>) -> ApiResult<()> {
         let cannot_access = ids
-            .iter()
+            .into_iter()
             .filter(|x| !self.can_decrypt((*x).clone()))
             .collect_vec();
         if !cannot_access.is_empty() {
@@ -64,8 +64,8 @@ impl<Type> TenantVw<Type> {
         dis_and_transforms: Vec<(DataIdentifier, Vec<enclave_proxy::DataTransform>)>,
         req: DecryptRequest,
     ) -> ApiResult<HashMap<EnclaveDecryptOperation, PiiString>> {
-        let dis = dis_and_transforms.iter().map(|(di, _)| di.clone()).collect_vec();
-        self.check_ob_config_access(dis.as_slice())?;
+        let dis = dis_and_transforms.iter().map(|(di, _)| di).collect();
+        self.check_ob_config_access(dis)?;
         let results = self
             .fn_decrypt_unchecked(&state.enclave_client, dis_and_transforms)
             .await?;
@@ -81,7 +81,7 @@ impl<Type> TenantVw<Type> {
         di: DataIdentifier,
         req: DecryptRequest,
     ) -> ApiResult<Option<Pii>> {
-        self.check_ob_config_access(&[di.clone()])?;
+        self.check_ob_config_access(vec![&di])?;
         let results = self
             .fn_decrypt_unchecked_raw(&state.enclave_client, vec![(di, vec![])])
             .await?;

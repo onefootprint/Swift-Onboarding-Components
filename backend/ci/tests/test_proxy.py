@@ -3,6 +3,7 @@ from tests.utils import _make_request
 from tests.headers import BaseAuth
 from tests.utils import post, get, patch
 from tests.constants import ID_DATA
+from tests.dashboard.utils import latest_access_event_for
 import requests
 import urllib.parse
 
@@ -569,22 +570,21 @@ class TestVaultProxy:
         assert response["custom.message"] == "MY REALLY REALLY"
 
     def test_proxy_reflect(self, sandbox_tenant):
-        # create the vault
-        body = post("users/", None, sandbox_tenant.sk.key)
-        user = body
-        fp_id = user["id"]
-        assert fp_id
-
-        # post data to it
-        data = {
+        # create two vaults
+        user1_data = {
             "id.first_name": "Piip",
             "id.last_name": "Penguin",
             "custom.message": "lorem ipsum dolor FLERP",
             "card.primary.number": "42424242424242",
-            "card.primary.expiration": "12/2024",
         }
-
-        patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+        body = post("users/", user1_data, sandbox_tenant.sk.key)
+        fp_id = body["id"]
+        user2_data = {
+            "id.first_name": "Hayes",
+            "id.last_name": "Valley",
+        }
+        body = post("users/", user2_data, sandbox_tenant.sk.key)
+        fp_id2 = body["id"]
 
         data = {
             "data": {
@@ -593,6 +593,7 @@ class TestVaultProxy:
             },
             "cc_first_3": f"{{{{ {fp_id}.card.primary.number | prefix(3) }}}}",
             "flerp": f"{{{{ {fp_id}.custom.message | suffix(5) | to_lowercase }}}}",
+            "office_location": f"{{{{ {fp_id2}.id.first_name }}}} {{{{ {fp_id2}.id.last_name }}}}",
         }
 
         response = post(f"vault_proxy/reflect", data, sandbox_tenant.sk.key)
@@ -600,6 +601,14 @@ class TestVaultProxy:
         assert response["data"]["message"] == "lorem ipsum dolor FLERP"
         assert response["cc_first_3"] == "424"
         assert response["flerp"] == "flerp"
+        assert response["office_location"] == "Hayes Valley"
+
+        access_event = latest_access_event_for(fp_id, sandbox_tenant.sk)
+        assert access_event["kind"] == "decrypt"
+        assert set(access_event["targets"]) == set(user1_data)
+        access_event = latest_access_event_for(fp_id2, sandbox_tenant.sk)
+        assert access_event["kind"] == "decrypt"
+        assert set(access_event["targets"]) == set(user2_data)
 
 
 ### Tests to do ###

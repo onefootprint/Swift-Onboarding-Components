@@ -1,23 +1,19 @@
-use std::collections::HashMap;
-
 use crate::auth::tenant::TenantAuth;
-
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
 use crate::utils::headers::InsightHeaders;
-use crate::utils::vault_wrapper::DecryptRequest;
+use crate::utils::vault_wrapper::bulk_decrypt;
+use crate::utils::vault_wrapper::BulkDecryptReq;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
-
 use itertools::Itertools;
-
 use newtypes::FpId;
 use newtypes::PiiString;
 use newtypes::ProxyToken;
+use std::collections::HashMap;
 
 use super::filter_function_to_transform;
 use super::transform_to_filter_function;
@@ -34,8 +30,6 @@ pub async fn detokenize(
     reason: Option<String>,
     insight: InsightHeaders,
 ) -> ApiResult<HashMap<ProxyToken, PiiString>> {
-    let mut out = HashMap::new();
-
     // split tokens by fp_id
     let tokens = tokens
         .into_iter()
@@ -45,7 +39,7 @@ pub async fn detokenize(
     let fp_ids = tokens.keys().cloned().collect_vec();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let vws: HashMap<FpId, TenantVw> = state
+    let mut vws: HashMap<FpId, TenantVw> = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let svs = ScopedVault::bulk_get(conn, fp_ids, &tenant_id, is_live)?;
@@ -57,46 +51,46 @@ pub async fn detokenize(
         .map(|vw| (vw.scoped_vault.fp_id.clone(), vw))
         .collect();
 
-    for (fp_id, targets) in tokens.into_iter() {
-        let vw = vws
-            .get(&fp_id)
-            .ok_or(TenantError::VaultDoesntExist(fp_id.clone()))?;
+    let decrypt_reqs = tokens
+        .into_iter()
+        .map(|(fp_id, targets)| -> ApiResult<_> {
+            let vw = vws
+                .remove(&fp_id)
+                .ok_or(TenantError::VaultDoesntExist(fp_id.clone()))?;
+            let targets = targets
+                .into_iter()
+                .map(|(di, filters)| {
+                    let transforms = filters.iter().map(filter_function_to_transform).collect_vec();
+                    (di, transforms)
+                })
+                .collect();
+            Ok(BulkDecryptReq { vw, targets })
+        })
+        .collect::<ApiResult<_>>()?;
+    let reason = reason.unwrap_or_else(|| "Vault Proxy Default Reason".to_string());
+    let insight = CreateInsightEvent::from(insight);
+    let decrypted_results = bulk_decrypt(state, decrypt_reqs, insight, reason, auth.actor().into()).await?;
 
-        let req = DecryptRequest {
-            reason: reason
-                .clone()
-                .unwrap_or_else(|| "Vault Proxy Default Reason".to_string()),
-            principal: auth.actor().into(),
-            insight: CreateInsightEvent::from(insight.clone()),
-        };
-        let targets = targets
-            .into_iter()
-            .map(|(di, filters)| {
-                let transforms = filters.iter().map(filter_function_to_transform).collect_vec();
-                (di, transforms)
-            })
-            .collect();
-
-        // TODO we should support a multi-user batch decrypt.
-        // We're also making all access events sequentially right now
-        let results = vw
-            .fn_decrypt(state, targets, req)
-            .await?
-            .into_iter()
-            .map(|(op, v)| {
-                let token = ProxyToken {
-                    fp_id: fp_id.clone(),
-                    identifier: op.identifier,
-                    filter_functions: op
+    let out = decrypted_results
+        .into_iter()
+        .flat_map(|(fp_id, results)| {
+            results
+                .into_iter()
+                .map(|(op, pii)| {
+                    let filter_functions = op
                         .transforms
                         .into_iter()
                         .filter_map(transform_to_filter_function)
-                        .collect(),
-                };
-                (token, v)
-            });
-        out.extend(results);
-    }
-
+                        .collect();
+                    let token = ProxyToken {
+                        fp_id: fp_id.clone(),
+                        identifier: op.identifier,
+                        filter_functions,
+                    };
+                    (token, pii)
+                })
+                .collect_vec()
+        })
+        .collect();
     Ok(out)
 }
