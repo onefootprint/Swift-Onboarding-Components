@@ -38,6 +38,10 @@ class ClientTokenAuth(BaseAuth):
     HEADER_NAME = "x-fp-authorization"
 
 
+class IgnoreCardValidation(BaseAuth):
+    HEADER_NAME = "x-fp-ignore-card-validation"
+
+
 class IsLive(BaseAuth):
     """
     Allows specifying whether a request made with the DashboardAuth should be for live or sandbox data

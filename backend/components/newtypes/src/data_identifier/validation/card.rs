@@ -7,10 +7,10 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 
 impl Validate for CI {
-    fn validate(&self, value: PiiString, _: ValidateArgs, all_data: &AllData) -> NtResult<PiiString> {
+    fn validate(&self, value: PiiString, args: ValidateArgs, all_data: &AllData) -> NtResult<PiiString> {
         let Self { alias, kind } = self;
         let result = match kind {
-            CDK::Number => validate_card_number(value)?,
+            CDK::Number => validate_card_number(value, args)?,
             CDK::Cvc => validate_cc_cvc(value, alias, all_data)?,
             CDK::Expiration => Expiration::validate(&value)?.into(),
             CDK::ExpMonth => Expiration::validate_month(value.leak())?,
@@ -67,24 +67,39 @@ impl From<card_validate::Type> for CardIssuer {
     }
 }
 
-fn validate_card_number(value: PiiString) -> VResult<PiiString> {
-    CardValidate::from(value.leak()).map_err(|e| {
-        Error::CardError(match e {
-            card_validate::ValidateError::InvalidLuhn => {
-                "Invalid checksum. Please verify that the number is correct".to_owned()
+fn validate_card_number(value: PiiString, args: ValidateArgs) -> VResult<PiiString> {
+    // TODO this is annoying because we also need this to succeed in order to extract the issuer
+    // Make sure frontend doesn't crash w empty issuer
+    let result = CardValidate::from(value.leak());
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            let err_str = match e {
+                // This exploits the fact that I know the card library does luhn validation after
+                // all other validations... Pretty fragile, but I don't want to fork the card
+                // library yet.
+                card_validate::ValidateError::InvalidLuhn if args.ignore_card_validation => None,
+                card_validate::ValidateError::InvalidLuhn => {
+                    Some("Invalid checksum. Please verify that the number is correct".to_owned())
+                }
+                card_validate::ValidateError::InvalidLength => {
+                    Some("Invalid length. Please verify that the number is correct".to_owned())
+                }
+                card_validate::ValidateError::InvalidFormat => {
+                    Some("Invalid format. Please verify that the number is correct".to_owned())
+                }
+                card_validate::ValidateError::UnknownType => {
+                    Some("Unknown type. Please verify that the number is correct".to_owned())
+                }
+                _ => Some(format!("{:?}", e)),
+            };
+            if let Some(err_str) = err_str {
+                Err(Error::CardError(err_str))
+            } else {
+                Ok(())
             }
-            card_validate::ValidateError::InvalidLength => {
-                "Invalid length. Please verify that the number is correct".to_owned()
-            }
-            card_validate::ValidateError::InvalidFormat => {
-                "Invalid format. Please verify that the number is correct".to_owned()
-            }
-            card_validate::ValidateError::UnknownType => {
-                "Unknown type. Please verify that the number is correct".to_owned()
-            }
-            _ => format!("{:?}", e),
-        })
-    })?;
+        }
+    }?;
     Ok(value)
 }
 
@@ -236,6 +251,27 @@ mod test {
             .validate(PiiString::new(pii.to_owned()), args, &HashMap::new())
             .ok()
             .map(|pii| pii.leak_to_string())
+    }
+
+    #[test_case("4428680502681658" => Some("4428680502681658".to_owned()))]
+    // This has invalid luhn and should succeed
+    #[test_case("4428680502681659" => Some("4428680502681659".to_owned()))]
+    // Even though luhn validation is silenced, this shouldn't be parseable
+    #[test_case("4428" => None)]
+    fn test_validate_ignore_luhn(pii: &str) -> Option<String> {
+        let alias = AliasId::from("flerp".to_owned());
+        let args = ValidateArgs {
+            for_bifrost: true,
+            ignore_card_validation: true,
+            ..ValidateArgs::for_tests()
+        };
+        CI {
+            alias,
+            kind: CDK::Number,
+        }
+        .validate(PiiString::new(pii.to_owned()), args, &HashMap::new())
+        .ok()
+        .map(|pii| pii.leak_to_string())
     }
 
     // Visa

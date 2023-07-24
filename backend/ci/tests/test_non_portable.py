@@ -1,7 +1,7 @@
 import pytest
 from tests.utils import _gen_random_ssn, create_ob_config
 from tests.utils import post, get, patch, delete
-from tests.headers import IdempotencyId
+from tests.headers import IdempotencyId, IgnoreCardValidation
 from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA, CREDIT_CARD_DATA
 import hmac
 import hashlib
@@ -98,6 +98,22 @@ def test_data_validation(tenant, key, value, expected_error):
     assert body["error"]["message"][key] == expected_error
     # Validate endpoint should also fail
     post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
+
+
+def test_ignore_card_validation(tenant):
+    body = post("users/", None, tenant.sk.key)
+    fp_id = body["id"]
+
+    # Should fail luhn validation
+    data = {"card.primary.number": "4242424242424241"}
+    body = patch(f"users/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+    assert (
+        body["error"]["message"]["card.primary.number"]
+        == "Invalid checksum. Please verify that the number is correct"
+    )
+
+    # Should be able to silence luhn validation
+    patch(f"users/{fp_id}/vault", data, tenant.sk.key, IgnoreCardValidation("true"))
 
 
 @pytest.mark.parametrize(

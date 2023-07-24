@@ -8,6 +8,7 @@ use crate::State;
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanVault;
 use api_core::errors::AssertionError;
+use api_core::utils::headers::IgnoreCardValidation;
 use api_core::utils::vault_wrapper::Any;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -41,10 +42,13 @@ pub async fn patch(
     request: Json<RawDataRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
+    ignore_card_validation: IgnoreCardValidation,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
-    let result = patch_inner(&state, path.into_inner(), request.into_inner(), auth, insight).await?;
+    let path = path.into_inner();
+    let request = request.into_inner();
+    let result = patch_inner(&state, path, request, auth, insight, *ignore_card_validation).await?;
     Ok(result)
 }
 
@@ -71,7 +75,7 @@ pub async fn patch_client(
     let auth = auth.check_guard(CanVault::new(request.keys().cloned().collect()))?;
     let fp_id = auth.fp_id.clone();
 
-    let result = patch_inner(&state, fp_id, request, Box::new(auth), insight).await?;
+    let result = patch_inner(&state, fp_id, request, Box::new(auth), insight, false).await?;
     Ok(result)
 }
 
@@ -81,6 +85,7 @@ async fn patch_inner(
     request: RawDataRequest,
     auth: Box<dyn TenantAuth>,
     insight: InsightHeaders,
+    ignore_card_validation: bool,
 ) -> JsonApiResponse<EmptyResponse> {
     let insight = CreateInsightEvent::from(insight);
 
@@ -123,7 +128,9 @@ async fn patch_inner(
         }
     }
     let targets = request.keys().cloned().collect_vec();
-    let request = request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
+    let mut args = ValidateArgs::for_non_portable(is_live);
+    args.ignore_card_validation = ignore_card_validation;
+    let request = request.clean_and_validate(args)?;
     let request = request.build_tenant_fingerprints(state, &tenant_id).await?;
 
     state

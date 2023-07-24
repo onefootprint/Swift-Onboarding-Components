@@ -15,6 +15,9 @@ pub use idempotency_id::*;
 mod sandbox_id;
 pub use sandbox_id::*;
 
+mod ignore_card_validation;
+pub use ignore_card_validation::*;
+
 use crate::{
     errors::{ApiError, ApiResult},
     ApiErrorKind,
