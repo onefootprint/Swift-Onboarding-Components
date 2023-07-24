@@ -2,15 +2,8 @@
   "$schema": "https://turborepo.org/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**",
-        "public/dist/**"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
       "env": [
         "API_BASE_URL",
         "BIFROST_URL",
@@ -36,7 +29,7 @@
         "NEXT_PUBLIC_VERCEL_URL",
         "NODE_ENV",
         "REVALIDATE_SECRET_TOKEN",
-        "NEXT_PUBLIC_FINGERPRINT_API_KEY",
+
         "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY",
         "NEXT_PUBLIC_APP_CLIP_ENABLED",
         "NEXT_PUBLIC_KYC_TENANT_KEY",
@@ -46,35 +39,23 @@
       ]
     },
     "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".jest-cache/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": [".jest-cache/**"]
     },
     "start": {
       "dependsOn": [],
       "outputs": []
     },
     "lint": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "typecheck": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "build:storybook": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "storybook-static/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
     },
     "format": {
       "outputs": []
