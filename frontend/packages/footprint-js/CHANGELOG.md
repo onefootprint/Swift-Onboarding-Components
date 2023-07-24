@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 2.2.0
+
+### Minor Changes
+
+- a8c205031: Add option to show customer logo at the start of the flow
+
 ## 2.1.1
 
 ### Patch Changes

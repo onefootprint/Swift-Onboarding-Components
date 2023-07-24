@@ -2,7 +2,7 @@
   "name": "@onefootprint/footprint-react",
   "private": false,
   "type": "module",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "main": "./dist/footprint-react.umd.js",
   "module": "./dist/footprint-react.js",
   "types": "./dist/footprint-react.d.ts",
