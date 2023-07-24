@@ -36,6 +36,7 @@ const Root = () => {
             authToken={authToken}
             obConfigAuth={obConfigAuth}
             showCompletionPage
+            showLogo
           />
         )}
       </Layout>
