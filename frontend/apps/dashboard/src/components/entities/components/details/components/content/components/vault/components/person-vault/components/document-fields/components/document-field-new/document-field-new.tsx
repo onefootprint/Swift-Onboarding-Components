@@ -8,6 +8,7 @@ import {
 import { Drawer, LinkButton, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 
+import ConfidenceScores from './components/confidence-scores';
 import ExtractedDocumentData from './components/extracted-document-data';
 
 export type DocumentFieldProps = {
@@ -25,6 +26,7 @@ const DocumentField = ({
 }: DocumentFieldProps) => {
   const { t } = useTranslation('pages.entity.fieldset.document');
   const [isDrawerOpen, show, hide] = useToggle(false);
+  const currentDocument = documents[0];
 
   return documentKind ? (
     <Container role="row" aria-label={label}>
@@ -47,13 +49,10 @@ const DocumentField = ({
           title={t(`drawer.${documentKind}.title`)}
           onClose={hide}
         >
-          <ExtractedDocumentData vault={vault} documentKind={documentKind} />
-          {/* Placeholder! */}
-          <div style={{ marginTop: 40 }}>
-            <div>{JSON.stringify(vault)}</div>
-            <div>{JSON.stringify(documents)}</div>
-          </div>
-          <DrawerItems />
+          <DrawerItems>
+            <ConfidenceScores document={currentDocument} />
+            <ExtractedDocumentData vault={vault} documentKind={documentKind} />
+          </DrawerItems>
         </Drawer>
       </>
     </Container>

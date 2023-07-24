@@ -577,6 +577,14 @@
                 "issuing_state": "Issuing state",
                 "ref_number": "Ref number"
               }
+            },
+            "confidence-scores": {
+              "title": "Scores",
+              "labels": {
+                "document": "Document",
+                "extracted-data": "Extracted data",
+                "face-match": "Face match"
+              }
             }
           }
         },

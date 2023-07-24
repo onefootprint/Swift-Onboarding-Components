@@ -17,7 +17,7 @@ export type Document = {
   startedAt: string;
   status: IdDocStatus;
   uploads: DocumentUpload[];
-  documentScore: number;
-  selfieScore: number;
-  ocrConfidenceScore: number;
+  documentScore: number | null;
+  selfieScore: number | null;
+  ocrConfidenceScore: number | null;
 };
