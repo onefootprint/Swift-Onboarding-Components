@@ -776,7 +776,7 @@ table! {
         uvw_snapshot_seqno -> Int8,
         identity_document_id -> Nullable<Text>,
         scoped_vault_id -> Text,
-        decision_intent_id -> Nullable<Text>,
+        decision_intent_id -> Text,
     }
 }
 

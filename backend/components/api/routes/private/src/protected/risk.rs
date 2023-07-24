@@ -18,7 +18,8 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use newtypes::{
-    DecisionStatus, FpId, TenantId, VaultKind, Vendor, VerificationRequestId, VerificationResultId,
+    DecisionIntentId, DecisionStatus, FpId, TenantId, VaultKind, Vendor, VerificationRequestId,
+    VerificationResultId,
 };
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
@@ -275,7 +276,8 @@ async fn shadow_run(
                     uvw_snapshot_seqno: seqno,
                     identity_document_id: None,
                     scoped_vault_id: scoped_user.id.clone(),
-                    decision_intent_id: None,
+                    decision_intent_id: DecisionIntentId::from_str("fake in-memory-only DecisionIntent")
+                        .unwrap(),
                 })
                 .collect();
 

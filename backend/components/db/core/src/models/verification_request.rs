@@ -30,7 +30,7 @@ pub struct VerificationRequest {
     // could be multiple in the vault, seqno doesn't help us
     pub identity_document_id: Option<IdentityDocumentId>,
     pub scoped_vault_id: ScopedVaultId,
-    pub decision_intent_id: Option<DecisionIntentId>,
+    pub decision_intent_id: DecisionIntentId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -42,7 +42,7 @@ struct NewVerificationRequestRow {
     uvw_snapshot_seqno: DataLifetimeSeqno,
     identity_document_id: Option<IdentityDocumentId>,
     scoped_vault_id: ScopedVaultId,
-    decision_intent_id: Option<DecisionIntentId>,
+    decision_intent_id: DecisionIntentId,
 }
 
 pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
@@ -65,7 +65,7 @@ impl VerificationRequest {
                 uvw_snapshot_seqno: seqno,
                 identity_document_id: None,
                 scoped_vault_id: scoped_vault_id.clone(),
-                decision_intent_id: Some(decision_intent_id.clone()),
+                decision_intent_id: decision_intent_id.clone(),
             })
             .collect();
         let result = diesel::insert_into(verification_request::table)
@@ -144,7 +144,7 @@ impl VerificationRequest {
             uvw_snapshot_seqno: seqno,
             identity_document_id: Some(identity_document_id),
             scoped_vault_id,
-            decision_intent_id: Some(decision_intent_id.clone()),
+            decision_intent_id: decision_intent_id.clone(),
         };
         let result = diesel::insert_into(verification_request::table)
             .values(new_row)

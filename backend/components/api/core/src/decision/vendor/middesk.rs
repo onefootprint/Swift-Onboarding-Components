@@ -235,11 +235,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
 
         let vr = (self.state.create_business_vreq.clone(), vendor_response.clone());
         let sv_id = self.state.create_business_vreq.scoped_vault_id.clone();
-        let di_id = self
-            .state
-            .create_business_vreq
-            .decision_intent_id
-            .ok_or(DbError::ObjectNotFound)?;
+        let di_id = self.state.create_business_vreq.decision_intent_id;
         let middesk_request_id = self.middesk_request.id.clone();
         let (udpated_middesk_request, business_update_webhook_vreq) = db_pool
             .db_query(move |conn| -> ApiResult<_> {
@@ -286,10 +282,7 @@ impl MiddeskState<AwaitingBusinessUpdateWebhook> {
         let mr = middesk_response.clone();
         let has_tin_error = mr.has_tin_error();
         let sv_id = webhook_vreq.scoped_vault_id.clone();
-        let di_id = webhook_vreq
-            .decision_intent_id
-            .clone()
-            .ok_or(DbError::ObjectNotFound)?;
+        let di_id = webhook_vreq.decision_intent_id.clone();
 
         let middesk_request_id = self.middesk_request.id.clone();
         let (updated_middesk_request, vres, tin_retry_vreq) = db_pool
@@ -357,10 +350,7 @@ impl MiddeskState<AwaitingTinRetry> {
         let mr = middesk_response.clone();
         let webhook_vreq = self.state.tin_retry_vreq;
         let sv_id = webhook_vreq.scoped_vault_id.clone();
-        let di_id = webhook_vreq
-            .decision_intent_id
-            .clone()
-            .ok_or(DbError::ObjectNotFound)?;
+        let di_id = webhook_vreq.decision_intent_id.clone();
         let middesk_request_id = self.middesk_request.id.clone();
 
         let (updated_middesk_request, get_business_vreq) = db_pool
