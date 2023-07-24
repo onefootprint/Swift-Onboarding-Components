@@ -8,9 +8,9 @@ import React from 'react';
 import LinkButton from 'src/components/linking-button';
 
 import { isNavLink, isNavMenu, NavEntry } from '../../types';
-import LogoLink from '../logo-link';
 import DesktopNavLink from './components/desktop-nav-link';
 import DesktopNavMenu from './components/desktop-nav-menu';
+import LogoCopyAssets from './components/logo-copy-assets';
 
 type DesktopNavProps = {
   entries: NavEntry[];
@@ -22,7 +22,7 @@ const DesktopNav = ({ entries }: DesktopNavProps) => {
   return (
     <Container delayDuration={0}>
       <MainNav>
-        <LogoLink />
+        <LogoCopyAssets />
         {entries.map(entry => {
           if (isNavLink(entry)) {
             return <DesktopNavLink link={entry} key={entry.text} />;
@@ -64,9 +64,11 @@ const MainNav = styled(NavigationMenu.List)`
     ${createFontStyles('label-3')};
     align-items: center;
     display: flex;
+    position: relative;
     gap: ${theme.spacing[3]};
     justify-content: flex-start;
     width: 100%;
+    height: 100%;
   `}
 `;
 

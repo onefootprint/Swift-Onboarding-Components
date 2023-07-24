@@ -8,6 +8,11 @@
       "help": "Need help?",
       "dark-mode": "Dark mode"
     },
+    "save-assets": {
+      "logo": "Save full logo as .svg",
+      "isotype": "Save icon as .svg",
+      "aria-label": "Save logo"
+    },
     "header": {
       "request-early-access": "Request Early Access",
       "nav": {

@@ -1,12 +1,11 @@
-import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { LogoFpCompact } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, LinkButton, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 
 import type { LinkItem } from '../../app-header.types';
+import LogoCopyAssets from './components/logo-copy-assets';
 
 type DesktopNavProps = {
   links: LinkItem[];
@@ -19,15 +18,12 @@ const DesktopNav = ({ links }: DesktopNavProps) => {
     <Container>
       <Nav>
         <MainLinks>
-          <LogoLink href={FRONTPAGE_BASE_URL} aria-label={t('nav.home')}>
-            <LogoFpCompact />
-          </LogoLink>
-          <Divider />
+          <LogoCopyAssets />
+          <Line />
           <DocumentationLink href="/">
             {t('nav.documentation')}
           </DocumentationLink>
         </MainLinks>
-
         <>
           {links.map(({ href, Icon, text }) => (
             <LinkButton
@@ -46,6 +42,19 @@ const DesktopNav = ({ links }: DesktopNavProps) => {
   );
 };
 
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: none;
+
+    ${media.greaterThan('sm')`
+      display: flex;
+      height: var(--header-height);
+      padding: ${theme.spacing[4]} calc(${theme.spacing[7]} + ${theme.spacing[2]});
+      width: 100%;
+    `}
+  `};
+`;
+
 const DocumentationLink = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('body-3')}
@@ -61,46 +70,23 @@ const DocumentationLink = styled(Link)`
   `}
 `;
 
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: none;
-
-    ${media.greaterThan('sm')`
-      display: flex;
-      height: var(--header-height);
-      padding: ${theme.spacing[4]} calc(${theme.spacing[7]} + ${theme.spacing[2]});
-      width: 100%;
-    `}
-  `};
-`;
-
-const LogoLink = styled(Link)`
-  display: flex;
-  transition: opacity 0.2s ease-in-out;
-
-  @media (hover: hover) {
-    &:hover {
-      opacity: 0.8;
-    }
-  }
-`;
-
-const Divider = styled.div`
-  ${({ theme }) => css`
-    height: 100%;
-    width: 1px;
-    background-color: ${theme.borderColor.tertiary};
-    max-height: 20px;
-  `}
-`;
-
 const MainLinks = styled.div`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
     gap: ${theme.spacing[4]};
     position: relative;
+    flex: 1;
     height: 100%;
+  `};
+`;
+
+const Line = styled.div`
+  ${({ theme }) => css`
+    height: 100%;
+    width: 1px;
+    background-color: ${theme.borderColor.tertiary};
+    max-height: 20px;
   `};
 `;
 

@@ -55,6 +55,11 @@
       "logo": {
         "aria-label": "Go to Footprint's main page"
       },
+      "save-assets": {
+        "logo": "Save full logo as .svg",
+        "isotype": "Save icon as .svg",
+        "aria-label": "Save logo"
+      },
       "entries": {
         "compare": {
           "text": "Compare",
