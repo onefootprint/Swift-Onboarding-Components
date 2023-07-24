@@ -185,7 +185,7 @@ const useDecryptOptions = () => {
   ];
   const allOption = {
     value: DecryptOption.all,
-    label: t('scopes.decrypt_all'),
+    label: t('decrypt_all'),
   };
   return { options, allOption };
 };
