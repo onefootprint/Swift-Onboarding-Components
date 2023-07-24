@@ -97,6 +97,7 @@ pub async fn make_outstanding_kyc_vendor_calls(
     t_id: &TenantId,
 ) -> ApiResult<Vec<VendorResult>> {
     let svid = sv_id.clone();
+    let tid = t_id.clone();
     let vault = state
         .db_pool
         .db_query(move |conn| Vault::get(conn, &svid))
@@ -147,7 +148,12 @@ pub async fn make_outstanding_kyc_vendor_calls(
             .await?;
 
     if has_critical_error {
-        tracing::error!(errors = error_message, "VendorRequestsFailed");
+        tracing::error!(
+            errors = error_message,
+            scoped_vault_id = %sv_id,
+            tenant_id = %tid,
+            "VendorRequestsFailed"
+        );
         return Err(ApiErrorKind::VendorRequestsFailed)?;
     }
 
