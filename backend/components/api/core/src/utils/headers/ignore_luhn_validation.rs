@@ -8,10 +8,10 @@ use std::pin::Pin;
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize, Deref)]
 /// When value is "true," relaxes some card validation constraints when adding data to a vault
-pub struct IgnoreCardValidation(pub bool);
+pub struct IgnoreLuhnValidation(pub bool);
 
-impl IgnoreCardValidation {
-    const HEADER_NAME: &str = "x-fp-ignore-card-validation";
+impl IgnoreLuhnValidation {
+    const HEADER_NAME: &str = "x-fp-ignore-luhn-validation";
 
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
         let allow_extra_fields = get_header(Self::HEADER_NAME, headers)
@@ -21,12 +21,12 @@ impl IgnoreCardValidation {
     }
 }
 
-impl FromRequest for IgnoreCardValidation {
+impl FromRequest for IgnoreLuhnValidation {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
-        let headers = IgnoreCardValidation::parse_from_request(req.headers());
+        let headers = IgnoreLuhnValidation::parse_from_request(req.headers());
         Box::pin(async move { Ok(headers) })
     }
 }

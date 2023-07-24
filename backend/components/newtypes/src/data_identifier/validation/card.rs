@@ -78,7 +78,7 @@ fn validate_card_number(value: PiiString, args: ValidateArgs) -> VResult<PiiStri
                 // This exploits the fact that I know the card library does luhn validation after
                 // all other validations... Pretty fragile, but I don't want to fork the card
                 // library yet.
-                card_validate::ValidateError::InvalidLuhn if args.ignore_card_validation => None,
+                card_validate::ValidateError::InvalidLuhn if args.ignore_luhn_validation => None,
                 card_validate::ValidateError::InvalidLuhn => {
                     Some("Invalid checksum. Please verify that the number is correct".to_owned())
                 }
@@ -262,7 +262,7 @@ mod test {
         let alias = AliasId::from("flerp".to_owned());
         let args = ValidateArgs {
             for_bifrost: true,
-            ignore_card_validation: true,
+            ignore_luhn_validation: true,
             ..ValidateArgs::for_tests()
         };
         CI {

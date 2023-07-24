@@ -39,7 +39,7 @@ class ClientTokenAuth(BaseAuth):
 
 
 class IgnoreCardValidation(BaseAuth):
-    HEADER_NAME = "x-fp-ignore-card-validation"
+    HEADER_NAME = "x-fp-ignore-luhn-validation"
 
 
 class IsLive(BaseAuth):

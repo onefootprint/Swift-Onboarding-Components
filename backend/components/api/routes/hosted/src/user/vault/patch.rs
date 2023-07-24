@@ -26,7 +26,7 @@ pub async fn post_validate(
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let opts = ValidateArgs {
-        ignore_card_validation: false,
+        ignore_luhn_validation: false,
         for_bifrost: true,
         allow_dangling_keys: *allow_extra_fields,
         is_live: user_auth.scoped_user.is_live,

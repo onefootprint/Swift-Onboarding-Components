@@ -8,7 +8,7 @@ use crate::State;
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanVault;
 use api_core::errors::AssertionError;
-use api_core::utils::headers::IgnoreCardValidation;
+use api_core::utils::headers::IgnoreLuhnValidation;
 use api_core::utils::vault_wrapper::Any;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -42,13 +42,13 @@ pub async fn patch(
     request: Json<RawDataRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
-    ignore_card_validation: IgnoreCardValidation,
+    ignore_luhn_validation: IgnoreLuhnValidation,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
     let path = path.into_inner();
     let request = request.into_inner();
-    let result = patch_inner(&state, path, request, auth, insight, *ignore_card_validation).await?;
+    let result = patch_inner(&state, path, request, auth, insight, *ignore_luhn_validation).await?;
     Ok(result)
 }
 
@@ -85,7 +85,7 @@ async fn patch_inner(
     request: RawDataRequest,
     auth: Box<dyn TenantAuth>,
     insight: InsightHeaders,
-    ignore_card_validation: bool,
+    ignore_luhn_validation: bool,
 ) -> JsonApiResponse<EmptyResponse> {
     let insight = CreateInsightEvent::from(insight);
 
@@ -129,7 +129,7 @@ async fn patch_inner(
     }
     let targets = request.keys().cloned().collect_vec();
     let mut args = ValidateArgs::for_non_portable(is_live);
-    args.ignore_card_validation = ignore_card_validation;
+    args.ignore_luhn_validation = ignore_luhn_validation;
     let request = request.clean_and_validate(args)?;
     let request = request.build_tenant_fingerprints(state, &tenant_id).await?;
 

@@ -53,7 +53,7 @@ pub struct ValidateArgs {
     /// Useful to allow speculatively validating data for a partial CDO
     pub allow_dangling_keys: bool,
     /// Don't raise errors for card validation problems
-    pub ignore_card_validation: bool,
+    pub ignore_luhn_validation: bool,
     /// When true, validates as production data. When false, validates as sandbox data
     pub is_live: bool,
 }
@@ -61,7 +61,7 @@ pub struct ValidateArgs {
 impl ValidateArgs {
     pub fn for_bifrost(is_live: bool) -> Self {
         Self {
-            ignore_card_validation: false,
+            ignore_luhn_validation: false,
             for_bifrost: true,
             allow_dangling_keys: false,
             is_live,
@@ -70,7 +70,7 @@ impl ValidateArgs {
 
     pub fn for_non_portable(is_live: bool) -> Self {
         Self {
-            ignore_card_validation: false,
+            ignore_luhn_validation: false,
             for_bifrost: false,
             allow_dangling_keys: true,
             is_live,
@@ -82,7 +82,7 @@ impl ValidateArgs {
 impl ValidateArgs {
     pub fn for_tests() -> Self {
         Self {
-            ignore_card_validation: false,
+            ignore_luhn_validation: false,
             for_bifrost: false,
             allow_dangling_keys: false,
             is_live: true,
