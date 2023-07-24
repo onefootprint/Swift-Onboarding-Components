@@ -201,4 +201,5 @@ export type FootprintUserData = Partial<{
 
 export type FootprintOptions = {
   showCompletionPage?: boolean;
+  showLogo?: boolean;
 };
