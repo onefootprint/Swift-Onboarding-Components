@@ -20,6 +20,8 @@ import airplane from 'airplane';
 
 // Views documentation: https://docs.airplane.dev/views/getting-started
 const Stats = () => {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   return (
     <Stack>
       <Stack direction="row">
@@ -62,7 +64,7 @@ const Stats = () => {
         <GraphCard
           title={'Not (yet) Portable IDs this week'}
           query={`
-          SELECT to_char(scoped_vault.start_timestamp, 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
+          SELECT to_char(scoped_vault.start_timestamp at time zone 'utc' at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
           INNER JOIN vault on scoped_vault.vault_id = vault.id
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
           WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
