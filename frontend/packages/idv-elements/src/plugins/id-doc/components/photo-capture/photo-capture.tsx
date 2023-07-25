@@ -13,7 +13,7 @@ type PhotoCaptureProps = {
   outlineHeightRatio: number; // with respect to the video width (not height)
   cameraKind: CameraKind;
   outlineKind: OutlineKind;
-  onComplete: (imageString: string) => void;
+  onComplete: (imageString: string, mimeType: string) => void;
   autocaptureKind: AutocaptureKind;
 };
 
@@ -41,13 +41,15 @@ const PhotoCapture = ({
     }
 
     setIsLoading(true);
-    const processedImageFile = await processImageUrl(image);
-    if (!processedImageFile) {
+    const processingResult = await processImageUrl(image);
+    if (!processingResult) {
       // An error occurred, directly prompt user to re-take the image
       setIsLoading(false);
       handleRetake();
       return;
     }
+
+    const { processedImageFile, mimeType } = processingResult;
 
     const imageString = await convertImageFileToStrippedBase64(
       processedImageFile,
@@ -59,7 +61,7 @@ const PhotoCapture = ({
     }
 
     setIsLoading(false);
-    onComplete(imageString);
+    onComplete(imageString, mimeType);
   };
 
   const handleError = () => {

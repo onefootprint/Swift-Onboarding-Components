@@ -12,12 +12,6 @@ import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import RetryLimitExceeded from './components/retry-limit-exceeded';
 import useSubmitDoc from './hooks/use-submit-doc';
 
-const imageRequestFields = {
-  [IdDocImageTypes.front]: 'frontImage',
-  [IdDocImageTypes.back]: 'backImage',
-  [IdDocImageTypes.selfie]: 'selfieImage',
-};
-
 const Processing = () => {
   const { t } = useTranslation('pages.processing');
   const [state, send] = useIdDocMachine();
@@ -32,6 +26,7 @@ const Processing = () => {
     image,
     authToken,
     currSide,
+    id,
   } = state.context;
 
   const handleSubmitDocSuccess = (data: SubmitDocResponse) => {
@@ -67,17 +62,20 @@ const Processing = () => {
   };
 
   useEffectOnce(() => {
-    if (!image || !authToken || !type || !country || !currSide) {
+    if (!image || !authToken || !type || !country || !currSide || !id) {
       setIsMissingRequirements(true);
       return;
     }
 
+    const { imageString, mimeType } = image;
+
     submitDocMutation.mutate(
       {
-        [imageRequestFields[currSide]]: image,
         authToken,
-        documentType: type,
-        countryCode: country,
+        image: imageString,
+        mimeType,
+        side: currSide,
+        id,
       },
       {
         onSuccess: handleSubmitDocSuccess,

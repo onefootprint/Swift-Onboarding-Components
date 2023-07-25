@@ -25,11 +25,12 @@ const BackPhotoCapture = () => {
 
   if (!docType) return null;
 
-  const onComplete = (imageString: string) =>
+  const onComplete = (imageString: string, mimeType: string) =>
     send({
       type: 'receivedImage',
       payload: {
-        image: imageString,
+        imageString,
+        mimeType,
       },
     });
 

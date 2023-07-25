@@ -13,6 +13,8 @@ enum ImageProcessingStepError {
   other = 'Unknown Error',
 }
 
+type ProcessedImageType = { processedImageFile: File; mimeType: string };
+
 const useProcessImage = () => {
   const toast = useToast();
 
@@ -32,7 +34,9 @@ const useProcessImage = () => {
     return output;
   };
 
-  const processImageUrl = async (url: string): Promise<File | undefined> => {
+  const processImageUrl = async (
+    url: string,
+  ): Promise<ProcessedImageType | undefined> => {
     let file;
     try {
       file = await imageCompression.getFilefromDataUrl(url, 'imageFileName');
@@ -50,7 +54,7 @@ const useProcessImage = () => {
 
   const runProcessFileScript = async (
     file: File,
-  ): Promise<File | undefined> => {
+  ): Promise<ProcessedImageType | undefined> => {
     let converted;
     try {
       converted = await convertHEICImage(file);
@@ -62,6 +66,8 @@ const useProcessImage = () => {
       handleError(ImageProcessingStepError.heic);
       return undefined;
     }
+
+    const mimeType = converted.type;
 
     let resized;
     try {
@@ -87,7 +93,10 @@ const useProcessImage = () => {
       return undefined;
     }
 
-    return compressed;
+    return {
+      processedImageFile: compressed,
+      mimeType,
+    };
   };
 
   const convertImageFileToStrippedBase64 = async (

@@ -34,11 +34,13 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
       return;
     }
 
-    const processedImageFile = await processImageFile(files[0]);
-    if (!processedImageFile) {
+    const processingResult = await processImageFile(files[0]);
+    if (!processingResult) {
       onProcessingDone();
       return;
     }
+
+    const { processedImageFile, mimeType } = processingResult;
 
     const imageString = await convertImageFileToStrippedBase64(
       processedImageFile,
@@ -51,7 +53,8 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
     send({
       type: 'receivedImage',
       payload: {
-        image: imageString,
+        imageString,
+        mimeType,
       },
     });
     onProcessingDone();

@@ -17,11 +17,12 @@ const IdDocFrontPhotoRetry = () => {
 
   const countryName = getCountryFromCode(country)?.label;
 
-  const handleComplete = (image: string) => {
+  const handleComplete = (imageString: string, mimeType: string) => {
     send({
       type: 'receivedImage',
       payload: {
-        image,
+        imageString,
+        mimeType,
       },
     });
   };

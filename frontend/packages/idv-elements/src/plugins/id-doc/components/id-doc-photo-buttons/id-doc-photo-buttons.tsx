@@ -7,7 +7,7 @@ import useProcessImage from '../../hooks/use-process-image';
 import { useIdDocMachine } from '../machine-provider';
 
 type IdDocPhotoButtonsProp = {
-  onComplete: (image: string) => void;
+  onComplete: (imageString: string, mimeType: string) => void;
 };
 
 const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
@@ -35,11 +35,13 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
       return;
     }
 
-    const processedImageFile = await processImageFile(files[0]);
-    if (!processedImageFile) {
+    const processingResult = await processImageFile(files[0]);
+    if (!processingResult) {
       onProcessingDone();
       return;
     }
+
+    const { processedImageFile, mimeType } = processingResult;
 
     const imageString = await convertImageFileToStrippedBase64(
       processedImageFile,
@@ -49,7 +51,7 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
       return;
     }
 
-    onComplete(imageString);
+    onComplete(imageString, mimeType);
     onProcessingDone();
   };
 

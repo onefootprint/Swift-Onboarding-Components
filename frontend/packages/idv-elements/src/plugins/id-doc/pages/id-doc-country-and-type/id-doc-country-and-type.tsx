@@ -3,7 +3,7 @@ import {
   CountryRecord,
   DEFAULT_COUNTRY,
 } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import {
   IcoCar24,
   IcoIdCard24,
@@ -11,7 +11,7 @@ import {
   IcoPassport24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { IdDocType } from '@onefootprint/types';
+import { IdDocType, SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import {
   Button,
@@ -28,13 +28,18 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useIdDocMachine } from '../../components/machine-provider';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
+import idDocTypeToSupportedType from '../../utils/id-doc-type-to-supported-type';
 import supportedTypeToIdDocType from '../../utils/supported-type-to-doc-type';
+import useSubmitDocType from './hooks/use-submit-doc-type';
 import IdDocTypesByCountry from './id-doc-types-by-country.constants';
 
 const IdDocCountryAndType = () => {
   const { t } = useTranslation('pages.country-and-type-selection');
   const [state, send] = useIdDocMachine();
-  const { country: defaultCountry, type: defaultType } = state.context.idDoc;
+  const submitDocTypeMutation = useSubmitDocType();
+  const { idDoc: defaultCountryDoc, authToken } = state.context;
+  const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
+  const requestErrorToast = useRequestErrorToast();
   const [country, setCountry] = useState<CountryRecord>(
     getCountryFromCode(defaultCountry) ?? DEFAULT_COUNTRY,
   );
@@ -74,15 +79,33 @@ const IdDocCountryAndType = () => {
     setDocType(value as IdDocType);
   };
 
-  const handleSubmit = () => {
+  const handleSubmitDocTypeSuccess = (data: SubmitDocTypeResponse) => {
+    const { id } = data;
     send({
       type: 'receivedCountryAndType',
       payload: {
         type: docType,
         country:
           getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value,
+        id,
       },
     });
+  };
+
+  const handleSubmit = () => {
+    const selectedCountry =
+      getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value;
+    submitDocTypeMutation.mutate(
+      {
+        authToken,
+        documentType: idDocTypeToSupportedType[docType],
+        countryCode: selectedCountry,
+      },
+      {
+        onSuccess: handleSubmitDocTypeSuccess,
+        onError: requestErrorToast,
+      },
+    );
   };
 
   const optionByDocType: { [key in IdDocType]?: RadioSelectOptionFields } = {};

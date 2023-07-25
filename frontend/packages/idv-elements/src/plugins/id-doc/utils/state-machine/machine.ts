@@ -37,7 +37,7 @@ const createIdDocMachine = (args: MachineContext) =>
           on: {
             receivedCountryAndType: {
               target: 'frontImage',
-              actions: 'assignCountryAndType',
+              actions: ['assignCountryAndType', 'assignId'],
             },
           },
         },
@@ -193,8 +193,15 @@ const createIdDocMachine = (args: MachineContext) =>
           };
           return context;
         }),
+        assignId: assign((context, event) => {
+          context.id = event.payload.id;
+          return context;
+        }),
         assignImage: assign((context, event) => {
-          context.image = event.payload.image;
+          context.image = {
+            imageString: event.payload.imageString,
+            mimeType: event.payload.mimeType,
+          };
           return context;
         }),
         assignIdDocImageErrors: assign((context, event) => {

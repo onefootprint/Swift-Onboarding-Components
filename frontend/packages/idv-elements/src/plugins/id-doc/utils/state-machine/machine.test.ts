@@ -53,6 +53,7 @@ describe('Id Doc Machine Tests', () => {
         payload: {
           type: IdDocType.driversLicense,
           country: 'US',
+          id: 'id',
         },
       });
       expect(state.value).toEqual('frontImage');
@@ -70,6 +71,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
         {
@@ -84,12 +86,16 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
       ]);
       expect(state.value).toEqual('processing');
-      expect(state.context.image).toEqual('image');
+      expect(state.context.image).toEqual({
+        imageString: 'image',
+        mimeType: 'image/png',
+      });
 
       state = machine.send({
         type: 'processingSucceeded',
@@ -109,12 +115,16 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
       ]);
       expect(state.value).toEqual('processing');
-      expect(state.context.image).toEqual('image');
+      expect(state.context.image).toEqual({
+        imageString: 'image',
+        mimeType: 'image/png',
+      });
 
       state = machine.send({
         type: 'processingSucceeded',
@@ -133,12 +143,16 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
       ]);
       expect(state.value).toEqual('processing');
-      expect(state.context.image).toEqual('image');
+      expect(state.context.image).toEqual({
+        imageString: 'image',
+        mimeType: 'image/png',
+      });
 
       state = machine.send({
         type: 'processingSucceeded',
@@ -161,6 +175,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
 
@@ -173,12 +188,16 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
       ]);
       expect(state.value).toEqual('processing');
-      expect(state.context.image).toEqual('image');
+      expect(state.context.image).toEqual({
+        imageString: 'image',
+        mimeType: 'image/png',
+      });
     });
 
     it('Can take back image using inline camera and upload', () => {
@@ -191,6 +210,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
         {
@@ -202,7 +222,8 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
         {
@@ -217,12 +238,16 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
       ]);
       expect(state.value).toEqual('processing');
-      expect(state.context.image).toEqual('image');
+      expect(state.context.image).toEqual({
+        imageString: 'image',
+        mimeType: 'image/png',
+      });
     });
 
     it('Can retry image upload when processing fails and update errors', () => {
@@ -235,6 +260,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
         {
@@ -243,7 +269,8 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
         {
@@ -260,7 +287,8 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
         {
@@ -284,6 +312,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
         {
@@ -292,7 +321,8 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
         {
@@ -315,6 +345,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
         {
@@ -323,7 +354,8 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
         {
@@ -346,6 +378,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
         {
@@ -371,6 +404,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
         {
@@ -379,7 +413,8 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
         {
@@ -408,6 +443,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
         {
@@ -416,7 +452,8 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
         {
@@ -450,6 +487,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
         {
@@ -481,12 +519,14 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             type: IdDocType.driversLicense,
             country: 'US',
+            id: 'id',
           },
         },
         {
           type: 'receivedImage',
           payload: {
-            image: 'image',
+            imageString: 'image',
+            mimeType: 'image/png',
           },
         },
         {

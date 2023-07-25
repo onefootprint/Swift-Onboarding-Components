@@ -12,12 +12,13 @@ export type MachineContext = {
   authToken: string;
   device: DeviceInfo;
   requirement: IdDocRequirement;
-  image?: string;
+  image?: { imageString: string; mimeType: string };
   currSide?: IdDocImageTypes;
   idDoc: {
     type?: IdDocType;
     country?: CountryCode;
   };
+  id?: string;
   errors?: IdDocImageError[];
 };
 
@@ -34,12 +35,14 @@ export type MachineEvents =
       payload: {
         type?: IdDocType;
         country?: CountryCode;
+        id: string;
       };
     }
   | {
       type: 'receivedImage';
       payload: {
-        image: string;
+        imageString: string;
+        mimeType: string;
       };
     }
   | {

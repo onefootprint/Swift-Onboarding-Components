@@ -1,17 +1,11 @@
-import {
-  CountryCode,
-  IdDocImageError,
-  IdDocImageTypes,
-  IdDocType,
-} from '../data';
+import { IdDocImageError, IdDocImageTypes } from '../data';
 
 export type SubmitDocRequest = {
   authToken: string;
-  frontImage?: string;
-  backImage?: string;
-  selfieImage?: string;
-  documentType: IdDocType;
-  countryCode: CountryCode;
+  image: string;
+  side: string;
+  mimeType: string;
+  id: string;
 };
 
 export type SubmitDocResponse = {
