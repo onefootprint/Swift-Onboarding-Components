@@ -7,7 +7,7 @@ mod config;
 pub use self::config::Config;
 
 use crate::enclave::{
-    handle_decrypt, handle_decrypt_then_hmac_sign, handle_fn_decrypt, handle_generate_data_keypair,
+    handle_decrypt, handle_decrypt_then_hmac_sign, handle_generate_data_keypair,
     handle_generate_symmetric_data_key, handle_hmac_sign, init as init_enclave_sdk,
 };
 
@@ -174,9 +174,6 @@ async fn handle_request(request: RpcPayload) -> Result<EnclavePayload, Box<dyn s
         }
         RpcPayload::Decrypt(decrypt_request) => {
             EnclavePayload::Decryption(handle_decrypt(decrypt_request).await?)
-        }
-        RpcPayload::FnDecrypt(decrypt_request) => {
-            EnclavePayload::FnDecryption(handle_fn_decrypt(decrypt_request).await?)
         }
         RpcPayload::DecryptThenHmacSign(decrypt_then_sign_request) => {
             EnclavePayload::HmacSignature(handle_decrypt_then_hmac_sign(decrypt_then_sign_request).await?)

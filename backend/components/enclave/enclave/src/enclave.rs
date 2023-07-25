@@ -4,9 +4,9 @@ use crypto::{
 use once_cell::sync::Lazy;
 use rpc::{
     DataTransformer, DataTransforms, DecryptThenSignRequest, EnvelopeDecryptThenHmacSignRequest,
-    EnvelopeFnDecryptRequest, EnvelopeHmacSignRequest, GenerateDataKeypairRequest,
-    GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair, GeneratedSealedDataKey, HmacSignature,
-    HmacSignatureSingle, SealedIkek, SealedIkekId, SignRequest,
+    EnvelopeHmacSignRequest, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
+    GeneratedDataKeyPair, GeneratedSealedDataKey, HmacSignature, HmacSignatureSingle, SealedIkek,
+    SealedIkekId, SignRequest,
 };
 use std::collections::HashMap;
 use thiserror::Error;
@@ -18,7 +18,7 @@ mod simulated;
 #[cfg(feature = "nitro")]
 mod ne;
 
-use crate::{log_info_t, EnvelopeDecryptRequest, FnDecryption, FnDecryptionSingle, KmsCredentials};
+use crate::{log_info_t, Decryption, DecryptionSingle, EnvelopeDecryptRequest, KmsCredentials};
 
 /// init the enclave sdk if needed
 pub fn init() {
@@ -151,38 +151,7 @@ pub async fn handle_generate_symmetric_data_key(
     Ok(GeneratedSealedDataKey { sealed_key })
 }
 
-pub async fn handle_fn_decrypt(request: EnvelopeFnDecryptRequest) -> Result<FnDecryption, Error> {
-    let EnvelopeFnDecryptRequest {
-        kms_creds,
-        sealed_key,
-        requests,
-        sealed_ikek,
-    } = request;
-
-    let ikek = load_ikek(kms_creds, sealed_ikek).await?;
-
-    let data_private_key = ikek.key.unseal_bytes(sealed_key)?;
-
-    let results: Vec<FnDecryptionSingle> = requests
-        .into_iter()
-        .map(|r| {
-            let result = crypto::seal::unseal::unseal_ecies_p256_x963_sha256_aes_gcm(
-                &data_private_key,
-                r.sealed_data.clone(),
-            )?;
-            let transforms = DataTransforms(r.transforms);
-            Ok(FnDecryptionSingle {
-                data: transforms.apply(result.0)?,
-            })
-        })
-        .collect::<Result<Vec<FnDecryptionSingle>, Error>>()?;
-
-    log_info_t("unsealed ciphertext(s)");
-
-    Ok(FnDecryption { results })
-}
-
-pub async fn handle_decrypt(request: EnvelopeDecryptRequest) -> Result<FnDecryption, Error> {
+pub async fn handle_decrypt(request: EnvelopeDecryptRequest) -> Result<Decryption, Error> {
     let EnvelopeDecryptRequest {
         kms_creds,
         requests,
@@ -190,7 +159,7 @@ pub async fn handle_decrypt(request: EnvelopeDecryptRequest) -> Result<FnDecrypt
     } = request;
 
     let ikek = load_ikek(kms_creds, sealed_ikek).await?;
-    let results: Vec<FnDecryptionSingle> = requests
+    let results: Vec<DecryptionSingle> = requests
         .into_iter()
         .map(|r| {
             let data_private_key = ikek.key.unseal_bytes(r.sealed_key)?;
@@ -199,15 +168,15 @@ pub async fn handle_decrypt(request: EnvelopeDecryptRequest) -> Result<FnDecrypt
                 r.sealed_data.clone(),
             )?;
             let transforms = DataTransforms(r.transforms);
-            Ok(FnDecryptionSingle {
+            Ok(DecryptionSingle {
                 data: transforms.apply(result.0)?,
             })
         })
-        .collect::<Result<Vec<FnDecryptionSingle>, Error>>()?;
+        .collect::<Result<Vec<DecryptionSingle>, Error>>()?;
 
     log_info_t("unsealed ciphertext(s)");
 
-    Ok(FnDecryption { results })
+    Ok(Decryption { results })
 }
 
 pub async fn handle_hmac_sign(request: EnvelopeHmacSignRequest) -> Result<HmacSignature, Error> {

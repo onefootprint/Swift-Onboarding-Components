@@ -17,8 +17,7 @@ pub enum EnclavePayload {
     Pong(String),
     GenerateDataKeyPair(GeneratedDataKeyPair),
     GenerateSymmetricDataKey(GeneratedSealedDataKey),
-    FnDecryption(FnDecryption),
-    Decryption(FnDecryption),
+    Decryption(Decryption),
     HmacSignature(HmacSignature),
     Ok,
     Error(String),
@@ -31,13 +30,11 @@ impl EnclavePayload {
     }
 }
 
-impl TryFrom<EnclavePayload> for FnDecryption {
+impl TryFrom<EnclavePayload> for Decryption {
     type Error = crate::Error;
 
     fn try_from(value: EnclavePayload) -> Result<Self, Self::Error> {
-        if let EnclavePayload::FnDecryption(r) = value {
-            Ok(r)
-        } else if let EnclavePayload::Decryption(r) = value {
+        if let EnclavePayload::Decryption(r) = value {
             Ok(r)
         } else if let EnclavePayload::Error(error) = value {
             Err(crate::Error::EnclaveError(error))
@@ -97,16 +94,16 @@ pub struct GeneratedDataKeyPair {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub struct FnDecryption {
-    pub results: Vec<FnDecryptionSingle>,
+pub struct Decryption {
+    pub results: Vec<DecryptionSingle>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub struct FnDecryptionSingle {
+pub struct DecryptionSingle {
     pub data: Vec<u8>,
 }
-impl Debug for FnDecryptionSingle {
+impl Debug for DecryptionSingle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("FnDecryptionSingle")
             .field("data", &"<omitted>")

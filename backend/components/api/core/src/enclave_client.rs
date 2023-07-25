@@ -4,9 +4,9 @@ use crypto::{
     seal::EciesP256Sha256AesGcmSealed,
 };
 use enclave_proxy::{
-    http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, DecryptThenSignRequest,
+    http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, DecryptThenSignRequest, Decryption,
     EnclavePayload, EnvelopeDecryptRequest, EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest,
-    FnDecryption, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
+    GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
     GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing,
     SignRequest, Signing,
 };
@@ -216,7 +216,7 @@ impl EnclaveClient {
         }));
 
         let response = self.send(req).await?;
-        let response = FnDecryption::try_from(response)?;
+        let response = Decryption::try_from(response)?;
         if response.results.len() != num_requests {
             return Err(EnclaveError::InvalidEnclaveDecryptResponse);
         }
