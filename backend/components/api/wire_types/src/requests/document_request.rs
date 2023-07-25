@@ -18,6 +18,7 @@ pub struct DocumentRequest {
     pub document_type: IdDocKind,
     /// country of document
     pub country_code: String, // TODO this should be an enum
+    pub fixture_result: Option<IdentityDocumentFixtureResult>,
 }
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]

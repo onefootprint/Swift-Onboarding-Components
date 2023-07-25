@@ -348,7 +348,7 @@ pub async fn mock_incode_doc_collection(
                 &scoped_vault_id,
                 &vault,
                 serde_json::to_value(
-                    idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE().unwrap(),
+                    idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE(None).unwrap(),
                 )
                 .unwrap(),
                 VendorAPI::IncodeFetchScores,

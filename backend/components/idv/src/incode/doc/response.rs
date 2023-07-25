@@ -7,7 +7,8 @@ use crate::{
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use newtypes::{
     incode::{IncodeDocumentType, IncodeStatus, IncodeTest},
-    IncodeFailureReason, IncodeVerificationSessionKind, PiiString, ScrubbedPiiString,
+    IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind, PiiString,
+    ScrubbedPiiString,
 };
 
 /// Response we get back from adding a document image
@@ -149,9 +150,21 @@ impl FetchScoresResponse {
     }
 
     #[allow(non_snake_case)]
-    pub fn TEST_ONLY_FIXTURE() -> Result<Self, IncodeError> {
-        let resp: Self =
-            serde_json::from_value(test_fixtures::incode_fetch_scores_response(DocTestOpts::default()))?;
+    pub fn TEST_ONLY_FIXTURE(fixture: Option<IdentityDocumentFixtureResult>) -> Result<Self, IncodeError> {
+        let doc_opts = if let Some(f) = fixture {
+            match f {
+                IdentityDocumentFixtureResult::Fail => DocTestOpts {
+                    overall: IncodeStatus::Fail,
+                    tamper: IncodeStatus::Fail,
+                    fake: IncodeStatus::Fail,
+                    ..Default::default()
+                },
+                IdentityDocumentFixtureResult::Pass => DocTestOpts::default(),
+            }
+        } else {
+            DocTestOpts::default()
+        };
+        let resp: Self = serde_json::from_value(test_fixtures::incode_fetch_scores_response(doc_opts))?;
 
         Ok(resp)
     }
@@ -382,8 +395,8 @@ impl FetchOCRResponse {
         last_name: Option<PiiString>,
         dob: Option<i64>,
     ) -> serde_json::Value {
-        let first_name = first_name.unwrap_or(PiiString::from("Bobby"));
-        let last_name = last_name.unwrap_or(PiiString::from("Bobierto"));
+        let first_name = first_name.unwrap_or(PiiString::from("Piip"));
+        let last_name = last_name.unwrap_or(PiiString::from("Penguin"));
         let full_name = format!("{} {}", first_name.leak(), last_name.leak());
         let dob = dob.unwrap_or(529873860000);
 

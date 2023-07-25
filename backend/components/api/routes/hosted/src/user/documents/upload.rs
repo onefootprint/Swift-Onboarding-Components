@@ -150,6 +150,7 @@ pub async fn post(
                 Some((decision_intent, doc_request, id_doc.id))
             } else {
                 if missing_sides.is_empty() {
+                    let fixture = id_doc.fixture_result;
                     // Create fixture data once all of the sides are uploaded
                     let ocr = serde_json::from_value(
                         idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None),
@@ -157,8 +158,8 @@ pub async fn post(
 
                     // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals
                     let fake_score_response =
-                        idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE().unwrap();
-                    let res = serde_json::to_value(fake_score_response)?;
+                        idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE(fixture).unwrap();
+                    let res = serde_json::to_value(fake_score_response.clone())?;
                     let vres = save_vres_for_fixture_risk_signals(conn, &su_id, &vault2, &wf_id, res)?;
 
                     // Enter the complete state
@@ -169,8 +170,7 @@ pub async fn post(
                         &id_doc.id,
                         id_doc.document_type,
                         ocr,
-                        // TODO: support fixture decision!
-                        idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE().unwrap(),
+                        fake_score_response,
                         IncodeOcrComparisonDataFields::default(),
                         doc_request.should_collect_selfie,
                         vres.id.clone(),
