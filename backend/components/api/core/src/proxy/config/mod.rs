@@ -9,6 +9,7 @@ use url::Url;
 use crate::{
     api_headers_schema,
     auth::tenant::TenantAuth,
+    enclave_client::DecryptReq,
     errors::{proxy::VaultProxyError, ApiError, ApiResult},
     State,
 };
@@ -238,11 +239,14 @@ impl ProxyConfig {
             .chain({
                 let secret_header_values = secret_headers
                     .iter()
-                    .map(|sh| (sh.name.clone(), &sh.e_data, vec![]))
+                    .map(|sh| {
+                        let req = DecryptReq(&auth.tenant().e_private_key, &sh.e_data, vec![]);
+                        (sh.name.clone(), req)
+                    })
                     .collect();
                 state
                     .enclave_client
-                    .batch_decrypt_to_piistring(secret_header_values, &auth.tenant().e_private_key)
+                    .batch_decrypt_to_piistring(secret_header_values)
                     .await?
                     .into_iter()
             });

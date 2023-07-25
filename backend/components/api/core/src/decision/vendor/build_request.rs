@@ -79,10 +79,10 @@ async fn decrypt_documents(
     enclave_client: &EnclaveClient,
     images: Vec<DocumentUpload>,
 ) -> ApiResult<HashMap<DocumentSide, PiiBytes>> {
-    let (sides, docs): (Vec<_>, _) = images.iter().map(|u| (u.side, (&u.e_data_key, &u.s3_url))).unzip();
+    let (sides, docs): (Vec<_>, _) = images.iter().map(|u| (u.side, (e_private_key, &u.e_data_key, &u.s3_url))).unzip();
 
     let decrypted_documents = enclave_client
-        .batch_decrypt_documents(e_private_key, docs)
+        .batch_decrypt_documents(docs)
         .await?;
 
     let results = sides.into_iter().zip(decrypted_documents).collect();

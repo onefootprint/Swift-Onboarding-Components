@@ -2,7 +2,6 @@ use std::slice;
 
 use crate::{enclave_client::EnclaveClient, errors::ApiError};
 use chrono::Utc;
-use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::{
     models::{
         verification_request::VerificationRequest,
@@ -102,16 +101,13 @@ pub async fn decrypt_verification_result_response(
     sealed_data: Vec<SealedVaultBytes>, // sealed vault bytes
     sealed_key: &EncryptedVaultPrivateKey,
 ) -> Result<Vec<PiiJsonValue>, ApiError> {
-    let sealed_data: Vec<_> = sealed_data
+    let sealed_data = sealed_data
         .iter()
-        .map(|b| EciesP256Sha256AesGcmSealed::from_bytes(b.as_ref()))
-        .collect::<Result<_, _>>()?;
+        .map(|sealed| (sealed_key, sealed, vec![]))
+        .collect();
 
     enclave_client
-        .batch_decrypt_to_piibytes(
-            sealed_data.into_iter().map(|sealed| (sealed, vec![])).collect(),
-            sealed_key,
-        )
+        .batch_decrypt_to_piibytes(sealed_data)
         .await?
         .into_iter()
         .map(|b| PiiJsonValue::try_from(b).map_err(ApiError::from))

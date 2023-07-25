@@ -1,6 +1,6 @@
 use super::super::VaultWrapper;
 use super::{DecryptUncheckedResult, EnclaveDecryptOperation, Pii};
-use crate::enclave_client::EnclaveClient;
+use crate::enclave_client::{DecryptReq, EnclaveClient};
 use crate::errors::ApiResult;
 use db::VaultedData;
 use either::Either;
@@ -102,9 +102,10 @@ impl<Type> VaultWrapper<Type> {
         let (p_data, e_data): (Vec<_>, Vec<_>) = datas.into_iter().partition_map(|(d, op)| match d {
             VaultedData::NonPrivate(p_data) => Either::Left((p_data, op)),
             VaultedData::Sealed(e_data) => Either::Right(Either::Left((e_data, op))),
-            VaultedData::LargeSealed(s3_url, e_data_key) => {
-                Either::Right(Either::Right(((e_data_key, s3_url), op)))
-            }
+            VaultedData::LargeSealed(s3_url, e_data_key) => Either::Right(Either::Right((
+                (&self.vault.e_private_key, e_data_key, s3_url),
+                op,
+            ))),
         });
         let (e_data, e_large_data): (Vec<_>, Vec<_>) = e_data.into_iter().partition_map(|x| x);
 
@@ -127,11 +128,14 @@ impl<Type> VaultWrapper<Type> {
         } else {
             let data_to_decrypt = e_data
                 .into_iter()
-                .map(|(e_data, op)| (op.clone(), e_data, op.transforms))
+                .map(|(e_data, op)| {
+                    let req = DecryptReq(&self.vault.e_private_key, e_data, op.transforms.clone());
+                    (op, req)
+                })
                 .collect();
             // decrypt remaining e_data
             enclave_client
-                .batch_decrypt_to_piistring(data_to_decrypt, &self.vault.e_private_key)
+                .batch_decrypt_to_piistring(data_to_decrypt)
                 .await?
                 .into_iter()
                 .map(|(k, v)| (k, Pii::String(v)))
@@ -143,9 +147,8 @@ impl<Type> VaultWrapper<Type> {
             HashMap::new() // short-circuit to avoid network requests
         } else {
             let (document_datas, operations): (Vec<_>, Vec<_>) = e_large_data.into_iter().unzip();
-            let decrypted_documents: Vec<PiiBytes> = enclave_client
-                .batch_decrypt_documents(&self.vault.e_private_key, document_datas)
-                .await?;
+            let decrypted_documents: Vec<PiiBytes> =
+                enclave_client.batch_decrypt_documents(document_datas).await?;
 
             // Zip operations back with the decrypted documents, which are returned in order
             operations
