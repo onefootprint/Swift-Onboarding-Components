@@ -5,14 +5,13 @@ use db::models::{
     insight_event::CreateInsightEvent,
 };
 use enclave_proxy::DataTransform;
+use futures_util::StreamExt;
 use itertools::Itertools;
-use newtypes::{AccessEventKind, DataIdentifier, DbActor, FpId, PiiString};
+use newtypes::{AccessEventKind, DataIdentifier, DbActor, FpId, PiiString, ScopedVaultId, TenantId};
 
 use crate::{
-    errors::{ApiResult, AssertionError},
-    utils::vault_wrapper::{
-        batch_execute_decrypt_requests, decrypt::EnclaveDecryptOperation, Any, DecryptUncheckedResult,
-    },
+    errors::ApiResult,
+    utils::vault_wrapper::{decrypt::EnclaveDecryptOperation, Any, DecryptUncheckedResult},
     State,
 };
 
@@ -21,6 +20,13 @@ use super::TenantVw;
 pub struct BulkDecryptReq<T = Any> {
     pub vw: TenantVw<T>,
     pub targets: Vec<(DataIdentifier, Vec<DataTransform>)>,
+}
+
+pub struct NewAccessEvent {
+    scoped_vault_id: ScopedVaultId,
+    tenant_id: TenantId,
+    is_live: bool,
+    targets: Vec<DataIdentifier>,
 }
 
 pub async fn bulk_decrypt<T>(
@@ -35,67 +41,64 @@ pub async fn bulk_decrypt<T>(
         r.vw.check_ob_config_access(dis)?;
     }
 
-    let decrypt_requests = requests
-        .iter()
-        .flat_map(|i| {
-            i.vw.decrypt_requests(i.targets.clone())
-                .into_iter()
-                .map(|r| (i.vw.scoped_vault.fp_id.clone(), r))
-        })
-        .collect();
-    let mut fp_id_to_scoped_vault: HashMap<_, _> = requests
-        .iter()
-        .map(|BulkDecryptReq { vw, targets: _ }| (vw.scoped_vault.fp_id.clone(), vw.scoped_vault.clone()))
-        .collect();
-
-    let results = batch_execute_decrypt_requests(&state.enclave_client, decrypt_requests).await?;
-
-    // Separate the results into access events and decrypted results
-    let (access_events, decrypted_results): (Vec<_>, Vec<_>) = results
+    // TODO actually decrypt the data in batch - we'll need to support an enclave operation that
+    // decrypts data with multiple different keys
+    let result_futs = requests
         .into_iter()
-        .map(|(fp_id, res)| -> ApiResult<_> {
-            let DecryptUncheckedResult::<PiiString> {
-                decrypted_dis,
-                results,
-            } = res.map_to_piistrings()?;
-            let decrypted_dis = decrypted_dis.into_iter().map(|t| t.identifier).collect_vec();
-            let access_event = (fp_id.clone(), decrypted_dis);
-            let decrypted_result = (fp_id, results);
-            Ok((access_event, decrypted_result))
-        })
-        .collect::<ApiResult<Vec<_>>>()?
+        .map(|r| single_decrypt(state, r))
+        .collect_vec();
+
+    // Do 10 vaults' decrypts in parallel
+    let result_futs = futures::stream::iter(result_futs).buffer_unordered(10);
+    let stream_collect = result_futs
+        .collect::<Vec<_>>()
+        .await
         .into_iter()
+        .collect::<ApiResult<Vec<_>>>()?;
+    let (access_events, decrypted_results): (Vec<_>, Vec<_>) = stream_collect
+        .into_iter()
+        .map(|(vw, res)| {
+            // TODO i don't love that this is a different codepath from making other access events
+            let access_event = NewAccessEvent {
+                scoped_vault_id: vw.scoped_vault.id,
+                tenant_id: vw.scoped_vault.tenant_id,
+                is_live: vw.scoped_vault.is_live,
+                targets: res.decrypted_dis.into_iter().map(|t| t.identifier).collect(),
+            };
+            (access_event, (vw.scoped_vault.fp_id, res.results))
+        })
         .unzip();
 
-    // Bulk save all new access events in the DB. We'll use only one insight event for all of the
-    // access events
+    // Save access events for each decrypt. We'll use one insight event for each access event
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let insight = insight.insert_with_conn(conn)?;
             let access_events = access_events
                 .into_iter()
-                .map(|(fp_id, targets)| -> ApiResult<_> {
-                    let sv = fp_id_to_scoped_vault
-                        .remove(&fp_id)
-                        .ok_or(AssertionError("No ScopedVault for fp_id"))?;
-                    let access_event = NewAccessEventRow {
-                        scoped_vault_id: sv.id,
-                        tenant_id: sv.tenant_id,
-                        is_live: sv.is_live,
-                        targets,
-                        insight_event_id: insight.id.clone(),
-                        reason: Some(reason.clone()),
-                        principal: principal.clone(),
-                        kind: AccessEventKind::Decrypt,
-                    };
-                    Ok(access_event)
+                .map(|r| NewAccessEventRow {
+                    scoped_vault_id: r.scoped_vault_id,
+                    tenant_id: r.tenant_id,
+                    is_live: r.is_live,
+                    targets: r.targets,
+                    insight_event_id: insight.id.clone(),
+                    reason: Some(reason.clone()),
+                    principal: principal.clone(),
+                    kind: AccessEventKind::Decrypt,
                 })
-                .collect::<ApiResult<_>>()?;
+                .collect();
             AccessEvent::bulk_create(conn, access_events)?;
             Ok(())
         })
         .await??;
-
     Ok(decrypted_results)
+}
+
+async fn single_decrypt<T>(
+    state: &State,
+    req: BulkDecryptReq<T>,
+) -> ApiResult<(TenantVw<T>, DecryptUncheckedResult)> {
+    let BulkDecryptReq { vw, targets } = req;
+    let results = vw.fn_decrypt_unchecked(&state.enclave_client, targets).await?;
+    Ok((vw, results))
 }
