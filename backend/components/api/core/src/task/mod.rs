@@ -68,7 +68,7 @@ pub async fn poll_and_execute_tasks(
                 tracing::info!(task_id=%t.id, "Task completed successfully");
             }
             Err(e) => {
-                tracing::warn!(err=%e, task_id=%t.id, num_attempts=t.num_attempts, "Task failed");
+                tracing::error!(err=%e, task_id=%t.id, num_attempts=t.num_attempts, "Task failed");
             }
         };
         let task_new_status = task_result_to_status(t, task_result);
