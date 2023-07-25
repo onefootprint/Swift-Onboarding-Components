@@ -8,37 +8,20 @@ import {
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React from 'react';
 
 import InfoBox from '../../../../components/info-box';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import FadeInContainer from '../../components/fade-in-container';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-import SelfieConsent from './components/selfie-consent/selfie-consent';
 
 const SelfiePrompt = () => {
-  const [state, send] = useIdDocMachine();
+  const [, send] = useIdDocMachine();
   const { t } = useTranslation('pages.selfie-photo-prompt');
-  const { shouldCollectConsent: consentRequired } = state.context.requirement;
-  const [consentVisible, setConsentVisible] = useState(false);
-
-  const handleClose = () => {
-    setConsentVisible(false);
-  };
-
-  const handleConsent = () => {
-    send({ type: 'consentReceived' });
-    setConsentVisible(false);
-    send({ type: 'startImageCapture' });
-  };
 
   const handleClick = () => {
-    if (consentRequired) {
-      setConsentVisible(true);
-    } else {
-      send({ type: 'startImageCapture' });
-    }
+    send({ type: 'startImageCapture' });
   };
 
   return (
@@ -73,11 +56,6 @@ const SelfiePrompt = () => {
         <Button fullWidth onClick={handleClick}>
           {t('cta')}
         </Button>
-        <SelfieConsent
-          open={consentVisible}
-          onClose={handleClose}
-          onConsent={handleConsent}
-        />
       </PromptContainer>
     </FadeInContainer>
   );

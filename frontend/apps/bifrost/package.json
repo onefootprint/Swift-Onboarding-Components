@@ -33,7 +33,7 @@
     "axios-case-converter": "^0.9.0",
     "axios": "^1.2.1",
     "base64url": "^3.0.1",
-    "focus-trap-react": "^10.0.2",
+    "focus-trap-react": "^10.2.1",
     "google-libphonenumber": "^3.2.32",
     "isemail": "^3.2.0",
     "mockdate": "^3.0.5",

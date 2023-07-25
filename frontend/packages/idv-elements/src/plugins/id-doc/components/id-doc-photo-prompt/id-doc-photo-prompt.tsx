@@ -8,7 +8,7 @@ import {
 import styled, { css } from '@onefootprint/styled';
 import { CountryCode3, IdDocImageTypes, IdDocType } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
@@ -16,12 +16,14 @@ import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { imageIcons } from '../../constants/image-types';
 import FadeInContainer from '../fade-in-container';
 import { useIdDocMachine } from '../machine-provider';
+import ImageConsent from './components/image-consent';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;
   type: IdDocType;
   imageType: IdDocImageTypes;
   country: CountryCode3;
+  promptConsent?: boolean;
 };
 
 const IdDocPhotoPrompt = ({
@@ -29,17 +31,34 @@ const IdDocPhotoPrompt = ({
   imageType,
   type,
   country,
+  promptConsent,
 }: IdDocPhotoPromptProps) => {
   const { t } = useTranslation('components.id-doc-photo-prompt');
-  const [, send] = useIdDocMachine();
+  const [state, send] = useIdDocMachine();
   const ImageIcon = imageIcons[imageType];
+  const { shouldCollectConsent: consentRequired } = state.context.requirement;
+  const [consentVisible, setConsentVisible] = useState(false);
   const side =
     type === IdDocType.passport && IdDocImageTypes.front
       ? 'photo page'
       : `${imageType} side`;
 
-  const handleTake = () => {
+  const handleClose = () => {
+    setConsentVisible(false);
+  };
+
+  const handleConsent = () => {
+    send({ type: 'consentReceived' });
+    setConsentVisible(false);
     send({ type: 'startImageCapture' });
+  };
+
+  const handleTake = () => {
+    if (consentRequired && promptConsent) {
+      setConsentVisible(true);
+    } else {
+      send({ type: 'startImageCapture' });
+    }
   };
 
   return (
@@ -85,6 +104,11 @@ const IdDocPhotoPrompt = ({
         <Button fullWidth onClick={handleTake}>
           {t('continue')}
         </Button>
+        <ImageConsent
+          open={consentVisible}
+          onClose={handleClose}
+          onConsent={handleConsent}
+        />
       </PromptContainer>
     </FadeInContainer>
   );

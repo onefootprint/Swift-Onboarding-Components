@@ -46,12 +46,16 @@ const createIdDocMachine = (args: MachineContext) =>
             navigatedToPrev: {
               target: 'countryAndType',
             },
+            consentReceived: {
+              actions: 'assignConsent',
+            },
             receivedImage: {
               target: 'processing',
               actions: 'assignImage',
             },
             startImageCapture: {
               target: 'frontImageCapture',
+              cond: context => !context.requirement.shouldCollectConsent,
             },
           },
         },
@@ -118,12 +122,8 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         selfiePrompt: {
           on: {
-            consentReceived: {
-              actions: 'assignConsent',
-            },
             startImageCapture: {
               target: 'selfieImage',
-              cond: context => !context.requirement.shouldCollectConsent,
             },
           },
         },

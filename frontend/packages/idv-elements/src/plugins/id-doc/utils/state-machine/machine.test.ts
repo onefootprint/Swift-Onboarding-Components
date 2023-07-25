@@ -73,6 +73,9 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
+          type: 'consentReceived',
+        },
+        {
           type: 'startImageCapture',
         },
         {
@@ -122,12 +125,6 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('selfiePrompt');
 
       state = machine.send({
-        type: 'consentReceived',
-      });
-      expect(state.value).toEqual('selfiePrompt');
-      expect(state.context.requirement.shouldCollectConsent).toEqual(false);
-
-      state = machine.send({
         type: 'startImageCapture',
       });
       expect(state.value).toEqual('selfieImage');
@@ -166,6 +163,10 @@ describe('Id Doc Machine Tests', () => {
             country: 'US',
           },
         },
+
+        {
+          type: 'consentReceived',
+        },
         {
           type: 'startImageCapture',
         },
@@ -191,6 +192,9 @@ describe('Id Doc Machine Tests', () => {
             type: IdDocType.driversLicense,
             country: 'US',
           },
+        },
+        {
+          type: 'consentReceived',
         },
         {
           type: 'startImageCapture',
@@ -232,6 +236,9 @@ describe('Id Doc Machine Tests', () => {
             type: IdDocType.driversLicense,
             country: 'US',
           },
+        },
+        {
+          type: 'consentReceived',
         },
         {
           type: 'receivedImage',
@@ -280,6 +287,9 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
+          type: 'consentReceived',
+        },
+        {
           type: 'receivedImage',
           payload: {
             image: 'image',
@@ -306,6 +316,9 @@ describe('Id Doc Machine Tests', () => {
             type: IdDocType.driversLicense,
             country: 'US',
           },
+        },
+        {
+          type: 'consentReceived',
         },
         {
           type: 'receivedImage',
@@ -336,6 +349,9 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
+          type: 'consentReceived',
+        },
+        {
           type: 'startImageCapture',
         },
         {
@@ -358,6 +374,9 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
+          type: 'consentReceived',
+        },
+        {
           type: 'receivedImage',
           payload: {
             image: 'image',
@@ -368,9 +387,6 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             nextSideToCollect: 'back',
           },
-        },
-        {
-          type: 'consentReceived',
         },
         {
           type: 'startImageCapture',
@@ -395,6 +411,9 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
+          type: 'consentReceived',
+        },
+        {
           type: 'receivedImage',
           payload: {
             image: 'image',
@@ -405,9 +424,6 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             nextSideToCollect: 'selfie',
           },
-        },
-        {
-          type: 'consentReceived',
         },
         {
           type: 'startImageCapture',
@@ -419,7 +435,7 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('selfiePrompt');
     });
 
-    it('Does not start selfie capture if consent was not provided', () => {
+    it('Does not start front image capture if consent was not provided', () => {
       const machine = interpret(
         createIdDocMachine({
           ...argsRegular,
@@ -428,7 +444,7 @@ describe('Id Doc Machine Tests', () => {
       );
       machine.start();
 
-      const state = machine.send([
+      let state = machine.send([
         {
           type: 'receivedCountryAndType',
           payload: {
@@ -437,22 +453,22 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
-          type: 'receivedImage',
-          payload: {
-            image: 'image',
-          },
+          type: 'startImageCapture',
         },
+      ]);
+
+      expect(state.value).toEqual('frontImage');
+      expect(state.context.requirement.shouldCollectConsent).toEqual(true);
+
+      state = machine.send([
         {
-          type: 'processingSucceeded',
-          payload: {
-            nextSideToCollect: 'selfie',
-          },
+          type: 'consentReceived',
         },
         {
           type: 'startImageCapture',
         },
       ]);
-      expect(state.value).toEqual('selfiePrompt');
+      expect(state.value).toEqual('frontImageCapture');
     });
 
     it('Terminate the flow when retry limit exceeds', () => {

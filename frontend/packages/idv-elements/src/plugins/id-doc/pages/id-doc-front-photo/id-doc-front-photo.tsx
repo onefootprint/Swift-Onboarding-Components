@@ -32,6 +32,7 @@ const IdDocFrontPhoto = () => {
         imageType={IdDocImageTypes.front}
         type={type}
         country={countryCode3}
+        promptConsent
       />
     </>
   );
