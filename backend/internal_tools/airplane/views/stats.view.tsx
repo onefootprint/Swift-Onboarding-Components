@@ -59,6 +59,18 @@ const Stats = () => {
           WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
           `}
         ></OverviewCard>
+        <GraphCard
+          title={'Not (yet) Portable IDs this week'}
+          query={`
+          SELECT to_char(scoped_vault.start_timestamp, 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
+          INNER JOIN vault on scoped_vault.vault_id = vault.id
+          INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
+          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
+          AND scoped_vault.start_timestamp BETWEEN NOW() - INTERVAL '7 DAYS' AND NOW()
+          GROUP BY "day"
+          ORDER BY "day";
+        `}
+        ></GraphCard>
       </Stack>
     </Stack>
   );
@@ -84,6 +96,32 @@ const OverviewCard = ({ title, query }) => {
           <Text color="error">{error.message}</Text>
         ) : (
           <Title color="green">{output[0].count}</Title>
+        )}
+      </Stack>
+    </Card>
+  );
+};
+
+const GraphCard = ({ title, query }) => {
+  const { output, loading, error } = useTaskQuery({
+    slug: 'dbquery',
+    params: {
+      query: query,
+    },
+  });
+
+  return (
+    <Card>
+      <Stack>
+        <Text size="xl" weight={700}>
+          {title}
+        </Text>
+        {loading ? (
+          <Loader variant="dots" />
+        ) : error ? (
+          <Text color="error">{error.message}</Text>
+        ) : (
+          <Chart type="line" data={output} />
         )}
       </Stack>
     </Card>

@@ -25,11 +25,10 @@ const QueryUI = () => {
   const query = useComponentState();
   const schemaToggle = useComponentState();
 
-  const [showSchemaHelper, setShowSchemaHelper] = useState(false);
-
-  const { output, loading, error, mutate } = useTaskMutation({
+  let { error, output, loading, refetch } = useTaskQuery({
     slug: 'dbquery',
     params: { query: query.value },
+    enabled: false,
   });
 
   return (
@@ -40,7 +39,7 @@ const QueryUI = () => {
         <Stack direction="row" justify="end">
           <Button
             onClick={() => {
-              mutate();
+              refetch();
             }}
             disabled={loading}
           >
@@ -50,7 +49,7 @@ const QueryUI = () => {
             preset="secondary"
             onClick={() => {
               query.setValue('select 1;');
-              mutate();
+              refetch();
             }}
           >
             Clear
