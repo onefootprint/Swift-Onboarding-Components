@@ -12,7 +12,7 @@ export type DocumentUpload = {
 };
 
 export type Document = {
-  completedVersion: number;
+  completedVersion: number | null;
   kind: SupportedIdDocTypes;
   startedAt: string;
   status: IdDocStatus;

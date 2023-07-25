@@ -1,13 +1,13 @@
 import { Document, SupportedIdDocTypes } from '@onefootprint/types';
 
 const filterDocumentsByKind = (
-  documents: Document[],
-  documentKind?: SupportedIdDocTypes,
+  documents?: Document[],
+  documentType?: SupportedIdDocTypes,
 ) => {
-  if (documents.length === 0 || !documentKind) {
+  if (!documents || documents.length === 0 || !documentType) {
     return [];
   }
-  return documents.filter(document => document.kind === documentKind);
+  return documents.filter(document => document.kind === documentType);
 };
 
 export default filterDocumentsByKind;

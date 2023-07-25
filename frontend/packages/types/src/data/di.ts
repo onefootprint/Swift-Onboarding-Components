@@ -85,6 +85,46 @@ export enum DocumentDI {
   idCardRefNumber = 'document.id_card.ref_number',
 }
 
+export type VersionedDocumentDI<Version extends string = string> =
+  | `${DocumentDI.latestPassport}:${Version}`
+  | `${DocumentDI.latestPassportSelfie}:${Version}`
+  | `${DocumentDI.passportFullName}:${Version}`
+  | `${DocumentDI.passportDOB}:${Version}`
+  | `${DocumentDI.passportGender}:${Version}`
+  | `${DocumentDI.passportFullAddress}:${Version}`
+  | `${DocumentDI.passportDocumentNumber}:${Version}`
+  | `${DocumentDI.passportIssuedAt}:${Version}`
+  | `${DocumentDI.passportExpiresAt}:${Version}`
+  | `${DocumentDI.passportIssuingState}:${Version}`
+  | `${DocumentDI.passportIssuingCountry}:${Version}`
+  | `${DocumentDI.passportRefNumber}:${Version}`
+  | `${DocumentDI.latestDriversLicenseFront}:${Version}`
+  | `${DocumentDI.latestDriversLicenseBack}:${Version}`
+  | `${DocumentDI.latestDriversLicenseSelfie}:${Version}`
+  | `${DocumentDI.driversLicenseFullName}:${Version}`
+  | `${DocumentDI.driversLicenseDOB}:${Version}`
+  | `${DocumentDI.driversLicenseGender}:${Version}`
+  | `${DocumentDI.driversLicenseFullAddress}:${Version}`
+  | `${DocumentDI.driversLicenseDocumentNumber}:${Version}`
+  | `${DocumentDI.driversLicenseIssuedAt}:${Version}`
+  | `${DocumentDI.driversLicenseExpiresAt}:${Version}`
+  | `${DocumentDI.driversLicenseIssuingState}:${Version}`
+  | `${DocumentDI.driversLicenseIssuingCountry}:${Version}`
+  | `${DocumentDI.driversLicenseRefNumber}:${Version}`
+  | `${DocumentDI.latestIdCardFront}:${Version}`
+  | `${DocumentDI.latestIdCardBack}:${Version}`
+  | `${DocumentDI.latestIdCardSelfie}:${Version}`
+  | `${DocumentDI.idCardFullName}:${Version}`
+  | `${DocumentDI.idCardDOB}:${Version}`
+  | `${DocumentDI.idCardGender}:${Version}`
+  | `${DocumentDI.idCardFullAddress}:${Version}`
+  | `${DocumentDI.idCardDocumentNumber}:${Version}`
+  | `${DocumentDI.idCardIssuedAt}:${Version}`
+  | `${DocumentDI.idCardExpiresAt}:${Version}`
+  | `${DocumentDI.idCardIssuingState}:${Version}`
+  | `${DocumentDI.idCardIssuingCountry}:${Version}`
+  | `${DocumentDI.idCardRefNumber}:${Version}`;
+
 export enum CardDIField {
   name = 'name',
   issuer = 'issuer',
@@ -122,5 +162,6 @@ export type DataIdentifier =
   | IdDI
   | BusinessDI
   | DocumentDI
+  | VersionedDocumentDI
   | CardDI
   | CustomDI;

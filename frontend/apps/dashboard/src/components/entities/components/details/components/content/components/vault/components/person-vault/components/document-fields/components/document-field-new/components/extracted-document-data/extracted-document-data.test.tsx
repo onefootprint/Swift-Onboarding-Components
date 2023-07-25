@@ -8,21 +8,27 @@ import ExtractedDocumentData, {
 import {
   driversLicensePartialDIs,
   entityVaultWithAllDocumentDIs,
-} from './extracted-document-data.config';
+} from './extracted-document-data.test.config';
 
 const renderExtractedDocumentData = ({
   vault,
-  documentKind,
+  documentType,
+  activeDocumentVersion,
 }: ExtractedDocumentDataProps) =>
   customRender(
-    <ExtractedDocumentData vault={vault} documentKind={documentKind} />,
+    <ExtractedDocumentData
+      vault={vault}
+      documentType={documentType}
+      activeDocumentVersion={activeDocumentVersion}
+    />,
   );
 
 describe('<ExtractedDocumentData />', () => {
   it('should display all attributes for drivers license correctly and not show id card or passport attributes', () => {
     renderExtractedDocumentData({
       vault: entityVaultWithAllDocumentDIs,
-      documentKind: SupportedIdDocTypes.driversLicense,
+      documentType: SupportedIdDocTypes.driversLicense,
+      activeDocumentVersion: '456',
     });
     expect(screen.getByText('Full name')).toBeInTheDocument();
     expect(
@@ -87,7 +93,8 @@ describe('<ExtractedDocumentData />', () => {
   it('should display all attributes for id card correctly and not show drivers license or passport attributes', () => {
     renderExtractedDocumentData({
       vault: entityVaultWithAllDocumentDIs,
-      documentKind: SupportedIdDocTypes.idCard,
+      documentType: SupportedIdDocTypes.idCard,
+      activeDocumentVersion: '123',
     });
     expect(screen.getByText('Full name')).toBeInTheDocument();
     expect(screen.getByText('test ID full name')).toBeInTheDocument();
@@ -131,7 +138,8 @@ describe('<ExtractedDocumentData />', () => {
   it('should display all attributes for passport correctly and not show drivers license or id card attributes', () => {
     renderExtractedDocumentData({
       vault: entityVaultWithAllDocumentDIs,
-      documentKind: SupportedIdDocTypes.passport,
+      documentType: SupportedIdDocTypes.passport,
+      activeDocumentVersion: '679',
     });
     expect(screen.getByText('Full name')).toBeInTheDocument();
     expect(screen.getByText('test passport full name')).toBeInTheDocument();
@@ -175,7 +183,8 @@ describe('<ExtractedDocumentData />', () => {
   it('should only display subset of attributes when subset of attributes are provided', () => {
     renderExtractedDocumentData({
       vault: driversLicensePartialDIs,
-      documentKind: SupportedIdDocTypes.driversLicense,
+      documentType: SupportedIdDocTypes.driversLicense,
+      activeDocumentVersion: '456',
     });
     expect(screen.getByText('Full name')).toBeInTheDocument();
     expect(

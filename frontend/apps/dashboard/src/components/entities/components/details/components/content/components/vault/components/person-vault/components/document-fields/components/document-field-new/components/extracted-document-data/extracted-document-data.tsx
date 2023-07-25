@@ -14,15 +14,21 @@ import { getDataLabel, getRelevantKeys } from '../../../../utils';
 
 export type ExtractedDocumentDataProps = {
   vault: EntityVault;
-  documentKind: SupportedIdDocTypes;
+  documentType: SupportedIdDocTypes;
+  activeDocumentVersion: string;
 };
 
 const ExtractedDocumentData = ({
   vault,
-  documentKind,
+  documentType,
+  activeDocumentVersion,
 }: ExtractedDocumentDataProps) => {
   const { t } = useTranslation('pages.entity.fieldset.document');
-  const relevantKeys = getRelevantKeys(vault, documentKind);
+  const relevantKeys = getRelevantKeys({
+    vault,
+    documentType,
+    currentDocumentNumber: activeDocumentVersion,
+  });
 
   const getVaultValueString = (key: DocumentDI) => {
     const vaultValue = vault[key];
@@ -32,7 +38,7 @@ const ExtractedDocumentData = ({
     return JSON.stringify(vaultValue);
   };
 
-  return (
+  return relevantKeys.length ? (
     <Section>
       <LabelContainer>
         <IcoFileText24 />
@@ -41,10 +47,15 @@ const ExtractedDocumentData = ({
         </Typography>
       </LabelContainer>
       <DocumentDataFieldContainer>
-        {relevantKeys.map(key => (
+        {relevantKeys.sort().map(key => (
           <DocumentDataField key={key}>
             <Typography variant="body-3" color="tertiary" as="label">
-              {t(`drawer.document-data.labels.${getDataLabel(key)}`)}
+              {t(
+                `drawer.document-data.labels.${getDataLabel(
+                  key,
+                  activeDocumentVersion,
+                )}`,
+              )}
             </Typography>
             <Typography
               variant="body-3"
@@ -57,7 +68,7 @@ const ExtractedDocumentData = ({
         ))}
       </DocumentDataFieldContainer>
     </Section>
-  );
+  ) : null;
 };
 
 const LabelContainer = styled.div`

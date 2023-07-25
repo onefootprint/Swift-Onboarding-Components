@@ -13,14 +13,14 @@ import driversLicensePartialDIs from './document-field-new.test.config';
 const renderDocumentField = ({
   vault,
   label,
-  documentKind,
+  documentType,
   documents,
 }: DocumentFieldProps) =>
   customRender(
     <DocumentField
       vault={vault}
       label={label}
-      documentKind={documentKind}
+      documentType={documentType}
       documents={documents}
     />,
   );
@@ -30,7 +30,7 @@ describe('<DocumentField />', () => {
     renderDocumentField({
       vault: driversLicensePartialDIs,
       label: `Driver's license and selfie`,
-      documentKind: SupportedIdDocTypes.driversLicense,
+      documentType: SupportedIdDocTypes.driversLicense,
       documents: [],
     });
 
@@ -39,14 +39,14 @@ describe('<DocumentField />', () => {
 
     // drawer should not show beforehand
 
-    let drawerCloseButton = screen.queryByLabelText('drawer-close-button');
+    let drawerCloseButton = screen.queryByLabelText('Close document details');
     expect(drawerCloseButton).not.toBeInTheDocument();
 
     await userEvent.click(show);
 
     // drawer should show after click
     await waitFor(() => {
-      drawerCloseButton = screen.queryByLabelText('drawer-close-button');
+      drawerCloseButton = screen.queryByLabelText('Close document details');
       expect(drawerCloseButton).toBeInTheDocument();
     });
   });

@@ -1,8 +1,8 @@
 import { DocumentDI, SupportedIdDocTypes } from '@onefootprint/types';
 
 // Given a primary DI (i.e. document.drivers_license.front.latest_upload)
-// return the DocumentKind (i.e. drivers_license)
-const getDocumentKind = (di: DocumentDI) => {
+// return the DocumentType (i.e. drivers_license)
+const getDocumentType = (di: DocumentDI) => {
   if (di.includes(SupportedIdDocTypes.driversLicense)) {
     return SupportedIdDocTypes.driversLicense;
   }
@@ -15,4 +15,4 @@ const getDocumentKind = (di: DocumentDI) => {
   return undefined;
 };
 
-export default getDocumentKind;
+export default getDocumentType;
