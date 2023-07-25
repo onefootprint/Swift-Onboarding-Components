@@ -79,14 +79,13 @@ async fn decrypt_documents(
     enclave_client: &EnclaveClient,
     images: Vec<DocumentUpload>,
 ) -> ApiResult<HashMap<DocumentSide, PiiBytes>> {
-    let (sides, docs): (Vec<_>, _) = images.iter().map(|u| (u.side, (e_private_key, &u.e_data_key, &u.s3_url))).unzip();
+    let docs = images.iter().map(|u| (u.side, (e_private_key, &u.e_data_key, &u.s3_url))).collect();
 
     let decrypted_documents = enclave_client
         .batch_decrypt_documents(docs)
         .await?;
 
-    let results = sides.into_iter().zip(decrypted_documents).collect();
-    Ok(results)
+    Ok(decrypted_documents)
 }
 
 /// Build a data structure that can be used to submit the images of identity documents (and selfie) to vendors

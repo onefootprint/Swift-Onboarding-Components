@@ -322,10 +322,11 @@ impl EnclaveClient {
     /// Decrypts the each document by decrypting their SealedVaultDataKey from the enclave and using
     /// this to unseal the actual document bytes, downloaded from s3.
     /// NOTE: this does not apply any data transforms
-    pub async fn batch_decrypt_documents(
+    pub async fn batch_decrypt_documents<T: Eq + Hash>(
         &self,
-        documents: Vec<(&EncryptedVaultPrivateKey, &SealedVaultDataKey, &S3Url)>,
-    ) -> Result<Vec<PiiBytes>, ApiError> {
+        documents: HashMap<T, (&EncryptedVaultPrivateKey, &SealedVaultDataKey, &S3Url)>,
+    ) -> Result<HashMap<T, PiiBytes>, ApiError> {
+        let (ids, documents): (Vec<_>, Vec<_>) = documents.into_iter().unzip();
         let (sealed_keys, s3_urls): (Vec<_>, Vec<_>) = documents
             .into_iter()
             // A little hacky - have to convert the SealedVaultDataKey to SealedVaultDataBytes.
@@ -350,7 +351,7 @@ impl EnclaveClient {
             .map(|b| SealingKey::new(b.into_leak()))
             .collect::<Result<Vec<_>, _>>()?;
 
-        let decrypted_document_bytes = document_bytes
+        let results = document_bytes
             .into_iter()
             .zip(decrypted_keys)
             .map(|(bytes, key)| {
@@ -358,7 +359,7 @@ impl EnclaveClient {
                     .map(PiiBytes::new)
             })
             .collect::<Result<Vec<_>, _>>()?;
-
-        Ok(decrypted_document_bytes)
+        let results = ids.into_iter().zip(results.into_iter()).collect();
+        Ok(results)
     }
 }

@@ -41,11 +41,54 @@ pub struct DecryptUncheckedResult<T = PiiString> {
     pub decrypted_dis: Vec<EnclaveDecryptOperation>,
 }
 
+impl<T> Default for DecryptUncheckedResult<T> {
+    fn default() -> Self {
+        DecryptUncheckedResult {
+            results: HashMap::new(),
+            decrypted_dis: vec![],
+        }
+    }
+}
+
 impl DecryptUncheckedResult {
     /// convenience method to ignore the transforms
     /// and just map results to DI <-> PII dictionary
     pub fn results_by_data_identifier(self) -> HashMap<DataIdentifier, PiiString> {
         self.results.into_iter().map(|(k, v)| (k.identifier, v)).collect()
+    }
+}
+
+impl DecryptUncheckedResult<Pii> {
+    pub(in crate::utils::vault_wrapper) fn map_to_piistrings(
+        self,
+    ) -> ApiResult<DecryptUncheckedResult<PiiString>> {
+        let DecryptUncheckedResult {
+            results,
+            decrypted_dis,
+        } = self;
+        // Map the PiiBytes to PiiStrings
+        let results = results
+            .into_iter()
+            .map(|(k, v)| -> ApiResult<_> {
+                let pii = match v {
+                    Pii::String(s) => s,
+                    Pii::Bytes(b) => {
+                        if k.is_identity_transform() {
+                            b.into_leak_base64_pii()
+                        } else {
+                            PiiString::try_from(b)?
+                        }
+                    }
+                };
+                Ok((k, pii))
+            })
+            .collect::<ApiResult<_>>()?;
+
+        let result = DecryptUncheckedResult {
+            results,
+            decrypted_dis,
+        };
+        Ok(result)
     }
 }
 
