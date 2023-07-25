@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX unique_onboarding_decision_intent_per_scoped_vault ON decision_intent(scoped_vault_id) WHERE kind = 'onboarding_kyc'

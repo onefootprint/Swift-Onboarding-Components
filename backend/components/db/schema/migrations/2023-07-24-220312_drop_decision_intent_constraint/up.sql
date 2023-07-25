@@ -1,0 +1,1 @@
+DROP INDEX unique_onboarding_decision_intent_per_scoped_vault;
