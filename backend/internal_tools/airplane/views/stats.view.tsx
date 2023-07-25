@@ -64,13 +64,14 @@ const Stats = () => {
         <GraphCard
           title={'Not (yet) Portable IDs this week'}
           query={`
-          SELECT to_char(scoped_vault.start_timestamp at time zone 'utc' at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
+          SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
           INNER JOIN vault on scoped_vault.vault_id = vault.id
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
           WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
-          AND scoped_vault.start_timestamp BETWEEN NOW() - INTERVAL '7 DAYS' AND NOW()
           GROUP BY "day"
-          ORDER BY "day";
+          ORDER BY "day" DESC LIMIT 7) r 
+          ORDER BY "day" ASC;
+
         `}
         ></GraphCard>
       </Stack>
