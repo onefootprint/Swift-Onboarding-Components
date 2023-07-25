@@ -13,6 +13,7 @@ mod document_side;
 mod fingerprint;
 mod fingerprint_meta;
 mod footprint_reason_code;
+mod identity_document_fixture_result;
 mod identity_document_status;
 mod incode;
 mod liveness_source;
@@ -41,10 +42,10 @@ pub use self::{
     access_event_kind::*, actor::*, attestation_type::*, business_owner_kind::*, company_size::*,
     compliance_status::*, contact_info_priority::*, d2p_session_status::*, d2p_session_status::*,
     data_priority::*, decision_intent_kind::*, decision_status::*, document_side::*, fingerprint::*,
-    fingerprint_meta::*, footprint_reason_code::*, identity_document_status::*, incode::*,
-    liveness_source::*, manual_review::*, middesk_request_state::*, ob_config::*, onboarding_status::*,
-    org_member_email::*, proxy_ingress_kind::*, requirement_status::*, risk_signal_group::*, sealed_bytes::*,
-    session_kind::*, task_status::*, tenant_scope::*, user_timeline_event::*, vault_key_pair::*,
-    vault_kind::*, vault_proxy_permission::*, vendor::*, verification_status::*, watchlist_check::*,
-    workflow::*,
+    fingerprint_meta::*, footprint_reason_code::*, identity_document_fixture_result::*,
+    identity_document_status::*, incode::*, liveness_source::*, manual_review::*, middesk_request_state::*,
+    ob_config::*, onboarding_status::*, org_member_email::*, proxy_ingress_kind::*, requirement_status::*,
+    risk_signal_group::*, sealed_bytes::*, session_kind::*, task_status::*, tenant_scope::*,
+    user_timeline_event::*, vault_key_pair::*, vault_kind::*, vault_proxy_permission::*, vendor::*,
+    verification_status::*, watchlist_check::*, workflow::*,
 };

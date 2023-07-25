@@ -8,6 +8,7 @@ use api_core::types::JsonApiResponse;
 use api_wire_types::{CreateIdentityDocumentRequest, CreateIdentityDocumentResponse};
 use db::models::document_request::{DocRequestIdentifier, DocumentRequest as DbDocumentRequest};
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
+use db::models::vault::Vault;
 use newtypes::output::Csv;
 use newtypes::WorkflowGuard;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -27,6 +28,7 @@ pub async fn post(
     let CreateIdentityDocumentRequest {
         document_type,
         country_code,
+        fixture_result,
     } = request.into_inner();
 
     let su_id = user_auth.scoped_user.id.clone();
@@ -50,11 +52,18 @@ pub async fn post(
                     return Err(OnboardingError::UnsupportedDocumentType(Csv::from(doc_types)).into());
                 }
             }
+            let vault = Vault::get(conn, &su_id)?;
+            // Check we're in sandbox
+            if vault.sandbox_id.is_none() && fixture_result.is_some() {
+                return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
+            }
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request.id,
                 document_type: document_type.into(),
                 country_code,
+                fixture_result,
             };
+
             let id_doc = IdentityDocument::create(conn, args)?;
             Ok(id_doc)
         })

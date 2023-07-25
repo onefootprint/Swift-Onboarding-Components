@@ -11,7 +11,7 @@ use std::collections::HashMap;
 
 use newtypes::{
     Base64Data, DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentSide, IdDocKind,
-    IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, VaultId,
+    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, VaultId,
 };
 
 use super::document_request::DocumentRequest;
@@ -38,7 +38,8 @@ pub struct IdentityDocument {
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
-    pub status: IdentityDocumentStatus, // TODO rename to IdentityDocumentStatus
+    pub status: IdentityDocumentStatus,
+    pub fixture_result: Option<IdentityDocumentFixtureResult>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -47,6 +48,7 @@ pub struct NewIdentityDocumentArgs {
     pub request_id: DocumentRequestId,
     pub document_type: IdDocKind,
     pub country_code: String,
+    pub fixture_result: Option<IdentityDocumentFixtureResult>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -57,6 +59,7 @@ struct NewIdentityDocumentRow {
     country_code: String,
     created_at: DateTime<Utc>,
     status: IdentityDocumentStatus,
+    fixture_result: Option<IdentityDocumentFixtureResult>,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -90,6 +93,7 @@ impl IdentityDocument {
             request_id,
             document_type,
             country_code,
+            fixture_result,
         } = args;
         let new = NewIdentityDocumentRow {
             request_id,
@@ -97,6 +101,7 @@ impl IdentityDocument {
             country_code,
             created_at: Utc::now(),
             status: IdentityDocumentStatus::Pending,
+            fixture_result,
         };
         let result = diesel::insert_into(identity_document::table)
             .values(new)
@@ -119,6 +124,7 @@ impl IdentityDocument {
                 request_id,
                 document_type,
                 country_code,
+                fixture_result,
             } = args;
             let new = NewIdentityDocumentRow {
                 request_id,
@@ -126,6 +132,7 @@ impl IdentityDocument {
                 country_code,
                 created_at: Utc::now(),
                 status: IdentityDocumentStatus::Pending,
+                fixture_result,
             };
             diesel::insert_into(identity_document::table)
                 .values(new)

@@ -62,7 +62,6 @@ pub async fn post(
             Ok((vault, doc_request, user_consent))
         })
         .await??;
-
     if request.selfie_image.is_some() {
         if !doc_request.should_collect_selfie {
             return Err(OnboardingError::NotExpectingSelfie.into());
@@ -109,6 +108,7 @@ pub async fn post(
                 request_id: doc_request.id.clone(),
                 document_type: request.document_type,
                 country_code: request.country_code.clone(),
+                fixture_result: None,
             };
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
             if id_doc.status != IdentityDocumentStatus::Pending {

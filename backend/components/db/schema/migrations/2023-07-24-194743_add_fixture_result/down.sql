@@ -1,0 +1,1 @@
+ALTER TABLE identity_document DROP COLUMN fixture_result;

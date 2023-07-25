@@ -218,6 +218,7 @@ table! {
         selfie_score -> Nullable<Float8>,
         ocr_confidence_score -> Nullable<Float8>,
         status -> Text,
+        fixture_result -> Nullable<Text>,
     }
 }
 
