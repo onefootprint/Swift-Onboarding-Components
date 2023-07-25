@@ -90,17 +90,17 @@ const Trigger = styled.button`
     align-items: center;
     min-width: fit-content;
     height: 100%;
-    background-color: ${theme.backgroundColor.primary};
+    background-color: ${theme.backgroundColor.transparent};
 
     &:hover {
       && {
-        background: ${theme.backgroundColor.primary};
+        background: ${theme.backgroundColor.transparent};
       }
     }
 
     &[data-state='open'] {
       && {
-        background: ${theme.backgroundColor.primary};
+        background: ${theme.backgroundColor.transparent};
       }
     }
   `}
