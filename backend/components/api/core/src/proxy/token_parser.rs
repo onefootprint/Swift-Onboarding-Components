@@ -43,6 +43,7 @@ impl<'a> ProxyTokenParser<'a> {
     }
 
     /// parses a string into a map of Proxy Tokens
+    #[tracing::instrument("ProxyTokenParser::parse", skip_all)]
     pub fn parse(raw: &'a str, global_fp_id: Option<FpId>) -> ApiResult<ProxyTokenParser> {
         let mut parsed: Vec<(String, ProxyToken)> = vec![];
         let mut chars = raw.chars().peekable();
@@ -102,6 +103,7 @@ impl<'a> ProxyTokenParser<'a> {
     }
 
     /// replace proxy tokens with their detokenized counterparts
+    #[tracing::instrument("ProxyTokenParser::detokenize_body", skip_all)]
     pub fn detokenize_body(self, detokens: HashMap<ProxyToken, PiiString>) -> ApiResult<PiiString> {
         let mut detokenized_body = self.body.to_string();
 
