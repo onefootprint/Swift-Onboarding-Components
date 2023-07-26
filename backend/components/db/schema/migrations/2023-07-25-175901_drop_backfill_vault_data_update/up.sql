@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS backfill_vault_data_update;
