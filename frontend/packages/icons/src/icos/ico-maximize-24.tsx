@@ -15,20 +15,13 @@ const IcoMaximize24 = ({ color = 'primary', className, testID }: IconProps) => {
       className={className}
       aria-hidden="true"
     >
-      <g
-        clipPath="url(#prefix__a)"
+      <path
+        d="M4.75 14.75v4.5h4.5M5 19l5.25-5.25m9-4.5v-4.5h-4.5M19 5l-5.25 5.25"
         stroke={theme.color[color]}
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
-        <path d="M4.75 14.75v4.5h4.5M19.25 9.25v-4.5h-4.5M5 19l5.25-5.25M19 5l-5.25 5.25" />
-      </g>
-      <defs>
-        <clipPath id="prefix__a">
-          <path fill="#fff" d="M0 0h24v24H0z" />
-        </clipPath>
-      </defs>
+      />
     </svg>
   );
 };
