@@ -39,6 +39,9 @@ function createDocumentImagesBucket(
       bucket: bucketName,
       arn: `arn:aws:s3:::${bucketName}`,
       acl: 'private',
+      versioning: {
+        enabled: true,
+      },
     },
     {
       provider,
