@@ -11,16 +11,17 @@ import { Database } from './config';
 import * as inputs from '@pulumi/aws/types';
 import * as tailscale from '@pulumi/tailscale';
 
+// Parameters set on both the cluster and instance PG
 const DEFAULT_PG_PARAMETERS = [
   // Kill queries that have a deadlock detected after 1s
   {
     name: 'deadlock_timeout',
     value: '1000', // 1s
   },
-  // Kill connections that have a transaction open for 60m
+  // Kill connections that have a transaction open and haven't sent any queries for 1m
   {
     name: 'idle_in_transaction_session_timeout',
-    value: '3600000', // 60m
+    value: '60000', // 1m
   },
   // Set an unreasonably high cap on the number of connections (the default is more unreasonably high)
   {
@@ -32,6 +33,38 @@ const DEFAULT_PG_PARAMETERS = [
   {
     name: 'statement_timeout',
     value: '300000', // 5m
+  },
+  // Tune query planning
+  {
+    name: 'random_page_cost',
+    value: '1.1',
+  },
+  {
+    name: 'log_connections',
+    value: '1',
+  },
+  {
+    name: 'log_disconnections',
+    value: '1',
+  },
+  {
+    name: 'log_lock_waits',
+    value: '1',
+  },
+  {
+    name: 'log_statement',
+    value: 'ddl',
+  },
+  {
+    name: 'log_temp_files',
+    value: '0',
+  },
+];
+
+const DEFAULT_PG_CLUSTER_PARAMETERS = [
+  {
+    name: 'log_autovacuum_min_duration',
+    value: '1000',
   },
 ];
 
@@ -98,7 +131,7 @@ export async function CreateDB(
   new aws.rds.ClusterParameterGroup(clusterParameterGroupName, {
     name: clusterParameterGroupName,
     family: 'aurora-postgresql14',
-    parameters: DEFAULT_PG_PARAMETERS,
+    parameters: DEFAULT_PG_PARAMETERS.concat(DEFAULT_PG_CLUSTER_PARAMETERS),
   });
 
   const instanceParameterGroupName = `fpc-pg-instance-${clusterIdentifier}`;
