@@ -49,6 +49,16 @@ impl<Type> VaultWrapper<Type> {
         self.speculative.get(id.clone()).or_else(|| self.portable.get(id))
     }
 
+    /// If the provided DI is a document, return the mime type
+    pub fn get_mime_type<T>(&self, id: T) -> Option<&str>
+    where
+        T: Into<DataIdentifier> + Clone,
+    {
+        self.speculative
+            .get_mime_type(id.clone())
+            .or_else(|| self.portable.get_mime_type(id))
+    }
+
     /// Get the plaintext data for the provided data identifier.
     /// Returns None if the id doesn't exist in the vault or the id is encrypted
     pub fn get_p_data<T>(&self, id: T) -> Option<&PiiString>

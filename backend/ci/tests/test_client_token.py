@@ -170,3 +170,4 @@ def test_large_objects(sandbox_user):
 
     response = get_raw(f"entities/vault/decrypt/{token.value}")
     assert json.loads(response.content) == obj
+    assert response.headers.get("content-type") == "application/json"

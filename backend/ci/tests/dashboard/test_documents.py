@@ -93,10 +93,12 @@ def test_tenant_document_decrypt_download(user_with_documents):
 
     body = post(f"users/{user_with_documents.fp_id}/client_token", data, tenant.sk.key)
     token = body["token"]
+    print(token)
 
     # Make raw request since the downloaded content is not json
     response = get_raw(f"users/vault/decrypt/{token}")
     assert response.headers.get("content-disposition") == "attachment"
+    assert response.headers.get("content-type") == "image/png"
     assert response.content == base64.b64decode(test_image_dl_front)
 
     access_event = latest_access_event_for(user_with_documents.fp_id, tenant.sk)

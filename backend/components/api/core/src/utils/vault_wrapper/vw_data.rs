@@ -108,6 +108,18 @@ impl<Type> VwData<Type> {
         maybe_vault_data.or_else(maybe_doc_data)
     }
 
+    /// If the provided DI is a document, return the mime type
+    pub fn get_mime_type<T>(&self, di: T) -> Option<&str>
+    where
+        T: Into<DataIdentifier>,
+    {
+        let di = di.into();
+        self.documents
+            .iter()
+            .find(|d| d.kind == di)
+            .map(|d| d.mime_type.leak())
+    }
+
     pub(super) fn get_lifetimes<VecT, T>(&self, kinds: VecT) -> Vec<&DataLifetime>
     where
         VecT: IntoIterator<Item = T>,

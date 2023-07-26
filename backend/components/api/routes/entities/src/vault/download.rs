@@ -3,6 +3,7 @@ use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use actix_web::http::header::ContentType;
+use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use api_core::auth::tenant::{ClientTenantScope, PathClientTenantAuthContext, TenantAuth};
 use api_core::auth::AuthError;
@@ -65,20 +66,19 @@ pub async fn get(
     let result = vw
         .decrypt_single_raw(&state, di.clone(), req)
         .await?
-        .ok_or(TenantError::DataDoesntExist(di))?;
+        .ok_or(TenantError::DataDoesntExist(di.clone()))?;
+    let mime_type = vw.get_mime_type(di.clone());
 
-    // TODO mime type and headers. Maybe we don't need mime type? browser seems to infer
-    // TODO tests
-
+    let mut resp = HttpResponse::build(StatusCode::OK);
+    resp.insert_header(("Content-Disposition", "attachment"));
+    if let Some(mime_type) = mime_type {
+        resp.insert_header(("Content-Type", mime_type.to_owned()));
+    } else {
+        resp.content_type(ContentType::plaintext());
+    }
     let response = match result {
-        Pii::String(s) => HttpResponse::Ok()
-            .content_type(ContentType::plaintext())
-            .insert_header(("Content-Disposition", "attachment"))
-            .body(s.leak_to_string()),
-        Pii::Bytes(b) => HttpResponse::Ok()
-            .content_type(ContentType::plaintext())
-            .insert_header(("Content-Disposition", "attachment"))
-            .body(b.into_leak()),
+        Pii::String(s) => resp.body(s.leak_to_string()),
+        Pii::Bytes(b) => resp.body(b.into_leak()),
     };
     Ok(response)
 }
