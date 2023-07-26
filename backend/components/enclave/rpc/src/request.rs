@@ -3,7 +3,6 @@ use std::{fmt::Debug, marker::PhantomData};
 use crypto::{hex::ToHex, seal::EciesP256Sha256AesGcmSealed, sha256};
 use serde::{Deserialize, Serialize};
 
-use strum_macros::EnumDiscriminants;
 use uuid::Uuid;
 
 use crate::{types::KmsCredentials, DataTransform};
@@ -23,7 +22,7 @@ impl RpcRequest {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, EnumDiscriminants)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum RpcPayload {
     Ping(String),

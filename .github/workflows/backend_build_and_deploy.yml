@@ -34,6 +34,12 @@ on:
         type: string
         required: false
 
+      useEphemeralHoneycombApiKey:
+        description: 'override the honeycomb API key for the stack with the ephemeral API key'
+        type: boolean
+        required: false
+        default: false
+
       commitHash:
         description: 'hash of commit that we will be deploying'
         type: string
@@ -302,6 +308,14 @@ jobs:
         working-directory: ./backend/infra
         run: |
           pulumi config set --path constants.domain.prefix ${{ inputs.prefixDomain }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: 'override honeycomb API key'
+        if: ${{ inputs.useEphemeralHoneycombApiKey || false }}
+        working-directory: ./backend/infra
+        run: |
+          pulumi config set --secret --path constants.honeycomb.apiKey $(pulumi config get --path constants.honeycomb.ephemeralApiKey)
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
