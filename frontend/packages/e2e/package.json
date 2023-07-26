@@ -1,0 +1,27 @@
+{
+  "name": "@onefootprint/e2e",
+  "private": true,
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint src --fix",
+    "postinstall": "npx playwright install",
+    "test:e2e": "npx playwright test --ui",
+    "test:e2e:ci": "npx playwright test",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@playwright/test": "^1.36.0",
+    "dotenv": "^16.3.1",
+    "jimp": "^0.22.8",
+    "qrcode-reader": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.4",
+    "eslint-config-footprint": "*",
+    "typescript": "4.9.5"
+  }
+}

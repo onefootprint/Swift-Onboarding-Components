@@ -28,6 +28,7 @@
     "@onefootprint/test-utils",
     "@onefootprint/design-tokens",
     "@onefootprint/dev-tools",
+    "@onefootprint/e2e",
     "@onefootprint/idv",
     "@onefootprint/types",
     "@onefootprint/idv-elements"

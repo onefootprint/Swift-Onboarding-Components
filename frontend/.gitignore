@@ -48,8 +48,4 @@ storybook-static
 
 # Env
 apps/**/.env
-
-# Playwright
-test-results/
-playwright-report/
-playwright/.cache/
+packages/**/.env

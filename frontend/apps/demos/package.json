@@ -10,8 +10,7 @@
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "set:dot-env": "sh ../../scripts/set-dot-env.sh",
-    "test:e2e": "playwright test"
+    "set:dot-env": "sh ../../scripts/set-dot-env.sh"
   },
   "dependencies": {
     "@onefootprint/design-tokens": "*",
@@ -38,7 +37,6 @@
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
-    "@playwright/test": "^1.29.1",
     "@sentry/browser": "^7.28.1",
     "@tanstack/react-query": "^4.29.19",
     "@types/lodash": "^4.14.191",

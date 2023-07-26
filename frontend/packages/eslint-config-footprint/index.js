@@ -8,7 +8,6 @@ module.exports = {
     'turbo',
     'prettier',
   ],
-
   settings: {
     next: {
       rootDir: ['apps/*/'],
