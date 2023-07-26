@@ -49,6 +49,8 @@ pub struct NewRiskSignal {
     pub risk_signal_group_id: RiskSignalGroupId,
 }
 
+pub struct IncludeHidden(pub bool);
+
 impl RiskSignal {
     #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
     pub fn bulk_create(
@@ -124,12 +126,12 @@ impl RiskSignal {
         Ok(res)
     }
 
-    #[tracing::instrument("RiskSignal::latest_by_risk_signal_group_kind", skip_all)]
+    #[tracing::instrument("RiskSignal::latest_by_risk_signal_group_kinds", skip_all)]
     pub fn latest_by_risk_signal_group_kinds(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
+        include_hidden: IncludeHidden,
     ) -> DbResult<Vec<(RiskSignalGroupKind, Self)>> {
-        // let rsg = RiskSignalGroup::latest_by_kinds(conn, scoped_vault_id)?;
         let rsg: Vec<RiskSignalGroup> = risk_signal_group::table
             .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))
             .order((risk_signal_group::kind, risk_signal_group::created_at.desc()))
@@ -139,9 +141,13 @@ impl RiskSignal {
         let rsg_map: HashMap<RiskSignalGroupId, RiskSignalGroupKind> =
             rsg.into_iter().map(|r| (r.id, r.kind)).collect();
 
-        let risk_signals: Vec<RiskSignal> = risk_signal::table
+        let mut query = risk_signal::table
             .filter(risk_signal::risk_signal_group_id.eq_any(rsg_ids))
-            .get_results(conn)?;
+            .into_boxed();
+        if !include_hidden.0 {
+            query = query.filter(risk_signal::hidden.eq(false));
+        }
+        let risk_signals: Vec<RiskSignal> = query.get_results(conn)?;
 
         // construct output
         let res = risk_signals

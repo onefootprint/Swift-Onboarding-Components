@@ -13,7 +13,7 @@ use db::models::fingerprint::Fingerprint;
 use db::models::manual_review::ManualReview;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
-use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal::{IncludeHidden, RiskSignal};
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
@@ -150,19 +150,10 @@ pub async fn query_data(
             let sv = ScopedVault::get(conn, &svid).unwrap();
             let (ob, _, mr, obd) = Onboarding::get(conn, (&sv.id, &sv.vault_id)).unwrap();
 
-            let latest_obd = OnboardingDecision::latest_footprint_actor_decision(
-                conn,
-                &sv.fp_id,
-                &sv.tenant_id,
-                sv.is_live,
-            )
-            .unwrap();
-            let rs = latest_obd
-                .as_ref()
-                .map(|obd| RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &obd.id).unwrap())
-                .unwrap_or_default()
+            let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, IncludeHidden(false))
+                .unwrap()
                 .into_iter()
-                .filter(|rs| !rs.hidden)
+                .map(|(_, rs)| rs)
                 .collect();
 
             let wf = Workflow::get(conn, &wfid).unwrap();

@@ -4,7 +4,6 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 
-use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 
@@ -12,8 +11,10 @@ use crate::State;
 
 use api_core::decision::field_validations::create_field_validation_results;
 use api_wire_types::GetFieldValidationResponse;
-use db::models::onboarding_decision::OnboardingDecision;
+use db::models::risk_signal::IncludeHidden;
 use db::models::risk_signal::RiskSignal;
+use db::models::scoped_vault::ScopedVault;
+use db::DbResult;
 use newtypes::FpId;
 
 use newtypes::SignalScope;
@@ -36,20 +37,13 @@ pub async fn get(
 
     let reason_codes = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<Vec<RiskSignal>> {
-            let latest_onboarding_decision =
-                OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?;
-
-            match latest_onboarding_decision {
-                Some(obd) => Ok(RiskSignal::list_tenant_visible_by_onboarding_decision_id(
-                    conn, &obd.id,
-                )?),
-                None => Ok(vec![]),
-            }
+        .db_query(move |conn| -> DbResult<Vec<_>> {
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, IncludeHidden(false))
         })
         .await??
         .into_iter()
-        .map(|rs| rs.reason_code)
+        .map(|(_, rs)| rs.reason_code)
         .collect();
 
     let field_validations_map = create_field_validation_results(reason_codes);
