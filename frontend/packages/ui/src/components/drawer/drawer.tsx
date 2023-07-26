@@ -17,6 +17,7 @@ import useOpenAnimation, { State } from './hooks/use-open-animation';
 
 export type DrawerProps = {
   children?: React.ReactNode;
+  headerComponent?: React.ReactNode;
   closeAriaLabel?: string;
   closeIconComponent?: Icon;
   onClose: () => void;
@@ -33,6 +34,7 @@ const Drawer = ({
   open,
   testID,
   title,
+  headerComponent,
 }: DrawerProps) => {
   const state = useOpenAnimation(open);
   const DrawerRef = useRef<HTMLDivElement>(null);
@@ -69,6 +71,7 @@ const Drawer = ({
                 {title}
               </Typography>
             </Header>
+            {headerComponent}
             <Body>{children}</Body>
           </DrawerContainer>
         </span>

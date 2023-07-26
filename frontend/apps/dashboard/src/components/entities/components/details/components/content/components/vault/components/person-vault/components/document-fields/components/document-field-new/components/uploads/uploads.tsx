@@ -20,7 +20,7 @@ export type UploadsProps = {
 
 const Uploads = ({ vault, currentDocument }: UploadsProps) => {
   const { t } = useTranslation('pages.entity.fieldset.document.drawer.uploads');
-  const { formatDateWithTime } = useIntl();
+  const { formatTime } = useIntl();
 
   const getSrc = (side: IdDocImageTypes, version: string) => {
     const vaultIndex =
@@ -60,11 +60,13 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
       {currentDocument.uploads.map((upload, i) => (
         <Row key={upload.timestamp}>
           <Typography
-            sx={{ whiteSpace: 'nowrap', minWidth: '120px' }}
+            sx={{ whiteSpace: 'nowrap' }}
             variant="label-3"
             color="tertiary"
           >
-            {formatDateWithTime(new Date(upload.timestamp))}
+            {formatTime(new Date(upload.timestamp))
+              // AM --> am
+              .toLowerCase()}
           </Typography>
           <IconAndLine>
             <IconContainer>

@@ -25,6 +25,14 @@ const useIntl = (locale = 'en-US') => {
       ...options,
     });
 
+  const formatTime = (date: Date, options?: Record<string, any>) =>
+    date.toLocaleString(locale, {
+      hour: '2-digit',
+      minute: 'numeric',
+      hour12: true,
+      ...options,
+    });
+
   const formatRelativeDate = (date: Date) => {
     const units: Record<string, number> = {
       year: 24 * 60 * 60 * 1000 * 365,
@@ -59,6 +67,7 @@ const useIntl = (locale = 'en-US') => {
     formatDateWithTime,
     formatUtcDate,
     formatRelativeDate,
+    formatTime,
   };
 };
 

@@ -564,6 +564,10 @@
             "drivers_license.title": "Driver's license and selfie",
             "id_card.title": "ID card and selfie",
             "passport.title": "Passport and selfie",
+            "session-selector": {
+              "title": "Session",
+              "session": "Session"
+            },
             "document-data": {
               "title": "Extracted document data",
               "labels": {

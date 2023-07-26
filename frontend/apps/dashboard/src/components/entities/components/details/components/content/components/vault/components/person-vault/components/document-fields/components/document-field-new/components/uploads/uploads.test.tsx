@@ -46,9 +46,9 @@ describe('<Uploads />', () => {
       currentDocument: successfulIDCardDocument,
     });
 
-    expect(screen.getByText('5/6/22, 6:12 AM')).toBeInTheDocument();
-    expect(screen.getByText('5/8/22, 3:16 AM')).toBeInTheDocument();
-    expect(screen.getByText('5/9/22, 5:27 AM')).toBeInTheDocument();
+    expect(screen.getByText('06:12 am')).toBeInTheDocument();
+    expect(screen.getByText('03:16 am')).toBeInTheDocument();
+    expect(screen.getByText('05:27 am')).toBeInTheDocument();
   });
 
   it('Should render each image', () => {

@@ -1,16 +1,17 @@
-import { useIntl, useToggle, useTranslation } from '@onefootprint/hooks';
+import { useToggle, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   Document,
   EntityVault,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
-import { Drawer, LinkButton, Select, Typography } from '@onefootprint/ui';
+import { Drawer, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import { getDocumentVersion } from '../../utils';
 import ConfidenceScores from './components/confidence-scores';
 import ExtractedDocumentData from './components/extracted-document-data';
+import SessionSelect from './components/session-select';
 import Uploads from './components/uploads';
 
 export type DocumentFieldProps = {
@@ -31,12 +32,6 @@ const DocumentField = ({
   const [activeDocumentVersion, setActiveDocumentVersion] = useState(
     getDocumentVersion(documents[0], documents),
   );
-  const { formatDateWithTime } = useIntl();
-
-  const documentOptions = documents.map(document => ({
-    label: formatDateWithTime(new Date(document.startedAt)),
-    value: getDocumentVersion(document, documents),
-  }));
 
   const currentDocument = documents.find(
     document =>
@@ -63,20 +58,15 @@ const DocumentField = ({
         open={isDrawerOpen}
         title={t(`drawer.${documentType}.title`)}
         onClose={hide}
+        headerComponent={
+          <SessionSelect
+            onActiveDocumentVersionChange={setActiveDocumentVersion}
+            documents={documents}
+            activeDocumentVersion={activeDocumentVersion}
+          />
+        }
       >
         <DrawerItems>
-          <Select
-            placeholder={
-              documentOptions.find(
-                option => option.value === activeDocumentVersion.toString(),
-              )?.label || ''
-            }
-            options={documentOptions}
-            onChange={newOption => setActiveDocumentVersion(newOption.value)}
-            value={documentOptions.find(
-              option => option.value === activeDocumentVersion.toString(),
-            )}
-          />
           {currentDocument && <ConfidenceScores document={currentDocument} />}
           <ExtractedDocumentData
             vault={vault}
@@ -103,6 +93,7 @@ const DrawerItems = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[9]};
+    padding-bottom: ${theme.spacing[8]};
   `}
 `;
 
