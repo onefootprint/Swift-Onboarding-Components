@@ -9,6 +9,7 @@ use db::models::contact_info::{ContactInfo, NewContactInfoArgs};
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::user_timeline::UserTimeline;
+use db::models::vault::Vault;
 use db::models::vault_data::VaultData;
 use db::TxnPgConn;
 use itertools::Itertools;
@@ -16,7 +17,6 @@ use newtypes::{BusinessDataKind as BDK, DataLifetimeSeqno, S3Url};
 use newtypes::{
     CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, Fingerprints,
     IdentityDataKind as IDK, KycedBusinessOwnerData, PiiString, ScopedVaultId, SealedVaultDataKey, VaultId,
-    VaultPublicKey,
 };
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
@@ -217,26 +217,25 @@ pub async fn seal_file_and_upload_to_s3(
     state: &State,
     file: &FileUpload,
     kind: DataIdentifier,
-    public_key: &VaultPublicKey,
-    vault_id: &VaultId,
+    vault: &Vault,
     scoped_vault_id: &ScopedVaultId,
 ) -> ApiResult<(SealedVaultDataKey, S3Url)> {
     let (e_data_key, data_key) =
         SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
-            public_key.as_ref(),
+            vault.public_key.as_ref(),
         )?;
     let e_data_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;
-    let sealed_bytes = data_key.seal_bytes(&file.bytes)?;
+    let sealed_bytes = data_key.seal_bytes(file.bytes.leak_slice())?;
 
     let bucket = &state.config.document_s3_bucket.clone();
-    let key = document_s3_key(vault_id, scoped_vault_id, kind);
+    let key = document_s3_key(&vault.id, scoped_vault_id, kind);
 
     let s3_path = state
         .s3_client
         .put_object(bucket, key, sealed_bytes.0, Some(&file.mime_type))
         .await?;
 
-    tracing::info!(s3_path = s3_path, scoped_vault_id=%scoped_vault_id, vault_id=%vault_id, filename=%file.filename, mime_type=%file.mime_type, "Uploaded Document to S3");
+    tracing::info!(s3_path = s3_path, scoped_vault_id=%scoped_vault_id, vault_id=%vault.id, filename=%file.filename, mime_type=%file.mime_type, "Uploaded Document to S3");
 
     Ok((e_data_key, S3Url::from(s3_path)))
 }

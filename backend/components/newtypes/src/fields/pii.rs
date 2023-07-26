@@ -73,6 +73,10 @@ impl PiiBytes {
         self.0
     }
 
+    pub fn leak_slice(&self) -> &[u8] {
+        &self.0
+    }
+
     pub fn into_leak_base64_pii(self) -> PiiString {
         PiiString::from(self.into_leak_base64().to_string_standard().0)
     }

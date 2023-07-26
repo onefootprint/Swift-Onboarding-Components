@@ -255,8 +255,7 @@ async fn encrypt_document(
         state,
         &file,
         doc_kind.into(),
-        &vault.public_key,
-        &vault.id,
+        &vault,
         &scoped_vault.id,
     )
     .await?;

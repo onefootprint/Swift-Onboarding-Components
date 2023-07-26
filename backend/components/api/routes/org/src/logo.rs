@@ -58,7 +58,7 @@ pub async fn put(
         .put_object(
             &state.config.assets_s3_bucket,
             file_name,
-            file.bytes,
+            file.bytes.into_leak(),
             Some(&file.mime_type),
         )
         .await?;

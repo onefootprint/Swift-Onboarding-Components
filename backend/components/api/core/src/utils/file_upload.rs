@@ -2,7 +2,7 @@ use crate::errors::file_upload::FileUploadError;
 use crate::errors::ApiError;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
-use bytes::{Bytes, BytesMut};
+use bytes::BytesMut;
 use futures_util::StreamExt as _;
 
 use mime::Mime;
@@ -11,7 +11,7 @@ use reqwest::header::CONTENT_LENGTH;
 
 #[derive(Clone)]
 pub struct FileUpload {
-    pub bytes: Bytes,
+    pub bytes: PiiBytes,
     pub mime_type: String,
     pub filename: String,
     pub file_extension: String,
@@ -38,7 +38,7 @@ impl FileUpload {
         };
 
         Self {
-            bytes: Bytes::from(pii.into_leak()),
+            bytes: pii,
             mime_type: mime.to_string(),
             file_extension: file_extension.to_string(),
             filename: name,
@@ -102,7 +102,7 @@ pub async fn handle_file_upload(
         }
     }
 
-    let bytes = Bytes::from(bytes);
+    let bytes = PiiBytes::new(bytes.to_vec());
 
     Ok(FileUpload {
         bytes,

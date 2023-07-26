@@ -16,7 +16,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use macros::route_alias;
-use newtypes::{AccessEventKind, DataIdentifier, FpId};
+use newtypes::{AccessEventKind, DataIdentifier, FpId, PiiBytes};
 use paperclip::actix::{self, api_v2_operation, web, web::Path};
 
 api_headers_schema! {
@@ -123,7 +123,7 @@ async fn post_upload_inner(
         .await?;
 
     let file = FileUpload {
-        bytes: body.into_inner(),
+        bytes: PiiBytes::new(body.into_inner().to_vec()),
         mime_type: headers.mime_type.unwrap_or("application/octet-stream".into()),
         filename: data_identifier.to_string(),
         file_extension: "bin".to_string(),
@@ -133,8 +133,7 @@ async fn post_upload_inner(
         state,
         &file,
         data_identifier.clone(),
-        &vault.public_key,
-        &vault.id,
+        &vault,
         &scoped_vault.id,
     )
     .await?;

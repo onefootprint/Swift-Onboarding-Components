@@ -38,8 +38,7 @@ pub async fn post(
         &state,
         &file,
         kind.into(),
-        &user_auth.user().public_key,
-        &user_auth.user().id,
+        user_auth.user(),
         &user_auth.scoped_user.id,
     )
     .await?;
