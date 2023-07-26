@@ -3,6 +3,10 @@ pub mod states;
 #[cfg(test)]
 mod tests;
 
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod tests_collect_document;
+
 use super::{
     actions::{MakeDecision, MakeVendorCalls},
     traits::HasRuleGroup,
