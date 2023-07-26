@@ -18,6 +18,7 @@ tokio-vsock = { version = "0.3", optional = true }
 reqwest = { workspace = true }
 reqwest-middleware = { workspace = true }
 reqwest-retry = { workspace = true }
+reqwest-tracing = { workspace = true }
 retry-policies = { workspace = true }
 chrono = { workspace = true }
 

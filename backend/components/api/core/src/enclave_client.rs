@@ -78,11 +78,9 @@ impl EnclaveClient {
     }
 
     /// send the request to the enclave
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("EnclaveClient::send", skip_all)]
     async fn send(&self, req: RpcRequest) -> Result<EnclavePayload, EnclaveError> {
-        tracing::debug!("sending enclave request");
         let response = self.client.send_request(req).await?;
-        tracing::debug!("got enclave response");
 
         Ok(response)
     }

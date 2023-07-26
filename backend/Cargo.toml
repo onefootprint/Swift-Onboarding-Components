@@ -89,6 +89,7 @@ webauthn-rs-proto = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd
 reqwest = {version = "0.11.13", features=["json", "default-tls", "rustls-tls", "rustls-tls-manual-roots", "rustls-tls-webpki-roots", "native-tls"]}
 reqwest-middleware = "0.2.2"
 reqwest-retry = "0.2.2"
+reqwest-tracing = "0.4.5"
 retry-policies = "0.1.2"
 
 schemars = { version = "0.8", features = ["chrono", "uuid1", "preserve_order"]}

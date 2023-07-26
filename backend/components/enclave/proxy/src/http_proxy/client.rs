@@ -1,10 +1,12 @@
+use reqwest_middleware::ClientWithMiddleware;
+use reqwest_tracing::TracingMiddleware;
 use rpc::{EnclavePayload, RpcRequest};
 use std::time::Duration;
 
 #[derive(Clone, Debug)]
 pub struct ProxyHttpClient {
     endpoint: String,
-    client: reqwest::Client,
+    client: ClientWithMiddleware,
     bearer_token: String,
 }
 
@@ -20,11 +22,14 @@ pub struct ProxyPayloadResponse {
 
 impl ProxyHttpClient {
     pub fn new(endpoint: &str, proxy_auth_token: &str) -> Result<Self, crate::Error> {
-        let client = reqwest::ClientBuilder::new()
+        let reqwest_client = reqwest::Client::builder()
             // Some requests can be latent, like a batch decrypt in vault proxy. We might want
             // different timeouts for different use cases
             .timeout(Duration::from_secs(5))
             .build()?;
+        let client = reqwest_middleware::ClientBuilder::new(reqwest_client)
+            .with(TracingMiddleware::default())
+            .build();
 
         Ok(Self {
             client,
@@ -65,26 +70,21 @@ impl ProxyHttpClient {
             request: request.clone(),
         };
 
-        let mut response = self
-            .client
-            .post(&url)
-            .bearer_auth(&self.bearer_token)
-            .json(&payload_request)
-            .send()
-            .await;
-
-        while match &response {
-            Ok(response) if response.status().as_u16() >= 500 && retries_left > 0 => true,
-            Err(e) if e.is_timeout() && retries_left > 0 => true,
-            Ok(_) | Err(_) => false,
-        } {
-            response = self
-                .client
+        let make_request = || {
+            self.client
                 .post(&url)
                 .bearer_auth(&self.bearer_token)
                 .json(&payload_request)
                 .send()
-                .await;
+        };
+        let mut response = make_request().await;
+
+        while match &response {
+            Ok(response) if response.status().as_u16() >= 500 && retries_left > 0 => true,
+            Err(reqwest_middleware::Error::Reqwest(e)) if e.is_timeout() && retries_left > 0 => true,
+            Ok(_) | Err(_) => false,
+        } {
+            response = make_request().await;
             retries_left -= 1;
         }
 
