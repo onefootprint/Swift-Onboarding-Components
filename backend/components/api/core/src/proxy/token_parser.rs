@@ -114,6 +114,8 @@ impl<'a> ProxyTokenParser<'a> {
                 continue;
             };
 
+            // TODO this is taking multiple seconds for large bodies. Should do some more efficient
+            // string processing
             for to_replace in matches {
                 detokenized_body = detokenized_body.replace(&to_replace, detoken.leak());
             }

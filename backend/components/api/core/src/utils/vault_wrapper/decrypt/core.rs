@@ -1,11 +1,13 @@
 use super::super::VaultWrapper;
 use super::{DecryptUncheckedResult, EnclaveDecryptOperation, Pii};
 use crate::enclave_client::{DecryptReq, EnclaveClient};
+use crate::errors::enclave::EnclaveError;
 use crate::errors::ApiResult;
 use db::VaultedData;
 use either::Either;
 use enclave_proxy::DataTransform;
 use enclave_proxy::{DataTransformer, DataTransforms};
+use futures_util::StreamExt;
 use itertools::Itertools;
 use newtypes::{DataIdentifier, DocumentKind, EncryptedVaultPrivateKey, PiiBytes, PiiString};
 use std::collections::HashMap;
@@ -118,6 +120,8 @@ pub(in crate::utils::vault_wrapper) struct VwDecryptRequest<'a>(
     VaultedData<'a>,
 );
 
+const BATCH_DECRYPT_CHUNK_SIZE: usize = 500;
+
 /// Executes a batch of decrypt requests for potentially multiple users, returning a hashmap of identifiers to their decrypted values
 #[tracing::instrument("batch_execute_decrypt_requests", skip_all)]
 pub(in crate::utils::vault_wrapper) async fn batch_execute_decrypt_requests<'a, T>(
@@ -140,7 +144,7 @@ where
                     Either::Right(Either::Right(((id, op), (e_private_key, e_data_key, s3_url))))
                 }
             });
-    let (e_data, e_large_data): (HashMap<_, _>, HashMap<_, _>) = e_data.into_iter().partition_map(|x| x);
+    let (e_data, e_large_data): (Vec<_>, Vec<_>) = e_data.into_iter().partition_map(|x| x);
 
     // Handle p_data
     let p_data = {
@@ -159,10 +163,20 @@ where
     let e_data = if e_data.is_empty() {
         vec![] // short-circuit to avoid network requests
     } else {
-        enclave_client
-            .batch_decrypt_to_piistring(e_data)
-            .await?
+        let result_futs = e_data
             .into_iter()
+            .chunks(BATCH_DECRYPT_CHUNK_SIZE)
+            .into_iter()
+            .map(|c| enclave_client.batch_decrypt_to_piistring(c.into_iter().collect()))
+            .collect_vec();
+        futures::stream::iter(result_futs)
+            .buffer_unordered(4)
+            .collect::<Vec<_>>()
+            .await
+            .into_iter()
+            .collect::<Result<Vec<_>, EnclaveError>>()?
+            .into_iter()
+            .flatten()
             .map(|((id, op), d)| (id, (op, Pii::String(d))))
             .collect()
     };
@@ -171,10 +185,20 @@ where
     let e_large_data = if e_large_data.is_empty() {
         vec![] // short-circuit to avoid network requests
     } else {
-        enclave_client
-            .batch_decrypt_documents(e_large_data)
-            .await?
+        let result_futs = e_large_data
             .into_iter()
+            .chunks(BATCH_DECRYPT_CHUNK_SIZE)
+            .into_iter()
+            .map(|c| enclave_client.batch_decrypt_documents(c.into_iter().collect()))
+            .collect_vec();
+        futures::stream::iter(result_futs)
+            .buffer_unordered(4)
+            .collect::<Vec<_>>()
+            .await
+            .into_iter()
+            .collect::<ApiResult<Vec<_>>>()?
+            .into_iter()
+            .flatten()
             .map(|((id, op), pii_bytes)| -> ApiResult<_> {
                 // Apply the document transforms inline since we decrypt the document outside of
                 // the enclave

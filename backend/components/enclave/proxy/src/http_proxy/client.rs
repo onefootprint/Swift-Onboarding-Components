@@ -21,7 +21,9 @@ pub struct ProxyPayloadResponse {
 impl ProxyHttpClient {
     pub fn new(endpoint: &str, proxy_auth_token: &str) -> Result<Self, crate::Error> {
         let client = reqwest::ClientBuilder::new()
-            .timeout(Duration::from_secs(1))
+            // Some requests can be latent, like a batch decrypt in vault proxy. We might want
+            // different timeouts for different use cases
+            .timeout(Duration::from_secs(5))
             .build()?;
 
         Ok(Self {
