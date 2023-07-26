@@ -75,6 +75,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
           <Content>
             <Typography variant="body-4">{getEventText(upload)}</Typography>
             <HoverableImage
+              isSuccess={upload.failureReasons.length === 0}
               src={getSrc(upload.side, upload.version.toString())}
             />
           </Content>
@@ -120,6 +121,8 @@ const Content = styled.div`
     justify-content: flex-start;
     width: 100%;
     margin-top: ${theme.spacing[2]};
+    gap: ${theme.spacing[6]};
+    margin-bottom: ${theme.spacing[9]};
   `}
 `;
 
