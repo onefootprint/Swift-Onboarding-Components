@@ -1,1 +1,1 @@
-export { default } from './uploads';
+export { type UploadsProps, default } from './uploads';

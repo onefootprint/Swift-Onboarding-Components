@@ -102,7 +102,7 @@ const DrawerItems = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[4]};
+    gap: ${theme.spacing[9]};
   `}
 `;
 

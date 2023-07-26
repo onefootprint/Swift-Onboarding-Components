@@ -588,7 +588,18 @@
               }
             },
             "uploads": {
-              "title": "Uploads"
+              "title": "Uploads",
+              "front": "Front",
+              "back": "Back",
+              "selfie": "Selfie",
+              "success": "successfully uploaded",
+              "failed": "upload failed",
+              "image-alt": "Upload image",
+              "document-types": {
+                "id_card": "ID",
+                "drivers_license": "driver's license",
+                "passport": "passport"
+              }
             }
           }
         },
