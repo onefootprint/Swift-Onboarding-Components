@@ -52,4 +52,6 @@ pub enum OnboardingError {
     UnsupportedDocumentType(Csv<ModernIdDocKind>),
     #[error("Cannot create a document fixture result for a non-sandbox Vault")]
     CannotCreateFixtureResultForNonSandbox,
+    #[error("Can only provide one image at a time")]
+    OnlyOneImageAllowed,
 }

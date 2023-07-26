@@ -3,15 +3,14 @@ use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{document_request, document_upload, identity_document};
 
-use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
 use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
-    Base64Data, DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentSide, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, VaultId,
+    DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, IdDocKind, IdentityDocumentFixtureResult,
+    IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId,
 };
 
 use super::document_request::DocumentRequest;
@@ -232,35 +231,5 @@ impl IdentityDocument {
         }
         let results = query.get_results(conn)?;
         Ok(results)
-    }
-}
-
-impl IdentityDocument {
-    pub fn seal_with_data_key(
-        b64_image: &str,
-        data_key: &ScopedSealingKey,
-    ) -> Result<AeadSealedBytes, crypto::Error> {
-        let b64_data = Base64Data::from_str_standard(b64_image)?;
-        data_key.seal_bytes(&b64_data.0)
-    }
-
-    pub fn unseal_with_data_key(
-        image_bytes: AeadSealedBytes,
-        data_key: &ScopedSealingKey,
-    ) -> Result<String, crypto::Error> {
-        let bytes = data_key.unseal_bytes(image_bytes)?;
-        Ok(Base64Data::into_string_standard(bytes).0)
-    }
-
-    pub fn s3_path_for_document_image(
-        side: DocumentSide,
-        document_request_id: &DocumentRequestId,
-        user_vault_id: &VaultId,
-    ) -> String {
-        // Store documents in a path like "documents/encrypted/uv_1234/front/dr_1234"
-        format!(
-            "documents/encrypted/{}/{}/{}",
-            user_vault_id, side, document_request_id
-        )
     }
 }

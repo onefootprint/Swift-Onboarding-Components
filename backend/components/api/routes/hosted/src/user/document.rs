@@ -2,9 +2,7 @@ use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
-use crate::user::documents::upload::{
-    handle_incode_request, save_vres_for_fixture_risk_signals, upload_images, TempUploadDocuments,
-};
+use crate::user::documents::upload::{handle_incode_request, save_vres_for_fixture_risk_signals};
 use crate::utils::large_json::LargeJson;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
@@ -13,6 +11,8 @@ use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
 use api_core::errors::workflow::WorkflowError;
 use api_core::types::JsonApiResponse;
+use api_core::utils::file_upload::FileUpload;
+use api_core::utils::vault_wrapper::seal_file_and_upload_to_s3;
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::DocumentResponse;
 use db::models::decision_intent::DecisionIntent;
@@ -24,7 +24,7 @@ use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::WorkflowGuard;
+use newtypes::{DataIdentifier, WorkflowGuard};
 use newtypes::{DocumentKind, DocumentSide, IdentityDocumentStatus};
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -79,12 +79,20 @@ pub async fn post(
         }
     }
 
-    let req = TempUploadDocuments {
-        front_image: request.front_image,
-        back_image: request.back_image,
-        selfie_image: request.selfie_image,
+    let (side, image) = match (request.front_image, request.back_image, request.selfie_image) {
+        (Some(i), None, None) => (DocumentSide::Front, i),
+        (None, Some(i), None) => (DocumentSide::Back, i),
+        (None, None, Some(i)) => (DocumentSide::Selfie, i),
+        _ => return Err(OnboardingError::OnlyOneImageAllowed.into()),
     };
-    let (e_data_key, s3_urls) = upload_images(&state, req, &vault, &doc_request.id).await?;
+
+    let mime_type = "image/png";
+    let di = DataIdentifier::from(DocumentKind::LatestUpload(request.document_type, side));
+    let su_id = user_auth.scoped_user.id.clone();
+    let image_bytes = image.try_decode_base64().map_err(crypto::Error::from)?;
+    let file = FileUpload::new_simple(image_bytes, format!("{}", di), mime_type);
+    let (e_data_key, s3_url) =
+        seal_file_and_upload_to_s3(&state, &file, di.clone(), user_auth.user(), &su_id).await?;
 
     // Check if we should be initiating requests (e.g. check if we are testing)
     let should_initiate_reqs = decision::utils::get_fixture_data_decision(
@@ -115,24 +123,9 @@ pub async fn post(
                 return Err(OnboardingError::IdentityDocumentNotPending.into());
             }
             // Vault the images under latest uploads
-            let s3_urls = s3_urls
-                .into_iter()
-                .map(|(side, s3_url)| -> ApiResult<_> {
-                    let kind = DocumentKind::LatestUpload(id_doc.document_type, side).into();
-                    let name = format!("{}.png", kind);
-                    let mt = "image/png".to_string();
-                    let (_, seqno) =
-                        uvw.put_document_unsafe(conn, kind, mt, name, e_data_key.clone(), s3_url.clone())?;
-                    Ok((side, s3_url, seqno))
-                })
-                .collect::<ApiResult<Vec<_>>>()?;
-            // Create each of the uploads
-            s3_urls
-                .into_iter()
-                .map(|(side, s3_url, seqno)| {
-                    DocumentUpload::create(conn, id_doc.id.clone(), side, s3_url, e_data_key.clone(), seqno)
-                })
-                .collect::<db::DbResult<Vec<_>>>()?;
+            let (d, seqno) =
+                uvw.put_document_unsafe(conn, di, file.mime_type, file.filename, e_data_key, s3_url)?;
+            DocumentUpload::create(conn, id_doc.id.clone(), side, d.s3_url, d.e_data_key, seqno)?;
             let existing_sides = id_doc
                 .images(conn, true)?
                 .into_iter()

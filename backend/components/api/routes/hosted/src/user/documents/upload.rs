@@ -13,10 +13,10 @@ use api_core::decision::vendor::incode::{get_config_id, IncodeContext, IncodeSta
 use api_core::errors::workflow::WorkflowError;
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
+use api_core::utils::file_upload::FileUpload;
 use api_core::utils::large_json::LargeJson;
+use api_core::utils::vault_wrapper::seal_file_and_upload_to_s3;
 use api_wire_types::{CreateIdentityDocumentUploadRequest, DocumentImageError, DocumentResponse};
-use crypto::aead::AeadSealedBytes;
-use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
 use db::models::document_upload::DocumentUpload;
@@ -29,11 +29,10 @@ use db::models::verification_result::VerificationResult;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, DocumentKind, DocumentRequestId, DocumentSide, IdentityDocumentId,
-    IdentityDocumentStatus, IncodeVerificationSessionState, PiiString, SealedVaultDataKey, TenantId, VaultId,
-    WorkflowId,
+    DataIdentifier, DecisionIntentId, DocumentKind, DocumentSide, IdentityDocumentId, IdentityDocumentStatus,
+    IncodeVerificationSessionState, TenantId, WorkflowId,
 };
-use newtypes::{S3Url, ScopedVaultId, VendorAPI, WorkflowGuard};
+use newtypes::{ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -51,7 +50,11 @@ pub async fn post(
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let wf = user_auth.workflow().ok_or(WorkflowError::AuthMissingWorkflow)?;
     let document_id: IdentityDocumentId = document_id.into_inner();
-    let request = request.0;
+    let CreateIdentityDocumentUploadRequest {
+        image,
+        side,
+        mime_type,
+    } = request.0;
 
     let su_id = user_auth.scoped_user.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
@@ -65,7 +68,7 @@ pub async fn post(
         })
         .await??;
 
-    if request.side == DocumentSide::Selfie {
+    if side == DocumentSide::Selfie {
         if !doc_request.should_collect_selfie {
             return Err(OnboardingError::NotExpectingSelfie.into());
         }
@@ -74,17 +77,13 @@ pub async fn post(
         }
     }
 
-    let front_image = (request.side == DocumentSide::Front).then_some(request.image.clone());
-    let back_image = (request.side == DocumentSide::Back).then_some(request.image.clone());
-    let selfie_image = (request.side == DocumentSide::Selfie).then_some(request.image);
-    let r = TempUploadDocuments {
-        front_image,
-        back_image,
-        selfie_image,
-    };
-
-    // Upload the image(s) to s3
-    let (e_data_key, s3_urls) = upload_images(&state, r, &vault, &doc_request.id).await?;
+    // Upload the image to s3
+    let di = DataIdentifier::from(DocumentKind::LatestUpload(id_doc.document_type, side));
+    let su_id = user_auth.scoped_user.id.clone();
+    let image_bytes = image.try_decode_base64().map_err(crypto::Error::from)?;
+    let file = FileUpload::new_simple(image_bytes, format!("{}", di), &mime_type);
+    let (e_data_key, s3_url) =
+        seal_file_and_upload_to_s3(&state, &file, di.clone(), user_auth.user(), &su_id).await?;
 
     // Check if we should be initiating requests (e.g. check if we are testing)
     let should_initiate_reqs = decision::utils::get_fixture_data_decision(
@@ -96,10 +95,8 @@ pub async fn post(
 
     // Create uploads for the document
     let ob_id = user_auth.onboarding()?.id.clone();
-    let su_id = user_auth.scoped_user.id.clone();
     let vault2 = vault.clone();
     let wf_id = wf.id.clone();
-    let mime_type = request.mime_type;
     let (missing_sides, created_reqs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -108,24 +105,9 @@ pub async fn post(
                 return Err(OnboardingError::IdentityDocumentNotPending.into());
             }
             // Vault the images under latest uploads
-            let s3_urls = s3_urls
-                .into_iter()
-                .map(|(side, s3_url)| -> ApiResult<_> {
-                    let kind = DocumentKind::LatestUpload(id_doc.document_type, side).into();
-                    let name = format!("{}.png", kind);
-                    let mt = mime_type.clone();
-                    let (_, seqno) =
-                        uvw.put_document_unsafe(conn, kind, mt, name, e_data_key.clone(), s3_url.clone())?;
-                    Ok((side, s3_url, seqno))
-                })
-                .collect::<ApiResult<Vec<_>>>()?;
-            // Create each of the uploads
-            s3_urls
-                .into_iter()
-                .map(|(side, s3_url, seqno)| {
-                    DocumentUpload::create(conn, id_doc.id.clone(), side, s3_url, e_data_key.clone(), seqno)
-                })
-                .collect::<db::DbResult<Vec<_>>>()?;
+            let (d, seqno) =
+                uvw.put_document_unsafe(conn, di, mime_type, file.filename, e_data_key, s3_url)?;
+            DocumentUpload::create(conn, id_doc.id.clone(), side, d.s3_url, d.e_data_key, seqno)?;
             let existing_sides = id_doc
                 .images(conn, true)?
                 .into_iter()
@@ -205,70 +187,6 @@ pub async fn post(
         }
     };
     ResponseData::ok(response).json()
-}
-
-// TODO clean up
-pub struct TempUploadDocuments {
-    pub front_image: Option<PiiString>,
-    pub back_image: Option<PiiString>,
-    pub selfie_image: Option<PiiString>,
-}
-
-pub(in crate::user) async fn upload_images(
-    state: &State,
-    request: TempUploadDocuments,
-    vault: &Vault,
-    doc_request_id: &DocumentRequestId,
-) -> ApiResult<(SealedVaultDataKey, Vec<(DocumentSide, S3Url)>)> {
-    // generate a sealed data key (with its plaintext)
-    let (e_data_key, data_key) =
-        SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
-            vault.public_key.as_ref(),
-        )?;
-    let e_data_key = SealedVaultDataKey::try_from(e_data_key.sealed_key)?;
-    let bucket = &state.config.document_s3_bucket.clone();
-
-    //
-    // Encrypt all images
-    //
-    let e_imgs = vec![
-        request.front_image.map(|img| (DocumentSide::Front, img)),
-        request.back_image.map(|img| (DocumentSide::Back, img)),
-        request.selfie_image.map(|img| (DocumentSide::Selfie, img)),
-    ]
-    .into_iter()
-    .flatten()
-    .map(|(side, img)| -> ApiResult<_> {
-        let e_data = IdentityDocument::seal_with_data_key(img.leak(), &data_key)?;
-        Ok((side, e_data))
-    })
-    .collect::<ApiResult<Vec<_>>>()?;
-
-    //
-    // Upload all images to s3
-    //
-    let s3_upload_futs = e_imgs
-        .into_iter()
-        .map(|(side, e_data)| upload_image(state, side, e_data, doc_request_id, &vault.id, bucket))
-        .collect_vec();
-
-    let s3_urls = futures::future::try_join_all(s3_upload_futs).await?;
-    Ok((e_data_key, s3_urls))
-}
-
-/// Uploads the provided image to s3.
-/// Only needed because rust doesn't yet support async closures
-pub async fn upload_image(
-    state: &State,
-    side: DocumentSide,
-    e_data: AeadSealedBytes,
-    req_id: &DocumentRequestId,
-    uv_id: &VaultId,
-    bucket: &str,
-) -> ApiResult<(DocumentSide, S3Url)> {
-    let path = IdentityDocument::s3_path_for_document_image(side, req_id, uv_id);
-    let s3_url = state.s3_client.put_object(bucket, path, e_data.0, None).await?;
-    Ok((side, S3Url::from(s3_url)))
 }
 
 #[allow(clippy::too_many_arguments)]

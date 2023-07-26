@@ -33,6 +33,7 @@ pub struct DocumentData {
     pub kind: DataIdentifier,
     pub mime_type: PiiString,
     pub filename: String,
+    // TODO unique index
     pub s3_url: S3Url,
     pub e_data_key: SealedVaultDataKey,
 }
