@@ -13,7 +13,11 @@ import { hotjar } from 'react-hotjar';
 
 import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';
-import { FATHOM_TRACKING_CODE, HOTJAR_SITE_ID } from '../config/constants';
+import {
+  FATHOM_TRACKING_CODE,
+  HOTJAR_SITE_ID,
+  HOTJAR_VERSION,
+} from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 
@@ -33,8 +37,8 @@ const GlobalStyle = createGlobalStyle`
 
 const App = ({ Component, pageProps }: AppProps) => {
   useEffect(() => {
-    if (HOTJAR_SITE_ID) {
-      hotjar.initialize(+HOTJAR_SITE_ID, 6);
+    if (HOTJAR_SITE_ID && HOTJAR_VERSION) {
+      hotjar.initialize(Number(HOTJAR_SITE_ID), Number(HOTJAR_VERSION));
     }
   }, []);
 

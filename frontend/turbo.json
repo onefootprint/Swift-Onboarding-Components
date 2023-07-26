@@ -43,7 +43,8 @@
         "NEXT_PUBLIC_KYB_TENANT_KEY",
         "NEXT_PUBLIC_KYC_ID_DOC_TENANT_KEY",
         "NEXT_PUBLIC_E2E_TENANT_PK",
-        "NEXT_PUBLIC_HOTJAR_SITE_ID"
+        "NEXT_PUBLIC_HOTJAR_SITE_ID",
+        "NEXT_PUBLIC_HOTJAR_VERSION"
       ]
     },
     "test": {

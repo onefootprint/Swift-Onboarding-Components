@@ -7,3 +7,4 @@ export const FATHOM_TRACKING_CODE =
   process.env.NEXT_PUBLIC_FATHOM_TRACKING_CODE;
 
 export const HOTJAR_SITE_ID = process.env.NEXT_PUBLIC_HOTJAR_SITE_ID;
+export const HOTJAR_VERSION = process.env.NEXT_PUBLIC_HOTJAR_VERSION;
