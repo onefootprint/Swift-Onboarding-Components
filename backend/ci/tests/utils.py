@@ -66,6 +66,18 @@ def get(path, params=None, *auths, status_code=200):
     ).json()
 
 
+def get_raw(path, status_code=200):
+    return _make_request(
+        method=requests.get,
+        path=path,
+        data=None,
+        params=None,
+        status_code=status_code,
+        auths=[],
+        files=None,
+    )
+
+
 def put(path, data=None, *auths, status_code=200, files=None):
     return _make_request(
         method=requests.put,

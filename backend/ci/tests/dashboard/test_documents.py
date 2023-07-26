@@ -1,8 +1,11 @@
+import base64
+import requests
 import pytest
 from tests.dashboard.utils import latest_access_event_for
 from tests.utils import (
     get,
     post,
+    get_raw,
 )
 from tests.bifrost_client import BifrostClient
 
@@ -44,7 +47,6 @@ def test_tenant_document_get_decrypt(user_with_documents):
     assert resp["document.drivers_license.dob"]
 
 
-# Test decryption of vaulted documents
 def test_tenant_document_decrypt(user_with_documents):
     from tests.image_fixtures import test_image_dl_front
 
@@ -71,6 +73,31 @@ def test_tenant_document_decrypt(user_with_documents):
     assert resp["document.drivers_license.issuing_state"] == "CALIFORNIA"
     assert resp["document.drivers_license.expires_at"] == "2024-10-15"
     assert resp["document.drivers_license.dob"] == "1986-10-16"
+
+    access_event = latest_access_event_for(user_with_documents.fp_id, tenant.sk)
+    assert set(access_event["targets"]) == set(fields)
+
+
+def test_tenant_document_decrypt_download(user_with_documents):
+    from tests.image_fixtures import test_image_dl_front
+
+    tenant = user_with_documents.tenant
+    fields = [
+        "document.drivers_license.front.image",
+    ]
+    data = {
+        "fields": fields,
+        "scopes": ["decrypt_download"],
+        "decrypt_reason": "Responding to a customer request",
+    }
+
+    body = post(f"users/{user_with_documents.fp_id}/client_token", data, tenant.sk.key)
+    token = body["token"]
+
+    # Make raw request since the downloaded content is not json
+    response = get_raw(f"users/vault/decrypt/{token}")
+    assert response.headers.get("content-disposition") == "attachment"
+    assert response.content == base64.b64decode(test_image_dl_front)
 
     access_event = latest_access_event_for(user_with_documents.fp_id, tenant.sk)
     assert set(access_event["targets"]) == set(fields)

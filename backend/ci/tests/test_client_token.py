@@ -1,6 +1,6 @@
 import pytest
 from tests.constants import FIELDS_TO_DECRYPT
-from tests.utils import post, patch, get
+from tests.utils import post, patch, get_raw, get
 from tests.dashboard.utils import latest_access_event_for
 from tests.headers import ClientTokenAuth
 
@@ -159,3 +159,14 @@ def test_large_objects(sandbox_user):
     assert resp[di]
     obj_out = base64.b64decode(resp[di])
     assert json.loads(obj_out)["some_key"] == obj["some_key"]
+
+    # Test decrypt downloading
+    token = client_token_with_scopes(
+        sandbox_user,
+        fields=["custom.large_id"],
+        scopes=["decrypt_download"],
+        decrypt_reason="flerp",
+    )
+
+    response = get_raw(f"entities/vault/decrypt/{token.value}")
+    assert json.loads(response.content) == obj
