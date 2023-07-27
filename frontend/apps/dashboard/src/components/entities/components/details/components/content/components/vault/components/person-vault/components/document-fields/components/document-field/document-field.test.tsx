@@ -7,8 +7,8 @@ import {
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
-import DocumentField, { DocumentFieldProps } from './document-field-new';
-import driversLicensePartialDIs from './document-field-new.test.config';
+import DocumentField, { DocumentFieldProps } from './document-field';
+import driversLicensePartialDIs from './document-field.test.config';
 
 const renderDocumentField = ({
   vault,
