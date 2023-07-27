@@ -21,7 +21,6 @@ use crate::DocumentSide;
     Hash,
     AsExpression,
     FromSqlRow,
-    EnumString,
     EnumIter,
     JsonSchema,
 )]
@@ -32,6 +31,21 @@ pub enum IdDocKind {
     IdCard,
     DriverLicense,
     Passport,
+}
+
+impl ::core::str::FromStr for IdDocKind {
+    type Err = strum::ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let result = match s {
+            "id_card" => IdDocKind::IdCard,
+            "driver_license" => IdDocKind::DriverLicense,
+            "drivers_license" => IdDocKind::DriverLicense,
+            "passport" => IdDocKind::Passport,
+            _ => return Err(strum::ParseError::VariantNotFound),
+        };
+        Ok(result)
+    }
 }
 
 crate::util::impl_enum_string_diesel!(IdDocKind);
