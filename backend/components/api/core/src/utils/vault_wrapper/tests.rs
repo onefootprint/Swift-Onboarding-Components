@@ -16,7 +16,7 @@ use newtypes::KvDataKey;
 use newtypes::PiiString;
 use newtypes::S3Url;
 use newtypes::{
-    BusinessDataKind as BDK, DocumentSide, IdDocKind, InvestorProfileKind as IPK, SealedVaultBytes,
+    BusinessDataKind as BDK, DocumentSide, InvestorProfileKind as IPK, ModernIdDocKind, SealedVaultBytes,
 };
 use std::collections::HashSet;
 use std::str::FromStr;
@@ -784,7 +784,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
     let _ = uvw
         .put_document_unsafe(
             conn,
-            DocumentKind::Image(IdDocKind::DriverLicense, DocumentSide::Front).into(),
+            DocumentKind::Image(ModernIdDocKind::DriversLicense, DocumentSide::Front).into(),
             "image/png".into(),
             "filename.png".into(),
             newtypes::SealedVaultDataKey(vec![0x01]),
@@ -815,7 +815,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
         custom_key1.into(),
         custom_key2.into(),
         // Assert identity doc DL is not portable
-        DocumentKind::Image(IdDocKind::DriverLicense, DocumentSide::Front).into(),
+        DocumentKind::Image(ModernIdDocKind::DriversLicense, DocumentSide::Front).into(),
         IPK::AnnualIncome.into(),
         IPK::NetWorth.into(),
         IPK::InvestmentGoals.into(),

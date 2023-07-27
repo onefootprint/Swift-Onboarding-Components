@@ -16,8 +16,8 @@ use std::str::FromStr;
 
 use db::models::{identity_document::IdentityDocument, scoped_vault::ScopedVault};
 use newtypes::{
-    email::Email, DataIdentifier as DI, Declaration, DocumentKind as DK, IdDocKind, IdentityDataKind as IDK,
-    InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
+    email::Email, DataIdentifier as DI, Declaration, DocumentKind as DK, IdentityDataKind as IDK,
+    InvestorProfileKind as IPK, ModernIdDocKind, PhoneNumber, PiiJsonValue, PiiString, TenantId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -188,7 +188,7 @@ async fn create_create_account_request(
 }
 
 struct DocInfo {
-    id_doc_kind: IdDocKind,
+    id_doc_kind: ModernIdDocKind,
     di_pairs: Vec<(DI, DI)>, // (LatestUpload, MimeType)
 }
 

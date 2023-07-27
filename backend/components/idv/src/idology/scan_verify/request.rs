@@ -1,5 +1,5 @@
 use crate::idology::error as IdologyError;
-use newtypes::{DocVData, IdDocKind, PiiString};
+use newtypes::{DocVData, ModernIdDocKind, PiiString};
 
 type QueryId = u64;
 #[derive(Debug, Clone, serde::Serialize)]
@@ -56,12 +56,12 @@ pub enum ScanDocumentType {
     Passport,
 }
 
-impl From<IdDocKind> for ScanDocumentType {
-    fn from(value: IdDocKind) -> Self {
+impl From<ModernIdDocKind> for ScanDocumentType {
+    fn from(value: ModernIdDocKind) -> Self {
         match value {
-            IdDocKind::DriverLicense => Self::DriverLicense,
-            IdDocKind::IdCard => Self::IdCard,
-            IdDocKind::Passport => Self::Passport,
+            ModernIdDocKind::DriversLicense => Self::DriverLicense,
+            ModernIdDocKind::IdCard => Self::IdCard,
+            ModernIdDocKind::Passport => Self::Passport,
         }
     }
 }

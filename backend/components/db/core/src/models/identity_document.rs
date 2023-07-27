@@ -9,8 +9,8 @@ use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
-    DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, IdDocKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId,
+    DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, IdentityDocumentFixtureResult, IdentityDocumentId,
+    IdentityDocumentStatus, ModernIdDocKind, ScopedVaultId,
 };
 
 use super::document_request::DocumentRequest;
@@ -22,7 +22,7 @@ pub struct IdentityDocument {
     pub id: IdentityDocumentId,
     pub request_id: DocumentRequestId,
     /// This is the stated document type, selected by the user, not necessarily the true document type
-    pub document_type: IdDocKind,
+    pub document_type: ModernIdDocKind,
     pub country_code: String,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
@@ -45,7 +45,7 @@ pub struct IdentityDocument {
 #[diesel(table_name = identity_document)]
 pub struct NewIdentityDocumentArgs {
     pub request_id: DocumentRequestId,
-    pub document_type: IdDocKind,
+    pub document_type: ModernIdDocKind,
     pub country_code: String,
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
 }
@@ -54,7 +54,7 @@ pub struct NewIdentityDocumentArgs {
 #[diesel(table_name = identity_document)]
 struct NewIdentityDocumentRow {
     request_id: DocumentRequestId,
-    document_type: IdDocKind,
+    document_type: ModernIdDocKind,
     country_code: String,
     created_at: DateTime<Utc>,
     status: IdentityDocumentStatus,

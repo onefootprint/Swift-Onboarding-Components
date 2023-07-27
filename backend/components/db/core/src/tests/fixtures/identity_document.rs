@@ -8,12 +8,12 @@ use crate::{
     },
     TxnPgConn,
 };
-use newtypes::{DocumentRequestId, DocumentSide, IdDocKind, S3Url, SealedVaultDataKey};
+use newtypes::{DocumentRequestId, DocumentSide, ModernIdDocKind, S3Url, SealedVaultDataKey};
 
 pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> IdentityDocument {
     let args = NewIdentityDocumentArgs {
         request_id: request_id.unwrap_or_else(|| DocumentRequestId::from_str("test_derp").unwrap()),
-        document_type: IdDocKind::DriverLicense,
+        document_type: ModernIdDocKind::DriversLicense,
         country_code: "Flerp country code".to_owned(),
         fixture_result: None,
     };

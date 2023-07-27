@@ -10,7 +10,7 @@ use super::{
 };
 use crate::{footprint_http_client::FootprintVendorHttpClient, incode::error::Error as IncodeError};
 use newtypes::{
-    vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, IncodeSessionId,
+    vendor_credentials::IncodeCredentials, DocVData, IncodeConfigurationId, IncodeSessionId, ModernIdDocKind,
     PiiString,
 };
 use newtypes::{IncodeVerificationSessionId, IncodeVerificationSessionKind};
@@ -408,12 +408,12 @@ impl AuthenticatedIncodeClientAdapter {
     }
 }
 
-fn url_path_for_document_side(document_type: &IdDocKind, document_side: &DocumentSide) -> String {
+fn url_path_for_document_side(document_type: &ModernIdDocKind, document_side: &DocumentSide) -> String {
     // Not all documents have backs
     let front_only = match document_type {
-        IdDocKind::IdCard => false,
-        IdDocKind::DriverLicense => false,
-        IdDocKind::Passport => true,
+        ModernIdDocKind::IdCard => false,
+        ModernIdDocKind::DriversLicense => false,
+        ModernIdDocKind::Passport => true,
     };
 
     match document_side {
@@ -441,8 +441,8 @@ fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString,
 #[cfg(test)]
 mod tests {
     use newtypes::{
-        vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId,
-        IncodeVerificationSessionId, IncodeVerificationSessionKind, PiiString,
+        vendor_credentials::IncodeCredentials, DocVData, IncodeConfigurationId, IncodeVerificationSessionId,
+        IncodeVerificationSessionKind, ModernIdDocKind, PiiString,
     };
 
     use crate::{
@@ -503,19 +503,19 @@ mod tests {
             front_image: Some(PiiString::from(
                 load_image_and_encode_as_b64("fake_incode_front.jpg").0,
             )),
-            document_type: Some(IdDocKind::DriverLicense),
+            document_type: Some(ModernIdDocKind::DriversLicense),
             ..Default::default()
         };
         let back_docv_data = DocVData {
             back_image: Some(PiiString::from(
                 load_image_and_encode_as_b64("fake_incode_back.jpg").0,
             )),
-            document_type: Some(IdDocKind::DriverLicense),
+            document_type: Some(ModernIdDocKind::DriversLicense),
             ..Default::default()
         };
         let selfie_docv_data = DocVData {
             selfie_image: Some(PiiString::from(load_image_and_encode_as_b64("fake_selfie.jpg").0)),
-            document_type: Some(IdDocKind::DriverLicense),
+            document_type: Some(ModernIdDocKind::DriversLicense),
             ..Default::default()
         };
 

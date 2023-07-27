@@ -1,6 +1,6 @@
 use crate::{
-    AllData, CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant, NtResult,
-    PiiString, StorageType, Validate, ValidateArgs,
+    AllData, CollectedData, DataIdentifier, DocumentSide, IsDataIdentifierDiscriminant, ModernIdDocKind,
+    NtResult, PiiString, StorageType, Validate, ValidateArgs,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
@@ -30,23 +30,23 @@ pub enum DocumentKind {
     /// represents the verified image for a document
     /// document.[doc_kind].[side].image
     #[strum_discriminants(strum(to_string = "image"))]
-    Image(IdDocKind, DocumentSide),
+    Image(ModernIdDocKind, DocumentSide),
     /// represents the mime type of a document
     /// document.[doc_kind].[side].mime_type
     #[strum_discriminants(strum(to_string = "mime_type"))]
-    MimeType(IdDocKind, DocumentSide),
+    MimeType(ModernIdDocKind, DocumentSide),
 
     /// represents the latest upload of a document
     /// document.[doc_kind].[side].latest_upload - TODO one day latest_upload_mime_type?
     #[strum_discriminants(strum(to_string = "latest_upload"))]
-    LatestUpload(IdDocKind, DocumentSide),
+    LatestUpload(ModernIdDocKind, DocumentSide),
 
     /// Letter signed by a compliance officer granting permission to carry an account, required by FINFRA rules in certain cases
     #[strum_discriminants(strum(to_string = "finra_compliance_letter"))]
     FinraComplianceLetter,
 
     /// Extracted OCR information from the image
-    OcrData(IdDocKind, OcrDataKind),
+    OcrData(ModernIdDocKind, OcrDataKind),
 }
 
 crate::util::impl_enum_string_diesel!(DocumentKind);
@@ -129,7 +129,7 @@ impl DocumentKind {
         }
     }
 
-    pub fn from_id_doc_kind(kind: IdDocKind, side: DocumentSide) -> Self {
+    pub fn from_id_doc_kind(kind: ModernIdDocKind, side: DocumentSide) -> Self {
         Self::Image(kind, side)
     }
 }
@@ -149,7 +149,7 @@ impl DocumentKind {
 
 impl DocumentKind {
     pub fn searchable() -> Vec<Self> {
-        IdDocKind::iter()
+        ModernIdDocKind::iter()
             .map(|k| Self::OcrData(k, OcrDataKind::DocumentNumber))
             .collect()
     }
@@ -179,10 +179,10 @@ impl std::str::FromStr for DocumentKind {
         let suffix = parts.last().ok_or(strum::ParseError::VariantNotFound)?;
         let variant = DocumentKindDiscriminant::from_str(suffix);
 
-        let get_parts = || -> Result<(IdDocKind, DocumentSide), _> {
+        let get_parts = || -> Result<(ModernIdDocKind, DocumentSide), _> {
             let prefix = parts.first().ok_or(strum::ParseError::VariantNotFound)?;
             let suffix = parts.get(1).ok_or(strum::ParseError::VariantNotFound)?;
-            let prefix = IdDocKind::correct_from_str(prefix)?;
+            let prefix = ModernIdDocKind::from_str(prefix)?;
             let suffix = DocumentSide::from_str(suffix)?;
             Ok((prefix, suffix))
         };
@@ -212,7 +212,7 @@ impl std::str::FromStr for DocumentKind {
                 } else {
                     let prefix = parts.first().ok_or(strum::ParseError::VariantNotFound)?;
                     let suffix = parts.get(1).ok_or(strum::ParseError::VariantNotFound)?;
-                    let prefix = IdDocKind::correct_from_str(prefix)?;
+                    let prefix = ModernIdDocKind::from_str(prefix)?;
                     let suffix = OcrDataKind::from_str(suffix)?;
                     Self::OcrData(prefix, suffix)
                 }
@@ -232,13 +232,13 @@ impl std::fmt::Display for DocumentKind {
                 write!(
                     f,
                     "{}.{}.{}",
-                    id_doc_kind.correct_fmt(),
+                    id_doc_kind,
                     side,
                     DocumentKindDiscriminant::from(self),
                 )
             }
             DocumentKind::OcrData(doc_kind, data_kind) => {
-                write!(f, "{}.{}", doc_kind.correct_fmt(), data_kind)
+                write!(f, "{}.{}", doc_kind, data_kind)
             }
             DocumentKind::FinraComplianceLetter => write!(f, "{}", DocumentKindDiscriminant::from(self)),
         }
@@ -248,7 +248,7 @@ impl std::fmt::Display for DocumentKind {
 impl DocumentKind {
     /// Enumerate all possible DIs for DocumentKind that we'll display in API docs
     pub fn api_examples() -> Vec<Self> {
-        let complex_types = IdDocKind::iter().flat_map(|k| {
+        let complex_types = ModernIdDocKind::iter().flat_map(|k| {
             // Purposefully omitting LatestUpload here
             let image_types =
                 DocumentSide::iter().flat_map(move |s| vec![Self::Image(k, s), Self::MimeType(k, s)]);

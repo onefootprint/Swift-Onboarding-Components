@@ -1,4 +1,4 @@
-use crate::{CollectedDataOption, DocumentRequestId, IdDocKind, ModernIdDocKind};
+use crate::{CollectedDataOption, DocumentRequestId, ModernIdDocKind};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use strum::EnumDiscriminants;
@@ -78,6 +78,5 @@ impl OnboardingRequirement {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize, JsonSchema)]
 pub struct AuthorizeFields {
     pub collected_data: Vec<CollectedDataOption>,
-    pub identity_document_types: Vec<IdDocKind>,
     pub document_types: Vec<ModernIdDocKind>,
 }

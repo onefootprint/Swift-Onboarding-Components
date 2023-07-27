@@ -16,9 +16,6 @@ pub use self::decision::*;
 pub mod annotation;
 pub use self::annotation::*;
 
-pub mod decrypt_document_request;
-pub use self::decrypt_document_request::*;
-
 pub mod org;
 pub use self::org::*;
 

@@ -59,7 +59,7 @@ pub async fn post(
             }
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request.id,
-                document_type: document_type.into(),
+                document_type,
                 country_code,
                 fixture_result,
             };

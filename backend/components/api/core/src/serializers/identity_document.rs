@@ -17,7 +17,7 @@ impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::IdentityDo
 
         Self {
             status,
-            document_type: document_type.into(),
+            document_type,
             selfie_collected: should_collect_selfie,
         }
     }

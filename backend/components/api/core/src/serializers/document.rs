@@ -24,7 +24,7 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             .collect();
 
         Self {
-            kind: document_type.into(),
+            kind: document_type,
             started_at: created_at,
             status,
             completed_version: completed_seqno,

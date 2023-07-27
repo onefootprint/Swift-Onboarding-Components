@@ -1,9 +1,8 @@
-use crate::FootprintReasonCode as FRC;
+use crate::{FootprintReasonCode as FRC, ModernIdDocKind};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::Display;
 use strum_macros::EnumString;
 
-use crate::IdDocKind;
 #[derive(Clone)]
 pub struct IncodeRCH {
     // If the test passes, what FRC should we show
@@ -268,12 +267,12 @@ pub enum IncodeDocumentType {
     NonParsableDocType(String),
 }
 
-impl<'a> TryFrom<&'a IncodeDocumentType> for IdDocKind {
+impl<'a> TryFrom<&'a IncodeDocumentType> for ModernIdDocKind {
     type Error = crate::Error;
     fn try_from(value: &'a IncodeDocumentType) -> Result<Self, Self::Error> {
         match value {
             IncodeDocumentType::Passport => Ok(Self::Passport),
-            IncodeDocumentType::DriversLicense => Ok(Self::DriverLicense),
+            IncodeDocumentType::DriversLicense => Ok(Self::DriversLicense),
             IncodeDocumentType::IdentificationCard => Ok(Self::IdCard),
             _ => Err(crate::Error::Custom(format!(
                 "Incode document type {} not supported",

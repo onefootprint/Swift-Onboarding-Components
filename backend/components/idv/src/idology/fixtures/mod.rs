@@ -1,6 +1,6 @@
 #[cfg(test)]
 pub(crate) mod test_data {
-    use newtypes::{IdDocKind, PiiString};
+    use newtypes::{ModernIdDocKind, PiiString};
     use serde::Serialize;
 
     fn load_username() -> PiiString {
@@ -44,14 +44,14 @@ pub(crate) mod test_data {
         pub username: PiiString,
         pub password: PiiString,
         pub country_code: String,
-        pub scan_document_type: IdDocKind,
+        pub scan_document_type: ModernIdDocKind,
     }
 
     impl ScanOnboardingTestData {
         pub fn load_passing_sandbox_data() -> Self {
             Self {
                 country_code: "USA".into(),
-                scan_document_type: IdDocKind::DriverLicense,
+                scan_document_type: ModernIdDocKind::DriversLicense,
                 username: load_username(),
                 password: load_password(),
             }

@@ -23,7 +23,7 @@ use macros::test_state_case;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
     CollectedDataOption, CountryRestriction, DocTypeRestriction, DocVData, DocumentCdoInfo, DocumentSide,
-    IdDocKind, IdentityDocumentStatus, IncodeFailureReason, IncodeVerificationSessionState, PiiString,
+    IdentityDocumentStatus, IncodeFailureReason, IncodeVerificationSessionState, ModernIdDocKind, PiiString,
     RiskSignalGroupKind, S3Url, SealedVaultDataKey, Selfie, VendorAPI,
 };
 
@@ -105,7 +105,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         front_image: Some(PiiString::from(small_front_image())),
         back_image: None, // only upload one document at a time
         selfie_image: None,
-        document_type: Some(IdDocKind::IdCard),
+        document_type: Some(ModernIdDocKind::IdCard),
         first_name: Some(PiiString::from("Robert")),
         last_name: Some(PiiString::from("Roberto")),
         country_code: Some(PiiString::from("USA")),
@@ -344,7 +344,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         front_image: Some(PiiString::from(non_document_image())),
         back_image: None,
         selfie_image: None,
-        document_type: Some(IdDocKind::IdCard),
+        document_type: Some(ModernIdDocKind::IdCard),
         first_name: Some(PiiString::from("Robert")),
         last_name: Some(PiiString::from("Roberto")),
         country_code: Some(PiiString::from("USA")),

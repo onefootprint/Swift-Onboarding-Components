@@ -59,6 +59,7 @@ crate::util::impl_enum_string_diesel!(IdDocKind);
     Debug,
     Display,
     Clone,
+    Copy,
     Eq,
     PartialEq,
     Hash,
@@ -68,8 +69,11 @@ crate::util::impl_enum_string_diesel!(IdDocKind);
     JsonSchema,
     Apiv2Schema,
     EnumIter,
+    AsExpression,
+    FromSqlRow,
 )]
 #[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
 pub enum ModernIdDocKind {
     IdCard,
     DriversLicense,
@@ -98,21 +102,13 @@ impl From<IdDocKind> for ModernIdDocKind {
     }
 }
 
-impl IdDocKind {
+impl ModernIdDocKind {
     pub fn sides(&self) -> Vec<DocumentSide> {
         match self {
-            IdDocKind::DriverLicense => vec![DocumentSide::Front, DocumentSide::Back],
-            IdDocKind::IdCard => vec![DocumentSide::Front, DocumentSide::Back],
-            IdDocKind::Passport => vec![DocumentSide::Front],
+            Self::DriversLicense => vec![DocumentSide::Front, DocumentSide::Back],
+            Self::IdCard => vec![DocumentSide::Front, DocumentSide::Back],
+            Self::Passport => vec![DocumentSide::Front],
         }
-    }
-
-    pub fn correct_fmt(&self) -> String {
-        ModernIdDocKind::from(*self).to_string()
-    }
-
-    pub fn correct_from_str(v: &str) -> Result<Self, strum::ParseError> {
-        <ModernIdDocKind as std::str::FromStr>::from_str(v).map(|x| x.into())
     }
 }
 
@@ -125,12 +121,12 @@ pub enum AlpacaDocumentType {
     Visa,
 }
 
-impl From<IdDocKind> for AlpacaDocumentType {
-    fn from(value: IdDocKind) -> Self {
+impl From<ModernIdDocKind> for AlpacaDocumentType {
+    fn from(value: ModernIdDocKind) -> Self {
         match value {
-            IdDocKind::IdCard => AlpacaDocumentType::NationalId,
-            IdDocKind::DriverLicense => AlpacaDocumentType::DriversLicense,
-            IdDocKind::Passport => AlpacaDocumentType::Passport,
+            ModernIdDocKind::IdCard => AlpacaDocumentType::NationalId,
+            ModernIdDocKind::DriversLicense => AlpacaDocumentType::DriversLicense,
+            ModernIdDocKind::Passport => AlpacaDocumentType::Passport,
         }
     }
 }

@@ -87,7 +87,7 @@ pub async fn post(
     };
 
     let mime_type = "image/png";
-    let di = DataIdentifier::from(DocumentKind::LatestUpload(request.document_type, side));
+    let di = DataIdentifier::from(DocumentKind::LatestUpload(request.document_type.into(), side));
     let su_id = user_auth.scoped_user.id.clone();
     let image_bytes = image.try_decode_base64().map_err(crypto::Error::from)?;
     let file = FileUpload::new_simple(image_bytes, format!("{}", di), mime_type);
@@ -114,7 +114,7 @@ pub async fn post(
             // Get or create the identity document
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request.id.clone(),
-                document_type: request.document_type,
+                document_type: request.document_type.into(),
                 country_code: request.country_code.clone(),
                 fixture_result: request.fixture_result,
             };
@@ -155,7 +155,7 @@ pub async fn post(
                     let ocr = serde_json::from_value(
                         idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None),
                     )?;
-                    let doc_type = request.document_type;
+                    let doc_type = request.document_type.into();
 
                     // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals
                     let fake_score_response =

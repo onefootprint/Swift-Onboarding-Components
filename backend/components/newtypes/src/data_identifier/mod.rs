@@ -381,7 +381,7 @@ impl_enum_string_diesel!(DataIdentifier);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{DocumentSide, IdDocKind};
+    use crate::{DocumentSide, ModernIdDocKind};
     use itertools::Itertools;
     use test_case::test_case;
 
@@ -391,12 +391,12 @@ mod tests {
     #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::Tin) => "business.tin")]
     #[test_case(DataIdentifier::Business(BusinessDataKind::AddressLine2) => "business.address_line2")]
-    #[test_case(DataIdentifier::Document(DocumentKind::Image(IdDocKind::DriverLicense, DocumentSide::Front)) => "document.drivers_license.front.image")]
-    #[test_case(DataIdentifier::Document(DocumentKind::MimeType(IdDocKind::DriverLicense, DocumentSide::Front)) => "document.drivers_license.front.mime_type")]
-    #[test_case(DataIdentifier::Document(DocumentKind::LatestUpload(IdDocKind::DriverLicense, DocumentSide::Front)) => "document.drivers_license.front.latest_upload")]
+    #[test_case(DataIdentifier::Document(DocumentKind::Image(ModernIdDocKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.image")]
+    #[test_case(DataIdentifier::Document(DocumentKind::MimeType(ModernIdDocKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.mime_type")]
+    #[test_case(DataIdentifier::Document(DocumentKind::LatestUpload(ModernIdDocKind::DriversLicense, DocumentSide::Front)) => "document.drivers_license.front.latest_upload")]
     #[test_case(DataIdentifier::Document(DocumentKind::FinraComplianceLetter) => "document.finra_compliance_letter")]
     #[test_case(DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}) => "card.hayesvalley.expiration_month")]
-    #[test_case(DataIdentifier::Document(DocumentKind::OcrData(IdDocKind::DriverLicense, OcrDataKind::DocumentNumber)) => "document.drivers_license.document_number")]
+    #[test_case(DataIdentifier::Document(DocumentKind::OcrData(ModernIdDocKind::DriversLicense, OcrDataKind::DocumentNumber)) => "document.drivers_license.document_number")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
@@ -407,12 +407,12 @@ mod tests {
     #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
     #[test_case("business.tin" => DataIdentifier::Business(BusinessDataKind::Tin))]
     #[test_case("business.phone_number" => DataIdentifier::Business(BusinessDataKind::PhoneNumber))]
-    #[test_case("document.drivers_license.front.image" => DataIdentifier::Document(DocumentKind::Image(IdDocKind::DriverLicense, DocumentSide::Front)))]
-    #[test_case("document.drivers_license.front.mime_type" => DataIdentifier::Document(DocumentKind::MimeType(IdDocKind::DriverLicense, DocumentSide::Front)))]
-    #[test_case("document.drivers_license.front.latest_upload" => DataIdentifier::Document(DocumentKind::LatestUpload(IdDocKind::DriverLicense, DocumentSide::Front)))]
+    #[test_case("document.drivers_license.front.image" => DataIdentifier::Document(DocumentKind::Image(ModernIdDocKind::DriversLicense, DocumentSide::Front)))]
+    #[test_case("document.drivers_license.front.mime_type" => DataIdentifier::Document(DocumentKind::MimeType(ModernIdDocKind::DriversLicense, DocumentSide::Front)))]
+    #[test_case("document.drivers_license.front.latest_upload" => DataIdentifier::Document(DocumentKind::LatestUpload(ModernIdDocKind::DriversLicense, DocumentSide::Front)))]
     #[test_case("document.finra_compliance_letter" => DataIdentifier::Document(DocumentKind::FinraComplianceLetter))]
     #[test_case("card.hayesvalley.expiration_month" => DataIdentifier::Card(CardInfo{alias: AliasId::from("hayesvalley".to_string()), kind: CardDataKind::ExpMonth}))]
-    #[test_case("document.passport.document_number" => DataIdentifier::Document(DocumentKind::OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber)))]
+    #[test_case("document.passport.document_number" => DataIdentifier::Document(DocumentKind::OcrData(ModernIdDocKind::Passport, OcrDataKind::DocumentNumber)))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }
