@@ -41,20 +41,19 @@ const ConfidenceScores = ({ document }: ConfidenceScoresProps) => {
         <Typography variant="label-2">{t('title')}</Typography>
       </LabelContainer>
       <ScoresContainer>
-        {confidenceScores.map(
-          (score, index) =>
-            score && (
-              <ScoreContainer
-                index={index}
-                numScores={numScores}
-                key={confidenceScoreLabels[index]}
-              >
-                <ConfidenceScore
-                  label={confidenceScoreLabels[index]}
-                  score={score}
-                />
-              </ScoreContainer>
-            ),
+        {confidenceScores.map((score, index) =>
+          score ? (
+            <ScoreContainer
+              index={index}
+              numScores={numScores}
+              key={confidenceScoreLabels[index]}
+            >
+              <ConfidenceScore
+                label={confidenceScoreLabels[index]}
+                score={score}
+              />
+            </ScoreContainer>
+          ) : null,
         )}
       </ScoresContainer>
     </Section>
