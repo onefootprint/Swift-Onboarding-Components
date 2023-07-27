@@ -48,4 +48,15 @@ export const documentWithNoScores: Document = {
   ocrConfidenceScore: null,
 };
 
+export const documentWithZeroScores: Document = {
+  completedVersion: 1,
+  kind: SupportedIdDocTypes.driversLicense,
+  startedAt: '2020-01-01T00:00:00.000Z',
+  status: IdDocStatus.pending,
+  uploads: [],
+  documentScore: 0,
+  selfieScore: 0,
+  ocrConfidenceScore: 0,
+};
+
 export default documentFixture;

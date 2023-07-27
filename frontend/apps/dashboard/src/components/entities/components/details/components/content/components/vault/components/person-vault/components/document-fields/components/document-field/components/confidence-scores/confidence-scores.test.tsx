@@ -7,6 +7,7 @@ import documentFixture, {
   documentWithNoScores,
   documentWithOneScore,
   documentWithTwoScores,
+  documentWithZeroScores,
 } from './confidence-scores.test.config';
 
 const renderConfidenceScores = (document: Document) =>
@@ -53,5 +54,14 @@ describe('<ConfidenceScores />', () => {
     expect(screen.queryByText('Document')).not.toBeInTheDocument();
     expect(screen.queryByText('Face match')).not.toBeInTheDocument();
     expect(screen.queryByText('Scores')).not.toBeInTheDocument();
+  });
+
+  it('should render three scores when they are all 0 when no scores defined', () => {
+    renderConfidenceScores(documentWithZeroScores);
+    expect(screen.getByText('Scores')).toBeInTheDocument();
+    expect(screen.getByText('Face match')).toBeInTheDocument();
+    expect(screen.getByText('Document')).toBeInTheDocument();
+    expect(screen.getByText('Extracted data')).toBeInTheDocument();
+    expect(screen.getAllByText('0/')).toHaveLength(3);
   });
 });

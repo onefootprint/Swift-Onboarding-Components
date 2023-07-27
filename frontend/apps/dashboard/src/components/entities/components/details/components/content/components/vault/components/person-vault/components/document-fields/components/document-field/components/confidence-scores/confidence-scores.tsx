@@ -22,7 +22,9 @@ const ConfidenceScores = ({ document }: ConfidenceScoresProps) => {
     document?.selfieScore,
   ];
 
-  const numScores = confidenceScores.filter(score => score).length;
+  const numScores = confidenceScores.filter(
+    score => score || score === 0,
+  ).length;
 
   if (numScores === 0) {
     return null;
@@ -42,7 +44,7 @@ const ConfidenceScores = ({ document }: ConfidenceScoresProps) => {
       </LabelContainer>
       <ScoresContainer>
         {confidenceScores.map((score, index) =>
-          score ? (
+          score || score === 0 ? (
             <ScoreContainer
               index={index}
               numScores={numScores}
