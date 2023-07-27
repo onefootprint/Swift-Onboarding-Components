@@ -76,7 +76,6 @@ const LinksContainer = styled.ul`
     align-items: center;
     display: flex;
     justify-content: center;
-    gap: ${theme.spacing[2]};
 
     ${media.lessThan('sm')`
       display: none;
