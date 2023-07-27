@@ -27,6 +27,7 @@ const HoverableImage = ({ src, isSuccess }: HoverableImageProps) => {
     <ImageContainer
       animate={{ width: isExpanded ? '100%' : '50%' }}
       transition={{ duration: 0.2, ease: 'easeInOut' }}
+      initial={{ width: '50%' }}
     >
       <StyledImage src={src} width={0} height={0} alt={t('image-alt')} />
       <ToggleContainer onClick={handleToggleExpanded} className="toggle">

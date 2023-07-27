@@ -60,7 +60,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
       {currentDocument.uploads.map((upload, i) => (
         <Row key={upload.timestamp}>
           <Typography
-            sx={{ whiteSpace: 'nowrap' }}
+            sx={{ whiteSpace: 'nowrap', minWidth: '70px' }}
             variant="label-3"
             color="tertiary"
           >
@@ -75,7 +75,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
             <Line data-last={i === currentDocument.uploads.length - 1} />
           </IconAndLine>
           <Content>
-            <Typography variant="body-4">{getEventText(upload)}</Typography>
+            <Typography variant="body-3">{getEventText(upload)}</Typography>
             <HoverableImage
               isSuccess={upload.failureReasons.length === 0}
               src={getSrc(upload.side, upload.version.toString())}
