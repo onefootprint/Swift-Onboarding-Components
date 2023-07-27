@@ -45,9 +45,9 @@ pub async fn get(
     let (svs, count) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let count = db::scoped_vault::count_authorized_for_tenant(conn, params.clone()).map(Some)?;
-            let svs =
-                db::scoped_vault::list_authorized_for_tenant(conn, params, cursor, (page_size + 1) as i64)?;
+            let page_size = (page_size + 1) as i64;
+            let (svs, count) =
+                db::scoped_vault::list_and_count_authorized_for_tenant(conn, params, cursor, page_size)?;
             Ok((svs, count))
         })
         .await??;
@@ -58,5 +58,5 @@ pub async fn get(
         .into_iter()
         .map(|(sv, _)| api_wire_types::UserId::from_db(sv))
         .collect();
-    Ok(CursorPaginatedResponse::ok(results, cursor, count))
+    Ok(CursorPaginatedResponse::ok(results, cursor, Some(count)))
 }

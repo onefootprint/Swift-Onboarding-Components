@@ -6,6 +6,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema;
 use diesel::dsl::not;
 use diesel::prelude::*;
+use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusFilter;
 use newtypes::PiiString;
@@ -13,17 +14,16 @@ use newtypes::VaultId;
 use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
 use newtypes::{Fingerprint, FpId, TenantId};
-use std::collections::HashSet;
 use tracing::instrument;
 
 #[derive(Debug, Clone, Default)]
-pub struct ScopedVaultListQueryParams {
+pub struct ScopedVaultListQueryParams<TSearch = (PiiString, Vec<Fingerprint>)> {
     pub tenant_id: TenantId,
     pub is_live: bool,
     /// When true, only returns the scoped users that are either (1) authorized or (2) non-portable
     pub only_billable: bool,
     pub statuses: Vec<OnboardingStatusFilter>,
-    pub search: Option<(PiiString, Vec<Fingerprint>)>,
+    pub search: Option<TSearch>,
     pub fp_id: Option<FpId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
@@ -32,23 +32,60 @@ pub struct ScopedVaultListQueryParams {
     pub kind: Option<VaultKind>,
 }
 
+impl ScopedVaultListQueryParams {
+    fn map_search(self, conn: &mut PgConn) -> DbResult<ScopedVaultListQueryParams<Vec<VaultId>>> {
+        let Self {
+            tenant_id,
+            is_live,
+            only_billable,
+            statuses,
+            search,
+            fp_id,
+            timestamp_lte,
+            timestamp_gte,
+            requires_manual_review,
+            watchlist_hit,
+            kind,
+        } = self;
+
+        let matching_vaults = if let Some((search, fingerprints)) = search.as_ref() {
+            let vault_ids = vaults_matching_search(conn, search, fingerprints, &tenant_id)?;
+            Some(vault_ids)
+        } else {
+            None
+        };
+
+        let result = ScopedVaultListQueryParams {
+            tenant_id,
+            is_live,
+            only_billable,
+            statuses,
+            search: matching_vaults,
+            fp_id,
+            timestamp_lte,
+            timestamp_gte,
+            requires_manual_review,
+            watchlist_hit,
+            kind,
+        };
+        Ok(result)
+    }
+}
+
 /// Composes the query to fetch authorized users matching the provided filter params.
 /// Requires the `conn` only to execute one subquery because diesel doesn't like it. Returns a box
 /// query that must still be executed
 macro_rules! list_query {
-    ($conn: ident, $params: ident) => {
+    ($params: ident) => {
         {
             // Filter out onboardings that haven't been explicitly authorized by the user - these should
             // not be visible in the dashboard since the tenant doesn't have permissions to view anything
             // about the user
-            use db_schema::schema::{
-                data_lifetime, fingerprint, manual_review, onboarding, scoped_vault, vault, vault_data,
-                watchlist_check,
-            };
+            use db_schema::schema::{manual_review, onboarding, scoped_vault, vault, watchlist_check};
             let mut query = scoped_vault::table
                 .inner_join(vault::table)
                 .left_join(onboarding::table)
-                .filter(scoped_vault::tenant_id.eq($params.tenant_id.clone()))
+                .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
                 .filter(scoped_vault::is_live.eq($params.is_live))
                 .into_boxed();
             if $params.only_billable {
@@ -75,14 +112,14 @@ macro_rules! list_query {
             }
 
             // Filter on whether user has a watchlist hit
-            if let Some(watchlist_hit) = $params.watchlist_hit {
+            if let Some(watchlist_hit) = $params.watchlist_hit.as_ref() {
                 let matching_ids = watchlist_check::table
                     .filter(watchlist_check::status.eq(WatchlistCheckStatusKind::Fail))
                     .filter(watchlist_check::deactivated_at.is_null())
                     .filter(not(watchlist_check::completed_at.is_null()))
                     .select(watchlist_check::scoped_vault_id)
                     .distinct();
-                if watchlist_hit {
+                if *watchlist_hit {
                     query = query.filter(scoped_vault::id.eq_any(matching_ids))
                 } else {
                     query = query.filter(diesel::dsl::not(scoped_vault::id.eq_any(matching_ids)))
@@ -121,7 +158,7 @@ macro_rules! list_query {
                 }
             }
 
-            if let Some(fp_id) = $params.fp_id {
+            if let Some(fp_id) = $params.fp_id.as_ref() {
                 query = query.filter(scoped_vault::fp_id.eq(fp_id))
             }
 
@@ -133,95 +170,100 @@ macro_rules! list_query {
                 query = query.filter(scoped_vault::start_timestamp.ge(timestamp_gte))
             }
 
-            if let Some(kind) = $params.kind {
+            if let Some(kind) = $params.kind.as_ref() {
                 query = query.filter(vault::kind.eq(kind))
             }
 
-            if let Some((search, fingerprints)) = $params.search {
-                // We have to basically replicate the DataLifetime::get_active inside a SQL query -
-                // fingerprints for a piece of data for a given tenant A should be visible if either:
-                // - the data is not portablized but was added by tenant A
-                // - the data is portablized (could be added by any tenant)
-                // These two subqueries handle each case respectively
-
-                // Specifically get the matching vault_ids (the scoped_vault_id might belong to another tenant)
-                // Sadly, diesel doesn't let you join on scoped_vault and use it in a subquery on the
-                // scoped_vault table... So, we have to actually execute these subqueries
-                let matching_speculative_fp_ids: Vec<VaultId> = fingerprint::table
-                    .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-                    // SPECULATIVE visibility filters
-                    .filter(data_lifetime::deactivated_seqno.is_null())
-                    .filter(data_lifetime::portablized_seqno.is_null())
-                    .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
-                    // Matching filter
-                    .filter(fingerprint::sh_data.eq_any(&fingerprints))
-                    .select(data_lifetime::vault_id)
-                    .get_results($conn)?;
-
-                // TODO we should store the plaintext on the fingerprint table so all searching
-                // happens on one table
-                let matching_speculative_plaintext_ids: Vec<VaultId> = vault_data::table
-                    .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-                    // SPECULATIVE visibility filters
-                    .filter(data_lifetime::deactivated_seqno.is_null())
-                    .filter(data_lifetime::portablized_seqno.is_null())
-                    .filter(scoped_vault::tenant_id.eq($params.tenant_id))
-                    // Matching filter
-                    // TODO do we want to search every vault_data's p_data, or only certain kinds? i imagine card issuer will get annoying
-                    .filter(vault_data::p_data.ilike(format!("%{}%", search.leak())))
-                    .select(data_lifetime::vault_id)
-                    .get_results($conn)?;
-
-                let matching_portable_fp_ids: Vec<VaultId> = fingerprint::table
-                    .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-                    // PORTABLE visibility filters
-                    .filter(data_lifetime::deactivated_seqno.is_null())
-                    .filter(not(data_lifetime::portablized_seqno.is_null()))
-                    // Matching filter
-                    .filter(fingerprint::sh_data.eq_any(fingerprints))
-                    .select(data_lifetime::vault_id)
-                    .get_results($conn)?;
-
-                let matching_portable_plaintext_ids: Vec<VaultId> = vault_data::table
-                    .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-                    // PORTABLE visibility filters
-                    .filter(data_lifetime::deactivated_seqno.is_null())
-                    .filter(not(data_lifetime::portablized_seqno.is_null()))
-                    // Matching filter
-                    .filter(vault_data::p_data.ilike(format!("%{}%", search.leak())))
-                    .select(data_lifetime::vault_id)
-                    .get_results($conn)?;
-
-                let all_ids: HashSet<_> = vec![
-                    matching_speculative_fp_ids.into_iter(),
-                    matching_speculative_plaintext_ids.into_iter(),
-                    matching_portable_fp_ids.into_iter(),
-                    matching_portable_plaintext_ids.into_iter(),
-                ].into_iter().flatten().collect();
-                query = query.filter(scoped_vault::vault_id.eq_any(all_ids));
+            if let Some(vault_ids) = $params.search.as_ref() {
+                query = query.filter(vault::id.eq_any(vault_ids))
             }
             query
         }
     };
 }
 
-#[instrument(skip_all)]
-pub fn count_authorized_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> DbResult<i64> {
-    // TODO in the API requests where we do count and list, we should save results of subqueries in RAM
-    let query = list_query!(conn, params);
-    let count = query.count().get_result(conn)?;
-    Ok(count)
+fn vaults_matching_search(
+    conn: &mut PgConn,
+    search: &PiiString,
+    fingerprints: &[Fingerprint],
+    tenant_id: &TenantId,
+) -> DbResult<Vec<VaultId>> {
+    use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, vault_data};
+    // We have to basically replicate the DataLifetime::get_active inside a SQL query -
+    // fingerprints for a piece of data for a given tenant A should be visible if either:
+    // - the data is not portablized but was added by tenant A
+    // - the data is portablized (could be added by any tenant)
+    // These two subqueries handle each case respectively
+
+    // Specifically get the matching vault_ids (the scoped_vault_id might belong to another tenant)
+    // Sadly, diesel doesn't let you join on scoped_vault and use it in a subquery on the
+    // scoped_vault table... So, we have to actually execute these subqueries
+    let matching_speculative_fp_ids: Vec<VaultId> = fingerprint::table
+        .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+        // SPECULATIVE visibility filters
+        .filter(data_lifetime::deactivated_seqno.is_null())
+        .filter(data_lifetime::portablized_seqno.is_null())
+        .filter(scoped_vault::tenant_id.eq(tenant_id))
+        // Matching filter
+        .filter(fingerprint::sh_data.eq_any(fingerprints))
+        .select(data_lifetime::vault_id)
+        .get_results(conn)?;
+
+    // TODO we should store the plaintext on the fingerprint table so all searching
+    // happens on one table
+    let matching_speculative_plaintext_ids: Vec<VaultId> = vault_data::table
+        .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+        // SPECULATIVE visibility filters
+        .filter(data_lifetime::deactivated_seqno.is_null())
+        .filter(data_lifetime::portablized_seqno.is_null())
+        .filter(scoped_vault::tenant_id.eq(tenant_id))
+        // Matching filter
+        // TODO do we want to search every vault_data's p_data, or only certain kinds? i imagine card issuer will get annoying
+        .filter(vault_data::p_data.ilike(format!("%{}%", search.leak())))
+        .select(data_lifetime::vault_id)
+        .get_results(conn)?;
+
+    let matching_portable_fp_ids: Vec<VaultId> = fingerprint::table
+        .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+        // PORTABLE visibility filters
+        .filter(data_lifetime::deactivated_seqno.is_null())
+        .filter(not(data_lifetime::portablized_seqno.is_null()))
+        // Matching filter
+        .filter(fingerprint::sh_data.eq_any(fingerprints))
+        .select(data_lifetime::vault_id)
+        .get_results(conn)?;
+
+    let matching_portable_plaintext_ids: Vec<VaultId> = vault_data::table
+        .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+        // PORTABLE visibility filters
+        .filter(data_lifetime::deactivated_seqno.is_null())
+        .filter(not(data_lifetime::portablized_seqno.is_null()))
+        // Matching filter
+        .filter(vault_data::p_data.ilike(format!("%{}%", search.leak())))
+        .select(data_lifetime::vault_id)
+        .get_results(conn)?;
+
+    let all_ids = vec![
+        matching_speculative_fp_ids.into_iter(),
+        matching_speculative_plaintext_ids.into_iter(),
+        matching_portable_fp_ids.into_iter(),
+        matching_portable_plaintext_ids.into_iter(),
+    ]
+    .into_iter()
+    .flatten()
+    .unique()
+    .collect();
+    Ok(all_ids)
 }
 
-/// lists all scoped_vaults across all configurations
-#[instrument(skip_all)]
-pub fn list_authorized_for_tenant(
+fn list(
     conn: &mut PgConn,
-    params: ScopedVaultListQueryParams,
+    params: &ScopedVaultListQueryParams<Vec<VaultId>>,
     cursor: Option<i64>,
     page_size: i64,
 ) -> DbResult<Vec<(ScopedVault, Vault)>> {
-    let query = list_query!(conn, params);
+    let query = list_query!(params);
+
     let mut scoped_vaults = query
         .order_by(schema::scoped_vault::ordering_id.desc())
         .limit(page_size);
@@ -234,4 +276,41 @@ pub fn list_authorized_for_tenant(
         .select((schema::scoped_vault::all_columns, schema::vault::all_columns))
         .get_results(conn)?;
     Ok(results)
+}
+
+#[instrument(skip_all)]
+pub fn count_authorized_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> DbResult<i64> {
+    let params = &params.map_search(conn)?;
+    let query = list_query!(params);
+    let count = query.count().get_result(conn)?;
+    Ok(count)
+}
+
+/// lists all scoped_vaults across all configurations
+#[instrument(skip_all)]
+pub fn list_authorized_for_tenant(
+    conn: &mut PgConn,
+    params: ScopedVaultListQueryParams,
+    cursor: Option<i64>,
+    page_size: i64,
+) -> DbResult<Vec<(ScopedVault, Vault)>> {
+    let params = &params.map_search(conn)?;
+    list(conn, params, cursor, page_size)
+}
+
+/// List and count all scoped vaults matching the search params. Use this if you need both the
+/// count of results and the results themselves - this util saves and reuses some intermediate
+/// computation
+#[instrument(skip_all)]
+pub fn list_and_count_authorized_for_tenant(
+    conn: &mut PgConn,
+    params: ScopedVaultListQueryParams,
+    cursor: Option<i64>,
+    page_size: i64,
+) -> DbResult<(Vec<(ScopedVault, Vault)>, i64)> {
+    let params = &params.map_search(conn)?;
+
+    let results = list(conn, params, cursor, page_size)?;
+    let count = list_query!(params).count().get_result(conn)?;
+    Ok((results, count))
 }

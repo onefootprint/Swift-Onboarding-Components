@@ -56,7 +56,7 @@ pub async fn get(
     let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
 
     let tenant_id = tenant.id.clone();
-    let query_params = ScopedVaultListQueryParams {
+    let params = ScopedVaultListQueryParams {
         tenant_id: tenant_id.clone(),
         only_billable: false,
         is_live: auth.is_live()?,
@@ -72,18 +72,14 @@ pub async fn get(
     let (scoped_vaults, mut entities, vws, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_vaults = db::scoped_vault::list_authorized_for_tenant(
-                conn,
-                query_params.clone(),
-                cursor,
-                (page_size + 1) as i64,
-            )?;
-            let count = db::scoped_vault::count_authorized_for_tenant(conn, query_params).map(Some)?;
+            let page_size = (page_size + 1) as i64;
+            let (svs, count) =
+                db::scoped_vault::list_and_count_authorized_for_tenant(conn, params, cursor, page_size)?;
             let vws: HashMap<ScopedVaultId, TenantVw> =
-                VaultWrapper::multi_get_for_tenant(conn, scoped_vaults.clone(), &tenant_id, None)?;
-            let scoped_vault_ids: Vec<_> = scoped_vaults.iter().map(|su| &su.0.id).collect();
+                VaultWrapper::multi_get_for_tenant(conn, svs.clone(), &tenant_id, None)?;
+            let scoped_vault_ids: Vec<_> = svs.iter().map(|su| &su.0.id).collect();
             let entities = ScopedVault::bulk_get_serializable_info(conn, scoped_vault_ids.clone())?;
-            Ok((scoped_vaults, entities, vws, count))
+            Ok((svs, entities, vws, count))
         })
         .await??;
 
@@ -108,7 +104,7 @@ pub async fn get(
         .into_iter()
         .map(|(vw, entity)| api_wire_types::Entity::from_db((entity, vw, &auth)))
         .collect();
-    Ok(Json(CursorPaginatedResponse::ok(entities, cursor, count)))
+    Ok(Json(CursorPaginatedResponse::ok(entities, cursor, Some(count))))
 }
 
 /// Given a search string and fp_id, parse into the list of fingerprints and fp_id by which to query
