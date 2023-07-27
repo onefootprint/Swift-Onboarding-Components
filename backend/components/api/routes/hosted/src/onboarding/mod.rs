@@ -294,6 +294,10 @@ fn get_requirement_inner(
 
                 let fields_to_authorize = AuthorizeFields {
                     collected_data: ob_config.can_access_data.clone(),
+                    document_types: identity_document_types
+                        .iter()
+                        .map(|i| ModernIdDocKind::from(*i))
+                        .collect(),
                     identity_document_types,
                 };
                 Some(OnboardingRequirement::Authorize { fields_to_authorize })

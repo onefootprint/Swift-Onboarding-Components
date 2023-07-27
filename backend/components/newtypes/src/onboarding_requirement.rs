@@ -79,4 +79,5 @@ impl OnboardingRequirement {
 pub struct AuthorizeFields {
     pub collected_data: Vec<CollectedDataOption>,
     pub identity_document_types: Vec<IdDocKind>,
+    pub document_types: Vec<ModernIdDocKind>,
 }
