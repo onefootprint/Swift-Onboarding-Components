@@ -15,7 +15,7 @@ import CustomDataFields from './components/custom-data-fields';
 import DocumentsFields from './components/document-fields';
 import InvestorProfileFields from './components/investor-profile-fields';
 import useFieldsets from './hooks/use-fieldsets';
-import generateGridTemplateAreas from './utils/generate-grid-template-areas';
+import getGridTemplateAreas from './utils/get-grid-template-areas';
 
 type PersonVaultProps = {
   entity: Entity;
@@ -35,10 +35,12 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
   const hasDocuments = hasEntityDocuments(entity);
   const hasInvestorProfile = hasEntityInvestorProfile(entity);
   const hasCustomData = hasEntityCustomData(entity);
-  const gridTemplateAreas = generateGridTemplateAreas(entity);
 
-  return (
-    <Grid gridTemplateAreas={gridTemplateAreas}>
+  // if there are three elements, we want to display as grid
+  const displayFirstSectionAsGrid = getGridTemplateAreas(entity) <= 3;
+
+  const gridFirstSection = (
+    <Grid>
       <GridArea name="basic">
         <Fieldset
           fields={basic.fields}
@@ -63,59 +65,127 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
           footer={<RiskSignalsOverview type="address" />}
         />
       </GridArea>
-      {hasCards ? (
-        <GridArea name="payment">
-          <CardFieldset
-            title={cards.title}
-            iconComponent={cards.iconComponent}
-          />
-        </GridArea>
-      ) : null}
-      {hasDocuments ? (
-        <GridArea name="documents">
-          <Fieldset
-            fields={documents.fields}
-            iconComponent={documents.iconComponent}
-            title={documents.title}
-            footer={<RiskSignalsOverview type="document" />}
-          >
-            <DocumentsFields />
-          </Fieldset>
-        </GridArea>
-      ) : null}
-      {hasInvestorProfile ? (
-        <GridArea name="investor-profile">
-          <Fieldset
-            fields={investorProfile.fields}
-            iconComponent={investorProfile.iconComponent}
-            title={investorProfile.title}
-          >
-            <InvestorProfileFields />
-          </Fieldset>
-        </GridArea>
-      ) : null}
-      {hasCustomData ? (
-        <GridArea name="custom">
-          <CustomDataFields
-            entity={entity}
-            title={custom.title}
-            iconComponent={custom.iconComponent}
-          />
-        </GridArea>
-      ) : null}
     </Grid>
+  );
+
+  const basicAddressIdentity = (
+    <>
+      <GridItem>
+        <Fieldset
+          fields={basic.fields}
+          iconComponent={basic.iconComponent}
+          title={basic.title}
+          footer={<RiskSignalsOverview type="basic" />}
+        />
+      </GridItem>
+      <GridItem>
+        <Fieldset
+          fields={address.fields}
+          iconComponent={address.iconComponent}
+          title={address.title}
+          footer={<RiskSignalsOverview type="address" />}
+        />
+      </GridItem>
+      <GridItem>
+        <Fieldset
+          fields={identity.fields}
+          iconComponent={identity.iconComponent}
+          title={identity.title}
+          footer={<RiskSignalsOverview type="identity" />}
+        />
+      </GridItem>
+    </>
+  );
+
+  return (
+    <Vault>
+      {displayFirstSectionAsGrid && gridFirstSection}
+      <Container>
+        {!displayFirstSectionAsGrid && basicAddressIdentity}
+        {hasDocuments ? (
+          <GridItem>
+            <Fieldset
+              fields={documents.fields}
+              iconComponent={documents.iconComponent}
+              title={documents.title}
+              footer={<RiskSignalsOverview type="document" />}
+            >
+              <DocumentsFields />
+            </Fieldset>
+          </GridItem>
+        ) : null}
+        {hasCards ? (
+          <GridItem>
+            <CardFieldset
+              title={cards.title}
+              iconComponent={cards.iconComponent}
+            />
+          </GridItem>
+        ) : null}
+        {hasCustomData ? (
+          <WideGridItem>
+            <CustomDataFields
+              entity={entity}
+              title={custom.title}
+              iconComponent={custom.iconComponent}
+            />
+          </WideGridItem>
+        ) : null}
+        {hasInvestorProfile ? (
+          // we always want investor profile to span two columns
+          <WideGridItem>
+            <Fieldset
+              fields={investorProfile.fields}
+              iconComponent={investorProfile.iconComponent}
+              title={investorProfile.title}
+            >
+              <InvestorProfileFields />
+            </Fieldset>
+          </WideGridItem>
+        ) : null}
+      </Container>
+    </Vault>
   );
 };
 
-const Grid = styled.div<{
-  gridTemplateAreas: string;
-}>`
-  ${({ theme, gridTemplateAreas }) => css`
+const Vault = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacing[5]};
+    width: 100%;
+    flex-direction: column;
+  `};
+`;
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-wrap: wrap;
+    gap: ${theme.spacing[5]};
+  `};
+`;
+
+// spans one column if it can, two if there are extra elements
+const GridItem = styled.div`
+  ${({ theme }) => css`
+    flex: 1 1 calc(50% - ${theme.spacing[5]});
+  `};
+`;
+
+// spans two columns always
+const WideGridItem = styled.div`
+  ${({ theme }) => css`
+    flex: 1 1 calc(100% - ${theme.spacing[5]});
+  `};
+`;
+
+const Grid = styled.div`
+  ${({ theme }) => css`
     display: grid;
     gap: ${theme.spacing[5]};
     grid-template-columns: repeat(2, 1fr);
-    grid-template-areas: ${gridTemplateAreas};
-  `}
+    grid-template-areas: ${`'basic address' 'identity address'`};
+  `};
 `;
 
 const GridArea = styled.div<{ name: string }>`
