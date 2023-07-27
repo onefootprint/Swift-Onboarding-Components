@@ -4,9 +4,9 @@ import {
   CollectKycDataRequirement,
   IdDI,
   IdDocRequirement,
-  IdDocType,
   LivenessRequirement,
   OnboardingConfig,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -29,7 +29,7 @@ const kycRequirement = {
 const authorizeRequirement = {
   fieldsToAuthorize: {
     collectedData: [CollectedKycDataOption.name],
-    identityDocumentTypes: [] as IdDocType[],
+    documentTypes: [] as SupportedIdDocTypes[],
   },
 } as AuthorizeRequirement;
 

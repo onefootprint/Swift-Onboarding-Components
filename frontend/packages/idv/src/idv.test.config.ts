@@ -22,7 +22,7 @@ export const TestAuthorizeRequirement: OnboardingRequirement = {
       CollectedKycDataOption.dob,
       CollectedKycDataOption.ssn9,
     ],
-    identityDocumentTypes: [],
+    documentTypes: [],
   },
 };
 

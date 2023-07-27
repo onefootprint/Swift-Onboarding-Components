@@ -1,9 +1,9 @@
 import {
   CollectedKycDataOption,
-  IdDocType,
   OnboardingConfig,
   OnboardingRequirement,
   OnboardingRequirementKind,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 
 import computeRequirementsToShow from './compute-requirements-to-show';
@@ -16,7 +16,7 @@ describe('computeRequirementsToShow', () => {
           kind: OnboardingRequirementKind.authorize,
           fieldsToAuthorize: {
             collectedData: [] as CollectedKycDataOption[],
-            identityDocumentTypes: [] as IdDocType[],
+            documentTypes: [] as SupportedIdDocTypes[],
           },
         },
       ] as OnboardingRequirement[],

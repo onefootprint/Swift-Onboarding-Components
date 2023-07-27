@@ -18,7 +18,7 @@ import {
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
-  IdDocType,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -39,10 +39,10 @@ const IconByCollectedKycDataOption: Record<CollectedKycDataOption, Icon> = {
   [CollectedKycDataOption.nationality]: IcoFlag24,
 };
 
-const IconByIdDocType: Record<IdDocType, Icon> = {
-  [IdDocType.idCard]: IcoIdCard24,
-  [IdDocType.driversLicense]: IcoCar24,
-  [IdDocType.passport]: IcoPassport24,
+const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
+  [SupportedIdDocTypes.idCard]: IcoIdCard24,
+  [SupportedIdDocTypes.driversLicense]: IcoCar24,
+  [SupportedIdDocTypes.passport]: IcoPassport24,
 };
 
 type KycFieldsProps = {
@@ -51,7 +51,7 @@ type KycFieldsProps = {
     | CollectedDocumentDataOption
     | CollectedInvestorProfileDataOption
   )[];
-  documentTypes: IdDocType[];
+  documentTypes: SupportedIdDocTypes[];
   showTitle?: boolean;
 };
 
@@ -69,10 +69,10 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [CollectedKycDataOption.partialAddress]: t('data-labels.address-partial'),
     [CollectedKycDataOption.nationality]: t('data-labels.nationality'),
   };
-  const docTypeLabels: Record<IdDocType, string> = {
-    [IdDocType.idCard]: t('data-labels.id-card'),
-    [IdDocType.passport]: t('data-labels.passport'),
-    [IdDocType.driversLicense]: t('data-labels.driversLicense'),
+  const docTypeLabels: Record<SupportedIdDocTypes, string> = {
+    [SupportedIdDocTypes.idCard]: t('data-labels.id-card'),
+    [SupportedIdDocTypes.passport]: t('data-labels.passport'),
+    [SupportedIdDocTypes.driversLicense]: t('data-labels.driversLicense'),
   };
 
   const fields: FieldProps[] = [];

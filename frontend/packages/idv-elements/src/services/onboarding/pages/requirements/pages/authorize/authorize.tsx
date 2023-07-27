@@ -41,8 +41,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     return <div />;
   }
 
-  const collectedIdDocTypes =
-    requirement.fieldsToAuthorize.identityDocumentTypes;
+  const collectedIdDocTypes = requirement.fieldsToAuthorize.documentTypes;
 
   const { orgName: tenantName, canAccessData } = config;
   const kycData = canAccessData.filter(
