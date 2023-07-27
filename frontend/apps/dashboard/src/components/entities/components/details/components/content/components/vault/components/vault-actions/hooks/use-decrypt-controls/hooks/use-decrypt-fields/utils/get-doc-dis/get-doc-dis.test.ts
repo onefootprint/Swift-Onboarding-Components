@@ -11,7 +11,7 @@ import {
   incompleteDriversLicense,
 } from './get-doc-dis.test.config';
 
-describe.skip('getDocDis', () => {
+describe('getDocDis', () => {
   it('should return correct DIs when there are multiple documents of same type', () => {
     expect(
       getDocDis({
