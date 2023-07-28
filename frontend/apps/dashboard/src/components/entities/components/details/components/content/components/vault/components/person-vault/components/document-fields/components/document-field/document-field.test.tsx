@@ -34,7 +34,7 @@ describe('<DocumentField />', () => {
       documents: [],
     });
 
-    const show = screen.getByText('Show');
+    const show = screen.getByText('See details');
     expect(show).toBeInTheDocument();
 
     // drawer should not show beforehand

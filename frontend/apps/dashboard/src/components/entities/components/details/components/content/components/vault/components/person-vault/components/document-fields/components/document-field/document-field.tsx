@@ -50,11 +50,7 @@ const DocumentField = ({
           </Typography>
           <DocumentStatusBadge status={documentStatus} />
         </LabelContainer>
-        {isDrawerOpen ? (
-          <LinkButton onClick={hide}>{t('hide')}</LinkButton>
-        ) : (
-          <LinkButton onClick={show}>{t('show')}</LinkButton>
-        )}
+        <LinkButton onClick={show}>{t('see-details')}</LinkButton>
       </Inner>
       <Drawer
         closeAriaLabel={t('close-aria-label')}

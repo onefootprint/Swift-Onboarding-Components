@@ -558,8 +558,7 @@
         "select-all": "Select all",
         "deselect-all": "Deselect all",
         "document": {
-          "hide": "Hide",
-          "show": "Show",
+          "see-details": "See details",
           "close-aria-label": "Close document details",
           "drawer": {
             "drivers_license.title": "Driver's license and selfie",

@@ -8,7 +8,7 @@ import {
   EntityVault,
   IdDocImageTypes,
 } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import HoverableImage from './components/hoverable-image';
@@ -63,15 +63,11 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
       </LabelContainer>
       {uploadsSortedByDate.map((upload, i) => (
         <Row key={upload.timestamp}>
-          <Typography
-            sx={{ whiteSpace: 'nowrap', minWidth: '70px' }}
-            variant="label-3"
-            color="tertiary"
-          >
+          <Time>
             {formatTime(new Date(upload.timestamp))
               // AM --> am
               .toLowerCase()}
-          </Typography>
+          </Time>
           <IconAndLine>
             <IconContainer>
               <IcoIdFront16 />
@@ -91,6 +87,16 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
   );
 };
 
+const Time = styled.div`
+  ${({ theme }) => css`
+    ${createFontStyles('label-3')}
+    white-space: nowrap;
+    min-width: 70px;
+    color: ${theme.color.tertiary};
+    height: fit-content;
+  `};
+`;
+
 const LabelContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
@@ -98,13 +104,15 @@ const LabelContainer = styled.div`
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
+    width: 100%;
+    padding-bottom: ${theme.spacing[5]};
   `};
 `;
 
 const Section = styled.div`
   ${({ theme }) => css`
     display: flex;
-    gap: ${theme.spacing[5]};
+    gap: ${theme.spacing[2]};
     flex-direction: column;
     align-items: flex-start;
   `};
@@ -126,22 +134,18 @@ const Content = styled.div`
     flex-direction: column;
     justify-content: flex-start;
     width: 100%;
-    margin-top: ${theme.spacing[2]};
     gap: ${theme.spacing[6]};
     margin-bottom: ${theme.spacing[9]};
   `}
 `;
 
 const IconAndLine = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-width: 16px;
-    flex-shrink: 0;
-    margin-top: ${theme.spacing[2]};
-  `};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 16px;
+  flex-shrink: 0;
 `;
 
 const IconContainer = styled.div`
@@ -152,6 +156,7 @@ const IconContainer = styled.div`
     justify-content: center;
     padding: 0 ${theme.spacing[4]};
     background: ${theme.backgroundColor.primary};
+    margin-top: ${theme.spacing[2]};
     z-index: 3;
   `};
 `;
