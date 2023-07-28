@@ -46,18 +46,49 @@ impl DecisionIntent {
         Ok(result)
     }
 
-    #[tracing::instrument("DecisionIntent::get_or_create_for_kind", skip_all)]
-    fn get_or_create_for_kind(
+    #[tracing::instrument("DecisionIntent::get_or_create_for_kind_by_workflow_id", skip_all)]
+    fn get_or_create_for_kind_by_workflow_id(
+        conn: &mut TxnPgConn,
+        sv_id: &ScopedVaultId,
+        wf_id: &WorkflowId,
+        kind: DecisionIntentKind,
+    ) -> DbResult<Self> {
+        let new_di = NewDecisionIntent {
+            created_at: Utc::now(),
+            kind,
+            scoped_vault_id: sv_id.clone(),
+            workflow_id: Some(wf_id.clone()),
+        };
+
+        let existing_di = decision_intent::table
+            .filter(decision_intent::workflow_id.eq(wf_id))
+            .filter(decision_intent::kind.eq(kind))
+            .first(conn.conn())
+            .optional()?;
+
+        if let Some(existing_di) = existing_di {
+            return Ok(existing_di);
+        }
+
+        let new_di = diesel::insert_into(decision_intent::table)
+            .values(new_di)
+            .get_result::<DecisionIntent>(conn.conn())?;
+
+        Ok(new_di)
+    }
+
+    // Legacy query now just used for KYB since this has not been migrated to Workflows yet
+    #[tracing::instrument("DecisionIntent::get_or_create_for_kind_by_scoped_vault_id", skip_all)]
+    fn get_or_create_for_kind_by_scoped_vault_id(
         conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,
         kind: DecisionIntentKind,
-        workflow_id: Option<&WorkflowId>,
     ) -> DbResult<Self> {
         let new_di = NewDecisionIntent {
             created_at: Utc::now(),
             kind,
             scoped_vault_id: scoped_vault_id.clone(),
-            workflow_id: workflow_id.cloned(),
+            workflow_id: None,
         };
 
         let existing_di = decision_intent::table
@@ -83,11 +114,11 @@ impl DecisionIntent {
         scoped_vault_id: &ScopedVaultId,
         workflow_id: &WorkflowId,
     ) -> DbResult<Self> {
-        Self::get_or_create_for_kind(
+        Self::get_or_create_for_kind_by_workflow_id(
             conn,
             scoped_vault_id,
+            workflow_id,
             DecisionIntentKind::OnboardingKyc,
-            Some(workflow_id),
         )
     }
 
@@ -96,7 +127,11 @@ impl DecisionIntent {
         conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,
     ) -> DbResult<Self> {
-        Self::get_or_create_for_kind(conn, scoped_vault_id, DecisionIntentKind::OnboardingKyb, None)
+        Self::get_or_create_for_kind_by_scoped_vault_id(
+            conn,
+            scoped_vault_id,
+            DecisionIntentKind::OnboardingKyb,
+        )
     }
 }
 
