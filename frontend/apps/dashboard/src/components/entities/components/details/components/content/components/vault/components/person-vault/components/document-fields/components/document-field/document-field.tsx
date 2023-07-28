@@ -8,7 +8,8 @@ import {
 import { Drawer, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import { getDocumentVersion } from '../../utils';
+import { getDocumentStatus, getDocumentVersion } from '../../utils';
+import DocumentStatusBadge from '../document-status-badge';
 import ConfidenceScores from './components/confidence-scores';
 import ExtractedDocumentData from './components/extracted-document-data';
 import SessionSelect from './components/session-select';
@@ -32,6 +33,7 @@ const DocumentField = ({
   const [activeDocumentVersion, setActiveDocumentVersion] = useState(
     getDocumentVersion(documents[0], documents),
   );
+  const documentStatus = getDocumentStatus({ documents, documentType });
 
   const currentDocument = documents.find(
     document =>
@@ -46,6 +48,7 @@ const DocumentField = ({
           <Typography variant="body-3" color="tertiary" as="label">
             {label}
           </Typography>
+          <DocumentStatusBadge status={documentStatus} />
         </LabelContainer>
         {isDrawerOpen ? (
           <LinkButton onClick={hide}>{t('hide')}</LinkButton>
@@ -100,9 +103,10 @@ const DrawerItems = styled.div`
 const LabelContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
-    gap: ${theme.spacing[2]};
+    gap: ${theme.spacing[3]};
     flex-direction: row;
-    align-items: flex-end;
+    align-items: center;
+    justify-content: center;
   `};
 `;
 

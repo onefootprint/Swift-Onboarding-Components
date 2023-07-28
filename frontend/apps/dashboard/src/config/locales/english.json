@@ -631,6 +631,11 @@
         "start": "Decrypt data",
         "decrypt": "Decrypt",
         "not-allowed": "You're not allowed to decrypt data",
+        "status": {
+          "error": "Failed",
+          "success": "Successful",
+          "warning": "Pending"
+        },
         "reason-dialog": {
           "title": "Decrypt data",
           "description": "Why are you decrypting this data?",

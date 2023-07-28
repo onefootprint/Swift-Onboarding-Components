@@ -8,7 +8,12 @@ import { WithEntityProps } from '@/entity/components/with-entity';
 
 import Field from '../../../field';
 import DocumentField from './components/document-field';
-import { filterDocumentsByKind, getDocumentType } from './utils';
+import DocumentStatusBadge from './components/document-status-badge';
+import {
+  filterDocumentsByKind,
+  getDocumentStatus,
+  getDocumentType,
+} from './utils';
 import useDocumentFields from './utils/use-document-fields';
 
 type DocumentFieldsProps = WithEntityProps;
@@ -34,7 +39,18 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
                 )}
               />
             ) : (
-              <Field di={field.main} entity={entity} />
+              <Field
+                di={field.main}
+                entity={entity}
+                status={
+                  <DocumentStatusBadge
+                    status={getDocumentStatus({
+                      documents,
+                      documentType: getDocumentType(field.main),
+                    })}
+                  />
+                }
+              />
             )}
           </Box>
         ) : null,

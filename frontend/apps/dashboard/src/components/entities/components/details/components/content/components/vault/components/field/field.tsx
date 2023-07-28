@@ -22,9 +22,17 @@ export type FieldProps = {
     value: VaultValue,
     isValueDecrypted: boolean,
   ) => React.ReactNode;
+  status?: React.ReactNode;
 };
 
-const Field = ({ di, entity, hint, renderValue, renderLabel }: FieldProps) => {
+const Field = ({
+  di,
+  entity,
+  hint,
+  renderValue,
+  renderLabel,
+  status,
+}: FieldProps) => {
   const { t } = useTranslation('pages.entity.decrypt');
   const { register } = useFormContext();
   const field = useField(entity)(di);
@@ -55,9 +63,12 @@ const Field = ({ di, entity, hint, renderValue, renderLabel }: FieldProps) => {
           {customLabel && React.isValidElement(customLabel) ? (
             customLabel
           ) : (
-            <Typography variant="body-3" color="tertiary" as="label">
-              {label}
-            </Typography>
+            <LabelAndStatusContainer>
+              <Typography variant="body-3" color="tertiary" as="label">
+                {label}
+              </Typography>
+              {status}
+            </LabelAndStatusContainer>
           )}
           {hint && (
             <Typography variant="caption-2" color="secondary">
@@ -89,4 +100,13 @@ const LabelContainer = styled.div`
   `};
 `;
 
+const LabelAndStatusContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacing[3]};
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  `};
+`;
 export default Field;
