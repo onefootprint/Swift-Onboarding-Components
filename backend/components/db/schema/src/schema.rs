@@ -585,6 +585,27 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    stytch_fingerprint_event (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        session_id -> Nullable<Text>,
+        vault_id -> Nullable<Text>,
+        scoped_vault_id -> Nullable<Text>,
+        verification_result_id -> Text,
+        browser_fingerprint -> Nullable<Text>,
+        browser_id -> Nullable<Text>,
+        hardware_fingerprint -> Nullable<Text>,
+        network_fingerprint -> Nullable<Text>,
+        visitor_fingerprint -> Nullable<Text>,
+        visitor_id -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     task (id) {
         id -> Text,
         created_at -> Timestamptz,
@@ -915,6 +936,9 @@ joinable!(scoped_vault -> ob_configuration (ob_configuration_id));
 joinable!(scoped_vault -> tenant (tenant_id));
 joinable!(scoped_vault -> vault (vault_id));
 joinable!(socure_device_session -> onboarding (onboarding_id));
+joinable!(stytch_fingerprint_event -> scoped_vault (scoped_vault_id));
+joinable!(stytch_fingerprint_event -> vault (vault_id));
+joinable!(stytch_fingerprint_event -> verification_result (verification_result_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key -> tenant_role (role_id));
 joinable!(tenant_role -> tenant (tenant_id));
@@ -976,6 +1000,7 @@ allow_tables_to_appear_in_same_query!(
     scoped_vault,
     session,
     socure_device_session,
+    stytch_fingerprint_event,
     task,
     tenant,
     tenant_api_key,

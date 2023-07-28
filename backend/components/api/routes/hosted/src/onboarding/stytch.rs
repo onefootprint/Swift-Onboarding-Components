@@ -6,10 +6,13 @@ use api_core::auth::user::UserAuth;
 use api_core::decision;
 use api_core::decision::vendor;
 use api_core::errors::{ApiResult, AssertionError};
+use api_core::utils::headers::TelemetryHeaders;
 use api_core::ApiError;
 use api_wire_types::hosted::stytch::StytchTelemetryRequest;
+use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::risk_signal::RiskSignal;
+use db::models::stytch_fingerprint_event::{NewStytchFingerprintEvent, StytchFingerprintEvent};
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use idv::stytch::StytchLookupRequest;
@@ -26,6 +29,7 @@ pub async fn post(
     request: Json<StytchTelemetryRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
+    telemetry_headers: TelemetryHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     let StytchTelemetryRequest { telemetry_id } = request.into_inner();
@@ -73,6 +77,48 @@ pub async fn post(
                 RiskSignalGroupKind::WebDevice,
                 false,
             )?;
+
+            let _e = StytchFingerprintEvent::create(
+                conn,
+                NewStytchFingerprintEvent {
+                    created_at: Utc::now(),
+                    session_id: telemetry_headers.session_id.clone(),
+                    vault_id: Some(uv_id.clone()),
+                    scoped_vault_id: Some(sv_id.clone()),
+                    verification_result_id: vres.id,
+                    browser_fingerprint: res
+                        .parsed_response
+                        .fingerprints
+                        .browser_fingerprint
+                        .map(|s| s.leak_to_string().into()),
+                    browser_id: res
+                        .parsed_response
+                        .fingerprints
+                        .browser_id
+                        .map(|s| s.leak_to_string().into()),
+                    hardware_fingerprint: res
+                        .parsed_response
+                        .fingerprints
+                        .hardware_fingerprint
+                        .map(|s| s.leak_to_string().into()),
+                    network_fingerprint: res
+                        .parsed_response
+                        .fingerprints
+                        .network_fingerprint
+                        .map(|s| s.leak_to_string().into()),
+                    visitor_fingerprint: res
+                        .parsed_response
+                        .fingerprints
+                        .visitor_fingerprint
+                        .map(|s| s.leak_to_string().into()),
+                    visitor_id: res
+                        .parsed_response
+                        .fingerprints
+                        .visitor_id
+                        .map(|s| s.leak_to_string().into()),
+                },
+            )?;
+
             Ok(())
         })
         .await?;
