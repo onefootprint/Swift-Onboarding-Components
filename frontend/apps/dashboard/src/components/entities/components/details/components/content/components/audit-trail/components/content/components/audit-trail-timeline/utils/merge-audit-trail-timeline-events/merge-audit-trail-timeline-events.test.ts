@@ -99,7 +99,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              status: IdDocStatus.success,
+              status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.driversLicense,
               selfieCollected: true,
             },
@@ -111,7 +111,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              status: IdDocStatus.success,
+              status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.passport,
               selfieCollected: true,
             },
@@ -126,7 +126,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              status: IdDocStatus.success,
+              status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.driversLicense,
               selfieCollected: true,
             },
@@ -138,7 +138,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              status: IdDocStatus.success,
+              status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.passport,
               selfieCollected: true,
             },
@@ -230,7 +230,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              status: IdDocStatus.success,
+              status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.driversLicense,
               selfieCollected: true,
             },
@@ -271,7 +271,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.idDocUploaded,
             data: {
-              status: IdDocStatus.success,
+              status: IdDocStatus.complete,
               documentType: SupportedIdDocTypes.driversLicense,
               selfieCollected: true,
             },

@@ -13,7 +13,7 @@ type GetDocumentStatusProps = {
 };
 
 const DocStatusToUIState: Record<IdDocStatus, DocumentStatus> = {
-  [IdDocStatus.success]: 'success',
+  [IdDocStatus.complete]: 'success',
   [IdDocStatus.pending]: 'warning',
   [IdDocStatus.failed]: 'error',
 };
@@ -24,9 +24,9 @@ const getDocumentStatus = ({
 }: GetDocumentStatusProps) => {
   const relevantDocuments = filterDocumentsByKind(documents, documentType);
   if (
-    relevantDocuments.some(document => document.status === IdDocStatus.success)
+    relevantDocuments.some(document => document.status === IdDocStatus.complete)
   ) {
-    return DocStatusToUIState[IdDocStatus.success];
+    return DocStatusToUIState[IdDocStatus.complete];
   }
   if (
     relevantDocuments.some(document => document.status === IdDocStatus.pending)

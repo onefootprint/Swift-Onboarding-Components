@@ -24,5 +24,5 @@ export enum IdDocRegionality {
 export enum IdDocStatus {
   failed = 'failed',
   pending = 'pending',
-  success = 'success',
+  complete = 'complete',
 }
