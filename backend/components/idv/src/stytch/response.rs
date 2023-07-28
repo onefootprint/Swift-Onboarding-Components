@@ -1,5 +1,10 @@
 use super::error::{Error, StytchError};
+use chrono::{DateTime, Utc};
+use newtypes::PiiString;
 use serde::*;
+use serde_with::DeserializeFromStr;
+use strum::Display;
+use strum_macros::EnumString;
 
 pub fn parse_response(value: serde_json::Value) -> Result<LookupResponse, Error> {
     let response: Response = serde_json::value::from_value(value)?;
@@ -11,6 +16,7 @@ pub fn parse_response(value: serde_json::Value) -> Result<LookupResponse, Error>
 
 #[derive(Deserialize, Debug)]
 #[serde(untagged)]
+#[allow(clippy::large_enum_variant)]
 pub enum Response {
     Success(LookupResponse),
     Error(StytchErrorResponse),
@@ -25,21 +31,68 @@ pub struct StytchErrorResponse {
 #[derive(Debug, Clone, Deserialize)]
 pub struct LookupResponse {
     pub telemetry_id: String,
+    pub fingerprints: Fingerprints,
+    pub verdict: Verdict,
+    pub created_at: Option<DateTime<Utc>>,
+    pub expires_at: Option<DateTime<Utc>>,
+    pub status_code: Option<u16>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Fingerprints {
+    pub browser_fingerprint: Option<PiiString>,
+    pub browser_id: Option<PiiString>,
+    pub hardware_fingerprint: Option<PiiString>,
+    pub network_fingerprint: Option<PiiString>,
+    pub visitor_fingerprint: Option<PiiString>,
+    pub visitor_id: Option<PiiString>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Verdict {
+    pub action: Action,
+    pub detected_device_type: Option<String>,
+    pub is_authentic_device: Option<bool>,
+    pub reasons: Option<Vec<Reason>>,
+}
+
+#[derive(Debug, Clone, Deserialize, Eq, PartialEq)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum Action {
+    Allow,
+    Block,
+    Challenge,
+}
+
+#[derive(Clone, Debug, Display, EnumString, DeserializeFromStr, Eq, PartialEq)]
+#[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
+pub enum Reason {
+    AuthenticDevice,
+    AuthorizedDevice,
+    KnownDatacenterIp,
+    JsPropertyDeception,
+    UnverifiedDevice,
+    IpRateLimitExceeded,
+    MalformedSubmission,
+    InvalidSignature,
+    TokenAlreadyExchanged,
+    UnauthorizedPayloadOrigin,
+    BannedDevice,
+    HeadlessBrowserAutomation,
+    KnownTorExitNode,
+    BannedIpAddress,
+    UserAgentDeception,
+    IpRateLimitExceededCritical,
+    TuningRuleMatch,
+    #[strum(default)]
+    Unknown(String),
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use serde_json::json;
-
-    #[test]
-    fn parse_success() {
-        let json = json!({
-            "telemetry_id": "abc_123",
-        });
-        let parsed = parse_response(json).unwrap();
-        assert_eq!("abc_123".to_owned(), parsed.telemetry_id);
-    }
+    use test_case::test_case;
 
     #[test]
     fn parse_error() {
@@ -69,5 +122,64 @@ mod tests {
             panic!("Expected StytchError::Unknown");
         };
         assert_eq!("Oh shoot".to_owned(), s);
+    }
+
+    #[test_case(example_response1() => (Action::Allow, vec![]))]
+    #[test_case(example_response2() => (Action::Challenge, vec![Reason::KnownDatacenterIp, Reason::Unknown(String::from("SOMETHING_ELSE_YO"))]))]
+    fn parse_success(json: serde_json::Value) -> (Action, Vec<Reason>) {
+        let parsed = parse_response(json).unwrap();
+        let action = parsed.verdict.action;
+        let reasons = parsed.verdict.reasons.unwrap_or_default();
+        (action, reasons)
+    }
+
+    fn example_response1() -> serde_json::Value {
+        json!(
+            {
+                "created_at": "2023-07-26T20:53:43.821880491Z",
+                "expires_at": "2023-07-26T20:58:43.821880491Z",
+                "fingerprints": {
+                    "browser_fingerprint": "browser-fingerprint-14ba6d33-ddfc-3f36-b6d7-c7fb0c649fc6",
+                    "browser_id": "browser-id-d2a4389b-fc01-35f7-9211-04676d43e19d",
+                    "hardware_fingerprint": "hardware-fingerprint-e7faa291-ade1-371e-a339-6e540b3c092a",
+                    "network_fingerprint": "network-fingerprint-b5060259-40e6-3f29-8215-45ae2da3caa1",
+                    "visitor_fingerprint": "visitor-fingerprint-0101d011-dc7c-3f66-84f7-28afb6e8b168",
+                    "visitor_id": "visitor-3e411811-5281-32d2-8a5e-cc2320aed32f"
+                },
+                "status_code": 200,
+                "telemetry_id": "c99c652c-e966-456e-8111-ced042d40f92",
+                "verdict": {
+                    "action": "ALLOW",
+                    "detected_device_type": "APPLE_CHROME",
+                    "is_authentic_device": true,
+                    "reasons": []
+                }
+            }
+        )
+    }
+
+    fn example_response2() -> serde_json::Value {
+        json!(
+            {
+                "created_at": "2023-07-26T23:31:18.950734891Z",
+                "expires_at": "2023-07-26T23:36:18.950734891Z",
+                "fingerprints": {
+                    "browser_fingerprint": "browser-fingerprint-14ba6d33-ddfc-3f36-b6d7-c7fb0c649fc6",
+                    "browser_id": "browser-id-cc487856-e9ed-35cb-829a-6bbc36c95f13",
+                    "hardware_fingerprint": "hardware-fingerprint-e7faa291-ade1-371e-a339-6e540b3c092a",
+                    "network_fingerprint": "network-fingerprint-26a3646c-7782-304a-83bc-65ef41319593",
+                    "visitor_fingerprint": "visitor-fingerprint-af0aa3fa-4d99-3e75-b24f-08e6623ab6b9",
+                    "visitor_id": "visitor-2317bebe-d7cb-3d23-8674-62423c5e1126"
+                },
+                "status_code": 200,
+                "telemetry_id": "309d6757-d439-4e02-8546-ba8f3e65c288",
+                "verdict": {
+                    "action": "CHALLENGE",
+                    "detected_device_type": "APPLE_CHROME",
+                    "is_authentic_device": false,
+                    "reasons": ["KNOWN_DATACENTER_IP", "SOMETHING_ELSE_YO"]
+                }
+            }
+        )
     }
 }

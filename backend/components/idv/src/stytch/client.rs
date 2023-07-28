@@ -44,7 +44,6 @@ impl StytchClient {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::stytch::response::LookupResponse;
     use dotenv;
     use newtypes::PiiString;
 
@@ -55,11 +54,11 @@ mod tests {
         let secret = PiiString::from(dotenv::var("STYTCH_SECRET").unwrap());
         let stytch_client = StytchClient::new(project, secret).unwrap();
 
-        let telemetry_id = "cc606a7a-6059-4499-918d-f2a734d901e9";
+        let telemetry_id = "afdcd45a-cbb0-4835-9899-957c17207e6f";
 
         let res = stytch_client.lookup(telemetry_id).await.unwrap();
         tracing::info!(res = format!("{:?}", res), "res");
-        let parsed_res: LookupResponse = serde_json::value::from_value(res).unwrap();
-        assert_eq!(telemetry_id, parsed_res.telemetry_id);
+        let parsed = crate::stytch::response::parse_response(res).unwrap();
+        assert_eq!(telemetry_id, parsed.telemetry_id);
     }
 }
