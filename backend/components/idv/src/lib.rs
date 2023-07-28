@@ -32,6 +32,7 @@ pub mod lexis;
 pub mod middesk;
 pub mod requirements;
 pub mod socure;
+pub mod stytch;
 pub mod test_fixtures;
 pub mod tests;
 pub mod twilio;
