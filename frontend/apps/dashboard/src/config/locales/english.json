@@ -208,6 +208,7 @@
     "phone_number": "Phone number",
     "identity": "Identity",
     "ip_address": "IP Address",
+    "device": "Device",
     "document": "Document",
     "business_address": "Registered business address",
     "business_name": "Business name",
