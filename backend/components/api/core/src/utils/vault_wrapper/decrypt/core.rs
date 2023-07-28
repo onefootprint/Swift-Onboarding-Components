@@ -9,6 +9,7 @@ use enclave_proxy::DataTransform;
 use enclave_proxy::{DataTransformer, DataTransforms};
 use futures_util::StreamExt;
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{DataIdentifier, DocumentKind, EncryptedVaultPrivateKey, PiiBytes, PiiString};
 use std::collections::HashMap;
 
@@ -100,7 +101,7 @@ impl<Type> VaultWrapper<Type> {
         &self,
         ids: Vec<(DataIdentifier, Vec<DataTransform>)>,
     ) -> Vec<VwDecryptRequest> {
-        tracing::info!(dis=?ids.iter().map(|(di, _)| di.clone()).collect_vec(), "Decrypting DIs");
+        tracing::info!(dis=%Csv::from(ids.iter().map(|(di, _)| di.clone()).collect_vec()), "Decrypting DIs");
 
         // Fetch each DI's underlying data from the vault wrapper's in-memory state
         ids.into_iter()
