@@ -1,7 +1,7 @@
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
 use rpc::{EnclavePayload, RpcRequest};
-use std::time::Duration;
+use std::{error::Error, time::Duration};
 
 #[derive(Clone, Debug)]
 pub struct ProxyHttpClient {
@@ -81,7 +81,11 @@ impl ProxyHttpClient {
 
         while match &response {
             Ok(response) if response.status().as_u16() >= 500 && retries_left > 0 => true,
-            Err(reqwest_middleware::Error::Reqwest(e)) if e.is_timeout() && retries_left > 0 => true,
+            Err(reqwest_middleware::Error::Reqwest(e))
+                if e.is_timeout() || is_incomplete_message_err(e) && retries_left > 0 =>
+            {
+                true
+            }
             Ok(_) | Err(_) => false,
         } {
             response = make_request().await;
@@ -91,4 +95,24 @@ impl ProxyHttpClient {
         let response: ProxyPayloadResponse = response?.json().await?;
         Ok(response.response)
     }
+}
+
+fn is_incomplete_message_err(err: &reqwest::Error) -> bool {
+    // Inspired by some reqwest code that checks for inner hyper errors:
+    // https://github.com/seanmonstar/reqwest/blob/v0.11.13/src/error.rs#L121
+    // These errors occur when the server closes a connection while we are using it and can happen
+    // in connection reuse. So, we want to retry them
+    let mut source = err.source();
+
+    while let Some(err) = source {
+        if let Some(hyper_err) = err.downcast_ref::<hyper::Error>() {
+            if hyper_err.is_incomplete_message() {
+                return true;
+            }
+        }
+
+        source = err.source();
+    }
+
+    false
 }

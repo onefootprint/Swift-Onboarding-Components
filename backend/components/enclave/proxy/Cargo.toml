@@ -42,3 +42,4 @@ futures-util = { workspace = true }
 bb8 = "0.7"
 async-trait = { workspace = true }
 thiserror = { workspace = true }
+hyper = "0.14.18"
