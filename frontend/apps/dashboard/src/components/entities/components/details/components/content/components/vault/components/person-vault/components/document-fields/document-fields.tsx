@@ -24,10 +24,10 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
   const fields = useDocumentFields();
 
   return vault ? (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       {fields.map(field =>
         entity.attributes.includes(field.main) ? (
-          <Box key={field.main} sx={{ paddingBottom: 4 }}>
+          <Box key={field.main}>
             {isVaultDataDecrypted(vault?.[field.main]) ? (
               <DocumentField
                 label={field.label}

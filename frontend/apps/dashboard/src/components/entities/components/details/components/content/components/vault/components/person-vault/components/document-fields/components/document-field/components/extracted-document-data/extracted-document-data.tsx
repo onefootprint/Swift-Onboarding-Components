@@ -104,6 +104,7 @@ const DocumentDataFieldContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[3]};
+    width: 100%;
   `}
 `;
 
