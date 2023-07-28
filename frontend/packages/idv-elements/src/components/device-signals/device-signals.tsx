@@ -1,6 +1,7 @@
 import React from 'react';
 
 import SocureIntegration from './components/socure';
+import Stytch from './components/stytch';
 import type { Page } from './device-signals.types';
 
 type DeviceSignalsProps = {
@@ -12,6 +13,7 @@ type DeviceSignalsProps = {
 const DeviceSignals = ({ children, fpAuthToken, page }: DeviceSignalsProps) => (
   <>
     <SocureIntegration page={page} fpAuthToken={fpAuthToken} />
+    <Stytch fpAuthToken={fpAuthToken} />
     {children}
   </>
 );

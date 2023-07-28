@@ -47,6 +47,7 @@ export * from './org-member-response';
 export * from './org-onboarding-configs-create';
 export * from './org-onboarding-configs-update';
 export * from './send-socure-device-session-d';
+export * from './send-stytch-telemetry';
 export * from './session-validate';
 export * from './signup-challenge';
 export * from './skip-liveness';
