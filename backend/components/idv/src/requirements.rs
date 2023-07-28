@@ -98,6 +98,7 @@ pub fn vendor_api_requirements_are_satisfied(
         }
         VendorAPI::IncodeGetOnboardingStatus => false,
         VendorAPI::IncodeProcessFace => false,
+        VendorAPI::StytchLookup => false,
     }
 }
 
@@ -136,6 +137,7 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         VendorAPI::IncodeWatchlistCheck => false,
         VendorAPI::IncodeGetOnboardingStatus => false,
         VendorAPI::IncodeProcessFace => false,
+        VendorAPI::StytchLookup => false,
     }
 }
 

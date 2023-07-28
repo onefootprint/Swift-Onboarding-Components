@@ -3,6 +3,7 @@ pub mod idology;
 pub mod incode;
 pub mod middesk;
 pub mod socure;
+pub mod stytch;
 pub mod twilio;
 
 use async_trait::async_trait;

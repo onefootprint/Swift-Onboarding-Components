@@ -109,6 +109,7 @@ fn deserialize_from_vendor_api(
             ParsedResponse::from_incode_get_onboarding_status(raw_response)?
         }
         VendorAPI::IncodeProcessFace => ParsedResponse::from_incode_process_face(raw_response)?,
+        VendorAPI::StytchLookup => ParsedResponse::from_stytch(raw_response)?,
     };
 
     Ok(res)

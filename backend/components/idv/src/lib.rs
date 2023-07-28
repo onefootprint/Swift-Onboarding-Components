@@ -66,6 +66,7 @@ pub enum ParsedResponse {
     IncodeRawResponse(PiiJsonValue),
     IncodeGetOnboardingStatus(GetOnboardingStatusResponse),
     IncodeProcessFace(ProcessFaceResponse),
+    StytchLookup(stytch::response::LookupResponse),
 }
 
 impl ParsedResponse {
@@ -212,6 +213,11 @@ impl ParsedResponse {
         let parsed: ProcessFaceResponse = serde_json::value::from_value(raw_response)?;
         Ok(Self::IncodeProcessFace(parsed))
     }
+
+    pub fn from_stytch(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed = crate::stytch::response::parse_response(raw_response).map_err(Error::from)?;
+        Ok(Self::StytchLookup(parsed))
+    }
 }
 
 #[derive(Clone)]
@@ -247,6 +253,8 @@ pub enum Error {
     MiddeskError(#[from] middesk::Error),
     #[error("Assertion error: {0}")]
     AssertionError(String),
+    #[error("Stytch error: {0}")]
+    StytchError(#[from] stytch::error::Error),
 }
 
 impl From<&ParsedResponse> for VendorAPI {
@@ -277,6 +285,7 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::IncodeRawResponse(_) => VendorAPI::IncodeGetOnboardingStatus, // TODO: i think we decided we'd remove IncodeRawResponse
             ParsedResponse::IncodeGetOnboardingStatus(_) => VendorAPI::IncodeGetOnboardingStatus,
             ParsedResponse::IncodeProcessFace(_) => VendorAPI::IncodeProcessFace,
+            ParsedResponse::StytchLookup(_) => VendorAPI::StytchLookup,
         }
     }
 }

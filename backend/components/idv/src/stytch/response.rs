@@ -28,7 +28,7 @@ pub struct StytchErrorResponse {
     pub status_code: Option<u16>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct LookupResponse {
     pub telemetry_id: String,
     pub fingerprints: Fingerprints,
@@ -38,7 +38,7 @@ pub struct LookupResponse {
     pub status_code: Option<u16>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Fingerprints {
     pub browser_fingerprint: Option<PiiString>,
     pub browser_id: Option<PiiString>,
@@ -48,7 +48,7 @@ pub struct Fingerprints {
     pub visitor_id: Option<PiiString>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Verdict {
     pub action: Action,
     pub detected_device_type: Option<String>,
@@ -56,7 +56,7 @@ pub struct Verdict {
     pub reasons: Option<Vec<Reason>>,
 }
 
-#[derive(Debug, Clone, Deserialize, Eq, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Action {
     Allow,
@@ -64,7 +64,7 @@ pub enum Action {
     Challenge,
 }
 
-#[derive(Clone, Debug, Display, EnumString, DeserializeFromStr, Eq, PartialEq)]
+#[derive(Clone, Debug, Display, EnumString, DeserializeFromStr, Eq, PartialEq, Serialize)]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum Reason {
     AuthenticDevice,

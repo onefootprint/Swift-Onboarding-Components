@@ -1,4 +1,5 @@
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
+use idv::stytch::response::LookupResponse;
 use newtypes::{
     EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI,
     VerificationRequestId, VerificationResultId,
@@ -112,6 +113,7 @@ pub fn scrub_raw_vendor_response(
         VendorAPI::IncodeWatchlistCheck => scrub_response::<IncodeWatchlistCheck>(raw_response),
         VendorAPI::IncodeGetOnboardingStatus => scrub_response::<IncodeGetOnboardingStatus>(raw_response),
         VendorAPI::IncodeProcessFace => scrub_response::<IncodeProcessFace>(raw_response),
+        VendorAPI::StytchLookup => scrub_response::<StytchLookup>(raw_response),
     }
 }
 
@@ -167,6 +169,7 @@ fn build_parsed_vendor_response_map_entry(
             insert_map_entry(map, IncodeGetOnboardingStatus, raw_response)?
         }
         VendorAPI::IncodeProcessFace => insert_map_entry(map, IncodeProcessFace, raw_response)?,
+        VendorAPI::StytchLookup => insert_map_entry(map, StytchLookup, raw_response)?,
     };
 
     Ok(())
@@ -204,6 +207,7 @@ fn build_verification_identifier_map_entry(
         VendorAPI::IncodeWatchlistCheck => map.insert(IncodeWatchlistCheck, request_and_result),
         VendorAPI::IncodeGetOnboardingStatus => map.insert(IncodeGetOnboardingStatus, request_and_result),
         VendorAPI::IncodeProcessFace => map.insert(IncodeProcessFace, request_and_result),
+        VendorAPI::StytchLookup => map.insert(StytchLookup, request_and_result),
     };
 }
 
@@ -355,6 +359,9 @@ impl TypedMapKey<VendorAPIResponseMarker> for IncodeGetOnboardingStatus {
 impl TypedMapKey<VendorAPIResponseMarker> for IncodeProcessFace {
     type Value = ProcessFaceResponse;
 }
+impl TypedMapKey<VendorAPIResponseMarker> for StytchLookup {
+    type Value = LookupResponse;
+}
 
 /// Verification Request and Result map, used in conjunction with the above map for reason codes
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyExpectID {
@@ -427,6 +434,9 @@ impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeGetOnboardingStatus {
     type Value = VerificationRequestAndResult;
 }
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeProcessFace {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for StytchLookup {
     type Value = VerificationRequestAndResult;
 }
 

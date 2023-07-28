@@ -38,6 +38,7 @@ pub enum Vendor {
     Twilio,
     Middesk,
     Incode,
+    Stytch,
 }
 
 impl_enum_str_diesel!(Vendor);
@@ -89,6 +90,7 @@ pub enum VendorAPI {
     IncodeWatchlistCheck,
     IncodeGetOnboardingStatus,
     IncodeProcessFace,
+    StytchLookup,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -119,6 +121,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IncodeWatchlistCheck => Self::Incode,
             VendorAPI::IncodeGetOnboardingStatus => Self::Incode,
             VendorAPI::IncodeProcessFace => Self::Incode,
+            VendorAPI::StytchLookup => Self::Stytch,
         }
     }
 }
@@ -157,6 +160,7 @@ impl VendorAPI {
             VendorAPI::IncodeWatchlistCheck => false,
             VendorAPI::IncodeGetOnboardingStatus => false,
             VendorAPI::IncodeProcessFace => false,
+            VendorAPI::StytchLookup => false,
         }
     }
 
@@ -186,7 +190,8 @@ impl VendorAPI {
             | VendorAPI::IncodeAddSelfie
             | VendorAPI::IncodeWatchlistCheck
             | VendorAPI::IncodeGetOnboardingStatus
-            | VendorAPI::IncodeProcessFace => false,
+            | VendorAPI::IncodeProcessFace
+            | VendorAPI::StytchLookup => false,
         }
     }
 
@@ -215,7 +220,8 @@ impl VendorAPI {
             | VendorAPI::IdologyExpectID
             | VendorAPI::TwilioLookupV2
             | VendorAPI::SocureIDPlus
-            | VendorAPI::ExperianPreciseID => false,
+            | VendorAPI::ExperianPreciseID
+            | VendorAPI::StytchLookup => false,
         }
     }
 }

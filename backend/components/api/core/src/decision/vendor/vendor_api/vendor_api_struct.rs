@@ -34,6 +34,7 @@ pub enum WrappedVendorAPI {
     IncodeWatchlistCheck,
     IncodeGetOnboardingStatus,
     IncodeProcessFace,
+    StytchLookup,
 }
 impl From<VendorAPI> for WrappedVendorAPI {
     fn from(value: VendorAPI) -> Self {
@@ -62,6 +63,7 @@ impl From<VendorAPI> for WrappedVendorAPI {
             VendorAPI::IncodeWatchlistCheck => Self::IncodeWatchlistCheck,
             VendorAPI::IncodeGetOnboardingStatus => Self::IncodeGetOnboardingStatus,
             VendorAPI::IncodeProcessFace => Self::IncodeProcessFace,
+            VendorAPI::StytchLookup => Self::StytchLookup,
         }
     }
 }
@@ -93,6 +95,7 @@ impl From<WrappedVendorAPI> for VendorAPI {
             WrappedVendorAPI::IncodeWatchlistCheck => VendorAPI::IncodeWatchlistCheck,
             WrappedVendorAPI::IncodeGetOnboardingStatus => VendorAPI::IncodeGetOnboardingStatus,
             WrappedVendorAPI::IncodeProcessFace => VendorAPI::IncodeProcessFace,
+            WrappedVendorAPI::StytchLookup => VendorAPI::StytchLookup,
         }
     }
 }
