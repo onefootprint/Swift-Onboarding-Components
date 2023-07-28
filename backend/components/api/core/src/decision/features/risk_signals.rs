@@ -187,6 +187,7 @@ pub enum WrappedRiskSignalGroupKind {
     Watchlist,
     AdverseMedia,
     Doc,
+    Device,
 }
 use risk_signal_group_struct::*;
 
@@ -198,6 +199,7 @@ impl From<RiskSignalGroupKind> for WrappedRiskSignalGroupKind {
             RiskSignalGroupKind::Watchlist => Self::Watchlist,
             RiskSignalGroupKind::AdverseMedia => Self::AdverseMedia,
             RiskSignalGroupKind::Doc => Self::Doc,
+            RiskSignalGroupKind::WebDevice => Self::Device,
         }
     }
 }
@@ -210,6 +212,7 @@ impl From<WrappedRiskSignalGroupKind> for RiskSignalGroupKind {
             WrappedRiskSignalGroupKind::Watchlist => Self::Watchlist,
             WrappedRiskSignalGroupKind::AdverseMedia => Self::AdverseMedia,
             WrappedRiskSignalGroupKind::Doc => Self::Doc,
+            WrappedRiskSignalGroupKind::Device => Self::WebDevice,
         }
     }
 }
