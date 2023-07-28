@@ -51,13 +51,17 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
     )}`;
   };
 
+  const uploadsSortedByDate = currentDocument.uploads.sort(
+    (a, b) => Number(new Date(b.timestamp)) - Number(new Date(a.timestamp)),
+  );
+
   return (
     <Section>
       <LabelContainer>
         <IcoUpload24 />
         <Typography variant="label-2">{t(`title`)}</Typography>
       </LabelContainer>
-      {currentDocument.uploads.map((upload, i) => (
+      {uploadsSortedByDate.map((upload, i) => (
         <Row key={upload.timestamp}>
           <Typography
             sx={{ whiteSpace: 'nowrap', minWidth: '70px' }}

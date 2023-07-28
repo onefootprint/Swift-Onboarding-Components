@@ -58,10 +58,10 @@ describe('<Uploads />', () => {
     });
     const images: HTMLImageElement[] = screen.getAllByRole('img');
     expect(images).toHaveLength(3);
-    expect(images[0]?.src).toContain('data:image/jpg;base64,test ID front URL');
-    expect(images[1]?.src).toContain('data:image/jpg;base64,test ID back URL');
-    expect(images[2]?.src).toContain(
+    expect(images[0]?.src).toContain(
       'data:image/jpg;base64,test ID selfie URL',
     );
+    expect(images[1]?.src).toContain('data:image/jpg;base64,test ID back URL');
+    expect(images[2]?.src).toContain('data:image/jpg;base64,test ID front URL');
   });
 });
