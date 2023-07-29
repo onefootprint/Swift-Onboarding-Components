@@ -18,7 +18,6 @@ use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::input::Csv;
 
 use newtypes::{flat_api_object_map_type, AccessEventKind, DataIdentifier, FpId};
 use paperclip::actix::Apiv2Schema;
@@ -26,10 +25,9 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 use serde::Deserialize;
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
-pub struct DeleteFieldsParams {
-    /// Comma separated list of fields to check. For example, `id.first_name,id.ssn4,custom.bank_account`
-    #[openapi(example = "card.primary.cvc, custom.ach_account")]
-    fields: Csv<DataIdentifier>,
+pub struct DeleteRequest {
+    /// List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
+    fields: Vec<DataIdentifier>,
 }
 
 flat_api_object_map_type!(
@@ -58,12 +56,12 @@ flat_api_object_map_type!(
 pub async fn delete(
     state: web::Data<State>,
     path: Path<FpId>,
-    request: Json<DeleteFieldsParams>,
+    request: Json<DeleteRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insight: InsightHeaders,
 ) -> JsonApiResponse<DeleteVaultResponse> {
     let fp_id = path.into_inner();
-    let DeleteFieldsParams { fields } = request.into_inner();
+    let DeleteRequest { fields } = request.into_inner();
 
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let actor = auth.actor();

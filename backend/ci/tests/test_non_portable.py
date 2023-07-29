@@ -238,17 +238,22 @@ def test_vault_create_write_decrypt(tenant):
     assert events == set(fields_to_check)
 
     # delete some data
-    params = dict(fields="card.valley.cvc")
-    body = delete(f"entities/{fp_id}/vault", params, tenant.sk.key)
+    fields = ["card.valley.cvc", "id.first_name"]
+    data = dict(fields=fields)
+    body = delete(f"entities/{fp_id}/vault", data, tenant.sk.key)
     assert body["card.valley.cvc"] == True
+    assert body["id.first_name"] == True
 
     # check data no longer exists
+    params = dict(fields=",".join(fields))
     body = get(f"entities/{fp_id}/vault", params, tenant.sk.key)
     assert not body["card.valley.cvc"]
+    assert not body["id.first_name"]
 
     data = dict(fields=["card.valley.cvc"], reason="try decrypt failure")
     body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key, status_code=200)
     assert "card.valley.cvc" not in data
+    assert "id.first_name" not in data
 
     # check the access events and check it's correct
     body = get(
@@ -258,7 +263,7 @@ def test_vault_create_write_decrypt(tenant):
     )
     access_events = body["data"]
     events = access_events[1]["targets"]
-    assert events == ["card.valley.cvc"]
+    assert set(events) == set(["card.valley.cvc", "id.first_name"])
 
     assert access_events[1]["kind"] == "delete"
 
