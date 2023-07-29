@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{AlpacaKycState, DocumentState};
+use newtypes::{AlpacaKycState, DocumentState, WorkflowFixtureResult};
 use newtypes::{Locked, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
 use serde::{Deserialize, Serialize};
 
@@ -22,6 +22,7 @@ pub struct Workflow {
     pub kind: WorkflowKind,
     pub state: WorkflowState,
     pub config: WorkflowConfig,
+    pub fixture_result: Option<WorkflowFixtureResult>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -32,6 +33,9 @@ pub struct NewWorkflow {
     pub kind: WorkflowKind,
     pub state: WorkflowState,
     pub config: WorkflowConfig,
+    // TODO create the workflow fixture result from the sandbox id on the vault so we can deprecate
+    // the codepaths to read from the vault
+    pub fixture_result: Option<WorkflowFixtureResult>,
 }
 
 impl Workflow {
@@ -45,7 +49,12 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::create", skip_all)]
-    pub fn create(conn: &mut PgConn, sv_id: &ScopedVaultId, config: WorkflowConfig) -> DbResult<Self> {
+    pub fn create(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        config: WorkflowConfig,
+        fixture_result: Option<WorkflowFixtureResult>,
+    ) -> DbResult<Self> {
         let kind = config.kind();
         let initial_state = match kind {
             WorkflowKind::AlpacaKyc => WorkflowState::AlpacaKyc(AlpacaKycState::DataCollection),
@@ -58,6 +67,7 @@ impl Workflow {
             kind,
             state: initial_state,
             config,
+            fixture_result,
         };
 
         Self::insert(conn, new_workflow)
@@ -99,16 +109,25 @@ impl Workflow {
         workflow: Locked<Self>,
         new_state: WorkflowState,
     ) -> DbResult<Self> {
-        let wfid = workflow.id.clone();
+        let wf = workflow.into_inner();
         let result = diesel::update(workflow::table)
-            .filter(workflow::id.eq(wfid))
+            .filter(workflow::id.eq(&wf.id))
             .set(workflow::state.eq(new_state))
             .get_result(conn.conn())?;
+        WorkflowEvent::create(conn, wf.id, wf.state, new_state)?;
+        Ok(result)
+    }
 
-        let wfid = workflow.id.clone();
-        let curr_state = workflow.state;
-        let _wfe = WorkflowEvent::create(conn, wfid, curr_state, new_state)?;
-
+    #[tracing::instrument("Workflow::update_state", skip_all)]
+    pub fn update_fixture_result(
+        conn: &mut TxnPgConn,
+        id: &WorkflowId,
+        fixture_result: WorkflowFixtureResult,
+    ) -> DbResult<Self> {
+        let result = diesel::update(workflow::table)
+            .filter(workflow::id.eq(id))
+            .set(workflow::fixture_result.eq(fixture_result))
+            .get_result(conn.conn())?;
         Ok(result)
     }
 
@@ -146,6 +165,7 @@ mod tests {
                 kind: (&wf_state).into(),
                 state: wf_state,
                 config,
+                fixture_result: None,
             },
         )
         .unwrap();
@@ -166,6 +186,7 @@ mod tests {
                 kind: (&s).into(),
                 state: s,
                 config,
+                fixture_result: None,
             },
         )
         .unwrap();

@@ -55,6 +55,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
                     kind: (&s).into(),
                     state: s,
                     config: WorkflowConfig::Kyc(KycConfig { is_redo: false }),
+                    fixture_result: None,
                 },
             )
             .unwrap()
@@ -498,7 +499,9 @@ async fn redo_and_pass(
     let sv_id = prior_ob.scoped_vault_id.clone();
     let wf = state
         .db_pool
-        .db_query(move |conn| Workflow::create(conn, &sv_id, KycConfig { is_redo: true }.into()).unwrap())
+        .db_query(move |conn| {
+            Workflow::create(conn, &sv_id, KycConfig { is_redo: true }.into(), None).unwrap()
+        })
         .await
         .unwrap();
 

@@ -706,7 +706,7 @@ async fn redo_and_pass(
     let wf = state
         .db_pool
         .db_query(move |conn| {
-            Workflow::create(conn, &sv_id, AlpacaKycConfig { is_redo: true }.into()).unwrap()
+            Workflow::create(conn, &sv_id, AlpacaKycConfig { is_redo: true }.into(), None).unwrap()
         })
         .await
         .unwrap();

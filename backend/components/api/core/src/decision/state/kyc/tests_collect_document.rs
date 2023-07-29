@@ -185,7 +185,7 @@ async fn redo_document_and_pass(
     let sv_id = prior_ob.scoped_vault_id.clone();
     let wf = state
         .db_pool
-        .db_query(move |conn| Workflow::create(conn, &sv_id, DocumentConfig {}.into()).unwrap())
+        .db_query(move |conn| Workflow::create(conn, &sv_id, DocumentConfig {}.into(), None).unwrap())
         .await
         .unwrap();
 

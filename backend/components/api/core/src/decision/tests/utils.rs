@@ -5,7 +5,7 @@ use db::tests::test_db_pool::TestDbPool;
 use db::DbResult;
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use macros::test_state;
-use newtypes::{DecisionStatus, OnboardingStatus};
+use newtypes::{DecisionStatus, OnboardingStatus, WorkflowFixtureResult};
 use std::sync::Arc;
 use test_case::test_case;
 
@@ -69,14 +69,4 @@ async fn test_handle_setup(state: &mut State) {
     let res =
         utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &tenant.id).unwrap();
     assert!(res == Some((DecisionStatus::Pass, false))); // Fixture decision for demo tenant
-}
-
-#[test_case("fail" => (DecisionStatus::Fail, false))]
-#[test_case("failininin1234" => (DecisionStatus::Fail, false))]
-#[test_case("manualreview" => (DecisionStatus::Fail, true))]
-#[test_case("manualreview1234" => (DecisionStatus::Fail, true))]
-#[test_case("passmeplease" => (DecisionStatus::Pass, false))]
-#[test_case("idv" => (DecisionStatus::Pass, false))]
-fn test_decision_status_from_sandbox_suffix(suffix: &str) -> (DecisionStatus, bool) {
-    utils::decision_status_from_sandbox_id(suffix)
 }

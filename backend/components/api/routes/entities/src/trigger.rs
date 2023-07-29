@@ -82,10 +82,10 @@ pub async fn post(
                     } else {
                         KycConfig { is_redo: true }.into()
                     };
-                    Workflow::create(conn, &sv.id, config)?
+                    Workflow::create(conn, &sv.id, config, None)?
                 }
                 TriggerInfo::IdDocument { collect_selfie } => {
-                    let wf = Workflow::create(conn, &sv.id, DocumentConfig {}.into())?;
+                    let wf = Workflow::create(conn, &sv.id, DocumentConfig {}.into(), None)?;
                     let args = NewDocumentRequestArgs {
                         scoped_vault_id: sv.id.clone(),
                         ref_id: None,

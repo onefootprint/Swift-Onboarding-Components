@@ -17,6 +17,9 @@ use api_core::errors::workflow::WorkflowError;
 use api_core::errors::AssertionError;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
+use api_core::utils::actix::OptionalJson;
+use api_wire_types::ProcessRequest;
+use db::models::workflow::Workflow;
 use decision::state::Authorize;
 use itertools::Itertools;
 use newtypes::OnboardingRequirement;
@@ -27,8 +30,13 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Continue processing the onboarding after user this stage of user input has finished"
 )]
 #[actix::post("/hosted/onboarding/process")]
-pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> JsonApiResponse<EmptyResponse> {
+pub async fn post(
+    user_auth: UserObAuthContext,
+    state: web::Data<State>,
+    request: OptionalJson<ProcessRequest>,
+) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let fixture_result = request.into_inner().map(|r| r.fixture_result);
 
     // Verify there are no unmet requirements
     let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
@@ -43,9 +51,23 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
     }
 
+    // Update the fixture result on the workflow, if provided
     let wf = user_auth
         .workflow()
         .ok_or(AssertionError("User doesn't have a workflow"))?;
+    let wf = if let Some(fixture_result) = fixture_result {
+        if user_auth.user().is_live {
+            return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
+        }
+        let wf_id = wf.id.clone();
+        state
+            .db_pool
+            .db_transaction(move |conn| Workflow::update_fixture_result(conn, &wf_id, fixture_result))
+            .await?
+    } else {
+        wf.clone()
+    };
+
     let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
     // Since actions are typed right now, infer which action needs to be sent to the workflow
     // in order to make it proceed

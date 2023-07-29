@@ -2,12 +2,12 @@ use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
-use api_core::ApiErrorKind;
 use api_core::auth::tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard};
 use api_core::auth::Either;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::traits::Workflow as TWorkflow;
 use api_core::decision::state::{WorkflowActionsKind, WorkflowWrapper};
+use api_core::ApiErrorKind;
 use chrono::Utc;
 use db::models::workflow::{NewWorkflow, Workflow};
 use db::DbError;
@@ -53,6 +53,7 @@ async fn create_workflow(
                     kind: wf_kind,
                     state: wf_state,
                     config: wf_config,
+                    fixture_result: None,
                 },
             )
         })

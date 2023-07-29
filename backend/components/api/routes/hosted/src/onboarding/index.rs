@@ -36,6 +36,7 @@ use newtypes::Selfie;
 use newtypes::VaultId;
 use newtypes::VaultKind;
 use newtypes::VaultPublicKey;
+use newtypes::WorkflowFixtureResult;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -143,7 +144,8 @@ pub fn get_or_start_onboarding(
         insight_event: insight_event.clone(),
     };
 
-    let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, true)?;
+    let fixture_result = WorkflowFixtureResult::from_sandbox_id(user_vault.sandbox_id.as_ref());
+    let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, true, fixture_result)?;
     if let IsNew::Yes(ref wf) = is_new_ob {
         if let Some(doc_info) = obc
             .must_collect_data
@@ -202,7 +204,7 @@ pub fn get_or_start_onboarding(
                 ob_configuration_id: obc.id.clone(),
                 insight_event,
             };
-            Onboarding::get_or_create(conn, ob_create_args, false)?;
+            Onboarding::get_or_create(conn, ob_create_args, false, fixture_result)?;
             sb
         };
         Some(sb)

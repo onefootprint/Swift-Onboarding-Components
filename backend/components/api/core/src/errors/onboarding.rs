@@ -50,7 +50,7 @@ pub enum OnboardingError {
     UnsupportedNonUSDocumentCountry,
     #[error("Unsupported document type. Supported document types: {0}")]
     UnsupportedDocumentType(Csv<ModernIdDocKind>),
-    #[error("Cannot create a document fixture result for a non-sandbox Vault")]
+    #[error("Cannot create a fixture result for a non-sandbox Vault")]
     CannotCreateFixtureResultForNonSandbox,
     #[error("Can only provide one image at a time")]
     OnlyOneImageAllowed,

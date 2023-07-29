@@ -17,7 +17,7 @@ use diesel::{Insertable, Queryable};
 use newtypes::{
     AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, FpId, InsightEventId, KycConfig, Locked,
     ObConfigurationId, OnboardingCompletedPayload, OnboardingId, OnboardingStatusChangedPayload,
-    ScopedVaultId, TaskData, TenantId, TenantScope, VaultId, WebhookEvent, WorkflowId,
+    ScopedVaultId, TaskData, TenantId, TenantScope, VaultId, WebhookEvent, WorkflowFixtureResult, WorkflowId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
@@ -318,6 +318,7 @@ impl Onboarding {
         conn: &mut TxnPgConn,
         args: OnboardingCreateArgs,
         should_create_workflow: bool,
+        fixture_result: Option<WorkflowFixtureResult>,
     ) -> DbResult<(Onboarding, IsNew)> {
         let ob = onboarding::table
             .filter(onboarding::scoped_vault_id.eq(&args.scoped_vault_id))
@@ -338,7 +339,8 @@ impl Onboarding {
             } else {
                 KycConfig { is_redo: false }.into()
             };
-            Some(Workflow::create(conn, &args.scoped_vault_id, config)?)
+            let wf = Workflow::create(conn, &args.scoped_vault_id, config, fixture_result)?;
+            Some(wf)
         } else {
             None
         };

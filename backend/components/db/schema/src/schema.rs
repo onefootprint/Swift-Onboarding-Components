@@ -869,6 +869,7 @@ table! {
         kind -> Text,
         state -> Text,
         config -> Jsonb,
+        fixture_result -> Nullable<Text>,
     }
 }
 
