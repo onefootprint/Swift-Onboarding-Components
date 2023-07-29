@@ -33,7 +33,6 @@ pub enum RiskSignalGroupKind {
     Watchlist,
     AdverseMedia,
     Doc,
-    WebDevice,
 }
 
 impl_enum_str_diesel!(RiskSignalGroupKind);

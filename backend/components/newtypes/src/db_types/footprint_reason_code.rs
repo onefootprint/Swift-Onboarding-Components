@@ -417,8 +417,6 @@ footprint_reason_code_enum! {
  NamePartiallyMatches,
 
  // ~~~~~~~~~~~~ IP Address ~~~~~~~~~~~~
-        // TODO: we aren't currently sending ip_address to Idology so these are unused. We possibly want to just remove these and just use Stytch
-        // to replace these. Alternatively, we could still get these from Idology but then we need to think about how to combine those vs Stytch
 
         #[scope = SignalScope::IpAddress, additional_scopes = vec![SignalScope::State], match_level = None]
         #[note = "IP state does not match", severity = SignalSeverity::Low,  description = "The located IP State does not match the input IP State."]
@@ -451,10 +449,6 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::IpAddress, additional_scopes = vec![], match_level = None]
         #[note = "IP high risk proxy", severity = SignalSeverity::High,  description = "The IP address is associated with an anonymizing proxy"]
         IpAlertHighRiskProxy,
-
-        #[scope = SignalScope::IpAddress, additional_scopes = vec![], match_level = None]
-        #[note = "IP from data center", severity = SignalSeverity::Medium,  description = "The IP address is from a known data center"]
-        IpAlertDataCenter,
 
         // ~~~~~~~~~~~~ Email ~~~~~~~~~~~~
 
@@ -1050,31 +1044,7 @@ footprint_reason_code_enum! {
 
         #[scope = SignalScope::BusinessName, additional_scopes = vec![SignalScope::BusinessAddress, SignalScope::BeneficialOwners], match_level = None]
         #[note = "No SOS filing found in business's state", severity = SignalSeverity::Medium,  description = "No Secretary of State filing was found for the business in the state of the input business address"]
-        SosBusinessAddressFilingNotFound,
-
-        //
-        // ~~~~~~~~~ Device ~~~~~~~~~~~
-        //
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
-        #[note = "Low Risk Device", severity = SignalSeverity::Info,  description = "Device exhibits properties typical of low risk populations"]
-        DeviceLowRisk,
-
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
-        #[note = "Medium Risk Device", severity = SignalSeverity::Low,  description = "Device exhibits properties typical of medium risk populations"]
-        DeviceMediumRisk,
-
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
-        #[note = "High Risk Device", severity = SignalSeverity::Medium,  description = "Device exhibits properties typical of high risk populations"]
-        DeviceHighRisk,
-
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
-        #[note = "Browser tampering", severity = SignalSeverity::Medium,  description = "Analysis indicates the user may have been tampering with aspects of their browser (user agent, javascript runtime, network calls) to circumvent or disrupt our collection of device insights. Often a sign of abuse."]
-        BrowserTampering,
-
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
-        #[note = "Browser automation", severity = SignalSeverity::Medium,  description = "User's device was using browser automation which is often a sign of abuse."]
-        BrowserAutomation
-
+        SosBusinessAddressFilingNotFound
     }
 }
 crate::util::impl_enum_str_diesel!(FootprintReasonCode);
@@ -1091,7 +1061,7 @@ impl FootprintReasonCode {
             FootprintReasonCode::DobMobDoesNotMatch => Some(Self::DobMobMatches),
             FootprintReasonCode::SsnDoesNotMatch => Some(Self::SsnMatches),
             FootprintReasonCode::NameLastDoesNotMatch => Some(Self::NameLastMatches),
-            FootprintReasonCode::IpStateDoesNotMatch => Some(Self::IpStateMatches), // TODO: right now we dont even send ip_address to Idology so this is pretty bogus. If we aren't getting an explicit match qualifier from idolgoy (or other vendors i guess since this is generic) then we should probably also assert here that we did indeed send up ip_address. Easiest for now might be to just remove this- this doesn't seem like the most useful reason code in isolation
+            FootprintReasonCode::IpStateDoesNotMatch => Some(Self::IpStateMatches),
             FootprintReasonCode::PhoneNumberDoesNotMatch => Some(Self::PhoneNumberMatches),
             FootprintReasonCode::InputPhoneNumberDoesNotMatchInputState => {
                 Some(Self::InputPhoneNumberMatchesInputState)

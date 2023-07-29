@@ -3,18 +3,16 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
 use actix_web::web::Json;
 use api_core::auth::user::UserAuth;
-use api_core::decision;
 use api_core::decision::vendor;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::ApiError;
 use api_wire_types::hosted::stytch::StytchTelemetryRequest;
 use db::models::decision_intent::DecisionIntent;
-use db::models::risk_signal::RiskSignal;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use idv::stytch::StytchLookupRequest;
 use idv::{ParsedResponse, VendorResponse};
-use newtypes::{DecisionIntentKind, RiskSignalGroupKind, VendorAPI};
+use newtypes::{DecisionIntentKind, VendorAPI};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -45,33 +43,18 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn: &mut db::TxnPgConn<'_>| -> ApiResult<_> {
-            let vendor_api = VendorAPI::StytchLookup;
             let di = DecisionIntent::create(conn, DecisionIntentKind::DeviceFingerprint, &sv_id, None)?;
-            let vreq = VerificationRequest::create(conn, &sv_id, &di.id, vendor_api)?;
+            let vreq = VerificationRequest::create(conn, &sv_id, &di.id, VendorAPI::StytchLookup)?;
 
             let uv = Vault::get(conn, &uv_id)?;
             let vendor_response = VendorResponse {
-                response: ParsedResponse::StytchLookup(res.parsed_response.clone()),
+                response: ParsedResponse::StytchLookup(res.parsed_response),
                 raw_response: res.raw_response,
             };
-            let vres = vendor::verification_result::save_verification_result(
+            let _vres = vendor::verification_result::save_verification_result(
                 conn,
                 &(vreq, vendor_response),
                 &uv.public_key,
-            )?;
-
-            let reason_codes =
-                decision::features::stytch::lookup_response_to_footprint_reason_codes(&res.parsed_response);
-
-            let _rs = RiskSignal::bulk_create(
-                conn,
-                &sv_id,
-                reason_codes
-                    .into_iter()
-                    .map(|rc| (rc, vendor_api, vres.id.clone()))
-                    .collect::<Vec<_>>(),
-                RiskSignalGroupKind::WebDevice,
-                false,
             )?;
             Ok(())
         })

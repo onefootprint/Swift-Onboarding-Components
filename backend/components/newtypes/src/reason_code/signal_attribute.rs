@@ -33,7 +33,6 @@ pub enum SignalScope {
     PhoneNumber,
 
     IpAddress,
-    Device,
     Document,
     Selfie,
 
@@ -60,7 +59,6 @@ impl SignalScope {
             SignalScope::Email => true,
             SignalScope::PhoneNumber => true,
             SignalScope::IpAddress => true,
-            SignalScope::Device => true,
             SignalScope::Document => true,
             SignalScope::Selfie => true,
             SignalScope::BusinessAddress => false,
