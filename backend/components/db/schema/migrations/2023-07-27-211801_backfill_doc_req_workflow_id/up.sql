@@ -4,6 +4,7 @@
 
 -- Every document request that doesn't have a workflow is for a user that only has one workflow,
 -- so we can just backfill with the workflow belonging to that scoped vault
+SET CONSTRAINTS ALL IMMEDIATE;
 
 UPDATE document_request
 SET workflow_id = workflow.id
