@@ -28,7 +28,6 @@ pub mod risk_signal_group;
 pub mod scoped_vault;
 pub mod session;
 pub mod socure_device_session;
-pub mod stytch_fingerprint_event;
 pub mod task;
 pub mod tenant;
 pub mod tenant_api_key;

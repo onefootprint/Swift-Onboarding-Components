@@ -1,1 +1,0 @@
-DROP TABLE stytch_fingerprint_event;
