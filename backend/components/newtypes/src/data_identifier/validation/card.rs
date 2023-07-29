@@ -68,38 +68,38 @@ impl From<card_validate::Type> for CardIssuer {
 }
 
 fn validate_card_number(value: PiiString, args: ValidateArgs) -> VResult<PiiString> {
-    // TODO this is annoying because we also need this to succeed in order to extract the issuer
-    // Make sure frontend doesn't crash w empty issuer
-    let result = CardValidate::from(value.leak());
-    match result {
-        Ok(_) => Ok(()),
-        Err(e) => {
-            let err_str = match e {
-                // This exploits the fact that I know the card library does luhn validation after
-                // all other validations... Pretty fragile, but I don't want to fork the card
-                // library yet.
-                card_validate::ValidateError::InvalidLuhn if args.ignore_luhn_validation => None,
+    if args.ignore_luhn_validation {
+        // Silence almost all validation for a handful of cards that don't obey the normal validation rules
+        if !value.leak().chars().all(|c| c.is_numeric()) {
+            return Err(Error::CardError(
+                "Invalid format. Please verify that the number is correct".to_owned(),
+            ));
+        }
+        if value.len() < 10 || value.len() > 19 {
+            return Err(Error::CardError(
+                "Invalid length. Please verify that the number is correct".to_owned(),
+            ));
+        }
+        return Ok(value);
+    } else {
+        CardValidate::from(value.leak()).map_err(|e| {
+            Error::CardError(match e {
                 card_validate::ValidateError::InvalidLuhn => {
-                    Some("Invalid checksum. Please verify that the number is correct".to_owned())
+                    "Invalid checksum. Please verify that the number is correct".to_owned()
                 }
                 card_validate::ValidateError::InvalidLength => {
-                    Some("Invalid length. Please verify that the number is correct".to_owned())
+                    "Invalid length. Please verify that the number is correct".to_owned()
                 }
                 card_validate::ValidateError::InvalidFormat => {
-                    Some("Invalid format. Please verify that the number is correct".to_owned())
+                    "Invalid format. Please verify that the number is correct".to_owned()
                 }
                 card_validate::ValidateError::UnknownType => {
-                    Some("Unknown type. Please verify that the number is correct".to_owned())
+                    "Unknown type. Please verify that the number is correct".to_owned()
                 }
-                _ => Some(format!("{:?}", e)),
-            };
-            if let Some(err_str) = err_str {
-                Err(Error::CardError(err_str))
-            } else {
-                Ok(())
-            }
-        }
-    }?;
+                _ => format!("{:?}", e),
+            })
+        })?;
+    }
     Ok(value)
 }
 
