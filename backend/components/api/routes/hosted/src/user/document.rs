@@ -16,7 +16,7 @@ use api_core::utils::vault_wrapper::seal_file_and_upload_to_s3;
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::DocumentResponse;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document_request::{DocRequestIdentifier, DocumentRequest as DbDocumentRequest};
+use db::models::document_request::DocumentRequest as DbDocumentRequest;
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::onboarding::Onboarding;
@@ -51,12 +51,8 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             // If there's no pending doc requests, nothing to do here
-            let identifier = DocRequestIdentifier {
-                sv_id: &su_id,
-                wf_id: Some(&wf_id),
-            };
-            let doc_request = DbDocumentRequest::get(conn, identifier)?
-                .ok_or(OnboardingError::IdentityDocumentNotPending)?;
+            let doc_request =
+                DbDocumentRequest::get(conn, &wf_id)?.ok_or(OnboardingError::IdentityDocumentNotPending)?;
             let vault = Vault::get(conn, &su_id)?;
             let user_consent = UserConsent::latest_for_onboarding(conn, &ob_id)?;
             Ok((vault, doc_request, user_consent))

@@ -17,7 +17,7 @@ use api_core::{
             vendor_result::VendorResult,
         },
     },
-    errors::{cip_error::CipError, ApiResult},
+    errors::{cip_error::CipError, onboarding::OnboardingError, ApiResult},
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::{DecryptUncheckedResult, TenantVw, VaultWrapper},
     ApiError, ApiErrorKind, State,
@@ -27,14 +27,9 @@ use chrono::{DateTime, Utc};
 use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
-        document_request::{DocRequestIdentifier, DocumentRequest},
-        insight_event::InsightEvent,
-        manual_review::ManualReview,
-        onboarding::Onboarding,
-        onboarding_decision::OnboardingDecision,
-        risk_signal::RiskSignal,
-        scoped_vault::ScopedVault,
-        verification_request::VerificationRequest,
+        document_request::DocumentRequest, insight_event::InsightEvent, manual_review::ManualReview,
+        onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
+        scoped_vault::ScopedVault, verification_request::VerificationRequest,
     },
 };
 use idv::ParsedResponse;
@@ -134,8 +129,8 @@ async fn create_cip_request(
                 };
 
                 let (ob, sv, _mr, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
-                let id = DocRequestIdentifier::new(&sv.id, ob.workflow_id.as_ref());
-                let collected_document = DocumentRequest::get(conn, id)?.map(|d| d.should_collect_selfie);
+                let wf_id = ob.workflow_id.as_ref().ok_or(OnboardingError::NoWorkflow)?;
+                let collected_document = DocumentRequest::get(conn, wf_id)?.map(|d| d.should_collect_selfie);
                 let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
                 let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;
 

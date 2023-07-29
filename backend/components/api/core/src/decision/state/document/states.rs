@@ -176,7 +176,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         } else {
             // Rerun decisioning, but with the latest doc risk signals
             // TODO: what's the review strategy for this case?
-            common::get_decision(&self, conn, risk_signals, &self.sv_id, &self.wf_id)?
+            common::get_decision(&self, conn, risk_signals, &self.wf_id)?
         };
 
         common::save_kyc_decision(

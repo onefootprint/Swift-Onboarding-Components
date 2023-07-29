@@ -14,6 +14,7 @@ pub type DocRefId = String;
 #[diesel(table_name = document_request)]
 pub struct DocumentRequest {
     pub id: DocumentRequestId,
+    // Not really needed anymore since we can go through Workflow
     pub scoped_vault_id: ScopedVaultId,
     pub ref_id: Option<DocRefId>,
     pub created_at: DateTime<Utc>,
@@ -23,20 +24,6 @@ pub struct DocumentRequest {
     pub workflow_id: WorkflowId,
     pub only_us: bool,
     pub doc_type_restriction: Option<Vec<ModernIdDocKind>>,
-}
-
-// A document request is uniquely identified by this weird combination while we are in progress
-// migrating to Workflows.
-// TODO use the workflow ID
-pub struct DocRequestIdentifier<'a> {
-    pub sv_id: &'a ScopedVaultId,
-    pub wf_id: Option<&'a WorkflowId>,
-}
-
-impl<'a> DocRequestIdentifier<'a> {
-    pub fn new(sv_id: &'a ScopedVaultId, wf_id: Option<&'a WorkflowId>) -> Self {
-        Self { sv_id, wf_id }
-    }
 }
 
 impl DocumentRequest {
@@ -66,20 +53,11 @@ impl DocumentRequest {
     }
 
     #[tracing::instrument("DocumentRequest::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: DocRequestIdentifier) -> DbResult<Option<Self>> {
-        let mut query = document_request::table.into_boxed();
-
-        // TODO we should backfill workflow_id on DocumentRequest and deprecate this old codepath
-        if let Some(wf_id) = id.wf_id {
-            query = query.filter(document_request::workflow_id.eq(wf_id))
-        } else {
-            // For legacy codepaths with no workflow, we want to make sure we don't find doc
-            // requests belonging to a re-collect document workflow
-            query = query
-                .filter(document_request::scoped_vault_id.eq(id.sv_id))
-                .filter(document_request::workflow_id.is_null())
-        }
-        let result = query.first(conn).optional()?;
+    pub fn get(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
+        let result = document_request::table
+            .filter(document_request::workflow_id.eq(wf_id))
+            .first(conn)
+            .optional()?;
         Ok(result)
     }
 }

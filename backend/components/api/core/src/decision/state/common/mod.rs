@@ -3,7 +3,7 @@ use std::sync::Arc;
 use db::{
     models::{
         decision_intent::DecisionIntent,
-        document_request::{DocRequestIdentifier, DocumentRequest},
+        document_request::DocumentRequest,
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
         vault::Vault,
@@ -266,11 +266,9 @@ pub fn get_decision(
     rule_group: &impl HasRuleGroup,
     conn: &mut TxnPgConn,
     risk_signals: RiskSignalsForDecision,
-    sv_id: &ScopedVaultId,
     wf_id: &WorkflowId,
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
-    let id = DocRequestIdentifier::new(sv_id, Some(wf_id));
-    let include_doc = DocumentRequest::get(conn, id)?.is_some();
+    let include_doc = DocumentRequest::get(conn, wf_id)?.is_some();
     let config = KycRuleExecutionConfig { include_doc };
     let rules_output = rule_group.rule_group().evaluate(risk_signals, config)?;
     Ok(rules_output)

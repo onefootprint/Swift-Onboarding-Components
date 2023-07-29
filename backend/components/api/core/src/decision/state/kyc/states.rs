@@ -239,7 +239,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let decision = if let Some(fixture_decision) = fixture_decision {
             common::kyc_decision_from_fixture(fixture_decision)?
         } else {
-            common::get_decision(&self, conn, self.risk_signals.clone(), &self.sv_id, &self.wf_id)?
+            common::get_decision(&self, conn, self.risk_signals.clone(), &self.wf_id)?
         };
 
         // Now, we unhide the risk signals for the vendor that made the decision

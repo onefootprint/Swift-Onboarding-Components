@@ -8,13 +8,9 @@ use api_core::{
 };
 use db::{
     models::{
-        document_request::{DocRequestIdentifier, DocumentRequest},
-        identity_document::IdentityDocument,
-        liveness_event::LivenessEvent,
-        ob_configuration::ObConfiguration,
-        onboarding::Onboarding,
-        user_consent::UserConsent,
-        workflow::Workflow,
+        document_request::DocumentRequest, identity_document::IdentityDocument,
+        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, onboarding::Onboarding,
+        user_consent::UserConsent, workflow::Workflow,
     },
     PgConn,
 };
@@ -252,12 +248,13 @@ fn get_requirement_inner(
                 .then_some(OnboardingRequirement::Liveness)
         }
         OnboardingRequirementKind::CollectDocument => {
-            let user_consent = UserConsent::latest_for_onboarding(conn, &args.onboarding.id)?;
-            let identifier = DocRequestIdentifier {
-                sv_id: &args.onboarding.scoped_vault_id,
-                wf_id: args.workflow.as_ref().map(|wf| &wf.id),
-            };
-            if let Some(dr) = DocumentRequest::get(conn, identifier)? {
+            let wf_id = args.workflow.as_ref().map(|wf| &wf.id);
+            let dr = wf_id
+                .map(|wf_id| DocumentRequest::get(conn, wf_id))
+                .transpose()?
+                .flatten();
+            if let Some(dr) = dr {
+                let user_consent = UserConsent::latest_for_onboarding(conn, &args.onboarding.id)?;
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
                 // Show a CollectDocument requirement if there's no id_document or the existing
                 // id_document is still Pending
