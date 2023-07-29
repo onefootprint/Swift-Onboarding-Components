@@ -79,7 +79,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
             let args = NewDocumentRequestArgs {
                 scoped_vault_id: su_id,
                 ref_id: None,
-                workflow_id: None,
+                workflow_id: wf.id,
                 should_collect_selfie: is_selfie,
                 only_us: false,
                 doc_type_restriction: None,
@@ -319,7 +319,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
             let args = NewDocumentRequestArgs {
                 scoped_vault_id: suid,
                 ref_id: None,
-                workflow_id: None,
+                workflow_id: wf.id,
                 should_collect_selfie: is_selfie,
                 only_us: false,
                 doc_type_restriction: None,

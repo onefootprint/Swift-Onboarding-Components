@@ -322,7 +322,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 let args = NewDocumentRequestArgs {
                     scoped_vault_id: self.sv_id.clone(),
                     ref_id: None,
-                    workflow_id: Some(self.wf_id.clone()),
+                    workflow_id: self.wf_id.clone(),
                     // TODO: should come from a config
                     should_collect_selfie: true,
                     only_us: true,

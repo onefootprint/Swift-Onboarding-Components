@@ -89,7 +89,7 @@ pub async fn post(
                     let args = NewDocumentRequestArgs {
                         scoped_vault_id: sv.id.clone(),
                         ref_id: None,
-                        workflow_id: Some(wf.id.clone()),
+                        workflow_id: wf.id.clone(),
                         should_collect_selfie: collect_selfie,
                         // TODO should these come from the last doc request? or be tenant-specific? or from workflow?
                         only_us: false,

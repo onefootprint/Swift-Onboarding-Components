@@ -326,7 +326,7 @@ pub async fn mock_incode_doc_collection(
                 let args = NewDocumentRequestArgs {
                     scoped_vault_id: scoped_vault_id.clone(),
                     ref_id: None,
-                    workflow_id: Some(wf_id.clone()),
+                    workflow_id: wf_id.clone(),
                     should_collect_selfie: false,
                     only_us: false,
                     doc_type_restriction: None,

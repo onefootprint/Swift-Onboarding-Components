@@ -141,7 +141,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         should_collect_selfie -> Bool,
-        workflow_id -> Nullable<Text>,
+        workflow_id -> Text,
         only_us -> Bool,
         doc_type_restriction -> Nullable<Array<Text>>,
     }

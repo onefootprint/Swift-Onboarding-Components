@@ -158,7 +158,10 @@ pub fn get_or_start_onboarding(
         {
             // Create a `DocumentRequest` if specified in the ob config.
             // To prevent duplicate document requests, only create a doc request if the onboarding is new
-            let wf_id = wf.as_ref().map(|wf| wf.id.clone());
+            let wf_id = wf
+                .as_ref()
+                .map(|wf| wf.id.clone())
+                .ok_or(OnboardingError::NoWorkflow)?;
             let doc_type_restriction = if let DocTypeRestriction::Restrict(types) = doc_info.0.clone() {
                 Some(types)
             } else {

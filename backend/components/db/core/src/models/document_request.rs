@@ -20,7 +20,7 @@ pub struct DocumentRequest {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
-    pub workflow_id: Option<WorkflowId>,
+    pub workflow_id: WorkflowId,
     pub only_us: bool,
     pub doc_type_restriction: Option<Vec<ModernIdDocKind>>,
 }
@@ -89,7 +89,7 @@ pub struct NewDocumentRequestArgs {
     pub scoped_vault_id: ScopedVaultId,
     pub ref_id: Option<String>,
     pub should_collect_selfie: bool,
-    pub workflow_id: Option<WorkflowId>,
+    pub workflow_id: WorkflowId,
     pub only_us: bool,
     pub doc_type_restriction: Option<Vec<ModernIdDocKind>>,
 }
@@ -101,7 +101,7 @@ struct NewDocumentRequestRow {
     ref_id: Option<String>,
     created_at: DateTime<Utc>,
     should_collect_selfie: bool,
-    workflow_id: Option<WorkflowId>,
+    workflow_id: WorkflowId,
     only_us: bool,
     doc_type_restriction: Option<Vec<ModernIdDocKind>>,
 }
