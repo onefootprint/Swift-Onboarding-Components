@@ -27,7 +27,6 @@ use idv::{
         MiddeskGetBusinessRequest, MiddeskGetBusinessResponse,
     },
     socure::{client::SocureClient, SocureIDPlusAPIResponse, SocureIDPlusRequest},
-    stytch::{client::StytchClient, StytchLookupRequest, StytchLookupResponse},
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
 };
 
@@ -183,7 +182,6 @@ pub struct VendorClients {
     pub idology_expect_id:
         VendorClient<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idology::error::Error>,
     pub idology_pa: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
-    pub stytch_lookup: VendorClient<StytchLookupRequest, StytchLookupResponse, idv::stytch::error::Error>,
     pub incode: IncodeClients,
 }
 
@@ -193,7 +191,6 @@ impl VendorClients {
         twilio_client: TwilioClient,
         footprint_client: FootprintVendorHttpClient,
         middesk_client: MiddeskClient,
-        stytch_client: StytchClient,
     ) -> Self {
         let middesk_client = Arc::new(middesk_client);
         let footprint_client = Arc::new(footprint_client);
@@ -206,7 +203,6 @@ impl VendorClients {
             middesk_get_business: middesk_client,
             idology_expect_id: footprint_client.clone(),
             idology_pa: footprint_client.clone(),
-            stytch_lookup: Arc::new(stytch_client),
             incode: IncodeClients::new(footprint_client),
         }
     }
@@ -250,11 +246,6 @@ impl VendorClients {
                 IdologyExpectIDRequest,
                 IdologyExpectIDAPIResponse,
                 idv::idology::error::Error,
-            >::new()),
-            stytch_lookup: Arc::new(MockVendorAPICall::<
-                StytchLookupRequest,
-                StytchLookupResponse,
-                idv::stytch::error::Error,
             >::new()),
             incode: IncodeClients::new_with_mocks(),
         }

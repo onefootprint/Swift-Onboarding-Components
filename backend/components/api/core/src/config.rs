@@ -117,9 +117,6 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub middesk_config: MiddeskConfig,
-
-    #[envconfig(nested = true)]
-    pub stytch_config: StytchConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
@@ -315,13 +312,4 @@ pub struct MiddeskConfig {
 
     #[envconfig(from = "MIDDESK_BASE_URL")]
     pub middesk_base_url: String,
-}
-
-#[derive(Envconfig, Debug, Clone)]
-pub struct StytchConfig {
-    #[envconfig(from = "STYTCH_PROJECT")]
-    pub stytch_project: String,
-
-    #[envconfig(from = "STYTCH_SECRET")]
-    pub stytch_secret: PiiString,
 }
