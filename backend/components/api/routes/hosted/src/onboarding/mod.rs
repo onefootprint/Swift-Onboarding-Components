@@ -35,7 +35,6 @@ mod process;
 mod skip_liveness;
 mod socure_device;
 mod status;
-mod stytch;
 mod validate;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -48,8 +47,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(pat::get)
         .service(socure_device::post)
         .service(process::post)
-        .service(validate::post)
-        .service(stytch::post);
+        .service(validate::post);
 
     d2p::routes(config);
 }
