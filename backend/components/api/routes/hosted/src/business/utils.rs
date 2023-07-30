@@ -9,8 +9,9 @@ use api_core::errors::business::BusinessError;
 use api_core::utils::email::BoInviteEmailInfo;
 use api_core::utils::session::AuthSession;
 use api_core::utils::twilio::BoSessionSmsInfo;
-use api_core::utils::vault_wrapper::{Business, TenantVw};
+use api_core::utils::vault_wrapper::{Business, DecryptedBusinessOwners, TenantVw, VaultWrapper};
 use db::models::business_owner::BusinessOwner;
+use db::models::onboarding::Onboarding;
 use db::models::tenant::Tenant;
 use futures::FutureExt;
 use newtypes::{BusinessOwnerKind, PiiString};
@@ -103,4 +104,61 @@ pub async fn send_secondary_bo_links(
         .collect::<ApiResult<_>>()?;
 
     Ok(())
+}
+
+#[tracing::instrument(skip(state))]
+pub async fn should_run_kyb(state: &State, biz_ob: &Onboarding, tenant: &Tenant) -> ApiResult<bool> {
+    let svid = biz_ob.scoped_vault_id.clone();
+    let ob_config_id = biz_ob.ob_configuration_id.clone();
+
+    let bvw = state
+        .db_pool
+        .db_query(move |conn| VaultWrapper::<Business>::build_for_tenant(conn, &svid))
+        .await??;
+
+    let dbo = bvw
+        .decrypt_business_owners(&state.db_pool, &state.enclave_client, Some(ob_config_id))
+        .await?;
+
+    let bo_kyc_is_complete = match dbo {
+        DecryptedBusinessOwners::KYBStart {
+            primary_bo: _,
+            primary_bo_vault: _,
+        } => {
+            tracing::info!(?biz_ob, "[should_run_kyb] KYBStart");
+            false
+        }
+        // For Single-KYC KYB, only need the primary BO to have completed KYC
+        DecryptedBusinessOwners::SingleKYC {
+            primary_bo: _,
+            primary_bo_vault,
+            primary_bo_data: _,
+            secondary_bos: _,
+        } => {
+            tracing::info!(?biz_ob, primary_bo_ob=?primary_bo_vault.2, "[should_run_kyb] SingleKYC");
+            primary_bo_vault.2.status.has_decision()
+        }
+        // For Multi-KYC KYB, we need the primary BO and all secondary BOs to have completed KYC
+        DecryptedBusinessOwners::MultiKYC {
+            primary_bo: _,
+            primary_bo_vault,
+            primary_bo_data: _,
+            secondary_bos,
+        } => {
+            tracing::info!(?biz_ob, primary_bo_ob=?primary_bo_vault.2, ?secondary_bos, "[should_run_kyb] MultiKYC");
+            let all_secondary_not_initiated = secondary_bos.iter().all(|bo| bo.2.is_none());
+            if all_secondary_not_initiated {
+                // If we are in authorize and all secondary BOs have no vault, we are in authorize
+                // for the primary BO. So, send the links out to all secondary BOs
+                let secondary_bos = secondary_bos.iter().map(|bo| bo.1.clone()).collect();
+                send_secondary_bo_links(state, &bvw, tenant, secondary_bos).await?;
+            }
+            primary_bo_vault.2.status.has_decision()
+                && secondary_bos
+                    .into_iter()
+                    .all(|b| b.2.map(|d| d.2.status.has_decision()).unwrap_or(false))
+        }
+    };
+
+    Ok(bo_kyc_is_complete && biz_ob.idv_reqs_initiated_at.is_none())
 }

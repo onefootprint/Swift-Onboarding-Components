@@ -1,10 +1,12 @@
 use crate::auth::user::UserAuthGuard;
+use crate::business;
 use crate::decision;
 use crate::errors::onboarding::OnboardingError;
 use crate::onboarding::get_requirements;
 use crate::onboarding::GetRequirementsArgs;
 use crate::types::response::ResponseData;
 use crate::State;
+use api_core::auth::user::CheckedUserObAuthContext;
 use api_core::auth::user::UserObAuthContext;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::alpaca_kyc::AlpacaKycState;
@@ -14,7 +16,9 @@ use api_core::decision::state::DocCollected;
 use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::workflow::WorkflowError;
+use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
+use api_core::task;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use api_core::utils::actix::OptionalJson;
@@ -92,5 +96,33 @@ pub async fn post(
         }
         s => return Err(WorkflowError::WorkflowCannotProceed(newtypes::WorkflowState::from(&s)).into()),
     }
+
+    run_kyb_if_needed(&state, user_auth).await?;
+
     ResponseData::ok(EmptyResponse {}).json()
+}
+
+#[tracing::instrument(skip_all)]
+async fn run_kyb_if_needed(state: &State, user_auth: CheckedUserObAuthContext) -> ApiResult<()> {
+    // Run KYB
+    let tenant = user_auth.tenant()?.clone();
+    let uv = user_auth.user().clone();
+    let biz_ob = state
+        .db_pool
+        .db_query(move |conn| user_auth.business_onboarding(conn))
+        .await??;
+
+    if let Some(biz_ob) = biz_ob {
+        let should_run_kyb = business::utils::should_run_kyb(state, &biz_ob, &tenant).await?;
+        tracing::info!(should_run_kyb, "should_run_kyb");
+        if should_run_kyb {
+            let kyb_res = decision::vendor::middesk::run_kyb(state, biz_ob.id, &uv, &tenant.id).await;
+            if let Err(e) = kyb_res {
+                tracing::error!(error=%e, "Error kicking off KYB")
+            }
+            // temporary until we migrate to a KYB workflow
+            task::execute_webhook_tasks(state.clone());
+        }
+    }
+    Ok(())
 }
