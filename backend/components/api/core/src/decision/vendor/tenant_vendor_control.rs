@@ -1,4 +1,4 @@
-use crate::{config::Config, errors::ApiResult};
+use crate::{config::Config, enclave_client::EnclaveClient, errors::ApiResult};
 use db::{
     models::{tenant::Tenant, tenant_vendor::TenantVendorControl as DbTenantVendorControl},
     DbPool, DbResult,
@@ -10,6 +10,7 @@ use idv::{
 use newtypes::{
     vendor_credentials::{
         ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials, IncodeCredentials,
+        MiddeskCredentials,
     },
     IdvData, PiiString, TenantId, Vendor, VendorAPI,
 };
@@ -21,6 +22,7 @@ pub struct TenantVendorControl {
     idology_credentials: IdologyCredentials,
     experian_credentials: ExperianCredentials,
     incode_credentials: IncodeCredentials,
+    middesk_credentials: MiddeskCredentials,
     enabled_vendor_apis: Vec<VendorAPI>,
     tenant_id: TenantId,
     tenant_name: String,
@@ -31,6 +33,7 @@ impl TenantVendorControl {
         tenant_id: TenantId,
         db_pool: &DbPool,
         config: &Config,
+        enclave_client: &EnclaveClient,
     ) -> ApiResult<TenantVendorControl> {
         let (tenant, vendor_control) = db_pool
             .db_query(move |conn| -> DbResult<_> {
@@ -41,7 +44,7 @@ impl TenantVendorControl {
             })
             .await??;
 
-        Self::new_internal(vendor_control, config, tenant).await
+        Self::new_internal(vendor_control, config, enclave_client, tenant).await
     }
 
     // Accessors
@@ -55,6 +58,10 @@ impl TenantVendorControl {
 
     pub fn incode_credentials(&self) -> IncodeCredentials {
         self.incode_credentials.clone()
+    }
+
+    pub fn middesk_credentials(&self) -> MiddeskCredentials {
+        self.middesk_credentials.clone()
     }
 
     pub fn enabled_vendor_apis(&self) -> Vec<VendorAPI> {
@@ -89,6 +96,7 @@ impl TenantVendorControl {
     async fn new_internal(
         vendor_control: Option<DbTenantVendorControl>,
         config: &Config,
+        enclave_client: &EnclaveClient,
         tenant: Tenant,
     ) -> ApiResult<Self> {
         // As of 2023-06-28 we just use our default idology credentials for all tenants
@@ -109,6 +117,20 @@ impl TenantVendorControl {
         // As of 2023-04-25, we only have a single set of incode credentials
         let incode_credentials = IncodeCredentials::from(config);
 
+        let middesk_credentials = if let Some(middesk_api_key) =
+            vendor_control.as_ref().and_then(|vc| vc.middesk_api_key.clone())
+        {
+            let middesk_api_key_plaintext = enclave_client
+                .decrypt_to_piistring(&middesk_api_key, &tenant.e_private_key, vec![])
+                .await?;
+            MiddeskCredentials {
+                api_key: middesk_api_key_plaintext,
+            }
+        } else {
+            // if the tenants isnt using their own API key, then we use the global footprint one
+            MiddeskCredentials::from(config)
+        };
+
         // stash the enabled APIs on TVC
         let enabled_vendor_apis = Self::get_enabled_vendor_apis(&vendor_control);
 
@@ -119,6 +141,7 @@ impl TenantVendorControl {
             experian_credentials,
             enabled_vendor_apis,
             incode_credentials,
+            middesk_credentials,
             tenant_name: tenant.name,
             tenant_id: tenant.id,
         };
@@ -173,10 +196,11 @@ impl TenantVendorControl {
     #[cfg(test)]
     pub async fn new_for_test(
         config: &Config,
+        enclave_client: &EnclaveClient,
         vendor_control: Option<DbTenantVendorControl>,
         tenant: Tenant,
     ) -> ApiResult<Self> {
-        Self::new_internal(vendor_control, config, tenant).await
+        Self::new_internal(vendor_control, config, enclave_client, tenant).await
     }
 }
 
@@ -195,6 +219,14 @@ impl From<&Config> for IncodeCredentials {
         IncodeCredentials {
             api_key: config.incode.api_key.clone(),
             base_url: config.incode.base_url.clone(),
+        }
+    }
+}
+
+impl From<&Config> for MiddeskCredentials {
+    fn from(config: &Config) -> Self {
+        MiddeskCredentials {
+            api_key: config.middesk_config.middesk_api_key.clone(),
         }
     }
 }

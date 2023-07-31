@@ -1,4 +1,4 @@
-use newtypes::BusinessData;
+use newtypes::{BusinessData, PiiString};
 use reqwest::{header, Url};
 
 use std::time::Duration;
@@ -14,11 +14,11 @@ pub struct MiddeskClient {
 }
 
 impl MiddeskClient {
-    pub fn new(api_key: String, base_url: String) -> Result<Self, Error> {
+    pub fn new(api_key: PiiString, base_url: String) -> Result<Self, Error> {
         let mut headers = header::HeaderMap::new();
         headers.insert(
             "Authorization",
-            header::HeaderValue::from_str(format!("Bearer {}", api_key).as_str())
+            header::HeaderValue::from_str(format!("Bearer {}", api_key.leak_to_string()).as_str())
                 .map_err(MiddeskReqwestError::from)?,
         );
         headers.insert(
@@ -86,7 +86,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_client() {
-        let api_key = dotenv::var("MIDDESK_API_KEY").unwrap();
+        let api_key = PiiString::from(dotenv::var("MIDDESK_API_KEY").unwrap());
         let base_url = dotenv::var("MIDDESK_BASE_URL").unwrap();
 
         let client = MiddeskClient::new(api_key, base_url).unwrap();

@@ -71,7 +71,7 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
 
         // Create TVC for use in writing vreqs in `on_commit`
         let tid = self.t_id.clone();
-        let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config).await?;
+        let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
 
         Ok(tvc)
     }

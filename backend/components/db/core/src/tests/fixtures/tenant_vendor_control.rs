@@ -18,5 +18,6 @@ pub fn create_in_memory(
         idology_enabled,
         experian_enabled,
         experian_subscriber_code,
+        middesk_api_key: None,
     }
 }

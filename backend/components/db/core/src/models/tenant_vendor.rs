@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_vendor_control;
 use diesel::ExpressionMethods;
 use diesel::{Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
-use newtypes::{TenantId, TenantVendorControlId};
+use newtypes::{SealedVaultBytes, TenantId, TenantVendorControlId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, PartialEq, Eq)]
@@ -20,6 +20,8 @@ pub struct TenantVendorControl {
 
     pub experian_enabled: bool,
     pub experian_subscriber_code: Option<String>,
+
+    pub middesk_api_key: Option<SealedVaultBytes>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -29,6 +31,7 @@ struct NewTenantVendorControl {
     idology_enabled: bool,
     experian_enabled: bool,
     experian_subscriber_code: Option<String>,
+    middesk_api_key: Option<SealedVaultBytes>,
 }
 
 impl TenantVendorControl {
@@ -39,12 +42,14 @@ impl TenantVendorControl {
         idology_enabled: bool,
         experian_enabled: bool,
         experian_subscriber_code: Option<String>,
+        middesk_api_key: Option<SealedVaultBytes>,
     ) -> DbResult<Self> {
         let new = NewTenantVendorControl {
             tenant_id,
             idology_enabled,
             experian_enabled,
             experian_subscriber_code,
+            middesk_api_key,
         };
 
         let tvc = diesel::insert_into(tenant_vendor_control::table)

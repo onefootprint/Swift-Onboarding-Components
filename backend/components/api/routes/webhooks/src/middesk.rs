@@ -63,7 +63,7 @@ impl FromRequest for MiddeskWebhookSignature {
             let webhook_signature = hex::decode(webhook_signature)
                 .map_err(|_| AuthError::InvalidHeader("Invalid encoding".to_owned()))?;
 
-            let expected = crypto::hmac_sha256_sign(secret.as_bytes(), &req_bytes)?;
+            let expected = crypto::hmac_sha256_sign(secret.leak_to_string().as_bytes(), &req_bytes)?;
 
             if crypto::safe_compare(&expected, &webhook_signature) {
                 let request = serde_json::from_slice(&req_bytes)?;

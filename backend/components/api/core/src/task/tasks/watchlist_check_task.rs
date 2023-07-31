@@ -290,7 +290,8 @@ impl WatchlistCheckTask {
         )
         .await?;
 
-        let tenant_vendor_control = TenantVendorControl::new(tenant_id.clone(), db_pool, config).await?;
+        let tenant_vendor_control =
+            TenantVendorControl::new(tenant_id.clone(), db_pool, config, enclave_client).await?;
 
         let res = idology_client
             .make_request(tenant_vendor_control.build_idology_pa_request(idv_data))

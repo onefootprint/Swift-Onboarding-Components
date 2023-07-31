@@ -94,7 +94,7 @@ impl OnAction<DocCollected, DocumentState> for DocumentDataCollection {
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         let tid = self.t_id.clone();
-        let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config).await?;
+        let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
 
         Ok(tvc)
     }

@@ -94,7 +94,7 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
         common::write_authorized_fingerprints(state, &self.sv_id).await?;
 
         let tid = self.t_id.clone();
-        let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config).await?;
+        let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
 
         Ok(tvc)
     }
@@ -398,7 +398,13 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 Ok((di, uv))
             })
             .await?;
-        let tvc = TenantVendorControl::new(self.t_id.clone(), &state.db_pool, &state.config).await?;
+        let tvc = TenantVendorControl::new(
+            self.t_id.clone(),
+            &state.db_pool,
+            &state.config,
+            &state.enclave_client,
+        )
+        .await?;
 
         let fixture_decision =
             decision::utils::get_fixture_data_decision(state.feature_flag_client.clone(), &uv, &self.t_id)?;

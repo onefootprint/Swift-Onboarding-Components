@@ -305,10 +305,10 @@ pub struct ExperianConfig {
 #[derive(Envconfig, Debug, Clone)]
 pub struct MiddeskConfig {
     #[envconfig(from = "MIDDESK_API_KEY")]
-    pub middesk_api_key: String,
+    pub middesk_api_key: PiiString,
 
     #[envconfig(from = "MIDDESK_WEBHOOK_SECRET")]
-    pub middesk_webhook_secret: String,
+    pub middesk_webhook_secret: PiiString,
 
     #[envconfig(from = "MIDDESK_BASE_URL")]
     pub middesk_base_url: String,

@@ -1,0 +1,1 @@
+ALTER TABLE tenant_vendor_control ADD COLUMN middesk_api_key bytea;
