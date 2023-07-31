@@ -288,7 +288,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                         .iter()
                         .map(|vr| vr.verification_result_id.clone())
                         .collect(),
-                    decision,
+                    decision.into(),
                     self.is_redo,
                     fixture_decision.is_some(),
                     vec![],
@@ -536,7 +536,6 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let output = WaterfallOnboardingRulesDecisionOutput::new(
             DecisionResult::Evaluated(decision),
             DecisionResult::NotRequired,
-            DecisionResult::NotRequired,
             vec![],
         );
 
@@ -550,7 +549,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 .iter()
                 .map(|vr| vr.verification_result_id.clone()) // TODO: a little funky- we maybe dont need the OBD<>VRes junction table anymore 
                 .collect(),
-            output,
+            output.into(),
             self.is_redo,
             is_sandbox,
             review_reasons,

@@ -122,7 +122,6 @@ impl KycRuleGroup {
         let output = WaterfallOnboardingRulesDecisionOutput::new(
             DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(kyc_result)),
             doc_result,
-            DecisionResult::NotRequired,
             additional_results,
         );
 
@@ -192,7 +191,6 @@ pub fn calculate_kyc_rules_output_with_waterfall(
 
     let output = WaterfallOnboardingRulesDecisionOutput::new(
         DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(result)),
-        DecisionResult::NotRequired,
         DecisionResult::NotRequired,
         additional_results,
     );

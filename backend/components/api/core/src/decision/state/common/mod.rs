@@ -22,8 +22,8 @@ use crate::{
         self, engine,
         features::risk_signals::RiskSignalsForDecision,
         onboarding::{
-            rules::KycRuleExecutionConfig, Decision, DecisionResult, OnboardingRulesDecisionOutput,
-            WaterfallOnboardingRulesDecisionOutput,
+            rules::KycRuleExecutionConfig, Decision, DecisionResult, OnboardingRulesDecision,
+            OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
         },
         utils::FixtureDecision,
         vendor::{
@@ -218,7 +218,6 @@ pub fn kyc_decision_from_fixture(
     let output = WaterfallOnboardingRulesDecisionOutput::new(
         DecisionResult::Evaluated(rules_output),
         DecisionResult::NotRequired,
-        DecisionResult::NotRequired,
         vec![],
     );
 
@@ -254,7 +253,6 @@ pub fn alpaca_kyc_decision_from_fixture(
     let rules_output = WaterfallOnboardingRulesDecisionOutput::new(
         DecisionResult::Evaluated(final_decision),
         DecisionResult::NotRequired,
-        DecisionResult::NotRequired,
         vec![],
     );
 
@@ -283,7 +281,7 @@ pub fn save_kyc_decision(
     sv_id: &ScopedVaultId,
     workflow_id: &WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
-    rules_output: WaterfallOnboardingRulesDecisionOutput,
+    rules_output: OnboardingRulesDecision,
     is_redo: bool,
     is_sandbox: bool,
     review_reasons: Vec<ReviewReason>,

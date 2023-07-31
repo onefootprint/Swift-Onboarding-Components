@@ -5,8 +5,8 @@ use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResul
 use crate::{
     decision::{
         onboarding::{
-            Decision, DecisionReasonCodes, DecisionResult, FeatureSet, FeatureVector,
-            OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
+            Decision, DecisionReasonCodes, FeatureSet, FeatureVector, KybOnboardingRulesDecisionOutput,
+            OnboardingRulesDecision, OnboardingRulesDecisionOutput,
         },
         rule::{
             self,
@@ -78,7 +78,7 @@ impl KybFeatureVector {
 }
 
 impl FeatureVector for KybFeatureVector {
-    fn evaluate(&self) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecision, DecisionReasonCodes)> {
         let middesk_rules: Vec<RuleSet<KybFeatureVector>> = vec![
             rule_sets::kyb::middesk_base_rule_set(),
             rule_sets::kyb::bos_pass_kyc_rule_set(),
@@ -107,12 +107,7 @@ impl FeatureVector for KybFeatureVector {
             rules_not_triggered: eval_result.rules_not_triggered,
         };
 
-        let output = WaterfallOnboardingRulesDecisionOutput::new(
-            DecisionResult::NotRequired,
-            DecisionResult::NotRequired,
-            DecisionResult::Evaluated(kyb_decision),
-            vec![],
-        );
+        let output = OnboardingRulesDecision::Kyb(KybOnboardingRulesDecisionOutput::new(kyb_decision));
 
         let reason_codes = self.reason_codes();
         Ok((output, reason_codes))

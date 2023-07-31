@@ -1,3 +1,4 @@
+use enum_dispatch::enum_dispatch;
 use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResultId};
 
 use crate::errors::ApiResult;
@@ -21,27 +22,44 @@ pub enum DecisionResult {
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]
+#[enum_dispatch(FinalAndAdditionalDecisions)]
+pub enum OnboardingRulesDecision {
+    Kyc(WaterfallOnboardingRulesDecisionOutput),
+    Kyb(KybOnboardingRulesDecisionOutput),
+}
+
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct WaterfallOnboardingRulesDecisionOutput {
     kyc_decision: DecisionResult,
     doc_decision: DecisionResult,
-    kyb_decision: DecisionResult,
     additional_kyc_evaluated: Vec<OnboardingRulesDecisionOutput>,
+}
+
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub struct KybOnboardingRulesDecisionOutput {
+    kyb_decision_output: OnboardingRulesDecisionOutput,
+}
+
+#[enum_dispatch]
+pub trait FinalAndAdditionalDecisions {
+    fn final_decision_and_additional_evaluated(
+        &self,
+    ) -> ApiResult<(OnboardingRulesDecisionOutput, Vec<OnboardingRulesDecisionOutput>)>;
 }
 
 impl WaterfallOnboardingRulesDecisionOutput {
     pub fn new(
         kyc_decision: DecisionResult,
         doc_decision: DecisionResult,
-        kyb_decision: DecisionResult,
         additional_kyc_evaluated: Vec<OnboardingRulesDecisionOutput>,
     ) -> Self {
         Self {
             kyc_decision,
             doc_decision,
-            kyb_decision,
             additional_kyc_evaluated,
         }
     }
+
     pub fn final_kyc_decision(&self) -> ApiResult<OnboardingRulesDecisionOutput> {
         let result = self
             .kyc_decisions()
@@ -57,14 +75,23 @@ impl WaterfallOnboardingRulesDecisionOutput {
         Ok(result)
     }
 
-    pub fn final_kyb_decision(&self) -> ApiResult<OnboardingRulesDecisionOutput> {
-        match self.kyb_decision.clone() {
-            DecisionResult::Evaluated(e) => Ok(e),
-            DecisionResult::NotRequired => Err(crate::decision::Error::DecisionNotFound.into()),
-        }
+    fn kyc_decisions(&self) -> Vec<DecisionResult> {
+        vec![self.kyc_decision.clone(), self.doc_decision.clone()]
     }
 
-    pub fn final_kyc_decision_and_additional_kyc_evaluated(
+    pub fn vendors_for_unhiding_risk_signals(&self) -> Vec<VendorAPI> {
+        self.kyc_decisions()
+            .iter()
+            .filter_map(|d| match d {
+                DecisionResult::Evaluated(e) => Some(e.decision.vendor_api),
+                DecisionResult::NotRequired => None,
+            })
+            .collect()
+    }
+}
+
+impl FinalAndAdditionalDecisions for WaterfallOnboardingRulesDecisionOutput {
+    fn final_decision_and_additional_evaluated(
         &self,
     ) -> ApiResult<(OnboardingRulesDecisionOutput, Vec<OnboardingRulesDecisionOutput>)> {
         let final_decision = self.final_kyc_decision()?;
@@ -86,27 +113,21 @@ impl WaterfallOnboardingRulesDecisionOutput {
 
         Ok((final_decision, additional))
     }
+}
 
-    pub fn vendors_for_unhiding_risk_signals(&self) -> Vec<VendorAPI> {
-        self.all_decisions()
-            .iter()
-            .filter_map(|d| match d {
-                DecisionResult::Evaluated(e) => Some(e.decision.vendor_api),
-                DecisionResult::NotRequired => None,
-            })
-            .collect()
+impl KybOnboardingRulesDecisionOutput {
+    pub fn new(kyb_decision_output: OnboardingRulesDecisionOutput) -> Self {
+        Self { kyb_decision_output }
     }
+}
 
-    fn kyc_decisions(&self) -> Vec<DecisionResult> {
-        vec![self.kyc_decision.clone(), self.doc_decision.clone()]
-    }
+impl FinalAndAdditionalDecisions for KybOnboardingRulesDecisionOutput {
+    fn final_decision_and_additional_evaluated(
+        &self,
+    ) -> ApiResult<(OnboardingRulesDecisionOutput, Vec<OnboardingRulesDecisionOutput>)> {
+        let final_decision = self.kyb_decision_output.clone();
 
-    fn all_decisions(&self) -> Vec<DecisionResult> {
-        vec![
-            self.kyc_decision.clone(),
-            self.doc_decision.clone(),
-            self.kyb_decision.clone(),
-        ]
+        Ok((final_decision, vec![]))
     }
 }
 
@@ -122,7 +143,7 @@ pub struct Decision {
 
 pub type DecisionReasonCodes = Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>;
 pub trait FeatureVector {
-    fn evaluate(&self) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)>;
+    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecision, DecisionReasonCodes)>;
 }
 
 pub trait FeatureSet {

@@ -63,7 +63,7 @@ pub struct Complete {
     business_response_vres: VerificationResult,
 }
 
-#[derive(Debug)]
+#[derive(Debug, strum_macros::Display)]
 pub enum MiddeskStates {
     PendingCreateBusinessCall(MiddeskState<PendingCreateBusinessCall>),
     AwaitingBusinessUpdateWebhook(MiddeskState<AwaitingBusinessUpdateWebhook>),
@@ -591,7 +591,7 @@ pub async fn handle_middesk_webhook(
             state.make_get_business_call(db_pool, middesk_client).await
         }
         (s, r) => Err(MiddeskError::UnexpectedState(format!(
-            "state = {:?}, webhook_id = {:?}, business_id = {:?}",
+            "state = {}, webhook_id = {:?}, business_id = {:?}",
             s,
             r.webhook_id(),
             r.business_id()

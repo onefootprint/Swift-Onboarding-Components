@@ -4,7 +4,7 @@ use super::{
     features::kyc_features::KycFeatureVector,
     onboarding::{
         rules::calculate_kyc_rules_output_with_waterfall, rules::KycRuleGroup, DecisionReasonCodes,
-        FeatureVector, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
+        FeatureVector, FinalAndAdditionalDecisions, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
     },
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
@@ -321,15 +321,14 @@ pub fn calculate_decision(
 pub fn save_onboarding_decision(
     conn: &mut TxnPgConn,
     ob: &Onboarding,
-    rules_output: WaterfallOnboardingRulesDecisionOutput,
+    rules_output: OnboardingRulesDecision,
     verification_result_ids: Vec<VerificationResultId>,
     assert_is_first_decision_for_onboarding: bool,
     is_sandbox: bool,
     workflow_id: Option<WorkflowId>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
-    let (final_decision, additional_evaluated) =
-        rules_output.final_kyc_decision_and_additional_kyc_evaluated()?;
+    let (final_decision, additional_evaluated) = rules_output.final_decision_and_additional_evaluated()?;
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     let onboarding_decision = risk::save_final_decision(
         conn,

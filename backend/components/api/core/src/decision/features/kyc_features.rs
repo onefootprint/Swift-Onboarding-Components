@@ -1,7 +1,7 @@
 use crate::decision::{
     onboarding::{
         rules::calculate_kyc_rules_output_with_waterfall, rules::KycRuleGroup, DecisionReasonCodes,
-        WaterfallOnboardingRulesDecisionOutput,
+        OnboardingRulesDecision,
     },
     Error,
 };
@@ -238,11 +238,11 @@ pub fn create_features(results: Vec<VendorResult>) -> KycFeatureVector {
 
 // TODO: remove KYCFeatureVector
 impl FeatureVector for KycFeatureVector {
-    fn evaluate(&self) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
+    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecision, DecisionReasonCodes)> {
         let rule_group = KycRuleGroup::default();
-        let result = calculate_kyc_rules_output_with_waterfall(self, rule_group)?;
+        let (decision, codes) = calculate_kyc_rules_output_with_waterfall(self, rule_group)?;
 
-        Ok(result)
+        Ok((OnboardingRulesDecision::Kyc(decision), codes))
     }
 }
 

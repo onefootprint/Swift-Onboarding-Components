@@ -1,4 +1,4 @@
-use crate::decision::onboarding::{Decision, FeatureVector};
+use crate::decision::onboarding::{Decision, FeatureVector, OnboardingRulesDecision};
 use crate::decision::{
     features::idology_expectid::IDologyFeatures, features::kyc_features::KycFeatureVector,
     onboarding::OnboardingRulesDecisionOutput, rule::rule_sets, rule::RuleName,
@@ -57,5 +57,8 @@ fn test_evaluate_onboarding_rules(
 
     // function under test
     let (decision, _) = feature_vector.evaluate().unwrap();
-    decision.final_kyc_decision().unwrap()
+    match decision {
+        OnboardingRulesDecision::Kyc(d) => d.final_kyc_decision().unwrap(),
+        OnboardingRulesDecision::Kyb(_) => panic!(),
+    }
 }
