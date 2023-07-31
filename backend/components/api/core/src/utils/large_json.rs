@@ -46,6 +46,7 @@ mod actix_json {
         type Output = Result<LargeJson<T, LIMIT>, ActixError>;
 
         fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+            tracing::info!("Polling JsonExtractFut");
             let this = self.get_mut();
 
             let res = ready!(Pin::new(&mut this.fut).poll(cx));
@@ -57,6 +58,7 @@ mod actix_json {
                 }
                 Ok(data) => Ok(LargeJson(data)),
             };
+            tracing::info!("Polling JsonExtractFut finished");
 
             Poll::Ready(res)
         }

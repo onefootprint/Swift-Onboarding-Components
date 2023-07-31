@@ -46,15 +46,18 @@ pub async fn post(
     document_id: web::Path<IdentityDocumentId>,
     request: LargeJson<CreateIdentityDocumentUploadRequest, 5_242_880>,
 ) -> JsonApiResponse<DocumentResponse> {
+    tracing::info!("Starting handler");
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let wf = user_auth.workflow().ok_or(WorkflowError::AuthMissingWorkflow)?;
     let document_id: IdentityDocumentId = document_id.into_inner();
+    tracing::info!("Before unpacking request");
     let CreateIdentityDocumentUploadRequest {
         image,
         side,
         mime_type,
     } = request.0;
+    tracing::info!("After unpacking request");
 
     let su_id = user_auth.scoped_user.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
