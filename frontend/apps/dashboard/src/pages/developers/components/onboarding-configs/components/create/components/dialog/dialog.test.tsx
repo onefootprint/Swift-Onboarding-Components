@@ -6,7 +6,7 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import React from 'react';
-import { asAdminUser, asAdminUserFirmEmployee } from 'src/config/tests';
+import { asAdminUser } from 'src/config/tests';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import Dialog, { DialogProps } from './dialog';
@@ -57,8 +57,6 @@ describe('<Dialog />', () => {
     onClose: jest.fn(),
     onCreate: jest.fn(),
   };
-
-  beforeEach(asAdminUserFirmEmployee);
 
   const renderDialog = ({
     open = defaultOptions.open,
@@ -482,22 +480,21 @@ describe('<Dialog />', () => {
     describe('When user is not a firm-employee', () => {
       beforeEach(asAdminUser);
 
-      it('should not display option to KYC all BOs', async () => {
+      it('should display option to KYC all BOs', async () => {
         renderDialog();
 
         // Advance to data collection screen
         await selectType(true);
         await fillName();
 
-        // Make sure we don't see fully-KYCed option
         expect(
           screen.getByTestId(getFormIdForState('kybCollect')),
         ).toBeInTheDocument();
 
         const options = screen.getByTestId('kyb-collect-form-options');
         expect(
-          within(options).queryByLabelText('Fully KYC all beneficial owners'),
-        ).not.toBeInTheDocument();
+          within(options).getByLabelText('Fully KYC all beneficial owners'),
+        ).toBeInTheDocument();
       });
     });
 

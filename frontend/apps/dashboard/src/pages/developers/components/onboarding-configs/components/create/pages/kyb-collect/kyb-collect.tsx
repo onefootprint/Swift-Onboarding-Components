@@ -4,7 +4,6 @@ import { CollectedKybDataOption } from '@onefootprint/types';
 import { Checkbox, InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import useSession from 'src/hooks/use-session';
 
 import CollectedDataSummary from '../../components/collected-data-summary';
 import FormTitle from '../../components/form-title';
@@ -23,9 +22,6 @@ const KybCollect = () => {
     'pages.developers.onboarding-configs.create.kyb-collect-form',
   );
   const [state, send] = useOnboardingConfigMachine();
-  const {
-    data: { user },
-  } = useSession();
   const { kybCollect } = state.context;
   const { register, handleSubmit, watch } = useForm<FormData>({
     defaultValues: {
@@ -86,13 +82,10 @@ const KybCollect = () => {
           {t('optional')}
         </Typography>
         <OptionsContainer data-testid="kyb-collect-form-options">
-          {/* Long term, all KYB configs will KYC all BOs. For now, just a flag for employees */}
-          {user?.isFirmEmployee && (
-            <Checkbox
-              label={t('kyced-beneficial-owners')}
-              {...register(CollectedKybDataOption.kycedBeneficialOwners)}
-            />
-          )}
+          <Checkbox
+            label={t('kyced-beneficial-owners')}
+            {...register(CollectedKybDataOption.kycedBeneficialOwners)}
+          />
           <Checkbox
             label={allT('cdo.business_website')}
             {...register(CollectedKybDataOption.website)}
