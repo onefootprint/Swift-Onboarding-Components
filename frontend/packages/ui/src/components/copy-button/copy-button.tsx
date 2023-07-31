@@ -3,11 +3,12 @@ import styled from '@onefootprint/styled';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
-import Tooltip from '../tooltip';
+import Tooltip, { TooltipProps } from '../tooltip';
 
 export type CopyButtonProps = {
   ariaLabel?: string;
   disable?: boolean;
+  tooltipPosition?: TooltipProps['position'];
   tooltipText?: string;
   tooltipTextConfirmation?: string;
   children?: string | React.ReactNode;
@@ -20,6 +21,7 @@ let confirmationTimeout: null | NodeJS.Timeout = null;
 
 const CopyButton = ({
   ariaLabel = 'Copy to clipboard',
+  tooltipPosition = 'right',
   tooltipText = 'Copy to clipboard',
   tooltipTextConfirmation = 'Copied!',
   children,
@@ -69,7 +71,7 @@ const CopyButton = ({
 
   return (
     <Tooltip
-      position="right"
+      position={tooltipPosition}
       alignment="center"
       text={handleText()}
       disabled={disable}

@@ -18,6 +18,12 @@ export default {
       description: 'Content to be displayed',
       required: false,
     },
+    tooltipPosition: {
+      control: 'select',
+      options: ['top', 'bottom', 'left', 'right'],
+      description: 'Tooltip position',
+      required: false,
+    },
     tooltipText: {
       control: {
         type: 'text',
@@ -44,6 +50,7 @@ const Template: Story<CopyButtonProps> = ({
   ariaLabel,
   children,
   contentToCopy,
+  tooltipPosition,
   tooltipText,
   tooltipTextConfirmation,
   disable,
@@ -52,6 +59,7 @@ const Template: Story<CopyButtonProps> = ({
     <CopyButton
       ariaLabel={ariaLabel}
       tooltipText={tooltipText}
+      tooltipPosition={tooltipPosition}
       tooltipTextConfirmation={tooltipTextConfirmation}
       contentToCopy={contentToCopy}
       disable={disable}
@@ -66,6 +74,7 @@ Default.args = {
   ariaLabel: 'Copy to clipboard',
   children: 'Copy me',
   contentToCopy: 'Copy me',
+  tooltipPosition: 'right',
   tooltipText: 'Copy to clipboard',
   tooltipTextConfirmation: 'Copied!',
   disable: false,
