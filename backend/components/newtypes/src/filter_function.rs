@@ -4,21 +4,53 @@ use std::vec::IntoIter;
 use strum_macros::EnumDiscriminants;
 use strum_macros::EnumString;
 
+use crate::PiiBytes;
+
 /// Represents a data transform to apply to underlying plaintext behind a data identifier
 /// i.e. `{{ id.first_name | to_lower_case }}
-#[derive(Debug, Clone, EnumDiscriminants, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, EnumDiscriminants, PartialEq, Eq, Hash, serde::Deserialize)]
 #[strum_discriminants(name(FilterFunctionName))]
 #[strum_discriminants(derive(serde_with::SerializeDisplay, strum_macros::Display, EnumString, Hash))]
 #[strum_discriminants(vis(pub))]
 #[strum_discriminants(strum(serialize_all = "snake_case"))]
+#[serde(rename_all = "snake_case")]
 pub enum FilterFunction {
     ToLowercase,
     ToUppercase,
     ToAscii,
-    Prefix { count: usize },
-    Suffix { count: usize },
-    Replace { from: String, to: String },
-    DateFormat { from_format: String, to_format: String },
+    Prefix {
+        count: usize,
+    },
+    Suffix {
+        count: usize,
+    },
+    Replace {
+        from: String,
+        to: String,
+    },
+    DateFormat {
+        from_format: String,
+        to_format: String,
+    },
+    HmacSha256 {
+        /// hex-encoded signing key
+        #[serde(with = "crypto::hex")]
+        key: PiiBytes,
+    },
+    Encrypt {
+        algorithm: EncryptFilterAlgorithmName,
+        /// hex encoded, DER-formatted asymmetric public key
+        #[serde(with = "crypto::hex")]
+        public_key: Vec<u8>,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize, EnumString)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+pub enum EncryptFilterAlgorithmName {
+    RsaPkcs1v15,
+    EciesP256X963Sha256AesGcm,
 }
 
 #[derive(thiserror::Error, Debug, PartialEq)]
@@ -34,6 +66,12 @@ pub enum FilterFunctionParsingError {
 
     #[error("argument could not parse as Integer")]
     InvalidIntegerArgumentType(#[from] std::num::ParseIntError),
+
+    #[error("argument invalid: {0}")]
+    InvalidArgument(&'static str),
+
+    #[error("argument '{0}' must be hex-encoded")]
+    InvalidHexArgument(&'static str),
 
     #[error("unknown function")]
     UnknownFunctionName,
@@ -54,8 +92,12 @@ impl FilterFunction {
     fn num_args(&self) -> usize {
         match self {
             FilterFunction::ToLowercase | FilterFunction::ToUppercase | FilterFunction::ToAscii => 0,
-            FilterFunction::Prefix { .. } | FilterFunction::Suffix { .. } => 1,
-            FilterFunction::DateFormat { .. } | FilterFunction::Replace { .. } => 2,
+            FilterFunction::HmacSha256 { .. }
+            | FilterFunction::Prefix { .. }
+            | FilterFunction::Suffix { .. } => 1,
+            FilterFunction::Encrypt { .. }
+            | FilterFunction::DateFormat { .. }
+            | FilterFunction::Replace { .. } => 2,
         }
     }
 
@@ -101,6 +143,15 @@ impl FilterFunction {
             FilterFunctionName::DateFormat => FilterFunction::DateFormat {
                 from_format: args.parse_string("from_format")?,
                 to_format: args.parse_string("to_format")?,
+            },
+            FilterFunctionName::HmacSha256 => FilterFunction::HmacSha256 {
+                key: PiiBytes::new(args.parse_hex("key")?),
+            },
+            FilterFunctionName::Encrypt => FilterFunction::Encrypt {
+                algorithm: EncryptFilterAlgorithmName::from_str(&args.parse_string("algorithm")?).map_err(
+                    |_| FilterFunctionParsingError::InvalidArgument("algorithm is invalid or unsupported"),
+                )?,
+                public_key: args.parse_hex("public_key")?,
             },
         };
 
@@ -202,6 +253,11 @@ impl ArgParser {
 
         Err(FilterFunctionParsingError::StringArgumentMustUseQuotes(name))
     }
+
+    fn parse_hex(&mut self, name: &'static str) -> Result<Vec<u8>, FilterFunctionParsingError> {
+        crypto::hex::decode(self.parse_string(name)?)
+            .map_err(|_| FilterFunctionParsingError::InvalidHexArgument(name))
+    }
 }
 
 #[cfg(test)]
@@ -223,6 +279,8 @@ mod tests {
     #[test_case("replace('\"hi','flerp')" => Ok(FF::Replace { from: "\"hi".into(), to: "flerp".into() }))]
     #[test_case("replace(\"my\\,flerp\",\" derp \")" => Ok(FF::Replace { from: "my,flerp".into(), to: " derp ".into() }))]
     #[test_case("replace('\\(my','paren\\)')" => Ok(FF::Replace { from: "(my".into(), to: "paren)".into() }))]
+    #[test_case("hmac_sha256('00')" => Ok(FF::HmacSha256 { key: PiiBytes::new(vec![0x00]) }))]
+    #[test_case("encrypt('rsa_pkcs1v15', '00')" => Ok(FF::Encrypt { algorithm: EncryptFilterAlgorithmName::RsaPkcs1v15, public_key: vec![0x00] }))]
     fn test_filter_function_parsing(input: &str) -> Result<FilterFunction, FilterFunctionParsingError> {
         FilterFunction::parse(input)
     }

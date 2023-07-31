@@ -9,10 +9,10 @@ pub use rpc::Error as EnclaveError;
 use rpc::WireMessage;
 pub use rpc::{
     DataTransform, DataTransformer, DataTransforms, DecryptRequest, DecryptThenSignRequest, Decryption,
-    EnclavePayload, EnclaveResponse, EnvelopeDecryptRequest, EnvelopeDecryptThenHmacSignRequest,
-    EnvelopeHmacSignRequest, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
-    GeneratedDataKeyPair, GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest,
-    SealedIkek, Sealing, SignRequest, Signing, TransformError,
+    EnclavePayload, EnclaveResponse, EncryptTransformAlgorithm, EnvelopeDecryptRequest,
+    EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest, GenerateDataKeypairRequest,
+    GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair, GeneratedSealedDataKey, HmacSignature,
+    KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing, SignRequest, Signing, TransformError,
 };
 
 use pool::{Stream, StreamConnection};

@@ -2,7 +2,7 @@ use std::str::Utf8Error;
 
 use thiserror::Error;
 
-use crate::DataTransform;
+use crate::{DataTransform, EncryptTransformAlgorithm};
 
 #[derive(Error, Debug)]
 pub enum TransformError {
@@ -29,6 +29,12 @@ impl DataTransformer for DataTransform {
             DataTransform::HmacSha256 { key } => crypto::hex::encode(crypto::hmac_sha256_sign(key, &data)?)
                 .as_bytes()
                 .to_vec(),
+            DataTransform::Encrypt {
+                algorithm,
+                public_key_der,
+            } => crypto::hex::encode(algorithm.encrypt(public_key_der.as_slice(), data.as_slice())?)
+                .as_bytes()
+                .to_vec(),
             DataTransform::Prefix { .. }
             | DataTransform::Suffix { .. }
             | DataTransform::ToLowercase
@@ -52,6 +58,10 @@ impl DataTransformer for DataTransform {
             DataTransform::HmacSha256 { key } => {
                 crypto::hex::encode(crypto::hmac_sha256_sign(key, data.as_bytes())?)
             }
+            DataTransform::Encrypt {
+                algorithm,
+                public_key_der,
+            } => crypto::hex::encode(algorithm.encrypt(public_key_der.as_slice(), data.as_bytes())?),
             DataTransform::ToLowercase => data.to_lowercase(),
             DataTransform::ToUppercase => data.to_uppercase(),
             DataTransform::ToAscii => deunicode::deunicode(data),
@@ -73,6 +83,19 @@ impl DataTransformer for DataTransform {
             }
         };
         Ok(T::from(string))
+    }
+}
+
+impl EncryptTransformAlgorithm {
+    pub fn encrypt(&self, public_key_der: &[u8], data: &[u8]) -> Result<Vec<u8>, TransformError> {
+        use EncryptTransformAlgorithm::*;
+        Ok(match self {
+            RsaPksc1v15 => crypto::rsa_pksc1v15::encrypt(data, public_key_der)?,
+            EciesP256X963Sha256AesGcm => {
+                let pub_key = crypto::conversion::public_key_der_to_raw_uncompressed(public_key_der)?;
+                crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(&pub_key, data.to_vec())?.to_vec()?
+            }
+        })
     }
 }
 
@@ -121,5 +144,34 @@ mod tests {
         DataTransforms(transforms)
             .apply_str(input)
             .expect("error occured processing transform")
+    }
+
+    #[test]
+    fn test_rsa_encrypt() {
+        let input = "footprint hello world";
+        let pk_der = crypto::hex::decode("3082010a0282010100ebe06f857cf432c7ac5994e95651f3af27cd2653ee92a42ae4d46c614f0e29b408d5ae0905736d765dcfb304bb5ca9f6c2557979c8c1250cd2d1cb832150a9e3fc4c554ccea1ce98744c2ec3a02998ef3146e0a441c403860af9c123f729820e3b62a6877d75734b9b69c4ec60b9bbae85a0582515f6b1deda43f542e74dbdfe85ba0a2be5d440f1d1745c7f4808c81509520adb3ed7e9fa9078fb481e495d6bcb8a7a780c46ad88a3c4bdf6da73e3d4d11b4f2a720b7ad99e49d5952d004dc6bcc462e3fac6e8fcdbb419c63e3fc028fa4c2ab91d5adcb48a984a4b2e430b843c563672753eafd43e3b2c7fbedae73f2bd40a44e69b059c77dd48397307e6590203010001").expect("hex decode");
+
+        let _ = test_apply_data_tranform(
+            vec![Encrypt {
+                algorithm: EncryptTransformAlgorithm::RsaPksc1v15,
+                public_key_der: pk_der,
+            }],
+            input,
+        );
+    }
+
+    #[test]
+    fn test_ecies_encrypt() {
+        let input = "footprint hello world";
+        let pk = crypto::hex::decode("0460f81c63e9bb142cc75091bf44ae979e707e0928785c84e4f936ca3e680d3c6029eb2844268aa117349277abf0c60c03dc6f1ae80530857f8438865ff5166321").expect("hex decode");
+        let pk_der = crypto::conversion::public_key_raw_uncompressed_to_der(&pk).expect("convert");
+
+        let _ = test_apply_data_tranform(
+            vec![Encrypt {
+                algorithm: EncryptTransformAlgorithm::EciesP256X963Sha256AesGcm,
+                public_key_der: pk_der,
+            }],
+            input,
+        );
     }
 }

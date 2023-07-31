@@ -81,6 +81,23 @@ impl PiiBytes {
         PiiString::from(self.into_leak_base64().to_string_standard().0)
     }
 }
+impl crypto::hex::ToHex for PiiBytes {
+    fn encode_hex<T: std::iter::FromIterator<char>>(&self) -> T {
+        self.0.encode_hex()
+    }
+
+    fn encode_hex_upper<T: std::iter::FromIterator<char>>(&self) -> T {
+        self.0.encode_hex_upper()
+    }
+}
+
+impl crypto::hex::FromHex for PiiBytes {
+    type Error = crypto::hex::FromHexError;
+
+    fn from_hex<T: AsRef<[u8]>>(hex: T) -> Result<Self, Self::Error> {
+        Ok(PiiBytes(Vec::from_hex(hex.as_ref())?))
+    }
+}
 
 /// Like PiiString, but scrubs the serde::Serialize implementation
 #[derive(Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash, derive_more::Deref)]

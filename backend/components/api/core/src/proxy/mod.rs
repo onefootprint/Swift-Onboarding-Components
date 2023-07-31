@@ -6,7 +6,7 @@ pub mod token_parser;
 pub mod tokenize;
 
 use enclave_proxy::{DataTransform, DataTransformer, DataTransforms};
-use newtypes::FilterFunction;
+use newtypes::{FilterFunction, PiiBytes};
 
 pub use self::config::ingress_rule::IngressRule;
 
@@ -22,9 +22,27 @@ pub fn filter_function_to_transform(value: &FilterFunction) -> DataTransform {
             from: from.clone(),
             to: to.clone(),
         },
-        FilterFunction::DateFormat { from_format, to_format } => DataTransform::DateFormat {
+        FilterFunction::DateFormat {
+            from_format,
+            to_format,
+        } => DataTransform::DateFormat {
             from_format: from_format.clone(),
-            to_format: to_format.clone()
+            to_format: to_format.clone(),
+        },
+        FilterFunction::HmacSha256 { key } => DataTransform::HmacSha256 { key: key.clone().into_leak() },
+        FilterFunction::Encrypt {
+            algorithm,
+            public_key,
+        } => DataTransform::Encrypt {
+            algorithm: match algorithm {
+                newtypes::EncryptFilterAlgorithmName::RsaPkcs1v15 => {
+                    enclave_proxy::EncryptTransformAlgorithm::RsaPksc1v15
+                }
+                newtypes::EncryptFilterAlgorithmName::EciesP256X963Sha256AesGcm => {
+                    enclave_proxy::EncryptTransformAlgorithm::EciesP256X963Sha256AesGcm
+                }
+            },
+            public_key_der: public_key.clone(),
         },
     }
 }
@@ -38,8 +56,34 @@ pub fn transform_to_filter_function(value: DataTransform) -> Option<FilterFuncti
         DataTransform::Prefix { count } => FilterFunction::Prefix { count },
         DataTransform::Suffix { count } => FilterFunction::Suffix { count },
         DataTransform::Replace { from, to } => FilterFunction::Replace { from, to },
-        DataTransform::DateFormat { from_format, to_format } => FilterFunction::DateFormat { from_format, to_format },
-        DataTransform::Identity | DataTransform::HmacSha256 { .. } => {
+        DataTransform::DateFormat {
+            from_format,
+            to_format,
+        } => FilterFunction::DateFormat {
+            from_format,
+            to_format,
+        },
+        DataTransform::HmacSha256 { key } => FilterFunction::HmacSha256 {
+            key: PiiBytes::new(key),
+        },
+        DataTransform::Encrypt {
+            algorithm,
+            public_key_der,
+        } => {
+            let algorithm = match algorithm {
+                enclave_proxy::EncryptTransformAlgorithm::RsaPksc1v15 => {
+                    newtypes::EncryptFilterAlgorithmName::RsaPkcs1v15
+                }
+                enclave_proxy::EncryptTransformAlgorithm::EciesP256X963Sha256AesGcm => {
+                    newtypes::EncryptFilterAlgorithmName::EciesP256X963Sha256AesGcm
+                }
+            };
+            FilterFunction::Encrypt {
+                algorithm,
+                public_key: public_key_der,
+            }
+        }
+        DataTransform::Identity => {
             // TODO: handle more gracefull this case :)
             return None;
         }

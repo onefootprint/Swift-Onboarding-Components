@@ -19,6 +19,8 @@ pub use serde_cbor;
 mod clean_data;
 pub use self::clean_data::*;
 
+pub mod rsa_pksc1v15;
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("Bad key")]
@@ -56,6 +58,9 @@ pub enum Error {
 
     #[error("Invalid Sha256 Digest Key Length")]
     Sha2DigestLength(#[from] sha2::digest::InvalidLength),
+
+    #[error("rsa error: {0}")]
+    RsaError(#[from] rsa_pksc1v15::Error)
 }
 
 /// safely compare to byte strings

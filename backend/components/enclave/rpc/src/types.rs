@@ -36,7 +36,12 @@ pub enum DataTransform {
     HmacSha256 {
         key: Vec<u8>,
     },
-    ///
+    /// asymmetric encryption
+    Encrypt {
+        algorithm: EncryptTransformAlgorithm,
+        /// DER-encoded public-key
+        public_key_der: Vec<u8>,
+    },
     ToLowercase,
     ToUppercase,
     ToAscii,
@@ -66,4 +71,11 @@ impl std::fmt::Display for DataTransform {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(&DataTransformName::from(self), f)
     }
+}
+
+#[derive(Clone, Serialize, Deserialize, PartialEq, Hash, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum EncryptTransformAlgorithm {
+    RsaPksc1v15,
+    EciesP256X963Sha256AesGcm,
 }
