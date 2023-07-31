@@ -8,6 +8,9 @@ export const organizationFixture: Organization = {
   isSandboxRestricted: false,
   websiteUrl: 'https://acme.com',
   companySize: null,
+  domain: null,
+  allowDomainAccess: false,
+  isDomainAlreadyClaimed: false,
 };
 
 export const withOrganization = (organization?: Partial<Organization>) =>

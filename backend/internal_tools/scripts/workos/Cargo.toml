@@ -1,0 +1,15 @@
+[package]
+name = "workos"
+version = "0.1.0"
+edition = "2021"
+description = "Workos backfill"
+
+[dependencies]
+tokio = { workspace = true }
+diesel = { workspace = true }
+itertools = { workspace = true }
+anyhow = "1"
+csv = "1.2.2"
+workos = "0.2"
+dotenv = "0.15.0"
+db_schema = { path = "../../../components/db/schema" }

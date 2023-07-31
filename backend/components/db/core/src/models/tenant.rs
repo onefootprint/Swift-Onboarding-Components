@@ -40,6 +40,8 @@ pub struct Tenant {
     pub pinned_api_version: Option<i32>,
     // When true, don't allow creating ob configs in prod
     pub is_prod_ob_config_restricted: bool,
+    pub domain: Option<String>,
+    pub allow_domain_access: bool,
 }
 
 impl Tenant {
@@ -77,6 +79,8 @@ pub struct NewTenant {
     pub logo_url: Option<String>,
     pub sandbox_restricted: bool,
     pub is_prod_ob_config_restricted: bool,
+    pub domain: Option<String>,
+    pub allow_domain_access: bool,
 }
 
 /// Allows creating with an application-generated TenantId rather than db-generated
@@ -90,6 +94,8 @@ pub struct NewIntegrationTestTenant {
     pub sandbox_restricted: bool,
     pub is_demo_tenant: bool,
     pub is_prod_ob_config_restricted: bool,
+    pub domain: Option<String>,
+    pub allow_domain_access: bool,
 }
 
 impl Tenant {
@@ -172,6 +178,26 @@ impl Tenant {
             .optional()?;
         Ok(res)
     }
+
+    #[tracing::instrument("Tenant::get_tenant_by_domain", skip_all)]
+    pub fn get_tenant_by_domain(conn: &mut PgConn, domain: &String) -> DbResult<Option<Tenant>> {
+        let res = tenant::table
+            .filter(tenant::domain.eq(domain))
+            .filter(tenant::allow_domain_access.eq(true))
+            .first(conn)
+            .optional()?;
+        Ok(res)
+    }
+
+    #[tracing::instrument("Tenant::is_domain_already_claimed", skip_all)]
+    /// Returns true if the domain is already claimed
+    pub fn is_domain_already_claimed(conn: &mut PgConn, domain: Option<String>) -> DbResult<bool> {
+        let result = match domain.as_ref() {
+            Some(domain) => Self::get_tenant_by_domain(conn, domain)?.is_some(),
+            None => false,
+        };
+        Ok(result)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsChangeset, Default)]
@@ -183,4 +209,5 @@ pub struct UpdateTenant {
     pub company_size: Option<CompanySize>,
     pub privacy_policy_url: Option<String>,
     pub stripe_customer_id: Option<StripeCustomerId>,
+    pub allow_domain_access: Option<bool>,
 }

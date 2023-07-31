@@ -8,6 +8,9 @@ export const orgFixture: Organization = {
   isSandboxRestricted: false,
   websiteUrl: null,
   companySize: null,
+  domain: null,
+  allowDomainAccess: false,
+  isDomainAlreadyClaimed: false,
 };
 
 export const withOrg = (response: Organization = orgFixture) =>

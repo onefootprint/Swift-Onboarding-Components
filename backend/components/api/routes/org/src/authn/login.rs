@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::str::FromStr;
 
 use crate::auth::session::AuthSessionData;
@@ -22,9 +21,6 @@ use db::OffsetPagination;
 use itertools::Itertools;
 use newtypes::{OrgMemberEmail, TenantRolebindingId, TenantScope, TenantUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
-use workos::organizations::{
-    CreateOrganization, CreateOrganizationParams, DomainFilters, ListOrganizations, ListOrganizationsParams,
-};
 use workos::sso::{
     AuthorizationCode, ClientId, GetProfileAndToken, GetProfileAndTokenParams, GetProfileAndTokenResponse,
     Profile,
@@ -54,11 +50,12 @@ async fn handler(
     tracing::info!(org_id =?profile.organization_id, id = ?profile.id, "workos login");
 
     let profile2 = profile.clone();
-    // First, get all matching tenant rolebindings.
+    // Get all matching tenant rolebindings.
     let (user, matching_rolebindings) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let email = OrgMemberEmail::from_str(&profile2.email)?;
+            // Get or create tenant user
             let user =
                 TenantUser::get_and_update_or_create(conn, email, profile2.first_name, profile2.last_name)?;
             let matching_rolebindings = TenantRolebinding::list_by_user(conn, &user.id)?;
@@ -70,10 +67,12 @@ async fn handler(
     let (matching_rolebindings, created_new_tenant) = if !matching_rolebindings.is_empty() {
         (matching_rolebindings, false)
     } else {
+        // Find or create the tenant
+        let (tenant, created_new_tenant) = find_or_create_tenant(&state, profile).await?;
         // If there are no rolebindings for this user, make one.
         // The new user will be associated with the tenant that owns the email address's domain OR
         // with a brand new tenant named after the user's email
-        let (rb_id, created_new_tenant) = create_tenant_rolebinding(&state, user.id.clone(), profile).await?;
+        let rb_id = create_tenant_rolebinding(&state, user.id.clone(), tenant).await?;
         (vec![rb_id], created_new_tenant)
     };
 
@@ -120,15 +119,11 @@ async fn handler(
     ResponseData { data }.json()
 }
 
-type IsNewTenant = bool;
-
 async fn create_tenant_rolebinding(
     state: &State,
     user_id: TenantUserId,
-    profile: &Profile,
-) -> ApiResult<(TenantRolebindingId, IsNewTenant)> {
-    // Otherwise, find or create the tenant and create a new TenantUser
-    let (tenant, is_new_tenant) = find_or_create_tenant(state, profile).await?;
+    tenant: Tenant,
+) -> ApiResult<TenantRolebindingId> {
     let tenant_id = tenant.id.clone();
     let rb = state
         .db_pool
@@ -154,92 +149,30 @@ async fn create_tenant_rolebinding(
         })
         .await?;
     // Just give the ID - the caller will log into the rolebinding (and update last_login_at)
-    Ok((rb.id, is_new_tenant))
+    Ok(rb.id)
 }
 
+type IsNewTenant = bool;
 async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tenant, IsNewTenant), ApiError> {
-    // 1. try get tenant by workos org id returned from profile
-    // This will only ever really happen with SAML/SSO
-    if let Some(org_id) = &profile.organization_id {
-        let org_id = org_id.to_string();
+    // process domain
+    let domain = email_domain::parse_private_email_domain(profile.email.as_str());
+
+    let domain2 = domain.clone();
+    if let Some(domain) = domain2 {
+        // Check if tenant exists. If so, automatically add new tenant user
         let tenant = state
             .db_pool
-            .db_query(move |conn| Tenant::get_opt_by_workos_org_id(conn, &org_id))
-            .await??
-            .ok_or(WorkOsError::TenantForOrgDoesNotExist)?;
-
-        tracing::info!("matched workos auth by org id");
-        // TODO use a role inferred from the user's groups on workos when we create the user locally
-        return Ok((tenant, false));
-    }
-
-    let (new_tenant_name, new_tenant_workos_org_id) = if let Some(domain) =
-        email_domain::parse_private_email_domain(profile.email.as_str())
-    {
-        // 2. The domain for the user's email is private - see if we have a workos org that owns the domain.
-        let orgs = state
-            .workos_client
-            .organizations()
-            .list_organizations(&ListOrganizationsParams {
-                domains: Some(DomainFilters::from(vec![domain.as_str()])),
-                ..Default::default()
-            })
-            .await
-            .map_err(WorkOsError::from)?;
-        if orgs.data.len() > 1 {
-            // NOTE: there should only be 1 tenant returned as 1 domain supplied above
-            return Err(WorkOsError::MultipleOrgsForDomain.into());
+            .db_query(move |conn| Tenant::get_tenant_by_domain(conn, &domain))
+            .await??;
+        if let Some(tenant) = tenant {
+            return Ok((tenant, false));
         }
-
-        let workos_org_id = if let Some(org) = orgs.data.first() {
-            // An org on workos owns this domain!
-            let org_id = org.id.to_string();
-            let tenant = state
-                .db_pool
-                .db_query(move |conn| Tenant::get_opt_by_workos_org_id(conn, &org_id))
-                .await??;
-            if let Some(tenant) = tenant {
-                // The tenant exists inside the DB
-                tracing::info!("matched workos auth by domain");
-                return Ok((tenant, false));
-            } else {
-                // Tenant doesn't exist in the DB. This will only happen when, say, creating a local
-                // of the tenant owning a domain since we share workos across environments.
-                tracing::warn!("WARNING! failed to match workos by org id in the database so creating a new tenant! This is expected only for testing purposes.");
-                Some(org.id.clone())
-            }
-        } else {
-            // Workos has no record of an org that owns this domain
-            None
-        };
-
-        // Couldn't find a tenant with this domain, move forward to create a new tenant named after
-        // the email's domain
-        (domain, workos_org_id)
-    } else {
-        // The domain is public, like gmail.com - doesn't make sense to look up a workos org that owns the domain
-        (profile.email.clone(), None)
     };
 
-    // 3. finally, create a workos organization for our new user
-    let org_id = if let Some(org_id) = new_tenant_workos_org_id {
-        org_id
-    } else {
-        let org = state
-            .workos_client
-            .organizations()
-            .create_organization(&CreateOrganizationParams {
-                name: &new_tenant_name,
-                allow_profiles_outside_organization: Some(&true),
-                domains: HashSet::new(),
-            })
-            .await
-            .map_err(WorkOsError::from)?;
-        org.id
-    };
-
-    tracing::info!("did not match workos login, creating new tenant");
-    let tenant = create_tenant(state, new_tenant_name, Some(org_id.to_string())).await?;
+    // create new tenant in the case of public email tenant user or existing private tenant with allow_domain_access = false
+    tracing::info!("Creating new tenant with domain {:?}", domain);
+    let tenant_name = domain.clone().unwrap_or_else(|| profile.email.to_string());
+    let tenant = create_tenant(state, tenant_name, None, domain).await?;
     Ok((tenant, true))
 }
 
@@ -247,6 +180,7 @@ async fn create_tenant(
     state: &State,
     tenant_name: String,
     workos_org_id: Option<String>,
+    domain: Option<String>,
 ) -> Result<Tenant, ApiError> {
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
 
@@ -258,6 +192,8 @@ async fn create_tenant(
         logo_url: None,
         sandbox_restricted: true,
         is_prod_ob_config_restricted: true,
+        domain,
+        allow_domain_access: false, // false by default on creation, has to become true manually with PATCH /org
     };
     let result = state
         .db_pool

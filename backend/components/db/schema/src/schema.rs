@@ -617,6 +617,8 @@ table! {
         is_demo_tenant -> Bool,
         pinned_api_version -> Nullable<Int4>,
         is_prod_ob_config_restricted -> Bool,
+        domain -> Nullable<Text>,
+        allow_domain_access -> Bool,
     }
 }
 

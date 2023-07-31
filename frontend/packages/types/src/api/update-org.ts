@@ -5,6 +5,7 @@ export type UpdateOrgRequest = Partial<{
   logoUrl: string | null;
   websiteUrl: string | null;
   companySize: OrganizationSize | null;
+  allowDomainAccess: boolean | null;
 }>;
 
 export type UpdateOrgResponse = Organization;

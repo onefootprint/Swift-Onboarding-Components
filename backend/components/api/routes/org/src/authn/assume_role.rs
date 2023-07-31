@@ -1,8 +1,6 @@
 use crate::auth::session::{AuthSessionData, UpdateSession};
 
-
-
-use crate::errors::{ApiError};
+use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;

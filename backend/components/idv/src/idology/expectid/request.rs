@@ -114,7 +114,7 @@ mod tests {
             }),
         };
 
-        let json_val = serde_json::to_value(&req).unwrap();
+        let json_val = serde_json::to_value(req).unwrap();
 
         assert_eq!(
             json!({

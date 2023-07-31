@@ -112,7 +112,7 @@ macro_rules! api_headers_schema {
                 type Future = std::pin::Pin<Box<dyn std::future::Future<Output = Result<Self, Self::Error>>>>;
                 fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
 
-                    fn get_header<'a, 'b>(name: &'a str, req: &'b actix_web::http::header::HeaderMap) -> Option<&'b str> {
+                    fn get_header<'b>(name: &str, req: &'b actix_web::http::header::HeaderMap) -> Option<&'b str> {
                         req.get(name).and_then(|h| h.to_str().ok())
                     }
                     use std::str::FromStr;

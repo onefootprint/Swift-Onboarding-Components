@@ -1,9 +1,12 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import { Organization } from '@onefootprint/types';
 import { Box, Button, Portal, SelectOption } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import DomainAccess from 'src/components/domain-access';
+import useUpdateOrg from 'src/hooks/use-update-org';
 
 import AddButton from './components/add-button';
 import Error from './components/error';
@@ -12,6 +15,7 @@ import useInviteMembers from './hooks/use-invite-members';
 
 export type ContentProps = {
   defaultRole: SelectOption;
+  org: Organization;
   id: string;
   onComplete: () => void;
   roles: SelectOption[];
@@ -21,9 +25,10 @@ type FormData = {
   invitations: { email: string; role: SelectOption }[];
 };
 
-const Content = ({ id, onComplete, defaultRole, roles }: ContentProps) => {
+const Content = ({ id, onComplete, org, defaultRole, roles }: ContentProps) => {
   const { t, allT } = useTranslation('pages.onboarding.invite');
   const inviteMembersMutations = useInviteMembers();
+  const updateOrgMutation = useUpdateOrg();
   const [animate] = useAutoAnimate<HTMLFormElement>();
   const methods = useForm({
     defaultValues: {
@@ -37,7 +42,6 @@ const Content = ({ id, onComplete, defaultRole, roles }: ContentProps) => {
   });
   const { errors } = formState;
   const shouldShowError = !!errors.invitations && errors.invitations[0];
-
   const handleAddMore = () => {
     append({ email: '', role: defaultRole });
   };
@@ -70,11 +74,14 @@ const Content = ({ id, onComplete, defaultRole, roles }: ContentProps) => {
         </Form>
       </FormProvider>
       <AddButton onClick={handleAddMore} />
+      {org.domain && <DomainAccess org={org} />}
       {shouldShowError && <Error>{t('form.errors.invalid')}</Error>}
       <Portal selector="#onboarding-cta-portal">
         <Button
           form={id}
-          loading={inviteMembersMutations.isLoading}
+          loading={
+            inviteMembersMutations.isLoading || updateOrgMutation.isLoading
+          }
           size="compact"
           type="submit"
         >

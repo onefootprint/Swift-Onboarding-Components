@@ -440,6 +440,15 @@
             "invalid": "Please complete the fields above."
           }
         },
+        "allow-domain-access": {
+          "title": "Allow domain access",
+          "subtitle": "Allow users with email addresses with this domain to join your team without an invite.",
+          "action": "Enable access for",
+          "toggle": {
+            "cta-not-allowed": "You're not allowed to toggle domain access",
+            "domain-already-claimed": "Domain access for {{domain}} has already been claimed. Please contact your admin to invite you to the existing organization."
+          }
+        },
         "add-more": "Add more",
         "notification": {
           "error": {
@@ -1506,7 +1515,8 @@
         },
         "tabs": {
           "members": "Members",
-          "roles": "Roles"
+          "roles": "Roles",
+          "access": "Domain access"
         }
       },
       "members": {

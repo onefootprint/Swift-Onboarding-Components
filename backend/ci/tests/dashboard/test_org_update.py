@@ -1,10 +1,6 @@
-import pytest
 import os
-import requests
 
-from tests.utils import (
-    put,
-)
+from tests.utils import put
 
 
 def _logo_path():

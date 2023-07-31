@@ -9,6 +9,7 @@ pub struct UpdateTenantRequest {
     pub company_size: Option<CompanySize>,
     pub logo_url: Option<String>,
     pub privacy_policy_url: Option<String>,
+    pub allow_domain_access: Option<bool>,
 }
 
 export_schema!(UpdateTenantRequest);

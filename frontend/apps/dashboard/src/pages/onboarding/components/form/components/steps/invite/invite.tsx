@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import useOrg from 'src/hooks/use-org';
 import useRoles from 'src/hooks/use-roles';
 
 import Header from '../header';
@@ -16,21 +17,25 @@ export type InviteProps = {
 const Invite = ({ id, onComplete }: InviteProps) => {
   const { t } = useTranslation('pages.onboarding.invite');
   const rolesQuery = useRoles();
+  const orgQuery = useOrg();
 
   return (
     <Container>
       <>
         <Header title={t('title')} subtitle={t('subtitle')} />
-        {rolesQuery.isLoading && <Loading />}
-        {rolesQuery.data && (
+        {(rolesQuery.isLoading || orgQuery.isLoading) && <Loading />}
+        {rolesQuery.data && orgQuery.data && (
           <Content
             defaultRole={rolesQuery.options[0]}
+            org={orgQuery.data}
             id={id}
             onComplete={onComplete}
             roles={rolesQuery.options}
           />
         )}
-        {rolesQuery.error && <Error error={rolesQuery.error} />}
+        {(rolesQuery.error || orgQuery.error) && (
+          <Error error={rolesQuery.error || orgQuery.error} />
+        )}
       </>
     </Container>
   );

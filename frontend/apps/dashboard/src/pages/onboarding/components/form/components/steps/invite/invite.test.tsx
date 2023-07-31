@@ -10,6 +10,8 @@ import Invite, { InviteProps } from './invite';
 import {
   withInviteMember,
   withInviteMemberError,
+  withOrg,
+  withOrgError,
   withRoles,
   withRolesError,
 } from './invite.test.config';
@@ -41,6 +43,7 @@ describe('<Invite />', () => {
 
   describe('when the request to fetch the roles is loading', () => {
     beforeEach(() => {
+      withOrg();
       withRoles();
     });
 
@@ -54,7 +57,22 @@ describe('<Invite />', () => {
 
   describe('when the request to fetch the roles fails', () => {
     beforeEach(() => {
+      withOrg();
       withRolesError();
+    });
+
+    it('should show an error message', async () => {
+      renderInvite({});
+
+      const error = await screen.findByText('Something went wrong');
+      expect(error).toBeInTheDocument();
+    });
+  });
+
+  describe('when the request to fetch the org fails', () => {
+    beforeEach(() => {
+      withOrgError();
+      withRoles();
     });
 
     it('should show an error message', async () => {
@@ -67,6 +85,7 @@ describe('<Invite />', () => {
 
   describe('when the request to fetch the roles succeeds', () => {
     beforeEach(() => {
+      withOrg();
       withRoles();
     });
 

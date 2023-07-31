@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Role, RoleScopeKind } from '@onefootprint/types';
+import { Organization, Role, RoleScopeKind } from '@onefootprint/types';
 
 export const RolesFixture: Role[] = [
   {
@@ -22,6 +22,18 @@ export const RolesFixture: Role[] = [
   },
 ];
 
+export const orgFixture: Organization = {
+  id: 'org_9242CAdpXXlDDeSmi1DQks',
+  name: 'Acme Inc',
+  logoUrl: null,
+  isSandboxRestricted: false,
+  websiteUrl: null,
+  companySize: null,
+  domain: null,
+  allowDomainAccess: false,
+  isDomainAlreadyClaimed: false,
+};
+
 export const withRoles = (Roles: Role[] = RolesFixture) =>
   mockRequest({
     method: 'get',
@@ -39,6 +51,25 @@ export const withRolesError = () =>
   mockRequest({
     method: 'get',
     path: '/org/roles',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
+    },
+  });
+
+export const withOrg = (response: Organization = orgFixture) =>
+  mockRequest({
+    method: 'get',
+    path: '/org',
+    response,
+  });
+
+export const withOrgError = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org',
     statusCode: 400,
     response: {
       error: {

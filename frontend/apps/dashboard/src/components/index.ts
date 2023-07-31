@@ -1,3 +1,4 @@
+export { default as DomainAccess } from './domain-access';
 export { default as EncryptedCell } from './encrypted-cell';
 export { default as Error } from './error';
 export { default as Field } from './field';

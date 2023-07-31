@@ -84,6 +84,8 @@ async fn post(
                         sandbox_restricted: false,
                         is_demo_tenant: true,
                         is_prod_ob_config_restricted: false,
+                        domain: None,
+                        allow_domain_access: false,
                     };
                     Tenant::create(conn, new_tenant)?
                 }

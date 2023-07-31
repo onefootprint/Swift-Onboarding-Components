@@ -25,6 +25,7 @@ members = [
     "external_tools/ditto",
     "external_tools/hooky",
     "internal_tools/fp_cli",
+    "internal_tools/scripts/workos",
     "components/integrations/alpaca"
 ]
 

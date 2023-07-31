@@ -98,6 +98,8 @@ mod test {
             workos_id: None,
             sandbox_restricted: true,
             is_prod_ob_config_restricted: true,
+            domain: None,
+            allow_domain_access: false,
         };
         pool.db_query(|conn| Tenant::create(conn, tenant).expect("couldn't create tenant"))
             .await

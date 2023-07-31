@@ -13,6 +13,9 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isSandboxRestricted: false,
     websiteUrl: null,
     companySize: null,
+    domain: null,
+    allowDomainAccess: false,
+    isDomainAlreadyClaimed: null,
   },
   {
     id: '_private_it_org_3',
@@ -21,6 +24,9 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isSandboxRestricted: false,
     websiteUrl: null,
     companySize: null,
+    domain: null,
+    allowDomainAccess: false,
+    isDomainAlreadyClaimed: null,
   },
 ];
 
@@ -69,6 +75,9 @@ export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
     isSandboxRestricted: false,
     websiteUrl: null,
     companySize: null,
+    domain: null,
+    allowDomainAccess: false,
+    isDomainAlreadyClaimed: null,
   },
 };
 

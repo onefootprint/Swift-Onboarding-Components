@@ -6,6 +6,7 @@ use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use actix_web::web;
+use api_core::errors::tenant::TenantError;
 use api_wire_types::UpdateTenantRequest;
 use db::models::tenant::{Tenant, UpdateTenant};
 use paperclip::actix::patch;
@@ -17,14 +18,22 @@ use paperclip::actix::{self, api_v2_operation, web::Json};
 )]
 #[actix::get("/org")]
 pub async fn get(
+    state: web::Data<State>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<api_wire_types::Organization> {
     let auth = auth.check_guard(TenantGuard::Read)?; // No permissions needed to access this endpoint
     let tenant = auth.tenant().clone();
 
-    Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
+    let domain = tenant.domain.clone();
+    let is_domain_already_claimed = state
+        .db_pool
+        .db_query(move |conn| Tenant::is_domain_already_claimed(conn, domain))
+        .await??;
+
+    Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db((
         tenant,
-    ))))
+        is_domain_already_claimed,
+    )))))
 }
 
 #[api_v2_operation(
@@ -47,8 +56,14 @@ async fn patch(
         company_size,
         logo_url,
         privacy_policy_url,
+        allow_domain_access,
     } = request.into_inner();
 
+    if allow_domain_access == Some(true) && tenant.domain.is_none() {
+        return Err(TenantError::ValidationError("Tenant has no associated domain".to_string()).into());
+    }
+
+    // Note: Tenant domain uniqueness constraint protects us from having multiple tenants with the same domain and allow_domain_access true
     let update_tenant = UpdateTenant {
         name,
         logo_url,
@@ -56,6 +71,7 @@ async fn patch(
         company_size,
         privacy_policy_url,
         stripe_customer_id: None,
+        allow_domain_access,
     };
     let updated_tenant = state
         .db_pool
