@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use paperclip::actix::Apiv2Schema;
 use std::str::FromStr;
 use std::vec::IntoIter;
 use strum_macros::EnumDiscriminants;
@@ -7,8 +8,8 @@ use strum_macros::EnumString;
 use crate::PiiBytes;
 
 /// Represents a data transform to apply to underlying plaintext behind a data identifier
-/// i.e. `{{ id.first_name | to_lower_case }}
-#[derive(Debug, Clone, EnumDiscriminants, PartialEq, Eq, Hash, serde::Deserialize)]
+/// Proxy syntax example: `{{ id.first_name | to_lower_case }}
+#[derive(Debug, Clone, EnumDiscriminants, PartialEq, Eq, Hash, serde::Deserialize, Apiv2Schema)]
 #[strum_discriminants(name(FilterFunctionName))]
 #[strum_discriminants(derive(serde_with::SerializeDisplay, strum_macros::Display, EnumString, Hash))]
 #[strum_discriminants(vis(pub))]

@@ -101,4 +101,5 @@ def test_decrypt(sandbox_tenant, primary_bo, fields_to_decrypt):
     expected_access_event_fields = (
         set(fields_to_decrypt) - {"business.name"}
     ) & populated_keys
+    print(access_event["targets"])
     assert set(access_event["targets"]) == expected_access_event_fields

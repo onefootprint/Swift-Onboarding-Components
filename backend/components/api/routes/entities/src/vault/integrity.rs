@@ -5,10 +5,11 @@ use crate::utils::vault_wrapper::{DecryptRequest as VwDecryptRequest, VaultWrapp
 use crate::State;
 use api_core::types::ResponseData;
 use api_core::utils::headers::InsightHeaders;
-use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::vault_wrapper::{EnclaveDecryptOperation, TenantVw};
 use api_core::ApiError;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
+use enclave_proxy::DataTransform;
 use itertools::Itertools;
 use macros::route_alias;
 use newtypes::{flat_api_object_map_type, DataIdentifier, FpId, IntegritySigningKey, PiiString};
@@ -31,6 +32,7 @@ flat_api_object_map_type!(
     example=r#"{ "id.last_name": "f7ee801830...", "id.ssn9": "1cefe40fa...", "custom.credit_card": "f7dbdc6..." }"#
 );
 
+//TODO: replace handler with regular decrypt func
 #[route_alias(actix::post(
     "/users/{fp_id}/vault/integrity",
     tags(Users, Vault, PublicApi),
@@ -71,10 +73,17 @@ pub async fn post(
         reason: "Compute Integrity HMAC-SHA256".to_string(),
         principal: auth.actor().into(),
         insight: CreateInsightEvent::from(insights),
+        targets: fields
+            .into_iter()
+            .map(|identifier| EnclaveDecryptOperation {
+                identifier,
+                transforms: vec![DataTransform::HmacSha256 {
+                    key: signing_key.leak(),
+                }],
+            })
+            .collect(),
     };
-    let results = uvw
-        .compute_integrity_signed_hashes(&state, &fields, signing_key, req)
-        .await?;
+    let results = uvw.fn_decrypt(&state, req).await?;
 
     let out = IntegrityResponse {
         map: results

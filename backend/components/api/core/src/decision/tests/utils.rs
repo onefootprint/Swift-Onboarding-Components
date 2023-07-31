@@ -5,9 +5,8 @@ use db::tests::test_db_pool::TestDbPool;
 use db::DbResult;
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use macros::test_state;
-use newtypes::{DecisionStatus, OnboardingStatus, WorkflowFixtureResult};
+use newtypes::{DecisionStatus, OnboardingStatus};
 use std::sync::Arc;
-use test_case::test_case;
 
 #[test_state]
 async fn test_handle_setup(state: &mut State) {

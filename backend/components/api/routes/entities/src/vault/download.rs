@@ -8,7 +8,7 @@ use actix_web::HttpResponse;
 use api_core::auth::tenant::{ClientTenantScope, PathClientTenantAuthContext, TenantAuth};
 use api_core::auth::AuthError;
 use api_core::errors::tenant::TenantError;
-use api_core::utils::vault_wrapper::{Any, DecryptRequest, Pii, TenantVw};
+use api_core::utils::vault_wrapper::{Any, DecryptRequest, EnclaveDecryptOperation, Pii, TenantVw};
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
@@ -58,14 +58,21 @@ pub async fn get(
             Ok(vw)
         })
         .await??;
+
+    let op = EnclaveDecryptOperation {
+        identifier: di.clone(),
+        transforms: vec![],
+    };
     let req = DecryptRequest {
         reason,
         principal,
         insight: CreateInsightEvent::from(insights),
+        targets: vec![op.clone()],
     };
     let result = vw
-        .decrypt_single_raw(&state, di.clone(), req)
+        .fn_decrypt_raw(&state, req)
         .await?
+        .remove(&op)
         .ok_or(TenantError::DataDoesntExist(di.clone()))?;
     let mime_type = vw.get_mime_type(di.clone());
 

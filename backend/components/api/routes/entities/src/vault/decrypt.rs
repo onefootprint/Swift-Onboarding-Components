@@ -8,13 +8,14 @@ use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::{ApiResult, AssertionError};
-use api_core::utils::vault_wrapper::TenantVw;
+use api_core::proxy::filter_function_to_transform;
+use api_core::utils::vault_wrapper::{EnclaveDecryptOperation, TenantVw};
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::FpId;
-use newtypes::{flat_api_object_map_type, DataLifetimeSeqno, PiiString, VersionedDataIdentifier};
+use newtypes::{flat_api_object_map_type, DataLifetimeSeqno, DbActor, PiiString, VersionedDataIdentifier};
+use newtypes::{FilterFunction, FpId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
 use serde::Deserialize;
@@ -26,6 +27,10 @@ pub struct DecryptRequest {
     fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged
     reason: String,
+    /// A list of filter functions to apply to each decrypted data
+    /// Omit or leave empty to apply no filters
+    #[serde(default)]
+    filters: Vec<FilterFunction>,
 }
 
 #[derive(Debug, Deserialize, Apiv2Schema)]
@@ -35,6 +40,10 @@ pub struct ClientDecryptRequest {
     /// Reason for the data decryption. This will be logged.
     /// The reason must be provided either here or in the client token
     reason: Option<String>,
+    /// A list of filter functions to apply to each decrypted data
+    /// Omit or leave empty to apply no filters
+    #[serde(default)]
+    filters: Vec<FilterFunction>,
 }
 
 flat_api_object_map_type!(
@@ -98,11 +107,19 @@ pub async fn post_client(
     let fp_id = auth.fp_id.clone();
 
     // Compose the DecryptRequest
-    let ClientDecryptRequest { fields, reason } = request.into_inner();
+    let ClientDecryptRequest {
+        fields,
+        reason,
+        filters,
+    } = request.into_inner();
     let reason = reason
         .or(auth.data.decrypt_reason.clone())
         .ok_or(TenantError::NoDecryptionReasonProvided)?;
-    let request = DecryptRequest { reason, fields };
+    let request = DecryptRequest {
+        reason,
+        fields,
+        filters,
+    };
 
     // TODO would be really cool if we could share the handler - the only difference is one gets
     // the fp_id from the path while the other gets it from the token. could we make an extractor
@@ -118,7 +135,14 @@ async fn post_inner(
     auth: Box<dyn TenantAuth>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptResponse> {
-    let DecryptRequest { fields, reason } = request;
+    let DecryptRequest {
+        fields,
+        reason,
+        filters,
+    } = request;
+
+    let transforms = filters.iter().map(filter_function_to_transform).collect_vec();
+
     // Create a VW for each version in fields
     let version_to_fields = fields.into_iter().map(|f| (f.version, f.di)).into_group_map();
     let versions = version_to_fields.keys().cloned().collect_vec();
@@ -139,20 +163,32 @@ async fn post_inner(
         })
         .await??;
 
-    let req = VwDecryptRequest {
-        reason,
-        principal: auth.actor().into(),
-        insight: CreateInsightEvent::from(insights),
-    };
+    let insight = CreateInsightEvent::from(insights.clone());
+    let principal: DbActor = auth.actor().into();
+
     let mut results = HashMap::new();
     for (v, fields) in version_to_fields {
+        let targets = fields
+            .into_iter()
+            .map(|identifier| EnclaveDecryptOperation {
+                identifier,
+                transforms: transforms.clone(),
+            })
+            .collect_vec();
+
+        let req = VwDecryptRequest {
+            reason: reason.clone(),
+            principal: principal.clone(),
+            insight: insight.clone(),
+            targets: targets.clone(),
+        };
         let vw = uvws.remove(&v).ok_or(AssertionError("No VW found for version"))?;
         // TODO this will make separate access events for each version - maybe fine?
-        let mut v_results = vw.decrypt(state, &fields, req.clone()).await?;
+        let mut v_results = vw.fn_decrypt(state, req).await?;
         // Is this step necessary? Every key is present in the response if it was in the request?
-        let v_results: HashMap<_, _> = fields
-            .into_iter()
-            .map(|di| (di.clone(), v_results.remove(&di.into())))
+        let v_results: HashMap<_, _> = targets
+            .iter()
+            .map(|op| (op.identifier.clone(), v_results.remove(op)))
             .collect();
         for (di, result) in v_results {
             let id = VersionedDataIdentifier { di, version: v };

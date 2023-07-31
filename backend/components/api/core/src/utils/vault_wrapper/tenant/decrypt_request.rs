@@ -10,19 +10,23 @@ pub struct DecryptRequest {
     pub reason: String,
     pub principal: DbActor,
     pub insight: CreateInsightEvent,
+    pub targets: Vec<EnclaveDecryptOperation>,
 }
 
 impl DecryptRequest {
+    /// note: decrypted_dis are a subset of targets
+    /// as not all targets need be PII.
     pub(super) async fn create_access_event(
         self,
         state: &State,
         scoped_vault: &ScopedVault,
-        targets: Vec<EnclaveDecryptOperation>,
+        decrypted_dis: Vec<EnclaveDecryptOperation>,
     ) -> ApiResult<()> {
         let DecryptRequest {
             reason,
             principal,
             insight,
+            targets: _,
         } = self;
         let event = NewAccessEvent {
             scoped_vault_id: scoped_vault.id.clone(),
@@ -33,7 +37,7 @@ impl DecryptRequest {
             insight,
             kind: AccessEventKind::Decrypt,
             // TODO: also store the transforms!
-            targets: targets.into_iter().map(|t| t.identifier).collect(),
+            targets: decrypted_dis.into_iter().map(|t| t.identifier).collect(),
         };
         state.db_pool.db_query(|conn| event.create(conn)).await??;
         Ok(())
