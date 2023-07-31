@@ -111,8 +111,16 @@ const useAutoCapture = ({
           desiredImageWidth,
           desiredImageHeight,
         });
-        canvasRef.current.setAttribute('width', `${sourceDimensions.sWidth}`);
-        canvasRef.current.setAttribute('height', `${sourceDimensions.sHeight}`);
+
+        // Lower the size of the canvas so that autocapture algorithm runs faster
+        canvasRef.current.setAttribute(
+          'width',
+          `${Math.floor(sourceDimensions.sWidth / 4)}`,
+        );
+        canvasRef.current.setAttribute(
+          'height',
+          `${Math.floor(sourceDimensions.sHeight / 4)}`,
+        );
 
         // We get the static image from the video
         // We only use the area within the frame outline with a little bit of cushion space around the outline

@@ -11,10 +11,10 @@ import Flash from './components/flash';
 import Overlay, { OutlineKind } from './components/overlay';
 import UploadButton from './components/upload-button';
 import useAutoCapture, { AutocaptureKind } from './hooks/use-auto-capture';
+import useGetImageString from './hooks/use-get-image-string';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
 import { CameraKind } from './utils/get-camera-options';
-import getImageStringFromVideo from './utils/get-image-string-from-video';
 import getVideoHeight from './utils/get-video-height';
 
 type CameraProps = {
@@ -51,6 +51,7 @@ const Camera = ({
   const [shouldDetect, setShouldDetect] = useState(true); // TODO: Completely remove the use of this hook by moving the image processing to the processing component
   const [shouldShowInstructions, setShouldShowInstruction] = useState(true);
   const [canCapture, setCanCapture] = useState(true);
+  const getImageStringFromVideo = useGetImageString();
 
   const mediaStream = useUserMedia(cameraKind, onError);
   const isCameraVisible = !!mediaStream && isVideoPlaying;
@@ -122,6 +123,7 @@ const Camera = ({
       mediaStream,
       desiredImageWidth,
       desiredImageHeight,
+      shouldSharpen: false,
     });
 
     setImage(imageString || undefined);

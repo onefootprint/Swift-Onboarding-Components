@@ -25,11 +25,31 @@ export enum CardCaptureStatus {
   detecting = 'detecting',
 }
 
+export const sharpenImage = (
+  cv: OpenCVType,
+  src: Mat,
+  shouldCleanUp: boolean,
+) => {
+  const dst = new cv.Mat();
+
+  const kdata = [0, -1, 0, -1, 5, -1, 0, -1, 0]; // Another stronger convolution kernel to use [-1, -1, -1, -1, 9, -1, -1, -1, -1]
+  const M = cv.matFromArray(3, 3, cv.CV_32FC1, kdata);
+  const anchor = new cv.Point(-1, -1);
+  cv.filter2D(src, dst, cv.CV_8U, M, anchor, 0, cv.BORDER_DEFAULT);
+
+  if (shouldCleanUp) {
+    src.delete();
+    M.delete();
+  }
+
+  return dst;
+};
+
 export const getMedianBlur = (
   cv: OpenCVType,
   src: Mat,
   kSize: number,
-  shouldCleanUp: Boolean,
+  shouldCleanUp: boolean,
 ) => {
   const dst = new cv.Mat();
   cv.medianBlur(src, dst, kSize); // Kernel with size 9x9 worked best during testing

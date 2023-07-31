@@ -30,6 +30,8 @@ const getCameraOptions = async (cameraKind: CameraKind) => {
       deviceId,
       facingMode: 'environment',
       zoom: 1,
+      width: { ideal: 2560 },
+      height: { ideal: 1920 },
     },
   };
 };
