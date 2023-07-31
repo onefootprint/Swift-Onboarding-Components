@@ -8,7 +8,7 @@ pub mod declare_map_container {
             )]
             pub struct $name {
                 #[serde(flatten)]
-                map: std::collections::HashMap<$key, $value>,
+                pub map: std::collections::HashMap<$key, $value>,
             }
 
             impl IntoIterator for $name {

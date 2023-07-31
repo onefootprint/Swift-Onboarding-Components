@@ -24,13 +24,13 @@ use std::collections::{HashMap, HashSet};
 #[derive(Debug, Deserialize, Apiv2Schema)]
 pub struct DecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
-    fields: HashSet<VersionedDataIdentifier>,
+    pub(super) fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged
-    reason: String,
+    pub(super) reason: String,
     /// A list of filter functions to apply to each decrypted data
     /// Omit or leave empty to apply no filters
     #[serde(default)]
-    filters: Vec<FilterFunction>,
+    pub(super) filters: Vec<FilterFunction>,
 }
 
 #[derive(Debug, Deserialize, Apiv2Schema)]
@@ -128,7 +128,7 @@ pub async fn post_client(
     Ok(result)
 }
 
-async fn post_inner(
+pub(super) async fn post_inner(
     state: &State,
     fp_id: FpId,
     request: DecryptRequest,
