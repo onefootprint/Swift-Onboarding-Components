@@ -1,6 +1,7 @@
 import {
   createUseRouterSpy,
   customRender,
+  mockRequest,
   screen,
   userEvent,
   waitFor,
@@ -25,6 +26,11 @@ describe('<DomainAccess />', () => {
       query: {
         tab: 'domain-access',
       },
+    });
+    mockRequest({
+      method: 'get',
+      path: '/org',
+      response: { data: {} },
     });
   });
 
