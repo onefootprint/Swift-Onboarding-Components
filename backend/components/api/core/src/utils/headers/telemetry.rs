@@ -12,17 +12,27 @@ pub struct TelemetryHeaders {
     /// Optional client-generated and -provided session identifier that links multiple HTTP requests
     /// that occured in the same "session"
     pub session_id: Option<String>,
+    pub is_integration_test_req: bool,
 }
 
 impl TelemetryHeaders {
+    const SESSION_HEADER_NAME: &str = "x-fp-session-id";
+    const INTEGRATION_TESTS_HEADER_NAME: &str = "x-fp-integration-test";
+
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
-        let session_id = get_header("x-fp-session-id", headers)
+        let session_id = get_header(Self::SESSION_HEADER_NAME, headers)
             // Make sure the provided value is a Uuid to prevent accepting arbitrary user input
             .map(|h| Uuid::parse_str(&h))
             .transpose()
             .unwrap_or(None)
             .map(|uuid| uuid.to_string());
-        Self { session_id }
+        let is_integration_test_req = get_header(Self::INTEGRATION_TESTS_HEADER_NAME, headers)
+            .map(|h| h == "true")
+            .unwrap_or_default();
+        Self {
+            session_id,
+            is_integration_test_req,
+        }
     }
 }
 

@@ -18,6 +18,7 @@ from tests.constants import (
 url = lambda path: "{}/{}".format(TEST_URL, path.strip("/"))
 
 SERVER_VERSION_HEADER = "x-footprint-server-version"
+INTERGRATION_TESTS_DEFAULT_HEADER = {"x-fp-integration-test": "true"}
 EXPECTED_SERVER_VERSION_GIT_HASH = os.environ.get("EXPECTED_SERVER_VERSION", None)
 
 
@@ -37,10 +38,7 @@ def _make_request(
     method, path, data, params, status_code, auths, files, addl_headers=None
 ):
     headers = {auth.HEADER_NAME: auth.value for auth in auths}
-    headers = {
-        **headers,
-        **(addl_headers or {}),
-    }
+    headers = {**headers, **(addl_headers or {}), **INTERGRATION_TESTS_DEFAULT_HEADER}
     response = method(url(path), headers=headers, json=data, params=params, files=files)
     if response.status_code != status_code:
         raise HttpError(

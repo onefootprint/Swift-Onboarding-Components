@@ -96,7 +96,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             region_name: _,
             latitude,
             longitude,
-            postal_code,
+            postal_code: _,
             time_zone: _,
             user_agent,
             timestamp: _,
@@ -115,7 +115,10 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             tls: _,
         } = InsightHeaders::parse_from_request(request.headers());
 
-        let TelemetryHeaders { session_id } = TelemetryHeaders::parse_from_request(request.headers());
+        let TelemetryHeaders {
+            session_id,
+            is_integration_test_req,
+        } = TelemetryHeaders::parse_from_request(request.headers());
 
         let server_git_hash = crate::GIT_HASH.to_string();
 
@@ -134,10 +137,10 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             longitude,
             city,
             country,
-            postal_code,
             user_agent,
             session_id,
             server_git_hash,
+            is_integration_test_req,
             "Root span"
         );
         span
