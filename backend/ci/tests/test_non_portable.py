@@ -310,21 +310,33 @@ def test_data_integrity_check(sandbox_tenant):
 
     signing_key = "a1f928d87278290bf9dece075d0e46330a01d21b346073f4f193739078dca458"
 
+    def check(resp):
+        for key, value in data.items():
+            expected = hmac.new(
+                bytes.fromhex(signing_key),
+                msg=bytes(value, "utf-8"),
+                digestmod=hashlib.sha256,
+            ).hexdigest()
+            assert resp[key] == expected
+
     # should be able to validate the integrity
     resp = post(
-        f"users/{fp_id}/vault/integrity",
+        f"users/{fp_id}/vault/integrity",  # backwards compat
         dict(fields=list(data.keys()), signing_key=signing_key),
         sandbox_tenant.sk.key,
     )
-    print("response: ", resp)
+    check(resp)
 
-    for key, value in data.items():
-        expected = hmac.new(
-            bytes.fromhex(signing_key),
-            msg=bytes(value, "utf-8"),
-            digestmod=hashlib.sha256,
-        ).hexdigest()
-        assert resp[key] == expected
+    resp = post(
+        f"users/{fp_id}/vault/decrypt",
+        {
+            "fields": list(data.keys()),
+            "reason": "hmac",
+            "filters": [{"hmac_sha256": {"key": signing_key}}],
+        },
+        sandbox_tenant.sk.key,
+    )
+    check(resp)
 
 
 @pytest.mark.parametrize(
@@ -481,3 +493,53 @@ def test_too_large_object_upload(sandbox_tenant):
         body["error"]["message"]
         == "The request is too large, max size accepted is 10485760 KB."
     )
+
+
+def test_decrypt_rsa_encrypt(sandbox_tenant):
+    initial_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": EMAIL,
+        "custom.test_field": "hello world",
+        **ID_DATA,
+        **CREDIT_CARD_DATA,
+    }
+    body = post("users/", initial_data, sandbox_tenant.sk.key)
+    user = body
+    fp_id = user["id"]
+
+    # setup our keys
+    from cryptography.hazmat.primitives.asymmetric import rsa, padding
+    from cryptography.hazmat.primitives import serialization
+
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+    )
+    public_key = private_key.public_key()
+    pk_der = public_key.public_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PublicFormat.PKCS1,
+    ).hex()
+
+    # do our re-encrypt
+    fields = ["custom.test_field", "id.first_name", "id.phone_number"]
+    resp = post(
+        f"entities/{fp_id}/vault/decrypt",
+        {
+            "fields": fields,
+            "reason": "i want to",
+            "filters": [
+                {"encrypt": {"algorithm": "rsa_pkcs1v15", "public_key": pk_der}}
+            ],
+        },
+        sandbox_tenant.sk.key,
+    )
+
+    # check the results
+    for identifier in fields:
+        real_pii = initial_data[identifier]
+        result_value = resp[identifier]
+        decrypted = private_key.decrypt(
+            bytes.fromhex(result_value), padding.PKCS1v15()
+        ).decode("utf-8")
+        assert decrypted == real_pii
