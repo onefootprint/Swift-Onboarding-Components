@@ -91,14 +91,19 @@ struct ObConfigurationUpdate {
 pub struct ObConfigurationQuery {
     pub tenant_id: TenantId,
     pub is_live: bool,
+    pub status: Option<ApiKeyStatus>,
 }
 
 impl ObConfiguration {
-    fn list_query(query: &ObConfigurationQuery) -> BoxedQuery<Pg> {
-        ob_configuration::table
-            .filter(ob_configuration::tenant_id.eq(&query.tenant_id))
-            .filter(ob_configuration::is_live.eq(query.is_live))
-            .into_boxed()
+    fn list_query(filters: &ObConfigurationQuery) -> BoxedQuery<Pg> {
+        let mut query = ob_configuration::table
+            .filter(ob_configuration::tenant_id.eq(&filters.tenant_id))
+            .filter(ob_configuration::is_live.eq(filters.is_live))
+            .into_boxed();
+        if let Some(status) = filters.status.as_ref() {
+            query = query.filter(ob_configuration::status.eq(status))
+        }
+        query
     }
 
     #[tracing::instrument("ObConfiguration::list", skip_all)]

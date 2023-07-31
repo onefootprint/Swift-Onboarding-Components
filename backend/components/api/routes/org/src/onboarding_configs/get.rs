@@ -14,6 +14,7 @@ use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::auth::Any;
 use api_core::types::JsonApiResponse;
+use api_wire_types::OnboardingConfigFilters;
 use chrono::DateTime;
 use chrono::Utc;
 use db::models::appearance::Appearance;
@@ -72,6 +73,7 @@ pub fn get_bifrost(
 #[get("/org/onboarding_configs")]
 async fn get_list(
     state: web::Data<State>,
+    filters: web::Query<OnboardingConfigFilters>,
     pagination: web::Query<CursorPaginationRequest<DateTime<Utc>>>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<
@@ -83,9 +85,12 @@ async fn get_list(
     let cursor = pagination.cursor;
     let page_size = pagination.page_size(&state);
 
+    let OnboardingConfigFilters { status } = filters.into_inner();
+
     let query = ObConfigurationQuery {
         tenant_id: tenant.id.clone(),
         is_live: auth.is_live()?,
+        status,
     };
     let (configs, count) = state
         .db_pool

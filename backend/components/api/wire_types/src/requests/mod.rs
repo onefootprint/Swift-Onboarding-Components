@@ -48,3 +48,6 @@ pub use alpaca_create_account::*;
 
 mod process;
 pub use process::*;
+
+mod onboarding_configs;
+pub use onboarding_configs::*;
