@@ -68,13 +68,11 @@ pub async fn post(
         })
         .await??;
 
-    if side == DocumentSide::Selfie {
-        if !doc_request.should_collect_selfie {
-            return Err(OnboardingError::NotExpectingSelfie.into());
-        }
-        if user_consent.is_none() {
-            return Err(OnboardingError::UserConsentNotFound.into());
-        }
+    if side == DocumentSide::Selfie && !doc_request.should_collect_selfie {
+        return Err(OnboardingError::NotExpectingSelfie.into());
+    }
+    if user_consent.is_none() {
+        return Err(OnboardingError::UserConsentNotFound.into());
     }
 
     // Upload the image to s3

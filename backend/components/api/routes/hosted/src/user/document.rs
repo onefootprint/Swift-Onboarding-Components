@@ -58,13 +58,12 @@ pub async fn post(
             Ok((vault, doc_request, user_consent))
         })
         .await??;
-    if request.selfie_image.is_some() {
-        if !doc_request.should_collect_selfie {
-            return Err(OnboardingError::NotExpectingSelfie.into());
-        }
-        if user_consent.is_none() {
-            return Err(OnboardingError::UserConsentNotFound.into());
-        }
+
+    if request.selfie_image.is_some() && !doc_request.should_collect_selfie {
+        return Err(OnboardingError::NotExpectingSelfie.into());
+    }
+    if user_consent.is_none() {
+        return Err(OnboardingError::UserConsentNotFound.into());
     }
     if doc_request.only_us && request.country_code != "US" {
         return Err(OnboardingError::UnsupportedNonUSDocumentCountry.into());
