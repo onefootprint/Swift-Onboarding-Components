@@ -52,7 +52,10 @@
         },
         "button": {
           "edit": "Edit",
-          "save": "Save"
+          "save": "Save",
+          "copy": "Copy",
+          "copy-confirmation": "Copied",
+          "reset": "Reset"
         }
       },
       "cta": "Continue"

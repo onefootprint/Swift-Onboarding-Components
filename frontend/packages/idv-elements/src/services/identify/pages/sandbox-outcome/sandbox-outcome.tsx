@@ -1,12 +1,20 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoCheck24, IcoUser24, IcoWarning24 } from '@onefootprint/icons';
+import {
+  IcoCheck24,
+  IcoClose24,
+  IcoPencil24,
+  IcoUser24,
+  IcoWarning24,
+} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   Button,
-  LinkButton,
+  CopyButton,
+  IconButton,
   RadioSelect,
   TextInput,
+  Tooltip,
   Typography,
 } from '@onefootprint/ui';
 import Hint from '@onefootprint/ui/src/components/internal/hint';
@@ -42,6 +50,8 @@ const SandboxOutcome = () => {
     register,
     handleSubmit,
     formState: { errors },
+    resetField,
+    getValues,
   } = useForm<FormData>({
     defaultValues: {
       outcome: Outcomes.success,
@@ -72,6 +82,10 @@ const SandboxOutcome = () => {
   };
 
   const handleSaveOrEdit = () => setIdInputLocked(prev => !prev);
+
+  const handleReset = () => {
+    resetField('testID');
+  };
 
   return (
     <Box>
@@ -137,15 +151,48 @@ const SandboxOutcome = () => {
                 })}
               />
             </Box>
-            <LinkButton
-              onClick={handleSaveOrEdit}
-              sx={{ marginRight: 5 }}
-              disabled={!!errors?.testID}
-            >
-              {idInputLocked
-                ? t('test-id.button.edit')
-                : t('test-id.button.save')}
-            </LinkButton>
+            {idInputLocked ? (
+              <>
+                <CopyButton
+                  contentToCopy={getValues('testID')}
+                  tooltipText={t('test-id.button.copy')}
+                  tooltipPosition="top"
+                  tooltipTextConfirmation={t(
+                    'test-id.button.copy-confirmation',
+                  )}
+                />
+                <Tooltip text={t('test-id.button.edit')}>
+                  <IconButton
+                    aria-label={t('test-id.button.edit')}
+                    onClick={handleSaveOrEdit}
+                  >
+                    <IcoPencil24 />
+                  </IconButton>
+                </Tooltip>
+              </>
+            ) : (
+              <>
+                <Tooltip text={t('test-id.button.save')}>
+                  <IconButton
+                    aria-label={t('test-id.button.save')}
+                    onClick={handleSaveOrEdit}
+                    disabled={!!errors?.testID}
+                  >
+                    <IcoCheck24
+                      color={errors?.testID ? 'primary' : 'success'}
+                    />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip text={t('test-id.button.reset')}>
+                  <IconButton
+                    aria-label={t('test-id.button.reset')}
+                    onClick={handleReset}
+                  >
+                    <IcoClose24 color="error" />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
           </InputControls>
           <Hint hasError={!!errors?.testID}>{getHint()}</Hint>
         </InputContainer>
@@ -174,7 +221,7 @@ const InputControls = styled.div`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
-    gap: ${theme.spacing[5]};
+    gap: ${theme.spacing[3]};
   `}
 `;
 

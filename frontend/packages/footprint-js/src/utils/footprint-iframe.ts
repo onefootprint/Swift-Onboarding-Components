@@ -47,7 +47,8 @@ class FootprintIframe {
       container,
       name: 'footprint-iframe',
       url,
-      allow: 'otp-credentials; publickey-credentials-get *; camera *;',
+      allow:
+        'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
     });
     this.handleIframeLoaded();
     this.child.on(FootprintInternalEvent.started, () => {
