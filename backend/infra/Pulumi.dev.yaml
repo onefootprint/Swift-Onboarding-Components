@@ -34,8 +34,8 @@ config:
         cid: 16
         cpus: 2
         instance: c5a.xlarge
-        memory: 4096
         maxInstances: 4
+        memory: 4096
         minInstances: 2
       signingSealedIkek: 0102010078691c3df6e54c78ffe3c192c6d55f17bc23005299e722f6c6e7a30bba69f084c8011b29da25d49e0ff8875c36a2df50e3a30000007e307c06092a864886f70d010706a06f306d020100306806092a864886f70d010701301e060960864801650304012e3011040ccd8f032a1bdcf8d452c32d99020110803bd3491c3f202b164e0adf1dd3856ff50a1ce6aa156def702c64b7e2dc1f7a272429904b34f54b3fd9739ec36292b1430d442e99e89b0c49d2c0296b
     experian:
@@ -118,6 +118,11 @@ config:
     stripe:
       apiKey:
         secure: v1:CwuAHUsNqEspf1Cy:gGUJpTuJz+qJXLj8S1+XhxH06h4R57xymLwcO8gWD7ulKVCtRH7opUXAttjxIEBLb+XN0f4e0bkP3zslcWWLYITmsajivNyQXaG5sjCyp02voARB9V4N/SM6tGzkGf4EGPyVIV4T0P0e2sZDJ2oT9aZorJV3IqSsDvBN
+    stytch:
+      project:
+        secure: v1:yt366i0AkYbLpf3A:b28iSB/HK2bjF1M4n/rgIo2dYzHGM6L6Hhtubr/k5kjaFrddE28nWICKLTrQSi4qu7sY4xmMMkvDLUvEtXGONUs=
+      secret:
+        secure: v1:lG0D0HlmMPLEm1Gk:wwDrUmrfM1wDcJU67r6IzEi4pqpMCZp06vpzRjGGDYnHmBPZ2GidRJmN0GTAV/tcBSOFt7gicJufRK1KMY1tGA==
     svix:
       authToken:
         secure: v1:62LpQHhq4cJ7TcAM:1pW6m/ihRXBX0d9wzlYpR3EMilk0E95608Zq9RPCrcFITw6rk7tlGKN1LMitafcFkvJ3IANJ8rj7ww==
@@ -127,8 +132,8 @@ config:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      integrationTestPhoneNumber: '+13393311410'
-      phoneNumber: '+15105883668'
+      integrationTestPhoneNumber: "+13393311410"
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

@@ -18,7 +18,7 @@ config:
       assets: i.onefp.net
       base: api.onefootprint.com
       frontendBase: onefootprint.com
-      prefix: ''
+      prefix: ""
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
@@ -34,8 +34,8 @@ config:
         cid: 16
         cpus: 2
         instance: c5a.xlarge
-        memory: 4096
         maxInstances: 50
+        memory: 4096
         minInstances: 6
       signingSealedIkek: 0102010078d60908a902e09468073c42ef11aec9d74032ecf5883ca24187d76552bdb7e5df0107a5f5e67bd7aec30e66842e4f85feb10000007e307c06092a864886f70d010706a06f306d020100306806092a864886f70d010701301e060960864801650304012e3011040c477422e72e1878522107e16f020110803be8ab2eee542229e0f8dd2f128dc7e1bf980f324041570168d1f2a545481f787be91f6542526a87e3005a65d3228ecfa9404ad09518b5bf93fa59cb
     experian:
@@ -116,6 +116,11 @@ config:
     stripe:
       apiKey:
         secure: v1:M7HjVZ81Nh2vF2/T:n//gfJmgaVdleXGkcfTQH7gkcNYjXO4H35yGWnsiuE9j7q7tOoChfHj45W+R7XefyQYNd7AAshREC6U7fyPC9p9KexaOgV6dslmrHZMCnno80/XsbLSsSRGIdHzT2fO/w1UTQa4YqB4UmVnBtf+47ybacSeIW+AbyJ8R
+    stytch:
+      project:
+        secure: v1:l0L/r32xm9lkc/0X:x6iLKfZKYC/t3PEsW2Exj33dPlzCFsxihTK7FC86lFSSr3iMFK2aQU8htC6y6Vob9cyECKZXhIvV9WHu9ct6xVY=
+      secret:
+        secure: v1:19SFFEWJNJo3Ysr/:LCoxIl3CtwXJRx9wksqX1JU+23ZCRnl8AZmmvL6K2p47XKf5T8TYLHoiZgMGmI/6k4BGj1TvH2dOV1n7UrOvPA==
     svix:
       authToken:
         secure: v1:EB18OjkgS2mqtf8b:ZZXYDnFMxA/wEoYGA40l7yBLtMB7MsZFCbMg402qqSuY9faTZ4AM7yV0i9zOc8MTh8kbAOoI
@@ -125,8 +130,8 @@ config:
         secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
-      integrationTestPhoneNumber: '+13393311410'
-      phoneNumber: '+15105883668'
+      integrationTestPhoneNumber: "+13393311410"
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

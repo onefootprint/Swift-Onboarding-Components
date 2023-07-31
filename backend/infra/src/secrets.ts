@@ -55,6 +55,8 @@ export interface StaticSecrets {
   experianCrossCoreUsername: aws.ssm.Parameter;
   experianCrossCorePassword: aws.ssm.Parameter;
   experianCrossCoreSubscriberCode: aws.ssm.Parameter;
+  stytchProject: aws.ssm.Parameter;
+  stytchSecret: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -74,6 +76,7 @@ interface SecretConstants {
   incode: Incode;
   middesk: Middesk;
   experian: Experian;
+  stytch: Stytch;
 }
 
 interface ElasticSecrets {
@@ -155,6 +158,11 @@ interface Experian {
   crossCoreUsername: string;
   crossCorePassword: string;
   crossCoreSubscriberCode: string;
+}
+
+interface Stytch {
+  project: string;
+  secret: string;
 }
 
 export async function LoadSecrets(
@@ -384,6 +392,14 @@ export async function LoadSecrets(
     experianCrossCoreSubscriberCode: createSecretParameter(
       `experianCrossCoreSubscriberCode-${stack}`,
       secretConstants.experian.crossCoreSubscriberCode,
+    ),
+    stytchProject: createSecretParameter(
+      `stytchProject-${stack}`,
+      secretConstants.stytch.project,
+    ),
+    stytchSecret: createSecretParameter(
+      `stytchSecret-${stack}`,
+      secretConstants.stytch.secret,
     ),
   };
 }

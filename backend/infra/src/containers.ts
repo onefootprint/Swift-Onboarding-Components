@@ -149,6 +149,8 @@ export abstract class ServiceContainers {
         secretsStore.experianCrossCoreUsername.arn,
         secretsStore.experianCrossCorePassword.arn,
         secretsStore.experianCrossCoreSubscriberCode.arn,
+        secretsStore.stytchProject.arn,
+        secretsStore.stytchSecret.arn,
       ])
       .apply(
         ([
@@ -190,6 +192,8 @@ export abstract class ServiceContainers {
           experianCrossCoreUsername,
           experianCrossCorePassword,
           experianCrossCoreSubscriberCode,
+          stytchProject,
+          stytchSecret,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -335,6 +339,14 @@ export abstract class ServiceContainers {
               {
                 name: 'EXPERIAN_PRECISEID_SUBSCRIBER_CODE',
                 valueFrom: experianCrossCoreSubscriberCode,
+              },
+              {
+                name: 'STYTCH_PROJECT',
+                valueFrom: stytchProject,
+              },
+              {
+                name: 'STYTCH_SECRET',
+                valueFrom: stytchSecret,
               },
             ],
             environment: [
