@@ -158,11 +158,8 @@ impl State {
         let fingerprintjs_client = FingerprintJSClient::new(config.fingerprintjs_sdk_key.clone().into())
             .expect("failed to build fingerprint client");
 
-        let middesk_client = MiddeskClient::new(
-            config.middesk_config.middesk_api_key.clone(),
-            config.middesk_config.middesk_base_url.clone(),
-        )
-        .expect("failed to build middesk client");
+        let middesk_client = MiddeskClient::new(config.middesk_config.middesk_base_url.clone())
+            .expect("failed to build middesk client");
 
         // Check experian in dev so we fail early if something is misconfigured
         if !config.service_config.is_production()

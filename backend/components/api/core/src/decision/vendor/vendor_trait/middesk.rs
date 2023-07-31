@@ -22,7 +22,7 @@ impl VendorAPICall<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, 
         &self,
         request: MiddeskCreateBusinessRequest,
     ) -> Result<MiddeskCreateBusinessResponse, idv::middesk::Error> {
-        let raw_response = self.post_business(request.business_data).await?;
+        let raw_response = self.post_business(request).await?;
         let parsed_response = idv::middesk::response::parse_response(raw_response.clone())?;
 
         Ok(MiddeskCreateBusinessResponse {
@@ -55,7 +55,7 @@ impl VendorAPICall<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::m
         &self,
         request: MiddeskGetBusinessRequest,
     ) -> Result<MiddeskGetBusinessResponse, idv::middesk::Error> {
-        let raw_response = self.get_business(request.business_id).await?;
+        let raw_response = self.get_business(request).await?;
         let parsed_response = idv::middesk::response::parse_response(raw_response.clone())?;
 
         Ok(MiddeskGetBusinessResponse {

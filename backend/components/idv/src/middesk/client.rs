@@ -1,11 +1,11 @@
-use newtypes::{BusinessData, PiiString};
-use reqwest::{header, Url};
+use newtypes::vendor_credentials::MiddeskCredentials;
+use reqwest::{header, Method, RequestBuilder, Url};
 
 use std::time::Duration;
 
 use crate::middesk::request::business::BusinessRequest;
 
-use super::{response, Error, MiddeskReqwestError};
+use super::{response, Error, MiddeskCreateBusinessRequest, MiddeskGetBusinessRequest, MiddeskReqwestError};
 
 #[derive(Clone)]
 pub struct MiddeskClient {
@@ -14,13 +14,9 @@ pub struct MiddeskClient {
 }
 
 impl MiddeskClient {
-    pub fn new(api_key: PiiString, base_url: String) -> Result<Self, Error> {
+    pub fn new(base_url: String) -> Result<Self, Error> {
         let mut headers = header::HeaderMap::new();
-        headers.insert(
-            "Authorization",
-            header::HeaderValue::from_str(format!("Bearer {}", api_key.leak_to_string()).as_str())
-                .map_err(MiddeskReqwestError::from)?,
-        );
+
         headers.insert(
             "Content-Type",
             header::HeaderValue::from_static("application/json"),
@@ -33,8 +29,27 @@ impl MiddeskClient {
         Ok(Self { client, base_url })
     }
 
+    fn request(
+        &self,
+        credentials: &MiddeskCredentials,
+        method: Method,
+        url: Url,
+    ) -> Result<RequestBuilder, Error> {
+        Ok(self.client.request(method, url).header(
+            "Authorization",
+            header::HeaderValue::from_str(
+                format!("Bearer {}", credentials.api_key.leak_to_string()).as_str(),
+            )
+            .map_err(MiddeskReqwestError::from)?,
+        ))
+    }
+
     #[allow(unused)]
-    pub async fn post_business(&self, business_data: BusinessData) -> Result<serde_json::Value, Error> {
+    pub async fn post_business(&self, req: MiddeskCreateBusinessRequest) -> Result<serde_json::Value, Error> {
+        let MiddeskCreateBusinessRequest {
+            business_data,
+            credentials,
+        } = req;
         let req = BusinessRequest::from(business_data);
         let url = Url::parse(self.base_url.as_str())
             .map_err(Error::RequestUrlError)?
@@ -44,8 +59,7 @@ impl MiddeskClient {
         tracing::info!(req=?req, url=?url, "MiddeskClient::post_business");
 
         let response = self
-            .client
-            .post(url)
+            .request(&credentials, Method::POST, url)?
             .json(&req)
             .timeout(Duration::from_secs(5))
             .send()
@@ -56,7 +70,11 @@ impl MiddeskClient {
     }
 
     #[allow(unused)]
-    pub async fn get_business(&self, business_id: String) -> Result<serde_json::Value, Error> {
+    pub async fn get_business(&self, req: MiddeskGetBusinessRequest) -> Result<serde_json::Value, Error> {
+        let MiddeskGetBusinessRequest {
+            business_id,
+            credentials,
+        } = req;
         let url = Url::parse(self.base_url.as_str())
             .map_err(Error::RequestUrlError)?
             .join(&format!("businesses/{}", business_id))
@@ -65,8 +83,7 @@ impl MiddeskClient {
         tracing::info!(url=?url, "MiddeskClient::get_business");
 
         let response = self
-            .client
-            .get(url)
+            .request(&credentials, Method::GET, url)?
             .timeout(Duration::from_secs(5))
             .send()
             .await
@@ -87,9 +104,10 @@ mod tests {
     #[tokio::test]
     async fn test_client() {
         let api_key = PiiString::from(dotenv::var("MIDDESK_API_KEY").unwrap());
+        let credentials = MiddeskCredentials { api_key };
         let base_url = dotenv::var("MIDDESK_BASE_URL").unwrap();
 
-        let client = MiddeskClient::new(api_key, base_url).unwrap();
+        let client = MiddeskClient::new(base_url).unwrap();
 
         let business_data = BusinessData {
             name: Some(PiiString::from("Middesk".to_owned())),
@@ -108,7 +126,13 @@ mod tests {
             }],
         };
 
-        let res = client.post_business(business_data).await.unwrap();
+        let res = client
+            .post_business(MiddeskCreateBusinessRequest {
+                business_data,
+                credentials,
+            })
+            .await
+            .unwrap();
         let json_res = String::from_utf8(serde_json::to_vec_pretty(&res).unwrap()).unwrap();
         println!("json_res: {}", json_res);
         let parsed_res = response::parse_response(res).unwrap();

@@ -1,4 +1,4 @@
-use newtypes::{BusinessData, PiiJsonValue};
+use newtypes::{vendor_credentials::MiddeskCredentials, BusinessData, PiiJsonValue};
 use reqwest::StatusCode;
 use thiserror::Error;
 
@@ -11,6 +11,7 @@ use self::response::{business::BusinessResponse, MiddeskApiErrorResponse};
 
 pub struct MiddeskCreateBusinessRequest {
     pub business_data: BusinessData,
+    pub credentials: MiddeskCredentials,
 }
 #[derive(Clone)]
 pub struct MiddeskCreateBusinessResponse {
@@ -20,6 +21,7 @@ pub struct MiddeskCreateBusinessResponse {
 
 pub struct MiddeskGetBusinessRequest {
     pub business_id: String,
+    pub credentials: MiddeskCredentials,
 }
 
 #[derive(Clone)]

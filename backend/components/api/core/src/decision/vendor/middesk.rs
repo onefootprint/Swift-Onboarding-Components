@@ -5,6 +5,7 @@ use std::sync::Arc;
 use super::vendor_trait::VendorAPIResponse;
 use super::*;
 
+use crate::config::Config;
 use crate::enclave_client::EnclaveClient;
 use crate::{decision, State};
 
@@ -16,6 +17,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::middesk_request::{MiddeskRequest, UpdateMiddeskRequest};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::{Onboarding, OnboardingUpdate};
+use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_result::VerificationResult;
 use db::DbPool;
@@ -194,6 +196,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
     async fn make_create_business_call(
         self,
         db_pool: &DbPool,
+        config: &Config,
         enclave_client: &EnclaveClient,
         ff_client: Arc<dyn FeatureFlagClient>,
         middesk_client: VendorClient<
@@ -201,6 +204,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
             MiddeskCreateBusinessResponse,
             idv::middesk::Error,
         >,
+        tenant_id: &TenantId,
     ) -> Result<MiddeskState<AwaitingBusinessUpdateWebhook>, ApiError> {
         let vreq_id = self.state.create_business_vreq.id.clone();
         let ob_id = self.middesk_request.onboarding_id;
@@ -217,9 +221,17 @@ impl MiddeskState<PendingCreateBusinessCall> {
             .await??
             .key;
 
-        let res = send_middesk_call(business_data, middesk_client, ff_client, ob_configuration_key)
-            .await
-            .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+        let res = send_middesk_call(
+            db_pool,
+            &middesk_client,
+            ff_client,
+            config,
+            enclave_client,
+            business_data,
+            ob_configuration_key,
+            tenant_id,
+        )
+        .await?;
 
         let business_id = res
             .parsed_response
@@ -393,11 +405,13 @@ impl MiddeskState<PendingGetBusinessCall> {
     pub async fn make_get_business_call(
         self,
         db_pool: &DbPool,
-        middesk_client: VendorClient<
+        middesk_client: &VendorClient<
             MiddeskGetBusinessRequest,
             MiddeskGetBusinessResponse,
             idv::middesk::Error,
         >,
+        config: &Config,
+        enclave_client: &EnclaveClient,
     ) -> ApiResult<MiddeskStates> {
         let business_id = self
             .middesk_request
@@ -407,8 +421,17 @@ impl MiddeskState<PendingGetBusinessCall> {
         let ob_id = self.middesk_request.onboarding_id.clone();
         let middesk_request_id = self.middesk_request.id.clone();
 
+        let obid = ob_id.clone();
+        let tenant_id = db_pool
+            .db_query(move |conn| ScopedVault::get(conn, &obid))
+            .await??
+            .tenant_id;
+        let tvc = TenantVendorControl::new(tenant_id, db_pool, config, enclave_client).await?;
         let get_business_res = middesk_client
-            .make_request(MiddeskGetBusinessRequest { business_id })
+            .make_request(MiddeskGetBusinessRequest {
+                business_id,
+                credentials: tvc.middesk_credentials(),
+            })
             .await
             .map_err(|e| ApiError::from(idv::Error::from(e)))?;
 
@@ -513,9 +536,11 @@ pub async fn run_kyb(
         let _middesk_state = middesk_state
             .make_create_business_call(
                 &state.db_pool,
+                &state.config,
                 &state.enclave_client,
                 state.feature_flag_client.clone(),
                 state.vendor_clients.middesk_create_business.clone(),
+                tenant_id,
             )
             .await?;
     }
@@ -565,6 +590,7 @@ pub async fn init_middesk_request(
 pub async fn handle_middesk_webhook(
     db_pool: &DbPool,
     middesk_client: VendorClient<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::middesk::Error>,
+    config: &Config,
     enclave_client: &EnclaveClient,
     res: serde_json::Value,
 ) -> Result<(), ApiError> {
@@ -588,7 +614,9 @@ pub async fn handle_middesk_webhook(
             middesk::response::webhook::MiddeskWebhookResponse::TinRetried(t),
         ) => {
             let state = s.handle_tin_retried_response(db_pool, t, res).await?;
-            state.make_get_business_call(db_pool, middesk_client).await
+            state
+                .make_get_business_call(db_pool, &middesk_client, config, enclave_client)
+                .await
         }
         (s, r) => Err(MiddeskError::UnexpectedState(format!(
             "state = {}, webhook_id = {:?}, business_id = {:?}",
@@ -606,19 +634,28 @@ pub async fn handle_middesk_webhook(
 }
 
 async fn send_middesk_call(
-    business_data: BusinessData,
-    middesk_client: VendorClient<
+    db_pool: &DbPool,
+    middesk_client: &VendorClient<
         MiddeskCreateBusinessRequest,
         MiddeskCreateBusinessResponse,
         idv::middesk::Error,
     >,
     ff_client: Arc<dyn FeatureFlagClient>,
+    config: &Config,
+    enclave_client: &EnclaveClient,
+    business_data: BusinessData,
     ob_configuration_key: ObConfigurationKey,
-) -> Result<MiddeskCreateBusinessResponse, idv::middesk::Error> {
+    tenant_id: &TenantId,
+) -> ApiResult<MiddeskCreateBusinessResponse> {
     if ff_client.flag(BoolFlag::EnableMiddeskInNonProd(&ob_configuration_key)) {
+        let tvc = TenantVendorControl::new(tenant_id.clone(), db_pool, config, enclave_client).await?;
         middesk_client
-            .make_request(MiddeskCreateBusinessRequest { business_data })
+            .make_request(MiddeskCreateBusinessRequest {
+                business_data,
+                credentials: tvc.middesk_credentials(),
+            })
             .await
+            .map_err(|e| ApiError::from(idv::Error::from(e)))
     } else {
         // TODO: the faked vendor response thing doesn't really work well for stuff like Middesk flow. Would need to rethink how to support this if its really needed.
         let raw = serde_json::json!(
@@ -631,7 +668,8 @@ async fn send_middesk_call(
             "status": "in_review",
           }
         );
-        let parsed: BusinessResponse = idv::middesk::response::parse_response(raw.clone())?;
+        let parsed: BusinessResponse = idv::middesk::response::parse_response(raw.clone())
+            .map_err(|e| ApiError::from(idv::Error::from(e)))?;
 
         Ok(MiddeskCreateBusinessResponse {
             raw_response: raw.into(),

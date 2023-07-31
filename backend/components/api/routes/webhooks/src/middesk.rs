@@ -17,6 +17,7 @@ async fn handle_webhook(
     decision::vendor::middesk::handle_middesk_webhook(
         &state.db_pool,
         state.vendor_clients.middesk_get_business.clone(),
+        &state.config,
         &state.enclave_client,
         webhook_signature.request,
     )
