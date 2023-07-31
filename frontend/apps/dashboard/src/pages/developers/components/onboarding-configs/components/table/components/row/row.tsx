@@ -27,15 +27,19 @@ const Row = ({ onboardingConfig }: RowProps) => {
       <td>
         {sandbox.isSandbox ? (
           <IndicatorContainer>
-            <LinkButton
-              href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
-              iconComponent={IcoArrowTopRight24}
-              target="_blank"
-              size="compact"
-              onClick={event => event.stopPropagation()}
-            >
-              {name}
-            </LinkButton>
+            {status === 'enabled' ? (
+              <LinkButton
+                href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
+                iconComponent={IcoArrowTopRight24}
+                target="_blank"
+                size="compact"
+                onClick={event => event.stopPropagation()}
+              >
+                {name}
+              </LinkButton>
+            ) : (
+              name
+            )}
             <IntroDialog />
           </IndicatorContainer>
         ) : (
