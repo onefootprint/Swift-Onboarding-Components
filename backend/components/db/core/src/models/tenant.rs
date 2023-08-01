@@ -12,7 +12,8 @@ use diesel::query_builder::QueryFragment;
 use diesel::query_builder::QueryId;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    CompanySize, EncryptedVaultPrivateKey, ScopedVaultId, StripeCustomerId, TenantId, VaultId, VaultPublicKey,
+    CompanySize, EncryptedVaultPrivateKey, ScopedVaultId, StripeCustomerId, TenantId, VaultId,
+    VaultPublicKey, WorkosAuthMethod,
 };
 use serde::{Deserialize, Serialize};
 
@@ -42,6 +43,8 @@ pub struct Tenant {
     pub is_prod_ob_config_restricted: bool,
     pub domain: Option<String>,
     pub allow_domain_access: bool,
+    /// When None, any method is allowed. When Some, only specified methods are allowed.
+    pub supported_auth_methods: Option<Vec<WorkosAuthMethod>>,
 }
 
 impl Tenant {

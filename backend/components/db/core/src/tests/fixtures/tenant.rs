@@ -59,5 +59,6 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         is_prod_ob_config_restricted: false,
         domain: None,
         allow_domain_access: false,
+        supported_auth_methods: None,
     }
 }

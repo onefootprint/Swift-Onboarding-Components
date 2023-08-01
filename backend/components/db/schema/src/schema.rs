@@ -640,6 +640,7 @@ table! {
         is_prod_ob_config_restricted -> Bool,
         domain -> Nullable<Text>,
         allow_domain_access -> Bool,
+        supported_auth_methods -> Nullable<Array<Text>>,
     }
 }
 

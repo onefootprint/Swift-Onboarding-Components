@@ -48,11 +48,22 @@ pub struct TenantRbAuth {
 pub struct ParsedTenantRbAuth(pub(super) TenantRbAuth);
 
 impl TenantRbSession {
-    pub fn create(rb_id: TenantRolebindingId, auth_method: Option<WorkosAuthMethod>) -> Self {
-        Self {
+    pub fn create(
+        tenant: &Tenant,
+        rb_id: TenantRolebindingId,
+        auth_method: Option<WorkosAuthMethod>,
+    ) -> ApiResult<Self> {
+        if let Some(auth_methods) = tenant.supported_auth_methods.as_ref() {
+            if let Some(auth_method) = auth_method {
+                if !auth_methods.contains(&auth_method) {
+                    return Err(AuthError::UnsupportedAuthMethod.into());
+                }
+            }
+        }
+        Ok(Self {
             tenant_rolebinding_id: rb_id,
             auth_method,
-        }
+        })
     }
 }
 

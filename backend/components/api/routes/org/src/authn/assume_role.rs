@@ -30,8 +30,7 @@ fn post(
         .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &tenant_id)))
         .await?;
-    // Assert auth method is supported?
-    let session_data = TenantRbSession::create(rb.id.clone(), auth_method).into();
+    let session_data = TenantRbSession::create(&tenant, rb.id.clone(), auth_method)?.into();
 
     let session_sealing_key = state.session_sealing_key.clone();
     // Update the auth session to contain the newly assumed role.

@@ -67,4 +67,6 @@ pub enum AuthError {
     NonPortableVault,
     #[error("Cannot log in as a non-person vault")]
     NonPersonVault,
+    #[error("Your organization administrator has disabled the ability to log in using this auth method. Please retry using another auth method.")]
+    UnsupportedAuthMethod,
 }

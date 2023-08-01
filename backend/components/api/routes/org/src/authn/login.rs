@@ -103,8 +103,7 @@ async fn handler(
             .db_transaction(move |conn| TenantRolebinding::login(conn, &rolebinding_id))
             .await?;
 
-        // TODO: enforce here that the auth method is allowed by the tenant
-        let session_data = TenantRbSession::create(rb.id.clone(), Some(auth_method)).into();
+        let session_data = TenantRbSession::create(&tenant, rb.id.clone(), Some(auth_method))?.into();
 
         let requires_onboarding = tenant_role.scopes.contains(&TenantScope::Admin)
             && (tenant.website_url.is_none() || tenant.company_size.is_none());

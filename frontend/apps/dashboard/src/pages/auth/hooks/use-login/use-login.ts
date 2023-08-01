@@ -21,10 +21,16 @@ const useLogin = () => {
   const toast = useToast();
 
   return useMutation(login, {
-    onError: () => {
+    onError: (e: any) => {
+      let description;
+      if (e.response.status === 401) {
+        description = e.response.data.error.message;
+      } else {
+        description = t('workos-error.description');
+      }
       toast.show({
         title: t('workos-error.title'),
-        description: t('workos-error.description'),
+        description,
         variant: 'error',
       });
       router.replace('/login');

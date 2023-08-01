@@ -121,7 +121,7 @@ async fn post(
             };
             // Create a new workos session for the integration test tenant user
             let session_data =
-                TenantRbSession::create(rb.id.clone(), Some(WorkosAuthMethod::GoogleOauth)).into();
+                TenantRbSession::create(&tenant, rb.id.clone(), Some(WorkosAuthMethod::GoogleOauth))?.into();
             let (auth_token, _) = AuthSession::create_sync(conn, &key, session_data, Duration::minutes(15))?;
 
             //
