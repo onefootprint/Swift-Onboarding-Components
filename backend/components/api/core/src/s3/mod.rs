@@ -41,14 +41,12 @@ impl S3Client {
 
         let delete = Delete::builder().set_objects(Some(delete_objects)).build();
 
-        tracing::info!("s3: deleting objects");
         self.client
             .delete_objects()
             .bucket(bucket)
             .delete(delete)
             .send()
             .await?;
-        tracing::info!("s3: deleted objects");
 
         Ok(())
     }
@@ -68,8 +66,6 @@ impl S3Client {
     {
         let body: ByteStream = ByteStream::from(object);
 
-        tracing::info!(bucket=%bucket, key=%key, "s3: begin put object");
-
         let mut put = self
             .client
             .put_object()
@@ -84,7 +80,6 @@ impl S3Client {
         put.send().await?;
 
         let s3_path = format!("{}{}/{}", S3_PATH_PREFIX, bucket, key);
-        tracing::info!(s3_path=%s3_path, "s3: put object complete");
         Ok(s3_path)
     }
 
@@ -189,7 +184,6 @@ impl S3Client {
     #[allow(unused)]
     #[tracing::instrument(skip(self))]
     pub async fn get_object(&self, bucket: String, object: String) -> Result<actix_web::web::Bytes, S3Error> {
-        tracing::info!("s3: getting object");
         let obj = self
             .client
             .get_object()
@@ -202,7 +196,6 @@ impl S3Client {
             .await
             .map(|b| b.into_bytes())
             .map_err(|e| S3Error::AwsHttpByteStreamError(format!("{:?}", e)))?;
-        tracing::info!("s3: got object");
 
         Ok(obj)
     }

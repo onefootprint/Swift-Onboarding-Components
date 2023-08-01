@@ -13,6 +13,7 @@ use db::models::vault::Vault;
 use db::models::vault_data::VaultData;
 use db::TxnPgConn;
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{BusinessDataKind as BDK, DataLifetimeSeqno, S3Url};
 use newtypes::{
     CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, Fingerprints,
@@ -39,8 +40,8 @@ impl<Type> WriteableVw<Type> {
         request: DataRequest<Fingerprints>,
     ) -> ApiResult<PatchDataResult> {
         request.assert_allowable_identifiers(self.vault.kind)?;
-        let keys = request.keys().cloned().collect();
-        tracing::info!(dis=?keys, "Patching DIs");
+        let keys = request.keys().cloned().collect_vec();
+        tracing::info!(dis=%Csv::from(keys.clone()), "Patching DIs");
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
         let (new_ci, seqno) = if !request.is_empty() {
             // Must do this validation here inside the locked, WriteableUvw

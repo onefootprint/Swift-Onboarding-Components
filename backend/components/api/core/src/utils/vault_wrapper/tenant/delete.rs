@@ -1,7 +1,7 @@
 use super::TenantVw;
 use crate::errors::ApiResult;
 use db::{models::data_lifetime::DataLifetime, TxnPgConn};
-use newtypes::DataIdentifier;
+use newtypes::{output::Csv, DataIdentifier};
 
 impl<Type> TenantVw<Type> {
     /// soft "delete" vault data by deactivating the data-lifetimes to prevent access
@@ -11,7 +11,7 @@ impl<Type> TenantVw<Type> {
         conn: &mut TxnPgConn,
         dis: Vec<DataIdentifier>,
     ) -> ApiResult<Vec<DataIdentifier>> {
-        tracing::info!(dis=?dis, "Deleting DIs");
+        tracing::info!(dis=%Csv::from(dis.clone()), "Deleting DIs");
         let (dis, dls) = dis
             .into_iter()
             // Only allow deleting speculative data so we don't accidentally affect other tenants'
