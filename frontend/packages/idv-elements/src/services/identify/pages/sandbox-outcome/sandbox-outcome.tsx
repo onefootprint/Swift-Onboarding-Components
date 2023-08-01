@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCheck24,
   IcoClose24,
+  IcoCopy24,
   IcoPencil24,
   IcoUser24,
   IcoWarning24,
@@ -11,10 +12,8 @@ import {
   Box,
   Button,
   CopyButton,
-  IconButton,
   RadioSelect,
   TextInput,
-  Tooltip,
   Typography,
 } from '@onefootprint/ui';
 import Hint from '@onefootprint/ui/src/components/internal/hint';
@@ -24,6 +23,8 @@ import { Controller, useForm } from 'react-hook-form';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
+import InlineButton from './components/inline-button';
+import InlineButtonsLayout from './components/inline-buttons-layout';
 import useSkipIfHasBootstrapData from './hooks/use-skip-if-has-bootstrap-data';
 import getRandomID from './utils/get-random-id';
 import parseTestID from './utils/parse-suffix';
@@ -153,7 +154,7 @@ const SandboxOutcome = () => {
               />
             </Box>
             {idInputLocked ? (
-              <>
+              <InlineButtonsLayout>
                 <CopyButton
                   contentToCopy={getValues('testID')}
                   tooltipText={t('test-id.button.copy')}
@@ -161,38 +162,30 @@ const SandboxOutcome = () => {
                   tooltipTextConfirmation={t(
                     'test-id.button.copy-confirmation',
                   )}
+                >
+                  <InlineButton icon={IcoCopy24} />
+                </CopyButton>
+                <InlineButton
+                  onClick={handleSaveOrEdit}
+                  tooltipText={t('test-id.button.edit')}
+                  icon={IcoPencil24}
                 />
-                <Tooltip text={t('test-id.button.edit')}>
-                  <IconButton
-                    aria-label={t('test-id.button.edit')}
-                    onClick={handleSaveOrEdit}
-                  >
-                    <IcoPencil24 />
-                  </IconButton>
-                </Tooltip>
-              </>
+              </InlineButtonsLayout>
             ) : (
-              <>
-                <Tooltip text={t('test-id.button.save')}>
-                  <IconButton
-                    aria-label={t('test-id.button.save')}
-                    onClick={handleSaveOrEdit}
-                    disabled={!!errors?.testID}
-                  >
-                    <IcoCheck24
-                      color={errors?.testID ? 'primary' : 'success'}
-                    />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip text={t('test-id.button.reset')}>
-                  <IconButton
-                    aria-label={t('test-id.button.reset')}
-                    onClick={handleReset}
-                  >
-                    <IcoClose24 color="error" />
-                  </IconButton>
-                </Tooltip>
-              </>
+              <InlineButtonsLayout>
+                <InlineButton
+                  aria-label={t('test-id.button.save')}
+                  onClick={handleSaveOrEdit}
+                  tooltipText={t('test-id.button.save')}
+                  icon={IcoCheck24}
+                  disabled={!!errors?.testID}
+                />
+                <InlineButton
+                  onClick={handleReset}
+                  tooltipText={t('test-id.button.reset')}
+                  icon={IcoClose24}
+                />
+              </InlineButtonsLayout>
             )}
           </InputControls>
           <Hint hasError={!!errors?.testID}>{getHint()}</Hint>
@@ -219,11 +212,8 @@ const InputContainer = styled.div`
 `;
 
 const InputControls = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-  `}
+  display: flex;
+  align-items: center;
 `;
 
 const InputTitle = styled.div`
