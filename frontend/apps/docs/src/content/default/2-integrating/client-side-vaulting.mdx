@@ -104,3 +104,88 @@ curl https://api.onefootprint.com/users/vault \
 ### Example response
 
 A successful response will return status 200 and an empty object.
+
+## Step 4 (optional): Use a client token to decrypt data
+
+Footprint's client side vaulting APIs support two ways of decrypting data: structured decryption and downloads.
+
+### Structured Decrypt Example
+
+Structured decryption is useful when you need to decrypt several smaller fields like `ssn` or `card.*.number` at once. This API is similar to its backend counter-part.
+
+On your backend, create a client side token with a single field and the `decrypt` scope. This token is safe to pass to your frontend because it has a short expiration time and limited scope.
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_token \
+	-X POST \
+    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+    -d '{
+          "fields": [
+            "id.ssn9",
+            "card.primary.number"
+          ],
+          "scopes": [
+            "decrypt"
+          ],
+          "ttl": 180,
+          "decrypt_reason": "test structured"
+      }'
+```
+
+```json
+{
+  "expires_at": "2023-07-31T14:15:22Z",
+  "token": "tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0"
+}
+```
+
+```bash
+curl https://api.onefootprint.com/users/vault/decrypt \
+	-X POST \
+  -H 'x-fp-authorization: tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0' \
+  -d '{
+        "fields": ["id.ssn9", "card.primary.number"]
+      }'
+```
+
+```json
+{
+  "id.ssn9": "1212121212",
+  "card.primary.number": "424242424242424"
+}
+```
+
+### Download Decrypt
+
+Download decryption is most useful for decrypting larger objects like files. This is especially useful when you'd like to have a user download this file directly instead of decrypting it.
+
+On your backend, create a client side token with a single field and the `decrypt_download` scope.
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_token \
+	-X POST \
+  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+  -d '{
+        "fields": [
+          "custom.paystub_w2"
+        ],
+        "scopes": [
+          "decrypt_download"
+        ],
+        "ttl": 180,
+        "decrypt_reason": "download w2 test"
+      }'
+```
+
+```json
+{
+  "expires_at": "2023-07-31T14:15:22Z",
+  "token": "tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0"
+}
+```
+
+Now the client side can decrypt and download this object with a simple GET request. The response body will entirely comprise the contents of the object specified in `fields` above. This can easily be used by your frontend to download the contents directly to the users device.
+
+```bash
+curl https://api.onefootprint.com/users/vault/decrypt/tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0
+```
