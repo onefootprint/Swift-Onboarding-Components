@@ -85,6 +85,7 @@ const SandboxOutcome = () => {
 
   const handleReset = () => {
     resetField('testID');
+    handleSaveOrEdit();
   };
 
   return (
