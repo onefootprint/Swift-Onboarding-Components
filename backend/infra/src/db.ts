@@ -29,10 +29,10 @@ const DEFAULT_PG_PARAMETERS = [
     value: '500',
     applyMethod: 'pending-reboot',
   },
-  // Don't allow any singular query to run for more than 1m. Long-running query workloads will need to override this.
+  // Don't allow any singular query to run for more than 10m. Long-running query workloads will need to override this.
   {
     name: 'statement_timeout',
-    value: '300000', // 5m
+    value: '600000', // 10m
   },
   // Tune query planning
   {
