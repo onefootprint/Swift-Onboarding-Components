@@ -49,6 +49,40 @@ impl<'a> From<(&'a TenantUserId, &'a TenantId)> for TenantRolebindingIdentifier<
     }
 }
 
+// It's hard to type this query in Rust, so we use a macro to share its logic
+macro_rules! list_query {
+    ($params: ident) => {{
+        let mut query = tenant_user::table
+            .inner_join(tenant_rolebinding::table.inner_join(tenant_role::table))
+            .filter(tenant_rolebinding::tenant_id.eq($params.tenant_id))
+            .into_boxed();
+
+        if $params.only_active {
+            query = query.filter(tenant_rolebinding::deactivated_at.is_null())
+        }
+        if let Some(ref role_ids) = $params.role_ids {
+            query = query.filter(tenant_rolebinding::tenant_role_id.eq_any(role_ids));
+        }
+        if let Some(ref search) = $params.search {
+            let pattern = format!("%{}%", search);
+            query = query.filter(
+                tenant_user::first_name
+                    .ilike(pattern.clone())
+                    .or(tenant_user::last_name.ilike(pattern.clone()))
+                    .or(tenant_user::email.ilike(pattern)),
+            )
+        }
+        if let Some(is_invite_pending) = $params.is_invite_pending {
+            match is_invite_pending {
+                true => query = query.filter(tenant_rolebinding::last_login_at.is_null()),
+                false => query = query.filter(not(tenant_rolebinding::last_login_at.is_null())),
+            }
+        }
+
+        query
+    }};
+}
+
 impl TenantRolebinding {
     /// Gets or creates the TenantUser with the provided email, and creates a rolebinding to
     /// associate the TenantUser with the provided role
@@ -204,33 +238,7 @@ impl TenantRolebinding {
 
     #[tracing::instrument("TenantRolebinding::count", skip_all)]
     pub fn count(conn: &mut PgConn, filters: &TenantRolebindingFilters) -> DbResult<i64> {
-        // Apply filters. TODO share these with list
-        let mut query = tenant_user::table
-            .inner_join(tenant_rolebinding::table)
-            .filter(tenant_rolebinding::tenant_id.eq(filters.tenant_id))
-            .into_boxed();
-
-        if filters.only_active {
-            query = query.filter(tenant_rolebinding::deactivated_at.is_null())
-        }
-        if let Some(ref role_ids) = filters.role_ids {
-            query = query.filter(tenant_rolebinding::tenant_role_id.eq_any(role_ids));
-        }
-        if let Some(ref search) = filters.search {
-            let pattern = format!("%{}%", search);
-            query = query.filter(
-                tenant_user::first_name
-                    .ilike(pattern.clone())
-                    .or(tenant_user::last_name.ilike(pattern.clone()))
-                    .or(tenant_user::email.ilike(pattern)),
-            )
-        }
-        if let Some(is_invite_pending) = filters.is_invite_pending {
-            match is_invite_pending {
-                true => query = query.filter(tenant_rolebinding::last_login_at.is_null()),
-                false => query = query.filter(not(tenant_rolebinding::last_login_at.is_null())),
-            }
-        }
+        let query = list_query!(filters);
 
         let count = query.count().get_result(conn)?;
         Ok(count)
@@ -242,33 +250,7 @@ impl TenantRolebinding {
         filters: &TenantRolebindingFilters,
         pagination: OffsetPagination,
     ) -> DbResult<(Vec<BasicTenantUserInfo>, NextPage)> {
-        // Apply filters. TODO share these with count. Do list of filters
-        let mut query = tenant_user::table
-            .inner_join(tenant_rolebinding::table.inner_join(tenant_role::table))
-            .filter(tenant_rolebinding::tenant_id.eq(filters.tenant_id))
-            .into_boxed();
-
-        if filters.only_active {
-            query = query.filter(tenant_rolebinding::deactivated_at.is_null())
-        }
-        if let Some(ref role_ids) = filters.role_ids {
-            query = query.filter(tenant_rolebinding::tenant_role_id.eq_any(role_ids));
-        }
-        if let Some(ref search) = filters.search {
-            let pattern = format!("%{}%", search);
-            query = query.filter(
-                tenant_user::first_name
-                    .ilike(pattern.clone())
-                    .or(tenant_user::last_name.ilike(pattern.clone()))
-                    .or(tenant_user::email.ilike(pattern)),
-            )
-        }
-        if let Some(is_invite_pending) = filters.is_invite_pending {
-            match is_invite_pending {
-                true => query = query.filter(tenant_rolebinding::last_login_at.is_null()),
-                false => query = query.filter(not(tenant_rolebinding::last_login_at.is_null())),
-            }
-        }
+        let mut query = list_query!(filters);
 
         // Apply pagination filters
         if let Some(offset) = pagination.offset() {
