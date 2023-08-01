@@ -172,3 +172,30 @@ define_newtype_id!(WorkflowId, String, "Identifier for a workflow");
 define_newtype_id!(WorkflowEventId, String, "Identifier for a workflow_event");
 define_newtype_id!(S3Url, String, "URL to S3 for document data");
 define_newtype_id!(RiskSignalGroupId, String, "Identifier for a risk_signal_group");
+define_newtype_id!(
+    StytchFingerprintEventId,
+    String,
+    "Identifier for a stytch_fingerprint_event"
+);
+define_newtype_id!(
+    StytchBrowserFingerprint,
+    String,
+    "Stytch generated browser_fingerprint"
+);
+define_newtype_id!(StytchBrowserId, String, "Stytch generated browser_id");
+define_newtype_id!(
+    StytchHardwareFingerprint,
+    String,
+    "Stytch generated hardware_fingerprint"
+);
+define_newtype_id!(
+    StytchNetworkFingerprint,
+    String,
+    "Stytch generated network_fingerprint"
+);
+define_newtype_id!(
+    StytchVisitorFingerprint,
+    String,
+    "Stytch generated visitor_fingerprint"
+);
+define_newtype_id!(StytchVisitorId, String, "Stytch generated visitor_id");
