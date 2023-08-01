@@ -24,6 +24,8 @@ pub struct BulkDecryptReq<T = Any> {
     pub targets: Vec<EnclaveDecryptOperation>,
 }
 
+const MAX_ACCESS_EVENTS: usize = 5000;
+
 pub async fn bulk_decrypt<TKey, T>(
     state: &State,
     requests: HashMap<TKey, BulkDecryptReq<T>>,
@@ -91,6 +93,8 @@ where
                         .ok_or(AssertionError("No ScopedVault for key"))?;
                     // Combine decrypts for one fp_id into a single access event
                     let targets = targets.into_iter().flatten().unique().collect();
+                    // NOTE: If we add any more fields to the access event, we might have to lower
+                    // the chunk size below or we'll hit a max size for an insert statement.
                     let access_event = NewAccessEventRow {
                         scoped_vault_id: sv.id,
                         tenant_id: sv.tenant_id,
@@ -103,8 +107,11 @@ where
                     };
                     Ok(access_event)
                 })
-                .collect::<ApiResult<_>>()?;
-            AccessEvent::bulk_create(conn, access_events)?;
+                .collect::<ApiResult<Vec<_>>>()?;
+
+            for access_events in access_events.into_iter().chunks(MAX_ACCESS_EVENTS).into_iter() {
+                AccessEvent::bulk_create(conn, access_events.into_iter().collect())?;
+            }
             Ok(())
         })
         .await??;
