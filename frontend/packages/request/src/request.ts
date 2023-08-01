@@ -3,7 +3,7 @@ import { DataIdentifierKeys } from '@onefootprint/types';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
-const LOGOUT_ERROR = 'Session expired or does not exist';
+const LOGOUT_ERRORS = ['Session expired or does not exist', 'Session invalid'];
 
 export type FootprintServerError = {
   message: string;
@@ -44,7 +44,7 @@ export const isLogoutError = (error: unknown) => {
   const serverError = isFootprintServerError(error);
   return !!(
     serverError?.statusCode === 401 &&
-    serverError?.message?.includes(LOGOUT_ERROR)
+    LOGOUT_ERRORS.some(e => serverError?.message?.includes(e))
   );
 };
 

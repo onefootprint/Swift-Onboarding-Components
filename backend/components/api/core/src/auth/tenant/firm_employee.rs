@@ -17,7 +17,7 @@ use db::{
     PgConn,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::TenantScope;
+use newtypes::{TenantScope, WorkosAuthMethod};
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -28,6 +28,8 @@ pub struct FirmEmployeeAuth {
     tenant_user: TenantUser,
     role: TenantRole,
     is_risk_ops: bool,
+    // TODO make this non-null after old session expires
+    pub(super) auth_method: Option<WorkosAuthMethod>,
 }
 
 /// Nests a private FirmEmployeeAuth and implements traits required to extract this session from an
@@ -43,7 +45,7 @@ pub struct FirmEmployeeAuth {
     name = "X-Fp-Dashboard-Authorization",
     description = "Short-lived auth token for a firm-employee dashboard user."
 )]
-pub struct ParsedFirmEmployeeAuth(FirmEmployeeAuth);
+pub struct ParsedFirmEmployeeAuth(pub(super) FirmEmployeeAuth);
 
 /// A shorthand for the extractor for a firm employee auth session
 pub type FirmEmployeeAuthContext = SessionContext<ParsedFirmEmployeeAuth>;
@@ -83,6 +85,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
             tenant_user,
             role,
             is_risk_ops,
+            auth_method: data.auth_method,
         }))
     }
 
@@ -180,7 +183,7 @@ mod test {
     use crate::auth::{session::AuthSessionData, SessionContext};
     use db::tests::prelude::*;
     use macros::db_test_case;
-    use newtypes::TenantScope;
+    use newtypes::{TenantScope, WorkosAuthMethod};
 
     #[db_test_case(false => vec![TenantScope::Read])]
     #[db_test_case(true => vec![
@@ -197,12 +200,14 @@ mod test {
         let session_data = AuthSessionData::FirmEmployee(FirmEmployeeSession {
             tenant_user_id: tenant_user.id.clone(),
             tenant_id: tenant.id.clone(),
+            auth_method: Some(WorkosAuthMethod::GoogleOauth),
         });
         let data = FirmEmployeeAuth {
             tenant,
             tenant_user,
             role,
             is_risk_ops,
+            auth_method: Some(WorkosAuthMethod::GoogleOauth),
         };
         let data = ParsedFirmEmployeeAuth(data);
         let auth = SessionContext::create_fixture(data, session_data);

@@ -16,7 +16,7 @@ use db::{
     PgConn,
 };
 use feature_flag::FeatureFlagClient;
-use newtypes::TenantScope;
+use newtypes::{TenantRolebindingId, TenantScope, WorkosAuthMethod};
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -28,6 +28,8 @@ pub struct TenantRbAuth {
     tenant_user: TenantUser,
     #[allow(unused)]
     tenant_rolebinding: TenantRolebinding,
+    // TODO make this non-null after old session expires
+    pub(super) auth_method: Option<WorkosAuthMethod>,
 }
 
 /// Nests a private TenantRbAuth and implements traits required to extract this session from an
@@ -43,12 +45,13 @@ pub struct TenantRbAuth {
     name = "X-Fp-Dashboard-Authorization",
     description = "Short-lived token for an authenticated dashboard user."
 )]
-pub struct ParsedTenantRbAuth(TenantRbAuth);
+pub struct ParsedTenantRbAuth(pub(super) TenantRbAuth);
 
-impl From<TenantRolebinding> for TenantRbSession {
-    fn from(rb: TenantRolebinding) -> Self {
+impl TenantRbSession {
+    pub fn create(rb_id: TenantRolebindingId, auth_method: Option<WorkosAuthMethod>) -> Self {
         Self {
-            tenant_rolebinding_id: rb.id,
+            tenant_rolebinding_id: rb_id,
+            auth_method,
         }
     }
 }
@@ -78,6 +81,7 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
             tenant_rolebinding: rb,
             tenant_role: tr,
             tenant_user: tu,
+            auth_method: data.auth_method,
         }))
     }
 

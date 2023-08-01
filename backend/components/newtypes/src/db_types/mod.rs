@@ -38,6 +38,7 @@ mod verification_status;
 mod watchlist_check;
 mod workflow;
 mod workflow_fixture_result;
+mod workos_auth_method;
 
 pub use self::{
     access_event_kind::*, actor::*, attestation_type::*, business_owner_kind::*, company_size::*,
@@ -49,4 +50,5 @@ pub use self::{
     risk_signal_group::*, sealed_bytes::*, session_kind::*, task_status::*, tenant_scope::*,
     user_timeline_event::*, vault_key_pair::*, vault_kind::*, vault_proxy_permission::*, vendor::*,
     verification_status::*, watchlist_check::*, workflow::*, workflow_fixture_result::*,
+    workos_auth_method::*,
 };

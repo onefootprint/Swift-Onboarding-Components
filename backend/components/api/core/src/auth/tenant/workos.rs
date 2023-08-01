@@ -9,7 +9,7 @@ use crate::{
 };
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use newtypes::TenantUserId;
+use newtypes::{TenantUserId, WorkosAuthMethod};
 use paperclip::actix::Apiv2Security;
 
 /// Represents a session where a user has logged in but is part of multiple tenants and hasn't yet
@@ -24,6 +24,8 @@ use paperclip::actix::Apiv2Security;
 )]
 pub struct WorkOsSessionData {
     pub tenant_user_id: TenantUserId,
+    // TODO make this non-null after old session expires
+    pub auth_method: Option<WorkosAuthMethod>,
 }
 
 impl ExtractableAuthSession for WorkOsSessionData {
@@ -38,8 +40,14 @@ impl ExtractableAuthSession for WorkOsSessionData {
     ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::WorkOs(data) => {
-                let WorkOsSession { tenant_user_id } = data;
-                Self { tenant_user_id }
+                let WorkOsSession {
+                    tenant_user_id,
+                    auth_method,
+                } = data;
+                Self {
+                    tenant_user_id,
+                    auth_method,
+                }
             }
             _ => {
                 return Err(AuthError::SessionTypeError.into());

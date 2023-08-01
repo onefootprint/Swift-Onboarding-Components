@@ -28,6 +28,7 @@ async fn post(
     auth: TenantSessionAuth,
     request: Json<AssumeRequest>,
 ) -> JsonApiResponse<api_wire_types::Organization> {
+    let auth_method = auth.auth_method();
     let firm_employee = auth.firm_employee_user()?;
     let session_sealing_key = state.session_sealing_key.clone();
     let tenant_id = request.into_inner().tenant_id;
@@ -48,6 +49,7 @@ async fn post(
             let session = FirmEmployeeSession {
                 tenant_user_id: firm_employee.id,
                 tenant_id,
+                auth_method,
             };
             auth.update_session(conn, &session_sealing_key, AuthSessionData::FirmEmployee(session))?;
             Ok(tenant)

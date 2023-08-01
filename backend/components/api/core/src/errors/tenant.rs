@@ -3,6 +3,8 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum TenantError {
+    #[error("Unknown workos auth method: {0}")]
+    UnknownWorkosAuthMethod(String),
     #[error("Validation error: {0}")]
     ValidationError(String),
     #[error("Cannot edit the currently logged-in user")]

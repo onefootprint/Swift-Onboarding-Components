@@ -7,6 +7,7 @@ use db::models::tenant::Tenant;
 use db::models::tenant_user::TenantUser;
 
 mod secret_key;
+use newtypes::WorkosAuthMethod;
 pub use secret_key::*;
 mod tenant_rb;
 pub use self::tenant_rb::*;
@@ -48,6 +49,22 @@ impl AnyTenantSessionAuth {
             }
         };
         Ok(tu_id)
+    }
+
+    pub fn auth_method(&self) -> Option<WorkosAuthMethod> {
+        match self {
+            Either::Left(l) => l.data.auth_method,
+            Either::Right(r) => r.auth_method(),
+        }
+    }
+}
+
+impl TenantSessionAuth {
+    pub fn auth_method(&self) -> Option<WorkosAuthMethod> {
+        match self {
+            Either::Left(l) => l.data.0.auth_method,
+            Either::Right(r) => r.data.0.auth_method,
+        }
     }
 }
 

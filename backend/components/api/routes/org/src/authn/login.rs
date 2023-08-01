@@ -9,7 +9,7 @@ use crate::utils::email_domain;
 use crate::utils::session::AuthSession;
 use crate::State;
 use crate::{errors::ApiError, types::response::ResponseData};
-use api_core::auth::session::tenant::WorkOsSession;
+use api_core::auth::session::tenant::{TenantRbSession, WorkOsSession};
 use api_wire_types::{OrgLoginRequest, OrgLoginResponse};
 use api_wire_types::{Organization, OrganizationMember};
 use chrono::Duration;
@@ -19,12 +19,25 @@ use db::models::tenant_rolebinding::{TenantRolebinding, TenantRolebindingFilters
 use db::models::tenant_user::TenantUser;
 use db::OffsetPagination;
 use itertools::Itertools;
-use newtypes::{OrgMemberEmail, TenantRolebindingId, TenantScope, TenantUserId};
+use newtypes::{OrgMemberEmail, TenantRolebindingId, TenantScope, TenantUserId, WorkosAuthMethod};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::sso::{
-    AuthorizationCode, ClientId, GetProfileAndToken, GetProfileAndTokenParams, GetProfileAndTokenResponse,
-    Profile,
+    AuthorizationCode, ClientId, ConnectionType, GetProfileAndToken, GetProfileAndTokenParams,
+    GetProfileAndTokenResponse, Profile,
 };
+use workos::KnownOrUnknown;
+
+fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> ApiResult<WorkosAuthMethod> {
+    // To protect against MagcicLink becoming a known type, check based on the string representation
+    // of the connection type. Sadly, Display isn't implemented so have to check the serialization
+    let connection_type = serde_json::ser::to_string(&connection_type)?;
+    let result = match connection_type.as_ref() {
+        "\"GoogleOAuth\"" => WorkosAuthMethod::GoogleOauth,
+        "\"MagicLink\"" => WorkosAuthMethod::MagicLink,
+        _ => return Err(TenantError::UnknownWorkosAuthMethod(connection_type).into()),
+    };
+    Ok(result)
+}
 
 #[api_v2_operation(
     tags(Private),
@@ -50,6 +63,7 @@ async fn handler(
     tracing::info!(org_id =?profile.organization_id, id = ?profile.id, "workos login");
 
     let profile2 = profile.clone();
+    let auth_method = get_auth_method(&profile.connection_type)?;
     // Get all matching tenant rolebindings.
     let (user, matching_rolebindings) = state
         .db_pool
@@ -89,7 +103,8 @@ async fn handler(
             .db_transaction(move |conn| TenantRolebinding::login(conn, &rolebinding_id))
             .await?;
 
-        let session_data = AuthSessionData::TenantRb(rb.clone().into());
+        // TODO: enforce here that the auth method is allowed by the tenant
+        let session_data = TenantRbSession::create(rb.id.clone(), Some(auth_method)).into();
 
         let requires_onboarding = tenant_role.scopes.contains(&TenantScope::Admin)
             && (tenant.website_url.is_none() || tenant.company_size.is_none());
@@ -103,11 +118,12 @@ async fn handler(
         // TODO one day support footprint firm employees
         let session_data = AuthSessionData::WorkOs(WorkOsSession {
             tenant_user_id: user.id,
+            auth_method: Some(auth_method),
         });
         (session_data, false, None, None, false)
     };
     // Save tenant login in session data into the DB
-    let auth_token = AuthSession::create(&state, session, Duration::hours(8)).await?;
+    let auth_token = AuthSession::create(&state, session, Duration::hours(24)).await?;
     let data = OrgLoginResponse {
         auth_token,
         created_new_tenant,

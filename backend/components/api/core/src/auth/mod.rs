@@ -39,8 +39,12 @@ pub enum AuthError {
     InvalidBody,
     #[error("Incorrect session type auth")]
     SessionTypeError,
+    // Do not change this - frontend matches on exact error string
     #[error("Session expired or does not exist")]
     NoSessionFound,
+    // Do not change this - frontend matches on exact error string
+    #[error("Session invalid")]
+    CouldNotParseSession,
     #[error("Not allowed: restricted to sandbox mode")]
     SandboxRestricted,
     #[error("Not allowed: required permission is missing: {0}")]

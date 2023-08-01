@@ -26,7 +26,7 @@ impl AuthSession {
         let session = if let Some(session) = session {
             let data = AuthSessionData::unseal(&state.session_sealing_key, SealedSessionBytes(session.data));
             let data = if let Err(crypto::Error::Cbor(_)) = data {
-                return Err(AuthError::NoSessionFound.into());
+                return Err(AuthError::CouldNotParseSession.into());
             } else {
                 data?
             };

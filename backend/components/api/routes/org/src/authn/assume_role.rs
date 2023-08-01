@@ -1,9 +1,10 @@
-use crate::auth::session::{AuthSessionData, UpdateSession};
+use crate::auth::session::UpdateSession;
 
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::session::tenant::TenantRbSession;
 use api_core::auth::tenant::AnyTenantSessionAuth;
 use api_wire_types::{AssumeRoleRequest, AssumeRoleResponse, Organization, OrganizationMember};
 use db::models::tenant_rolebinding::TenantRolebinding;
@@ -22,13 +23,15 @@ fn post(
     tenant_auth: AnyTenantSessionAuth,
 ) -> actix_web::Result<Json<ResponseData<AssumeRoleResponse>>, ApiError> {
     let AssumeRoleRequest { tenant_id } = request.into_inner();
+    let auth_method = tenant_auth.auth_method();
     let tu_id = tenant_auth.clone().tenant_user_id()?;
 
     let ((tenant_user, rb, tenant_role, tenant), _) = state
         .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &tenant_id)))
         .await?;
-    let session_data = AuthSessionData::TenantRb(rb.clone().into());
+    // Assert auth method is supported?
+    let session_data = TenantRbSession::create(rb.id.clone(), auth_method).into();
 
     let session_sealing_key = state.session_sealing_key.clone();
     // Update the auth session to contain the newly assumed role.

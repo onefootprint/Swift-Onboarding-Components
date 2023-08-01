@@ -1,13 +1,13 @@
 use std::str::FromStr;
 
 use crate::auth::custodian::CustodianAuthContext;
-use crate::auth::session::AuthSessionData;
 use crate::errors::tenant::TenantError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::session::AuthSession;
 use crate::State;
+use api_core::auth::session::tenant::TenantRbSession;
 use chrono::Duration;
 use db::models::tenant::{NewIntegrationTestTenant, Tenant};
 use db::models::tenant_api_key::TenantApiKey;
@@ -15,7 +15,9 @@ use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{OrgMemberEmail, SessionAuthToken, TenantId, TenantUserId, INTEGRATION_TEST_USER_EMAIL};
+use newtypes::{
+    OrgMemberEmail, SessionAuthToken, TenantId, TenantUserId, WorkosAuthMethod, INTEGRATION_TEST_USER_EMAIL,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -118,7 +120,8 @@ async fn post(
                 }
             };
             // Create a new workos session for the integration test tenant user
-            let session_data = AuthSessionData::TenantRb(rb.clone().into());
+            let session_data =
+                TenantRbSession::create(rb.id.clone(), Some(WorkosAuthMethod::GoogleOauth)).into();
             let (auth_token, _) = AuthSession::create_sync(conn, &key, session_data, Duration::minutes(15))?;
 
             //

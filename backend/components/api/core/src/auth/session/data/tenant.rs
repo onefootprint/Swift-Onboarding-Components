@@ -1,4 +1,4 @@
-use newtypes::{FpId, TenantApiKeyId, TenantId, TenantRolebindingId, TenantUserId};
+use newtypes::{FpId, TenantApiKeyId, TenantId, TenantRolebindingId, TenantUserId, WorkosAuthMethod};
 
 use crate::auth::tenant::ClientTenantScope;
 
@@ -7,6 +7,15 @@ use crate::auth::tenant::ClientTenantScope;
 /// single Tenant
 pub struct TenantRbSession {
     pub tenant_rolebinding_id: TenantRolebindingId,
+    // TODO make this non-null after old session expires
+    /// The auth method used to log in via workos
+    pub auth_method: Option<WorkosAuthMethod>,
+}
+
+impl From<TenantRbSession> for super::AuthSessionData {
+    fn from(value: TenantRbSession) -> Self {
+        Self::TenantRb(value)
+    }
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -17,6 +26,9 @@ pub struct FirmEmployeeSession {
     pub tenant_user_id: TenantUserId,
     /// The TenantId whose role is being assumed by this firm employee
     pub tenant_id: TenantId,
+    // TODO make this non-null after old session expires
+    /// The auth method used to log in via workos
+    pub auth_method: Option<WorkosAuthMethod>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -25,6 +37,9 @@ pub struct FirmEmployeeSession {
 pub struct WorkOsSession {
     /// The TenantUserId that is proven to be owned via a workos auth
     pub tenant_user_id: TenantUserId,
+    // TODO make this non-null after old session expires
+    /// The auth method used to log in via workos
+    pub auth_method: Option<WorkosAuthMethod>,
 }
 
 /// Short-lived token that temporarily gives a tenant's access to perform operations on a single user.
