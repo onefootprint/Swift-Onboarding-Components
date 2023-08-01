@@ -167,7 +167,7 @@ Using the token template format above, simply concatentate zero or more filter f
 | `replace(from,to)`                   | Replaces all matches of the string `from` with the string `to` in the target utf-8 string.                                                                                                                                                                     |
 | `date_format(from_format,to_format)` | Parses the target string in date format `from_format` and then converts it to date format `to_format`. Supports [`strftime` format strings](https://strftime.org). Uses of this filter will error if the target string is not codable in the supplied formats. |
 | `hmac_sha256(key)`                   | HMAC-SHA256 algorithm where the `key` argument is parsed as a HEX-encoded string, and the output is HEX-encoded.                                                                                                                                               |
-| `encrypt(algorithm, public_key)`     | Asymmetrically encrypts the contents to a public-key, where algorithm is either `rsa_pkcs1v15` or `ecies_p256_x963_sha256_aes_gcm` and the corresponding public key is a HEX-encoded DER-formatted public key.                                                 |
+| `encrypt(algorithm, public_key)`     | Asymmetrically encrypts the contents to a public-key, where algorithm is either `rsa_pkcs1v15` or `ecies_p256_x963_sha256_aes_gcm` and the corresponding public key is a HEX-encoded DER-formatted public key. RSA public-keys must be formatted with PKCS#8.  |
 
 <inline-alert variant="info">
   String arguments to filter functions must be enclosed in either `"` or `'`

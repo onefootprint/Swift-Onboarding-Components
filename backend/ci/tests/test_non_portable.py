@@ -518,7 +518,7 @@ def test_decrypt_rsa_encrypt(sandbox_tenant):
     public_key = private_key.public_key()
     pk_der = public_key.public_bytes(
         encoding=serialization.Encoding.DER,
-        format=serialization.PublicFormat.PKCS1,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
     ).hex()
 
     # do our re-encrypt

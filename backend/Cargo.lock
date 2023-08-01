@@ -2719,7 +2719,6 @@ dependencies = [
  "hmac",
  "p256",
  "pem 1.1.1",
- "pkcs1 0.7.5",
  "rand 0.8.5",
  "rand_core 0.6.4",
  "rsa 0.9.2",

@@ -6,7 +6,7 @@ use crate::{DataTransform, EncryptTransformAlgorithm};
 
 #[derive(Error, Debug)]
 pub enum TransformError {
-    #[error("failed cryptographic operation: {0}")]
+    #[error("cryptography error: {0}")]
     CryptoError(#[from] crypto::Error),
 
     #[error("invalid utf-8 string")]
@@ -149,7 +149,8 @@ mod tests {
     #[test]
     fn test_rsa_encrypt() {
         let input = "footprint hello world";
-        let pk_der = crypto::hex::decode("3082010a0282010100ebe06f857cf432c7ac5994e95651f3af27cd2653ee92a42ae4d46c614f0e29b408d5ae0905736d765dcfb304bb5ca9f6c2557979c8c1250cd2d1cb832150a9e3fc4c554ccea1ce98744c2ec3a02998ef3146e0a441c403860af9c123f729820e3b62a6877d75734b9b69c4ec60b9bbae85a0582515f6b1deda43f542e74dbdfe85ba0a2be5d440f1d1745c7f4808c81509520adb3ed7e9fa9078fb481e495d6bcb8a7a780c46ad88a3c4bdf6da73e3d4d11b4f2a720b7ad99e49d5952d004dc6bcc462e3fac6e8fcdbb419c63e3fc028fa4c2ab91d5adcb48a984a4b2e430b843c563672753eafd43e3b2c7fbedae73f2bd40a44e69b059c77dd48397307e6590203010001").expect("hex decode");
+
+        let pk_der = crypto::hex::decode("30820122300d06092a864886f70d01010105000382010f003082010a0282010100d1bd6da56e6cea4fddeed843a66ba94e534cbdaf61f90427d7b734ca9a36bb358cfb3a63e4e017c248f3ed39a6325fd48aed569bb59384870c050f8a2f39b8e7dd145f14935b1cce4905d6580133a78624a7120262c3470351a92eda9d03eac641ccb1dd3264761d7ee5259109c4494229146b9c1c02912cf8bfcd066f0078acbfaeab438dbd018c0a99be854f7b8276cc994fc306f1ac8b29b920909b195e6c81ed8bdefe99a7e51aecbff5757c6b0d4584a6cce68790c6cf4cd09e3dc756bb6aaa4812e5b7676db8510c2e1b3468d2f377a4fdd8192e5c7c58d58e5690157d04cdabe5e06eeef46d88a663e4cbf0357835b20b9d0afc5d0d442b586f8524c30203010001").expect("hex decode");
 
         let _ = test_apply_data_tranform(
             vec![Encrypt {

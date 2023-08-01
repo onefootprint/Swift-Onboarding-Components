@@ -268,9 +268,11 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::S3Error(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiErrorKind::EnclaveDataTransformError(_) | ApiErrorKind::EnclaveError(_) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
+            ApiErrorKind::EnclaveDataTransformError(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::EnclaveError(enclave::EnclaveError::Enclave(
+                enclave_proxy::EnclaveError::EnclaveError(err),
+            )) if err.starts_with("TransformError") => StatusCode::BAD_REQUEST, // a little hacky, but for future need structured errors from enclave!
+            ApiErrorKind::EnclaveError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::Database(e) => status_code_for_db_error(e),
             ApiErrorKind::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
