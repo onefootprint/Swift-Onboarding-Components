@@ -60,7 +60,7 @@ impl SecretApiKey {
 
     /// Determines if an ob config public key may have been accidentally provided as the secret key
     pub fn is_maybe_ob_config_key(&self) -> bool {
-        &self.0[..3] == "ob_"
+        self.0.starts_with("ob_")
     }
 }
 

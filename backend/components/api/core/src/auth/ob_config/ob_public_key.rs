@@ -51,7 +51,7 @@ impl FromRequest for PublicOnboardingContext {
                 .map_err(|e| -> Self::Error {
                     if e.is_not_found() {
                         // Slightly more informative error message when we can't find an ObConfig with this key
-                        if &key2[..3] == "sk_" {
+                        if key2.starts_with("sk_") {
                             AuthError::ApiKeyUsedForObConfig.into()
                         } else {
                             AuthError::ObConfigNotFound.into()
