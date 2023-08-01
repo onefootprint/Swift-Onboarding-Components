@@ -1,20 +1,15 @@
 import {
   CLIENT_PUBLIC_KEY_HEADER,
+  HostedUrlType,
   KYB_BO_SESSION_AUTHORIZATION_HEADER,
   ObConfigAuth,
 } from '@onefootprint/types';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-export enum TokenType {
-  beneficialOwner = 'bo',
-  onboardingConfigPublicKey = 'ob_pk',
-  user = 'user',
-}
-
 const ObConfigAuthHeaderByTokenKind = {
-  [TokenType.beneficialOwner]: KYB_BO_SESSION_AUTHORIZATION_HEADER,
-  [TokenType.onboardingConfigPublicKey]: CLIENT_PUBLIC_KEY_HEADER,
+  [HostedUrlType.beneficialOwner]: KYB_BO_SESSION_AUTHORIZATION_HEADER,
+  [HostedUrlType.onboardingConfigPublicKey]: CLIENT_PUBLIC_KEY_HEADER,
 };
 
 export type UseParseUrlParamOptions = {
@@ -35,7 +30,7 @@ const useParseUrl = (options: UseParseUrlParamOptions = {}) => {
     if (
       !type ||
       typeof type !== 'string' ||
-      !Object.values(TokenType).includes(type as TokenType)
+      !Object.values(HostedUrlType).includes(type as HostedUrlType)
     ) {
       onError?.();
       return;
@@ -53,8 +48,8 @@ const useParseUrl = (options: UseParseUrlParamOptions = {}) => {
       return;
     }
 
-    const tokenKind = type as TokenType;
-    if (tokenKind === TokenType.user) {
+    const tokenKind = type as HostedUrlType;
+    if (tokenKind === HostedUrlType.user) {
       onSuccess?.(undefined, token);
     } else {
       const authHeader = ObConfigAuthHeaderByTokenKind[tokenKind];

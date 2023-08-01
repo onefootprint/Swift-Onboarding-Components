@@ -7,6 +7,7 @@ import PermissionGate from 'src/components/permission-gate';
 
 import EditName, { EditNameHandler } from './components/edit-name';
 import Status, { StatusHandler } from './components/status';
+import getPermanentLink from './utils/get-permanent-link';
 
 type ActionsProps = {
   onboardingConfig: OnboardingConfig;
@@ -24,6 +25,11 @@ const Actions = ({ onboardingConfig }: ActionsProps) => {
 
   const launchEditName = () => {
     editNameRef.current?.launch();
+  };
+
+  const copyLinkToClipboard = () => {
+    const permanentLink = getPermanentLink(onboardingConfig);
+    navigator.clipboard.writeText(permanentLink);
   };
 
   return (
@@ -54,6 +60,12 @@ const Actions = ({ onboardingConfig }: ActionsProps) => {
             {onboardingConfig.status === 'enabled'
               ? t('status.disable.cta')
               : t('status.enable')}
+          </Dropdown.Item>
+          <Dropdown.Item
+            onSelect={copyLinkToClipboard}
+            onClick={event => event.stopPropagation()}
+          >
+            {t('get-link.cta')}
           </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>

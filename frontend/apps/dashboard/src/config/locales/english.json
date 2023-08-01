@@ -1328,6 +1328,9 @@
                 "description": "Onboarding configuration name changed!"
               }
             }
+          },
+          "get-link": {
+            "cta": "Get shareable link"
           }
         },
         "create": {

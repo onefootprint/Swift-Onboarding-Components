@@ -18,6 +18,7 @@ export * from './collected-data-option';
 export { default as ComplianceStatus } from './compliance-status';
 export * from './countries';
 export * from './d2p-meta';
+export { default as HostedUrlType } from './hosted-url-type';
 export { default as D2PStatus } from './d2p-status';
 export { default as D2PStatusUpdate } from './d2p-status-update';
 export * from './date-range';

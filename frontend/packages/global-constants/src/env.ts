@@ -52,6 +52,12 @@ export const DASHBOARD_BASE_URL = createGetProjectUrl({
   prodAlias: 'dashboard',
 })(env, branchName);
 
+export const HOSTED_BASE_URL = createGetProjectUrl({
+  port: '3004',
+  previewAlias: 'hosted',
+  prodAlias: 'verify',
+})(env, branchName);
+
 export const HANDOFF_BASE_URL = createGetProjectUrl({
   port: '3005',
   local: process.env.NEXT_PUBLIC_LOCAL_HANDOFF_BASE_URL,

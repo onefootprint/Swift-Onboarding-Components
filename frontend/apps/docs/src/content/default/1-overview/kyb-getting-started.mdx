@@ -129,7 +129,7 @@ for both the primary beneficial owner of the business (the user who submitted th
 
 ### Check the onboarding decision status
 
-Using the `status` and `requires_manual_review` fields to decide whether or not to onboard this user to your product.
+Using the `status` and `requires_manual_review` fields to decide whether or not to onboard this business to your product.
 
 | Status | Review | What does this mean?                                                                        |
 | ------ | ------ | ------------------------------------------------------------------------------------------- |
@@ -138,7 +138,7 @@ Using the `status` and `requires_manual_review` fields to decide whether or not 
 | `fail` | False  | Verification failed. Do not onboard this user.                                              |
 | `fail` | True   | Verification failed, but Footprint suggests manually checking possible acceptance criteria. |
 
-### Optionally, decrypt identity fields from the user’s vault:
+### Optionally, decrypt identity fields from the user and business vaults:
 
 ```bash
 curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/decrypt \
