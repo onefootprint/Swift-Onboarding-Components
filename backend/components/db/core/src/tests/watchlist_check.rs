@@ -103,7 +103,7 @@ fn make_vault(
         let sv = fixtures::scoped_vault::create(conn, &uvid, &ob_config.id);
         let svid = sv.id.clone();
         if let Some(ob_decision_made_at) = ob_decision_made_at {
-            let onboarding = fixtures::onboarding::create(conn, svid, ob_config.id);
+            let onboarding = fixtures::onboarding::create(conn, svid, ob_config.id, None);
             let ob = Onboarding::lock(conn, &onboarding.id).unwrap();
             Onboarding::update(
                 ob,

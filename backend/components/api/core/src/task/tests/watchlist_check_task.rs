@@ -337,16 +337,16 @@ async fn setup(
     MockWebhookClient,
     Config,
 ) {
-    let (_tenant, _onboarding, _uv, sv, task) = db_pool
+    let (sv, task) = db_pool
         .db_transaction(move |conn| -> DbResult<_> {
-            let (tenant, onboarding, uv, sv) = crate::tests::fixtures::lib::create_user_and_onboarding(
+            let (_, _, _, sv, _) = crate::tests::fixtures::lib::create_user_and_onboarding(
                 conn,
                 is_live,
                 onboarding_status,
                 idks,
             );
             let task = fixtures::task::create_watchlist_check(conn, &sv.id);
-            Ok((tenant, onboarding, uv, sv, task))
+            Ok((sv, task))
         })
         .await
         .unwrap();

@@ -26,7 +26,8 @@ def test_deterministic_onboarding(
     )
     bifrost.run()
 
-    bifrost.validate_response["user"]["status"] == expected_status
-    bifrost.validate_response["user"][
-        "requires_manual_review"
-    ] == expected_requires_manual_review
+    assert bifrost.validate_response["user"]["status"] == expected_status
+    assert (
+        bifrost.validate_response["user"]["requires_manual_review"]
+        == expected_requires_manual_review
+    )

@@ -295,7 +295,7 @@ mod tests {
             conn, &sv.id, &wf.id,
         )
         .unwrap();
-        let ob = fixtures::onboarding::create(conn, sv.id.clone(), obc.id);
+        let ob = fixtures::onboarding::create(conn, sv.id.clone(), obc.id, None);
         let ob = Onboarding::lock(conn, &ob.id).unwrap();
 
         (sv, di, ob)

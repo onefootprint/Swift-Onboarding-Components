@@ -93,6 +93,7 @@ pub async fn post(
     let should_initiate_reqs = decision::utils::get_fixture_data_decision(
         state.feature_flag_client.clone(),
         &vault,
+        wf,
         &user_auth.tenant()?.id,
     )?
     .is_none();

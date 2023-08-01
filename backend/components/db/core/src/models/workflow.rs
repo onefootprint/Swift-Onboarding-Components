@@ -7,6 +7,7 @@ use newtypes::{Locked, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, 
 use serde::{Deserialize, Serialize};
 
 use super::workflow_event::WorkflowEvent;
+use crate::models::vault::Vault;
 use crate::{DbResult, PgConn, TxnPgConn};
 use db_schema::schema::workflow;
 use newtypes::KycState;
@@ -33,8 +34,7 @@ pub struct NewWorkflow {
     pub kind: WorkflowKind,
     pub state: WorkflowState,
     pub config: WorkflowConfig,
-    // TODO create the workflow fixture result from the sandbox id on the vault so we can deprecate
-    // the codepaths to read from the vault
+    // One day we'll get rid of this
     pub fixture_result: Option<WorkflowFixtureResult>,
 }
 
@@ -79,6 +79,17 @@ impl Workflow {
             .filter(workflow::id.eq(workflow_id))
             .get_result(conn)?;
 
+        Ok(res)
+    }
+
+    #[tracing::instrument("Workflow::get_with_vault", skip_all)]
+    pub fn get_with_vault(conn: &mut PgConn, id: &WorkflowId) -> DbResult<(Self, Vault)> {
+        use db_schema::schema::{scoped_vault, vault};
+        let res = workflow::table
+            .filter(workflow::id.eq(id))
+            .inner_join(scoped_vault::table.inner_join(vault::table))
+            .select((workflow::all_columns, vault::all_columns))
+            .get_result::<(Self, Vault)>(conn)?;
         Ok(res)
     }
 

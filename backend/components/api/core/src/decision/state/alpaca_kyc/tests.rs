@@ -31,20 +31,25 @@ use newtypes::{
     AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, ObConfigurationKey, ReviewReason,
     VendorAPI,
 };
-use newtypes::{FootprintReasonCode, RiskSignalGroupKind};
+use newtypes::{FootprintReasonCode, RiskSignalGroupKind, WorkflowFixtureResult};
 
 use newtypes::WorkflowState;
 
 use std::sync::Arc;
 
 #[test_state_case(UserKind::Demo)]
-#[test_state_case(UserKind::Sandbox("pass"))]
+#[test_state_case(UserKind::Sandbox(WorkflowFixtureResult::Pass))]
 #[test_state_case(UserKind::Live)]
 #[tokio::test]
 async fn pass(state: &mut State, user_kind: UserKind) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) =
-        setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
+    let (wf, tenant, obc, _tu) = setup_data(
+        state,
+        user_kind,
+        Some(CipKind::Alpaca),
+        user_kind.fixture_result(),
+    )
+    .await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
@@ -180,8 +185,14 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
 #[test_state_case(UserKind::Live, TerminalDecisionStatus::Pass)]
 #[test_state_case(UserKind::Live, TerminalDecisionStatus::Fail)]
-#[test_state_case(UserKind::Sandbox("manualreview"), TerminalDecisionStatus::Pass)]
-#[test_state_case(UserKind::Sandbox("manualreview"), TerminalDecisionStatus::Fail)]
+#[test_state_case(
+    UserKind::Sandbox(WorkflowFixtureResult::ManualReview),
+    TerminalDecisionStatus::Pass
+)]
+#[test_state_case(
+    UserKind::Sandbox(WorkflowFixtureResult::ManualReview),
+    TerminalDecisionStatus::Fail
+)]
 #[tokio::test]
 async fn pass_then_watchlist_hit(
     state: &mut State,
@@ -189,8 +200,13 @@ async fn pass_then_watchlist_hit(
     review_decision: TerminalDecisionStatus,
 ) {
     // DATA SETUP
-    let (wf, tenant, obc, tu) =
-        setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
+    let (wf, tenant, obc, tu) = setup_data(
+        state,
+        user_kind,
+        Some(CipKind::Alpaca),
+        user_kind.fixture_result(),
+    )
+    .await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
@@ -380,12 +396,17 @@ async fn pass_then_watchlist_hit(
 }
 
 #[test_state_case(UserKind::Live)]
-#[test_state_case(UserKind::Sandbox("stepup"))]
+#[test_state_case(UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
 #[tokio::test]
 async fn step_up(state: &mut State, user_kind: UserKind) {
     // DATA SETUP
-    let (wf, tenant, obc, tu) =
-        setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
+    let (wf, tenant, obc, tu) = setup_data(
+        state,
+        user_kind,
+        Some(CipKind::Alpaca),
+        user_kind.fixture_result(),
+    )
+    .await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = wf.scoped_vault_id.clone();
@@ -552,13 +573,18 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     assert!(!rs.is_empty()); // sanity check since we made a new OBD
 }
 
-#[test_state_case(UserKind::Sandbox("fail"))]
+#[test_state_case(UserKind::Sandbox(WorkflowFixtureResult::Fail))]
 #[test_state_case(UserKind::Live)]
 #[tokio::test]
 async fn fail(state: &mut State, user_kind: UserKind) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) =
-        setup_data(state, user_kind, Some(CipKind::Alpaca), user_kind.phone_suffix()).await;
+    let (wf, tenant, obc, _tu) = setup_data(
+        state,
+        user_kind,
+        Some(CipKind::Alpaca),
+        user_kind.fixture_result(),
+    )
+    .await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 

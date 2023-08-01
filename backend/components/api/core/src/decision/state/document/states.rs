@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use db::models::{vault::Vault, workflow::Workflow as DbWorkflow};
+use db::models::workflow::Workflow as DbWorkflow;
 
 use feature_flag::FeatureFlagClient;
 use newtypes::DocumentConfig;
@@ -167,8 +167,8 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
     #[tracing::instrument("OnAction<MakeDecision, DocumentState>::on_commit", skip_all)]
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<DocumentState> {
         let (ff_client, vendor_results, webhook_client) = async_res;
-        let vault = Vault::get(conn, &self.sv_id)?;
-        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
+        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
         let decision = if let Some(fixture_decision) = fixture_decision {

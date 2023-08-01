@@ -6,7 +6,6 @@ use db::{
         document_request::DocumentRequest,
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
-        vault::Vault,
         workflow::Workflow,
     },
     DbError, DbPool, DbResult, TxnPgConn,
@@ -93,18 +92,18 @@ pub fn setup_kyc_onboarding_vreqs(
 #[tracing::instrument(skip(state))]
 pub async fn make_outstanding_kyc_vendor_calls(
     state: &State,
+    wf_id: &WorkflowId,
     sv_id: &ScopedVaultId,
     ob_id: &OnboardingId,
     t_id: &TenantId,
 ) -> ApiResult<Vec<VendorResult>> {
-    let svid = sv_id.clone();
-    let tid = t_id.clone();
-    let vault = state
+    let wf_id = wf_id.clone();
+    let (wf, v) = state
         .db_pool
-        .db_query(move |conn| Vault::get(conn, &svid))
+        .db_query(move |conn| Workflow::get_with_vault(conn, &wf_id))
         .await??;
-    let fixture_decision =
-        decision::utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, t_id)?;
+    let ff_client = state.feature_flag_client.clone();
+    let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, t_id)?;
 
     let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
         ob_id,
@@ -154,7 +153,7 @@ pub async fn make_outstanding_kyc_vendor_calls(
         tracing::error!(
             errors = error_message,
             scoped_vault_id = %sv_id,
-            tenant_id = %tid,
+            tenant_id = %t_id,
             "VendorRequestsFailed"
         );
         return Err(ApiErrorKind::VendorRequestsFailed)?;

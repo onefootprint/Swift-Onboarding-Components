@@ -32,7 +32,7 @@ use std::sync::Arc;
 #[tokio::test]
 async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: DocumentOutcome) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.phone_suffix()).await;
+    let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.fixture_result()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = wf.scoped_vault_id.clone();

@@ -30,7 +30,7 @@ use newtypes::{
     TenantId, VendorAPI, WorkflowConfig,
 };
 use newtypes::{KycConfig, OnboardingStatus};
-use newtypes::{KycState, WorkflowId, WorkflowState};
+use newtypes::{KycState, WorkflowFixtureResult, WorkflowId, WorkflowState};
 use std::sync::Arc;
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
@@ -122,16 +122,22 @@ async fn invalid_action(state: &mut State) {
 }
 
 #[test_state_case(UserKind::Demo, DocumentCollectionKind::DocumentNotRequested)]
-#[test_state_case(UserKind::Sandbox("pass"), DocumentCollectionKind::DocumentNotRequested)]
+#[test_state_case(
+    UserKind::Sandbox(WorkflowFixtureResult::Pass),
+    DocumentCollectionKind::DocumentNotRequested
+)]
 #[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentNotRequested)]
 // with doc
 #[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(Success))]
-#[test_state_case(UserKind::Sandbox("pass"), DocumentCollectionKind::DocumentRequested(Success))]
+#[test_state_case(
+    UserKind::Sandbox(WorkflowFixtureResult::Pass),
+    DocumentCollectionKind::DocumentRequested(Success)
+)]
 #[test_state_case(UserKind::Demo, DocumentCollectionKind::DocumentRequested(Success))]
 #[tokio::test]
 async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.phone_suffix()).await;
+    let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.fixture_result()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = svid.clone();
@@ -274,29 +280,38 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 }
 
 #[test_state_case(
-    UserKind::Sandbox("manualreview"),
+    UserKind::Sandbox(WorkflowFixtureResult::ManualReview),
     DocumentCollectionKind::DocumentNotRequested
 )]
-#[test_state_case(UserKind::Sandbox("fail"), DocumentCollectionKind::DocumentNotRequested)]
+#[test_state_case(
+    UserKind::Sandbox(WorkflowFixtureResult::Fail),
+    DocumentCollectionKind::DocumentNotRequested
+)]
 #[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentNotRequested)]
 // with doc
 #[test_state_case(
-    UserKind::Sandbox("manualreview"),
+    UserKind::Sandbox(WorkflowFixtureResult::ManualReview),
     DocumentCollectionKind::DocumentRequested(Success)
 )]
-#[test_state_case(UserKind::Sandbox("fail"), DocumentCollectionKind::DocumentRequested(Success))]
+#[test_state_case(
+    UserKind::Sandbox(WorkflowFixtureResult::Fail),
+    DocumentCollectionKind::DocumentRequested(Success)
+)]
 #[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(Success))]
 #[test_state_case(
-    UserKind::Sandbox("manualreview"),
+    UserKind::Sandbox(WorkflowFixtureResult::ManualReview),
     DocumentCollectionKind::DocumentRequested(Failure)
 )]
-#[test_state_case(UserKind::Sandbox("fail"), DocumentCollectionKind::DocumentRequested(Failure))]
+#[test_state_case(
+    UserKind::Sandbox(WorkflowFixtureResult::Fail),
+    DocumentCollectionKind::DocumentRequested(Failure)
+)]
 #[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(Failure))]
 #[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(DocUploadFailed))]
 #[tokio::test]
 async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.phone_suffix()).await;
+    let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.fixture_result()).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = wf.scoped_vault_id.clone();
@@ -382,7 +397,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     }
 
     // Expect Webhook
-    let expect_review = matches!(user_kind, UserKind::Sandbox("manualreview")); //#fail currently indicates hard failing without raising review
+    let expect_review = matches!(user_kind, UserKind::Sandbox(WorkflowFixtureResult::ManualReview)); //#fail currently indicates hard failing without raising review
     mock_webhooks(
         state,
         vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Fail))],

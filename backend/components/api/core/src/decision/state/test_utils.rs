@@ -33,7 +33,10 @@ use idv::incode::IncodeResponse;
 use idv::incode::IncodeStartOnboardingRequest;
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
-use newtypes::{CipKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI, WorkflowId};
+use newtypes::{
+    CipKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI, WorkflowFixtureResult,
+    WorkflowId,
+};
 use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use webhooks::events::WebhookEvent;
 use webhooks::MockWebhookClient;
@@ -41,14 +44,14 @@ use webhooks::MockWebhookClient;
 #[derive(Clone, Copy, Debug)]
 pub enum UserKind {
     Demo,
-    Sandbox(&'static str),
+    Sandbox(WorkflowFixtureResult),
     Live,
 }
 impl UserKind {
-    pub fn phone_suffix(&self) -> Option<String> {
+    pub fn fixture_result(&self) -> Option<WorkflowFixtureResult> {
         match self {
             UserKind::Demo => None,
-            UserKind::Sandbox(s) => Some(s.to_string()),
+            UserKind::Sandbox(s) => Some(*s),
             UserKind::Live => None,
         }
     }
@@ -96,7 +99,7 @@ pub async fn setup_data(
     state: &State,
     user_kind: UserKind,
     cip_kind: Option<CipKind>,
-    phone_suffix: Option<String>,
+    fixture_result: Option<WorkflowFixtureResult>,
 ) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
     // TODO: create sandbox vs demo vs real, diff sandbox fixues
     let is_live = matches!(user_kind, UserKind::Live | UserKind::Demo);
@@ -106,7 +109,7 @@ pub async fn setup_data(
         Some(vec![CDO::FullAddress]), // so we can meet min req for kyc vendor calls
         cip_kind,
         is_live,
-        phone_suffix,
+        fixture_result,
     )
     .await;
 

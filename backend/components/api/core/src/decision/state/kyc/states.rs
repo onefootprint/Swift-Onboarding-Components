@@ -2,8 +2,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use db::models::{
-    risk_signal::RiskSignal, risk_signal_group::RiskSignalGroup, vault::Vault,
-    workflow::Workflow as DbWorkflow,
+    risk_signal::RiskSignal, risk_signal_group::RiskSignalGroup, workflow::Workflow as DbWorkflow,
 };
 
 use feature_flag::FeatureFlagClient;
@@ -132,7 +131,14 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         Ok((
-            common::make_outstanding_kyc_vendor_calls(state, &self.sv_id, &self.ob_id, &self.t_id).await?,
+            common::make_outstanding_kyc_vendor_calls(
+                state,
+                &self.wf_id,
+                &self.sv_id,
+                &self.ob_id,
+                &self.t_id,
+            )
+            .await?,
             state.feature_flag_client.clone(),
         ))
     }
@@ -140,8 +146,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     #[tracing::instrument("OnAction<MakeVendorCalls, KycState>::on_commit", skip_all)]
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         let (vendor_results, ff_client) = async_res;
-        let vault = Vault::get(conn, &self.sv_id)?;
-        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
+        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> =
             if let Some(fd) = fixture_decision {
                 let reason_codes = decision::sandbox::get_fixture_reason_codes(fd, VaultKind::Person);
@@ -232,8 +238,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
     #[tracing::instrument("OnAction<MakeDecision, KycState>::on_commit", skip_all)]
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         let (ff_client, webhook_client) = async_res;
-        let vault = Vault::get(conn, &self.sv_id)?;
-        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &vault, &self.t_id)?;
+        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
 
         // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
         let decision = if let Some(fixture_decision) = fixture_decision {

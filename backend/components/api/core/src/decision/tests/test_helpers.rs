@@ -6,7 +6,10 @@ use db::{
     tests::fixtures,
     DbError, DbPool, TxnPgConn,
 };
-use newtypes::{CipKind, CollectedDataOption, DataIdentifier, IdentityDataKind, PiiString, VaultKind};
+use newtypes::{
+    CipKind, CollectedDataOption, DataIdentifier, IdentityDataKind, PiiString, VaultKind,
+    WorkflowFixtureResult,
+};
 
 use crate::{
     enclave_client::EnclaveClient,
@@ -20,7 +23,7 @@ pub async fn create_user_and_onboarding(
     must_collect_data: Option<Vec<CollectedDataOption>>,
     cip_kind: Option<CipKind>,
     is_live: bool,
-    phone_suffix: Option<String>,
+    fixture_result: Option<WorkflowFixtureResult>,
 ) -> (Tenant, Onboarding, Vault, ScopedVault, ObConfiguration) {
     let (pk, tenant_e_key) = enclave_client.generate_sealed_keypair().await.unwrap();
     db_pool
@@ -35,9 +38,9 @@ pub async fn create_user_and_onboarding(
             );
             let ob_config_id = ob_config.id.clone();
 
-            let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), phone_suffix);
+            let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), fixture_result);
 
-            let onboarding = fixtures::onboarding::create(conn, su.id.clone(), ob_config_id);
+            let onboarding = fixtures::onboarding::create(conn, su.id.clone(), ob_config_id, fixture_result);
 
             Ok((tenant, onboarding, uv, su, ob_config))
         })
@@ -48,8 +51,9 @@ pub async fn create_user_and_onboarding(
 pub fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
     ob_config: ObConfiguration,
-    sandbox_id: Option<String>,
+    fixture_result: Option<WorkflowFixtureResult>,
 ) -> (Vault, ScopedVault) {
+    let sandbox_id = fixture_result.map(|f| format!("{}_sandbox", f));
     let uv = fixtures::vault::create(conn, VaultKind::Person, sandbox_id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 

@@ -106,6 +106,10 @@ pub async fn post(
 async fn run_kyb_if_needed(state: &State, user_auth: CheckedUserObAuthContext) -> ApiResult<()> {
     // Run KYB
     let tenant = user_auth.tenant()?.clone();
+    let wf = user_auth
+        .workflow()
+        .ok_or(WorkflowError::AuthMissingWorkflow)?
+        .clone();
     let uv = user_auth.user().clone();
     let biz_ob = state
         .db_pool
@@ -116,7 +120,9 @@ async fn run_kyb_if_needed(state: &State, user_auth: CheckedUserObAuthContext) -
         let should_run_kyb = business::utils::should_run_kyb(state, &biz_ob, &tenant).await?;
         tracing::info!(should_run_kyb, "should_run_kyb");
         if should_run_kyb {
-            let kyb_res = decision::vendor::middesk::run_kyb(state, biz_ob.id, &uv, &tenant.id).await;
+            // We pass the user's KYC wf in here - for now, we are just piggybacking the KYB decision
+            // off of the KYC decision, but one day we'll probably want to send a fixture KYB decision
+            let kyb_res = decision::vendor::middesk::run_kyb(state, biz_ob.id, &uv, &wf, &tenant.id).await;
             if let Err(e) = kyb_res {
                 tracing::error!(error=%e, "Error kicking off KYB")
             }

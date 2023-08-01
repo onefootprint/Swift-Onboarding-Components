@@ -144,6 +144,7 @@ pub fn get_or_start_onboarding(
         insight_event: insight_event.clone(),
     };
 
+    // TODO rm this when fixture result is passed in process
     let fixture_result = WorkflowFixtureResult::from_sandbox_id(user_vault.sandbox_id.as_ref());
     let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, true, fixture_result)?;
     if let IsNew::Yes(ref wf) = is_new_ob {

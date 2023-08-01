@@ -14,12 +14,12 @@ async fn test_handle_setup(state: &mut State) {
     // PROD
     //
     // create a live UV and ob_config
-    let (tenant, vault) = state
+    let (tenant, vault, wf) = state
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
-            let (tenant, _, vault, _) =
+            let (tenant, _, vault, _, wf) =
                 fixtures::lib::create_user_and_onboarding(conn, true, OnboardingStatus::Pass, vec![]);
-            Ok((tenant, vault))
+            Ok((tenant, vault, wf))
         })
         .await
         .unwrap();
@@ -36,7 +36,7 @@ async fn test_handle_setup(state: &mut State) {
     state.set_ff_client(Arc::new(mock_ff_client));
 
     let res =
-        utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &tenant.id).unwrap();
+        utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &wf, &tenant.id).unwrap();
     assert!(res.is_none()); // No fixture decision
 
     //
@@ -45,12 +45,12 @@ async fn test_handle_setup(state: &mut State) {
 
     // create a live UV and ob_config
     // TODO: do we even need to make a new user here?
-    let (tenant, vault) = state
+    let (tenant, vault, wf) = state
         .db_pool
         .db_transaction(move |conn| -> db::DbResult<_> {
-            let (tenant, _, vault, _) =
+            let (tenant, _, vault, _, wf) =
                 fixtures::lib::create_user_and_onboarding(conn, true, OnboardingStatus::Pass, vec![]);
-            Ok((tenant, vault))
+            Ok((tenant, vault, wf))
         })
         .await
         .unwrap();
@@ -66,6 +66,6 @@ async fn test_handle_setup(state: &mut State) {
     state.set_ff_client(Arc::new(mock_ff_client));
 
     let res =
-        utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &tenant.id).unwrap();
+        utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &wf, &tenant.id).unwrap();
     assert!(res == Some((DecisionStatus::Pass, false))); // Fixture decision for demo tenant
 }

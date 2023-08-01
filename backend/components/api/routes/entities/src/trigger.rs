@@ -30,6 +30,7 @@ use newtypes::FpId;
 use newtypes::KycConfig;
 use newtypes::TriggerInfo;
 use newtypes::VaultKind;
+use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowTriggeredInfo;
 use paperclip::actix::{api_v2_operation, post, web};
 
@@ -82,7 +83,9 @@ pub async fn post(
                     } else {
                         KycConfig { is_redo: true }.into()
                     };
-                    Workflow::create(conn, &sv.id, config, None)?
+                    // TODO rm this when fixture result is passed in process
+                    let fixture_result = WorkflowFixtureResult::from_sandbox_id(vault.sandbox_id.as_ref());
+                    Workflow::create(conn, &sv.id, config, fixture_result)?
                 }
                 TriggerInfo::IdDocument { collect_selfie } => {
                     let wf = Workflow::create(conn, &sv.id, DocumentConfig {}.into(), None)?;

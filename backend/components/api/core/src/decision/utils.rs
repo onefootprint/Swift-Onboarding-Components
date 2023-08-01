@@ -9,17 +9,18 @@ use db::{
         vault::Vault,
         verification_request::VerificationRequest,
         verification_result::VerificationResult,
+        workflow::Workflow,
     },
     PgConn,
 };
 use newtypes::{
     DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentId, OnboardingId, RiskSignalGroupKind,
-    ScopedVaultId, TenantId, VaultKind, VendorAPI,
+    ScopedVaultId, TenantId, VaultKind, VendorAPI, WorkflowFixtureResult,
 };
 
 use super::{sandbox, vendor};
 use crate::{
-    errors::{ApiError, ApiResult, ApiErrorKind},
+    errors::{onboarding::OnboardingError, ApiError, ApiErrorKind, ApiResult},
     State,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
@@ -34,12 +35,17 @@ pub type FixtureDecision = (DecisionStatus, CreateManualReview);
 pub fn get_fixture_data_decision(
     ff_client: Arc<dyn FeatureFlagClient>, // Pass in ff_client directly to make it easier to test
     vault: &Vault,
+    workflow: &Workflow,
     tenant_id: &TenantId,
 ) -> ApiResult<Option<FixtureDecision>> {
     let is_demo_tenant = ff_client.flag(BoolFlag::IsDemoTenant(tenant_id));
-    if let Some(sandbox_id) = vault.sandbox_id.as_ref() {
-        // Sandbox users have the final KYC state encoded in their phone number's sandbox suffix
-        let fixture_decision = decision_status_from_sandbox_id(sandbox_id);
+    if !vault.is_live {
+        let fixture_result = workflow
+            .fixture_result
+            // Ensure that each sandbox vault has a fixture result - we don't want to make real
+            // requests for sandbox vaults
+            .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
+        let fixture_decision = decision_status(fixture_result);
         return Ok(Some(fixture_decision));
     }
 
@@ -84,15 +90,12 @@ pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &Ve
     !matches!(vendor_api, VendorAPI::SocureIDPlus | VendorAPI::TwilioLookupV2)
 }
 
-pub fn decision_status_from_sandbox_id(sandbox_id: &str) -> FixtureDecision {
-    if sandbox_id.starts_with("fail") {
-        (DecisionStatus::Fail, false)
-    } else if sandbox_id.starts_with("manualreview") {
-        (DecisionStatus::Fail, true)
-    } else if sandbox_id.starts_with("stepup") {
-        (DecisionStatus::StepUp, false)
-    } else {
-        (DecisionStatus::Pass, false)
+pub fn decision_status(fixture_result: WorkflowFixtureResult) -> FixtureDecision {
+    match fixture_result {
+        WorkflowFixtureResult::Pass => (DecisionStatus::Pass, false),
+        WorkflowFixtureResult::Fail => (DecisionStatus::Fail, false),
+        WorkflowFixtureResult::ManualReview => (DecisionStatus::Fail, true),
+        WorkflowFixtureResult::StepUp => (DecisionStatus::StepUp, false),
     }
 }
 

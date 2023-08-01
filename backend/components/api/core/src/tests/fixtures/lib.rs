@@ -4,6 +4,7 @@ use db::models::onboarding::{Onboarding, OnboardingUpdate};
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
+use db::models::workflow::Workflow;
 use db::tests::fixtures;
 use db::TxnPgConn;
 use itertools::Itertools;
@@ -70,7 +71,7 @@ pub fn create_user_and_onboarding(
     is_live: bool,
     onboarding_status: OnboardingStatus,
     idks: Vec<IDK>,
-) -> (Tenant, Onboarding, Vault, ScopedVault) {
+) -> (Tenant, Onboarding, Vault, ScopedVault, Workflow) {
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, is_live);
     let ob_config_id = ob_config.id.clone();
@@ -79,7 +80,7 @@ pub fn create_user_and_onboarding(
     let (uv, su) = create_user_and_populate_vault(conn, is_live, tenant_id, Some(ob_config), idks);
 
     let suid = su.id.clone();
-    let onboarding = fixtures::onboarding::create(conn, suid, ob_config_id);
+    let onboarding = fixtures::onboarding::create(conn, suid, ob_config_id, None);
     let ob = Onboarding::lock(conn, &onboarding.id).unwrap();
     let onboarding = Onboarding::update(
         ob,
@@ -90,6 +91,7 @@ pub fn create_user_and_onboarding(
         },
     )
     .unwrap();
+    let wf = Workflow::get(conn, onboarding.workflow_id.as_ref().unwrap()).unwrap();
 
-    (tenant, onboarding, uv, su)
+    (tenant, onboarding, uv, su, wf)
 }

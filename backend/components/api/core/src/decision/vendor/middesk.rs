@@ -20,6 +20,7 @@ use db::models::onboarding::{Onboarding, OnboardingUpdate};
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_result::VerificationResult;
+use db::models::workflow::Workflow;
 use db::DbPool;
 use db::{models::verification_request::VerificationRequest, DbError};
 use feature_flag::{BoolFlag, FeatureFlagClient};
@@ -519,11 +520,13 @@ pub async fn run_kyb(
     state: &State,
     biz_ob_id: OnboardingId,
     person_vault: &Vault,
+    wf: &Workflow,
     tenant_id: &TenantId,
 ) -> Result<(), ApiError> {
     let fixture_decision = decision::utils::get_fixture_data_decision(
         state.feature_flag_client.clone(),
         person_vault,
+        wf,
         tenant_id,
     )?;
 
