@@ -36,6 +36,8 @@ pub enum Error {
     InvalidDate,
     #[error("The entered date of birth results in an improbable age")]
     ImprobableDob,
+    #[error("The entered date of birth results in an improbably young age")]
+    ImprobableDobTooYoung,
     #[error("The entered address is a PO Box")]
     AddressIsPOBox,
     #[error("Cannot parse: {0}")]

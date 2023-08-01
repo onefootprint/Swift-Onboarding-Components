@@ -50,7 +50,7 @@ fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiStr
         let age = (today - date).num_days() / 365;
 
         if age <= 13 {
-            return Err(Error::ImprobableDob);
+            return Err(Error::ImprobableDobTooYoung);
         }
     }
     Ok(PiiString::new(date.format("%Y-%m-%d").to_string()))
