@@ -16,8 +16,9 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
         identity_document, incode_verification_session, incode_verification_session_event, liveness_event,
         manual_review, middesk_request, onboarding, onboarding_decision,
         onboarding_decision_verification_result_junction, risk_signal, risk_signal_group, scoped_vault,
-        socure_device_session, user_consent, user_timeline, vault, vault_data, verification_request,
-        verification_result, watchlist_check, webauthn_credential, workflow, workflow_event,
+        socure_device_session, stytch_fingerprint_event, user_consent, user_timeline, vault, vault_data,
+        verification_request, verification_result, watchlist_check, webauthn_credential, workflow,
+        workflow_event,
     };
     let mut deleted_rows = 0;
 
@@ -44,6 +45,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
     deleted_rows += diesel::delete(business_owner::table)
         .filter(business_owner::user_vault_id.eq_any(&v_ids))
+        .execute(conn.conn())?;
+
+    deleted_rows += diesel::delete(stytch_fingerprint_event::table)
+        .filter(stytch_fingerprint_event::vault_id.eq_any(&v_ids))
         .execute(conn.conn())?;
 
     // DataLifetimes
