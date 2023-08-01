@@ -28,10 +28,10 @@ pub struct WebhookApp {
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("Svix service error")]
+    #[error("Svix service error: {0:?}")]
     ServiceError(#[from] svix::error::Error),
 
-    #[error("Payload serialization")]
+    #[error("Payload serialization: {0:?}")]
     SerdeJson(#[from] serde_json::Error),
 }
 
