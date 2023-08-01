@@ -85,7 +85,6 @@ module.exports = withPlugins([withMDX], {
     '@onefootprint/hooks',
     '@onefootprint/request',
     '@onefootprint/types',
-    'react-hotjar',
   ],
   images: {
     remotePatterns: [

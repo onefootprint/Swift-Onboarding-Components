@@ -8,8 +8,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
-import React, { useEffect } from 'react';
-import { hotjar } from 'react-hotjar';
+import React from 'react';
 
 import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';
@@ -35,59 +34,67 @@ const GlobalStyle = createGlobalStyle`
  `}
 `;
 
-const App = ({ Component, pageProps }: AppProps) => {
-  useEffect(() => {
-    if (HOTJAR_SITE_ID && HOTJAR_VERSION) {
-      hotjar.initialize(Number(HOTJAR_SITE_ID), Number(HOTJAR_VERSION));
-    }
-  }, []);
-
-  return (
-    <>
-      <Head>
-        <meta charSet="utf-8" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/apple-touch-icon.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon-16x16.png"
-        />
-        <link rel="manifest" href="/site.webmanifest" />
-      </Head>
-      {FATHOM_TRACKING_CODE && (
-        <Script
-          data-canonical="false"
-          data-site={FATHOM_TRACKING_CODE}
-          data-spa="auto"
-          defer
-          src="https://cdn.usefathom.com/script.js"
-        />
-      )}
-      <Script />
-      <QueryClientProvider client={queryClient}>
-        <DesignSystemProvider theme={themes.light}>
-          <GlobalStyle />
-          <Layout>
-            <MDXProvider>
-              <Component {...pageProps} />
-            </MDXProvider>
-          </Layout>
-        </DesignSystemProvider>
-      </QueryClientProvider>
-    </>
-  );
-};
+const App = ({ Component, pageProps }: AppProps) => (
+  <>
+    <Head>
+      <meta charSet="utf-8" />
+      <link rel="shortcut icon" href="/favicon.ico" />
+      <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="/apple-touch-icon.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="/favicon-32x32.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="16x16"
+        href="/favicon-16x16.png"
+      />
+      <link rel="manifest" href="/site.webmanifest" />
+    </Head>
+    {FATHOM_TRACKING_CODE && (
+      <Script
+        data-canonical="false"
+        data-site={FATHOM_TRACKING_CODE}
+        data-spa="auto"
+        defer
+        src="https://cdn.usefathom.com/script.js"
+      />
+    )}
+    <Script />
+    {HOTJAR_SITE_ID && HOTJAR_VERSION && (
+      <Script
+        id="hotjar"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `(function(h,o,t,j,a,r){
+                h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+                h._hjSettings={hjid:${HOTJAR_SITE_ID},hjsv:${HOTJAR_VERSION}};
+                a=o.getElementsByTagName('head')[0];
+                r=o.createElement('script');r.async=1;
+                r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+                a.appendChild(r);
+            })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=')`,
+        }}
+      />
+    )}
+    <QueryClientProvider client={queryClient}>
+      <DesignSystemProvider theme={themes.light}>
+        <GlobalStyle />
+        <Layout>
+          <MDXProvider>
+            <Component {...pageProps} />
+          </MDXProvider>
+        </Layout>
+      </DesignSystemProvider>
+    </QueryClientProvider>
+  </>
+);
 
 export default App;
