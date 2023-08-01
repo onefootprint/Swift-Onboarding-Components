@@ -1,4 +1,4 @@
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
 use db::models::{
     access_event::{AccessEvent, NewAccessEventRow},
@@ -8,7 +8,7 @@ use itertools::Itertools;
 use newtypes::{AccessEventKind, DbActor, PiiString};
 
 use crate::{
-    errors::{tenant::TenantError, ApiResult, AssertionError},
+    errors::{ApiResult, AssertionError},
     utils::vault_wrapper::{
         batch_execute_decrypt_requests, decrypt::EnclaveDecryptOperation, Any, DecryptUncheckedResult,
     },
@@ -19,43 +19,37 @@ use super::TenantVw;
 
 /// Represents a request to decrypt targets for a specific VaultWrapper instance. Use the key to
 /// uniquely identify the VW
-pub struct BulkDecryptReq<TKey, T = Any> {
-    /// Something that uniquely identifies this VW from the others being decrypted at the same time
-    pub key: TKey,
+pub struct BulkDecryptReq<T = Any> {
     pub vw: TenantVw<T>,
     pub targets: Vec<EnclaveDecryptOperation>,
 }
 
 pub async fn bulk_decrypt<TKey, T>(
     state: &State,
-    requests: Vec<BulkDecryptReq<TKey, T>>,
+    requests: HashMap<TKey, BulkDecryptReq<T>>,
     insight: CreateInsightEvent,
     reason: String,
     principal: DbActor,
 ) -> ApiResult<Vec<(TKey, HashMap<EnclaveDecryptOperation, PiiString>)>>
 where
-    TKey: Clone + Eq + Hash + 'static + Send,
+    TKey: Eq + std::hash::Hash + 'static + Clone,
 {
-    let count_unique_keys = requests.iter().map(|r| &r.key).unique().count();
-    if count_unique_keys != requests.len() {
-        return Err(TenantError::KeysMustBeUnique.into());
-    }
-    for r in requests.iter() {
+    for r in requests.values() {
         let dis = r.targets.iter().map(|op| &op.identifier).collect_vec();
         r.vw.check_ob_config_access(dis)?;
     }
 
     let decrypt_requests = requests
         .iter()
-        .flat_map(|i| {
-            i.vw.decrypt_requests(i.targets.clone())
+        .flat_map(|(key, r)| {
+            r.vw.decrypt_requests(r.targets.clone())
                 .into_iter()
-                .map(|r| (i.key.clone(), r))
+                .map(|result| (key.clone(), result))
         })
         .collect();
     let key_to_sv: HashMap<_, _> = requests
         .iter()
-        .map(|BulkDecryptReq { key, vw, targets: _ }| (key.clone(), vw.scoped_vault.clone()))
+        .map(|(key, r)| (key.clone(), r.vw.scoped_vault.clone()))
         .collect();
 
     let results = batch_execute_decrypt_requests(&state.enclave_client, decrypt_requests).await?;

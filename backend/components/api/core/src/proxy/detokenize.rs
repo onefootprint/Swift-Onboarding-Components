@@ -69,7 +69,7 @@ pub async fn detokenize(
                 })
                 .collect();
             let key = vw.scoped_vault.fp_id.clone();
-            Ok(BulkDecryptReq { key, vw, targets })
+            Ok((key, BulkDecryptReq { vw, targets }))
         })
         .collect::<ApiResult<_>>()?;
     let reason = reason.unwrap_or_else(|| "Vault Proxy Default Reason".to_string());

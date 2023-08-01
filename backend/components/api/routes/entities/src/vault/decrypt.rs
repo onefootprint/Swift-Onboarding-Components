@@ -177,7 +177,7 @@ pub(super) async fn post_inner(
         .into_iter()
         .map(|(v, targets)| -> ApiResult<_> {
             let vw = vws.remove(&v).ok_or(AssertionError("No VW found for version"))?;
-            Ok(BulkDecryptReq { key: v, vw, targets })
+            Ok((v, BulkDecryptReq { vw, targets }))
         })
         .collect::<ApiResult<_>>()?;
     let insight = CreateInsightEvent::from(insights);

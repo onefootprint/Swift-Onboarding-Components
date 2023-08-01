@@ -51,6 +51,4 @@ pub enum TenantError {
     DataDoesntExist(DataIdentifier),
     #[error("User {0} does not exist")]
     VaultDoesntExist(FpId),
-    #[error("Bulk decrypt keys must be unique")]
-    KeysMustBeUnique,
 }
