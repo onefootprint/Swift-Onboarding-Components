@@ -6,14 +6,12 @@ const task = async params => {
   };
   const fmtTenant = tenant => {
     const header = `*${tenant.name}* (<https://dashboard.onefootprint.com/assume?tenantId=${tenant.tenant_id}|assume>)`;
-    const keysInUse = (tenant.all_keys || []).map(k => `\`${k}\``).join(', ');
     return [
       header,
       `• num scoped users: ${tenant.num_scoped_vaults || 0}`,
       `• max number of keys on one user: ${tenant.max_keys_per_user || 0}`,
       `• num proxy requests: ${tenant.num_proxy_requests || 0}`,
       `• num keys in use: ${tenant.count_keys || 0}`,
-      `• keys in use: ${keysInUse}`,
     ].join('\n');
   };
   const dataIdentifiers = JSON.parse(params.data_identifiers_json);
