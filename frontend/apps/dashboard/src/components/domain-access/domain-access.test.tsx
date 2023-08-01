@@ -32,6 +32,11 @@ describe('<DomainAccess />', () => {
       path: '/org',
       response: { data: {} },
     });
+    mockRequest({
+      method: 'patch',
+      path: '/org',
+      response: { data: {} },
+    });
   });
 
   afterAll(() => {
