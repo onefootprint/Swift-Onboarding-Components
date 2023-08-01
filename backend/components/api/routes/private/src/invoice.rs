@@ -6,7 +6,7 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
 use api_core::errors::AssertionError;
 use billing::{BillingCounts, BillingInfo};
-use chrono::{NaiveDate, Utc};
+use chrono::{Duration, NaiveDate, Utc};
 use db::models::onboarding::Onboarding;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
@@ -68,11 +68,8 @@ async fn post_all(
 
     let tenants = state.db_pool.db_query(Tenant::list_live).await??;
 
-    // Subtract one day so we always generate the invoice for last month
-    let billing_date = Utc::now()
-        .checked_sub_days(chrono::Days::new(1))
-        .ok_or(AssertionError("Can't subtract date"))?
-        .date_naive();
+    // Subtract 8 hours so we always generate the invoice for last month
+    let billing_date = (Utc::now() - Duration::hours(8)).date_naive();
     let fut_bill_tenant = tenants
         .into_iter()
         .map(|t| create_bill_for_tenant(&state, t, billing_date));
