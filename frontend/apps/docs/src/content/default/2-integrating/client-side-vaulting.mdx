@@ -117,7 +117,7 @@ On your backend, create a client side token with a single field and the `decrypt
 
 ```bash
 curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_token \
-	-X POST \
+    -X POST \
     -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
     -d '{
           "fields": [
@@ -139,11 +139,13 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_toke
 }
 ```
 
+On your client, you can make a request to the decrypt endpoint using the token generated above. You will be able to decrypt any field specified when creating the token.
+
 ```bash
 curl https://api.onefootprint.com/users/vault/decrypt \
-	-X POST \
-  -H 'x-fp-authorization: tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0' \
-  -d '{
+    -X POST \
+    -H 'x-fp-authorization: tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0' \
+    -d '{
         "fields": ["id.ssn9", "card.primary.number"]
       }'
 ```
@@ -163,9 +165,9 @@ On your backend, create a client side token with a single field and the `decrypt
 
 ```bash
 curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_token \
-	-X POST \
-  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
-  -d '{
+	  -X POST \
+    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+    -d '{
         "fields": [
           "custom.paystub_w2"
         ],
@@ -184,7 +186,7 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_toke
 }
 ```
 
-Now the client side can decrypt and download this object with a simple GET request. The response body will entirely comprise the contents of the object specified in `fields` above. This can easily be used by your frontend to download the contents directly to the users device.
+Now, the client can decrypt and download this object with a simple GET request. The response body will entirely comprise the contents of the object specified in `fields` above. This can easily be used by your frontend to download the contents directly to the user's device.
 
 ```bash
 curl https://api.onefootprint.com/users/vault/decrypt/tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0
