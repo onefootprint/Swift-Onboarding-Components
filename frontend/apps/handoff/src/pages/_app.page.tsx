@@ -31,10 +31,6 @@ const App = ({ Component, pageProps }: AppProps) => {
             name="apple-itunes-app"
             content="app-id=1632436468, app-clip-bundle-id=com.onefootprint.my.Clip, app-clip-display=card"
           />
-          <link
-            rel="alternate"
-            href="https://appclip.apple.com/id?p=com.onefootprint.my.Clip"
-          />
         </Head>
       ) : null}
       <QueryClientProvider client={queryClient}>
