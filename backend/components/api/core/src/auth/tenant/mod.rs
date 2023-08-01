@@ -51,7 +51,7 @@ impl AnyTenantSessionAuth {
         Ok(tu_id)
     }
 
-    pub fn auth_method(&self) -> Option<WorkosAuthMethod> {
+    pub fn auth_method(&self) -> WorkosAuthMethod {
         match self {
             Either::Left(l) => l.data.auth_method,
             Either::Right(r) => r.auth_method(),
@@ -60,7 +60,7 @@ impl AnyTenantSessionAuth {
 }
 
 impl TenantSessionAuth {
-    pub fn auth_method(&self) -> Option<WorkosAuthMethod> {
+    pub fn auth_method(&self) -> WorkosAuthMethod {
         match self {
             Either::Left(l) => l.data.0.auth_method,
             Either::Right(r) => r.data.0.auth_method,

@@ -28,8 +28,7 @@ pub struct TenantRbAuth {
     tenant_user: TenantUser,
     #[allow(unused)]
     tenant_rolebinding: TenantRolebinding,
-    // TODO make this non-null after old session expires
-    pub(super) auth_method: Option<WorkosAuthMethod>,
+    pub(super) auth_method: WorkosAuthMethod,
 }
 
 /// Nests a private TenantRbAuth and implements traits required to extract this session from an
@@ -51,13 +50,11 @@ impl TenantRbSession {
     pub fn create(
         tenant: &Tenant,
         rb_id: TenantRolebindingId,
-        auth_method: Option<WorkosAuthMethod>,
+        auth_method: WorkosAuthMethod,
     ) -> ApiResult<Self> {
         if let Some(auth_methods) = tenant.supported_auth_methods.as_ref() {
-            if let Some(auth_method) = auth_method {
-                if !auth_methods.contains(&auth_method) {
-                    return Err(AuthError::UnsupportedAuthMethod.into());
-                }
+            if !auth_methods.contains(&auth_method) {
+                return Err(AuthError::UnsupportedAuthMethod.into());
             }
         }
         Ok(Self {

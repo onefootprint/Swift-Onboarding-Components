@@ -24,8 +24,7 @@ use paperclip::actix::Apiv2Security;
 )]
 pub struct WorkOsSessionData {
     pub tenant_user_id: TenantUserId,
-    // TODO make this non-null after old session expires
-    pub auth_method: Option<WorkosAuthMethod>,
+    pub auth_method: WorkosAuthMethod,
 }
 
 impl ExtractableAuthSession for WorkOsSessionData {

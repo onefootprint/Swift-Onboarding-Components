@@ -103,7 +103,7 @@ async fn handler(
             .db_transaction(move |conn| TenantRolebinding::login(conn, &rolebinding_id))
             .await?;
 
-        let session_data = TenantRbSession::create(&tenant, rb.id.clone(), Some(auth_method))?.into();
+        let session_data = TenantRbSession::create(&tenant, rb.id.clone(), auth_method)?.into();
 
         let requires_onboarding = tenant_role.scopes.contains(&TenantScope::Admin)
             && (tenant.website_url.is_none() || tenant.company_size.is_none());
@@ -117,7 +117,7 @@ async fn handler(
         // TODO one day support footprint firm employees
         let session_data = AuthSessionData::WorkOs(WorkOsSession {
             tenant_user_id: user.id,
-            auth_method: Some(auth_method),
+            auth_method,
         });
         (session_data, false, None, None, false)
     };

@@ -28,8 +28,7 @@ pub struct FirmEmployeeAuth {
     tenant_user: TenantUser,
     role: TenantRole,
     is_risk_ops: bool,
-    // TODO make this non-null after old session expires
-    pub(super) auth_method: Option<WorkosAuthMethod>,
+    pub(super) auth_method: WorkosAuthMethod,
 }
 
 /// Nests a private FirmEmployeeAuth and implements traits required to extract this session from an
@@ -200,14 +199,14 @@ mod test {
         let session_data = AuthSessionData::FirmEmployee(FirmEmployeeSession {
             tenant_user_id: tenant_user.id.clone(),
             tenant_id: tenant.id.clone(),
-            auth_method: Some(WorkosAuthMethod::GoogleOauth),
+            auth_method: WorkosAuthMethod::GoogleOauth,
         });
         let data = FirmEmployeeAuth {
             tenant,
             tenant_user,
             role,
             is_risk_ops,
-            auth_method: Some(WorkosAuthMethod::GoogleOauth),
+            auth_method: WorkosAuthMethod::GoogleOauth,
         };
         let data = ParsedFirmEmployeeAuth(data);
         let auth = SessionContext::create_fixture(data, session_data);
