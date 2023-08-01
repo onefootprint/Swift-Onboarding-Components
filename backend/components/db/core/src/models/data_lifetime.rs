@@ -335,12 +335,8 @@ impl DataLifetime {
         let uv_id_to_lifetimes = results
             .into_iter()
             .map(|l| (l.vault_id.clone(), l))
-            .sorted_by_key(|(uv_id, _)| uv_id.clone())
             .into_group_map();
-        let results = uv_id_to_lifetimes
-            .into_iter()
-            .map(|(uv_id, lifetimes)| (uv_id, lifetimes))
-            .collect();
+        let results = uv_id_to_lifetimes.into_iter().collect();
         Ok(results)
     }
 
