@@ -16,5 +16,8 @@ pub struct Organization {
     // Only serialize in the GET /org response
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_domain_already_claimed: Option<bool>,
+    // Only serialize in the GET /org/auth/roles response
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_auth_method_supported: Option<bool>,
 }
 export_schema!(Organization);

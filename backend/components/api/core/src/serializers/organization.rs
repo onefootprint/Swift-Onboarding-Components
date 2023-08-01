@@ -2,20 +2,41 @@ use db::models::tenant::Tenant;
 
 use crate::utils::db2api::DbToApi;
 
+pub struct IsAuthMethodSupported(pub bool);
+pub struct IsDomainAlreadyClaimed(pub bool);
+
 impl DbToApi<Tenant> for api_wire_types::Organization {
     fn from_db(t: Tenant) -> Self {
-        Self::from_db((t, None))
+        Self::from_db((t, None, None))
     }
 }
 
-impl DbToApi<(Tenant, bool)> for api_wire_types::Organization {
-    fn from_db((t, is_domain_already_claimed): (Tenant, bool)) -> Self {
-        Self::from_db((t, Some(is_domain_already_claimed)))
+impl DbToApi<(Tenant, IsDomainAlreadyClaimed)> for api_wire_types::Organization {
+    fn from_db((t, is_domain_already_claimed): (Tenant, IsDomainAlreadyClaimed)) -> Self {
+        Self::from_db((t, Some(is_domain_already_claimed), None))
     }
 }
 
-impl DbToApi<(Tenant, Option<bool>)> for api_wire_types::Organization {
-    fn from_db((t, is_domain_already_claimed): (Tenant, Option<bool>)) -> Self {
+impl DbToApi<(Tenant, IsAuthMethodSupported)> for api_wire_types::Organization {
+    fn from_db((t, is_auth_type_supported): (Tenant, IsAuthMethodSupported)) -> Self {
+        Self::from_db((t, None, Some(is_auth_type_supported)))
+    }
+}
+
+impl
+    DbToApi<(
+        Tenant,
+        Option<IsDomainAlreadyClaimed>,
+        Option<IsAuthMethodSupported>,
+    )> for api_wire_types::Organization
+{
+    fn from_db(
+        (t, is_domain_already_claimed, is_auth_method_supported): (
+            Tenant,
+            Option<IsDomainAlreadyClaimed>,
+            Option<IsAuthMethodSupported>,
+        ),
+    ) -> Self {
         let Tenant {
             id,
             name,
@@ -36,7 +57,9 @@ impl DbToApi<(Tenant, Option<bool>)> for api_wire_types::Organization {
             company_size,
             domain,
             allow_domain_access,
-            is_domain_already_claimed,
+            // These fields are only conditionally serialized in some endpoints
+            is_domain_already_claimed: is_domain_already_claimed.map(|i| i.0),
+            is_auth_method_supported: is_auth_method_supported.map(|i| i.0),
         }
     }
 }

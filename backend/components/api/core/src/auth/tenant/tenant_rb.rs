@@ -52,10 +52,8 @@ impl TenantRbSession {
         rb_id: TenantRolebindingId,
         auth_method: WorkosAuthMethod,
     ) -> ApiResult<Self> {
-        if let Some(auth_methods) = tenant.supported_auth_methods.as_ref() {
-            if !auth_methods.contains(&auth_method) {
-                return Err(AuthError::UnsupportedAuthMethod.into());
-            }
+        if !tenant.supports_auth_method(auth_method) {
+            return Err(AuthError::UnsupportedAuthMethod.into());
         }
         Ok(Self {
             tenant_rolebinding_id: rb_id,

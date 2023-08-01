@@ -203,6 +203,17 @@ impl Tenant {
     }
 }
 
+impl Tenant {
+    pub fn supports_auth_method(&self, auth_method: WorkosAuthMethod) -> bool {
+        if let Some(auth_methods) = self.supported_auth_methods.as_ref() {
+            if !auth_methods.contains(&auth_method) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, AsChangeset, Default)]
 #[diesel(table_name = tenant)]
 pub struct UpdateTenant {

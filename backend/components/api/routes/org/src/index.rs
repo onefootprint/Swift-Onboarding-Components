@@ -7,6 +7,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use actix_web::web;
 use api_core::errors::tenant::TenantError;
+use api_core::serializers::IsDomainAlreadyClaimed;
 use api_wire_types::UpdateTenantRequest;
 use db::models::tenant::{Tenant, UpdateTenant};
 use paperclip::actix::patch;
@@ -32,7 +33,7 @@ pub async fn get(
 
     Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db((
         tenant,
-        is_domain_already_claimed,
+        IsDomainAlreadyClaimed(is_domain_already_claimed),
     )))))
 }
 
