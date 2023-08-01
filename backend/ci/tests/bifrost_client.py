@@ -274,7 +274,19 @@ class BifrostClient:
         post("hosted/onboarding/authorize", None, self.auth_token, **kwargs)
 
     def handle_process(self, **kwargs):
-        post("hosted/onboarding/process", None, self.auth_token, **kwargs)
+        # Extract the fixture result from the sandbox_id
+        if self.sandbox_id is None:
+            fixture_result = None
+        elif self.sandbox_id.startswith("fail"):
+            fixture_result = "fail"
+        elif self.sandbox_id.startswith("manualreview"):
+            fixture_result = "manual_review"
+        elif self.sandbox_id.startswith("stepup"):
+            fixture_result = "step_up"
+        else:
+            fixture_result = "pass"
+        body = dict(fixture_result=fixture_result) if fixture_result else None
+        post("hosted/onboarding/process", body, self.auth_token, **kwargs)
 
     def validate(self, **kwargs):
         return post("hosted/onboarding/validate", None, self.auth_token, **kwargs)

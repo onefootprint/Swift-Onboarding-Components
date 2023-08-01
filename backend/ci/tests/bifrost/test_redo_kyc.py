@@ -66,11 +66,7 @@ def test_redo_kyc(sandbox_tenant, twilio):
     # Edit some data
     data = {"id.ssn9": "999-99-9999"}
     patch("/hosted/user/vault", data, bifrost.auth_token)
-    # have to manually handle requirements for now since the bifrost client is using legacy logic
-    # TODO change to bifrost.run() when process is handled normally
-    bifrost.handle_process()
-    validation_token = bifrost.validate()["validation_token"]
-    bifrost.validate_token(validation_token)
+    bifrost.run()
 
     # we should have re-run KYC and now have 2 OBDs
     timeline = get(

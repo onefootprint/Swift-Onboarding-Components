@@ -56,3 +56,10 @@ class IdempotencyId(BaseAuth):
 
 class SandboxId(BaseAuth):
     HEADER_NAME = "x-sandbox-id"
+
+    def __init__(self, value):
+        # Don't send the fixture result in sandbox ID anymore so it is required to be sent in POST /process
+        value = (
+            value.replace("fail", "").replace("manualreview", "").replace("stepup", "")
+        )
+        super().__init__(value)

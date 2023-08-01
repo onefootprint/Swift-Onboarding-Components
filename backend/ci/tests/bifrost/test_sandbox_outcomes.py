@@ -9,7 +9,8 @@ from tests.utils import _gen_random_n_digit_number
     [
         ("fail", "fail", False),
         ("blah_123", "pass", False),
-        ("manualreview", "fail", True),
+        ("manualreview12", "fail", True),
+        ("stepup12", "pending", False),
     ],
 )
 def test_deterministic_onboarding(
