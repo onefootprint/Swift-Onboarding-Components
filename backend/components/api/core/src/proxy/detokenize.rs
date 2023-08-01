@@ -4,6 +4,7 @@ use crate::errors::ApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::bulk_decrypt;
 use crate::utils::vault_wrapper::BulkDecryptReq;
+use crate::utils::vault_wrapper::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
@@ -59,9 +60,12 @@ pub async fn detokenize(
                 .ok_or(TenantError::VaultDoesntExist(fp_id.clone()))?;
             let targets = targets
                 .into_iter()
-                .map(|(di, filters)| {
+                .map(|(identifier, filters)| {
                     let transforms = filters.iter().map(filter_function_to_transform).collect_vec();
-                    (di, transforms)
+                    EnclaveDecryptOperation {
+                        identifier,
+                        transforms,
+                    }
                 })
                 .collect();
             Ok(BulkDecryptReq { vw, targets })

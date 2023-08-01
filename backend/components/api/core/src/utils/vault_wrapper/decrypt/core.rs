@@ -5,7 +5,6 @@ use crate::errors::enclave::EnclaveError;
 use crate::errors::ApiResult;
 use db::VaultedData;
 use either::Either;
-use enclave_proxy::DataTransform;
 use enclave_proxy::{DataTransformer, DataTransforms};
 use futures_util::StreamExt;
 use itertools::Itertools;
@@ -18,10 +17,10 @@ impl<Type> VaultWrapper<Type> {
     pub async fn decrypt_unchecked(
         &self,
         enclave_client: &EnclaveClient,
-        ids: &[DataIdentifier],
+        ops: &[DataIdentifier],
     ) -> ApiResult<DecryptUncheckedResult> {
-        let ids: Vec<_> = ids.iter().map(|di| (di.clone(), vec![])).collect();
-        self.fn_decrypt_unchecked(enclave_client, ids).await
+        let ops: Vec<_> = ops.iter().map(|di| di.clone().into()).collect();
+        self.fn_decrypt_unchecked(enclave_client, ops).await
     }
 
     /// Get the VaultedData for the provided id, if exists. This also includes strange logic to
@@ -48,10 +47,10 @@ impl<Type> VaultWrapper<Type> {
     pub async fn fn_decrypt_unchecked(
         &self,
         enclave_client: &EnclaveClient,
-        ids: Vec<(DataIdentifier, Vec<DataTransform>)>,
+        ops: Vec<EnclaveDecryptOperation>,
     ) -> ApiResult<DecryptUncheckedResult> {
         let results = self
-            .fn_decrypt_unchecked_raw(enclave_client, ids)
+            .fn_decrypt_unchecked_raw(enclave_client, ops)
             .await?
             .map_to_piistrings()?;
         Ok(results)
@@ -64,11 +63,11 @@ impl<Type> VaultWrapper<Type> {
     pub async fn fn_decrypt_unchecked_raw(
         &self,
         enclave_client: &EnclaveClient,
-        ids: Vec<(DataIdentifier, Vec<DataTransform>)>,
+        ops: Vec<EnclaveDecryptOperation>,
     ) -> ApiResult<DecryptUncheckedResult<Pii>> {
         // Fetch each DI's underlying data from the vault wrapper's in-memory state
         let datas = self
-            .decrypt_requests(ids)
+            .decrypt_requests(ops)
             .into_iter()
             // Use the unit type as the key for the hashmap, since we don't care about the key
             .map(|req| ((), req))
@@ -99,17 +98,15 @@ impl<Type> VaultWrapper<Type> {
 
     pub(in crate::utils::vault_wrapper) fn decrypt_requests(
         &self,
-        ids: Vec<(DataIdentifier, Vec<DataTransform>)>,
+        ops: Vec<EnclaveDecryptOperation>,
     ) -> Vec<VwDecryptRequest> {
-        tracing::info!(dis=%Csv::from(ids.iter().map(|(di, _)| di.clone()).collect_vec()), "Decrypting DIs");
+        tracing::info!(dis=%Csv::from(ops.iter().map(|op| op.identifier.clone()).collect_vec()), "Decrypting DIs");
 
         // Fetch each DI's underlying data from the vault wrapper's in-memory state
-        ids.into_iter()
-            .flat_map(|(di, transform)| {
-                self.get_vaulted_data(di.clone()).map(|d| {
-                    let op = EnclaveDecryptOperation::new(di, transform);
-                    VwDecryptRequest(&self.vault.e_private_key, op, d)
-                })
+        ops.into_iter()
+            .flat_map(|op| {
+                self.get_vaulted_data(op.identifier.clone())
+                    .map(|d| VwDecryptRequest(&self.vault.e_private_key, op, d))
             })
             .collect_vec()
     }

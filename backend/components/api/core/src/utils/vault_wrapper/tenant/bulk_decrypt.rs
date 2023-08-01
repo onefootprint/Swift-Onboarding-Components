@@ -4,9 +4,8 @@ use db::models::{
     access_event::{AccessEvent, NewAccessEventRow},
     insight_event::CreateInsightEvent,
 };
-use enclave_proxy::DataTransform;
 use itertools::Itertools;
-use newtypes::{AccessEventKind, DataIdentifier, DbActor, FpId, PiiString};
+use newtypes::{AccessEventKind, DbActor, FpId, PiiString};
 
 use crate::{
     errors::{ApiResult, AssertionError},
@@ -20,7 +19,7 @@ use super::TenantVw;
 
 pub struct BulkDecryptReq<T = Any> {
     pub vw: TenantVw<T>,
-    pub targets: Vec<(DataIdentifier, Vec<DataTransform>)>,
+    pub targets: Vec<EnclaveDecryptOperation>,
 }
 
 pub async fn bulk_decrypt<T>(
@@ -31,7 +30,7 @@ pub async fn bulk_decrypt<T>(
     principal: DbActor,
 ) -> ApiResult<Vec<(FpId, HashMap<EnclaveDecryptOperation, PiiString>)>> {
     for r in requests.iter() {
-        let dis = r.targets.iter().map(|(di, _)| di).collect_vec();
+        let dis = r.targets.iter().map(|op| &op.identifier).collect_vec();
         r.vw.check_ob_config_access(dis)?;
     }
 

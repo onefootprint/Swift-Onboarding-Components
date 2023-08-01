@@ -34,13 +34,11 @@ impl<Type> TenantVw<Type> {
     ) -> ApiResult<HashMap<EnclaveDecryptOperation, PiiString>> {
         let dis = req.targets.iter().map(|op| &op.identifier).collect();
         self.check_ob_config_access(dis)?;
-        let targets = req
-            .targets
-            .iter()
-            .map(|op| (op.identifier.clone(), op.transforms.clone()))
-            .collect();
-        let results = self.fn_decrypt_unchecked(&state.enclave_client, targets).await?;
-        req.create_access_event(state, &self.scoped_vault, results.decrypted_dis).await?;
+        let results = self
+            .fn_decrypt_unchecked(&state.enclave_client, req.targets.clone())
+            .await?;
+        req.create_access_event(state, &self.scoped_vault, results.decrypted_dis)
+            .await?;
         Ok(results.results)
     }
 
@@ -53,15 +51,11 @@ impl<Type> TenantVw<Type> {
     ) -> ApiResult<HashMap<EnclaveDecryptOperation, Pii>> {
         let dis = req.targets.iter().map(|op| &op.identifier).collect();
         self.check_ob_config_access(dis)?;
-        let targets = req
-            .targets
-            .iter()
-            .map(|op| (op.identifier.clone(), op.transforms.clone()))
-            .collect();
         let results = self
-            .fn_decrypt_unchecked_raw(&state.enclave_client, targets)
+            .fn_decrypt_unchecked_raw(&state.enclave_client, req.targets.clone())
             .await?;
-        req.create_access_event(state, &self.scoped_vault, results.decrypted_dis).await?;
+        req.create_access_event(state, &self.scoped_vault, results.decrypted_dis)
+            .await?;
         Ok(results.results)
     }
 }
