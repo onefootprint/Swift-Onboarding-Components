@@ -132,8 +132,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
-    // TODO: fix this
-    assert!(obd.seqno.is_none());
+    assert!(obd.seqno.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(ob.decision_made_at.is_some());

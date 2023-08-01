@@ -13,6 +13,12 @@ pub struct OnboardingRulesDecisionOutput {
     pub rules_not_triggered: Vec<RuleName>,
 }
 
+impl OnboardingRulesDecisionOutput {
+    pub fn update_should_commit(&mut self, should_commit: bool) {
+        self.decision.should_commit = should_commit;
+    }
+}
+
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum DecisionResult {
     /// an evaluated decision
@@ -61,7 +67,7 @@ impl WaterfallOnboardingRulesDecisionOutput {
     }
 
     pub fn final_kyc_decision(&self) -> ApiResult<OnboardingRulesDecisionOutput> {
-        let result = self
+        let mut result = self
             .kyc_decisions()
             .iter()
             .filter_map(|d| match d {
@@ -71,8 +77,17 @@ impl WaterfallOnboardingRulesDecisionOutput {
             .min_by(|x, y| x.decision.decision_status.cmp(&y.decision.decision_status))
             .ok_or(crate::decision::Error::DecisionNotFound)?
             .clone();
+        // Kinda hacky, but we want the status to come from Doc OR KYC, but the committing decision to just come from KYC
+        result.update_should_commit(self.should_commit());
 
         Ok(result)
+    }
+
+    pub fn should_commit(&self) -> bool {
+        match &self.kyc_decision {
+            DecisionResult::Evaluated(d) => d.decision.should_commit,
+            DecisionResult::NotRequired => false,
+        }
     }
 
     fn kyc_decisions(&self) -> Vec<DecisionResult> {
