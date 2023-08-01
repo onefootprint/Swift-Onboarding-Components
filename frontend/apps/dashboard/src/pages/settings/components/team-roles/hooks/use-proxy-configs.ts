@@ -22,10 +22,14 @@ const getProxyConfigs = async (
   return response.data;
 };
 
-const useProxyConfigs = (filters?: GetProxyConfigsRequest) => {
-  const { authHeaders, isLive } = useSession();
+const useProxyConfigs = (
+  overrideIsLive: boolean,
+  filters?: GetProxyConfigsRequest,
+) => {
+  const { authHeaders } = useSession();
+  authHeaders['x-is-live'] = `${overrideIsLive}`;
 
-  const proxyConfigsQuery = useQuery([QUERY_KEY, filters, isLive], () =>
+  const proxyConfigsQuery = useQuery([QUERY_KEY, filters, overrideIsLive], () =>
     getProxyConfigs(authHeaders, filters),
   );
   const { error, data = [] } = proxyConfigsQuery;

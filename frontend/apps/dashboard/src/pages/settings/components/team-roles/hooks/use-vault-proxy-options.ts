@@ -53,9 +53,14 @@ export type Option = {
 
 const useVaultProxyOptions = () => {
   const { t } = useTranslation('pages.settings.roles.scopes');
-  const { data } = useProxyConfigs({ status: 'enabled' });
+  // TODO we'll get rid of this overriding of is-live once IAM roles are environment-specific
+  const { data: liveData } = useProxyConfigs(true, {
+    status: 'enabled',
+  });
+  const { data: sandboxData } = useProxyConfigs(false, { status: 'enabled' });
 
-  const vaultProxyOptions: Option[] = data.map(c => ({
+  const allData = sandboxData.concat(liveData);
+  const vaultProxyOptions: Option[] = allData.map(c => ({
     value: c.id,
     label: c.name,
   }));
