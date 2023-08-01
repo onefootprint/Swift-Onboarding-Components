@@ -1,9 +1,9 @@
-use crate::decision::onboarding::{Decision, FeatureVector, OnboardingRulesDecision};
-use crate::decision::{
-    features::idology_expectid::IDologyFeatures, features::kyc_features::KycFeatureVector,
-    onboarding::OnboardingRulesDecisionOutput, rule::rule_sets, rule::RuleName,
-};
-use newtypes::{DecisionStatus, FootprintReasonCode, VerificationResultId};
+use crate::decision::features::risk_signals::risk_signal_group_struct::Kyc;
+use crate::decision::features::risk_signals::{RiskSignalGroupStruct, RiskSignalsForDecision};
+use crate::decision::onboarding::rules::{KycRuleExecutionConfig, KycRuleGroup};
+use crate::decision::onboarding::Decision;
+use crate::decision::{onboarding::OnboardingRulesDecisionOutput, rule::rule_sets, rule::RuleName};
+use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResultId};
 use std::str::FromStr;
 use test_case::test_case;
 
@@ -33,7 +33,7 @@ fn create_onboarding_rules_decision_output(
 }
 
 // id located
-#[test_case(vec![] => create_onboarding_rules_decision_output(DecisionStatus::Pass, false, true, vec![]); "id located -> pass")]
+#[test_case(vec![FootprintReasonCode::DobMatches] => create_onboarding_rules_decision_output(DecisionStatus::Pass, false, true, vec![]); "id located -> pass")]
 #[test_case(vec![FootprintReasonCode::IdNotLocated] => create_onboarding_rules_decision_output(DecisionStatus::Fail, false, false, vec![RuleName::IdNotLocated]); "id not located -> fail")]
 // id located, but was a watchlist hit so we commit, but fail onboarding and raise a review since it's just WL
 #[test_case(vec![FootprintReasonCode::WatchlistHitOfac] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, true, vec![RuleName::WatchlistHit]); "id located, watchlist hit -> fail but commit")]
@@ -44,21 +44,31 @@ fn create_onboarding_rules_decision_output(
 fn test_evaluate_onboarding_rules(
     fp_reason_codes: Vec<FootprintReasonCode>,
 ) -> OnboardingRulesDecisionOutput {
-    // Set up a feature vector
-    let idology_features = IDologyFeatures {
-        footprint_reason_codes: fp_reason_codes,
-        verification_result_id: VerificationResultId::from_str("vres123").unwrap(),
-    };
+    let frcs = fp_reason_codes
+        .into_iter()
+        .map(|f| {
+            (
+                f,
+                VendorAPI::IdologyExpectID,
+                VerificationResultId::from_str("vres123").unwrap(),
+            )
+        })
+        .collect();
 
-    let feature_vector = KycFeatureVector {
-        idology_features: Some(idology_features),
+    let rsg = RiskSignalsForDecision {
+        kyc: RiskSignalGroupStruct {
+            footprint_reason_codes: frcs,
+            group: Kyc,
+        },
         ..Default::default()
     };
 
+    let rule_group = KycRuleGroup::default();
+
     // function under test
-    let (decision, _) = feature_vector.evaluate().unwrap();
-    match decision {
-        OnboardingRulesDecision::Kyc(d) => d.final_kyc_decision().unwrap(),
-        OnboardingRulesDecision::Kyb(_) => panic!(),
-    }
+    rule_group
+        .evaluate(rsg, KycRuleExecutionConfig { include_doc: false })
+        .unwrap()
+        .final_kyc_decision()
+        .unwrap()
 }

@@ -5,21 +5,28 @@ use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
-use api_core::decision::features;
+use api_core::decision::engine;
+use api_core::decision::features::risk_signals::{
+    create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map, save_risk_signals,
+};
+use api_core::decision::onboarding::rules::KycRuleExecutionConfig;
 use api_core::decision::onboarding::{rules::KycRuleGroup, Decision, OnboardingRulesDecisionOutput};
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use api_core::decision::vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results;
+use api_core::errors::workflow::WorkflowError;
 use api_core::errors::AssertionError;
 use api_core::{task, ApiErrorKind};
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
+use db::models::document_request::DocumentRequest;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
+use db::models::workflow::Workflow;
 use newtypes::{
-    DecisionIntentId, DecisionStatus, FpId, TenantId, VaultKind, Vendor, VerificationRequestId,
-    VerificationResultId,
+    DecisionIntentId, DecisionStatus, FpId, TenantId, Vendor, VerificationRequestId, VerificationResultId,
 };
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
@@ -139,8 +146,7 @@ async fn make_vendor_calls(
     )
     .await?;
     let rule_group = KycRuleGroup::default();
-    let (rules_output, _, _) =
-        crate::decision::engine::calculate_decision(vendor_results.clone(), rule_group)?;
+    let rules_output = crate::decision::engine::calculate_decision(vendor_results.clone(), rule_group)?;
 
     let (request_ids, response_ids): (Vec<VerificationRequestId>, Vec<VerificationResultId>) = vendor_results
         .into_iter()
@@ -180,13 +186,15 @@ async fn make_decision(
 ) -> actix_web::Result<Json<ResponseData<MakeDecisionResponse>>, ApiError> {
     let MakeDecisionRequest { tenant_id, fp_id } = request.into_inner();
 
-    let ob = state
+    let (ob, is_sandbox, wf) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
             let uv = Vault::get(conn, &scoped_user.id)?;
             let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
-            Ok(ob)
+            let is_sandbox = !uv.is_live;
+            let wf = Workflow::latest(conn, &scoped_user.id)?.ok_or(WorkflowError::AuthMissingWorkflow)?;
+            Ok((ob, is_sandbox, wf))
         })
         .await?;
 
@@ -206,22 +214,38 @@ async fn make_decision(
         return Err(AssertionError("No completed vendor requests found").into());
     }
 
-    let vendor_result_ids: Vec<VerificationResultId> = vendor_requests
-        .completed_requests
-        .as_slice()
+    let vendor_results: Vec<VendorResult> = vendor_requests.completed_requests;
+    let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+    let verification_result_ids: Vec<VerificationResultId> = vendor_results
         .iter()
         .map(|vr| vr.verification_result_id.clone())
         .collect();
+    let vendor_result_ids = verification_result_ids.clone();
+    let risk_signals = create_risk_signals_from_vendor_results(vendor_result_maps)?;
 
-    let fv = features::kyc_features::create_features(vendor_requests.completed_requests);
-    decision::engine::make_onboarding_decision(
-        &ob,
-        fv,
-        &state.db_pool,
-        vendor_result_ids.clone(),
-        VaultKind::Person,
-    )
-    .await?;
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            save_risk_signals(conn, &ob.scoped_vault_id, &risk_signals, false)?;
+            let rule_group = KycRuleGroup::default();
+            let risk_signals = fetch_latest_risk_signals_map(conn, &ob.scoped_vault_id)?;
+            let include_doc = DocumentRequest::get(conn, &wf.id)?.is_some();
+            let config = KycRuleExecutionConfig { include_doc };
+            let rules_output = rule_group.evaluate(risk_signals, config)?;
+            engine::save_onboarding_decision(
+                conn,
+                &ob,
+                rules_output.into(),
+                verification_result_ids,
+                false,
+                is_sandbox,
+                Some(wf.id.clone()),
+                vec![],
+            )?;
+
+            Ok(())
+        })
+        .await?;
 
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
@@ -328,7 +352,7 @@ async fn shadow_run(
         })
         .collect();
     let rule_group = KycRuleGroup::default();
-    let (rules_output, _, _) = decision::engine::calculate_decision(vendor_results, rule_group)?;
+    let rules_output = decision::engine::calculate_decision(vendor_results, rule_group)?;
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
         decision_status: rules_output.decision.decision_status,

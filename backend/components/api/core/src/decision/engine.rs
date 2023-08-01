@@ -1,14 +1,15 @@
 use std::{collections::HashMap, sync::Arc};
 
 use super::{
-    features::kyc_features::KycFeatureVector,
+    features::risk_signals::{create_risk_signals_from_vendor_results, RiskSignalsForDecision},
     onboarding::{
-        rules::calculate_kyc_rules_output_with_waterfall, rules::KycRuleGroup, DecisionReasonCodes,
+        rules::{KycRuleExecutionConfig, KycRuleGroup},
         FeatureVector, FinalAndAdditionalDecisions, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
     },
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
         tenant_vendor_control::TenantVendorControl,
+        vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
         vendor_result::VendorResult,
         verification_result,
     },
@@ -304,16 +305,15 @@ pub async fn make_vendor_requests(
 pub fn calculate_decision(
     vendor_results: Vec<VendorResult>,
     rule_group: KycRuleGroup,
-) -> ApiResult<(
-    OnboardingRulesDecisionOutput,
-    DecisionReasonCodes,
-    KycFeatureVector,
-)> {
-    // From our results, create a FeatureVector for the final decision output
-    let fv = features::kyc_features::create_features(vendor_results);
-    let (decision, reason_codes) = calculate_kyc_rules_output_with_waterfall(&fv, rule_group)?;
+) -> ApiResult<OnboardingRulesDecisionOutput> {
+    let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+    let risk_signals = RiskSignalsForDecision {
+        kyc: create_risk_signals_from_vendor_results(vendor_result_maps)?,
+        ..Default::default()
+    };
+    let decision = rule_group.evaluate(risk_signals, KycRuleExecutionConfig { include_doc: false })?;
 
-    Ok((decision.final_kyc_decision()?, reason_codes, fv))
+    decision.final_kyc_decision()
 }
 
 /// Create and save an onboarding decision

@@ -2,18 +2,16 @@ use newtypes::{DecisionStatus, VendorAPI};
 
 use crate::decision::rule::RuleName;
 use crate::errors::ApiResult;
-use crate::{decision::Error, ApiError};
+use crate::ApiError;
 
 use crate::decision::{
     features::{
         experian::ExperianFeatures,
         idology_expectid::IDologyFeatures,
         incode_docv::IncodeDocumentFeatures,
-        kyc_features::KycFeatureVector,
         risk_signals::{RiskSignalGroupStruct, RiskSignalsForDecision, WrappedRiskSignalGroupKind},
     },
     rule::{
-        self,
         rule_set::{Action, RuleSet},
         rule_sets,
         rules_engine::{evaluate_onboarding_rule_set, OnboardingEvaluationResult},
@@ -22,7 +20,7 @@ use crate::decision::{
 };
 
 use super::{
-    Decision, DecisionReasonCodes, DecisionResult, FeatureSet, OnboardingRulesDecisionOutput,
+    Decision, DecisionResult, FeatureSet, OnboardingRulesDecisionOutput,
     WaterfallOnboardingRulesDecisionOutput,
 };
 
@@ -149,55 +147,6 @@ impl KycRuleGroup {
     }
 }
 
-// Calculate the outputs of rules
-pub fn calculate_kyc_rules_output_with_waterfall(
-    feature_vector: &KycFeatureVector,
-    rule_group: KycRuleGroup,
-) -> ApiResult<(WaterfallOnboardingRulesDecisionOutput, DecisionReasonCodes)> {
-    // Evaluate rules
-    let idology_rule_result = feature_vector
-        .idology_features
-        .as_ref()
-        .map(|f| rule::rules_engine::evaluate_onboarding_rule_set(rule_group.idology_rules, f));
-
-    let experian_result = feature_vector
-        .experian_features
-        .as_ref()
-        .map(|e| rule::rules_engine::evaluate_onboarding_rule_set(rule_group.experian_rules, e));
-
-    // TODO: add Ord so we have a vendor preference
-    let rule_results: Vec<OnboardingEvaluationResult> = vec![experian_result, idology_rule_result]
-        .into_iter()
-        .flatten()
-        .collect();
-    if rule_results.is_empty() {
-        Err(crate::decision::Error::from(RuleError::MissingInputForRules))?;
-    }
-
-    let result = rule_results
-        .iter()
-        .min_by(|x, y| x.triggered_action.cmp(&y.triggered_action))
-        .ok_or(RuleError::AssertionError("could not compute waterfall".into()))
-        .map_err(Error::from)?
-        .clone();
-    let additional_results = rule_results
-        .into_iter()
-        .filter(|ober| ober != &result)
-        .map(OnboardingRulesDecisionOutput::from)
-        .collect();
-
-    // TODO: derive this better
-    let reason_codes = feature_vector.reason_codes(vec![VendorAPI::TwilioLookupV2, result.vendor_api]);
-
-    let output = WaterfallOnboardingRulesDecisionOutput::new(
-        DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(result)),
-        DecisionResult::NotRequired,
-        additional_results,
-    );
-
-    Ok((output, reason_codes))
-}
-
 impl From<&Action> for DecisionStatus {
     fn from(value: &Action) -> Self {
         match value {
@@ -218,7 +167,8 @@ impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
 
         OnboardingRulesDecisionOutput {
             decision: Decision {
-                should_commit: KycFeatureVector::should_commit(&result.rules_triggered),
+                // TODO: fix this
+                should_commit: should_commit(&result.rules_triggered),
                 decision_status,
                 create_manual_review,
                 vendor_api: result.vendor_api,
@@ -227,4 +177,12 @@ impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
             rules_not_triggered: result.rules_not_triggered.to_owned(),
         }
     }
+}
+
+// For now, we have very simple logic to decide when to commit which is just "if the only thing
+// that failed this user is a watchlist hit, commit"
+// More thoughts: https://www.notion.so/onefootprint/Design-Doc-Portabilization-Decision-71f1cfb945234c58b74e97f005211917?pvs=4
+pub fn should_commit(rules_triggered: &Vec<RuleName>) -> bool {
+    rules_triggered.is_empty()
+        || (rules_triggered.len() == 1 && rules_triggered.contains(&RuleName::WatchlistHit))
 }

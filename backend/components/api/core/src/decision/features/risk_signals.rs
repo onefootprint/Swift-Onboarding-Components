@@ -312,7 +312,7 @@ impl TryFrom<RiskSignalGroupStruct<Doc>> for IncodeDocumentFeatures {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct RiskSignalsForDecision {
     pub kyc: RiskSignalGroupStruct<Kyc>,
     pub doc: RiskSignalGroupStruct<Doc>,
