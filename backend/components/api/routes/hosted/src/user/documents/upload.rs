@@ -2,6 +2,7 @@ use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
+use crate::user::documents::temporary_should_skip_consent_always;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
 use api_core::auth::user::UserObAuthContext;
@@ -74,7 +75,15 @@ pub async fn post(
     if side == DocumentSide::Selfie && !doc_request.should_collect_selfie {
         return Err(OnboardingError::NotExpectingSelfie.into());
     }
-    if user_consent.is_none() {
+    // TEMPORARY until appclip supports consent always
+    // if appclip enabled && sandbox && !selfie
+    let temp_appclip_readiness_should_skip_consent = temporary_should_skip_consent_always(
+        state.feature_flag_client.clone(),
+        &user_auth.scoped_user.tenant_id,
+        &vault,
+        &doc_request,
+    );
+    if user_consent.is_none() && !temp_appclip_readiness_should_skip_consent {
         return Err(OnboardingError::UserConsentNotFound.into());
     }
 
