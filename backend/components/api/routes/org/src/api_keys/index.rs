@@ -34,7 +34,11 @@ pub async fn get(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let page_size = pagination.page_size(&state);
     let cursor = pagination.cursor;
-    let ApiKeyFilters { role_ids, status } = filters.into_inner();
+    let ApiKeyFilters {
+        role_ids,
+        status,
+        search,
+    } = filters.into_inner();
     let role_ids = role_ids.map(|r_ids| r_ids.0);
 
     let query = ApiKeyListFilters {
@@ -42,6 +46,7 @@ pub async fn get(
         is_live: auth.is_live()?,
         role_ids,
         status,
+        search,
     };
     let (keys, count) = state
         .db_pool

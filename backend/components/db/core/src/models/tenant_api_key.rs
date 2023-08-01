@@ -60,6 +60,7 @@ pub struct ApiKeyListFilters {
     pub is_live: IsLive,
     pub role_ids: Option<Vec<TenantRoleId>>,
     pub status: Option<ApiKeyStatus>,
+    pub search: Option<String>,
 }
 
 pub enum TenantApiKeyIdentifier<'a> {
@@ -87,15 +88,15 @@ impl TenantApiKey {
             .filter(tenant_api_key::is_live.eq(filters.is_live))
             .filter(tenant_api_key::deactivated_at.is_null())
             .into_boxed();
-
         if let Some(role_ids) = filters.role_ids.as_ref() {
             query = query.filter(tenant_api_key::role_id.eq_any(role_ids));
         }
-
         if let Some(status) = filters.status.as_ref() {
             query = query.filter(tenant_api_key::status.eq(status));
         }
-
+        if let Some(search) = filters.search.as_ref() {
+            query = query.filter(tenant_api_key::name.ilike(format!("%{}%", search)));
+        }
         query
     }
 

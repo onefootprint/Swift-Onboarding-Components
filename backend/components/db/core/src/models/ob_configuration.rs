@@ -92,6 +92,7 @@ pub struct ObConfigurationQuery {
     pub tenant_id: TenantId,
     pub is_live: bool,
     pub status: Option<ApiKeyStatus>,
+    pub search: Option<String>,
 }
 
 impl ObConfiguration {
@@ -102,6 +103,9 @@ impl ObConfiguration {
             .into_boxed();
         if let Some(status) = filters.status.as_ref() {
             query = query.filter(ob_configuration::status.eq(status))
+        }
+        if let Some(search) = filters.search.as_ref() {
+            query = query.filter(ob_configuration::name.ilike(format!("%{}%", search)));
         }
         query
     }

@@ -34,6 +34,7 @@ impl ExecuteTask<LogNumTenantApiKeysArgs> for LogNumTenantApiKeysTask {
                     is_live,
                     role_ids: None,
                     status: None,
+                    search: None,
                 };
                 let count = TenantApiKey::count(conn, &filters)?;
                 Ok(count)

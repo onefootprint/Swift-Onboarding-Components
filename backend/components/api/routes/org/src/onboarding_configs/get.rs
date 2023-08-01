@@ -85,12 +85,13 @@ async fn get_list(
     let cursor = pagination.cursor;
     let page_size = pagination.page_size(&state);
 
-    let OnboardingConfigFilters { status } = filters.into_inner();
+    let OnboardingConfigFilters { status, search } = filters.into_inner();
 
     let query = ObConfigurationQuery {
         tenant_id: tenant.id.clone(),
         is_live: auth.is_live()?,
         status,
+        search,
     };
     let (configs, count) = state
         .db_pool

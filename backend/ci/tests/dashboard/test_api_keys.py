@@ -31,6 +31,65 @@ def secret_key(sandbox_tenant, admin_role):
     return SecretApiKey.from_response(body)
 
 
+@pytest.fixture(scope="session")
+def limited_disabled_secret_key(sandbox_tenant, limited_role):
+    data = dict(name="Limited test secret key", role_id=limited_role["id"])
+    body = post("org/api_keys", data, sandbox_tenant.auth_token)
+    data = dict(status="disabled")
+    key_id = body["id"]
+    body = patch(f"org/api_keys/{key_id}", data, sandbox_tenant.auth_token)
+    return body
+
+
+def test_api_key_list(secret_key):
+    body = get("org/api_keys", None, secret_key.key)
+    key = next(key for key in body["data"] if key["id"] == secret_key.id)
+    assert key["name"] == secret_key.name
+    assert key["status"] == secret_key.status
+    assert key["created_at"]
+    assert "key" not in key
+    assert key["last_used_at"]
+
+
+@pytest.mark.parametrize(
+    "params,expect_key1,expect_key2",
+    [
+        (dict(status="enabled"), True, False),
+        (dict(status="disabled"), False, True),
+        (dict(search="Test"), True, True),
+        (dict(search="limited"), False, True),
+        (dict(role_ids=["admin"]), True, False),
+        (dict(role_ids=["limited"]), False, True),
+        (dict(role_ids=["limited", "admin"]), True, True),
+    ],
+)
+def test_api_key_list_filters(
+    secret_key,
+    limited_disabled_secret_key,
+    params,
+    expect_key1,
+    expect_key2,
+    admin_role,
+    limited_role,
+):
+    if params.get("role_ids"):
+        role_name_to_id = {
+            "admin": admin_role["id"],
+            "limited": limited_role["id"],
+        }
+        params["role_ids"] = ",".join(
+            [role_name_to_id[name] for name in params["role_ids"]]
+        )
+
+    body = get("org/api_keys", params, secret_key.key)
+    assert any(u["id"] == secret_key.id for u in body["data"]) == expect_key1
+    assert (
+        any(u["id"] == limited_disabled_secret_key["id"] for u in body["data"])
+        == expect_key2
+    )
+    assert not any("key" in key for key in body["data"])
+
+
 def test_api_key_limited_role(
     sandbox_tenant,
     admin_role,
@@ -129,16 +188,6 @@ def test_deactivate_api_key_role(limited_role, sandbox_tenant):
         None,
         sandbox_tenant.auth_token,
     )
-
-
-def test_api_key_list(secret_key):
-    body = get("org/api_keys", None, secret_key.key)
-    key = next(key for key in body["data"] if key["id"] == secret_key.id)
-    assert key["name"] == secret_key.name
-    assert key["status"] == secret_key.status
-    assert key["created_at"]
-    assert "key" not in key
-    assert key["last_used_at"]
 
 
 def test_api_key_reveal(secret_key):

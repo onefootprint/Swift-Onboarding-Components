@@ -24,7 +24,7 @@ def ob_configuration(sandbox_tenant, must_collect_data, can_access_data):
 @pytest.fixture(scope="session")
 def inactive_ob_configuration(sandbox_tenant, must_collect_data, can_access_data):
     ob_config = create_ob_config(
-        sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
+        sandbox_tenant, "My inactive test OB Config", must_collect_data, can_access_data
     )
     data = dict(status="disabled")
     body = patch(
@@ -56,16 +56,31 @@ def test_config_list(sandbox_tenant, ob_configuration, inactive_ob_configuration
     assert config["status"] == "disabled"
 
 
+@pytest.mark.parametrize(
+    "params,expect_ob_config1,expect_ob_config2",
+    [
+        (dict(status="enabled"), True, False),
+        (dict(status="disabled"), False, True),
+        (dict(search="Test"), True, True),
+        (dict(search="Inactive"), False, True),
+    ],
+)
 def test_config_list_filters(
-    sandbox_tenant, ob_configuration, inactive_ob_configuration
+    sandbox_tenant,
+    ob_configuration,
+    inactive_ob_configuration,
+    params,
+    expect_ob_config1,
+    expect_ob_config2,
 ):
-    params = dict(status="enabled")
     body = get("org/onboarding_configs", params, sandbox_tenant.sk.key)
-    assert [i for i in body["data"] if i["id"] == ob_configuration.id]
-
-    params = dict(status="disabled")
-    body = get("org/onboarding_configs", params, sandbox_tenant.sk.key)
-    assert [i for i in body["data"] if i["id"] == inactive_ob_configuration["id"]]
+    assert (
+        any(u["id"] == ob_configuration.id for u in body["data"]) == expect_ob_config1
+    )
+    assert (
+        any(u["id"] == inactive_ob_configuration["id"] for u in body["data"])
+        == expect_ob_config2
+    )
 
 
 def test_config_detail(sandbox_tenant, ob_configuration):
