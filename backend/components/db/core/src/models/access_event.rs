@@ -82,7 +82,7 @@ impl NewAccessEvent {
 impl AccessEvent {
     #[tracing::instrument("AccessEvent::bulk_create", skip_all)]
     pub fn bulk_create(conn: &mut PgConn, rows: Vec<NewAccessEventRow>) -> DbResult<()> {
-        let rows = rows.into_iter().filter(|r| r.targets.len() > 1).collect_vec();
+        let rows = rows.into_iter().filter(|r| !r.targets.is_empty()).collect_vec();
         diesel::insert_into(access_event::table)
             .values(rows)
             .execute(conn)?;

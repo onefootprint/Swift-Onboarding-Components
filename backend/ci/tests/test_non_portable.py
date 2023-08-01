@@ -250,11 +250,6 @@ def test_vault_create_write_decrypt(tenant):
     assert not body["card.valley.cvc"]
     assert not body["id.first_name"]
 
-    data = dict(fields=["card.valley.cvc"], reason="try decrypt failure")
-    body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key, status_code=200)
-    assert "card.valley.cvc" not in data
-    assert "id.first_name" not in data
-
     # check the access events and check it's correct
     body = get(
         "org/access_events",
@@ -262,10 +257,14 @@ def test_vault_create_write_decrypt(tenant):
         tenant.sk.key,
     )
     access_events = body["data"]
-    events = access_events[1]["targets"]
+    events = access_events[0]["targets"]
     assert set(events) == set(["card.valley.cvc", "id.first_name"])
+    assert access_events[0]["kind"] == "delete"
 
-    assert access_events[1]["kind"] == "delete"
+    data = dict(fields=["card.valley.cvc"], reason="try decrypt failure")
+    body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key, status_code=200)
+    assert "card.valley.cvc" not in data
+    assert "id.first_name" not in data
 
 
 def test_idempotency_id(tenant, sandbox_tenant):

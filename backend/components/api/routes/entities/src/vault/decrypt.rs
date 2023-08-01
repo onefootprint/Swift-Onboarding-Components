@@ -2,19 +2,19 @@ use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
 use crate::auth::{tenant::TenantSessionAuth, Either};
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::headers::InsightHeaders;
-use crate::utils::vault_wrapper::{DecryptRequest as VwDecryptRequest, VaultWrapper};
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{errors::ApiError, State};
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::proxy::filter_function_to_transform;
-use api_core::utils::vault_wrapper::{EnclaveDecryptOperation, TenantVw};
+use api_core::utils::vault_wrapper::{bulk_decrypt, BulkDecryptReq, EnclaveDecryptOperation, TenantVw};
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::{flat_api_object_map_type, DataLifetimeSeqno, DbActor, PiiString, VersionedDataIdentifier};
+use newtypes::{flat_api_object_map_type, DataLifetimeSeqno, PiiString, VersionedDataIdentifier};
 use newtypes::{FilterFunction, FpId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
@@ -144,51 +144,56 @@ pub(super) async fn post_inner(
     let transforms = filters.iter().map(filter_function_to_transform).collect_vec();
 
     // Create a VW for each version in fields
-    let version_to_fields = fields.into_iter().map(|f| (f.version, f.di)).into_group_map();
-    let versions = version_to_fields.keys().cloned().collect_vec();
+    let version_to_targets = fields
+        .into_iter()
+        .map(|f| {
+            let target = EnclaveDecryptOperation {
+                identifier: f.di,
+                transforms: transforms.clone(),
+            };
+            (f.version, target)
+        })
+        .into_group_map();
+    let versions = version_to_targets.keys().cloned().collect_vec();
 
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
 
-    let mut uvws: HashMap<Option<DataLifetimeSeqno>, TenantVw> = state
+    let mut vws: HashMap<Option<DataLifetimeSeqno>, TenantVw> = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             // Build a VW for every version requested
-            let uvws = versions
+            let vws = versions
                 .into_iter()
                 .map(|v| VaultWrapper::build_for_tenant_version(conn, &scoped_user.id, v).map(|vw| (v, vw)))
                 .collect::<ApiResult<_>>()?;
-            Ok(uvws)
+            Ok(vws)
         })
         .await??;
 
-    let insight = CreateInsightEvent::from(insights.clone());
-    let principal: DbActor = auth.actor().into();
+    let decrypt_reqs = version_to_targets
+        .clone()
+        .into_iter()
+        .map(|(v, targets)| -> ApiResult<_> {
+            let vw = vws.remove(&v).ok_or(AssertionError("No VW found for version"))?;
+            Ok(BulkDecryptReq { key: v, vw, targets })
+        })
+        .collect::<ApiResult<_>>()?;
+    let insight = CreateInsightEvent::from(insights);
+    // TODO this will make separate access events for each version - maybe fine?
+    let mut decrypted_results = bulk_decrypt(state, decrypt_reqs, insight, reason, auth.actor().into())
+        .await?
+        .into_iter()
+        .collect::<HashMap<_, _>>();
 
     let mut results = HashMap::new();
-    for (v, fields) in version_to_fields {
-        let targets = fields
-            .into_iter()
-            .map(|identifier| EnclaveDecryptOperation {
-                identifier,
-                transforms: transforms.clone(),
-            })
-            .collect_vec();
-
-        let req = VwDecryptRequest {
-            reason: reason.clone(),
-            principal: principal.clone(),
-            insight: insight.clone(),
-            targets: targets.clone(),
-        };
-        let vw = uvws.remove(&v).ok_or(AssertionError("No VW found for version"))?;
-        // TODO this will make separate access events for each version - maybe fine?
-        let mut v_results = vw.fn_decrypt(state, req).await?;
+    for (v, targets) in version_to_targets {
+        let mut v_results = decrypted_results.remove(&v).unwrap_or_default();
         // Is this step necessary? Every key is present in the response if it was in the request?
         let v_results: HashMap<_, _> = targets
             .iter()
-            .map(|op| (op.identifier.clone(), v_results.remove(op)))
+            .map(|target| (target.identifier.clone(), v_results.remove(target)))
             .collect();
         for (di, result) in v_results {
             let id = VersionedDataIdentifier { di, version: v };
