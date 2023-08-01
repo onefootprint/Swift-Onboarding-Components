@@ -5,6 +5,7 @@ import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 import React from 'react';
 
@@ -35,7 +36,6 @@ describe('<CdoTagList />', () => {
       CollectedDocumentDataOption.documentAndSelfie,
       CollectedKycDataOption.phoneNumber,
       CollectedKycDataOption.email,
-      CollectedDocumentDataOption.document,
       CollectedKycDataOption.ssn9,
       CollectedInvestorProfileDataOption.investorProfile,
       CollectedKycDataOption.dob,
@@ -50,9 +50,22 @@ describe('<CdoTagList />', () => {
       'SSN (Full)',
       'Business beneficial owners',
       'Investor profile',
-      'ID Document',
       'ID Document &amp; Selfie',
     ];
+    const tags = screen.getAllByRole('listitem');
+    tags.forEach((tag, index) => {
+      expect(tag.innerHTML).toEqual(itemSorted[index]);
+    });
+  });
+
+  it('should show ID docs correctly', () => {
+    const items = [
+      SupportedIdDocTypes.passport,
+      SupportedIdDocTypes.idCard,
+      'selfie',
+    ];
+    renderCdoTagList(items);
+    const itemSorted: string[] = ['Passport', 'ID card', 'Selfie'];
     const tags = screen.getAllByRole('listitem');
     tags.forEach((tag, index) => {
       expect(tag.innerHTML).toEqual(itemSorted[index]);

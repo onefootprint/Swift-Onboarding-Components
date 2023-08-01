@@ -25,6 +25,7 @@ import {
   clickBack,
   clickNext,
   DOB_LABEL,
+  DRIVERS_LICENSE_LABEL,
   DRIVERS_LICENSE_OPTION,
   EMAIL_LABEL,
   fillInvestorProfile,
@@ -33,6 +34,7 @@ import {
   fillKycAccess,
   fillKycCollect,
   fillName,
+  ID_CARD_LABEL,
   ID_CARD_OPTION,
   ID_DOCUMENT_AND_SELFIE_LABEL,
   ID_DOCUMENT_LABEL,
@@ -40,9 +42,11 @@ import {
   NAME_LABEL,
   NATIONALITY_LABEL,
   NATIONALITY_OPTION,
+  PASSPORT_LABEL,
   PASSPORT_OPTION,
   PHONE_LABEL,
   selectType,
+  SELFIE_LABEL,
   SELFIE_OPTION,
   SSN_FULL_LABEL,
   SSN_LAST_FOUR_LABEL,
@@ -222,51 +226,31 @@ describe('<Dialog />', () => {
       await toggleCollectOption(NATIONALITY_OPTION, NATIONALITY_LABEL, false);
 
       // Select ID card & selfie
-      await toggleCollectOption(ID_CARD_OPTION, ID_DOCUMENT_LABEL, true);
-      await toggleCollectOption(
-        SELFIE_OPTION,
-        ID_DOCUMENT_AND_SELFIE_LABEL,
-        true,
-      );
+      await toggleCollectOption(ID_CARD_OPTION, ID_CARD_LABEL, true);
+      await toggleCollectOption(SELFIE_OPTION, SELFIE_LABEL, true);
 
       // Unselect Selfie & then ID card
-      await toggleCollectOption(
-        SELFIE_OPTION,
-        ID_DOCUMENT_AND_SELFIE_LABEL,
-        false,
-      );
-      await checkCollectedDataExists([ID_DOCUMENT_LABEL]);
-      await toggleCollectOption(ID_CARD_OPTION, ID_DOCUMENT_LABEL, false);
+      await toggleCollectOption(SELFIE_OPTION, SELFIE_LABEL, false);
+      await checkCollectedDataExists([ID_CARD_LABEL]);
+      await toggleCollectOption(ID_CARD_OPTION, ID_CARD_LABEL, false);
       expect(screen.queryByText(SELFIE_OPTION)).not.toBeInTheDocument();
 
       // Select Passport & selfie
-      await toggleCollectOption(PASSPORT_OPTION, ID_DOCUMENT_LABEL, true);
-      await toggleCollectOption(
-        SELFIE_OPTION,
-        ID_DOCUMENT_AND_SELFIE_LABEL,
-        true,
-      );
+      await toggleCollectOption(PASSPORT_OPTION, PASSPORT_LABEL, true);
+      await toggleCollectOption(SELFIE_OPTION, SELFIE_LABEL, true);
 
       // Unselect passport
       // This should automatically unselect the selfie
-      await toggleCollectOption(
-        PASSPORT_OPTION,
-        ID_DOCUMENT_AND_SELFIE_LABEL,
-        false,
-      );
-      await checkCollectedDataDoesNotExist([ID_DOCUMENT_LABEL]);
+      await toggleCollectOption(PASSPORT_OPTION, PASSPORT_LABEL, false);
+      await checkCollectedDataDoesNotExist([ID_CARD_LABEL]);
 
       // Select Driver's license & selfie
       await toggleCollectOption(
         DRIVERS_LICENSE_OPTION,
-        ID_DOCUMENT_LABEL,
+        DRIVERS_LICENSE_LABEL,
         true,
       );
-      await toggleCollectOption(
-        SELFIE_OPTION,
-        ID_DOCUMENT_AND_SELFIE_LABEL,
-        true,
-      );
+      await toggleCollectOption(SELFIE_OPTION, SELFIE_LABEL, true);
     });
 
     it('should go back to the name form', async () => {
@@ -340,7 +324,7 @@ describe('<Dialog />', () => {
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
-      await toggleCollectOption(ID_CARD_OPTION, ID_DOCUMENT_LABEL, true);
+      await toggleCollectOption(ID_CARD_OPTION, ID_CARD_LABEL, true);
       await clickNext();
 
       await fillInvestorProfile();
@@ -365,12 +349,8 @@ describe('<Dialog />', () => {
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
-      await toggleCollectOption(ID_CARD_OPTION, ID_DOCUMENT_LABEL, true);
-      await toggleCollectOption(
-        SELFIE_OPTION,
-        ID_DOCUMENT_AND_SELFIE_LABEL,
-        true,
-      );
+      await toggleCollectOption(ID_CARD_OPTION, ID_CARD_LABEL, true);
+      await toggleCollectOption(SELFIE_OPTION, SELFIE_LABEL, true);
       await clickNext();
 
       await fillInvestorProfile();

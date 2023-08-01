@@ -42,6 +42,9 @@ export const SSN_FULL_LABEL = 'SSN (Full)';
 export const SSN_LAST_FOUR_LABEL = 'SSN (Last 4)';
 export const NATIONALITY_LABEL = 'Nationality';
 export const ID_DOCUMENT_LABEL = 'ID Document';
+export const ID_CARD_LABEL = 'ID card';
+export const PASSPORT_LABEL = 'Passport';
+export const DRIVERS_LICENSE_LABEL = "Driver's license";
 export const SELFIE_LABEL = 'Selfie';
 export const ID_DOCUMENT_AND_SELFIE_LABEL = 'ID Document & Selfie';
 export const INVESTOR_PROFILE_LABEL = 'Investor profile';
@@ -64,12 +67,20 @@ export const BUSINESS_BO_FULL_KYC_LABEL =
 
 export const BUSINESS_BO_FULL_KYC_OPTION = 'Fully KYC all beneficial owners';
 
+const getOption = (label: string) =>
+  (screen.queryByRole('radio', { name: label }) ||
+    screen.queryByRole('checkbox', { name: label })) as HTMLInputElement | null;
+
 export const toggleCollectOption = async (
   optionLabel: string,
   collectedDataLabel: string,
   isSelected: boolean,
 ) => {
-  const option = screen.getByLabelText(optionLabel);
+  const option = getOption(optionLabel);
+  expect(option).toBeInTheDocument();
+  if (!option) {
+    return;
+  }
   await userEvent.click(option);
   const collectedData = getCollectedData();
 
@@ -88,7 +99,11 @@ export const toggleAccessOption = async (
   optionLabel: string,
   isSelected: boolean,
 ) => {
-  const option = screen.getByLabelText(optionLabel) as HTMLInputElement;
+  const option = getOption(optionLabel);
+  expect(option).toBeInTheDocument();
+  if (!option) {
+    return;
+  }
   if (isSelected) {
     expect(option.checked).toBeFalsy();
   } else {

@@ -6,18 +6,22 @@ import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
+  IdDocType,
 } from '@onefootprint/types';
 import { Tag, Typography } from '@onefootprint/ui';
 import React from 'react';
 
+import getCdos from './utils/get-cdos';
+
 type CdoTagListProps = {
   label?: string;
   testID?: string;
-  cdos: CollectedDataOption[];
+  cdos: (CollectedDataOption | string)[];
   disableSort?: boolean;
 };
 
-const order: CollectedDataOption[] = [
+// We need to clean this up when we re-do the CDO structure in the dashboard
+const tagOrder: (CollectedDataOption | IdDocType | 'selfie')[] = [
   CollectedKycDataOption.name,
   CollectedKycDataOption.email,
   CollectedKycDataOption.fullAddress,
@@ -36,26 +40,17 @@ const order: CollectedDataOption[] = [
   CollectedInvestorProfileDataOption.investorProfile,
   CollectedDocumentDataOption.document,
   CollectedDocumentDataOption.documentAndSelfie,
+  IdDocType.driversLicense,
+  IdDocType.passport,
+  IdDocType.idCard,
+  'selfie',
 ];
-
-const isDocumentDi = (cdo: string) => cdo.startsWith('document.');
-
-const isDocumentAndSelfieDi = (cdo: string) =>
-  isDocumentDi(cdo) && cdo.indexOf('selfie') > -1;
 
 const CdoTagList = ({ label, testID, cdos, disableSort }: CdoTagListProps) => {
   const { t } = useTranslation('cdo');
-  const processedCdos = cdos.map(cdo => {
-    if (isDocumentAndSelfieDi(cdo)) {
-      return CollectedDocumentDataOption.documentAndSelfie;
-    }
-    if (isDocumentDi(cdo)) {
-      return CollectedDocumentDataOption.document;
-    }
-    return cdo;
-  });
-  const attributeLabels = order.map(attr => t(attr));
-  const tagLabels = processedCdos.map(attr => t(attr));
+  const allCdos = getCdos(cdos);
+  const tagLabels = allCdos.map(cdo => t(cdo));
+  const attributeLabels = tagOrder.map(attr => t(attr));
   if (!disableSort)
     tagLabels.sort(
       (a, b) => attributeLabels.indexOf(a) - attributeLabels.indexOf(b),

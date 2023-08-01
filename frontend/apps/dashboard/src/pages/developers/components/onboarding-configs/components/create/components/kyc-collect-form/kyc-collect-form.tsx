@@ -2,7 +2,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedDataOption,
-  CollectedDocumentDataOption,
   CollectedKycDataOption,
   IdDocRegionality,
   SupportedIdDocTypes,
@@ -48,7 +47,8 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
     },
   });
   const { register, handleSubmit, watch } = methods;
-  const collectedData: CollectedDataOption[] = getRequiredKycCollectFields();
+  const collectedData: (CollectedDataOption | string)[] =
+    getRequiredKycCollectFields();
   const ssnKind = watch('ssnKind');
   collectedData.push(
     ssnKind === CollectedKycDataOption.ssn4
@@ -61,10 +61,14 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
   }
   const idDoc = watch('idDocType');
   const selfie = watch('selfieRequired');
-  if (idDoc?.length && selfie) {
-    collectedData.push(CollectedDocumentDataOption.documentAndSelfie);
-  } else if (idDoc?.length) {
-    collectedData.push(CollectedDocumentDataOption.document);
+
+  if (idDoc?.length) {
+    idDoc.forEach(doc => {
+      collectedData.push(doc);
+    });
+    if (selfie) {
+      collectedData.push('selfie');
+    }
   }
 
   const handleBeforeSubmit = (formData: FormData) => {
