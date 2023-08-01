@@ -71,10 +71,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             let (set_biz_is_authorized, bizob) = if let Some(biz_ob) = biz_ob {
                 let b = Onboarding::lock(c, &biz_ob.id)?;
                 let (set_biz_is_authorized, bizob) = if b.authorized_at.is_none() {
-                    (
-                        true,
-                        Onboarding::update(b, c, OnboardingUpdate::is_authorized_and_status_pending())?,
-                    )
+                    (true, Onboarding::update(b, c, OnboardingUpdate::is_authorized())?)
                 } else {
                     (false, b.into_inner())
                 };

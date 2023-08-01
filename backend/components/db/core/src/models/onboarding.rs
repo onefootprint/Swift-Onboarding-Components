@@ -79,14 +79,6 @@ impl OnboardingUpdate {
         }
     }
 
-    pub fn is_authorized_and_status_pending() -> Self {
-        Self {
-            authorized_at: Some(Some(Utc::now())),
-            status: Some(OnboardingStatus::Pending),
-            ..Self::default()
-        }
-    }
-
     pub fn idv_reqs_initiated() -> Self {
         Self {
             idv_reqs_initiated_at: Some(Some(Utc::now())),

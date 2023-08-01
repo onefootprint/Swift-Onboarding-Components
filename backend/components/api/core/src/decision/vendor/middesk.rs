@@ -21,8 +21,8 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
-use db::DbPool;
 use db::{models::verification_request::VerificationRequest, DbError};
+use db::{DbPool, DbResult};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
 use idv::middesk::response::business::BusinessResponse;
@@ -36,7 +36,10 @@ use idv::middesk::{
 
 use idv::{ParsedResponse, VendorResponse};
 
-use newtypes::{BusinessData, MiddeskRequestState, ObConfigurationKey, PiiJsonValue, TenantId, VendorAPI};
+use newtypes::{
+    BusinessData, MiddeskRequestState, ObConfigurationKey, OnboardingStatus, PiiJsonValue, TenantId,
+    VendorAPI,
+};
 
 #[derive(Debug)]
 pub struct MiddeskState<T> {
@@ -523,6 +526,16 @@ pub async fn run_kyb(
     wf: &Workflow,
     tenant_id: &TenantId,
 ) -> Result<(), ApiError> {
+    let bizobid = biz_ob_id.clone();
+    state
+        .db_pool
+        .db_transaction(move |conn| -> DbResult<_> {
+            let ob = Onboarding::lock(conn, &bizobid)?;
+            Onboarding::update(ob, conn, OnboardingUpdate::set_status(OnboardingStatus::Pending))?;
+            Ok(())
+        })
+        .await?;
+
     let fixture_decision = decision::utils::get_fixture_data_decision(
         state.feature_flag_client.clone(),
         person_vault,

@@ -13,7 +13,7 @@ use api_core::utils::db2api::DbToApi;
 use api_wire_types::{EntityValidateResponse, ValidateRequest, ValidateResponse};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::{BasicOnboardingInfo, Onboarding, OnboardingIdentifier};
-use newtypes::DataIdentifierDiscriminant;
+use newtypes::{DataIdentifierDiscriminant, VaultKind};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -73,21 +73,30 @@ pub async fn post(
 
     // Validate and serialize the user and optionally the business onboardings
     let validate_and_serialize =
-        |ob_info: BasicOnboardingInfo<Onboarding>| -> ApiResult<EntityValidateResponse> {
+        |ob_info: BasicOnboardingInfo<Onboarding>, kind: VaultKind| -> ApiResult<EntityValidateResponse> {
             if ob_info.1.tenant_id != auth.tenant().id {
                 return Err(OnboardingError::TenantMismatch.into());
             }
             if ob_info.1.is_live != auth.is_live()? {
                 return Err(OnboardingError::InvalidSandboxState.into());
             }
-            if !ob_info.0.status.is_complete() {
-                return Err(OnboardingError::NonTerminalState.into());
+            match kind {
+                VaultKind::Person => {
+                    if ob_info.0.status.requires_user_input() {
+                        return Err(OnboardingError::NonTerminalState.into());
+                    }
+                }
+                // Businesses could still be in status = `incomplete` if we are still waiting for BO's to complete KYC
+                VaultKind::Business => {}
             }
+
             let response = api_wire_types::EntityValidateResponse::from_db(ob_info);
             Ok(response)
         };
-    let user = validate_and_serialize(user_ob)?;
-    let business = business_ob.map(validate_and_serialize).transpose()?;
+    let user = validate_and_serialize(user_ob, VaultKind::Person)?;
+    let business = business_ob
+        .map(|bo| validate_and_serialize(bo, VaultKind::Business))
+        .transpose()?;
 
     let response = ValidateResponse {
         user,

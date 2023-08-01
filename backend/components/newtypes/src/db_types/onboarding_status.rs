@@ -40,12 +40,12 @@ pub enum OnboardingStatus {
 }
 
 impl OnboardingStatus {
-    pub fn is_complete(&self) -> bool {
+    pub fn requires_user_input(&self) -> bool {
         match self {
-            OnboardingStatus::Pass => true,
-            OnboardingStatus::Fail => true,
-            OnboardingStatus::Incomplete => false,
-            OnboardingStatus::Pending => true,
+            OnboardingStatus::Pass => false,
+            OnboardingStatus::Fail => false,
+            OnboardingStatus::Incomplete => true,
+            OnboardingStatus::Pending => false,
         }
     }
 
