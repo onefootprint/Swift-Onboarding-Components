@@ -7,7 +7,7 @@ import { GlobalState } from '../main';
 
 const recipientSlackChannel: Partial<Record<StackEnvironment, string>> = {
   [StackEnvironment.Dev]: '#honeycomb-backend-dev',
-  [StackEnvironment.Prod]: '#honeycomb-backend',
+  [StackEnvironment.Prod]: '#alerts-backend',
 };
 
 type HoneycombSecrets = {
