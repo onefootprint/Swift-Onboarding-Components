@@ -446,7 +446,7 @@
         },
         "allow-domain-access": {
           "title": "Allow domain access",
-          "subtitle": "Allow users with email addresses with this domain to join your team without an invite.",
+          "subtitle": "Allow users with email addresses with this domain to join your team with read-only access without requiring an invite.",
           "action": "Enable access for",
           "toggle": {
             "cta-not-allowed": "You're not allowed to toggle domain access",
