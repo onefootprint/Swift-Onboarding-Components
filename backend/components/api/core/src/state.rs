@@ -17,6 +17,7 @@ use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use idv::{
     fingerprintjs::client::FingerprintJSClient, footprint_http_client::FootprintVendorHttpClient,
     idology::client::IdologyClient, middesk::client::MiddeskClient, socure::client::SocureClient,
+    stytch::client::StytchClient,
 };
 
 use webhooks::WebhookClient;
@@ -161,6 +162,12 @@ impl State {
         let middesk_client = MiddeskClient::new(config.middesk_config.middesk_base_url.clone())
             .expect("failed to build middesk client");
 
+        let stytch_client = StytchClient::new(
+            config.stytch_config.stytch_project.clone(),
+            config.stytch_config.stytch_secret.clone(),
+        )
+        .expect("failed to build stytch client");
+
         // Check experian in dev so we fail early if something is misconfigured
         if !config.service_config.is_production()
             && !config.service_config.is_local()
@@ -212,6 +219,7 @@ impl State {
             twilio_client.clone(),
             footprint_vendor_http_client,
             middesk_client,
+            stytch_client,
         );
 
         let metrics = crate::metrics::init();
