@@ -88,7 +88,7 @@
           "placeholder": "(123) 123-1234",
           "errors": {
             "required": "Phone number cannot be empty",
-            "pattern": "Phone number is invalid"
+            "invalid": "Phone number is invalid"
           }
         },
         "cta": "Continue"

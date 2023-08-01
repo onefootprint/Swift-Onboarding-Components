@@ -7,6 +7,7 @@ import { useIdentifyMachine } from '../../components/identify-machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
 import EmailPreview from './components/email-preview';
 import Form from './components/form';
+import checkIsPhoneValid from './components/form/utils/check-is-phone-valid';
 import Header from './components/header';
 
 type FormData = {
@@ -26,6 +27,9 @@ const PhoneIdentification = () => {
   const logoUrl = config?.logoUrl;
   const orgName = config?.orgName;
   const showRequestErrorToast = useRequestErrorToast();
+
+  const validatePhone = (phone: string) =>
+    checkIsPhoneValid(phone, !config?.isLive);
 
   const handleSubmit = (formData: FormData) => {
     const phoneFromForm = formData.phoneNumber;
@@ -77,6 +81,7 @@ const PhoneIdentification = () => {
         onSubmit={handleSubmit}
         isLoading={isLoading}
         defaultPhone={phoneNumber}
+        validator={validatePhone}
       />
       <SandboxOutcomeFooter sandboxId={sandboxId} />
     </>

@@ -12,14 +12,16 @@ export type FormProps = {
   defaultPhone?: string;
   isLoading?: boolean;
   onSubmit: (formData: FormData) => void;
+  validator?: (phone: string) => boolean;
 };
 
-const Form = ({ isLoading, defaultPhone, onSubmit }: FormProps) => {
+const Form = ({ isLoading, defaultPhone, onSubmit, validator }: FormProps) => {
   const { t } = useTranslation('pages.phone-identification.form');
   const {
     control,
     setValue,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -29,8 +31,20 @@ const Form = ({ isLoading, defaultPhone, onSubmit }: FormProps) => {
   const hasError = !!errors.phoneNumber;
   const hint = hasError ? errors.phoneNumber?.message : undefined;
 
+  const handleBeforeSubmit = (formData: FormData) => {
+    if (validator && !validator(formData.phoneNumber)) {
+      setError(
+        'phoneNumber',
+        { message: t('phone.errors.invalid') },
+        { shouldFocus: true },
+      );
+      return;
+    }
+    onSubmit(formData);
+  };
+
   return (
-    <StyledForm onSubmit={handleSubmit(onSubmit)}>
+    <StyledForm onSubmit={handleSubmit(handleBeforeSubmit)}>
       <Controller
         control={control}
         name="phoneNumber"
@@ -41,7 +55,7 @@ const Form = ({ isLoading, defaultPhone, onSubmit }: FormProps) => {
           },
           pattern: {
             value: PhoneInputRegex,
-            message: t('phone.errors.pattern'),
+            message: t('phone.errors.invalid'),
           },
         }}
         render={({
