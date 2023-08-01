@@ -1,24 +1,23 @@
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantSessionAuth};
 use crate::auth::Either;
 use crate::errors::ApiResult;
-use crate::types::CursorPaginationRequest;
 use crate::types::JsonApiResponse;
-use crate::types::{CursorPaginatedResponse, ResponseData};
+use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::AuthActor;
 use api_core::errors::tenant::TenantError;
+use api_core::types::{OffsetPaginatedResponse, OffsetPaginationRequest};
 use api_wire_types::ApiKeyFilters;
-use chrono::{DateTime, Utc};
 use db::models::tenant_api_key::{ApiKeyListFilters, TenantApiKey};
 use db::models::tenant_role::TenantRole;
-use db::DbError;
+use db::{DbError, OffsetPagination};
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::{ApiKeyStatus, TenantApiKeyId, TenantRoleId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, patch, web, web::Json};
 
-type ApiKeysResponse = Json<CursorPaginatedResponse<Vec<api_wire_types::SecretApiKey>, DateTime<Utc>>>;
+type ApiKeysResponse = Json<OffsetPaginatedResponse<api_wire_types::SecretApiKey>>;
 
 #[api_v2_operation(
     description = "Lists the tenant's secret API keys",
@@ -28,12 +27,12 @@ type ApiKeysResponse = Json<CursorPaginatedResponse<Vec<api_wire_types::SecretAp
 pub async fn get(
     state: web::Data<State>,
     filters: web::Query<ApiKeyFilters>,
-    pagination: web::Query<CursorPaginationRequest<DateTime<Utc>>>,
+    pagination: web::Query<OffsetPaginationRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> ApiResult<ApiKeysResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
+    let page = pagination.page;
     let page_size = pagination.page_size(&state);
-    let cursor = pagination.cursor;
     let ApiKeyFilters {
         role_ids,
         status,
@@ -48,23 +47,22 @@ pub async fn get(
         status,
         search,
     };
-    let (keys, count) = state
+    let pagination = OffsetPagination::new(page, page_size);
+    let (keys, next_page, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
-            let keys = TenantApiKey::list(conn, &query, cursor, (page_size + 1) as i64)?;
+            let (keys, next_page) = TenantApiKey::list(conn, &query, pagination)?;
             let count = TenantApiKey::count(conn, &query)?;
-            Ok((keys, count))
+            Ok((keys, next_page, count))
         })
         .await??;
 
-    let cursor = pagination.cursor_item(&state, &keys).map(|x| x.0.created_at);
-    let keys = keys
+    let results = keys
         .into_iter()
-        .take(page_size)
         .map(|(key, role)| (key, role, None))
         .map(api_wire_types::SecretApiKey::from_db)
         .collect::<Vec<api_wire_types::SecretApiKey>>();
-    Ok(Json(CursorPaginatedResponse::ok(keys, cursor, Some(count))))
+    Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]

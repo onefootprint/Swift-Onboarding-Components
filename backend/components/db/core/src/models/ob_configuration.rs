@@ -1,4 +1,6 @@
 use super::tenant::Tenant;
+use crate::NextPage;
+use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
 use crate::{DbError, DbResult};
@@ -114,18 +116,17 @@ impl ObConfiguration {
     pub fn list(
         conn: &mut PgConn,
         query: &ObConfigurationQuery,
-        cursor: Option<DateTime<Utc>>,
-        page_size: i64,
-    ) -> DbResult<Vec<Self>> {
+        pagination: OffsetPagination,
+    ) -> DbResult<(Vec<Self>, NextPage)> {
         let mut query = Self::list_query(query)
             .order_by(ob_configuration::created_at.desc())
-            .limit(page_size);
+            .limit(pagination.limit());
 
-        if let Some(cursor) = cursor {
-            query = query.filter(ob_configuration::created_at.le(cursor))
+        if let Some(offset) = pagination.offset() {
+            query = query.offset(offset)
         }
         let results = query.load::<Self>(conn)?;
-        Ok(results)
+        Ok(pagination.results(results))
     }
 
     #[tracing::instrument("ObConfiguration::count", skip_all)]

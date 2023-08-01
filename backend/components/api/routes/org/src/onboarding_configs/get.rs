@@ -7,20 +7,20 @@ use crate::auth::{
 };
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
-use crate::types::CursorPaginatedResponse;
-use crate::types::CursorPaginationRequest;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::auth::Any;
+use api_core::errors::ApiResult;
 use api_core::types::JsonApiResponse;
+use api_core::types::OffsetPaginatedResponse;
+use api_core::types::OffsetPaginationRequest;
 use api_wire_types::OnboardingConfigFilters;
-use chrono::DateTime;
-use chrono::Utc;
 use db::models::appearance::Appearance;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::DbError;
+use db::OffsetPagination;
 use newtypes::ObConfigurationId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -74,17 +74,14 @@ pub fn get_bifrost(
 async fn get_list(
     state: web::Data<State>,
     filters: web::Query<OnboardingConfigFilters>,
-    pagination: web::Query<CursorPaginationRequest<DateTime<Utc>>>,
+    pagination: web::Query<OffsetPaginationRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> actix_web::Result<
-    Json<CursorPaginatedResponse<Vec<api_wire_types::OnboardingConfiguration>, DateTime<Utc>>>,
-    ApiError,
-> {
+) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::OnboardingConfiguration>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
-    let cursor = pagination.cursor;
+    let page = pagination.page;
     let page_size = pagination.page_size(&state);
-
+    let pagination = OffsetPagination::new(page, page_size);
     let OnboardingConfigFilters { status, search } = filters.into_inner();
 
     let query = ObConfigurationQuery {
@@ -93,25 +90,23 @@ async fn get_list(
         status,
         search,
     };
-    let (configs, count) = state
+    let (results, next_page, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
-            let results = ObConfiguration::list(conn, &query, cursor, (page_size + 1) as i64)?;
+            let (results, next_page) = ObConfiguration::list(conn, &query, pagination)?;
             let count = ObConfiguration::count(conn, &query)?;
-            Ok((results, count))
+            Ok((results, next_page, count))
         })
         .await??;
 
-    let cursor = pagination.cursor_item(&state, &configs).map(|x| x.created_at);
     let ff_client = state.feature_flag_client.clone();
-    let configs = configs
+    let results = results
         .into_iter()
-        .take(page_size)
         .map(|obc| {
             api_wire_types::OnboardingConfiguration::from_db((obc, tenant.clone(), None, ff_client.clone()))
         })
         .collect::<Vec<api_wire_types::OnboardingConfiguration>>();
-    Ok(Json(CursorPaginatedResponse::ok(configs, cursor, Some(count))))
+    Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
 }
 
 #[api_v2_operation(

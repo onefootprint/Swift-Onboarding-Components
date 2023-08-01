@@ -1,5 +1,5 @@
-use crate::PgConn;
-use crate::{DbError, DbResult, TxnPgConn};
+use crate::{DbError, DbResult, OffsetPagination, TxnPgConn};
+use crate::{NextPage, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_api_key;
 use db_schema::schema::tenant_api_key::BoxedQuery;
@@ -104,21 +104,20 @@ impl TenantApiKey {
     pub fn list(
         conn: &mut PgConn,
         filters: &ApiKeyListFilters,
-        cursor: Option<DateTime<Utc>>,
-        page_size: i64,
-    ) -> DbResult<Vec<(TenantApiKey, TenantRole)>> {
+        pagination: OffsetPagination,
+    ) -> DbResult<(Vec<(TenantApiKey, TenantRole)>, NextPage)> {
         let mut query = Self::list_query(filters)
             .inner_join(tenant_role::table)
             .select((tenant_api_key::all_columns, tenant_role::all_columns))
             .order_by(tenant_api_key::created_at.desc())
-            .limit(page_size);
+            .limit(pagination.limit());
 
-        if let Some(cursor) = cursor {
-            query = query.filter(tenant_api_key::created_at.le(cursor))
+        if let Some(offset) = pagination.offset() {
+            query = query.offset(offset)
         }
 
         let results = query.get_results::<(Self, TenantRole)>(conn)?;
-        Ok(results)
+        Ok(pagination.results(results))
     }
 
     #[tracing::instrument("TenantApiKey::count", skip_all)]
