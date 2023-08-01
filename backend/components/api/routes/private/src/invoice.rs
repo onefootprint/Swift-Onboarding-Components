@@ -4,7 +4,6 @@ use crate::auth::Either;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
-use api_core::errors::AssertionError;
 use billing::{BillingCounts, BillingInfo};
 use chrono::{Duration, NaiveDate, Utc};
 use db::models::onboarding::Onboarding;
