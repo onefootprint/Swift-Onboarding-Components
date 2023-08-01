@@ -36,7 +36,8 @@
         "dob": {
           "label": "Date of Birth",
           "placeholder": "MM/DD/YYYY",
-          "error": "Date of birth cannot be empty or is invalid"
+          "error": "Date of birth cannot be empty or is invalid",
+          "hint": "Must be at least 13 years old"
         },
         "nationality": {
           "label": "Nationality",

@@ -23,7 +23,7 @@ const DobField = ({ disabled }: DobFieldProps) => {
       data-private
       disabled={disabled}
       hasError={!!errors.dob}
-      hint={errors.dob ? t('error') : undefined}
+      hint={errors.dob ? t('error') : t('hint')}
       label={t('label')}
       mask={inputMasks.dob}
       placeholder={t('placeholder')}
