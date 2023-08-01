@@ -26,7 +26,7 @@ const createMobileMachine = () =>
           on: {
             receivedContext: {
               target: 'deviceSupport',
-              actions: 'assignInitialContext',
+              actions: 'assignContext',
             },
           },
         },
@@ -88,10 +88,11 @@ const createMobileMachine = () =>
     },
     {
       actions: {
-        assignInitialContext: assign((context, event) => ({
+        assignContext: assign((context, event) => ({
           ...context,
           device: event.payload.device,
           authToken: event.payload.authToken,
+          config: event.payload.config,
         })),
         assignScopedAuthToken: assign((context, event) => ({
           ...context,

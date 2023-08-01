@@ -13,14 +13,18 @@ const i18n = configureI18next();
 
 const MobileApp = ({ context, onDone }: TransferProps) => {
   const [, send] = useMobileMachine();
-  const { authToken, device } = context;
+  const { authToken, device, customData } = context;
 
   useEffectOnce(() => {
+    if (!customData) {
+      return;
+    }
     send({
       type: 'receivedContext',
       payload: {
         authToken,
         device,
+        config: customData.config,
       },
     });
   });

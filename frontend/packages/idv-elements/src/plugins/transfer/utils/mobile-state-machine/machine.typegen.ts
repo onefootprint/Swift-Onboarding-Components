@@ -13,7 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignInitialContext: 'receivedContext';
+    assignContext: 'receivedContext';
     assignScopedAuthToken: 'scopedAuthTokenGenerated';
     assignTab: 'newTabOpened';
     clearScopedAuthToken: 'statusPollingErrored';
