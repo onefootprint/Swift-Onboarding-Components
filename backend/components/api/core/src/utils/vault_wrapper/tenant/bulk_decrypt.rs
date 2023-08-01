@@ -53,7 +53,7 @@ where
                 .map(|r| (i.key.clone(), r))
         })
         .collect();
-    let mut fp_id_to_scoped_vault: HashMap<_, _> = requests
+    let key_to_sv: HashMap<_, _> = requests
         .iter()
         .map(|BulkDecryptReq { key, vw, targets: _ }| (key.clone(), vw.scoped_vault.clone()))
         .collect();
@@ -69,13 +69,19 @@ where
                 results,
             } = res.map_to_piistrings()?;
             let decrypted_dis = decrypted_dis.into_iter().map(|t| t.identifier).collect_vec();
-            let access_event = (key.clone(), decrypted_dis);
+            let sv = key_to_sv
+                .get(&key)
+                .ok_or(AssertionError("No ScopedVault for key"))?;
+            let access_event = (sv.fp_id.clone(), decrypted_dis);
             let decrypted_result = (key, results);
             Ok((access_event, decrypted_result))
         })
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
         .unzip();
+
+    let access_events = access_events.into_iter().into_group_map();
+    let mut fp_id_to_sv: HashMap<_, _> = key_to_sv.into_values().map(|sv| (sv.fp_id.clone(), sv)).collect();
 
     // Bulk save all new access events in the DB. We'll use only one insight event for all of the
     // access events
@@ -85,10 +91,12 @@ where
             let insight = insight.insert_with_conn(conn)?;
             let access_events = access_events
                 .into_iter()
-                .map(|(key, targets)| -> ApiResult<_> {
-                    let sv = fp_id_to_scoped_vault
-                        .remove(&key)
-                        .ok_or(AssertionError("No ScopedVault for fp_id"))?;
+                .map(|(fp_id, targets)| -> ApiResult<_> {
+                    let sv = fp_id_to_sv
+                        .remove(&fp_id)
+                        .ok_or(AssertionError("No ScopedVault for key"))?;
+                    // Combine decrypts for one fp_id into a single access event
+                    let targets = targets.into_iter().flatten().unique().collect();
                     let access_event = NewAccessEventRow {
                         scoped_vault_id: sv.id,
                         tenant_id: sv.tenant_id,

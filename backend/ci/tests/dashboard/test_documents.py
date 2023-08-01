@@ -134,6 +134,7 @@ def test_decrypt_historical(user_with_documents):
     ocr_data_version = doc["completed_version"]
 
     fields = [
+        "id.first_name",
         "document.drivers_license.front.latest_upload",
         f"document.drivers_license.front.latest_upload:{front_version}",
         f"document.drivers_license.front.latest_upload:{front_version - 1}",
@@ -165,4 +166,18 @@ def test_decrypt_historical(user_with_documents):
     # Version before created version should be empty
     assert (
         body[f"document.drivers_license.document_number:{ocr_data_version - 1}"] == None
+    )
+
+    body = get(
+        "org/access_events",
+        dict(search=fp_id),
+        tenant.sk.key,
+    )
+    access_event = body["data"][0]
+    assert set(access_event["targets"]) == set(
+        [
+            "id.first_name",
+            "document.drivers_license.front.latest_upload",
+            "document.drivers_license.document_number",
+        ]
     )

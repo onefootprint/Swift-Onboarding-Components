@@ -181,7 +181,6 @@ pub(super) async fn post_inner(
         })
         .collect::<ApiResult<_>>()?;
     let insight = CreateInsightEvent::from(insights);
-    // TODO this will make separate access events for each version - maybe fine?
     let mut decrypted_results = bulk_decrypt(state, decrypt_reqs, insight, reason, auth.actor().into())
         .await?
         .into_iter()
