@@ -108,10 +108,23 @@ const Company = () => {
       twitter: 'https://twitter.com/elliottvforde',
     },
     {
+      name: 'Filipe Botti',
+      avatarSrc: '/team/member-filipe.png',
+      linkedin: 'https://www.linkedin.com/in/filipe-botti/',
+      role: 'Engineering',
+    },
+    {
       name: 'Keagan Long',
       avatarSrc: '/team/member-keagan.png',
       role: 'Engineering',
       linkedin: 'https://www.linkedin.com/in/keagan-long-50597769/',
+    },
+    {
+      name: 'Lucas Gelfond',
+      avatarSrc: '/team/member-lucas.png',
+      role: 'Engineering',
+      linkedin: 'https://www.linkedin.com/in/lucasgelfond/',
+      twitter: 'https://twitter.com/gucaslelfond',
     },
     {
       name: 'Pedro Marques',
@@ -119,6 +132,13 @@ const Company = () => {
       role: 'Design',
       linkedin: 'https://www.linkedin.com/in/phmarques/',
       twitter: 'https://twitter.com/marques_ph',
+    },
+    {
+      name: 'Peter Sweeney',
+      avatarSrc: '/team/member-peter.png',
+      role: 'Growth',
+      linkedin: 'https://www.linkedin.com/in/peter-sweeney-a78b85b9/',
+      twitter: 'https://twitter.com/peter_sweeney0',
     },
     {
       name: 'Rafael Motta',
