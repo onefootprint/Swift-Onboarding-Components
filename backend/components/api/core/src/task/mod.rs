@@ -1,6 +1,12 @@
 use async_trait::async_trait;
-use db::{models::task::Task, DbError, DbPool};
-use newtypes::{TaskId, TaskKind, TaskStatus};
+use db::{
+    models::{
+        task::Task,
+        task_execution::{TaskExecution, TaskExecutionUpdate},
+    },
+    DbError, DbPool, DbResult,
+};
+use newtypes::{TaskExecutionId, TaskId, TaskKind, TaskStatus};
 use thiserror::Error;
 
 use crate::{errors::ApiError, State};
@@ -51,28 +57,38 @@ pub async fn poll_and_execute_tasks(
     limit: i64,
     kind: Option<TaskKind>,
 ) -> Result<Vec<Task>, DbError> {
-    let tasks = state
+    let tasks: Vec<(Task, TaskExecution)> = state
         .db_pool
-        .db_transaction(move |conn| -> Result<Vec<Task>, DbError> {
+        .db_transaction(move |conn| -> Result<Vec<_>, DbError> {
             let tasks = Task::poll(conn, limit, kind)?;
             Ok(tasks)
         })
         .await?;
 
     tracing::info!(tasks = format!("{:?}", tasks), "Executing polled tasks");
-    let futs = tasks.iter().map(|t| async {
+    let futs = tasks.iter().map(|(t, te)| async {
         tracing::info!(task_id=%t.id, "Executing task");
         let task_result = execute_task(t, state).await;
-        match &task_result {
+        let task_error_str = match &task_result {
             Ok(_) => {
                 tracing::info!(task_id=%t.id, "Task completed successfully");
+                None
             }
             Err(e) => {
-                tracing::error!(err=%e, task_id=%t.id, num_attempts=t.num_attempts, "Task failed");
+                tracing::error!(err=?e, task_id=%t.id, num_attempts=t.num_attempts, "Task failed");
+                Some(format!("{:?}", e))
             }
         };
         let task_new_status = task_result_to_status(t, task_result);
-        update_task(&state.db_pool, t.id.clone(), task_new_status).await
+        let task_execution_update = TaskExecutionUpdate::new(task_new_status, task_error_str);
+        update_task(
+            &state.db_pool,
+            t.id.clone(),
+            task_new_status,
+            &te.id,
+            task_execution_update,
+        )
+        .await
     });
 
     futures::future::join_all(futs)
@@ -123,34 +139,20 @@ fn task_result_to_status(task: &Task, task_result: Result<(), TaskError>) -> Tas
     }
 }
 
-async fn update_task(db_pool: &DbPool, task_id: TaskId, task_status: TaskStatus) -> Result<Task, DbError> {
+async fn update_task(
+    db_pool: &DbPool,
+    task_id: TaskId,
+    task_status: TaskStatus,
+    task_execution_id: &TaskExecutionId,
+    task_execution_update: TaskExecutionUpdate,
+) -> DbResult<Task> {
+    let te_id = task_execution_id.clone();
     db_pool
-        .db_query(move |conn| {
-            let updated_task = Task::update(conn, &task_id, task_status)?;
+        .db_transaction(move |conn| -> DbResult<Task> {
+            let updated_task = Task::update(conn, &task_id, task_status, &te_id, task_execution_update)?;
             Ok(updated_task)
         })
-        .await?
-}
-
-#[allow(unused)]
-async fn update_tasks(
-    task_updates: Vec<(TaskId, TaskStatus)>,
-    db_pool: &DbPool,
-) -> Result<Vec<Task>, DbError> {
-    // TODO: in future do a proper bulk update in 1 diesel query
-    let updated_tasks = db_pool
-        .db_transaction(move |conn| -> Result<Vec<Task>, DbError> {
-            let updated_tasks: Result<Vec<Task>, DbError> = task_updates
-                .iter()
-                .map(|tu| {
-                    let updated_task = Task::update(conn, &tu.0, tu.1)?;
-                    Ok(updated_task)
-                })
-                .collect();
-            updated_tasks
-        })
-        .await?;
-    Ok(updated_tasks)
+        .await
 }
 
 #[async_trait]
@@ -204,15 +206,5 @@ mod task_tests {
                 .map(|t| (&t.id, t.status, t.num_attempts))
                 .collect()
         ));
-
-        // Teardown
-        cleanup(&state.db_pool, tasks).await.unwrap();
-    }
-
-    async fn cleanup(db_pool: &DbPool, tasks: Vec<Task>) -> Result<(), DbError> {
-        let _cnt = db_pool
-            .db_query(move |conn| Task::_bulk_delete_for_tests(conn, tasks.iter().map(|t| &t.id).collect()))
-            .await??;
-        Ok(())
     }
 }

@@ -199,3 +199,4 @@ define_newtype_id!(
     "Stytch generated visitor_fingerprint"
 );
 define_newtype_id!(StytchVisitorId, String, "Stytch generated visitor_id");
+define_newtype_id!(TaskExecutionId, String, "Identifier for a task_execution");

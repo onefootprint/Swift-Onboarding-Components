@@ -621,6 +621,22 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    task_execution (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        completed_at -> Nullable<Timestamptz>,
+        task_id -> Text,
+        attempt_num -> Int4,
+        error -> Nullable<Text>,
+        new_status -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     tenant (id) {
         id -> Text,
         name -> Text,
@@ -944,6 +960,7 @@ joinable!(socure_device_session -> onboarding (onboarding_id));
 joinable!(stytch_fingerprint_event -> scoped_vault (scoped_vault_id));
 joinable!(stytch_fingerprint_event -> vault (vault_id));
 joinable!(stytch_fingerprint_event -> verification_result (verification_result_id));
+joinable!(task_execution -> task (task_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key -> tenant_role (role_id));
 joinable!(tenant_role -> tenant (tenant_id));
@@ -1007,6 +1024,7 @@ allow_tables_to_appear_in_same_query!(
     socure_device_session,
     stytch_fingerprint_event,
     task,
+    task_execution,
     tenant,
     tenant_api_key,
     tenant_role,

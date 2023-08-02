@@ -30,6 +30,7 @@ pub mod session;
 pub mod socure_device_session;
 pub mod stytch_fingerprint_event;
 pub mod task;
+pub mod task_execution;
 pub mod tenant;
 pub mod tenant_api_key;
 pub mod tenant_role;

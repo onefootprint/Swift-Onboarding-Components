@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::task;
@@ -6,8 +8,10 @@ use diesel::{
     sql_query,
     sql_types::{BigInt, Text, Timestamptz},
 };
-use newtypes::{Locked, TaskData, TaskId, TaskKind, TaskStatus};
+use newtypes::{Locked, TaskData, TaskExecutionId, TaskId, TaskKind, TaskStatus};
 use serde::{Deserialize, Serialize};
+
+use super::task_execution::{TaskExecution, TaskExecutionCreateArgs, TaskExecutionUpdate};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName)]
 #[diesel(table_name = task)]
@@ -82,9 +86,13 @@ impl Task {
     }
 
     #[tracing::instrument("Task::poll", skip_all)]
-    pub fn poll(conn: &mut TxnPgConn, limit: i64, kind: Option<TaskKind>) -> DbResult<Vec<Self>> {
+    pub fn poll(
+        conn: &mut TxnPgConn,
+        limit: i64,
+        kind: Option<TaskKind>,
+    ) -> DbResult<Vec<(Task, TaskExecution)>> {
         // TODO: cannot for the life of me get this to compile in diesel
-        let results = sql_query(format!(
+        let tasks = sql_query(format!(
             "
             UPDATE task
             SET status = $1, num_attempts = num_attempts + 1
@@ -106,16 +114,48 @@ impl Task {
         .bind::<BigInt, _>(limit)
         .get_results::<Task>(conn.conn())?;
 
+        let task_execution_args: Vec<TaskExecutionCreateArgs> = tasks
+            .iter()
+            .map(|t| TaskExecutionCreateArgs {
+                task_id: t.id.clone(),
+                attempt_num: t.num_attempts,
+            })
+            .collect();
+        let task_executions = TaskExecution::bulk_create(conn.conn(), task_execution_args)?;
+        let task_id_to_task_execution: HashMap<TaskId, TaskExecution> = task_executions
+            .into_iter()
+            .map(|te| (te.task_id.clone(), te))
+            .collect();
+        let results = tasks
+            .into_iter()
+            .map(|t| {
+                task_id_to_task_execution
+                    .get(&t.id)
+                    .cloned()
+                    .ok_or(DbError::RelatedObjectNotFound)
+                    .map(|te| (t, te))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+
         Ok(results)
     }
 
     #[tracing::instrument("Task::update", skip_all)]
-    pub fn update(conn: &mut PgConn, id: &TaskId, status: TaskStatus) -> DbResult<Self> {
+    pub fn update(
+        conn: &mut TxnPgConn,
+        id: &TaskId,
+        status: TaskStatus,
+        task_execution_id: &TaskExecutionId,
+        task_execution_update: TaskExecutionUpdate,
+    ) -> DbResult<Self> {
+        let _updated_task_execution =
+            TaskExecution::update(conn.conn(), task_execution_id, task_execution_update)?;
+
         let task_update = TaskUpdate { status };
         let result = diesel::update(task::table)
             .filter(task::id.eq(id))
             .set(task_update)
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
         Ok(result)
     }
 
@@ -141,6 +181,18 @@ impl Task {
             .values(new_task)
             .get_result(conn)?;
         Ok(res)
+    }
+
+    #[cfg(test)]
+    #[tracing::instrument("Task::update", skip_all)]
+    pub fn _update_for_test(conn: &mut TxnPgConn, id: &TaskId, status: TaskStatus) -> DbResult<Self> {
+        // only updates `task`, not `task_execution`
+        let task_update = TaskUpdate { status };
+        let result = diesel::update(task::table)
+            .filter(task::id.eq(id))
+            .set(task_update)
+            .get_result(conn.conn())?;
+        Ok(result)
     }
 }
 
@@ -173,26 +225,29 @@ mod tests {
         // The oldest 2 scheduled tasks and returned + their status has changed to Running and their num_attempts is incremented
         assert!(have_same_elements(
             vec![
-                (&task1.id, TaskStatus::Running, 1),
-                (&task2.id, TaskStatus::Running, 1),
+                (&task1.id, TaskStatus::Running, 1, &task1.id, 1),
+                (&task2.id, TaskStatus::Running, 1, &task2.id, 1),
             ],
-            tasks.iter().map(|t| (&t.id, t.status, t.num_attempts)).collect(),
+            tasks
+                .iter()
+                .map(|(t, te)| (&t.id, t.status, t.num_attempts, &te.task_id, te.attempt_num))
+                .collect(),
         ));
     }
 
     #[db_test]
     fn only_pending_tasks_are_retrieved(conn: &mut TestPgConn) {
         let task1 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        Task::update(conn, &task1.id, TaskStatus::Running);
+        Task::_update_for_test(conn, &task1.id, TaskStatus::Running);
         let task2 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        Task::update(conn, &task2.id, TaskStatus::Completed);
+        Task::_update_for_test(conn, &task2.id, TaskStatus::Completed);
         let task3 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        Task::update(conn, &task3.id, TaskStatus::Failed);
+        Task::_update_for_test(conn, &task3.id, TaskStatus::Failed);
         let task4 = Task::create(conn, Utc::now(), task_data()).unwrap();
 
         let tasks = Task::poll(conn, 4, None).unwrap();
         assert_eq!(1, tasks.len());
-        assert_eq!(tasks[0].id, task4.id);
+        assert_eq!(tasks[0].0.id, task4.id);
     }
 
     #[db_test]
@@ -224,7 +279,10 @@ mod tests {
                 (&task1.id, TaskStatus::Running, 1),
                 (&task3.id, TaskStatus::Running, 1),
             ],
-            tasks.iter().map(|t| (&t.id, t.status, t.num_attempts)).collect(),
+            tasks
+                .iter()
+                .map(|(t, _)| (&t.id, t.status, t.num_attempts))
+                .collect(),
         );
     }
 }
