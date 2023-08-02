@@ -24,6 +24,7 @@
     "generate": "yarn generate:tokens && yarn generate:styles",
     "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
     "lint": "eslint src --fix",
+    "lint:ci": "eslint src",
     "postgenerate": "yarn format:fix && yarn lint:fix",
     "typecheck": "yarn tsc --noEmit"
   },

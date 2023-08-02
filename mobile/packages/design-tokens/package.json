@@ -19,6 +19,7 @@
     "format:fix": "prettier --write \"./**/*.{ts,tsx,md}\"",
     "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
     "lint": "eslint src --fix",
+    "lint:ci": "eslint src",
     "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {

@@ -9,6 +9,7 @@
     "dev": "npx expo start --dev-client --clear",
     "ios": "npx expo run:ios",
     "lint": "eslint src --fix",
+    "lint:ci": "eslint src",
     "test:watch": "jest --watch --detectOpenHandles",
     "test": "jest --ci --bail --detectOpenHandles",
     "typecheck": "yarn tsc --noEmit",

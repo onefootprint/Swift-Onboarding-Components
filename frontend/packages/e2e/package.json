@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint src --fix",
+    "lint:ci": "eslint src",
     "postinstall": "npx playwright install",
     "test:e2e": "npx playwright test --ui",
     "test:e2e:ci": "npx playwright test",

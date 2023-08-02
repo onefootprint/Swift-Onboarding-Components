@@ -10,6 +10,7 @@
     "test:ci": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
+    "lint:ci": "eslint src",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },

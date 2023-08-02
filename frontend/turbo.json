@@ -67,6 +67,11 @@
         "^build"
       ]
     },
+    "lint:ci": {
+      "dependsOn": [
+        "^build"
+      ]
+    },
     "typecheck": {
       "dependsOn": [
         "^build"

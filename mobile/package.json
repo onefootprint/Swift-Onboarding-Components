@@ -9,6 +9,7 @@
     "dev:packages": "turbo run dev --filter=./packages/* dev --concurrency 30 --continue",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
+    "lint:ci": "eslint src",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "build:packages": "turbo run build --filter=./packages/*"

@@ -15,6 +15,7 @@
     "format": "prettier --check \"**/*.{ts,tsx,md,mdx}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
     "lint": "turbo run lint",
+    "lint:ci": "turbo run lint:ci",
     "test": "turbo run test",
     "test:ci": "turbo run test:ci",
     "test:watch": "turbo run test:watch",

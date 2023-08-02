@@ -61,7 +61,7 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Lint
         working-directory: ./frontend
-        run: yarn lint
+        run: yarn lint:ci
 
   format:
     runs-on: frontend_runner

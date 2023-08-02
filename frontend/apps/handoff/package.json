@@ -10,6 +10,7 @@
     "test": "jest",
     "test:ci": "jest --ci --bail --runInBand",
     "lint": "eslint src --fix",
+    "lint:ci": "eslint src",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh"

@@ -12,6 +12,7 @@
     "test:ci": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
+    "lint:ci": "eslint src",
     "typecheck": "yarn tsc --noEmit",
     "dev:storybook": "start-storybook -p 3100",
     "build:storybook": "build-storybook",
