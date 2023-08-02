@@ -37,28 +37,27 @@ export default async function handler(req: NextRequest) {
       >
         <div
           style={{
-            padding: 12,
             background: 'white',
-            borderRadius: 100,
+            height: 150,
+            width: 150,
+            borderRadius: '50%',
             display: 'flex',
+            padding: 12,
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow:
               '0px 4px 4px rgba(0, 0, 0, 0.04), 0px 6px 16px rgba(0, 0, 0, 0.12)',
           }}
         >
-          <svg
-            width="120"
-            height="120"
-            viewBox="0 0 120 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M75.0012 71.25H89.998V57.9762C87.792 59.2553 85.2338 60 82.4984 60C74.215 60 67.5004 53.2842 67.5004 45.0008C67.5004 36.7162 74.215 29.9992 82.4984 29.9992C85.2338 29.9992 87.792 30.7439 89.998 32.023V15H30V105H56.2492V90.0008C56.2492 79.6447 64.6439 71.25 75.0012 71.25Z"
-              fill="black"
-            />
-          </svg>
+          <img
+            height={150}
+            width={150}
+            src={tenantLogoUrl}
+            alt="Tenant Logo"
+            style={{
+              borderRadius: '50%',
+            }}
+          />
         </div>
         <svg
           width="24"
@@ -74,17 +73,42 @@ export default async function handler(req: NextRequest) {
         </svg>
         <div
           style={{
+            padding: 12,
             background: 'white',
-            borderRadius: 100,
+            height: 150,
+            width: 150,
+            borderRadius: '50%',
             display: 'flex',
-            padding: '24px',
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow:
               '0px 4px 4px rgba(0, 0, 0, 0.04), 0px 6px 16px rgba(0, 0, 0, 0.12)',
           }}
         >
-          <img height="104" width="104" src={tenantLogoUrl} alt="Tenant Logo" />
+          <svg
+            width="150"
+            height="150"
+            viewBox="0 0 150 150"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g clipPath="url(#clip0_1458_5)">
+              <path
+                d="M86.1259 83.3333H97.2346V73.5009C95.6006 74.4484 93.7056 75 91.6794 75C85.5435 75 80.5698 70.0254 80.5698 63.8895C80.5698 57.7527 85.5435 52.7772 91.6794 52.7772C93.7056 52.7772 95.6006 53.3288 97.2346 54.2763V41.6667H52.7917V108.333H72.2355V97.2228C72.2355 89.5516 78.4538 83.3333 86.1259 83.3333Z"
+                fill="black"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_1458_5">
+                <rect
+                  width="66.6667"
+                  height="66.6667"
+                  fill="white"
+                  transform="translate(41.6667 41.6667)"
+                />
+              </clipPath>
+            </defs>
+          </svg>
         </div>
       </div>
     ),
