@@ -288,3 +288,7 @@ export { default as LogoFpCompact } from './logo-fp-compact-colored';
 export { default as LogoFpDefault } from './logo-fp-default-colored';
 export { default as LogoFpLarge } from './logo-fp-large-colored';
 export { default as LogoFpdocsDefault } from './logo-fpdocs-default-colored';
+export { default as ThemedLogoFpCompact } from './themed-logo-fp-compact';
+export { default as ThemedLogoFpDefault } from './themed-logo-fp-default';
+export { default as ThemedLogoFpLarge } from './themed-logo-fp-large';
+export { default as ThemedLogoFpdocsDefault } from './themed-logo-fpdocs-default';
