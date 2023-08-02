@@ -8,10 +8,15 @@ const task = async params => {
     const header = `*${tenant.name}* (<https://dashboard.onefootprint.com/assume?tenantId=${tenant.tenant_id}|assume>)`;
     return [
       header,
-      `• num scoped users: ${tenant.num_scoped_vaults || 0}`,
-      `• max number of keys on one user: ${tenant.max_keys_per_user || 0}`,
-      `• num proxy requests: ${tenant.num_proxy_requests || 0}`,
-      `• num keys in use: ${tenant.count_keys || 0}`,
+      `• num scoped users: ${(tenant.num_scoped_vaults || 0).toLocaleString()}`,
+      `• max number of keys on one user: ${(
+        tenant.max_keys_per_user || 0
+      ).toLocaleString()}`,
+      `• num hot users last 7 days: ${(
+        tenant.num_hot_users || 0
+      ).toLocaleString()}`,
+      `• num proxy requests: ${(tenant.num_proxy_reqs || 0).toLocaleString()}`,
+      `• num keys in use: ${(tenant.count_keys || 0).toLocaleString()}`,
     ].join('\n');
   };
   const dataIdentifiers = JSON.parse(params.data_identifiers_json);
