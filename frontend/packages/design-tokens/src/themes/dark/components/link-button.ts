@@ -1,6 +1,6 @@
 import { linkButtonHeights } from '../../../primitives/sizes';
 import { typography } from '../../../primitives/typography';
-import { textColor } from '../../../tokens/light';
+import { textColor } from '../../../tokens/dark';
 import type { LinkButton } from '../../types/components';
 
 const linkButton: LinkButton = {

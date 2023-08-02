@@ -5,7 +5,7 @@ import {
   elevation,
   surfaceColor,
   textColor,
-} from '../../../tokens/light';
+} from '../../../tokens/dark';
 import type { Dropdown } from '../../types/components';
 
 const dropdown: Dropdown = {

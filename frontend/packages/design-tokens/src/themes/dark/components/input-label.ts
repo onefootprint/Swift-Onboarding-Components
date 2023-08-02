@@ -1,5 +1,5 @@
 import { typography } from '../../../primitives/typography';
-import { textColor } from '../../../tokens/light';
+import { textColor } from '../../../tokens/dark';
 import type { InputLabel } from '../../types/components';
 
 const inputLabel: InputLabel = {

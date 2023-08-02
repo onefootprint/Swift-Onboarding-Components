@@ -212,7 +212,14 @@ export type ZIndexes = {
   toast: number;
 };
 
+export type SurfaceColor = {
+  1: string;
+  2: string;
+  3: string;
+};
+
 export type Theme = {
+  screenOverlay: string;
   backgroundColor: BackgroundColors;
   borderColor: BorderColors;
   borderRadius: BorderRadiuses;
@@ -226,6 +233,7 @@ export type Theme = {
   spacing: Spacings;
   typography: Typographies;
   zIndex: ZIndexes;
+  surfaceColor: SurfaceColor;
   components: {
     bifrost: Bifrost;
     button: Button;

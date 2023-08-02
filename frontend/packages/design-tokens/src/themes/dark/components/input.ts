@@ -6,7 +6,7 @@ import {
   borderColor,
   inputFocus,
   textColor,
-} from '../../../tokens/light';
+} from '../../../tokens/dark';
 import type { Input } from '../../types/components';
 
 const input: Input = {

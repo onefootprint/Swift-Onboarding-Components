@@ -1,0 +1,11 @@
+export const opacity100 = 0.04;
+export const opacity200 = 0.08;
+export const opacity300 = 0.12;
+export const opacity400 = 0.16;
+export const opacity500 = 0.24;
+export const opacity600 = 0.32;
+export const opacity700 = 0.48;
+export const opacity800 = 0.64;
+export const opacity900 = 0.8;
+export const opacity1000 = 1;
+export const opacityTransparent = 0;

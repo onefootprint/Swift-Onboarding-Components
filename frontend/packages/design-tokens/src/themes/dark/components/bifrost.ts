@@ -5,7 +5,7 @@ import {
   overlay,
   surfaceColor,
   textColor,
-} from '../../../tokens/light';
+} from '../../../tokens/dark';
 import type { Bifrost } from '../../types/components';
 
 export const fpButtonHeight = '48px';

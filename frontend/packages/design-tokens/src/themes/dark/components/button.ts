@@ -8,7 +8,7 @@ import {
   primaryBtnBackgroundColor,
   secondaryBtnBackgroundColor,
   textColor,
-} from '../../../tokens/light';
+} from '../../../tokens/dark';
 import type { Button } from '../../types/components';
 
 const button: Button = {

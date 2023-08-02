@@ -1,4 +1,4 @@
-import type { Grids } from '../types';
+import type { Grids } from '../themes/types';
 
 const grid: Grids = {
   columns: 12,

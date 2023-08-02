@@ -1,5 +1,5 @@
 import { borderRadius, borderWidth } from '../../../primitives/borders';
-import { backgroundColor, borderColor, textColor } from '../../../tokens/light';
+import { backgroundColor, borderColor, textColor } from '../../../tokens/dark';
 import type { RadioSelect } from '../../types/components';
 
 const radioSelect: RadioSelect = {
