@@ -1,5 +1,13 @@
 # @onefootprint/footprint-react
 
+## 4.2.0
+
+### Patch Changes
+
+- 79d29121c: Add component variant
+- Updated dependencies [79d29121c]
+  - @onefootprint/footprint-js@2.3.0
+
 ## 4.1.0
 
 ### Patch Changes

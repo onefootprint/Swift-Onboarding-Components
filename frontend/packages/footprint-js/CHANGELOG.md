@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 2.3.0
+
+### Minor Changes
+
+- 79d29121c: Add component variant
+
 ## 2.2.0
 
 ### Minor Changes
