@@ -15,20 +15,33 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
     'buttonPrimaryBg',
     {
       var: 'components.button.variant.primary.bg',
-      assignDefault: ['buttonPrimaryHoverBg', 'buttonPrimaryActiveBg'],
+      assignDefault: [
+        'buttonPrimaryHoverBg',
+        'buttonPrimaryActiveBg',
+        'buttonPrimaryLoadingBg',
+      ],
     },
   ],
   [
     'buttonPrimaryColor',
     {
       var: 'components.button.variant.primary.color',
-      assignDefault: ['buttonPrimaryHoverColor', 'buttonPrimaryActiveColor'],
+      assignDefault: [
+        'buttonPrimaryHoverColor',
+        'buttonPrimaryActiveColor',
+        'buttonPrimaryLoadingColor',
+      ],
     },
   ],
   [
     'buttonPrimaryBorderColor',
     {
       var: 'components.button.variant.primary.borderColor',
+      assignDefault: [
+        'buttonPrimaryHoverBorderColor',
+        'buttonPrimaryActiveBorderColor',
+        'buttonsPrimaryLoadingBorderColor',
+      ],
     },
   ],
   [
