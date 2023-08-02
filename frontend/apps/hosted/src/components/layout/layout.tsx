@@ -15,7 +15,7 @@ const Layout = ({ children }: LayoutProps) => {
   const [state] = useHostedMachine();
   const { onboardingConfig } = state.context;
   const isSandbox = onboardingConfig?.isLive === false;
-  const { appearance, key } = onboardingConfig ?? {};
+  const { key } = onboardingConfig ?? {};
 
   return (
     <Container>
@@ -24,12 +24,10 @@ const Layout = ({ children }: LayoutProps) => {
         <AppLayout
           tenantPk={key}
           isSandbox={isSandbox}
-          appearance={appearance}
           options={{
             hideDesktopSandboxBanner: true,
             hideDesktopFooter: true,
             hasDesktopBorderRadius: true,
-            fixContainerSize: true,
           }}
         >
           {children}

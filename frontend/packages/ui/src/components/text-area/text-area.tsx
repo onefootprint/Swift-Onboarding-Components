@@ -1,6 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef, TextareaHTMLAttributes, useId } from 'react';
 
+import { createTypography } from '../../utils';
 import Box from '../box';
 import Hint from '../internal/hint';
 import Label from '../label';
@@ -61,13 +62,13 @@ const Textarea = styled.textarea`
     const { input } = theme.components;
 
     return css`
+      ${createTypography(input.size.default.typography)};
       background: ${input.state.default.initial.bg};
       border-color: ${input.state.default.initial.border};
       border-radius: ${input.global.borderRadius};
       border-style: solid;
       border-width: ${input.global.borderWidth};
       color: ${input.global.color};
-      font: ${input.size.default.typography};
       min-height: ${theme.spacing[11]};
       outline: none;
       padding: ${theme.spacing[4]} ${theme.spacing[5]};

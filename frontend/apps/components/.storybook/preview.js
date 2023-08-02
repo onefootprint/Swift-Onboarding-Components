@@ -1,7 +1,6 @@
 import React from 'react';
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
-import '@onefootprint/design-tokens/src/output/theme.css';
 import i18n from './i18next.js';
 
 export const parameters = {

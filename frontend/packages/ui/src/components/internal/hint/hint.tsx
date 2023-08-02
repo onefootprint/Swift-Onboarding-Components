@@ -1,6 +1,8 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
+import { createTypography } from '../../../utils/mixins';
+
 export type HintProps = {
   size?: 'compact' | 'default';
   children: string;
@@ -28,26 +30,26 @@ const Hint = ({
 
 const HintContainer = styled.div`
   ${({ theme }) => {
-    const { inputHint } = theme.components;
+    const { hint } = theme.components;
 
     return css`
       margin-top: ${theme.spacing[3]};
       text-align: left;
 
       &[data-has-error='false'] {
-        color: ${inputHint.states.default.color};
+        color: ${hint.states.default.color};
       }
 
       &[data-has-error='true'] {
-        color: ${inputHint.states.error.color};
+        color: ${hint.states.error.color};
       }
 
       &[data-size='default'] {
-        font: ${inputHint.size.default.typography};
+        ${createTypography(hint.size.default.typography)}
       }
 
       &[data-size='compact'] {
-        font: ${inputHint.size.compact.typography};
+        ${createTypography(hint.size.compact.typography)}
       }
     `;
   }}

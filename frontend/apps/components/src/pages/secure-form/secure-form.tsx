@@ -1,8 +1,10 @@
+import getCustomAppearance from '@onefootprint/appearance';
 import {
   SecureFormDataProps,
   SecureFormEvent,
 } from '@onefootprint/footprint-components-js';
 import { CardDIField } from '@onefootprint/types';
+import type { GetServerSideProps } from 'next';
 import React from 'react';
 
 import { useFootprintProvider } from '../../components/footprint-provider';
@@ -89,6 +91,15 @@ const SecureForm = () => {
       onClose={handleClose}
     />
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const params = query as Record<string, string>;
+  const { theme, fontSrc, rules, variant } = await getCustomAppearance({
+    strategy: ['queryParameters'],
+    params,
+  });
+  return { props: { theme, fontSrc, rules, variant } };
 };
 
 export default SecureForm;

@@ -1,6 +1,6 @@
 import * as CSS from 'csstype';
 
-import type { Typography } from './typography';
+import type { Typography } from '../types';
 
 export type LinkButton = {
   variant: {

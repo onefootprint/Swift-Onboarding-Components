@@ -4,9 +4,10 @@ import type {
   Bifrost,
   Button,
   Dropdown,
+  Hint,
   Input,
-  InputHint,
-  InputLabel,
+  Label,
+  Link,
   LinkButton,
   RadioSelect,
 } from './components';
@@ -18,6 +19,11 @@ export type UIStates = {
   neutral: string;
   success: string;
   warning: string;
+};
+
+export type FontFamilies = {
+  default: string;
+  code: string;
 };
 
 export type FontVariant =
@@ -43,7 +49,11 @@ export type FontVariant =
   | 'snippet-1'
   | 'snippet-2';
 
-type Typography = string;
+export type Typography = {
+  fontWeight: CSS.Property.FontWeight;
+  fontSize: CSS.Property.FontSize;
+  lineHeight: CSS.Property.LineHeight;
+};
 
 export type Typographies = Record<FontVariant, Typography>;
 
@@ -219,7 +229,6 @@ export type SurfaceColor = {
 };
 
 export type Theme = {
-  screenOverlay: string;
   backgroundColor: BackgroundColors;
   borderColor: BorderColors;
   borderRadius: BorderRadiuses;
@@ -228,19 +237,22 @@ export type Theme = {
   codeHighlight: CodeHighlight;
   color: Colors;
   elevation: Elevations;
+  fontFamily: FontFamilies;
   grid: Grids;
   overlay: Overlays;
+  screenOverlay: string;
   spacing: Spacings;
+  surfaceColor: SurfaceColor;
   typography: Typographies;
   zIndex: ZIndexes;
-  surfaceColor: SurfaceColor;
   components: {
     bifrost: Bifrost;
     button: Button;
     dropdown: Dropdown;
     input: Input;
-    inputHint: InputHint;
-    inputLabel: InputLabel;
+    hint: Hint;
+    label: Label;
+    link: Link;
     linkButton: LinkButton;
     radioSelect: RadioSelect;
   };
@@ -249,3 +261,5 @@ export type Theme = {
 export type ThemeKey = keyof Theme;
 
 export type UIState = keyof UIStates;
+
+export type FontFamily = keyof FontFamilies;

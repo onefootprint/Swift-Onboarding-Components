@@ -1,4 +1,3 @@
-import '@onefootprint/design-tokens/src/output/theme.css';
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 import '@onefootprint/footprint-components-js/dist/footprint-components-js.css';
 

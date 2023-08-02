@@ -1,5 +1,7 @@
 import * as CSS from 'csstype';
 
+import { Typography } from '../types';
+
 type VariantStyles = Partial<{
   bg: CSS.Property.Background;
   color: CSS.Property.Color;
@@ -16,18 +18,16 @@ type Variant = VariantStyles & {
 type Size = {
   height: CSS.Property.Height;
   paddingHorizontal: CSS.Property.PaddingLeft | CSS.Property.PaddingRight;
-  typography: string;
+  typography: Typography;
 };
 
 export type Button = {
-  global: {
-    borderWidth: CSS.Property.BorderWidth;
-    borderRadius: CSS.Property.BorderRadius;
-    elevation: {
-      initial: CSS.Property.BoxShadow;
-      hover: CSS.Property.BoxShadow;
-      active: CSS.Property.BoxShadow;
-    };
+  borderWidth: CSS.Property.BorderWidth;
+  borderRadius: CSS.Property.BorderRadius;
+  elevation: {
+    initial: CSS.Property.BoxShadow;
+    hover: CSS.Property.BoxShadow;
+    active: CSS.Property.BoxShadow;
   };
   variant: {
     primary: Variant;

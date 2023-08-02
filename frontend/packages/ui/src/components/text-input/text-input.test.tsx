@@ -64,21 +64,17 @@ describe('<TextInput />', () => {
       });
 
       const input = screen.getByPlaceholderText('placeholder');
-      expect(input).toHaveStyle({
-        borderColor: 'var(--fp-base-inputs-initial-error-border)',
-      });
+      expect(input.getAttribute('data-has-error')).toEqual('true');
     });
 
-    it('should add an error border to the hint', () => {
+    it('should add a error color to the hint', () => {
       renderTextInput({
         hasError: true,
         hint: 'Hint',
       });
 
       const hint = screen.getByText('Hint');
-      expect(hint).toHaveStyle({
-        color: 'var(--fp-base-inputs-base-hint-error)',
-      });
+      expect(hint.getAttribute('data-has-error')).toEqual('true');
     });
   });
 

@@ -1,4 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
+import { createTypography } from '@onefootprint/ui';
 import Link from 'next/link';
 
 export type LinkingButtonProps = {
@@ -11,16 +12,16 @@ const LinkingButton = styled(Link)<LinkingButtonProps>`
       const { button } = theme.components;
 
       return css`
+        ${createTypography(button.size[size].typography)}
         align-items: center;
         background-color: ${button.variant.primary.bg};
         border-color: ${button.variant.primary.borderColor};
-        border-radius: ${button.global.borderRadius};
+        border-radius: ${button.borderRadius};
         border-style: solid;
-        border-width: ${button.global.borderWidth};
+        border-width: ${button.borderWidth};
         color: ${button.variant.primary.color};
         cursor: pointer;
         display: flex;
-        font: ${button.size[size].typography};
         height: ${button.size[size].height};
         justify-content: center;
         outline-offset: ${theme.spacing[2]};

@@ -121,17 +121,13 @@ describe('<CountrySelect />', () => {
       const trigger = screen.getByRole('button', {
         name: 'Select',
       }) as HTMLButtonElement;
-      expect(trigger).toHaveStyle({
-        borderColor: 'var(--fp-base-inputs-base-hint-error)',
-      });
+      expect(trigger.getAttribute('data-has-error')).toEqual('true');
     });
 
-    it('should add an error border to the hint', () => {
+    it('should add a error color to the hint', () => {
       renderCountrySelect({ hasError: true, hint: 'Hint' });
       const hint = screen.getByText('Hint');
-      expect(hint).toHaveStyle({
-        color: 'var(--fp-base-inputs-base-hint-error)',
-      });
+      expect(hint.getAttribute('data-has-error')).toEqual('true');
     });
   });
 

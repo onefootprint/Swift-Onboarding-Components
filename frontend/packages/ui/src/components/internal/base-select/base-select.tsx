@@ -3,6 +3,7 @@ import React, { useCallback, useId, useState } from 'react';
 import { usePopper } from 'react-popper';
 import ReactSelect, { OptionProps } from 'react-select';
 
+import { createTypography } from '../../../utils/mixins';
 import Label, { LabelTooltipProps } from '../../label';
 import Hint from '../hint';
 import type { BaseSelectOption } from './base-select.types';
@@ -137,7 +138,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
               }),
               placeholder: provided => ({
                 ...provided,
-                font: theme.typography['body-3'],
+                ...createTypography(theme.typography['body-3']),
               }),
               control: () => ({
                 alignItems: 'center',
@@ -150,7 +151,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
               }),
               input: provided => ({
                 ...provided,
-                font: theme.typography['body-3'],
+                ...createTypography(theme.typography['body-3']),
               }),
               menu: () => ({}),
             }}

@@ -2,7 +2,7 @@ import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef, useId } from 'react';
 
 import { createFontStyles } from '../../utils/mixins';
-import InputHint from '../internal/hint';
+import Hint from '../internal/hint';
 import { createCheckedStyled, createPseudoStyles } from './radio.utils';
 
 export type RadioProps = {
@@ -57,9 +57,9 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
             aria-disabled={disabled}
             aria-required={required}
             checked={checked}
+            data-has-error={hasError}
             defaultChecked={defaultChecked}
             disabled={disabled}
-            hasError={hasError}
             id={id}
             name={name}
             onBlur={onBlur}
@@ -74,9 +74,9 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
           {label}
         </Label>
         {hint && (
-          <StyledInputHint hasError={hasError} id={`${id}-hint`} size="compact">
+          <StyledHint hasError={hasError} id={`${id}-hint`} size="compact">
             {hint}
-          </StyledInputHint>
+          </StyledHint>
         )}
       </Container>
     );
@@ -143,31 +143,27 @@ const Input = styled.input<Pick<RadioProps, 'hasError'>>`
         ${createCheckedStyled('quaternary')};
       }
     }
-  `}
 
-  ${({ hasError, theme }) => {
-    if (hasError) {
-      return css`
-        border-color: ${theme.borderColor.error};
-        ${createPseudoStyles({
-          hoverOverlay: 'error-1',
-          activeOverlay: 'error-2',
-          background: 'primary',
-        })}
-      `;
-    }
-
-    return css`
+    &[data-has-error='false'] {
       ${createPseudoStyles({
         hoverOverlay: 'darken-1',
         activeOverlay: 'darken-2',
         background: 'primary',
       })}
-    `;
-  }}
+    }
+
+    &[data-has-error='true'] {
+      border-color: ${theme.borderColor.error};
+      ${createPseudoStyles({
+        hoverOverlay: 'error-1',
+        activeOverlay: 'error-2',
+        background: 'primary',
+      })}
+    }
+  `}
 `;
 
-const StyledInputHint = styled(InputHint)`
+const StyledHint = styled(Hint)`
   ${({ theme }) => css`
     margin-top: ${theme.spacing[2]};
     margin-left: calc(${theme.spacing[8]} - ${theme.spacing[1]});

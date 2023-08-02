@@ -134,7 +134,6 @@ export type FootprintAppearanceVariables = Partial<{
 export type FootprintAppearanceTheme = 'light' | 'dark';
 
 export type FootprintAppearanceRules = Partial<{
-  container: CSS.Properties;
   button: CSS.Properties;
   'button:hover': CSS.Properties;
   'button:focus': CSS.Properties;
@@ -159,6 +158,7 @@ export type FootprintAppearanceRules = Partial<{
 }>;
 
 export type FootprintAppearance = {
+  variant?: 'dialog' | 'drawer';
   fontSrc?: string;
   rules?: FootprintAppearanceRules;
   theme?: FootprintAppearanceTheme;

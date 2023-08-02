@@ -21,18 +21,13 @@ env:
 
 jobs:
   install-dependencies:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node-version: [18.x]
-        os: [ubuntu-latest]
+    runs-on: frontend_runner
     steps:
       - uses: actions/checkout@v3
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+
       - name: Restore node modules cache
         uses: actions/cache@v3
         id: cache-dependencies
@@ -47,19 +42,14 @@ jobs:
         run: yarn install --frozen-lockfile
 
   lint:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node-version: [18.x]
-        os: [ubuntu-latest]
+    runs-on: frontend_runner
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v3
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+
 
       - name: Restore yarn dependencies
         uses: actions/cache@v3
@@ -74,18 +64,13 @@ jobs:
         run: yarn lint
 
   format:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node-version: [18.x]
-        os: [ubuntu-latest]
+    runs-on: frontend_runner
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+
       - name: Restore yarn dependencies
         uses: actions/cache@v3
         id: cache-dependencies
@@ -99,18 +84,13 @@ jobs:
         run: yarn format
 
   test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node-version: [18.x]
-        os: [ubuntu-latest]
+    runs-on: frontend_runner
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+
       - name: Restore yarn dependencies
         uses: actions/cache@v3
         id: cache-dependencies
@@ -124,18 +104,13 @@ jobs:
         run: yarn test
 
   typecheck:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node-version: [18.x]
-        os: [ubuntu-latest]
+    runs-on: frontend_runner
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+
       - name: Restore yarn dependencies
         uses: actions/cache@v3
         id: cache-dependencies

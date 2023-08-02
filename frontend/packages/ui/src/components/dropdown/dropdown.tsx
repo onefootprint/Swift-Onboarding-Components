@@ -15,9 +15,9 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
         align-items: center;
         background-color: ${button.variant.secondary.bg};
         border-color: ${button.variant.secondary.borderColor};
-        border-radius: ${button.global.borderRadius};
+        border-radius: ${button.borderRadius};
         border-style: solid;
-        border-width: ${button.global.borderWidth};
+        border-width: ${button.borderWidth};
         cursor: pointer;
         display: flex;
         height: 32px;

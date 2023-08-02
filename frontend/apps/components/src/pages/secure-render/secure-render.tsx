@@ -1,7 +1,9 @@
+import getCustomAppearance from '@onefootprint/appearance';
 import { SecureRenderProps } from '@onefootprint/footprint-components-js';
 import { useTranslation } from '@onefootprint/hooks';
 import { DataIdentifier } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
+import type { GetServerSideProps } from 'next';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -62,6 +64,15 @@ const SecureRender = () => {
       canCopy={canCopy}
     />
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const params = query as Record<string, string>;
+  const { theme, fontSrc, rules, variant } = await getCustomAppearance({
+    strategy: ['queryParameters'],
+    params,
+  });
+  return { props: { theme, fontSrc, rules, variant } };
 };
 
 export default SecureRender;

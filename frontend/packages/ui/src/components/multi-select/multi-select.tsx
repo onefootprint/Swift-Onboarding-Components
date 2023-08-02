@@ -8,6 +8,7 @@ import Select, {
   PropsValue,
 } from 'react-select';
 
+import { createTypography } from '../../utils';
 import Box from '../box';
 import Hint from '../internal/hint';
 import Label from '../label';
@@ -198,7 +199,7 @@ const MultiSelect = <
           }),
           placeholder: base => ({
             ...base,
-            font: inputSize.typography,
+            ...createTypography(inputSize.typography),
             color: input.global.placeholderColor,
             padding: `0 ${theme.spacing[3]}`,
           }),
@@ -228,7 +229,7 @@ const MultiSelect = <
           }),
           groupHeading: () => ({
             color: theme.color.tertiary,
-            font: theme.typography['caption-3'],
+            ...createTypography(theme.typography['caption-3']),
             marginBottom: theme.spacing[2],
             padding: `${theme.spacing[3]} ${theme.spacing[5]} ${theme.spacing[2]}`,
             textTransform: 'uppercase',
@@ -240,7 +241,7 @@ const MultiSelect = <
           input: (base, { hasValue }) => ({
             ...base,
             color: input.global.color,
-            font: inputSize.typography,
+            ...createTypography(inputSize.typography),
             margin: `${theme.spacing[1]} auto ${theme.spacing[1]} ${
               theme.spacing[hasValue ? 1 : 3]
             }`,
@@ -261,7 +262,7 @@ const MultiSelect = <
             padding: `${theme.spacing[2]} ${theme.spacing[3]}`,
           }),
           multiValueLabel: () => ({
-            font: theme.typography['body-4'],
+            ...createTypography(theme.typography['body-4']),
           }),
           multiValueRemove: () => ({
             cursor: 'pointer',
@@ -278,7 +279,7 @@ const MultiSelect = <
           }),
           noOptionsMessage: () => ({
             color: theme.color.tertiary,
-            font: theme.typography['body-3'],
+            ...createTypography(theme.typography['body-3']),
             margin: `${theme.spacing[3]} ${theme.spacing[5]}`,
             textAlign: 'left',
           }),

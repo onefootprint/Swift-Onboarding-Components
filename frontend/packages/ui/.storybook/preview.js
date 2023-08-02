@@ -1,7 +1,6 @@
 import React from 'react';
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '../src/utils/design-system-provider';
-import '@onefootprint/design-tokens/src/output/theme.css';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },

@@ -92,6 +92,7 @@ const handleOpen = () => {
       showCompletionPage: true,
     },
     appearance: {
+      variant: 'drawer',
       fontSrc:
         'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
       variables: {
@@ -121,17 +122,6 @@ const handleOpen = () => {
         labelFont: '500 14px/21px "Inter"',
       },
       rules: {
-        container: {
-          width: '460px',
-          margin: 'unset',
-          height: '100vh',
-          maxHeight: 'unset',
-          position: 'fixed',
-          right: 0,
-          border: '1px solid #101516',
-          boxShadow:
-            '0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.24) 0px 4px 24px 0px',
-        },
         input: {
           transition: '0.15s all cubic-bezier(.4,0,.2,1)',
         },

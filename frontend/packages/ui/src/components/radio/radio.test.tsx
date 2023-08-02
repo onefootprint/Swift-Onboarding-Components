@@ -70,13 +70,11 @@ describe('<Radio />', () => {
         });
       });
 
-      it('should add an error border to the hint', () => {
+      it('should add a error color to the hint', () => {
         renderRadio({ hasError: true, hint: 'Hint' });
         const hint = screen.getByText('Hint');
 
-        expect(hint).toHaveStyle({
-          color: 'var(--fp-primitives-red-600)',
-        });
+        expect(hint.getAttribute('data-has-error')).toEqual('true');
       });
     });
 

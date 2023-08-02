@@ -1,8 +1,8 @@
+import { useAppearance } from '@onefootprint/appearance';
 import { getSessionId } from '@onefootprint/dev-tools';
 import { D2PGenerateResponse, OnboardingConfig } from '@onefootprint/types';
 import { useEffect } from 'react';
 
-import { useLayoutOptions } from '../../../components/layout/components/layout-options-provider';
 import useD2PGenerate from '../../../hooks/api/hosted/onboarding/d2p/use-d2p-generate';
 import { DeviceInfo } from '../../../hooks/ui/use-device-info';
 
@@ -21,7 +21,7 @@ const useGenerateScopedAuthToken = ({
   const d2pGenerateMutation = useD2PGenerate();
   const opener = device?.type ?? 'unknown';
   const sessionId = getSessionId();
-  const { appearance } = useLayoutOptions();
+  const appearance = useAppearance();
   const styleParams = appearance ? JSON.stringify(appearance) : undefined;
 
   const generateScopedAuthToken = () => {

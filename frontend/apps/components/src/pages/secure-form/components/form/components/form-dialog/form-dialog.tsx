@@ -46,7 +46,7 @@ const Container = styled.div`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     width: 100%;
 
-    &[data-variant='modal'] {
+    body[data-variant='modal'] & {
       box-shadow: ${theme.elevation[3]};
       border: none;
       height: 100%;
@@ -64,7 +64,7 @@ const Container = styled.div`
     `}
     }
 
-    &[data-variant='drawer'] {
+    body[data-variant='drawer'] & {
       box-shadow: ${theme.elevation[3]};
       border: none;
       border-radius: 0;

@@ -11,7 +11,6 @@ export const BIFROST_CONTAINER_ID = 'bifrost-container-id';
 type LayoutProps = {
   children: React.ReactNode;
   options?: Options;
-  appearance?: Record<string, any>;
   tenantPk?: string;
   isSandbox?: boolean;
   onClose?: () => void;
@@ -22,14 +21,9 @@ const Layout = ({
   options = {},
   tenantPk,
   isSandbox,
-  appearance,
   onClose,
 }: LayoutProps) => (
-  <LayoutOptionsProvider
-    options={options}
-    onClose={onClose}
-    appearance={appearance}
-  >
+  <LayoutOptionsProvider options={options} onClose={onClose}>
     <FullHeightContainer
       id={LAYOUT_CONTAINER_ID}
       hasBorderRadius={!!options.hasDesktopBorderRadius}

@@ -1,4 +1,3 @@
-import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -41,7 +40,7 @@ describe('<Tabs />', () => {
   });
 
   describe('when a tab item is selected', () => {
-    it('should have a different style in order to highlight it', () => {
+    it('should have a `data-selected` attribute', () => {
       renderTab({
         children: (
           <>
@@ -53,9 +52,7 @@ describe('<Tabs />', () => {
         ),
       });
       const selectedTab = screen.getByRole('tab', { name: 'Users' });
-      expect(selectedTab).toHaveStyle({
-        backgroundColor: themes.light.backgroundColor.accent,
-      });
+      expect(selectedTab.getAttribute('data-selected')).toEqual('true');
     });
   });
 

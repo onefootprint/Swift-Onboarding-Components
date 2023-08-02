@@ -13,7 +13,7 @@ export const getURL = (
   const { variables, rules, fontSrc } = params;
   const searchParams = new URLSearchParams();
   if (variables) {
-    searchParams.append('tokens', variables);
+    searchParams.append('variables', variables);
   }
   if (rules) {
     searchParams.append('rules', rules);

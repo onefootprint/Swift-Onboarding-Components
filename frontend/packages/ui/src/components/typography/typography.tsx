@@ -72,12 +72,11 @@ const StyledTypography = styled.p<{
 }>`
   ${({ theme, $color, variant, sx }) => css`
     ${createFontStyles(variant)}
-    font-family: var(--fp-font-family-default);
     color: ${theme.color[$color]};
     ${sx};
 
     a {
-      color: var(--fp-link-color);
+      color: ${theme.components.link.color};
       text-decoration: none;
 
       @media (hover: hover) {

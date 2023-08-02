@@ -92,7 +92,6 @@ export type FootprintAppearanceVariables = Partial<{
 export type FootprintAppearanceTheme = 'light' | 'dark';
 
 export type FootprintAppearanceRules = Partial<{
-  container: CSS.Properties;
   button: CSS.Properties;
   'button:hover': CSS.Properties;
   'button:active': CSS.Properties;

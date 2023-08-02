@@ -75,5 +75,6 @@ module.exports = {
     '@onefootprint/request',
     '@onefootprint/types',
     '@onefootprint/global-constants',
+    '@onefootprint/appearance',
   ],
 };

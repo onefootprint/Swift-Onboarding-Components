@@ -1,0 +1,63 @@
+import { Theme } from '@onefootprint/design-tokens';
+import { FootprintAppearanceVariables } from '@onefootprint/footprint-js';
+import set from 'lodash/set';
+
+import variablesMap from './constants/variables-map';
+
+export const createTheme = (
+  baseTheme: Theme,
+  variables?: FootprintAppearanceVariables,
+): Theme => {
+  if (!variables || Object.keys(variables).length === 0) return baseTheme;
+  return Object.entries(variables).reduce(
+    (theme, [tokenName, tokenValue]) =>
+      iterateOverVariables({ theme, variables, tokenName, tokenValue }),
+    baseTheme,
+  );
+};
+
+const mutateTheme = (options: {
+  theme: Theme;
+  cssVariable: string;
+  cssValue: string;
+}) => {
+  const { theme, cssVariable, cssValue } = options;
+  set(theme, cssVariable, cssValue);
+  return theme;
+};
+
+const iterateOverVariables = (options: {
+  theme: Theme;
+  variables: Record<string, any>;
+  tokenName: string;
+  tokenValue: any;
+}) => {
+  let { theme } = options;
+  const { variables, tokenName, tokenValue } = options;
+  const definitions = variablesMap.get(tokenName);
+  if (definitions) {
+    const cssVariable = definitions.var;
+    theme = mutateTheme({
+      theme,
+      cssVariable,
+      cssValue: tokenValue,
+    });
+    if (definitions.assignDefault) {
+      definitions.assignDefault.forEach(innerTokenName => {
+        const shouldOverwrite = !variables.innerTokenName;
+        if (shouldOverwrite) {
+          theme = iterateOverVariables({
+            theme,
+            variables,
+            tokenName: innerTokenName,
+            tokenValue,
+          });
+        }
+      });
+    }
+    return theme;
+  }
+  return theme;
+};
+
+export default createTheme;

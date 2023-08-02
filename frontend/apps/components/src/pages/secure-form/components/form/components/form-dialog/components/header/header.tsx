@@ -51,12 +51,12 @@ const Container = styled.header`
     border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
       0;
 
-    &[data-variant='card'] {
+    body[data-variant='card'] & {
       padding: ${theme.spacing[7]} ${theme.spacing[7]} 0;
     }
 
-    &[data-variant='modal'],
-    &[data-variant='drawer'] {
+    body[data-variant='modal'],
+    body[data-variant='card'] & {
       justify-content: center;
       padding: ${theme.spacing[4]};
       border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};

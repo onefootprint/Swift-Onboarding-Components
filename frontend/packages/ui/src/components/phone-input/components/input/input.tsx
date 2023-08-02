@@ -4,6 +4,7 @@ import Cleave from 'cleave.js/react';
 import React, { forwardRef, useId, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
 
+import { createTypography } from '../../../../utils';
 import Box from '../../../box';
 import Label from '../../../label';
 import type { PhoneInputProps } from '../../phone-input.types';
@@ -177,9 +178,9 @@ const RealInput = styled(Cleave)`
     } = theme;
 
     return css`
+      ${createTypography(input.size.default.typography)};
       background: transparent;
       border: unset;
-      font: ${input.size.default.typography};
       outline: none;
       width: 100%;
 

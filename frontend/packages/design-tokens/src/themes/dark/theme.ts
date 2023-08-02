@@ -5,7 +5,7 @@ import breakpoint from '../../primitives/breakpoint';
 import * as t from '../../primitives/color';
 import grid from '../../primitives/grid';
 import { spacing } from '../../primitives/spacing';
-import { typography } from '../../primitives/typography';
+import { fontFamily, typography } from '../../primitives/typography';
 import zIndex from '../../primitives/z-index';
 import {
   backgroundColor,
@@ -20,6 +20,7 @@ import codeHighlight from './code-highlight';
 import components from './components';
 
 const theme: Theme = {
+  fontFamily,
   grid,
   typography,
   breakpoint,

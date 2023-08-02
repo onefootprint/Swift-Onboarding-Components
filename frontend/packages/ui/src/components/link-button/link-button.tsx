@@ -3,6 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef, HTMLAttributeAnchorTarget } from 'react';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import { createTypography } from '../../utils/mixins';
 import type { LinkButtonSize, LinkButtonVariant } from './link-button.types';
 
 type IconPosition = 'left' | 'right';
@@ -106,7 +107,7 @@ export const LinkButtonStyled = styled.a.attrs<{
     } = theme;
 
     return css`
-      font: ${linkButton.size[size].typography};
+      ${createTypography(linkButton.size[size].typography)}
       align-items: center;
       background: transparent;
       border: none;

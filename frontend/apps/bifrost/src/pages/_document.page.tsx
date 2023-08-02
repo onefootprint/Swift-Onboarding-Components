@@ -11,6 +11,8 @@ import React from 'react';
 
 import { COMMIT_SHA, DEPLOYMENT_URL } from '../config/constants';
 
+const nextData = '__NEXT_DATA__';
+
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const sheet = new ServerStyleSheet();
@@ -32,15 +34,22 @@ export default class MyDocument extends Document {
     }
   }
 
+  getPageProps() {
+    return this.props[nextData].props.pageProps;
+  }
+
   render() {
+    const { variant, fontSrc } = this.getPageProps();
+
     return (
       <Html>
         <Head>
-          <LoadFonts />
           <meta name="app-commit-sha" content={COMMIT_SHA} />
           <meta name="app-deployment-url" content={DEPLOYMENT_URL} />
+          <meta charSet="utf-8" />
+          <LoadFonts href={fontSrc} />
         </Head>
-        <body>
+        <body data-variant={variant}>
           <Main />
           <NextScript />
         </body>

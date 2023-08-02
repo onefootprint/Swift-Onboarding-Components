@@ -13,9 +13,9 @@
   },
   "devDependencies": {
     "@onefootprint/design-tokens": "*",
-    "@onefootprint/ui": "*",
-    "@onefootprint/types": "*",
     "@onefootprint/test-utils": "*",
+    "@onefootprint/types": "*",
+    "@onefootprint/ui": "*",
     "@types/lodash": "^4.14.194",
     "@types/react": "^18.2.8",
     "@types/styled-components": "^5.1.26",

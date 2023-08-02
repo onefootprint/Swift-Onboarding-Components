@@ -12,14 +12,12 @@ import {
 import type { Button } from '../../types/components';
 
 const button: Button = {
-  global: {
-    borderRadius: borderRadius.default,
-    borderWidth: borderWidth[1],
-    elevation: {
-      initial: elevation[0],
-      hover: elevation[0],
-      active: elevation[0],
-    },
+  borderRadius: borderRadius.default,
+  borderWidth: borderWidth[1],
+  elevation: {
+    initial: elevation[0],
+    hover: elevation[0],
+    active: elevation[0],
   },
   variant: {
     primary: {
@@ -75,7 +73,11 @@ const button: Button = {
     large: {
       height: buttonHeights.large,
       paddingHorizontal: spacing[7],
-      typography: typography['label-1'],
+      typography: {
+        fontSize: typography['label-1'].fontSize,
+        fontWeight: typography['label-1'].fontWeight,
+        lineHeight: typography['label-1'].lineHeight,
+      },
     },
     compact: {
       height: buttonHeights.compact,

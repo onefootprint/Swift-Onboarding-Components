@@ -2,6 +2,7 @@ import { IcoInfo16, Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
+import { createTypography } from '../../utils';
 import Tooltip from '../tooltip';
 
 export type LabelTooltipProps = {
@@ -67,18 +68,18 @@ const LabelContainer = styled.div`
 
 const StyledLabel = styled.label`
   ${({ theme }) => {
-    const { inputLabel } = theme.components;
+    const { label } = theme.components;
 
     return css`
-      color: ${inputLabel.states.default.color};
-      font: ${inputLabel.size.default.typography};
+      ${createTypography(label.size.default.typography)}
+      color: ${label.states.default.color};
 
       &[data-has-error='true'] {
-        color: ${inputLabel.states.error.color};
+        color: ${label.states.error.color};
       }
 
       &[data-size='compact'] {
-        font: ${inputLabel.size.compact.typography};
+        ${createTypography(label.size.compact.typography)}
       }
     `;
   }}

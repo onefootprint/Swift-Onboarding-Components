@@ -4,6 +4,7 @@ import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef } from 'react';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import { createTypography } from '../../utils/mixins';
 import Box from '../box';
 import LoadingIndicator from '../loading-indicator';
 import type { ButtonSize, ButtonVariant } from './button.types';
@@ -107,21 +108,21 @@ const ButtonContainer = styled.button<{
     const { button } = theme.components;
 
     return css`
-      font: ${button.size[size].typography};
+      ${createTypography(button.size[size].typography)}
       align-items: center;
       background-color: ${button.variant[variant].bg};
       border-color: ${button.variant[variant].borderColor};
-      border-radius: ${button.global.borderRadius};
+      border-radius: ${button.borderRadius};
       border-style: solid;
-      border-width: ${button.global.borderWidth};
+      border-width: ${button.borderWidth};
       color: ${button.variant[variant].color};
       cursor: pointer;
       display: flex;
       height: ${button.size[size].height};
-      position: relative;
       justify-content: center;
       outline-offset: ${theme.spacing[2]};
       padding: 0 ${button.size[size].paddingHorizontal};
+      position: relative;
       user-select: none;
       ${sx};
 

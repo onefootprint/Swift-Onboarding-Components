@@ -13,6 +13,7 @@ import {
   OptionProps,
 } from 'react-select';
 
+import { createFontStyles } from '../../../utils/mixins';
 import Checkbox from '../../checkbox';
 
 export const ClearIndicator = <
@@ -113,11 +114,11 @@ const CustomOption = styled.div`
     } = theme;
 
     return css`
+      ${createFontStyles('body-3')};
       align-items: center;
       color: ${dropdown.colorPrimary};
       cursor: pointer;
       display: flex;
-      font: ${theme.typography['body-3']};
       height: 36px;
       padding: 0 ${theme.spacing[5]};
       user-select: none;

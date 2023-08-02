@@ -12,14 +12,12 @@ import {
 import type { Button } from '../../types/components';
 
 const button: Button = {
-  global: {
-    borderRadius: borderRadius.default,
-    borderWidth: borderWidth[1],
-    elevation: {
-      initial: elevation[0],
-      hover: elevation[0],
-      active: elevation[0],
-    },
+  borderRadius: borderRadius.default,
+  borderWidth: borderWidth[1],
+  elevation: {
+    initial: elevation[0],
+    hover: elevation[0],
+    active: elevation[0],
   },
   variant: {
     primary: {

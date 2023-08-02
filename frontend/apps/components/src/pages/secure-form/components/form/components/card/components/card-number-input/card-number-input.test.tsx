@@ -50,9 +50,7 @@ describe('<CardNumberInput />', () => {
       });
 
       const firstInput = screen.getByLabelText('Card number');
-      expect(firstInput).toHaveStyle({
-        borderColor: 'var(--fp-base-inputs-base-hint-error)',
-      });
+      expect(firstInput.getAttribute('data-has-error')).toEqual('true');
     });
   });
 

@@ -1,9 +1,10 @@
 import bifrost from './bifrost';
 import button from './button';
 import dropdown from './dropdown';
+import hint from './hint';
 import input from './input';
-import inputHint from './input-hint';
-import inputLabel from './input-label';
+import label from './label';
+import link from './link';
 import linkButton from './link-button';
 import radioSelect from './radio-select';
 
@@ -11,9 +12,10 @@ export default {
   dropdown,
   button,
   input,
-  inputHint,
-  inputLabel,
+  hint,
+  label,
   linkButton,
+  link,
   bifrost,
   radioSelect,
 };

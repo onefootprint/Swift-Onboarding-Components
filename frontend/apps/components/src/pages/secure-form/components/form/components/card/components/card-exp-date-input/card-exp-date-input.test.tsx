@@ -43,9 +43,7 @@ describe('CardExpDateInput', () => {
         label: 'Expiration date',
       });
       const firstInput = screen.getByLabelText('Expiration date');
-      expect(firstInput).toHaveStyle({
-        borderColor: 'var(--fp-base-inputs-base-hint-error)',
-      });
+      expect(firstInput.getAttribute('data-has-error')).toEqual('true');
     });
   });
 

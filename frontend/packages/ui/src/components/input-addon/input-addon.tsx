@@ -1,7 +1,10 @@
 import styled, { css } from '@onefootprint/styled';
 
+import { createFontStyles } from '../../utils';
+
 const InputAddon = styled.div`
   ${({ theme }) => css`
+    ${createFontStyles('body-4')};
     padding: ${theme.spacing[3]} ${theme.spacing[5]};
     margin-inline-end: -1px;
     border-top-right-radius: 0px;
@@ -16,7 +19,6 @@ const InputAddon = styled.div`
     background: ${theme.backgroundColor.secondary};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     color: ${theme.color.primary};
-    font: ${theme.typography['body-4']};
     border-radius: ${theme.borderRadius.default} 0 0
       ${theme.borderRadius.default};
   `}

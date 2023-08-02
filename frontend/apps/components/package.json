@@ -17,6 +17,7 @@
     "build:storybook": "build-storybook"
   },
   "dependencies": {
+    "@onefootprint/appearance": "*",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/dev-tools": "*",
     "@onefootprint/footprint-components-js": "*",

@@ -1,5 +1,3 @@
-import '@onefootprint/design-tokens/src/output/theme.css';
-
 import themes from '@onefootprint/design-tokens';
 import { createGlobalStyle } from '@onefootprint/styled';
 import { DesignSystemProvider } from '@onefootprint/ui';
