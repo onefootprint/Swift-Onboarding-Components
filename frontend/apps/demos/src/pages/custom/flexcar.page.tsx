@@ -8,29 +8,34 @@ import React from 'react';
 const publicKey = 'ob_test_rXIYpBLZBkoQkJRiOlm6or';
 
 const installation = `npm install @onefootprint/footprint-js
-npm install @onefootprint/footprint-react
 `;
 
 const basic = `import '@onefootprint/footprint-js/dist/footprint-js.css';
-import './app.css';
 import { appearance, publicKey } from './config';
-import { FootprintButton } from '@onefooprint/footprint-react';
+import footprint from '@onefooprint/footprint-js';
+
 const Page = () => {
+  const handleOpen = () => {
+    footprint.open({
+      publicKey,
+      appearance,
+      onCompleted: handleCompleted,
+      onCanceled: handleCanceled,
+    });
+  };
+
   const handleCompleted = (validationToken: string) => {
     // Send validationToken to your backend
     console.log(validationToken);
   };
+
   const handleCanceled = () => {
     console.log('user canceled');
   };
+
   return (
     <main>
-      <FootprintButton
-        appearance={appearance}
-        publicKey={publicKey}
-        onCompleted={handleCompleted}
-        onCanceled={handleCanceled}
-      />
+      <button onClick={handleOpen}>Verify</button>
     </main>
   );
 };

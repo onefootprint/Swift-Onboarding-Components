@@ -24,7 +24,7 @@ const getURL = (params: {
     searchParams.append('public_key', publicKey);
   }
   if (variables) {
-    searchParams.append('tokens', variables);
+    searchParams.append('variables', variables);
   }
   if (rules) {
     searchParams.append('rules', rules);

@@ -55,6 +55,8 @@ export type Typography = {
   lineHeight: CSS.Property.LineHeight;
 };
 
+export type DeprecatedTypography = string;
+
 export type Typographies = Record<FontVariant, Typography>;
 
 export type Overlays = {

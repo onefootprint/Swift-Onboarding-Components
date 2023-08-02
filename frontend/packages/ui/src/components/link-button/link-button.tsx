@@ -114,7 +114,7 @@ export const LinkButtonStyled = styled.a.attrs<{
       color: ${linkButton.variant[variant].color.text.initial};
       cursor: ${disabled ? 'initial' : 'pointer'};
       display: inline-flex;
-      height: ${linkButton.size[size].height}px;
+      height: ${linkButton.size[size].height};
       margin: 0;
       padding: 0;
       text-decoration: none;

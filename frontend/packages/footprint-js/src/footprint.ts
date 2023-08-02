@@ -35,8 +35,9 @@ const footprint = () => {
     }
     hasIframeOpened = true;
 
-    const { fontSrc, rules, variables } = getAppearanceStyles(appearance);
-    const url = getURL({ fontSrc, publicKey, rules, variables });
+    const { fontSrc, rules, variables, variant } =
+      getAppearanceStyles(appearance);
+    const url = getURL({ fontSrc, publicKey, rules, variables, variant });
     await iframeManager.open(url, userData, options);
     subscribeToComplete(onCompleted);
     subscribeToCancel(() => {

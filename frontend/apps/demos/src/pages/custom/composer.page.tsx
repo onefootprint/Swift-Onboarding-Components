@@ -6,29 +6,34 @@ import Link from 'next/link';
 import React from 'react';
 
 const installation = `npm install @onefootprint/footprint-js
-npm install @onefootprint/footprint-react
 `;
 
 const basic = `import '@onefootprint/footprint-js/dist/footprint-js.css';
-import './app.css';
 import { appearance, publicKey } from './config';
-import { FootprintButton } from '@onefooprint/footprint-react';
+import footprint from '@onefooprint/footprint-js';
+
 const Page = () => {
+  const handleOpen = () => {
+    footprint.open({
+      publicKey,
+      appearance,
+      onCompleted: handleCompleted,
+      onCanceled: handleCanceled,
+    });
+  };
+
   const handleCompleted = (validationToken: string) => {
     // Send validationToken to your backend
     console.log(validationToken);
   };
+
   const handleCanceled = () => {
     console.log('user canceled');
   };
+
   return (
     <main>
-      <FootprintButton
-        appearance={appearance}
-        publicKey={publicKey}
-        onCompleted={handleCompleted}
-        onCanceled={handleCanceled}
-      />
+      <button onClick={handleOpen}>Verify</button>
     </main>
   );
 };
@@ -41,6 +46,7 @@ export const appearance: FootprintAppearance = {
   variables: {
     fontFamily:
       '"Inter", ui-sans-serif, system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
+    colorAccent: '#3F83F7',
     linkColor: '#3F83F7',
     borderRadius: '3px',
     linkButtonColor: '#3F83F7',
@@ -64,18 +70,8 @@ export const appearance: FootprintAppearance = {
     labelColor: '#101516',
     labelFont: '500 14px/21px "Inter"',
   },
+  variant: 'drawer',
   rules: {
-    container: {
-      width: '460px',
-      margin: 'unset',
-      height: '100vh',
-      maxHeight: 'unset',
-      position: 'fixed',
-      right: 0,
-      border: '1px solid #101516',
-      boxShadow:
-        '0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.24) 0px 4px 24px 0px',
-    },
     input: {
       transition: '0.15s all cubic-bezier(.4,0,.2,1)',
     },
@@ -92,12 +88,13 @@ const handleOpen = () => {
       showCompletionPage: true,
     },
     appearance: {
-      variant: 'drawer',
       fontSrc:
         'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
+      variant: 'drawer',
       variables: {
         fontFamily:
           '"Inter", ui-sans-serif, system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
+        colorAccent: '#3F83F7',
         linkColor: '#3F83F7',
         borderRadius: '3px',
         linkButtonColor: '#3F83F7',
