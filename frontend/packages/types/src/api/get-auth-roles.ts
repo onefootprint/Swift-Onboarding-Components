@@ -4,4 +4,8 @@ export type GetAuthRolesRequest = {
   authToken: string;
 };
 
-export type GetAuthRoleResponse = Organization[];
+export type GetAuthRolesOrg = Organization & {
+  isAuthMethodSupported: boolean;
+};
+
+export type GetAuthRoleResponse = GetAuthRolesOrg[];

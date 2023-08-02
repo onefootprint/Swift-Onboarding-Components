@@ -1,6 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { Organization } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { GetAuthRolesOrg } from '@onefootprint/types';
+import { Tooltip, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import useSession from 'src/hooks/use-session';
@@ -10,7 +10,7 @@ import useAssumeRole from './hooks/use-assume-role';
 
 type DataProps = {
   authToken: string;
-  organizations: Organization[];
+  organizations: GetAuthRolesOrg[];
 };
 
 const Data = ({ authToken, organizations }: DataProps) => {
@@ -52,13 +52,22 @@ const Data = ({ authToken, organizations }: DataProps) => {
       </Typography>
       <ButtonGroup>
         {organizations.map(organization => (
-          <button
+          <Tooltip
             key={organization.id}
-            onClick={handleClick(organization.id)}
-            type="button"
+            text={t('errors.auth-method-not-supported', {
+              orgName: organization.name,
+            })}
+            position="right"
+            disabled={organization.isAuthMethodSupported}
           >
-            {organization.name}
-          </button>
+            <button
+              disabled={!organization.isAuthMethodSupported}
+              onClick={handleClick(organization.id)}
+              type="button"
+            >
+              {organization.name}
+            </button>
+          </Tooltip>
         ))}
       </ButtonGroup>
     </>

@@ -92,6 +92,11 @@ describe('<Organizations />', () => {
             screen.getByRole('button', { name: organization.name }),
           ).toBeInTheDocument();
         });
+        const [, secondOrg] = getOrgAuthRoleFixture;
+        const secondOrgButton = screen.getByRole('button', {
+          name: secondOrg.name,
+        });
+        expect(secondOrgButton).toBeDisabled();
       });
     });
 

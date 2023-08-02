@@ -323,7 +323,8 @@
       "page-title": "Footprint Login | Select an Organization",
       "title": "Select an organization",
       "errors": {
-        "no-auth-token": "No auth token provided. Please, log in again."
+        "no-auth-token": "No auth token provided. Please, log in again.",
+        "auth-method-not-supported": "{{orgName}} has disabled the ability to log in using this auth method. Please retry using another method."
       }
     },
     "email-login": {

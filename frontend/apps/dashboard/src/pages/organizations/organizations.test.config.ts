@@ -16,6 +16,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     domain: null,
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
+    isAuthMethodSupported: true,
   },
   {
     id: '_private_it_org_3',
@@ -27,6 +28,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     domain: null,
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
+    isAuthMethodSupported: false,
   },
 ];
 
