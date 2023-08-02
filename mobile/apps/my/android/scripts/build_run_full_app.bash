@@ -1,18 +1,7 @@
 #!/bin/bash
 
-set -e
-
-adb uninstall com.onefootprint.my || true
-
-# clean
-sh scripts/cleanup.bash
-./gradlew clean
-
-# build bundle
-./gradlew app:bundleRelease
-
-# build apks file from bundle based on connected device configuration
-bundletool build-apks --bundle=app/build/outputs/bundle/release/app-release.aab  --output=local_app.apks --connected-device --ks=debug.keystore --ks-pass=pass:12345678 --ks-key-alias=key0 --key-pass=pass:12345678
+# Build
+sh scripts/build_full_app.bash
 
 # install full app
 bundletool install-apks --apks local_app.apks
