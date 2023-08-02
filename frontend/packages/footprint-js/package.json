@@ -27,7 +27,8 @@
     "identity verification"
   ],
   "scripts": {
-    "test": "jest --ci --bail ",
+    "test": "jest",
+    "test:ci": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
     "dev": "tsup --watch",
     "build": "tsup",

@@ -51,9 +51,11 @@
     "test": {
       "dependsOn": [
         "^build"
-      ],
-      "outputs": [
-        ".jest-cache/**"
+      ]
+    },
+    "test:ci": {
+      "dependsOn": [
+        "^build"
       ]
     },
     "start": {

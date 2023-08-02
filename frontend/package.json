@@ -16,6 +16,7 @@
     "format:fix": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "test:ci": "turbo run test:ci",
     "test:watch": "turbo run test:watch",
     "preset:dot-env": "npx vercel login footprint",
     "set:dot-env": "turbo run set:dot-env",

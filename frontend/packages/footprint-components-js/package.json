@@ -29,7 +29,7 @@
     "pci"
   ],
   "scripts": {
-    "test": "jest --ci --bail --passWithNoTests",
+    "test": "jest",
     "test:watch": "jest --watch",
     "dev": "tsup --watch",
     "build": "tsup",

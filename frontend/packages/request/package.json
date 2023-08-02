@@ -6,7 +6,8 @@
   "types": "./src/index.ts",
   "license": "MIT",
   "scripts": {
-    "test": "jest --ci --bail ",
+    "test": "jest",
+    "test:ci": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",

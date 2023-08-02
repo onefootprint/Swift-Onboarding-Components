@@ -101,7 +101,7 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Tests
         working-directory: ./frontend
-        run: yarn test
+        run: yarn test:ci
 
   typecheck:
     runs-on: frontend_runner
