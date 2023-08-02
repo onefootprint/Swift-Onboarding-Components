@@ -56,11 +56,8 @@ module.exports = {
     return [
       {
         source: '/:path*',
-        headers: securityHeaders,
-      },
-      {
-        source: '/_next/static/css/:path*',
         headers: [
+          ...securityHeaders,
           {
             key: 'Cache-Control',
             value: 'no-store',
