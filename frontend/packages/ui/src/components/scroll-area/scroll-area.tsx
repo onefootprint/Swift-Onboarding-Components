@@ -1,7 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
 import * as ScrollAreaRadix from '@radix-ui/react-scroll-area';
 import React, { useEffect, useRef, useState } from 'react';
-import { useEventListener } from 'usehooks-ts';
 
 import { SXStyleProps, SXStyles, useSX } from '../../hooks';
 
@@ -22,11 +21,6 @@ const ScrollArea = ({ children, sx }: ScrollAreaProps) => {
   const scrolledToBottom =
     scrollTop > 0 && scrollTop + scrollAreaHeight >= viewportHeight;
 
-  const updateDimensions = () => {
-    setScrollAreaHeight(scrollAreaRef.current?.clientHeight ?? 0);
-    setViewportHeight(viewportRef.current?.clientHeight ?? 0);
-  };
-
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
   };
@@ -41,7 +35,26 @@ const ScrollArea = ({ children, sx }: ScrollAreaProps) => {
     }
   }, [noOverflow, scrolledToBottom]);
 
-  useEventListener('resize', updateDimensions);
+  useEffect(() => {
+    const updateDimensions = () => {
+      setScrollAreaHeight(scrollAreaRef.current?.clientHeight ?? 0);
+      setViewportHeight(viewportRef.current?.clientHeight ?? 0);
+    };
+
+    const startResizeObserve = () => {
+      if (viewportRef.current)
+        new ResizeObserver(updateDimensions).observe(viewportRef.current);
+    };
+
+    const stopResizeObserve = () => {
+      if (viewportRef.current)
+        new ResizeObserver(updateDimensions).unobserve(viewportRef.current);
+    };
+
+    startResizeObserve();
+
+    return stopResizeObserve;
+  }, []);
 
   return (
     <StyledRoot

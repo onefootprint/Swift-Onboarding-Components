@@ -1361,6 +1361,7 @@
             "will-collect": "Will collect:"
           },
           "id-doc-form": {
+            "alert-info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
             "selfie": {
               "label": "Request a selfie",
               "hint": "You can optionally request users to take a selfie to validate the ID document requested."
@@ -1379,10 +1380,7 @@
             "description": "Select types of documents to request.",
             "ssn": "ID Number",
             "nationality": "Request users to specify their nationality",
-            "id-doc": {
-              "title": "ID photo (optional)",
-              "description": "If needed, select the types of documents that you accept from users as part of their onboarding."
-            }
+            "id-doc": "Photo ID (optional)"
           },
           "kyc-step-up": {
             "title": "Step-up document request",

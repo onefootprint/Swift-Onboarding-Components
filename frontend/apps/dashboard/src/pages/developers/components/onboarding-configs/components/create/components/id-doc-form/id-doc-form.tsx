@@ -1,18 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDocRegionality, SupportedIdDocTypes } from '@onefootprint/types';
-import { Box, Checkbox, Radio, Typography } from '@onefootprint/ui';
+import {
+  Box,
+  Checkbox,
+  InlineAlert,
+  Radio,
+  Typography,
+} from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import AnimatedContainer from 'src/components/animated-container';
 
 type IdDocFormProps = {
   title: string;
-  description: string;
   isPrimary?: boolean;
 };
 
-const IdDocForm = ({ title, description, isPrimary }: IdDocFormProps) => {
+const IdDocForm = ({ title, isPrimary }: IdDocFormProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create.id-doc-form',
   );
@@ -33,9 +38,6 @@ const IdDocForm = ({ title, description, isPrimary }: IdDocFormProps) => {
         <Typography variant={isPrimary ? 'label-2' : 'label-3'}>
           {title}
         </Typography>
-        <Typography variant="body-3" color="tertiary">
-          {description}
-        </Typography>
       </SectionTitle>
       <OptionsContainer>
         {Object.values(SupportedIdDocTypes).map((type: SupportedIdDocTypes) => (
@@ -49,6 +51,7 @@ const IdDocForm = ({ title, description, isPrimary }: IdDocFormProps) => {
           />
         ))}
       </OptionsContainer>
+      <InlineAlert variant="info">{t('alert-info')}</InlineAlert>
       <AnimatedContainer isExpanded={hasDocument}>
         <DashedDivider />
         <Checkbox

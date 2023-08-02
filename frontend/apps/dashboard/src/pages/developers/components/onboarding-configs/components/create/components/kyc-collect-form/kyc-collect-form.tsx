@@ -119,10 +119,7 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
             {...register(CollectedKycDataOption.nationality)}
           />
         </Section>
-        <IdDocForm
-          title={t('id-doc.title')}
-          description={t('id-doc.description')}
-        />
+        <IdDocForm title={t('id-doc')} />
       </Form>
     </FormProvider>
   );
