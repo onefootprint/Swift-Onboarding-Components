@@ -8,6 +8,7 @@ import { css } from '@onefootprint/styled';
 
 export const createFontStyles = (variant: FontVariant) => css`
   ${({ theme }) => css`
+    font-family: inherit;
     font-weight: ${theme.typography[variant].fontWeight};
     font-size: ${theme.typography[variant].fontSize};
     line-height: ${theme.typography[variant].lineHeight};
