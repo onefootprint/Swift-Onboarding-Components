@@ -1,22 +1,12 @@
-import { CountryCode, CountryCode3, IdDocImageError, IdDocType } from '../data';
+import { CountryCode, CountryCode3, SupportedIdDocTypes } from '../data';
 
-export enum SubmitDocumentSide {
-  Front = 'front',
-  Back = 'back',
-  Selfie = 'selfie',
-}
-
-export type SubmitDocRequest = {
+export type SubmitDocTypeRequest = {
   authToken: string;
-  frontImage?: string;
-  backImage?: string;
-  selfieImage?: string;
-  documentType: IdDocType;
+  documentType: SupportedIdDocTypes;
   countryCode: CountryCode | CountryCode3;
 };
 
-export type SubmitDocResponse = {
-  errors: IdDocImageError[];
-  nextSideToCollect: SubmitDocumentSide | null;
-  isRetryLimitExceeded: boolean;
+export type SubmitDocTypeResponse = {
+  errors: string[];
+  id: string;
 };

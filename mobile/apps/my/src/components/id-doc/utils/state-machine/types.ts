@@ -1,15 +1,16 @@
 import {
   CountryCode,
   IdDocRequirement,
-  IdDocType,
   SubmitDocumentSide,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 
 export type MachineContext = {
   requirement?: IdDocRequirement;
   collectingDocumentMeta?: {
     countryCode: CountryCode;
-    type: IdDocType;
+    type: SupportedIdDocTypes;
+    docId: string;
   };
   currentSide?: SubmitDocumentSide;
 };
@@ -18,7 +19,7 @@ export type MachineEvents =
   | {
       type: 'countryAndTypeSubmitted';
       payload: {
-        documentType: IdDocType;
+        documentType: SupportedIdDocTypes;
         countryCode: CountryCode;
       };
     }

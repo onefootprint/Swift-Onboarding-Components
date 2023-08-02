@@ -1,8 +1,8 @@
 import { getCountryFromCode } from '@onefootprint/global-constants';
 import {
   IdDocType,
-  SubmitDocumentSide,
   SupportedIdDocTypes,
+  UploadDocumentSide,
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
@@ -22,10 +22,11 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
       tsTypes: {} as import('./machine.typegen').Typegen0,
       context: {
         requirement: undefined,
-        currentSide: SubmitDocumentSide.Front,
+        currentSide: UploadDocumentSide.Front,
         collectingDocumentMeta: {
           countryCode: USCountryCode,
-          type: IdDocType.passport,
+          type: SupportedIdDocTypes.passport,
+          docId: '',
         },
         ...initialContext,
       },
@@ -140,6 +141,7 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
           return {
             ...context,
             collectingDocumentMeta: {
+              docId: payload.docId,
               countryCode: payload.countryCode,
               type: payload.documentType,
             },

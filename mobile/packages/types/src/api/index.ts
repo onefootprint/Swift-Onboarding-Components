@@ -59,6 +59,7 @@ export * from './update-member';
 export * from './update-org';
 export * from './update-org-role';
 export * from './update-proxy-config';
+export * from './upload-doc';
 export * from './upload-file';
 export * from './user-data-identity';
 export * from './user-decrypt';

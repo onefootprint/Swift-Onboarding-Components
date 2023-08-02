@@ -1,6 +1,6 @@
 import { CountryRecord } from '@onefootprint/global-constants';
 import { getErrorMessage } from '@onefootprint/request';
-import { IdDocType, SubmitDocumentSide } from '@onefootprint/types';
+import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
 import React, { useMemo, useState } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
@@ -10,20 +10,29 @@ import IdCard from './components/id-card';
 import Passport from './components/passport';
 import Context from './components/scan-context';
 import Selfie from './components/selfie';
-import useSubmitDoc from './hooks/use-submit-doc';
+import useUploadDoc from './hooks/use-upload-doc';
 
 export type DocScanProps = {
   authToken: string;
   country: CountryRecord;
-  onDone: (nextSideToCollect: SubmitDocumentSide) => void;
-  side: SubmitDocumentSide;
-  type: IdDocType;
+  onDone: (nextSideToCollect: UploadDocumentSide) => void;
+  side: UploadDocumentSide;
+  type: SupportedIdDocTypes;
+  docId: string;
 };
 
-const DocScan = ({ authToken, country, onDone, side, type }: DocScanProps) => {
+const DocScan = ({
+  authToken,
+  country,
+  onDone,
+  side,
+  type,
+  docId,
+}: DocScanProps) => {
   const { t, allT } = useTranslation('components.scan.preview.errors');
   const [errors, setErrors] = useState([]);
-  const mutation = useSubmitDoc({
+
+  const uploadMutation = useUploadDoc({
     onError: error => {
       setErrors([getErrorMessage(error)]);
     },
@@ -34,14 +43,13 @@ const DocScan = ({ authToken, country, onDone, side, type }: DocScanProps) => {
   };
 
   const handleSubmit = (image: string) => {
-    mutation.mutate(
+    uploadMutation.mutate(
       {
+        docId,
+        image,
         authToken,
-        countryCode: country.value,
-        documentType: type,
-        selfieImage: side === SubmitDocumentSide.Selfie ? image : null,
-        frontImage: side === SubmitDocumentSide.Front ? image : null,
-        backImage: side === SubmitDocumentSide.Back ? image : null,
+        side,
+        mimeType: 'image/png',
       },
       {
         onSuccess: response => {
@@ -68,23 +76,26 @@ const DocScan = ({ authToken, country, onDone, side, type }: DocScanProps) => {
       authToken,
       errors,
       isError: errors.length > 0,
-      isLoading: mutation.isLoading,
-      isSuccess: mutation.isSuccess && mutation.data.errors.length === 0,
+      isLoading: uploadMutation.isLoading,
+      isSuccess:
+        uploadMutation.isSuccess && uploadMutation.data.errors.length === 0,
       onSubmit: handleSubmit,
       onResetErrors: handleResetErrors,
     }),
-    [authToken, country, errors, mutation],
+    [authToken, country, errors, uploadMutation],
   );
 
   return (
     <Context.Provider value={contextValues}>
-      {side === SubmitDocumentSide.Selfie ? (
-        <Selfie authToken={authToken} />
+      {side === UploadDocumentSide.Selfie ? (
+        <Selfie />
       ) : (
         <>
-          {type === IdDocType.driversLicense && <DriversLicense side={side} />}
-          {type === IdDocType.idCard && <IdCard side={side} />}
-          {type === IdDocType.passport && <Passport />}
+          {type === SupportedIdDocTypes.driversLicense && (
+            <DriversLicense side={side} />
+          )}
+          {type === SupportedIdDocTypes.idCard && <IdCard side={side} />}
+          {type === SupportedIdDocTypes.passport && <Passport />}
         </>
       )}
     </Context.Provider>

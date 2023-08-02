@@ -33,11 +33,12 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
     return (
       <DocSelection
         requirement={requirement}
+        authToken={authToken}
         defaultType={collectingDocumentMeta.type}
         defaultCountry={country}
-        onSubmit={(countryCode, documentType) => {
+        onSubmit={(countryCode, documentType, docId) => {
           send('countryAndTypeSubmitted', {
-            payload: { countryCode, documentType },
+            payload: { countryCode, documentType, docId },
           });
         }}
       />
@@ -50,6 +51,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
   ) {
     return (
       <DocScan
+        docId={collectingDocumentMeta.docId}
         key={currentSide}
         authToken={authToken}
         country={country}
