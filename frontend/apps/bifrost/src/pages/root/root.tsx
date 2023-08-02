@@ -54,10 +54,7 @@ const Root = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({
-  res,
-  query,
-}) => {
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const obConfig = query.public_key as string | undefined;
   const params = query as Record<string, string>;
   const response = await getCustomAppearance({
