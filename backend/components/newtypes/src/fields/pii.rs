@@ -2,6 +2,7 @@ use crate::Base64Data;
 
 use super::api_schema_helper::string_api_data_type_alias;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use paperclip::v2::schema::TypedData;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -96,6 +97,16 @@ impl crypto::hex::FromHex for PiiBytes {
 
     fn from_hex<T: AsRef<[u8]>>(hex: T) -> Result<Self, Self::Error> {
         Ok(PiiBytes(Vec::from_hex(hex.as_ref())?))
+    }
+}
+
+impl TypedData for PiiBytes {
+    fn data_type() -> paperclip::v2::models::DataType {
+        paperclip::v2::models::DataType::String
+    }
+
+    fn format() -> Option<paperclip::v2::models::DataTypeFormat> {
+        Some(paperclip::v2::models::DataTypeFormat::Binary)
     }
 }
 

@@ -148,7 +148,7 @@ mod tests {
     use std::str::FromStr;
 
     use super::*;
-    use newtypes::{DataIdentifier, FilterFunction, FpId, IdentityDataKind as IDK, KvDataKey};
+    use newtypes::{CountArgs, DataIdentifier, FilterFunction, FpId, IdentityDataKind as IDK, KvDataKey};
     use test_case::test_case;
     use DataIdentifier as DI;
     use FilterFunction::*;
@@ -220,7 +220,7 @@ mod tests {
         assert!(result.matches.contains_key(&tok2(
             "fp_id_abcd",
             IDK::LastName,
-            vec![Prefix { count: 2 }, ToUppercase]
+            vec![Prefix(CountArgs { count: 2 }), ToUppercase]
         )));
 
         assert!(result.matches.contains_key(&tok1("fp_id_abcd", DI::Id(IDK::Dob))));
@@ -260,7 +260,7 @@ mod tests {
                 tok2(
                     "fp_id_abcd",
                     IDK::LastName,
-                    vec![Prefix { count: 2 }, ToUppercase],
+                    vec![Prefix(CountArgs { count: 2 }), ToUppercase],
                 ),
                 "MU".into(),
             ),
@@ -350,8 +350,8 @@ mod tests {
     }"#;
 
     #[test_case(B_7, &[
-        (tok2(B7_FP_ID, IDK::Ssn9, vec![Suffix { count: 4 }]), 1),
-        (tok2(B7_FP_ID, IDK::LastName, vec![Prefix { count: 4 }, ToUppercase ]), 1),
+        (tok2(B7_FP_ID, IDK::Ssn9, vec![Suffix(CountArgs { count: 4 })]), 1),
+        (tok2(B7_FP_ID, IDK::LastName, vec![Prefix(CountArgs { count: 4 }), ToUppercase ]), 1),
         (tok2(B7_FP_ID, IDK::LastName, vec![ToLowercase]), 1),
     ])]
     fn test_with_filters(body: &str, expected: &[(ProxyToken, usize)]) {

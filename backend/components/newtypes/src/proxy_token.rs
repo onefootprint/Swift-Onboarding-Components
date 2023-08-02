@@ -139,6 +139,7 @@ pub enum ProxyTokenError {
 mod tests {
     use super::FilterFunction::*;
     use super::*;
+    use crate::CountArgs;
     use crate::{DataIdentifier, FpId, IdentityDataKind as IDK};
     use test_case::test_case;
 
@@ -158,12 +159,12 @@ mod tests {
     #[test_case("fp_id_xyz.id.last_name", None => tok("fp_id_xyz", IDK::LastName, vec![]))]
     #[test_case("id.ssn9   | to_lowercase", Some("fp_id_xyz") => tok("fp_id_xyz", IDK::Ssn9, vec![ToLowercase]))]
     #[test_case("id.last_name | suffix(4) | to_lowercase", Some("fp_id_1") => tok("fp_id_1", IDK::LastName, vec![
-        Suffix { count: 4 },
+        Suffix(CountArgs { count: 4 }),
         ToLowercase
     ]))]
     #[test_case("id.address_line1 | suffix(16) | prefix(4) | to_lowercase | to_ascii", Some("fp_id_1") => tok("fp_id_1", IDK::AddressLine1, vec![
-        Suffix { count: 16 },
-        Prefix { count: 4 },
+        Suffix(CountArgs { count: 16 }),
+        Prefix(CountArgs { count: 4 }),
         ToLowercase,
         ToAscii
     ]))]

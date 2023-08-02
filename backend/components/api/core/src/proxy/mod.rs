@@ -6,7 +6,9 @@ pub mod token_parser;
 pub mod tokenize;
 
 use enclave_proxy::{DataTransform, DataTransformer, DataTransforms};
-use newtypes::{FilterFunction, PiiBytes};
+use newtypes::{
+    CountArgs, DateFormatArgs, EncryptArgs, FilterFunction, HmacSha256Args, PiiBytes, ReplaceArgs,
+};
 
 pub use self::config::ingress_rule::IngressRule;
 
@@ -16,24 +18,26 @@ pub fn filter_function_to_transform(value: &FilterFunction) -> DataTransform {
         FilterFunction::ToLowercase => DataTransform::ToLowercase,
         FilterFunction::ToUppercase => DataTransform::ToUppercase,
         FilterFunction::ToAscii => DataTransform::ToAscii,
-        FilterFunction::Prefix { count } => DataTransform::Prefix { count: *count },
-        FilterFunction::Suffix { count } => DataTransform::Suffix { count: *count },
-        FilterFunction::Replace { from, to } => DataTransform::Replace {
+        FilterFunction::Prefix(CountArgs { count }) => DataTransform::Prefix { count: *count },
+        FilterFunction::Suffix(CountArgs { count }) => DataTransform::Suffix { count: *count },
+        FilterFunction::Replace(ReplaceArgs { from, to }) => DataTransform::Replace {
             from: from.clone(),
             to: to.clone(),
         },
-        FilterFunction::DateFormat {
+        FilterFunction::DateFormat(DateFormatArgs {
             from_format,
             to_format,
-        } => DataTransform::DateFormat {
+        }) => DataTransform::DateFormat {
             from_format: from_format.clone(),
             to_format: to_format.clone(),
         },
-        FilterFunction::HmacSha256 { key } => DataTransform::HmacSha256 { key: key.clone().into_leak() },
-        FilterFunction::Encrypt {
+        FilterFunction::HmacSha256(HmacSha256Args { key }) => DataTransform::HmacSha256 {
+            key: key.clone().into_leak(),
+        },
+        FilterFunction::Encrypt(EncryptArgs {
             algorithm,
             public_key,
-        } => DataTransform::Encrypt {
+        }) => DataTransform::Encrypt {
             algorithm: match algorithm {
                 newtypes::EncryptFilterAlgorithmName::RsaPkcs1v15 => {
                     enclave_proxy::EncryptTransformAlgorithm::RsaPksc1v15
@@ -53,19 +57,19 @@ pub fn transform_to_filter_function(value: DataTransform) -> Option<FilterFuncti
         DataTransform::ToLowercase => FilterFunction::ToLowercase,
         DataTransform::ToUppercase => FilterFunction::ToUppercase,
         DataTransform::ToAscii => FilterFunction::ToAscii,
-        DataTransform::Prefix { count } => FilterFunction::Prefix { count },
-        DataTransform::Suffix { count } => FilterFunction::Suffix { count },
-        DataTransform::Replace { from, to } => FilterFunction::Replace { from, to },
+        DataTransform::Prefix { count } => FilterFunction::Prefix(CountArgs { count }),
+        DataTransform::Suffix { count } => FilterFunction::Suffix(CountArgs { count }),
+        DataTransform::Replace { from, to } => FilterFunction::Replace(ReplaceArgs { from, to }),
         DataTransform::DateFormat {
             from_format,
             to_format,
-        } => FilterFunction::DateFormat {
+        } => FilterFunction::DateFormat(DateFormatArgs {
             from_format,
             to_format,
-        },
-        DataTransform::HmacSha256 { key } => FilterFunction::HmacSha256 {
+        }),
+        DataTransform::HmacSha256 { key } => FilterFunction::HmacSha256(HmacSha256Args {
             key: PiiBytes::new(key),
-        },
+        }),
         DataTransform::Encrypt {
             algorithm,
             public_key_der,
@@ -78,10 +82,10 @@ pub fn transform_to_filter_function(value: DataTransform) -> Option<FilterFuncti
                     newtypes::EncryptFilterAlgorithmName::EciesP256X963Sha256AesGcm
                 }
             };
-            FilterFunction::Encrypt {
+            FilterFunction::Encrypt(EncryptArgs {
                 algorithm,
                 public_key: public_key_der,
-            }
+            })
         }
         DataTransform::Identity => {
             // TODO: handle more gracefull this case :)

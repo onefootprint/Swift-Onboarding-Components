@@ -7,7 +7,7 @@ use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
 use newtypes::{
     flat_api_object_map_type, FilterFunction, FpId, IntegritySigningKey, PiiBytes, PiiString,
-    VersionedDataIdentifier,
+    VersionedDataIdentifier, HmacSha256Args,
 };
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
@@ -54,9 +54,9 @@ pub async fn post(
     let req = super::decrypt::DecryptRequest {
         reason: "Compute Integrity HMAC-SHA256".to_string(),
         fields,
-        filters: vec![FilterFunction::HmacSha256 {
+        filters: Some(vec![FilterFunction::HmacSha256(HmacSha256Args {
             key: PiiBytes::new(signing_key.leak()),
-        }],
+        })]),
     };
 
     let fp_id = path.into_inner();

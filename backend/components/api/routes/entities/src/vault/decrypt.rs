@@ -29,8 +29,7 @@ pub struct DecryptRequest {
     pub(super) reason: String,
     /// A list of filter functions to apply to each decrypted data
     /// Omit or leave empty to apply no filters
-    #[serde(default)]
-    pub(super) filters: Vec<FilterFunction>,
+    pub(super) filters: Option<Vec<FilterFunction>>,
 }
 
 #[derive(Debug, Deserialize, Apiv2Schema)]
@@ -42,8 +41,7 @@ pub struct ClientDecryptRequest {
     reason: Option<String>,
     /// A list of filter functions to apply to each decrypted data
     /// Omit or leave empty to apply no filters
-    #[serde(default)]
-    filters: Vec<FilterFunction>,
+    filters: Option<Vec<FilterFunction>>,
 }
 
 flat_api_object_map_type!(
@@ -141,7 +139,11 @@ pub(super) async fn post_inner(
         filters,
     } = request;
 
-    let transforms = filters.iter().map(filter_function_to_transform).collect_vec();
+    let transforms = filters
+        .unwrap_or_default()
+        .iter()
+        .map(filter_function_to_transform)
+        .collect_vec();
 
     // Create a VW for each version in fields
     let version_to_targets = fields
