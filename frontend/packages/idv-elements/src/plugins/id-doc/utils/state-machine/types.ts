@@ -3,7 +3,7 @@ import {
   IdDocImageError,
   IdDocImageTypes,
   IdDocRequirement,
-  IdDocType,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 
 import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
@@ -15,7 +15,7 @@ export type MachineContext = {
   image?: { imageString: string; mimeType: string };
   currSide?: IdDocImageTypes;
   idDoc: {
-    type?: IdDocType;
+    type?: SupportedIdDocTypes;
     country?: CountryCode;
   };
   id?: string;
@@ -33,7 +33,7 @@ export type MachineEvents =
   | {
       type: 'receivedCountryAndType';
       payload: {
-        type?: IdDocType;
+        type?: SupportedIdDocTypes;
         country?: CountryCode;
         id: string;
       };

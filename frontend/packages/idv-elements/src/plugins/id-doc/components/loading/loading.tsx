@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { IdDocImageTypes, IdDocType } from '@onefootprint/types';
+import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 
@@ -9,14 +9,15 @@ import FeedbackIcon from '../feedback-icon';
 
 export type LoadingProps = {
   imageType: IdDocImageTypes;
-  docType: IdDocType;
+  docType: SupportedIdDocTypes;
 };
 
 const Loading = ({ imageType, docType }: LoadingProps) => {
   const { t } = useTranslation('components.loading');
 
   const side =
-    imageType === (docType === IdDocType.passport && IdDocImageTypes.front)
+    imageType ===
+    (docType === SupportedIdDocTypes.passport && IdDocImageTypes.front)
       ? 'one-side'
       : imageType;
 

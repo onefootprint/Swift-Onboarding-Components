@@ -1,7 +1,7 @@
 import {
   CollectedDocumentDataOption,
   CollectedKycDataOption,
-  IdDocType,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 
 import extractIdDocTypesFromCdo from './extract-id-doc-types-from-cdo';
@@ -10,25 +10,30 @@ describe('extractIdDocTypesFromCdo', () => {
   it('should return an array of id doc types', () => {
     expect(
       extractIdDocTypesFromCdo(CollectedDocumentDataOption.document),
-    ).toEqual([IdDocType.idCard, IdDocType.driversLicense, IdDocType.passport]);
+    ).toEqual([
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.passport,
+    ]);
     expect(
       extractIdDocTypesFromCdo(CollectedDocumentDataOption.documentAndSelfie),
-    ).toEqual([IdDocType.idCard, IdDocType.driversLicense, IdDocType.passport]);
+    ).toEqual([
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.passport,
+    ]);
     expect(extractIdDocTypesFromCdo(CollectedKycDataOption.dob)).toEqual([]);
     expect(extractIdDocTypesFromCdo('document.id_card.none.none')).toEqual([
-      IdDocType.idCard,
+      SupportedIdDocTypes.idCard,
     ]);
     expect(extractIdDocTypesFromCdo('document.passport.none.none')).toEqual([
-      IdDocType.passport,
+      SupportedIdDocTypes.passport,
     ]);
     expect(
       extractIdDocTypesFromCdo('document.drivers_license.none.none'),
-    ).toEqual([IdDocType.driversLicense]);
-    expect(
-      extractIdDocTypesFromCdo('document.driver_license.none.none'),
-    ).toEqual([IdDocType.driversLicense]);
+    ).toEqual([SupportedIdDocTypes.driversLicense]);
     expect(
       extractIdDocTypesFromCdo('document.id_card,drivers_license.none.none'),
-    ).toEqual([IdDocType.idCard, IdDocType.driversLicense]);
+    ).toEqual([SupportedIdDocTypes.idCard, SupportedIdDocTypes.driversLicense]);
   });
 });

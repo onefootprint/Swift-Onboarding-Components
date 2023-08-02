@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IdDocImageTypes, IdDocType } from '@onefootprint/types';
+import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTimeout } from 'usehooks-ts';
@@ -8,7 +8,7 @@ import { imageIcons } from '../../constants/image-types';
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 
 type NextSideProps = {
-  docType: IdDocType;
+  docType: SupportedIdDocTypes;
   nextSideImageType: IdDocImageTypes;
   onComplete: () => void;
 };
@@ -26,8 +26,7 @@ const NextSide = ({
   }, TRANSITION_DELAY_DEFAULT);
 
   const side =
-    nextSideImageType ===
-    (docType === IdDocType.passport && IdDocImageTypes.front)
+    docType === SupportedIdDocTypes.passport && IdDocImageTypes.front
       ? 'one-side'
       : nextSideImageType;
 

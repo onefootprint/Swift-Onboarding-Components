@@ -1,4 +1,4 @@
-import { IdDocType, SupportedIdDocTypes } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 
 const extractIdDocTypesFromCdo = (cdo: string) => {
   if (!cdo.startsWith('document')) {
@@ -10,21 +10,20 @@ const extractIdDocTypesFromCdo = (cdo: string) => {
     .flat()
     .filter(
       part =>
-        part === IdDocType.idCard ||
-        part === IdDocType.driversLicense ||
+        part === SupportedIdDocTypes.idCard ||
         part === SupportedIdDocTypes.driversLicense ||
-        part === IdDocType.passport,
+        part === SupportedIdDocTypes.passport,
     );
 
   // We must be collecting all possible document types
   if (!docTypes.length) {
-    return [IdDocType.idCard, IdDocType.driversLicense, IdDocType.passport];
+    return [
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.passport,
+    ];
   }
 
-  const legacyDLIndex = docTypes.indexOf(SupportedIdDocTypes.driversLicense);
-  if (legacyDLIndex > -1) {
-    docTypes.splice(legacyDLIndex, 1, IdDocType.driversLicense);
-  }
   return Array.from(new Set(docTypes));
 };
 

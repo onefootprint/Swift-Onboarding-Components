@@ -1,4 +1,4 @@
-import { IdDocType } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createIdDocMachine from './machine';
@@ -51,7 +51,7 @@ describe('Id Doc Machine Tests', () => {
       let state = machine.send({
         type: 'receivedCountryAndType',
         payload: {
-          type: IdDocType.driversLicense,
+          type: SupportedIdDocTypes.driversLicense,
           country: 'US',
           id: 'id',
         },
@@ -59,7 +59,9 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('frontImage');
       expect(state.context.idDoc.country).toEqual('US');
 
-      expect(state.context.idDoc.type).toEqual(IdDocType.driversLicense);
+      expect(state.context.idDoc.type).toEqual(
+        SupportedIdDocTypes.driversLicense,
+      );
       state = machine.send({
         type: 'navigatedToPrev',
       });
@@ -69,7 +71,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },
@@ -173,7 +175,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },
@@ -208,7 +210,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },
@@ -258,7 +260,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },
@@ -310,7 +312,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },
@@ -343,7 +345,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },
@@ -376,7 +378,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },
@@ -402,7 +404,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },
@@ -441,7 +443,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },
@@ -485,7 +487,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },
@@ -517,7 +519,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedCountryAndType',
           payload: {
-            type: IdDocType.driversLicense,
+            type: SupportedIdDocTypes.driversLicense,
             country: 'US',
             id: 'id',
           },

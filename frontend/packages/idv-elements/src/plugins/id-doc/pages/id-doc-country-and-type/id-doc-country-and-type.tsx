@@ -11,7 +11,7 @@ import {
   IcoPassport24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { IdDocType, SubmitDocTypeResponse } from '@onefootprint/types';
+import { SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import {
   Button,
@@ -28,10 +28,8 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useIdDocMachine } from '../../components/machine-provider';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
-import idDocTypeToSupportedType from '../../utils/id-doc-type-to-supported-type';
-import supportedTypeToIdDocType from '../../utils/supported-type-to-doc-type';
 import useSubmitDocType from './hooks/use-submit-doc-type';
-import IdDocTypesByCountry from './id-doc-types-by-country.constants';
+import SupportedDocTypesByCountry from './supported-doc-types-by-country.constants';
 
 const IdDocCountryAndType = () => {
   const { t } = useTranslation('pages.country-and-type-selection');
@@ -45,14 +43,13 @@ const IdDocCountryAndType = () => {
   );
 
   const { onlyUsSupported, supportedDocumentTypes } = state.context.requirement;
-  const supportedIdDocTypes = supportedDocumentTypes.map(
-    supportedDocumentType => supportedTypeToIdDocType[supportedDocumentType],
-  ); // get rid of this line once back end fixes the typo with "drivers license" in id-doc type
-  const types: IdDocType[] = IdDocTypesByCountry[country.value].filter(type =>
-    supportedIdDocTypes.includes(type),
-  );
-  const firstTypeFromOptions = types.length ? types[0] : IdDocType.passport;
-  const [docType, setDocType] = useState<IdDocType>(
+  const types: SupportedIdDocTypes[] = SupportedDocTypesByCountry[
+    country.value
+  ].filter(type => supportedDocumentTypes.includes(type));
+  const firstTypeFromOptions = types.length
+    ? types[0]
+    : SupportedIdDocTypes.passport;
+  const [docType, setDocType] = useState<SupportedIdDocTypes>(
     defaultType ?? firstTypeFromOptions,
   );
 
@@ -65,18 +62,18 @@ const IdDocCountryAndType = () => {
     // Update both selected country and type
     if (nextCountry) {
       setCountry(nextCountry);
-      const typesForNextCountry = IdDocTypesByCountry[nextCountry.value].filter(
-        type => supportedIdDocTypes.includes(type),
-      );
+      const typesForNextCountry = SupportedDocTypesByCountry[
+        nextCountry.value
+      ].filter(type => supportedDocumentTypes.includes(type));
       const nextType = typesForNextCountry.length
         ? typesForNextCountry[0]
-        : IdDocType.passport;
+        : SupportedIdDocTypes.passport;
       setDocType(nextType);
     }
   };
 
   const handleDocTypeChange = (value: string) => {
-    setDocType(value as IdDocType);
+    setDocType(value as SupportedIdDocTypes);
   };
 
   const handleSubmitDocTypeSuccess = (data: SubmitDocTypeResponse) => {
@@ -98,7 +95,7 @@ const IdDocCountryAndType = () => {
     submitDocTypeMutation.mutate(
       {
         authToken,
-        documentType: idDocTypeToSupportedType[docType],
+        documentType: docType,
         countryCode: selectedCountry,
       },
       {
@@ -108,29 +105,31 @@ const IdDocCountryAndType = () => {
     );
   };
 
-  const optionByDocType: { [key in IdDocType]?: RadioSelectOptionFields } = {};
+  const optionByDocType: {
+    [key in SupportedIdDocTypes]?: RadioSelectOptionFields;
+  } = {};
   if (supportedDocumentTypes?.includes(SupportedIdDocTypes.passport)) {
-    optionByDocType[IdDocType.passport] = {
+    optionByDocType[SupportedIdDocTypes.passport] = {
       title: t('form.type.passport.title'),
       description: t('form.type.passport.description'),
       IconComponent: IcoPassport24,
-      value: IdDocType.passport,
+      value: SupportedIdDocTypes.passport,
     };
   }
   if (supportedDocumentTypes?.includes(SupportedIdDocTypes.driversLicense)) {
-    optionByDocType[IdDocType.driversLicense] = {
+    optionByDocType[SupportedIdDocTypes.driversLicense] = {
       title: t('form.type.driversLicense.title'),
       description: t('form.type.driversLicense.description'),
       IconComponent: IcoCar24,
-      value: IdDocType.driversLicense,
+      value: SupportedIdDocTypes.driversLicense,
     };
   }
   if (supportedDocumentTypes?.includes(SupportedIdDocTypes.idCard)) {
-    optionByDocType[IdDocType.idCard] = {
+    optionByDocType[SupportedIdDocTypes.idCard] = {
       title: t('form.type.idCard.title'),
       description: t('form.type.idCard.description'),
       IconComponent: IcoIdCard24,
-      value: IdDocType.idCard,
+      value: SupportedIdDocTypes.idCard,
     };
   }
 

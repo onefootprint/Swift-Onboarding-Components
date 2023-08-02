@@ -1,7 +1,7 @@
 import {
   IdDocImageError,
   IdDocImageTypes,
-  IdDocType,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
@@ -11,7 +11,7 @@ import FadeInContainer from '../fade-in-container';
 import IdDocPhotoButtons from '../id-doc-photo-buttons';
 
 type IdDocPhotoRetryPromptProps = {
-  docType: IdDocType;
+  docType: SupportedIdDocTypes;
   countryName: string;
   imageType: IdDocImageTypes.front | IdDocImageTypes.back;
   errors: IdDocImageError[];

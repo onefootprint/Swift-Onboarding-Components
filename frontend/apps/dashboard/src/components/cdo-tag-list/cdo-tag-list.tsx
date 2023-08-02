@@ -6,7 +6,7 @@ import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
-  IdDocType,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Tag, Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -21,7 +21,7 @@ type CdoTagListProps = {
 };
 
 // We need to clean this up when we re-do the CDO structure in the dashboard
-const tagOrder: (CollectedDataOption | IdDocType | 'selfie')[] = [
+const tagOrder: (CollectedDataOption | SupportedIdDocTypes | 'selfie')[] = [
   CollectedKycDataOption.name,
   CollectedKycDataOption.email,
   CollectedKycDataOption.fullAddress,
@@ -40,9 +40,9 @@ const tagOrder: (CollectedDataOption | IdDocType | 'selfie')[] = [
   CollectedInvestorProfileDataOption.investorProfile,
   CollectedDocumentDataOption.document,
   CollectedDocumentDataOption.documentAndSelfie,
-  IdDocType.driversLicense,
-  IdDocType.passport,
-  IdDocType.idCard,
+  SupportedIdDocTypes.driversLicense,
+  SupportedIdDocTypes.passport,
+  SupportedIdDocTypes.idCard,
   'selfie',
 ];
 

@@ -1,9 +1,3 @@
-export enum IdDocType {
-  idCard = 'id_card',
-  driversLicense = 'driver_license',
-  passport = 'passport',
-}
-
 export enum IdDocImageTypes {
   front = 'front',
   back = 'back',

@@ -6,7 +6,11 @@ import {
   IcoSquareFrame24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { CountryCode3, IdDocImageTypes, IdDocType } from '@onefootprint/types';
+import {
+  CountryCode3,
+  IdDocImageTypes,
+  SupportedIdDocTypes,
+} from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
@@ -20,7 +24,7 @@ import ImageConsent from './components/image-consent';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;
-  type: IdDocType;
+  type: SupportedIdDocTypes;
   imageType: IdDocImageTypes;
   country: CountryCode3;
   promptConsent?: boolean;
@@ -39,7 +43,7 @@ const IdDocPhotoPrompt = ({
   const { shouldCollectConsent: consentRequired } = state.context.requirement;
   const [consentVisible, setConsentVisible] = useState(false);
   const side =
-    type === IdDocType.passport && IdDocImageTypes.front
+    type === SupportedIdDocTypes.passport && IdDocImageTypes.front
       ? 'photo page'
       : `${imageType} side`;
 
@@ -77,7 +81,8 @@ const IdDocPhotoPrompt = ({
             items={[
               {
                 title: t('guidelines.position-document.title', {
-                  document: type === IdDocType.passport ? 'passport' : 'ID',
+                  document:
+                    type === SupportedIdDocTypes.passport ? 'passport' : 'ID',
                 }),
                 description: t('guidelines.position-document.description', {
                   side,

@@ -12,7 +12,6 @@ import { FaceModelProvider } from './hooks/use-face-model-loader';
 import Router from './pages/router';
 import { IdDocProps } from './types';
 import { MachineContext } from './utils/state-machine';
-import supportedTypeToIdDocType from './utils/supported-type-to-doc-type';
 
 const App = ({ context, onDone }: IdDocProps) => {
   const { authToken, device, customData } = context;
@@ -31,9 +30,7 @@ const App = ({ context, onDone }: IdDocProps) => {
       country: customData.requirement.onlyUsSupported ? 'US' : undefined,
       type:
         customData.requirement.supportedDocumentTypes.length === 1
-          ? supportedTypeToIdDocType[
-              customData.requirement.supportedDocumentTypes[0]
-            ]
+          ? customData.requirement.supportedDocumentTypes[0]
           : undefined,
     },
   };

@@ -4,7 +4,7 @@ import styled, { css } from '@onefootprint/styled';
 import {
   IdDocImageError,
   IdDocImageTypes,
-  IdDocType,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -17,7 +17,7 @@ import FeedbackIcon from '../feedback-icon';
 type ErrorProps = {
   imageType: IdDocImageTypes;
   errors: IdDocImageError[];
-  docType: IdDocType;
+  docType: SupportedIdDocTypes;
   countryName: string;
 };
 
@@ -25,7 +25,7 @@ const Error = ({ errors, imageType, docType, countryName }: ErrorProps) => {
   const { t } = useTranslation('components.error');
 
   const side =
-    docType === IdDocType.passport && IdDocImageTypes.front
+    docType === SupportedIdDocTypes.passport && IdDocImageTypes.front
       ? 'photo page'
       : `${imageType} side`;
 

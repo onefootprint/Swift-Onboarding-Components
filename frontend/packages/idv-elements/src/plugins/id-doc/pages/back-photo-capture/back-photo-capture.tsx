@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IdDocType } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
@@ -9,10 +9,10 @@ import useIdDocMachine from '../../hooks/use-id-doc-machine';
 const ID_OUTLINE_WIDTH_RATIO = 0.9;
 const ID_OUTLINE_HEIGHT_RATIO = 0.56;
 
-const translationIndex: { [key in IdDocType]: string } = {
-  [IdDocType.driversLicense]: 'driversLicense',
-  [IdDocType.idCard]: 'idCard',
-  [IdDocType.passport]: 'passport',
+const translationIndex: { [key in SupportedIdDocTypes]: string } = {
+  [SupportedIdDocTypes.driversLicense]: 'driversLicense',
+  [SupportedIdDocTypes.idCard]: 'idCard',
+  [SupportedIdDocTypes.passport]: 'passport',
 };
 
 const BackPhotoCapture = () => {
