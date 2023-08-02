@@ -20,6 +20,7 @@ export const createFontStyles = (
 `;
 
 export const createTypography = (typography: Typography) => ({
+  fontFamily: 'inherit',
   fontSize: typography.fontSize,
   fontWeight: typography.fontWeight,
   lineHeight: typography.lineHeight,
