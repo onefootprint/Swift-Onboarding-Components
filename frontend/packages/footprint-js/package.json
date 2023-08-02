@@ -3,20 +3,11 @@
   "private": false,
   "type": "module",
   "version": "2.3.0",
-  "main": "./dist/footprint-js.umd.js",
+  "main": "./dist/footprint-js.cjs",
   "module": "./dist/footprint-js.js",
+  "unpkg": "dist/index.min.js",
   "types": "./dist/footprint-js.d.ts",
-  "exports": {
-    ".": {
-      "require": "./dist/footprint-js.umd.js",
-      "import": "./dist/footprint-js.js",
-      "types": "./dist/footprint-js.d.ts"
-    },
-    "./dist/footprint-js.css": {
-      "import": "./dist/footprint-js.css",
-      "require": "./dist/footprint-js.css"
-    }
-  },
+  "style": "./dist/footprint-js.css",
   "sideEffects": false,
   "license": "MIT",
   "files": [

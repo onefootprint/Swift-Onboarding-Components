@@ -43,6 +43,7 @@ const customization = `import { FootprintAppearance } from '@onefootprint/footpr
 export const publicKey = 'your-public-key';
 export const appearance: FootprintAppearance = {
   fontSrc: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
+  variant: 'drawer',
   variables: {
     fontFamily:
       '"Inter", ui-sans-serif, system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',

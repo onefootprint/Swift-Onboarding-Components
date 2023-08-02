@@ -56,13 +56,7 @@ module.exports = {
     return [
       {
         source: '/:path*',
-        headers: [
-          ...securityHeaders,
-          {
-            key: 'Cache-Control',
-            value: 'no-store',
-          },
-        ],
+        headers: securityHeaders,
       },
     ];
   },
