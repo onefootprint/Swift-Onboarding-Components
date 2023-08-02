@@ -29,14 +29,12 @@ const GlobalStyle = createGlobalStyle`
    h6,
    p,
    blockquote,
-   pre,
    a,
    abbr,
    acronym,
    address,
    big,
    cite,
-   code,
    del,
    dfn,
    em,
@@ -103,6 +101,19 @@ const GlobalStyle = createGlobalStyle`
      font-family: ${theme.fontFamily.default};
      font-size: 100%;
      vertical-align: baseline;
+   }
+   code,
+   pre {
+     margin: 0;
+     padding: 0;
+     border: 0;
+     font-family: ${theme.fontFamily.code};
+     font-size: 100%;
+     vertical-align: baseline;
+   }
+   code > *,
+   pre > * {
+     font-family: ${theme.fontFamily.code};
    }
    /* HTML5 display-role reset for older browsers */
    article,

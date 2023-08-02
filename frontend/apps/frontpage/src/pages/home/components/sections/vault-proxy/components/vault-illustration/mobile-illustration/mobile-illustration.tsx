@@ -119,7 +119,7 @@ const Container = styled.div`
 
 const Label = styled.div`
   ${({ theme }) => css`
-    ${createFontStyles('snippet-2')}
+    ${createFontStyles('snippet-2', 'code')}
     color: ${theme.color.quinary};
     display: flex;
     align-items: center;

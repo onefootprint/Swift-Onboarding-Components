@@ -1,14 +1,18 @@
 import {
   BackgroundColor,
+  FontFamily,
   FontVariant,
   Overlay,
   Typography,
 } from '@onefootprint/design-tokens';
 import { css } from '@onefootprint/styled';
 
-export const createFontStyles = (variant: FontVariant) => css`
+export const createFontStyles = (
+  variant: FontVariant,
+  fontFamily?: FontFamily,
+) => css`
   ${({ theme }) => css`
-    font-family: inherit;
+    font-family: ${fontFamily ? theme.fontFamily[fontFamily] : 'inherit'};
     font-weight: ${theme.typography[variant].fontWeight};
     font-size: ${theme.typography[variant].fontSize};
     line-height: ${theme.typography[variant].lineHeight};

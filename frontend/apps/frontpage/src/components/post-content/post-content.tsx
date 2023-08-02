@@ -44,7 +44,7 @@ const Content = styled.div`
     }
 
     code {
-      ${createFontStyles('snippet-2')};
+      ${createFontStyles('snippet-2', 'code')};
     }
 
     pre {

@@ -47,7 +47,7 @@ const CodeInline = ({
 
 const CodeContent = styled.code`
   ${({ theme }) => css`
-    ${createFontStyles('snippet-2')};
+    ${createFontStyles('snippet-2', 'code')};
     background: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.compact};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};

@@ -70,7 +70,7 @@ const Header = styled.header`
 
 const Content = styled.div`
   ${({ theme }) => css`
-    ${createFontStyles('snippet-2')};
+    ${createFontStyles('snippet-2', 'code')};
     background: transparent;
     position: relative;
     width: 100%;
