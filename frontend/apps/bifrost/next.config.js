@@ -58,6 +58,15 @@ module.exports = {
         source: '/:path*',
         headers: securityHeaders,
       },
+      {
+        source: '/_next/static/css/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store',
+          },
+        ],
+      },
     ];
   },
   transpilePackages: [
