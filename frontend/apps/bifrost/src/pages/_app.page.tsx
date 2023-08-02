@@ -24,7 +24,6 @@ configureReactI18next();
 
 const App = ({ Component, pageProps }: AppProps) => {
   const { appearance, theme, rules } = pageProps;
-
   return (
     <>
       <Head>

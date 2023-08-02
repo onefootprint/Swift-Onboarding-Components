@@ -38,8 +38,9 @@ const getCustomAppearance = async ({
   strategy,
 }: AppearanceOptions): Promise<AppearanceResponse> => {
   if (strategy.includes('queryParameters')) {
-    if (params?.variables || params?.rules) {
-      const appearance = await getAppearanceFromUrl(params);
+    const variables = params?.variables || params?.tokens;
+    if (variables || params?.rules) {
+      const appearance = await getAppearanceFromUrl({ ...params, variables });
       if (appearance) {
         return {
           appearance,
