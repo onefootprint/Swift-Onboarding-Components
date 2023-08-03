@@ -152,6 +152,7 @@
       "subtitle": "We need some more information about your identity.",
       "form": {
         "country": "Country",
+        "only-us": "We only support US documents",
         "type": {
           "passport": {
             "title": "Passport",

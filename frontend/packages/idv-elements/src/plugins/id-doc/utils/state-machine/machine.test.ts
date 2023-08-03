@@ -5,7 +5,6 @@ import createIdDocMachine from './machine';
 import {
   argsNonMobile,
   argsRegular,
-  argsUsOnlySingleDocType,
   processingErrors,
   requirement,
 } from './machine.test.config';
@@ -18,16 +17,6 @@ describe('Id Doc Machine Tests', () => {
           expect(state.value).toEqual('incompatibleDevice');
         },
       );
-      machine.start();
-      machine.stop();
-    });
-
-    it('If the doc requirement is US only with a only one accepted doc type, it should transition to front image state', () => {
-      const machine = interpret(
-        createIdDocMachine(argsUsOnlySingleDocType),
-      ).onTransition(state => {
-        expect(state.value).toEqual('frontImage');
-      });
       machine.start();
       machine.stop();
     });

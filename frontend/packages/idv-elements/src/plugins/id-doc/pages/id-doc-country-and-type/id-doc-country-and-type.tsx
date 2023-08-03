@@ -146,10 +146,12 @@ const IdDocCountryAndType = () => {
       <InputsContainer>
         <CountrySelect
           data-private
+          disabled={onlyUsSupported}
           label={t('form.country')}
           onChange={handleCountryChange}
           options={countryOptions}
           value={country}
+          hint={onlyUsSupported ? t('form.only-us') : undefined}
         />
         <Divider />
         {options.length > 0 ? (

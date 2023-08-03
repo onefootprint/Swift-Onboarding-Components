@@ -23,12 +23,6 @@ const createIdDocMachine = (args: MachineContext) =>
               cond: context => context.device.type !== 'mobile',
             },
             {
-              target: 'frontImage',
-              cond: context =>
-                !!context.requirement.onlyUsSupported &&
-                context.requirement.supportedDocumentTypes?.length === 1,
-            },
-            {
               target: 'countryAndType',
             },
           ],
