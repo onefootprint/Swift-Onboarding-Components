@@ -35,23 +35,20 @@ export const getVueIntegration = () => `
   export default {
     mounted() {
       const component = footprint.init({
-        kind: 'secure-form',
-        containerId: 'footprint-secure-form',
-        props: {
-          authToken: "tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", // auth token generated using the Secret API Key on step 5
-          appearance: appearance, // appearance object from step 6
-          title: "Add a New Card",
-          type: "cardAndZip",
-          variant: "drawer",
-          onSave: handleSave,
-          onClose: handleClose,
-          onCancel: handleCancel
-        }
+        kind: 'form',
+        authToken: "tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", // auth token generated using the Secret API Key on step 5
+        appearance: appearance, // appearance object from step 6
+        title: "Add a New Card",
+        type: "cardAndZip",
+        variant: "drawer",
+        onComplete: handleComplete,
+        onClose: handleClose,
+        onCancel: handleCancel
       });
       component.render();
     },
     methods: {
-      handleSave() {
+      handleComplete() {
         // TODO: Decrypt or proxy the saved data from your backend
       },
       handleClose() {
@@ -65,6 +62,6 @@ export const getVueIntegration = () => `
 </script>
 
 <template>
-  <div id="footprint-secure-form"/>
+  <div id="my-page"/>
 </template>
 `;

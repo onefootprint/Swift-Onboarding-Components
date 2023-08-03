@@ -15,10 +15,10 @@ meta:
 
 Our SDKs support a variety of components.
 
-| Component               | Description                                                                             |
-| ----------------------- | --------------------------------------------------------------------------------------- |
-| `FootprintVerifyButton` | A button that when clicked launches the footprint onboarding flow in a modal or drawer. |
-| `FootprintForm`         | A PCI-compliant form to collect user data for specific fields.                          |
+| Component                   | Description                                                                                                       |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `<FootprintVerifyButton />` | A button that when clicked launches the footprint onboarding flow in a modal or drawer.                           |
+| `<FootprintForm />`         | A PCI-compliant form to collect user data for specific fields. It can be rendered inline, in a modal or a drawer. |
 
 You will find more information on each of these below:
 
@@ -38,7 +38,7 @@ yarn add @onefootprint/footprint-react
 
 ## FootprintVerifyButton Integration
 
-`FootprintVerifyButton` is a button that launches our onboarding flow when clicked. The flow can be rendered in a modal or drawer.
+`<FootprintVerifyButton />` is a button that launches our onboarding flow when clicked. The flow can be rendered in a modal or drawer.
 
 1. Grab the Onboarding Publishable Key, for example `ob_test_VMooXd04EUlnu3AvMYKjMW`.
 
@@ -117,6 +117,8 @@ Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react
 
 ## FootprintForm Integration
 
+`<FootprintForm />` is our PCI-compliant form to collect user data for specific fields, for example credit card payment information.
+
 1. Perform steps 1-5 from [here](https://docs.onefootprint.com/embedded-components/getting-started#add-footprint-js-to-your-app).
 
 2. Import the styles file and embed the Footprint component, passing the Auth token, callback functions and any other options:
@@ -124,7 +126,7 @@ Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { SecureFormType } from '@onefootprint/footprint-js';
+import { FootprintFormType } from '@onefootprint/footprint-js';
 import { FootprintForm } from '@onefootprint/footprint-react';
 
 const Page = () => {
@@ -144,7 +146,7 @@ const Page = () => {
     <main>
       <FootprintForm
         authToken={secretAuthToken}
-        type={SecureFormType.cardAndZip}
+        type={FootprintFormType.cardAndZip}
         variant="modal"
         title="Payment information"
         onSave={handleSave}
@@ -160,13 +162,13 @@ Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react
 
 ### Available FootprintForm Props
 
-| Variable     | Description                                                                                                                                                              |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                                                |
-| `title`      | Optional. A string that will be displayed at the top of the field                                                                                                        |
-| `type`       | Optional. Of type SecureFormType, one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
-| `variant`    | Optional. One of `modal`, `drawer` or `card`. Specifies whether the form will be rendered in-line or in a modal.                                                         |
-| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                                                 |
+| Variable     | Description                                                                                                                                                                        |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                                                          |
+| `title`      | Optional. A string that will be displayed at the top of the field                                                                                                                  |
+| `type`       | Optional. A FootprintFormType, which can be one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
+| `variant`    | Optional. One of `modal`, `drawer` or `card`. Specifies whether the form will be rendered in-line or in a modal.                                                                   |
+| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                                                           |
 
 ## Customizing appearance
 

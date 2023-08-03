@@ -28,8 +28,6 @@ const Form = () => {
     type = FootprintFormType.cardAndName,
     variant,
   } = props || {};
-  const formVariant =
-    variant === 'drawer' || variant === 'modal' ? variant : 'inline';
   const usersVaultMutation = useUsersVault();
   const clientTokenFields = useClientTokenFields(authToken);
   const footprintProvider = useFootprintProvider();
@@ -104,7 +102,7 @@ const Form = () => {
     <FormBase
       title={title}
       type={type}
-      variant={formVariant}
+      variant={variant}
       isLoading={usersVaultMutation.isLoading}
       onSave={handleSave}
       onCancel={handleCancel}
@@ -118,6 +116,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { theme, fontSrc, rules, variant } = await getCustomAppearance({
     strategy: ['queryParameters'],
     params,
+    variant: params.variant,
   });
   return { props: { theme, fontSrc, rules, variant } };
 };

@@ -15,18 +15,11 @@ export const ComponentCallbacksByEvent: Record<
     [PublicEvent.canceled]: 'onCancel',
     [PublicEvent.completed]: 'onComplete',
   },
-  [ComponentKind.VerifyButton]: {
-    [PublicEvent.closed]: 'onClose',
-    [PublicEvent.canceled]: 'onCancel',
-    [PublicEvent.completed]: 'onComplete',
-    [PublicEvent.clicked]: 'onClick',
-  },
   [ComponentKind.Render]: {},
 };
 
 export const RequiredCallbacksByComponent: Record<ComponentKind, string[]> = {
   [ComponentKind.Form]: [],
   [ComponentKind.Verify]: [],
-  [ComponentKind.VerifyButton]: [],
   [ComponentKind.Render]: [],
 };

@@ -1,33 +1,18 @@
-import {
-  ComponentKind,
-  Props,
-  Variant,
-  VerifyButtonProps,
-  VerifyProps,
-} from '../types/components';
+import { ComponentKind, Props, VerifyProps } from '../types/components';
 import { getEncodedAppearance } from './appearance-utils';
+import { getDefaultVariantForKind } from './variant-utils';
 
 // TODO: (belce) in the future combine these onto the same app?
 const getURL = (props: Props) => {
   const { kind } = props;
-  if (kind === ComponentKind.Verify || kind === ComponentKind.VerifyButton) {
+  if (kind === ComponentKind.Verify) {
     return getBifrostURL(props);
   }
   return getComponentsURL(props);
 };
 
-const getVariantName = (variant?: Variant) => {
-  if (!variant) {
-    return 'modal';
-  }
-  if (variant === 'modal' || variant === 'drawer') {
-    return variant;
-  }
-  return 'inline';
-};
-
-const getBifrostURL = (props: VerifyProps | VerifyButtonProps) => {
-  const { appearance, publicKey, variant } = props;
+const getBifrostURL = (props: VerifyProps) => {
+  const { appearance, publicKey, variant, kind } = props;
   const { fontSrc, rules, variables } = getEncodedAppearance(appearance);
   const url = process.env.BIFROST_URL;
   const searchParams = new URLSearchParams();
@@ -36,7 +21,7 @@ const getBifrostURL = (props: VerifyProps | VerifyButtonProps) => {
     searchParams.append('public_key', publicKey);
   }
   if (variables) {
-    searchParams.append('tokens', variables);
+    searchParams.append('variables', variables);
   }
   if (rules) {
     searchParams.append('rules', rules);
@@ -44,14 +29,9 @@ const getBifrostURL = (props: VerifyProps | VerifyButtonProps) => {
   if (fontSrc) {
     searchParams.append('font_src', fontSrc);
   }
-  if (variant) {
-    searchParams.append('variant', getVariantName(variant));
-  }
+  searchParams.append('variant', variant ?? getDefaultVariantForKind(kind));
 
   const searchParamsStr = searchParams.toString();
-  if (!searchParamsStr) {
-    return `${url}`;
-  }
   return `${url}?${searchParamsStr}`;
 };
 
@@ -62,7 +42,7 @@ const getComponentsURL = (props: Props) => {
   const searchParams = new URLSearchParams();
 
   if (variables) {
-    searchParams.append('tokens', variables);
+    searchParams.append('variables', variables);
   }
   if (rules) {
     searchParams.append('rules', rules);
@@ -70,15 +50,10 @@ const getComponentsURL = (props: Props) => {
   if (fontSrc) {
     searchParams.append('font_src', fontSrc);
   }
-  if (variant) {
-    searchParams.append('variant', getVariantName(variant));
-  }
+  searchParams.append('variant', variant ?? getDefaultVariantForKind(kind));
 
   const searchParamsStr = searchParams.toString();
-  if (!searchParamsStr) {
-    return `${url}/${kind}`;
-  }
-  return `${url}/${kind}?${searchParams.toString()}`;
+  return `${url}/${kind}?${searchParamsStr}`;
 };
 
 export default getURL;

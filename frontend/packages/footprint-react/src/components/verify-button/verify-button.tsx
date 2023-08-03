@@ -1,14 +1,18 @@
 import footprint, {
   FootprintComponentKind,
-  FootprintVerifyButtonProps,
+  FootprintVerifyProps,
 } from '@onefootprint/footprint-js';
 import React from 'react';
 
 export type VerifyButtonProps = Omit<
-  FootprintVerifyButtonProps,
-  'kind' | 'variant'
+  FootprintVerifyProps,
+  'kind' | 'variant' | 'publicKey'
 > & {
+  publicKey?: string;
   testID?: string;
+  label?: string;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  dialogVariant?: 'modal' | 'drawer';
 };
 
 const VerifyButton = ({
@@ -30,8 +34,8 @@ const VerifyButton = ({
       return;
     }
     const component = footprint.init({
-      variant: dialogVariant,
       kind: FootprintComponentKind.Verify,
+      variant: dialogVariant,
       appearance,
       onCancel,
       onComplete,

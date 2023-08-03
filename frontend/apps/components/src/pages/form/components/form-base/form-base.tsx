@@ -1,4 +1,7 @@
-import { FootprintFormType } from '@onefootprint/footprint-js';
+import {
+  FootprintFormType,
+  FootprintVariant,
+} from '@onefootprint/footprint-js';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
@@ -26,7 +29,7 @@ export type FormData =
 export type FormBaseProps = {
   title?: string;
   type?: FootprintFormType;
-  variant?: 'modal' | 'inline' | 'drawer';
+  variant?: FootprintVariant;
   isLoading?: boolean;
   onSave?: (data: FormData) => void;
   onCancel?: () => void;

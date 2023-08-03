@@ -122,7 +122,7 @@ module.exports = {
       },
       {
         source: '/components',
-        destination: '/components/secure-form',
+        destination: '/components/all',
         permanent: true,
       },
     ];

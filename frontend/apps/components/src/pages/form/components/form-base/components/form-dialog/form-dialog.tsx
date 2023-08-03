@@ -1,3 +1,4 @@
+import { FootprintVariant } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
 import { media, ScrollArea } from '@onefootprint/ui';
 import React from 'react';
@@ -11,7 +12,7 @@ export type FormDialogProps = {
   onClose?: () => void;
   children: React.ReactNode;
   testID?: string;
-  variant?: 'modal' | 'inline' | 'drawer';
+  variant?: FootprintVariant;
 } & (AllButtons | OnlyPrimaryButton);
 
 const FormDialog = ({
@@ -45,6 +46,8 @@ const Container = styled.div`
     justify-content: stretch;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     width: 100%;
+    max-height: 100%;
+    overflow: auto;
 
     body[data-variant='modal'] & {
       box-shadow: ${theme.elevation[3]};

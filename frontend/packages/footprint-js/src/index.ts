@@ -13,15 +13,11 @@ export type {
 export type {
   Footprint,
   Component as FootprintComponent,
-  DrawerVariant as FootprintDrawerVariant,
   FormProps as FootprintFormProps,
-  InlineVariant as FootprintInlineVariant,
-  ModalVariant as FootprintModalVariant,
   Props as FootprintProps,
   PropsBase as FootprintPropsBase,
   RenderProps as FootprintRenderProps,
   Variant as FootprintVariant,
-  VerifyButtonProps as FootprintVerifyButtonProps,
   VerifyOptions as FootprintVerifyOptions,
   VerifyProps as FootprintVerifyProps,
 } from './types/components';

@@ -36,7 +36,7 @@ const Tab = forwardRef<HTMLAnchorElement, TabProps>(
         data-variant={variant}
       >
         <Label selected={selected} data-variant={variant} className="label">
-          {variant === 'pill' && (
+          {variant === 'pill' && renderedIcon && (
             <IconContainer selected={selected}>{renderedIcon}</IconContainer>
           )}
           {children}

@@ -61,6 +61,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     strategy: ['queryParameters', 'obConfig'],
     obConfig,
     params,
+    variant: params.variant,
   });
   return { props: response };
 };

@@ -8,26 +8,22 @@ import useStableContainerId from '../../hooks/use-stable-container-id';
 
 export type FootprintFootprintFormProps = Omit<
   FootprintFormProps,
-  'kind' | 'variant'
-> & {
-  variant: 'modal' | 'drawer' | 'inline';
-};
+  'kind' | 'containerId'
+>;
 
 const FootprintForm = (props: FootprintFootprintFormProps) => {
   const containerId = useStableContainerId();
+  const { variant = 'inline' } = props;
 
   useEffect(() => {
     if (!containerId) {
       return () => {};
     }
 
-    const { variant: variantProp } = props;
-    const variant = variantProp === 'inline' ? { containerId } : variantProp;
-
     const component = footprint.init({
       kind: FootprintComponentKind.Form,
       ...props,
-      variant,
+      containerId,
     });
     component.render();
 
@@ -36,7 +32,9 @@ const FootprintForm = (props: FootprintFootprintFormProps) => {
     };
   }, [props, containerId]);
 
-  return containerId ? <div id={containerId} /> : null;
+  return variant === 'inline' && containerId ? (
+    <div style={{ width: '100%', height: '100%' }} id={containerId} />
+  ) : null;
 };
 
 export default FootprintForm;

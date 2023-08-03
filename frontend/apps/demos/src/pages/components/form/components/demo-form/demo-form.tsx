@@ -19,9 +19,8 @@ const DemoForm = ({ authToken }: DemoFormProps) => {
       authToken,
       title: 'Add a New Card',
       type: FootprintFormType.cardAndName,
-      variant: {
-        containerId: 'footprint-secure-form',
-      },
+      variant: 'inline',
+      containerId: 'footprint-secure-form',
     });
     component.render();
 

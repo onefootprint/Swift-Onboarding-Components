@@ -21,10 +21,10 @@ launch iframes from your website, and exchange secure messages between Footprint
 
 Our SDKs support a variety of component kinds.
 
-| Component | Description                                                    |
-| --------- | -------------------------------------------------------------- |
-| `verify`  | Our onboarding flow that launches in a modal or drawer.        |
-| `form`    | A PCI-compliant form to collect user data for specific fields. |
+| Component | Description                                                                                                       |
+| --------- | ----------------------------------------------------------------------------------------------------------------- |
+| `verify`  | Our onboarding flow that launches in a modal or drawer.                                                           |
+| `form`    | A PCI-compliant form to collect user data for specific fields. It can be rendered inline, in a modal or a drawer. |
 
 You will find more information on each of these below:
 
@@ -40,13 +40,13 @@ npm install @onefootprint/footprint-js
 yarn add @onefootprint/footprint-js
 ```
 
-## Verify Integration
+## Verify Component Integration
 
 This is our onboarding flow that can be rendered in a modal or drawer.
 
 1. Grab the Onboarding Publishable Key, for example, `ob_test_VMooXd04EUlnu3AvMYKjMW`.
 
-2. Import the styles file and embed the Footprint button, passing the Publishable Key and the callback functions:
+2. Import the styles file and embed the component, passing the Publishable Key and the callback functions:
 
 ```html
 <html lang="en">
@@ -84,9 +84,9 @@ This is our onboarding flow that can be rendered in a modal or drawer.
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <main>
       <div
-        id="footprint-component"
+        data-footprint
         data-kind="verify"
-        data-props='{"publicKey":"123"}'
+        data-props='{"publicKey":"ob_test_WNgSBRR7uxoT8JRDBBflgw"}'
       ></div>
     </main>
     <script
@@ -99,13 +99,13 @@ This is our onboarding flow that can be rendered in a modal or drawer.
 
 What's happening under the hood?
 
-1. Footprint will identify an element with ids starting with `footprint-component` (you can append other strings to the end), and will render the component with the kind passed into the `data-kind` attribute inside it. It parses the component props from the `data-props` attribute,
-   and, it will start the KYC flow using your onboarding configuration.
+1. Footprint will identify all elements with `data-footprint` attribute, and will render the component with the kind passed into the `data-kind` attribute inside it. It parses the variant from `data-variant` and component props from the `data-props` attribute. Later, it will start the KYC flow using your onboarding configuration.
 
-- `data-kind` attribute determines the kind of the component to render
-- `data-props` are the stringified props objects that will be passed into your component
+   - `data-kind` attribute determines the kind of the component to render
+   - `data-variant` attribute determines whether onboarding should launch in a modal or drawer
+   - `data-props` are the stringified props objects that will be passed into your component
 
-2. Once the user completes the flow, you'll receive the `validationToken` through the `onComplete` fuction defined on `window.footprintCalls`. From there,
+2. Once the user completes the flow, you'll receive the `validationToken` through the `onComplete` fuction defined on `window.footprintCallbacks`. From there,
    you can post it to your backend.
 
 Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vanilla-js) to check out a full example.
@@ -113,7 +113,7 @@ Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vanil
 ### Usage with frameworks
 
 Let's imagine your app was written using [Vue](https://vuejs.org/) (could be any framework or library). To integrate with Footprint,
-you can render a Footprint verify button that launches the onboarding flow when clicked. You can either pass the props directly to the container div, or call our `init` and `render` methods on footprint on mount.
+you can render a Footprint verify button that launches the onboarding flow when clicked. You can either pass the props directly to the container div, or call our `init` and `render` methods on footprint to launch the verification dialog.
 
 ```vue
 <script>
@@ -121,39 +121,14 @@ import footprint from '@onefootprint/footprint-js';
 
 <template>
   <div
-    id="footprint-component"
-    data-kind="verify–button"
-    data-props='{"publicKey":"123"}'
+    data-footprint
+    data-kind="verify"
+    data-props='{"publicKey":"ob_test_WNgSBRR7uxoT8JRDBBflgw"}'
   ></div>
 </template>
 ```
 
-```vue
-<script>
-import footprint from '@onefootprint/footprint-js';
-
-export default {
-  mounted() {
-    const component = footprint.init({
-      kind: 'verify-button',
-      publicKey: 'ob_test_WNgSBRR7uxoT8JRDBBflgw',
-      containerId: 'my-button',
-    });
-    component.render();
-  },
-};
-</script>
-
-<template>
-  <div id="my-button"></div>
-</template>
-```
-
-Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vite-vue) to check out a full example.
-
-### Custom button
-
-Alternatively, you can render a custom button and initialize the onboarding flow in the click callback. To do that, just call the `init` (with any props) and `render` methods on footprint in the event handler.
+Alternatively, you can render a button and initialize the onboarding flow in the click callback. To do that, just call the `init` (with any props) and `render` methods on footprint in the event handler.
 
 ```vue
 <script>
@@ -182,12 +157,15 @@ export default {
 </template>
 ```
 
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vite-vue) to check out a full example.
+
 ### Listening to events
 
-Footprint provides some events based on some actions performed by the user. To listen to event, just pass it from the `show` method.
+Footprint provides some events based on some actions performed by the user. To listen to event, just pass it from the `init` method.
 
 ```typescript
 footprint.init({
+  kind: 'verify',
   publicKey: 'ob_test_WNgSBRR7uxoT8JRDBBflgw',
   onComplete: validationToken => {
     console.log(validationToken);
@@ -203,7 +181,7 @@ footprint.render();
 | `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                         |
 | `onClick`    | Triggered when the verify button is clicked.                                                                                    |
 
-## Form Integration
+## Form Component Integration
 
 1. Perform steps 1-5 from [here](https://docs.onefootprint.com/embedded-components/getting-started#add-footprint-js-to-your-app).
 
@@ -247,9 +225,9 @@ footprint.render();
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <main>
       <div
-        id="footprint-component"
+        data-footprint
         data-kind="form"
-        data-props='{"authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", variant: 'modal'}'
+        data-props='{"authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit"}'
       ></div>
     </main>
     <script
@@ -262,10 +240,11 @@ footprint.render();
 
 What's happening under the hood?
 
-1. Footprint will identify an element with ids starting with `footprint-component` (you can append other strings to the end), and will render the form component, based on the `data-kind`. It also parses the component props from the `data-props` attribute.
+1. Footprint will identify all elements with `data-footprint` attribute, and will render the component with the kind passed into the `data-kind` attribute inside it. It parses the variant from `data-variant` and component props from the `data-props` attribute. Later, it will render the footprint form inside that element.
 
-- `data-kind` attribute determines the kind of the component to render
-- `data-props` are the stringified props objects that will be passed into your component
+   - `data-kind` attribute determines the kind of the component to render
+   - `data-variant` attribute determines whether the form should be rendered inline, in a modal or in a drawer
+   - `data-props` are the stringified props objects that will be passed into your component
 
 2. When the user has completed filling the secure collection form on your product, you can decrypt the data collected. More details can be found [here](https://docs.onefootprint.com/vault/apis#decrypt-data-from-a-users-vault)
 
@@ -285,7 +264,8 @@ export default {
   mounted() {
     const component = footprint.init({
       kind: 'form',
-      variant: { containerId: 'my-form' }, // alternatively, you can set the variant to 'modal' or 'drawer'
+      variant: 'inline', // alternatively, you can set the variant to 'modal' or 'drawer'
+      containerId: 'my-form', // required if rendering "inline"
       authToken: 'tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit', // auth token generated using the Secret API Key on step 5
       onComplete: handleComplete,
     });
@@ -315,7 +295,8 @@ const component = footprint.init({
   kind: 'form'
   authToken,
   title: 'Add a New Card',
-  variant: { containerId: 'footprint-secure-form' },
+  containerId: 'my-form',
+  variant: 'inline',
   type: 'cardAndName',
   onSave: handleSave,
   onClose: handleClose,

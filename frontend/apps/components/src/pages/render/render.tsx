@@ -27,10 +27,12 @@ const Render = () => {
     showHiddenToggle,
     defaultHidden,
   } = props || {};
+  const field = id as DataIdentifier;
 
   useEffectOnce(() => {
     decryptMutation.mutate({ authToken, field });
   });
+
   const [isHidden, setIsHidden] = useState(defaultHidden);
   if (!props) {
     return <Loading />;
@@ -41,7 +43,6 @@ const Render = () => {
     return <Invalid />;
   }
 
-  const field = id as DataIdentifier;
   const mask = getMaskForId(id);
   const { data, isLoading: isMutationLoading } = decryptMutation;
   const isLoading = !isHidden && isMutationLoading; // Only show loading indicator if the value is not hidden
@@ -72,6 +73,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { theme, fontSrc, rules, variant } = await getCustomAppearance({
     strategy: ['queryParameters'],
     params,
+    variant: params.variant,
   });
   return { props: { theme, fontSrc, rules, variant } };
 };

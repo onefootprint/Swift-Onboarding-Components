@@ -61,9 +61,14 @@ const useProps = <T extends BaseProps>(
   );
 
   useEffectOnce(() => {
-    footprintProvider.load().then(() => {
-      setIsLoaded(true);
-    });
+    footprintProvider
+      .load()
+      .then(() => {
+        setIsLoaded(true);
+      })
+      .catch(() => {
+        console.error('Failed to load footprint provider.');
+      });
   });
 
   useEffect(() => {

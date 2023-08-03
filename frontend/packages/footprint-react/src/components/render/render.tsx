@@ -8,7 +8,7 @@ import useStableContainerId from '../../hooks/use-stable-container-id';
 
 export type FootprintFootprintRenderProps = Omit<
   FootprintRenderProps,
-  'kind' | 'variant'
+  'kind' | 'variant' | 'containerId'
 >;
 
 const FootprintRender = (props: FootprintFootprintRenderProps) => {
@@ -21,10 +21,9 @@ const FootprintRender = (props: FootprintFootprintRenderProps) => {
 
     const component = footprint.init({
       kind: FootprintComponentKind.Render,
-      variant: {
-        containerId,
-      },
+      variant: 'inline',
       ...props,
+      containerId,
     });
     component.render();
 

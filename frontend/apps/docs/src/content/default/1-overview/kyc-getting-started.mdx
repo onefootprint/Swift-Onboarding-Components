@@ -51,17 +51,16 @@ yarn add @onefootprint/footprint-js
 4. Embed the Footprint button.
 
 ```html
-<div
-  id="footprint-button"
-  data-public-key="ob_test_VMooXd04EUlnu3AvMYKjMW"
-></div>
+<div data-footprint data-public-key="ob_test_VMooXd04EUlnu3AvMYKjMW"></div>
 ```
 
 5. Add your Footprint completion handler
 
 ```javascript
-window.onFootprintCompleted = function (token) {
-  // TODO: Post the token to your server
+window.footprintCallbacks = {
+  onComplete: function (token) {
+    // TODO: Post the token to your server
+  },
 };
 ```
 

@@ -4,7 +4,6 @@ import { ComponentCallbacksByEvent } from './constants/callbacks';
 import { Props } from './types/components';
 import { PrivateEvent, PublicEvent } from './types/events';
 import checkIsKindValid from './utils/check-is-kind-valid';
-import checkIsVariantValid from './utils/check-is-variant-valid';
 import {
   createInlineContainer,
   createLoader,
@@ -15,6 +14,10 @@ import {
   removeLoader,
 } from './utils/dom-utils';
 import getURL from './utils/get-url';
+import {
+  checkIsVariantValid,
+  getDefaultVariantForKind,
+} from './utils/variant-utils';
 
 type IframeManager = {
   render: () => Promise<void>;
@@ -26,11 +29,17 @@ const initIframeManager = (
   onDestroy: () => void,
 ): IframeManager => {
   let child: Postmate.ParentAPI | null = null;
-  const { kind, appearance, variant = 'modal', ...customProps } = props;
+  const {
+    kind,
+    appearance,
+    variant: rawVariant,
+    containerId,
+    ...customProps
+  } = props;
   checkIsKindValid(kind);
-  checkIsVariantValid(kind, variant);
-  const variantName =
-    variant === 'drawer' || variant === 'modal' ? variant : 'inline';
+  checkIsVariantValid(kind, rawVariant);
+  const variant = rawVariant || getDefaultVariantForKind(kind);
+
   const callbacks = ComponentCallbacksByEvent[kind] ?? {};
   const hasOverlay = variant === 'modal' || variant === 'drawer';
   const uniqueId = getUniqueDomId();
@@ -87,7 +96,7 @@ const initIframeManager = (
 
     child.call(PrivateEvent.propsReceived, {
       ...filteredProps,
-      variant: variantName,
+      variant,
     });
   };
 
@@ -95,9 +104,11 @@ const initIframeManager = (
     if (hasOverlay) {
       return createOverlayContainer(uniqueId);
     }
+    if (!containerId) {
+      throw new Error('containerId is required when rendering inline');
+    }
 
     // If rendering inline, find the client parent div
-    const { containerId } = variant;
     const clientParent = document.getElementById(containerId);
     if (!clientParent) {
       throw new Error(
@@ -110,8 +121,8 @@ const initIframeManager = (
   const setLoading = (container: HTMLElement, isLoading?: boolean) => {
     if (!isLoading) {
       removeLoader(uniqueId);
-      child?.frame.classList.remove(`footprint-${variantName}-loading`);
-      child?.frame.classList.add(`footprint-${variantName}-loaded`);
+      child?.frame.classList.remove(`footprint-${variant}-loading`);
+      child?.frame.classList.add(`footprint-${variant}-loaded`);
 
       return;
     }
@@ -135,10 +146,7 @@ const initIframeManager = (
 
     setLoading(container, true);
     child = await new Postmate({
-      classListArray: [
-        `footprint-${variantName}`,
-        `footprint-${variantName}-loading`,
-      ],
+      classListArray: [`footprint-${variant}`, `footprint-${variant}-loading`],
       container,
       name: `footprint-iframe-${uniqueId}`,
       url: getURL(props),

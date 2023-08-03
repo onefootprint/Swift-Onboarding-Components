@@ -96,17 +96,16 @@ Make sure to pass the auth token generated from Step 5.
 
 ```html
 <div
-  id="footprint-component"
-  data-kind="secure-form"
-  data-props='{
-    "authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", 
-    "variant": "card", 
-    "type": "cardAndZip"
-  }'
+  data-footprint
+  data-kind="form"
+  data-variant="inline"
+  data-props='{"authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit"}'
 ></div>
 ```
 
-If you are rendering the secure form in a card variant, it will take up all of the space provided by its parent container. The easiest way to customize the placement is to wrap the it in a div and apply styles to this div.
+If you are rendering the secure form in an inline variant, it will take up all of the space provided by its parent container. The easiest way to customize the placement is to wrap the it in a div and apply styles to this div.
+
+You can also render it in `modal` or `drawer` variants:
 
 ```html
 <style>
@@ -120,14 +119,15 @@ If you are rendering the secure form in a card variant, it will take up all of t
 
 <div class="container">
   <div
-    id="footprint-component"
-    data-kind="secure-form"
-    data-props='{"authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", variant: 'modal'}'
+    data-footprint
+    data-kind="form"
+    data-variant="modal"
+    data-props='{"authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit"}'
   ></div>
 </div>
 ```
 
-If you are rendering the secure form in a modal variant, it will take up the whole viewport when launched.
+If you are rendering the secure form in a modal or drawer variant, it will take up the whole viewport when launched.
 
 8. Add callbacks for form events
 
@@ -151,10 +151,10 @@ When the user has completed filling the secure collection form on your product, 
 
 ## Available FootprintForm Props
 
-| Variable     | Description                                                                                                                                      |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                        |
-| `title`      | Optional. A string that will be displayed at the top of the field                                                                                |
-| `type`       | Optional. one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
-| `variant`    | Optional. One of `modal`, `drawer` or `inline`. Specifies whether the form will be rendered in-line or in a modal.                               |
-| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                         |
+| Variable     | Description                                                                                                                                                                        |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                                                          |
+| `title`      | Optional. A string that will be displayed at the top of the field                                                                                                                  |
+| `type`       | Optional. A FootprintFormType, which can be one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
+| `variant`    | Optional. One of `modal`, `drawer` or `inline`. Specifies whether the form will be rendered in-line or in a modal.                                                                 |
+| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                                                           |

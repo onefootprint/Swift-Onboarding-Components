@@ -152,7 +152,7 @@ export type AppearanceRules = Partial<{
 }>;
 
 export type Appearance = {
-  variant?: 'dialog' | 'drawer';
+  variant?: 'modal' | 'drawer' | 'inline';
   fontSrc?: string;
   rules?: AppearanceRules;
   theme?: AppearanceTheme;

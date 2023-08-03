@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { IconButton, Typography } from '@onefootprint/ui';
+import { createFontStyles, IconButton } from '@onefootprint/ui';
 import React from 'react';
 
 type HeaderProps = {
@@ -13,7 +13,7 @@ type HeaderProps = {
 const Header = ({ title, variant, onClose }: HeaderProps) => {
   const { t } = useTranslation('pages.secure-form.form-dialog.header');
   const canClose = (variant === 'modal' || variant === 'drawer') && onClose;
-  const titleVariant = variant === 'inline' ? 'label-1' : 'label-2';
+
   if (!title && !canClose) {
     return null;
   }
@@ -27,7 +27,7 @@ const Header = ({ title, variant, onClose }: HeaderProps) => {
           </IconButton>
         </CloseContainer>
       )}
-      {title && <Typography variant={titleVariant}>{title}</Typography>}
+      {title && <span>{title}</span>}
     </Container>
   );
 };
@@ -50,13 +50,15 @@ const Container = styled.header`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
       0;
+    ${createFontStyles('label-2')}
 
-    body[data-variant='inline'] & {
+    &[data-variant='inline'] {
       padding: ${theme.spacing[7]} ${theme.spacing[7]} 0;
+      ${createFontStyles('label-1')}
     }
 
-    body[data-variant='modal'],
-    body[data-variant='inline'] & {
+    &[data-variant='modal'],
+    &[data-variant='drawer'] {
       justify-content: center;
       padding: ${theme.spacing[4]};
       border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};

@@ -10,26 +10,21 @@ export interface Component {
   destroy: () => void;
 }
 
-export type Props = FormProps | VerifyButtonProps | VerifyProps | RenderProps;
+export type Props = FormProps | VerifyProps | RenderProps;
 
 export enum ComponentKind {
-  Form = 'form',
-  VerifyButton = 'verify-button',
   Verify = 'verify',
+  Form = 'form',
   Render = 'render',
 }
 
-export type Variant = ModalVariant | DrawerVariant | InlineVariant;
-export type ModalVariant = 'modal';
-export type DrawerVariant = 'drawer';
-export type InlineVariant = {
-  containerId: string;
-};
+export type Variant = 'modal' | 'drawer' | 'inline';
 
 export interface PropsBase {
   kind: ComponentKind;
   appearance?: Appearance;
   variant?: Variant;
+  containerId?: string;
 }
 
 export type VerifyOptions = {
@@ -39,22 +34,8 @@ export type VerifyOptions = {
 
 export interface VerifyProps extends PropsBase {
   kind: ComponentKind.Verify;
-  variant?: ModalVariant | DrawerVariant;
+  variant?: 'modal' | 'drawer';
   publicKey: string;
-  userData?: UserData;
-  options?: VerifyOptions;
-  onComplete?: (validationToken: string) => void;
-  onCancel?: () => void;
-  onClose?: () => void;
-}
-
-export interface VerifyButtonProps extends PropsBase {
-  kind: ComponentKind.VerifyButton;
-  variant: InlineVariant; // We require a containerId
-  dialogVariant?: ModalVariant | DrawerVariant;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  label?: string;
-  publicKey?: string;
   userData?: UserData;
   options?: VerifyOptions;
   onComplete?: (validationToken: string) => void;
@@ -70,7 +51,8 @@ export interface RenderProps extends PropsBase {
   canCopy?: boolean;
   showHiddenToggle?: boolean;
   defaultHidden?: boolean;
-  variant: InlineVariant; // We require a containerId
+  variant: 'inline';
+  containerId: string;
 }
 
 export enum FormType {
@@ -89,4 +71,5 @@ export interface FormProps extends PropsBase {
   onCancel?: () => void;
   onClose?: () => void;
   variant?: Variant; // supports all variants, falls back to modal, so optional
+  containerId?: string; // required for inline variant
 }

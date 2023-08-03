@@ -2,7 +2,10 @@ import { RequiredCallbacksByComponent } from './constants/callbacks';
 import { ComponentKind, Footprint, Props, Variant } from './types/components';
 import { getAppearanceForVanilla } from './utils/appearance-utils';
 import checkIsKindValid from './utils/check-is-kind-valid';
-import checkIsVariantValid from './utils/check-is-variant-valid';
+import {
+  checkIsVariantValid,
+  getDefaultVariantForKind,
+} from './utils/variant-utils';
 
 const defer = (callback: () => void) => {
   window.setTimeout(callback, 0);
@@ -38,7 +41,9 @@ const vanillaIntegration = (footprint: Footprint) => {
     const kind = container.getAttribute('data-kind') as ComponentKind;
     checkIsKindValid(kind);
 
-    const variant = container.getAttribute('data-variant') as Variant;
+    const variant =
+      (container.getAttribute('data-variant') as Variant) ??
+      getDefaultVariantForKind(kind);
     checkIsVariantValid(kind, variant);
 
     const appearance = getAppearanceForVanilla();
@@ -56,6 +61,7 @@ const vanillaIntegration = (footprint: Footprint) => {
         '`data-props` on the footprint element has to be a valid JSON object stringified.',
       );
     }
+    const containerId = variant === 'inline' ? container.id : undefined;
 
     const addComponentToDom = () => {
       if (typeof window === 'undefined') return;
@@ -64,6 +70,7 @@ const vanillaIntegration = (footprint: Footprint) => {
         kind,
         variant,
         appearance,
+        containerId,
         ...callbacks,
         ...props,
       } as Props);
@@ -75,7 +82,7 @@ const vanillaIntegration = (footprint: Footprint) => {
 
   const handlePageLoaded = () => {
     // Find and replace all footprint components
-    const containers = document.querySelectorAll('[id^=footprint-component]');
+    const containers = document.querySelectorAll('[data-footprint]');
     if (!containers.length) {
       return;
     }
