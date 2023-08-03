@@ -1,8 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
 use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::State;
@@ -21,7 +19,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 pub async fn detail(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<api_wire_types::User> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

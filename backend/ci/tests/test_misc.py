@@ -27,7 +27,7 @@ def test_tenant_create():
 
 def test_basic_auth(sandbox_tenant):
     response = requests.get(
-        url("entities"),
+        url("users"),
         auth=HTTPBasicAuth(sandbox_tenant.sk.key.value, ""),
     )
     assert response.status_code == 200

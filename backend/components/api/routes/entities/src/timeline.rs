@@ -1,8 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
 
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
@@ -20,14 +18,14 @@ type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
 
 #[api_v2_operation(
     description = "Gets the timeline for a user verification trail.",
-    tags(Entities, Preview)
+    tags(Entities, Private)
 )]
 #[get("/entities/{fp_id}/timeline")]
 pub async fn get(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
     filters: web::Query<ListTimelineRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<TimelineEventsResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

@@ -22,7 +22,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
     description = "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",
-    tags(Entities, Preview)
+    tags(Entities, Private)
 )]
 #[post("/entities/{fp_id}/decisions")]
 pub async fn post(

@@ -1,9 +1,5 @@
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::{
-    tenant::{CheckTenantGuard, TenantSessionAuth},
-    Either,
-};
+use crate::auth::tenant::{CheckTenantGuard, TenantSessionAuth};
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
@@ -125,7 +121,7 @@ impl CreateOnboardingConfigurationRequest {
 #[post("/org/onboarding_configs")]
 pub async fn post(
     state: web::Data<State>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;

@@ -90,7 +90,7 @@ def configure_proxy(tenant, ingress_rules):
     body = post(
         "org/proxy_configs/",
         data,
-        tenant.sk.key,
+        *tenant.db_auths,
     )
     assert body["id"]
     return body["id"]
@@ -328,7 +328,9 @@ class TestVaultProxy:
             [{"target": "$.data.card_number", "token": "custom.card_number"}],
         )
 
-        proxy_config = get(f"org/proxy_configs/{proxy_id}", None, sandbox_tenant.sk.key)
+        proxy_config = get(
+            f"org/proxy_configs/{proxy_id}", None, *sandbox_tenant.db_auths
+        )
         assert proxy_config["id"] == proxy_id
         assert len(proxy_config["headers"]) == 1
         assert len(proxy_config["secret_headers"]) == 1
@@ -351,7 +353,7 @@ class TestVaultProxy:
         new_proxy_config = patch(
             f"org/proxy_configs/{proxy_id}",
             data,
-            sandbox_tenant.sk.key,
+            *sandbox_tenant.db_auths,
         )
 
         assert new_proxy_config["access_reason"] == "test decrypt2"
@@ -364,13 +366,13 @@ class TestVaultProxy:
         post(
             f"org/proxy_configs/{proxy_id}/deactivate",
             None,
-            sandbox_tenant.sk.key,
+            *sandbox_tenant.db_auths,
         )
 
         get(
             f"org/proxy_configs/{proxy_id}",
             None,
-            sandbox_tenant.sk.key,
+            *sandbox_tenant.db_auths,
             status_code=404,
         )
 
@@ -603,10 +605,10 @@ class TestVaultProxy:
         assert response["flerp"] == "flerp"
         assert response["office_location"] == "Hayes Valley"
 
-        access_event = latest_access_event_for(fp_id, sandbox_tenant.sk)
+        access_event = latest_access_event_for(fp_id, sandbox_tenant)
         assert access_event["kind"] == "decrypt"
         assert set(access_event["targets"]) == set(user1_data)
-        access_event = latest_access_event_for(fp_id2, sandbox_tenant.sk)
+        access_event = latest_access_event_for(fp_id2, sandbox_tenant)
         assert access_event["kind"] == "decrypt"
         assert set(access_event["targets"]) == set(user2_data)
 

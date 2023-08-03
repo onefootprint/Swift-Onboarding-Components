@@ -87,7 +87,7 @@ def test_portable_timeline_events(
     foo_fp_id = dual_onboarded_user.foo_fp_id
 
     # Timeline events from sandbox_tenant's view belong to self
-    body = get(f"/entities/{fp_id}/timeline", None, sandbox_tenant.sk.key)
+    body = get(f"/entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     assert body
     assert not any(i["is_from_other_org"] for i in body)
 
@@ -95,7 +95,7 @@ def test_portable_timeline_events(
     body = get(
         f"/entities/{foo_fp_id}/timeline",
         None,
-        foo_sandbox_tenant.sk.key,
+        *foo_sandbox_tenant.db_auths,
     )
     collect_data_events = [i for i in body if i["event"]["kind"] == "data_collected"]
     assert collect_data_events
@@ -106,19 +106,19 @@ def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user)
     fp_id = dual_onboarded_user.fp_id
     foo_fp_id = dual_onboarded_user.foo_fp_id
 
-    get(f"/entities/{foo_fp_id}", None, sandbox_tenant.sk.key, status_code=404)
-    get(f"/entities/{fp_id}", None, foo_sandbox_tenant.sk.key, status_code=404)
+    get(f"/entities/{foo_fp_id}", None, *sandbox_tenant.db_auths, status_code=404)
+    get(f"/entities/{fp_id}", None, *foo_sandbox_tenant.db_auths, status_code=404)
 
     get(
         f"/entities/{foo_fp_id}/timeline",
         None,
-        sandbox_tenant.sk.key,
+        *sandbox_tenant.db_auths,
         status_code=404,
     )
     get(
         f"/entities/{fp_id}/timeline",
         None,
-        foo_sandbox_tenant.sk.key,
+        *foo_sandbox_tenant.db_auths,
         status_code=404,
     )
 
@@ -139,11 +139,11 @@ def test_cant_see_speculative_fingerprints(
         data = dict(search=search_query)
 
         # sandbox_tenant should be able to search for the user from its new name
-        body = get(f"/entities", data, sandbox_tenant.sk.key)
+        body = get(f"/entities", data, *sandbox_tenant.db_auths)
         assert [i for i in body["data"] if i["id"] == fp_id]
 
         # foo_sandbox_tenant should _not_ be able to find the user by its name at sandbox_tenant
-        body = get(f"/entities", data, foo_sandbox_tenant.sk.key)
+        body = get(f"/entities", data, *foo_sandbox_tenant.db_auths)
         assert not len(body["data"])
 
 
@@ -153,6 +153,6 @@ def test_cant_decrypt_unrequested_portable(dual_onboarded_user, foo_sandbox_tena
     post(
         f"entities/{dual_onboarded_user.foo_fp_id}/vault/decrypt",
         data,
-        foo_sandbox_tenant.sk.key,
+        *foo_sandbox_tenant.db_auths,
         status_code=401,
     )

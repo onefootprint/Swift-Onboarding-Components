@@ -18,7 +18,7 @@ def test_reonboard(sandbox_tenant, twilio, sandbox_user):
     timeline = get(
         f"entities/{sandbox_user.fp_id}/timeline",
         None,
-        sandbox_user.tenant.sk.key,
+        *sandbox_user.tenant.db_auths,
     )
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1

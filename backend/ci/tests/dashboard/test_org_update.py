@@ -13,7 +13,7 @@ def test_org_update_logo(sandbox_tenant):
     body = put(
         "org/logo",
         None,
-        sandbox_tenant.auth_token,
+        *sandbox_tenant.db_auths,
         files=files,
     )
 

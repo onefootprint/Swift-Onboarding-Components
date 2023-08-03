@@ -89,7 +89,7 @@ def test_onboarding_authorize(tenant, bifrost, sandbox_tenant):
     assert body["user"]["status"]
 
     # Make sure the fp_id works
-    body = get(f"entities/{fp_id}/timeline", None, tenant.sk.key)
+    body = get(f"entities/{fp_id}/timeline", None, *tenant.db_auths)
     assert len(body) > 0
 
     # Should be idempotent if we authorize again

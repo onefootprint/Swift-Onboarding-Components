@@ -7,9 +7,6 @@ from tests.utils import (
     patch,
     post,
 )
-from tests.headers import (
-    IsLive,
-)
 
 
 @pytest.fixture(scope="module")
@@ -25,7 +22,7 @@ def incomplete_user(sandbox_tenant, twilio):
 
     phone_number = bifrost.decrypted_data["id.phone_number"]
     # Get the user by searching by fingerprint in the admin API since we can't get the fp_id otherwise
-    body = get("entities", dict(search=phone_number), sandbox_tenant.sk.key)
+    body = get("entities", dict(search=phone_number), *sandbox_tenant.db_auths)
     return body["data"][0]["id"]
 
 
@@ -35,7 +32,7 @@ def vault_user(sandbox_tenant):
 
 
 def test_get_org(sandbox_user):
-    body = get("org", None, sandbox_user.tenant.sk.key)
+    body = get("org", None, *sandbox_user.tenant.db_auths)
     tenant = body
     assert tenant["name"] == sandbox_user.tenant.name
     assert not tenant["is_sandbox_restricted"]
@@ -44,7 +41,7 @@ def test_get_org(sandbox_user):
 
 def test_get_users_list(incomplete_user, sandbox_user2, vault_user, sandbox_user):
     tenant = sandbox_user.tenant
-    body = get("entities", None, tenant.sk.key)
+    body = get("entities", None, *tenant.db_auths)
     scoped_users = body["data"]
     assert len(scoped_users)
 
@@ -63,7 +60,7 @@ def test_get_users_list(incomplete_user, sandbox_user2, vault_user, sandbox_user
 
 def test_get_users_by_fp_id_query(sandbox_user):
     tenant = sandbox_user.tenant
-    body = get("entities", {"search": sandbox_user.fp_id}, tenant.sk.key)
+    body = get("entities", {"search": sandbox_user.fp_id}, *tenant.db_auths)
     scoped_users = body["data"]
     assert len(scoped_users) == 1
     assert scoped_users[0]["id"] == sandbox_user.fp_id
@@ -90,7 +87,7 @@ def test_get_users_filter(
     expected_user_idxs,
 ):
     tenant = sandbox_user.tenant
-    body = get("entities", filters, tenant.sk.key)
+    body = get("entities", filters, *tenant.db_auths)
     scoped_users = body["data"]
     all_fp_ids = [
         sandbox_user.fp_id,
@@ -106,21 +103,21 @@ def test_get_users_list_pagination(sandbox_user, sandbox_user2):
     sandbox_user2  # Not used, but need the fixture
     tenant = sandbox_user.tenant
     # Test paginated request with filters
-    body = get("entities", dict(page_size=1, statuses="pass"), tenant.sk.key)
+    body = get("entities", dict(page_size=1, statuses="pass"), *tenant.db_auths)
     assert len(body["data"]) == 1
     next_cursor = body["meta"]["next"]
     assert next_cursor  # Should be more than one page
     body = get(
         "entities",
         dict(page_size=1, cursor=next_cursor, statuses="pass"),
-        tenant.sk.key,
+        *tenant.db_auths,
     )
     assert len(body["data"]) == 1
 
 
 def test_get_users_detail(sandbox_user):
     tenant = sandbox_user.tenant
-    scoped_user = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
+    scoped_user = get(f"entities/{sandbox_user.fp_id}", None, *tenant.db_auths)
     assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
 
 
@@ -134,7 +131,7 @@ def test_get_users_detail_doc(
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
     user = bifrost.run()
 
-    res = get(f"entities/{user.fp_id}", None, tenant.sk.key)
+    res = get(f"entities/{user.fp_id}", None, *tenant.db_auths)
     assert "document.drivers_license.front.image" in res["attributes"]
     assert "document.drivers_license.back.image" in res["attributes"]
     assert "document.drivers_license.selfie.image" in res["attributes"]
@@ -142,7 +139,7 @@ def test_get_users_detail_doc(
 
 def test_liveness_list(sandbox_user):
     tenant = sandbox_user.tenant
-    body = get(f"entities/{sandbox_user.fp_id}/liveness", None, tenant.sk.key)
+    body = get(f"entities/{sandbox_user.fp_id}/liveness", None, *tenant.db_auths)
     creds = body
     assert len(creds)
     assert creds[0]["insight_event"]
@@ -152,7 +149,7 @@ def test_timeline(sandbox_user):
     body = get(
         f"entities/{sandbox_user.fp_id}/timeline",
         None,
-        sandbox_user.tenant.sk.key,
+        *sandbox_user.tenant.db_auths,
     )
     assert any(i["event"]["kind"] == "data_collected" for i in body)
     assert any(i["event"]["kind"] == "liveness" for i in body)
@@ -166,7 +163,7 @@ def test_timeline(sandbox_user):
     body = get(
         f"entities/{sandbox_user.fp_id}/timeline",
         dict(kinds="onboarding_decision"),
-        sandbox_user.tenant.sk.key,
+        *sandbox_user.tenant.db_auths,
     )
     assert len(body) == 1
     assert body[0] == decision_event
@@ -183,14 +180,14 @@ def test_access_events_list(sandbox_user):
         body = post(
             f"entities/{sandbox_user.fp_id}/vault/decrypt",
             data,
-            tenant.sk.key,
+            *tenant.db_auths,
         )
 
     # Then check the access event list
     body = get(
         "org/access_events",
         dict(search=sandbox_user.fp_id),
-        tenant.sk.key,
+        *tenant.db_auths,
     )
     access_events = body["data"]
     assert len(access_events) == len(FIELDS_TO_DECRYPT)
@@ -206,7 +203,7 @@ def test_access_events_list(sandbox_user):
         targets=",".join(["id.email", "id.address_line1"]),
         kind="decrypt",
     )
-    body = get("org/access_events", params, tenant.sk.key)
+    body = get("org/access_events", params, *tenant.db_auths)
     access_events = body["data"]
     assert len(access_events) == 2
     assert "id.email" in set(access_events[0]["targets"])
@@ -214,7 +211,7 @@ def test_access_events_list(sandbox_user):
 
     # Test filtering on timestamp - if we filter for events in the future, there shouldn't be any
     params = dict(timestamp_gte=arrow.utcnow().shift(days=1).isoformat())
-    body = get("org/access_events", params, tenant.sk.key)
+    body = get("org/access_events", params, *tenant.db_auths)
     assert not body["data"]
 
 
@@ -242,12 +239,14 @@ def test_update_data_for_portable_user(sandbox_user):
 def test_override_onboarding_decision(sandbox_user):
     tenant = sandbox_user.tenant
 
-    scoped_user = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
+    scoped_user = get(f"entities/{sandbox_user.fp_id}", None, *tenant.db_auths)
     onboarding = scoped_user["onboarding"]
     assert onboarding["status"] == "pass"
 
     event_kinds = dict(kinds="onboarding_decision")
-    events = get(f"entities/{sandbox_user.fp_id}/timeline", event_kinds, tenant.sk.key)
+    events = get(
+        f"entities/{sandbox_user.fp_id}/timeline", event_kinds, *tenant.db_auths
+    )
     event = events[0]["event"]
     assert event["data"]["decision"]["source"]["kind"] == "footprint"
 
@@ -256,18 +255,15 @@ def test_override_onboarding_decision(sandbox_user):
         annotation=dict(note=test_note, is_pinned=True),
         status="fail",
     )
-    post(
-        f"entities/{sandbox_user.fp_id}/decisions",
-        decision_data,
-        tenant.auth_token,
-        IsLive("false"),
-    )
+    post(f"entities/{sandbox_user.fp_id}/decisions", decision_data, *tenant.db_auths)
 
-    scoped_user = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
+    scoped_user = get(f"entities/{sandbox_user.fp_id}", None, *tenant.db_auths)
     onboarding = scoped_user["onboarding"]
     assert onboarding["status"] == "fail"
     # Assert the latest decision is a manual decision
-    events = get(f"entities/{sandbox_user.fp_id}/timeline", event_kinds, tenant.sk.key)
+    events = get(
+        f"entities/{sandbox_user.fp_id}/timeline", event_kinds, *tenant.db_auths
+    )
     event = events[0]["event"]
     assert event["data"]["decision"]["source"]["kind"] == "organization"
     assert "@onefootprint.com" in event["data"]["decision"]["source"]["member"]
@@ -276,7 +272,7 @@ def test_override_onboarding_decision(sandbox_user):
     pinned_annotations = get(
         f"entities/{sandbox_user.fp_id}/annotations",
         dict(is_pinned="true"),
-        tenant.sk.key,
+        *tenant.db_auths,
     )
     annotation = pinned_annotations[0]
     assert annotation["is_pinned"]
@@ -293,23 +289,19 @@ def test_get_annotations(sandbox_user):
             note=note1,
             is_pinned=False,
         ),
-        sandbox_user.tenant.sk.key,
-        # `sandbox_user` creates a scoped sandbox_user that is is_live=false but the auths (tenant.sk.key, tenant.auth_token, workos_sandbox_tentnat.auth_token)
-        # all are auth.is_live() = true, so I think I need to pass this IsLive struct on every request? seems weird
-        IsLive("false"),
+        *sandbox_user.tenant.db_auths,
     )
 
     annotations = get(
         f"/entities/{sandbox_user.fp_id}/annotations",
         None,
-        sandbox_user.tenant.sk.key,
-        IsLive("false"),
+        *sandbox_user.tenant.db_auths,
     )
     annotations.sort(key=lambda x: x["timestamp"])
 
     assert annotation1["id"] == annotations[-1]["id"]
     assert annotation1["note"] == note1
-    assert annotation1["source"]["kind"] == "api_key"
+    assert annotation1["source"]["kind"] == "organization"
     assert annotation1["is_pinned"] == False
 
     note2 = "ok mb they are a little sketch"
@@ -320,15 +312,13 @@ def test_get_annotations(sandbox_user):
             note=note2,
             is_pinned=True,
         ),
-        sandbox_user.tenant.auth_token,
-        IsLive("false"),
+        *sandbox_user.tenant.db_auths,
     )
 
     annotations = get(
         f"/entities/{sandbox_user.fp_id}/annotations",
         None,
-        sandbox_user.tenant.auth_token,
-        IsLive("false"),
+        *sandbox_user.tenant.db_auths,
     )
     annotations.sort(key=lambda x: x["timestamp"])
 

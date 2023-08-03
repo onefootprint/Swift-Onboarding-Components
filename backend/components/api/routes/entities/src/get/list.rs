@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::get::EntityListResponse;
@@ -29,14 +27,14 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
     description = "View list of entities (business or user) that have started onboarding to the tenant.",
-    tags(Entities, Preview)
+    tags(Entities, Private)
 )]
 #[get("/entities")]
 pub async fn get(
     state: web::Data<State>,
     filters: web::Query<ListEntitiesRequest>,
     pagination: web::Query<CursorPaginationRequest<i64>>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> ApiResult<Json<CursorPaginatedResponse<EntityListResponse, i64>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();

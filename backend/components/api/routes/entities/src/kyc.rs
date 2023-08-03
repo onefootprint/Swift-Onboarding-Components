@@ -1,8 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
@@ -37,13 +35,13 @@ use newtypes::OnboardingRequirement;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
-#[api_v2_operation(description = "Trigger KYC on the provided user.", tags(Entities, Private))]
+#[api_v2_operation(description = "Trigger KYC on the provided user.", tags(Entities, Preview))]
 #[post("/entities/{fp_id}/kyc")]
 pub async fn post(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
     request: web::Json<TriggerKycRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EntityValidateResponse> {
     let auth = auth.check_guard(TenantGuard::TriggerKyc)?;
     let tenant_id = auth.tenant().id.clone();

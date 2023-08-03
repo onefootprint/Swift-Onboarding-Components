@@ -229,7 +229,7 @@ def test_vault_create_write_decrypt(tenant):
     body = get(
         "org/access_events",
         dict(search=fp_id),
-        tenant.sk.key,
+        *tenant.db_auths,
     )
     access_events = body["data"]
     assert access_events[0]["kind"] == "decrypt"
@@ -254,7 +254,7 @@ def test_vault_create_write_decrypt(tenant):
     body = get(
         "org/access_events",
         dict(search=fp_id),
-        tenant.sk.key,
+        *tenant.db_auths,
     )
     access_events = body["data"]
     events = access_events[0]["targets"]
@@ -394,7 +394,7 @@ def test_kyc(
     timeline = get(
         f"entities/{fp_id}/timeline",
         None,
-        sandbox_tenant.sk.key,
+        *sandbox_tenant.db_auths,
     )
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1

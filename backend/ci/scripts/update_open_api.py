@@ -8,6 +8,10 @@ from urllib.parse import unquote
 # Every API endpoint must have only one of these tag values
 IDENTIFYING_TAG_VALUES = ["Private", "PublicApi", "Hosted", "Preview"]
 
+# Only APIs that take one of these auth methods should ever be publicly documented - otherwise,
+# the API isn't usable
+VISIBLE_API_SECURITY = ["Secret API Key", "Client Token"]
+
 
 class Endpoint:
     """
@@ -43,7 +47,11 @@ class Endpoint:
     def security_schemes(self):
         """Computes the security schemes that are used for the endpoint"""
         # Read specifically from path_info and not _path_info to get the mutated security
-        return [k for i in self.path_info.get("security") for k in i.keys()]
+        security_schemes = [k for i in self.path_info.get("security") for k in i.keys()]
+        assert not security_schemes or any(
+            s in security_schemes for s in VISIBLE_API_SECURITY
+        ), f"API auth not found in schemes for {self.method.upper()} {self.url}. No reason to document if the API is not accesible via an accessible auth method"
+        return security_schemes
 
     @property
     def path_info(self):
@@ -51,7 +59,7 @@ class Endpoint:
         Serializes the Endpoint back into open-api JSON path info
         """
         # Update the description
-        description = self._path_info["description"]
+        description = self._path_info.get("description", "")
         if self.identifying_tag == "Preview":
             # Add a disclaimer tag to all Preview APIs
             description = f"This is a preview API. By using this, you consent to potentially breaking API changes.\n{description}"

@@ -1,6 +1,5 @@
 import pytest
 from tests.types import SecretApiKey
-from tests.headers import IsLive
 from tests.utils import (
     get,
     post,
@@ -17,37 +16,42 @@ def limited_role(sandbox_tenant):
         name=f"Test limited role {suffix}",
         scopes=[
             {"kind": "read"},
-            {"kind": "onboarding_configuration"},
             {"kind": "write_entities"},
         ],
     )
-    return post("org/roles", role_data, sandbox_tenant.auth_token)
+    return post("org/roles", role_data, *sandbox_tenant.db_auths)
 
 
 @pytest.fixture(scope="session")
 def secret_key(sandbox_tenant, admin_role):
     data = dict(name="Test secret key", role_id=admin_role["id"])
-    body = post("org/api_keys", data, sandbox_tenant.auth_token)
+    body = post("org/api_keys", data, *sandbox_tenant.db_auths)
     return SecretApiKey.from_response(body)
 
 
 @pytest.fixture(scope="session")
 def limited_disabled_secret_key(sandbox_tenant, limited_role):
     data = dict(name="Limited test secret key", role_id=limited_role["id"])
-    body = post("org/api_keys", data, sandbox_tenant.auth_token)
+    body = post("org/api_keys", data, *sandbox_tenant.db_auths)
     data = dict(status="disabled")
     key_id = body["id"]
-    body = patch(f"org/api_keys/{key_id}", data, sandbox_tenant.auth_token)
+    body = patch(f"org/api_keys/{key_id}", data, *sandbox_tenant.db_auths)
     return body
 
 
-def test_api_key_list(secret_key):
-    body = get("org/api_keys", None, secret_key.key)
+def test_api_key_list(secret_key, sandbox_tenant):
+    body = get("org/api_keys", None, *sandbox_tenant.db_auths)
     key = next(key for key in body["data"] if key["id"] == secret_key.id)
     assert key["name"] == secret_key.name
     assert key["status"] == secret_key.status
     assert key["created_at"]
     assert "key" not in key
+    assert not key["last_used_at"]
+
+    # Use the secret key
+    get("/users", None, secret_key.key)
+    body = get("org/api_keys", None, *sandbox_tenant.db_auths)
+    key = next(key for key in body["data"] if key["id"] == secret_key.id)
     assert key["last_used_at"]
 
 
@@ -71,6 +75,7 @@ def test_api_key_list_filters(
     expect_key2,
     admin_role,
     limited_role,
+    sandbox_tenant,
 ):
     if params.get("role_ids"):
         role_name_to_id = {
@@ -81,7 +86,7 @@ def test_api_key_list_filters(
             [role_name_to_id[name] for name in params["role_ids"]]
         )
 
-    body = get("org/api_keys", params, secret_key.key)
+    body = get("org/api_keys", params, *sandbox_tenant.db_auths)
     assert any(u["id"] == secret_key.id for u in body["data"]) == expect_key1
     assert (
         any(u["id"] == limited_disabled_secret_key["id"] for u in body["data"])
@@ -99,30 +104,21 @@ def test_api_key_limited_role(
     limited_role,
 ):
     data = dict(name="Test secret key", role_id=limited_role["id"])
-    body = post("org/api_keys", data, sandbox_tenant.auth_token, IsLive("false"))
+    body = post("org/api_keys", data, *sandbox_tenant.db_auths)
     key = SecretApiKey.from_response(body)
 
-    # Can do ob config operations with limited role
-    data = {
-        "name": "FLERP",
-        "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
-    }
-    post("org/onboarding_configs", data, key.key)
+    # Can do write_entities actions
+    data = {"id.first_name": "Hayes Valley"}
+    post("users", data, key.key)
 
-    # Cannot do other actions with limited role
+    # Cannot do other actions, like decrypt, with limited role
     decrypt_data = dict(fields=["id.first_name"], reason="HI")
     fp_id = sandbox_user.fp_id
     post(f"entities/{fp_id}/vault/decrypt", decrypt_data, key.key, status_code=401)
 
     # Now, change the key's role
     data = dict(role_id=admin_role["id"])
-    patch(
-        f"org/api_keys/{key.id}",
-        data,
-        sandbox_tenant.auth_token,
-        IsLive("false"),
-    )
+    patch(f"org/api_keys/{key.id}", data, *sandbox_tenant.db_auths)
 
     # And now can do other actions with admin permissions
     post(f"entities/{fp_id}/vault/decrypt", decrypt_data, key.key)
@@ -130,7 +126,7 @@ def test_api_key_limited_role(
 
 def test_client_token_perms(limited_role, sandbox_tenant, sandbox_user, admin_role):
     data = dict(name="Test secret key", role_id=limited_role["id"])
-    body = post("org/api_keys", data, sandbox_tenant.auth_token, IsLive("false"))
+    body = post("org/api_keys", data, *sandbox_tenant.db_auths)
     key = SecretApiKey.from_response(body)
 
     # Try creating a client token with missing permissions
@@ -148,12 +144,7 @@ def test_client_token_perms(limited_role, sandbox_tenant, sandbox_user, admin_ro
 
     # After changing the API key to have admin perms, should be able to make all of these client tokens
     data = dict(role_id=admin_role["id"])
-    patch(
-        f"org/api_keys/{key.id}",
-        data,
-        sandbox_tenant.auth_token,
-        IsLive("false"),
-    )
+    patch(f"org/api_keys/{key.id}", data, *sandbox_tenant.db_auths)
 
     for data in decrypt_datas:
         post(f"entities/{fp_id}/client_token", data, key.key)
@@ -161,7 +152,7 @@ def test_client_token_perms(limited_role, sandbox_tenant, sandbox_user, admin_ro
 
 def test_deactivate_api_key_role(limited_role, sandbox_tenant):
     data = dict(name="Test secret key", role_id=limited_role["id"])
-    body = post("org/api_keys", data, sandbox_tenant.auth_token, IsLive("false"))
+    body = post("org/api_keys", data, *sandbox_tenant.db_auths)
     key_id = body["id"]
 
     # Can't deactivate role with active API keys
@@ -169,49 +160,48 @@ def test_deactivate_api_key_role(limited_role, sandbox_tenant):
     post(
         f"org/roles/{role_id}/deactivate",
         None,
-        sandbox_tenant.auth_token,
+        *sandbox_tenant.db_auths,
         status_code=400,
     )
 
     # Deactivate the API key
     data = dict(status="disabled")
-    patch(
-        f"org/api_keys/{key_id}",
-        data,
-        sandbox_tenant.auth_token,
-        IsLive("false"),
-    )
+    patch(f"org/api_keys/{key_id}", data, *sandbox_tenant.db_auths)
 
     # Now we can deactivate the role
-    post(
-        f"org/roles/{role_id}/deactivate",
-        None,
-        sandbox_tenant.auth_token,
-    )
+    post(f"org/roles/{role_id}/deactivate", None, *sandbox_tenant.db_auths)
 
 
-def test_api_key_reveal(secret_key):
-    body = post(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key)
+def test_api_key_reveal(secret_key, sandbox_tenant):
+    body = post(f"org/api_keys/{secret_key.id}/reveal", None, *sandbox_tenant.db_auths)
     key = body
     assert key["key"] == secret_key.key.value
     assert key["status"] == "enabled"
     assert key["name"] == "Test secret key"
+
+    # Make sure we can't reveal other keys with an API key
+    post(
+        f"org/api_keys/{secret_key.id}/reveal",
+        None,
+        sandbox_tenant.sk.key,
+        status_code=401,
+    )
 
 
 def test_api_key_update(sandbox_tenant, secret_key):
     # Test failing to update
     new_name = "Updated secret key name"
     data = dict(name=new_name, status="disabled")
-    patch(f"org/api_keys/flerpderp", data, sandbox_tenant.auth_token, status_code=404)
+    patch(f"org/api_keys/flerpderp", data, *sandbox_tenant.db_auths, status_code=404)
 
     # Update the name and status
-    body = patch(f"org/api_keys/{secret_key.id}", data, sandbox_tenant.auth_token)
+    body = patch(f"org/api_keys/{secret_key.id}", data, *sandbox_tenant.db_auths)
     key = body
     assert key["name"] == new_name
     assert key["status"] == "disabled"
 
     # Verify the update, using the reveal endpoint as the detail endpoint
-    body = post(f"org/api_keys/{secret_key.id}/reveal", None, sandbox_tenant.auth_token)
+    body = post(f"org/api_keys/{secret_key.id}/reveal", None, *sandbox_tenant.db_auths)
     assert body["name"] == new_name
     assert body["status"] == "disabled"
 

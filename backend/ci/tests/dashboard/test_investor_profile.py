@@ -9,7 +9,7 @@ from tests.constants import IP_DATA
 def sb_user_with_investor_profile(sandbox_tenant, investor_profile_ob_config, twilio):
     bifrost = BifrostClient.new(investor_profile_ob_config, twilio)
     user = bifrost.run()
-    body = get("entities", dict(kind="person"), sandbox_tenant.sk.key)
+    body = get("entities", dict(kind="person"), *sandbox_tenant.db_auths)
     entity = body["data"][0]
     assert set(entity["attributes"]) > set(IP_DATA)
     return user
@@ -52,7 +52,7 @@ def test_decrypt(sandbox_tenant, sb_user_with_investor_profile, fields_to_decryp
         assert body[field] == IP_DATA.get(field)
 
     access_event = latest_access_event_for(
-        sb_user_with_investor_profile.fp_id, sandbox_tenant.sk
+        sb_user_with_investor_profile.fp_id, sandbox_tenant
     )
     populated_keys = set(sb_user_with_investor_profile.client.data)
     assert set(access_event["targets"]) == set(fields_to_decrypt) & populated_keys

@@ -1,5 +1,4 @@
 import pytest
-from tests.headers import IsLive
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
 from tests.utils import _gen_random_n_digit_number
@@ -58,12 +57,7 @@ def test_alpaca_cip(
 
     if review_annotation:
         # Check that the review_reasons are correctly populated in /entities for showing in the review UI
-        entities_body = get(
-            f"entities/{user.fp_id}",
-            None,
-            sandbox_tenant.auth_token,
-            IsLive("false"),
-        )
+        entities_body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
         # Complete review
         post(
             f"entities/{user.fp_id}/decisions",
@@ -71,15 +65,11 @@ def test_alpaca_cip(
                 annotation=dict(note=review_annotation, is_pinned=False),
                 status="pass",
             ),
-            sandbox_tenant.auth_token,
-            IsLive("false"),
+            *sandbox_tenant.db_auths,
         )
         # Check that the timeline event for the completed review has correct review_reasons as well
         timeline = get(
-            f"entities/{user.fp_id}/timeline",
-            None,
-            sandbox_tenant.auth_token,
-            IsLive("false"),
+            f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths
         )
         if sandbox_outcome == "stepup":
             expected_review_reasons = [

@@ -1,8 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::types::EmptyResponse;
@@ -27,13 +25,13 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web};
 
 type AnnotationsListResponse = Vec<api_wire_types::Annotation>;
 
-#[api_v2_operation(description = "Gets the annotations for a user.", tags(Entities, Preview))]
+#[api_v2_operation(description = "Gets the annotations for a user.", tags(Entities, Private))]
 #[get("/entities/{fp_id}/annotations")]
 pub async fn get(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
     query: web::Query<AnnotationFilters>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<AnnotationsListResponse> {
     // TODO paginate?
     let auth = auth.check_guard(TenantGuard::Read)?;
@@ -58,11 +56,11 @@ struct UpdateAnnotationPath {
     annotation_id: AnnotationId,
 }
 
-#[api_v2_operation(description = "Updates an existing annotation.", tags(Entities, Preview))]
+#[api_v2_operation(description = "Updates an existing annotation.", tags(Entities, Private))]
 #[patch("/entities/{fp_id}/annotations/{annotation_id}")]
 async fn patch(
     state: web::Data<State>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
     path: web::Path<UpdateAnnotationPath>,
     request: web::Json<UpdateAnnotationRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
@@ -96,11 +94,11 @@ impl ValidateRequest for CreateAnnotationRequest {
     }
 }
 
-#[api_v2_operation(description = "Creates a new freeform annotation.", tags(Entities, Preview))]
+#[api_v2_operation(description = "Creates a new freeform annotation.", tags(Entities, Private))]
 #[post("/entities/{fp_id}/annotations")]
 pub fn post(
     state: web::Data<State>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
     fp_id: web::Path<FpId>,
     request: Json<CreateAnnotationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::Annotation>>, ApiError> {

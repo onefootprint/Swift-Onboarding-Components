@@ -5,10 +5,10 @@ mod annotations;
 mod client_token;
 mod decisions;
 mod documents;
-mod field_validations;
 mod get;
 mod kyc;
 mod liveness;
+mod match_signals;
 mod risk_signals;
 mod timeline;
 mod trigger;
@@ -32,7 +32,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(liveness::get)
         .service(timeline::get)
         .service(risk_signals::get)
-        .service(field_validations::get)
+        .service(match_signals::get)
         .service(trigger::post)
         .service(kyc::post)
         .service(risk_signals::get_detail);

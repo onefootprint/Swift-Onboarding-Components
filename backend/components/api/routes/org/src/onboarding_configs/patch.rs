@@ -1,9 +1,5 @@
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::{
-    tenant::{CheckTenantGuard, TenantSessionAuth},
-    Either,
-};
+use crate::auth::tenant::{CheckTenantGuard, TenantSessionAuth};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
@@ -32,7 +28,7 @@ struct UpdateObConfigRequest {
 #[patch("/org/onboarding_configs/{id}")]
 async fn patch(
     state: web::Data<State>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {

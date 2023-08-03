@@ -1,10 +1,11 @@
 use paperclip::actix::web;
 
-pub mod assume_role;
-pub mod login;
-pub mod logout;
-pub mod magic_link;
-pub mod oauth;
+mod assume_role;
+mod login;
+mod logout;
+mod magic_link;
+mod oauth;
+mod roles;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -12,6 +13,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(logout::handler)
         .service(magic_link::handler)
         .service(oauth::handler)
-        .service(assume_role::get)
+        .service(roles::get)
         .service(assume_role::post);
 }

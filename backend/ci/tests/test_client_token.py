@@ -20,7 +20,7 @@ def test_generate(sandbox_user):
     post(
         f"entities/{sandbox_user.fp_id}/client_token",
         data,
-        tenant.auth_token,
+        *tenant.db_auths,
         status_code=401,
     )
 
@@ -42,7 +42,7 @@ def test_decrypt(sandbox_user, attrs_to_decrypt):
     for di, value in body.items():
         assert sandbox_user.client.decrypted_data[di] == value
 
-    access_event = latest_access_event_for(sandbox_user.fp_id, tenant.sk)
+    access_event = latest_access_event_for(sandbox_user.fp_id, tenant)
     assert set(access_event["targets"]) == set(body)
 
 
@@ -63,7 +63,7 @@ def test_decrypt_reason(sandbox_user):
         decrypt_reason="Hayes valley",
     )
     post(f"entities/vault/decrypt", data, auth_token)
-    access_event = latest_access_event_for(sandbox_user.fp_id, tenant.sk)
+    access_event = latest_access_event_for(sandbox_user.fp_id, tenant)
     assert access_event["reason"] == "Hayes valley"
 
     # And should be able to override the reason
@@ -72,7 +72,7 @@ def test_decrypt_reason(sandbox_user):
         reason="Hayes valley2",
     )
     post(f"entities/vault/decrypt", data, auth_token)
-    access_event = latest_access_event_for(sandbox_user.fp_id, tenant.sk)
+    access_event = latest_access_event_for(sandbox_user.fp_id, tenant)
     assert access_event["reason"] == "Hayes valley2"
 
 

@@ -74,7 +74,7 @@ def test_tenant_document_decrypt(user_with_documents):
     assert resp["document.drivers_license.expires_at"] == "2024-10-15"
     assert resp["document.drivers_license.dob"] == "1986-10-16"
 
-    access_event = latest_access_event_for(user_with_documents.fp_id, tenant.sk)
+    access_event = latest_access_event_for(user_with_documents.fp_id, tenant)
     assert set(access_event["targets"]) == set(fields)
 
 
@@ -101,14 +101,14 @@ def test_tenant_document_decrypt_download(user_with_documents):
     assert response.headers.get("content-type") == "image/png"
     assert response.content == base64.b64decode(test_image_dl_front)
 
-    access_event = latest_access_event_for(user_with_documents.fp_id, tenant.sk)
+    access_event = latest_access_event_for(user_with_documents.fp_id, tenant)
     assert set(access_event["targets"]) == set(fields)
 
 
 def test_get_entity_documents(user_with_documents):
     tenant = user_with_documents.tenant
     fp_id = user_with_documents.fp_id
-    body = get(f"entities/{fp_id}/documents", None, tenant.sk.key)
+    body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
     doc = body[0]
     assert doc["kind"] == "drivers_license"
     assert doc["status"] == "complete"
@@ -126,7 +126,7 @@ def test_decrypt_historical(user_with_documents):
 
     tenant = user_with_documents.tenant
     fp_id = user_with_documents.fp_id
-    body = get(f"entities/{fp_id}/documents", None, tenant.sk.key)
+    body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
     doc = body[0]
     assert doc["kind"] == "drivers_license"
     front = next(u for u in doc["uploads"] if u["side"] == "front")
@@ -171,7 +171,7 @@ def test_decrypt_historical(user_with_documents):
     body = get(
         "org/access_events",
         dict(search=fp_id),
-        tenant.sk.key,
+        *tenant.db_auths,
     )
     access_event = body["data"][0]
     assert set(access_event["targets"]) == set(

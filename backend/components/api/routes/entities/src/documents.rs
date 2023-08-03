@@ -1,8 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -14,14 +12,14 @@ use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
-    description = "Allows a tenant to view a customer's registered webauthn credentials.",
-    tags(Entities, Preview)
+    description = "View the documents uploaded for this vault.",
+    tags(Entities, Private)
 )]
 #[get("/entities/{fp_id}/documents")]
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FpId>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<Vec<api_wire_types::Document>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

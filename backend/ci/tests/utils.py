@@ -7,8 +7,8 @@ import arrow
 import time
 import os
 from tests.headers import SandboxId
-from tests.types import ObConfiguration, SecretApiKey, Tenant, BasicUser
-from tests.headers import DashboardAuth, FpAuth
+from tests.types import ObConfiguration, SecretApiKey, Tenant
+from tests.headers import DashboardAuth, FpAuth, IsLive
 from tests.constants import (
     CUSTODIAN_AUTH,
     TEST_URL,
@@ -345,10 +345,12 @@ def create_tenant(org_data, ob_conf_data):
     print(body)
     sk = SecretApiKey.from_response(body["key"])
     auth_token = DashboardAuth(body["auth_token"])
+    is_live = IsLive("true" if org_data.get("is_live", False) else "false")
     tenant = Tenant(
         id=body["org_id"],
         sk=sk,
         name=org_data["name"],
+        db_auths=[auth_token, is_live],
         auth_token=auth_token,
         member_id=body["tenant_user_id"],
         default_ob_config=None,  # Will populate this after making OB config
@@ -367,7 +369,7 @@ def create_ob_config(tenant, name, must_collect_data, can_access_data, cip_kind=
         "cip_kind": cip_kind,
     }
     # TODO also make this get or create?
-    body = post("org/onboarding_configs", ob_conf_data, tenant.sk.key)
+    body = post("org/onboarding_configs", ob_conf_data, *tenant.db_auths)
     ob_config = ObConfiguration.from_response(body, tenant)
     print("\n======org onboarding info======")
     print(body)

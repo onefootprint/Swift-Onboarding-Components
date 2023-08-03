@@ -1,24 +1,18 @@
-use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::auth::tenant::TenantGuard;
-
-use api_core::auth::tenant::TenantSessionAuth;
-use api_core::auth::Either;
-use webhooks::WebhookApp;
-
 use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
-
 use crate::State;
-
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use paperclip::actix::{api_v2_operation, get, web};
 use webhooks::PortalResponse;
+use webhooks::WebhookApp;
 
 #[api_v2_operation(tags(OrgSettings, Private), description = "Returns the webhook portal url.")]
 #[get("/org/webhook_portal")]
 async fn get(
     state: web::Data<State>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::WebhookPortalResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let is_live = auth.is_live()?;

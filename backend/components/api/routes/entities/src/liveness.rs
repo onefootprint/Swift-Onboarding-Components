@@ -1,8 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
@@ -12,13 +10,13 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
     description = "Allows a tenant to view a customer's registered webauthn credentials.",
-    tags(Entities, Preview)
+    tags(Entities, Private)
 )]
 #[get("/entities/{fp_id}/liveness")]
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FpId>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> actix_web::Result<Json<ResponseData<Vec<api_wire_types::LivenessEvent>>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

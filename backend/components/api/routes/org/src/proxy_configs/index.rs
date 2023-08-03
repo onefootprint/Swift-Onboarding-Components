@@ -1,7 +1,6 @@
 use std::str::FromStr;
 
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantSessionAuth};
-use crate::auth::Either;
+use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
 use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiResult;
 use crate::types::ResponseData;
@@ -23,7 +22,7 @@ type ProxyConfigsResponse = Json<ResponseData<Vec<api_wire_types::ProxyConfigBas
 pub async fn get(
     state: web::Data<State>,
     filters: web::Query<GetProxyConfigRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> ApiResult<ProxyConfigsResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let GetProxyConfigRequest { status } = filters.into_inner();
@@ -59,7 +58,7 @@ pub async fn get(
 pub async fn get_detail(
     state: web::Data<State>,
     proxy_config_id: web::Path<ProxyConfigId>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
@@ -81,7 +80,7 @@ pub async fn get_detail(
 pub async fn post(
     state: web::Data<State>,
     request: Json<CreateProxyConfigRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
     let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
@@ -189,7 +188,7 @@ pub async fn patch(
     state: web::Data<State>,
     request: Json<PatchProxyConfigRequest>,
     proxy_config_id: web::Path<ProxyConfigId>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
     let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();

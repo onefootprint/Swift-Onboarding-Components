@@ -1,5 +1,4 @@
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantSessionAuth};
-use crate::auth::Either;
+use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
 use crate::errors::ApiResult;
 use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
@@ -28,7 +27,7 @@ pub async fn get(
     state: web::Data<State>,
     filters: web::Query<ApiKeyFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> ApiResult<ApiKeysResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let page = pagination.page;

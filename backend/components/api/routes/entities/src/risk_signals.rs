@@ -94,13 +94,13 @@ fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<
 
 #[api_v2_operation(
     description = "Lists the risk signals for a footprint user.",
-    tags(Entities, Preview)
+    tags(Entities, Private)
 )]
 #[get("/entities/{fp_id}/risk_signals/{signal_id}")]
 pub async fn get_detail(
     state: web::Data<State>,
     request: web::Path<(FpId, RiskSignalId)>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<RiskSignalsDetailResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

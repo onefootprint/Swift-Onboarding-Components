@@ -45,6 +45,7 @@ class Tenant(NamedTuple):
     default_ob_config: ObConfiguration
     sk: SecretApiKey
     name: str
+    db_auths: list
     auth_token: DashboardAuth
     # The tenant user id for the authed user
     member_id: str

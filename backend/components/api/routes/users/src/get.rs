@@ -1,10 +1,8 @@
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::Either;
 use crate::errors::ApiResult;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
-use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::CursorPaginatedResponse;
 use api_core::types::CursorPaginationRequest;
 use api_core::utils::db2api::DbToApi;
@@ -23,7 +21,7 @@ pub async fn get(
     state: web::Data<State>,
     pagination: web::Query<CursorPaginationRequest<i64>>,
     request: web::Query<SearchUsersRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: SecretTenantAuthContext,
 ) -> ApiResult<CursorPaginatedResponse<Vec<api_wire_types::UserId>, i64>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();

@@ -30,13 +30,13 @@ def inactive_ob_configuration(sandbox_tenant, must_collect_data, can_access_data
     body = patch(
         f"org/onboarding_configs/{ob_config.id}",
         data,
-        sandbox_tenant.sk.key,
+        *sandbox_tenant.db_auths,
     )
     return body
 
 
 def test_config_list(sandbox_tenant, ob_configuration, inactive_ob_configuration):
-    body = get("org/onboarding_configs", None, sandbox_tenant.sk.key)
+    body = get("org/onboarding_configs", None, *sandbox_tenant.db_auths)
 
     config = next(
         config for config in body["data"] if config["id"] == ob_configuration.id
@@ -73,7 +73,7 @@ def test_config_list_filters(
     expect_ob_config1,
     expect_ob_config2,
 ):
-    body = get("org/onboarding_configs", params, sandbox_tenant.sk.key)
+    body = get("org/onboarding_configs", params, *sandbox_tenant.db_auths)
     assert (
         any(u["id"] == ob_configuration.id for u in body["data"]) == expect_ob_config1
     )
@@ -85,7 +85,7 @@ def test_config_list_filters(
 
 def test_config_detail(sandbox_tenant, ob_configuration):
     config = get(
-        f"org/onboarding_configs/{ob_configuration.id}", None, sandbox_tenant.sk.key
+        f"org/onboarding_configs/{ob_configuration.id}", None, *sandbox_tenant.db_auths
     )
     assert config["key"] == ob_configuration.key.value
     assert config["name"] == ob_configuration.name
@@ -101,7 +101,7 @@ def test_config_create(sandbox_tenant, twilio):
         must_collect_data=["ssn4", "phone_number", "email", "name", "full_address"],
         can_access_data=["ssn4", "phone_number", "email", "name", "full_address"],
     )
-    body = post("org/onboarding_configs", data, sandbox_tenant.sk.key)
+    body = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
     ob_config = body
     ob_config_key = PublishableOnboardingKey(ob_config["key"])
 
@@ -145,7 +145,7 @@ def test_config_create_validation(
     post(
         "org/onboarding_configs",
         data,
-        sandbox_tenant.sk.key,
+        *sandbox_tenant.db_auths,
         status_code=expected_status,
     )
 
@@ -158,7 +158,7 @@ def test_config_update(sandbox_tenant, ob_configuration):
     patch(
         f"org/onboarding_configs/flerpderp",
         data,
-        sandbox_tenant.sk.key,
+        *sandbox_tenant.db_auths,
         status_code=404,
     )
 
@@ -166,14 +166,14 @@ def test_config_update(sandbox_tenant, ob_configuration):
     body = patch(
         f"org/onboarding_configs/{ob_configuration.id}",
         data,
-        sandbox_tenant.sk.key,
+        *sandbox_tenant.db_auths,
     )
     ob_config = body
     assert ob_config["name"] == new_name
     assert ob_config["status"] == new_status
 
     # Verify the update
-    body = get(f"org/onboarding_configs", None, sandbox_tenant.sk.key)
+    body = get(f"org/onboarding_configs", None, *sandbox_tenant.db_auths)
     configs = body["data"]
     ob_config = next(i for i in configs if i["id"] == ob_configuration.id)
     assert ob_config["name"] == new_name

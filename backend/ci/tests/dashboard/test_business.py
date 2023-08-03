@@ -25,7 +25,7 @@ def test_get_entities(sandbox_tenant, primary_bo, populated_business_data):
     body = get(
         f"entities/{primary_bo.fp_bid}",
         None,
-        sandbox_tenant.sk.key,
+        *sandbox_tenant.db_auths,
     )
     assert set(body["attributes"]) == populated_business_data
     assert (
@@ -38,7 +38,7 @@ def test_get_business_owners(sandbox_tenant, primary_bo):
     body = get(
         f"businesses/{primary_bo.fp_bid}/owners",
         None,
-        sandbox_tenant.sk.key,
+        *sandbox_tenant.db_auths,
     )
     assert len(body) == 2
     assert body[0]["id"] == primary_bo.fp_id
@@ -54,7 +54,7 @@ def test_get_vault(sandbox_tenant, primary_bo, populated_business_data):
     body = get(
         f"entities/{primary_bo.fp_bid}/vault",
         None,
-        sandbox_tenant.sk.key,
+        *sandbox_tenant.db_auths,
     )
     populated_keys = set(k for (k, v) in body.items() if v)
     assert populated_keys == populated_business_data
@@ -89,14 +89,14 @@ def test_decrypt(sandbox_tenant, primary_bo, fields_to_decrypt):
     body = post(
         f"entities/{primary_bo.fp_bid}/vault/decrypt",
         data,
-        sandbox_tenant.sk.key,
+        *sandbox_tenant.db_auths,
     )
     for field in fields_to_decrypt:
         assert body[field] == expected_data.get(field)
 
     # Check the access event - but never expect business.name since it's stored in plaintext, or
     # other attributes that don't exist
-    access_event = latest_access_event_for(primary_bo.fp_bid, sandbox_tenant.sk)
+    access_event = latest_access_event_for(primary_bo.fp_bid, sandbox_tenant)
     populated_keys = set(primary_bo.client.data)
     expected_access_event_fields = (
         set(fields_to_decrypt) - {"business.name"}

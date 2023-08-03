@@ -1,5 +1,4 @@
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantSessionAuth};
-use crate::auth::Either;
+use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
@@ -26,10 +25,9 @@ struct RevealRequest {
 async fn post(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::SecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
-    // TODO more strict auth for viewing secret keys using a SecretTenantAuthContext
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
     let (key, role) = state

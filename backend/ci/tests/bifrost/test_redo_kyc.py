@@ -37,7 +37,7 @@ def test_redo_kyc(sandbox_tenant, twilio):
     timeline = get(
         f"entities/{sandbox_user.fp_id}/timeline",
         None,
-        sandbox_user.tenant.sk.key,
+        *sandbox_user.tenant.db_auths,
     )
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
@@ -48,7 +48,7 @@ def test_redo_kyc(sandbox_tenant, twilio):
     post(
         f"entities/{sandbox_user.fp_id}/trigger",
         dict(trigger=trigger, note=note),
-        sandbox_tenant.sk.key,
+        *sandbox_user.tenant.db_auths,
     )
     # find link we sent to user via Twilio
     token = extract_trigger_sms(
@@ -72,7 +72,7 @@ def test_redo_kyc(sandbox_tenant, twilio):
     timeline = get(
         f"entities/{sandbox_user.fp_id}/timeline",
         None,
-        sandbox_user.tenant.sk.key,
+        *sandbox_user.tenant.db_auths,
     )
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 2

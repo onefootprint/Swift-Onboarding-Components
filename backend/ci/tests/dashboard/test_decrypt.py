@@ -24,7 +24,7 @@ def test_tenant_decrypt(sandbox_user):
         for di, value in attributes.items():
             assert sandbox_user.client.decrypted_data[di] == value
 
-        access_event = latest_access_event_for(sandbox_user.fp_id, tenant.sk)
+        access_event = latest_access_event_for(sandbox_user.fp_id, tenant)
         assert set(access_event["targets"]) == set(attributes)
 
 
@@ -57,7 +57,7 @@ def test_tenant_document_decrypt_no_permissions(sandbox_user):
         "reason": "Not doing a hecking decrypt",
     }
     # confirm they didn't auth identity_document
-    body = get(f"entities/{sandbox_user.fp_id}", None, tenant.sk.key)
+    body = get(f"entities/{sandbox_user.fp_id}", None, *tenant.db_auths)
     assert not "id.dob" in body["decryptable_attributes"]
 
     post(
@@ -103,7 +103,7 @@ def test_tenant_selfie_decrypt(
     assert resp["document.drivers_license.selfie.image"] == test_image_dl_selfie
     assert resp["document.drivers_license.front.mime_type"] == "image/png"
 
-    access_event = latest_access_event_for(user.fp_id, sandbox_tenant.sk)
+    access_event = latest_access_event_for(user.fp_id, sandbox_tenant)
     assert set(access_event["targets"]) == {
         "document.drivers_license.front.image",
         "document.drivers_license.back.image",

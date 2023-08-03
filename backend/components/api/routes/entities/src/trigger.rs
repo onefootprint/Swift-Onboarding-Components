@@ -1,8 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
@@ -43,7 +41,7 @@ pub async fn post(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
     request: web::Json<TriggerRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let TriggerRequest { trigger, note } = request.into_inner();

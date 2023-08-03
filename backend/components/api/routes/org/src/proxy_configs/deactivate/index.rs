@@ -1,10 +1,6 @@
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantSessionAuth};
-use crate::auth::Either;
-
+use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
 use crate::types::{EmptyResponse, JsonApiResponse};
-
 use crate::State;
-
 use db::models::proxy_config::ProxyConfig;
 use db::DbError;
 use newtypes::ProxyConfigId;
@@ -17,7 +13,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 #[actix::post("/org/proxy_configs/{proxy_config_id}/deactivate")]
 pub async fn post(
     state: web::Data<State>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
     proxy_config_id: web::Path<ProxyConfigId>,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;

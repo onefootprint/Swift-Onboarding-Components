@@ -1,8 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::request::CursorPaginationRequest;
 use crate::types::response::CursorPaginatedResponse;
@@ -31,14 +29,14 @@ type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 
 #[api_v2_operation(
     description = "View all access events for all users.",
-    tags(Organization, Preview)
+    tags(Organization, Private)
 )]
 #[get("/org/access_events")]
 async fn get(
     state: web::Data<State>,
     filters: web::Query<AccessEventRequest>,
     pagination: web::Query<CursorPaginationRequest<i64>>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> actix_web::Result<Json<CursorPaginatedResponse<AccessEventResponse, i64>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;
 

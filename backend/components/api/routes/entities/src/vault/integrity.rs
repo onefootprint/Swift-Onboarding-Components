@@ -6,8 +6,8 @@ use api_core::types::ResponseData;
 use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
 use newtypes::{
-    flat_api_object_map_type, FilterFunction, FpId, IntegritySigningKey, PiiBytes, PiiString,
-    VersionedDataIdentifier, HmacSha256Args,
+    flat_api_object_map_type, FilterFunction, FpId, HmacSha256Args, IntegritySigningKey, PiiBytes, PiiString,
+    VersionedDataIdentifier,
 };
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
@@ -31,12 +31,12 @@ flat_api_object_map_type!(
 //TODO: replace handler with regular decrypt func
 #[route_alias(actix::post(
     "/users/{fp_id}/vault/integrity",
-    tags(Users, Vault, PublicApi),
+    tags(Users, Vault, Preview),
     description = "Checks if provided data is valid before adding it to the vault."
 ))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Checks if provided data is valid before adding it to the vault.",
-    tags(Vault, Entities, Preview)
+    tags(Vault, Entities, Private)
 )]
 #[actix::post("/entities/{fp_id}/vault/integrity")]
 pub async fn post(
@@ -47,6 +47,7 @@ pub async fn post(
     insights: InsightHeaders,
 ) -> JsonApiResponse<IntegrityResponse> {
     // TODO: should we add a separate guard for checking integrity?
+    // This is incorrect - won't change though since we are deprecating this soon
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
     let IntegrityRequest { fields, signing_key } = request.into_inner();

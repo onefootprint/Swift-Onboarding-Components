@@ -8,8 +8,6 @@ use crate::types::JsonApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 
 use crate::State;
-use api_core::auth::tenant::TenantSessionAuth;
-use api_core::auth::Either;
 use api_core::types::ResponseData;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::TenantVw;
@@ -57,7 +55,7 @@ pub async fn delete(
     state: web::Data<State>,
     path: Path<FpId>,
     request: Json<DeleteRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: SecretTenantAuthContext,
     insight: InsightHeaders,
 ) -> JsonApiResponse<DeleteVaultResponse> {
     let fp_id = path.into_inner();

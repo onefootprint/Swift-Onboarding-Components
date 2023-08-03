@@ -1,8 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either as AuthEither;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
@@ -22,13 +20,13 @@ type BusinessOwnerListResponse = Vec<ApiBusinessOwner>;
 
 #[api_v2_operation(
     description = "Gets the beneficial owners of a business.",
-    tags(Businesses, Preview)
+    tags(Businesses, Private)
 )]
 #[get("/businesses/{fp_id}/owners")]
 pub async fn get(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
-    auth: AuthEither<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<BusinessOwnerListResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

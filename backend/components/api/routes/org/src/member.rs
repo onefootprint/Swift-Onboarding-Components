@@ -55,7 +55,7 @@ struct UpdateTenantUserRequest {
 async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantUserRequest>,
-    // Weird to take in an impersonation token here
+    // Weird to take in an impersonation token here, so we only take TenantRbAuth
     auth: TenantRbAuthContext,
 ) -> JsonApiResponse<api_wire_types::AuthOrgMember> {
     let scopes = auth.token_scopes();

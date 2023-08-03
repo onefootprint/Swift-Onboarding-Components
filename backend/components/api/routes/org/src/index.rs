@@ -1,6 +1,5 @@
+use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::{CheckTenantGuard, TenantSessionAuth};
-use crate::auth::tenant::{SecretTenantAuthContext, TenantGuard};
-use crate::auth::Either;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
@@ -20,7 +19,7 @@ use paperclip::actix::{self, api_v2_operation, web::Json};
 #[actix::get("/org")]
 pub async fn get(
     state: web::Data<State>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::Organization> {
     let auth = auth.check_guard(TenantGuard::Read)?; // No permissions needed to access this endpoint
     let tenant = auth.tenant().clone();

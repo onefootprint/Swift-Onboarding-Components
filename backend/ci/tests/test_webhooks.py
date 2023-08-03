@@ -25,7 +25,7 @@ def get_latest_webhook(hooky_url):
 
 def test_webhook_e2e(sandbox_tenant, twilio):
     # 1. get the svix app id
-    body = get("org/webhook_portal", None, sandbox_tenant.sk.key)
+    body = get("org/webhook_portal", None, *sandbox_tenant.db_auths)
     assert body["url"]
     assert body["app_id"]
     app_id = body["app_id"]

@@ -25,7 +25,7 @@ def configure_proxy(tenant, base_url):
     body = post(
         "org/proxy_configs/",
         data,
-        tenant.sk.key,
+        *tenant.db_auths,
     )
     assert body["id"]
     return body["id"]

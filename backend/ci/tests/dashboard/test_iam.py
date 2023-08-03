@@ -14,7 +14,7 @@ def test_deactivate_roles(sandbox_tenant, limited_role):
     Deactivate roles at this tenant that were created by previous integration testing runs.
     Otherwise, the users you want to see end up on the second page...
     """
-    body = get(f"org/roles", None, sandbox_tenant.auth_token)
+    body = get(f"org/roles", None, *sandbox_tenant.db_auths)
     roles_to_deactivate = (
         i
         for i in body["data"]
@@ -24,13 +24,13 @@ def test_deactivate_roles(sandbox_tenant, limited_role):
     for r in roles_to_deactivate:
         # Deactivate members using this role
         r_id = r["id"]
-        members = get(f"org/members", dict(role_ids=r_id), sandbox_tenant.auth_token)
+        members = get(f"org/members", dict(role_ids=r_id), *sandbox_tenant.db_auths)
         for m in members["data"]:
             m_id = m["id"]
             post(
                 f"org/members/{m_id}/deactivate",
                 None,
-                sandbox_tenant.auth_token,
+                *sandbox_tenant.db_auths,
             )
         # Deactivate api keys using this role
         data = dict(role_ids=r_id, status="enabled")
@@ -46,7 +46,7 @@ def test_deactivate_roles(sandbox_tenant, limited_role):
                     is_live,
                 )
         # Deactivate the role
-        post(f"org/roles/{r_id}/deactivate", None, sandbox_tenant.auth_token)
+        post(f"org/roles/{r_id}/deactivate", None, *sandbox_tenant.db_auths)
 
 
 @pytest.fixture(scope="session")
@@ -57,7 +57,7 @@ def limited_role(sandbox_tenant):
         name=f"Test limited role {suffix}",
         scopes=[{"kind": "read"}, {"kind": "write_entities"}],
     )
-    body = post("org/roles", role_data, sandbox_tenant.auth_token)
+    body = post("org/roles", role_data, *sandbox_tenant.db_auths)
     assert body["name"] == role_data["name"]
     assert set(i["kind"] for i in body["scopes"]) == set(
         i["kind"] for i in role_data["scopes"]
@@ -132,7 +132,7 @@ def test_get_members(
     expected_user1,
     expected_user2,
 ):
-    body = get(f"org/members", filters, sandbox_tenant.auth_token)
+    body = get(f"org/members", filters, *sandbox_tenant.db_auths)
     assert any(u["id"] == tenant_user["id"] for u in body["data"]) == expected_user1
     assert any(u["id"] == tenant_user2["id"] for u in body["data"]) == expected_user2
 
@@ -149,7 +149,7 @@ def test_get_members_pagination(
         body = get(
             f"org/members",
             dict(search="custom_it_user", page_size=1, page=i),
-            sandbox_tenant.auth_token,
+            *sandbox_tenant.db_auths,
         )
         assert len(body["data"]) == 1
         assert body["data"][0]["id"] == ORDERED_USERS[i]["id"]
@@ -163,7 +163,7 @@ def test_get_members_pagination(
     body = get(
         f"org/members",
         dict(search="custom_it_user", page_size=1),
-        sandbox_tenant.auth_token,
+        *sandbox_tenant.db_auths,
     )
     assert len(body["data"]) == 1
     assert body["data"][0]["id"] == tenant_user["id"]
@@ -185,7 +185,7 @@ def test_get_members_filter_role_id(tenant_user, tenant_user2, sandbox_tenant):
     ]
 
     for filters, expected_user1, expected_user2 in tests:
-        body = get(f"org/members", filters, sandbox_tenant.auth_token)
+        body = get(f"org/members", filters, *sandbox_tenant.db_auths)
         assert any(u["id"] == tenant_user["id"] for u in body["data"]) == expected_user1
         assert (
             any(u["id"] == tenant_user2["id"] for u in body["data"]) == expected_user2
@@ -196,11 +196,11 @@ def test_update_name(sandbox_tenant):
     first_name = f"Footprint {_gen_random_n_digit_number(5)}"
     last_name = f"Integration Testing {_gen_random_n_digit_number(5)}"
     data = dict(first_name=first_name, last_name=last_name)
-    body = patch(f"org/member", data, sandbox_tenant.auth_token)
+    body = patch(f"org/member", data, *sandbox_tenant.db_auths)
     assert body["first_name"] == first_name
     assert body["last_name"] == last_name
 
-    body = get(f"org/member", data, sandbox_tenant.auth_token)
+    body = get(f"org/member", data, *sandbox_tenant.db_auths)
     assert body["first_name"] == first_name
     assert body["last_name"] == last_name
 
@@ -208,9 +208,9 @@ def test_update_name(sandbox_tenant):
 def test_update_user_role(sandbox_tenant, tenant_user, limited_role):
     user_id = tenant_user["id"]
     user_data = dict(role_id=limited_role["id"])
-    patch(f"org/members/{user_id}", user_data, sandbox_tenant.auth_token)
+    patch(f"org/members/{user_id}", user_data, *sandbox_tenant.db_auths)
 
-    body = get(f"org/members", None, sandbox_tenant.auth_token)
+    body = get(f"org/members", None, *sandbox_tenant.db_auths)
     user = next(u for u in body["data"] if u["id"] == user_id)
     assert user["role"]["id"] == limited_role["id"]
 
@@ -220,7 +220,7 @@ def test_cannot_edit_current_user(sandbox_tenant, limited_role):
     patch(
         f"org/members/{user_id}",
         dict(role_id=limited_role["id"]),
-        sandbox_tenant.auth_token,
+        *sandbox_tenant.db_auths,
         status_code=400,
     )
 
@@ -230,7 +230,7 @@ def test_cannot_deactivate_current_user(sandbox_tenant):
     post(
         f"org/members/{user_id}/deactivate",
         None,
-        sandbox_tenant.auth_token,
+        *sandbox_tenant.db_auths,
         status_code=400,
     )
 
@@ -258,7 +258,7 @@ def test_get_roles(
     tenant_user2
     tenant_user3
 
-    body = get(f"org/roles", filters, sandbox_tenant.auth_token)
+    body = get(f"org/roles", filters, *sandbox_tenant.db_auths)
     assert any(u["id"] == admin_role["id"] for u in body["data"]) == expected_admin_role
     assert (
         any(u["id"] == limited_role["id"] for u in body["data"])
@@ -269,7 +269,7 @@ def test_get_roles(
         limited_role = next(u for u in body["data"] if u["id"] == limited_role["id"])
         # Check num_active_users
         body = get(
-            "org/members", dict(role_ids=limited_role["id"]), sandbox_tenant.auth_token
+            "org/members", dict(role_ids=limited_role["id"]), *sandbox_tenant.db_auths
         )
         expected_num_users = len(body["data"])
         assert limited_role["num_active_users"] == expected_num_users
@@ -283,9 +283,9 @@ def test_update_roles(sandbox_tenant, limited_role, admin_role):
         name=f"New role name {suffix}",
         scopes=[{"kind": "read"}, {"kind": "onboarding_configuration"}],
     )
-    patch(f"org/roles/{role_id}", patch_data, sandbox_tenant.auth_token)
+    patch(f"org/roles/{role_id}", patch_data, *sandbox_tenant.db_auths)
 
-    body = get("org/roles", None, sandbox_tenant.auth_token)
+    body = get("org/roles", None, *sandbox_tenant.db_auths)
     role_ids = set(r["id"] for r in body["data"])
     assert role_id in role_ids
     assert admin_role["id"] in role_ids
@@ -305,7 +305,7 @@ def test_cant_update_admin_role(sandbox_tenant, admin_role):
     patch(
         f"org/roles/{role_id}",
         patch_data,
-        sandbox_tenant.auth_token,
+        *sandbox_tenant.db_auths,
         status_code=400,
     )
 
@@ -319,28 +319,28 @@ def test_deactivate_role_and_user(
     user_id3 = tenant_user3["id"]
     # Make sure the tenant_user is using the limited role
     user_data = dict(role_id=limited_role["id"])
-    patch(f"org/members/{user_id}", user_data, sandbox_tenant.auth_token)
+    patch(f"org/members/{user_id}", user_data, *sandbox_tenant.db_auths)
 
     # Can't deactivate role that has activate users
     post(
         f"org/roles/{role_id}/deactivate",
         None,
-        sandbox_tenant.auth_token,
+        *sandbox_tenant.db_auths,
         status_code=400,
     )
 
     # So we deactivate the users
-    post(f"org/members/{user_id}/deactivate", None, sandbox_tenant.auth_token)
-    post(f"org/members/{user_id2}/deactivate", None, sandbox_tenant.auth_token)
-    post(f"org/members/{user_id3}/deactivate", None, sandbox_tenant.auth_token)
+    post(f"org/members/{user_id}/deactivate", None, *sandbox_tenant.db_auths)
+    post(f"org/members/{user_id2}/deactivate", None, *sandbox_tenant.db_auths)
+    post(f"org/members/{user_id3}/deactivate", None, *sandbox_tenant.db_auths)
 
     # And now we can deactivate it
-    post(f"org/roles/{role_id}/deactivate", None, sandbox_tenant.auth_token)
+    post(f"org/roles/{role_id}/deactivate", None, *sandbox_tenant.db_auths)
 
     # Make sure the deactivated user isn't displayed anymore
-    body = get("org/members", None, sandbox_tenant.auth_token)
+    body = get("org/members", None, *sandbox_tenant.db_auths)
     assert user_id not in set(u["id"] for u in body["data"])
 
     # Make sure the deactivated role isn't displayed anymore
-    body = get("org/roles", None, sandbox_tenant.auth_token)
+    body = get("org/roles", None, *sandbox_tenant.db_auths)
     assert role_id not in set(r["id"] for r in body["data"])

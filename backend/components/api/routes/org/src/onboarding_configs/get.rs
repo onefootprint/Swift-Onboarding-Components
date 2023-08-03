@@ -1,5 +1,4 @@
 use crate::auth::ob_config::ObConfigAuth;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::{
     tenant::{CheckTenantGuard, TenantSessionAuth},
@@ -75,7 +74,7 @@ async fn get_list(
     state: web::Data<State>,
     filters: web::Query<OnboardingConfigFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::OnboardingConfiguration>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
@@ -117,7 +116,7 @@ async fn get_list(
 async fn get_detail(
     state: web::Data<State>,
     ob_config_id: web::Path<ObConfigurationId>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
