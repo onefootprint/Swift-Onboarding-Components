@@ -3,7 +3,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoFingerprint16 = ({
+const IcoQuestionMark24 = ({
   color = 'primary',
   className,
   testID,
@@ -11,8 +11,8 @@ const IcoFingerprint16 = ({
   const theme = useTheme();
   return (
     <svg
-      width={16}
-      height={16}
+      width={24}
+      height={24}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
@@ -20,13 +20,13 @@ const IcoFingerprint16 = ({
       aria-hidden="true"
     >
       <path
-        d="M14 14V8c0-2.144-1.164-4.17-2.894-5.172M2.01 10.276V14M2.01 8.207C1.803 4.276 4.808 2 8.005 2M8.005 5.31c1.484 0 2.687 1.035 2.687 2.897M10.692 10.276v1.241M5.318 11.104v1.24C5.318 13.38 4.49 14 4.49 14M7.798 8.62v2.897c0 1.449.662 2.483 2.48 2.483M5.62 6.759A2.68 2.68 0 0 0 5.318 8v1.034"
+        d="M10.234 9.25a2.248 2.248 0 0 1 4.098.147 2.25 2.25 0 0 1-.503 2.456c-.5.493-1.108 1.025-1.402 1.65M12.25 16.5v.01m0 2.99a7.25 7.25 0 1 1 0-14.498 7.25 7.25 0 0 1 0 14.498Z"
         stroke={theme.color[color]}
-        strokeWidth={1.4}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
     </svg>
   );
 };
-export default IcoFingerprint16;
+export default IcoQuestionMark24;

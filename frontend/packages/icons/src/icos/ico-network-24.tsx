@@ -3,11 +3,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoFingerprint24 = ({
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoNetwork24 = ({ color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -20,7 +16,7 @@ const IcoFingerprint24 = ({
       aria-hidden="true"
     >
       <path
-        d="M18.75 18.75V12c0-2.412-1.31-4.692-3.256-5.819m-10.233 8.38v4.189M5.261 12.233C5.03 7.81 8.41 5.25 12.006 5.25M12.006 8.974c1.67 0 3.023 1.164 3.023 3.259M15.029 14.56v1.397M8.982 15.492v1.396c0 1.164-.93 1.862-.93 1.862M11.773 12.698v3.259c0 1.63.744 2.793 2.79 2.793M9.323 10.604c-.218.417-.34.892-.34 1.396v1.164"
+        d="M8 8h.01M8 16h.01M16 8h.01M16 16h.01m-2.76-4a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Zm0-6a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Zm6 6a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Zm-12 0a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Zm6 6a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Z"
         stroke={theme.color[color]}
         strokeWidth={1.5}
         strokeLinecap="round"
@@ -29,4 +25,4 @@ const IcoFingerprint24 = ({
     </svg>
   );
 };
-export default IcoFingerprint24;
+export default IcoNetwork24;

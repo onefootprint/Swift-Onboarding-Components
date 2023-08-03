@@ -3,12 +3,12 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoMaximize16 = ({ color = 'primary', className, testID }: IconProps) => {
+const IcoFlask24 = ({ color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
-      width={16}
-      height={16}
+      width={24}
+      height={24}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
@@ -16,13 +16,13 @@ const IcoMaximize16 = ({ color = 'primary', className, testID }: IconProps) => {
       aria-hidden="true"
     >
       <path
-        d="M1.958 10.292v3.75m0 0h3.75m-3.75 0 4.584-4.584m7.5-3.75v-3.75m0 0h-3.75m3.75 0L9.458 6.542"
+        d="M9.083 4.41h5.834m-7.948 9.333H17.03M10.25 4.41v3.408c0 .441-.125.873-.36 1.246l-4.554 7.213c-.905 1.432.124 3.3 1.818 3.3h9.692c1.694 0 2.723-1.868 1.818-3.3L14.11 9.064a2.337 2.337 0 0 1-.36-1.246V4.41"
         stroke={theme.color[color]}
-        strokeWidth={1.4}
+        strokeWidth={1.5}
+        strokeMiterlimit={10}
         strokeLinecap="round"
-        strokeLinejoin="round"
       />
     </svg>
   );
 };
-export default IcoMaximize16;
+export default IcoFlask24;

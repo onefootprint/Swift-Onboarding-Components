@@ -3,12 +3,16 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoMinimize24 = ({ color = 'primary', className, testID }: IconProps) => {
+const IcoQuestionMark16 = ({
+  color = 'primary',
+  className,
+  testID,
+}: IconProps) => {
   const theme = useTheme();
   return (
     <svg
-      width={24}
-      height={24}
+      width={17}
+      height={17}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
@@ -17,7 +21,7 @@ const IcoMinimize24 = ({ color = 'primary', className, testID }: IconProps) => {
     >
       <g clipPath="url(#prefix__a)">
         <path
-          d="M10.25 18.25v-4.5m0 0h-4.5m4.5 0-5.5 5.5m9-13.5v4.5m0 0h4.5m-4.5 0 5.5-5.5"
+          d="M6.622 5.553a2.015 2.015 0 0 1 2.932-.78 2.017 2.017 0 0 1 .291 3.113c-.448.442-.993.92-1.257 1.48m-.158 2.687v.008m0 2.681a6.5 6.5 0 1 1 0-12.998 6.5 6.5 0 0 1 0 12.998Z"
           stroke={theme.color[color]}
           strokeWidth={1.5}
           strokeLinecap="round"
@@ -26,10 +30,10 @@ const IcoMinimize24 = ({ color = 'primary', className, testID }: IconProps) => {
       </g>
       <defs>
         <clipPath id="prefix__a">
-          <path fill="#fff" d="M0 0h24v24H0z" />
+          <path fill="#fff" transform="translate(.43 .242)" d="M0 0h16v16H0z" />
         </clipPath>
       </defs>
     </svg>
   );
 };
-export default IcoMinimize24;
+export default IcoQuestionMark16;
