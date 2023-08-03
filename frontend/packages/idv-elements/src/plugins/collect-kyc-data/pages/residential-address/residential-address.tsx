@@ -57,7 +57,10 @@ const ResidentialAddress = ({
   const isCityDisabled = data[IdDI.city]?.disabled;
   const isStateDisabled = data[IdDI.state]?.disabled;
   const isZipDisabled = data[IdDI.zip]?.disabled;
-  const isCountryDisabled = data[IdDI.country]?.disabled;
+
+  // disabling country field for now as per https://linear.app/footprint/issue/FP-4793/[general-bifrost]-bifrost-has-country-picker-but-only-fields-for-us
+  // const isCountryDisabled = data[IdDI.country]?.disabled;
+  const isCountryDisabled = true;
 
   const countryVal = data[IdDI.country]?.value;
   const defaultCountry =

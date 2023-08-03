@@ -28,6 +28,7 @@ const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
           }}
           placeholder={t('placeholder')}
           value={field.value}
+          hint={t('disabled-hint')}
         />
       )}
     />

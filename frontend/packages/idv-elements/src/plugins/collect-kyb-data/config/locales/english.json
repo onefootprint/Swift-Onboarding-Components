@@ -78,7 +78,8 @@
         "country": {
           "label": "Country",
           "placeholder": "Select",
-          "error": "Country cannot be empty"
+          "error": "Country cannot be empty",
+          "us-only-hint": "Only US businesses are supported at the moment."
         },
         "zip": {
           "label": "Zip code",

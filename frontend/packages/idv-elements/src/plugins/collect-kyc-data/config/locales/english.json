@@ -69,7 +69,8 @@
         "country": {
           "label": "Country",
           "placeholder": "Select",
-          "error": "Country cannot be empty"
+          "error": "Country cannot be empty",
+          "disabled-hint": "We only support addresses in the United States at the moment."
         },
         "zipCode": {
           "label": "Zip code",

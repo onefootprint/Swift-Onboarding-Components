@@ -26,6 +26,9 @@ const CountryField = ({ onChange }: CountryFieldProps) => {
           }}
           placeholder={t('placeholder')}
           value={field.value}
+          // hardcode disabled until we support other countries
+          disabled
+          hint={t('us-only-hint')}
         />
       )}
     />
