@@ -5,7 +5,7 @@ import type { Hint } from '../../types/components';
 const hint: Hint = {
   states: {
     default: {
-      color: textColor.secondary,
+      color: textColor.tertiary,
     },
     error: {
       color: textColor.error,
