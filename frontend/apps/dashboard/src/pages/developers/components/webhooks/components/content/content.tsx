@@ -17,7 +17,7 @@ export type ContentProps = {
 };
 
 const Content = ({ data }: ContentProps) => (
-  <AppPortal fullSize fontFamily="DM Sans" url={data.url} />
+  <AppPortal fullSize fontFamily="DM Sans" url={data.url} darkMode />
 );
 
 export default Content;

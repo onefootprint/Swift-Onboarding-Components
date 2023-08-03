@@ -1,7 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-import FootprintDevTools, {
-  ObserveCollectorProvider,
-} from '@onefootprint/dev-tools';
+import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { createGlobalStyle, css } from '@onefootprint/styled';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { Analytics } from '@vercel/analytics/react';
@@ -48,8 +46,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       </Head>
       <ObserveCollectorProvider appName="dashboard">
         <ReactQueryProvider>
-          <DesignSystemProvider theme={themes.light}>
-            <FootprintDevTools />
+          <DesignSystemProvider theme={themes.dark}>
             <GlobalStyle />
             <ErrorBoundary>
               <Layout name={pageProps.layout}>

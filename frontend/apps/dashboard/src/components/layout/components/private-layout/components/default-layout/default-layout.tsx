@@ -6,6 +6,7 @@ import {
   IcoStore16,
   IcoUsers16,
   LogoFpCompact,
+  ThemedLogoFpCompact,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, Tab, Tabs, Typography } from '@onefootprint/ui';
@@ -50,7 +51,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
           <Footprint>
             <Link href="/users" aria-label={t('users')}>
               <i>
-                <LogoFpCompact />
+                <ThemedLogoFpCompact color="primary" />
               </i>
             </Link>
             <NavDropdown />
