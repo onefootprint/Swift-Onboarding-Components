@@ -63,7 +63,7 @@ const Container = styled.div`
         max-height: calc(100% - (2 * ${theme.spacing[9]}));
         margin: ${theme.spacing[9]};
         border-radius: ${theme.borderRadius.default};
-        max-width: 600px;
+        max-width: 480px;
     `}
     }
 
@@ -77,7 +77,7 @@ const Container = styled.div`
       right: 0;
 
       ${media.greaterThan('md')`
-        width: 460px;
+        width: 480px;
         border-radius: 0;
     `}
     }

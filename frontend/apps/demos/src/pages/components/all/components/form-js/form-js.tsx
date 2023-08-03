@@ -3,9 +3,8 @@ import footprint, {
   FootprintFormType,
   FootprintVariant,
 } from '@onefootprint/footprint-js';
-import styled from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 const authToken = 'tok_SkgpMYfPAqkl3AaLrtsQsfNxKqxbWF88LN'; // process.env.NEXT_PUBLIC_COMPONENTS_AUTH_TOKEN as string;
 
@@ -22,31 +21,31 @@ const FormJsIntegration = () => {
     return component;
   };
 
-  useEffect(() => {
-    const component = launchForm('inline', 'my-form');
+  // useEffect(() => {
+  //   const component = launchForm('inline', 'my-form');
 
-    return () => {
-      component.destroy();
-    };
-  }, []);
+  //   return () => {
+  //     component.destroy();
+  //   };
+  // }, []);
 
   return (
     <>
       <Button onClick={() => launchForm('modal')}>Modal</Button>
       <Button onClick={() => launchForm('drawer')}>Drawer</Button>
-      <Container id="my-form" />
+      {/* <Container id="my-form" /> */}
     </>
   );
 };
 
-const Container = styled.div`
-  width: 500px;
-  min-width: 500px;
-  height: 500px;
-  min-height: 500px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
+// const Container = styled.div`
+//   width: 500px;
+//   min-width: 500px;
+//   height: 500px;
+//   min-height: 500px;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+// `;
 
 export default FormJsIntegration;

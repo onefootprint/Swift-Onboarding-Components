@@ -49,7 +49,7 @@ const VerifyButton = ({
 
   return (
     <button
-      className="footprint-button"
+      className="footprint-verify-button"
       type="button"
       onClick={handleClick}
       data-testid={testID}

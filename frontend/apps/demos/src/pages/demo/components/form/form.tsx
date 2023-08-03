@@ -191,7 +191,7 @@ const FormContainer = styled.div`
     margin-right: auto;
     max-width: 450px;
 
-    .footprint-button {
+    .footprint-verify-button {
       width: 100%;
     }
   `}

@@ -3,7 +3,7 @@ import React from 'react';
 
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
 
-const VerifyReactIntegration = () => (
+const VerifyButtonReactIntegration = () => (
   <>
     <FootprintVerifyButton
       label="Verify with Footprint (modal)"
@@ -17,4 +17,4 @@ const VerifyReactIntegration = () => (
   </>
 );
 
-export default VerifyReactIntegration;
+export default VerifyButtonReactIntegration;

@@ -1,6 +1,6 @@
 import { ComponentKind, Props, VerifyProps } from '../types/components';
 import { getEncodedAppearance } from './appearance-utils';
-import { getDefaultVariantForKind } from './variant-utils';
+import { getDefaultVariantForKind } from './prop-utils';
 
 // TODO: (belce) in the future combine these onto the same app?
 const getURL = (props: Props) => {

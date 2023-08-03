@@ -10,12 +10,13 @@ export interface Component {
   destroy: () => void;
 }
 
-export type Props = FormProps | VerifyProps | RenderProps;
+export type Props = FormProps | VerifyProps | VerifyButtonProps | RenderProps;
 
 export enum ComponentKind {
   Verify = 'verify',
   Form = 'form',
   Render = 'render',
+  VerifyButton = 'verify-button',
 }
 
 export type Variant = 'modal' | 'drawer' | 'inline';
@@ -36,6 +37,21 @@ export interface VerifyProps extends PropsBase {
   kind: ComponentKind.Verify;
   variant?: 'modal' | 'drawer';
   publicKey: string;
+  userData?: UserData;
+  options?: VerifyOptions;
+  onComplete?: (validationToken: string) => void;
+  onCancel?: () => void;
+  onClose?: () => void;
+}
+
+export interface VerifyButtonProps extends PropsBase {
+  kind: ComponentKind.VerifyButton;
+  variant: 'inline';
+  containerId: string;
+  dialogVariant?: 'modal' | 'drawer';
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  label?: string;
+  publicKey?: string;
   userData?: UserData;
   options?: VerifyOptions;
   onComplete?: (validationToken: string) => void;

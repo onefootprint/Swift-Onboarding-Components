@@ -1,11 +1,12 @@
 import { RequiredCallbacksByComponent } from './constants/callbacks';
 import { ComponentKind, Footprint, Props, Variant } from './types/components';
 import { getAppearanceForVanilla } from './utils/appearance-utils';
-import checkIsKindValid from './utils/check-is-kind-valid';
+import getUniqueId from './utils/get-unique-id';
 import {
+  checkIsKindValid,
   checkIsVariantValid,
   getDefaultVariantForKind,
-} from './utils/variant-utils';
+} from './utils/prop-utils';
 
 const defer = (callback: () => void) => {
   window.setTimeout(callback, 0);
@@ -37,7 +38,7 @@ const vanillaIntegration = (footprint: Footprint) => {
     return callbacks;
   };
 
-  const renderComponent = (container: Element) => {
+  const renderComponent = (container: HTMLElement) => {
     const kind = container.getAttribute('data-kind') as ComponentKind;
     checkIsKindValid(kind);
 
@@ -61,23 +62,18 @@ const vanillaIntegration = (footprint: Footprint) => {
         '`data-props` on the footprint element has to be a valid JSON object stringified.',
       );
     }
-    const containerId = variant === 'inline' ? container.id : undefined;
+    const containerId = getUniqueId();
+    container.setAttribute('id', containerId);
 
-    const addComponentToDom = () => {
-      if (typeof window === 'undefined') return;
-
-      const component = footprint.init({
-        kind,
-        variant,
-        appearance,
-        containerId,
-        ...callbacks,
-        ...props,
-      } as Props);
-      component.render();
-    };
-
-    defer(addComponentToDom);
+    const component = footprint.init({
+      kind,
+      variant,
+      appearance,
+      containerId: container.id,
+      ...callbacks,
+      ...props,
+    } as Props);
+    component.render();
   };
 
   const handlePageLoaded = () => {
@@ -86,13 +82,25 @@ const vanillaIntegration = (footprint: Footprint) => {
     if (!containers.length) {
       return;
     }
-
     containers.forEach(container => {
-      renderComponent(container);
+      renderComponent(container as HTMLElement);
     });
   };
 
-  document.addEventListener('DOMContentLoaded', () => handlePageLoaded());
+  // Render the component when the page is loaded
+  // If the page is loaded dynamically, DOMContentLoaded will fire
+  // before the page content is fully loaded, so also listen for readyState instead
+  document.addEventListener('DOMContentLoaded', () => defer(handlePageLoaded));
+  // TODO: alternative to DOMContentLoaded for SSR
+  // if (document.readyState === 'complete') {
+  //   defer(handlePageLoaded);
+  // } else {
+  //   document.onreadystatechange = () => {
+  //     if (document.readyState === 'complete') {
+  //       defer(handlePageLoaded);
+  //     }
+  //   };
+  // }
 };
 
 export default vanillaIntegration;

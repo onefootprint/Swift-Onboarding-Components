@@ -1,31 +1,41 @@
 import './styles.css';
 
-import initIframeManager from './iframe-manager';
 import { Component, Footprint, Props } from './types/components';
+import initIframe from './utils/iframe-utils/iframe';
+import initIframeManager from './utils/iframe-utils/iframe-manager';
+import { Iframe } from './utils/iframe-utils/types';
 
-const initFootprint = (): Footprint => {
+const getFootprint = (): Footprint => {
+  const manager = initIframeManager();
+
   const init = (props: Props): Component => {
-    let isRendered = false;
+    let iframe = initIframe(props);
 
-    const render = async (): Promise<void> => {
-      if (isRendered) {
-        return;
-      }
-      isRendered = true;
-      await iframeManager.render();
+    const destroy = async () => {
+      manager.remove(iframe);
+      await iframe.destroy();
     };
 
-    const destroy = async (): Promise<void> => {
-      if (!isRendered) {
-        return;
-      }
-      iframeManager.destroy();
-      isRendered = false;
+    const destroySecondary = async (secondary: Iframe) => {
+      manager.removeSecondary(iframe, secondary);
+      await secondary.destroy();
     };
 
-    const iframeManager = initIframeManager(props, () => {
-      isRendered = false;
-    });
+    const renderSecondary = async (secondaryProps: Props) => {
+      let secondaryIframe = initIframe(secondaryProps);
+      secondaryIframe = manager.getOrCreateSecondary(iframe, secondaryIframe);
+      secondaryIframe.registerEvent('destroy', () => {
+        destroySecondary(secondaryIframe);
+      });
+      secondaryIframe.render();
+    };
+
+    const render = async () => {
+      iframe = manager.getOrCreate(iframe);
+      iframe.registerEvent('destroy', destroy);
+      iframe.registerEvent('renderSecondary', renderSecondary);
+      await iframe.render();
+    };
 
     return {
       render,
@@ -38,5 +48,5 @@ const initFootprint = (): Footprint => {
   };
 };
 
-const footprint = initFootprint();
+const footprint = getFootprint();
 export default footprint;

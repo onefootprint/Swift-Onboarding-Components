@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 
-const Vanilla = dynamic(() => import('./form-vanilla'), {
+const FormVanilla = dynamic(() => import('./form-vanilla'), {
   ssr: false,
 });
 
-export default Vanilla;
+export default FormVanilla;

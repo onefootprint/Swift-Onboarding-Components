@@ -10,17 +10,10 @@ const LOADING_INDICATOR_ID_PREFIX = 'footprint-loading-indicator';
 export const getDomElementId = (elementId: string, uniqueId: string) =>
   `${elementId}-${uniqueId}`;
 
-export const getUniqueDomId = () => {
-  // Generate a unique ID for DOM elements to avoid collisions between different footprint components
-  const randomSeed = Math.floor(Math.random() * 1000);
-  return `${randomSeed}`;
-};
-
-export const removeDOMElements = (uniqueId: string) => {
+export const removeDOMElements = async (uniqueId: string) => {
   removeLoader(uniqueId);
   removeInlineContainer(uniqueId);
-  removeOverlay(uniqueId);
-  removeOverlayContainer(uniqueId);
+  await removeOverlayContainer(uniqueId);
 };
 
 export const createOverlayContainer = (uniqueId: string) => {
@@ -35,12 +28,42 @@ export const createOverlayContainer = (uniqueId: string) => {
   return container;
 };
 
-const removeOverlayContainer = (uniqueId: string) => {
+const removeOverlayContainer = async (uniqueId: string) => {
   const id = getDomElementId(OVERLAY_CONTAINER_ID_PREFIX, uniqueId);
   const overlayContainer = document.getElementById(id);
-  if (overlayContainer) {
-    overlayContainer.remove();
+  if (!overlayContainer) {
+    return;
   }
+  const drawerIframe = overlayContainer.querySelector(
+    'iframe.footprint-drawer',
+  );
+  if (drawerIframe) {
+    drawerIframe?.classList.add('footprint-drawer-closing');
+    await new Promise(resolve => {
+      setTimeout(resolve, 300); // Wait for animation to finish
+    });
+  }
+  const modalIframe = overlayContainer.querySelector('iframe.footprint-modal');
+  if (modalIframe) {
+    modalIframe?.classList.add('footprint-modal-closing');
+    await new Promise(resolve => {
+      setTimeout(resolve, 100); // Wait for animation to finish
+    });
+  }
+
+  const overlayId = getDomElementId(OVERLAY_ID_PREFIX, uniqueId);
+  const overlay = document.getElementById(overlayId);
+  if (!overlay) {
+    return;
+  }
+  overlay.classList.add('footprint-overlay-fading');
+  await new Promise(resolve => {
+    setTimeout(resolve, 200); // Wait for animation to finish
+  });
+  overlayContainer.remove();
+  overlay.remove();
+
+  document.body.classList.remove(BODY_LOCKED_CLASS);
 };
 
 export const createInlineContainer = (
@@ -85,15 +108,6 @@ export const createOverlay = (container: HTMLElement, uniqueId: string) => {
   overlay.classList.add(OVERLAY_CLASS);
   container.appendChild(overlay);
   return overlay;
-};
-
-const removeOverlay = (uniqueId: string) => {
-  document.body.classList.remove(BODY_LOCKED_CLASS);
-  const id = getDomElementId(OVERLAY_ID_PREFIX, uniqueId);
-  const overlay = document.getElementById(id);
-  if (overlay) {
-    overlay.remove();
-  }
 };
 
 const createLoadingIndicator = (id: string) => {

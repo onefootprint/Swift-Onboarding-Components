@@ -1,3 +1,4 @@
+import { FootprintVariant } from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
@@ -6,7 +7,7 @@ import React from 'react';
 
 type HeaderProps = {
   title?: string;
-  variant: 'modal' | 'inline' | 'drawer';
+  variant: FootprintVariant;
   onClose?: () => void;
 };
 

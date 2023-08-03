@@ -13,6 +13,7 @@ const VerifyJsIntegration = () => {
     });
     component.render();
   };
+
   return (
     <>
       <Button onClick={() => launchVerify('modal')}>Modal</Button>
