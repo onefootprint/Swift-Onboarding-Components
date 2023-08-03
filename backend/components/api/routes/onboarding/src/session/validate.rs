@@ -5,8 +5,7 @@ use crate::types::response::ResponseData;
 use crate::utils::session::AuthSession;
 use crate::State;
 use api_core::auth::session::user::ValidateUserToken;
-use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::Any;
+use api_core::auth::tenant::{CheckTenantGuard, TenantGuard};
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
@@ -26,7 +25,7 @@ pub async fn post(
     request: web::Json<ValidateRequest>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<ValidateResponse> {
-    let auth = auth.check_guard(Any)?;
+    let auth = auth.check_guard(TenantGuard::Onboarding)?;
 
     let session = AuthSession::get(&state, &request.validation_token)
         .await?

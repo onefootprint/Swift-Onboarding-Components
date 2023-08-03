@@ -30,28 +30,38 @@ pub enum TenantScope {
     Read,
     /// A special scope that gives permission to perform all actions.
     Admin,
+
     //
+    // Dashboard-user-only scopes
     //
-    // CAREFUL: The below scopes allow WRITE access to various related endpoints.
-    //
-    //
-    /// Allows adding and editing onboarding configurations
-    OnboardingConfiguration,
-    /// Allows adding, editing, and decrypting tenant API keys
+    /// Add, edit, and decrypt secret API keys and their roles
     ApiKeys,
-    /// Allows updating org settings, roles, and users
-    OrgSettings,
-    /// Allows updating and creating vault proxy configurations
+    /// Create and update vault proxy configurations
     ManageVaultProxy,
-    /// Allows invoking the vault proxy
-    InvokeVaultProxy { data: InvokeVaultProxyPermission },
-    /// Allows performing manual review actions on users, like making a new decision or adding an annotation
+    /// Manage webhook configuration
+    ManageWebhooks,
+    /// Perform review actions on users, like making a new decision, adding an annotation, or re-triggering KYC
     ManualReview,
-    /// Allows creating new users and updating existing entities' data
+    /// Create and update onboarding configurations
+    OnboardingConfiguration,
+    /// Update org settings, roles, and users
+    OrgSettings,
+
+    //
+    // API-KEY-ONLY SCOPES
+    //
+    /// Forward identity data to a CIP integration
+    CipIntegration,
+    /// Invoke a vault proxy
+    InvokeVaultProxy { data: InvokeVaultProxyPermission },
+    /// Run KYC checks on a vaulted user
+    TriggerKyc,
+    /// Create new vaults and update their information
     WriteEntities,
+    /// Perform actions related to onboarding users - created short-lived onboarding sessions and validate tokens returned from Footprint.js
+    Onboarding,
 
     /// Allows decrypting data attributes belonging to the listed CollectedDataOption
-    /// TODO: Should probably also add a DecryptAll here
     Decrypt { data: CollectedDataOption },
     /// Allows decrypting all custom attributes. TODO more fine-grained decryption controls
     DecryptCustom,
@@ -65,12 +75,38 @@ pub enum TenantScope {
     DecryptDocumentAndSelfie,
     /// Allows decrypting all data
     DecryptAll,
+}
 
-    /// Allows decrypting relevant identity data for forwarding to a CIP integration
-    CipIntegration,
+pub enum TenantRoleKind {
+    ApiKey,
+    DashboardUser,
+}
 
-    /// Allows manually triggering KYC for a user via API
-    TriggerKyc,
+impl TenantScope {
+    pub fn role_kind(&self) -> Vec<TenantRoleKind> {
+        match self {
+            Self::Read => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
+            Self::Admin => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
+            Self::Decrypt { .. } => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
+            Self::DecryptCustom => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
+            Self::DecryptDocument => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
+            Self::DecryptDocumentAndSelfie => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
+            Self::DecryptAll => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
+
+            Self::ApiKeys => vec![TenantRoleKind::DashboardUser],
+            Self::ManageVaultProxy => vec![TenantRoleKind::DashboardUser],
+            Self::ManageWebhooks => vec![TenantRoleKind::DashboardUser],
+            Self::ManualReview => vec![TenantRoleKind::DashboardUser],
+            Self::OnboardingConfiguration => vec![TenantRoleKind::DashboardUser],
+            Self::OrgSettings => vec![TenantRoleKind::DashboardUser],
+
+            Self::CipIntegration => vec![TenantRoleKind::ApiKey],
+            Self::InvokeVaultProxy { .. } => vec![TenantRoleKind::ApiKey],
+            Self::TriggerKyc => vec![TenantRoleKind::ApiKey],
+            Self::WriteEntities => vec![TenantRoleKind::ApiKey],
+            Self::Onboarding => vec![TenantRoleKind::ApiKey],
+        }
+    }
 }
 
 #[cfg(test)]

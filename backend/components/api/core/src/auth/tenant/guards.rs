@@ -24,6 +24,8 @@ pub enum TenantGuard {
     ManualReview,
     CipIntegration,
     TriggerKyc,
+    ManageWebhooks,
+    Onboarding,
 }
 
 impl TenantGuard {
@@ -40,6 +42,8 @@ impl TenantGuard {
             Self::ManualReview => TenantScope::ManualReview,
             Self::CipIntegration => TenantScope::CipIntegration,
             Self::TriggerKyc => TenantScope::TriggerKyc,
+            Self::ManageWebhooks => TenantScope::ManageWebhooks,
+            Self::Onboarding => TenantScope::Onboarding,
         }
     }
 }

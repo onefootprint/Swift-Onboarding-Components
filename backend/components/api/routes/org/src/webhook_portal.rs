@@ -14,7 +14,7 @@ async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<api_wire_types::WebhookPortalResponse> {
-    let auth = auth.check_guard(TenantGuard::Admin)?;
+    let auth = auth.check_guard(TenantGuard::ManageWebhooks)?;
     let is_live = auth.is_live()?;
 
     let PortalResponse { app_id, url, token } = state

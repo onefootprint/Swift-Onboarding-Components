@@ -1,16 +1,13 @@
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::Any;
-
 use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
-
 use crate::types::JsonApiResponse;
 use crate::utils::session::AuthSession;
 use crate::State;
-
 use api_core::auth::session::ob_config::OnboardingSession;
+use api_core::auth::tenant::TenantGuard;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::ObConfigurationId;
 use newtypes::SessionAuthToken;
@@ -38,7 +35,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<CreateOnboardingSessionRequest>,
 ) -> JsonApiResponse<ObConfigSessionToken> {
-    let auth = auth.check_guard(Any)?; // TODO add permissions when we have IAM for secret keys
+    let auth = auth.check_guard(TenantGuard::Onboarding)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
 
