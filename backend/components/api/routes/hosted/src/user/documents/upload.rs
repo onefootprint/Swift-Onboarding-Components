@@ -95,19 +95,13 @@ pub async fn post(
     let (e_data_key, s3_url) =
         seal_file_and_upload_to_s3(&state, &file, di.clone(), user_auth.user(), &su_id).await?;
 
-    // Check if we should be initiating requests (e.g. check if we are testing)
-    let should_initiate_reqs = decision::utils::get_fixture_data_decision(
-        state.feature_flag_client.clone(),
-        &vault,
-        wf,
-        &user_auth.tenant()?.id,
-    )?
-    .is_none();
-
     // Create uploads for the document
     let ob_id = user_auth.onboarding()?.id.clone();
     let vault2 = vault.clone();
     let wf_id = wf.id.clone();
+    let ff_client = state.feature_flag_client.clone();
+    let tenant_id = user_auth.tenant()?.id.clone();
+    let is_sandbox = id_doc.fixture_result.is_some();
     let (missing_sides, created_reqs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -135,6 +129,14 @@ pub async fn post(
                 .filter(|s| !existing_sides.contains(s))
                 .collect_vec();
 
+            // Check if we should be initiating requests (e.g. check if we are testing)
+            let should_initiate_reqs = decision::utils::should_initiate_requests_for_document(
+                ff_client,
+                &vault2,
+                &tenant_id,
+                id_doc.fixture_result,
+            )?;
+
             // Now that the document is created, either initiate IDV reqs or create fixture data
             let result = if should_initiate_reqs {
                 // Initiate IDV reqs once and only once for this id_doc
@@ -143,15 +145,17 @@ pub async fn post(
                 Some((decision_intent, doc_request, id_doc.id))
             } else {
                 if missing_sides.is_empty() {
-                    let fixture = id_doc.fixture_result;
                     // Create fixture data once all of the sides are uploaded
                     let ocr = serde_json::from_value(
-                        idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None),
+                        idv::incode::doc::response::FetchOCRResponse::fixture_response(None, None, None),
                     )?;
 
                     // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals
                     let fake_score_response =
-                        idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE(fixture).unwrap();
+                        idv::incode::doc::response::FetchScoresResponse::fixture_response(
+                            id_doc.fixture_result,
+                        )
+                        .map_err(idv::Error::from)?;
                     let res = serde_json::to_value(fake_score_response.clone())?;
                     let vres = save_vres_for_fixture_risk_signals(conn, &su_id, &vault2, &wf_id, res)?;
 
@@ -181,7 +185,7 @@ pub async fn post(
     let response = if let Some((di, doc_request, id_doc_id)) = created_reqs {
         // Not sandbox - make our request to vendors!
         let t_id = user_auth.scoped_user.tenant_id.clone();
-        handle_incode_request(&state, id_doc_id, t_id, di.id, vault, doc_request).await?
+        handle_incode_request(&state, id_doc_id, t_id, di.id, vault, doc_request, is_sandbox).await?
     } else {
         // Fixture response - we always complete successfully!
         let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
@@ -208,6 +212,7 @@ pub(in crate::user) async fn handle_incode_request(
     decision_intent_id: DecisionIntentId,
     vault: Vault,
     doc_request: DocumentRequest,
+    is_sandbox: bool,
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
 
@@ -225,8 +230,9 @@ pub(in crate::user) async fn handle_incode_request(
         state,
         tenant_id,
         // TODO: upstream this somewhere based on OBC
-        get_config_id(&state.config, doc_request.should_collect_selfie),
+        get_config_id(&state.config, doc_request.should_collect_selfie, is_sandbox),
         ctx,
+        is_sandbox,
     )
     .await?; // TODO: handle this with better requirement checking
 

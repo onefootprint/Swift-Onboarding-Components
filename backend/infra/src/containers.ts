@@ -139,6 +139,10 @@ export abstract class ServiceContainers {
         secretsStore.incodeSelfieFlowId.arn,
         secretsStore.incodeDocumentFlowId.arn,
         secretsStore.incodeBaseUrl.arn,
+        secretsStore.incodeDemoApiKey.arn,
+        secretsStore.incodeDemoSelfieFlowId.arn,
+        secretsStore.incodeDemoDocumentFlowId.arn,
+        secretsStore.incodeDemoBaseUrl.arn,
         secretsStore.middeskApiKey.arn,
         secretsStore.middeskWebhookSecret.arn,
         secretsStore.middeskBaseUrl.arn,
@@ -182,6 +186,10 @@ export abstract class ServiceContainers {
           incodeSelfieFlowId,
           incodeDocumentFlowId,
           incodeBaseUrl,
+          incodeDemoApiKey,
+          incodeDemoSelfieFlowId,
+          incodeDemoDocumentFlowId,
+          incodeDemoBaseUrl,
           middeskApiKey,
           middeskWebhookSecret,
           middeskBaseUrl,
@@ -299,6 +307,22 @@ export abstract class ServiceContainers {
               {
                 name: 'INCODE_BASE_URL',
                 valueFrom: incodeBaseUrl,
+              },
+              {
+                name: 'INCODE_DEMO_API_KEY',
+                valueFrom: incodeDemoApiKey,
+              },
+              {
+                name: 'INCODE_DEMO_SELFIE_FLOW_ID',
+                valueFrom: incodeDemoSelfieFlowId,
+              },
+              {
+                name: 'INCODE_DEMO_DOCUMENT_FLOW_ID',
+                valueFrom: incodeDemoDocumentFlowId,
+              },
+              {
+                name: 'INCODE_DEMO_BASE_URL',
+                valueFrom: incodeDemoBaseUrl,
               },
               {
                 name: 'MIDDESK_API_KEY',

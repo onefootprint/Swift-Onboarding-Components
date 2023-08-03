@@ -26,4 +26,6 @@ pub enum Error {
     ChronoParseError(#[from] chrono::ParseError),
     #[error("Results not ready")]
     ResultsNotReady,
+    #[error("Request indicated real result")]
+    FixtureResultMismatch,
 }

@@ -14,8 +14,8 @@ use db::{
     PgConn,
 };
 use newtypes::{
-    DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentId, OnboardingId, RiskSignalGroupKind,
-    ScopedVaultId, TenantId, VaultKind, VendorAPI, WorkflowFixtureResult,
+    DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentFixtureResult, IdentityDocumentId,
+    OnboardingId, RiskSignalGroupKind, ScopedVaultId, TenantId, VaultKind, VendorAPI, WorkflowFixtureResult,
 };
 
 use super::{sandbox, vendor};
@@ -58,6 +58,37 @@ pub fn get_fixture_data_decision(
         // In order to create production UVs, customers need us to flip a bit for them in PG on `tenant` (sandbox_restricted -> false)
         Ok(None)
     }
+}
+
+type ShouldInitiateRealDocumentRequests = bool;
+
+/// Determines whether production identity document requests should be made, and if not, what the outcome should be
+pub fn should_initiate_requests_for_document(
+    ff_client: Arc<dyn FeatureFlagClient>,
+    vault: &Vault,
+    tenant_id: &TenantId,
+    document_decision: Option<IdentityDocumentFixtureResult>,
+) -> ApiResult<ShouldInitiateRealDocumentRequests> {
+    // We allow identity documents to be tested in sandbox against incode demo environment, if a tenant is flagged in
+    // We use a flag since not all tenants should have this enabled by default (they might need to sign incode terms and be advised that they can only do this for testing purposes)
+    if !vault.is_live {
+        // TODO: frontend not merged yet, enable this when it is
+        // let d = document_decision
+        //     // Ensure that each sandbox vault has a fixture result - we don't want to make real
+        //     // requests for sandbox vaults
+        //     .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
+
+        let can_make_demo_incode_requests_in_sandbox =
+            ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(tenant_id));
+        let should_initiate_sandbox = matches!(document_decision, Some(IdentityDocumentFixtureResult::Real))
+            && can_make_demo_incode_requests_in_sandbox;
+        return Ok(should_initiate_sandbox);
+    // guard against prod vaults from providing document fixtures (we prevent this in the API route that starts the flow, but double checking never hurt nobody)
+    } else if document_decision.is_some() {
+        return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
+    }
+
+    Ok(true)
 }
 
 /// Helper to do some sanity checks when creating document verification requests

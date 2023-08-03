@@ -28,5 +28,6 @@ pub enum IdentityDocumentFixtureResult {
     /// Document was verified (e.g. not tampered, all checks passing)
     Pass,
     // TODO: could add other enums for different fail cases
+    Real,
 }
 crate::util::impl_enum_str_diesel!(IdentityDocumentFixtureResult);

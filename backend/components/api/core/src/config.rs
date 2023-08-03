@@ -285,6 +285,33 @@ pub struct IncodeConfig {
     pub document_flow_id: PiiString,
     #[envconfig(from = "INCODE_SELFIE_FLOW_ID")]
     pub selfie_flow_id: PiiString,
+
+    #[envconfig(from = "INCODE_DEMO_API_KEY")]
+    pub demo_api_key: PiiString,
+    #[envconfig(from = "INCODE_DEMO_BASE_URL")]
+    pub demo_base_url: PiiString,
+    #[envconfig(from = "INCODE_DEMO_DOCUMENT_FLOW_ID")]
+    pub demo_document_flow_id: PiiString,
+    #[envconfig(from = "INCODE_DEMO_SELFIE_FLOW_ID")]
+    pub demo_selfie_flow_id: PiiString,
+}
+
+impl IncodeConfig {
+    pub fn selfie_flow_id(&self, is_sandbox: bool) -> PiiString {
+        if is_sandbox {
+            self.demo_selfie_flow_id.clone()
+        } else {
+            self.selfie_flow_id.clone()
+        }
+    }
+
+    pub fn document_flow_id(&self, is_sandbox: bool) -> PiiString {
+        if is_sandbox {
+            self.demo_document_flow_id.clone()
+        } else {
+            self.document_flow_id.clone()
+        }
+    }
 }
 
 #[derive(Envconfig, Debug, Clone)]

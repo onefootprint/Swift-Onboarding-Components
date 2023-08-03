@@ -53,7 +53,7 @@ pub async fn post(
             }
             let vault = Vault::get(conn, &su_id)?;
             // Check we're in sandbox
-            if vault.sandbox_id.is_none() && fixture_result.is_some() {
+            if vault.is_live && fixture_result.is_some() {
                 return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
             }
             let args = NewIdentityDocumentArgs {

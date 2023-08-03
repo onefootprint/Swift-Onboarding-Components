@@ -149,21 +149,21 @@ impl FetchScoresResponse {
         )
     }
 
-    #[allow(non_snake_case)]
-    pub fn TEST_ONLY_FIXTURE(fixture: Option<IdentityDocumentFixtureResult>) -> Result<Self, IncodeError> {
+    pub fn fixture_response(fixture: Option<IdentityDocumentFixtureResult>) -> Result<Self, IncodeError> {
         let doc_opts = if let Some(f) = fixture {
             match f {
-                IdentityDocumentFixtureResult::Fail => DocTestOpts {
+                IdentityDocumentFixtureResult::Fail => Ok(DocTestOpts {
                     overall: IncodeStatus::Fail,
                     tamper: IncodeStatus::Fail,
                     fake: IncodeStatus::Fail,
                     ..Default::default()
-                },
-                IdentityDocumentFixtureResult::Pass => DocTestOpts::default(),
+                }),
+                IdentityDocumentFixtureResult::Pass => Ok(DocTestOpts::default()),
+                IdentityDocumentFixtureResult::Real => Err(IncodeError::FixtureResultMismatch),
             }
         } else {
-            DocTestOpts::default()
-        };
+            Ok(DocTestOpts::default())
+        }?;
         let resp: Self = serde_json::from_value(test_fixtures::incode_fetch_scores_response(doc_opts))?;
 
         Ok(resp)
@@ -389,8 +389,7 @@ impl FetchOCRResponse {
         Ok((today - dob).num_days() / 365)
     }
 
-    #[allow(non_snake_case)]
-    pub fn TEST_ONLY_FIXTURE(
+    pub fn fixture_response(
         first_name: Option<PiiString>,
         last_name: Option<PiiString>,
         dob: Option<i64>,

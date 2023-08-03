@@ -78,6 +78,14 @@ config:
         secure: v1:H5nhKgfH0nMLUp8e:YUE2teYkDPFEsaohxczRC4nlgYz958HAsXea/GXOhbQARzrUNTvLYSTLO+Y2db41n+70B3R8eIc=
       incodeBaseUrl:
         secure: v1:e/D91lOrER6lhRLR:/kc3JjCgTyA2DTIwOHVzZN0pKVMPQlxgAkVFVIusxG1lnL69aV/mdvuAvTgf/tSj
+      incodeDemoApiKey:
+        secure: v1:qkH4u5kyompAdYfp:KBEnGVSGc4wQlPrRktihLs2v6b3JIY3nVscN6SmQEBRGeoCarl/wb2PLmtnhCtzxaoiwc0piV08=
+      incodeDemoBaseUrl:
+        secure: v1:HC5NzX2KjdE1QeRd:KQL0upuqVHRdVVcKP0pOUzAqEXXqt/SEn/oC45rbDO/nPdEPN1OZQX/ru6v/1UpK
+      incodeDemoDocumentFlowId:
+        secure: v1:hqQI05F8dcy7W/2i:qrjYjhwhYAXD0efnC1wVXQUoHyI4AXC1C17kMnX66uZ6KCjNjTfWyg==
+      incodeDemoSelfieFlowId:
+        secure: v1:t1eBJ3QmQt9FVcMk:T6pqCW/rBZHtbO7YbqjKnJj8Q6Gc9+o8gEAuF7Q1LUuoiQ7zFTAWsA==
       incodeDocumentFlowId:
         secure: v1:XEcXshrWL1DuUfvU:9wjQdVCn9557clzq1Ii1QIZonzbxS+UWULOps5KlNIf0AcpV9RmWfQ==
       incodeSelfieFlowId:

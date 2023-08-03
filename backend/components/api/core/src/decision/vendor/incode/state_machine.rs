@@ -78,6 +78,7 @@ impl IncodeStateMachine {
         tenant_id: TenantId,
         configuration_id: IncodeConfigurationId,
         ctx: IncodeContext,
+        is_sandbox: bool,
     ) -> ApiResult<Self> {
         // get incode credentials from TVC
         let tenant_vendor_control =
@@ -110,7 +111,7 @@ impl IncodeStateMachine {
 
         // Run StartOnboarding immediately - it sets up some data that all other states need
         if matches!(session.state, IncodeVerificationSessionState::StartOnboarding) {
-            let credentials = tenant_vendor_control.incode_credentials();
+            let credentials = tenant_vendor_control.incode_credentials(is_sandbox);
             StartOnboarding::run(state, &ctx, session, credentials, configuration_id).await?;
         }
 
@@ -129,7 +130,7 @@ impl IncodeStateMachine {
                 id: session.id,
                 kind: session.kind,
                 credentials: IncodeCredentialsWithToken {
-                    credentials: tenant_vendor_control.incode_credentials(),
+                    credentials: tenant_vendor_control.incode_credentials(is_sandbox),
                     authentication_token: token.into(),
                 },
             }

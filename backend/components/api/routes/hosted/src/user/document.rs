@@ -86,6 +86,11 @@ pub async fn post(
         }
     }
 
+    // Check we're in sandbox
+    if vault.is_live && request.fixture_result.is_some() {
+        return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
+    }
+
     let (side, image) = match (request.front_image, request.back_image, request.selfie_image) {
         (Some(i), None, None) => (DocumentSide::Front, i),
         (None, Some(i), None) => (DocumentSide::Back, i),
@@ -102,13 +107,13 @@ pub async fn post(
         seal_file_and_upload_to_s3(&state, &file, di.clone(), user_auth.user(), &su_id).await?;
 
     // Check if we should be initiating requests (e.g. check if we are testing)
-    let should_initiate_reqs = decision::utils::get_fixture_data_decision(
+    let should_initiate_reqs = decision::utils::should_initiate_requests_for_document(
         state.feature_flag_client.clone(),
         &vault,
-        wf,
         &user_auth.tenant()?.id,
-    )?
-    .is_none();
+        request.fixture_result,
+    )?;
+    let fixture = request.fixture_result;
 
     // write a identity_document
     let ob_id = user_auth.onboarding()?.id.clone();
@@ -124,7 +129,7 @@ pub async fn post(
                 request_id: doc_request.id.clone(),
                 document_type: request.document_type.into(),
                 country_code: request.country_code.clone(),
-                fixture_result: request.fixture_result,
+                fixture_result: fixture,
             };
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
             if id_doc.status != IdentityDocumentStatus::Pending {
@@ -161,13 +166,14 @@ pub async fn post(
                     let fixture = id_doc.fixture_result;
                     // Create fixture data once all of the sides are uploaded
                     let ocr = serde_json::from_value(
-                        idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(None, None, None),
+                        idv::incode::doc::response::FetchOCRResponse::fixture_response(None, None, None),
                     )?;
                     let doc_type = request.document_type.into();
 
                     // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals
                     let fake_score_response =
-                        idv::incode::doc::response::FetchScoresResponse::TEST_ONLY_FIXTURE(fixture).unwrap();
+                        idv::incode::doc::response::FetchScoresResponse::fixture_response(fixture)
+                            .map_err(idv::Error::from)?;
                     let vres = save_vres_for_fixture_risk_signals(
                         conn,
                         &su_id,
@@ -201,7 +207,16 @@ pub async fn post(
     let response = if let Some((di, doc_request, id_doc_id)) = created_reqs {
         // Not sandbox - make our request to vendors!
         let t_id = user_auth.scoped_user.tenant_id.clone();
-        handle_incode_request(&state, id_doc_id, t_id, di.id, vault, doc_request).await?
+        handle_incode_request(
+            &state,
+            id_doc_id,
+            t_id,
+            di.id,
+            vault,
+            doc_request,
+            fixture.is_some(),
+        )
+        .await?
     } else {
         // Fixture response - we always complete successfully!
         let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]

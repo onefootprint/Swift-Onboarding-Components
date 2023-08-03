@@ -118,8 +118,8 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         doc_request_id: id_doc.request_id,
         enclave_client: state.enclave_client.clone(),
     };
-    let config_id = get_config_id(&state.config, is_selfie);
-    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
+    let config_id = get_config_id(&state.config, is_selfie, false);
+    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx, false)
         .await
         .unwrap();
     let (machine, failure_reasons) = machine
@@ -150,7 +150,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     //
     let mut ctx = machine.ctx;
     ctx.docv_data.back_image = Some(PiiString::from(small_back_image()));
-    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
+    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx, false)
         .await
         .unwrap();
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddBack);
@@ -166,7 +166,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         assert!(failure_reasons.is_empty());
         let mut ctx = machine.ctx;
         ctx.docv_data.selfie_image = Some(PiiString::from(selfie_image()));
-        machine = IncodeStateMachine::init(state, tenant.id, config_id, ctx)
+        machine = IncodeStateMachine::init(state, tenant.id, config_id, ctx, false)
             .await
             .unwrap();
         assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddConsent);
@@ -357,8 +357,8 @@ async fn test_fail(state: &State, is_selfie: bool) {
         doc_request_id: id_doc.request_id.clone(),
         enclave_client: state.enclave_client.clone(),
     };
-    let config_id = get_config_id(&state.config, is_selfie);
-    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
+    let config_id = get_config_id(&state.config, is_selfie, false);
+    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx, false)
         .await
         .unwrap();
     let (machine, failure_reasons) = machine
@@ -423,7 +423,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
     ctx.docv_data.front_image = Some(PiiString::from(small_front_image()));
     ctx.docv_data.back_image = Some(PiiString::from(small_back_image()));
     ctx.docv_data.selfie_image = Some(PiiString::from(selfie_image()));
-    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx)
+    let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx, false)
         .await
         .unwrap();
     assert_eq!(machine.state.name(), IncodeVerificationSessionState::AddFront);

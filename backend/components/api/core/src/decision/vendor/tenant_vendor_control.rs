@@ -23,6 +23,7 @@ pub struct TenantVendorControl {
     experian_credentials: ExperianCredentials,
     incode_credentials: IncodeCredentials,
     middesk_credentials: MiddeskCredentials,
+    incode_sandbox_credentials: IncodeSandboxCredentials,
     enabled_vendor_apis: Vec<VendorAPI>,
     tenant_id: TenantId,
     tenant_name: String,
@@ -56,8 +57,12 @@ impl TenantVendorControl {
         self.experian_credentials.clone()
     }
 
-    pub fn incode_credentials(&self) -> IncodeCredentials {
-        self.incode_credentials.clone()
+    pub fn incode_credentials(&self, is_sandbox: bool) -> IncodeCredentials {
+        if is_sandbox {
+            self.incode_sandbox_credentials.0.clone()
+        } else {
+            self.incode_credentials.clone()
+        }
     }
 
     pub fn middesk_credentials(&self) -> MiddeskCredentials {
@@ -116,6 +121,7 @@ impl TenantVendorControl {
 
         // As of 2023-04-25, we only have a single set of incode credentials
         let incode_credentials = IncodeCredentials::from(config);
+        let incode_sandbox_credentials = IncodeSandboxCredentials::from(config);
 
         let middesk_credentials = if let Some(middesk_api_key) =
             vendor_control.as_ref().and_then(|vc| vc.middesk_api_key.clone())
@@ -142,6 +148,7 @@ impl TenantVendorControl {
             enabled_vendor_apis,
             incode_credentials,
             middesk_credentials,
+            incode_sandbox_credentials,
             tenant_name: tenant.name,
             tenant_id: tenant.id,
         };
@@ -220,6 +227,20 @@ impl From<&Config> for IncodeCredentials {
             api_key: config.incode.api_key.clone(),
             base_url: config.incode.base_url.clone(),
         }
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
+pub struct IncodeSandboxCredentials(pub IncodeCredentials);
+
+impl From<&Config> for IncodeSandboxCredentials {
+    fn from(config: &Config) -> Self {
+        let creds = IncodeCredentials {
+            api_key: config.incode.demo_api_key.clone(),
+            base_url: config.incode.demo_base_url.clone(),
+        };
+
+        IncodeSandboxCredentials(creds)
     }
 }
 

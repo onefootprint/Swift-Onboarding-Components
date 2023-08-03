@@ -195,7 +195,7 @@ pub async fn save_incode_fixtures(
             )?;
 
             // Save OCR
-            let raw_ocr_response = idv::incode::doc::response::FetchOCRResponse::TEST_ONLY_FIXTURE(
+            let raw_ocr_response = idv::incode::doc::response::FetchOCRResponse::fixture_response(
                 Some(first_name),
                 Some(last_name),
                 date_of_birth_timestamp,

@@ -45,6 +45,10 @@ export interface StaticSecrets {
   incodeSelfieFlowId: aws.ssm.Parameter;
   incodeDocumentFlowId: aws.ssm.Parameter;
   incodeBaseUrl: aws.ssm.Parameter;
+  incodeDemoApiKey: aws.ssm.Parameter;
+  incodeDemoSelfieFlowId: aws.ssm.Parameter;
+  incodeDemoDocumentFlowId: aws.ssm.Parameter;
+  incodeDemoBaseUrl: aws.ssm.Parameter;
   middeskApiKey: aws.ssm.Parameter;
   middeskWebhookSecret: aws.ssm.Parameter;
   middeskBaseUrl: aws.ssm.Parameter;
@@ -138,6 +142,10 @@ interface Incode {
   incodeSelfieFlowId: string;
   incodeDocumentFlowId: string;
   incodeBaseUrl: string;
+  incodeDemoApiKey: string;
+  incodeDemoSelfieFlowId: string;
+  incodeDemoDocumentFlowId: string;
+  incodeDemoBaseUrl: string;
 }
 
 interface Fingerprint {
@@ -352,6 +360,22 @@ export async function LoadSecrets(
     incodeBaseUrl: createSecretParameter(
       `incodeBaseUrl-${stack}`,
       secretConstants.incode.incodeBaseUrl,
+    ),
+    incodeDemoApiKey: createSecretParameter(
+      `incodeDemoApiKey-${stack}`,
+      secretConstants.incode.incodeDemoApiKey,
+    ),
+    incodeDemoSelfieFlowId: createSecretParameter(
+      `incodeDemoSelfieFlowId-${stack}`,
+      secretConstants.incode.incodeDemoSelfieFlowId,
+    ),
+    incodeDemoDocumentFlowId: createSecretParameter(
+      `incodeDemoDocumentFlowId-${stack}`,
+      secretConstants.incode.incodeDemoDocumentFlowId,
+    ),
+    incodeDemoBaseUrl: createSecretParameter(
+      `incodeDemoBaseUrl-${stack}`,
+      secretConstants.incode.incodeDemoBaseUrl,
     ),
     middeskApiKey: createSecretParameter(
       `middeskApiKey-${stack}`,

@@ -13,11 +13,11 @@ mod images;
 mod test;
 
 // TEMP: will get this into State + TVC properly
-pub fn get_config_id(config: &Config, is_selfie: bool) -> IncodeConfigurationId {
+pub fn get_config_id(config: &Config, is_selfie: bool, is_sandbox: bool) -> IncodeConfigurationId {
     let id = if is_selfie {
-        config.incode.selfie_flow_id.clone()
+        config.incode.selfie_flow_id(is_sandbox)
     } else {
-        config.incode.document_flow_id.clone()
+        config.incode.document_flow_id(is_sandbox)
     };
 
     IncodeConfigurationId::from(id.leak_to_string())
