@@ -1,12 +1,16 @@
-import { FootprintPublicEvent } from '@onefootprint/footprint-js';
+import {
+  FootprintPrivateEvent,
+  FootprintProps,
+  FootprintPublicEvent,
+} from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
 import { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 
 import {
   CompletePayload,
   FootprintClient,
-  FootprintInternalEvent,
-} from '../footprint-js-provider.types';
+  LegacyFootprintInternalEvent,
+} from '../types';
 import EventEmitter from '../utils/event-emitter/event-emmiter';
 
 class IframeAdapter implements FootprintClient {
@@ -16,16 +20,26 @@ class IframeAdapter implements FootprintClient {
 
   async load() {
     const postmate = await new Postmate.Model({
-      [FootprintInternalEvent.bootstrapDataReceived]: (
+      // Listen for the new events
+      [FootprintPrivateEvent.propsReceived]: (props: FootprintProps) => {
+        this.eventEmitter.emit(FootprintPrivateEvent.propsReceived, props);
+      },
+
+      // We still support listening for the legacy events in bifrost but
+      // these shouldn't be used for new features since they will get deprecated
+      [LegacyFootprintInternalEvent.bootstrapDataReceived]: (
         data?: IdvBootstrapData,
       ) => {
         this.eventEmitter.emit(
-          FootprintInternalEvent.bootstrapDataReceived,
+          LegacyFootprintInternalEvent.bootstrapDataReceived,
           data,
         );
       },
-      [FootprintInternalEvent.optionsReceived]: (data?: IdvOptions) => {
-        this.eventEmitter.emit(FootprintInternalEvent.optionsReceived, data);
+      [LegacyFootprintInternalEvent.optionsReceived]: (data?: IdvOptions) => {
+        this.eventEmitter.emit(
+          LegacyFootprintInternalEvent.optionsReceived,
+          data,
+        );
       },
     });
     this.postmate = postmate;
@@ -41,7 +55,10 @@ class IframeAdapter implements FootprintClient {
   }
 
   start() {
-    this.sendEvent(FootprintInternalEvent.started);
+    // Send both new and legacy start message to the SDK client (since
+    // we don't know which version it is running)
+    this.sendEvent(FootprintPrivateEvent.started);
+    this.sendEvent(LegacyFootprintInternalEvent.started);
   }
 
   complete({ validationToken, closeDelay = 0 }: CompletePayload) {

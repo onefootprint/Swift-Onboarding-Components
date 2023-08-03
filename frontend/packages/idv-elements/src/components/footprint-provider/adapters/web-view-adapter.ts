@@ -1,7 +1,4 @@
-import {
-  CompletePayload,
-  FootprintClient,
-} from '../footprint-js-provider.types';
+import { CompletePayload, FootprintClient } from '../types';
 
 class WebView implements FootprintClient {
   get redirectUrl() {

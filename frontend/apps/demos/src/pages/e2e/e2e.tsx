@@ -1,4 +1,7 @@
-import footprint, { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintComponentKind } from '@onefootprint/footprint-js';
+import footprint, {
+  FootprintVerifyButton,
+} from '@onefootprint/footprint-react';
 import styled, { css } from '@onefootprint/styled';
 import Head from 'next/head';
 import React from 'react';
@@ -6,12 +9,15 @@ import React from 'react';
 const publicKey = process.env.NEXT_PUBLIC_E2E_TENANT_PK as string;
 
 const handleOpen = () => {
-  footprint.open({
+  const component = footprint.init({
+    kind: FootprintComponentKind.Verify,
     publicKey,
     options: {
       showCompletionPage: true,
     },
   });
+
+  component.render();
 };
 
 // Do not change this page. It is used for E2E testing.
@@ -21,7 +27,7 @@ const Demo = () => (
       <title>Footprint E2E</title>
     </Head>
     <Container>
-      <FootprintButton onClick={handleOpen} />
+      <FootprintVerifyButton onClick={handleOpen} />
     </Container>
   </>
 );

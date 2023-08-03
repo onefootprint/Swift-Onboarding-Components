@@ -26,6 +26,20 @@ const getBifrostUrl = (isLocal: boolean) => {
   return 'https://id.onefootprint.com';
 };
 
+const getComponentsUrl = (isLocal: boolean) => {
+  if (isLocal) {
+    return 'http://localhost:3010';
+  }
+  if (isDevelopment) {
+    return 'https://components.preview.onefootprint.com';
+  }
+  if (isPreview) {
+    const branchAsSlug = getBranchAsSlug(currentBranch);
+    return `https://components-git-${branchAsSlug}.preview.onefootprint.com`;
+  }
+  return 'https://components.onefootprint.com';
+};
+
 const getApiUrl = (isLocal: boolean) => {
   if (isLocal) {
     return 'http://localhost:8000';
@@ -49,6 +63,9 @@ export default defineConfig(options => ({
   env: {
     API_BASE_URL: getApiUrl(!!options.watch || forceFootprintToUseLocal),
     BIFROST_URL: getBifrostUrl(!!options.watch || forceFootprintToUseLocal),
+    COMPONENTS_URL: getComponentsUrl(
+      !!options.watch || forceFootprintToUseLocal,
+    ),
     NODE_ENV: options.watch ? 'development' : 'production',
   },
   outExtension({ format }) {

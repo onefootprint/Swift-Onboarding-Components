@@ -1,4 +1,7 @@
-import footprint, { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintComponentKind } from '@onefootprint/footprint-js';
+import footprint, {
+  FootprintVerifyButton,
+} from '@onefootprint/footprint-react';
 import styled from '@onefootprint/styled';
 import { CodeBlock, CodeInline, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -16,12 +19,14 @@ import footprint from '@onefooprint/footprint-js';
 
 const Page = () => {
   const handleOpen = () => {
-    footprint.open({
+    const component = footprint.init({
+      kind: 'verify',
       publicKey,
       appearance,
       onCompleted: handleCompleted,
       onCanceled: handleCanceled,
     });
+    component.render();
   };
 
   const handleCompleted = (validationToken: string) => {
@@ -101,7 +106,8 @@ export const appearance: FootprintAppearance = {
 `;
 
 const handleOpen = () => {
-  footprint.open({
+  const component = footprint.init({
+    kind: FootprintComponentKind.Verify,
     publicKey,
     options: {
       showCompletionPage: true,
@@ -161,13 +167,15 @@ const handleOpen = () => {
         },
       },
     },
-    onCanceled: () => {
-      console.log('onCanceled');
+    onCancel: () => {
+      console.log('onCancel'); // eslint-disable-line no-console
     },
-    onCompleted: (validationToken: string) => {
-      console.log('onCompleted', validationToken);
+    onComplete: (validationToken: string) => {
+      console.log('onComplete', validationToken); // eslint-disable-line no-console
     },
   });
+
+  component.render();
 };
 
 const Flexcar = () => (
@@ -216,7 +224,7 @@ const Flexcar = () => (
       </Left>
       <Right>
         <ButtonContainer>
-          <FootprintButton onClick={handleOpen} />
+          <FootprintVerifyButton onClick={handleOpen} />
         </ButtonContainer>
       </Right>
     </Grid>

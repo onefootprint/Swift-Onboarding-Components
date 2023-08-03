@@ -60,8 +60,10 @@ yarn add @onefootprint/footprint-js
 5. Add your Footprint completion handler
 
 ```javascript
-window.onFootprintCompleted = function (token) {
-  // TODO: Post the token to your server
+window.footprintCallbacks = {
+  onComplete: function (token) {
+    // TODO: Post the token to your server
+  },
 };
 ```
 

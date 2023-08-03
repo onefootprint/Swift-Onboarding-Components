@@ -1,7 +1,5 @@
-import type {
-  FootprintUserData,
-  IdentifyRequest,
-} from '../../footprint-js.types';
+import { IdentifyRequest } from '../../types/identify';
+import { FootprintUserData } from '../../types/user-data';
 
 const identifyUserRequest = async (payload: IdentifyRequest) => {
   const response = await fetch(`${process.env.API_BASE_URL}/hosted/identify`, {

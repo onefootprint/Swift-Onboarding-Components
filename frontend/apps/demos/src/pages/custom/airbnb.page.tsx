@@ -1,4 +1,4 @@
-import footprint from '@onefootprint/footprint-js';
+import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -7,7 +7,8 @@ import React from 'react';
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
 
 const handleOpen = () => {
-  footprint.open({
+  const component = footprint.init({
+    kind: FootprintComponentKind.Verify,
     publicKey,
     options: {
       showCompletionPage: true,
@@ -46,6 +47,8 @@ const handleOpen = () => {
       },
     },
   });
+
+  component.render();
 };
 
 const Demo = () => (

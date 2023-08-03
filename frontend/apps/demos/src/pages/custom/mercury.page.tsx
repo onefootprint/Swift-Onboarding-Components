@@ -1,4 +1,4 @@
-import footprint, { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import styled, { css } from '@onefootprint/styled';
 import Head from 'next/head';
 import React from 'react';
@@ -7,33 +7,29 @@ import React from 'react';
 // With id doc
 const publicKey = 'ob_test_BdkyTJgurgl8T6EHR5FDsc';
 
-const handleOpen = () => {
-  footprint.open({
-    publicKey,
-    appearance: {
-      variables: {
-        // global
-        colorAccent: '#465ed1',
-        colorError: '#c21877',
-
-        // label
-        labelColor: '#545454',
-
-        // button
-        buttonPrimaryBg: '#465ed1',
-        buttonPrimaryHoverBg: '#1835c1',
-      },
-    },
-  });
-};
-
 const Demo = () => (
   <>
     <Head>
       <title>Footprint and Mercury</title>
     </Head>
     <Container>
-      <FootprintButton onClick={handleOpen} />
+      <FootprintVerifyButton
+        publicKey={publicKey}
+        appearance={{
+          variables: {
+            // global
+            colorAccent: '#465ed1',
+            colorError: '#c21877',
+
+            // label
+            labelColor: '#545454',
+
+            // button
+            buttonPrimaryBg: '#465ed1',
+            buttonPrimaryHoverBg: '#1835c1',
+          },
+        }}
+      />
     </Container>
   </>
 );

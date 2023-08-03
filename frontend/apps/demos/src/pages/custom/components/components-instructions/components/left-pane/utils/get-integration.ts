@@ -1,10 +1,9 @@
-export const getReactIntegration = (
-  cardAlias: string,
-) => `import '@onefootprint/footprint-components-js/dist/footprint-components-js.css';
+export const getReactIntegration =
+  () => `import '@onefootprint/footprint-js/dist/footprint-js.css';
 import './app.css';
 import { appearance } from './config';
-import { SecureFormType } from '@onefootprint/footprint-components-js';
-import { FootprintSecureForm } from '@onefooprint/footprint-components-react';
+import { FootprintFormType } from '@onefootprint/footprint-js';
+import { FootprintForm } from '@onefooprint/footprint-react';
 
 const secretKey = process.env.FOOTPRINT_API_SECRET_KEY;
 
@@ -15,10 +14,9 @@ const PaymentForm = () => {
   };
 
   return (
-    <FootprintSecureForm
+    <FootprintForm
       authToken="tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit" // auth token generated using the Secret API Key on step 5
-      cardAlias={${cardAlias}} // this should match the cardAliases used while generating the auth token
-      type={SecureFormType.cardAndZip}
+      type={FootprintFormType.cardAndZip}
       variant="modal"
       appearance={appearance} // appearance object from step 6
       onSave={onSave}
@@ -28,20 +26,19 @@ const PaymentForm = () => {
 
 export default PaymentForm;`;
 
-export const getVueIntegration = (cardAlias: string) => `
+export const getVueIntegration = () => `
 <script>
-  import '@onefootprint/footprint-components-js/dist/footprint-components-js.css';
-  import footprintComponent from '@onefootprint/footprint-components-js';
+  import '@onefootprint/footprint-js/dist/footprint-js.css';
+  import footprint from '@onefootprint/footprint-js';
   import { appearance } from './config';
 
   export default {
     mounted() {
-      footprintComponent.render({
+      const component = footprint.init({
         kind: 'secure-form',
         containerId: 'footprint-secure-form',
         props: {
           authToken: "tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", // auth token generated using the Secret API Key on step 5
-          cardAlias: "${cardAlias}", // this should match the cardAliases used while generating the auth token
           appearance: appearance, // appearance object from step 6
           title: "Add a New Card",
           type: "cardAndZip",
@@ -50,7 +47,8 @@ export const getVueIntegration = (cardAlias: string) => `
           onClose: handleClose,
           onCancel: handleCancel
         }
-      })
+      });
+      component.render();
     },
     methods: {
       handleSave() {

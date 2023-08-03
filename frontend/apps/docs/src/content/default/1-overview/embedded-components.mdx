@@ -2,18 +2,20 @@
 page: default
 slug: /embedded-components/getting-started
 category: Guides
-title: Embedded Components
+title: Other Components
 position: 6
 meta:
   {
-    title: Embedded Components,
+    title: Other Components,
     description: PCI Compliant collection and rendering of sensitive data,
   }
 ---
 
-## Add Footprint-components.js to your app
+# FootprintForm
 
-Our embedded components can help you collect and render sensitive PII data in your product in a PCI compliant way. Below is a guide that describes how to integrate our FootprintSecureForm component to collect user data that automatically gets saved to the user's Footprint vault.
+Our embedded form component can help you collect sensitive PII data in your product in a PCI compliant way. Below is a guide that describes how to integrate our FootprintForm component to collect user data that automatically gets saved to the user's Footprint vault.
+
+## Add Footprint.js to your app
 
 1. Go to Footprint dashboard [Settings - Roles](https://dashboard.onefootprint.com/settings?tab=roles) page. Create a new role for card vaulting.
 
@@ -60,20 +62,20 @@ A sample response can be found below:
 
 The token returned will need to be passed into the Footprint component on the frontend.
 
-6. Add the `footprint-components.js` script to your app.
+6. Add the `footprint.js` script to your app.
 
 ```html
 <head>
   <link
     rel="stylesheet"
-    href="https://unpkg.com/@onefootprint/footprint-components-js@latest/dist/footprint-components-js.css"
+    href="https://unpkg.com/@onefootprint/footprint-js@latest/dist/footprint-js.css"
   />
 </head>
 <body>
   ...
   <script
     crossorigin
-    src="https://unpkg.com/@onefootprint/footprint-components-js@latest/dist/footprint-components-js.umd.js"
+    src="https://unpkg.com/@onefootprint/footprint-js@latest/dist/footprint-js.umd.js"
   ></script>
 </body>
 ```
@@ -82,22 +84,21 @@ or
 
 ```bash
 # With NPM
-npm install @onefootprint/footprint-components-js
+npm install @onefootprint/footprint-js
 
 # With yarn
-yarn add @onefootprint/footprint-components-js
+yarn add @onefootprint/footprint-js
 ```
 
-7. Embed the FootprintSecureForm component.
+7. Embed the FootprintForm component.
 
-Make sure to pass the auth token generated from Step 5, as well as a unique card_alias for the user. Note that this card_alias has to match the one used to generate the auth token in step 4.
+Make sure to pass the auth token generated from Step 5.
 
 ```html
 <div
   id="footprint-component"
   data-kind="secure-form"
   data-props='{
-    "cardAlias":"primary",
     "authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", 
     "variant": "card", 
     "type": "cardAndZip"
@@ -121,7 +122,7 @@ If you are rendering the secure form in a card variant, it will take up all of t
   <div
     id="footprint-component"
     data-kind="secure-form"
-    data-props='{"cardAlias":"primary","authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", variant: 'card'}'
+    data-props='{"authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", variant: 'modal'}'
   ></div>
 </div>
 ```
@@ -131,8 +132,8 @@ If you are rendering the secure form in a modal variant, it will take up the who
 8. Add callbacks for form events
 
 ```javascript
-window.footprintComponentsCallbacks = {
-  onSave: function () {
+window.footprintCallbacks = {
+  onComplete: function () {
     // TODO: Decrypt or proxy the saved data from your backend
   },
   onCancel: function () {
@@ -148,13 +149,12 @@ window.footprintComponentsCallbacks = {
 
 When the user has completed filling the secure collection form on your product, you can decrypt the data collected. More details can be found [here](https://docs.onefootprint.com/vault/apis#decrypt-data-from-a-users-vault)
 
-## Available FootprintSecureForm Props
+## Available FootprintForm Props
 
 | Variable     | Description                                                                                                                                      |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                        |
-| `cardAlias`  | Required. A string that is a unique alias for the card information                                                                               |
 | `title`      | Optional. A string that will be displayed at the top of the field                                                                                |
 | `type`       | Optional. one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
-| `variant`    | Optional. One of `modal`, `drawer` or `card`. Specifies whether the form will be rendered in-line or in a modal.                                 |
+| `variant`    | Optional. One of `modal`, `drawer` or `inline`. Specifies whether the form will be rendered in-line or in a modal.                               |
 | `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                         |

@@ -1,4 +1,4 @@
-import { FootprintAppearance } from '@onefootprint/footprint-components-js';
+import { FootprintAppearance } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
 import {
   Button,
@@ -125,12 +125,10 @@ const LeftPane = ({
         </CodeBlock>
         <Typography variant="body-2">7. Now, add to your app:</Typography>
         {framework === 'react' && (
-          <CodeBlock language="typescript">
-            {getReactIntegration(cardAlias)}
-          </CodeBlock>
+          <CodeBlock language="typescript">{getReactIntegration()}</CodeBlock>
         )}
         {framework === 'vue' && (
-          <CodeBlock language="html">{getVueIntegration(cardAlias)}</CodeBlock>
+          <CodeBlock language="html">{getVueIntegration()}</CodeBlock>
         )}
         {customCSS && (
           <>

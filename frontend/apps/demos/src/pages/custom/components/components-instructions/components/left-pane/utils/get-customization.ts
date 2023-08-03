@@ -1,4 +1,4 @@
-import { FootprintAppearance } from '@onefootprint/footprint-components-js';
+import { FootprintAppearance } from '@onefootprint/footprint-js';
 
 type CustomizationProps = {
   appearance: FootprintAppearance;
@@ -6,7 +6,7 @@ type CustomizationProps = {
 
 const getCustomization = ({
   appearance,
-}: CustomizationProps) => `import { FootprintAppearance } from '@onefootprint/footprint-components-js';
+}: CustomizationProps) => `import { FootprintAppearance } from '@onefootprint/footprint-js';
 
 export const appearance: FootprintAppearance = ${JSON.stringify(
   appearance,

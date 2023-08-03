@@ -1,8 +1,8 @@
-import { FootprintComponentsEvent } from '@onefootprint/footprint-components-js';
+import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import { useEffect, useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { useFootprintProvider } from '..';
+import { useFootprintProvider } from '../footprint-provider';
 import usePropsFromUrl from './use-props-from-url';
 
 // Wait for a bit for post message to arrive before giving up
@@ -54,7 +54,7 @@ const useProps = <T extends BaseProps>(
   };
 
   const unsubscribe = footprintProvider.on(
-    FootprintComponentsEvent.propsReceived,
+    FootprintPrivateEvent.propsReceived,
     (data: T) => {
       setProviderProps(data);
     },

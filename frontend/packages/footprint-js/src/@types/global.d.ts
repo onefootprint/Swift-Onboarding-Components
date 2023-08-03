@@ -1,5 +1,4 @@
 declare interface Window {
-  onFootprintCanceled?: any;
-  onFootprintCompleted?: any;
   footprintAppearance?: any;
+  footprintCallbacks?: { [key: string]: () => any };
 }

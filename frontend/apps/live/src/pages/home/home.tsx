@@ -1,4 +1,4 @@
-import { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
@@ -57,10 +57,10 @@ const Live = () => {
                 {t(`${translationsKey}.subtitle`)}
               </Typography>
               <ActionsContainer>
-                <FootprintButton
+                <FootprintVerifyButton
                   publicKey={publicKey}
                   label={t(`${translationsKey}.cta`)}
-                  onCompleted={() => {
+                  onComplete={() => {
                     router.push('/ending');
                   }}
                 />

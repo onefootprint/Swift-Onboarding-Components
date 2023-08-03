@@ -11,9 +11,18 @@ meta:
   }
 ---
 
-## Footprint.js Library
+# Available Components
 
-### Installation
+Our SDKs support a variety of components.
+
+| Component               | Description                                                                             |
+| ----------------------- | --------------------------------------------------------------------------------------- |
+| `FootprintVerifyButton` | A button that when clicked launches the footprint onboarding flow in a modal or drawer. |
+| `FootprintForm`         | A PCI-compliant form to collect user data for specific fields.                          |
+
+You will find more information on each of these below:
+
+## Installation
 
 1. Install `footprint-js` and `footprint-react`:
 
@@ -27,7 +36,9 @@ yarn add @onefootprint/footprint-js
 yarn add @onefootprint/footprint-react
 ```
 
-### Integration
+## FootprintVerifyButton Integration
+
+`FootprintVerifyButton` is a button that launches our onboarding flow when clicked. The flow can be rendered in a modal or drawer.
 
 1. Grab the Onboarding Publishable Key, for example `ob_test_VMooXd04EUlnu3AvMYKjMW`.
 
@@ -35,24 +46,23 @@ yarn add @onefootprint/footprint-react
 
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
-
-import { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 
 const Page = () => {
-  const handleCompleted = (validationToken: string) => {
-    console.log(validationToken);
+  const handleVerifyCancel = () => {
+    console.log('user canceled');
   };
 
-  const handleCanceled = () => {
-    console.log('user canceled');
+  const handleCardSaved = () => {
+    console.log('user card data saved');
   };
 
   return (
     <main>
-      <FootprintButton
+      <FootprintVerifyButton
         publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
-        onCompleted={handleCompleted}
-        onCanceled={handleCanceled}
+        onComplete={handleVerifyComplete}
+        onCancel={handleVerifyCancel}
       />
     </main>
   );
@@ -60,32 +70,6 @@ const Page = () => {
 ```
 
 Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-cra) to check out a full example. We also have some examples using [Next.js](https://github.com/onefootprint/examples/tree/master/frontend-react-typescript-next)
-
-### Customizing appearance
-
-You can customize the appearance of our flow using the `appearance` prop:
-
-```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-
-import { FootprintButton } from '@onefootprint/footprint-react';
-
-const Page = () => {
-  return (
-    <main>
-      <FootprintButton
-        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
-        appearance={{
-          borderRadius: 0,
-          inputBg: 'red',
-        }}
-      />
-    </main>
-  );
-};
-```
-
-Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-customized) to check out a full example and [here](https://docs.onefootprint.com/integrate/customization) for more details about customization.
 
 ### Setting user data
 
@@ -96,12 +80,12 @@ use the prop `userData`:
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 
 const Page = () => {
   return (
     <main>
-      <FootprintButton
+      <FootprintVerifyButton
         publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
         userData={{
           email: 'jane.doe@acme.com',
@@ -115,33 +99,33 @@ const Page = () => {
 
 Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-user-data) to check out a full example and [here](https://docs.onefootprint.com/integrate/user-data) for more details about user data.
 
-## Footprint-components.js Library
+### Available FootprintVerifyButton Props
 
-### Installation
+| Variable        | Description                                                                                                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`         | Optional. A string that will be displayed on the button                                                                                                                                                 |
+| `publicKey`     | Optional. Onboarding configuration public key that will be used to launch the onboarding modal when button is clicked.                                                                                  |
+| `dialogVariant` | Optional. One of `modal` or `drawer`. Specifies how the onboarding dialog should be displayed when launched.                                                                                            |
+| `onClick`       | Optional. A function that is called when the button is clicked.                                                                                                                                         |
+| `onComplete`    | Optional. A function that is called when the onboarding flow is completed by the user.                                                                                                                  |
+| `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                   |
+| `onClose`       | Optional. A function that is called when the onboarding flow is closed by the user.                                                                                                                     |
+| `userData`      | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://www.npmjs.com/package/@onefootprint/footprint-react).          |
+| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options) |
+| `appearance`    | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                                                                                |
+| `testID`        | Optional. A test string to use for UI tests.                                                                                                                                                            |
 
-1. Install `footprint-components-js` and `footprint-components-react`:
+## FootprintForm Integration
 
-```bash
-# With NPM
-npm install @onefootprint/footprint-components-js
-npm install @onefootprint/footprint-components-react
+1. Perform steps 1-5 from [here](https://docs.onefootprint.com/embedded-components/getting-started#add-footprint-js-to-your-app).
 
-# With yarn
-yarn add @onefootprint/footprint-components-js
-yarn add @onefootprint/footprint-components-react
-```
-
-### Integration
-
-1. Perform steps 1-5 from [here](https://docs.onefootprint.com/embedded-components/getting-started#add-footprint-components-js-to-your-app).
-
-2. Import the styles file and embed the Footprint component, passing the Auth token, card alias, callback functions and any other options:
+2. Import the styles file and embed the Footprint component, passing the Auth token, callback functions and any other options:
 
 ```typescript
-import '@onefootprint/footprint-components-js/dist/footprint-components-js.css';
+import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { SecureFormType } from '@onefootprint/footprint-components-js';
-import { FootprintSecureForm } from '@onefootprint/footprint-components-react';
+import { SecureFormType } from '@onefootprint/footprint-js';
+import { FootprintForm } from '@onefootprint/footprint-react';
 
 const Page = () => {
   const handleSave = () => {
@@ -158,9 +142,8 @@ const Page = () => {
 
   return (
     <main>
-      <FootprintSecureForm
+      <FootprintForm
         authToken={secretAuthToken}
-        cardAlias="primary"
         type={SecureFormType.cardAndZip}
         variant="modal"
         title="Payment information"
@@ -175,18 +158,27 @@ const Page = () => {
 
 Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-cra) to check out a full example. We also have some examples using [Next.js](https://github.com/onefootprint/examples/tree/master/frontend-react-typescript-next)
 
-### Customizing appearance
+### Available FootprintForm Props
 
-You can customize the appearance of our embedded components using the `appearance` prop:
+| Variable     | Description                                                                                                                                                              |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                                                |
+| `title`      | Optional. A string that will be displayed at the top of the field                                                                                                        |
+| `type`       | Optional. Of type SecureFormType, one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
+| `variant`    | Optional. One of `modal`, `drawer` or `card`. Specifies whether the form will be rendered in-line or in a modal.                                                         |
+| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                                                 |
+
+## Customizing appearance
+
+You can customize the appearance of our components using the `appearance` prop:
 
 ```typescript
-import '@onefootprint/footprint-components-js/dist/footprint-components-js.css';
+import '@onefootprint/footprint-js/dist/footprint-js.css';
 
 import {
-  FootprintAppearance,
-  SecureFormType,
-} from '@onefootprint/footprint-components-js';
-import { FootprintSecureForm } from '@onefootprint/footprint-components-react';
+  FootprintVerifyButton,
+  FootprintForm,
+} from '@onefootprint/footprint-react';
 
 const Page = () => {
   const appearance: FootprintAppearance = {
@@ -196,10 +188,12 @@ const Page = () => {
 
   return (
     <main>
-      <FootprintSecureForm
-        authToken={secretAuthToken}
-        cardAlias="primary"
-        type={SecureFormType.cardAndZip}
+      <FootprintVerifyButton
+        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
+        appearance={appearance}
+      />
+      <FootprintForm
+        authToken="tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit"
         appearance={appearance}
       />
     </main>
@@ -208,14 +202,3 @@ const Page = () => {
 ```
 
 Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-customized) to check out a full example and [here](https://docs.onefootprint.com/integrate/customization) for more details about customization.
-
-### Available SecureForm Props
-
-| Variable     | Description                                                                                                                                                              |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                                                |
-| `cardAlias`  | Required. A string that is a unique alias for the card information                                                                                                       |
-| `title`      | Optional. A string that will be displayed at the top of the field                                                                                                        |
-| `type`       | Optional. Of type SecureFormType, one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
-| `variant`    | Optional. One of `modal`, `drawer` or `card`. Specifies whether the form will be rendered in-line or in a modal.                                                         |
-| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                                                 |

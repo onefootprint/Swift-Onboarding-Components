@@ -1,33 +1,34 @@
-import footprintComponent, {
+import footprint, {
   FootprintComponentKind,
-  SecureFormType,
-} from '@onefootprint/footprint-components-js';
+  FootprintFormType,
+} from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
-import React from 'react';
-import { useEffectOnce } from 'usehooks-ts';
+import React, { useEffect } from 'react';
 
 type DemoFormProps = {
   authToken: string;
-  cardAlias: string;
 };
 
-const DemoForm = ({ authToken, cardAlias }: DemoFormProps) => {
-  useEffectOnce(() => {
-    if (!authToken) return;
+const DemoForm = ({ authToken }: DemoFormProps) => {
+  useEffect(() => {
+    if (!authToken) return () => {};
 
-    footprintComponent.render({
-      kind: FootprintComponentKind.SecureForm,
-      props: {
-        authToken,
-        cardAlias,
-        title: 'Add a New Card',
-        type: SecureFormType.cardAndName,
-        variant: 'card',
+    const component = footprint.init({
+      kind: FootprintComponentKind.Form,
+      authToken,
+      title: 'Add a New Card',
+      type: FootprintFormType.cardAndName,
+      variant: {
+        containerId: 'footprint-secure-form',
       },
-      containerId: 'footprint-secure-form',
     });
-  });
+    component.render();
+
+    return () => {
+      component.destroy();
+    };
+  }, [authToken]);
 
   return <SecureFormContainer id="footprint-secure-form" />;
 };

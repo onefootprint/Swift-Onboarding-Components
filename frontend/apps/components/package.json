@@ -22,7 +22,7 @@
     "@onefootprint/appearance": "*",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/dev-tools": "*",
-    "@onefootprint/footprint-components-js": "*",
+    "@onefootprint/footprint-js": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",

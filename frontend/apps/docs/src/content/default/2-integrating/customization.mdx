@@ -33,7 +33,8 @@ const appearance = {
   theme: 'dark',
 };
 
-footprint.open({ publicKey, appearance });
+const component = footprint.init({ kind: 'verify', publicKey, appearance });
+component.render();
 ```
 
 ## Variables
@@ -57,7 +58,8 @@ const appearance = {
   },
 };
 
-footprint.open({ publicKey, appearance });
+const component = footprint.init({ kind: 'verify', publicKey, appearance });
+component.render();
 ```
 
 ## Global variables
@@ -321,7 +323,8 @@ const appearance = {
   }
 };
 
-footprint.open({ publicKey, appearance });
+const component = footprint.init({ kind: 'verify', publicKey, appearance });
+component.render();
 ```
 
 ### Available rules
@@ -356,7 +359,8 @@ const options = {
   showCompletionPage: true,
 };
 
-footprint.open({ publicKey, options });
+const component = footprint.init({ kind: 'verify', publicKey, options });
+component.render();
 ```
 
 If the `showCompletionPage` is not provided, the modal will automatically close when the user onboarding is complete. The completion page looks like the following.
@@ -380,7 +384,8 @@ const options = {
   showLogo: true,
 };
 
-footprint.open({ publicKey, options });
+const component = footprint.init({ kind: 'verify', publicKey, options });
+component.render();
 ```
 
 <img

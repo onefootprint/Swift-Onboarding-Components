@@ -10,7 +10,8 @@ export const themes: Theme[] = [
   publicKey: 'ob_live_NCIvO0m9VVlxPy2p1BwzFf'
 };
 
-footprint.open({ appearance, publicKey });`,
+const compoent = footprint.init({ kind: 'verify', appearance, publicKey });
+component.render();`,
   },
   {
     name: 'Ever Green',
@@ -42,7 +43,8 @@ footprint.open({ appearance, publicKey });`,
   }
 };
 
-footprint.open({ appearance, publicKey });`,
+const compoent = footprint.init({ kind: 'verify', appearance, publicKey });
+component.render();`,
   },
 ];
 

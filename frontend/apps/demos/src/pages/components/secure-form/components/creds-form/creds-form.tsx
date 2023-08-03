@@ -13,7 +13,7 @@ type FormData = {
 };
 
 type CredsFormProps = {
-  onSubmit: (cardAlias: string, authToken: string) => void;
+  onSubmit: (authToken: string) => void;
 };
 
 const CredsForm = ({ onSubmit }: CredsFormProps) => {
@@ -37,7 +37,7 @@ const CredsForm = ({ onSubmit }: CredsFormProps) => {
       {
         onSuccess: (response: ClientTokenResponse) => {
           const authToken = response.token;
-          onSubmit(data.cardAlias, authToken);
+          onSubmit(authToken);
         },
       },
     );

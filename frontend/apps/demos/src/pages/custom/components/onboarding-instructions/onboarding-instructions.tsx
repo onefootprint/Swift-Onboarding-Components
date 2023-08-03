@@ -1,5 +1,5 @@
 import { FootprintAppearance } from '@onefootprint/footprint-js';
-import footprint, { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import styled from '@onefootprint/styled';
 import { CodeBlock, CodeInline, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -28,7 +28,7 @@ npm install @onefootprint/footprint-react
 const basic = `import '@onefootprint/footprint-js/dist/footprint-js.css';
 import './app.css';
 import { appearance, publicKey } from './config';
-import { FootprintButton } from '@onefooprint/footprint-react';
+import { FootprintVerifyButton } from '@onefooprint/footprint-react';
 const Page = () => {
   const handleCompleted = (validationToken: string) => {
     // Send validationToken to your backend
@@ -39,30 +39,18 @@ const Page = () => {
   };
   return (
     <main>
-      <FootprintButton
+      <FootprintVerifyButton
         appearance={appearance}
         publicKey={publicKey}
-        onCompleted={handleCompleted}
-        onCanceled={handleCanceled}
+        onComplete={handleCompleted}
+        onCancel={handleCanceled}
+        options={{
+          showCompletionPage: true,
+        }}
       />
     </main>
   );
 };`;
-
-type HandleOpenProps = {
-  obKey: string;
-  appearance: FootprintAppearance;
-};
-
-const handleOpen = ({ obKey, appearance }: HandleOpenProps) => {
-  footprint.open({
-    publicKey: obKey,
-    options: {
-      showCompletionPage: true,
-    },
-    appearance,
-  });
-};
 
 type TemplateProps = {
   appearance: FootprintAppearance;
@@ -118,12 +106,24 @@ const OnboardingInstructions = ({
           </CodeBlock>
         </Content>
         <MobileButtonContainer>
-          <FootprintButton onClick={() => handleOpen({ obKey, appearance })} />
+          <FootprintVerifyButton
+            appearance={appearance}
+            publicKey={obKey}
+            options={{
+              showCompletionPage: true,
+            }}
+          />
         </MobileButtonContainer>
       </Left>
       <Right>
         <DesktopButtonContainer>
-          <FootprintButton onClick={() => handleOpen({ obKey, appearance })} />
+          <FootprintVerifyButton
+            appearance={appearance}
+            publicKey={obKey}
+            options={{
+              showCompletionPage: true,
+            }}
+          />
         </DesktopButtonContainer>
       </Right>
     </Grid>

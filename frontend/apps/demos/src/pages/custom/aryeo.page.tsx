@@ -1,4 +1,4 @@
-import { FootprintAppearance } from '@onefootprint/footprint-components-js';
+import { FootprintAppearance } from '@onefootprint/footprint-js';
 import React from 'react';
 import { ARYEO_AUTH_TOKEN } from 'src/config/constants';
 

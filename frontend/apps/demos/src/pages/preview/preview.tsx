@@ -1,4 +1,4 @@
-import { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import styled, { css } from '@onefootprint/styled';
 import { Box, media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -52,9 +52,9 @@ const Preview = ({ tenant }: PreviewProps) => {
                 please see our privacy policy.
               </Typography>
               <ButtonContainer>
-                <FootprintButton
+                <FootprintVerifyButton
                   publicKey={tenant.key}
-                  onCompleted={validationToken => {
+                  onComplete={validationToken => {
                     console.log('validationToken', validationToken); // eslint-disable-line no-console
                     setConfirmation(true);
                   }}

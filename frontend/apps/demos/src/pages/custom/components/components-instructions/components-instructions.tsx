@@ -1,9 +1,8 @@
 import {
   FootprintAppearance,
-  SecureFormType,
-  SecureFormVariant,
-} from '@onefootprint/footprint-components-js';
-import { FootprintSecureForm } from '@onefootprint/footprint-components-react';
+  FootprintFormType,
+} from '@onefootprint/footprint-js';
+import { FootprintForm } from '@onefootprint/footprint-react';
 import styled from '@onefootprint/styled';
 import { useToast } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -22,7 +21,7 @@ type ComponentsInstructionsProps = {
   title?: string;
   customCSS?: string;
   framework?: 'react' | 'vue';
-  variant: SecureFormVariant;
+  variant: 'modal' | 'inline' | 'drawer';
 };
 
 const ComponentsInstructions = ({
@@ -43,7 +42,7 @@ const ComponentsInstructions = ({
     setIsVisible(true);
   };
 
-  const handleSave = () => {
+  const handleComplete = () => {
     const dashboardUrl = `https://dashboard.onefootprint.com/users/${userId}`;
     const dashboardLink = (
       <Link href={dashboardUrl}>your Footprint dashboard</Link>
@@ -88,14 +87,13 @@ const ComponentsInstructions = ({
         />
         <RightPane onLaunch={handleLaunch} />
         {isVisible && (
-          <FootprintSecureForm
+          <FootprintForm
             appearance={appearance}
             authToken={secretAuthToken}
-            cardAlias={cardAlias}
-            type={SecureFormType.cardAndZip}
+            type={FootprintFormType.cardAndZip}
             variant={variant}
             title={title}
-            onSave={handleSave}
+            onComplete={handleComplete}
             onClose={handleClose}
             onCancel={handleClose}
           />

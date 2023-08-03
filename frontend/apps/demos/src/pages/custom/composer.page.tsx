@@ -1,4 +1,7 @@
-import footprint, { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintComponentKind } from '@onefootprint/footprint-js';
+import footprint, {
+  FootprintVerifyButton,
+} from '@onefootprint/footprint-react';
 import styled from '@onefootprint/styled';
 import { CodeBlock, CodeInline, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -14,12 +17,15 @@ import footprint from '@onefooprint/footprint-js';
 
 const Page = () => {
   const handleOpen = () => {
-    footprint.open({
+    const component = footprint.init({
+      kind: 'verify',
       publicKey,
       appearance,
-      onCompleted: handleCompleted,
-      onCanceled: handleCanceled,
+      onComplete: handleCompleted,
+      onCancel: handleCanceled,
+      variant: 'drawer',
     });
+    component.render();
   };
 
   const handleCompleted = (validationToken: string) => {
@@ -71,7 +77,6 @@ export const appearance: FootprintAppearance = {
     labelColor: '#101516',
     labelFont: '500 14px/21px "Inter"',
   },
-  variant: 'drawer',
   rules: {
     input: {
       transition: '0.15s all cubic-bezier(.4,0,.2,1)',
@@ -83,7 +88,9 @@ export const appearance: FootprintAppearance = {
 const publicKey = 'ob_test_KYA0PU0awxnHKjzh9M849Y';
 
 const handleOpen = () => {
-  footprint.open({
+  const component = footprint.init({
+    kind: FootprintComponentKind.Verify,
+    variant: 'drawer',
     publicKey,
     options: {
       showCompletionPage: true,
@@ -126,6 +133,8 @@ const handleOpen = () => {
       },
     },
   });
+
+  component.render();
 };
 
 const Composer = () => (
@@ -181,7 +190,7 @@ const Composer = () => (
       </Left>
       <Right>
         <ButtonContainer>
-          <FootprintButton onClick={handleOpen} />
+          <FootprintVerifyButton onClick={handleOpen} />
         </ButtonContainer>
       </Right>
     </Grid>

@@ -1,8 +1,9 @@
 import footprint, {
+  FootprintComponentKind,
   FootprintUserData,
-  identifyUser,
+  identifyFootprintUser,
 } from '@onefootprint/footprint-js';
-import { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import styled, { css } from '@onefootprint/styled';
 import {
   Button,
@@ -63,15 +64,18 @@ const Form = ({ html, onSuccess }: FormProps) => {
   };
 
   const showFootprint = () => {
-    footprint.open({
+    const component = footprint.init({
+      kind: FootprintComponentKind.Verify,
       userData: getUserData(),
       publicKey,
-      onCanceled: handleFootprintCanceled,
-      onCompleted: handleFootprintCompleted,
+      onCancel: handleFootprintCanceled,
+      onComplete: handleFootprintCompleted,
       options: {
         showCompletionPage: true,
       },
     });
+
+    component.render();
   };
 
   const handleChange = async () => {
@@ -83,7 +87,7 @@ const Form = ({ html, onSuccess }: FormProps) => {
       return;
     }
     try {
-      const foundUser = await identifyUser({
+      const foundUser = await identifyFootprintUser({
         'id.email': email,
         'id.phone_number': phoneNumber,
       });
@@ -153,7 +157,7 @@ const Form = ({ html, onSuccess }: FormProps) => {
             or
           </Typography>
         </OrDivider>
-        <FootprintButton onClick={showFootprint} />
+        <FootprintVerifyButton onClick={showFootprint} />
       </FormContainer>
     </Container>
   );

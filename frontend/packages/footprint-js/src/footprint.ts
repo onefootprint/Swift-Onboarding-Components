@@ -1,62 +1,42 @@
-import './footprint-styles.css';
+import './styles.css';
 
-import { FootprintPublicEvent, OpenFootprint } from './footprint-js.types';
-import IframeManager from './utils/footprint-iframe';
-import { createButton } from './utils/footprint-ui';
-import { getAppearanceStyles, getURL } from './utils/footprint-utils';
+import initIframeManager from './iframe-manager';
+import { Component, Footprint, Props } from './types/components';
 
-const iframeManager = new IframeManager();
-let hasIframeOpened = false;
+const initFootprint = (): Footprint => {
+  const init = (props: Props): Component => {
+    let isRendered = false;
 
-const footprint = () => {
-  const subscribeToComplete = (callback?: (validationToken: string) => void) =>
-    iframeManager.on(FootprintPublicEvent.completed, (data: any) => {
-      if (data && typeof data === 'string') {
-        callback?.(data);
+    const render = async (): Promise<void> => {
+      if (isRendered) {
+        return;
       }
+      isRendered = true;
+      await iframeManager.render();
+    };
+
+    const destroy = async (): Promise<void> => {
+      if (!isRendered) {
+        return;
+      }
+      iframeManager.destroy();
+      isRendered = false;
+    };
+
+    const iframeManager = initIframeManager(props, () => {
+      isRendered = false;
     });
 
-  const subscribeToCancel = (callback: () => void) =>
-    iframeManager.on(FootprintPublicEvent.canceled, callback);
-
-  const subscribeToClose = (callback: () => void) =>
-    iframeManager.on(FootprintPublicEvent.closed, callback);
-
-  const open = async ({
-    appearance,
-    onCanceled,
-    onCompleted,
-    publicKey,
-    userData,
-    options,
-  }: OpenFootprint) => {
-    if (hasIframeOpened) {
-      return;
-    }
-    hasIframeOpened = true;
-
-    const { fontSrc, rules, variables, variant } =
-      getAppearanceStyles(appearance);
-    const url = getURL({ fontSrc, publicKey, rules, variables, variant });
-    await iframeManager.open(url, userData, options);
-    subscribeToComplete(onCompleted);
-    subscribeToCancel(() => {
-      onCanceled?.();
-      close();
-    });
-    subscribeToClose(close);
-  };
-
-  const close = async () => {
-    await iframeManager.close();
-    hasIframeOpened = false;
+    return {
+      render,
+      destroy,
+    };
   };
 
   return {
-    open,
-    close,
-    createButton,
+    init,
   };
 };
 
+const footprint = initFootprint();
 export default footprint;

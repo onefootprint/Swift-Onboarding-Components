@@ -19,8 +19,6 @@
     "@onefootprint/footprint-react": "*",
     "@onefootprint/request": "*",
     "@onefootprint/global-constants": "*",
-    "@onefootprint/footprint-components-js": "*",
-    "@onefootprint/footprint-components-react": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/types": "*",

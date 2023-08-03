@@ -37,7 +37,8 @@ const userData = {
   'id.country': 'US',
   'id.zip': '02117',
 };
-footprint.open({ publicKey, userData });
+const component = footprint.init({ kind: 'verify', publicKey, userData });
+component.render();
 ```
 
 ### Available user data

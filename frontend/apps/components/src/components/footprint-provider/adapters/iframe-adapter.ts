@@ -1,4 +1,4 @@
-import { FootprintComponentsEvent } from '@onefootprint/footprint-components-js';
+import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
 
 import { FootprintClient } from '../types';
@@ -11,8 +11,8 @@ class IframeAdapter implements FootprintClient {
 
   async load() {
     const postmate = await new Postmate.Model({
-      [FootprintComponentsEvent.propsReceived]: (data?: any) => {
-        this.eventEmitter.emit(FootprintComponentsEvent.propsReceived, data);
+      [FootprintPrivateEvent.propsReceived]: (data?: any) => {
+        this.eventEmitter.emit(FootprintPrivateEvent.propsReceived, data);
       },
     });
     this.postmate = postmate;
@@ -24,7 +24,7 @@ class IframeAdapter implements FootprintClient {
   }
 
   start() {
-    this.sendEvent(FootprintComponentsEvent.started);
+    this.sendEvent(FootprintPrivateEvent.started);
   }
 
   on(name: string, callback: (result: unknown) => void) {
@@ -37,7 +37,7 @@ class IframeAdapter implements FootprintClient {
     } else {
       // eslint-disable-next-line no-console
       console.warn(
-        `Footprint-components.js must be initialized in order to dispatch the event "${eventName}"`,
+        `Footprint.js must be initialized in order to dispatch the event "${eventName}"`,
       );
     }
   }

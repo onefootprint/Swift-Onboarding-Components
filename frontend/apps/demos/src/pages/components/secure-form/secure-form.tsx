@@ -8,11 +8,9 @@ import DemoForm from './components/demo-form';
 
 const SecureFormDemo = () => {
   const [authToken, setAuthToken] = useState<string>();
-  const [cardAlias, setCardAlias] = useState<string>();
 
-  const handleSubmit = (alias: string, token: string) => {
+  const handleSubmit = (token: string) => {
     setAuthToken(token);
-    setCardAlias(alias);
   };
 
   return (
@@ -24,8 +22,8 @@ const SecureFormDemo = () => {
         <Typography variant="heading-2" sx={{ marginBottom: 7 }}>
           Secure Form Demo
         </Typography>
-        {authToken && cardAlias ? (
-          <DemoForm authToken={authToken} cardAlias={cardAlias} />
+        {authToken ? (
+          <DemoForm authToken={authToken} />
         ) : (
           <CredsForm onSubmit={handleSubmit} />
         )}

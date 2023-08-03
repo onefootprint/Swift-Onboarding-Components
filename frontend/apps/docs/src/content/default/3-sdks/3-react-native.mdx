@@ -73,10 +73,10 @@ export default function App() {
   const handleButtonPress = async () => {
     footprint.open({
       publicKey: 'ob_test_ilBQgKtvrgQrQNV8U2rb7e',
-      onCompleted: validationToken => {
+      onComplete: validationToken => {
         alert(validationToken);
       },
-      onCanceled: () => {
+      onCancel: () => {
         console.log('canceled');
       },
     });
