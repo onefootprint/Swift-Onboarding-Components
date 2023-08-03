@@ -1,5 +1,16 @@
 # @onefootprint/footprint-react
 
+## 5.0.0
+
+### Major Changes
+
+- 467956004: Updated interfaces to support our full component library
+
+### Patch Changes
+
+- Updated dependencies [467956004]
+  - @onefootprint/footprint-js@3.0.0
+
 ## 4.2.0
 
 ### Patch Changes

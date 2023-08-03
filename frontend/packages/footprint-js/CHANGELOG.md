@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.0.0
+
+### Major Changes
+
+- 467956004: Updated interfaces to support our full component library
+
 ## 2.3.0
 
 ### Minor Changes
