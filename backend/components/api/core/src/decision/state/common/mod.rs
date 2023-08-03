@@ -11,8 +11,8 @@ use db::{
     DbError, DbPool, DbResult, TxnPgConn,
 };
 use newtypes::{
-    DecisionStatus, FootprintReasonCode, OnboardingId, ReviewReason, ScopedVaultId, TenantId, VendorAPI,
-    VerificationResultId, WorkflowId,
+    DecisionIntentKind, DecisionStatus, FootprintReasonCode, OnboardingId, ReviewReason, ScopedVaultId,
+    TenantId, VendorAPI, VerificationResultId, WorkflowId,
 };
 use webhooks::WebhookClient;
 
@@ -75,7 +75,12 @@ pub fn setup_kyc_onboarding_vreqs(
         Onboarding::update(ob, conn, OnboardingUpdate::idv_reqs_initiated_and_is_authorized())?;
     }
     // TODO: create new DI if is_redo
-    let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id, wf_id)?;
+    let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
+        conn,
+        sv_id,
+        wf_id,
+        DecisionIntentKind::OnboardingKyc,
+    )?;
 
     let uvw = VaultWrapper::build(conn, VwArgs::Tenant(sv_id))?;
 

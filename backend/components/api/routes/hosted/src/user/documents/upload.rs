@@ -30,8 +30,8 @@ use db::models::verification_result::VerificationResult;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, DecisionIntentId, DocumentKind, DocumentSide, IdentityDocumentId, IdentityDocumentStatus,
-    IncodeVerificationSessionState, TenantId, WorkflowId,
+    DataIdentifier, DecisionIntentId, DecisionIntentKind, DocumentKind, DocumentSide, IdentityDocumentId,
+    IdentityDocumentStatus, IncodeVerificationSessionState, TenantId, WorkflowId,
 };
 use newtypes::{ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
@@ -141,7 +141,12 @@ pub async fn post(
             let result = if should_initiate_reqs {
                 // Initiate IDV reqs once and only once for this id_doc
                 let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
-                let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id, &wf_id)?;
+                let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
+                    conn,
+                    &su_id,
+                    &wf_id,
+                    DecisionIntentKind::DocScan,
+                )?;
                 Some((decision_intent, doc_request, id_doc.id))
             } else {
                 if missing_sides.is_empty() {
@@ -268,7 +273,8 @@ pub(in crate::user) fn save_vres_for_fixture_risk_signals(
     wf_id: &WorkflowId,
     response: serde_json::Value,
 ) -> Result<VerificationResult, ApiError> {
-    let di = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id, wf_id)?;
+    let di =
+        DecisionIntent::get_or_create_for_workflow_and_kind(conn, sv_id, wf_id, DecisionIntentKind::DocScan)?;
     let vreq = VerificationRequest::create(conn, sv_id, &di.id, VendorAPI::IncodeFetchScores)?;
     let e_response = vendor::verification_result::encrypt_verification_result_response(
         &response.clone().into(),

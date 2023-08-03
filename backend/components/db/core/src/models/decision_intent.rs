@@ -109,17 +109,13 @@ impl DecisionIntent {
     }
 
     #[tracing::instrument("DecisionIntent::get_or_create_onboarding_kyc", skip_all)]
-    pub fn get_or_create_onboarding_kyc(
+    pub fn get_or_create_for_workflow_and_kind(
         conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,
         workflow_id: &WorkflowId,
+        kind: DecisionIntentKind,
     ) -> DbResult<Self> {
-        Self::get_or_create_for_kind_by_workflow_id(
-            conn,
-            scoped_vault_id,
-            workflow_id,
-            DecisionIntentKind::OnboardingKyc,
-        )
+        Self::get_or_create_for_kind_by_workflow_id(conn, scoped_vault_id, workflow_id, kind)
     }
 
     #[tracing::instrument("DecisionIntent::get_or_create_onboarding_kyb", skip_all)]
@@ -147,8 +143,20 @@ mod tests {
     fn test_get_or_create_onboarding_kyc(conn: &mut TestPgConn) {
         let sv_id = ScopedVaultId::from_str("123").unwrap();
         let wf_id = WorkflowId::from_str("456").unwrap();
-        let di1 = DecisionIntent::get_or_create_onboarding_kyc(conn, &sv_id, &wf_id).unwrap();
-        let di2 = DecisionIntent::get_or_create_onboarding_kyc(conn, &sv_id, &wf_id).unwrap();
+        let di1 = DecisionIntent::get_or_create_for_workflow_and_kind(
+            conn,
+            &sv_id,
+            &wf_id,
+            DecisionIntentKind::OnboardingKyc,
+        )
+        .unwrap();
+        let di2 = DecisionIntent::get_or_create_for_workflow_and_kind(
+            conn,
+            &sv_id,
+            &wf_id,
+            DecisionIntentKind::OnboardingKyc,
+        )
+        .unwrap();
         assert_eq!(di1, di2);
     }
 }

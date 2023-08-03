@@ -34,8 +34,8 @@ use idv::incode::IncodeStartOnboardingRequest;
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
 use newtypes::{
-    CipKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI, WorkflowFixtureResult,
-    WorkflowId,
+    CipKind, DecisionIntentKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
+    WorkflowFixtureResult, WorkflowId,
 };
 use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use webhooks::events::WebhookEvent;
@@ -292,7 +292,7 @@ pub fn mock_webhooks(
     state.set_webhook_client(Arc::new(mock_webhook_client));
 }
 
-pub fn save_vres_for_fixture_risk_signals(
+pub fn save_vres_for_doc_fixture_risk_signals(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
     vault: &Vault,
@@ -300,7 +300,8 @@ pub fn save_vres_for_fixture_risk_signals(
     vendor_api: VendorAPI,
     wf_id: &WorkflowId,
 ) -> Result<VerificationResult, ApiError> {
-    let di = DecisionIntent::get_or_create_onboarding_kyc(conn, sv_id, wf_id)?;
+    let di =
+        DecisionIntent::get_or_create_for_workflow_and_kind(conn, sv_id, wf_id, DecisionIntentKind::DocScan)?;
     let vreq = VerificationRequest::create(conn, sv_id, &di.id, vendor_api)?;
     let e_response = vendor::verification_result::encrypt_verification_result_response(
         &response.clone().into(),
@@ -337,7 +338,7 @@ pub async fn mock_incode_doc_collection(
                 DocumentRequest::create(conn, args).unwrap();
             }
 
-            let vres = save_vres_for_fixture_risk_signals(
+            let vres = save_vres_for_doc_fixture_risk_signals(
                 conn,
                 &scoped_vault_id,
                 &vault,

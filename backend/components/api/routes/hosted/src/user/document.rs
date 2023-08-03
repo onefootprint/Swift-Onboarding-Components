@@ -24,7 +24,7 @@ use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{DataIdentifier, WorkflowGuard};
+use newtypes::{DataIdentifier, DecisionIntentKind, WorkflowGuard};
 use newtypes::{DocumentKind, DocumentSide, IdentityDocumentStatus};
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -159,7 +159,12 @@ pub async fn post(
             let result = if should_initiate_reqs {
                 // Initiate IDV reqs once and only once for this id_doc
                 let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
-                let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id, &wf_id)?;
+                let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
+                    conn,
+                    &su_id,
+                    &wf_id,
+                    DecisionIntentKind::DocScan,
+                )?;
                 Some((decision_intent, doc_request, id_doc.id))
             } else {
                 if missing_sides.is_empty() {

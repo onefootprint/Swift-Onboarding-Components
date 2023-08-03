@@ -22,9 +22,10 @@ use idv::{
 use macros::test_state_case;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
-    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocVData, DocumentCdoInfo, DocumentSide,
-    IdentityDocumentStatus, IncodeFailureReason, IncodeVerificationSessionState, ModernIdDocKind, PiiString,
-    RiskSignalGroupKind, S3Url, SealedVaultDataKey, Selfie, VendorAPI,
+    CollectedDataOption, CountryRestriction, DecisionIntentKind, DocTypeRestriction, DocVData,
+    DocumentCdoInfo, DocumentSide, IdentityDocumentStatus, IncodeFailureReason,
+    IncodeVerificationSessionState, ModernIdDocKind, PiiString, RiskSignalGroupKind, S3Url,
+    SealedVaultDataKey, Selfie, VendorAPI,
 };
 
 use super::IncodeContext;
@@ -74,7 +75,13 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let wf = db::tests::fixtures::workflow::create(conn, &su_id);
-            let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &su_id, &wf.id).unwrap();
+            let di = DecisionIntent::get_or_create_for_workflow_and_kind(
+                conn,
+                &su_id,
+                &wf.id,
+                DecisionIntentKind::DocScan,
+            )
+            .unwrap();
 
             let args = NewDocumentRequestArgs {
                 scoped_vault_id: su_id,
@@ -312,7 +319,13 @@ async fn test_fail(state: &State, is_selfie: bool) {
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let wf = db::tests::fixtures::workflow::create(conn, &suid);
-            let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &suid, &wf.id).unwrap();
+            let di = DecisionIntent::get_or_create_for_workflow_and_kind(
+                conn,
+                &suid,
+                &wf.id,
+                DecisionIntentKind::DocScan,
+            )
+            .unwrap();
 
             let args = NewDocumentRequestArgs {
                 scoped_vault_id: suid,

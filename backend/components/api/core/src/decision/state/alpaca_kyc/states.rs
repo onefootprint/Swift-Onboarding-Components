@@ -17,7 +17,7 @@ use either::Either;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    AlpacaKycConfig, DecisionStatus, FootprintReasonCode, OnboardingStatus, ReviewReason,
+    AlpacaKycConfig, DecisionIntentKind, DecisionStatus, FootprintReasonCode, OnboardingStatus, ReviewReason,
     RiskSignalGroupKind, VendorAPI,
 };
 use webhooks::WebhookClient;
@@ -399,8 +399,13 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let (di, wf, v) = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let di = DecisionIntent::get_or_create_onboarding_kyc(conn, &sv_id, &wf_id)?;
                 let (wf, v) = DbWorkflow::get_with_vault(conn, &wf_id)?;
+                let di = DecisionIntent::get_or_create_for_workflow_and_kind(
+                    conn,
+                    &sv_id,
+                    &wf_id,
+                    DecisionIntentKind::WatchlistCheck,
+                )?;
                 Ok((di, wf, v))
             })
             .await?;

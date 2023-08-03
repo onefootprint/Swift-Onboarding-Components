@@ -50,7 +50,7 @@ use db::DbPool;
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DataIdentifier, IdentityDataKind, IncodeFailureReason, IncodeVerificationSessionId,
+    DataIdentifier, DecisionIntentKind, IdentityDataKind, IncodeFailureReason, IncodeVerificationSessionId,
     IncodeVerificationSessionKind, ModernIdDocKind, PiiJsonValue, ScopedVaultId, ScrubbedPiiJsonValue,
     ScrubbedPiiString, VendorAPI, WorkflowId,
 };
@@ -158,7 +158,12 @@ pub async fn save_incode_fixtures(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let vw = VaultWrapper::build_for_tenant(conn, &suid)?;
-            let decision_intent = DecisionIntent::get_or_create_onboarding_kyc(conn, &suid, &wf_id)?;
+            let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
+                conn,
+                &suid,
+                &wf_id,
+                DecisionIntentKind::DocScan,
+            )?;
 
             Ok((decision_intent, vw))
         })

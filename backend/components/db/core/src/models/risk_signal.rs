@@ -281,6 +281,7 @@ mod tests {
     use crate::tests::prelude::*;
     use itertools::Itertools;
     use macros::db_test_case;
+    use newtypes::DecisionIntentKind;
     use newtypes::Locked;
     use newtypes::{DbActor, DecisionIntentId, DecisionStatus, ScopedVaultId};
     use serde_json::json;
@@ -291,8 +292,11 @@ mod tests {
         let uv = fixtures::vault::create_person(conn, true).into_inner();
         let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
         let wf = fixtures::workflow::create(conn, &sv.id);
-        let di = crate::models::decision_intent::DecisionIntent::get_or_create_onboarding_kyc(
-            conn, &sv.id, &wf.id,
+        let di = crate::models::decision_intent::DecisionIntent::get_or_create_for_workflow_and_kind(
+            conn,
+            &sv.id,
+            &wf.id,
+            DecisionIntentKind::OnboardingKyc,
         )
         .unwrap();
         let ob = fixtures::onboarding::create(conn, sv.id.clone(), obc.id, None);
