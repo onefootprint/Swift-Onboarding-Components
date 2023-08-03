@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Box } from '@onefootprint/ui';
+import { Box, Pagination } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 import SectionHeader from 'src/components/section-header';
@@ -13,7 +13,12 @@ import useOnboardingConfigs from './hooks/use-onboarding-configs';
 
 const OnboardingConfigs = () => {
   const { t } = useTranslation('pages.developers.onboarding-configs');
-  const { data, errorMessage, isLoading, refetch } = useOnboardingConfigs();
+  const {
+    data: response,
+    errorMessage,
+    isLoading,
+    pagination,
+  } = useOnboardingConfigs();
 
   return (
     <>
@@ -23,8 +28,8 @@ const OnboardingConfigs = () => {
       <Box testID="onboarding-configs-section" as="section">
         <SectionHeader title={t('title')} subtitle={t('subtitle')}>
           <Wrapper>
-            <Create onCreate={refetch} />
-            {data?.length === 0 && (
+            <Create />
+            {response?.data?.length === 0 && (
               <>
                 <Divider />
                 <WaveAnimation width={140} />
@@ -33,7 +38,22 @@ const OnboardingConfigs = () => {
           </Wrapper>
         </SectionHeader>
         <Box sx={{ marginY: 5 }} />
-        <Table data={data} errorMessage={errorMessage} isLoading={isLoading} />
+        <Table
+          data={response?.data}
+          errorMessage={errorMessage}
+          isLoading={isLoading}
+        />
+        {response && response.meta.count > 0 && (
+          <Pagination
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            onNextPage={pagination.loadNextPage}
+            onPrevPage={pagination.loadPrevPage}
+            pageIndex={pagination.pageIndex}
+            pageSize={pagination.pageSize}
+            totalNumResults={response.meta.count}
+          />
+        )}
         <Details />
       </Box>
     </>

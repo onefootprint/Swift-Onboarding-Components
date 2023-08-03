@@ -1,5 +1,9 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  OnboardingConfig,
+  OnboardingConfigStatus,
+} from '@onefootprint/types';
 
 export const onboardingConfigDetailsFixture: OnboardingConfig = {
   id: 'ob_config_id_e0XeR8sxG2Fs6k7fQmYrEG',
@@ -16,7 +20,7 @@ export const onboardingConfigDetailsFixture: OnboardingConfig = {
   canAccessData: [CollectedKycDataOption.ssn4],
   isLive: true,
   createdAt: '8/10/22, 11:56 AM',
-  status: 'disabled',
+  status: OnboardingConfigStatus.disabled,
   isAppClipEnabled: false,
 };
 

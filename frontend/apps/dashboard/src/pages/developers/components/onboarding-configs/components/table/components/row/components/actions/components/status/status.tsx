@@ -1,6 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfig, OnboardingConfigStatus } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans } from 'react-i18next';
@@ -29,12 +29,13 @@ const Status = forwardRef<StatusHandler, StatusProps>(
     };
 
     const disable = () => {
-      const newStatus =
-        onboardingConfig.status === 'enabled' ? 'disabled' : 'enabled';
       mutation.mutate(
         {
           id: onboardingConfig.id,
-          status: newStatus,
+          status:
+            onboardingConfig.status === 'enabled'
+              ? OnboardingConfigStatus.disabled
+              : OnboardingConfigStatus.enabled,
         },
         {
           onSuccess: hideConfirmation,

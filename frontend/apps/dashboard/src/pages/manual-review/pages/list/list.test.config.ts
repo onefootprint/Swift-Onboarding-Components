@@ -6,6 +6,7 @@ import {
   EntityKind,
   EntityStatus,
   GetOnboardingConfigsResponse,
+  OnboardingConfigStatus,
   OnboardingStatus,
 } from '@onefootprint/types';
 
@@ -96,7 +97,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     ],
     isLive: true,
     createdAt: '2023-04-11T17:59:54.816474Z',
-    status: 'enabled',
+    status: OnboardingConfigStatus.enabled,
     isAppClipEnabled: false,
   },
 ];

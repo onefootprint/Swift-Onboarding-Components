@@ -2,6 +2,7 @@ import {
   CollectedKycDataOption,
   IdDI,
   OnboardingConfig,
+  OnboardingConfigStatus,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -18,7 +19,7 @@ describe('Onboarding Machine Tests', () => {
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
-    status: 'enabled',
+    status: OnboardingConfigStatus.enabled,
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
     isAppClipEnabled: false,

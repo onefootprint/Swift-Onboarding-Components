@@ -4,6 +4,7 @@ import {
   CollectedKycDataOption,
   KYB_BO_SESSION_AUTHORIZATION_HEADER,
   OnboardingConfig,
+  OnboardingConfigStatus,
 } from '@onefootprint/types';
 
 import { MachineContext, MachineEvents } from '../../types';
@@ -19,7 +20,7 @@ describe('isContextReady', () => {
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
-    status: 'enabled',
+    status: OnboardingConfigStatus.enabled,
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
     isAppClipEnabled: false,

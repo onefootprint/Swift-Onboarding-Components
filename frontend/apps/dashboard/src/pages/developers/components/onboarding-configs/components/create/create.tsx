@@ -6,11 +6,7 @@ import PermissionGate from 'src/components/permission-gate';
 
 import Dialog from './components/dialog';
 
-type CreateProps = {
-  onCreate: () => void;
-};
-
-const Create = ({ onCreate }: CreateProps) => {
+const Create = () => {
   const { t } = useTranslation('pages.developers.onboarding-configs');
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =
     useToggle(false);
@@ -25,11 +21,7 @@ const Create = ({ onCreate }: CreateProps) => {
           {t('cta')}
         </Button>
       </PermissionGate>
-      <Dialog
-        open={isCreateDialogOpen}
-        onClose={closeCreateDialog}
-        onCreate={onCreate}
-      />
+      <Dialog open={isCreateDialogOpen} onClose={closeCreateDialog} />
     </>
   );
 };

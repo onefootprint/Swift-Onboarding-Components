@@ -6,13 +6,12 @@ import DialogContent from './components/dialog-content';
 export type DialogProps = {
   open: boolean;
   onClose: () => void;
-  onCreate: () => void;
 };
 
-const Dialog = ({ open, onClose, onCreate }: DialogProps) =>
+const Dialog = ({ open, onClose }: DialogProps) =>
   open ? (
     <OnboardingConfigMachineProvider>
-      <DialogContent onClose={onClose} onCreate={onCreate} />
+      <DialogContent onClose={onClose} />
     </OnboardingConfigMachineProvider>
   ) : null;
 

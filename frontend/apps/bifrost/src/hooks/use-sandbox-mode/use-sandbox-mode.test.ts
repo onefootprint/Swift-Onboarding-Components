@@ -1,5 +1,9 @@
 import { renderHook } from '@onefootprint/test-utils';
-import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  OnboardingConfig,
+  OnboardingConfigStatus,
+} from '@onefootprint/types';
 import { BifrostMachine } from 'src/utils/state-machine';
 
 import { BifrostMachineProvider } from '../../components/bifrost-machine-provider';
@@ -15,7 +19,7 @@ describe('useSandboxMode', () => {
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
-    status: 'enabled',
+    status: OnboardingConfigStatus.enabled,
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
     isAppClipEnabled: false,

@@ -30,7 +30,7 @@ const useCreateOnboardingConfig = () => {
       createOnboardingConfig(authHeaders, data),
     {
       onSettled: () => {
-        queryClient.invalidateQueries(['onboarding-configs']);
+        queryClient.invalidateQueries();
       },
       onError: showErrorToast,
     },

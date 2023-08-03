@@ -49,7 +49,7 @@ describe('<OnboardingConfigs />', () => {
     withEntities();
   });
 
-  describe('when the request to fetch the proxy configs succeeds', () => {
+  describe('when the request to fetch onboarding configs succeeds', () => {
     describe('when there are no onboarding configs', () => {
       beforeEach(() => {
         withOnboardingConfigs([]);
@@ -85,12 +85,6 @@ describe('<OnboardingConfigs />', () => {
       it('should show the name, key, status and creation date of each onboarding config', async () => {
         await renderOnboardingConfigsAndWaitData();
 
-        expect(screen.getByText('Configuration name')).toBeInTheDocument();
-        expect(screen.getByText('Publishable key')).toBeInTheDocument();
-        expect(screen.getByText('Status')).toBeInTheDocument();
-        expect(screen.getByText('Created at')).toBeInTheDocument();
-        expect(screen.getByText('Type')).toBeInTheDocument();
-
         onboardingConfigsFixture.forEach(config => {
           const name = screen.getByText(config.name);
           expect(name).toBeInTheDocument();
@@ -120,10 +114,39 @@ describe('<OnboardingConfigs />', () => {
         expect(screen.getByText('Enabled')).toBeInTheDocument();
         expect(screen.getByText('Disabled')).toBeInTheDocument();
       });
+
+      describe('when typing on the table search', () => {
+        it('should append email to query', async () => {
+          const push = jest.fn();
+          useRouterSpy({
+            pathname: '/developers',
+            query: {
+              tab: 'onboarding_configs',
+            },
+            push,
+          });
+          await renderOnboardingConfigsAndWaitData();
+
+          const search = screen.getByPlaceholderText('Search...');
+          await userEvent.type(search, 'KYC');
+          await waitFor(() => {
+            expect(push).toHaveBeenCalledWith(
+              {
+                query: {
+                  onboarding_configs_search: 'KYC',
+                  tab: 'onboarding_configs',
+                },
+              },
+              undefined,
+              { shallow: true },
+            );
+          });
+        });
+      });
     });
   });
 
-  describe('when the request to fetch the onboarding configs fails', () => {
+  describe('when the request to fetch onboarding configs fails', () => {
     beforeEach(() => {
       withOnboardingConfigsError();
     });

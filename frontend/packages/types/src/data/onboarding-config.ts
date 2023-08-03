@@ -2,13 +2,18 @@ import { FootprintAppearance } from '@onefootprint/footprint-js';
 
 import { CollectedDataOption } from './collected-data-option';
 
+export enum OnboardingConfigStatus {
+  enabled = 'enabled',
+  disabled = 'disabled',
+}
+
 export type OnboardingConfig = {
   id: string;
   name: string;
   key: string;
   isLive: boolean;
   createdAt: string;
-  status: 'enabled' | 'disabled';
+  status: OnboardingConfigStatus;
   appearance?: FootprintAppearance;
 
   orgName: string;

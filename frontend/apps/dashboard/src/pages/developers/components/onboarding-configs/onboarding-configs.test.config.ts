@@ -34,6 +34,10 @@ export const withOnboardingConfigs = (data = onboardingConfigsFixture) =>
     delay: 50,
     response: {
       data,
+      meta: {
+        count: data.length,
+        next_page: null,
+      },
     },
   });
 

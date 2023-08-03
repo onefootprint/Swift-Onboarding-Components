@@ -65,9 +65,8 @@ describe('<Dialog />', () => {
   const renderDialog = ({
     open = defaultOptions.open,
     onClose = defaultOptions.onClose,
-    onCreate = defaultOptions.onCreate,
   }: Partial<DialogProps> = defaultOptions) => {
-    customRender(<Dialog open={open} onClose={onClose} onCreate={onCreate} />);
+    customRender(<Dialog open={open} onClose={onClose} />);
   };
 
   describe('When toggling open/closed state', () => {
@@ -388,9 +387,8 @@ describe('<Dialog />', () => {
     it('should save onboarding config next', async () => {
       withCreateOnboardingConfig();
 
-      const onCreate = jest.fn();
       const onClose = jest.fn();
-      renderDialog({ onCreate, onClose });
+      renderDialog({ onClose });
 
       await selectType();
       await fillName();
@@ -398,9 +396,6 @@ describe('<Dialog />', () => {
       await fillInvestorProfile();
       await fillKycAccess();
 
-      await waitFor(() => {
-        expect(onCreate).toHaveBeenCalled();
-      });
       await waitFor(() => {
         expect(onClose).toHaveBeenCalled();
       });
@@ -519,9 +514,8 @@ describe('<Dialog />', () => {
     it('should save onboarding config next', async () => {
       withCreateOnboardingConfig();
 
-      const onCreate = jest.fn();
       const onClose = jest.fn();
-      renderDialog({ onCreate, onClose });
+      renderDialog({ onClose });
 
       await selectType(true);
       await fillName();
@@ -529,9 +523,6 @@ describe('<Dialog />', () => {
       await fillKycCollect();
       await fillKybAccess();
 
-      await waitFor(() => {
-        expect(onCreate).toHaveBeenCalled();
-      });
       await waitFor(() => {
         expect(onClose).toHaveBeenCalled();
       });

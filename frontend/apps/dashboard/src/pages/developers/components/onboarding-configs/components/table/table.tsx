@@ -4,6 +4,7 @@ import { Table as UITable } from '@onefootprint/ui';
 import React from 'react';
 
 import useFilters from '../../hooks/use-filters';
+import Filters from './components/filters';
 import Row from './components/row';
 
 type TableProps = {
@@ -24,8 +25,12 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
     { id: 'actions', text: '', width: '5%' },
   ];
 
-  const handleClick = (config: OnboardingConfig) => {
+  const handleRowClick = (config: OnboardingConfig) => {
     filters.push({ onboarding_config_id: config.id });
+  };
+
+  const handleSearchChange = (search: string) => {
+    filters.push({ onboarding_configs_search: search });
   };
 
   return (
@@ -35,9 +40,12 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
       emptyStateText={errorMessage || t('table.empty-state')}
       getAriaLabelForRow={onboardingConfig => onboardingConfig.name}
       getKeyForRow={onboardingConfig => onboardingConfig.id}
+      initialSearch={filters.values.search}
       isLoading={isLoading}
       items={data}
-      onRowClick={handleClick}
+      onChangeSearchText={handleSearchChange}
+      onRowClick={handleRowClick}
+      renderActions={() => <Filters />}
       renderTr={({ item: onboardingConfig }) => (
         <Row onboardingConfig={onboardingConfig} />
       )}

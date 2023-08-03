@@ -22,13 +22,12 @@ import { useOnboardingConfigMachine } from '../../../machine-provider';
 
 type DialogContentProps = {
   onClose: () => void;
-  onCreate: () => void;
 };
 
 // We should never need this fallback name but it's here for typecheck safety
 const DEFAULT_ONBOARDING_CONFIG_NAME = 'Unnamed Onboarding Config';
 
-const DialogContent = ({ onClose, onCreate }: DialogContentProps) => {
+const DialogContent = ({ onClose }: DialogContentProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create',
   );
@@ -89,7 +88,6 @@ const DialogContent = ({ onClose, onCreate }: DialogContentProps) => {
             title: t('feedback.success.title'),
             description: t('feedback.success.description'),
           });
-          onCreate();
           onClose();
         },
         onError: (error: unknown) => {

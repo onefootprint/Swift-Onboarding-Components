@@ -1293,6 +1293,13 @@
             "status": "Status",
             "created": "Created at"
           },
+          "filters": {
+            "status": {
+              "label": "Status",
+              "enabled": "Enabled",
+              "disabled": "Disabled"
+            }
+          },
           "empty-state": "You haven't created any vault onboarding configurations just yet."
         },
         "actions": {

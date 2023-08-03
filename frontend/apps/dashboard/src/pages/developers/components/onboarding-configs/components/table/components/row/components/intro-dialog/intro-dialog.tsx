@@ -17,7 +17,7 @@ const IntroDialog = () => {
   const { data: entities } = useEntities(EntityKind.person);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const shouldShowIntroDialog =
-    configs?.length === 1 && entities?.data?.length === 0;
+    configs?.data.length === 1 && entities?.data?.length === 0;
 
   useTimeout(() => {
     if (shouldShowIntroDialog) {

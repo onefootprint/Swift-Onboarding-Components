@@ -12,6 +12,7 @@ import {
   CollectedKycDataOption,
   IdDI,
   OnboardingConfig,
+  OnboardingConfigStatus,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
@@ -93,7 +94,7 @@ describe.skip('<CollectKycData />', () => {
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
-    status: 'enabled',
+    status: OnboardingConfigStatus.enabled,
     mustCollectData: mustCollectData ?? [],
     canAccessData: canAccessData ?? [],
     isAppClipEnabled: false,

@@ -28,7 +28,7 @@ const useRoles = () => {
   const { formatDateWithTime } = useIntl();
   const filters = useRolesFilters();
   const { requestParams } = filters;
-  const RolesQuery = useQuery(
+  const rolesQuery = useQuery(
     ['org', 'roles', requestParams],
     () => getRoles(authHeaders, requestParams),
     {
@@ -43,18 +43,17 @@ const useRoles = () => {
     },
   );
   const pagination = usePagination({
-    count: RolesQuery.data?.meta.count,
-    next: RolesQuery.data?.meta.nextPage,
+    count: rolesQuery.data?.meta.count,
+    next: rolesQuery.data?.meta.nextPage,
     page: filters.values.page,
     onChange: newPage => filters.push({ roles_page: newPage }),
   });
-  const errorMessage = RolesQuery.error
-    ? getErrorMessage(RolesQuery.error)
+  const errorMessage = rolesQuery.error
+    ? getErrorMessage(rolesQuery.error)
     : undefined;
 
   return {
-    ...RolesQuery,
-
+    ...rolesQuery,
     errorMessage,
     pagination,
   };

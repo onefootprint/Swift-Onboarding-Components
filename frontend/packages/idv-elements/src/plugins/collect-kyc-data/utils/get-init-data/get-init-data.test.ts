@@ -2,6 +2,7 @@ import {
   CollectedKycDataOption,
   IdDI,
   OnboardingConfig,
+  OnboardingConfigStatus,
 } from '@onefootprint/types';
 
 import getInitData from './get-init-data';
@@ -18,7 +19,7 @@ describe('getInitData', () => {
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
-    status: 'enabled',
+    status: OnboardingConfigStatus.enabled,
     mustCollectData: mustCollectData ?? [],
     canAccessData: mustCollectData ?? [],
     isAppClipEnabled: false,
