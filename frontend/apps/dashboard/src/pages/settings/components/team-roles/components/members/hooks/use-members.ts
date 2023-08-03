@@ -56,8 +56,9 @@ const useMembers = () => {
   const pagination = usePagination({
     count: membersQuery.data?.meta.count,
     next: membersQuery.data?.meta.nextPage,
-    page: filters.values.page,
     onChange: newPage => filters.push({ members_page: newPage }),
+    page: filters.values.page,
+    pageSize: 10,
   });
   const errorMessage = membersQuery.error
     ? getErrorMessage(membersQuery.error)

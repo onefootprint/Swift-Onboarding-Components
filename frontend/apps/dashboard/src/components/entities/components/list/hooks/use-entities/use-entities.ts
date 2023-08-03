@@ -59,6 +59,7 @@ const useEntities = (
     next: query.data?.meta.next,
     cursor: filters.values.cursor,
     onChange: newCursor => filters.push({ cursor: newCursor }),
+    pageSize: 15,
   });
 
   const { error } = query;

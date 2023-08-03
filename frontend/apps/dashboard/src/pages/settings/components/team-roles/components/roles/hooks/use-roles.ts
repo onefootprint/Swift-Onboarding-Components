@@ -45,8 +45,9 @@ const useRoles = () => {
   const pagination = usePagination({
     count: rolesQuery.data?.meta.count,
     next: rolesQuery.data?.meta.nextPage,
-    page: filters.values.page,
     onChange: newPage => filters.push({ roles_page: newPage }),
+    page: filters.values.page,
+    pageSize: 10,
   });
   const errorMessage = rolesQuery.error
     ? getErrorMessage(rolesQuery.error)
