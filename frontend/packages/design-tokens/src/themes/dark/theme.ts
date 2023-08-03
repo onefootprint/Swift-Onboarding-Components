@@ -14,7 +14,7 @@ import {
   overlay,
   surfaceColor,
   textColor,
-} from '../../tokens/dark';
+} from '../../tokens/light';
 import type { Theme } from '../types';
 import codeHighlight from './code-highlight';
 import components from './components';
