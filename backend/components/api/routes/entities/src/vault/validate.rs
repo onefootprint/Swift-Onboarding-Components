@@ -27,7 +27,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 )]
 #[api_v2_operation(
     description = "Works for either person or business entities. Checks if provided data is valid before adding it to the vault.",
-    tags(Vault, Entities, Preview)
+    tags(Vault, Entities, Private)
 )]
 #[actix::post("/entities/{fp_id}/vault/validate")]
 pub async fn post(

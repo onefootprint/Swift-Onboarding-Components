@@ -16,7 +16,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 
 #[route_alias(get(
     "/users/vault/decrypt/{token}",
-    tags(Client, Vault, Users, Preview),
+    tags(Client, Vault, Users, PublicApi),
     description = "Decrypts and downloads the user's data as specified by the provided token.",
 ))]
 #[api_v2_operation(

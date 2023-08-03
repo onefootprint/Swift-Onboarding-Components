@@ -64,7 +64,7 @@ flat_api_object_map_type!(
     )
 )]
 #[api_v2_operation(
-    tags(Vault, Entities, Preview),
+    tags(Vault, Entities, Private),
     description = "Works for either person or business entities. Decrypts the specified list of fields from the provided vault."
 )]
 #[post("/entities/{fp_id}/vault/decrypt")]
