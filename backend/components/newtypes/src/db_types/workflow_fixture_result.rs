@@ -34,7 +34,7 @@ crate::util::impl_enum_str_diesel!(WorkflowFixtureResult);
 
 impl WorkflowFixtureResult {
     pub fn from_sandbox_id(value: Option<&SandboxId>) -> Option<Self> {
-        let value = value?;
+        let value = value?.to_lowercase();
         let res = if value.starts_with("fail") {
             Self::Fail
         } else if value.starts_with("manualreview") {

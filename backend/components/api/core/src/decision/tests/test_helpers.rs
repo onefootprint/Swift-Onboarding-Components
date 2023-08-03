@@ -53,7 +53,7 @@ pub fn create_user_and_populate_vault(
     ob_config: ObConfiguration,
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> (Vault, ScopedVault) {
-    let sandbox_id = fixture_result.map(|f| format!("{}_sandbox", f));
+    let sandbox_id = fixture_result.map(|f| format!("{}_sandbox", f.as_ref()));
     let uv = fixtures::vault::create(conn, VaultKind::Person, sandbox_id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
