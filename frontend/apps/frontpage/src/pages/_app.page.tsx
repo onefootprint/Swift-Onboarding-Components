@@ -11,11 +11,7 @@ import React from 'react';
 
 import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';
-import {
-  FATHOM_TRACKING_CODE,
-  HOTJAR_SITE_ID,
-  HOTJAR_VERSION,
-} from '../config/constants';
+import { FATHOM_TRACKING_CODE } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 
@@ -67,22 +63,20 @@ const App = ({ Component, pageProps }: AppProps) => (
       />
     )}
     <Script />
-    {HOTJAR_SITE_ID && HOTJAR_VERSION && (
-      <Script
-        id="hotjar"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `(function(h,o,t,j,a,r){
-                h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-                h._hjSettings={hjid:${HOTJAR_SITE_ID},hjsv:${HOTJAR_VERSION}};
-                a=o.getElementsByTagName('head')[0];
-                r=o.createElement('script');r.async=1;
-                r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-                a.appendChild(r);
-            })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=')`,
-        }}
-      />
-    )}
+    <Script
+      id="hotjar"
+      strategy="afterInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `(function(h,o,t,j,a,r){
+          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+          h._hjSettings={hjid:3586342,hjsv:6};
+          a=o.getElementsByTagName('head')[0];
+          r=o.createElement('script');r.async=1;
+          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+          a.appendChild(r);
+        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`,
+      }}
+    />
     <QueryClientProvider client={queryClient}>
       <DesignSystemProvider theme={themes.light}>
         <GlobalStyle />
