@@ -96,6 +96,9 @@ const ComponentsInstructions = ({
             onComplete={handleComplete}
             onClose={handleClose}
             onCancel={handleClose}
+            options={{
+              hideFootprintLogo: true,
+            }}
           />
         )}
       </Grid>

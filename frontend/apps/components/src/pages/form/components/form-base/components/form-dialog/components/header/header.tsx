@@ -13,8 +13,7 @@ type HeaderProps = {
 
 const Header = ({ title, variant, onClose }: HeaderProps) => {
   const { t } = useTranslation('pages.secure-form.form-dialog.header');
-  const canClose = (variant === 'modal' || variant === 'drawer') && onClose;
-
+  const canClose = variant === 'modal' || variant === 'drawer';
   if (!title && !canClose) {
     return null;
   }
@@ -51,6 +50,7 @@ const Container = styled.header`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
       0;
+    height: 46px;
     ${createFontStyles('label-2')}
 
     &[data-variant='inline'] {

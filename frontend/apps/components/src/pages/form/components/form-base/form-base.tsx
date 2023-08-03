@@ -34,6 +34,7 @@ export type FormBaseProps = {
   onSave?: (data: FormData) => void;
   onCancel?: () => void;
   onClose?: () => void;
+  hideFootprintLogo?: boolean;
 };
 
 const FORM_ID = 'secure-form';
@@ -46,6 +47,7 @@ const FormBase = ({
   onSave,
   onCancel,
   onClose,
+  hideFootprintLogo,
 }: FormBaseProps) => {
   const { t } = useTranslation('pages.secure-form');
   const confirmationDialog = useConfirmationDialog();
@@ -102,7 +104,7 @@ const FormBase = ({
 
   return (
     <FormDialog
-      title={title ?? t('title')}
+      title={title}
       variant={variant}
       primaryButton={{
         form: FORM_ID,
@@ -119,6 +121,7 @@ const FormBase = ({
         }
       }
       onClose={handleClose}
+      hideFootprintLogo={hideFootprintLogo}
     >
       <FormProvider {...methods}>
         <StyledForm id={FORM_ID} onSubmit={handleSubmit(handleBeforeSubmit)}>

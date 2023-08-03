@@ -13,6 +13,7 @@ export type FormDialogProps = {
   children: React.ReactNode;
   testID?: string;
   variant?: FootprintVariant;
+  hideFootprintLogo?: boolean;
 } & (AllButtons | OnlyPrimaryButton);
 
 const FormDialog = ({
@@ -23,6 +24,7 @@ const FormDialog = ({
   testID,
   onClose,
   variant = 'modal',
+  hideFootprintLogo,
 }: FormDialogProps) => (
   <Container
     id="footprint-container"
@@ -33,7 +35,11 @@ const FormDialog = ({
     <div style={{ flexGrow: 1 }}>
       <ScrollArea sx={{ padding: 7 }}>{children}</ScrollArea>
     </div>
-    <Footer primaryButton={primaryButton} secondaryButton={secondaryButton} />
+    <Footer
+      primaryButton={primaryButton}
+      secondaryButton={secondaryButton}
+      hideFootprintLogo={hideFootprintLogo}
+    />
   </Container>
 );
 

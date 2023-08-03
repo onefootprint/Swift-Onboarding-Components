@@ -14,6 +14,7 @@ describe('<FormFormDialog />', () => {
     secondaryButton,
     testID,
     children = 'content',
+    hideFootprintLogo,
   }: Partial<FormDialogProps>) =>
     renderComponents(
       <FormDialog
@@ -22,6 +23,7 @@ describe('<FormFormDialog />', () => {
         secondaryButton={secondaryButton}
         testID={testID}
         title={title}
+        hideFootprintLogo={hideFootprintLogo}
       >
         {children}
       </FormDialog>,
@@ -76,5 +78,14 @@ describe('<FormFormDialog />', () => {
     const button = screen.getByRole('button', { name: 'Secondary' });
     await userEvent.click(button);
     expect(secondaryButton.onClick).toHaveBeenCalled();
+  });
+
+  it('should hide footprint logo when hideFootprintLogo is true', async () => {
+    renderFormDialog({ hideFootprintLogo: true });
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId('secured-by-footprint'),
+      ).not.toBeInTheDocument();
+    });
   });
 });

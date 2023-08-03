@@ -13,6 +13,7 @@ export type {
 export type {
   Footprint,
   Component as FootprintComponent,
+  FormOptions as FootprintFormOptions,
   FormProps as FootprintFormProps,
   Props as FootprintProps,
   PropsBase as FootprintPropsBase,

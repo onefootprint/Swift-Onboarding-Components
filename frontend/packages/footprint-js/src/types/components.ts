@@ -78,14 +78,19 @@ export enum FormType {
   cardAndZip = 'cardAndZip',
 }
 
+export type FormOptions = {
+  hideFootprintLogo?: boolean;
+};
+
 export interface FormProps extends PropsBase {
   kind: ComponentKind.Form;
   authToken: string;
   title?: string;
   type?: FormType;
+  containerId?: string; // required for inline variant
+  variant?: Variant; // supports all variants, falls back to modal, so optional
+  options?: FormOptions;
   onComplete?: () => void;
   onCancel?: () => void;
   onClose?: () => void;
-  variant?: Variant; // supports all variants, falls back to modal, so optional
-  containerId?: string; // required for inline variant
 }

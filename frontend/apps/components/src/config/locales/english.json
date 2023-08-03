@@ -9,7 +9,6 @@
         "title": "Integration incorrectly configured",
         "subtitle": "It seems like the form integration is using an invalid authentication. Please contact the owner of this product."
       },
-      "title": "Add credit card",
       "section-title": {
         "card-information": "Card information",
         "billing-address": "Billing address"

@@ -41,7 +41,6 @@ const Aryeo = () => (
   <ComponentsInstructions
     appearance={appearance}
     cardAlias="primary"
-    title="Add a New Card"
     tenantName="Aryeo"
     framework="vue"
     userId="fp_id_UIUImA2Kfqkhcrc90qjaMu"

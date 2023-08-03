@@ -9,14 +9,19 @@ import SecuredByFootprint from './components/secured-by-footprint';
 type FooterProps = {
   primaryButton: FormDialogButton;
   secondaryButton?: FormDialogButton;
+  hideFootprintLogo?: boolean;
 };
 
-const Footer = ({ primaryButton, secondaryButton }: FooterProps) => {
+const Footer = ({
+  primaryButton,
+  secondaryButton,
+  hideFootprintLogo,
+}: FooterProps) => {
   const { t } = useTranslation('pages.secure-form.form-dialog');
 
   return (
-    <Container>
-      <SecuredByFootprint />
+    <Container hideFootprintLogo={hideFootprintLogo}>
+      {!hideFootprintLogo && <SecuredByFootprint />}
       <ButtonsContainer>
         {secondaryButton && (
           <Button
@@ -51,11 +56,11 @@ const Footer = ({ primaryButton, secondaryButton }: FooterProps) => {
   );
 };
 
-const Container = styled.footer`
-  ${({ theme }) => css`
+const Container = styled.footer<{ hideFootprintLogo?: boolean }>`
+  ${({ theme, hideFootprintLogo }) => css`
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: ${hideFootprintLogo ? 'flex-end' : 'space-between'};
     padding: ${theme.spacing[5]} ${theme.spacing[7]};
     background-color: ${theme.backgroundColor.primary};
     width: 100%;

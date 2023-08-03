@@ -27,6 +27,7 @@ const Form = () => {
     title,
     type = FootprintFormType.cardAndName,
     variant,
+    options,
   } = props || {};
   const usersVaultMutation = useUsersVault();
   const clientTokenFields = useClientTokenFields(authToken);
@@ -104,6 +105,7 @@ const Form = () => {
       type={type}
       variant={variant}
       isLoading={usersVaultMutation.isLoading}
+      hideFootprintLogo={options?.hideFootprintLogo}
       onSave={handleSave}
       onCancel={handleCancel}
       onClose={handleClose}

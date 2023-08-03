@@ -45,6 +45,11 @@ export default {
       description: 'Function called when the close button is clicked',
       required: false,
     },
+    hideFootprintLogo: {
+      control: 'boolean',
+      description: 'If true, the footprint logo is hidden',
+      required: false,
+    },
   },
 } as Meta;
 
@@ -55,6 +60,7 @@ const Template: Story<FormBaseProps> = ({
   onSave,
   onClose,
   onCancel,
+  hideFootprintLogo,
 }: FormBaseProps) => (
   <FormBase
     title={title}
@@ -63,6 +69,7 @@ const Template: Story<FormBaseProps> = ({
     onSave={onSave}
     onCancel={onCancel}
     onClose={onClose}
+    hideFootprintLogo={hideFootprintLogo}
   />
 );
 
