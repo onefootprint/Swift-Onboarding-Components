@@ -37,9 +37,9 @@ impl WorkflowFixtureResult {
         let value = value?.to_lowercase();
         let res = if value.starts_with("fail") {
             Self::Fail
-        } else if value.starts_with("manualreview") {
+        } else if value.starts_with("manualreview") | value.starts_with("manual_review") {
             Self::ManualReview
-        } else if value.starts_with("stepup") {
+        } else if value.starts_with("stepup") | value.starts_with("step_up") {
             Self::StepUp
         } else {
             Self::Pass
