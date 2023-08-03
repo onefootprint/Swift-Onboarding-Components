@@ -1,13 +1,13 @@
-import {
+import footprint, {
   FootprintAppearance,
+  FootprintComponentKind,
   FootprintFormType,
 } from '@onefootprint/footprint-js';
-import { FootprintForm } from '@onefootprint/footprint-react';
 import styled from '@onefootprint/styled';
 import { useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React from 'react';
 
 import LeftPane from './components/left-pane';
 import RightPane from './components/right-pane';
@@ -35,11 +35,24 @@ const ComponentsInstructions = ({
   userId,
   variant,
 }: ComponentsInstructionsProps) => {
-  const [isVisible, setIsVisible] = useState(false);
   const toast = useToast();
 
   const handleLaunch = () => {
-    setIsVisible(true);
+    const component = footprint.init({
+      kind: FootprintComponentKind.Form,
+      authToken: secretAuthToken,
+      variant,
+      title,
+      appearance,
+      type: FootprintFormType.cardAndZip,
+      onComplete: handleComplete,
+      onClose: handleClose,
+      onCancel: handleClose,
+      options: {
+        hideFootprintLogo: true,
+      },
+    });
+    component.render();
   };
 
   const handleComplete = () => {
@@ -56,8 +69,6 @@ const ComponentsInstructions = ({
         </span>
       ),
     });
-
-    setIsVisible(false);
   };
 
   const handleClose = () => {
@@ -66,8 +77,6 @@ const ComponentsInstructions = ({
       title: 'Payment method not saved',
       description: 'User cancelled the payment method form',
     });
-
-    setIsVisible(false);
   };
 
   return (
@@ -86,21 +95,6 @@ const ComponentsInstructions = ({
           onLaunch={handleLaunch}
         />
         <RightPane onLaunch={handleLaunch} />
-        {isVisible && (
-          <FootprintForm
-            appearance={appearance}
-            authToken={secretAuthToken}
-            type={FootprintFormType.cardAndZip}
-            variant={variant}
-            title={title}
-            onComplete={handleComplete}
-            onClose={handleClose}
-            onCancel={handleClose}
-            options={{
-              hideFootprintLogo: true,
-            }}
-          />
-        )}
       </Grid>
     </>
   );

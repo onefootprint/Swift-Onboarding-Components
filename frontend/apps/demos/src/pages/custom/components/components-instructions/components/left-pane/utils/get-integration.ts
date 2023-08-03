@@ -38,12 +38,14 @@ export const getVueIntegration = () => `
         kind: 'form',
         authToken: "tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", // auth token generated using the Secret API Key on step 5
         appearance: appearance, // appearance object from step 6
-        title: "Add a New Card",
         type: "cardAndZip",
         variant: "drawer",
         onComplete: handleComplete,
         onClose: handleClose,
-        onCancel: handleCancel
+        onCancel: handleCancel,
+        options: {
+          hideFootprintLogo: false
+        }
       });
       component.render();
     },

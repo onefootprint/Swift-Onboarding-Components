@@ -1,7 +1,5 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { IcoFootprint16 } from '@onefootprint/icons';
-import styled, { css, keyframes } from '@onefootprint/styled';
-import { Grid, media, ScrollArea, Shimmer, Typography } from '@onefootprint/ui';
+import styled, { css } from '@onefootprint/styled';
+import { Grid, media, ScrollArea, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
@@ -34,7 +32,6 @@ const Loading = () => (
       </ScrollArea>
     </div>
     <Footer>
-      <SecuredByFootprint />
       <ButtonsContainer>
         <Button />
         <Button />
@@ -166,65 +163,7 @@ const Footer = styled.footer`
       ${theme.borderRadius.default};
     position: relative;
     overflow: hidden;
-  `}
-`;
-
-const SecuredByFootprint = () => {
-  const { t } = useTranslation(
-    'pages.secure-form.form-dialog.secured-by-footprint',
-  );
-  return (
-    <SecuredByFootprintContainer>
-      <IconContainer>
-        <IcoFootprint16 color="quaternary" />
-      </IconContainer>
-      <TextContainer>
-        <Typography variant="caption-1" color="quaternary">
-          {t('label')}
-        </Typography>
-      </TextContainer>
-    </SecuredByFootprintContainer>
-  );
-};
-
-const IconContainer = styled.div`
-  min-width: 16px;
-`;
-
-const blink = keyframes`
-  100% {
-    transform: translateX(100%);
-  }
-`;
-
-const SecuredByFootprintContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &::after {
-    bottom: 0;
-    content: '';
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transform: translateX(-100%);
-
-    background-image: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0,
-      rgba(255, 255, 255, 0.2) 20%,
-      rgba(255, 255, 255, 0.5) 60%,
-      rgba(255, 255, 255, 0)
-    );
-    animation: ${blink} 2s infinite;
-  }
-`;
-
-const TextContainer = styled.div`
-  ${({ theme }) => css`
-    margin-left: ${theme.spacing[2]};
+    justify-content: flex-end;
   `}
 `;
 
