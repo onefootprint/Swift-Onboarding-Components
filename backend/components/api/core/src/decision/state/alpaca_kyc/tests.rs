@@ -40,7 +40,7 @@ use std::sync::Arc;
 #[test_state_case(UserKind::Demo)]
 #[test_state_case(UserKind::Sandbox(WorkflowFixtureResult::Pass))]
 #[test_state_case(UserKind::Live)]
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn pass(state: &mut State, user_kind: UserKind) {
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(
@@ -193,7 +193,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     UserKind::Sandbox(WorkflowFixtureResult::ManualReview),
     TerminalDecisionStatus::Fail
 )]
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn pass_then_watchlist_hit(
     state: &mut State,
     user_kind: UserKind,
@@ -397,7 +397,7 @@ async fn pass_then_watchlist_hit(
 
 #[test_state_case(UserKind::Live)]
 #[test_state_case(UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn step_up(state: &mut State, user_kind: UserKind) {
     // DATA SETUP
     let (wf, tenant, obc, tu) = setup_data(
@@ -575,7 +575,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 
 #[test_state_case(UserKind::Sandbox(WorkflowFixtureResult::Fail))]
 #[test_state_case(UserKind::Live)]
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn fail(state: &mut State, user_kind: UserKind) {
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(

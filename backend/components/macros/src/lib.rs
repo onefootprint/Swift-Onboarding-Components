@@ -218,7 +218,7 @@ pub fn test_state(args: proc_macro::TokenStream, stream: proc_macro::TokenStream
             }
         }
 
-        #[tokio::test]
+        #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
         async fn #fn_name() {
             let test_db_pool = TestDbPool::new(#retain);
             let state = &mut State::test_state().await;

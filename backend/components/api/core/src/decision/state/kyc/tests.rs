@@ -87,6 +87,12 @@ async fn valid_action(state: &mut State) {
         WorkflowKind::Kyc(kyc::KycState::DataCollection(_))
     ));
 
+    mock_webhooks(
+        state,
+        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![],
+    );
+
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
@@ -134,7 +140,7 @@ async fn invalid_action(state: &mut State) {
     DocumentCollectionKind::DocumentRequested(Success)
 )]
 #[test_state_case(UserKind::Demo, DocumentCollectionKind::DocumentRequested(Success))]
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.fixture_result()).await;
@@ -308,7 +314,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 )]
 #[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(Failure))]
 #[test_state_case(UserKind::Live, DocumentCollectionKind::DocumentRequested(DocUploadFailed))]
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.fixture_result()).await;

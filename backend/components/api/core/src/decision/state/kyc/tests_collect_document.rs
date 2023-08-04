@@ -29,7 +29,7 @@ use std::sync::Arc;
 
 #[test_state_case(UserKind::Live, Failure)]
 #[test_state_case(UserKind::Live, DocUploadFailed)]
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: DocumentOutcome) {
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.fixture_result()).await;

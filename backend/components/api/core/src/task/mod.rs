@@ -43,13 +43,21 @@ pub fn execute_webhook_tasks(state: State) {
 }
 
 pub fn poll_and_execute_tasks_non_blocking(state: State, limit: i64, kind: TaskKind) {
-    tokio::spawn(async move {
+    let fut = async move {
         let _ = poll_and_execute_tasks(&state, limit, Some(kind))
             .await
             .map_err(|err| {
                 tracing::error!(error=?err, kind=?kind, "poll_and_execute_tasks_non_blocking failed to execute 1 or more tasks");
             });
-    });
+    };
+
+    if cfg!(test) {
+        tokio::task::block_in_place(move || {
+            futures::executor::block_on(fut);
+        });
+    } else {
+        tokio::spawn(fut);
+    }
 }
 
 pub async fn poll_and_execute_tasks(
