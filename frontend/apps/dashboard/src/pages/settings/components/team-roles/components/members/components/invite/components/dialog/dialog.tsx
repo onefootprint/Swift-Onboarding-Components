@@ -1,8 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { RoleKind } from '@onefootprint/types';
 import { Dialog as FPDialog } from '@onefootprint/ui';
 import React from 'react';
+import useRoles from 'src/hooks/use-roles';
 
-import useRoles from '../../../../hooks/use-roles';
 import Data from './components/data';
 import Error from './components/error';
 import Loading from './components/loading';
@@ -16,7 +17,7 @@ type DialogProps = {
 
 const Dialog = ({ onClose, open }: DialogProps) => {
   const { t } = useTranslation('pages.settings.members.invite');
-  const rolesQuery = useRoles();
+  const rolesQuery = useRoles(RoleKind.dashboardUser);
   const inviteMembersMutations = useInviteMembers();
 
   const handleSubmit = (invitations: Invitation[]) => {

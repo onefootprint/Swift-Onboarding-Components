@@ -1,14 +1,15 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { RoleKind } from '@onefootprint/types';
 import { Filters as FPFilter } from '@onefootprint/ui';
 import React from 'react';
+import useRoles from 'src/hooks/use-roles';
 
 import useMembersFilters from '../../../../hooks/use-members-filters';
-import useRoles from '../../../../hooks/use-roles';
 
 const Filters = () => {
   const { t } = useTranslation('pages.settings.members.filters');
   const filters = useMembersFilters();
-  const rolesQuery = useRoles();
+  const rolesQuery = useRoles(RoleKind.dashboardUser);
 
   return (
     <FPFilter

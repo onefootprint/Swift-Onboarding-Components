@@ -1223,10 +1223,6 @@
               "name": "Access control",
               "label": "Access control",
               "placeholder": "Select role",
-              "tooltip": {
-                "text": "Manage access controls from Settings",
-                "trigger-aria-label": "Learn more about access controls"
-              },
               "errors": {
                 "required": "Please select a role."
               }

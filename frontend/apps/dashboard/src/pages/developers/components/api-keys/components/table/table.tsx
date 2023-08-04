@@ -18,14 +18,7 @@ const ApiKeysTable = () => {
     { text: t('table.header.last-used'), width: '15%' },
     { text: t('table.header.created'), width: '15%' },
     { text: t('table.header.status'), width: '12.5%' },
-    {
-      text: t('table.header.access-control.title'),
-      tooltip: {
-        triggerAriaLabel: t('table.header.access-control.trigger-aria-label'),
-        text: t('table.header.access-control.tooltip'),
-      },
-      width: '12.5%',
-    },
+    { text: t('table.header.access-control.title'), width: '12.5%' },
     { text: '', width: '10%' },
   ];
 

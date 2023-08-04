@@ -1,3 +1,4 @@
+import { RoleKind } from '@onefootprint/types';
 import { Box, Pagination, Portal } from '@onefootprint/ui';
 import React from 'react';
 
@@ -6,8 +7,12 @@ import RolesTable from './components/roles-table';
 import useRoles from './hooks/use-roles';
 
 const Roles = () => {
-  // TODO only filter dashboardUser RoleKind here
-  const { data: response, errorMessage, isLoading, pagination } = useRoles();
+  const {
+    data: response,
+    errorMessage,
+    isLoading,
+    pagination,
+  } = useRoles(RoleKind.dashboardUser);
 
   return (
     <Box testID="roles-table" as="section">

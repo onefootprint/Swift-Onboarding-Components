@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Member } from '@onefootprint/types';
+import { Member, RoleKind } from '@onefootprint/types';
 import React, { useState } from 'react';
+import useRoles from 'src/hooks/use-roles';
 
 import RoleDropdownSelector from '../../../../../../../role-dropdown-selector';
-import useRoles from '../../../../hooks/use-roles';
 import useUpdateMember from './hooks/use-update-member';
 
 export type EditRoleProps = {
@@ -16,7 +16,7 @@ const EditRole = ({ member }: EditRoleProps) => {
     id: member.role.id,
     name: member.role.name,
   });
-  const rolesQuery = useRoles();
+  const rolesQuery = useRoles(RoleKind.dashboardUser);
   const updateMemberMutation = useUpdateMember(member.id);
   const options = rolesQuery?.data?.map(r => ({
     id: r.id,

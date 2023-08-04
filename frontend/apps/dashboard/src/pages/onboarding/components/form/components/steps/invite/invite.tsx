@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import { RoleKind } from '@onefootprint/types';
 import React from 'react';
 import useOrg from 'src/hooks/use-org';
 import useRoles from 'src/hooks/use-roles';
@@ -16,7 +17,7 @@ export type InviteProps = {
 
 const Invite = ({ id, onComplete }: InviteProps) => {
   const { t } = useTranslation('pages.onboarding.invite');
-  const rolesQuery = useRoles();
+  const rolesQuery = useRoles(RoleKind.dashboardUser);
   const orgQuery = useOrg();
 
   return (

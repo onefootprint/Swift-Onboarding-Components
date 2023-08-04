@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { RoleKind } from '@onefootprint/types';
 import { Dialog, Grid, Select, TextInput, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -26,7 +27,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
     control,
   } = useForm<FormData>();
 
-  const rolesQuery = useRoles();
+  const rolesQuery = useRoles(RoleKind.apiKey);
 
   const handleClose = () => {
     reset();

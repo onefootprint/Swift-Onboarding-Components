@@ -2,11 +2,11 @@ import request, {
   getErrorMessage,
   PaginatedRequestResponse,
 } from '@onefootprint/request';
-import { GetRolesResponse } from '@onefootprint/types';
+import { GetRolesResponse, RoleKind } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-const getRolesRequest = async (authHeaders: AuthHeaders) => {
+const getRolesRequest = async (authHeaders: AuthHeaders, kind?: RoleKind) => {
   const { data: response } = await request<
     PaginatedRequestResponse<GetRolesResponse>
   >({
@@ -15,6 +15,7 @@ const getRolesRequest = async (authHeaders: AuthHeaders) => {
     headers: authHeaders,
     params: {
       // we don't want pagination here
+      kind,
       pageSize: 100,
     },
   });
@@ -22,10 +23,10 @@ const getRolesRequest = async (authHeaders: AuthHeaders) => {
   return response.data;
 };
 
-const useRoles = () => {
+const useRoles = (kind: RoleKind) => {
   const { authHeaders } = useSession();
-  const rolesQuery = useQuery(['members', 'roles'], () =>
-    getRolesRequest(authHeaders),
+  const rolesQuery = useQuery(['members', 'roles', kind, authHeaders], () =>
+    getRolesRequest(authHeaders, kind),
   );
   const { error, data = [] } = rolesQuery;
   const options = data.map(role => ({ label: role.name, value: role.id }));

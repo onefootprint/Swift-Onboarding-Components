@@ -28,7 +28,7 @@ const getRoles = async (authHeaders: AuthHeaders, params: GetRolesRequest) => {
   return response;
 };
 
-const useRoles = (kind?: RoleKind) => {
+const useRoles = (kind: RoleKind) => {
   const { authHeaders } = useSession();
   const { formatDateWithTime } = useIntl();
   const filters = useRolesFilters();
