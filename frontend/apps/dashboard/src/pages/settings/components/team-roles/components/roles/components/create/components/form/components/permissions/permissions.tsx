@@ -65,13 +65,19 @@ const Permissions = ({ kind }: PermissionsProps) => {
       </Box>
       <ToggleContainer>
         {supportedScopeKinds.includes(RoleScopeKind.read) && (
-          <Checkbox disabled label={t('scopes.read')} checked />
+          <Checkbox
+            disabled
+            label={t('scopes.read')}
+            hint={t('scopes.hints.read')}
+            checked
+          />
         )}
         {supportedScopeKinds.includes(
           RoleScopeKind.onboardingConfiguration,
         ) && (
           <Checkbox
             label={t('scopes.onboarding_configuration')}
+            hint={t('scopes.hints.onboarding_configuration')}
             value={RoleScopeKind.onboardingConfiguration}
             {...register('scopeKinds')}
           />
@@ -79,6 +85,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         {supportedScopeKinds.includes(RoleScopeKind.apiKeys) && (
           <Checkbox
             label={t('scopes.api_keys')}
+            hint={t('scopes.hints.api_keys')}
             value={RoleScopeKind.apiKeys}
             {...register('scopeKinds')}
           />
@@ -86,6 +93,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         {supportedScopeKinds.includes(RoleScopeKind.orgSettings) && (
           <Checkbox
             label={t('scopes.org_settings')}
+            hint={t('scopes.hints.org_settings')}
             value={RoleScopeKind.orgSettings}
             {...register('scopeKinds')}
           />
@@ -93,6 +101,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         {supportedScopeKinds.includes(RoleScopeKind.manualReview) && (
           <Checkbox
             label={t('scopes.manual_review')}
+            hint={t('scopes.hints.manual_review')}
             value={RoleScopeKind.manualReview}
             {...register('scopeKinds')}
           />
@@ -100,6 +109,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         {supportedScopeKinds.includes(RoleScopeKind.writeEntities) && (
           <Checkbox
             label={t('scopes.write_entities')}
+            hint={t('scopes.hints.write_entities')}
             value={RoleScopeKind.writeEntities}
             {...register('scopeKinds')}
           />
@@ -107,6 +117,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         {supportedScopeKinds.includes(RoleScopeKind.cipIntegration) && (
           <Checkbox
             label={t('scopes.cip_integration')}
+            hint={t('scopes.hints.cip_integration')}
             value={RoleScopeKind.cipIntegration}
             {...register('scopeKinds')}
           />
@@ -114,6 +125,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         {supportedScopeKinds.includes(RoleScopeKind.triggerKyc) && (
           <Checkbox
             label={t('scopes.trigger_kyc')}
+            hint={t('scopes.hints.trigger_kyc')}
             value={RoleScopeKind.triggerKyc}
             {...register('scopeKinds')}
           />
@@ -121,6 +133,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         {supportedScopeKinds.includes(RoleScopeKind.onboarding) && (
           <Checkbox
             label={t('scopes.onboarding')}
+            hint={t('scopes.hints.onboarding')}
             value={RoleScopeKind.onboarding}
             {...register('scopeKinds')}
           />
@@ -128,6 +141,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         {supportedScopeKinds.includes(RoleScopeKind.manageWebhooks) && (
           <Checkbox
             label={t('scopes.manage_webhooks')}
+            hint={t('scopes.hints.manage_webhooks')}
             value={RoleScopeKind.manageWebhooks}
             {...register('scopeKinds')}
           />
@@ -135,6 +149,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         {supportedScopeKinds.includes(RoleScopeKind.manageVaultProxy) && (
           <Checkbox
             label={t('scopes.manage_vault_proxy')}
+            hint={t('scopes.hints.manage_vault_proxy')}
             value={RoleScopeKind.manageVaultProxy}
             {...register('scopes')}
           />
@@ -143,6 +158,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
           <div>
             <Checkbox
               label={t('scopes.invoke_vault_proxy.checkbox')}
+              hint={t('scopes.hints.invoke_vault_proxy')}
               {...register('showProxyConfigs')}
             />
             <div ref={animateProxyConfigSelect}>
@@ -180,6 +196,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
           <div>
             <Checkbox
               label={t('form.decrypt.label')}
+              hint={t('scopes.hints.decrypt')}
               {...register('showDecrypt')}
             />
             <div ref={animateDecryptSelect}>

@@ -1764,6 +1764,21 @@
             "custom": "Custom attributes",
             "investor_profile": "Broker questions (Investor profile)",
             "card": "Card data"
+          },
+          "hints": {
+            "read": "Basic read-only access",
+            "onboarding_configuration": "Create and update onboarding configurations",
+            "api_keys": "Add, edit, and decrypt secret API keys and their roles",
+            "manage_vault_proxy": "Create and update vault proxy configurations",
+            "invoke_vault_proxy": "Invoke the specified vault proxies",
+            "cip_integration": "Forward identity data to a CIP integration",
+            "org_settings": "Update org settings, roles, and users",
+            "manual_review": "Make new decisions, add annotations, re-trigger KYC",
+            "write_entities": "Create new vaults and update existing vaults' information",
+            "trigger_kyc": "Run KYC checks on an existing vaulted user",
+            "onboarding": "Create short-lived onboarding sessions, validate tokens from Footprint.js",
+            "manage_webhooks": "Configure webhook endpoints",
+            "decrypt": "Decrypt the specified attributes"
           }
         }
       }
