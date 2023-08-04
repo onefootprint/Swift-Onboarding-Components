@@ -17,7 +17,7 @@ use db::{
     PgConn,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::{TenantScope, WorkosAuthMethod};
+use newtypes::{TenantRoleKind, TenantScope, WorkosAuthMethod};
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -74,7 +74,12 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         // Firm employee session _always_ has RO role
         // This is the magic of the FirmEmployeeAuthContet: firm employees only ever have read
         // permissions for other tenants
-        let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, None)?;
+        let role = TenantRole::get_immutable(
+            conn,
+            &tenant.id,
+            ImmutableRoleKind::ReadOnly,
+            Some(TenantRoleKind::DashboardUser),
+        )?;
 
         let is_risk_ops = ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
 
