@@ -64,6 +64,7 @@ pub enum OcrDataKind {
     IssuingState,
     IssuingCountry,
     RefNumber,
+    Nationality,
 }
 
 impl From<DocumentKind> for DataIdentifier {

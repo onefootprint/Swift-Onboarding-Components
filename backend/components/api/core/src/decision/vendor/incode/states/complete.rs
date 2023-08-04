@@ -97,6 +97,7 @@ impl Complete {
             di(ODK::IssuingState, r.issuing_state),
             di(ODK::IssuingCountry, r.issuing_country),
             di(ODK::RefNumber, r.ref_number),
+            di(ODK::Nationality, r.nationality_mrz.or(r.nationality)),
             di(
                 ODK::FullName,
                 // prefer MRZ decoded name to OCR, since OCR has a higher rate of whoopsies
