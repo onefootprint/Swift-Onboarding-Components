@@ -2890,6 +2890,7 @@ dependencies = [
  "hex",
  "ipnetwork",
  "itertools 0.10.3",
+ "log",
  "macros",
  "newtypes",
  "openssl",

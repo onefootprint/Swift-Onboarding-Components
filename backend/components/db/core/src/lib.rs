@@ -168,8 +168,10 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
 pub fn run_migrations(url: &str) -> Result<(), DbError> {
     use crate::diesel_migrations::MigrationHarness;
     let mut conn = DieselPgConnection::establish(url)?;
+    log::info!("Running migrations");
     conn.run_pending_migrations(db_schema::MIGRATIONS)
         .map_err(DbError::MigrationFailed)?;
+    log::info!("Migrations finished");
     Ok(())
 }
 
