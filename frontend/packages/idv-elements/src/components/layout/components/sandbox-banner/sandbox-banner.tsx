@@ -23,8 +23,6 @@ const SandboxBanner = forwardRef<SandboxBannerHandler, SandboxBannerProps>(
       [],
     );
 
-    return null;
-
     return (
       <SandboxBannerContainer
         ref={containerRef}
