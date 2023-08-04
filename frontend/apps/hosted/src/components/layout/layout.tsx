@@ -5,7 +5,7 @@ import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
 import Footer from './components/footer';
-// import SandboxBanner from './components/sandbox-banner';
+import SandboxBanner from './components/sandbox-banner';
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -19,7 +19,7 @@ const Layout = ({ children }: LayoutProps) => {
 
   return (
     <Container>
-      {/* <SandboxBanner /> */}
+      <SandboxBanner />
       <Content>
         <AppLayout
           tenantPk={key}
