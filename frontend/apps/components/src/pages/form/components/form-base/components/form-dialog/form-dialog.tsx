@@ -59,7 +59,6 @@ const Container = styled.div`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     justify-content: stretch;
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     width: 100%;
     max-height: 100%;
     overflow: auto;
