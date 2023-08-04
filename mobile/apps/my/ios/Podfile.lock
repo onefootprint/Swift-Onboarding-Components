@@ -106,9 +106,9 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.71.11)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - hermes-engine (0.71.11):
-    - hermes-engine/Pre-built (= 0.71.11)
-  - hermes-engine/Pre-built (0.71.11)
+  - hermes-engine (0.71.12):
+    - hermes-engine/Pre-built (= 0.71.12)
+  - hermes-engine/Pre-built (0.71.12)
   - libevent (2.1.12)
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -719,7 +719,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 007975be621464bce8ea38b3b512e987694e941f
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
-  hermes-engine: 34c863b446d0135b85a6536fa5fd89f48196f848
+  hermes-engine: b60ebc812e0179a612d8146ac54730d533c804a2
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: f6187ec763637e6a57f5728dd9a3bdabc6d6b4e0
@@ -762,6 +762,6 @@ SPEC CHECKSUMS:
   VisionCamera: c6356b309f7b8e185b7be2e703ec67bb35acf345
   Yoga: f7decafdc5e8c125e6fa0da38a687e35238420fa
 
-PODFILE CHECKSUM: cc57c7dd519cd5eee55ef0bef11d0aecbbafc818
+PODFILE CHECKSUM: 71cae4ee40765dc1c1ead29720155b7d263ecf07
 
 COCOAPODS: 1.12.1

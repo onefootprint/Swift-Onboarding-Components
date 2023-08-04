@@ -44,9 +44,14 @@ def use_native_modules_app_clip!(config = nil)
   project_root = Pathname.new(config["project"]["ios"]["sourceDir"])
 
   packages = config["dependencies"]
+  idv_packages = ["@expo-google-fonts/dm-sans", "@tanstack/react-query", "expo-splash-screen", 
+                    "@shopify/flash-list", "expo", "expo-dev-client", "expo-linking", "expo-splash-screen", "expo-fon", 
+                    "react-native-app-clip", "react-native-passkey", "react-native-svg", "react-native-vision-camera", "vision-camera-plugin-document",
+                    "vision-camera-plugin-face-detection", "expo-status-bar", "react-native-reanimated", "react-native-screens", "react-native-safe-area-context"]
+  filtered_packages = packages.select { |key, _| idv_packages.include?(key) }
   found_pods = []
 
-  packages.each do |package_name, package|
+  filtered_packages.each do |package_name, package|
     next unless package_config = package["platforms"]["ios"]
 
     podspec_path = package_config["podspecPath"]

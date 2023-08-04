@@ -47,7 +47,7 @@
     "react-hook-form": "^7.45.2",
     "react-i18next": "^12.2.0",
     "react-native": "0.71.8",
-    "react-native-app-clip": "^0.1.2",
+    "react-native-app-clip": "0.1.2",
     "react-native-passkey": "^2.0.0",
     "react-native-reanimated": "~2.14.4",
     "react-native-safe-area-context": "4.5.0",
