@@ -10,33 +10,13 @@ use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::IsGuardMet;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
-use db::models::business_owner::BusinessOwner;
-use db::models::document_request::DocumentRequest;
-use db::models::document_request::NewDocumentRequestArgs;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding::IsNew;
-use db::models::onboarding::Onboarding;
-use db::models::onboarding::OnboardingCreateArgs;
 use db::models::scoped_vault::ScopedVault;
-use db::models::vault::NewVaultArgs;
-use db::models::vault::Vault;
-use db::TxnPgConn;
-use newtypes::CollectedDataOption;
-use newtypes::CountryRestriction;
 use newtypes::DataIdentifierDiscriminant;
-use newtypes::DocTypeRestriction;
-use newtypes::EncryptedVaultPrivateKey;
-use newtypes::ScopedVaultId;
-use newtypes::Selfie;
-use newtypes::VaultId;
-use newtypes::VaultKind;
-use newtypes::VaultPublicKey;
-use newtypes::WorkflowFixtureResult;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -85,7 +65,7 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (ob, sb) = get_or_start_onboarding(
+            let (ob, sb) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
                 &scoped_user.vault_id,
                 &scoped_user.id,
@@ -125,96 +105,4 @@ pub async fn post(
         onboarding_config,
     })
     .json()
-}
-
-pub fn get_or_start_onboarding(
-    conn: &mut TxnPgConn,
-    v_id: &VaultId,
-    sv_id: &ScopedVaultId,
-    obc: &ObConfiguration,
-    insight_event: Option<CreateInsightEvent>,
-    maybe_new_biz_keypair: Option<(VaultPublicKey, EncryptedVaultPrivateKey)>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
-) -> ApiResult<(Onboarding, Option<ScopedVault>)> {
-    let user_vault = Vault::lock(conn, v_id)?;
-
-    // Create the onboarding for this scoped user
-    let ob_create_args = OnboardingCreateArgs {
-        scoped_vault_id: sv_id.clone(),
-        ob_configuration_id: obc.id.clone(),
-        insight_event: insight_event.clone(),
-    };
-
-    // TODO rm this when fixture result is passed in process
-    let fixture_result = WorkflowFixtureResult::from_sandbox_id(user_vault.sandbox_id.as_ref());
-    let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, true, fixture_result)?;
-    if let IsNew::Yes(ref wf) = is_new_ob {
-        if let Some(doc_info) = obc
-            .must_collect_data
-            .iter()
-            .filter_map(|cdo| match cdo {
-                CollectedDataOption::Document(doc_info) => Some(doc_info),
-                _ => None,
-            })
-            .next()
-        {
-            // Create a `DocumentRequest` if specified in the ob config.
-            // To prevent duplicate document requests, only create a doc request if the onboarding is new
-            let wf_id = wf
-                .as_ref()
-                .map(|wf| wf.id.clone())
-                .ok_or(OnboardingError::NoWorkflow)?;
-            let doc_type_restriction = if let DocTypeRestriction::Restrict(types) = doc_info.0.clone() {
-                Some(types)
-            } else {
-                None
-            };
-            let args = NewDocumentRequestArgs {
-                scoped_vault_id: ob.scoped_vault_id.clone(),
-                ref_id: None,
-                workflow_id: wf_id,
-                should_collect_selfie: doc_info.2 == Selfie::RequireSelfie,
-                only_us: doc_info.1 == CountryRestriction::UsOnly,
-                doc_type_restriction,
-            };
-            DocumentRequest::create(conn, args)?;
-        }
-    }
-
-    // If the ob config has business fields, create a business vault, scoped vault, and ob
-    let sb = if let Some(maybe_new_biz_keypair) = maybe_new_biz_keypair {
-        let existing_businesses = BusinessOwner::list_businesses(conn, &user_vault.id, &obc.id)?;
-        let sb = if let Some(existing) = existing_businesses.into_iter().next() {
-            // If the user has already started onboarding their business onto this exact
-            // ob config, we should locate it.
-            // Note, this isn't quite portablizing the business since we only locate it
-            // when onboarding onto the exact same ob config
-            existing.1 .0
-        } else {
-            let (public_key, e_private_key) = maybe_new_biz_keypair;
-            let args = NewVaultArgs {
-                public_key,
-                e_private_key,
-                is_live: user_vault.is_live,
-                is_portable: true,
-                kind: VaultKind::Business,
-                is_fixture: false,
-                sandbox_id: user_vault.sandbox_id.clone(), // Use the same sandbox ID for business vault
-            };
-            let business_vault = Vault::create(conn, args)?;
-            BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;
-            let sb = ScopedVault::get_or_create(conn, &business_vault, obc.id.clone())?;
-            let ob_create_args = OnboardingCreateArgs {
-                scoped_vault_id: sb.id.clone(),
-                ob_configuration_id: obc.id.clone(),
-                insight_event,
-            };
-            Onboarding::get_or_create(conn, ob_create_args, false, fixture_result)?;
-            sb
-        };
-        Some(sb)
-    } else {
-        None
-    };
-
-    Ok((ob, sb))
 }

@@ -14,18 +14,34 @@ use newtypes::{
 use crate::{
     enclave_client::EnclaveClient,
     tests::fixtures::lib::random_phone_number,
-    utils::vault_wrapper::{Any, VaultWrapper},
+    utils::{
+        self,
+        vault_wrapper::{Any, VaultWrapper},
+    },
 };
 
 pub async fn create_user_and_onboarding(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
-    must_collect_data: Option<Vec<CollectedDataOption>>,
+    must_collect_data: Vec<CollectedDataOption>,
     cip_kind: Option<CipKind>,
     is_live: bool,
-    fixture_result: Option<WorkflowFixtureResult>,
-) -> (Tenant, Onboarding, Vault, ScopedVault, ObConfiguration) {
+    kyc_fixture_result: Option<WorkflowFixtureResult>,
+    create_business: bool,
+) -> (
+    Tenant,
+    Onboarding,
+    Vault,
+    ScopedVault,
+    ObConfiguration,
+    Option<ScopedVault>,
+) {
     let (pk, tenant_e_key) = enclave_client.generate_sealed_keypair().await.unwrap();
+    let biz_key_pair = if create_business {
+        Some(enclave_client.generate_sealed_keypair().await.unwrap())
+    } else {
+        None
+    };
     db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let tenant = fixtures::tenant::create_with_keys(conn, pk, tenant_e_key);
@@ -33,19 +49,81 @@ pub async fn create_user_and_onboarding(
                 conn,
                 &tenant.id,
                 is_live,
-                must_collect_data,
+                Some(must_collect_data),
                 cip_kind,
             );
-            let ob_config_id = ob_config.id.clone();
 
-            let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), fixture_result);
+            let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), kyc_fixture_result);
 
-            let onboarding = fixtures::onboarding::create(conn, su.id.clone(), ob_config_id, fixture_result);
+            let (onboarding, sbv) = utils::onboarding::get_or_start_onboarding(
+                conn,
+                &uv.id,
+                &su.id,
+                &ob_config,
+                None,
+                biz_key_pair,
+            )
+            .unwrap();
 
-            Ok((tenant, onboarding, uv, su, ob_config))
+            Ok((tenant, onboarding, uv, su, ob_config, sbv))
         })
         .await
         .unwrap()
+}
+
+pub async fn create_kyc_user_and_onboarding(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    must_collect_data: Option<Vec<CollectedDataOption>>,
+    cip_kind: Option<CipKind>,
+    is_live: bool,
+    fixture_result: Option<WorkflowFixtureResult>,
+) -> (Tenant, Onboarding, Vault, ScopedVault, ObConfiguration) {
+    let must_collect_data: Vec<CollectedDataOption> =
+        must_collect_data.unwrap_or(vec![CollectedDataOption::PhoneNumber]);
+    let (t, ob, v, sv, obc, _) = create_user_and_onboarding(
+        db_pool,
+        enclave_client,
+        must_collect_data,
+        cip_kind,
+        is_live,
+        fixture_result,
+        false,
+    )
+    .await;
+    (t, ob, v, sv, obc)
+}
+
+pub async fn create_kyb_user_and_onboarding(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    must_collect_data: Option<Vec<CollectedDataOption>>,
+    is_live: bool,
+    fixture_result: Option<WorkflowFixtureResult>,
+) -> (
+    Tenant,
+    Onboarding,
+    Vault,
+    ScopedVault,
+    ObConfiguration,
+    ScopedVault,
+) {
+    let must_collect_data: Vec<CollectedDataOption> = must_collect_data.unwrap_or(vec![
+        CollectedDataOption::PhoneNumber,
+        CollectedDataOption::FullAddress,
+        CollectedDataOption::BusinessName,
+    ]);
+    let (t, ob, v, sv, obc, sbv) = create_user_and_onboarding(
+        db_pool,
+        enclave_client,
+        must_collect_data,
+        None,
+        is_live,
+        fixture_result,
+        true,
+    )
+    .await;
+    (t, ob, v, sv, obc, sbv.unwrap())
 }
 
 pub fn create_user_and_populate_vault(

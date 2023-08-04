@@ -37,6 +37,7 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
         _action: Authorize,
         _state: &State,
     ) -> ApiResult<Self::AsyncRes> {
+        // TODO: write fingerprints here
         Ok(())
     }
 
@@ -85,6 +86,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
 
     #[tracing::instrument("KybAwaitingBoKyc#OnAction<BoKycCompleted, KybState>::on_commit", skip_all)]
     fn on_commit(self, _async_res: (), _conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
+        // TODO: set status = pending
         Ok(KybState::from(KybVendorCalls { wf_id: self.wf_id }))
     }
 }
@@ -129,6 +131,7 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
 
     #[tracing::instrument("KybVendorCalls#OnAction<MakeVendorCalls, KybState>::on_commit", skip_all)]
     fn on_commit(self, _async_res: (), _conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
+        // TODO: set idv_reqs_initiated_at here i guess?
         Ok(KybState::from(KybAwaitingAsyncVendors { wf_id: self.wf_id }))
     }
 }

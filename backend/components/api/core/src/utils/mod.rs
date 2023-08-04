@@ -9,6 +9,7 @@ pub mod headers;
 pub mod large_json;
 pub mod liveness;
 pub mod magic_link;
+pub mod onboarding;
 pub mod paperclip;
 pub mod session;
 pub mod twilio;

@@ -31,7 +31,7 @@ use newtypes::{
 use super::IncodeContext;
 use crate::{
     decision::{
-        tests::test_helpers::create_user_and_onboarding,
+        tests::test_helpers::create_kyc_user_and_onboarding,
         vendor::incode::{get_config_id, images::*, IncodeStateMachine},
     },
     State,
@@ -59,7 +59,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     } else {
         None
     };
-    let (tenant, ob, uv, su, _) = create_user_and_onboarding(
+    let (tenant, ob, uv, su, _) = create_kyc_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         must_collect_data,
@@ -303,7 +303,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
     } else {
         None
     };
-    let (tenant, ob, uv, su, _) = create_user_and_onboarding(
+    let (tenant, ob, uv, su, _) = create_kyc_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         must_collect_data,
