@@ -1,5 +1,6 @@
 import { Theme } from '@onefootprint/design-tokens';
 import { FootprintAppearanceVariables } from '@onefootprint/footprint-js';
+import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 
 import variablesMap from './constants/variables-map';
@@ -8,11 +9,13 @@ export const createTheme = (
   baseTheme: Theme,
   variables?: FootprintAppearanceVariables,
 ): Theme => {
-  if (!variables || Object.keys(variables).length === 0) return baseTheme;
+  const clonedBasedTheme = cloneDeep(baseTheme);
+  if (!variables || Object.keys(variables).length === 0)
+    return clonedBasedTheme;
   return Object.entries(variables).reduce(
     (theme, [tokenName, tokenValue]) =>
       iterateOverVariables({ theme, variables, tokenName, tokenValue }),
-    baseTheme,
+    clonedBasedTheme,
   );
 };
 
