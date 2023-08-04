@@ -612,6 +612,31 @@ class TestVaultProxy:
         assert access_event["kind"] == "decrypt"
         assert set(access_event["targets"]) == set(user2_data)
 
+    # test that we error if the proxy token is valid
+    def test_proxy_error(self, sandbox_tenant):
+        # create two vaults
+        user1_data = {
+            "id.first_name": "Piip",
+        }
+        body = post("users/", user1_data, sandbox_tenant.sk.key)
+        fp_id = body["id"]
+
+        # bad filter
+        data = {
+            "data": {
+                "invalid": f"{{{{ {fp_id}.id.first_name | prefix('hi') }}}}",
+            },
+        }
+        post(f"vault_proxy/reflect", data, sandbox_tenant.sk.key, status_code=400)
+
+        # invalid id
+        data = {
+            "data": {
+                "invalid": f"{{{{ {fp_id}.id.middle_name | prefix(3) }}}}",
+            },
+        }
+        post(f"vault_proxy/reflect", data, sandbox_tenant.sk.key, status_code=400)
+
 
 ### Tests to do ###
 # - ingress biz data

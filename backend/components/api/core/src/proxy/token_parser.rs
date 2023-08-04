@@ -70,12 +70,11 @@ impl<'a> ProxyTokenParser<'a> {
                 Some(current) if [c1, *c2] == Self::DELIMITER_END => {
                     let text_match = Self::text_match(current.as_ref());
 
-                    // parse and add the found token if it's acceptable
-                    if let Ok(token) = ProxyToken::parse_global(current, global_fp_id.clone())
-                        .map(|token| (text_match, token))
-                    {
-                        parsed.push(token);
-                    }
+                    // parse and add the token
+                    parsed.push((
+                        text_match,
+                        ProxyToken::parse_global(current, global_fp_id.clone())?,
+                    ));
 
                     // reset state
                     current_token = None;
@@ -148,7 +147,9 @@ mod tests {
     use std::str::FromStr;
 
     use super::*;
-    use newtypes::{CountArgs, DataIdentifier, FilterFunction, FpId, IdentityDataKind as IDK, KvDataKey};
+    use newtypes::{
+        pii, CountArgs, DataIdentifier, FilterFunction, FpId, IdentityDataKind as IDK, KvDataKey,
+    };
     use test_case::test_case;
     use DataIdentifier as DI;
     use FilterFunction::*;
@@ -238,7 +239,8 @@ mod tests {
 
     #[test]
     fn test_detokenize() {
-        let result = ProxyTokenParser::parse(VALID_JSON_BODY, None).expect("failed to parse");
+        let global = FpId::from("fp_id_abcd".to_string());
+        let result = ProxyTokenParser::parse(VALID_JSON_BODY, Some(global)).expect("failed to parse");
         let test = TestData {
             ssn: "12-121-1212",
             full_name: "Elon Musk",
@@ -264,6 +266,7 @@ mod tests {
                 ),
                 "MU".into(),
             ),
+            (tok1("fp_id_abcd", DI::Id(IDK::Dob)), pii!("1999-09-09")),
         ]);
         let detokenized = result.detokenize_body(detokens).expect("detokenize");
         let result: TestData =
@@ -300,9 +303,9 @@ mod tests {
         token == expected
     }
 
-    const B_1: &str = r#"{ blah blah blah {{ id.ssn9 }} sdfsdf sd {{ custom.cc4 }} }} {{ blah {{ }} {{"#;
-    const B_2: &str = r#"{ blah blah blah {{ id.ssn9 }} sdfsdf sd {{  }} }} {{ blah {{ custom.cc4 }} {{"#;
-    const B_3: &str = r#"{{ {{ {{ }} {{id.dob}} }}"#;
+    const B_1: &str = r#"{ blah blah blah {{ id.ssn9 }} sdfsdf sd {{ custom.cc4 }} }} {{ blah { {{"#;
+    const B_2: &str = r#"{ blah blah blah {{ id.ssn9 }} sdfsdf sd {{}  }} }} {{ blah {{ custom.cc4 }} {{"#;
+    const B_3: &str = r#"{{ {{ {{ {{id.dob}} }}"#;
     const B_4: &str = r#"{{ custom.ach}"#;
     const B_5: &str =
         r#"{{ fp_id_x.custom.ach}} {{{fp_id_y.id.ssn9}} sdf {{ fp_id_z.custom.ach2}}} {{fp_id_y.id.ssn9}}"#;

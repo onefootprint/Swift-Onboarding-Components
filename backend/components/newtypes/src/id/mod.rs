@@ -62,10 +62,10 @@ pub trait PrefixId: From<String> {
 
     fn parse_with_prefix<S: Into<String>>(s: S) -> Result<Self, crate::Error> {
         let s: String = s.into();
-        if !s.starts_with(Self::PREFIX) {
+        let Some(unique_part) = s.strip_prefix(Self::PREFIX) else {
             return Err(crate::Error::IdPrefixError(Self::PREFIX));
-        }
-        let unique_part = s.replace(Self::PREFIX, "");
+        };
+
         if !unique_part.chars().all(char::is_alphanumeric) || unique_part.is_empty() {
             return Err(crate::Error::IdPrefixError(Self::PREFIX));
         }
