@@ -174,7 +174,11 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
                 &self.ob_id,
                 fixture_decision,
             )?;
-            Ok(KybState::from(KybDecisioning { wf_id: self.wf_id }))
+            Ok(KybState::from(KybDecisioning {
+                wf_id: self.wf_id,
+                t_id: self.t_id,
+                ob_id: self.ob_id,
+            }))
         } else {
             // TODO: set idv_reqs_initiated_at here i guess?
             Err(AssertionError("Non fixture workflow KYB not supported yet"))?
@@ -198,8 +202,14 @@ impl WorkflowState for KybVendorCalls {
 /// We remain in this state until the Middesk asyncronous flow completes.
 impl KybAwaitingAsyncVendors {
     #[tracing::instrument("KybAwaitingAsyncVendors::init", skip_all)]
-    pub async fn init(_state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
-        Ok(KybAwaitingAsyncVendors { wf_id: workflow.id })
+    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
+        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+
+        Ok(KybAwaitingAsyncVendors {
+            wf_id: workflow.id,
+            ob_id: ob.id,
+            t_id: sv.tenant_id,
+        })
     }
 }
 
@@ -224,7 +234,11 @@ impl OnAction<AsyncVendorCallsCompleted, KybState> for KybAwaitingAsyncVendors {
         skip_all
     )]
     fn on_commit(self, _async_res: (), _conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
-        Ok(KybState::from(KybDecisioning { wf_id: self.wf_id }))
+        Ok(KybState::from(KybDecisioning {
+            wf_id: self.wf_id,
+            ob_id: self.ob_id,
+            t_id: self.t_id,
+        }))
     }
 }
 
@@ -243,14 +257,20 @@ impl WorkflowState for KybAwaitingAsyncVendors {
 /// ////////////////
 impl KybDecisioning {
     #[tracing::instrument("KybDecisioning::init", skip_all)]
-    pub async fn init(_state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
-        Ok(KybDecisioning { wf_id: workflow.id })
+    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
+        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+
+        Ok(KybDecisioning {
+            wf_id: workflow.id,
+            ob_id: ob.id,
+            t_id: sv.tenant_id,
+        })
     }
 }
 
 #[async_trait]
 impl OnAction<MakeDecision, KybState> for KybDecisioning {
-    type AsyncRes = ();
+    type AsyncRes = Arc<dyn FeatureFlagClient>;
 
     #[tracing::instrument(
         "KybDecisioning#OnAction<MakeDecision, KybState>::execute_async_idempotent_actions",
@@ -259,15 +279,23 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
     async fn execute_async_idempotent_actions(
         &self,
         _action: MakeDecision,
-        _state: &State,
+        state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok(())
+        Ok(state.feature_flag_client.clone())
     }
 
     #[tracing::instrument("KybDecisioning#OnAction<MakeDecision, KybState>::on_commit", skip_all)]
-    fn on_commit(self, _async_res: (), _conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
-        // TODO: get fixture decision or real decision from executing rules
-        // TODO: figure out how to slot KYB into the KycRuleGroup type of dealios
+    fn on_commit(self, ff_client: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
+        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
+        if let Some(fixture_decision) = fixture_decision {
+            decision::utils::write_kyb_fixture_ob_decision(conn, &self.ob_id, fixture_decision)?;
+        } else {
+            // TODO: get fixture decision or real decision from executing rules
+            // TODO: figure out how to slot KYB into the KycRuleGroup type of dealios
+            Err(AssertionError("Non fixture workflow KYB not supported yet"))?
+        }
+
         Ok(KybState::from(KybComplete {}))
     }
 }

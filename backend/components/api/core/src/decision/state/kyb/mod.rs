@@ -38,12 +38,15 @@ pub struct KybVendorCalls {
 #[derive(Clone)]
 pub struct KybAwaitingAsyncVendors {
     wf_id: WorkflowId,
+    ob_id: OnboardingId,
+    t_id: TenantId,
 }
 
 #[derive(Clone)]
 pub struct KybDecisioning {
-    #[allow(dead_code)]
     wf_id: WorkflowId,
+    ob_id: OnboardingId,
+    t_id: TenantId,
 }
 
 #[derive(Clone)]
