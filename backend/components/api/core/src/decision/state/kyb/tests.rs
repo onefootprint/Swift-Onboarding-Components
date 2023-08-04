@@ -66,7 +66,7 @@ async fn authorize(state: &mut State) {
 
 #[test_state_case(WorkflowFixtureResult::Pass)]
 #[test_state_case(WorkflowFixtureResult::Fail)]
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn sandbox_pass(state: &mut State, fixture_result: WorkflowFixtureResult) {
     // SETUP
     let (wf, tenant) = setup(state, Some(fixture_result)).await;
