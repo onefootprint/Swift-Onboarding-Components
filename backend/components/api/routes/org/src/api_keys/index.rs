@@ -67,7 +67,7 @@ pub async fn get(
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateApiKeyRequest {
     name: String,
-    role_id: Option<TenantRoleId>,
+    role_id: TenantRoleId,
 }
 
 #[api_v2_operation(

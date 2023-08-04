@@ -66,7 +66,7 @@ pub(crate) fn test_tenant_api_key(
         SealedVaultBytes(vec![4, 5, 6]),
         tenant_id,
         is_live,
-        Some(role_id),
+        role_id,
     )
     .unwrap()
 }

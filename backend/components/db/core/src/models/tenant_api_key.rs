@@ -11,7 +11,7 @@ use newtypes::{ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, Tena
 
 use super::ob_configuration::IsLive;
 use super::tenant::Tenant;
-use super::tenant_role::{ImmutableRoleKind, TenantRole};
+use super::tenant_role::TenantRole;
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = tenant_api_key)]
@@ -226,21 +226,14 @@ impl TenantApiKey {
         e_secret_api_key: SealedVaultBytes,
         tenant_id: TenantId,
         is_live: IsLive,
-        role_id: Option<TenantRoleId>,
+        role_id: TenantRoleId,
     ) -> DbResult<TenantApiKey> {
-        // For now, while role_id is optional from the API, default to the admin role for backwards
-        // compatibility
-        // TODO make this not null
-        let role_id = if let Some(role_id) = role_id {
-            // Make sure the role we are using belongs to the tenant, otherwise could make api key
-            // for another tenant's role
-            // And, lock the role so it isn't deactivated while we are making the key
-            TenantRole::lock_active(conn, &role_id, &tenant_id)?
-                .into_inner()
-                .id
-        } else {
-            TenantRole::get_or_create_immutable(conn, &tenant_id, ImmutableRoleKind::Admin)?.id
-        };
+        // Make sure the role we are using belongs to the tenant, otherwise could make api key
+        // for another tenant's role
+        // And, lock the role so it isn't deactivated while we are making the key
+        let role_id = TenantRole::lock_active(conn, &role_id, &tenant_id)?
+            .into_inner()
+            .id;
         let new_key = NewTenantApiKey {
             name,
             sh_secret_api_key,

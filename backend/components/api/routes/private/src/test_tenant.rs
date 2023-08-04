@@ -138,7 +138,7 @@ async fn post(
                         secret_api_key.seal_to(&tenant.public_key)?,
                         tenant.id.clone(),
                         is_live,
-                        Some(admin_role.id.clone()),
+                        admin_role.id.clone(),
                     )?;
                     (api_key, admin_role)
                 }
