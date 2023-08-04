@@ -8,10 +8,6 @@ use byteorder::{BigEndian, ReadBytesExt};
 use db::{DbError, DbResult, TxnPgConn};
 use diesel::{sql_query, sql_types::BigInt, RunQueryDsl};
 
-mod m042323_migrate_fingerprints;
-mod m061423_migrate_sandbox_suffix;
-mod m080323_migrate_tenant_roles;
-
 trait CustomMigration {
     type MigrationState;
 
@@ -26,10 +22,8 @@ trait CustomMigration {
 }
 
 /// runs any active migrations that need to be run
-pub async fn run(state: &State) -> ApiResult<()> {
-    run_migration(state, m042323_migrate_fingerprints::Migration).await?;
-    run_migration(state, m061423_migrate_sandbox_suffix::Migration).await?;
-    run_migration(state, m080323_migrate_tenant_roles::Migration).await?;
+pub async fn run(_state: &State) -> ApiResult<()> {
+    // TODO Add any custom migrations here
     Ok(())
 }
 
