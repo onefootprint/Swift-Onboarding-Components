@@ -134,43 +134,10 @@ pub fn vendor_apis_from_vendor(vendor: Vendor) -> Vec<VendorAPI> {
 }
 
 impl VendorAPI {
-    pub fn is_doc_scan_call(&self) -> bool {
-        match self {
-            VendorAPI::IdologyExpectID => false,
-            VendorAPI::IdologyScanVerifySubmission => true,
-            VendorAPI::IdologyScanVerifyResults => true,
-            VendorAPI::IdologyScanOnboarding => true,
-            VendorAPI::TwilioLookupV2 => false,
-            VendorAPI::SocureIDPlus => false,
-            VendorAPI::IdologyPa => false,
-            VendorAPI::ExperianPreciseID => false,
-            VendorAPI::MiddeskCreateBusiness => false,
-            VendorAPI::MiddeskBusinessUpdateWebhook => false,
-            VendorAPI::MiddeskTinRetriedWebhook => false,
-            VendorAPI::MiddeskGetBusiness => false,
-            VendorAPI::IncodeStartOnboarding => false,
-            VendorAPI::IncodeAddFront => false,
-            VendorAPI::IncodeAddBack => false,
-            VendorAPI::IncodeProcessId => false,
-            VendorAPI::IncodeFetchScores => true,
-            VendorAPI::IncodeAddPrivacyConsent => false,
-            VendorAPI::IncodeAddMLConsent => false,
-            VendorAPI::IncodeFetchOCR => false,
-            VendorAPI::IncodeAddSelfie => false,
-            VendorAPI::IncodeWatchlistCheck => false,
-            VendorAPI::IncodeGetOnboardingStatus => false,
-            VendorAPI::IncodeProcessFace => false,
-            VendorAPI::StytchLookup => false,
-        }
-    }
-
     // temporary hack to allow us to filter to just vendor calls that are made in a batch of KYC vendor calls
     pub fn is_kyc_call(&self) -> bool {
         match self {
-            VendorAPI::IdologyExpectID
-            | VendorAPI::TwilioLookupV2
-            | VendorAPI::SocureIDPlus
-            | VendorAPI::ExperianPreciseID => true,
+            VendorAPI::IdologyExpectID | VendorAPI::TwilioLookupV2 | VendorAPI::ExperianPreciseID => true,
             VendorAPI::IdologyScanVerifySubmission
             | VendorAPI::IdologyScanVerifyResults
             | VendorAPI::IdologyScanOnboarding
@@ -191,6 +158,7 @@ impl VendorAPI {
             | VendorAPI::IncodeWatchlistCheck
             | VendorAPI::IncodeGetOnboardingStatus
             | VendorAPI::IncodeProcessFace
+            | VendorAPI::SocureIDPlus
             | VendorAPI::StytchLookup => false,
         }
     }

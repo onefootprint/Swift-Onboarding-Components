@@ -183,7 +183,13 @@ impl UserTimeline {
         let identity_documents_and_requests =
             IdentityDocument::get_bulk_with_requests(conn, identity_document_ids.collect())?;
         let vendor_apis_to_include = VendorAPI::iter()
-            .filter(|v| (!matches!(v, &VendorAPI::SocureIDPlus)) || tenant_can_view_socure_risk_signal)
+            .filter(|v| {
+                let can_see_socure =
+                    matches!(v, &VendorAPI::SocureIDPlus) && tenant_can_view_socure_risk_signal;
+                let included_in_verification_decision = v.is_kyc_call() || v.is_incode_doc_flow_api();
+
+                included_in_verification_decision || can_see_socure
+            })
             .collect_vec();
         let actors: HashMap<_, _> = saturate_actors(conn, db_actors.collect())?.into_iter().collect();
         let watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
