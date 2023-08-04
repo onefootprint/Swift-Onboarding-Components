@@ -101,18 +101,9 @@ async fn post(
                 Some("Integration Testing".to_owned()),
             )?;
             let user = TenantUser::set_is_firm_employee_testing_only(conn, &user.id)?;
+            let admin_irk = ImmutableRoleKind::Admin;
             let admin_role =
-                TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::Admin, None)?;
-            TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, None)?;
-            // Create modern immutable roles
-            for k in [ImmutableRoleKind::Admin, ImmutableRoleKind::ReadOnly] {
-                for is_live in [true, false] {
-                    let kind = Some(TenantRoleKind::ApiKey { is_live });
-                    TenantRole::get_or_create_immutable(conn, &tenant.id, k, kind)?;
-                }
-                let kind = Some(TenantRoleKind::DashboardUser);
-                TenantRole::get_or_create_immutable(conn, &tenant.id, k, kind)?;
-            }
+                TenantRole::get_immutable(conn, &tenant.id, admin_irk, TenantRoleKind::DashboardUser)?;
             let rb = match TenantRolebinding::get(conn, (&user.id, &tenant.id)) {
                 Ok((_, rb, _, _)) => rb,
                 Err(e) => {
@@ -120,7 +111,7 @@ async fn post(
                         return Err(e.into()); // Real error, return
                     }
                     let role_id = admin_role.id.clone();
-                    let tenant_id = admin_role.tenant_id.clone();
+                    let tenant_id = admin_role.tenant_id;
                     let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, tenant_id)?;
                     rb
                 }
@@ -133,6 +124,8 @@ async fn post(
             //
             // Get or create the TenantUser
             //
+            let admin_role =
+                TenantRole::get_immutable(conn, &tenant.id, admin_irk, TenantRoleKind::ApiKey { is_live })?;
             let tenant_api_key_name = "Integration test API key";
             let (api_key, role) = match TenantApiKey::get(conn, (tenant_api_key_name, &tenant.id, is_live)) {
                 Ok(r) => r,

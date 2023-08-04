@@ -69,7 +69,7 @@ async fn get(
 struct CreateTenantRoleRequest {
     name: String,
     scopes: Vec<TenantScope>,
-    kind: Option<TenantRoleKindDiscriminant>,
+    kind: TenantRoleKindDiscriminant,
 }
 
 #[api_v2_operation(
@@ -88,10 +88,10 @@ async fn post(
 
     let tenant_id = tenant.id.clone();
     let CreateTenantRoleRequest { name, scopes, kind } = request.into_inner();
-    let kind = kind.map(|k| match k {
+    let kind = match kind {
         TenantRoleKindDiscriminant::ApiKey => TenantRoleKind::ApiKey { is_live },
         TenantRoleKindDiscriminant::DashboardUser => TenantRoleKind::DashboardUser,
-    });
+    };
     let result = state
         .db_pool
         .db_query(move |conn| TenantRole::create(conn, tenant_id, name, scopes, false, kind))

@@ -11,11 +11,14 @@ use diesel::prelude::*;
 use diesel::query_builder::QueryFragment;
 use diesel::query_builder::QueryId;
 use diesel::{Insertable, Queryable};
+use itertools::Itertools;
 use newtypes::{
-    CompanySize, EncryptedVaultPrivateKey, ScopedVaultId, StripeCustomerId, TenantId, VaultId,
-    VaultPublicKey, WorkosAuthMethod,
+    CompanySize, EncryptedVaultPrivateKey, ScopedVaultId, StripeCustomerId, TenantId, TenantRoleKind,
+    TenantRoleKindDiscriminant, VaultId, VaultPublicKey, WorkosAuthMethod,
 };
 use serde::{Deserialize, Serialize};
+
+use super::tenant_role::{ImmutableRoleKind, NewTenantRoleRow};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = tenant)]
@@ -142,14 +145,40 @@ impl Tenant {
     /// Save any struct that implements `Insertable<tenant::table>`. The diesel trait constraints
     /// are kind of clunky, but removes the need to have two separate functions with the same exact body
     #[tracing::instrument("Tenant::create", skip_all)]
-    pub fn create<T>(conn: &mut PgConn, value: T) -> DbResult<Self>
+    pub fn create<T>(conn: &mut TxnPgConn, value: T) -> DbResult<Self>
     where
         T: Insertable<tenant::table>,
         <T as Insertable<tenant::table>>::Values: QueryFragment<Pg> + CanInsertInSingleQuery<Pg> + QueryId,
     {
         let tenant = diesel::insert_into(tenant::table)
             .values(value)
-            .get_result(conn)?;
+            .get_result::<Self>(conn.conn())?;
+        // Atomically create all of the immutable roles needed for the tenant
+        let new_roles = [ImmutableRoleKind::Admin, ImmutableRoleKind::ReadOnly]
+            .into_iter()
+            .flat_map(|irk| {
+                let (name, scopes) = irk.props();
+                let tenant_id = tenant.id.clone();
+                [
+                    TenantRoleKind::ApiKey { is_live: true },
+                    TenantRoleKind::ApiKey { is_live: false },
+                    TenantRoleKind::DashboardUser,
+                ]
+                .into_iter()
+                .map(move |kind| NewTenantRoleRow {
+                    tenant_id: tenant_id.clone(),
+                    name: name.to_owned(),
+                    scopes: scopes.clone(),
+                    is_immutable: true,
+                    kind: TenantRoleKindDiscriminant::from(&kind),
+                    is_live: kind.is_live(),
+                    created_at: Utc::now(),
+                })
+            })
+            .collect_vec();
+        diesel::insert_into(db_schema::schema::tenant_role::table)
+            .values(new_roles)
+            .execute(conn.conn())?;
         Ok(tenant)
     }
 

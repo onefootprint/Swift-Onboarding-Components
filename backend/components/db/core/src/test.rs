@@ -101,7 +101,7 @@ mod test {
             domain: None,
             allow_domain_access: false,
         };
-        pool.db_query(|conn| Tenant::create(conn, tenant).expect("couldn't create tenant"))
+        pool.db_transaction(|conn| Tenant::create(conn, tenant))
             .await
             .expect("couldn't make DB query");
 

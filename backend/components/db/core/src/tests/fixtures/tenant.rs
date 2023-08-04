@@ -1,10 +1,10 @@
-use crate::PgConn;
+use crate::TxnPgConn;
 use chrono::Utc;
 use newtypes::{EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
 
 use crate::models::tenant::{NewTenant, Tenant};
 
-pub fn create(conn: &mut PgConn) -> Tenant {
+pub fn create(conn: &mut TxnPgConn) -> Tenant {
     let new_tenant = NewTenant {
         name: "Test tenant".to_owned(),
         public_key: VaultPublicKey::unvalidated(vec![]),
@@ -20,7 +20,7 @@ pub fn create(conn: &mut PgConn) -> Tenant {
 }
 
 pub fn create_with_keys(
-    conn: &mut PgConn,
+    conn: &mut TxnPgConn,
     public_key: VaultPublicKey,
     e_private_key: EncryptedVaultPrivateKey,
 ) -> Tenant {

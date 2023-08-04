@@ -308,10 +308,12 @@ mod tests {
     use crate::actor::SaturatedActor;
     use crate::tests::prelude::*;
     // TODO modernize utils
+    use crate::models::tenant_role::{ImmutableRoleKind, TenantRole};
     use crate::test::{test_annotation, test_tenant_api_key, test_tenant_user};
     use crate::tests::fixtures;
     use crate::tests::prelude::TestPgConn;
     use macros::db_test;
+    use newtypes::TenantRoleKind;
 
     #[db_test]
     fn test_list(conn: &mut TestPgConn) {
@@ -320,7 +322,9 @@ mod tests {
         let tenant = fixtures::tenant::create(conn);
         let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
         let scoped_vault = fixtures::scoped_vault::create(conn, &vault.id, &ob_config.id);
-        let role = fixtures::tenant_role::create_admin_api_key(conn, &tenant.id);
+        let role_kind = TenantRoleKind::ApiKey { is_live };
+        let role =
+            TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, role_kind).unwrap();
 
         let tenant_user1 = test_tenant_user(conn, String::from("tu1@acme.com"), None, None);
         let tenant_user2 = test_tenant_user(conn, String::from("tu2@acme.com"), None, None);

@@ -24,4 +24,14 @@ pub enum TenantRoleKind {
     DashboardUser,
 }
 
+impl TenantRoleKind {
+    pub fn is_live(&self) -> Option<bool> {
+        if let TenantRoleKind::ApiKey { is_live } = &self {
+            Some(*is_live)
+        } else {
+            None
+        }
+    }
+}
+
 crate::util::impl_enum_str_diesel!(TenantRoleKindDiscriminant);

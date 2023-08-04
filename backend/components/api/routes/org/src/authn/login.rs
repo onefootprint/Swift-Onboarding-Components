@@ -145,21 +145,10 @@ async fn create_tenant_rolebinding(
     let rb = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            // Get or create the default admin and read-only role for this tenant
-            // TODO make separate roles for dashboard users and API keys
-            let admin_role =
-                TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::Admin, None)?;
-            let ro_role =
-                TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, None)?;
-            // Create immutable roles to be used for API keys
-            for k in [ImmutableRoleKind::Admin, ImmutableRoleKind::ReadOnly] {
-                for is_live in [true, false] {
-                    let kind = Some(TenantRoleKind::ApiKey { is_live });
-                    TenantRole::get_or_create_immutable(conn, &tenant.id, k, kind)?;
-                }
-                let kind = Some(TenantRoleKind::DashboardUser);
-                TenantRole::get_or_create_immutable(conn, &tenant.id, k, kind)?;
-            }
+            // Get the default admin and read-only role for this tenant
+            let kind = TenantRoleKind::DashboardUser;
+            let admin_role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::Admin, kind)?;
+            let ro_role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, kind)?;
             // If the tenant was just created and has no users, give the user admin perms.
             // Otherwise, read-only perms
             let filters = TenantRolebindingFilters {
@@ -226,8 +215,8 @@ async fn create_tenant(
     };
     let result = state
         .db_pool
-        .db_query(move |conn| Tenant::create(conn, new_tenant))
-        .await??;
+        .db_transaction(move |conn| Tenant::create(conn, new_tenant))
+        .await?;
 
     Ok(result)
 }

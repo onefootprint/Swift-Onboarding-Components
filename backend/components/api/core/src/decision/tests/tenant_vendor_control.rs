@@ -1,6 +1,7 @@
 use crate::enclave_client::EnclaveClient;
 use crate::{config::Config, decision::vendor::tenant_vendor_control::TenantVendorControl, State};
 use db::tests::test_db_pool::TestDbPool;
+use db::DbResult;
 use db::{models::tenant_vendor::TenantVendorControl as DbTenantVendorControl, DbPool};
 use macros::test_state;
 use newtypes::{
@@ -18,7 +19,7 @@ async fn create_db_vendor_control(
     experian_subscriber_code: Option<String>,
 ) -> TenantId {
     db_pool
-        .db_query(move |conn| -> TenantId {
+        .db_transaction(move |conn| -> DbResult<_> {
             let tenant = db::tests::fixtures::tenant::create_with_keys(conn, public_key, e_private_key);
             DbTenantVendorControl::create(
                 conn,
@@ -30,7 +31,7 @@ async fn create_db_vendor_control(
             )
             .unwrap();
 
-            tenant.id
+            Ok(tenant.id)
         })
         .await
         .unwrap()
@@ -72,7 +73,13 @@ async fn test_update_credentials(state: &mut State) {
     // No TVC, credentials should be the same
     let tenant_with_no_tvc = state
         .db_pool
-        .db_query(move |conn| db::tests::fixtures::tenant::create_with_keys(conn, pk2, tenant_e_key2))
+        .db_transaction(move |conn| -> DbResult<_> {
+            Ok(db::tests::fixtures::tenant::create_with_keys(
+                conn,
+                pk2,
+                tenant_e_key2,
+            ))
+        })
         .await
         .unwrap();
     let (default_creds_from_state, updated) = get_tenant_vendor_control(

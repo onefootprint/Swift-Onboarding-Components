@@ -74,12 +74,8 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         // Firm employee session _always_ has RO role
         // This is the magic of the FirmEmployeeAuthContet: firm employees only ever have read
         // permissions for other tenants
-        let role = TenantRole::get_immutable(
-            conn,
-            &tenant.id,
-            ImmutableRoleKind::ReadOnly,
-            Some(TenantRoleKind::DashboardUser),
-        )?;
+        let kind = TenantRoleKind::DashboardUser;
+        let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, kind)?;
 
         let is_risk_ops = ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
 
@@ -185,9 +181,10 @@ mod test {
     use super::{FirmEmployeeAuth, ParsedFirmEmployeeAuth};
     use crate::auth::session::tenant::FirmEmployeeSession;
     use crate::auth::{session::AuthSessionData, SessionContext};
+    use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
     use db::tests::prelude::*;
     use macros::db_test_case;
-    use newtypes::{TenantScope, WorkosAuthMethod};
+    use newtypes::{TenantRoleKind, TenantScope, WorkosAuthMethod};
 
     #[db_test_case(false => vec![TenantScope::Read])]
     #[db_test_case(true => vec![
@@ -199,7 +196,9 @@ mod test {
     ])]
     fn test_roles(conn: &mut TestPgConn, is_risk_ops: bool) -> Vec<TenantScope> {
         let tenant = db::tests::fixtures::tenant::create(conn);
-        let role = db::tests::fixtures::tenant_role::create_ro(conn, &tenant.id);
+        let role_kind = TenantRoleKind::DashboardUser;
+        let role =
+            TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, role_kind).unwrap();
         let tenant_user = db::tests::fixtures::tenant_user::create(conn);
         let session_data = AuthSessionData::FirmEmployee(FirmEmployeeSession {
             tenant_user_id: tenant_user.id.clone(),

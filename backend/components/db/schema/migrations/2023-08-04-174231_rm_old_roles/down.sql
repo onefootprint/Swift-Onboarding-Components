@@ -1,0 +1,1 @@
+ALTER TABLE tenant_role ALTER COLUMN kind DROP NOT NULL;

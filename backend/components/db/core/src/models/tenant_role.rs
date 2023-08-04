@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use super::ob_configuration::IsLive;
-use super::tenant::Tenant;
 use crate::PgConn;
 use crate::{DbError, DbResult, NextPage, OffsetPagination, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -39,7 +38,7 @@ pub struct TenantRole {
     pub is_immutable: IsImmutable,
     /// The list of scopes that are granted to every user in this role
     pub scopes: Vec<TenantScope>,
-    pub kind: Option<TenantRoleKindDiscriminant>,
+    pub kind: TenantRoleKindDiscriminant,
     // For ApiKey roles, is_live must be set
     pub is_live: Option<IsLive>,
 }
@@ -52,7 +51,7 @@ pub enum ImmutableRoleKind {
 }
 
 impl ImmutableRoleKind {
-    fn props(&self) -> (&str, Vec<TenantScope>) {
+    pub(super) fn props(&self) -> (&'static str, Vec<TenantScope>) {
         match self {
             Self::Admin => ("Admin", vec![TenantScope::Admin]),
             Self::ReadOnly => ("Member", vec![TenantScope::Read]),
@@ -65,8 +64,7 @@ impl TenantRole {
         conn: &mut PgConn,
         scopes: &[TenantScope],
         tenant_id: &TenantId,
-        // TODO make not optional after migration
-        kind: Option<TenantRoleKindDiscriminant>,
+        kind: TenantRoleKindDiscriminant,
         is_live: Option<IsLive>,
     ) -> DbResult<()> {
         if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
@@ -76,15 +74,12 @@ impl TenantRole {
         if scopes.iter().unique().count() != scopes.len() {
             return Err(DbError::NonUniqeTenantScopes);
         }
-        if let Some(kind) = kind {
-            // If no kind, this is a legacy role that can have any scope
-            if let Some(s) = scopes
-                .iter()
-                .find(|s| !s.role_kinds().into_iter().contains(&kind))
-            {
-                let s = TenantScopeDiscriminants::from(s);
-                return Err(DbError::InvalidTenantScope(kind, s));
-            }
+        if let Some(s) = scopes
+            .iter()
+            .find(|s| !s.role_kinds().into_iter().contains(&kind))
+        {
+            let s = TenantScopeDiscriminants::from(s);
+            return Err(DbError::InvalidTenantScope(kind, s));
         }
         let proxy_config_ids = scopes
             .iter()
@@ -118,8 +113,7 @@ impl TenantRole {
         conn: &mut PgConn,
         tenant_id: &TenantId,
         kind: ImmutableRoleKind,
-        // TODO make this non-null
-        role_kind: Option<TenantRoleKind>,
+        role_kind: TenantRoleKind,
     ) -> DbResult<Self> {
         let (name, scopes) = kind.props();
         let mut query = tenant_role::table
@@ -128,43 +122,12 @@ impl TenantRole {
             .filter(tenant_role::scopes.eq(&scopes))
             .filter(tenant_role::is_immutable.eq(true))
             .into_boxed();
-        if let Some(role_kind) = role_kind {
-            let kind_discriminant = TenantRoleKindDiscriminant::from(&role_kind);
-            query = query.filter(tenant_role::kind.eq(kind_discriminant));
-            if let TenantRoleKind::ApiKey { is_live } = role_kind {
-                query = query.filter(tenant_role::is_live.eq(is_live))
-            }
-        } else {
-            query = query.filter(tenant_role::kind.is_null())
+        let kind_discriminant = TenantRoleKindDiscriminant::from(&role_kind);
+        query = query.filter(tenant_role::kind.eq(kind_discriminant));
+        if let TenantRoleKind::ApiKey { is_live } = role_kind {
+            query = query.filter(tenant_role::is_live.eq(is_live))
         }
         let role = query.first::<Self>(conn)?;
-        Ok(role)
-    }
-
-    /// Every tenant is created with an admin/read only role - this gets or creates that role
-    #[tracing::instrument("TenantRole::get_or_create_immutable", skip_all)]
-    pub fn get_or_create_immutable(
-        conn: &mut TxnPgConn,
-        tenant_id: &TenantId,
-        kind: ImmutableRoleKind,
-        // TODO make this non-null
-        role_kind: Option<TenantRoleKind>,
-    ) -> DbResult<Self> {
-        Tenant::lock(conn, tenant_id)?;
-        let role = Self::get_immutable(conn, tenant_id, kind, role_kind);
-        let role = match role {
-            Ok(role) => role,
-            Err(e) => {
-                if e.is_not_found() {
-                    // If the role is not found, create it
-                    let (name, scopes) = kind.props();
-                    let tenant_id = tenant_id.clone();
-                    Self::create(conn, tenant_id, name.to_owned(), scopes, true, role_kind)?
-                } else {
-                    return Err(e);
-                }
-            }
-        };
         Ok(role)
     }
 
@@ -183,14 +146,10 @@ impl TenantRole {
         name: String,
         scopes: Vec<TenantScope>,
         is_immutable: IsImmutable,
-        kind: Option<TenantRoleKind>,
+        kind: TenantRoleKind,
     ) -> DbResult<Self> {
-        let is_live = if let Some(TenantRoleKind::ApiKey { is_live }) = kind.as_ref() {
-            Some(*is_live)
-        } else {
-            None
-        };
-        let kind = kind.map(TenantRoleKindDiscriminant::from);
+        let is_live = kind.is_live();
+        let kind = TenantRoleKindDiscriminant::from(kind);
         Self::validate_scopes(conn, &scopes, &tenant_id, kind, is_live)?;
         let new = NewTenantRoleRow {
             tenant_id,
@@ -338,21 +297,8 @@ impl TenantRole {
         if let Some(ref search) = filters.search {
             query = query.filter(tenant_role::name.ilike(format!("%{}%", search)))
         }
-        match filters.kind {
-            None => {
-                // For legacy filters (from the settings tab), show only legacy roles AND dashboard user roles
-                query = query.filter(
-                    tenant_role::kind
-                        .is_null()
-                        .or(tenant_role::kind.eq(TenantRoleKindDiscriminant::DashboardUser)),
-                )
-            }
-            Some(TenantRoleKindDiscriminant::ApiKey) => {
-                query = query.filter(tenant_role::kind.eq(TenantRoleKindDiscriminant::ApiKey))
-            }
-            Some(TenantRoleKindDiscriminant::DashboardUser) => {
-                query = query.filter(tenant_role::kind.eq(TenantRoleKindDiscriminant::DashboardUser))
-            }
+        if let Some(kind) = filters.kind.as_ref() {
+            query = query.filter(tenant_role::kind.eq(kind))
         }
         query
     }
@@ -414,14 +360,14 @@ impl TenantRole {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = tenant_role)]
-struct NewTenantRoleRow {
-    tenant_id: TenantId,
-    name: String,
-    scopes: Vec<TenantScope>,
-    created_at: DateTime<Utc>,
-    is_immutable: IsImmutable,
-    kind: Option<TenantRoleKindDiscriminant>,
-    is_live: Option<IsLive>,
+pub(super) struct NewTenantRoleRow {
+    pub(super) tenant_id: TenantId,
+    pub(super) name: String,
+    pub(super) scopes: Vec<TenantScope>,
+    pub(super) created_at: DateTime<Utc>,
+    pub(super) is_immutable: IsImmutable,
+    pub(super) kind: TenantRoleKindDiscriminant,
+    pub(super) is_live: Option<IsLive>,
 }
 
 #[derive(AsChangeset, Default)]

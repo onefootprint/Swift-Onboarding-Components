@@ -1,3 +1,4 @@
+use crate::DbResult;
 use std::ops::Deref;
 
 use diesel::PgConnection;
@@ -111,7 +112,7 @@ impl Drop for TestDbPool {
 #[test_db_pool]
 async fn example_test(db_pool: TestDbPool) {
     let _tenant = db_pool
-        .db_query(crate::tests::fixtures::tenant::create)
+        .db_transaction(|conn| -> DbResult<_> { Ok(crate::tests::fixtures::tenant::create(conn)) })
         .await
         .unwrap();
 }
@@ -121,7 +122,7 @@ async fn example_test(db_pool: TestDbPool) {
 #[test_db_pool(retain)]
 async fn example_test_retain_test_db(db_pool: TestDbPool) {
     let _tenant = db_pool
-        .db_query(crate::tests::fixtures::tenant::create)
+        .db_transaction(|conn| -> DbResult<_> { Ok(crate::tests::fixtures::tenant::create(conn)) })
         .await
         .unwrap();
 }
