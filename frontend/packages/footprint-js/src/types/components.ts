@@ -80,6 +80,11 @@ export enum FormType {
 
 export type FormOptions = {
   hideFootprintLogo?: boolean;
+  hideButtons?: boolean;
+};
+
+export type FormRef = {
+  save: () => void;
 };
 
 export interface FormProps extends PropsBase {
@@ -90,6 +95,7 @@ export interface FormProps extends PropsBase {
   containerId?: string; // required for inline variant
   variant?: Variant; // supports all variants, falls back to modal, so optional
   options?: FormOptions;
+  getRef?: (ref: FormRef) => void; // returns a ref on mount that the tenants can trigger form actions from
   onComplete?: () => void;
   onCancel?: () => void;
   onClose?: () => void;

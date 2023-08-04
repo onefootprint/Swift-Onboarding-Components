@@ -15,6 +15,7 @@ export type {
   Component as FootprintComponent,
   FormOptions as FootprintFormOptions,
   FormProps as FootprintFormProps,
+  FormRef as FootprintFormRef,
   Props as FootprintProps,
   PropsBase as FootprintPropsBase,
   RenderProps as FootprintRenderProps,

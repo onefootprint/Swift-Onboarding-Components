@@ -88,4 +88,21 @@ describe('<FormFormDialog />', () => {
       ).not.toBeInTheDocument();
     });
   });
+
+  it('should hide buttons when hideButtons is true', async () => {
+    renderFormDialog({ hideButtons: true });
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('button', { name: 'Primary' }) &&
+          screen.queryByRole('button', { name: 'Secondary' }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it('should hide the footer when hideButtons and hideFootprintLogo are true', async () => {
+    renderFormDialog({ hideButtons: true, hideFootprintLogo: true });
+    await waitFor(() => {
+      expect(screen.queryByRole('footer')).not.toBeInTheDocument();
+    });
+  });
 });

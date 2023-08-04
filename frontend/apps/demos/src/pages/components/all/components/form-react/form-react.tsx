@@ -22,13 +22,6 @@ const FormReactIntegration = () => {
       <Button onClick={() => setIsModalVisible(true)}>Modal</Button>
       <Button onClick={() => setIsDrawerVisible(true)}>Drawer</Button>
       <Container>
-        {/* <FootprintForm
-          authToken={authToken}
-          type={FootprintFormType.cardAndNameAndAddress}
-          onComplete={() => console.log('complete')}
-          onCancel={() => console.log('cancel')}
-          onClose={() => console.log('close')}
-        /> */}
         {isModalVisible && (
           <FootprintForm
             variant="modal"

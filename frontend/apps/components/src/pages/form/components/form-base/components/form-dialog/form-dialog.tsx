@@ -14,6 +14,7 @@ export type FormDialogProps = {
   testID?: string;
   variant?: FootprintVariant;
   hideFootprintLogo?: boolean;
+  hideButtons?: boolean;
 } & (AllButtons | OnlyPrimaryButton);
 
 const FormDialog = ({
@@ -25,23 +26,31 @@ const FormDialog = ({
   onClose,
   variant = 'modal',
   hideFootprintLogo,
-}: FormDialogProps) => (
-  <Container
-    id="footprint-container"
-    data-testid={testID}
-    data-variant={variant}
-  >
-    <Header variant={variant} onClose={onClose} title={title} />
-    <div style={{ flexGrow: 1 }}>
-      <ScrollArea sx={{ padding: 7 }}>{children}</ScrollArea>
-    </div>
-    <Footer
-      primaryButton={primaryButton}
-      secondaryButton={secondaryButton}
-      hideFootprintLogo={hideFootprintLogo}
-    />
-  </Container>
-);
+  hideButtons,
+}: FormDialogProps) => {
+  const shouldHideFooter = hideButtons && hideFootprintLogo;
+
+  return (
+    <Container
+      id="footprint-container"
+      data-testid={testID}
+      data-variant={variant}
+    >
+      <Header variant={variant} onClose={onClose} title={title} />
+      <div style={{ flexGrow: 1 }}>
+        <ScrollArea sx={{ padding: 7 }}>{children}</ScrollArea>
+      </div>
+      {!shouldHideFooter && (
+        <Footer
+          primaryButton={primaryButton}
+          secondaryButton={secondaryButton}
+          hideFootprintLogo={hideFootprintLogo}
+          hideButtons={hideButtons}
+        />
+      )}
+    </Container>
+  );
+};
 
 const Container = styled.div`
   ${({ theme }) => css`

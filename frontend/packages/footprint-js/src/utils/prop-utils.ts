@@ -1,4 +1,5 @@
 import { ComponentCallbacksByEvent } from '../constants/callbacks';
+import RefsByComponent from '../constants/refs';
 import {
   ComponentKind,
   Props,
@@ -86,6 +87,12 @@ const getSecondaryProps = (props: Props): Props | undefined => {
   return undefined;
 };
 
+export const getRefProps = (props: Props) => {
+  const { kind } = props;
+  const refs = RefsByComponent[kind] ?? [];
+  return refs;
+};
+
 // Certain callbacks need to destroy the iframe, and others might trigger a
 // secondary iframe to launch, like a new modal when a button is clicked
 export const getCallbackProps = (
@@ -103,12 +110,13 @@ export const getCallbackProps = (
       return;
     }
 
-    // Even if the user didn't specify a callback, we need to
-    // listen to for events that should trigger unmount
+    // Even if the user didn't specify a callback, we might still
+    // need to listen for events that should trigger other things
     let callback = (props as any)[callbackPropName];
     if (!callback || typeof callback !== 'function') {
       callback = () => {};
     }
+
     const shouldDestroy =
       publicEvent === PublicEvent.closed ||
       publicEvent === PublicEvent.canceled;
@@ -133,16 +141,20 @@ export const getCallbackProps = (
 };
 
 // Get the data props that will be sent over via post messages to the child iframe
-// We need to omit kind, appearance and callback props from the props sent to the iframe
+// We need to omit kind, appearance, ref and callback props from the props sent to the iframe
 // Functions cannot be sent via post message and appearance is already sent via URL
 export const getDataProps = (props: Props): Partial<Props> => {
   const { kind, appearance, containerId, ...customProps } = props;
   const callbacks = ComponentCallbacksByEvent[kind] ?? {};
-
   const callbackPropNames = Object.values(callbacks);
+
+  const refs = getRefProps(props);
+  const refPropNames = Object.values(refs);
+
   const dataProps = Object.fromEntries(
     Object.entries(customProps).filter(
-      ([key]) => !callbackPropNames.includes(key),
+      ([key]) =>
+        !callbackPropNames.includes(key) && !refPropNames.includes(key),
     ),
   );
 

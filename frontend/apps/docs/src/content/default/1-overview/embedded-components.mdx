@@ -152,9 +152,10 @@ When the user has completed filling the secure collection form on your product, 
 ## Available FootprintForm Props
 
 | Variable     | Description                                                                                                                                                                        |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
 | `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                                                          |
 | `title`      | Optional. A string that will be displayed at the top of the field                                                                                                                  |
 | `type`       | Optional. A FootprintFormType, which can be one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
 | `variant`    | Optional. One of `modal`, `drawer` or `inline`. Specifies whether the form will be rendered in-line or in a modal.                                                                 |
 | `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                                                           |
+| `getRef`     | Optional. A callback that takes one argument `(ref) => {}`. The `ref` object contains a method `save()` that can be called to save the form data (`ref.save()`).                   |     |

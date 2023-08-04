@@ -1,15 +1,17 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import {
   FootprintFormType,
+  FootprintPrivateEvent,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import { CardDIField } from '@onefootprint/types';
 import type { GetServerSideProps } from 'next';
-import React from 'react';
+import React, { useRef } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
 import { useFootprintProvider } from '../../components/footprint-provider';
 import useProps from '../../components/footprint-provider/hooks/use-props';
-import FormBase, { FormData } from './components/form-base';
+import FormBase, { FormBaseHandler, FormData } from './components/form-base';
 import Invalid from './components/invalid';
 import Loading from './components/loading';
 import useClientTokenFields from './hooks/use-client-token-fields';
@@ -21,6 +23,8 @@ import getCardAlias from './utils/get-card-alias';
 import validateClientTokenFields from './utils/validate-client-token-fields';
 
 const Form = () => {
+  const footprintProvider = useFootprintProvider();
+  const formBaseRef = useRef<FormBaseHandler>(null);
   const props = useProps<FootprintFormDataProps>();
   const {
     authToken = '',
@@ -31,7 +35,16 @@ const Form = () => {
   } = props || {};
   const usersVaultMutation = useUsersVault();
   const clientTokenFields = useClientTokenFields(authToken);
-  const footprintProvider = useFootprintProvider();
+
+  const subscribeSave = () =>
+    footprintProvider.on(FootprintPrivateEvent.formSaved, () => {
+      formBaseRef.current?.save();
+    });
+
+  useEffectOnce(() => {
+    subscribeSave();
+  });
+
   if (!props || !clientTokenFields.data) {
     return <Loading />;
   }
@@ -101,11 +114,13 @@ const Form = () => {
 
   return (
     <FormBase
+      ref={formBaseRef}
       title={title}
       type={type}
       variant={variant}
       isLoading={usersVaultMutation.isLoading}
       hideFootprintLogo={options?.hideFootprintLogo}
+      hideButtons={options?.hideButtons}
       onSave={handleSave}
       onCancel={handleCancel}
       onClose={handleClose}

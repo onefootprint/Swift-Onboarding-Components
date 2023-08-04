@@ -43,8 +43,12 @@ export const getVueIntegration = () => `
         onComplete: handleComplete,
         onClose: handleClose,
         onCancel: handleCancel,
+        getRef: ref => {
+          // TODO: you can call a 'save()' method on 'ref' ('ref.save()') to save the form data; this is useful if you want to use your own save button
+        },
         options: {
-          hideFootprintLogo: false
+          hideFootprintLogo: false,
+          hideButtons: false // hides the action buttons ('save' and 'cancel' buttons)
         }
       });
       component.render();

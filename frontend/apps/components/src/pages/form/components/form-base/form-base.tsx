@@ -7,7 +7,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Divider, useConfirmationDialog } from '@onefootprint/ui';
-import React from 'react';
+import React, { forwardRef, useImperativeHandle } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import Address, {
@@ -35,151 +35,182 @@ export type FormBaseProps = {
   onCancel?: () => void;
   onClose?: () => void;
   hideFootprintLogo?: boolean;
+  hideButtons?: boolean;
 };
 
 const FORM_ID = 'secure-form';
 
-const FormBase = ({
-  title,
-  type = FootprintFormType.cardAndName,
-  variant = 'modal',
-  isLoading,
-  onSave,
-  onCancel,
-  onClose,
-  hideFootprintLogo,
-}: FormBaseProps) => {
-  const { t } = useTranslation('pages.secure-form');
-  const confirmationDialog = useConfirmationDialog();
-  const hasCountry =
-    type === FootprintFormType.cardAndNameAndAddress ||
-    type === FootprintFormType.cardAndZip;
-
-  const defaultValues = hasCountry
-    ? {
-        country: DEFAULT_COUNTRY,
-      }
-    : undefined;
-  const methods = useForm<FormData>({
-    defaultValues,
-  });
-  const {
-    handleSubmit,
-    formState: { isDirty },
-  } = methods;
-
-  const confirmClose = (callback: () => void) => {
-    if (!isDirty) {
-      callback();
-      return;
-    }
-    confirmationDialog.open({
-      title: t('confirm-close.title'),
-      description: t('confirm-close.description'),
-      primaryButton: {
-        label: t('confirm-close.buttons.yes'),
-        onClick: callback,
-      },
-      secondaryButton: {
-        label: t('confirm-close.buttons.no'),
-      },
-    });
-  };
-
-  const handleBeforeSubmit = (data: FormData) => {
-    onSave?.(data);
-  };
-
-  const handleClose = () => {
-    if (onClose) {
-      confirmClose(onClose);
-    }
-  };
-
-  const handleCancel = () => {
-    if (onCancel) {
-      confirmClose(onCancel);
-    }
-  };
-
-  return (
-    <FormDialog
-      title={title}
-      variant={variant}
-      primaryButton={{
-        form: FORM_ID,
-        label: t('buttons.save'),
-        type: 'submit',
-        loading: isLoading,
-      }}
-      secondaryButton={
-        onCancel && {
-          label: t('buttons.cancel'),
-          type: 'reset',
-          onClick: handleCancel,
-          disabled: isLoading,
-        }
-      }
-      onClose={handleClose}
-      hideFootprintLogo={hideFootprintLogo}
-    >
-      <FormProvider {...methods}>
-        <StyledForm id={FORM_ID} onSubmit={handleSubmit(handleBeforeSubmit)}>
-          {type === FootprintFormType.cardOnly && (
-            <>
-              <Title
-                label={t('section-title.card-information')}
-                iconComponent={<IcoCreditcard24 />}
-              />
-              <Card />
-            </>
-          )}
-          {type === FootprintFormType.cardAndName && (
-            <>
-              <Title
-                label={t('section-title.card-information')}
-                iconComponent={<IcoCreditcard24 />}
-              />
-              <Name />
-              <Card />
-            </>
-          )}
-          {type === FootprintFormType.cardAndNameAndAddress && (
-            <>
-              <Title
-                label={t('section-title.card-information')}
-                iconComponent={<IcoCreditcard24 />}
-              />
-              <Name />
-              <Card />
-              <StyledDivider />
-              <Title
-                label={t('section-title.billing-address')}
-                iconComponent={<IcoBuilding24 />}
-              />
-              <Address />
-            </>
-          )}
-          {type === FootprintFormType.cardAndZip && (
-            <>
-              <Title
-                label={t('section-title.card-information')}
-                iconComponent={<IcoCreditcard24 />}
-              />
-              <Card />
-              <StyledDivider />
-              <Title
-                label={t('section-title.billing-address')}
-                iconComponent={<IcoBuilding24 />}
-              />
-              <PartialAddress />
-            </>
-          )}
-        </StyledForm>
-      </FormProvider>
-    </FormDialog>
-  );
+export type FormBaseHandler = {
+  save: () => void;
 };
+
+const FormBase = forwardRef<FormBaseHandler, FormBaseProps>(
+  (
+    {
+      title,
+      type = FootprintFormType.cardAndName,
+      variant = 'modal',
+      isLoading,
+      onSave,
+      onCancel,
+      onClose,
+      hideFootprintLogo,
+      hideButtons,
+    },
+    ref,
+  ) => {
+    const { t } = useTranslation('pages.secure-form');
+    const confirmationDialog = useConfirmationDialog();
+    const hasCountry =
+      type === FootprintFormType.cardAndNameAndAddress ||
+      type === FootprintFormType.cardAndZip;
+
+    const defaultValues = hasCountry
+      ? {
+          country: DEFAULT_COUNTRY,
+        }
+      : undefined;
+    const methods = useForm<FormData>({
+      defaultValues,
+    });
+    const {
+      handleSubmit,
+      formState: { isDirty, errors },
+      trigger,
+      getValues,
+    } = methods;
+
+    const confirmClose = (callback: () => void) => {
+      if (!isDirty) {
+        callback();
+        return;
+      }
+      confirmationDialog.open({
+        title: t('confirm-close.title'),
+        description: t('confirm-close.description'),
+        primaryButton: {
+          label: t('confirm-close.buttons.yes'),
+          onClick: callback,
+        },
+        secondaryButton: {
+          label: t('confirm-close.buttons.no'),
+        },
+      });
+    };
+
+    const handleBeforeSubmit = (data: FormData) => {
+      onSave?.(data);
+    };
+
+    const handleClose = () => {
+      if (onClose) {
+        confirmClose(onClose);
+      }
+    };
+
+    const handleCancel = () => {
+      if (onCancel) {
+        confirmClose(onCancel);
+      }
+    };
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        save: () => {
+          trigger();
+          if (Object.values(errors).length > 0) {
+            // There were some errors with inputs, don't trigger saving
+            return;
+          }
+          const data = getValues();
+          handleBeforeSubmit(data);
+        },
+      }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [],
+    );
+
+    return (
+      <FormDialog
+        title={title}
+        variant={variant}
+        primaryButton={{
+          form: FORM_ID,
+          label: t('buttons.save'),
+          type: 'submit',
+          loading: isLoading,
+        }}
+        secondaryButton={
+          onCancel && {
+            label: t('buttons.cancel'),
+            type: 'reset',
+            onClick: handleCancel,
+            disabled: isLoading,
+          }
+        }
+        onClose={handleClose}
+        hideFootprintLogo={hideFootprintLogo}
+        hideButtons={hideButtons}
+      >
+        <FormProvider {...methods}>
+          <StyledForm id={FORM_ID} onSubmit={handleSubmit(handleBeforeSubmit)}>
+            {type === FootprintFormType.cardOnly && (
+              <>
+                <Title
+                  label={t('section-title.card-information')}
+                  iconComponent={<IcoCreditcard24 />}
+                />
+                <Card />
+              </>
+            )}
+            {type === FootprintFormType.cardAndName && (
+              <>
+                <Title
+                  label={t('section-title.card-information')}
+                  iconComponent={<IcoCreditcard24 />}
+                />
+                <Name />
+                <Card />
+              </>
+            )}
+            {type === FootprintFormType.cardAndNameAndAddress && (
+              <>
+                <Title
+                  label={t('section-title.card-information')}
+                  iconComponent={<IcoCreditcard24 />}
+                />
+                <Name />
+                <Card />
+                <StyledDivider />
+                <Title
+                  label={t('section-title.billing-address')}
+                  iconComponent={<IcoBuilding24 />}
+                />
+                <Address />
+              </>
+            )}
+            {type === FootprintFormType.cardAndZip && (
+              <>
+                <Title
+                  label={t('section-title.card-information')}
+                  iconComponent={<IcoCreditcard24 />}
+                />
+                <Card />
+                <StyledDivider />
+                <Title
+                  label={t('section-title.billing-address')}
+                  iconComponent={<IcoBuilding24 />}
+                />
+                <PartialAddress />
+              </>
+            )}
+          </StyledForm>
+        </FormProvider>
+      </FormDialog>
+    );
+  },
+);
 
 const StyledForm = styled.form`
   ${({ theme }) => css`

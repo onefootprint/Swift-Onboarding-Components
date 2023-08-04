@@ -1,6 +1,6 @@
 import Postmate from '@onefootprint/postmate';
 
-import { Props } from '../../types/components';
+import { ComponentKind, FormRef, Props } from '../../types/components';
 import { PrivateEvent } from '../../types/events';
 import {
   createInlineContainer,
@@ -19,11 +19,11 @@ import {
 import getURL from '../util-utils';
 import { Iframe } from './types';
 
-const initIframe = (props: Props): Iframe => {
+const initIframe = (rawProps: Props): Iframe => {
   let child: Postmate.ParentAPI | null = null;
   let isRendered = false;
-  const sanitizedProps = getSanitizedProps(props);
-  const { variant, containerId } = sanitizedProps;
+  const props = getSanitizedProps(rawProps);
+  const { variant, containerId } = props;
   const hasOverlay = variant === 'modal' || variant === 'drawer';
   let onDestroy: (() => void) | undefined;
   let onRenderSecondary: ((secondaryProps: Props) => void) | undefined;
@@ -36,14 +36,38 @@ const initIframe = (props: Props): Iframe => {
       );
     }
 
-    const callbackProps = getCallbackProps(
-      sanitizedProps,
-      onDestroy,
-      onRenderSecondary,
-    );
+    const callbackProps = getCallbackProps(props, onDestroy, onRenderSecondary);
     Object.entries(callbackProps).forEach(([event, callback]) => {
       child?.on(event, callback);
     });
+  };
+
+  const setUpRefs = () => {
+    if (!child) {
+      throw new Error(
+        'Footprint should be initialized in order to set up refs',
+      );
+    }
+    // For now we only support refs on the form component
+    const { kind } = props;
+    if (kind !== ComponentKind.Form) {
+      return;
+    }
+    const { getRef } = props;
+    if (!getRef) {
+      return;
+    }
+    const formRef: FormRef = {
+      save: () => {
+        if (!child) {
+          throw new Error(
+            'Footprint should be initialized to call ref methods',
+          );
+        }
+        child?.call(PrivateEvent.formSaved);
+      },
+    };
+    getRef(formRef);
   };
 
   const sendDataProps = () => {
@@ -52,7 +76,7 @@ const initIframe = (props: Props): Iframe => {
         'Footprint should be initialized in order to receive props',
       );
     }
-    child.call(PrivateEvent.propsReceived, getDataProps(sanitizedProps));
+    child.call(PrivateEvent.propsReceived, getDataProps(props));
   };
 
   const getOrCreateContainer = (): HTMLElement | null => {
@@ -107,7 +131,7 @@ const initIframe = (props: Props): Iframe => {
       classListArray: [`footprint-${variant}`, `footprint-${variant}-loading`],
       container,
       name: `footprint-iframe-${id}`,
-      url: getURL(sanitizedProps),
+      url: getURL(props),
       allow:
         'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
     });
@@ -116,6 +140,7 @@ const initIframe = (props: Props): Iframe => {
     setLoading(container, false);
     child.on(PrivateEvent.started, () => {
       sendDataProps();
+      setUpRefs();
     });
   };
 
@@ -144,7 +169,7 @@ const initIframe = (props: Props): Iframe => {
   };
 
   return {
-    props: sanitizedProps,
+    props,
     isRendered,
     render,
     destroy,

@@ -14,24 +14,27 @@ class IframeAdapter implements FootprintClient {
       [FootprintPrivateEvent.propsReceived]: (data?: any) => {
         this.eventEmitter.emit(FootprintPrivateEvent.propsReceived, data);
       },
+      [FootprintPrivateEvent.formSaved]: () => {
+        this.eventEmitter.emit(FootprintPrivateEvent.formSaved);
+      },
     });
     this.postmate = postmate;
     this.start();
   }
 
   send(event: string, data?: any) {
-    this.sendEvent(event, data);
+    this.sendEventToParent(event, data);
   }
 
   start() {
-    this.sendEvent(FootprintPrivateEvent.started);
+    this.sendEventToParent(FootprintPrivateEvent.started);
   }
 
   on(name: string, callback: (result: unknown) => void) {
     return this.eventEmitter.on(name, callback);
   }
 
-  private sendEvent(eventName: string, data?: any) {
+  private sendEventToParent(eventName: string, data?: any) {
     if (this.postmate) {
       this.postmate.emit(eventName, data);
     } else {
