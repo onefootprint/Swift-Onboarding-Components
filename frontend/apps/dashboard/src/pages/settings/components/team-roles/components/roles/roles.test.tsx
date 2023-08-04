@@ -8,7 +8,7 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import { Role, RoleScopeKind } from '@onefootprint/types';
+import { Role, RoleKind, RoleScopeKind } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -174,6 +174,7 @@ describe.skip('<Roles />', () => {
             createdAt: '2022-09-19T16:24:35.367322Z',
             numActiveUsers: 0,
             numActiveApiKeys: 0,
+            kind: RoleKind.dashboardUser,
           });
         });
 
@@ -191,6 +192,7 @@ describe.skip('<Roles />', () => {
               createdAt: '2022-09-19T16:24:35.367322Z',
               numActiveUsers: 0,
               numActiveApiKeys: 0,
+              kind: RoleKind.dashboardUser,
             },
           ]);
           await renderRolesAndWaitData();

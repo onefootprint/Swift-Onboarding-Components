@@ -2,6 +2,7 @@ import { mockRequest } from '@onefootprint/test-utils';
 import {
   GetAuthRoleResponse,
   OrgAssumeRoleResponse,
+  RoleKind,
   RoleScopeKind,
 } from '@onefootprint/types';
 
@@ -65,6 +66,7 @@ export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
       numActiveUsers: 1,
       numActiveApiKeys: 0,
       scopes: [{ kind: RoleScopeKind.admin }],
+      kind: RoleKind.dashboardUser,
     },
     rolebinding: {
       lastLoginAt: '2023-01-18T17:54:10.668420Z',

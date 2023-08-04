@@ -18,7 +18,7 @@ import type { FormData } from './form.types';
 export type FormProps = {
   defaultValues?: FormData;
   onSubmit: (payload: CreateRoleRequest | UpdateRoleRequest) => void;
-  kind?: RoleKind;
+  kind: RoleKind;
 };
 
 const Form = ({

@@ -86,5 +86,5 @@ export type Role = {
   numActiveUsers: number;
   numActiveApiKeys: number;
   scopes: RoleScope[];
-  kind?: RoleKind;
+  kind: RoleKind;
 };

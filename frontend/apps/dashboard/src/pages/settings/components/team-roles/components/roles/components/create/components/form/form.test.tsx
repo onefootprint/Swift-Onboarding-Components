@@ -1,4 +1,5 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import { RoleKind } from '@onefootprint/types';
 import React from 'react';
 import { withProxyConfigs } from 'src/pages/developers/components/proxy-configs/proxy-config.test.config';
 
@@ -9,8 +10,11 @@ describe('<Form />', () => {
     withProxyConfigs();
   });
 
-  const renderForm = ({ onSubmit = jest.fn() }: Partial<FormProps>) =>
-    customRender(<Form onSubmit={onSubmit} />);
+  const renderForm = ({
+    onSubmit = jest.fn(),
+    kind = RoleKind.dashboardUser,
+  }: Partial<FormProps>) =>
+    customRender(<Form onSubmit={onSubmit} kind={kind} />);
 
   it('should render the read-only as checked by default', () => {
     renderForm({});
@@ -38,7 +42,7 @@ describe('<Form />', () => {
 
   describe('when clicking on the vault proxy field', () => {
     it('should toggle the multi-select to pick the proxy configs', async () => {
-      renderForm({});
+      renderForm({ kind: RoleKind.apiKey });
 
       const invokeProxyField = screen.getByRole('checkbox', {
         name: 'Invoke vault proxy',

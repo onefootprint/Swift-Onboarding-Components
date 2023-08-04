@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Member, Role, RoleScopeKind } from '@onefootprint/types';
+import { Member, Role, RoleKind, RoleScopeKind } from '@onefootprint/types';
 import { asUser, resetUser } from 'src/config/tests';
 
 export const withCurrentUserDifferentFromMember = () => {
@@ -37,6 +37,7 @@ export const memberFixture: Member = {
     numActiveUsers: 1,
     numActiveApiKeys: 0,
     scopes: [{ kind: RoleScopeKind.admin }],
+    kind: RoleKind.dashboardUser,
   },
   rolebinding: {
     lastLoginAt: '2023-01-18T17:54:10.668420Z',
@@ -52,6 +53,7 @@ export const RolesFixture: Role[] = [
     createdAt: '2022-09-19T16:24:35.367322Z',
     numActiveUsers: 1,
     numActiveApiKeys: 0,
+    kind: RoleKind.dashboardUser,
   },
   {
     id: 'Role_erflKNWEF13143EWRWELJN',
@@ -61,6 +63,7 @@ export const RolesFixture: Role[] = [
     createdAt: '2023-01-06T05:11:08.415924Z',
     numActiveUsers: 4,
     numActiveApiKeys: 0,
+    kind: RoleKind.dashboardUser,
   },
 ];
 

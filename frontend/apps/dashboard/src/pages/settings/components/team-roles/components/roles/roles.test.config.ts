@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Role, RoleScopeKind } from '@onefootprint/types';
+import { Role, RoleKind, RoleScopeKind } from '@onefootprint/types';
 
 export const RolesFixture: Role[] = [
   {
@@ -10,6 +10,7 @@ export const RolesFixture: Role[] = [
     createdAt: '2022-11-18T00:04:11.368107Z',
     numActiveUsers: 0,
     numActiveApiKeys: 0,
+    kind: RoleKind.dashboardUser,
   },
   {
     id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
@@ -19,6 +20,7 @@ export const RolesFixture: Role[] = [
     createdAt: '2023-01-25T21:47:22.679708Z',
     numActiveUsers: 2,
     numActiveApiKeys: 3,
+    kind: RoleKind.dashboardUser,
   },
   {
     id: 'Role_erflKNWEF13143EWRWELJN',
@@ -28,6 +30,7 @@ export const RolesFixture: Role[] = [
     createdAt: '2023-01-06T04:33:34.272399Z',
     numActiveUsers: 4,
     numActiveApiKeys: 5,
+    kind: RoleKind.dashboardUser,
   },
 ];
 

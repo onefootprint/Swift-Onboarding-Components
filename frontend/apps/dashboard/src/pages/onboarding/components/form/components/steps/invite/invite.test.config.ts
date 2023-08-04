@@ -1,5 +1,10 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Organization, Role, RoleScopeKind } from '@onefootprint/types';
+import {
+  Organization,
+  Role,
+  RoleKind,
+  RoleScopeKind,
+} from '@onefootprint/types';
 
 export const RolesFixture: Role[] = [
   {
@@ -10,6 +15,7 @@ export const RolesFixture: Role[] = [
     createdAt: '2022-09-19T16:24:35.367322Z',
     numActiveUsers: 1,
     numActiveApiKeys: 2,
+    kind: RoleKind.dashboardUser,
   },
   {
     id: 'Role_erflKNWEF13143EWRWELJN',
@@ -19,6 +25,7 @@ export const RolesFixture: Role[] = [
     createdAt: '2023-01-06T05:11:08.415924Z',
     numActiveUsers: 0,
     numActiveApiKeys: 3,
+    kind: RoleKind.dashboardUser,
   },
 ];
 

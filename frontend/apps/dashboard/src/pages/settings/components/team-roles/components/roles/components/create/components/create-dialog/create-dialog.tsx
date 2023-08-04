@@ -9,7 +9,7 @@ import Form from '../form';
 export type CreateDialogProps = {
   open: boolean;
   handleClose: () => void;
-  kind?: RoleKind;
+  kind: RoleKind;
 };
 
 const CreateDialog = ({ open, handleClose, kind }: CreateDialogProps) => {

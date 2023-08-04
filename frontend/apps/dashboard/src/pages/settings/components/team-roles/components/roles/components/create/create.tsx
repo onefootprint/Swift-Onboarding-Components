@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { RoleScopeKind } from '@onefootprint/types';
+import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import PermissionGate from 'src/components/permission-gate';
@@ -27,8 +27,7 @@ const Create = () => {
       <CreateDialog
         open={open}
         handleClose={() => setOpen(false)}
-        // TODO set this to only dashboardUser once we have separate API key management
-        // kind={RoleKind.dashboardUser}
+        kind={RoleKind.dashboardUser}
       />
     </Box>
   );

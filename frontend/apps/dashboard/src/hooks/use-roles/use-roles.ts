@@ -6,7 +6,7 @@ import { GetRolesResponse, RoleKind } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
-const getRolesRequest = async (authHeaders: AuthHeaders, kind?: RoleKind) => {
+const getRolesRequest = async (authHeaders: AuthHeaders, kind: RoleKind) => {
   const { data: response } = await request<
     PaginatedRequestResponse<GetRolesResponse>
   >({

@@ -20,7 +20,7 @@ import useDecryptOptions from '../../../../../../../../hooks/use-decrypt-options
 import useVaultProxyOptions from '../../../../../../../../hooks/use-vault-proxy-options';
 
 export type PermissionsProps = {
-  kind?: RoleKind;
+  kind: RoleKind;
 };
 
 const Permissions = ({ kind }: PermissionsProps) => {
