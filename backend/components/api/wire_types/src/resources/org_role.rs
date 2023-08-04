@@ -10,6 +10,7 @@ pub struct OrganizationRole {
     pub scopes: Vec<TenantScope>,
     pub is_immutable: bool,
     pub created_at: DateTime<Utc>,
+    pub kind: Option<TenantRoleKind>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub num_active_users: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]

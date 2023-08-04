@@ -36,7 +36,7 @@ async fn get(
 
     let page = pagination.page;
     let page_size = pagination.page_size(&state);
-    let OrgRoleFilters { search } = filters.into_inner();
+    let OrgRoleFilters { search, kind } = filters.into_inner();
 
     let tenant_id = tenant.id.clone();
     let (results, next_page, count) = state
@@ -46,6 +46,7 @@ async fn get(
                 tenant_id: &tenant_id,
                 scopes: None,
                 search,
+                kind,
             };
             let pagination = OffsetPagination::new(page, page_size);
             let (results, next_page) = TenantRole::list_active(conn, &filters, pagination)?;

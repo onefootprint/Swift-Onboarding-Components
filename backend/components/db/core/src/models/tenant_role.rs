@@ -39,9 +39,9 @@ pub struct TenantRole {
     /// The list of scopes that are granted to every user in this role
     pub scopes: Vec<TenantScope>,
     pub kind: Option<TenantRoleKind>,
-    // TODO support filtering on these kinds. show None or DashboardUser on the existing page, ApiKey on the new api key page
-    // make immutable roles for api keys too
+    // TODO make immutable roles for api keys too
     // TODO is_live roles
+    // TODO backfill roles
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -316,6 +316,22 @@ impl TenantRole {
         if let Some(ref search) = filters.search {
             query = query.filter(tenant_role::name.ilike(format!("%{}%", search)))
         }
+        match filters.kind {
+            None => {
+                // For legacy filters (from the settings tab), show only legacy roles AND dashboard user roles
+                query = query.filter(
+                    tenant_role::kind
+                        .is_null()
+                        .or(tenant_role::kind.eq(TenantRoleKind::DashboardUser)),
+                )
+            }
+            Some(TenantRoleKind::ApiKey) => {
+                query = query.filter(tenant_role::kind.eq(TenantRoleKind::ApiKey))
+            }
+            Some(TenantRoleKind::DashboardUser) => {
+                query = query.filter(tenant_role::kind.eq(TenantRoleKind::DashboardUser))
+            }
+        }
         query
     }
 
@@ -397,4 +413,5 @@ pub struct TenantRoleListFilters<'a> {
     pub tenant_id: &'a TenantId,
     pub scopes: Option<Vec<TenantScope>>,
     pub search: Option<String>,
+    pub kind: Option<TenantRoleKind>,
 }

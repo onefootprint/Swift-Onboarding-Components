@@ -29,6 +29,7 @@ impl DbToApi<(TenantRole, Option<i64>, Option<i64>)> for api_wire_types::Organiz
             scopes,
             is_immutable,
             created_at,
+            kind,
             ..
         } = role;
         Self {
@@ -37,6 +38,7 @@ impl DbToApi<(TenantRole, Option<i64>, Option<i64>)> for api_wire_types::Organiz
             scopes,
             is_immutable,
             created_at,
+            kind,
             num_active_users,
             num_active_api_keys,
         }
