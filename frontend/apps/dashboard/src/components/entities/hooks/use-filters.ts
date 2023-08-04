@@ -1,5 +1,4 @@
 import last from 'lodash/last';
-import { DEFAULT_PAGE_SIZE } from 'src/config/constants';
 import useBaseFilters, {
   getSearchParams,
   queryToArray,
@@ -33,7 +32,7 @@ const useFilters = () => {
   const values = {
     cursor: queryToArray(filters.query.cursor),
     dateRange: queryToArray(filters.query.date_range),
-    pageSize: filters.query.page_size || `${DEFAULT_PAGE_SIZE}`,
+    pageSize: filters.query.page_size || 15,
     search: filters.query.search,
     status: queryToArray(filters.query.status),
     watchlist_hit: filters.query.watchlist_hit,

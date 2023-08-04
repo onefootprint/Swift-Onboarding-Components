@@ -16,4 +16,3 @@ export const DEFAULT_PUBLIC_ROUTE = '/users';
 export const DEFAULT_PRIVATE_ROUTE = '/login';
 export const DASHBOARD_AUTHORIZATION_HEADER = 'x-fp-dashboard-authorization';
 export const DASHBOARD_IS_LIVE_HEADER = 'x-is-live';
-export const DEFAULT_PAGE_SIZE = 10;

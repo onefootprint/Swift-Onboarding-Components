@@ -1,11 +1,9 @@
-import { DEFAULT_PAGE_SIZE } from 'src/config/constants';
-
 const useCursorPagination = ({
   count = 0,
   next = null,
   cursor = [],
   onChange,
-  pageSize = DEFAULT_PAGE_SIZE,
+  pageSize = 15,
 }: {
   count?: number;
   next?: string | null;
