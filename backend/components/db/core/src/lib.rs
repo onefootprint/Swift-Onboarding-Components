@@ -62,7 +62,7 @@ impl DbPool {
         F: FnOnce(&mut PgConn) -> R + Send + 'static,
         R: Send + 'static,
     {
-        let current_span = tracing::info_span!("db query interact");
+        let current_span = tracing::info_span!("db_query::interact");
 
         let result = self
             .0
@@ -93,6 +93,9 @@ impl DbPool {
                 })
             })
             .await?;
+        if result.is_err() {
+            tracing::info!("Rolling back transaction due to error");
+        }
         // Return ApplicationErrors as-is. Map DbErrors to E
         result.map_err(|txn_error| match txn_error {
             TransactionError::ApplicationError(e) => e,
