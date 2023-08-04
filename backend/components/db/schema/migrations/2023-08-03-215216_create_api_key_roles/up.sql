@@ -1,4 +1,4 @@
-DROP INDEX tenant_role_unique_name_for_tenant_id;
+DROP INDEX IF EXISTS tenant_role_unique_name_for_tenant_id;
 
 CREATE UNIQUE INDEX tenant_role_unique_name_for_tenant_id_kind_is_live ON tenant_role(tenant_id, kind, is_live, lower(name)) WHERE deactivated_at IS NULL;
 
