@@ -67,6 +67,7 @@ impl TenantRole {
         tenant_id: &TenantId,
         // TODO make not optional after migration
         kind: Option<TenantRoleKindDiscriminant>,
+        is_live: Option<IsLive>,
     ) -> DbResult<()> {
         if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
             // Every role must have at least Read permissions for now
@@ -85,7 +86,6 @@ impl TenantRole {
                 return Err(DbError::InvalidTenantScope(kind, s));
             }
         }
-        use db_schema::schema::proxy_config;
         let proxy_config_ids = scopes
             .iter()
             .filter_map(|s| match s {
@@ -97,11 +97,15 @@ impl TenantRole {
             .collect_vec();
 
         if !proxy_config_ids.is_empty() {
-            let proxy_configs_count: i64 = proxy_config::table
+            use db_schema::schema::proxy_config;
+            let mut query = proxy_config::table
                 .filter(proxy_config::tenant_id.eq(tenant_id))
                 .filter(proxy_config::id.eq_any(&proxy_config_ids))
-                .count()
-                .get_result(conn)?;
+                .into_boxed();
+            if let Some(is_live) = is_live {
+                query = query.filter(proxy_config::is_live.eq(is_live));
+            }
+            let proxy_configs_count: i64 = query.count().get_result(conn)?;
             if (proxy_config_ids.len() as i64) != proxy_configs_count {
                 return Err(DbError::InvalidProxyConfigId);
             }
@@ -187,7 +191,7 @@ impl TenantRole {
             None
         };
         let kind = kind.map(TenantRoleKindDiscriminant::from);
-        Self::validate_scopes(conn, &scopes, &tenant_id, kind)?;
+        Self::validate_scopes(conn, &scopes, &tenant_id, kind, is_live)?;
         let new = NewTenantRoleRow {
             tenant_id,
             name,
@@ -282,7 +286,7 @@ impl TenantRole {
     ) -> DbResult<Self> {
         let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
         if let Some(scopes) = scopes.as_ref() {
-            Self::validate_scopes(conn, scopes, &role.tenant_id, role.kind)?;
+            Self::validate_scopes(conn, scopes, &role.tenant_id, role.kind, role.is_live)?;
         }
         if role.is_immutable {
             return Err(DbError::CannotUpdateImmutableRole(role.name));
