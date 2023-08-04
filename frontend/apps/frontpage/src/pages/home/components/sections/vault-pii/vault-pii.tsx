@@ -67,6 +67,7 @@ const Section = styled.section`
     color: ${theme.color.quinary};
     padding: ${theme.spacing[12]} 0;
     position: relative;
+    overflow: hidden;
   `}
 `;
 
