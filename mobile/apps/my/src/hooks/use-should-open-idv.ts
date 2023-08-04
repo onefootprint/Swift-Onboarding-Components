@@ -1,5 +1,6 @@
-import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
+
+import useURL from './use-url';
 
 const isAppClip = () => {
   if (Platform.OS !== 'ios') {
@@ -10,7 +11,7 @@ const isAppClip = () => {
 };
 
 const useShouldOpenIdv = () => {
-  const linkingUrl = Linking.useURL();
+  const linkingUrl = useURL();
   const shouldOpen = isAppClip() || linkingUrl?.includes('https://handoff');
   return { shouldOpen, linkingUrl };
 };

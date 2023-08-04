@@ -2,7 +2,7 @@ import request from '@onefootprint/request';
 import { IdentifyRequest, IdentifyResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
-import * as Linking from 'expo-linking';
+import { Linking } from 'react-native';
 
 import useTranslation from '@/hooks/use-translation';
 

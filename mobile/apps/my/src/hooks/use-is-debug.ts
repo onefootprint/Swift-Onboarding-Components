@@ -1,17 +1,18 @@
-import * as Linking from 'expo-linking';
-
 import { DEBUG_HANDOFF_URL, IS_DEV } from '@/domains/idv/config/constants';
+import { getQueryParams } from '@/utils/url';
+
+import useURL from './use-url';
 
 const useIsDebug = () => {
-  const linkingUrl = Linking.useURL();
+  const linkingUrl = useURL();
   const debugUrl = IS_DEV ? DEBUG_HANDOFF_URL : undefined;
   const url = debugUrl || linkingUrl;
 
   let isDebug = false;
 
   if (url) {
-    const urlObject = Linking.parse(url);
-    if (urlObject.queryParams && urlObject.queryParams.debug === 'true') {
+    const params = getQueryParams(url);
+    if (params?.debug === 'true') {
       isDebug = true;
     }
   }

@@ -1,6 +1,6 @@
 import { Box, Button, Dialog, Typography } from '@onefootprint/ui';
-import * as Linking from 'expo-linking';
 import React, { useEffect, useState } from 'react';
+import { Linking } from 'react-native';
 import { Camera } from 'react-native-vision-camera';
 
 import useTranslation from '@/hooks/use-translation';

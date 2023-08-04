@@ -5,15 +5,16 @@ import {
   DesignSystemProvider,
   Typography,
 } from '@onefootprint/ui';
-import * as Linking from 'expo-linking';
 import React from 'react';
+
+import useURL from '@/hooks/use-url';
 
 type DebugProps = {
   onLoad: () => void;
 };
 
 const Debug = ({ onLoad }: DebugProps) => {
-  const url = Linking.useURL();
+  const url = useURL();
 
   return (
     <DesignSystemProvider theme={themes.light}>
