@@ -545,7 +545,18 @@ pub async fn run_kyb(
 
     if let Some(fixture_decision) = fixture_decision {
         // Don't run prod middesk requests and instead just create fixture data for this business
-        decision::utils::setup_kyb_test_fixtures(state, &biz_ob_id, fixture_decision).await?;
+        let bizobid = biz_ob_id.clone();
+        state
+            .db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                decision::utils::write_kyb_fixture_vendor_result_and_risk_signals(
+                    conn,
+                    &bizobid,
+                    fixture_decision,
+                )?;
+                decision::utils::write_kyb_fixture_ob_decision(conn, &biz_ob_id, fixture_decision)
+            })
+            .await?;
     } else {
         let middesk_state = init_middesk_request(&state.db_pool, biz_ob_id).await?;
 

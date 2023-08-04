@@ -11,7 +11,7 @@ use db::{
         verification_result::VerificationResult,
         workflow::Workflow,
     },
-    PgConn,
+    PgConn, TxnPgConn,
 };
 use newtypes::{
     DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentFixtureResult, IdentityDocumentId,
@@ -19,10 +19,7 @@ use newtypes::{
 };
 
 use super::{sandbox, vendor};
-use crate::{
-    errors::{onboarding::OnboardingError, ApiError, ApiErrorKind, ApiResult},
-    State,
-};
+use crate::errors::{onboarding::OnboardingError, ApiError, ApiErrorKind, ApiResult};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
 pub type CreateManualReview = bool;
@@ -131,62 +128,73 @@ pub fn decision_status(fixture_result: WorkflowFixtureResult) -> FixtureDecision
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn setup_kyb_test_fixtures(
-    state: &State,
+pub fn write_kyb_fixture_vendor_result_and_risk_signals(
+    conn: &mut TxnPgConn,
     biz_ob_id: &OnboardingId,
     fixture_decision: FixtureDecision,
 ) -> ApiResult<()> {
     let biz_ob_id = biz_ob_id.clone();
+
+    // TODO update the rest of the business ob
+    let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
+    let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
+
+    Onboarding::update(biz_ob, conn, OnboardingUpdate::idv_reqs_initiated_and_pending())?;
+
+    let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
+    let uv = Vault::get(conn, &sb.id)?;
+    let vreq = VerificationRequest::create(conn, &sb.id, &di.id, VendorAPI::MiddeskBusinessUpdateWebhook)?;
+    let raw = idv::test_fixtures::middesk_business_response();
+    let e_response = vendor::verification_result::encrypt_verification_result_response(
+        &raw.clone().into(),
+        &uv.public_key,
+    )?;
+    let vres = VerificationResult::create(conn, vreq.id, raw.into(), e_response, false)?;
+
+    let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
+    RiskSignal::bulk_create(
+        conn,
+        &sb.id,
+        signals
+            .into_iter()
+            .map(|s| (s.0, s.1, vres.id.clone()))
+            .collect::<Vec<_>>(),
+        RiskSignalGroupKind::Kyb,
+        false,
+    )?;
+    Ok(())
+}
+
+#[tracing::instrument(skip_all)]
+// TODO: merge with risk::save_final_decision / decision::biz_risk::make_kyb_decision
+pub fn write_kyb_fixture_ob_decision(
+    conn: &mut TxnPgConn,
+    biz_ob_id: &OnboardingId,
+    fixture_decision: FixtureDecision,
+) -> ApiResult<()> {
+    let biz_ob_id = biz_ob_id.clone();
+    let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
+    let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
+
     let (decision_status, _create_manual_review) = fixture_decision;
-    state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            // TODO update the rest of the business ob
-            let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
-            let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
-            let new_decision = OnboardingDecisionCreateArgs {
-                vault_id: sb.vault_id,
-                onboarding: &biz_ob,
-                logic_git_hash: crate::GIT_HASH.to_string(),
-                status: decision_status,
-                result_ids: vec![],
-                annotation_id: None,
-                actor: DbActor::Footprint,
-                seqno: None,
-                workflow_id: None,
-            };
 
-            let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
-            let uv = Vault::get(conn, &sb.id)?;
-            let vreq =
-                VerificationRequest::create(conn, &sb.id, &di.id, VendorAPI::MiddeskBusinessUpdateWebhook)?;
-            let raw = idv::test_fixtures::middesk_business_response();
-            let e_response = vendor::verification_result::encrypt_verification_result_response(
-                &raw.clone().into(),
-                &uv.public_key,
-            )?;
-            let vres = VerificationResult::create(conn, vreq.id, raw.into(), e_response, false)?;
+    let new_decision = OnboardingDecisionCreateArgs {
+        vault_id: sb.vault_id,
+        onboarding: &biz_ob,
+        logic_git_hash: crate::GIT_HASH.to_string(),
+        status: decision_status,
+        result_ids: vec![],
+        annotation_id: None,
+        actor: DbActor::Footprint,
+        seqno: None,
+        workflow_id: None,
+    };
 
-            let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
-            RiskSignal::bulk_create(
-                conn,
-                &sb.id,
-                signals
-                    .into_iter()
-                    .map(|s| (s.0, s.1, vres.id.clone()))
-                    .collect::<Vec<_>>(),
-                RiskSignalGroupKind::Kyb,
-                false,
-            )?;
-
-            let _biz_obd = OnboardingDecision::create(conn, new_decision)?;
-            Onboarding::update(
-                biz_ob,
-                conn,
-                OnboardingUpdate::idv_reqs_and_has_final_decision_and_is_authorized(decision_status),
-            )?;
-
-            Ok(())
-        })
-        .await
+    let _obd = OnboardingDecision::create(conn, new_decision)?;
+    Onboarding::update(
+        biz_ob,
+        conn,
+        OnboardingUpdate::set_decision_and_decision_made_at(decision_status),
+    )?;
+    Ok(())
 }

@@ -95,6 +95,14 @@ impl OnboardingUpdate {
         }
     }
 
+    pub fn idv_reqs_initiated_and_pending() -> Self {
+        Self {
+            idv_reqs_initiated_at: Some(Some(Utc::now())),
+            status: Some(OnboardingStatus::Pending),
+            ..Self::default()
+        }
+    }
+
     pub fn set_decision_and_decision_made_at(decision_status: DecisionStatus) -> Self {
         Self {
             status: Some(decision_status.into()),
