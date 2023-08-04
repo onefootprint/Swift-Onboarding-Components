@@ -49,6 +49,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
             status,
             appearance,
             is_app_clip_enabled,
+            tenant_id,
         }
     }
 }

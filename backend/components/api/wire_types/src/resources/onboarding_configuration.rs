@@ -19,6 +19,8 @@ pub struct OnboardingConfiguration {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub appearance: Option<serde_json::Value>,
     pub is_app_clip_enabled: bool,
+    // Used to display a tenant-specific banner on the app clip
+    pub tenant_id: TenantId,
 }
 
 export_schema!(OnboardingConfiguration);
