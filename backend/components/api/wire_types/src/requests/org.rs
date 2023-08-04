@@ -26,7 +26,7 @@ export_schema!(OrgMemberFilters);
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
 pub struct OrgRoleFilters {
     pub search: Option<String>,
-    pub kind: Option<TenantRoleKind>,
+    pub kind: Option<TenantRoleKindDiscriminant>,
 }
 
 export_schema!(OrgRoleFilters);

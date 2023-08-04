@@ -1,6 +1,6 @@
 use diesel::result::DatabaseErrorKind;
 use diesel::result::Error::DatabaseError as DieselDbError;
-use newtypes::{TenantRoleKind, TenantScopeDiscriminants};
+use newtypes::{TenantRoleKindDiscriminant, TenantScopeDiscriminants};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -65,6 +65,8 @@ pub enum DbError {
     SandboxMismatch,
     #[error("Only portable vaults can be linked to an ob config")]
     CannotCreatedScopedUser,
+    #[error("TenantRole must have is_live set IFF it is an API key role")]
+    InvalidRoleIsLive,
     #[error("Cannot update an immutable role {0}")]
     CannotUpdateImmutableRole(String),
     #[error("Tenant role scopes must include at least Read")]
@@ -72,7 +74,7 @@ pub enum DbError {
     #[error("Tenant role scopes must be unique")]
     NonUniqeTenantScopes,
     #[error("Tenant role of kind {0} cannot have a scope of kind {1}")]
-    InvalidTenantScope(TenantRoleKind, TenantScopeDiscriminants),
+    InvalidTenantScope(TenantRoleKindDiscriminant, TenantScopeDiscriminants),
     #[error("Proxy config with provided ID does not exist")]
     InvalidProxyConfigId,
     #[error("{0}")]

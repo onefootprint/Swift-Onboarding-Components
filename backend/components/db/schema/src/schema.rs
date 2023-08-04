@@ -694,6 +694,7 @@ table! {
         is_immutable -> Bool,
         scopes -> Array<Jsonb>,
         kind -> Nullable<Text>,
+        is_live -> Nullable<Bool>,
     }
 }
 

@@ -14,6 +14,7 @@ use db::models::tenant_role::TenantRoleListFilters;
 use db::OffsetPagination;
 use newtypes::TenantRoleId;
 use newtypes::TenantRoleKind;
+use newtypes::TenantRoleKindDiscriminant;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
@@ -33,6 +34,7 @@ async fn get(
 ) -> ApiResult<RolesResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
+    let is_live = auth.is_live()?;
 
     let page = pagination.page;
     let page_size = pagination.page_size(&state);
@@ -47,6 +49,7 @@ async fn get(
                 scopes: None,
                 search,
                 kind,
+                is_live,
             };
             let pagination = OffsetPagination::new(page, page_size);
             let (results, next_page) = TenantRole::list_active(conn, &filters, pagination)?;
@@ -66,7 +69,7 @@ async fn get(
 struct CreateTenantRoleRequest {
     name: String,
     scopes: Vec<TenantScope>,
-    kind: Option<TenantRoleKind>,
+    kind: Option<TenantRoleKindDiscriminant>,
 }
 
 #[api_v2_operation(
@@ -81,9 +84,14 @@ async fn post(
 ) -> JsonApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
+    let is_live = auth.is_live()?;
 
     let tenant_id = tenant.id.clone();
     let CreateTenantRoleRequest { name, scopes, kind } = request.into_inner();
+    let kind = kind.map(|k| match k {
+        TenantRoleKindDiscriminant::ApiKey => TenantRoleKind::ApiKey { is_live },
+        TenantRoleKindDiscriminant::DashboardUser => TenantRoleKind::DashboardUser,
+    });
     let result = state
         .db_pool
         .db_query(move |conn| TenantRole::create(conn, tenant_id, name, scopes, false, kind))

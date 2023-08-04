@@ -1,4 +1,4 @@
-use crate::{CollectedDataOption, InvokeVaultProxyPermission, TenantRoleKind};
+use crate::{CollectedDataOption, InvokeVaultProxyPermission, TenantRoleKindDiscriminant};
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -81,28 +81,29 @@ pub enum TenantScope {
 }
 
 impl TenantScope {
-    pub fn role_kinds(&self) -> Vec<TenantRoleKind> {
+    pub fn role_kinds(&self) -> Vec<TenantRoleKindDiscriminant> {
+        use TenantRoleKindDiscriminant::*;
         match self {
-            Self::Read => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
-            Self::Admin => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
-            Self::Decrypt { .. } => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
-            Self::DecryptCustom => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
-            Self::DecryptDocument => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
-            Self::DecryptDocumentAndSelfie => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
-            Self::DecryptAll => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
+            Self::Read => vec![ApiKey, DashboardUser],
+            Self::Admin => vec![ApiKey, DashboardUser],
+            Self::Decrypt { .. } => vec![ApiKey, DashboardUser],
+            Self::DecryptCustom => vec![ApiKey, DashboardUser],
+            Self::DecryptDocument => vec![ApiKey, DashboardUser],
+            Self::DecryptDocumentAndSelfie => vec![ApiKey, DashboardUser],
+            Self::DecryptAll => vec![ApiKey, DashboardUser],
 
-            Self::ApiKeys => vec![TenantRoleKind::DashboardUser],
-            Self::ManageVaultProxy => vec![TenantRoleKind::DashboardUser],
-            Self::ManageWebhooks => vec![TenantRoleKind::DashboardUser],
-            Self::ManualReview => vec![TenantRoleKind::DashboardUser],
-            Self::OnboardingConfiguration => vec![TenantRoleKind::DashboardUser],
-            Self::OrgSettings => vec![TenantRoleKind::DashboardUser],
+            Self::ApiKeys => vec![DashboardUser],
+            Self::ManageVaultProxy => vec![DashboardUser],
+            Self::ManageWebhooks => vec![DashboardUser],
+            Self::ManualReview => vec![DashboardUser],
+            Self::OnboardingConfiguration => vec![DashboardUser],
+            Self::OrgSettings => vec![DashboardUser],
 
-            Self::CipIntegration => vec![TenantRoleKind::ApiKey],
-            Self::InvokeVaultProxy { .. } => vec![TenantRoleKind::ApiKey],
-            Self::TriggerKyc => vec![TenantRoleKind::ApiKey],
-            Self::WriteEntities => vec![TenantRoleKind::ApiKey],
-            Self::Onboarding => vec![TenantRoleKind::ApiKey],
+            Self::CipIntegration => vec![ApiKey],
+            Self::InvokeVaultProxy { .. } => vec![ApiKey],
+            Self::TriggerKyc => vec![ApiKey],
+            Self::WriteEntities => vec![ApiKey],
+            Self::Onboarding => vec![ApiKey],
         }
     }
 }

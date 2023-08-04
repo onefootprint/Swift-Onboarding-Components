@@ -1,29 +1,27 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
-use strum_macros::{AsRefStr, Display, EnumString};
+use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumString};
 
-#[derive(
-    Debug,
-    Clone,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumDiscriminants)]
+#[strum_discriminants(derive(
     Display,
-    Copy,
     serde_with::SerializeDisplay,
     serde_with::DeserializeFromStr,
+    AsRefStr,
     Apiv2Schema,
     AsExpression,
     FromSqlRow,
     EnumString,
-    AsRefStr,
-    PartialEq,
     JsonSchema,
-    Eq,
-)]
-#[strum(serialize_all = "snake_case")]
-#[diesel(sql_type = Text)]
+))]
+#[strum_discriminants(vis(pub))]
+#[strum_discriminants(name(TenantRoleKindDiscriminant))]
+#[strum_discriminants(strum(serialize_all = "snake_case"))]
+#[strum_discriminants(diesel(sql_type = Text))]
 pub enum TenantRoleKind {
-    ApiKey,
+    ApiKey { is_live: bool },
     DashboardUser,
 }
 
-crate::util::impl_enum_str_diesel!(TenantRoleKind);
+crate::util::impl_enum_str_diesel!(TenantRoleKindDiscriminant);

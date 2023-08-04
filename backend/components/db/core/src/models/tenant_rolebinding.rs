@@ -9,7 +9,7 @@ use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
 use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::{TenantId, TenantRoleId, TenantRoleKind, TenantRolebindingId, TenantUserId};
+use newtypes::{TenantId, TenantRoleId, TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -96,7 +96,7 @@ impl TenantRolebinding {
         // Make sure the role we are using belongs to the tenant, otherwise could invite self to
         // another tenant's role
         let tenant_role = TenantRole::lock_active(conn, &tenant_role_id, &tenant_id)?;
-        if tenant_role.kind == Some(TenantRoleKind::ApiKey) {
+        if tenant_role.kind == Some(TenantRoleKindDiscriminant::ApiKey) {
             return Err(DbError::IncorrectTenantRoleKind);
         }
         // Lock the user so we don't create two rolebindings in parallel
@@ -222,7 +222,7 @@ impl TenantRolebinding {
             // Lock the role to make sure we don't deactivate it before we update this rolebinding.
             // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
             let role = TenantRole::lock_active(conn, tenant_role_id, &tenant.id)?;
-            if role.kind == Some(TenantRoleKind::ApiKey) {
+            if role.kind == Some(TenantRoleKindDiscriminant::ApiKey) {
                 return Err(DbError::IncorrectTenantRoleKind);
             }
             if role.deactivated_at.is_some() {

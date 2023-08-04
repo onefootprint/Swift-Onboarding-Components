@@ -233,6 +233,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::TenantRoleHasUsers(_) => StatusCode::BAD_REQUEST,
         DbError::InvalidTenantScope(_, _) => StatusCode::BAD_REQUEST,
         DbError::TenantRoleAlreadyDeactivated => StatusCode::BAD_REQUEST,
+        DbError::InvalidRoleIsLive => StatusCode::BAD_REQUEST,
         DbError::TenantRoleHasActiveApiKeys(_) => StatusCode::BAD_REQUEST,
         DbError::IncorrectTenantRoleKind => StatusCode::BAD_REQUEST,
         DbError::SandboxMismatch => StatusCode::BAD_REQUEST,

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use super::ob_configuration::IsLive;
 use super::tenant::Tenant;
 use crate::PgConn;
 use crate::{DbError, DbResult, NextPage, OffsetPagination, TxnPgConn};
@@ -9,8 +10,8 @@ use diesel::{dsl::count_star, prelude::*};
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    ApiKeyStatus, InvokeVaultProxyPermission, Locked, TenantId, TenantRoleId, TenantRoleKind, TenantScope,
-    TenantScopeDiscriminants,
+    ApiKeyStatus, InvokeVaultProxyPermission, Locked, TenantId, TenantRoleId, TenantRoleKind,
+    TenantRoleKindDiscriminant, TenantScope, TenantScopeDiscriminants,
 };
 
 pub type IsImmutable = bool;
@@ -38,9 +39,10 @@ pub struct TenantRole {
     pub is_immutable: IsImmutable,
     /// The list of scopes that are granted to every user in this role
     pub scopes: Vec<TenantScope>,
-    pub kind: Option<TenantRoleKind>,
+    pub kind: Option<TenantRoleKindDiscriminant>,
+    // For ApiKey roles, is_live must be set
+    pub is_live: Option<IsLive>,
     // TODO make immutable roles for api keys too
-    // TODO is_live roles
     // TODO backfill roles
 }
 
@@ -66,7 +68,7 @@ impl TenantRole {
         scopes: &[TenantScope],
         tenant_id: &TenantId,
         // TODO make not optional after migration
-        kind: Option<TenantRoleKind>,
+        kind: Option<TenantRoleKindDiscriminant>,
     ) -> DbResult<()> {
         if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
             // Every role must have at least Read permissions for now
@@ -125,7 +127,11 @@ impl TenantRole {
             .filter(tenant_role::is_immutable.eq(true))
             .into_boxed();
         if let Some(role_kind) = role_kind {
-            query = query.filter(tenant_role::kind.eq(role_kind))
+            let kind_discriminant = TenantRoleKindDiscriminant::from(&role_kind);
+            query = query.filter(tenant_role::kind.eq(kind_discriminant));
+            if let TenantRoleKind::ApiKey { is_live } = role_kind {
+                query = query.filter(tenant_role::is_live.eq(is_live))
+            }
         } else {
             query = query.filter(tenant_role::kind.is_null())
         }
@@ -150,7 +156,8 @@ impl TenantRole {
                 if e.is_not_found() {
                     // If the role is not found, create it
                     let (name, scopes) = kind.props();
-                    Self::create(conn, tenant_id.clone(), name.to_owned(), scopes, true, role_kind)?
+                    let tenant_id = tenant_id.clone();
+                    Self::create(conn, tenant_id, name.to_owned(), scopes, true, role_kind)?
                 } else {
                     return Err(e);
                 }
@@ -176,6 +183,12 @@ impl TenantRole {
         is_immutable: IsImmutable,
         kind: Option<TenantRoleKind>,
     ) -> DbResult<Self> {
+        let is_live = if let Some(TenantRoleKind::ApiKey { is_live }) = kind.as_ref() {
+            Some(*is_live)
+        } else {
+            None
+        };
+        let kind = kind.map(TenantRoleKindDiscriminant::from);
         Self::validate_scopes(conn, &scopes, &tenant_id, kind)?;
         let new = NewTenantRoleRow {
             tenant_id,
@@ -183,6 +196,7 @@ impl TenantRole {
             scopes,
             is_immutable,
             kind,
+            is_live,
             created_at: Utc::now(),
         };
         let result = diesel::insert_into(tenant_role::table)
@@ -308,6 +322,12 @@ impl TenantRole {
         let mut query = tenant_role::table
             .filter(tenant_role::tenant_id.eq(filters.tenant_id))
             .filter(tenant_role::deactivated_at.is_null())
+            .filter(
+                tenant_role::is_live
+                    .eq(filters.is_live)
+                    // Always return results with is_live = null
+                    .or(tenant_role::is_live.is_null()),
+            )
             .into_boxed();
 
         if let Some(ref scopes) = filters.scopes {
@@ -322,14 +342,14 @@ impl TenantRole {
                 query = query.filter(
                     tenant_role::kind
                         .is_null()
-                        .or(tenant_role::kind.eq(TenantRoleKind::DashboardUser)),
+                        .or(tenant_role::kind.eq(TenantRoleKindDiscriminant::DashboardUser)),
                 )
             }
-            Some(TenantRoleKind::ApiKey) => {
-                query = query.filter(tenant_role::kind.eq(TenantRoleKind::ApiKey))
+            Some(TenantRoleKindDiscriminant::ApiKey) => {
+                query = query.filter(tenant_role::kind.eq(TenantRoleKindDiscriminant::ApiKey))
             }
-            Some(TenantRoleKind::DashboardUser) => {
-                query = query.filter(tenant_role::kind.eq(TenantRoleKind::DashboardUser))
+            Some(TenantRoleKindDiscriminant::DashboardUser) => {
+                query = query.filter(tenant_role::kind.eq(TenantRoleKindDiscriminant::DashboardUser))
             }
         }
         query
@@ -398,7 +418,8 @@ struct NewTenantRoleRow {
     scopes: Vec<TenantScope>,
     created_at: DateTime<Utc>,
     is_immutable: IsImmutable,
-    kind: Option<TenantRoleKind>,
+    kind: Option<TenantRoleKindDiscriminant>,
+    is_live: Option<IsLive>,
 }
 
 #[derive(AsChangeset, Default)]
@@ -413,5 +434,6 @@ pub struct TenantRoleListFilters<'a> {
     pub tenant_id: &'a TenantId,
     pub scopes: Option<Vec<TenantScope>>,
     pub search: Option<String>,
-    pub kind: Option<TenantRoleKind>,
+    pub kind: Option<TenantRoleKindDiscriminant>,
+    pub is_live: bool,
 }

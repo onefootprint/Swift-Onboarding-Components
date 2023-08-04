@@ -8,7 +8,8 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId, TenantRoleId, TenantRoleKind,
+    ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId, TenantRoleId,
+    TenantRoleKindDiscriminant,
 };
 
 use super::ob_configuration::IsLive;
@@ -234,7 +235,9 @@ impl TenantApiKey {
         // for another tenant's role
         // And, lock the role so it isn't deactivated while we are making the key
         let role = TenantRole::lock_active(conn, &role_id, &tenant_id)?;
-        if role.kind == Some(TenantRoleKind::DashboardUser) {
+        if role.kind.is_some()
+            && (role.kind == Some(TenantRoleKindDiscriminant::DashboardUser) || role.is_live != Some(is_live))
+        {
             return Err(DbError::IncorrectTenantRoleKind);
         }
         let role_id = role.into_inner().id;
@@ -278,7 +281,10 @@ impl TenantApiKey {
         // Lock the role to make sure we don't deactivate it before we update this rolebinding.
         // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
         let new_role = TenantRole::lock_active(conn, role_id_to_lock, &tenant_id)?;
-        if new_role.kind == Some(TenantRoleKind::DashboardUser) {
+        if new_role.kind.is_some()
+            && (new_role.kind == Some(TenantRoleKindDiscriminant::DashboardUser)
+                || new_role.is_live != Some(is_live))
+        {
             return Err(DbError::IncorrectTenantRoleKind);
         }
         if new_role.deactivated_at.is_some() {
