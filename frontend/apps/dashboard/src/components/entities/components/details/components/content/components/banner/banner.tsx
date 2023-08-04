@@ -34,7 +34,7 @@ const Banner = ({ entity }: BannerProps) => {
   if (entity.status === EntityStatus.incomplete) {
     return (
       <InlineAlert variant="warning">
-        {t('incomplete.header')}
+        {t(`incomplete.header.${entity.kind}`)}
         <LinkButton onClick={handleClick} sx={{ marginLeft: 2 }}>
           {t('cta')}
         </LinkButton>

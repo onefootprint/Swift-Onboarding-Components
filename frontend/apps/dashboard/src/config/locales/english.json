@@ -522,7 +522,10 @@
       "banner": {
         "cta": "See audit trail",
         "incomplete": {
-          "header": "User dropped off before providing all information."
+          "header": {
+            "person": "User dropped off before providing all information.",
+            "business": "All business information was not collected."
+          }
         },
         "manual-review": {
           "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
@@ -861,7 +864,10 @@
             }
           },
           "abandoned-event": {
-            "title": "User dropped off before providing all information"
+            "title": {
+              "person": "User dropped off before providing all information.",
+              "business": "All business information was not collected."
+            }
           },
           "watchlist-check-event": {
             "title": "Watchlist check performed",

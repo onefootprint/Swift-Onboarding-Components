@@ -73,7 +73,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
     // Prepend a custom timeline item for incomplete users with no timestamp
     items.push({
       iconComponent: <IcoWarning16 />,
-      headerComponent: <AbandonedEventHeader />,
+      headerComponent: <AbandonedEventHeader entity={entity} />,
       bodyComponent: <AbandonedEventBody />,
     });
   }
