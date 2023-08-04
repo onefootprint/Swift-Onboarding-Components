@@ -17,7 +17,7 @@ const AddOns = () => {
       <Box sx={{ marginBottom: 5, marginTop: 5 }}>
         <FeatureRow
           title={t('core-plan.price-table.KYB.title')}
-          cost={4}
+          cost={5}
           unitFirst={t('units.verification')}
         />
         <FeatureRow

@@ -7,7 +7,7 @@ export const KYC_THRESHOLD = 10000;
 export const KYB_INITIAL_VALUE = 50;
 export const KYB_DELTA = 50;
 export const KYB_MINIMUM_VALUE = 50;
-export const KYB_COST = 4;
+export const KYB_COST = 5;
 
 export const PII_INITIAL_VALUE = 500;
 export const PII_DELTA = 500;
