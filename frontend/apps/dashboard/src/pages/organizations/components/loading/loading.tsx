@@ -1,9 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Box, Shimmer, Typography } from '@onefootprint/ui';
-import times from 'lodash/times';
+import { Box, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
-
-import ButtonGroup from '../button-group';
 
 const Loading = () => {
   const { t } = useTranslation('pages.organizations');
@@ -13,17 +10,11 @@ const Loading = () => {
       <Typography
         variant="label-1"
         color="primary"
-        sx={{ marginTop: 8, marginBottom: 3, textAlign: 'center' }}
+        sx={{ marginTop: 8, marginBottom: 6, textAlign: 'center' }}
       >
         {t('title')}
       </Typography>
-      <ButtonGroup isLoading>
-        {times(3).map(value => (
-          <button type="button" key={value}>
-            <Shimmer aria-hidden sx={{ height: '24px', width: '100%' }} />
-          </button>
-        ))}
-      </ButtonGroup>
+      <LoadingIndicator />
     </Box>
   );
 };

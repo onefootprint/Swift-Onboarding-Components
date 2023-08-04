@@ -94,6 +94,8 @@ export * from './text-area';
 export { default as TextArea } from './text-area';
 export * from './text-input';
 export { default as TextInput } from './text-input';
+export * from './theme-toggle';
+export { default as ThemeToggle } from './theme-toggle';
 export { useToast } from './toast';
 export { ToastProvider } from './toast';
 export * from './toggle';

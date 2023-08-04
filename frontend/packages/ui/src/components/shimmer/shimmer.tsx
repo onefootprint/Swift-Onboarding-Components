@@ -56,10 +56,10 @@ const ShimmerContainer = styled.div<{ sx: SXStyles }>`
 
       background-image: linear-gradient(
         90deg,
-        rgba(255, 255, 255, 0) 0,
-        rgba(255, 255, 255, 0.2) 20%,
-        rgba(255, 255, 255, 0.5) 60%,
-        rgba(255, 255, 255, 0)
+        rgba(${theme.backgroundColor.primary}, 0) 0,
+        rgba(${theme.backgroundColor.primary}, 0.2) 20%,
+        rgba(${theme.backgroundColor.primary}, 0.5) 60%,
+        rgba(${theme.backgroundColor.primary}, 0)
       );
       animation: ${blink} 2s infinite;
     }

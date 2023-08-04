@@ -66,8 +66,11 @@ export const textColor = {
 
 export const surfaceColor = {
   1: `${c.Gray875}`,
+  11: `${c.Gray850}`,
   2: `${c.Gray850}`,
   3: `${c.Gray825}`,
+  4: `${c.Gray875}`,
+  41: `${c.Gray875}`,
 };
 
 export const elevation = {

@@ -73,8 +73,8 @@ const Option = styled.button<{ selected?: boolean; hovered?: boolean }>`
       ${hovered &&
       !selected &&
       css`
-        background-color: ${radioSelect.hover.bg};
-        border-color: ${radioSelect.hover.borderColor};
+        background-color: ${radioSelect.hover.default.bg};
+        border-color: ${radioSelect.hover.default.borderColor};
       `}
     `;
   }}

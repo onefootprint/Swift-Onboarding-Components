@@ -1492,7 +1492,8 @@
     "settings": {
       "page-title": "Footprint | Settings",
       "header": {
-        "title": "Settings"
+        "title": "Settings",
+        "theme": "Theme"
       },
       "business-profile": {
         "header": {
