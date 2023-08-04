@@ -14,4 +14,6 @@ pub struct HandoffMetadata {
     pub style_params: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sandbox_id_doc_outcome: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub redirect_url: Option<String>,
 }
