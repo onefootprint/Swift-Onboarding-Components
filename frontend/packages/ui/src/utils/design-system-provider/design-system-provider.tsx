@@ -173,10 +173,6 @@ const GlobalStyle = createGlobalStyle`
       font-size: clamp(14px, 2vw, 16px);
     `}
    }
-
-   body {
-     background-color: ${theme.backgroundColor.primary};
-   }
  `}
 `;
 

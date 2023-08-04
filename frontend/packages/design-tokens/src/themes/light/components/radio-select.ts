@@ -1,30 +1,19 @@
 import { borderRadius, borderWidth } from '../../../primitives/borders';
-import {
-  backgroundColor,
-  borderColor,
-  surfaceColor,
-  textColor,
-} from '../../../tokens/light';
+import { backgroundColor, borderColor, textColor } from '../../../tokens/light';
 import type { RadioSelect } from '../../types/components';
 
 const radioSelect: RadioSelect = {
-  bg: surfaceColor[1],
+  bg: backgroundColor.transparent,
   borderRadius: borderRadius.default,
   borderWidth: borderWidth[1],
   borderColor: borderColor.tertiary,
   color: textColor.accent,
   hover: {
-    default: {
-      bg: surfaceColor[11],
-      borderColor: borderColor.tertiary,
-    },
-    selected: {
-      bg: surfaceColor[41],
-      borderColor: borderColor.tertiary,
-    },
+    bg: backgroundColor.secondary,
+    borderColor: borderColor.tertiary,
   },
   selected: {
-    bg: surfaceColor[4],
+    bg: backgroundColor.active,
     borderColor: borderColor.secondary,
   },
   components: {

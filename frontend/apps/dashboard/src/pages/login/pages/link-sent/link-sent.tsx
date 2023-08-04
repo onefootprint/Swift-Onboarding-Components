@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { ThemedLogoFpDefault } from '@onefootprint/icons';
+import { LogoFpDefault } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Button, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -18,7 +18,7 @@ const LinkSent = () => {
       </Head>
       <Container>
         <Inner>
-          <ThemedLogoFpDefault />
+          <LogoFpDefault />
           <Typography variant="label-1" color="primary">
             {t('title')}
           </Typography>

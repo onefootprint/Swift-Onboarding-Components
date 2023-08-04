@@ -3,13 +3,13 @@ import React from 'react';
 import { GOOGLE_MAPS_API_KEY } from 'src/config/constants';
 
 import MapMarker from './components/map-marker';
-import useOptions from './hooks/use-options';
 import {
   CITY_LEVEL_ZOOM,
   FALLBACK_LATITUDE,
   FALLBACK_LONGITUDE,
   GLOBE_LEVEL_ZOOM,
 } from './map.constants';
+import mapStyles from './map.styles';
 
 export type MapProps = {
   latitude: number | null;
@@ -17,7 +17,6 @@ export type MapProps = {
 };
 
 const Map = ({ latitude, longitude }: MapProps) => {
-  const options = useOptions();
   const hasLocation = latitude && longitude;
   const location = {
     lat: hasLocation ? latitude : FALLBACK_LATITUDE,
@@ -35,6 +34,15 @@ const Map = ({ latitude, longitude }: MapProps) => {
       {hasLocation ? <MapMarker lat={location.lat} lng={location.lng} /> : null}
     </GoogleMapReact>
   ) : null;
+};
+
+const options = {
+  clickableIcons: false,
+  disableDefaultUI: true,
+  disableDoubleClickZoom: true,
+  gestureHandling: 'none',
+  keyboardShortcuts: false,
+  styles: mapStyles,
 };
 
 export default Map;

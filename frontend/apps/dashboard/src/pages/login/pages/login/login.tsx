@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { ThemedLogoFpDefault } from '@onefootprint/icons';
+import { LogoFpDefault } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Button, GoogleButton, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -23,7 +23,7 @@ const Login = () => {
       </Head>
       <Container>
         <Inner>
-          <ThemedLogoFpDefault color="primary" />
+          <LogoFpDefault />
           <Typography variant="label-1" color="primary">
             {t('title')}
           </Typography>

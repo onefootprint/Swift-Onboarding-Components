@@ -1,11 +1,14 @@
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import themes from '@onefootprint/design-tokens';
+import FootprintDevTools, {
+  ObserveCollectorProvider,
+} from '@onefootprint/dev-tools';
 import { createGlobalStyle, css } from '@onefootprint/styled';
+import { DesignSystemProvider } from '@onefootprint/ui';
 import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 
-import CustomDesignSystemProvider from '../components/custom-design-system-provider';
 import ErrorBoundary from '../components/error-boundary';
 import Layout from '../components/layout';
 import configureReactI18next from '../config/initializers/react-i18next';
@@ -24,17 +27,36 @@ const App = ({ Component, pageProps }: AppProps) => {
     <>
       <Head>
         <meta name="viewport" content="width=900,maximum-scale=1.0" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
       </Head>
       <ObserveCollectorProvider appName="dashboard">
         <ReactQueryProvider>
-          <CustomDesignSystemProvider>
+          <DesignSystemProvider theme={themes.light}>
+            <FootprintDevTools />
             <GlobalStyle />
             <ErrorBoundary>
               <Layout name={pageProps.layout}>
                 <Component />
               </Layout>
             </ErrorBoundary>
-          </CustomDesignSystemProvider>
+          </DesignSystemProvider>
         </ReactQueryProvider>
       </ObserveCollectorProvider>
       <Analytics />

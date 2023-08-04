@@ -1,20 +1,11 @@
-import { IcoFootprint40 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
-import { motion } from 'framer-motion';
+import RiveComponent from '@rive-app/react-canvas';
 import React from 'react';
 
 const Loading = () => (
   <Container>
-    <Canvas
-      initial={{ opacity: 0 }}
-      animate={{ opacity: [0, 1, 0] }}
-      transition={{
-        duration: 4,
-        repeat: Infinity,
-        repeatType: 'loop',
-      }}
-    >
-      <IcoFootprint40 color="primary" />
+    <Canvas>
+      <RiveComponent src="/animations/warming-up.riv" />
     </Canvas>
   </Container>
 );
@@ -26,7 +17,7 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-const Canvas = styled(motion.div)`
+const Canvas = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;

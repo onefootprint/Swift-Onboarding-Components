@@ -1,4 +1,4 @@
-import { getSessionId } from '@onefootprint/dev-tools';
+import { getCustomEnvVariable, getSessionId } from '@onefootprint/dev-tools';
 import { DataIdentifierKeys } from '@onefootprint/types';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
@@ -66,7 +66,10 @@ const getRequestOptions = (
 ) => {
   const sessionId = getSessionId();
   return {
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    baseURL: getCustomEnvVariable(
+      'NEXT_PUBLIC_API_BASE_URL',
+      process.env.NEXT_PUBLIC_API_BASE_URL,
+    ),
     timeout: 60000,
     withCredentials: true,
     ...requestConfig,

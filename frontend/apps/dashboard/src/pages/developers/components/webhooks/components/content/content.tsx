@@ -1,5 +1,4 @@
 import dynamic from 'next/dynamic';
-import { useTheme } from 'next-themes';
 import React from 'react';
 
 import { GetWebhooksPortalResponse } from '../../hooks/use-webhooks-portal';
@@ -17,17 +16,8 @@ export type ContentProps = {
   data: GetWebhooksPortalResponse;
 };
 
-const Content = ({ data }: ContentProps) => {
-  const { systemTheme } = useTheme();
-
-  return (
-    <AppPortal
-      darkMode={systemTheme === 'dark'}
-      fontFamily="DM Sans"
-      fullSize
-      url={data.url}
-    />
-  );
-};
+const Content = ({ data }: ContentProps) => (
+  <AppPortal fullSize fontFamily="DM Sans" url={data.url} />
+);
 
 export default Content;
