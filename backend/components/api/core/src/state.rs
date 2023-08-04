@@ -79,18 +79,13 @@ impl State {
     #[cfg(test)]
     #[allow(clippy::expect_used)]
     pub async fn test_state() -> Self {
+        use crate::utils::mock_enclave::MockEnclave;
         use feature_flag::MockFeatureFlagClient;
         use webhooks::MockWebhookClient;
-
-        use crate::utils::mock_enclave::MockEnclave;
-        let mut config = Config::load_from_env().expect("failed to load config");
-
-        let mock_enclave = MockEnclave::init().await;
-        config.enclave_config.enclave_proxy_endpoint = format!("http://localhost:{}", mock_enclave.port);
-        let enclave_client = EnclaveClient::new(config.clone()).await;
-        let _ = enclave_client.pong().await.expect("failed to ping");
+        let config = Config::load_from_env().expect("failed to load config");
 
         let mut s = Self::init_or_die(config).await;
+        s.enclave_client.replace_proxy_client(Arc::new(MockEnclave));
         s.set_ff_client(Arc::new(MockFeatureFlagClient::new()));
         s.set_webhook_client(Arc::new(MockWebhookClient::new()));
         s.set_vendor_clients(VendorClients::new_with_mocks());

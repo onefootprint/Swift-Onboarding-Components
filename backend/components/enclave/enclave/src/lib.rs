@@ -158,7 +158,7 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     Ok(())
 }
 
-async fn handle_request(request: RpcPayload) -> Result<EnclavePayload, Box<dyn std::error::Error>> {
+pub async fn handle_request(request: RpcPayload) -> Result<EnclavePayload, Box<dyn std::error::Error>> {
     let response = match request {
         RpcPayload::Ping(m) => EnclavePayload::Pong(m),
         RpcPayload::GenerateDataKeypair(generate_request) => {

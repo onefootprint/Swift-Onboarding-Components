@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use crypto::{
     aead::{AeadSealedBytes, SealingKey},
     hex,
@@ -16,20 +17,25 @@ use newtypes::{
     fingerprinter::FingerprintScopable, EncryptedVaultPrivateKey, Fingerprint, PiiBytes, PiiString, S3Url,
     SealedVaultBytes, SealedVaultDataKey, VaultPublicKey,
 };
-use std::collections::HashMap;
 use std::hash::Hash;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::{config::Config, errors::enclave::EnclaveError, s3::S3Client, ApiError};
 
 #[derive(Debug, Clone)]
 pub struct EnclaveClient {
-    client: ProxyHttpClient,
+    client: Arc<dyn EnclaveClientProxy>,
     sealed_enc_ikek: SealedIkek<Sealing>,
     sealed_hmac_ikek: SealedIkek<Signing>,
     kms_creds: KmsCredentials,
     /// an s3 client is initialized soley for fetching and decrypting
     /// large objects that are stored in s3
     s3_client: S3Client,
+}
+
+#[async_trait]
+pub trait EnclaveClientProxy: Sync + Send + std::fmt::Debug + 'static {
+    async fn send_rpc_request(&self, request: RpcRequest) -> Result<EnclavePayload, EnclaveError>;
 }
 
 pub struct DecryptReq<'a>(
@@ -39,6 +45,13 @@ pub struct DecryptReq<'a>(
 );
 
 pub type VaultKeyPair = (VaultPublicKey, EncryptedVaultPrivateKey);
+
+#[async_trait]
+impl EnclaveClientProxy for ProxyHttpClient {
+    async fn send_rpc_request(&self, request: RpcRequest) -> Result<EnclavePayload, EnclaveError> {
+        Ok(self.send_request(request).await?)
+    }
+}
 
 impl EnclaveClient {
     #[allow(clippy::expect_used)]
@@ -69,7 +82,7 @@ impl EnclaveClient {
         };
 
         Self {
-            client,
+            client: Arc::new(client),
             sealed_enc_ikek: SealedIkek::<Sealing>::new(sealed_enc_ikek),
             sealed_hmac_ikek: SealedIkek::<Signing>::new(sealed_hmac_ikek),
             kms_creds,
@@ -77,11 +90,15 @@ impl EnclaveClient {
         }
     }
 
+    #[cfg(test)]
+    pub fn replace_proxy_client(&mut self, client: Arc<dyn EnclaveClientProxy>) {
+        self.client = client;
+    }
+
     /// send the request to the enclave
     #[tracing::instrument("EnclaveClient::send", skip_all)]
     async fn send(&self, req: RpcRequest) -> Result<EnclavePayload, EnclaveError> {
-        let response = self.client.send_request(req).await?;
-
+        let response = self.client.send_rpc_request(req).await?;
         Ok(response)
     }
 
@@ -108,11 +125,8 @@ impl EnclaveClient {
             }));
 
         let response = self.send(req).await?;
-
         let response = GeneratedDataKeyPair::try_from(response)?;
-
         let public_key = VaultPublicKey::from_raw_uncompressed(&response.sealed_key_pair.public_key_bytes)?;
-
         let encrypted_private_key = EncryptedVaultPrivateKey(response.sealed_key_pair.sealed_private_key.0);
 
         Ok((public_key, encrypted_private_key))
