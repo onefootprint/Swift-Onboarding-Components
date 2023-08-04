@@ -59,6 +59,8 @@ pub enum DbError {
     TenantRoleAlreadyDeactivated,
     #[error("User and role belong to different tenants.")]
     TenantRoleMismatch,
+    #[error("This kind of role cannot be bound to this entity.")]
+    IncorrectTenantRoleKind,
     #[error("Scoped user is_live doesn't match UserVault is_live")]
     SandboxMismatch,
     #[error("Only portable vaults can be linked to an ob config")]

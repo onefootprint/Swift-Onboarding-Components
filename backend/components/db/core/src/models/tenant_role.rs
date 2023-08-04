@@ -39,8 +39,7 @@ pub struct TenantRole {
     /// The list of scopes that are granted to every user in this role
     pub scopes: Vec<TenantScope>,
     pub kind: Option<TenantRoleKind>,
-    // TODO when associating a role with a user or api key, check that the kind matches
-    // support filtering on these kinds. show None or DashboardUser on the existing page, ApiKey on the new api key page
+    // TODO support filtering on these kinds. show None or DashboardUser on the existing page, ApiKey on the new api key page
     // make immutable roles for api keys too
     // TODO is_live roles
 }
