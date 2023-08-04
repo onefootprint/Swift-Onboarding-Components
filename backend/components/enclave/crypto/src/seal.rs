@@ -117,9 +117,7 @@ pub mod seal {
             msg: &message,
             aad: recipient_public_key,
         };
-        let ciphertext_and_tag = cipher
-            .encrypt(nonce, payload)
-            .map_err(|_| crate::Error::AeadEncrypt)?;
+        let ciphertext_and_tag = cipher.encrypt(nonce, payload).map_err(|_| crate::Error::Aead)?;
 
         Ok(EciesP256Sha256AesGcmSealed {
             ephemeral_public_key: ephemeral_public_key.as_ref().to_vec(),
@@ -169,9 +167,7 @@ pub mod unseal {
             aad: public_key.as_bytes(),
         };
 
-        let plain = cipher
-            .decrypt(nonce, payload)
-            .map_err(|_| crate::Error::AeadEncrypt)?;
+        let plain = cipher.decrypt(nonce, payload).map_err(|_| crate::Error::Aead)?;
 
         Ok(Unsealed(plain))
     }

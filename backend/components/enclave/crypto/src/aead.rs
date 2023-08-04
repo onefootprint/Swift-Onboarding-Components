@@ -137,9 +137,7 @@ fn seal_aead_scoped_with_nonce(
         aad: scope.as_bytes(),
     };
 
-    let cipher_text_and_tag = cipher
-        .encrypt(nonce, payload)
-        .map_err(|_| crate::Error::AeadEncrypt)?;
+    let cipher_text_and_tag = cipher.encrypt(nonce, payload).map_err(|_| crate::Error::Aead)?;
 
     let sealed = SealedBytes {
         iv: iv.to_vec(),
@@ -160,9 +158,7 @@ fn unseal_aead_scoped(key: &[u8], sealed: &[u8], scope: &'static str) -> Result<
         aad: scope.as_bytes(),
     };
 
-    let plaintext = cipher
-        .decrypt(nonce, payload)
-        .map_err(|_| crate::Error::AeadEncrypt)?;
+    let plaintext = cipher.decrypt(nonce, payload).map_err(|_| crate::Error::Aead)?;
 
     Ok(plaintext)
 }

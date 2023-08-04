@@ -53,14 +53,14 @@ pub enum Error {
     #[error("Invalid der private key")]
     InvalidDerP256PrivateKey,
 
-    #[error("aead encrypt failed")]
-    AeadEncrypt,
+    #[error("Aead operation failed")]
+    Aead,
 
     #[error("Invalid Sha256 Digest Key Length")]
     Sha2DigestLength(#[from] sha2::digest::InvalidLength),
 
     #[error("rsa error: {0}")]
-    RsaError(#[from] rsa_pksc1v15::Error)
+    RsaError(#[from] rsa_pksc1v15::Error),
 }
 
 /// safely compare to byte strings
