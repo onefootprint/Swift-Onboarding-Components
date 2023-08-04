@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Box, Typography } from '@onefootprint/ui';
+import { Box, ThemeToggle, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
+import { useTheme } from 'next-themes';
 import React from 'react';
 
 import BusinessProfile from './components/business-profile';
@@ -9,6 +10,12 @@ import TeamRoles from './components/team-roles';
 
 const Settings = () => {
   const { t } = useTranslation('pages.settings');
+  const { resolvedTheme, setTheme } = useTheme();
+
+  const handleToggleTheme = () => {
+    const nextTheme = resolvedTheme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+  };
 
   return (
     <>
@@ -19,6 +26,11 @@ const Settings = () => {
         <Typography variant="heading-2" as="h2">
           {t('header.title')}
         </Typography>
+        <ThemeToggle
+          label={t('header.theme')}
+          onChange={handleToggleTheme}
+          checked={resolvedTheme === 'dark'}
+        />
       </Header>
       <Box sx={{ marginBottom: 10 }}>
         <BusinessProfile />

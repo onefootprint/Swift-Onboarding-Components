@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { LogoFpDefault } from '@onefootprint/icons';
+import { ThemedLogoFpDefault } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { Box } from '@onefootprint/ui';
@@ -29,7 +29,7 @@ const Organizations = () => {
           {hasToken ? (
             <>
               <Box>
-                <LogoFpDefault />
+                <ThemedLogoFpDefault color="primary" />
               </Box>
               {isLoading && <Loading />}
               {error && <Error message={getErrorMessage(error)} />}

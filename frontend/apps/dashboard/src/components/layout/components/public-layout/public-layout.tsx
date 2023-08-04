@@ -1,4 +1,4 @@
-import styled from '@onefootprint/styled';
+import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
 type PublicLayoutProps = {
@@ -10,7 +10,13 @@ const PublicLayout = ({ children }: PublicLayoutProps) => (
 );
 
 const Container = styled.div`
-  background: linear-gradient(180deg, #f0edff 0%, #ffffff 100%);
+  ${({ theme }) => css`
+    background: linear-gradient(
+      180deg,
+      ${theme.backgroundColor.secondary} 0%,
+      ${theme.backgroundColor.primary} 100%
+    );
+  `}
 `;
 
 export default PublicLayout;
