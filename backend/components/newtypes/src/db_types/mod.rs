@@ -28,6 +28,7 @@ mod risk_signal_group;
 mod sealed_bytes;
 mod session_kind;
 mod task_status;
+mod tenant_role_kind;
 mod tenant_scope;
 mod user_timeline_event;
 mod vault_key_pair;
@@ -47,8 +48,8 @@ pub use self::{
     fingerprint_meta::*, footprint_reason_code::*, identity_document_fixture_result::*,
     identity_document_status::*, incode::*, liveness_source::*, manual_review::*, middesk_request_state::*,
     ob_config::*, onboarding_status::*, org_member_email::*, proxy_ingress_kind::*, requirement_status::*,
-    risk_signal_group::*, sealed_bytes::*, session_kind::*, task_status::*, tenant_scope::*,
-    user_timeline_event::*, vault_key_pair::*, vault_kind::*, vault_proxy_permission::*, vendor::*,
-    verification_status::*, watchlist_check::*, workflow::*, workflow_fixture_result::*,
+    risk_signal_group::*, sealed_bytes::*, session_kind::*, task_status::*, tenant_role_kind::*,
+    tenant_scope::*, user_timeline_event::*, vault_key_pair::*, vault_kind::*, vault_proxy_permission::*,
+    vendor::*, verification_status::*, watchlist_check::*, workflow::*, workflow_fixture_result::*,
     workos_auth_method::*,
 };

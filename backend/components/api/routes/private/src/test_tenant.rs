@@ -100,9 +100,10 @@ async fn post(
                 Some("Integration Testing".to_owned()),
             )?;
             let user = TenantUser::set_is_firm_employee_testing_only(conn, &user.id)?;
-            let admin_role = TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::Admin)?;
+            let admin_role =
+                TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::Admin, None)?;
             let _ro_role =
-                TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly)?;
+                TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, None)?;
             let rb = match TenantRolebinding::get(conn, (&user.id, &tenant.id)) {
                 Ok((_, rb, _, _)) => rb,
                 Err(e) => {

@@ -1,5 +1,6 @@
 use diesel::result::DatabaseErrorKind;
 use diesel::result::Error::DatabaseError as DieselDbError;
+use newtypes::{TenantRoleKind, TenantScopeDiscriminants};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -68,6 +69,8 @@ pub enum DbError {
     InsufficientTenantScopes,
     #[error("Tenant role scopes must be unique")]
     NonUniqeTenantScopes,
+    #[error("Tenant role of kind {0} cannot have a scope of kind {1}")]
+    InvalidTenantScope(TenantRoleKind, TenantScopeDiscriminants),
     #[error("Proxy config with provided ID does not exist")]
     InvalidProxyConfigId,
     #[error("{0}")]

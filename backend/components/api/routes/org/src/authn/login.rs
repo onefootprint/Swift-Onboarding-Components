@@ -144,8 +144,11 @@ async fn create_tenant_rolebinding(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // Get or create the default admin and read-only role for this tenant
-            let admin_role = TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::Admin)?;
-            let ro_role = TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly)?;
+            // TODO make separate roles for dashboard users and API keys
+            let admin_role =
+                TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::Admin, None)?;
+            let ro_role =
+                TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, None)?;
             // If the tenant was just created and has no users, give the user admin perms.
             // Otherwise, read-only perms
             let filters = TenantRolebindingFilters {

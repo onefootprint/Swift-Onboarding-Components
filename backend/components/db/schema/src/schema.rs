@@ -693,6 +693,7 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         is_immutable -> Bool,
         scopes -> Array<Jsonb>,
+        kind -> Nullable<Text>,
     }
 }
 

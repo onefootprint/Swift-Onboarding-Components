@@ -1,4 +1,4 @@
-use crate::{CollectedDataOption, InvokeVaultProxyPermission};
+use crate::{CollectedDataOption, InvokeVaultProxyPermission, TenantRoleKind};
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -19,7 +19,10 @@ use strum::{AsRefStr, EnumDiscriminants};
     serde::Deserialize,
     AsJsonb,
 )]
-#[strum_discriminants(derive(strum_macros::EnumString), strum(serialize_all = "snake_case"))]
+#[strum_discriminants(
+    derive(strum_macros::EnumString, strum_macros::Display),
+    strum(serialize_all = "snake_case")
+)]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
@@ -77,13 +80,8 @@ pub enum TenantScope {
     DecryptAll,
 }
 
-pub enum TenantRoleKind {
-    ApiKey,
-    DashboardUser,
-}
-
 impl TenantScope {
-    pub fn role_kind(&self) -> Vec<TenantRoleKind> {
+    pub fn role_kinds(&self) -> Vec<TenantRoleKind> {
         match self {
             Self::Read => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],
             Self::Admin => vec![TenantRoleKind::ApiKey, TenantRoleKind::DashboardUser],

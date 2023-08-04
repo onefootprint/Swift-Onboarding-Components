@@ -13,6 +13,7 @@ use db::models::tenant_role::TenantRole;
 use db::models::tenant_role::TenantRoleListFilters;
 use db::OffsetPagination;
 use newtypes::TenantRoleId;
+use newtypes::TenantRoleKind;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
@@ -64,6 +65,7 @@ async fn get(
 struct CreateTenantRoleRequest {
     name: String,
     scopes: Vec<TenantScope>,
+    kind: Option<TenantRoleKind>,
 }
 
 #[api_v2_operation(
@@ -80,10 +82,10 @@ async fn post(
     let tenant = auth.tenant();
 
     let tenant_id = tenant.id.clone();
-    let CreateTenantRoleRequest { name, scopes } = request.into_inner();
+    let CreateTenantRoleRequest { name, scopes, kind } = request.into_inner();
     let result = state
         .db_pool
-        .db_query(move |conn| TenantRole::create(conn, tenant_id, name, scopes, false))
+        .db_query(move |conn| TenantRole::create(conn, tenant_id, name, scopes, false, kind))
         .await??;
 
     let result = api_wire_types::OrganizationRole::from_db(result);

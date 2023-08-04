@@ -8,7 +8,10 @@ use db_schema::schema::tenant_role::{self, BoxedQuery};
 use diesel::{dsl::count_star, prelude::*};
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::{ApiKeyStatus, InvokeVaultProxyPermission, Locked, TenantId, TenantRoleId, TenantScope};
+use newtypes::{
+    ApiKeyStatus, InvokeVaultProxyPermission, Locked, TenantId, TenantRoleId, TenantRoleKind, TenantScope,
+    TenantScopeDiscriminants,
+};
 
 pub type IsImmutable = bool;
 pub type NumActiveUsers = i64;
@@ -35,6 +38,11 @@ pub struct TenantRole {
     pub is_immutable: IsImmutable,
     /// The list of scopes that are granted to every user in this role
     pub scopes: Vec<TenantScope>,
+    pub kind: Option<TenantRoleKind>,
+    // TODO when associating a role with a user or api key, check that the kind matches
+    // support filtering on these kinds. show None or DashboardUser on the existing page, ApiKey on the new api key page
+    // make immutable roles for api keys too
+    // TODO is_live roles
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -54,13 +62,29 @@ impl ImmutableRoleKind {
 }
 
 impl TenantRole {
-    fn validate_scopes(conn: &mut PgConn, scopes: &[TenantScope], tenant_id: &TenantId) -> DbResult<()> {
+    fn validate_scopes(
+        conn: &mut PgConn,
+        scopes: &[TenantScope],
+        tenant_id: &TenantId,
+        // TODO make not optional after migration
+        kind: Option<TenantRoleKind>,
+    ) -> DbResult<()> {
         if !scopes.contains(&TenantScope::Read) && !scopes.contains(&TenantScope::Admin) {
             // Every role must have at least Read permissions for now
             return Err(DbError::InsufficientTenantScopes);
         }
         if scopes.iter().unique().count() != scopes.len() {
             return Err(DbError::NonUniqeTenantScopes);
+        }
+        if let Some(kind) = kind {
+            // If no kind, this is a legacy role that can have any scope
+            if let Some(s) = scopes
+                .iter()
+                .find(|s| !s.role_kinds().into_iter().contains(&kind))
+            {
+                let s = TenantScopeDiscriminants::from(s);
+                return Err(DbError::InvalidTenantScope(kind, s));
+            }
         }
         use db_schema::schema::proxy_config;
         let proxy_config_ids = scopes
@@ -87,14 +111,26 @@ impl TenantRole {
     }
 
     #[tracing::instrument("TenantRole::get_immutable", skip_all)]
-    pub fn get_immutable(conn: &mut PgConn, tenant_id: &TenantId, kind: ImmutableRoleKind) -> DbResult<Self> {
+    pub fn get_immutable(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        kind: ImmutableRoleKind,
+        // TODO make this non-null
+        role_kind: Option<TenantRoleKind>,
+    ) -> DbResult<Self> {
         let (name, scopes) = kind.props();
-        let role = tenant_role::table
+        let mut query = tenant_role::table
             .filter(tenant_role::tenant_id.eq(tenant_id))
             .filter(tenant_role::name.eq(name))
             .filter(tenant_role::scopes.eq(&scopes))
             .filter(tenant_role::is_immutable.eq(true))
-            .first::<Self>(conn)?;
+            .into_boxed();
+        if let Some(role_kind) = role_kind {
+            query = query.filter(tenant_role::kind.eq(role_kind))
+        } else {
+            query = query.filter(tenant_role::kind.is_null())
+        }
+        let role = query.first::<Self>(conn)?;
         Ok(role)
     }
 
@@ -104,16 +140,18 @@ impl TenantRole {
         conn: &mut TxnPgConn,
         tenant_id: &TenantId,
         kind: ImmutableRoleKind,
+        // TODO make this non-null
+        role_kind: Option<TenantRoleKind>,
     ) -> DbResult<Self> {
         Tenant::lock(conn, tenant_id)?;
-        let role = Self::get_immutable(conn, tenant_id, kind);
+        let role = Self::get_immutable(conn, tenant_id, kind, role_kind);
         let role = match role {
             Ok(role) => role,
             Err(e) => {
                 if e.is_not_found() {
                     // If the role is not found, create it
                     let (name, scopes) = kind.props();
-                    Self::create(conn, tenant_id.clone(), name.to_owned(), scopes, true)?
+                    Self::create(conn, tenant_id.clone(), name.to_owned(), scopes, true, role_kind)?
                 } else {
                     return Err(e);
                 }
@@ -137,13 +175,15 @@ impl TenantRole {
         name: String,
         scopes: Vec<TenantScope>,
         is_immutable: IsImmutable,
+        kind: Option<TenantRoleKind>,
     ) -> DbResult<Self> {
-        Self::validate_scopes(conn, &scopes, &tenant_id)?;
+        Self::validate_scopes(conn, &scopes, &tenant_id, kind)?;
         let new = NewTenantRoleRow {
             tenant_id,
             name,
             scopes,
             is_immutable,
+            kind,
             created_at: Utc::now(),
         };
         let result = diesel::insert_into(tenant_role::table)
@@ -231,7 +271,7 @@ impl TenantRole {
     ) -> DbResult<Self> {
         let role = Self::lock_active(conn, id, tenant_id)?.into_inner();
         if let Some(scopes) = scopes.as_ref() {
-            Self::validate_scopes(conn, scopes, &role.tenant_id)?;
+            Self::validate_scopes(conn, scopes, &role.tenant_id, role.kind)?;
         }
         if role.is_immutable {
             return Err(DbError::CannotUpdateImmutableRole(role.name));
@@ -343,6 +383,7 @@ struct NewTenantRoleRow {
     scopes: Vec<TenantScope>,
     created_at: DateTime<Utc>,
     is_immutable: IsImmutable,
+    kind: Option<TenantRoleKind>,
 }
 
 #[derive(AsChangeset, Default)]
