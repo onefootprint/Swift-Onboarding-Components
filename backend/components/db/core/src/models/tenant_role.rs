@@ -42,8 +42,6 @@ pub struct TenantRole {
     pub kind: Option<TenantRoleKindDiscriminant>,
     // For ApiKey roles, is_live must be set
     pub is_live: Option<IsLive>,
-    // TODO make immutable roles for api keys too
-    // TODO backfill roles
 }
 
 #[derive(Debug, Clone, Copy)]

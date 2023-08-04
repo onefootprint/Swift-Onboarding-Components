@@ -8,34 +8,41 @@ from tests.utils import (
 )
 
 
+@pytest.fixture(scope="session")
+def admin_role(sandbox_tenant):
+    body = get("org/roles", dict(kind="dashboard_user"), *sandbox_tenant.db_auths)
+    roles = body["data"]
+    return next(i for i in roles if i["scopes"][0]["kind"] == "admin")
+
+
 @pytest.fixture(autouse=True, scope="session")
 def test_deactivate_roles(sandbox_tenant, limited_role):
     """
     Deactivate roles at this tenant that were created by previous integration testing runs.
     Otherwise, the users you want to see end up on the second page...
     """
-    body = get(f"org/roles", None, *sandbox_tenant.db_auths)
-    roles_to_deactivate = (
-        i
-        for i in body["data"]
-        if not i["is_immutable"] and i["id"] != limited_role["id"]
-    )
+    for is_live in ["true", "false"]:
+        is_live = IsLive(is_live)
+        body = get(f"org/roles", None, sandbox_tenant.auth_token, is_live)
+        roles_to_deactivate = (
+            i
+            for i in body["data"]
+            if not i["is_immutable"] and i["id"] != limited_role["id"]
+        )
 
-    for r in roles_to_deactivate:
-        # Deactivate members using this role
-        r_id = r["id"]
-        members = get(f"org/members", dict(role_ids=r_id), *sandbox_tenant.db_auths)
-        for m in members["data"]:
-            m_id = m["id"]
-            post(
-                f"org/members/{m_id}/deactivate",
-                None,
-                *sandbox_tenant.db_auths,
-            )
-        # Deactivate api keys using this role
-        data = dict(role_ids=r_id, status="enabled")
-        for is_live in ["true", "false"]:
-            is_live = IsLive(is_live)
+        for r in roles_to_deactivate:
+            # Deactivate members using this role
+            r_id = r["id"]
+            members = get(f"org/members", dict(role_ids=r_id), *sandbox_tenant.db_auths)
+            for m in members["data"]:
+                m_id = m["id"]
+                post(
+                    f"org/members/{m_id}/deactivate",
+                    None,
+                    *sandbox_tenant.db_auths,
+                )
+            # Deactivate api keys using this role
+            data = dict(role_ids=r_id, status="enabled")
             api_keys = get("org/api_keys", data, sandbox_tenant.auth_token, is_live)
             for k in api_keys["data"]:
                 k_id = k["id"]
@@ -45,8 +52,8 @@ def test_deactivate_roles(sandbox_tenant, limited_role):
                     sandbox_tenant.auth_token,
                     is_live,
                 )
-        # Deactivate the role
-        post(f"org/roles/{r_id}/deactivate", None, *sandbox_tenant.db_auths)
+            # Deactivate the role
+            post(f"org/roles/{r_id}/deactivate", None, *sandbox_tenant.db_auths)
 
 
 @pytest.fixture(scope="session")
@@ -55,7 +62,8 @@ def limited_role(sandbox_tenant):
     suffix = _gen_random_n_digit_number(10)
     role_data = dict(
         name=f"Test limited role {suffix}",
-        scopes=[{"kind": "read"}, {"kind": "write_entities"}],
+        scopes=[{"kind": "read"}, {"kind": "manage_webhooks"}],
+        kind="dashboard_user",
     )
     body = post("org/roles", role_data, *sandbox_tenant.db_auths)
     assert body["name"] == role_data["name"]
@@ -258,6 +266,7 @@ def test_get_roles(
     tenant_user2
     tenant_user3
 
+    filters = dict(kind="dashboard_user", **filters) if filters else None
     body = get(f"org/roles", filters, *sandbox_tenant.db_auths)
     assert any(u["id"] == admin_role["id"] for u in body["data"]) == expected_admin_role
     assert (

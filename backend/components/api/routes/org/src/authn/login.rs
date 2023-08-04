@@ -19,7 +19,9 @@ use db::models::tenant_rolebinding::{TenantRolebinding, TenantRolebindingFilters
 use db::models::tenant_user::TenantUser;
 use db::OffsetPagination;
 use itertools::Itertools;
-use newtypes::{OrgMemberEmail, TenantRolebindingId, TenantScope, TenantUserId, WorkosAuthMethod};
+use newtypes::{
+    OrgMemberEmail, TenantRoleKind, TenantRolebindingId, TenantScope, TenantUserId, WorkosAuthMethod,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::sso::{
     AuthorizationCode, ClientId, ConnectionType, GetProfileAndToken, GetProfileAndTokenParams,
@@ -149,6 +151,15 @@ async fn create_tenant_rolebinding(
                 TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::Admin, None)?;
             let ro_role =
                 TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, None)?;
+            // Create immutable roles to be used for API keys
+            for k in [ImmutableRoleKind::Admin, ImmutableRoleKind::ReadOnly] {
+                for is_live in [true, false] {
+                    let kind = Some(TenantRoleKind::ApiKey { is_live });
+                    TenantRole::get_or_create_immutable(conn, &tenant.id, k, kind)?;
+                }
+                let kind = Some(TenantRoleKind::DashboardUser);
+                TenantRole::get_or_create_immutable(conn, &tenant.id, k, kind)?;
+            }
             // If the tenant was just created and has no users, give the user admin perms.
             // Otherwise, read-only perms
             let filters = TenantRolebindingFilters {

@@ -17,7 +17,8 @@ use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::{
-    OrgMemberEmail, SessionAuthToken, TenantId, TenantUserId, WorkosAuthMethod, INTEGRATION_TEST_USER_EMAIL,
+    OrgMemberEmail, SessionAuthToken, TenantId, TenantRoleKind, TenantUserId, WorkosAuthMethod,
+    INTEGRATION_TEST_USER_EMAIL,
 };
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -102,8 +103,16 @@ async fn post(
             let user = TenantUser::set_is_firm_employee_testing_only(conn, &user.id)?;
             let admin_role =
                 TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::Admin, None)?;
-            let _ro_role =
-                TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, None)?;
+            TenantRole::get_or_create_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, None)?;
+            // Create modern immutable roles
+            for k in [ImmutableRoleKind::Admin, ImmutableRoleKind::ReadOnly] {
+                for is_live in [true, false] {
+                    let kind = Some(TenantRoleKind::ApiKey { is_live });
+                    TenantRole::get_or_create_immutable(conn, &tenant.id, k, kind)?;
+                }
+                let kind = Some(TenantRoleKind::DashboardUser);
+                TenantRole::get_or_create_immutable(conn, &tenant.id, k, kind)?;
+            }
             let rb = match TenantRolebinding::get(conn, (&user.id, &tenant.id)) {
                 Ok((_, rb, _, _)) => rb,
                 Err(e) => {

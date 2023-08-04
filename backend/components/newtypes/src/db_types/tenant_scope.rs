@@ -41,7 +41,7 @@ pub enum TenantScope {
     ApiKeys,
     /// Create and update vault proxy configurations
     ManageVaultProxy,
-    /// Manage webhook configuration
+    /// Configure webhook endpoints
     ManageWebhooks,
     /// Perform review actions on users, like making a new decision, adding an annotation, or re-triggering KYC
     ManualReview,
@@ -55,13 +55,13 @@ pub enum TenantScope {
     //
     /// Forward identity data to a CIP integration
     CipIntegration,
-    /// Invoke a vault proxy
+    /// Invoke the specified vault proxies
     InvokeVaultProxy { data: InvokeVaultProxyPermission },
     /// Run KYC checks on a vaulted user
     TriggerKyc,
-    /// Create new vaults and update their information
+    /// Create new vaults and update existing vaults' information
     WriteEntities,
-    /// Perform actions related to onboarding users - created short-lived onboarding sessions and validate tokens returned from Footprint.js
+    /// Perform actions related to onboarding users - create short-lived onboarding sessions and validate tokens returned from Footprint.js
     Onboarding,
 
     /// Allows decrypting data attributes belonging to the listed CollectedDataOption

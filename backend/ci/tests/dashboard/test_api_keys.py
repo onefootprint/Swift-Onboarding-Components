@@ -9,6 +9,13 @@ from tests.utils import (
 
 
 @pytest.fixture(scope="session")
+def admin_role(sandbox_tenant):
+    body = get("org/roles", dict(kind="api_key"), *sandbox_tenant.db_auths)
+    roles = body["data"]
+    return next(i for i in roles if i["scopes"][0]["kind"] == "admin")
+
+
+@pytest.fixture(scope="session")
 def limited_role(sandbox_tenant):
     # Don't want to share this with test_iam since we will deactivate it here
     suffix = _gen_random_n_digit_number(10)
@@ -18,6 +25,7 @@ def limited_role(sandbox_tenant):
             {"kind": "read"},
             {"kind": "write_entities"},
         ],
+        kind="api_key",
     )
     return post("org/roles", role_data, *sandbox_tenant.db_auths)
 
