@@ -10,18 +10,20 @@ use crate::decision::state::WorkflowKind;
 use crate::decision::state::WorkflowWrapper;
 use crate::decision::state::{kyb, MakeDecision};
 use crate::{decision::tests::test_helpers, State};
+use db::models::onboarding::Onboarding;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow as DbWorkflow;
 use db::tests::test_db_pool::TestDbPool;
+use db::DbResult;
 use feature_flag::BoolFlag;
 use feature_flag::MockFeatureFlagClient;
 use macros::{test_state, test_state_case};
 use newtypes::KybState;
 use newtypes::OnboardingStatus;
 use newtypes::SignalSeverity;
+use newtypes::VendorAPI;
 use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowState;
-use newtypes::{KybConfig, VendorAPI};
 use std::sync::Arc;
 
 async fn setup(state: &State, fixture_result: Option<WorkflowFixtureResult>) -> (DbWorkflow, Tenant) {
@@ -35,12 +37,17 @@ async fn setup(state: &State, fixture_result: Option<WorkflowFixtureResult>) -> 
     )
     .await;
 
-    let svid = sbv.id.clone();
+    let sb_svid = sbv.id.clone();
+    let sb_vid = sbv.vault_id.clone();
     let wf = state
         .db_pool
-        .db_query(move |conn| DbWorkflow::create(conn, &svid, KybConfig {}.into(), fixture_result).unwrap())
+        .db_transaction(move |conn| -> DbResult<_> {
+            let (ob, _, _, _) = Onboarding::get(conn, (&sb_svid, &sb_vid)).unwrap();
+            Ok(DbWorkflow::get(conn, &ob.workflow_id.unwrap()).unwrap())
+        })
         .await
         .unwrap();
+
     (wf, t)
 }
 

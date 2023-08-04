@@ -17,13 +17,19 @@ use newtypes::{
 
 use crate::errors::{onboarding::OnboardingError, ApiResult};
 
+pub struct NewBusinessVaultArgs {
+    pub public_key: VaultPublicKey,
+    pub e_private_key: EncryptedVaultPrivateKey,
+    pub should_create_workflow: bool,
+}
+
 pub fn get_or_start_onboarding(
     conn: &mut TxnPgConn,
     v_id: &VaultId,
     sv_id: &ScopedVaultId,
     obc: &ObConfiguration,
     insight_event: Option<CreateInsightEvent>,
-    maybe_new_biz_keypair: Option<(VaultPublicKey, EncryptedVaultPrivateKey)>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
+    new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
 ) -> ApiResult<(Onboarding, Option<ScopedVault>)> {
     let user_vault = Vault::lock(conn, v_id)?;
 
@@ -71,7 +77,7 @@ pub fn get_or_start_onboarding(
     }
 
     // If the ob config has business fields, create a business vault, scoped vault, and ob
-    let sb = if let Some(maybe_new_biz_keypair) = maybe_new_biz_keypair {
+    let sb = if let Some(new_biz_args) = new_biz_args {
         let existing_businesses = BusinessOwner::list_businesses(conn, &user_vault.id, &obc.id)?;
         let sb = if let Some(existing) = existing_businesses.into_iter().next() {
             // If the user has already started onboarding their business onto this exact
@@ -80,10 +86,9 @@ pub fn get_or_start_onboarding(
             // when onboarding onto the exact same ob config
             existing.1 .0
         } else {
-            let (public_key, e_private_key) = maybe_new_biz_keypair;
             let args = NewVaultArgs {
-                public_key,
-                e_private_key,
+                public_key: new_biz_args.public_key,
+                e_private_key: new_biz_args.e_private_key,
                 is_live: user_vault.is_live,
                 is_portable: true,
                 kind: VaultKind::Business,
@@ -98,7 +103,12 @@ pub fn get_or_start_onboarding(
                 ob_configuration_id: obc.id.clone(),
                 insight_event,
             };
-            Onboarding::get_or_create(conn, ob_create_args, false, fixture_result)?;
+            Onboarding::get_or_create(
+                conn,
+                ob_create_args,
+                new_biz_args.should_create_workflow,
+                fixture_result,
+            )?;
             sb
         };
         Some(sb)

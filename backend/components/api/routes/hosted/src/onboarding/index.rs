@@ -12,10 +12,12 @@ use crate::State;
 use api_core::auth::IsGuardMet;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::onboarding::NewBusinessVaultArgs;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use feature_flag::BoolFlag;
 use newtypes::DataIdentifierDiscriminant;
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -53,9 +55,17 @@ pub async fn post(
     // we should display to the client an ability to select the business they want to use
     let should_create_new_business_vault = ob_config.must_collect(DataIdentifierDiscriminant::Business)
         && !UserAuthGuard::Business.is_met(&user_auth.scopes);
-    let maybe_new_biz_keypair = if should_create_new_business_vault {
+    let maybe_new_biz_args = if should_create_new_business_vault {
         // If we're going to make a new business vault,
-        Some(state.enclave_client.generate_sealed_keypair().await?)
+        let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
+        let should_create_workflow = state
+            .feature_flag_client
+            .flag(BoolFlag::CreateKybWorkflows(&ob_config.key));
+        Some(NewBusinessVaultArgs {
+            public_key,
+            e_private_key,
+            should_create_workflow,
+        })
     } else {
         None
     };
@@ -71,7 +81,7 @@ pub async fn post(
                 &scoped_user.id,
                 &obc,
                 Some(insight_event),
-                maybe_new_biz_keypair,
+                maybe_new_biz_args,
             )?;
 
             // update Auth scopes

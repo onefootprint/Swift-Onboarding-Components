@@ -16,6 +16,7 @@ use crate::{
     tests::fixtures::lib::random_phone_number,
     utils::{
         self,
+        onboarding::NewBusinessVaultArgs,
         vault_wrapper::{Any, VaultWrapper},
     },
 };
@@ -37,8 +38,13 @@ pub async fn create_user_and_onboarding(
     Option<ScopedVault>,
 ) {
     let (pk, tenant_e_key) = enclave_client.generate_sealed_keypair().await.unwrap();
-    let biz_key_pair = if create_business {
-        Some(enclave_client.generate_sealed_keypair().await.unwrap())
+    let biz_args = if create_business {
+        let (public_key, e_private_key) = enclave_client.generate_sealed_keypair().await.unwrap();
+        Some(NewBusinessVaultArgs {
+            public_key,
+            e_private_key,
+            should_create_workflow: true,
+        })
     } else {
         None
     };
@@ -55,15 +61,9 @@ pub async fn create_user_and_onboarding(
 
             let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), kyc_fixture_result);
 
-            let (onboarding, sbv) = utils::onboarding::get_or_start_onboarding(
-                conn,
-                &uv.id,
-                &su.id,
-                &ob_config,
-                None,
-                biz_key_pair,
-            )
-            .unwrap();
+            let (onboarding, sbv) =
+                utils::onboarding::get_or_start_onboarding(conn, &uv.id, &su.id, &ob_config, None, biz_args)
+                    .unwrap();
 
             Ok((tenant, onboarding, uv, su, ob_config, sbv))
         })

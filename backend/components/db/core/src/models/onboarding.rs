@@ -15,8 +15,8 @@ use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, FpId, InsightEventId, KycConfig, Locked,
-    ObConfigurationId, OnboardingCompletedPayload, OnboardingId, OnboardingStatusChangedPayload,
+    AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, FpId, InsightEventId, KybConfig, KycConfig,
+    Locked, ObConfigurationId, OnboardingCompletedPayload, OnboardingId, OnboardingStatusChangedPayload,
     ScopedVaultId, TaskData, TenantId, TenantScope, VaultId, WebhookEvent, WorkflowFixtureResult, WorkflowId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
@@ -331,14 +331,20 @@ impl Onboarding {
 
         let v = Vault::get(conn.conn(), &args.scoped_vault_id)?;
         // TODO: later have a KYB workflow and create that here as well
-        let wf = if matches!(v.kind, VaultKind::Person) && should_create_workflow {
+        let wf = if should_create_workflow {
             let (obc, _) = ObConfiguration::get(conn.conn(), &args.ob_configuration_id)?;
 
-            let config = if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
-                AlpacaKycConfig { is_redo: false }.into()
-            } else {
-                KycConfig { is_redo: false }.into()
+            let config = match v.kind {
+                VaultKind::Person => {
+                    if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
+                        AlpacaKycConfig { is_redo: false }.into()
+                    } else {
+                        KycConfig { is_redo: false }.into()
+                    }
+                }
+                VaultKind::Business => KybConfig {}.into(),
             };
+
             let wf = Workflow::create(conn, &args.scoped_vault_id, config, fixture_result)?;
             Some(wf)
         } else {
