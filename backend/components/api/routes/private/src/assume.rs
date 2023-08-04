@@ -7,21 +7,16 @@ use crate::errors::ApiResult;
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use actix_web::{post, web, web::Json};
 use api_core::auth::session::tenant::FirmEmployeeSession;
 use db::models::tenant::Tenant;
 use newtypes::{OrgMemberEmail, TenantId, INTEGRATION_TEST_USER_EMAIL};
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
-#[derive(Debug, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, serde::Deserialize)]
 struct AssumeRequest {
     pub tenant_id: TenantId,
 }
 
-#[api_v2_operation(
-    description = "Private endpoint to assume the read-only role a given tenant.",
-    tags(Private)
-)]
 #[post("/private/assume")]
 async fn post(
     state: web::Data<State>,

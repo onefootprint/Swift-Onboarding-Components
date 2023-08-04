@@ -7,6 +7,7 @@ use actix_web::http::KeepAlive;
 use api_core::{config::Config, *};
 mod custom_migrations;
 use actix_web_opentelemetry::RequestMetricsBuilder;
+use paperclip::v2::models::{DefaultApiRaw, Info, Tag};
 
 #[allow(clippy::expect_used)]
 fn main() -> std::io::Result<()> {
@@ -89,6 +90,27 @@ async fn run_server(config: Config) -> std::io::Result<()> {
             .error_handler(|err, _req| actix_web::Error::from(ApiError::from(ApiErrorKind::InvalidFormError(err))));
 
 
+        let  spec = DefaultApiRaw {
+            swagger: paperclip::v2::models::Version::V2,            
+            host: Some("api.onefootprint.com".to_string()),
+            info: Info {
+                version: crate::GIT_HASH.to_string(),
+                title: "Footprint API".into(),            
+                ..Default::default()
+            },
+            tags: vec![
+                Tag {
+                    name: "PublicApi".to_string(),
+                    ..Default::default()
+                },
+                Tag {
+                    name: "Preview".to_string(),
+                    ..Default::default()
+                }
+            ],
+            ..Default::default()
+        };
+
         App::new()
             .app_data(web::Data::new(state.clone()))
             .wrap(prom.clone())
@@ -108,7 +130,9 @@ async fn run_server(config: Config) -> std::io::Result<()> {
             .app_data(json_cfg)
             .app_data(query_cfg)
             .app_data(form_cfg)
-            .wrap_api()
+            // exclude from openapi spec generation
+            .configure(api_route_private::configure)
+            .wrap_api_with_spec(spec)
             .configure(api_routes_root::configure)
             .with_json_spec_at("docs-spec")
             .with_json_spec_v3_at("docs-spec-v3")

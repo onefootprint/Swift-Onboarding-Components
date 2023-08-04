@@ -1,6 +1,7 @@
 use crate::State;
-use api_core::ApiErrorKind;
+use actix_web::{post, web, web::Json};
 use api_core::decision::vendor;
+use api_core::ApiErrorKind;
 use api_core::{
     auth::tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard},
     types::{JsonApiResponse, ResponseData},
@@ -10,23 +11,18 @@ use db::models::{
 };
 use db::DbResult;
 use newtypes::{PiiJsonValue, VerificationResultId};
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-#[derive(Debug, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 pub struct DecryptVresRequest {
     vres_id: VerificationResultId,
 }
 
-#[derive(Debug, Apiv2Schema, serde::Serialize)]
+#[derive(Debug, serde::Serialize)]
 pub struct DecryptVresResponse {
     vres_id: VerificationResultId,
     decrypted_e_response: PiiJsonValue,
 }
 
-#[api_v2_operation(
-    description = "Decrypts the e_response for a verification_result",
-    tags(Private)
-)]
 #[post("/private/protected/decrypt_vres_response")]
 pub async fn post(
     state: web::Data<State>,

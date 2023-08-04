@@ -4,10 +4,7 @@ mod task;
 mod token_reveal;
 mod workflow;
 
-use paperclip::actix::{
-    api_v2_operation, get,
-    web::{self},
-};
+use actix_web::web;
 
 use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 
@@ -19,15 +16,14 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(risk::shadow_run)
         .service(task::execute_tasks)
         .service(task::create_task)
-        .service(token_reveal::post)
         .service(task::create_overdue_watchlist_check_tasks)
         .service(workflow::create_workflow)
         .service(workflow::proceed)
+        .service(token_reveal::post)
         .service(decrypt::post);
 }
 
-#[api_v2_operation(tags(Private, Protected))]
-#[get("/private/protected/check")]
-fn check(_: ProtectedCustodianAuthContext) -> &'static str {
+#[actix_web::get("/private/protected/check")]
+async fn check(_: ProtectedCustodianAuthContext) -> &'static str {
     "ok"
 }

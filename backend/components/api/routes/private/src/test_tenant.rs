@@ -7,6 +7,7 @@ use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::session::AuthSession;
 use crate::State;
+use actix_web::{post, web, web::Json};
 use api_core::auth::session::tenant::TenantRbSession;
 use chrono::Duration;
 use db::models::tenant::{NewIntegrationTestTenant, Tenant};
@@ -18,9 +19,8 @@ use newtypes::secret_api_key::SecretApiKey;
 use newtypes::{
     OrgMemberEmail, SessionAuthToken, TenantId, TenantUserId, WorkosAuthMethod, INTEGRATION_TEST_USER_EMAIL,
 };
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct NewClientRequest {
     /// Client-provided primary key of the tenant. Must start with a `_private_it_org_` prefix.
     /// If a tenant with this ID already exists, it will be returned and assumed.
@@ -30,7 +30,7 @@ struct NewClientRequest {
     is_live: bool,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 struct NewClientResponse {
     org_id: TenantId,
     key: api_wire_types::SecretApiKey,
@@ -38,10 +38,6 @@ struct NewClientResponse {
     tenant_user_id: TenantUserId,
 }
 
-#[api_v2_operation(
-    description = "Creates a new tenant (this endpoint will be private in prod TODO).",
-    tags(Private)
-)]
 #[post("/private/test_tenant")]
 async fn post(
     request: web::Json<NewClientRequest>,

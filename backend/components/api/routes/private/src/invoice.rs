@@ -4,6 +4,7 @@ use crate::auth::Either;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
+use actix_web::{post, web};
 use billing::{BillingCounts, BillingInfo};
 use chrono::{Duration, NaiveDate, Utc};
 use db::models::onboarding::Onboarding;
@@ -12,19 +13,14 @@ use db::models::watchlist_check::WatchlistCheck;
 use db::scoped_vault::{count_authorized_for_tenant, ScopedVaultListQueryParams};
 use feature_flag::BoolFlag;
 use newtypes::{StripeCustomerId, TenantId, VaultKind};
-use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
 
-#[derive(Debug, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, serde::Deserialize)]
 struct CreateInvoiceRequest {
     tenant_id: TenantId,
     /// When provided,
     billing_date: Option<NaiveDate>,
 }
 
-#[api_v2_operation(
-    description = "Private endpoint to issue draft invoices for a specific tenant on a specific billing period.",
-    tags(Private)
-)]
 #[post("/private/invoice")]
 async fn post(
     state: web::Data<State>,
@@ -51,10 +47,6 @@ async fn post(
     EmptyResponse::ok().json()
 }
 
-#[api_v2_operation(
-    description = "Private endpoint to issue draft invoices for all billable tenants.",
-    tags(Private)
-)]
 #[post("/private/invoices")]
 async fn post_all(
     state: web::Data<State>,

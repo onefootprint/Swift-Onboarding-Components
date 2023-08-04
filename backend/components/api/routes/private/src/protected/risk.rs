@@ -5,6 +5,8 @@ use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{decision, State};
+use actix_web::post;
+use actix_web::web::{self, Json};
 use api_core::decision::engine;
 use api_core::decision::features::risk_signals::{
     create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map, save_risk_signals,
@@ -28,24 +30,22 @@ use db::models::workflow::Workflow;
 use newtypes::{
     DecisionIntentId, DecisionStatus, FpId, TenantId, Vendor, VerificationRequestId, VerificationResultId,
 };
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::str::FromStr;
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct MakeVendorCallsRequest {
     pub tenant_id: TenantId,
     pub fp_id: FpId,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct MakeVendorCallsResponse {
     new_vendor_request_ids: Vec<VerificationRequestId>,
     new_vendor_result_ids: Vec<VerificationResultId>,
     decision_output: DecisionOutput,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 struct DecisionOutput {
     pub decision_status: DecisionStatus,
     pub create_manual_review: bool,
@@ -76,11 +76,7 @@ impl From<OnboardingRulesDecisionOutput> for DecisionOutput {
     }
 }
 
-#[api_v2_operation(
-    description = "Creates new VerificationRequest's, re-pings all vendors, and writes VerificationResults for the passed in fp_id",
-    tags(Private)
-)]
-#[post("/private/protected/risk/make_vendor_calls")]
+#[actix_web::post("/private/protected/risk/make_vendor_calls")]
 async fn make_vendor_calls(
     state: web::Data<State>,
     _: ProtectedCustodianAuthContext,
@@ -160,13 +156,13 @@ async fn make_vendor_calls(
     })))
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct MakeDecisionRequest {
     pub tenant_id: TenantId,
     pub fp_id: FpId,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct MakeDecisionResponse {
     // ID's of the VerificationResult's used for the decision engine run
     vendor_result_ids: Vec<VerificationResultId>,
@@ -174,10 +170,6 @@ pub struct MakeDecisionResponse {
 }
 
 // TODO: rework these to use Workflows
-#[api_v2_operation(
-    description = "Runs decisioning logic on latest completed vendor requests and writes a new onboarding decision",
-    tags(Private)
-)]
 #[post("/private/protected/risk/make_decision")]
 async fn make_decision(
     state: web::Data<State>,
@@ -252,21 +244,17 @@ async fn make_decision(
     Ok(Json(ResponseData::ok(MakeDecisionResponse { vendor_result_ids })))
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct ShadowRunRequest {
     pub tenant_id: TenantId,
     pub fp_id: FpId,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct ShadowRunResult {
     decision_status: DecisionStatus, // TODO: add DecisionOutput when merged in
 }
 
-#[api_v2_operation(
-    description = "Makes vendor calls and runs and return output of Decisioning logic, without writing any data into postgres.",
-    tags(Private)
-)]
 #[post("/private/protected/risk/shadow_run_vendor_calls_and_decisioning")]
 async fn shadow_run(
     state: web::Data<State>,

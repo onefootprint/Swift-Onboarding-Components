@@ -7,14 +7,12 @@ use api_route_index as index;
 use api_route_integrations as integrations;
 use api_route_onboarding as onboarding;
 use api_route_org as org;
-use api_route_private as private;
 use api_route_users as users;
 use api_route_vault_proxy as vault_proxy;
 use api_route_webhooks as webhooks;
 
 pub fn configure(config: &mut web::ServiceConfig) {
     index::routes(config);
-    private::routes(config);
     org::routes(config);
     onboarding::routes(config);
     users::routes(config);

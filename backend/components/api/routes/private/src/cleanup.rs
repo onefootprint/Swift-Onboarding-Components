@@ -11,24 +11,19 @@ use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use feature_flag::BoolFlag;
 use newtypes::PhoneNumber;
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use actix_web::{post, web, web::Json};
 
-#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct Request {
     phone_number: PhoneNumber,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct CleanupResponse {
     num_deleted_rows: usize,
 }
 
 #[tracing::instrument(skip(state, _custodian))]
-#[api_v2_operation(
-    description = "Private endpoint to clean up specific integration test user information.",
-    tags(Private)
-)]
 #[post("/private/cleanup")]
 async fn post(
     state: web::Data<State>,

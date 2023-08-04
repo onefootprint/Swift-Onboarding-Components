@@ -2,28 +2,23 @@ use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::{task, State};
+use actix_web::{post, web, web::Json};
 use chrono::Utc;
 use db::models::task::{Task, TaskCreateArgs};
 use db::models::watchlist_check::WatchlistCheck;
 use db::DbError;
 use newtypes::{TaskData, TaskId, TenantId, WatchlistCheckArgs};
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct ExecuteTasksRequest {
     pub num_tasks: i64,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct ExecuteTasksResponse {
     pub num_executed_tasks: usize,
 }
 
-#[api_v2_operation(
-    description = "Polls and executes a specified number of pending tasks",
-    tags(Private)
-)]
 #[post("/private/protected/task/execute_tasks")]
 async fn execute_tasks(
     state: web::Data<State>,
@@ -39,17 +34,16 @@ async fn execute_tasks(
     })))
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct CreateTaskRequest {
     pub task_data: TaskData,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct CreateTasksResponse {
     pub task_id: TaskId,
 }
 
-#[api_v2_operation(description = "Creates a single task scheduled for now", tags(Private))]
 #[post("/private/protected/task/create_task")]
 async fn create_task(
     state: web::Data<State>,
@@ -66,21 +60,17 @@ async fn create_task(
     Ok(Json(ResponseData::ok(CreateTasksResponse { task_id: task.id })))
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct CreateOverdueWatchlistCheckTasksRequest {
     pub tenant_id: TenantId,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct CreateOverdueWatchlistCheckTasksResponse {
     pub num_created_tasks: usize,
     pub created_tasks: Vec<TaskId>,
 }
 
-#[api_v2_operation(
-    description = "Creates WatchlistCheckTask's for livemode vaults that have not had a watchlist check in the past 30 days",
-    tags(Private)
-)]
 #[post("/private/protected/task/create_overdue_watchlist_check_tasks")]
 async fn create_overdue_watchlist_check_tasks(
     state: web::Data<State>,

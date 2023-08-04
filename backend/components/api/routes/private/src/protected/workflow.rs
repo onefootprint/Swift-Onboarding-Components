@@ -2,6 +2,7 @@ use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
+use actix_web::{post, web, web::Json};
 use api_core::auth::tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard};
 use api_core::auth::Either;
 use api_core::decision::state::actions::WorkflowActions;
@@ -12,10 +13,8 @@ use chrono::Utc;
 use db::models::workflow::{NewWorkflow, Workflow};
 use db::DbError;
 use newtypes::{ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct CreateWorkflowRequest {
     pub sv_id: ScopedVaultId,
     pub wf_kind: WorkflowKind,
@@ -23,12 +22,11 @@ pub struct CreateWorkflowRequest {
     pub wf_config: WorkflowConfig,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct CreateWorkflowResponse {
     pub workflow_id: WorkflowId,
 }
 
-#[api_v2_operation(description = "Creates a single task scheduled for now", tags(Private))]
 #[post("/private/protected/workflow/create_workflow")]
 async fn create_workflow(
     state: web::Data<State>,
@@ -64,18 +62,17 @@ async fn create_workflow(
     })))
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct ProceedRequest {
     pub wf_id: WorkflowId,
     pub wf_action_kind: Option<WorkflowActionsKind>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct ProceedResponse {
     pub new_workflow_state: WorkflowState,
 }
 
-#[api_v2_operation(description = "Runs Workflow with its current default action", tags(Private))]
 #[post("/private/protected/workflow/proceed")]
 async fn proceed(
     state: web::Data<State>,

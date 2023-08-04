@@ -62,7 +62,7 @@ pub struct EncryptArgs {
     pub algorithm: EncryptFilterAlgorithmName,
     /// hex encoded, DER-formatted asymmetric public key
     #[serde(with = "crypto::hex")]
-    pub public_key: Vec<u8>,
+    pub public_key: PiiBytes,
 }
 
 #[derive(
@@ -215,7 +215,7 @@ impl FilterFunction {
                 algorithm: EncryptFilterAlgorithmName::from_str(&args.parse_string("algorithm")?).map_err(
                     |_| FilterFunctionParsingError::InvalidArgument("algorithm is invalid or unsupported"),
                 )?,
-                public_key: args.parse_hex("public_key")?,
+                public_key: PiiBytes::new(args.parse_hex("public_key")?),
             }),
         };
 
@@ -344,7 +344,7 @@ mod tests {
     #[test_case("replace(\"my\\,flerp\",\" derp \")" => Ok(FF::Replace(ReplaceArgs { from: "my,flerp".into(), to: " derp ".into() })))]
     #[test_case("replace('\\(my','paren\\)')" => Ok(FF::Replace(ReplaceArgs { from: "(my".into(), to: "paren)".into() })))]
     #[test_case("hmac_sha256('00')" => Ok(FF::HmacSha256(HmacSha256Args { key: PiiBytes::new(vec![0x00]) })))]
-    #[test_case("encrypt('rsa_pkcs1v15', '00')" => Ok(FF::Encrypt(EncryptArgs { algorithm: EncryptFilterAlgorithmName::RsaPkcs1v15, public_key: vec![0x00] })))]
+    #[test_case("encrypt('rsa_pkcs1v15', '00')" => Ok(FF::Encrypt(EncryptArgs { algorithm: EncryptFilterAlgorithmName::RsaPkcs1v15, public_key: PiiBytes::new(vec![0x00]) })))]
     fn test_filter_function_parsing(input: &str) -> Result<FilterFunction, FilterFunctionParsingError> {
         FilterFunction::parse(input)
     }

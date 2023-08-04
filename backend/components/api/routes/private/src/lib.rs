@@ -1,4 +1,4 @@
-use paperclip::actix::web;
+use actix_web::web;
 
 mod assume;
 mod cleanup;
@@ -8,7 +8,7 @@ mod test_tenant;
 
 pub use api_core::*;
 
-pub fn routes(config: &mut web::ServiceConfig) {
+pub fn configure(config: &mut web::ServiceConfig) {
     config
         .service(cleanup::post)
         .service(assume::post)

@@ -13,16 +13,15 @@ crypto = { path = "../../../enclave/crypto" }
 enclave_proxy = { path = "../../../enclave/proxy" }
 newtypes = { path = "../../../newtypes" }
 db = { path = "../../../db/core" }
-twilio = { path = "../../../twilio"}
+twilio = { path = "../../../twilio" }
 idv = { path = "../../../idv" }
 privacy_pass = { path = "../../../privacy_pass" }
 feature_flag = { path = "../../../feature_flag" }
-webhooks = { path = "../../../webhooks"}
-billing = { path = "../../../billing"}
+webhooks = { path = "../../../webhooks" }
+billing = { path = "../../../billing" }
 api_wire_types = { path = "../../wire_types" }
 
 actix-web = { workspace = true }
-paperclip = { workspace = true }
 log = "0.4.14"
 tracing = { workspace = true }
 either = { workspace = true }
@@ -33,9 +32,9 @@ serde = { workspace = true }
 serde_with = "2.2.0"
 
 derive_more = { workspace = true }
-aws-config =  { workspace = true }
-aws-sdk-s3 =  { workspace = true }
-aws-sdk-kms =  { workspace = true }
+aws-config = { workspace = true }
+aws-sdk-s3 = { workspace = true }
+aws-sdk-kms = { workspace = true }
 
 thiserror = { workspace = true }
 
@@ -73,7 +72,7 @@ actix-multipart = "0.5.0"
 
 [dev-dependencies]
 test-case = { workspace = true }
-enclave = { path = "../../../enclave/enclave"}
+enclave = { path = "../../../enclave/enclave" }
 portpicker = "0.1.1"
 rand = { version = "0.8 " }
 tokio-test = "0.4.2"

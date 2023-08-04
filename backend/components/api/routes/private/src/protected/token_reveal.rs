@@ -1,4 +1,5 @@
 use crate::State;
+use actix_web::{post, web, web::Json};
 use api_core::{
     auth::{
         protected_custodian::ProtectedCustodianAuthContext,
@@ -6,31 +7,30 @@ use api_core::{
         tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard},
         Either,
     },
-    types::{JsonApiResponse, ResponseData}, ApiErrorKind,
+    types::{JsonApiResponse, ResponseData},
+    ApiErrorKind,
 };
 use db::models::session::Session;
 use newtypes::{SealedSessionBytes, SessionAuthToken};
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-#[derive(Debug, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 pub struct RevealRequest {
     token: SessionAuthToken,
 }
 
-#[derive(Debug, Apiv2Schema, serde::Serialize)]
+#[derive(Debug, serde::Serialize)]
 pub struct RevealResponse {
     data: serde_json::Value,
     kind: SessionKind,
 }
 
-#[derive(Debug, Apiv2Schema, serde::Serialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum SessionKind {
     Sealed,
     Json,
 }
 
-#[api_v2_operation(description = "Reveal the contents of an auth token's session", tags(Private))]
 #[post("/private/token/reveal")]
 pub async fn post(
     state: web::Data<State>,

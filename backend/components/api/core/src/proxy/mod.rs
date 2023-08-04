@@ -46,7 +46,7 @@ pub fn filter_function_to_transform(value: &FilterFunction) -> DataTransform {
                     enclave_proxy::EncryptTransformAlgorithm::EciesP256X963Sha256AesGcm
                 }
             },
-            public_key_der: public_key.clone(),
+            public_key_der: public_key.clone().into_leak(),
         },
     }
 }
@@ -84,7 +84,7 @@ pub fn transform_to_filter_function(value: DataTransform) -> Option<FilterFuncti
             };
             FilterFunction::Encrypt(EncryptArgs {
                 algorithm,
-                public_key: public_key_der,
+                public_key: PiiBytes::new(public_key_der),
             })
         }
         DataTransform::Identity => {
