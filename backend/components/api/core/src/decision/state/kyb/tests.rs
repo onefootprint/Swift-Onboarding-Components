@@ -67,7 +67,7 @@ async fn authorize(state: &mut State) {
 #[test_state_case(WorkflowFixtureResult::Pass)]
 #[test_state_case(WorkflowFixtureResult::Fail)]
 #[tokio::test(flavor = "multi_thread")]
-async fn sandbox_pass(state: &mut State, fixture_result: WorkflowFixtureResult) {
+async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
     // SETUP
     let (wf, tenant) = setup(state, Some(fixture_result)).await;
     let wfid = wf.id.clone();
@@ -77,14 +77,6 @@ async fn sandbox_pass(state: &mut State, fixture_result: WorkflowFixtureResult) 
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
-    let (ww, _) = ww
-        .action(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
-        .await
-        .unwrap();
-    assert!(matches!(
-        ww.state,
-        WorkflowKind::Kyb(kyb::KybState::VendorCalls(_))
-    ));
 
     let mut mock_ff_client = MockFeatureFlagClient::new();
     mock_ff_client
@@ -94,15 +86,29 @@ async fn sandbox_pass(state: &mut State, fixture_result: WorkflowFixtureResult) 
         .return_const(false);
     state.set_ff_client(Arc::new(mock_ff_client));
 
-    // TEST
-
-    // MakeVendorCalls
+    // BoKycCompleted
     mock_webhooks(
         state,
         vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
         vec![],
     );
 
+    let (ww, _) = ww
+        .action(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
+        .await
+        .unwrap();
+    assert!(matches!(
+        ww.state,
+        WorkflowKind::Kyb(kyb::KybState::VendorCalls(_))
+    ));
+
+    let (ob, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
+    assert_eq!(WorkflowState::Kyb(KybState::VendorCalls), wf.state);
+    assert_eq!(OnboardingStatus::Pending, ob.status);
+    assert!(ob.idv_reqs_initiated_at.is_none());
+    assert!(ob.decision_made_at.is_none());
+
+    // MakeVendorCalls
     let (ww, _) = ww
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await

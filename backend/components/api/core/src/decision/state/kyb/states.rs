@@ -1,10 +1,11 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use db::models::onboarding::{Onboarding, OnboardingUpdate};
 use db::models::workflow::Workflow as DbWorkflow;
 
 use feature_flag::FeatureFlagClient;
-use newtypes::KybConfig;
+use newtypes::{KybConfig, OnboardingStatus};
 
 use super::{
     KybAwaitingAsyncVendors, KybAwaitingBoKyc, KybComplete, KybDataCollection, KybDecisioning, KybState,
@@ -110,8 +111,10 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
     }
 
     #[tracing::instrument("KybAwaitingBoKyc#OnAction<BoKycCompleted, KybState>::on_commit", skip_all)]
-    fn on_commit(self, _async_res: (), _conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
-        // TODO: set status = pending
+    fn on_commit(self, _async_res: (), conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
+        let ob = Onboarding::lock(conn, &self.ob_id)?;
+        Onboarding::update(ob, conn, OnboardingUpdate::set_status(OnboardingStatus::Pending))?;
+
         Ok(KybState::from(KybVendorCalls {
             wf_id: self.wf_id,
             ob_id: self.ob_id,
