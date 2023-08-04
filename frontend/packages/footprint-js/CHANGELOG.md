@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.1.0
+
+### Minor Changes
+
+- cb96a1570: Added a getRef prop to get the ref from embedded forms that you can call save function on
+
 ## 3.0.0
 
 ### Major Changes
