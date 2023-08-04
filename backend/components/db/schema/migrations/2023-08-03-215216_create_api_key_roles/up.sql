@@ -11,7 +11,8 @@ SELECT
     'api_key',
     true,
     current_timestamp
-FROM tenant;
+FROM tenant
+ON CONFLICT DO NOTHING;
 
 INSERT INTO tenant_role(tenant_id, name, scopes, is_immutable, kind, is_live, created_at)
 SELECT 
@@ -22,7 +23,8 @@ SELECT
     'api_key',
     false,
     current_timestamp
-FROM tenant;
+FROM tenant
+ON CONFLICT DO NOTHING;
 
 INSERT INTO tenant_role(tenant_id, name, scopes, is_immutable, kind, is_live, created_at)
 SELECT 
@@ -33,7 +35,8 @@ SELECT
     'api_key',
     true,
     current_timestamp
-FROM tenant;
+FROM tenant
+ON CONFLICT DO NOTHING;
 
 INSERT INTO tenant_role(tenant_id, name, scopes, is_immutable, kind, is_live, created_at)
 SELECT 
@@ -44,7 +47,8 @@ SELECT
     'api_key',
     false,
     current_timestamp
-FROM tenant;
+FROM tenant
+ON CONFLICT DO NOTHING;
 
 -- Also create the dashboard_user roles
 
@@ -56,7 +60,8 @@ SELECT
     true,
     'dashboard_user',
     current_timestamp
-FROM tenant;
+FROM tenant
+ON CONFLICT DO NOTHING;
 
 INSERT INTO tenant_role(tenant_id, name, scopes, is_immutable, kind, created_at)
 SELECT 
@@ -66,4 +71,5 @@ SELECT
     true,
     'dashboard_user',
     current_timestamp
-FROM tenant;
+FROM tenant
+ON CONFLICT DO NOTHING;
