@@ -16,7 +16,38 @@ export enum RoleScopeKind {
   cipIntegration = 'cip_integration',
   triggerKyc = 'trigger_kyc',
   manageVaultProxy = 'manage_vault_proxy',
+  onboarding = 'onboarding',
+  manageWebhooks = 'manage_webhooks',
 }
+
+export enum RoleKind {
+  dashboardUser = 'dashboard_user',
+  apiKey = 'api_key',
+}
+
+// Specify which kinds of roles are able to have the given scope
+export const supportedRoleKinds: Record<RoleScopeKind, RoleKind[]> = {
+  [RoleScopeKind.read]: [RoleKind.dashboardUser, RoleKind.apiKey],
+  [RoleScopeKind.admin]: [RoleKind.dashboardUser, RoleKind.apiKey],
+
+  [RoleScopeKind.apiKeys]: [RoleKind.dashboardUser],
+  [RoleScopeKind.manageVaultProxy]: [RoleKind.dashboardUser],
+  [RoleScopeKind.manageWebhooks]: [RoleKind.dashboardUser],
+  [RoleScopeKind.manualReview]: [RoleKind.dashboardUser],
+  [RoleScopeKind.onboardingConfiguration]: [RoleKind.dashboardUser],
+  [RoleScopeKind.orgSettings]: [RoleKind.dashboardUser],
+
+  [RoleScopeKind.cipIntegration]: [RoleKind.apiKey],
+  [RoleScopeKind.invokeVaultProxy]: [RoleKind.apiKey],
+  [RoleScopeKind.triggerKyc]: [RoleKind.apiKey],
+  [RoleScopeKind.writeEntities]: [RoleKind.apiKey],
+  [RoleScopeKind.onboarding]: [RoleKind.apiKey],
+
+  [RoleScopeKind.decryptAll]: [RoleKind.dashboardUser, RoleKind.apiKey],
+  [RoleScopeKind.decryptDocuments]: [RoleKind.dashboardUser, RoleKind.apiKey],
+  [RoleScopeKind.decrypt]: [RoleKind.dashboardUser, RoleKind.apiKey],
+  [RoleScopeKind.decryptCustom]: [RoleKind.dashboardUser, RoleKind.apiKey],
+};
 
 export type BasicRoleScopeKind = Exclude<
   RoleScopeKind,
@@ -55,4 +86,5 @@ export type Role = {
   numActiveUsers: number;
   numActiveApiKeys: number;
   scopes: RoleScope[];
+  kind?: RoleKind;
 };

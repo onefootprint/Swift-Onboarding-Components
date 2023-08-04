@@ -24,7 +24,12 @@ const Create = () => {
           {t('title')}
         </Button>
       </PermissionGate>
-      <CreateDialog open={open} handleClose={() => setOpen(false)} />
+      <CreateDialog
+        open={open}
+        handleClose={() => setOpen(false)}
+        // TODO set this to only dashboardUser once we have separate API key management
+        // kind={RoleKind.dashboardUser}
+      />
     </Box>
   );
 };

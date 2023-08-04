@@ -1,19 +1,20 @@
-import { Box, Pagination, Portal } from '@onefootprint/ui';
+import { RoleKind } from '@onefootprint/types';
+import { Box, Pagination } from '@onefootprint/ui';
 import React from 'react';
+// TODO move imports
+import RolesTable from 'src/pages/settings/components/team-roles/components/roles/components/roles-table';
+import useRoles from 'src/pages/settings/components/team-roles/components/roles/hooks/use-roles';
 
-import Create from './components/create';
-import RolesTable from './components/roles-table';
-import useRoles from './hooks/use-roles';
-
-const Roles = () => {
-  // TODO only filter dashboardUser RoleKind here
-  const { data: response, errorMessage, isLoading, pagination } = useRoles();
+const Table = () => {
+  const {
+    data: response,
+    errorMessage,
+    isLoading,
+    pagination,
+  } = useRoles(RoleKind.apiKey);
 
   return (
     <Box testID="roles-table" as="section">
-      <Portal selector="#team-roles-actions">
-        <Create />
-      </Portal>
       <RolesTable
         data={response?.data}
         errorMessage={errorMessage}
@@ -34,4 +35,4 @@ const Roles = () => {
   );
 };
 
-export default Roles;
+export default Table;

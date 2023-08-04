@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CreateRoleRequest } from '@onefootprint/types';
+import { CreateRoleRequest, RoleKind } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
 
@@ -9,9 +9,10 @@ import Form from '../form';
 export type CreateDialogProps = {
   open: boolean;
   handleClose: () => void;
+  kind?: RoleKind;
 };
 
-const CreateDialog = ({ open, handleClose }: CreateDialogProps) => {
+const CreateDialog = ({ open, handleClose, kind }: CreateDialogProps) => {
   // TODO change translation path to be shared
   const { t, allT } = useTranslation('pages.settings.roles.create');
   const createRoleMutation = useCreateRole();
@@ -36,7 +37,7 @@ const CreateDialog = ({ open, handleClose }: CreateDialogProps) => {
         onClick: handleClose,
       }}
     >
-      <Form onSubmit={handleSubmit} />
+      <Form onSubmit={handleSubmit} kind={kind} />
     </Dialog>
   );
 };

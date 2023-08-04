@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   CreateRoleRequest,
+  RoleKind,
   RoleScope,
   RoleScopeKind,
   UpdateRoleRequest,
@@ -17,6 +18,7 @@ import type { FormData } from './form.types';
 export type FormProps = {
   defaultValues?: FormData;
   onSubmit: (payload: CreateRoleRequest | UpdateRoleRequest) => void;
+  kind?: RoleKind;
 };
 
 const Form = ({
@@ -29,6 +31,7 @@ const Form = ({
     vaultProxyConfigs: [],
     showProxyConfigs: false,
   },
+  kind,
 }: FormProps) => {
   const { t } = useTranslation('pages.settings.roles.form');
   const formMethods = useForm<FormData>({ defaultValues });
@@ -58,6 +61,7 @@ const Form = ({
     onSubmit({
       name,
       scopes: allScopes,
+      kind,
     });
   };
 
@@ -79,7 +83,7 @@ const Form = ({
             })}
           />
         </Box>
-        <Permissions />
+        <Permissions kind={kind} />
       </form>
     </FormProvider>
   );

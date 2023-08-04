@@ -86,6 +86,7 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
           name: role.name,
           scopeKinds: basicScopes.map(s => s.kind),
         }}
+        kind={role.kind}
       />
     </Dialog>
   );

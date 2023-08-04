@@ -1,7 +1,11 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { RoleScopeKind } from '@onefootprint/types';
+import {
+  RoleKind,
+  RoleScopeKind,
+  supportedRoleKinds,
+} from '@onefootprint/types';
 import {
   Box,
   Checkbox,
@@ -15,7 +19,11 @@ import { Controller, useFormContext } from 'react-hook-form';
 import useDecryptOptions from '../../../../../../../../hooks/use-decrypt-options';
 import useVaultProxyOptions from '../../../../../../../../hooks/use-vault-proxy-options';
 
-const Permissions = () => {
+export type PermissionsProps = {
+  kind?: RoleKind;
+};
+
+const Permissions = ({ kind }: PermissionsProps) => {
   const [animateDecryptSelect] = useAutoAnimate<HTMLDivElement>();
   const [animateProxyConfigSelect] = useAutoAnimate<HTMLDivElement>();
   const { t } = useTranslation('pages.settings.roles');
@@ -41,123 +49,170 @@ const Permissions = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showProxySelect]);
 
+  const supportedScopeKinds = Object.values(RoleScopeKind).filter(s => {
+    // For legacy roles, all scopes are supported
+    if (!kind) {
+      return true;
+    }
+
+    return supportedRoleKinds[s].includes(kind);
+  });
+
   return (
     <>
       <Box sx={{ marginBottom: 5 }}>
         <Typography variant="label-2">{t('form.permissions.title')}</Typography>
       </Box>
       <ToggleContainer>
-        <Checkbox disabled label={t('scopes.read')} checked />
-        <Checkbox
-          label={t('scopes.onboarding_configuration')}
-          value={RoleScopeKind.onboardingConfiguration}
-          {...register('scopeKinds')}
-        />
-        <Checkbox
-          label={t('scopes.api_keys')}
-          value={RoleScopeKind.apiKeys}
-          {...register('scopeKinds')}
-        />
-        <Checkbox
-          label={t('scopes.org_settings')}
-          value={RoleScopeKind.orgSettings}
-          {...register('scopeKinds')}
-        />
-        <Checkbox
-          label={t('scopes.manual_review')}
-          value={RoleScopeKind.manualReview}
-          {...register('scopeKinds')}
-        />
-        <Checkbox
-          label={t('scopes.write_entities')}
-          value={RoleScopeKind.writeEntities}
-          {...register('scopeKinds')}
-        />
-        <Checkbox
-          label={t('scopes.cip_integration')}
-          value={RoleScopeKind.cipIntegration}
-          {...register('scopeKinds')}
-        />
-        <Checkbox
-          label={t('scopes.trigger_kyc')}
-          value={RoleScopeKind.triggerKyc}
-          {...register('scopeKinds')}
-        />
-        <Checkbox
-          label={t('scopes.manage_vault_proxy')}
-          value={RoleScopeKind.manageVaultProxy}
-          {...register('scopes')}
-        />
-        <div>
+        {supportedScopeKinds.includes(RoleScopeKind.read) && (
+          <Checkbox disabled label={t('scopes.read')} checked />
+        )}
+        {supportedScopeKinds.includes(
+          RoleScopeKind.onboardingConfiguration,
+        ) && (
           <Checkbox
-            label={t('scopes.invoke_vault_proxy.checkbox')}
-            {...register('showProxyConfigs')}
+            label={t('scopes.onboarding_configuration')}
+            value={RoleScopeKind.onboardingConfiguration}
+            {...register('scopeKinds')}
           />
-          <div ref={animateProxyConfigSelect}>
-            {showProxySelect && (
-              <MultiSelectContainer>
-                <Controller
-                  control={control}
-                  name="vaultProxyConfigs"
-                  rules={{
-                    required: {
-                      value: true,
-                      message: t('form.proxy-configs.errors.required'),
-                    },
-                  }}
-                  render={({ field }) => (
-                    <MultiSelect
-                      label={t('form.proxy-configs.label')}
-                      options={proxyOptions}
-                      allOption={proxyAllOption}
-                      size="compact"
-                      onBlur={field.onBlur}
-                      onChange={field.onChange}
-                      value={field.value}
-                      hasError={!!errors.vaultProxyConfigs}
-                      hint={errors.vaultProxyConfigs?.message as string}
-                    />
-                  )}
-                />
-              </MultiSelectContainer>
-            )}
-          </div>
-        </div>
-        <div>
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.apiKeys) && (
           <Checkbox
-            label={t('form.decrypt.label')}
-            {...register('showDecrypt')}
+            label={t('scopes.api_keys')}
+            value={RoleScopeKind.apiKeys}
+            {...register('scopeKinds')}
           />
-          <div ref={animateDecryptSelect}>
-            {showDecryptSelect && (
-              <MultiSelectContainer>
-                <Controller
-                  control={control}
-                  name="decryptOptions"
-                  rules={{
-                    required: {
-                      value: true,
-                      message: t('form.decrypt.errors.required'),
-                    },
-                  }}
-                  render={({ field }) => (
-                    <MultiSelect
-                      label={t('form.decrypt-attributes.label')}
-                      options={decryptOptions}
-                      allOption={decryptAllOption}
-                      size="compact"
-                      onBlur={field.onBlur}
-                      onChange={field.onChange}
-                      value={field.value}
-                      hasError={!!errors.decryptFields}
-                      hint={errors.decryptFields?.message as string}
-                    />
-                  )}
-                />
-              </MultiSelectContainer>
-            )}
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.orgSettings) && (
+          <Checkbox
+            label={t('scopes.org_settings')}
+            value={RoleScopeKind.orgSettings}
+            {...register('scopeKinds')}
+          />
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.manualReview) && (
+          <Checkbox
+            label={t('scopes.manual_review')}
+            value={RoleScopeKind.manualReview}
+            {...register('scopeKinds')}
+          />
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.writeEntities) && (
+          <Checkbox
+            label={t('scopes.write_entities')}
+            value={RoleScopeKind.writeEntities}
+            {...register('scopeKinds')}
+          />
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.cipIntegration) && (
+          <Checkbox
+            label={t('scopes.cip_integration')}
+            value={RoleScopeKind.cipIntegration}
+            {...register('scopeKinds')}
+          />
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.triggerKyc) && (
+          <Checkbox
+            label={t('scopes.trigger_kyc')}
+            value={RoleScopeKind.triggerKyc}
+            {...register('scopeKinds')}
+          />
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.onboarding) && (
+          <Checkbox
+            label={t('scopes.onboarding')}
+            value={RoleScopeKind.onboarding}
+            {...register('scopeKinds')}
+          />
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.manageWebhooks) && (
+          <Checkbox
+            label={t('scopes.manage_webhooks')}
+            value={RoleScopeKind.manageWebhooks}
+            {...register('scopeKinds')}
+          />
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.manageVaultProxy) && (
+          <Checkbox
+            label={t('scopes.manage_vault_proxy')}
+            value={RoleScopeKind.manageVaultProxy}
+            {...register('scopes')}
+          />
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.invokeVaultProxy) && (
+          <div>
+            <Checkbox
+              label={t('scopes.invoke_vault_proxy.checkbox')}
+              {...register('showProxyConfigs')}
+            />
+            <div ref={animateProxyConfigSelect}>
+              {showProxySelect && (
+                <MultiSelectContainer>
+                  <Controller
+                    control={control}
+                    name="vaultProxyConfigs"
+                    rules={{
+                      required: {
+                        value: true,
+                        message: t('form.proxy-configs.errors.required'),
+                      },
+                    }}
+                    render={({ field }) => (
+                      <MultiSelect
+                        label={t('form.proxy-configs.label')}
+                        options={proxyOptions}
+                        allOption={proxyAllOption}
+                        size="compact"
+                        onBlur={field.onBlur}
+                        onChange={field.onChange}
+                        value={field.value}
+                        hasError={!!errors.vaultProxyConfigs}
+                        hint={errors.vaultProxyConfigs?.message as string}
+                      />
+                    )}
+                  />
+                </MultiSelectContainer>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+        {supportedScopeKinds.includes(RoleScopeKind.decrypt) && (
+          <div>
+            <Checkbox
+              label={t('form.decrypt.label')}
+              {...register('showDecrypt')}
+            />
+            <div ref={animateDecryptSelect}>
+              {showDecryptSelect && (
+                <MultiSelectContainer>
+                  <Controller
+                    control={control}
+                    name="decryptOptions"
+                    rules={{
+                      required: {
+                        value: true,
+                        message: t('form.decrypt.errors.required'),
+                      },
+                    }}
+                    render={({ field }) => (
+                      <MultiSelect
+                        label={t('form.decrypt-attributes.label')}
+                        options={decryptOptions}
+                        allOption={decryptAllOption}
+                        size="compact"
+                        onBlur={field.onBlur}
+                        onChange={field.onChange}
+                        value={field.value}
+                        hasError={!!errors.decryptFields}
+                        hint={errors.decryptFields?.message as string}
+                      />
+                    )}
+                  />
+                </MultiSelectContainer>
+              )}
+            </div>
+          </div>
+        )}
       </ToggleContainer>
     </>
   );

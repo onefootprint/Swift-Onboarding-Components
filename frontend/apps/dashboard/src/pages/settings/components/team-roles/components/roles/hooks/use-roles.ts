@@ -3,7 +3,12 @@ import request, {
   getErrorMessage,
   PaginatedRequestResponse,
 } from '@onefootprint/request';
-import { GetRolesRequest, GetRolesResponse, Role } from '@onefootprint/types';
+import {
+  GetRolesRequest,
+  GetRolesResponse,
+  Role,
+  RoleKind,
+} from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import usePagination from 'src/hooks/use-pagination';
 import useSession, { AuthHeaders } from 'src/hooks/use-session';
@@ -23,14 +28,15 @@ const getRoles = async (authHeaders: AuthHeaders, params: GetRolesRequest) => {
   return response;
 };
 
-const useRoles = () => {
+const useRoles = (kind?: RoleKind) => {
   const { authHeaders } = useSession();
   const { formatDateWithTime } = useIntl();
   const filters = useRolesFilters();
   const { requestParams } = filters;
+  const allReqParams = { ...requestParams, kind };
   const rolesQuery = useQuery(
-    ['org', 'roles', requestParams],
-    () => getRoles(authHeaders, requestParams),
+    ['org', 'roles', allReqParams, authHeaders],
+    () => getRoles(authHeaders, allReqParams),
     {
       enabled: filters.isReady,
       select: response => ({

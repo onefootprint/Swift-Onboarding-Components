@@ -1195,6 +1195,14 @@
         "proxy-configs": "Vault proxy configurations"
       },
       "api-keys": {
+        "roles": {
+          "header": {
+            "title": "API Key Access Roles",
+            "subtitle": "Configure fine-grained permissions for your API keys.",
+            "cta": "Create role",
+            "cta-not-allowed": "You're not allowed to create API key roles"
+          }
+        },
         "header": {
           "title": "Secret API Keys",
           "subtitle": "These are like passwords. Keep them safe.",
@@ -1740,6 +1748,8 @@
           "decrypt_all": "Everything",
           "decrypt_custom": "Custom attributes",
           "decrypt_documents": "Documents",
+          "onboarding": "Onboarding",
+          "manage_webhooks": "Manage webhook configuration",
           "decrypt": {
             "all": "Everything",
             "name": "Full name",
