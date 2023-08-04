@@ -19,10 +19,12 @@ pub struct CursorPaginationRequest<C> {
     pub page_size: Option<usize>,
 }
 
+const MAX_PAGE_SIZE: usize = 100;
+
 impl<C> CursorPaginationRequest<C> {
     pub fn page_size(&self, state: &web::Data<State>) -> usize {
         if let Some(page_size) = self.page_size {
-            page_size
+            std::cmp::min(page_size, MAX_PAGE_SIZE)
         } else {
             state.config.default_page_size
         }
@@ -54,7 +56,7 @@ pub struct OffsetPaginationRequest {
 impl OffsetPaginationRequest {
     pub fn page_size(&self, state: &web::Data<State>) -> usize {
         if let Some(page_size) = self.page_size {
-            page_size
+            std::cmp::min(page_size, MAX_PAGE_SIZE)
         } else {
             state.config.default_page_size
         }
