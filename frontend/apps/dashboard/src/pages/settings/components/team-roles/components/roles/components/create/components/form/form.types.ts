@@ -1,7 +1,7 @@
 import { BasicRoleScopeKind } from '@onefootprint/types';
 
-import { DecryptOption } from '../../../../hooks/use-decrypt-options';
-import { VaultProxyOption } from '../../../../hooks/use-vault-proxy-options';
+import { DecryptOption } from '../../../../../../hooks/use-decrypt-options';
+import { VaultProxyOption } from '../../../../../../hooks/use-vault-proxy-options';
 
 export type VaultProxySelectOption = {
   label: string;

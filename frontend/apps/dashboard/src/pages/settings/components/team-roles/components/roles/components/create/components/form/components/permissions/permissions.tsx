@@ -12,8 +12,8 @@ import {
 import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import useDecryptOptions from '../../../../../../hooks/use-decrypt-options';
-import useVaultProxyOptions from '../../../../../../hooks/use-vault-proxy-options';
+import useDecryptOptions from '../../../../../../../../hooks/use-decrypt-options';
+import useVaultProxyOptions from '../../../../../../../../hooks/use-vault-proxy-options';
 
 const Permissions = () => {
   const [animateDecryptSelect] = useAutoAnimate<HTMLDivElement>();

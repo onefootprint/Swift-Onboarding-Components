@@ -9,8 +9,8 @@ import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { DecryptOptionToRoleScope } from '../../../../hooks/use-decrypt-options';
-import { scopeFromVaultProxyOption } from '../../../../hooks/use-vault-proxy-options';
+import { DecryptOptionToRoleScope } from '../../../../../../hooks/use-decrypt-options';
+import { scopeFromVaultProxyOption } from '../../../../../../hooks/use-vault-proxy-options';
 import Permissions from './components/permissions';
 import type { FormData } from './form.types';
 

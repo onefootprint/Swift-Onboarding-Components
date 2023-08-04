@@ -5,8 +5,8 @@ import React, { forwardRef, useImperativeHandle, useState } from 'react';
 
 import useVaultProxyOptions from '../../../../../../../../hooks/use-vault-proxy-options';
 import groupScopes from '../../../../../../../../utils/group-scopes';
-import Form from '../../../../../form';
-import { VaultProxySelectOption } from '../../../../../form/form.types';
+import Form from '../../../../../create/components/form';
+import { VaultProxySelectOption } from '../../../../../create/components/form/form.types';
 import useEditRole from './hooks/use-edit-role';
 
 export type EditHandler = {
