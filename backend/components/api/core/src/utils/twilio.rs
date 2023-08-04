@@ -205,6 +205,12 @@ impl TwilioClient {
                 org_name,
                 link.leak()
             )),
+            TriggerKind::RedoKyb => PiiString::from(format!(
+                "{}Re-verify your business for {} here: {}",
+                note.map(|n| format!("{}\n\n", n)).unwrap_or_default(),
+                org_name,
+                link.leak()
+            )),
         };
 
         self.send_message(state, message_body, destination, rate_limit::DASHBOARD_TRIGGER)

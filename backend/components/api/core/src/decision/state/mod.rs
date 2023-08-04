@@ -5,13 +5,14 @@ use thiserror::Error;
 
 use crate::{errors::ApiResult, State};
 
-use self::actions::WorkflowActions;
+use self::{actions::WorkflowActions, kyb::KybState};
 
 pub mod actions;
 pub use actions::*;
 pub mod alpaca_kyc;
 pub mod common;
 pub mod document;
+pub mod kyb;
 pub mod kyc;
 #[cfg(test)]
 pub mod test_utils;
@@ -45,6 +46,7 @@ pub enum WorkflowKind {
     Kyc(KycState),
     AlpacaKyc(AlpacaKycState),
     Document(DocumentState),
+    Kyb(KybState),
 }
 
 impl std::fmt::Debug for WorkflowKind {
@@ -59,6 +61,7 @@ impl From<&WorkflowKind> for newtypes::WorkflowState {
             WorkflowKind::Kyc(s) => s.name(),
             WorkflowKind::AlpacaKyc(s) => s.name(),
             WorkflowKind::Document(s) => s.name(),
+            WorkflowKind::Kyb(s) => s.name(),
         }
     }
 }
@@ -79,6 +82,7 @@ impl WorkflowWrapper {
             newtypes::WorkflowState::Kyc(_) => KycState::init(state, workflow).await?.into(),
             newtypes::WorkflowState::AlpacaKyc(_) => AlpacaKycState::init(state, workflow).await?.into(),
             newtypes::WorkflowState::Document(_) => DocumentState::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::Kyb(_) => KybState::init(state, workflow).await?.into(),
         };
         Ok(Self {
             state: s,

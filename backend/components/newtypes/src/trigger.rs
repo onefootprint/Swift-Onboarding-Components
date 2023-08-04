@@ -17,6 +17,9 @@ pub enum TriggerInfo {
     /// Allow editing data, re-verify data, and then re-trigger decision engine
     RedoKyc,
     /// Upload a new document and re-run the decision engine
-    IdDocument { collect_selfie: bool },
+    IdDocument {
+        collect_selfie: bool,
+    },
+    RedoKyb,
     // TODO in the future, support BusinessOwnerLink, FinishKyc?, EditData?
 }

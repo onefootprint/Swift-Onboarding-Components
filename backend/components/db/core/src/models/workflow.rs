@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{AlpacaKycState, DocumentState, WorkflowFixtureResult};
+use newtypes::{AlpacaKycState, DocumentState, KybState, WorkflowFixtureResult};
 use newtypes::{Locked, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
 use serde::{Deserialize, Serialize};
 
@@ -60,6 +60,7 @@ impl Workflow {
             WorkflowKind::AlpacaKyc => WorkflowState::AlpacaKyc(AlpacaKycState::DataCollection),
             WorkflowKind::Kyc => WorkflowState::Kyc(KycState::DataCollection),
             WorkflowKind::Document => WorkflowState::Document(DocumentState::DataCollection),
+            WorkflowKind::Kyb => WorkflowState::Kyb(KybState::DataCollection),
         };
         let new_workflow = NewWorkflow {
             created_at: Utc::now(),

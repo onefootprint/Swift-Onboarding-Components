@@ -12,6 +12,7 @@ use newtypes::WorkflowId;
 // These are needed for enum_dispatch to work properly
 use super::alpaca_kyc::*;
 use super::document::*;
+use super::kyb::*;
 use super::kyc::*;
 
 #[enum_dispatch]

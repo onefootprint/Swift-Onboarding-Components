@@ -22,6 +22,10 @@ pub struct ReviewCompleted {
 }
 #[derive(Debug)]
 pub struct DocCollected;
+#[derive(Debug)]
+pub struct BoKycCompleted;
+#[derive(Debug)]
+pub struct AsyncVendorCallsCompleted;
 
 #[derive(EnumDiscriminants)]
 #[strum_discriminants(
@@ -38,6 +42,8 @@ pub enum WorkflowActions {
     MakeWatchlistCheckCall(MakeWatchlistCheckCall),
     ReviewCompleted(ReviewCompleted),
     DocCollected(DocCollected),
+    BoKycCompleted(BoKycCompleted),
+    AsyncVendorCallsCompleted(AsyncVendorCallsCompleted),
 }
 
 impl std::fmt::Debug for WorkflowActions {
@@ -61,6 +67,10 @@ impl TryFrom<WorkflowActionsKind> for WorkflowActions {
                 WorkflowActionsKind::ReviewCompleted,
             )),
             WorkflowActionsKind::DocCollected => Ok(Self::DocCollected(DocCollected {})),
+            WorkflowActionsKind::BoKycCompleted => Ok(Self::BoKycCompleted(BoKycCompleted {})),
+            WorkflowActionsKind::AsyncVendorCallsCompleted => {
+                Ok(Self::AsyncVendorCallsCompleted(AsyncVendorCallsCompleted {}))
+            }
         }
     }
 }

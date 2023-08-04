@@ -14,6 +14,7 @@ impl DbToApi<Workflow> for api_wire_types::Workflow {
         let kind = match wf_kind {
             WorkflowKind::AlpacaKyc | WorkflowKind::Kyc => TriggerKind::RedoKyc,
             WorkflowKind::Document => TriggerKind::IdDocument,
+            WorkflowKind::Kyb => TriggerKind::RedoKyb,
         };
         api_wire_types::Workflow { kind }
     }

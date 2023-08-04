@@ -46,6 +46,7 @@ pub enum WorkflowState {
     Kyc(KycState),
     AlpacaKyc(AlpacaKycState),
     Document(DocumentState),
+    Kyb(KybState),
 }
 
 impl_enum_string_diesel!(WorkflowKind);
@@ -58,6 +59,7 @@ impl std::fmt::Display for WorkflowState {
             WorkflowState::Kyc(s) => s.to_string(),
             WorkflowState::AlpacaKyc(s) => s.to_string(),
             WorkflowState::Document(s) => s.to_string(),
+            WorkflowState::Kyb(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
     }
@@ -84,6 +86,7 @@ impl FromStr for WorkflowState {
             WorkflowKind::Document => {
                 Self::Document(DocumentState::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
+            WorkflowKind::Kyb => Self::Kyb(KybState::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?),
         };
         Ok(result)
     }
@@ -133,5 +136,22 @@ pub enum DocumentState {
 impl From<DocumentState> for WorkflowState {
     fn from(value: DocumentState) -> Self {
         Self::Document(value)
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString)]
+#[strum(serialize_all = "snake_case")]
+pub enum KybState {
+    DataCollection,
+    AwaitingBoKyc,
+    VendorCalls,
+    AwaitingAsyncVendors,
+    Decisioning,
+    Complete,
+}
+
+impl From<KybState> for WorkflowState {
+    fn from(value: KybState) -> Self {
+        Self::Kyb(value)
     }
 }

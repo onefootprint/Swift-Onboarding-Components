@@ -99,6 +99,7 @@ pub async fn post(
                     DocumentRequest::create(conn, args)?;
                     wf
                 }
+                TriggerInfo::RedoKyb => return Err(TenantError::InvalidTriggerKind.into()), // not yet supported
             };
             // Create a timeline event logging that the workflow was triggered
             let event = WorkflowTriggeredInfo {

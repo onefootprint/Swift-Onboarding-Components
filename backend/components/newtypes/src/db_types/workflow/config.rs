@@ -12,6 +12,7 @@ pub enum WorkflowConfig {
     Kyc(KycConfig),
     AlpacaKyc(AlpacaKycConfig),
     Document(DocumentConfig),
+    Kyb(KybConfig),
 }
 
 impl WorkflowConfig {
@@ -20,6 +21,7 @@ impl WorkflowConfig {
             Self::Kyc(_) => WorkflowKind::Kyc,
             Self::AlpacaKyc(_) => WorkflowKind::AlpacaKyc,
             Self::Document(_) => WorkflowKind::Document,
+            Self::Kyb(_) => WorkflowKind::Kyb,
         }
     }
 }
@@ -54,5 +56,14 @@ pub struct DocumentConfig {}
 impl From<DocumentConfig> for WorkflowConfig {
     fn from(value: DocumentConfig) -> Self {
         Self::Document(value)
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct KybConfig {}
+
+impl From<KybConfig> for WorkflowConfig {
+    fn from(value: KybConfig) -> Self {
+        Self::Kyb(value)
     }
 }

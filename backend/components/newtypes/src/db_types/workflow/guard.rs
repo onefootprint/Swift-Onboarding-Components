@@ -15,6 +15,7 @@ impl WorkflowState {
             Self::Kyc(KycState::DataCollection) | Self::AlpacaKyc(AlpacaKycState::DataCollection) => {
                 vec![WorkflowGuard::AddData, WorkflowGuard::AddDocument]
             }
+            Self::Kyb(KybState::DataCollection) => vec![WorkflowGuard::AddData],
             Self::AlpacaKyc(AlpacaKycState::DocCollection)
             | Self::Document(DocumentState::DataCollection) => vec![WorkflowGuard::AddDocument],
             Self::Kyc(KycState::Complete)
@@ -26,7 +27,12 @@ impl WorkflowState {
             | Self::AlpacaKyc(AlpacaKycState::VendorCalls)
             | Self::AlpacaKyc(AlpacaKycState::WatchlistCheck)
             | Self::Document(DocumentState::Complete)
-            | Self::Document(DocumentState::Decisioning) => vec![],
+            | Self::Document(DocumentState::Decisioning)
+            | Self::Kyb(KybState::AwaitingAsyncVendors)
+            | Self::Kyb(KybState::AwaitingBoKyc)
+            | Self::Kyb(KybState::VendorCalls)
+            | Self::Kyb(KybState::Decisioning)
+            | Self::Kyb(KybState::Complete) => vec![],
         }
     }
 
@@ -36,7 +42,8 @@ impl WorkflowState {
             Self::Kyc(KycState::DataCollection)
             | Self::AlpacaKyc(AlpacaKycState::DataCollection)
             | Self::AlpacaKyc(AlpacaKycState::DocCollection)
-            | Self::Document(DocumentState::DataCollection) => true,
+            | Self::Document(DocumentState::DataCollection)
+            | Self::Kyb(KybState::DataCollection) => true,
             Self::Kyc(KycState::Complete)
             | Self::Kyc(KycState::Decisioning)
             | Self::Kyc(KycState::VendorCalls)
@@ -46,7 +53,12 @@ impl WorkflowState {
             | Self::AlpacaKyc(AlpacaKycState::VendorCalls)
             | Self::AlpacaKyc(AlpacaKycState::WatchlistCheck)
             | Self::Document(DocumentState::Complete)
-            | Self::Document(DocumentState::Decisioning) => false,
+            | Self::Document(DocumentState::Decisioning)
+            | Self::Kyb(KybState::AwaitingBoKyc)
+            | Self::Kyb(KybState::VendorCalls)
+            | Self::Kyb(KybState::AwaitingAsyncVendors)
+            | Self::Kyb(KybState::Decisioning)
+            | Self::Kyb(KybState::Complete) => false,
         }
     }
 }
