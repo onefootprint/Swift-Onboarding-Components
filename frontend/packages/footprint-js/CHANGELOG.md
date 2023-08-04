@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.1.1
+
+### Patch Changes
+
+- d8738a9ad: Update component inline styles
+
 ## 3.1.0
 
 ### Minor Changes

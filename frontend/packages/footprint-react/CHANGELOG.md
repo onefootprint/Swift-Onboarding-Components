@@ -1,5 +1,13 @@
 # @onefootprint/footprint-react
 
+## 5.1.1
+
+### Patch Changes
+
+- d8738a9ad: Update component inline styles
+- Updated dependencies [d8738a9ad]
+  - @onefootprint/footprint-js@3.1.1
+
 ## 5.1.0
 
 ### Minor Changes
