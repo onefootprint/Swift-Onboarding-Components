@@ -23,6 +23,7 @@ const Roles = () => {
         data={response?.data}
         errorMessage={errorMessage}
         isLoading={isLoading}
+        kind={RoleKind.dashboardUser}
       />
       {response && response.meta.count > 0 && (
         <Pagination

@@ -4,7 +4,11 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { CollectedKycDataOption, RoleScopeKind } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  RoleKind,
+  RoleScopeKind,
+} from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 import { withProxyConfigs } from 'src/pages/developers/components/proxy-configs/proxy-config.test.config';
@@ -35,8 +39,15 @@ describe('<Row />', () => {
   };
 
   it('should render the active API users', () => {
-    renderRow({ role: { ...roleFixture, numActiveApiKeys: 1234 } });
+    renderRow({
+      role: { ...roleFixture, numActiveApiKeys: 1234, kind: RoleKind.apiKey },
+    });
     expect(screen.getByText('1234')).toBeInTheDocument();
+  });
+
+  it('should render the active dashboard useres', () => {
+    renderRow({ role: { ...roleFixture, numActiveUsers: 4321 } });
+    expect(screen.getByText('4321')).toBeInTheDocument();
   });
 
   it('should render the name', () => {

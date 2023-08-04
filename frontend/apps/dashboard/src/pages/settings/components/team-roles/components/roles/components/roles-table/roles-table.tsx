@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Role } from '@onefootprint/types';
+import { Role, RoleKind } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
 
@@ -10,19 +10,30 @@ type RolesTableProps = {
   data?: Role[];
   errorMessage?: string;
   isLoading?: boolean;
+  kind: RoleKind;
 };
 
-const RolesTable = ({ data, errorMessage, isLoading }: RolesTableProps) => {
+const RolesTable = ({
+  data,
+  errorMessage,
+  isLoading,
+  kind,
+}: RolesTableProps) => {
   const { t } = useTranslation('pages.settings.roles');
   const filters = useRolesFilters();
   const columns = [
     { id: 'role', text: t('table.header.role'), width: '19%' },
-    { id: 'active-users', text: t('table.header.active-users'), width: '12%' },
-    {
-      id: 'active-api-keys',
-      text: t('table.header.active-api-keys'),
-      width: '12%',
-    },
+    kind === RoleKind.dashboardUser
+      ? {
+          id: 'active-users',
+          text: t('table.header.active-users'),
+          width: '12%',
+        }
+      : {
+          id: 'active-api-keys',
+          text: t('table.header.active-api-keys'),
+          width: '12%',
+        },
     { id: 'permissions', text: t('table.header.permissions'), width: '37%' },
     { id: 'created', text: t('table.header.created'), width: '15%' },
     { id: 'actions', text: '', width: '5%' },

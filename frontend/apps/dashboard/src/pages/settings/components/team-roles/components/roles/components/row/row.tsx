@@ -1,4 +1,4 @@
-import { Role } from '@onefootprint/types';
+import { Role, RoleKind } from '@onefootprint/types';
 import React from 'react';
 
 import Actions from './components/actions';
@@ -21,8 +21,11 @@ const Row = ({ role }: RowProps) => {
   return (
     <>
       <td>{name}</td>
-      <td>{numActiveUsers}</td>
-      <td>{numActiveApiKeys}</td>
+      {role.kind === RoleKind.dashboardUser ? (
+        <td>{numActiveUsers}</td>
+      ) : (
+        <td>{numActiveApiKeys}</td>
+      )}
       <td>
         <Scopes scopes={scopes} />
       </td>

@@ -19,6 +19,7 @@ const Table = () => {
         data={response?.data}
         errorMessage={errorMessage}
         isLoading={isLoading}
+        kind={RoleKind.apiKey}
       />
       {response && response.meta.count > 0 && (
         <Pagination
