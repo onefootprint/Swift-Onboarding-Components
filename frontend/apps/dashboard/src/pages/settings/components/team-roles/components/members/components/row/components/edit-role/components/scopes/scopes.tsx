@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { RoleScope } from '@onefootprint/types';
 import React from 'react';
-import DecryptOptions from 'src/pages/settings/components/team-roles/components/decrypt-options';
-import VaultProxyOptions from 'src/pages/settings/components/team-roles/components/vault-proxy-options';
-import groupScopes from 'src/pages/settings/components/team-roles/utils/group-scopes';
+import DecryptOptions from 'src/components/roles/roles-table/components/row/components/decrypt-options';
+import VaultProxyOptions from 'src/components/roles/roles-table/components/row/components/vault-proxy-options';
+import groupScopes from 'src/components/roles/utils/group-scopes';
 
 export type ScopesListProps = {
   scopes: RoleScope[];

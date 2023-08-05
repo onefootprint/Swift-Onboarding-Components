@@ -3,8 +3,8 @@ import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 import { Box, Button, Divider } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
+import CreateDialog from 'src/components/roles/create-dialog';
 import SectionHeader from 'src/components/section-header';
-import CreateDialog from 'src/pages/settings/components/team-roles/components/roles/components/create/components/create-dialog';
 
 import Table from './components/table';
 

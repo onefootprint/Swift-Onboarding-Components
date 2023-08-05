@@ -100,12 +100,12 @@ export const DecryptOptionToRoleScope: Record<DecryptOption, RoleScope> = {
   },
 };
 
-export type Option = {
+type Option = {
   label: string;
   value: DecryptOption;
 };
 
-export type Group = {
+type Group = {
   options: readonly Option[];
   label?: string;
 };

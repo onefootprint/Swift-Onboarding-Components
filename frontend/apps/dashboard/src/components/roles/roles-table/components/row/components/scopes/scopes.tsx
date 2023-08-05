@@ -3,10 +3,10 @@ import styled, { css } from '@onefootprint/styled';
 import { RoleScope } from '@onefootprint/types';
 import { Tag } from '@onefootprint/ui';
 import React from 'react';
+import groupScopes from 'src/components/roles/utils/group-scopes';
 
-import groupScopes from '../../../../../../utils/group-scopes';
-import DecryptOptions from '../../../../../decrypt-options';
-import VaultProxyOptions from '../../../../../vault-proxy-options';
+import DecryptOptions from '../decrypt-options';
+import VaultProxyOptions from '../vault-proxy-options';
 
 export type ScopesProps = {
   scopes: RoleScope[];

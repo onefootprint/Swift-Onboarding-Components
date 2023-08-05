@@ -1,9 +1,8 @@
 import { RoleKind } from '@onefootprint/types';
 import { Box, Pagination } from '@onefootprint/ui';
 import React from 'react';
-// TODO move imports
-import RolesTable from 'src/pages/settings/components/team-roles/components/roles/components/roles-table';
-import useRoles from 'src/pages/settings/components/team-roles/components/roles/hooks/use-roles';
+import useRoles from 'src/components/roles/hooks/use-roles';
+import RolesTable from 'src/components/roles/roles-table';
 
 const Table = () => {
   const {

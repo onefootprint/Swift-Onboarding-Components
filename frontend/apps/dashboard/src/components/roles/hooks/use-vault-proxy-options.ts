@@ -46,7 +46,7 @@ export const scopeFromVaultProxyOption = (
   };
 };
 
-export type Option = {
+type Option = {
   label: string;
   value: string;
 };

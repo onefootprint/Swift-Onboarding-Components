@@ -4,7 +4,7 @@ import React from 'react';
 import {
   VaultProxyOption,
   VaultProxyOptionKind,
-} from '../../hooks/use-vault-proxy-options';
+} from '../../../../../hooks/use-vault-proxy-options';
 
 export type VaultProxyOptionProps<T extends React.ElementType> = {
   options: VaultProxyOption[];

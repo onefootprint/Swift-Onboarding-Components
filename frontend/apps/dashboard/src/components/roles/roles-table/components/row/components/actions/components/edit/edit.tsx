@@ -2,11 +2,11 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Role, UpdateRoleRequest } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import Form from 'src/components/roles/create-dialog/components/form';
+import { VaultProxySelectOption } from 'src/components/roles/create-dialog/components/form/form.types';
+import { useVaultProxyOptions } from 'src/components/roles/hooks';
+import groupScopes from 'src/components/roles/utils/group-scopes';
 
-import useVaultProxyOptions from '../../../../../../../../hooks/use-vault-proxy-options';
-import groupScopes from '../../../../../../../../utils/group-scopes';
-import Form from '../../../../../create/components/form';
-import { VaultProxySelectOption } from '../../../../../create/components/form/form.types';
 import useEditRole from './hooks/use-edit-role';
 
 export type EditHandler = {

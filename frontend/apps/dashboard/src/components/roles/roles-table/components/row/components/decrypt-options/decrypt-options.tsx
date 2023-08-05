@@ -1,8 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Tooltip } from '@onefootprint/ui';
 import React from 'react';
-
-import { DecryptOption } from '../../hooks/use-decrypt-options';
+import { DecryptOption } from 'src/components/roles';
 
 export type DecryptOptionProps<T extends React.ElementType> = {
   options: DecryptOption[];

@@ -3,8 +3,8 @@ import { Role, RoleKind } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
 
-import useRolesFilters from '../../hooks/use-roles-filters';
-import Row from '../row';
+import useRolesFilters from '../hooks/use-roles-filters';
+import Row from './components/row';
 
 type RolesTableProps = {
   data?: Role[];
