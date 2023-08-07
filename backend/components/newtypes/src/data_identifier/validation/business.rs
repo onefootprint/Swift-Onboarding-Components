@@ -47,7 +47,7 @@ enum CorporationType {
     Agent,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
 pub struct BusinessOwnerData {
     #[allow(unused)]

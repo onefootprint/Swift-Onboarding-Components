@@ -31,6 +31,7 @@ use idv::incode::response::OnboardingStartResponse;
 
 use idv::incode::IncodeResponse;
 use idv::incode::IncodeStartOnboardingRequest;
+use idv::middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse};
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
 use newtypes::{
@@ -242,6 +243,24 @@ pub fn mock_twilio(state: &mut State) {
         .times(1)
         .return_once(move |_| Ok(idv::tests::fixtures::twilio::create_response()));
     state.set_twilio_lookup_v2(Arc::new(mock_twilio_lookup_v2));
+}
+
+pub fn mock_middesk(state: &mut State, business_id: &str) {
+    let business_id = business_id.to_owned();
+    let mut mock_middesk_create_business = MockVendorAPICall::<
+        MiddeskCreateBusinessRequest,
+        MiddeskCreateBusinessResponse,
+        idv::middesk::Error,
+    >::new();
+    mock_middesk_create_business
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| {
+            Ok(idv::tests::fixtures::middesk::create_business_response(
+                &business_id,
+            ))
+        });
+    state.set_middesk_create_business(Arc::new(mock_middesk_create_business));
 }
 
 #[derive(Clone)]

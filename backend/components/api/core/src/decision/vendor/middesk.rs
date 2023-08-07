@@ -6,6 +6,8 @@ use super::vendor_trait::VendorAPIResponse;
 use super::*;
 
 use crate::config::Config;
+use crate::decision::state::actions::WorkflowActions;
+use crate::decision::state::{AsyncVendorCallsCompleted, WorkflowWrapper};
 use crate::enclave_client::EnclaveClient;
 use crate::{decision, State};
 
@@ -37,8 +39,8 @@ use idv::middesk::{
 use idv::{ParsedResponse, VendorResponse};
 
 use newtypes::{
-    BusinessData, MiddeskRequestState, ObConfigurationKey, OnboardingStatus, PiiJsonValue, TenantId,
-    VendorAPI,
+    BusinessData, DecisionIntentKind, MiddeskRequestState, ObConfigurationKey, OnboardingStatus,
+    PiiJsonValue, TenantId, VendorAPI, WorkflowId,
 };
 
 #[derive(Debug)]
@@ -197,7 +199,7 @@ impl MiddeskStates {
 }
 
 impl MiddeskState<PendingCreateBusinessCall> {
-    async fn make_create_business_call(
+    pub async fn make_create_business_call(
         self,
         db_pool: &DbPool,
         config: &Config,
@@ -472,49 +474,73 @@ impl MiddeskState<PendingGetBusinessCall> {
 }
 
 impl MiddeskState<Complete> {
-    pub async fn run_kyb_decisioning(
-        self,
-        db_pool: &DbPool,
-        enclave_client: &EnclaveClient,
-    ) -> ApiResult<()> {
-        let obid = self.middesk_request.onboarding_id.clone();
-        let e_private_key = db_pool
-            .db_query(move |conn| Vault::get(conn, &obid))
-            .await??
-            .e_private_key;
+    pub async fn run_kyb_decisioning(self, state: &State) -> ApiResult<()> {
+        let di_id = self.state.business_response_vreq.decision_intent_id.clone();
 
-        // TODO: make a version of this method for a single vreq/vres
-        let vendor_result = vendor_result::VendorResult::from_verification_results_for_onboarding(
-            vec![(
-                self.state.business_response_vreq,
-                Some(self.state.business_response_vres),
-            )],
-            enclave_client,
-            &e_private_key,
-        )
-        .await?
-        .pop()
-        .ok_or(DbError::ObjectNotFound)?;
+        let wf = state
+            .db_pool
+            .db_query(move |conn| -> DbResult<_> {
+                let di = DecisionIntent::get(conn, &di_id)?;
+                let wf = if let Some(wf_id) = di.workflow_id {
+                    Some(Workflow::get(conn, &wf_id)?)
+                } else {
+                    None
+                };
+                Ok(wf)
+            })
+            .await??;
 
-        let (business_response, vendor_api) = match vendor_result.response.response {
-            ParsedResponse::MiddeskGetBusiness(r) => Ok((r, VendorAPI::MiddeskGetBusiness)),
-            ParsedResponse::MiddeskBusinessUpdateWebhook(r) => r
-                .business_response()
-                .cloned()
-                .ok_or(MiddeskError::ResponseMissingExpectedData("business data".into()))
-                .map(|b| (b, VendorAPI::MiddeskBusinessUpdateWebhook)),
-            _ => Err(MiddeskError::AssertionError("Unexpected VendorResult".into())),
-        }?;
+        // KYB workflows are FF'd so if we don't have a workflow then we fall back to legacy logic here
+        if let Some(wf) = wf {
+            let ww = WorkflowWrapper::init(state, wf).await?;
+            let _ww = ww
+                .run(
+                    state,
+                    WorkflowActions::AsyncVendorCallsCompleted(AsyncVendorCallsCompleted {}),
+                )
+                .await?;
+            Ok(())
+        } else {
+            let obid = self.middesk_request.onboarding_id.clone();
+            let e_private_key = state
+                .db_pool
+                .db_query(move |conn| Vault::get(conn, &obid))
+                .await??
+                .e_private_key;
 
-        decision::biz_risk::make_kyb_decision(
-            db_pool,
-            enclave_client,
-            self.middesk_request.onboarding_id,
-            &business_response,
-            &vendor_result.verification_result_id,
-            vendor_api,
-        )
-        .await
+            // TODO: make a version of this method for a single vreq/vres
+            let vendor_result = vendor_result::VendorResult::from_verification_results_for_onboarding(
+                vec![(
+                    self.state.business_response_vreq,
+                    Some(self.state.business_response_vres),
+                )],
+                &state.enclave_client,
+                &e_private_key,
+            )
+            .await?
+            .pop()
+            .ok_or(DbError::ObjectNotFound)?;
+
+            let (business_response, vendor_api) = match vendor_result.response.response {
+                ParsedResponse::MiddeskGetBusiness(r) => Ok((r, VendorAPI::MiddeskGetBusiness)),
+                ParsedResponse::MiddeskBusinessUpdateWebhook(r) => r
+                    .business_response()
+                    .cloned()
+                    .ok_or(MiddeskError::ResponseMissingExpectedData("business data".into()))
+                    .map(|b| (b, VendorAPI::MiddeskBusinessUpdateWebhook)),
+                _ => Err(MiddeskError::AssertionError("Unexpected VendorResult".into())),
+            }?;
+
+            decision::biz_risk::make_kyb_decision(
+                &state.db_pool,
+                &state.enclave_client,
+                self.middesk_request.onboarding_id,
+                &business_response,
+                &vendor_result.verification_result_id,
+                vendor_api,
+            )
+            .await
+        }
     }
 }
 
@@ -558,7 +584,7 @@ pub async fn run_kyb(
             })
             .await?;
     } else {
-        let middesk_state = init_middesk_request(&state.db_pool, biz_ob_id).await?;
+        let middesk_state = init_middesk_request(&state.db_pool, biz_ob_id, None).await?;
 
         let _middesk_state = middesk_state
             .make_create_business_call(
@@ -578,7 +604,9 @@ pub async fn run_kyb(
 pub async fn init_middesk_request(
     db_pool: &DbPool,
     ob_id: OnboardingId,
+    wf_id: Option<&WorkflowId>,
 ) -> ApiResult<MiddeskState<PendingCreateBusinessCall>> {
+    let wf_id = wf_id.cloned();
     let (middesk_request, create_business_vreq) = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &ob_id)?;
@@ -588,7 +616,17 @@ pub async fn init_middesk_request(
             }
             Onboarding::update(ob, conn, OnboardingUpdate::idv_reqs_initiated())?;
 
-            let decision_intent = DecisionIntent::get_or_create_onboarding_kyb(conn, &sv_id)?;
+            let decision_intent = if let Some(wf_id) = wf_id {
+                DecisionIntent::get_or_create_for_workflow_and_kind(
+                    conn,
+                    &sv_id,
+                    &wf_id,
+                    DecisionIntentKind::OnboardingKyb,
+                )?
+            } else {
+                DecisionIntent::get_or_create_onboarding_kyb(conn, &sv_id)?
+            };
+
             let vreq = VerificationRequest::create(
                 conn,
                 &sv_id,
@@ -614,35 +652,38 @@ pub async fn init_middesk_request(
 }
 
 // Insertion point 2: We are receiving either a `business.updated` or `tin.retried` webhook from Middesk
-pub async fn handle_middesk_webhook(
-    db_pool: &DbPool,
-    middesk_client: VendorClient<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::middesk::Error>,
-    config: &Config,
-    enclave_client: &EnclaveClient,
-    res: serde_json::Value,
-) -> Result<(), ApiError> {
+pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> Result<(), ApiError> {
     let webhook_res = middesk::response::webhook::parse_webhook(res.clone()).map_err(idv::Error::from)?;
     let business_id = webhook_res
         .business_id()
         .ok_or(MiddeskError::ResponseMissingExpectedData("business_id".into()))?;
 
-    let middesk_request = db_pool
+    let middesk_request = state
+        .db_pool
         .db_query(|conn| MiddeskRequest::get_by_business_id(conn, business_id))
         .await??;
-    let state = MiddeskStates::init(db_pool, middesk_request).await?;
+    let mid_state = MiddeskStates::init(&state.db_pool, middesk_request).await?;
 
-    let next_state = match (state, webhook_res) {
+    let next_state = match (mid_state, webhook_res) {
         (
             MiddeskStates::AwaitingBusinessUpdateWebhook(s),
             middesk::response::webhook::MiddeskWebhookResponse::BusinessUpdate(b),
-        ) => s.handle_business_update_webhook_response(db_pool, b, res).await,
+        ) => {
+            s.handle_business_update_webhook_response(&state.db_pool, b, res)
+                .await
+        }
         (
             MiddeskStates::AwaitingTinRetry(s),
             middesk::response::webhook::MiddeskWebhookResponse::TinRetried(t),
         ) => {
-            let state = s.handle_tin_retried_response(db_pool, t, res).await?;
-            state
-                .make_get_business_call(db_pool, &middesk_client, config, enclave_client)
+            let mid_state = s.handle_tin_retried_response(&state.db_pool, t, res).await?;
+            mid_state
+                .make_get_business_call(
+                    &state.db_pool,
+                    &state.vendor_clients.middesk_get_business,
+                    &state.config,
+                    &state.enclave_client,
+                )
                 .await
         }
         (s, r) => Err(MiddeskError::UnexpectedState(format!(
@@ -655,7 +696,7 @@ pub async fn handle_middesk_webhook(
     }?;
 
     match next_state {
-        MiddeskStates::Complete(c) => c.run_kyb_decisioning(db_pool, enclave_client).await,
+        MiddeskStates::Complete(c) => c.run_kyb_decisioning(state).await,
         _ => Ok(()),
     }
 }

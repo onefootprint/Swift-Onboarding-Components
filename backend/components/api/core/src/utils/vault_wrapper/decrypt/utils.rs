@@ -41,6 +41,7 @@ impl<Type> VaultWrapper<Type> {
 }
 
 #[allow(clippy::large_enum_variant)]
+#[derive(Debug)]
 pub enum DecryptedBusinessOwners {
     // Either a Single-KYC or Multi-KYC KYB flow was started and a new Business Vault was created and a BusinessOwner and Person Vault/ScopedVault/Onboarding was created for the Primary BO
     // However, they dropped off before they submitted the BO's information so we have no BO VaultData for either the Primary or potential Secondary BO's

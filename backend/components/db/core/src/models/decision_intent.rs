@@ -46,6 +46,14 @@ impl DecisionIntent {
         Ok(result)
     }
 
+    #[tracing::instrument("DecisionIntent::get", skip_all)]
+    pub fn get(conn: &mut PgConn, id: &DecisionIntentId) -> DbResult<Self> {
+        let result = decision_intent::table
+            .filter(decision_intent::id.eq(id))
+            .get_result(conn)?;
+        Ok(result)
+    }
+
     #[tracing::instrument("DecisionIntent::get_or_create_for_kind_by_workflow_id", skip_all)]
     fn get_or_create_for_kind_by_workflow_id(
         conn: &mut TxnPgConn,

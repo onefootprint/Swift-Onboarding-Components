@@ -11,8 +11,8 @@ use db::{
     DbPool, TxnPgConn,
 };
 use newtypes::{
-    CipKind, CollectedDataOption, DataIdentifier, IdentityDataKind, PiiString, VaultKind,
-    WorkflowFixtureResult,
+    BusinessDataKind, CipKind, CollectedDataOption, DataIdentifier, IdentityDataKind, PiiString,
+    ScopedVaultId, VaultKind, WorkflowFixtureResult,
 };
 
 use crate::{
@@ -86,6 +86,10 @@ pub async fn create_user_and_onboarding(
                 .map(|biz_ob| ScopedVault::get(conn, &biz_ob.scoped_vault_id))
                 .transpose()?;
 
+            if let Some(sbv) = sbv.as_ref() {
+                populate_business_vault(conn, &sbv.id);
+            }
+
             Ok((tenant, ob, uv, su, ob_config, sbv))
         })
         .await
@@ -133,6 +137,7 @@ pub async fn create_kyb_user_and_onboarding(
         CollectedDataOption::PhoneNumber,
         CollectedDataOption::FullAddress,
         CollectedDataOption::BusinessName,
+        CollectedDataOption::BusinessBeneficialOwners,
     ]);
     let (t, ob, v, sv, obc, sbv) = create_user_and_onboarding(
         db_pool,
@@ -144,6 +149,7 @@ pub async fn create_kyb_user_and_onboarding(
         true,
     )
     .await;
+
     (t, ob, v, sv, obc, sbv.unwrap())
 }
 
@@ -199,4 +205,16 @@ pub fn create_user_and_populate_vault(
     ContactInfo::mark_verified(conn, &ci.id).unwrap();
 
     (uv.into_inner(), su)
+}
+
+pub fn populate_business_vault(conn: &mut TxnPgConn, sb_id: &ScopedVaultId) {
+    let update = vec![(
+        BusinessDataKind::BeneficialOwners.into(),
+        PiiString::new(
+            "[{\"first_name\": \"Bob\", \"last_name\": \"Boberto\", \"ownership_stake\": 88}]".to_owned(),
+        ),
+    )];
+
+    let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, sb_id).unwrap();
+    uvw.patch_data_test(conn, update, false).unwrap();
 }

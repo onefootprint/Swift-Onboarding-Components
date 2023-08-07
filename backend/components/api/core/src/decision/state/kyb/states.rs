@@ -11,17 +11,15 @@ use super::{
     KybAwaitingAsyncVendors, KybAwaitingBoKyc, KybComplete, KybDataCollection, KybDecisioning, KybState,
     KybVendorCalls,
 };
-use crate::{decision::state::OnAction, errors::ApiResult, State};
-use crate::{
-    decision::{
-        self,
-        state::{
-            actions::{Authorize, WorkflowActions},
-            common, AsyncVendorCallsCompleted, BoKycCompleted, MakeDecision, MakeVendorCalls, WorkflowState,
-        },
+use crate::decision::utils::FixtureDecision;
+use crate::decision::{
+    self,
+    state::{
+        actions::{Authorize, WorkflowActions},
+        common, AsyncVendorCallsCompleted, BoKycCompleted, MakeDecision, MakeVendorCalls, WorkflowState,
     },
-    errors::AssertionError,
 };
+use crate::{decision::state::OnAction, errors::ApiResult, State};
 
 /////////////////////
 /// DataCollection
@@ -152,7 +150,7 @@ impl KybVendorCalls {
 
 #[async_trait]
 impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
-    type AsyncRes = Arc<dyn FeatureFlagClient>;
+    type AsyncRes = Option<FixtureDecision>;
 
     #[tracing::instrument(
         "KybVendorCalls#OnAction<MakeVendorCalls, KybState>::execute_async_idempotent_actions",
@@ -163,14 +161,47 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
         _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        // TODO: kick off Middesk state machine here
-        Ok(state.feature_flag_client.clone())
+        let wf_id = self.wf_id.clone();
+        let (wf, v) = state
+            .db_pool
+            .db_query(move |conn| DbWorkflow::get_with_vault(conn, &wf_id))
+            .await??;
+        let fixture_decision = decision::utils::get_fixture_data_decision(
+            state.feature_flag_client.clone(),
+            &v,
+            &wf,
+            &self.t_id,
+        )?;
+        if fixture_decision.is_none() {
+            // TODO: later will refactor so we instead construct the BusinessData from the vault here, then make the CreateBusiness request to middesk
+            // and then in the on_commit txn save the vreq + vres + MiddeskRequest with the business_id from the response all at once.
+
+            // TODO: make this get_or_create
+            let middesk_state = decision::vendor::middesk::init_middesk_request(
+                &state.db_pool,
+                self.ob_id.clone(),
+                Some(&self.wf_id),
+            )
+            .await?;
+
+            // TODO: match on MiddeskStates and only call this if AwaitingBusinessUpdateWebhook
+            let _middesk_state = middesk_state
+                .make_create_business_call(
+                    &state.db_pool,
+                    &state.config,
+                    &state.enclave_client,
+                    state.feature_flag_client.clone(),
+                    state.vendor_clients.middesk_create_business.clone(),
+                    &self.t_id,
+                )
+                .await?;
+        }
+
+        Ok(fixture_decision)
     }
 
     #[tracing::instrument("KybVendorCalls#OnAction<MakeVendorCalls, KybState>::on_commit", skip_all)]
-    fn on_commit(self, ff_client: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
-        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
-        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
+    fn on_commit(self, fixture_decision: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
         if let Some(fixture_decision) = fixture_decision {
             decision::utils::write_kyb_fixture_vendor_result_and_risk_signals(
                 conn,
@@ -183,8 +214,11 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
                 ob_id: self.ob_id,
             }))
         } else {
-            // TODO: set idv_reqs_initiated_at here i guess?
-            Err(AssertionError("Non fixture workflow KYB not supported yet"))?
+            Ok(KybState::from(KybAwaitingAsyncVendors {
+                wf_id: self.wf_id,
+                t_id: self.t_id,
+                ob_id: self.ob_id,
+            }))
         }
     }
 }
@@ -296,7 +330,6 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         } else {
             // TODO: get fixture decision or real decision from executing rules
             // TODO: figure out how to slot KYB into the KycRuleGroup type of dealios
-            Err(AssertionError("Non fixture workflow KYB not supported yet"))?
         }
 
         Ok(KybState::from(KybComplete {}))

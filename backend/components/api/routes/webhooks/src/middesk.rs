@@ -14,14 +14,7 @@ async fn handle_webhook(
     webhook_signature: MiddeskWebhookSignature,
     state: web::Data<State>,
 ) -> JsonApiResponse<EmptyResponse> {
-    decision::vendor::middesk::handle_middesk_webhook(
-        &state.db_pool,
-        state.vendor_clients.middesk_get_business.clone(),
-        &state.config,
-        &state.enclave_client,
-        webhook_signature.request,
-    )
-    .await?;
+    decision::vendor::middesk::handle_middesk_webhook(&state, webhook_signature.request).await?;
     // temporary until we migrate to a KYB workflow
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
     EmptyResponse::ok().json()
