@@ -11,9 +11,9 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		266D9DE6D25B4ACC8256D376 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7750023BF8034F509BFF18E7 /* LaunchScreen.storyboard */; };
+		266D9DE6D25B4ACC8256D376 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7750023BF8034F509BFF18E7 /* SplashScreen.storyboard */; };
 		27CCBF5E8F304ED1BA117BF6 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = B7493E88A62E45E5B4677E8E /* AppDelegate.mm */; };
-		3E461D99554A48A4959DE609 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* LaunchScreen.storyboard */; };
+		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		466FB29480ED45F29313B597 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D70DCF0218B413A89B9CE9C /* main.m */; };
 		5666E5B62A437AD8005BA1BD /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */; };
 		5B02D5BA96E4428ABC097AB8 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */; };
@@ -71,12 +71,12 @@
 		6D70DCF0218B413A89B9CE9C /* main.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "my/noop-file.swift"; sourceTree = "<group>"; };
 		76B1E9930B874D399C0F6E7A /* myClip.entitlements */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; path = myClip.entitlements; sourceTree = "<group>"; };
-		7750023BF8034F509BFF18E7 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		7750023BF8034F509BFF18E7 /* SplashScreen.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; path = SplashScreen.storyboard; sourceTree = "<group>"; };
 		7A4D352CD337FB3A3BF06240 /* Pods-my.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-my.release.xcconfig"; path = "Target Support Files/Pods-my/Pods-my.release.xcconfig"; sourceTree = "<group>"; };
 		87F4B5E7EE654F87A3F34AEF /* Images.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		8F3F1A47D53746429E58E364 /* Expo.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = Expo.plist; path = Supporting/Expo.plist; sourceTree = "<group>"; };
 		A2DE93B6EA9C671527A91A5D /* Pods-myClip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-myClip.debug.xcconfig"; path = "Target Support Files/Pods-myClip/Pods-myClip.debug.xcconfig"; sourceTree = "<group>"; };
-		AA286B85B6C04FC6940260E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = my/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = my/SplashScreen.storyboard; sourceTree = "<group>"; };
 		B7493E88A62E45E5B4677E8E /* AppDelegate.mm */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; path = AppDelegate.mm; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		D98E42AC46CF9C5970BF38C1 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-myClip/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
@@ -116,7 +116,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				AA286B85B6C04FC6940260E9 /* LaunchScreen.storyboard */,
+				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */,
 			);
 			name = my;
@@ -191,7 +191,7 @@
 				6D70DCF0218B413A89B9CE9C /* main.m */,
 				41B99DF686D046AF9888DA0B /* Info.plist */,
 				87F4B5E7EE654F87A3F34AEF /* Images.xcassets */,
-				7750023BF8034F509BFF18E7 /* LaunchScreen.storyboard */,
+				7750023BF8034F509BFF18E7 /* SplashScreen.storyboard */,
 				76B1E9930B874D399C0F6E7A /* myClip.entitlements */,
 				8F3F1A47D53746429E58E364 /* Expo.plist */,
 			);
@@ -350,7 +350,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				91B1B46AC6184BA0B75A5C48 /* Images.xcassets in Resources */,
-				266D9DE6D25B4ACC8256D376 /* LaunchScreen.storyboard in Resources */,
+				266D9DE6D25B4ACC8256D376 /* SplashScreen.storyboard in Resources */,
 				5EC2A3E9A3B0479AB1760D27 /* Expo.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -361,7 +361,7 @@
 			files = (
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				3E461D99554A48A4959DE609 /* LaunchScreen.storyboard in Resources */,
+				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,6 +475,25 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n export ENTRY_FILE=\"$PROJECT_ROOT\"/index.appclip.js\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh index.appclip.js'\"`\n\n";
 		};
+		C920B60B25ED43509541D329 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-my/expo-configure-project.sh\"\n";
+		};
 		C723CA5312303BDFE78F75A5 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -517,6 +536,25 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-myClip/Pods-myClip-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		D3CDF8F1CF579B680E5089BF /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-myClip/expo-configure-project.sh\"\n";
 		};
 		DABF40818886C3C36C69A7BC /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
