@@ -53,7 +53,7 @@ export const verifyPhoneNumber = async ({
   frame: FrameLocator;
   page: Page;
 }) => {
-  await expect(frame.getByText('Verify your phone number')).toBeAttached();
+  await expect(frame.getByText('Verify your phone number')).toBeVisible();
 
   await page.waitForTimeout(3000); // 3 seconds, receiving the SMS
 
@@ -65,7 +65,7 @@ export const verifyPhoneNumber = async ({
   await page.keyboard.press('0');
   await page.keyboard.press('0');
 
-  await expect(frame.getByText('Success!')).toBeAttached();
+  await expect(frame.getByText('Success!')).toBeVisible();
 };
 
 export const fillBasicData = async (
@@ -76,7 +76,7 @@ export const fillBasicData = async (
   },
   payload: { firstName: string; lastName: string; dob: string },
 ) => {
-  await expect(frame.getByText('Basic data').first()).toBeAttached();
+  await expect(frame.getByText('Basic data').first()).toBeVisible();
   await frame.getByLabel('First name').type(payload.firstName, { delay: 100 });
   await frame.getByLabel('Last name').type(payload.lastName, { delay: 100 });
   await frame.getByLabel('Date of Birth').type(payload.dob, { delay: 100 });
@@ -94,7 +94,7 @@ export const fillAddress = async (
 ) => {
   await expect(
     frame.getByText("What's your residential address?"),
-  ).toBeAttached();
+  ).toBeVisible();
 
   await frame
     .getByLabel('Address line 1')
@@ -116,7 +116,7 @@ export const fillSSN = async (
 ) => {
   await expect(
     frame.getByText("What's your Social Security Number?").first(),
-  ).toBeAttached();
+  ).toBeVisible();
   await frame.getByLabel('SSN').type(payload.ssn, { delay: 100 });
   await clickOnContinue({ frame });
 };
@@ -138,7 +138,7 @@ export const confirmData = async (
 ) => {
   await expect(
     frame.getByText('Confirm your personal data').first(),
-  ).toBeAttached();
+  ).toBeInViewport();
   await expect(frame.getByText(payload.firstName)).toBeAttached();
   await expect(frame.getByText(payload.lastName)).toBeAttached();
   await expect(frame.getByText(payload.dob)).toBeAttached();
@@ -159,7 +159,7 @@ export const doLivenessCheck = async (
   },
   { flowId }: { flowId: string },
 ) => {
-  await expect(frame.getByText('Liveness check')).toBeAttached();
+  await expect(frame.getByText('Liveness check')).toBeInViewport();
   await page.waitForTimeout(2000);
   await frame
     .locator('form svg')
@@ -168,15 +168,15 @@ export const doLivenessCheck = async (
 
   const screenshotPath = path.join(__dirname, `../media/qr-${flowId}.png`);
   const qrCodeUrl = await readQrCode(screenshotPath);
-  const popup = await browser.newPage();
+  const context = await browser.newContext();
+  const popup = await context.newPage();
   await popup.goto(qrCodeUrl);
-  await popup.waitForLoadState();
   await expect(
     popup.getByText('Please continue on your computer.'),
-  ).toBeAttached();
+  ).toBeVisible({ timeout: 20000 });
 };
 
 export const authorizeAccess = async ({ frame }: { frame: FrameLocator }) => {
-  await expect(frame.getByText('Authorize access')).toBeAttached();
+  await expect(frame.getByText('Authorize access')).toBeVisible();
   await frame.getByRole('button', { name: /Authorize/i }).click();
 };

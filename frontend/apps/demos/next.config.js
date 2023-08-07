@@ -2,7 +2,7 @@
 
 const IS_DEV = process.env.NODE_ENV === 'development';
 
-const ContentSecurityPolicy = `
+const DevContentSecurityPolicy = `
   child-src onefootprint.com;
   connect-src 'self' *.onefootprint.com http://localhost:8000 vitals.vercel-insights.com *.usefathom.com *.ingest.sentry.io *.pusher.com wss://*.pusher.com vercel.live unpkg.com; 
   default-src 'self' vitals.vercel-insights.com;
@@ -16,6 +16,25 @@ const ContentSecurityPolicy = `
   style-src 'self' 'unsafe-inline' fonts.googleapis.com;
   worker-src 'self' blob:;
 `;
+
+const ProdContentSecurityPolicy = `
+  child-src onefootprint.com;
+  connect-src 'self' *.onefootprint.com vitals.vercel-insights.com *.usefathom.com *.ingest.sentry.io *.pusher.com wss://*.pusher.com vercel.live unpkg.com; 
+  default-src 'self' vitals.vercel-insights.com;
+  font-src 'self' fonts.googleapis.com fonts.gstatic.com;
+  form-action 'self';
+  frame-ancestors 'self';
+  frame-src 'self' *.onefootprint.com vercel.live;
+  img-src 'self' data: assets.vercel.com vercel.live footprint-blog.ghost.io vercel.com;
+  media-src 'self' https;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usefathom.com vercel.live vitals.vercel-insights.com;
+  style-src 'self' 'unsafe-inline' fonts.googleapis.com;
+  worker-src 'self' blob:;
+`;
+
+const ContentSecurityPolicy = IS_DEV
+  ? DevContentSecurityPolicy
+  : ProdContentSecurityPolicy;
 
 const securityHeaders = [
   {

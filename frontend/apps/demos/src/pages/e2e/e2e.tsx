@@ -12,11 +12,8 @@ const handleOpen = () => {
   const component = footprint.init({
     kind: FootprintComponentKind.Verify,
     publicKey,
-    onComplete: (validationToken: string) => {
-      const el = document.querySelector('[data-testid="result"]');
-      if (el) {
-        el.innerHTML = validationToken;
-      }
+    options: {
+      showCompletionPage: true,
     },
   });
 
@@ -31,7 +28,6 @@ const Demo = () => (
     </Head>
     <Container>
       <FootprintVerifyButton onClick={handleOpen} />
-      <div data-testid="result" />
     </Container>
   </>
 );

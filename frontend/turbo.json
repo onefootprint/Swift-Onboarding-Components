@@ -12,39 +12,38 @@
         "public/dist/**"
       ],
       "env": [
+        "E2E_BASE_URL",
         "API_BASE_URL",
         "BIFROST_URL",
-        "COMPONENTS_URL",
-        "E2E_BASE_URL",
-        "FORCE_FOOTPRINT_COMPONENTS_JS_TO_USE_LOCAL",
         "FORCE_FOOTPRINT_JS_TO_USE_LOCAL",
+        "COMPONENTS_URL",
+        "FORCE_FOOTPRINT_COMPONENTS_JS_TO_USE_LOCAL",
         "GHOST_API_URL",
         "GHOST_CONTENT_API_KEY",
-        "IS_E2E",
+        "NEXT_PUBLIC_ARYEO_AUTH_TOKEN",
         "IS_LOCAL",
         "IS_VERCEL_ENV_DEV",
         "IS_VERCEL_ENV_PREV",
         "NEXT_PUBLIC_API_BASE_URL",
-        "NEXT_PUBLIC_APP_CLIP_ENABLED",
-        "NEXT_PUBLIC_ARYEO_AUTH_TOKEN",
-        "NEXT_PUBLIC_E2E_TENANT_PK",
         "NEXT_PUBLIC_FATHOM_TRACKING_CODE",
-        "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY",
         "NEXT_PUBLIC_GOOGLE_MAPS_KEY",
-        "NEXT_PUBLIC_KYB_TENANT_KEY",
-        "NEXT_PUBLIC_KYC_ID_DOC_TENANT_KEY",
-        "NEXT_PUBLIC_KYC_TENANT_KEY",
         "NEXT_PUBLIC_LOCAL_HANDOFF_BASE_URL",
         "NEXT_PUBLIC_SENTRY_DSN",
         "NEXT_PUBLIC_SOCURE_PUBLIC_KEY",
-        "NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN",
         "NEXT_PUBLIC_TENANT_KEY",
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF",
         "NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA",
         "NEXT_PUBLIC_VERCEL_URL",
         "NODE_ENV",
-        "REVALIDATE_SECRET_TOKEN"
+        "REVALIDATE_SECRET_TOKEN",
+        "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY",
+        "NEXT_PUBLIC_APP_CLIP_ENABLED",
+        "NEXT_PUBLIC_KYC_TENANT_KEY",
+        "NEXT_PUBLIC_KYB_TENANT_KEY",
+        "NEXT_PUBLIC_KYC_ID_DOC_TENANT_KEY",
+        "NEXT_PUBLIC_E2E_TENANT_PK",
+        "NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN"
       ]
     },
     "test": {
@@ -57,10 +56,10 @@
         "^build"
       ]
     },
-    "test:e2e:ci": {
-      "cache": false
+    "start": {
+      "dependsOn": [],
+      "outputs": []
     },
-    "start": {},
     "lint": {
       "dependsOn": [
         "^build"
@@ -74,7 +73,8 @@
     "typecheck": {
       "dependsOn": [
         "^build"
-      ]
+      ],
+      "outputs": []
     },
     "build:storybook": {
       "dependsOn": [
@@ -84,8 +84,14 @@
         "storybook-static/**"
       ]
     },
-    "format": {},
+    "format": {
+      "outputs": []
+    },
     "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:mobile": {
       "cache": false,
       "persistent": true
     },
