@@ -82,7 +82,16 @@
         },
         "number": "Passport number",
         "expiration": "Passport expiration",
-        "dob": "Passport DOB"
+        "dob": "Passport DOB",
+        "issuing_state": "Passport issuing state",
+        "issuing_country": "Passport issuing country",
+        "expires_at": "Passport expires at",
+        "issued_at": "Passport issued at",
+        "full_address": "Passport full address",
+        "gender": "Passport gender",
+        "full_name": "Passport full name",
+        "document_number": "Passport document number",
+        "ref_number": "Passport reference number"
       },
       "id_card": {
         "front": {
@@ -101,7 +110,17 @@
           "mime_type": "Selfie MIME type"
         },
         "number": "ID card number",
-        "expiration": "ID card expiration"
+        "expiration": "ID card expiration",
+        "dob": "ID card DOB",
+        "issuing_state": "ID card issuing state",
+        "issuing_country": "ID card issuing country",
+        "expires_at": "ID card expires at",
+        "issued_at": "ID card issued at",
+        "full_address": "ID card full address",
+        "gender": "ID card gender",
+        "full_name": "ID card full name",
+        "document_number": "ID card document number",
+        "ref_number": "ID card reference number"
       },
       "drivers_license": {
         "front": {
@@ -122,7 +141,15 @@
         "number": "Driver's license number",
         "expiration": "Driver's license expiration",
         "dob": "Driver's license DOB",
-        "issuing_state": "Driver's license issuing state"
+        "issuing_state": "Driver's license issuing state",
+        "issuing_country": "Driver's license issuing country",
+        "expires_at": "Driver's license expires at",
+        "issued_at": "Driver's license issued at",
+        "full_address": "Driver's license full address",
+        "gender": "Driver's license gender",
+        "full_name": "Driver's license full name",
+        "document_number": "Driver's license document number",
+        "ref_number": "Driver's license reference number"
       }
     },
     "business": {
