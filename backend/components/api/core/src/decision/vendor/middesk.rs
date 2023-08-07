@@ -721,7 +721,9 @@ async fn send_middesk_call(
     ob_configuration_key: ObConfigurationKey,
     tenant_id: &TenantId,
 ) -> ApiResult<MiddeskCreateBusinessResponse> {
-    if ff_client.flag(BoolFlag::EnableMiddeskInNonProd(&ob_configuration_key)) {
+    if config.service_config.is_production()
+        || ff_client.flag(BoolFlag::EnableMiddeskInNonProd(&ob_configuration_key))
+    {
         let tvc = TenantVendorControl::new(tenant_id.clone(), db_pool, config, enclave_client).await?;
         middesk_client
             .make_request(MiddeskCreateBusinessRequest {
