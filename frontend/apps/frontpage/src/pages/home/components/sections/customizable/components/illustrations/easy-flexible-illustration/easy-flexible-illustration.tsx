@@ -12,13 +12,16 @@ type EasyFlexibleIllustrationProps = {
 const EasyFlexibleIllustration = ({
   isHover,
 }: EasyFlexibleIllustrationProps) => {
-  const animationControls = useAnimationControls();
+  const gridAnimationControls = useAnimationControls();
+  const imageAnimationControls = useAnimationControls();
 
   useEffect(() => {
     if (isHover) {
-      animationControls.start(electicVariants.visible);
+      gridAnimationControls.start(electicVariants.visible);
+      imageAnimationControls.start(centerImageVariants.raised);
     } else {
-      animationControls.start(electicVariants.initial);
+      gridAnimationControls.start(electicVariants.initial);
+      imageAnimationControls.start(centerImageVariants.initial);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHover]);
@@ -44,9 +47,25 @@ const EasyFlexibleIllustration = ({
     },
   };
 
+  const centerImageVariants = {
+    initial: {
+      boxShadow: '0px 0px 0px 0px rgba(0, 0, 0, 0)',
+    },
+    raised: {
+      boxShadow: '0px 1px 12px 0px rgba(0, 0, 0, 0.12)',
+      transition: {
+        duration: 0.2,
+      },
+    },
+  };
+
   return (
     <StyledBaseIllustration>
-      <CenterImage isHover={isHover}>
+      <CenterImage
+        variants={centerImageVariants}
+        initial="initial"
+        animate={imageAnimationControls}
+      >
         <Image
           src="/home/customizable/easy-flexible/code-snippet.png"
           alt="decorative"
@@ -69,7 +88,7 @@ const EasyFlexibleIllustration = ({
           <motion.path
             d="M620 24.5L0 24.5001M620 48.5L0 48.5001M620 72.5L0 72.5001M620 96.5L0 96.5001M620 120.5L0 120.5M620 144.5L0 144.5M620 168.5L0 168.5M620 192.5L0 192.5M620 216.5L0 216.5M620 240.5L0 240.5M620 264.5L0 264.5M620 288.5L0 288.5M620 312.5L0 312.5M620 336.5L0 336.5M24.5 0L24.5 350M48.5 0L48.5 350M72.5 0L72.5 350M96.5 0L96.5 350M120.5 0L120.5 350M144.5 0L144.5 350M168.5 0L168.5 350M192.5 0L192.5 350M216.5 0L216.5 350M240.5 0L240.5 350M264.5 0L264.5 350M288.5 0V350M312.5 0V350M336.5 0V350M360.5 0V350M384.5 0V350M408.5 0V350M432.5 0V350M456.5 0V350M480.5 0V350M504.5 0V350M528.5 0V350M552.5 0L552.5 350M576.5 0L576.5 350M600.5 0L600.5 350"
             stroke="url(#gradient)"
-            animate={animationControls}
+            animate={gridAnimationControls}
           />
           <defs>
             <radialGradient id="gradient" gradientUnits="userSpaceOnUse">
@@ -87,16 +106,15 @@ const BackgroundGrid = styled.span`
   opacity: 0.5;
 `;
 
-const CenterImage = styled.div<{ isHover?: boolean }>`
-  ${({ theme, isHover }) => css`
+const CenterImage = styled(motion.div)`
+  ${({ theme }) => css`
     position: absolute;
     top: 24px;
     left: 24px;
     z-index: 2;
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
-    box-shadow: ${isHover ? theme.elevation[2] : theme.elevation[0]};
-    transition: box-shadow 0.3s ease-in-out;
+    transition: box-shadow 0.3s ease-in;
     height: 380px;
     width: 440px;
 

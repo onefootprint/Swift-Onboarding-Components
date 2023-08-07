@@ -42,9 +42,9 @@ const KycIllustration = () => {
       opacity: 1,
       y: -20,
       transition: {
-        duration: 1.6,
+        duration: 0.5,
         ease: 'easeOut',
-        delay: 0.8,
+        delay: 0.5,
       },
     },
   };
