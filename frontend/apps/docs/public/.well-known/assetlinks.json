@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.footprint.my",
+      "sha256_cert_fingerprints": [
+        "C9:2D:DF:DB:65:AF:C4:20:9D:ED:85:0F:34:14:28:9D:3F:75:37:1C:3B:3F:04:FF:D6:2F:30:94:10:85:CB:E3"
+      ]
+    }
+  }
+]
