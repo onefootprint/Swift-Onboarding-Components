@@ -1195,7 +1195,7 @@
         }
       },
       "tabs": {
-        "api-keys": "Secret API Keys",
+        "api-keys": "API Keys",
         "onboarding-configs": "Onboarding configurations",
         "webhooks": "Webhooks",
         "proxy-configs": "Vault proxy configurations"
@@ -1256,7 +1256,7 @@
           },
           "header": {
             "name": "Name",
-            "token": "Token",
+            "secret-key": "Secret key",
             "last-used": "Last used",
             "created": "Created",
             "status": "Status",

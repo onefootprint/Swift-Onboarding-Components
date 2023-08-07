@@ -14,7 +14,7 @@ const ApiKeysTable = () => {
   const { t } = useTranslation('pages.developers.api-keys');
   const columns = [
     { text: t('table.header.name'), width: '15%' },
-    { text: t('table.header.token'), width: '25%' },
+    { text: t('table.header.secret-key'), width: '25%' },
     { text: t('table.header.last-used'), width: '15%' },
     { text: t('table.header.created'), width: '15%' },
     { text: t('table.header.status'), width: '12.5%' },

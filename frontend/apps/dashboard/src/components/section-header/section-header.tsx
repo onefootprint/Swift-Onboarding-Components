@@ -11,10 +11,12 @@ export type SectionHeaderProps = {
 const SectionHeader = ({ children, subtitle, title }: SectionHeaderProps) => (
   <Header>
     <Box>
-      <Typography variant="label-1" as="h3" sx={{ marginBottom: 2 }}>
+      <Typography variant="label-1" as="h3" sx={{ marginBottom: 1 }}>
         {title}
       </Typography>
-      <Typography variant="body-3">{subtitle}</Typography>
+      <Typography variant="body-3" color="secondary">
+        {subtitle}
+      </Typography>
     </Box>
     {children}
   </Header>
