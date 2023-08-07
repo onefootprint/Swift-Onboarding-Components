@@ -57,6 +57,20 @@ pub fn get_fixture_data_decision(
     }
 }
 
+pub fn execute_rules_for_document_only(vault: &Vault, workflow: &Workflow) -> ApiResult<bool> {
+    if !vault.is_live {
+        let fixture_result = workflow
+            .fixture_result
+            // Ensure that each sandbox vault has a fixture result - we don't want to make real
+            // requests for sandbox vaults
+            .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
+        Ok(matches!(fixture_result, WorkflowFixtureResult::DocumentDecision))
+    } else {
+        // TODO based on OBC
+        Ok(false)
+    }
+}
+
 type ShouldInitiateRealDocumentRequests = bool;
 
 /// Determines whether production identity document requests should be made, and if not, what the outcome should be
@@ -124,6 +138,9 @@ pub fn decision_status(fixture_result: WorkflowFixtureResult) -> FixtureDecision
         WorkflowFixtureResult::Fail => (DecisionStatus::Fail, false),
         WorkflowFixtureResult::ManualReview => (DecisionStatus::Fail, true),
         WorkflowFixtureResult::StepUp => (DecisionStatus::StepUp, false),
+        // This isn't quite right, and will be ignored. We are running real rules on a real sandbox document vendor call
+        // but this fn is used in a lot of places and we should have it return something
+        WorkflowFixtureResult::DocumentDecision => (DecisionStatus::Pass, false),
     }
 }
 

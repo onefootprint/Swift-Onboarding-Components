@@ -311,7 +311,13 @@ pub fn calculate_decision(
         kyc: create_risk_signals_from_vendor_results(vendor_result_maps)?,
         ..Default::default()
     };
-    let decision = rule_group.evaluate(risk_signals, KycRuleExecutionConfig { include_doc: false })?;
+    let decision = rule_group.evaluate(
+        risk_signals,
+        KycRuleExecutionConfig {
+            include_doc: false,
+            document_only: false,
+        },
+    )?;
 
     decision.final_kyc_decision()
 }

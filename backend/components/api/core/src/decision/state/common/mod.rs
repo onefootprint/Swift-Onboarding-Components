@@ -6,6 +6,7 @@ use db::{
         document_request::DocumentRequest,
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
+        vault::Vault,
         workflow::Workflow,
     },
     DbError, DbPool, DbResult, TxnPgConn,
@@ -24,7 +25,7 @@ use crate::{
             rules::KycRuleExecutionConfig, Decision, DecisionResult, OnboardingRulesDecision,
             OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
         },
-        utils::FixtureDecision,
+        utils::{execute_rules_for_document_only, FixtureDecision},
         vendor::{
             tenant_vendor_control::TenantVendorControl,
             vendor_api::{
@@ -216,7 +217,6 @@ pub fn get_vres_id_for_fixture(vendor_results: &[VendorResult]) -> ApiResult<Ver
     Ok(idology.or(experian).ok_or(decision::Error::FixtureVresNotFound)?)
 }
 
-#[tracing::instrument(skip_all)]
 pub fn kyc_decision_from_fixture(
     fixture_decision: FixtureDecision,
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
@@ -270,10 +270,15 @@ pub fn get_decision(
     rule_group: &impl HasRuleGroup,
     conn: &mut TxnPgConn,
     risk_signals: RiskSignalsForDecision,
-    wf_id: &WorkflowId,
+    wf: &Workflow,
+    vault: &Vault,
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
-    let include_doc = DocumentRequest::get(conn, wf_id)?.is_some();
-    let config = KycRuleExecutionConfig { include_doc };
+    let include_doc = DocumentRequest::get(conn, &wf.id)?.is_some();
+    let document_only = execute_rules_for_document_only(vault, wf)?;
+    let config = KycRuleExecutionConfig {
+        include_doc,
+        document_only,
+    };
     let rules_output = rule_group.rule_group().evaluate(risk_signals, config)?;
     Ok(rules_output)
 }

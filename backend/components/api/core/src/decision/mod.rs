@@ -45,8 +45,10 @@ pub enum TenantVendorControlError {
 
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
 pub enum RuleError {
-    #[error("Missing input for rules")]
-    MissingInputForRules,
+    #[error("Missing input for KYC rules")]
+    MissingInputForKYCRules,
+    #[error("Missing input for Doc rules")]
+    MissingInputForDocRules,
     #[error("AssertionError {0}")]
     AssertionError(String),
 }

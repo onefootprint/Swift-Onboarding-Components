@@ -20,15 +20,16 @@ use feature_flag::BoolFlag;
 use feature_flag::MockFeatureFlagClient;
 use itertools::Itertools;
 use macros::test_state_case;
-use newtypes::OnboardingStatus;
 use newtypes::{
     DbActor, DecisionStatus, DocumentConfig, FootprintReasonCode, RiskSignalGroupKind, TenantId, VendorAPI,
 };
 use newtypes::{KycState, WorkflowState};
+use newtypes::{OnboardingStatus, WorkflowFixtureResult};
 use std::sync::Arc;
 
 #[test_state_case(UserKind::Live, Failure)]
 #[test_state_case(UserKind::Live, DocUploadFailed)]
+#[test_state_case(UserKind::Sandbox(newtypes::WorkflowFixtureResult::DocumentDecision), Failure)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: DocumentOutcome) {
     // DATA SETUP
@@ -50,11 +51,16 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
+    let mut expect_committed = true;
+
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
         UserKind::Demo | UserKind::Sandbox(_) => {
-            // TODO: sandbox won't work yet
+            // TODO: sandbox tests
             // https://linear.app/footprint/issue/FP-5157/sandbox-fixtures
+            mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+            // we don't even look at KYC results for this
+            expect_committed = false;
         }
         // Mock vendor calls for Live users
         UserKind::Live => {
@@ -132,7 +138,12 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
-    assert!(obd.seqno.is_some());
+    if expect_committed {
+        assert!(obd.seqno.is_some());
+    } else {
+        assert!(obd.seqno.is_none());
+    }
+
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(ob.decision_made_at.is_some());
@@ -143,7 +154,19 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     }
 
     match user_kind {
-        UserKind::Demo | UserKind::Sandbox(_) => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {
+            // redo document
+            redo_document_and_pass(
+                state,
+                user_kind,
+                &ob,
+                &obd,
+                &tenant.id,
+                risk_signals_for_doc,
+                wf.fixture_result,
+            )
+            .await
+        }
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
@@ -166,7 +189,16 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
             );
 
             // redo document
-            redo_document_and_pass(state, user_kind, &ob, &obd, &tenant.id, risk_signals_for_doc).await
+            redo_document_and_pass(
+                state,
+                user_kind,
+                &ob,
+                &obd,
+                &tenant.id,
+                risk_signals_for_doc,
+                None,
+            )
+            .await
         }
     }
 }
@@ -179,12 +211,15 @@ async fn redo_document_and_pass(
     prior_obd: &OnboardingDecision,
     tenant_id: &TenantId,
     previous_risk_signals: Vec<RiskSignal>,
+    fixture_result: Option<WorkflowFixtureResult>,
 ) {
     // Trigger Redo workflow
     let sv_id = prior_ob.scoped_vault_id.clone();
     let wf = state
         .db_pool
-        .db_query(move |conn| Workflow::create(conn, &sv_id, DocumentConfig {}.into(), None).unwrap())
+        .db_query(move |conn| {
+            Workflow::create(conn, &sv_id, DocumentConfig {}.into(), fixture_result).unwrap()
+        })
         .await
         .unwrap();
 
@@ -203,9 +238,14 @@ async fn redo_document_and_pass(
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
+    let mut expect_committed = true;
+
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox(_) => {}
+        UserKind::Demo | UserKind::Sandbox(_) => {
+            mock_incode_doc_collection(state, svid, Success, wfid.clone(), true).await;
+            expect_committed = false;
+        }
         // Mock vendor calls for Live users
         UserKind::Live => {
             // we aren't re-running KYC, just doc
@@ -237,8 +277,11 @@ async fn redo_document_and_pass(
     let obd = obd.unwrap();
     assert!(obd.id != prior_obd.id);
     assert!(obd.status == DecisionStatus::Pass);
-    // TODO: this logic will change, see https://linear.app/footprint/issue/FP-5195/fix-committing-data
-    assert!(obd.seqno.is_some());
+    if expect_committed {
+        assert!(obd.seqno.is_some())
+    } else {
+        assert!(obd.seqno.is_none())
+    };
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Pass, ob.status);
     // redo flow hasn't modified timestamps on ob
@@ -255,20 +298,40 @@ async fn redo_document_and_pass(
     rs_passing_doc
         .into_iter()
         .for_each(|r| assert!(!previous_rs_ids.contains(&r.id) && !r.hidden));
-
-    assert_have_same_elements(
-        vec![
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
-            (
-                VendorAPI::IncodeFetchScores,
-                FootprintReasonCode::DocumentVerified,
-            ),
-        ],
-        rs.into_iter()
-            .map(|rs| (rs.vendor_api, rs.reason_code))
-            .collect_vec(),
-    );
+    match user_kind {
+        UserKind::Sandbox(WorkflowFixtureResult::DocumentDecision) => {
+            // In this case, we run real rules to get a decision.
+            // We decide which vendor_apis to unhide when running rules/handling KYC fixtures
+            // however, as it's implemented now, real sandbox document decisions consider KYC rules to be `NotRequired` and thus,
+            // we do not unhide, hence the difference in risk signals between these branches. I think this is fine since the purpose of doing sandbox real document
+            // is just to see the doc outcome, not to get synthetic KYC risk signals
+            assert_have_same_elements(
+                vec![(
+                    VendorAPI::IncodeFetchScores,
+                    FootprintReasonCode::DocumentVerified,
+                )],
+                rs.into_iter()
+                    .map(|rs| (rs.vendor_api, rs.reason_code))
+                    .collect_vec(),
+            );
+        }
+        UserKind::Live => {
+            assert_have_same_elements(
+                vec![
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
+                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+                    (
+                        VendorAPI::IncodeFetchScores,
+                        FootprintReasonCode::DocumentVerified,
+                    ),
+                ],
+                rs.into_iter()
+                    .map(|rs| (rs.vendor_api, rs.reason_code))
+                    .collect_vec(),
+            );
+        }
+        _ => unimplemented!(),
+    }
 }

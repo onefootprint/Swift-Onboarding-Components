@@ -67,7 +67,13 @@ fn test_evaluate_onboarding_rules(
 
     // function under test
     rule_group
-        .evaluate(rsg, KycRuleExecutionConfig { include_doc: false })
+        .evaluate(
+            rsg,
+            KycRuleExecutionConfig {
+                include_doc: false,
+                document_only: false,
+            },
+        )
         .unwrap()
         .final_kyc_decision()
         .unwrap()

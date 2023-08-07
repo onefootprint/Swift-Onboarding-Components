@@ -28,6 +28,7 @@ pub enum WorkflowFixtureResult {
     Pass,
     ManualReview,
     StepUp,
+    DocumentDecision,
 }
 crate::util::impl_enum_str_diesel!(WorkflowFixtureResult);
 
@@ -40,6 +41,8 @@ impl WorkflowFixtureResult {
             Self::ManualReview
         } else if value.starts_with("stepup") | value.starts_with("step_up") {
             Self::StepUp
+        } else if value.starts_with("document_decision") | value.starts_with("documentdecision") {
+            Self::DocumentDecision
         } else {
             Self::Pass
         };

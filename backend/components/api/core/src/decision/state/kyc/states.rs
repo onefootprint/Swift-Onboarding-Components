@@ -22,6 +22,7 @@ use crate::decision::{
         common::{self, get_vres_id_for_fixture},
         WorkflowState,
     },
+    utils::execute_rules_for_document_only,
     vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
 };
 use crate::{
@@ -166,8 +167,6 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             };
 
         save_risk_signals(conn, &self.sv_id, &risk_signals, true)?;
-        // we might need doc signals here too, so we reload
-        let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
         Ok(KycState::from(KycDecisioning {
             wf_id: self.wf_id,
@@ -176,7 +175,6 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             sv_id: self.sv_id,
             t_id: self.t_id,
             vendor_results,
-            risk_signals,
         }))
     }
 }
@@ -201,12 +199,6 @@ impl KycDecisioning {
 
         let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
 
-        let svid = sv.id.clone();
-        let risk_signals = state
-            .db_pool
-            .db_query(move |conn| fetch_latest_risk_signals_map(conn, &svid))
-            .await??;
-
         Ok(KycDecisioning {
             wf_id: workflow.id,
             is_redo: config.is_redo,
@@ -214,7 +206,6 @@ impl KycDecisioning {
             sv_id: sv.id,
             t_id: sv.tenant_id,
             vendor_results,
-            risk_signals,
         })
     }
 }
@@ -240,12 +231,17 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let (ff_client, webhook_client) = async_res;
         let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
+        let execute_rules_for_real_document_decision_only = execute_rules_for_document_only(&v, &wf)?;
+        let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
-        // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
         let decision = if let Some(fixture_decision) = fixture_decision {
-            common::kyc_decision_from_fixture(fixture_decision)?
+            if execute_rules_for_real_document_decision_only {
+                common::get_decision(&self, conn, risk_signals, &wf, &v)?
+            } else {
+                common::kyc_decision_from_fixture(fixture_decision)?
+            }
         } else {
-            common::get_decision(&self, conn, self.risk_signals.clone(), &self.wf_id)?
+            common::get_decision(&self, conn, risk_signals, &wf, &v)?
         };
 
         // Now, we unhide the risk signals for the vendor that made the decision

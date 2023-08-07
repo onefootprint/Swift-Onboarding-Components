@@ -222,7 +222,10 @@ async fn make_decision(
             let rule_group = KycRuleGroup::default();
             let risk_signals = fetch_latest_risk_signals_map(conn, &ob.scoped_vault_id)?;
             let include_doc = DocumentRequest::get(conn, &wf.id)?.is_some();
-            let config = KycRuleExecutionConfig { include_doc };
+            let config = KycRuleExecutionConfig {
+                include_doc,
+                document_only: false,
+            };
             let rules_output = rule_group.evaluate(risk_signals, config)?;
             engine::save_onboarding_decision(
                 conn,

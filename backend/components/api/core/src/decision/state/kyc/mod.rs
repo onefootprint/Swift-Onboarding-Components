@@ -13,10 +13,7 @@ use super::{
     DoAction, StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
 };
 use crate::{
-    decision::{
-        features::risk_signals::RiskSignalsForDecision, onboarding::rules::KycRuleGroup, rule::rule_sets,
-        vendor::vendor_result::VendorResult,
-    },
+    decision::{onboarding::rules::KycRuleGroup, rule::rule_sets, vendor::vendor_result::VendorResult},
     errors::ApiResult,
     State,
 };
@@ -55,7 +52,6 @@ pub struct KycDecisioning {
     sv_id: ScopedVaultId,
     t_id: TenantId,
     vendor_results: Vec<VendorResult>,
-    risk_signals: RiskSignalsForDecision,
 }
 
 impl HasRuleGroup for KycDecisioning {

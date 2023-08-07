@@ -269,7 +269,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         let decision = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
-            common::get_decision(&self, conn, self.risk_signals.clone(), &self.wf_id)?
+            common::get_decision(&self, conn, self.risk_signals.clone(), &wf, &v)?
         };
 
         // Now, we unhide the risk signals for the vendor that made the decision
@@ -455,6 +455,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
     fn on_commit(self, res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         // TODO save Risk Signals + determine if we transition to PendingReview or Complete
         let (watchlist_res, vendor_results, webhook_client) = res;
+        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
 
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
@@ -513,7 +514,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let kyc_decision = if let Some((_, fixture_decision)) = watchlist_res.right() {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
-            common::get_decision(&self, conn, risk_signals, &self.wf_id)?
+            common::get_decision(&self, conn, risk_signals, &wf, &v)?
         }
         .final_kyc_decision()?;
 

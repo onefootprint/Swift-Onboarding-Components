@@ -137,6 +137,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
         WorkflowFixtureResult::Pass => SignalSeverity::Info,
         WorkflowFixtureResult::ManualReview => todo!(),
         WorkflowFixtureResult::StepUp => todo!(),
+        WorkflowFixtureResult::DocumentDecision => panic!("unsupported fixture passed for kyb"),
     };
     assert!(rs.iter().all(|rs| rs.reason_code.severity() == expected_severity
         && !rs.reason_code.scope().unwrap().is_for_person()
@@ -149,6 +150,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
         WorkflowFixtureResult::Pass => OnboardingStatus::Pass,
         WorkflowFixtureResult::ManualReview => todo!(),
         WorkflowFixtureResult::StepUp => todo!(),
+        WorkflowFixtureResult::DocumentDecision => panic!("unsupported fixture passed for kyb"),
     };
     mock_webhooks(
         state,

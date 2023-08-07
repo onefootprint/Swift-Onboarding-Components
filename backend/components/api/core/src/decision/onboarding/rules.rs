@@ -53,6 +53,7 @@ where
 
 pub struct KycRuleExecutionConfig {
     pub include_doc: bool,
+    pub document_only: bool,
 }
 
 pub struct KycRuleGroup {
@@ -92,17 +93,28 @@ impl KycRuleGroup {
                 .flatten()
                 .collect();
 
-        if kyc_rule_results.is_empty() {
-            Err(crate::decision::Error::from(RuleError::MissingInputForRules))?;
-        }
+        let (kyc_result, additional_results) = if !config.document_only {
+            // First we evaluate KYC, choosing which of the potentially multiple vendors we might have
+            let kyc_result = kyc_rule_results
+                .iter()
+                .min_by(|x, y| x.triggered_action.cmp(&y.triggered_action))
+                .ok_or(RuleError::MissingInputForKYCRules)
+                .map_err(crate::decision::Error::from)?
+                .clone();
 
-        // First we evaluate KYC, choosing which of the potentially multiple vendors we might have
-        let kyc_result = kyc_rule_results
-            .iter()
-            .min_by(|x, y| x.triggered_action.cmp(&y.triggered_action))
-            .ok_or(RuleError::AssertionError("could not compute waterfall".into()))
-            .map_err(crate::decision::Error::from)?
-            .clone();
+            let additional_results = kyc_rule_results
+                .into_iter()
+                .filter(|ober| ober != &kyc_result)
+                .map(OnboardingRulesDecisionOutput::from)
+                .collect();
+
+            (
+                DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(kyc_result)),
+                additional_results,
+            )
+        } else {
+            (DecisionResult::NotRequired, vec![])
+        };
 
         // handle document decisioning
         let doc_result = if config.include_doc {
@@ -111,17 +123,11 @@ impl KycRuleGroup {
             DecisionResult::NotRequired
         };
 
-        let additional_results: Vec<OnboardingRulesDecisionOutput> = kyc_rule_results
-            .into_iter()
-            .filter(|ober| ober != &kyc_result)
-            .map(OnboardingRulesDecisionOutput::from)
-            .collect();
+        if config.include_doc && !matches!(doc_result, DecisionResult::Evaluated(_)) {
+            Err(crate::decision::Error::from(RuleError::MissingInputForDocRules))?
+        }
 
-        let output = WaterfallOnboardingRulesDecisionOutput::new(
-            DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(kyc_result)),
-            doc_result,
-            additional_results,
-        );
+        let output = WaterfallOnboardingRulesDecisionOutput::new(kyc_result, doc_result, additional_results);
 
         Ok(output)
     }
