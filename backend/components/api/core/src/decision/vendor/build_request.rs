@@ -276,7 +276,7 @@ pub async fn build_business_data_from_verification_request(
 #[cfg(test)]
 #[allow(unused)]
 mod tests {
-    use db::{models::verification_request::VerificationRequest};
+    use db::models::verification_request::VerificationRequest;
     use macros::test_state;
     use newtypes::VerificationRequestId;
     use db::tests::test_db_pool::TestDbPool;

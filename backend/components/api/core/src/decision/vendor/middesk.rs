@@ -19,6 +19,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::middesk_request::{MiddeskRequest, UpdateMiddeskRequest};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::{Onboarding, OnboardingUpdate};
+use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_result::VerificationResult;
@@ -40,7 +41,7 @@ use idv::{ParsedResponse, VendorResponse};
 
 use newtypes::{
     BusinessData, DecisionIntentKind, MiddeskRequestState, ObConfigurationKey, OnboardingStatus,
-    PiiJsonValue, TenantId, VendorAPI, WorkflowId,
+    PiiJsonValue, RiskSignalGroupKind, TenantId, VendorAPI, WorkflowId,
 };
 
 #[derive(Debug)]
@@ -475,23 +476,58 @@ impl MiddeskState<PendingGetBusinessCall> {
 
 impl MiddeskState<Complete> {
     pub async fn run_kyb_decisioning(self, state: &State) -> ApiResult<()> {
+        let obid = self.middesk_request.onboarding_id.clone();
         let di_id = self.state.business_response_vreq.decision_intent_id.clone();
-
-        let wf = state
+        let (v, sv, wf) = state
             .db_pool
             .db_query(move |conn| -> DbResult<_> {
+                let v = Vault::get(conn, &obid)?;
+                let sv = ScopedVault::get(conn, &obid)?;
                 let di = DecisionIntent::get(conn, &di_id)?;
                 let wf = if let Some(wf_id) = di.workflow_id {
                     Some(Workflow::get(conn, &wf_id)?)
                 } else {
                     None
                 };
-                Ok(wf)
+                Ok((v, sv, wf))
             })
             .await??;
+        // TODO: make a version of this method for a single vreq/vres
+        let vendor_result = vendor_result::VendorResult::from_verification_results_for_onboarding(
+            vec![(
+                self.state.business_response_vreq,
+                Some(self.state.business_response_vres),
+            )],
+            &state.enclave_client,
+            &v.e_private_key,
+        )
+        .await?
+        .pop()
+        .ok_or(DbError::ObjectNotFound)?;
+
+        let (business_response, vendor_api) = match vendor_result.response.response {
+            ParsedResponse::MiddeskGetBusiness(r) => Ok((r, VendorAPI::MiddeskGetBusiness)),
+            ParsedResponse::MiddeskBusinessUpdateWebhook(r) => r
+                .business_response()
+                .cloned()
+                .ok_or(MiddeskError::ResponseMissingExpectedData("business data".into()))
+                .map(|b| (b, VendorAPI::MiddeskBusinessUpdateWebhook)),
+            _ => Err(MiddeskError::AssertionError("Unexpected VendorResult".into())),
+        }?;
 
         // KYB workflows are FF'd so if we don't have a workflow then we fall back to legacy logic here
         if let Some(wf) = wf {
+            let risk_signals = decision::features::middesk::reason_codes(&business_response)
+                .into_iter()
+                .map(|rc| (rc, vendor_api, vendor_result.verification_result_id.clone()))
+                .collect();
+            state
+                .db_pool
+                .db_transaction(move |conn| {
+                    RiskSignal::bulk_create(conn, &sv.id, risk_signals, RiskSignalGroupKind::Kyb, false)
+                })
+                .await?;
+
             let ww = WorkflowWrapper::init(state, wf).await?;
             let _ww = ww
                 .run(
@@ -501,36 +537,6 @@ impl MiddeskState<Complete> {
                 .await?;
             Ok(())
         } else {
-            let obid = self.middesk_request.onboarding_id.clone();
-            let e_private_key = state
-                .db_pool
-                .db_query(move |conn| Vault::get(conn, &obid))
-                .await??
-                .e_private_key;
-
-            // TODO: make a version of this method for a single vreq/vres
-            let vendor_result = vendor_result::VendorResult::from_verification_results_for_onboarding(
-                vec![(
-                    self.state.business_response_vreq,
-                    Some(self.state.business_response_vres),
-                )],
-                &state.enclave_client,
-                &e_private_key,
-            )
-            .await?
-            .pop()
-            .ok_or(DbError::ObjectNotFound)?;
-
-            let (business_response, vendor_api) = match vendor_result.response.response {
-                ParsedResponse::MiddeskGetBusiness(r) => Ok((r, VendorAPI::MiddeskGetBusiness)),
-                ParsedResponse::MiddeskBusinessUpdateWebhook(r) => r
-                    .business_response()
-                    .cloned()
-                    .ok_or(MiddeskError::ResponseMissingExpectedData("business data".into()))
-                    .map(|b| (b, VendorAPI::MiddeskBusinessUpdateWebhook)),
-                _ => Err(MiddeskError::AssertionError("Unexpected VendorResult".into())),
-            }?;
-
             decision::biz_risk::make_kyb_decision(
                 &state.db_pool,
                 &state.enclave_client,

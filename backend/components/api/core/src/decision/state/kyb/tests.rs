@@ -18,7 +18,9 @@ use db::tests::test_db_pool::TestDbPool;
 use db::DbResult;
 use feature_flag::BoolFlag;
 use feature_flag::MockFeatureFlagClient;
+use itertools::Itertools;
 use macros::{test_state, test_state_case};
+use newtypes::FootprintReasonCode;
 use newtypes::KybState;
 use newtypes::OnboardingStatus;
 use newtypes::SignalSeverity;
@@ -254,11 +256,29 @@ async fn live(state: &mut State) {
 
     let (ob, wf, _, mr, _, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
-    // TODO: write risk signals in Middesk state machine
     // TODO: decisioning using those risk signals in KYB workflow
     // then fix these assertsions:
     assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
     assert_eq!(OnboardingStatus::Pending, ob.status);
-    assert!(rs.is_empty());
+
+    assert_eq!(
+        vec![
+            (
+                VendorAPI::MiddeskBusinessUpdateWebhook,
+                FootprintReasonCode::BusinessNameMatch
+            ),
+            (
+                VendorAPI::MiddeskBusinessUpdateWebhook,
+                FootprintReasonCode::BusinessAddressMatch
+            ),
+            (
+                VendorAPI::MiddeskBusinessUpdateWebhook,
+                FootprintReasonCode::TinMatch
+            ),
+        ],
+        rs.into_iter()
+            .map(|rs| (rs.vendor_api, rs.reason_code))
+            .collect_vec()
+    );
 }
