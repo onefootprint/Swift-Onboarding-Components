@@ -62,7 +62,7 @@ pub fn save_review_decision(
             workflow_id,
         };
         let decision = OnboardingDecision::create(conn, new_decision)?;
-        Onboarding::update(ob, conn, OnboardingUpdate::set_decision(status.into()))?;
+        Onboarding::update(ob, conn, OnboardingUpdate::set_decision(status.into(), false))?;
         Some(decision)
     } else {
         // TODO should create some kind of UserTimeline event here since we are clearing a manual review

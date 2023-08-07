@@ -1,10 +1,14 @@
 use db::{
     models::{
-        contact_info::ContactInfo, ob_configuration::ObConfiguration, onboarding::Onboarding,
-        scoped_vault::ScopedVault, tenant::Tenant, vault::Vault,
+        contact_info::ContactInfo,
+        ob_configuration::ObConfiguration,
+        onboarding::{Onboarding, OnboardingUpdate},
+        scoped_vault::ScopedVault,
+        tenant::Tenant,
+        vault::Vault,
     },
     tests::fixtures,
-    DbError, DbPool, TxnPgConn,
+    DbPool, TxnPgConn,
 };
 use newtypes::{
     CipKind, CollectedDataOption, DataIdentifier, IdentityDataKind, PiiString, VaultKind,
@@ -13,6 +17,7 @@ use newtypes::{
 
 use crate::{
     enclave_client::EnclaveClient,
+    errors::ApiResult,
     tests::fixtures::lib::random_phone_number,
     utils::{
         self,
@@ -49,7 +54,7 @@ pub async fn create_user_and_onboarding(
         None
     };
     db_pool
-        .db_transaction(move |conn| -> Result<_, DbError> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let tenant = fixtures::tenant::create_with_keys(conn, pk, tenant_e_key);
             let ob_config = fixtures::ob_configuration::create_with_opts(
                 conn,
@@ -61,11 +66,27 @@ pub async fn create_user_and_onboarding(
 
             let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), kyc_fixture_result);
 
-            let (onboarding, sbv) =
+            let (ob, biz_ob) =
                 utils::onboarding::get_or_start_onboarding(conn, &uv.id, &su.id, &ob_config, None, biz_args)
                     .unwrap();
 
-            Ok((tenant, onboarding, uv, su, ob_config, sbv))
+            // Mark the onboardings as authorized since they would be authorized in prod by the
+            // time they're used here
+            let ob = Onboarding::lock(conn, &ob.id)?;
+            let ob = Onboarding::update(ob, conn, OnboardingUpdate::is_authorized())?;
+
+            let biz_ob = biz_ob
+                .map(|biz_ob| -> ApiResult<_> {
+                    let biz_ob = Onboarding::lock(conn, &biz_ob.id)?;
+                    let biz_ob = Onboarding::update(biz_ob, conn, OnboardingUpdate::is_authorized())?;
+                    Ok(biz_ob)
+                })
+                .transpose()?;
+            let sbv = biz_ob
+                .map(|biz_ob| ScopedVault::get(conn, &biz_ob.scoped_vault_id))
+                .transpose()?;
+
+            Ok((tenant, ob, uv, su, ob_config, sbv))
         })
         .await
         .unwrap()

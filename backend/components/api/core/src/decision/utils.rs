@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use chrono::Utc;
 use db::{
     models::{
         decision_intent::DecisionIntent,
@@ -156,7 +157,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
     let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
 
-    Onboarding::update(biz_ob, conn, OnboardingUpdate::idv_reqs_initiated_and_pending())?;
+    Onboarding::update(biz_ob, conn, OnboardingUpdate::idv_reqs_initiated())?;
 
     let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
     let uv = Vault::get(conn, &sb.id)?;
@@ -207,11 +208,13 @@ pub fn write_kyb_fixture_ob_decision(
         workflow_id: None,
     };
 
-    let _obd = OnboardingDecision::create(conn, new_decision)?;
-    Onboarding::update(
-        biz_ob,
-        conn,
-        OnboardingUpdate::set_decision_and_decision_made_at(decision_status),
-    )?;
+    OnboardingDecision::create(conn, new_decision)?;
+    let update = OnboardingUpdate {
+        authorized_at: Some(Some(Utc::now())),
+        idv_reqs_initiated_at: None,
+        decision_made_at: Some(Some(Utc::now())),
+        status: Some(decision_status.into()),
+    };
+    Onboarding::update(biz_ob, conn, update)?;
     Ok(())
 }

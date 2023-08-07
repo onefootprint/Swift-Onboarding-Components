@@ -82,48 +82,17 @@ impl OnboardingUpdate {
     pub fn idv_reqs_initiated() -> Self {
         Self {
             idv_reqs_initiated_at: Some(Some(Utc::now())),
-            ..Self::default()
-        }
-    }
-
-    pub fn idv_reqs_initiated_and_is_authorized() -> Self {
-        Self {
-            idv_reqs_initiated_at: Some(Some(Utc::now())),
-            authorized_at: Some(Some(Utc::now())),
             status: Some(OnboardingStatus::Pending),
             ..Self::default()
         }
     }
 
-    pub fn idv_reqs_initiated_and_pending() -> Self {
-        Self {
-            idv_reqs_initiated_at: Some(Some(Utc::now())),
-            status: Some(OnboardingStatus::Pending),
-            ..Self::default()
-        }
-    }
-
-    pub fn set_decision_and_decision_made_at(decision_status: DecisionStatus) -> Self {
+    pub fn set_decision(decision_status: DecisionStatus, is_first_decision: bool) -> Self {
+        let decision_made_at = is_first_decision.then_some(Some(Utc::now()));
         Self {
             status: Some(decision_status.into()),
-            decision_made_at: Some(Some(Utc::now())),
+            decision_made_at,
             ..Self::default()
-        }
-    }
-
-    pub fn set_decision(decision_status: DecisionStatus) -> Self {
-        Self {
-            status: Some(decision_status.into()),
-            ..Self::default()
-        }
-    }
-
-    pub fn idv_reqs_and_has_final_decision_and_is_authorized(decision_status: DecisionStatus) -> Self {
-        Self {
-            authorized_at: Some(Some(Utc::now())),
-            idv_reqs_initiated_at: Some(Some(Utc::now())),
-            decision_made_at: Some(Some(Utc::now())),
-            status: Some(decision_status.into()),
         }
     }
 

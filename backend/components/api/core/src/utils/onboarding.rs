@@ -30,7 +30,7 @@ pub fn get_or_start_onboarding(
     obc: &ObConfiguration,
     insight_event: Option<CreateInsightEvent>,
     new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
-) -> ApiResult<(Onboarding, Option<ScopedVault>)> {
+) -> ApiResult<(Onboarding, Option<Onboarding>)> {
     let user_vault = Vault::lock(conn, v_id)?;
 
     // Create the onboarding for this scoped user
@@ -77,14 +77,14 @@ pub fn get_or_start_onboarding(
     }
 
     // If the ob config has business fields, create a business vault, scoped vault, and ob
-    let sb = if let Some(new_biz_args) = new_biz_args {
+    let biz_ob = if let Some(new_biz_args) = new_biz_args {
         let existing_businesses = BusinessOwner::list_businesses(conn, &user_vault.id, &obc.id)?;
-        let sb = if let Some(existing) = existing_businesses.into_iter().next() {
+        let biz_ob = if let Some(existing) = existing_businesses.into_iter().next() {
             // If the user has already started onboarding their business onto this exact
             // ob config, we should locate it.
             // Note, this isn't quite portablizing the business since we only locate it
             // when onboarding onto the exact same ob config
-            existing.1 .0
+            existing.1 .1
         } else {
             let args = NewVaultArgs {
                 public_key: new_biz_args.public_key,
@@ -99,22 +99,22 @@ pub fn get_or_start_onboarding(
             BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;
             let sb = ScopedVault::get_or_create(conn, &business_vault, obc.id.clone())?;
             let ob_create_args = OnboardingCreateArgs {
-                scoped_vault_id: sb.id.clone(),
+                scoped_vault_id: sb.id,
                 ob_configuration_id: obc.id.clone(),
                 insight_event,
             };
-            Onboarding::get_or_create(
+            let (biz_ob, _) = Onboarding::get_or_create(
                 conn,
                 ob_create_args,
                 new_biz_args.should_create_workflow,
                 fixture_result,
             )?;
-            sb
+            biz_ob
         };
-        Some(sb)
+        Some(biz_ob)
     } else {
         None
     };
 
-    Ok((ob, sb))
+    Ok((ob, biz_ob))
 }
