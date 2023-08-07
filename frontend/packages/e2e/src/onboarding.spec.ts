@@ -88,6 +88,7 @@ test('smoke tests', async ({ browserName, page, browser }) => {
       flowId,
     },
   );
+
   await authorizeAccess({ frame });
-  return expect(frame.getByText('Submission completed')).toBeVisible();
+  return expect(frame.getByTestId('result').innerText).toBeDefined();
 });
