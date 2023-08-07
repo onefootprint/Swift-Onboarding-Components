@@ -10,6 +10,21 @@ import FooterLink from './components/footer-link';
 
 const currentYear = new Date().getFullYear();
 
+const productLinks = ['compare', 'pricing'];
+
+const companyLinks = ['about', 'blog', 'investor-updates', 'library'];
+
+const resourcesLinks = [
+  'terms-of-service',
+  'privacy-policy',
+  'faq',
+  'supported-id-documents',
+  'security-disclosure',
+  'idv-privacy',
+];
+
+const developerLinks = ['docs', 'status'];
+
 const Footer = () => {
   const { t } = useTranslation('components.footer');
   return (
@@ -70,75 +85,49 @@ const Footer = () => {
               <Typography variant="label-3">
                 {t('links.product.title')}
               </Typography>
-              <FooterLink
-                text={t('links.product.compare.text')}
-                href={t('links.product.compare.href')}
-              />
-              <FooterLink
-                text={t('links.product.pricing.text')}
-                href={t('links.product.pricing.href')}
-              />
+              {productLinks.map(link => (
+                <FooterLink
+                  key={link}
+                  text={t(`links.product.${link}.text`)}
+                  href={t(`links.product.${link}.href`)}
+                />
+              ))}
             </SectionColumn>
             <SectionColumn>
               <Typography variant="label-3">
                 {t('links.company.title')}
               </Typography>
-              <FooterLink
-                text={t('links.company.about.text')}
-                href={t('links.company.about.href')}
-              />
-              <FooterLink
-                text={t('links.company.blog.text')}
-                href={t('links.company.blog.href')}
-              />
-              <FooterLink
-                text={t('links.company.investor-updates.text')}
-                href={t('links.company.investor-updates.href')}
-              />
-              <FooterLink
-                text={t('links.company.library.text')}
-                href={t('links.company.library.href')}
-              />
+              {companyLinks.map(link => (
+                <FooterLink
+                  key={link}
+                  text={t(`links.company.${link}.text`)}
+                  href={t(`links.company.${link}.href`)}
+                />
+              ))}
             </SectionColumn>
             <SectionColumn>
               <Typography variant="label-3">
                 {t('links.developers.title')}
               </Typography>
-              <FooterLink
-                text={t('links.developers.docs.text')}
-                href={t('links.developers.docs.href')}
-                newWindow
-              />
-              <FooterLink
-                text={t('links.developers.status.text')}
-                href={t('links.developers.status.href')}
-                newWindow
-              />
+              {developerLinks.map(link => (
+                <FooterLink
+                  key={link}
+                  text={t(`links.developers.${link}.text`)}
+                  href={t(`links.developers.${link}.href`)}
+                />
+              ))}
             </SectionColumn>
             <SectionColumn>
               <Typography variant="label-3">
                 {t('links.resources.title')}
               </Typography>
-              <FooterLink
-                text={t('links.resources.terms-of-service.text')}
-                href={t('links.resources.terms-of-service.href')}
-              />
-              <FooterLink
-                text={t('links.resources.privacy-policy.text')}
-                href={t('links.resources.privacy-policy.href')}
-              />
-              <FooterLink
-                text={t('links.resources.security-disclosure.text')}
-                href={t('links.resources.security-disclosure.href')}
-              />
-              <FooterLink
-                text={t('links.resources.faq.text')}
-                href={t('links.resources.faq.href')}
-              />
-              <FooterLink
-                text={t('links.resources.supported-id-documents.text')}
-                href={t('links.resources.supported-id-documents.href')}
-              />
+              {resourcesLinks.map(link => (
+                <FooterLink
+                  key={link}
+                  text={t(`links.resources.${link}.text`)}
+                  href={t(`links.resources.${link}.href`)}
+                />
+              ))}
             </SectionColumn>
           </LinksContainer>
         </Inner>

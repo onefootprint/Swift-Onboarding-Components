@@ -196,6 +196,10 @@
           "security-disclosure": {
             "href": "/security-disclosure",
             "text": "Security Disclosure"
+          },
+          "idv-privacy": {
+            "href": "idv-privacy",
+            "text": "IDV Privacy"
           }
         },
         "developers": {
@@ -863,6 +867,66 @@
         "feature-4": {
           "title": "Secure enclave backed",
           "description": "Our advanced PII vaults use strong cryptography and are built on top of secure Nitro Enclaves."
+        }
+      }
+    },
+    "idv-privacy": {
+      "html-title": "Footprint - IDV Privacy",
+      "title": "ID Verification with Footprint",
+      "subtitle": "We care about your privacy. Here's how we use and protect your data.",
+      "how": {
+        "title": "How does Footprint verify my identity with a document?",
+        "subtitle": "There are multiple ways to confirm your identity through Footprint using an identity document:",
+        "id-document": {
+          "title": "Verify the authenticity of your ID document",
+          "description": "Footprint uses third party vendors and, in some cases, manual review, to review images of your government-issued photo ID to ensure that the document is authentic. Our vendors utilize automated identity verification technology that looks for patterns to help determine if an ID document is real or fake. This process is like a bank teller checking your ID document to confirm that it’s real."
+        },
+        "match-photos": {
+          "title": "Match your ID with photos of your face",
+          "description": "Footprint uses third party vendors and, in some cases, manual review, to review photos of your face that you provide to us to confirm that the photo ID belongs to you. Our vendors have built automated identity verification technology that uses distinctive physiological characteristics of your face (known as <biometricIdLink>biometric identifiers</biometricIdLink>) to match the photos of your face with the photo on the ID document. \n This process is similar to a bank teller confirming that the photo on your ID document is you based on your appearance, but done in an automated way. In some cases, Footprint will attempt to match new ID document images with ID document images to ensure each verification attempt corresponds to a valid and unique identity."
+        },
+        "databases": {
+          "title": "Validate your ID number against global databases",
+          "description": "In some instances, Footprint will check the collected government ID number against a global set of databases to confirm that it exists."
+        }
+      },
+      "more-about": {
+        "title": "More about identity verification technology",
+        "description": "Footprint’s identity verification technology uses <computerVisionLink>computer vision</computerVisionLink> to create <biometricIdLink>biometric identifiers</biometricIdLink> of your face from the selfies and the picture on your photo ID—and compares the two. This mimics what a person does to verify that your face matches the face on your ID document in-person, like a cashier who reviews your driver's license to verify that it’s real, then checks that you look like the photo on the ID document. \n \nFootprint and our vendors are constantly improving the accuracy of our biometric technology (which matches a selfie with a photo in the ID document) to reduce cases where we falsely reject legitimate users or approve fraudsters pretending to be someone else. This is why we separately ask for your permission to use your images for training purposes."
+      },
+      "consent": {
+        "title": "Consent to use your information",
+        "subtitle": "There are two different sets of permissions that we will ask of you when verifying your identity via a government document",
+        "verify": {
+          "title": "To verify your identity",
+          "cards": {
+            "capture": {
+              "title": "Footprint will capture images of you and your photo ID document to confirm your identity.",
+              "description": "Footprint will use the captured images to check that the ID document is valid, and to confirm that the ID document presented belongs to you. Footprint will have access to your verification status, captured images, and extracted data from images such as name, date of birth, and ID number, to the extent permissible by law. If a business uses Footprint to verify your identity, the business may also have access to the same information (e.g., your verification status, insights regarding why Footprint was or was not able to verify your identity, captured images, and the extracted data from those images)."
+            },
+            "biometric-identifiers": {
+              "title": "Neither Footprint, nor the business will see the biometric identifiers.",
+              "description": "These identifiers are used to confirm that your selfie matches the photo ID document, and those identifiers are not stored by Footprint, but may be stored by our vendors for up to three years. You can request the deletion of your biometric data or personal data, and exercise any other rights under applicable data protection laws, at any time by emailing Footprint at <mailLinkFootprint>privacy@onefootprint.com</mailLinkFootprint> or Incode at <mailLinkIncode>dataprotection@incode.com</mailLinkIncode>. \n As for the non-biometric data that you submitted (e.g., photo and ID document), Footprint retains that data in the business’ Footprint Vault for 3 years after the point the business indicates your account is closed and the data no longer needs to be retained."
+            },
+            "comfortable": {
+              "title": "If you are not comfortable sharing your information in this way, you can exit the verification.",
+              "description": "If a business requested your verification, please get in touch with the business for an alternative way to confirm your identity."
+            }
+          }
+        },
+        "optional": {
+          "tag": "Optional",
+          "title": "To improve our vendor’s verification technology",
+          "cards": {
+            "captured-images": {
+              "title": "Footprint’s vendors will use the captured images to improve the accuracy of their biometric verification technology.",
+              "description": "This will help us reduce cases where we falsely reject legitimate users or approve fraudsters pretending to be someone else. You can request the deletion of your biometric data or personal data, and exercise any other rights under applicable data protection laws, at any time by emailing Footprint at <mailLinkFootprint>privacy@onefootprint.com</mailLinkFootprint> or Incode at <mailLinkIncode>dataprotection@incode.com</mailLinkIncode/>."
+            },
+            "comfortable": {
+              "title": "If you are not comfortable letting us use your data to improve our services, we will only use your biometric information for the initial verification.",
+              "description": "You can learn more about how we handle and store your images and extracted data in our <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."
+            }
+          }
         }
       }
     },
