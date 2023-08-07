@@ -10,7 +10,7 @@ type CustomDesignSystemProviderProps = {
 const CustomDesignSystemProvider = ({
   children,
 }: CustomDesignSystemProviderProps) => (
-  <ThemeProvider>
+  <ThemeProvider defaultTheme="light" enableSystem={false}>
     <DesignSystemProviderWrapper>{children}</DesignSystemProviderWrapper>
   </ThemeProvider>
 );
