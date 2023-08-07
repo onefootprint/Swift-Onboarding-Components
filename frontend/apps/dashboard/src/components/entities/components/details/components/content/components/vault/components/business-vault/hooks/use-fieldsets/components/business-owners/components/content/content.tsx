@@ -75,6 +75,15 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
     </Box>
   );
 
+  const boHintText = (businessOwner: BusinessOwner) => {
+    if (businessOwner.ownershipStake) {
+      return t(`hint.${businessOwner.kind}`, {
+        stake: businessOwner.ownershipStake,
+      });
+    }
+    return businessOwner.kind === 'primary' ? t(`hint.primary_no_stake`) : '';
+  };
+
   return (
     <Box testID="business-owners-content">
       <Grid>
@@ -86,12 +95,7 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
             <Field
               entity={entity}
               di={di}
-              hint={t(
-                businessOwner.kind === 'primary'
-                  ? 'hint.primary'
-                  : 'hint.secondary',
-                { stake: businessOwner.ownershipStake },
-              )}
+              hint={boHintText(businessOwner)}
               renderValue={() => renderValue(index)}
               renderLabel={() => renderLabel(businessOwner)}
             />
