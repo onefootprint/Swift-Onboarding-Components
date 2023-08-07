@@ -153,6 +153,21 @@ impl Workflow {
             .optional()?;
         Ok(res)
     }
+
+    #[tracing::instrument("Workflow::latest_by_kind", skip_all)]
+    pub fn latest_by_kind(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+        kind: WorkflowKind,
+    ) -> DbResult<Option<Self>> {
+        let res = workflow::table
+            .filter(workflow::scoped_vault_id.eq(scoped_vault_id))
+            .filter(workflow::kind.eq(kind))
+            .order_by(workflow::created_at.desc())
+            .first(conn)
+            .optional()?;
+        Ok(res)
+    }
 }
 
 #[cfg(test)]
