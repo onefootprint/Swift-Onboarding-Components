@@ -11,6 +11,7 @@ const submitDocType = async ({
   authToken,
   documentType,
   countryCode,
+  fixtureResult,
 }: SubmitDocTypeRequest) => {
   const response = await request<SubmitDocTypeResponse>({
     method: 'POST',
@@ -18,6 +19,7 @@ const submitDocType = async ({
     data: {
       documentType,
       countryCode,
+      fixtureResult,
     },
     headers: {
       [AUTH_HEADER]: authToken,
@@ -27,7 +29,6 @@ const submitDocType = async ({
   return response.data;
 };
 
-const useSubmitDocType = ({ onError }: { onError: (error: unknown) => void }) =>
-  useMutation(submitDocType, { onError });
+const useSubmitDocType = () => useMutation(submitDocType);
 
 export default useSubmitDocType;

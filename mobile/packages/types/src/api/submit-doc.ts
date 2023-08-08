@@ -1,9 +1,15 @@
-import { CountryCode, CountryCode3, SupportedIdDocTypes } from '../data';
+import {
+  CountryCode,
+  CountryCode3,
+  IdDocOutcomes,
+  SupportedIdDocTypes,
+} from '../data';
 
 export type SubmitDocTypeRequest = {
   authToken: string;
-  documentType: SupportedIdDocTypes;
   countryCode: CountryCode | CountryCode3;
+  documentType: SupportedIdDocTypes;
+  fixtureResult?: IdDocOutcomes;
 };
 
 export type SubmitDocTypeResponse = {

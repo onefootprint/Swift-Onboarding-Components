@@ -18,6 +18,7 @@ import {
 import React, { useState } from 'react';
 
 import { REVIEW_AUTH_TOKEN } from '@/config/constants';
+import useApp from '@/domains/idv/hooks/use-app';
 import useTranslation from '@/hooks/use-translation';
 
 import ConsentDialog from '../doc-scan/components/selfie/components/consent-dialog';
@@ -47,6 +48,7 @@ const DocSelection = ({
   onSubmit,
 }: DocSelectionProps) => {
   const { t } = useTranslation('components.scan.doc-selection');
+  const app = useApp();
   const { onlyUsSupported, supportedDocumentTypes, shouldCollectConsent } =
     requirement;
   const [country, setCountry] = useState<CountryRecord>(defaultCountry);
@@ -55,8 +57,7 @@ const DocSelection = ({
   const [docType, setDocType] = useState<SupportedIdDocTypes>(
     docTypeOptions[0].value ?? defaultType,
   );
-
-  const docTypeMutation = useSubmitDocType({ onError: e => console.error(e) });
+  const docTypeMutation = useSubmitDocType();
   const isAppStoreReview = authToken === REVIEW_AUTH_TOKEN;
 
   const handleSubmit = () => {
@@ -65,6 +66,7 @@ const DocSelection = ({
         authToken,
         documentType: docType,
         countryCode: country.value,
+        fixtureResult: app?.sandboxIdDocOutcome,
       },
       {
         onSuccess(response) {

@@ -1,9 +1,5 @@
 import { getCountryFromCode } from '@onefootprint/global-constants';
-import {
-  IdDocType,
-  SupportedIdDocTypes,
-  UploadDocumentSide,
-} from '@onefootprint/types';
+import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
@@ -34,13 +30,6 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
       states: {
         init: {
           always: [
-            {
-              target: 'frontImage',
-              cond: context =>
-                !!context.requirement.onlyUsSupported &&
-                context.requirement.supportedDocumentTypes?.length === 1,
-              actions: 'assignDefaultCountryAndType',
-            },
             {
               target: 'docSelection',
             },
@@ -111,26 +100,6 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
     },
     {
       actions: {
-        assignDefaultCountryAndType: assign(context => {
-          const { supportedDocumentTypes } = context.requirement;
-          // get rid of this once back end fixes the typo with "drivers license" in id-doc type
-          const supportedTypeToIdDocType = {
-            [SupportedIdDocTypes.idCard]: IdDocType.idCard,
-            [SupportedIdDocTypes.driversLicense]: IdDocType.driversLicense,
-            [SupportedIdDocTypes.passport]: IdDocType.passport,
-          };
-          const supportedIdDocTypes: IdDocType[] = supportedDocumentTypes.map(
-            supportedDocumentType =>
-              supportedTypeToIdDocType[supportedDocumentType],
-          );
-          return {
-            ...context,
-            collectingDocumentMeta: {
-              countryCode: USCountryCode,
-              type: supportedIdDocTypes[0],
-            },
-          };
-        }),
         assignNextSideToCollect: assign((context, { payload }) => {
           return {
             ...context,

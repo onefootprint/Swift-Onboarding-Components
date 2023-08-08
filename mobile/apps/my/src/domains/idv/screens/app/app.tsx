@@ -1,14 +1,15 @@
 import themes from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
 import { DesignSystemProvider } from '@onefootprint/ui';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import createTheme from '@/utils/create-theme';
 
+import AppContext from '../../components/app-context';
 import Error from '../error';
 import Router from '../router';
 import useAuthToken from './hooks/use-auth-token';
-import useStyleParams from './hooks/use-style-params';
+import useHandoffMeta from './hooks/use-handoff-meta';
 
 type AppProps = {
   linkingUrl?: string;
@@ -18,8 +19,12 @@ type AppProps = {
 const App = ({ linkingUrl, onLoad }: AppProps) => {
   const tokenQuery = useAuthToken(linkingUrl);
   const authToken = tokenQuery.data?.authToken;
-  const styleQuery = useStyleParams(authToken);
-  const styleParams = styleQuery.data;
+  const handoffMetaQuery = useHandoffMeta(authToken);
+  const appContextValue = useMemo(() => {
+    return {
+      sandboxIdDocOutcome: handoffMetaQuery.data?.sandboxIdDocOutcome ?? null,
+    };
+  }, [handoffMetaQuery.data?.sandboxIdDocOutcome]);
 
   if (tokenQuery.isError) {
     return (
@@ -30,14 +35,17 @@ const App = ({ linkingUrl, onLoad }: AppProps) => {
       </DesignSystemProvider>
     );
   }
-  if (authToken && styleQuery.isFetched) {
+  if (authToken && handoffMetaQuery.isFetched) {
+    const { styleParams } = handoffMetaQuery.data;
     const theme = createTheme(themes.light, styleParams);
     return (
-      <DesignSystemProvider theme={theme}>
-        <Container onLayout={onLoad}>
-          <Router authToken={authToken} />
-        </Container>
-      </DesignSystemProvider>
+      <AppContext.Provider value={appContextValue}>
+        <DesignSystemProvider theme={theme}>
+          <Container onLayout={onLoad}>
+            <Router authToken={authToken} />
+          </Container>
+        </DesignSystemProvider>
+      </AppContext.Provider>
     );
   }
   return null;

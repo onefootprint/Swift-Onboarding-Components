@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '@/config/constants';
 
-const getD2PStatus = async (authToken: string) => {
+const getHandoffMeta = async (authToken: string) => {
   const response = await request<GetD2PResponse>({
     method: 'GET',
     url: '/hosted/onboarding/d2p/status',
@@ -12,13 +12,13 @@ const getD2PStatus = async (authToken: string) => {
       [AUTH_HEADER]: authToken,
     },
   });
-  return response.data.meta.styleParams;
+  return response.data.meta;
 };
 
-const useStyleParams = (authToken: string = '') => {
-  return useQuery(['appearance', authToken], () => getD2PStatus(authToken), {
+const useHandoffMeta = (authToken: string = '') => {
+  return useQuery(['appearance', authToken], () => getHandoffMeta(authToken), {
     enabled: !!authToken,
   });
 };
 
-export default useStyleParams;
+export default useHandoffMeta;
