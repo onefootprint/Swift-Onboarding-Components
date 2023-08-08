@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use db::models::{document_request::DocumentRequest, vault::Vault};
+use db::models::vault::Vault;
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::TenantId;
 
@@ -13,7 +13,6 @@ pub fn temporary_should_skip_consent_always(
     ff_client: Arc<dyn FeatureFlagClient>,
     tenant_id: &TenantId,
     vault: &Vault,
-    document_request: &DocumentRequest,
 ) -> bool {
     ff_client.flag(BoolFlag::IsAppClipEnabled(tenant_id)) && !vault.is_live
 }

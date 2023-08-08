@@ -81,7 +81,6 @@ pub async fn post(
         state.feature_flag_client.clone(),
         &user_auth.scoped_user.tenant_id,
         &vault,
-        &doc_request,
     );
     if user_consent.is_none() && !temp_appclip_readiness_should_skip_consent {
         return Err(OnboardingError::UserConsentNotFound.into());
