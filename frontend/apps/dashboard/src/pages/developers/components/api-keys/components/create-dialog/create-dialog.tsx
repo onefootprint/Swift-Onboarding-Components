@@ -97,10 +97,6 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
                 render={select => (
                   <Select
                     label={t('form.access-control.label')}
-                    labelTooltip={{
-                      text: t('form.access-control.tooltip.text'),
-                      triggerAriaLabel: t('form.access-control.tooltip.text'),
-                    }}
                     hasError={!!select.fieldState.error}
                     hint={
                       select.fieldState.error &&

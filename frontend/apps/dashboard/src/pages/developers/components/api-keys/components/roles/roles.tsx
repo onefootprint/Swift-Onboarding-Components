@@ -25,7 +25,7 @@ const Roles = () => {
           </Button>
         </PermissionGate>
       </SectionHeader>
-      <Box sx={{ marginTop: 5, marginBottom: 7 }}>
+      <Box sx={{ marginTop: 5, marginBottom: 5 }}>
         <Divider />
       </Box>
       <Table />
