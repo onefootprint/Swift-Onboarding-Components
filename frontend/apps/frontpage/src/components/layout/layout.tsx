@@ -19,7 +19,6 @@ const Layout = ({ children }: LayoutProps) => (
 
 const Content = styled.section`
   position: relative;
-  overflow: hidden;
   --desktop-padding-top: calc(
     var(--desktop-header-height) + var(--desktop-spacing)
   );

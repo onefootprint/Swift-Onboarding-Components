@@ -409,6 +409,92 @@
         "email-address": "join@onefootprint.com"
       }
     },
+    "kyc": {
+      "html-title": "Footprint - KYC",
+      "title": "Know Your Customer (KYC)",
+      "subtitle": "Verify the people behind the device",
+      "get-started": "Get started",
+      "book-a-demo": "Book a demo",
+      "onboard-users": {
+        "title": "Onboard new users at speed of light",
+        "subtitle": "We're removing the toggle between fraud and friction through UX that builds trust.",
+        "bullets": {
+          "user-experience": "World-class user experience: delight your users with an easy-to-use, optimized solution.",
+          "developer-experience": "World-class developer experience: integrate quickly and easily. Hassle-free.",
+          "progressive-onboarding": "Progressive onboarding & embedded components prevent unnecessary friction to limit drop-off.",
+          "one-click": "One-click onboarding."
+        }
+      },
+      "confidence": {
+        "title": "Confidence in who you are letting in",
+        "subtitle": "We're removing the toggle between fraud and friction by labeling good actors.",
+        "bullets": {
+          "one-device": "Limits one device to one identity, like it should be.",
+          "proprietary-approach": "Proprietary approach leveraging App Clips to triple bind identity.",
+          "passkeys": "Passkeys bind a strong cryptographic credential to verified PII info protected by biometrics",
+          "waterfall": "Automatically waterfall through leading data providers."
+        },
+        "tags": {
+          "email": "Email",
+          "phone-number": "Phone number",
+          "name": "Name",
+          "date-of-birth": "Date of birth",
+          "address": "Address",
+          "ssn": "Social Security Number",
+          "selfie": "Selfie",
+          "drivers-license": "Driver's License"
+        }
+      },
+      "onboarding-experience": {
+        "title": "Own your onboarding experience",
+        "subtitle": "Customize the look, feel, and questions to match your brand and collect what you need.",
+        "bullets": {
+          "fonts": "Fonts, colors, border radius, and more.",
+          "variables": "80+ variables are available.",
+          "style": "Style specific components with CSS-in-JS.",
+          "specify": "Specify which documents to collect.",
+          "sec": "Customize SEC broker questions, and more."
+        }
+      },
+      "app-clip": {
+        "title": "The first identity company to use App Clips",
+        "subtitle": "Our App Clip verifies that there is one identity per device, and it is the identity we expect.",
+        "bullets": {
+          "native-app": "Feel like a native app.",
+          "fast-reliable": "Fast and reliable.",
+          "brings-joy": "Brings joy to the experience.",
+          "conversion": "Increase your conversion rates.",
+          "no-download": "No download required."
+        }
+      },
+      "developer-experience": {
+        "title": "Developer experience like no other",
+        "subtitle": "Just five lines of code, Footprint is quick and easy to integrate into your product",
+        "see-documentation": "See documentation",
+        "sections": {
+          "aria-label": "Types of experiences selector",
+          "configuration": "Configuration",
+          "customization": "Customization",
+          "documentation": "Documentation"
+        }
+      },
+      "storage": {
+        "title": "Securely store customer data",
+        "subtitle": "Footprint automatically vaults PII during onboarding, meaning you never touch sensitive data.",
+        "learn-more": "Learn more",
+        "sections": {
+          "insights": "Insights",
+          "users": "Users",
+          "user-details": "User details",
+          "settings": "Settings"
+        }
+      },
+      "banner": {
+        "title": "Onboard more customers and enjoy peace of mind. Today.",
+        "get-started": "Get started",
+        "book-a-demo": "Book a demo"
+      }
+    },
     "media": {
       "html-title": "Footprint - Media",
       "title": "Media",
