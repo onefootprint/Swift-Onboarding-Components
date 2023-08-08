@@ -1,6 +1,6 @@
 import { FootprintVariant } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
-import { media, ScrollArea } from '@onefootprint/ui';
+import { Box, media, ScrollArea } from '@onefootprint/ui';
 import React from 'react';
 
 import Footer from './components/footer';
@@ -37,17 +37,19 @@ const FormDialog = ({
       data-variant={variant}
     >
       <Header variant={variant} onClose={onClose} title={title} />
-      <div style={{ flexGrow: 1 }}>
-        <ScrollArea sx={{ padding: 7 }}>{children}</ScrollArea>
-      </div>
-      {!shouldHideFooter && (
-        <Footer
-          primaryButton={primaryButton}
-          secondaryButton={secondaryButton}
-          hideFootprintLogo={hideFootprintLogo}
-          hideButtons={hideButtons}
-        />
-      )}
+      <Content>
+        <Box sx={{ flexGrow: 1 }}>
+          <ScrollArea>{children}</ScrollArea>
+        </Box>
+        {!shouldHideFooter && (
+          <Footer
+            primaryButton={primaryButton}
+            secondaryButton={secondaryButton}
+            hideFootprintLogo={hideFootprintLogo}
+            hideButtons={hideButtons}
+          />
+        )}
+      </Content>
     </Container>
   );
 };
@@ -94,6 +96,22 @@ const Container = styled.div`
         width: 480px;
         border-radius: 0;
     `}
+    }
+  `}
+`;
+
+const Content = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    body[data-variant='modal'] & {
+      padding: ${theme.spacing[7]};
+    }
+
+    body[data-variant='drawer'] & {
+      padding: ${theme.spacing[7]};
     }
   `}
 `;

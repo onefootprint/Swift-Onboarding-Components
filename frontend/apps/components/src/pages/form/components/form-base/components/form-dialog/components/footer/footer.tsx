@@ -65,7 +65,7 @@ const Container = styled.footer<{ hideFootprintLogo?: boolean }>`
     display: flex;
     align-items: center;
     justify-content: ${hideFootprintLogo ? 'flex-end' : 'space-between'};
-    padding: ${theme.spacing[5]} ${theme.spacing[7]};
+    padding: ${theme.spacing[8]} 0 0;
     background-color: ${theme.backgroundColor.primary};
     width: 100%;
     z-index: 1;
