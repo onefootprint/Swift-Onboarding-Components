@@ -17,6 +17,7 @@ type CalculateCostProps = {
   vaultProxy: number;
   driversLicense: number;
   embeddedOnboarding: number;
+  auth: number;
 };
 
 const calculateCost = ({
@@ -27,6 +28,7 @@ const calculateCost = ({
   vaultProxy,
   driversLicense,
   embeddedOnboarding,
+  auth,
 }: CalculateCostProps) =>
   Intl.NumberFormat('us-US', {
     style: 'currency',
@@ -39,7 +41,8 @@ const calculateCost = ({
       dataVaulting * constants.DATA_VAULTING_COST +
       vaultProxy * constants.VAULT_PROXY_COST +
       driversLicense * constants.DRIVERS_COST +
-      embeddedOnboarding * constants.EMBEDDED_ONBOARDING_COST,
+      embeddedOnboarding * constants.EMBEDDED_ONBOARDING_COST +
+      auth * constants.AUTH_COST,
   );
 
 const Calculator = () => {
@@ -52,6 +55,7 @@ const Calculator = () => {
     vaultProxy: constants.VAULT_PROXY_INITIAL_VALUE,
     driversLicense: constants.DRIVERS_INITIAL_VALUE,
     embeddedOnboarding: constants.EMBEDDED_ONBOARDING_INITIAL_VALUE,
+    auth: constants.AUTH_INITIAL_VALUE,
   });
 
   const variablesToCalculate = [
@@ -121,7 +125,7 @@ const Calculator = () => {
     },
     {
       key: 'vault-proxy',
-      unit: 'persons',
+      unit: 'active-user',
       unitSecond: 'month',
       initialValue: constants.VAULT_PROXY_INITIAL_VALUE,
       delta: constants.VAULT_PROXY_DELTA,
@@ -141,6 +145,18 @@ const Calculator = () => {
       value: calculatorValues.embeddedOnboarding,
       onChange: (value: number) => {
         setCalculatorValues(prev => ({ ...prev, embeddedOnboarding: value }));
+      },
+    },
+    {
+      key: 'auth',
+      unit: 'active-user',
+      unitSecond: 'month',
+      initialValue: constants.AUTH_INITIAL_VALUE,
+      delta: constants.AUTH_DELTA,
+      minimumValue: constants.AUTH_MINIMUM_VALUE,
+      value: calculatorValues.auth,
+      onChange: (value: number) => {
+        setCalculatorValues(prev => ({ ...prev, auth: value }));
       },
     },
   ];
@@ -192,6 +208,7 @@ const Calculator = () => {
                 vaultProxy: calculatorValues.vaultProxy,
                 driversLicense: calculatorValues.driversLicense,
                 embeddedOnboarding: calculatorValues.embeddedOnboarding,
+                auth: calculatorValues.auth,
               })}
             </TotalRow>
           </motion.span>

@@ -33,7 +33,7 @@ const translationKeys = [
     title: 'add-ons.features.vault-proxy.title',
     details: 'add-ons.features.vault-proxy.details',
     cost: constants.VAULT_PROXY_COST,
-    unit: 'person',
+    unit: 'active-user',
     unitSecond: 'month',
   },
   {
@@ -48,12 +48,13 @@ const translationKeys = [
     title: 'add-ons.features.embedded-onboarding.title',
     cost: constants.EMBEDDED_ONBOARDING_COST,
     unit: 'person',
-    unitSecond: 'month',
   },
   {
     key: 'auth',
     title: 'add-ons.features.auth.title',
-    labelRight: 'add-ons.features.auth.label',
+    unit: 'active-user',
+    unitSecond: 'month',
+    cost: constants.AUTH_COST,
   },
 ];
 
@@ -76,9 +77,6 @@ const AddOns = () => {
             unitSecond={
               translationKey.unitSecond &&
               t(`units.${translationKey.unitSecond}`)
-            }
-            labelRight={
-              translationKey.labelRight && t(`${translationKey.labelRight}`)
             }
           />
         ))}

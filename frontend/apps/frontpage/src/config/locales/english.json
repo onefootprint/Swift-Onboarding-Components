@@ -575,7 +575,8 @@
         "year": "year",
         "month": "month",
         "business": "business",
-        "scan": "scan"
+        "scan": "scan",
+        "active-user": "active user"
       },
       "core-plan": {
         "promo": {
@@ -676,7 +677,8 @@
           "verifications": "verifications",
           "month": "month",
           "persons": "persons",
-          "scans": "scans"
+          "scans": "scans",
+          "active-user": "active user"
         },
         "banners": {
           "recoup": {
