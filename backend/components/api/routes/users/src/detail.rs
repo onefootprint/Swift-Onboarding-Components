@@ -13,7 +13,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
     description = "View details of a most recent onboarding status of user",
-    tags(Users, Preview)
+    tags(Users, PublicApi)
 )]
 #[get("/users/{fp_id}")]
 pub async fn detail(
