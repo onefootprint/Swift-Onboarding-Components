@@ -1,13 +1,9 @@
-use crate::{
-    errors::{proxy::VaultProxyError, ApiError},
-    utils::headers::get_header,
-};
+use crate::errors::{proxy::VaultProxyError, ApiError};
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
 use newtypes::{FilterFunction, FpId, ProxyToken};
 
 use super::ProxyHeaderParams;
-
 
 /// Ingress rules define how to vault data in the response
 /// from the proxy requests
@@ -105,11 +101,12 @@ impl TryFrom<&HeaderMap> for ParsedIngressRules {
     type Error = ApiError;
 
     fn try_from(headers: &HeaderMap) -> Result<Self, Self::Error> {
-        let global_fp_id =
-            get_header(ProxyHeaderParams::USER_TOKEN_ASSIGNMENT_HEADER_NAME, headers).map(FpId::from);
+        let global_fp_id = ProxyHeaderParams::raw_get_user_token_assignment(headers)
+            .map(ToString::to_string)
+            .map(FpId::from);
 
-        let result = headers
-            .get_all(ProxyHeaderParams::INGRESS_RULE_HEADER_NAME)
+        let result = ProxyHeaderParams::raw_get_all_ingress_rule(headers)
+            .into_iter()
             .map(|value| {
                 let value = value
                     .to_str()

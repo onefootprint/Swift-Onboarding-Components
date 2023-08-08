@@ -44,8 +44,12 @@ class ProxyIngressContentType(BaseAuth):
     HEADER_NAME = "x-fp-proxy-ingress-content-type"
 
 
-class ProxyTokenAssignment(BaseAuth):
+class ProxyTokenAssignmentOld(BaseAuth):
     HEADER_NAME = "x-fp-proxy-footprint-token"
+
+
+class ProxyTokenAssignment(BaseAuth):
+    HEADER_NAME = "x-fp-id"
 
 
 class ProxyPathAndQuery(BaseAuth):
@@ -490,7 +494,7 @@ class TestVaultProxy:
                 sandbox_tenant.sk.key,
                 ProxyDestinationHeader(ditto_url),
                 ProxyAccessReason("test reason"),
-                ProxyTokenAssignment(fp_id),
+                ProxyTokenAssignmentOld(fp_id),
                 ProxyIngressRule(
                     "document.drivers_license.front.image=$.data.id_card,document.drivers_license.front.mime_type=$.data.type"
                 ),

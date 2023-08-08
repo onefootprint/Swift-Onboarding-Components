@@ -50,7 +50,8 @@ impl TryFrom<&ProxyHeaderParams> for ParsedClientCertificate {
         match (cert, key) {
             (Some(cert), Some(key)) => {
                 let cert = urlencoding::decode(&cert).map_err(|_| VaultProxyError::InvalidPemUrlEncoding)?;
-                let key = urlencoding::decode(key.leak()).map_err(|_| VaultProxyError::InvalidPemUrlEncoding)?;
+                let key =
+                    urlencoding::decode(key.leak()).map_err(|_| VaultProxyError::InvalidPemUrlEncoding)?;
 
                 Ok(ParsedClientCertificate {
                     client_tls_credential: Some(ClientCertificateKey::parse_cert_and_key(
@@ -77,8 +78,8 @@ impl TryFrom<&HeaderMap> for PinnedServerCertificates {
     type Error = VaultProxyError;
 
     fn try_from(headers: &HeaderMap) -> Result<Self, VaultProxyError> {
-        let certs = headers
-            .get_all(ProxyHeaderParams::PIN_CERT_HEADER_NAME)
+        let certs = ProxyHeaderParams::raw_get_all_pin_cert(headers)
+            .into_iter()
             .map(|value| -> Result<_, VaultProxyError> {
                 let value = value
                     .to_str()

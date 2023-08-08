@@ -7,6 +7,7 @@ macro_rules! api_headers_schema {
                 $(
 
                     $(#[doc = $r_doc:expr])*
+                    $(#[alias = $r_alias:literal])*
                     $r_name:ident: $r_typ:ty = $r_header:literal;
                 )*
             }
@@ -15,9 +16,11 @@ macro_rules! api_headers_schema {
                 $(
 
                     $(#[doc = $o_doc:expr])*
+                    $(#[alias = $o_alias:literal])*
                     $o_name:ident: $o_typ:ty = $o_header:literal;
                 )*
             }
+
         }
     ) => {
 
@@ -38,12 +41,52 @@ macro_rules! api_headers_schema {
             impl $group {
                 $(
                     $(#[doc = $r_doc])*
-                    pub const [<$r_name:upper _HEADER_NAME>]: &'static str = $r_header;
+                    pub const [<$r_name:snake:upper _HEADER_NAME>]:&'static str = $r_header;
+
+                    #[allow(unused)]
+                    $(#[doc = $r_doc])*
+                    pub fn [<raw_get_$r_name>]<'b>(req: &'b actix_web::http::header::HeaderMap) -> Option<&'b str> {
+                        req.get($r_header)
+                        $(
+                            .or(req.get($r_alias))
+                        )*
+                        .and_then(|h| h.to_str().ok())
+                    }
+
+                    #[allow(unused)]
+                    $(#[doc = $r_doc])*
+                    pub fn [<raw_get_all_$r_name>]<'b>(req: &'b actix_web::http::header::HeaderMap) -> Vec<&'b actix_web::http::header::HeaderValue> {
+                        req.get_all($r_header)
+                        $(
+                            .chain(req.get_all($r_alias))
+                        )*
+                        .collect()
+                    }
                 )*
 
                 $(
                     $(#[doc = $o_doc])*
-                    pub const [<$o_name:upper _HEADER_NAME>]: &'static str = $o_header;
+                    pub const [<$o_name:snake:upper _HEADER_NAME>]:&'static str = $o_header;
+
+                    #[allow(unused)]
+                    $(#[doc = $o_doc])*
+                    pub fn [<raw_get_$o_name>]<'b>(req: &'b actix_web::http::header::HeaderMap) -> Option<&'b str> {
+                        req.get($o_header)
+                        $(
+                            .or(req.get($o_alias))
+                        )*
+                        .and_then(|h| h.to_str().ok())
+                    }
+
+                    #[allow(unused)]
+                    $(#[doc = $o_doc])*
+                    pub fn [<raw_get_all_$o_name>]<'b>(req: &'b actix_web::http::header::HeaderMap) -> Vec<&'b actix_web::http::header::HeaderValue> {
+                        req.get_all($o_header)
+                        $(
+                            .chain(req.get_all($o_alias))
+                        )*
+                        .collect()
+                    }
 
                     #[allow(unused)]
                     pub fn [<get_ $o_name>](&self) -> Result<$o_typ, $crate::ApiError> {
@@ -118,10 +161,18 @@ macro_rules! api_headers_schema {
                     use std::str::FromStr;
 
                     $(
-                        let [<$r_name _res>] = get_header($r_header, req.headers()).map($r_typ::from_str).transpose().map_err($crate::ApiError::from);
+                        let [<$r_name _res>] = get_header($r_header, req.headers())
+                        $(
+                            .or(get_header($r_alias, req.headers()))
+                        )*
+                        .map($r_typ::from_str).transpose().map_err($crate::ApiError::from);
                     )*
                     $(
-                        let [<$o_name _res>] = get_header($o_header, req.headers()).map($o_typ::from_str).transpose().map_err($crate::ApiError::from);
+                        let [<$o_name _res>] = get_header($o_header, req.headers())
+                        $(
+                            .or(get_header($o_alias, req.headers()))
+                        )*
+                        .map($o_typ::from_str).transpose().map_err($crate::ApiError::from);
                     )*
                     Box::pin(async move {
                         Ok(Self {

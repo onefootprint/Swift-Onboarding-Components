@@ -139,9 +139,9 @@ Each token is specified as `{{ <footprint_user_token>.<data_identifier> }}`. `<f
 
 If you're operating on a single Footprint user vault, you can simplify the token body formatting by specifying the following header to identify which user vault is referenced.
 
-| Header                       | Value                                                 |
-| ---------------------------- | ----------------------------------------------------- |
-| `x-fp-proxy-footprint-token` | The Footprint user token used to infer request tokens |
+| Header    | Value                                                 |
+| --------- | ----------------------------------------------------- |
+| `x-fp-id` | The Footprint user token used to infer request tokens |
 
 In this case, the token can omit the `<footprint_user_token>` above and specify tokens as `{{ <data_identifier> }}`.
 
@@ -194,11 +194,11 @@ For simplicity, you can also define all of your ingress vaulting rules via the d
 
 However, when you declare ingress vaulting rules in the configuration, you still need to denote in the proxy request into which Footprint user vault to tokenize the data. Therefore, the following header value is required when using ingress rules for pre-configured proxy:
 
-| Header                       | Format    | value                                                           |
-| ---------------------------- | --------- | --------------------------------------------------------------- |
-| `x-fp-proxy-footprint-token` | `<fp_id>` | The Footprint user token for which the vaulting rules apply too |
+| Header    | Format    | value                                                           |
+| --------- | --------- | --------------------------------------------------------------- |
+| `x-fp-id` | `<fp_id>` | The Footprint user token for which the vaulting rules apply too |
 
-For example: add the header `'x-fp-proxy-footprint-token: fp_id_tctecBEvGc98V7Vx4MhZU'` where the rule in the proxy configuration would be defined as `custom.credit_card_number=$.data.card.number`.
+For example: add the header `'x-fp-id: fp_id_tctecBEvGc98V7Vx4MhZU'` where the rule in the proxy configuration would be defined as `custom.credit_card_number=$.data.card.number`.
 
 ## Just-in-time ingress vaulting
 
@@ -313,7 +313,7 @@ Note that some values can be defined in the proxy configuration settings and do 
 | `x-fp-proxy-method`               | Optional.                                        | Selects the HTTP Method Verb to use (defaults to POST if unspecified). Overrides a configuration's value if present.                  |
 | `x-fp-proxy-fwd-<HEADER>`         | Optional. Multiple allowed.                      | Sends a header named `<HEADER>` with the corresponding value                                                                          |
 | `x-fp-path-and-query`             | Optional.                                        | Use this header to customize/add additional path and/or query parameters to your existing proxy target URL                            |
-| `x-fp-proxy-footprint-token`      | Optional.                                        | The Footprint user token for which the proxy rules apply to. Required if tokens in the body dont specify an `fp_id_` prefix.          |
+| `x-fp-id`                         | Optional.                                        | The Footprint user token for which the proxy rules apply to. Required if tokens in the body dont specify an `fp_id_` prefix.          |
 | `x-fp-proxy-access-reason`        | Optional.                                        | The decryption reason to use for access/security logs during detokenization. Defaults to empty/no-reason.                             |
 | `x-fp-proxy-client-cert`          | Optional. Percent-encoded PEM                    | The client certificate to use                                                                                                         |
 | `x-fp-proxy-client-key`           | Optional. Percent-encoded PEM                    | The client certificate private key to use                                                                                             |

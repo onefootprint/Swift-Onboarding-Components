@@ -60,8 +60,9 @@ api_headers_schema! {
             /// Similarly, if specifying proxy configuration ingress rules from a stored configuration
             /// the corresponding token must be assigned just-in-time via a headers
             ///
-            /// i.e: `x-fp-proxy-footprint-token: fp_id_abc`
-            user_token_assignment: FpId = "x-fp-proxy-footprint-token";
+            /// i.e: `x-fp-id: fp_id_abc`
+            #[alias = "x-fp-proxy-footprint-token"]
+            user_token_assignment: FpId = "x-fp-id";
 
             /// Configure one more ingress rules
             ///
