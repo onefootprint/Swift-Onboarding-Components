@@ -29,11 +29,6 @@ export const DRIVERS_DELTA = 200;
 export const DRIVERS_MINIMUM_VALUE = 200;
 export const DRIVERS_COST = 1;
 
-export const AUTH_INITIAL_VALUE = 500;
-export const AUTH_DELTA = 500;
-export const AUTH_MINIMUM_VALUE = 500;
-export const AUTH_COST = 0.01;
-
 export const EMBEDDED_ONBOARDING_INITIAL_VALUE = 500;
 export const EMBEDDED_ONBOARDING_DELTA = 500;
 export const EMBEDDED_ONBOARDING_MINIMUM_VALUE = 500;

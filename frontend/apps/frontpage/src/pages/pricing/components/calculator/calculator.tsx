@@ -16,7 +16,6 @@ type CalculateCostProps = {
   dataVaulting: number;
   vaultProxy: number;
   driversLicense: number;
-  auth: number;
   embeddedOnboarding: number;
 };
 
@@ -27,7 +26,6 @@ const calculateCost = ({
   dataVaulting,
   vaultProxy,
   driversLicense,
-  auth,
   embeddedOnboarding,
 }: CalculateCostProps) =>
   Intl.NumberFormat('us-US', {
@@ -41,7 +39,6 @@ const calculateCost = ({
       dataVaulting * constants.DATA_VAULTING_COST +
       vaultProxy * constants.VAULT_PROXY_COST +
       driversLicense * constants.DRIVERS_COST +
-      auth * constants.AUTH_COST +
       embeddedOnboarding * constants.EMBEDDED_ONBOARDING_COST,
   );
 
@@ -54,7 +51,6 @@ const Calculator = () => {
     dataVaulting: constants.DATA_VAULTING_INITIAL_VALUE,
     vaultProxy: constants.VAULT_PROXY_INITIAL_VALUE,
     driversLicense: constants.DRIVERS_INITIAL_VALUE,
-    auth: constants.AUTH_INITIAL_VALUE,
     embeddedOnboarding: constants.EMBEDDED_ONBOARDING_INITIAL_VALUE,
   });
 
@@ -136,18 +132,6 @@ const Calculator = () => {
       },
     },
     {
-      key: 'auth',
-      unit: 'persons',
-      unitSecond: 'month',
-      initialValue: constants.AUTH_INITIAL_VALUE,
-      delta: constants.AUTH_DELTA,
-      minimumValue: constants.AUTH_MINIMUM_VALUE,
-      value: calculatorValues.auth,
-      onChange: (value: number) => {
-        setCalculatorValues(prev => ({ ...prev, auth: value }));
-      },
-    },
-    {
       key: 'embedded-onboarding',
       unit: 'persons',
       unitSecond: 'month',
@@ -207,7 +191,6 @@ const Calculator = () => {
                 dataVaulting: calculatorValues.dataVaulting,
                 vaultProxy: calculatorValues.vaultProxy,
                 driversLicense: calculatorValues.driversLicense,
-                auth: calculatorValues.auth,
                 embeddedOnboarding: calculatorValues.embeddedOnboarding,
               })}
             </TotalRow>

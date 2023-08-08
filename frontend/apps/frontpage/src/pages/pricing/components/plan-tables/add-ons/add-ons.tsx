@@ -44,18 +44,16 @@ const translationKeys = [
     unitSecond: 'month',
   },
   {
-    key: 'auth',
-    title: 'add-ons.features.auth.title',
-    cost: constants.AUTH_COST,
-    unit: 'person',
-    unitSecond: 'month',
-  },
-  {
     key: 'embedded-onboarding',
     title: 'add-ons.features.embedded-onboarding.title',
     cost: constants.EMBEDDED_ONBOARDING_COST,
     unit: 'person',
     unitSecond: 'month',
+  },
+  {
+    key: 'auth',
+    title: 'add-ons.features.auth.title',
+    labelRight: 'add-ons.features.auth.label',
   },
 ];
 
@@ -73,11 +71,14 @@ const AddOns = () => {
             key={translationKey.key}
             title={t(`${translationKey.title}`)}
             details={translationKey.details && t(`${translationKey.details}`)}
-            cost={translationKey.cost}
+            cost={translationKey.cost && translationKey.cost}
             unitFirst={translationKey.unit && t(`units.${translationKey.unit}`)}
             unitSecond={
               translationKey.unitSecond &&
               t(`units.${translationKey.unitSecond}`)
+            }
+            labelRight={
+              translationKey.labelRight && t(`${translationKey.labelRight}`)
             }
           />
         ))}

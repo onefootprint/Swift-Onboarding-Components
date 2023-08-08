@@ -567,7 +567,8 @@
             "details": "Process transactions without handling sensitive card data"
           },
           "auth": {
-            "title": "Auth"
+            "title": "Auth",
+            "label": "Coming soon"
           }
         }
       },
