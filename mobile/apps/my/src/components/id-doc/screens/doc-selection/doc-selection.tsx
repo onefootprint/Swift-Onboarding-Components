@@ -17,11 +17,9 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import { REVIEW_AUTH_TOKEN } from '@/config/constants';
 import useApp from '@/domains/idv/hooks/use-app';
 import useTranslation from '@/hooks/use-translation';
 
-import ConsentDialog from '../doc-scan/components/selfie/components/consent-dialog';
 import useSubmitDocType from '../doc-scan/hooks/use-submit-doc-type';
 import PermissionsDialog from './components/permissions-dialog';
 import useCountryOptions from './hooks/use-country-options';
@@ -49,8 +47,7 @@ const DocSelection = ({
 }: DocSelectionProps) => {
   const { t } = useTranslation('components.scan.doc-selection');
   const app = useApp();
-  const { onlyUsSupported, supportedDocumentTypes, shouldCollectConsent } =
-    requirement;
+  const { onlyUsSupported, supportedDocumentTypes } = requirement;
   const [country, setCountry] = useState<CountryRecord>(defaultCountry);
   const docTypeOptions = useDocumentOptions(supportedDocumentTypes, country);
   const countryOptions = useCountryOptions(onlyUsSupported);
@@ -58,7 +55,6 @@ const DocSelection = ({
     docTypeOptions[0].value ?? defaultType,
   );
   const docTypeMutation = useSubmitDocType();
-  const isAppStoreReview = authToken === REVIEW_AUTH_TOKEN;
 
   const handleSubmit = () => {
     docTypeMutation.mutate(
@@ -91,9 +87,6 @@ const DocSelection = ({
         <Typography variant="body-2">{t('subtitle')}</Typography>
       </Box>
       <Box justifyContent="space-between" flex={1}>
-        {shouldCollectConsent && !isAppStoreReview && (
-          <ConsentDialog authToken={authToken} />
-        )}
         <Box>
           <CountrySelect
             options={countryOptions}

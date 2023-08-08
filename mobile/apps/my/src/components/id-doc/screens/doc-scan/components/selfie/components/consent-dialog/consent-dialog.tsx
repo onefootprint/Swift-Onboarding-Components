@@ -21,13 +21,14 @@ import useConsent from './hooks/use-consent';
 
 export type ConsentDialogProps = {
   authToken: string;
+  onCompleted: () => void;
 };
 
 const HEADER_HEIGHT = 56;
 const SHOW_HEADER_THRESHOLD = 30;
 const SHOW_CTA_THRESHOLD = 700;
 
-const ConsentDialog = ({ authToken }: ConsentDialogProps) => {
+const ConsentDialog = ({ authToken, onCompleted }: ConsentDialogProps) => {
   const { t } = useTranslation('components.scan.selfie.consent');
   const consentMutation = useConsent();
   const [open, setOpen] = useState(true);
@@ -70,6 +71,7 @@ const ConsentDialog = ({ authToken }: ConsentDialogProps) => {
       {
         onSuccess: () => {
           setOpen(false);
+          onCompleted();
         },
       },
     );
@@ -110,9 +112,7 @@ const ConsentDialog = ({ authToken }: ConsentDialogProps) => {
             {t('subtitle')}
           </Typography>
           <Box marginTop={5}>
-            <Typography variant="body-3" marginBottom={4}>
-              {t('description')}
-            </Typography>
+            <Typography variant="body-3">{t('description')}</Typography>
             <Box
               backgroundColor="secondary"
               borderRadius="default"

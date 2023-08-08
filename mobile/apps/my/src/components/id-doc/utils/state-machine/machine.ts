@@ -45,6 +45,9 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
         },
         frontImage: {
           on: {
+            consentCompleted: {
+              actions: 'assignConsent',
+            },
             backButtonTapped: {
               target: 'docSelection',
             },
@@ -69,6 +72,9 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
         },
         backImage: {
           on: {
+            consentCompleted: {
+              actions: 'assignConsent',
+            },
             imageSubmitted: [
               {
                 target: 'selfie',
@@ -85,6 +91,9 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
         },
         selfie: {
           on: {
+            consentCompleted: {
+              actions: 'assignConsent',
+            },
             imageSubmitted: [
               {
                 target: 'completed',
@@ -104,6 +113,15 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
           return {
             ...context,
             currentSide: payload.nextSideToCollect,
+          };
+        }),
+        assignConsent: assign(context => {
+          return {
+            ...context,
+            requirement: {
+              ...context.requirement,
+              shouldCollectConsent: false,
+            },
           };
         }),
         assignCountryAndType: assign((context, { payload }) => {

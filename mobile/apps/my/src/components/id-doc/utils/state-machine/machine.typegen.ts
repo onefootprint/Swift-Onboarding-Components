@@ -13,6 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignConsent: 'consentCompleted';
     assignCountryAndType: 'countryAndTypeSubmitted';
     assignNextSideToCollect: 'imageSubmitted';
   };

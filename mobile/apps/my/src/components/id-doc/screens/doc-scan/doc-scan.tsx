@@ -1,8 +1,13 @@
 import { CountryRecord } from '@onefootprint/global-constants';
 import { getErrorMessage } from '@onefootprint/request';
-import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
-import React, { useMemo, useState } from 'react';
+import {
+  IdDocRequirement,
+  SupportedIdDocTypes,
+  UploadDocumentSide,
+} from '@onefootprint/types';
+import React, { useEffect, useMemo, useState } from 'react';
 
+import { REVIEW_AUTH_TOKEN } from '@/config/constants';
 import useTranslation from '@/hooks/use-translation';
 
 import DriversLicense from './components/drivers-license';
@@ -10,6 +15,7 @@ import IdCard from './components/id-card';
 import Passport from './components/passport';
 import Context from './components/scan-context';
 import Selfie from './components/selfie';
+import ConsentDialog from './components/selfie/components/consent-dialog';
 import useUploadDoc from './hooks/use-upload-doc';
 
 export type DocScanProps = {
@@ -19,7 +25,11 @@ export type DocScanProps = {
   side: UploadDocumentSide;
   type: SupportedIdDocTypes;
   docId: string;
+  requirement: IdDocRequirement;
+  onConsentCompleted: () => void;
 };
+
+const delayToShowConsentMS = 500;
 
 const DocScan = ({
   authToken,
@@ -28,10 +38,22 @@ const DocScan = ({
   side,
   type,
   docId,
+  requirement,
+  onConsentCompleted,
 }: DocScanProps) => {
   const { t, allT } = useTranslation('components.scan.preview.errors');
   const [errors, setErrors] = useState([]);
+  const [showConsent, setShowConsent] = useState(false);
+  const { shouldCollectConsent } = requirement;
+  const isAppStoreReview = authToken === REVIEW_AUTH_TOKEN;
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (shouldCollectConsent && !isAppStoreReview) {
+        setShowConsent(true);
+      }
+    }, delayToShowConsentMS);
+  }, []);
   const uploadMutation = useUploadDoc({
     onError: error => {
       setErrors([getErrorMessage(error)]);
@@ -87,6 +109,9 @@ const DocScan = ({
 
   return (
     <Context.Provider value={contextValues}>
+      {showConsent && (
+        <ConsentDialog authToken={authToken} onCompleted={onConsentCompleted} />
+      )}
       {side === UploadDocumentSide.Selfie ? (
         <Selfie />
       ) : (

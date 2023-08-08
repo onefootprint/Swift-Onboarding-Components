@@ -31,4 +31,7 @@ export type MachineEvents =
       payload: {
         nextSideToCollect?: SubmitDocumentSide;
       };
+    }
+  | {
+      type: 'consentCompleted';
     };
