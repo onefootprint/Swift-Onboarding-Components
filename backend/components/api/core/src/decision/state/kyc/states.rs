@@ -7,7 +7,6 @@ use db::models::{
 
 use feature_flag::FeatureFlagClient;
 use newtypes::{KycConfig, RiskSignalGroupKind, VaultKind};
-use webhooks::WebhookClient;
 
 use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
@@ -212,7 +211,7 @@ impl KycDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, KycState> for KycDecisioning {
-    type AsyncRes = (Arc<dyn FeatureFlagClient>, Arc<dyn WebhookClient>);
+    type AsyncRes = Arc<dyn FeatureFlagClient>;
 
     #[tracing::instrument(
         "OnAction<MakeDecision, KycState>::execute_async_idempotent_actions",
@@ -223,12 +222,11 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok((state.feature_flag_client.clone(), state.webhook_client.clone()))
+        Ok(state.feature_flag_client.clone())
     }
 
     #[tracing::instrument("OnAction<MakeDecision, KycState>::on_commit", skip_all)]
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
-        let (ff_client, webhook_client) = async_res;
+    fn on_commit(self, ff_client: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         let execute_rules_for_real_document_decision_only = execute_rules_for_document_only(&v, &wf)?;
@@ -254,7 +252,6 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         common::save_kyc_decision(
             conn,
-            webhook_client,
             &self.ob_id,
             &self.sv_id,
             &self.wf_id,

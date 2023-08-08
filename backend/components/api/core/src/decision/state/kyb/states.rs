@@ -2,14 +2,17 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use db::models::onboarding::{Onboarding, OnboardingUpdate};
+use db::models::onboarding_decision::OnboardingDecision;
+use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow as DbWorkflow;
-
-use feature_flag::FeatureFlagClient;
-use newtypes::{KybConfig, OnboardingStatus};
 
 use super::{
     KybAwaitingAsyncVendors, KybAwaitingBoKyc, KybComplete, KybDataCollection, KybDecisioning, KybState,
     KybVendorCalls,
+};
+use crate::decision::onboarding::rules::evaluate_kyb_rules;
+use crate::decision::onboarding::{
+    KybOnboardingRulesDecisionOutput, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
 };
 use crate::decision::utils::FixtureDecision;
 use crate::decision::{
@@ -20,6 +23,9 @@ use crate::decision::{
     },
 };
 use crate::{decision::state::OnAction, errors::ApiResult, State};
+use feature_flag::FeatureFlagClient;
+use itertools::Itertools;
+use newtypes::{KybConfig, OnboardingStatus};
 
 /////////////////////
 /// DataCollection
@@ -307,7 +313,7 @@ impl KybDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, KybState> for KybDecisioning {
-    type AsyncRes = Arc<dyn FeatureFlagClient>;
+    type AsyncRes = (Arc<dyn FeatureFlagClient>, Vec<OnboardingDecision>);
 
     #[tracing::instrument(
         "KybDecisioning#OnAction<MakeDecision, KybState>::execute_async_idempotent_actions",
@@ -318,19 +324,46 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok(state.feature_flag_client.clone())
+        let bo_obds =
+            decision::biz_risk::get_bo_obds(&state.db_pool, &state.enclave_client, &self.ob_id).await?;
+        Ok((state.feature_flag_client.clone(), bo_obds))
     }
 
     #[tracing::instrument("KybDecisioning#OnAction<MakeDecision, KybState>::on_commit", skip_all)]
-    fn on_commit(self, ff_client: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
+    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
+        let (ff_client, bo_obds) = async_res;
         let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
-        if let Some(fixture_decision) = fixture_decision {
-            decision::utils::write_kyb_fixture_ob_decision(conn, &self.ob_id, fixture_decision)?;
+
+        let sv = ScopedVault::get(conn, &self.ob_id)?;
+        let rsfd = decision::features::risk_signals::fetch_latest_risk_signals_map(conn, &sv.id)?;
+        let vres_ids = rsfd
+            .kyb
+            .footprint_reason_codes
+            .iter()
+            .map(|(_, _, vres_id)| vres_id.clone())
+            .unique()
+            .collect();
+
+        let decision = if let Some(fixture_decision) = fixture_decision {
+            OnboardingRulesDecision::Kyb(KybOnboardingRulesDecisionOutput::new(
+                OnboardingRulesDecisionOutput::from(fixture_decision),
+            ))
         } else {
-            // TODO: get fixture decision or real decision from executing rules
-            // TODO: figure out how to slot KYB into the KycRuleGroup type of dealios
-        }
+            evaluate_kyb_rules(rsfd.kyb, bo_obds)?
+        };
+
+        common::save_kyc_decision(
+            conn,
+            &self.ob_id,
+            &sv.id,
+            &self.wf_id,
+            vres_ids,
+            decision,
+            false, // dont support redo KYB at the moment
+            fixture_decision.is_some(),
+            vec![],
+        )?;
 
         Ok(KybState::from(KybComplete {}))
     }

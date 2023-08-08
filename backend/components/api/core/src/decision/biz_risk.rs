@@ -25,16 +25,52 @@ pub async fn make_kyb_decision(
     vres_id: &VerificationResultId,
     vendor_api: VendorAPI,
 ) -> Result<(), ApiError> {
+    let obds = get_bo_obds(db_pool, enclave_client, &ob_id).await?;
+    let reason_codes = features::middesk::reason_codes(business_response);
+    let fv = KybFeatureVector::new(reason_codes.clone(), obds);
+    let rules_output = fv.evaluate()?;
+
+    let vresid = vres_id.clone();
+    db_pool
+        .db_transaction(move |conn| -> ApiResult<()> {
+            let (ob, sv, _, _) = Onboarding::get(conn, &ob_id)?;
+            let risk_signals = reason_codes
+                .into_iter()
+                .map(|rc| (rc, vendor_api, vresid.clone()))
+                .collect();
+            let _rs = RiskSignal::bulk_create(conn, &sv.id, risk_signals, RiskSignalGroupKind::Kyb, false)?;
+
+            engine::save_onboarding_decision(
+                conn,
+                &ob,
+                rules_output,
+                vec![vresid],
+                true,
+                false,
+                None,
+                vec![],
+            )?;
+            Ok(())
+        })
+        .await?;
+    Ok(())
+}
+
+pub async fn get_bo_obds(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    business_ob_id: &OnboardingId,
+) -> Result<Vec<OnboardingDecision>, ApiError> {
+    let obid = business_ob_id.clone();
     let (ob, bvw) = db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (ob, _, _, _) = Onboarding::get(conn, &ob_id)?;
+            let (ob, _, _, _) = Onboarding::get(conn, &obid)?;
             let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &ob.scoped_vault_id)?;
             Ok((ob, bvw))
         })
         .await??;
 
     let ob_conf_id = ob.ob_configuration_id.clone();
-
     let dbo = bvw
         .decrypt_business_owners(db_pool, enclave_client, Some(ob_conf_id))
         .await?;
@@ -88,32 +124,5 @@ pub async fn make_kyb_decision(
         )));
     }
 
-    let reason_codes = features::middesk::reason_codes(business_response);
-    let fv = KybFeatureVector::new(reason_codes.clone(), obds);
-    let rules_output = fv.evaluate()?;
-
-    let svid = ob.scoped_vault_id.clone();
-    let vresid = vres_id.clone();
-    db_pool
-        .db_transaction(move |conn| -> ApiResult<()> {
-            let risk_signals = reason_codes
-                .into_iter()
-                .map(|rc| (rc, vendor_api, vresid.clone()))
-                .collect();
-            let _rs = RiskSignal::bulk_create(conn, &svid, risk_signals, RiskSignalGroupKind::Kyb, false)?;
-
-            engine::save_onboarding_decision(
-                conn,
-                &ob,
-                rules_output,
-                vec![vresid.clone()],
-                true,
-                false,
-                None,
-                vec![],
-            )?;
-            Ok(())
-        })
-        .await?;
-    Ok(())
+    Ok(obds)
 }

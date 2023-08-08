@@ -6,7 +6,6 @@ use db::models::workflow::Workflow as DbWorkflow;
 use feature_flag::FeatureFlagClient;
 use newtypes::DocumentConfig;
 use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
-use webhooks::WebhookClient;
 
 use super::{DocumentState, MakeDecision};
 use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
@@ -140,11 +139,7 @@ impl DocumentDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
-    type AsyncRes = (
-        Arc<dyn FeatureFlagClient>,
-        Vec<VendorResult>,
-        Arc<dyn WebhookClient>,
-    );
+    type AsyncRes = (Arc<dyn FeatureFlagClient>, Vec<VendorResult>);
 
     #[tracing::instrument(
         "OnAction<MakeDecision, DocumentState>::execute_async_idempotent_actions",
@@ -158,16 +153,12 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         let vendor_results =
             common::assert_kyc_vendor_calls_completed(state, &self.ob_id, &self.sv_id).await?;
 
-        Ok((
-            state.feature_flag_client.clone(),
-            vendor_results,
-            state.webhook_client.clone(),
-        ))
+        Ok((state.feature_flag_client.clone(), vendor_results))
     }
 
     #[tracing::instrument("OnAction<MakeDecision, DocumentState>::on_commit", skip_all)]
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<DocumentState> {
-        let (ff_client, vendor_results, webhook_client) = async_res;
+        let (ff_client, vendor_results) = async_res;
         let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         let execute_rules_for_real_document_decision_only = execute_rules_for_document_only(&v, &wf)?;
@@ -187,7 +178,6 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
 
         common::save_kyc_decision(
             conn,
-            webhook_client,
             &self.ob_id,
             &self.sv_id,
             &self.wf_id,

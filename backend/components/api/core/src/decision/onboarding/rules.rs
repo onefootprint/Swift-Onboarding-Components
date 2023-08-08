@@ -1,5 +1,9 @@
+use db::models::onboarding_decision::OnboardingDecision;
 use newtypes::{DecisionStatus, VendorAPI};
 
+use crate::decision::features::kyb_features::KybFeatureVector;
+use crate::decision::features::risk_signals::risk_signal_group_struct::Kyb;
+use crate::decision::onboarding::FeatureVector;
 use crate::decision::rule::RuleName;
 use crate::errors::ApiResult;
 use crate::ApiError;
@@ -20,7 +24,7 @@ use crate::decision::{
 };
 
 use super::{
-    Decision, DecisionResult, FeatureSet, OnboardingRulesDecisionOutput,
+    Decision, DecisionResult, FeatureSet, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
     WaterfallOnboardingRulesDecisionOutput,
 };
 
@@ -191,4 +195,17 @@ impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
 pub fn should_commit(rules_triggered: &Vec<RuleName>) -> bool {
     rules_triggered.is_empty()
         || (rules_triggered.len() == 1 && rules_triggered.contains(&RuleName::WatchlistHit))
+}
+
+pub fn evaluate_kyb_rules(
+    rsg: RiskSignalGroupStruct<Kyb>,
+    bo_obds: Vec<OnboardingDecision>,
+) -> ApiResult<OnboardingRulesDecision> {
+    let reason_codes = rsg
+        .footprint_reason_codes
+        .into_iter()
+        .map(|(rc, _, _)| rc)
+        .collect();
+    let fv = KybFeatureVector::new(reason_codes, bo_obds);
+    fv.evaluate()
 }

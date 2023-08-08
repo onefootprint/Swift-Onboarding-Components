@@ -20,7 +20,6 @@ use newtypes::{
     AlpacaKycConfig, DecisionIntentKind, DecisionStatus, FootprintReasonCode, OnboardingStatus, ReviewReason,
     RiskSignalGroupKind, VendorAPI, VerificationResultId,
 };
-use webhooks::WebhookClient;
 
 use crate::{
     auth::tenant::AuthActor,
@@ -243,7 +242,7 @@ impl AlpacaKycDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
-    type AsyncRes = (Arc<dyn FeatureFlagClient>, Arc<dyn WebhookClient>);
+    type AsyncRes = Arc<dyn FeatureFlagClient>;
 
     #[tracing::instrument(
         "OnAction<MakeDecision, AlpacaKycState>::execute_async_idempotent_actions",
@@ -254,12 +253,11 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok((state.feature_flag_client.clone(), state.webhook_client.clone()))
+        Ok(state.feature_flag_client.clone())
     }
 
     #[tracing::instrument("OnAction<MakeDecision, AlpacaKycState>::on_commit", skip_all)]
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
-        let (ff_client, webhook_client) = async_res;
+    fn on_commit(self, ff_client: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
         let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
@@ -285,7 +283,6 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 // If they hard fail, then we can immediatly save a Fail OBD/update onboarding.status = Fail
                 common::save_kyc_decision(
                     conn,
-                    webhook_client,
                     &self.ob_id,
                     &self.sv_id,
                     &self.wf_id,
@@ -380,7 +377,6 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
     type AsyncRes = (
         Either<(VerificationResult, WatchlistResultResponse), (VerificationResult, FixtureDecision)>,
         Vec<VendorResult>,
-        Arc<dyn WebhookClient>,
     );
 
     #[tracing::instrument(
@@ -447,13 +443,13 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let vendor_results =
             common::assert_kyc_vendor_calls_completed(state, &self.ob_id, &self.sv_id).await?;
 
-        Ok((watchlist_res, vendor_results, state.webhook_client.clone()))
+        Ok((watchlist_res, vendor_results))
     }
 
     #[tracing::instrument("OnAction<MakeWatchlistCheckCall, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(self, res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         // TODO save Risk Signals + determine if we transition to PendingReview or Complete
-        let (watchlist_res, vendor_results, webhook_client) = res;
+        let (watchlist_res, vendor_results) = res;
         let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
 
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
@@ -558,7 +554,6 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
 
         common::save_kyc_decision(
             conn,
-            webhook_client,
             &self.ob_id,
             &self.sv_id,
             &self.wf_id,

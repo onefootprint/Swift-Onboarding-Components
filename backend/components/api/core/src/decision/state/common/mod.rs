@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use db::{
     models::{
         decision_intent::DecisionIntent,
@@ -15,7 +13,6 @@ use newtypes::{
     DecisionIntentKind, DecisionStatus, FootprintReasonCode, OnboardingId, ReviewReason, ScopedVaultId,
     TenantId, VendorAPI, VerificationResultId, WorkflowId,
 };
-use webhooks::WebhookClient;
 
 use crate::{
     decision::{
@@ -283,11 +280,10 @@ pub fn get_decision(
     Ok(rules_output)
 }
 
-#[tracing::instrument(skip(conn, _webhook_client))]
+#[tracing::instrument(skip(conn))]
 #[allow(clippy::too_many_arguments)]
 pub fn save_kyc_decision(
     conn: &mut TxnPgConn,
-    _webhook_client: Arc<dyn WebhookClient>,
     ob_id: &OnboardingId,
     sv_id: &ScopedVaultId,
     workflow_id: &WorkflowId,
