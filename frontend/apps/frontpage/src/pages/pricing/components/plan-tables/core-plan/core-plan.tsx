@@ -7,11 +7,27 @@ import { Box, media, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import LinkButton from 'src/components/linking-button';
 
+import * as constants from '../../../utils/constants';
 import Banner from '../../banner';
 import InfoDialog from '../../info-dialog';
 import CheckedRow from '../components/checked-row';
 import FeatureRow from '../components/feature-row';
 import TableHeader from '../components/table-header';
+import PlusBottomBanner from './plus-bottom-banner';
+
+const translationKeys = [
+  'nitro-enclaves',
+  'isolated-compute',
+  'encryption-and-tokenization',
+  'access-control',
+  'audit-logs',
+  'idv-kyc',
+  'face-id',
+  'dashboard',
+  'one-click',
+  'step-up-verification',
+  'ofac',
+];
 
 const CorePlan = () => {
   const { t } = useTranslation('pages.pricing');
@@ -50,14 +66,14 @@ const CorePlan = () => {
         <PricingTable>
           <FeatureRow
             title={t('core-plan.price-table.KYC.title')}
-            cost={0.5}
+            cost={constants.KYC_COST}
             unitFirst={t('units.verification')}
             hideBorderBottom
           />
 
           <FeatureRow
             title={t('core-plan.price-table.pii-storage.title')}
-            cost={0.03}
+            cost={constants.PII_COST}
             unitFirst={t('units.person')}
             unitSecond={t('units.month')}
           />
@@ -67,38 +83,18 @@ const CorePlan = () => {
             <Typography variant="label-1" sx={{ marginLeft: 3 }}>
               {t('core-plan.features.title')}
             </Typography>
-            <CheckedRow>{t('core-plan.features.nitro-enclaves')}</CheckedRow>
-            <CheckedRow>{t('core-plan.features.isolated-compute')}</CheckedRow>
-            <CheckedRow>
-              {t('core-plan.features.encryption-and-tokenization')}
-            </CheckedRow>
-            <CheckedRow>{t('core-plan.features.access-control')}</CheckedRow>
-            <CheckedRow>{t('core-plan.features.audit-logs')}</CheckedRow>
-            <CheckedRow>{t('core-plan.features.idv-kyc')}</CheckedRow>
-            <CheckedRow>{t('core-plan.features.face-id')}</CheckedRow>
-            <CheckedRow>{t('core-plan.features.dashboard')}</CheckedRow>
-            <CheckedRow>{t('core-plan.features.one-click')}</CheckedRow>
-            <CheckedRow>
-              {t('core-plan.features.step-up-verification')}
-            </CheckedRow>
-            <CheckedRow>{t('core-plan.features.ofac')}</CheckedRow>
+            {translationKeys.map(translationKey => (
+              <CheckedRow
+                key={translationKey}
+                title={t(`core-plan.features.${translationKey}`)}
+              />
+            ))}
           </Box>
-          <Box sx={{ marginBottom: 8, marginTop: 4 }}>
-            <SoonFeature>
-              <Label>
-                <Typography variant="label-4" color="secondary">
-                  {t('core-plan.one-click-kyc.label')}
-                </Typography>
-              </Label>
-              <Typography variant="label-2">
-                {t('core-plan.one-click-kyc.title')}
-              </Typography>
-
-              <Typography variant="body-2" color="secondary">
-                {t('core-plan.one-click-kyc.details')}
-              </Typography>
-            </SoonFeature>
-          </Box>
+          <PlusBottomBanner
+            tag={t('core-plan.one-click-kyc.label')}
+            title={t('core-plan.one-click-kyc.title')}
+            details={t('core-plan.one-click-kyc.details')}
+          />
           <Box sx={{ marginTop: 4 }}>
             <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
               {t('cta')}
@@ -140,32 +136,6 @@ const Content = styled.div`
     ${media.greaterThan('sm')`
       padding: ${theme.spacing[7]};
     `}
-  `}
-`;
-
-const SoonFeature = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: ${theme.spacing[2]};
-    margin-top: ${theme.spacing[2]};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-    padding: ${theme.spacing[6]};
-  `}
-`;
-
-const Label = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 ${theme.spacing[2]};
-    border-radius: ${theme.borderRadius.compact};
-    background-color: ${theme.backgroundColor.quaternary};
-    margin-bottom: ${theme.spacing[2]};
   `}
 `;
 

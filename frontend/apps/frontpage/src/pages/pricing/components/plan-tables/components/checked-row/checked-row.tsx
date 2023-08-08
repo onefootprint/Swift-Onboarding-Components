@@ -4,14 +4,15 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
 type CheckedRowTypes = {
-  children: string;
+  title: string;
+  key: string;
 };
 
-const CheckedRow = ({ children }: CheckedRowTypes) => (
-  <CheckedRowContainer>
+const CheckedRow = ({ title, key }: CheckedRowTypes) => (
+  <CheckedRowContainer key={key}>
     <IcoCheckCircle24 />
     <Typography variant="body-2" as="p">
-      {children}
+      {title}
     </Typography>
   </CheckedRowContainer>
 );

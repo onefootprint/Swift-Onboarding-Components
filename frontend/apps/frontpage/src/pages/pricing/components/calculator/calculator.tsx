@@ -4,10 +4,10 @@ import { Typography } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
 
+import * as constants from '../../utils/constants';
 import Banner from '../banner';
 import Row from './components/row';
 import TotalRow from './components/total-row';
-import * as constants from './constants';
 
 type CalculateCostProps = {
   kyc: number;
@@ -16,6 +16,8 @@ type CalculateCostProps = {
   dataVaulting: number;
   vaultProxy: number;
   driversLicense: number;
+  auth: number;
+  embeddedOnboarding: number;
 };
 
 const calculateCost = ({
@@ -25,6 +27,8 @@ const calculateCost = ({
   dataVaulting,
   vaultProxy,
   driversLicense,
+  auth,
+  embeddedOnboarding,
 }: CalculateCostProps) =>
   Intl.NumberFormat('us-US', {
     style: 'currency',
@@ -36,24 +40,126 @@ const calculateCost = ({
       pii * constants.PII_COST +
       dataVaulting * constants.DATA_VAULTING_COST +
       vaultProxy * constants.VAULT_PROXY_COST +
-      driversLicense * constants.DRIVERS_COST,
+      driversLicense * constants.DRIVERS_COST +
+      auth * constants.AUTH_COST +
+      embeddedOnboarding * constants.EMBEDDED_ONBOARDING_COST,
   );
 
 const Calculator = () => {
   const { t } = useTranslation('pages.pricing.calculator');
+  const [calculatorValues, setCalculatorValues] = useState({
+    kyc: constants.KYC_INITIAL_VALUE,
+    kyb: constants.KYB_INITIAL_VALUE,
+    pii: constants.PII_INITIAL_VALUE,
+    dataVaulting: constants.DATA_VAULTING_INITIAL_VALUE,
+    vaultProxy: constants.VAULT_PROXY_INITIAL_VALUE,
+    driversLicense: constants.DRIVERS_INITIAL_VALUE,
+    auth: constants.AUTH_INITIAL_VALUE,
+    embeddedOnboarding: constants.EMBEDDED_ONBOARDING_INITIAL_VALUE,
+  });
 
-  const [kycValue, setKycValue] = useState(constants.KYC_INITIAL_VALUE);
-  const [kybValue, setKybValue] = useState(constants.KYB_INITIAL_VALUE);
-  const [piiValue, setPiiValue] = useState(constants.PII_INITIAL_VALUE);
-  const [vaultProxyValue, setVaultProxyValue] = useState(
-    constants.VAULT_PROXY_INITIAL_VALUE,
-  );
-  const [driversLicenseValue, setDriversLicenseValue] = useState(
-    constants.DRIVERS_INITIAL_VALUE,
-  );
-  const [dataVaultingValue, setDataVaultingValue] = useState(
-    constants.DATA_VAULTING_INITIAL_VALUE,
-  );
+  const variablesToCalculate = [
+    {
+      key: 'kyc',
+      unit: 'verifications',
+      unitSecond: 'month',
+      initialValue: constants.KYC_INITIAL_VALUE,
+      delta: constants.KYC_DELTA,
+      minimumValue: constants.KYC_MINIMUM_VALUE,
+      value: calculatorValues.kyc,
+      onChange: (value: number) => {
+        setCalculatorValues(prev => ({ ...prev, kyc: value }));
+      },
+      initialChecked: true,
+      disabled: true,
+    },
+    {
+      key: 'pii-storage',
+      unit: 'persons',
+      unitSecond: 'month',
+      initialValue: constants.PII_INITIAL_VALUE,
+      delta: constants.PII_DELTA,
+      minimumValue: constants.PII_MINIMUM_VALUE,
+      value: calculatorValues.pii,
+      onChange: (value: number) => {
+        setCalculatorValues(prev => ({ ...prev, pii: value }));
+      },
+      initialChecked: true,
+      disabled: true,
+    },
+    {
+      key: 'drivers-license-scan',
+      unit: 'persons',
+      unitSecond: 'month',
+      initialValue: constants.DRIVERS_INITIAL_VALUE,
+      delta: constants.DRIVERS_DELTA,
+      minimumValue: constants.DRIVERS_MINIMUM_VALUE,
+      value: calculatorValues.driversLicense,
+      onChange: (value: number) => {
+        setCalculatorValues(prev => ({ ...prev, driversLicense: value }));
+      },
+    },
+    {
+      key: 'kyb',
+      unit: 'verifications',
+      unitSecond: 'month',
+      initialValue: constants.KYB_INITIAL_VALUE,
+      delta: constants.KYB_DELTA,
+      minimumValue: constants.KYB_MINIMUM_VALUE,
+      value: calculatorValues.kyb,
+      onChange: (value: number) => {
+        setCalculatorValues(prev => ({ ...prev, kyb: value }));
+      },
+    },
+    {
+      key: 'non-identity-data-vaulting',
+      unit: 'persons',
+      unitSecond: 'month',
+      initialValue: constants.DATA_VAULTING_INITIAL_VALUE,
+      delta: constants.DATA_VAULTING_DELTA,
+      minimumValue: constants.DATA_VAULTING_MINIMUM_VALUE,
+      value: calculatorValues.dataVaulting,
+      onChange: (value: number) => {
+        setCalculatorValues(prev => ({ ...prev, dataVaulting: value }));
+      },
+    },
+    {
+      key: 'vault-proxy',
+      unit: 'persons',
+      unitSecond: 'month',
+      initialValue: constants.VAULT_PROXY_INITIAL_VALUE,
+      delta: constants.VAULT_PROXY_DELTA,
+      minimumValue: constants.VAULT_PROXY_MINIMUM_VALUE,
+      value: calculatorValues.vaultProxy,
+      onChange: (value: number) => {
+        setCalculatorValues(prev => ({ ...prev, vaultProxy: value }));
+      },
+    },
+    {
+      key: 'auth',
+      unit: 'persons',
+      unitSecond: 'month',
+      initialValue: constants.AUTH_INITIAL_VALUE,
+      delta: constants.AUTH_DELTA,
+      minimumValue: constants.AUTH_MINIMUM_VALUE,
+      value: calculatorValues.auth,
+      onChange: (value: number) => {
+        setCalculatorValues(prev => ({ ...prev, auth: value }));
+      },
+    },
+    {
+      key: 'embedded-onboarding',
+      unit: 'persons',
+      unitSecond: 'month',
+      initialValue: constants.EMBEDDED_ONBOARDING_INITIAL_VALUE,
+      delta: constants.EMBEDDED_ONBOARDING_DELTA,
+      minimumValue: constants.EMBEDDED_ONBOARDING_MINIMUM_VALUE,
+      value: calculatorValues.embeddedOnboarding,
+      onChange: (value: number) => {
+        setCalculatorValues(prev => ({ ...prev, embeddedOnboarding: value }));
+      },
+    },
+  ];
 
   return (
     <Container>
@@ -63,73 +169,26 @@ const Calculator = () => {
         </Typography>
       </Header>
       <TableRows>
-        <Row
-          units={`(${t('units.verifications')} / ${t('units.month')})`}
-          initialValue={constants.KYC_INITIAL_VALUE}
-          delta={constants.KYC_DELTA}
-          minimumValue={constants.KYC_MINIMUM_VALUE}
-          value={kycValue}
-          onChange={setKycValue}
-          initialChecked
-          disabled
-        >
-          {t('rows.kyc')}
-        </Row>
-        <Row
-          units={`(${t('units.persons')} / ${t('units.month')})`}
-          initialValue={constants.PII_INITIAL_VALUE}
-          delta={constants.PII_DELTA}
-          minimumValue={constants.PII_MINIMUM_VALUE}
-          value={piiValue}
-          onChange={setPiiValue}
-          initialChecked
-          disabled
-        >
-          {t('rows.pii-storage')}
-        </Row>
-        <Row
-          units={`(${t('units.verifications')} / ${t('units.month')})`}
-          initialValue={constants.KYB_INITIAL_VALUE}
-          delta={constants.KYB_DELTA}
-          minimumValue={constants.KYB_MINIMUM_VALUE}
-          value={kybValue}
-          onChange={setKybValue}
-        >
-          {t('rows.kyb')}
-        </Row>
-        <Row
-          units={`(${t('units.persons')} / ${t('units.month')})`}
-          initialValue={constants.DATA_VAULTING_INITIAL_VALUE}
-          delta={constants.DATA_VAULTING_DELTA}
-          minimumValue={constants.DATA_VAULTING_MINIMUM_VALUE}
-          value={dataVaultingValue}
-          onChange={setDataVaultingValue}
-        >
-          {t('rows.non-identity-data-vaulting')}
-        </Row>
-        <Row
-          units={`(${t('units.persons')} / ${t('units.month')})`}
-          initialValue={constants.VAULT_PROXY_INITIAL_VALUE}
-          delta={constants.VAULT_PROXY_DELTA}
-          minimumValue={constants.VAULT_PROXY_MINIMUM_VALUE}
-          value={vaultProxyValue}
-          onChange={setVaultProxyValue}
-        >
-          {t('rows.vault-proxy')}
-        </Row>
-        <Row
-          units={`(${t('units.scans')} / ${t('units.month')})`}
-          initialValue={constants.DRIVERS_INITIAL_VALUE}
-          delta={constants.DRIVERS_DELTA}
-          minimumValue={constants.DRIVERS_MINIMUM_VALUE}
-          value={driversLicenseValue}
-          onChange={setDriversLicenseValue}
-        >
-          {t('rows.drivers-license-scan')}
-        </Row>
+        {variablesToCalculate.map(row => (
+          <Row
+            key={row.key}
+            units={`(${t(`units.${row.unit}`)} / ${t(
+              `units.${row.unitSecond}`,
+            )})`}
+            initialValue={row.initialValue}
+            delta={row.delta}
+            minimumValue={row.minimumValue}
+            value={row.value}
+            onChange={row.onChange}
+            initialChecked={row.initialChecked}
+            disabled={row.disabled}
+          >
+            {t(`rows.${row.key}`)}
+          </Row>
+        ))}
       </TableRows>
       <AnimatePresence>
-        {kycValue < constants.KYC_THRESHOLD && (
+        {calculatorValues.kyc < constants.KYC_THRESHOLD && (
           <motion.span
             initial={{ opacity: 0.5, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -142,18 +201,20 @@ const Calculator = () => {
           >
             <TotalRow>
               {calculateCost({
-                kyc: kycValue,
-                kyb: kybValue,
-                pii: piiValue,
-                dataVaulting: dataVaultingValue,
-                vaultProxy: vaultProxyValue,
-                driversLicense: driversLicenseValue,
+                kyc: calculatorValues.kyc,
+                kyb: calculatorValues.kyb,
+                pii: calculatorValues.pii,
+                dataVaulting: calculatorValues.dataVaulting,
+                vaultProxy: calculatorValues.vaultProxy,
+                driversLicense: calculatorValues.driversLicense,
+                auth: calculatorValues.auth,
+                embeddedOnboarding: calculatorValues.embeddedOnboarding,
               })}
             </TotalRow>
           </motion.span>
         )}
         <AnimatePresence>
-          {kycValue >= constants.KYC_THRESHOLD && (
+          {calculatorValues.kyc >= constants.KYC_THRESHOLD && (
             <motion.span
               initial={{ opacity: 0.5, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

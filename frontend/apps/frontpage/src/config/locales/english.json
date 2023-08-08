@@ -507,19 +507,8 @@
           "KYC": {
             "title": "KYC"
           },
-          "KYB": {
-            "title": "KYB"
-          },
           "pii-storage": {
             "title": "PII Storage"
-          },
-          "non-identity-data-vaulting": {
-            "title": "Non-identity data vaulting",
-            "details": "Unlimited tokens & decryptions"
-          },
-          "vault-proxy": {
-            "title": "Vault Proxy",
-            "details": "Process transactions without handling sensitive card data"
           },
           "one-click-KYC": {
             "title": "One-click KYC",
@@ -557,9 +546,28 @@
         "micro-title": "Add-ons",
         "title": "Customize your plan",
         "features": {
-          "drivers-license": "Driver's license scan",
+          "kyb": {
+            "title": "KYB"
+          },
+          "non-identity-data-vaulting": {
+            "title": "Non-identity data vaulting",
+            "details": "Unlimited tokens & decryptions"
+          },
+          "drivers-license": {
+            "title": "Driver's license scan"
+          },
           "continuous-ofac": {
             "title": "Continuous OFAC monitoring"
+          },
+          "embedded-onboarding": {
+            "title": "Embedded onboarding"
+          },
+          "vault-proxy": {
+            "title": "Vault Proxy",
+            "details": "Process transactions without handling sensitive card data"
+          },
+          "auth": {
+            "title": "Auth"
           }
         }
       },
@@ -573,7 +581,9 @@
           "vault-proxy": "Vault proxy",
           "drivers-license-scan": "Driver's license scan",
           "total": "Total cost",
-          "per-month": "per month"
+          "per-month": "per month",
+          "auth": "Auth",
+          "embedded-onboarding": "Embedded onboarding"
         },
         "units": {
           "verifications": "verifications",
