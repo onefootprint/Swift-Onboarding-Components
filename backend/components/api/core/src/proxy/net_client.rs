@@ -1,4 +1,4 @@
-use super::config::EgressConfig;
+use super::{config::EgressConfig, validate_not_footprint_url};
 use crate::{
     errors::{proxy::VaultProxyError, ApiError, ApiResult},
     State,
@@ -42,6 +42,9 @@ pub async fn proxy_request(
     }
 
     let client = client.build()?;
+
+    // Double check we aren't proxying to ourselves
+    validate_not_footprint_url(&config.url)?;
 
     // record the log
     let log = NewProxyRequestLog {
