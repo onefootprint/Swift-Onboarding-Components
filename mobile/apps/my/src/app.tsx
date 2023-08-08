@@ -2,8 +2,8 @@ import 'react-native-reanimated';
 
 import { useFonts } from '@expo-google-fonts/dm-sans';
 import { QueryClientProvider } from '@tanstack/react-query';
-import * as SplashScreen from 'expo-splash-screen';
 import React, { useCallback } from 'react';
+import SplashScreen from 'react-native-splash-screen';
 
 import Debug from './components/debug';
 import queryClient from './config/initializers/react-query';
@@ -13,7 +13,6 @@ import Wallet from './domains/wallet';
 import useIsDebug from './hooks/use-is-debug';
 import useShouldOpenIdv from './hooks/use-should-open-idv';
 
-SplashScreen.preventAutoHideAsync();
 // configureLogger();
 
 const App = () => {
@@ -27,7 +26,7 @@ const App = () => {
 
   const handleLoad = useCallback(async () => {
     if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+      SplashScreen.hide();
     }
   }, [fontsLoaded]);
 

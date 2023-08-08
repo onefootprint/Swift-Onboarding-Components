@@ -47,7 +47,7 @@ def use_native_modules_app_clip!(config = nil)
   idv_packages = ["@expo-google-fonts/dm-sans", "@tanstack/react-query", "expo-splash-screen", 
                     "@shopify/flash-list", "expo", "expo-dev-client", "expo-linking", "expo-splash-screen", "expo-fon", 
                     "react-native-app-clip", "react-native-passkey", "react-native-svg", "react-native-vision-camera", "vision-camera-plugin-document",
-                    "vision-camera-plugin-face-detection", "expo-status-bar", "react-native-reanimated", "react-native-screens", "react-native-safe-area-context"]
+                    "vision-camera-plugin-face-detection", "expo-status-bar", "react-native-reanimated", "react-native-screens", "react-native-safe-area-context", "react-native-splash-screen"]
   filtered_packages = packages.select { |key, _| idv_packages.include?(key) }
   found_pods = []
 
