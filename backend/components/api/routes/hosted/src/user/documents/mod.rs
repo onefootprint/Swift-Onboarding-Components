@@ -15,7 +15,5 @@ pub fn temporary_should_skip_consent_always(
     vault: &Vault,
     document_request: &DocumentRequest,
 ) -> bool {
-    ff_client.flag(BoolFlag::IsAppClipEnabled(tenant_id))
-        && !vault.is_live
-        && !document_request.should_collect_selfie
+    ff_client.flag(BoolFlag::IsAppClipEnabled(tenant_id)) && !vault.is_live
 }
