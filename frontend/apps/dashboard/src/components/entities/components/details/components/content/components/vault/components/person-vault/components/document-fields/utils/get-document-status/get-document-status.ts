@@ -22,6 +22,9 @@ const getDocumentStatus = ({
   documents,
   documentType,
 }: GetDocumentStatusProps) => {
+  if (!documents || !documentType) {
+    return undefined;
+  }
   const relevantDocuments = filterDocumentsByKind(documents, documentType);
   if (
     relevantDocuments.some(document => document.status === IdDocStatus.complete)

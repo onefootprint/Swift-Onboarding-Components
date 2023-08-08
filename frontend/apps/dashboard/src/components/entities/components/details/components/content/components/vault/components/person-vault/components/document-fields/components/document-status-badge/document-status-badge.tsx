@@ -5,19 +5,19 @@ import React from 'react';
 export type DocumentStatus = 'success' | 'warning' | 'error';
 
 type DocumentBadgeStatusProps = {
-  status: DocumentStatus;
+  status?: DocumentStatus;
 };
 
 const DocumentStatusBadge = ({ status }: DocumentBadgeStatusProps) => {
   const { t } = useTranslation('pages.entity.decrypt.status');
 
-  return (
+  return status ? (
     <Badge variant={status}>
       <Typography variant="caption-1" color={status}>
         {t(status)}
       </Typography>
     </Badge>
-  );
+  ) : null;
 };
 
 export default DocumentStatusBadge;

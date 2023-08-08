@@ -51,15 +51,15 @@ describe('getDocumentStatus', () => {
     ).toEqual('warning');
   });
 
-  it('should return failure if there are no documents', () => {
+  it('should return undefined if there are no documents', () => {
     expect(
       getDocumentStatus({
         documentType: SupportedIdDocTypes.driversLicense,
       }),
-    ).toEqual('error');
+    ).toEqual(undefined);
   });
 
-  it('should return failure if is no document type', () => {
+  it('should return undefined if is no document type', () => {
     const documents = [
       driversLicenseFailed,
       driversLicensePending,
@@ -70,6 +70,6 @@ describe('getDocumentStatus', () => {
       getDocumentStatus({
         documents,
       }),
-    ).toEqual('error');
+    ).toEqual(undefined);
   });
 });
