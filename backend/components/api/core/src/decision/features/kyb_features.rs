@@ -1,12 +1,11 @@
 use db::models::onboarding_decision::OnboardingDecision;
-use idv::middesk::response::business::BusinessResponse;
-use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResultId};
+use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI};
 
 use crate::{
     decision::{
         onboarding::{
-            Decision, DecisionReasonCodes, FeatureSet, FeatureVector, KybOnboardingRulesDecisionOutput,
-            OnboardingRulesDecision, OnboardingRulesDecisionOutput,
+            Decision, FeatureSet, FeatureVector, KybOnboardingRulesDecisionOutput, OnboardingRulesDecision,
+            OnboardingRulesDecisionOutput,
         },
         rule::{
             self,
@@ -17,26 +16,9 @@ use crate::{
     errors::ApiResult,
 };
 
-use super::middesk;
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MiddeskFeatures {
-    pub footprint_reason_codes: Vec<FootprintReasonCode>,
-}
-
-impl MiddeskFeatures {
-    pub fn new(business_response: &BusinessResponse) -> Self {
-        let footprint_reason_codes = middesk::reason_codes(business_response);
-
-        Self {
-            footprint_reason_codes,
-        }
-    }
-}
-
 impl FeatureSet for KybFeatureVector {
     fn footprint_reason_codes(&self) -> &Vec<FootprintReasonCode> {
-        &self.middesk_features.footprint_reason_codes
+        &self.footprint_reason_codes
     }
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::MiddeskBusinessUpdateWebhook
@@ -45,40 +27,24 @@ impl FeatureSet for KybFeatureVector {
 
 #[derive(Clone, Debug)]
 pub struct KybFeatureVector {
-    pub middesk_features: MiddeskFeatures,
+    pub footprint_reason_codes: Vec<FootprintReasonCode>,
     pub bo_obds: Vec<OnboardingDecision>,
-    pub vendor_api: VendorAPI,
-    pub verification_result_id: VerificationResultId,
 }
 
 impl KybFeatureVector {
     pub fn new(
-        middesk_business_response: &BusinessResponse,
+        footprint_reason_codes: Vec<FootprintReasonCode>,
         bo_obds: Vec<OnboardingDecision>,
-        vendor_api: VendorAPI, // since the final BusinessResponse can come from either MiddeskBusinessUpdateWebhook or MiddeskGetBusiness, we must specifcy here (threaded into RiskSignal creation)
-        verification_result_id: VerificationResultId,
     ) -> KybFeatureVector {
         Self {
-            middesk_features: MiddeskFeatures::new(middesk_business_response),
+            footprint_reason_codes,
             bo_obds,
-            vendor_api,
-            verification_result_id,
         }
     }
 }
 
-impl KybFeatureVector {
-    fn reason_codes(&self) -> DecisionReasonCodes {
-        self.middesk_features
-            .footprint_reason_codes
-            .iter()
-            .map(|r| (r.clone(), self.vendor_api, self.verification_result_id.clone()))
-            .collect()
-    }
-}
-
 impl FeatureVector for KybFeatureVector {
-    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecision, DecisionReasonCodes)> {
+    fn evaluate(&self) -> ApiResult<OnboardingRulesDecision> {
         let middesk_rules: Vec<RuleSet<KybFeatureVector>> = vec![
             rule_sets::kyb::middesk_base_rule_set(),
             rule_sets::kyb::bos_pass_kyc_rule_set(),
@@ -107,9 +73,8 @@ impl FeatureVector for KybFeatureVector {
             rules_not_triggered: eval_result.rules_not_triggered,
         };
 
-        let output = OnboardingRulesDecision::Kyb(KybOnboardingRulesDecisionOutput::new(kyb_decision));
-
-        let reason_codes = self.reason_codes();
-        Ok((output, reason_codes))
+        Ok(OnboardingRulesDecision::Kyb(
+            KybOnboardingRulesDecisionOutput::new(kyb_decision),
+        ))
     }
 }

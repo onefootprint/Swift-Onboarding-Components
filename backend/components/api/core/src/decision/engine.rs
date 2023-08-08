@@ -4,7 +4,7 @@ use super::{
     features::risk_signals::{create_risk_signals_from_vendor_results, RiskSignalsForDecision},
     onboarding::{
         rules::{KycRuleExecutionConfig, KycRuleGroup},
-        FeatureVector, FinalAndAdditionalDecisions, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
+        FinalAndAdditionalDecisions, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
     },
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
@@ -24,7 +24,6 @@ use crate::{
 use db::{
     models::{
         onboarding::Onboarding,
-        risk_signal::RiskSignal,
         vault::Vault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
         verification_result::VerificationResult,
@@ -42,49 +41,10 @@ use idv::{
 
 use itertools::Itertools;
 use newtypes::{
-    ObConfigurationId, OnboardingId, PiiJsonValue, ReviewReason, RiskSignalGroupKind, ScopedVaultId,
-    VaultKind, VerificationRequestId, VerificationResultId, WorkflowId,
+    ObConfigurationId, OnboardingId, PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId,
+    VerificationResultId, WorkflowId,
 };
 use prometheus::labels;
-
-pub async fn make_onboarding_decision<T>(
-    ob: &Onboarding,
-    fv: T,
-    db_pool: &DbPool,
-    verification_result_ids: Vec<VerificationResultId>,
-    vault_kind: VaultKind,
-) -> ApiResult<()>
-where
-    T: FeatureVector + Send + Sync,
-{
-    // Calculate output from rules + features
-    let (rules_output, reason_codes) = fv.evaluate()?;
-
-    let ob = ob.clone();
-    db_pool
-        .db_transaction(move |conn| {
-            // Save/action/emit risk signals for the decision
-
-            // TODO: remove make_onboarding_decision entirely. used only by the now dead engine::run and the private/protected/make_decision endpoint
-            let rsg_kind = match vault_kind {
-                VaultKind::Person => RiskSignalGroupKind::Kyc,
-                VaultKind::Business => RiskSignalGroupKind::Kyb,
-            };
-            RiskSignal::bulk_create(conn, &ob.scoped_vault_id, reason_codes, rsg_kind, false)?;
-
-            save_onboarding_decision(
-                conn,
-                &ob,
-                rules_output,
-                verification_result_ids,
-                true,
-                false,
-                None,
-                vec![],
-            )
-        })
-        .await
-}
 
 pub async fn save_vendor_responses(
     db_pool: &DbPool,

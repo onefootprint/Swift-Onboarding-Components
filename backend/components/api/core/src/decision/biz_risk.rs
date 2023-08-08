@@ -1,18 +1,21 @@
 use db::{
-    models::{onboarding::Onboarding, onboarding_decision::OnboardingDecision},
+    models::{onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal},
     DbPool,
 };
 use idv::middesk::response::business::BusinessResponse;
-use newtypes::{OnboardingId, VaultKind, VendorAPI, VerificationResultId};
+use newtypes::{OnboardingId, RiskSignalGroupKind, VendorAPI, VerificationResultId};
 
+use super::{
+    engine,
+    features::{self, kyb_features::KybFeatureVector},
+};
+use crate::decision::onboarding::FeatureVector;
 use crate::{
     enclave_client::EnclaveClient,
     errors::{onboarding::OnboardingError, ApiResult},
     utils::vault_wrapper::{Business, DecryptedBusinessOwners, VaultWrapper},
     ApiError,
 };
-
-use super::{engine, features::kyb_features::KybFeatureVector};
 
 pub async fn make_kyb_decision(
     db_pool: &DbPool,
@@ -85,6 +88,32 @@ pub async fn make_kyb_decision(
         )));
     }
 
-    let fv = KybFeatureVector::new(business_response, obds, vendor_api, vres_id.clone());
-    engine::make_onboarding_decision(&ob, fv, db_pool, vec![vres_id.clone()], VaultKind::Person).await
+    let reason_codes = features::middesk::reason_codes(business_response);
+    let fv = KybFeatureVector::new(reason_codes.clone(), obds);
+    let rules_output = fv.evaluate()?;
+
+    let svid = ob.scoped_vault_id.clone();
+    let vresid = vres_id.clone();
+    db_pool
+        .db_transaction(move |conn| -> ApiResult<()> {
+            let risk_signals = reason_codes
+                .into_iter()
+                .map(|rc| (rc, vendor_api, vresid.clone()))
+                .collect();
+            let _rs = RiskSignal::bulk_create(conn, &svid, risk_signals, RiskSignalGroupKind::Kyb, false)?;
+
+            engine::save_onboarding_decision(
+                conn,
+                &ob,
+                rules_output,
+                vec![vresid.clone()],
+                true,
+                false,
+                None,
+                vec![],
+            )?;
+            Ok(())
+        })
+        .await?;
+    Ok(())
 }

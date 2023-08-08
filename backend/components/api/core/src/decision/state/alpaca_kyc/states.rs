@@ -18,7 +18,7 @@ use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     AlpacaKycConfig, DecisionIntentKind, DecisionStatus, FootprintReasonCode, OnboardingStatus, ReviewReason,
-    RiskSignalGroupKind, VendorAPI,
+    RiskSignalGroupKind, VendorAPI, VerificationResultId,
 };
 use webhooks::WebhookClient;
 
@@ -32,8 +32,7 @@ use crate::{
             save_risk_signals, RiskSignalGroupStruct,
         },
         onboarding::{
-            Decision, DecisionReasonCodes, DecisionResult, OnboardingRulesDecisionOutput,
-            WaterfallOnboardingRulesDecisionOutput,
+            Decision, DecisionResult, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
         },
         review::save_review_decision,
         state::{
@@ -758,15 +757,20 @@ fn get_review_reasons(wc_reason_codes: &[FootprintReasonCode], collected_doc: bo
     reasons
 }
 
+#[allow(clippy::type_complexity)]
 fn partition_adverse_media_watchlist_reason_codes(
-    reason_codes: DecisionReasonCodes,
-) -> (DecisionReasonCodes, DecisionReasonCodes) {
+    reason_codes: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+) -> (
+    Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+    Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+) {
     reason_codes
         .into_iter()
         .partition(|(frc, _, _)| frc.is_adverse_media())
 }
 
 #[cfg(test)]
+#[allow(clippy::type_complexity)]
 mod tests {
     use super::*;
     use newtypes::VerificationResultId;
@@ -799,8 +803,11 @@ mod tests {
     #[test_case(vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn)] => (vec![], vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn)]))]
     #[test_case(vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn), drc(FootprintReasonCode::AdverseMediaHit)] => (vec![drc(FootprintReasonCode::AdverseMediaHit)], vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn)]))]
     fn test_partition_adverse_media_watchlist_reason_codes(
-        wc_reason_codes: DecisionReasonCodes,
-    ) -> (DecisionReasonCodes, DecisionReasonCodes) {
+        wc_reason_codes: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+    ) -> (
+        Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+        Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+    ) {
         partition_adverse_media_watchlist_reason_codes(wc_reason_codes)
     }
 }

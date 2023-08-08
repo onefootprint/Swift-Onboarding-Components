@@ -30,8 +30,7 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
         Rule {
             rule: {
                 |f: &KybFeatureVector| {
-                    f.middesk_features
-                        .footprint_reason_codes
+                    f.footprint_reason_codes
                         .contains(&FootprintReasonCode::BusinessNameWatchlistHit)
                 }
             },
@@ -40,11 +39,7 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
         },
         Rule {
             rule: {
-                |f: &KybFeatureVector| {
-                    !f.middesk_features
-                        .footprint_reason_codes
-                        .contains(&FootprintReasonCode::TinMatch)
-                }
+                |f: &KybFeatureVector| !f.footprint_reason_codes.contains(&FootprintReasonCode::TinMatch)
             },
             name: RuleName::NoTinMatch,
             action: Action::Fail,
@@ -52,7 +47,7 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
         Rule {
             rule: {
                 |f: &KybFeatureVector| {
-                    !f.middesk_features.footprint_reason_codes.iter().any(|rc| {
+                    !f.footprint_reason_codes.iter().any(|rc| {
                         vec![
                             FootprintReasonCode::BusinessNameMatch,
                             FootprintReasonCode::BusinessNameSimilarMatch,
@@ -67,7 +62,7 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
         Rule {
             rule: {
                 |f: &KybFeatureVector| {
-                    !f.middesk_features.footprint_reason_codes.iter().any(|rc| {
+                    !f.footprint_reason_codes.iter().any(|rc| {
                         vec![
                             FootprintReasonCode::BusinessAddressMatch,
                             FootprintReasonCode::BusinessAddressCloseMatch,
@@ -91,20 +86,13 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::decision::{features::kyb_features::MiddeskFeatures, rule::rules_engine};
-    use newtypes::VendorAPI;
-    use newtypes::VerificationResultId;
-    use std::str::FromStr;
+    use crate::decision::rule::rules_engine;
     use test_case::test_case;
 
     fn middesk_features(fp_reason_codes: Vec<FootprintReasonCode>) -> KybFeatureVector {
         KybFeatureVector {
-            middesk_features: MiddeskFeatures {
-                footprint_reason_codes: fp_reason_codes,
-            },
+            footprint_reason_codes: fp_reason_codes,
             bo_obds: vec![],
-            vendor_api: VendorAPI::MiddeskBusinessUpdateWebhook,
-            verification_result_id: VerificationResultId::from_str("vres123").unwrap(),
         }
     }
 

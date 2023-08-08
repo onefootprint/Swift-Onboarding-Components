@@ -1,5 +1,5 @@
 use enum_dispatch::enum_dispatch;
-use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResultId};
+use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI};
 
 use crate::errors::ApiResult;
 
@@ -155,10 +155,8 @@ pub struct Decision {
     pub create_manual_review: bool,
     pub vendor_api: VendorAPI,
 }
-
-pub type DecisionReasonCodes = Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>;
 pub trait FeatureVector {
-    fn evaluate(&self) -> ApiResult<(OnboardingRulesDecision, DecisionReasonCodes)>;
+    fn evaluate(&self) -> ApiResult<OnboardingRulesDecision>;
 }
 
 pub trait FeatureSet {

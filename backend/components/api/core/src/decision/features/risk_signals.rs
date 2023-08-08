@@ -172,7 +172,20 @@ pub fn fetch_latest_risk_signals_map(
         group: Doc,
     };
 
-    Ok(RiskSignalsForDecision { kyc, doc })
+    let kyb: RiskSignalGroupStruct<Kyb> = RiskSignalGroupStruct {
+        footprint_reason_codes: db_risk_signals_map
+            .remove(&RiskSignalGroupKind::Kyb)
+            .map(|rs| {
+                rs.into_iter()
+                    .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
+                    .collect::<Vec<_>>()
+            })
+            // TODO: sure up the interface here, what's the contract? which part errors? currently the *Features TryFrom does
+            .unwrap_or(vec![]),
+        group: Kyb,
+    };
+
+    Ok(RiskSignalsForDecision { kyc, doc, kyb })
 }
 
 // RiskSignalGroupKind is defined in `newtypes` with all the other
@@ -316,4 +329,5 @@ impl TryFrom<RiskSignalGroupStruct<Doc>> for IncodeDocumentFeatures {
 pub struct RiskSignalsForDecision {
     pub kyc: RiskSignalGroupStruct<Kyc>,
     pub doc: RiskSignalGroupStruct<Doc>,
+    pub kyb: RiskSignalGroupStruct<Kyb>,
 }
