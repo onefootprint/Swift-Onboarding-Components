@@ -62,6 +62,7 @@ pub async fn get(
         business_tin: field_validations_map.get(&SignalScope::BusinessTin).cloned(),
         business_address: field_validations_map.get(&SignalScope::BusinessAddress).cloned(),
         business_beneficial_owners: field_validations_map.get(&SignalScope::BeneficialOwners).cloned(),
+        business_dba: field_validations_map.get(&SignalScope::BusinessDba).cloned(),
     };
 
     ResponseData::ok(response).json()

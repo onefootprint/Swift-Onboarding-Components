@@ -34,6 +34,7 @@ pub struct GetFieldValidationResponse {
     pub business_tin: Option<FieldValidation>,
     pub business_address: Option<FieldValidation>,
     pub business_beneficial_owners: Option<FieldValidation>,
+    pub business_dba: Option<FieldValidation>,
 }
 
 export_schema!(GetFieldValidationResponse);

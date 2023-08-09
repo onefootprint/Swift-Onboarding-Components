@@ -43,6 +43,7 @@ pub enum SignalScope {
     BusinessWebsite,
     BusinessTin,
     BeneficialOwners,
+    BusinessDba,
 }
 
 impl SignalScope {
@@ -69,6 +70,7 @@ impl SignalScope {
             SignalScope::BusinessWebsite => false,
             SignalScope::BusinessTin => false,
             SignalScope::BeneficialOwners => false,
+            SignalScope::BusinessDba => false,
         }
     }
 }

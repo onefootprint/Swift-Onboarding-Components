@@ -849,22 +849,6 @@ footprint_reason_code_enum! {
         #[note = "Business name does not match", severity = SignalSeverity::High,  description = "The input business name did not match"]
         BusinessNameDoesNotMatch,
 
-        #[scope = SignalScope::BusinessName, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "DBA matches", severity = SignalSeverity::Info,  description = "The input business DBA (Doing Business As) matches the located business's DBA"]
-        BusinessDbaMatch,
-
-        #[scope = SignalScope::BusinessName, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
-        #[note = "DBA is similar", severity = SignalSeverity::Low,  description = "The input business DBA (Doing Business As) is similar to the located business's DBA"]
-        BusinessDbaSimilarMatch,
-
-        #[scope = SignalScope::BusinessName, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "Alternate DBA found", severity = SignalSeverity::Medium,  description = "The located business goes by an alternate DBA (Doing Business As)"]
-        BusinessDbaAlternateMatch,
-
-        #[scope = SignalScope::BusinessName, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "DBA name does not match", severity = SignalSeverity::Medium,  description = "The input business DBA (Doing Business As) did not match"]
-        BusinessDbaDoesNotMatch,
-
         #[scope = SignalScope::BusinessName, additional_scopes = vec![], match_level = None]
         #[note = "No watchlist hits", severity = SignalSeverity::Info,  description = "No watchlist matches found for the business"]
         BusinessNameNoWatchlistHits,
@@ -872,6 +856,23 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::BusinessName, additional_scopes = vec![], match_level = None]
         #[note = "Watchlist hit", severity = SignalSeverity::High,  description = "One or more potential watchlist matches found for the business"]
         BusinessNameWatchlistHit, // TODO: make a variant per list like we do with KYC watchlist hits
+
+        // ~~~~~~~~ Business DBA ~~~~~~~~~~~~~~
+        #[scope = SignalScope::BusinessDba, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[note = "DBA matches", severity = SignalSeverity::Info,  description = "The input business DBA (Doing Business As) matches the located business's DBA"]
+        BusinessDbaMatch,
+
+        #[scope = SignalScope::BusinessDba, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+        #[note = "DBA is similar", severity = SignalSeverity::Low,  description = "The input business DBA (Doing Business As) is similar to the located business's DBA"]
+        BusinessDbaSimilarMatch,
+
+        #[scope = SignalScope::BusinessDba, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+        #[note = "Alternate DBA found", severity = SignalSeverity::Medium,  description = "The located business goes by an alternate DBA (Doing Business As)"]
+        BusinessDbaAlternateMatch,
+
+        #[scope = SignalScope::BusinessDba, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+        #[note = "DBA name does not match", severity = SignalSeverity::Medium,  description = "The input business DBA (Doing Business As) did not match"]
+        BusinessDbaDoesNotMatch,
 
         // ~~~~~~~~ Business Phone Number ~~~~~~~~~~~~~~
 
