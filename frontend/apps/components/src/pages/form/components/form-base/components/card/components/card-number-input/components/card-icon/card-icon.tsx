@@ -10,7 +10,6 @@ import {
   CcVisa24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { motion } from 'framer-motion';
 import React from 'react';
 
 type CardIconProps = {
@@ -33,14 +32,7 @@ const cardIcons: Record<string, JSX.Element> = {
 
 const CardIcon = ({ brand }: CardIconProps) =>
   brand ? (
-    <IconContainer
-      animate={{ opacity: 1, y: 0 }}
-      aria-label={brand}
-      initial={{ opacity: 0, y: 10 }}
-      key={brand}
-      role="img"
-      transition={{ duration: 0.2 }}
-    >
+    <IconContainer aria-label={brand} role="img">
       {cardIcons[brand] && cardIcons[brand]}
     </IconContainer>
   ) : (
@@ -49,7 +41,7 @@ const CardIcon = ({ brand }: CardIconProps) =>
     </IconContainer>
   );
 
-const IconContainer = styled(motion.div)`
+const IconContainer = styled.div`
   ${({ theme }) => css`
     align-items: center;
     display: flex;

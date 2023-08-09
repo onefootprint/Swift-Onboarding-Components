@@ -10591,15 +10591,6 @@ framer-motion@^10.11.2, framer-motion@^10.12.4, framer-motion@^10.5.0:
   optionalDependencies:
     "@emotion/is-prop-valid" "^0.8.2"
 
-framer-motion@^10.12.16:
-  version "10.12.16"
-  resolved "https://registry.npmjs.org/framer-motion/-/framer-motion-10.12.16.tgz"
-  integrity sha512-w/SfWEIWJkYSgRHYBmln7EhcNo31ao8Xexol8lGXf1pR/tlnBtf1HcxoUmEiEh6pacB4/geku5ami53AAQWHMQ==
-  dependencies:
-    tslib "^2.4.0"
-  optionalDependencies:
-    "@emotion/is-prop-valid" "^0.8.2"
-
 framer-motion@^7.8.0:
   version "7.10.3"
   resolved "https://registry.npmjs.org/framer-motion/-/framer-motion-7.10.3.tgz"

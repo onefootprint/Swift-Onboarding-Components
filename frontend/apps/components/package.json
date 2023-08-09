@@ -40,7 +40,6 @@
     "axios-case-converter": "^0.9.0",
     "creditcardutils": "^1.0.0",
     "date-fns": "^2.30.0",
-    "framer-motion": "^10.12.16",
     "i18next": "^22.5.0",
     "react-hook-form": "^7.45.2",
     "react-i18next": "^12.3.1",
