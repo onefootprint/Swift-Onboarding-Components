@@ -18,6 +18,7 @@ import type { ScanSize } from '../../scan.types';
 import Errors from './components/errors';
 import { DEFAULT_HEIGHT, LARGE_HEIGHT } from './preview.constants';
 import encodeImagePath from './utils/encode-image-path';
+import sanitizeImagePath from './utils/sanitize-image-path';
 
 type PreviewProps = {
   onReset: () => void;
@@ -65,7 +66,7 @@ const Preview = ({ title, subtitle, onReset, photo, size }: PreviewProps) => {
               hasError={isError}
               height={imageHeight}
               size={size}
-              source={{ uri: photo.path }}
+              source={{ uri: sanitizeImagePath(photo.path) }}
             />
           </Box>
           {isError && <Errors errors={errors} />}

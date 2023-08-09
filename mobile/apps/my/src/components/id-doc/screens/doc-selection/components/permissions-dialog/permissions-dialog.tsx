@@ -21,7 +21,8 @@ const PermissionsDialog = ({
   const [permissions, setPermission] = useState<CameraPermissionStatus | null>(
     null,
   );
-  const isNonDetermined = permissions === 'not-determined';
+  const isNonDetermined =
+    permissions === 'not-determined' || permissions === 'denied';
 
   const setInitialPermissions = async () => {
     try {
@@ -40,6 +41,8 @@ const PermissionsDialog = ({
       if (response === 'authorized') {
         onContinue();
       }
+
+      // TODO: add fallback for denied, speciallly for android
     } catch (error) {}
   };
 
