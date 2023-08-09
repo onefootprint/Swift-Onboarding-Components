@@ -22,7 +22,6 @@ describe('isContextReady', () => {
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
     isAppClipEnabled: false,
-    tenantId: 'org_Jr24ZzJj1RDg3DXv3V5HUIv',
   };
 
   describe('when init context info is complete', () => {

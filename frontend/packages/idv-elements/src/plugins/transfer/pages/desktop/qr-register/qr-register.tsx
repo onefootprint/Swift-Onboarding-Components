@@ -3,12 +3,12 @@ import styled, { css } from '@onefootprint/styled';
 import { D2PGenerateResponse } from '@onefootprint/types';
 import { Button, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import { QRCodeSVG } from 'qrcode.react';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import { useD2PSms, useGetD2PStatus } from '../../../../../hooks';
-import createHandoffUrl from '../../../../../utils/create-handoff-url';
+import { useCreateHandoffUrl } from '../../../../../hooks/ui';
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
 import useTranslationSourceForRequirements from '../../../hooks/desktop/use-translation-source-for-requirements';
@@ -19,14 +19,8 @@ const QRRegister = () => {
   const translationSource = useTranslationSourceForRequirements();
   const [state, send] = useDesktopMachine();
   const { authToken, device, config, scopedAuthToken } = state.context;
-  const url = useMemo(
-    () =>
-      createHandoffUrl({
-        authToken,
-        onboardingConfig: config,
-      }),
-    [authToken, config],
-  );
+  const url = useCreateHandoffUrl(scopedAuthToken, config?.isAppClipEnabled);
+
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
     authToken,
     device,

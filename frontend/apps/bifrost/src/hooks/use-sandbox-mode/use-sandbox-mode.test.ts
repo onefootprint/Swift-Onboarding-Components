@@ -23,7 +23,6 @@ describe('useSandboxMode', () => {
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
     isAppClipEnabled: false,
-    tenantId: 'org_Jr24ZzJj1RDg3DXv3V5HUIv',
   });
 
   describe('when it is using a live key', () => {

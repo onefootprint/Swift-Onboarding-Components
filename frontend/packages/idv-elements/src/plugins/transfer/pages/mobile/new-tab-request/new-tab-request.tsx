@@ -2,11 +2,11 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { D2PGenerateResponse } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import createHandoffUrl from '../../../../../utils/create-handoff-url';
+import { useCreateHandoffUrl } from '../../../../../hooks/ui';
 import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-token';
 
@@ -14,14 +14,7 @@ const NewTabRequest = () => {
   const { t } = useTranslation('pages.mobile.new-tab-requested');
   const [state, send] = useMobileMachine();
   const { authToken, device, config, scopedAuthToken } = state.context;
-  const url = useMemo(
-    () =>
-      createHandoffUrl({
-        authToken,
-        onboardingConfig: config,
-      }),
-    [authToken, config],
-  );
+  const url = useCreateHandoffUrl(scopedAuthToken, config?.isAppClipEnabled);
 
   const { mutation } = useGenerateScopedAuthToken({
     authToken,
