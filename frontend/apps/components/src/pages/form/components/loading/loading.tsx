@@ -1,15 +1,28 @@
 import styled, { css } from '@onefootprint/styled';
-import { Grid, media, ScrollArea, Shimmer } from '@onefootprint/ui';
+import { Grid, ScrollArea, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 
+import Container from '../container';
+
 const Loading = () => (
-  <Container id="footprint-container">
-    <Header>
-      <CloseButton />
-      <Title />
-    </Header>
+  <Container
+    header={
+      <>
+        <CloseButton />
+        <Title />
+      </>
+    }
+    footer={
+      <FooterWrapper>
+        <ButtonsContainer>
+          <Button />
+          <Button />
+        </ButtonsContainer>
+      </FooterWrapper>
+    }
+  >
     <div style={{ flexGrow: 1 }}>
-      <ScrollArea sx={{ padding: 7 }}>
+      <ScrollArea>
         <Form>
           <SectionTitle />
           <Grid.Row>
@@ -31,31 +44,8 @@ const Loading = () => (
         </Form>
       </ScrollArea>
     </div>
-    <Footer>
-      <ButtonsContainer>
-        <Button />
-        <Button />
-      </ButtonsContainer>
-    </Footer>
   </Container>
 );
-
-const Header = styled.header`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: sticky;
-    top: 0;
-    flex-shrink: 0;
-    z-index: 1;
-    padding: ${theme.spacing[4]};
-    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
-      0;
-  `}
-`;
 
 const CloseButton = () => (
   <Shimmer
@@ -83,53 +73,6 @@ const CardExpDateInput = () => (
 
 const CardCvc = () => <Shimmer sx={{ width: '100%', height: '40px' }} />;
 
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default};
-    justify-content: stretch;
-    width: 480px;
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    width: 100%;
-    border-radius: ${theme.borderRadius.default};
-
-    body[data-variant='modal'] & {
-      box-shadow: ${theme.elevation[3]};
-      border: none;
-      height: 100%;
-      width: 100%;
-      border-radius: 0;
-      margin: 0;
-
-      ${media.greaterThan('md')`
-        height: auto;
-        max-width: calc(100% - (2 * ${theme.spacing[9]}));
-        max-height: calc(100% - (2 * ${theme.spacing[9]}));
-        margin: ${theme.spacing[9]};
-        border-radius: ${theme.borderRadius.default};
-        width: 480px;
-    `}
-    }
-
-    body[data-variant='drawer'] & {
-      box-shadow: ${theme.elevation[3]};
-      border: none;
-      border-radius: 0;
-      height: 100vh;
-      width: 100%;
-      position: fixed;
-      right: 0;
-
-      ${media.greaterThan('md')`
-        width: 480px;
-        border-radius: 0;
-    `}
-    }
-  `}
-`;
-
 const Form = styled.div`
   ${({ theme }) => css`
     display: grid;
@@ -147,24 +90,11 @@ const ButtonsContainer = styled.div`
     position: relative;
   `}
 `;
-
-const Footer = styled.footer`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: ${theme.spacing[5]} ${theme.spacing[7]};
-    background-color: ${theme.backgroundColor.primary};
-    width: 100%;
-    z-index: 1;
-    position: sticky;
-    bottom: 0;
-    border-radius: 0 0 ${theme.borderRadius.default}
-      ${theme.borderRadius.default};
-    position: relative;
-    overflow: hidden;
-    justify-content: flex-end;
-  `}
+const FooterWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
 `;
 
 export default Loading;

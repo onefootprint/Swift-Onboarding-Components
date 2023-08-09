@@ -60,19 +60,12 @@ const Footer = ({
   );
 };
 
-const Container = styled.footer<{ hideFootprintLogo?: boolean }>`
-  ${({ theme, hideFootprintLogo }) => css`
+const Container = styled.div<{ hideFootprintLogo?: boolean }>`
+  ${({ hideFootprintLogo }) => css`
     display: flex;
     align-items: center;
     justify-content: ${hideFootprintLogo ? 'flex-end' : 'space-between'};
-    padding: ${theme.spacing[8]} 0 0;
-    background-color: ${theme.backgroundColor.primary};
     width: 100%;
-    z-index: 1;
-    position: sticky;
-    bottom: 0;
-    border-radius: 0 0 ${theme.borderRadius.default}
-      ${theme.borderRadius.default};
   `}
 `;
 

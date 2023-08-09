@@ -3,8 +3,7 @@ import { FootprintForm } from '@onefootprint/footprint-react';
 import styled from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
-
-const authToken = 'tok_SkgpMYfPAqkl3AaLrtsQsfNxKqxbWF88LN'; // process.env.NEXT_PUBLIC_COMPONENTS_AUTH_TOKEN as string;
+import { COMPONENTS_AUTH_TOKEN } from 'src/config/constants';
 
 const FormReactIntegration = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -25,7 +24,7 @@ const FormReactIntegration = () => {
         {isModalVisible && (
           <FootprintForm
             variant="modal"
-            authToken={authToken}
+            authToken={COMPONENTS_AUTH_TOKEN ?? ''}
             type={FootprintFormType.cardAndZip}
             onComplete={closeModal}
             onCancel={closeModal}
@@ -35,7 +34,7 @@ const FormReactIntegration = () => {
         {isDrawerVisible && (
           <FootprintForm
             variant="drawer"
-            authToken={authToken}
+            authToken={COMPONENTS_AUTH_TOKEN ?? ''}
             type={FootprintFormType.cardOnly}
             onComplete={closeDrawer}
             onCancel={closeDrawer}

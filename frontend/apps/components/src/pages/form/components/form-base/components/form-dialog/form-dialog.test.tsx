@@ -4,7 +4,7 @@ import React from 'react';
 import { renderComponents } from '../../../../../../config/tests';
 import FormDialog, { FormDialogProps } from './form-dialog';
 
-describe('<FormFormDialog />', () => {
+describe('<FormDialog />', () => {
   const renderFormDialog = ({
     title = 'Title',
     onClose = jest.fn(),
