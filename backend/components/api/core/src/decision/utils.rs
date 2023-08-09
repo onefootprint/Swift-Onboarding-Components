@@ -249,7 +249,7 @@ pub fn write_kyb_fixture_ob_decision(
 
     OnboardingDecision::create(conn, new_decision)?;
     let update = OnboardingUpdate {
-        authorized_at: Some(Some(Utc::now())),
+        authorized_at: None,
         idv_reqs_initiated_at: None,
         decision_made_at: Some(Some(Utc::now())),
         status: Some(decision_status.into()),
