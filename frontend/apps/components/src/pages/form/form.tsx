@@ -128,7 +128,15 @@ const Form = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  res,
+  query,
+}) => {
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=30, stale-while-revalidate=3600',
+  );
+
   const params = query as Record<string, string>;
   const { theme, fontSrc, rules, variant } = await getCustomAppearance({
     strategy: ['queryParameters'],

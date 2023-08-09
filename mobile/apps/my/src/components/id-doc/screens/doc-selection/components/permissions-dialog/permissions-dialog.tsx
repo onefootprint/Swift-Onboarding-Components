@@ -1,7 +1,7 @@
 import { Box, Button, Dialog, Typography } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { Linking } from 'react-native';
-import { Camera } from 'react-native-vision-camera';
+import { Camera, CameraPermissionStatus } from 'react-native-vision-camera';
 
 import useTranslation from '@/hooks/use-translation';
 
@@ -18,7 +18,9 @@ const PermissionsDialog = ({
     'components.scan.doc-selection.permissions-dialog',
   );
   const [open, setOpen] = useState(false);
-  const [permissions, setPermission] = useState(null);
+  const [permissions, setPermission] = useState<CameraPermissionStatus | null>(
+    null,
+  );
   const isNonDetermined = permissions === 'not-determined';
 
   const setInitialPermissions = async () => {
