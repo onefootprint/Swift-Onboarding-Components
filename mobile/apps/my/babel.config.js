@@ -3,12 +3,6 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      [
-        'react-native-reanimated/plugin',
-        {
-          globals: ['__detectDocument', '__detectFace'],
-        },
-      ],
       ['module:react-native-dotenv'],
       [
         'module-resolver',
@@ -30,6 +24,12 @@ module.exports = function (api) {
             '@/wallet': './src/domains/wallet',
             '@/scan': './src/domains/idv/components/scan',
           },
+        },
+      ],
+      [
+        'react-native-reanimated/plugin',
+        {
+          globals: ['__detectDocument', '__detectFace'],
         },
       ],
     ],

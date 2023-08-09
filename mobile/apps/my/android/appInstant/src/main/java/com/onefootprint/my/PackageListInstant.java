@@ -10,6 +10,20 @@ import com.facebook.react.shell.MainReactPackage;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// Manual package linking
+import com.mrousavy.camera.CameraPackage;
+import com.visioncameraplugindocument.VisionCameraPluginDocumentPackage;
+import com.visioncamerapluginfacedetection.VisionCameraPluginFaceDetectionPackage;
+import com.shopify.reactnative.flash_list.ReactNativeFlashListPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.horcrux.svg.SvgPackage;
+import com.reactnativepasskey.PasskeyPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import expo.modules.ExpoModulesPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
+
 public class PackageListInstant {
     private Application application;
     private ReactNativeHost reactNativeHost;
@@ -52,7 +66,19 @@ public class PackageListInstant {
 
     public ArrayList<ReactPackage> getPackages() {
         return new ArrayList<>(Arrays.<ReactPackage>asList(
-                new MainReactPackage(mConfig)
+                new MainReactPackage(mConfig),
+                new CameraPackage(),
+                new VisionCameraPluginDocumentPackage(),
+                new VisionCameraPluginFaceDetectionPackage(),
+                new ReactNativeFlashListPackage(),
+                new SafeAreaContextPackage(),
+                new RNScreensPackage(),
+                new SvgPackage(),
+                new PasskeyPackage(),
+                new RNCMaskedViewPackage(),
+                new AsyncStoragePackage(),
+                new ExpoModulesPackage(),
+                new ReanimatedPackage()
         ));
     }
 }

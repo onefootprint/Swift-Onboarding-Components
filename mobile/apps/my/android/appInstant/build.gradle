@@ -115,7 +115,7 @@ android {
         applicationId "com.onefootprint.my"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode 4
         versionName "1.0.0"
     }
 
@@ -179,6 +179,35 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.google.android.gms:play-services-instantapps:18.0.1")
+
+    // Instant app manual linking
+    implementation project(':vision-camera-plugin-document')
+    implementation project(':vision-camera-plugin-face-detection')
+    implementation project(':shopify_flash-list')
+    implementation project(':react-native-vision-camera')
+    implementation project(':react-native-svg')
+    implementation project(':react-native-screens')
+    implementation project(':react-native-safe-area-context')
+    implementation project(':react-native-reanimated')
+    implementation project(':react-native-passkey')
+    implementation project(':react-native-community_masked-view')
+    implementation project(':react-native-async-storage_async-storage')
+    implementation project(':expo-updates-interface')
+    implementation project(':expo-splash-screen')
+    implementation project(':expo-modules-core')
+    implementation project(':expo-manifests')
+    implementation project(':expo-keep-awake')
+    implementation project(':expo-json-utils')
+    implementation project(':expo-font')
+    implementation project(':expo-file-system')
+    implementation project(':expo-dev-menu-interface')
+    implementation project(':expo-dev-menu')
+    implementation project(':expo-dev-launcher')
+    implementation project(':expo-dev-client')
+    implementation project(':expo-constants')
+    implementation project(':expo-application')
+    implementation project(':expo')
+
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
