@@ -23,6 +23,7 @@ describe('getInitData', () => {
     mustCollectData: mustCollectData ?? [],
     canAccessData: mustCollectData ?? [],
     isAppClipEnabled: false,
+    tenantId: 'org_Jr24ZzJj1RDg3DXv3V5HUIv',
   });
 
   it('should return an empty object if no bootstrap data is provided', () => {

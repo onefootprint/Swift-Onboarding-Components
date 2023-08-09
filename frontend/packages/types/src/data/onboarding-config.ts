@@ -8,19 +8,18 @@ export enum OnboardingConfigStatus {
 }
 
 export type OnboardingConfig = {
-  id: string;
-  name: string;
-  key: string;
-  isLive: boolean;
-  createdAt: string;
-  status: OnboardingConfigStatus;
   appearance?: FootprintAppearance;
-
-  orgName: string;
-  logoUrl: string | null;
-  privacyPolicyUrl: string | null;
-
-  mustCollectData: CollectedDataOption[];
   canAccessData: CollectedDataOption[];
+  createdAt: string;
+  id: string;
   isAppClipEnabled: boolean;
+  isLive: boolean;
+  key: string;
+  logoUrl: string | null;
+  mustCollectData: CollectedDataOption[];
+  name: string;
+  orgName: string;
+  privacyPolicyUrl: string | null;
+  status: 'enabled' | 'disabled';
+  tenantId: string;
 };

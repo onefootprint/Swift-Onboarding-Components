@@ -22,6 +22,7 @@ export const onboardingConfigDetailsFixture: OnboardingConfig = {
   createdAt: '8/10/22, 11:56 AM',
   status: OnboardingConfigStatus.disabled,
   isAppClipEnabled: false,
+  tenantId: 'org_Jr24ZzJj1RDg3DXv3V5HUIv',
 };
 
 export const withOnboardingConfigDetails = (

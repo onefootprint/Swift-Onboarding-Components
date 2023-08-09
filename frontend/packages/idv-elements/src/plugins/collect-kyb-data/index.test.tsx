@@ -85,6 +85,7 @@ describe.skip('<CollectKybData />', () => {
     mustCollectData: mustCollectData ?? [],
     canAccessData: canAccessData ?? [],
     isAppClipEnabled: false,
+    tenantId: 'org_Jr24ZzJj1RDg3DXv3V5HUIv',
   });
 
   const getContext = (
