@@ -12,5 +12,15 @@
         "0F:FC:28:28:56:8F:D7:27:91:B6:17:55:38:AA:C3:D3:79:75:0F:1E:B1:2A:38:2F:ED:C0:A8:13:5D:D4:5D:C8"
       ]
     }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "web",
+      "site": "https://handoff.onefootprint.com"
+    }
   }
 ]
