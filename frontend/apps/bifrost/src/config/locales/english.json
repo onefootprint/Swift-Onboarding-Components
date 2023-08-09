@@ -3,5 +3,11 @@
     "errors": {}
   },
   "components": {},
-  "pages": {}
+  "pages": {
+    "error": {
+      "title": "Oops! An error occurred.",
+      "description": "We're sorry. Please restart the flow.",
+      "cta": "Restart"
+    }
+  }
 }

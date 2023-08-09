@@ -1,11 +1,6 @@
 {
   "components": {},
   "pages": {
-    "error": {
-      "title": "Oops! An error occurred.",
-      "description": "We're sorry. Please restart the onboarding.",
-      "cta": "Restart"
-    },
     "complete": {
       "title": "Submission completed!",
       "subtitle-with-kyb": "Thanks for using Footprint to verify your business and your identity.",

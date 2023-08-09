@@ -42,7 +42,7 @@ const EmptyState = ({
   >
     {Icon && (
       <Box sx={{ marginBottom: 7 }}>
-        <Icon />
+        <Icon color="error" />
       </Box>
     )}
     {renderHeader && <Box sx={{ marginBottom: 9 }}>{renderHeader()}</Box>}

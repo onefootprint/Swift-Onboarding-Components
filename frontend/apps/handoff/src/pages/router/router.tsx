@@ -45,12 +45,12 @@ const Router = () => {
   });
 
   return (
-    <AppErrorBoundary
-      onReset={() => {
-        send({ type: 'reset' });
-      }}
-    >
-      <Layout>
+    <Layout>
+      <AppErrorBoundary
+        onReset={() => {
+          send({ type: 'reset' });
+        }}
+      >
         {state.matches('init') && <Init />}
         {state.matches('idv') && obConfigAuth && (
           <Idv
@@ -65,8 +65,8 @@ const Router = () => {
         {state.matches('complete') && <Complete />}
         {state.matches('canceled') && <Canceled />}
         {state.matches('expired') && <Expired />}
-      </Layout>
-    </AppErrorBoundary>
+      </AppErrorBoundary>
+    </Layout>
   );
 };
 

@@ -17,12 +17,12 @@ const Root = () => {
   const { email, phoneNumber } = invited || {};
 
   return (
-    <AppErrorBoundary
-      onReset={() => {
-        send({ type: 'reset' });
-      }}
-    >
-      <Layout>
+    <Layout>
+      <AppErrorBoundary
+        onReset={() => {
+          send({ type: 'reset' });
+        }}
+      >
         {state.matches('init') && <Init />}
         {state.matches('intro') && <Intro />}
         {state.matches('expired') && <Expired />}
@@ -39,8 +39,8 @@ const Root = () => {
             showLogo
           />
         )}
-      </Layout>
-    </AppErrorBoundary>
+      </AppErrorBoundary>
+    </Layout>
   );
 };
 

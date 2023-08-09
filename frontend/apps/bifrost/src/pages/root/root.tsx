@@ -32,12 +32,12 @@ const Root = () => {
   };
 
   return (
-    <AppErrorBoundary
-      onReset={() => {
-        send({ type: 'reset' });
-      }}
-    >
-      <Layout>
+    <Layout>
+      <AppErrorBoundary
+        onReset={() => {
+          send({ type: 'reset' });
+        }}
+      >
         {state.matches('init') && <Init />}
         {state.matches('idv') && (
           <Idv
@@ -49,8 +49,8 @@ const Root = () => {
             showLogo={showLogo}
           />
         )}
-      </Layout>
-    </AppErrorBoundary>
+      </AppErrorBoundary>
+    </Layout>
   );
 };
 

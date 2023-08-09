@@ -27,7 +27,7 @@
     },
     "error": {
       "title": "Oops! An error occurred.",
-      "description": "We're sorry. Please restart this tab.",
+      "description": "We're sorry. Please refresh this tab to restart.",
       "cta": "Restart"
     }
   }
