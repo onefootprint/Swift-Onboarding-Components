@@ -39,8 +39,6 @@ pub enum BoolFlag<'a> {
     IsAppClipEnabled(&'a TenantId),
     #[strum(to_string = "CanMakeDemoIncodeRequestsInSandbox")]
     CanMakeDemoIncodeRequestsInSandbox(&'a TenantId),
-    #[strum(to_string = "CreateKybWorkflows")]
-    CreateKybWorkflows(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -68,7 +66,6 @@ impl<'a> BoolFlag<'a> {
             Self::RestrictToUsDriversLicense(k) => Some(k.to_string()),
             Self::IsAppClipEnabled(k) => Some(k.to_string()),
             Self::CanMakeDemoIncodeRequestsInSandbox(k) => Some(k.to_string()),
-            Self::CreateKybWorkflows(k) => Some(k.to_string()),
         }
     }
 
@@ -92,7 +89,6 @@ impl<'a> BoolFlag<'a> {
             Self::RestrictToUsDriversLicense(_) => false,
             Self::IsAppClipEnabled(_) => false,
             Self::CanMakeDemoIncodeRequestsInSandbox(_) => false,
-            Self::CreateKybWorkflows(_) => false,
         }
     }
 }

@@ -17,7 +17,6 @@ use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
-use feature_flag::BoolFlag;
 use newtypes::DataIdentifierDiscriminant;
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -58,13 +57,10 @@ pub async fn post(
     let maybe_new_biz_args = if should_create_new_business_vault {
         // If we're going to make a new business vault,
         let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
-        let should_create_workflow = state
-            .feature_flag_client
-            .flag(BoolFlag::CreateKybWorkflows(&ob_config.key));
         Some(NewBusinessVaultArgs {
             public_key,
             e_private_key,
-            should_create_workflow,
+            should_create_workflow: true,
         })
     } else {
         None
