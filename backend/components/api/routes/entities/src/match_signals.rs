@@ -55,6 +55,13 @@ pub async fn get(
         dob: field_validations_map.get(&SignalScope::Dob).cloned(),
         ssn: field_validations_map.get(&SignalScope::Ssn).cloned(),
         document: field_validations_map.get(&SignalScope::Document).cloned(),
+        business_name: field_validations_map.get(&SignalScope::BusinessName).cloned(),
+        business_phone_number: field_validations_map
+            .get(&SignalScope::BusinessPhoneNumber)
+            .cloned(),
+        business_tin: field_validations_map.get(&SignalScope::BusinessTin).cloned(),
+        business_address: field_validations_map.get(&SignalScope::BusinessAddress).cloned(),
+        business_beneficial_owners: field_validations_map.get(&SignalScope::BeneficialOwners).cloned(),
     };
 
     ResponseData::ok(response).json()
