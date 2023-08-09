@@ -1,4 +1,5 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
+import { FootprintVerifyProps } from '@onefootprint/footprint-js';
 import {
   InitShimmer,
   useGetOnboardingConfig,
@@ -13,8 +14,10 @@ import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
 import useTenantPublicKey from '../../hooks/use-tenant-public-key';
+import useLegacyFootprintProviderArgs from './hooks/use-legacy-footprint-provider-args';
 import useProps from './hooks/use-props';
-import { BifrostProps } from './hooks/use-props/types';
+
+type BifrostProps = Pick<FootprintVerifyProps, 'userData' | 'options'>;
 
 const Init = () => {
   const tenantPk = useTenantPublicKey();
@@ -54,13 +57,28 @@ const Init = () => {
     },
   );
 
-  useProps((props: BifrostProps) => {
-    const { userData, options } = props;
+  useProps<BifrostProps>((props?: BifrostProps) => {
+    const { userData, options } = props || {};
     const { showCompletionPage, showLogo } = options || {};
     send({
       type: 'initContextUpdated',
       payload: {
         bootstrapData: userData as IdvBootstrapData,
+        showCompletionPage,
+        showLogo,
+      },
+    });
+  });
+
+  useLegacyFootprintProviderArgs(args => {
+    const {
+      bootstrapData,
+      options: { showCompletionPage, showLogo },
+    } = args;
+    send({
+      type: 'initContextUpdated',
+      payload: {
+        bootstrapData,
         showCompletionPage,
         showLogo,
       },

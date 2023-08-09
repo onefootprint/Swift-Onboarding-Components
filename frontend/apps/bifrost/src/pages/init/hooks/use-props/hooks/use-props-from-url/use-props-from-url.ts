@@ -1,18 +1,32 @@
-import { IdvBootstrapData } from '@onefootprint/types';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-import { BifrostProps } from '../../types';
-import arePropsValid from '../../utils/are-props-valid';
-import getParsedProps from '../../utils/get-parsed-props';
-import parseLegacyUserData from '../../utils/parse-legacy-user-data';
+type BaseProps = Record<string, any>;
 
-const LEGACY_FRAGMENT_DIVIDER = '__';
+const getParsedProps = (props: string) => {
+  let parsedProps;
+  try {
+    parsedProps = JSON.parse(decodeURIComponent(props));
+  } catch (_) {
+    // eslint-disable-next-line no-console
+    console.warn(`Could not parse props from url. They will be ignored.`);
+  }
 
-const usePropsFromUrl = (onSuccess: (props: BifrostProps) => void) => {
+  return parsedProps || {};
+};
+
+const isPropsValid = (props: any) =>
+  !!props && typeof props === 'object' && props !== null;
+
+const usePropsFromUrl = <T extends BaseProps>(
+  onSuccess?: (props: T) => void,
+) => {
   const router = useRouter();
 
-  const getData = () => {
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
     let params = router.asPath;
     if (router.pathname) {
       const parts = params.split(router.pathname);
@@ -23,44 +37,14 @@ const usePropsFromUrl = (onSuccess: (props: BifrostProps) => void) => {
     const searchParams = new URLSearchParams(params);
     const props = searchParams.get('props') ?? undefined;
     if (!props) {
-      return undefined;
+      return;
     }
 
     const parsedProps = getParsedProps(props);
-    if (!arePropsValid(parsedProps)) {
-      return undefined;
-    }
-
-    return parsedProps;
-  };
-
-  const getLegacyData = () => {
-    const parts = router.asPath.split('#');
-    if (parts.length < 2) {
-      return undefined;
-    }
-
-    // We expect URLs to be formatted like this:
-    // <URL_BASE>#<ENCODED_LEGACY_USER_DATA>__<ENCODED_LEGACY_OPTIONS>
-    const args = parts[1];
-    const argsParts = args.split(LEGACY_FRAGMENT_DIVIDER);
-    const stringifiedUserData = argsParts[0];
-    const userData = getParsedProps(stringifiedUserData);
-    const stringifiedOptions = argsParts.length > 1 ? argsParts[1] : '';
-    const options = getParsedProps(stringifiedOptions);
-
-    return {
-      userData: parseLegacyUserData(userData as IdvBootstrapData),
-      options,
-    };
-  };
-
-  useEffect(() => {
-    if (!router.isReady) {
+    if (!isPropsValid(parsedProps)) {
       return;
     }
-    const data = getLegacyData() || getData() || {};
-    onSuccess(data);
+    onSuccess?.(parsedProps);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, router.asPath, router.pathname]);
