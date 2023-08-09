@@ -579,7 +579,7 @@ chmod +x connect_db.sh`;
       rootBlockDevice: {
         deleteOnTermination: true,
         encrypted: true,
-        volumeSize: 10,
+        volumeSize: 100,
         kmsKeyId: ebsKmsKey.arn,
       },
     },
