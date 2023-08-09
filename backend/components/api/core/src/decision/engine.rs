@@ -268,7 +268,7 @@ pub fn calculate_decision(
 ) -> ApiResult<OnboardingRulesDecisionOutput> {
     let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
     let risk_signals = RiskSignalsForDecision {
-        kyc: create_risk_signals_from_vendor_results(vendor_result_maps)?,
+        kyc: Some(create_risk_signals_from_vendor_results(vendor_result_maps)?),
         ..Default::default()
     };
     let decision = rule_group.evaluate(

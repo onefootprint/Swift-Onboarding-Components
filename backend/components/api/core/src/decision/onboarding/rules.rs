@@ -83,12 +83,20 @@ impl KycRuleGroup {
     ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
         // Since we waterfall here, we don't expect all the rule results to be available. But we do expect that at least _1_ is available
         // (for now, until we have doc only)
-        let idology_rule_result =
-            evaluate_rule_set_from_risk_signals(self.idology_rules.clone(), risk_signals.kyc.clone()).ok();
-        let experian_rule_result =
-            evaluate_rule_set_from_risk_signals(self.experian_rules.clone(), risk_signals.kyc).ok();
-        let incode_doc_rule_result =
-            evaluate_rule_set_from_risk_signals(self.incode_doc_rules.clone(), risk_signals.doc).ok();
+
+        let idology_rule_result = risk_signals
+            .kyc
+            .clone()
+            .and_then(|r| evaluate_rule_set_from_risk_signals(self.idology_rules.clone(), r).ok());
+
+        let experian_rule_result = risk_signals
+            .kyc
+            .clone()
+            .and_then(|r| evaluate_rule_set_from_risk_signals(self.experian_rules.clone(), r).ok());
+
+        let incode_doc_rule_result = risk_signals
+            .doc
+            .and_then(|r| evaluate_rule_set_from_risk_signals(self.incode_doc_rules.clone(), r).ok());
 
         // Check we have a KYC result from one of the vendors
         let kyc_rule_results: Vec<OnboardingEvaluationResult> =

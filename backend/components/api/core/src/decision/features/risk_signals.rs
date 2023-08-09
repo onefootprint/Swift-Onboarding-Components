@@ -146,46 +146,33 @@ pub fn fetch_latest_risk_signals_map(
                 acc.entry(kind).or_default().push(rs);
                 acc
             });
-    let kyc: RiskSignalGroupStruct<Kyc> = RiskSignalGroupStruct {
-        footprint_reason_codes: db_risk_signals_map
-            .remove(&RiskSignalGroupKind::Kyc)
-            .map(|rs| {
-                rs.into_iter()
-                    .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
-                    .collect::<Vec<_>>()
-            })
-            // TODO: sure up the interface here, what's the contract? which part errors? currently the *Features TryFrom does
-            .unwrap_or(vec![]),
-        group: Kyc,
-    };
 
-    let doc: RiskSignalGroupStruct<Doc> = RiskSignalGroupStruct {
-        footprint_reason_codes: db_risk_signals_map
-            .remove(&RiskSignalGroupKind::Doc)
-            .map(|rs| {
-                rs.into_iter()
-                    .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
-                    .collect::<Vec<_>>()
-            })
-            // TODO: sure up the interface here, what's the contract? which part errors? currently the *Features TryFrom does
-            .unwrap_or(vec![]),
-        group: Doc,
-    };
-
-    let kyb: RiskSignalGroupStruct<Kyb> = RiskSignalGroupStruct {
-        footprint_reason_codes: db_risk_signals_map
-            .remove(&RiskSignalGroupKind::Kyb)
-            .map(|rs| {
-                rs.into_iter()
-                    .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
-                    .collect::<Vec<_>>()
-            })
-            // TODO: sure up the interface here, what's the contract? which part errors? currently the *Features TryFrom does
-            .unwrap_or(vec![]),
-        group: Kyb,
-    };
+    let kyc = extract_risk_signal_group(&mut db_risk_signals_map, Kyc);
+    let doc = extract_risk_signal_group(&mut db_risk_signals_map, Doc);
+    let kyb = extract_risk_signal_group(&mut db_risk_signals_map, Kyb);
 
     Ok(RiskSignalsForDecision { kyc, doc, kyb })
+}
+
+fn extract_risk_signal_group<T>(
+    db_risk_signals_map: &mut HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
+    group: T,
+) -> Option<RiskSignalGroupStruct<T>>
+where
+    T: Into<WrappedRiskSignalGroupKind> + Clone,
+{
+    let rsg_kind = group.clone().into().into();
+    db_risk_signals_map
+        .remove(&rsg_kind)
+        .map(|rs| {
+            rs.into_iter()
+                .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
+                .collect::<Vec<_>>()
+        })
+        .map(|frcs| RiskSignalGroupStruct {
+            footprint_reason_codes: frcs,
+            group,
+        })
 }
 
 // RiskSignalGroupKind is defined in `newtypes` with all the other
@@ -327,7 +314,7 @@ impl TryFrom<RiskSignalGroupStruct<Doc>> for IncodeDocumentFeatures {
 
 #[derive(Clone, Default)]
 pub struct RiskSignalsForDecision {
-    pub kyc: RiskSignalGroupStruct<Kyc>,
-    pub doc: RiskSignalGroupStruct<Doc>,
-    pub kyb: RiskSignalGroupStruct<Kyb>,
+    pub kyc: Option<RiskSignalGroupStruct<Kyc>>,
+    pub doc: Option<RiskSignalGroupStruct<Doc>>,
+    pub kyb: Option<RiskSignalGroupStruct<Kyb>>,
 }

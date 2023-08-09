@@ -15,6 +15,7 @@ use crate::decision::onboarding::{
     KybOnboardingRulesDecisionOutput, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
 };
 use crate::decision::utils::FixtureDecision;
+use crate::decision::RuleError;
 use crate::decision::{
     self,
     state::{
@@ -339,8 +340,12 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
 
         let sv = ScopedVault::get(conn, &self.ob_id)?;
         let rsfd = decision::features::risk_signals::fetch_latest_risk_signals_map(conn, &sv.id)?;
-        let vres_ids = rsfd
+        let kyb_rsg = rsfd
             .kyb
+            .ok_or(RuleError::MissingInputForKYBRules)
+            .map_err(crate::decision::Error::from)?;
+
+        let vres_ids = kyb_rsg
             .footprint_reason_codes
             .iter()
             .map(|(_, _, vres_id)| vres_id.clone())
@@ -352,7 +357,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 OnboardingRulesDecisionOutput::from(fixture_decision),
             ))
         } else {
-            evaluate_kyb_rules(rsfd.kyb, bo_obds)?
+            evaluate_kyb_rules(kyb_rsg, bo_obds)?
         };
 
         common::save_kyc_decision(

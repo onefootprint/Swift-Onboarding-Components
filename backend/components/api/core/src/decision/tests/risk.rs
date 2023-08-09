@@ -56,10 +56,10 @@ fn test_evaluate_onboarding_rules(
         .collect();
 
     let rsg = RiskSignalsForDecision {
-        kyc: RiskSignalGroupStruct {
+        kyc: Some(RiskSignalGroupStruct {
             footprint_reason_codes: frcs,
             group: Kyc,
-        },
+        }),
         ..Default::default()
     };
 
