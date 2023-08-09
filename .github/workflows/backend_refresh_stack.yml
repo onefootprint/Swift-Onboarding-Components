@@ -35,19 +35,19 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Setup Pulumi CLI
-        uses: pulumi/setup-pulumi@v2.0.0
-        with:
-          pulumi-version: 3.48.0
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
+
+      - name: Pulumi login
+        run: pulumi login ${{ secrets.PULUMI_CLOUD_URL }}
 
       - run: yarn install
         working-directory: ./backend/infra
 
       # bring up the stack
-      - uses: pulumi/actions@v3
+      - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         with:
           command: refresh
           work-dir: ./backend/infra
-          stack-name: 'footprint/${{ github.event.inputs.stackName }}'
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          stack-name: '${{ github.event.inputs.stackName }}'
+          cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}

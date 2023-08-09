@@ -69,10 +69,11 @@ on:
         required: true
       ENCLAVE_SIGNING_CERT:
         required: true
-      PULUMI_ACCESS_TOKEN:
+      PULUMI_CLOUD_URL:
         required: true
       AIRPLANE_API_KEY:
         required: true
+
 jobs:
   extract_commit:
     name: Extract commit hash
@@ -265,10 +266,11 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Setup Pulumi CLI
-        uses: pulumi/setup-pulumi@v2.0.0
-        with:
-          pulumi-version: 3.48.0
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
+
+      - name: Pulumi login
+        run: pulumi login ${{ secrets.PULUMI_CLOUD_URL }}
 
       - run: yarn install
         working-directory: ./backend/infra
@@ -278,16 +280,12 @@ jobs:
         if: ${{ inputs.createStack }}
         working-directory: ./backend/infra
         run: |
-          pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/${{ inputs.baseStackName }}" "footprint/${{ inputs.stackName  }}" || true
+          pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "${{ inputs.baseStackName }}" "${{ inputs.stackName  }}" || true
           cp Pulumi.${{ inputs.baseStackName }}.yaml Pulumi.${{ inputs.stackName }}.yaml
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: select stack
         working-directory: ./backend/infra
-        run: pulumi stack select "footprint/${{ inputs.stackName }}"
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+        run: pulumi stack select "${{ inputs.stackName }}"
 
       - name: 'use fast ephemeral db'
         if: ${{ inputs.createStack && inputs.useNeonDB }}
@@ -300,65 +298,54 @@ jobs:
         working-directory: ./backend/infra
         run: |
           pulumi config set --path constants.domain.base ${{ inputs.baseDomain }}
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: 'override prefix domain'
         if: ${{ inputs.prefixDomain || false }}
         working-directory: ./backend/infra
         run: |
           pulumi config set --path constants.domain.prefix ${{ inputs.prefixDomain }}
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: 'override honeycomb API key'
         if: ${{ inputs.useEphemeralHoneycombApiKey || false }}
         working-directory: ./backend/infra
         run: |
           pulumi config set --secret --path constants.honeycomb.apiKey $(pulumi config get --path constants.honeycomb.ephemeralApiKey)
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: 'set api/enclave image version'
         working-directory: ./backend/infra
         run: |
           pulumi config set --path constants.containers.apiVersion ${{ needs.extract_commit.outputs.apiComponentVersion }}
           pulumi config set --path constants.containers.enclaveVersion ${{ needs.extract_commit.outputs.enclaveComponentVersion }}
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # refresh the state
-      - uses: pulumi/actions@v3.20.0
+      - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         with:
           command: refresh
           work-dir: ./backend/infra
-          stack-name: 'footprint/${{ inputs.stackName }}'
+          stack-name: '${{ inputs.stackName }}'
+          cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
           comment-on-pr: false
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # preview the stack
-      - uses: pulumi/actions@v3.20.0
+      - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         with:
           command: preview
           work-dir: ./backend/infra
-          stack-name: 'footprint/${{ inputs.stackName }}'
+          stack-name: '${{ inputs.stackName }}'
           comment-on-pr: false
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
 
       # deploy the stack
-      - uses: pulumi/actions@v3.20.0
+      - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         id: pulumi_deploy
         with:
           command: up
           work-dir: ./backend/infra
-          stack-name: 'footprint/${{ inputs.stackName }}'
+          stack-name: '${{ inputs.stackName }}'
           message: 'Deployed component ${{ needs.extract_commit.outputs.apiComponentVersion }} and ${{ needs.extract_commit.outputs.enclaveComponentVersion }}'
           comment-on-pr: true
           edit-pr-comment: true
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
 
       - name: Update deploy info on pull request
         if: github.event_name == 'pull_request'

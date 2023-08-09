@@ -42,10 +42,11 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Setup Pulumi CLI
-        uses: pulumi/setup-pulumi@v2.0.0
-        with:
-          pulumi-version: 3.48.0
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
+
+      - name: Pulumi login
+        run: pulumi login ${{ secrets.PULUMI_CLOUD_URL }}
 
       - run: yarn install
         working-directory: ./backend/infra
@@ -55,19 +56,17 @@ jobs:
         shell: bash
         working-directory: ./backend/infra
         run: |
-          sub=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.prefix)
-          base=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.base)
+          sub=$(pulumi config --stack ${{ inputs.stackName }} get --path constants.domain.prefix)
+          base=$(pulumi config --stack ${{ inputs.stackName }} get --path constants.domain.base)
           url="${sub}${base}"
           version="${branch}-${{ inputs.shortHashVersion }}"
           echo "##[set-output name=url;]$(echo ${url})"
           echo "##[set-output name=componentVersion;]$(echo ${version})"
         id: constants
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: select stack
         working-directory: ./backend/infra
-        run: pulumi stack select "footprint/${{ inputs.stackName }}"
+        run: pulumi stack select "${{ inputs.stackName }}"
 
       - name: 'set api/enclave image version'
         working-directory: ./backend/infra
@@ -76,14 +75,13 @@ jobs:
           pulumi config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
 
       # bring up the stack
-      - uses: pulumi/actions@v3
+      - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         with:
           command: up
           work-dir: ./backend/infra
-          stack-name: 'footprint/${{ inputs.stackName }}'
+          stack-name: '${{ inputs.stackName }}'
           message: 'Deployed to https://${{ steps.constants.outputs.url }} with component ${{ steps.constants.outputs.componentVersion }}'
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
 
   run_tests:
     name: 'integration tests'

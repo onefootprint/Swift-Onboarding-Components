@@ -124,7 +124,11 @@ Pulumi is our infra-as-code framework. All of the pulumi code is in /infra. For 
 1. Install [pulumi](https://www.pulumi.com/docs/get-started/install/). With homebrew, run `$ brew install pulumi`
 2. Install [docker](https://docs.docker.com/desktop/mac/install/) With homebrew, `$ brew install docker`
 3. Ensure you have completed the AWS credentials setup above
-4. Log in to [pulumi](pulumi.com) with github (make sure to use the account linked to the footprint organization). Generate an access token under your profile picture -> settings -> access tokens. Then run `$ pulumi login` and paste in the access token you generated to authenticate
+4. Login into Pulumi. We use AWS S3 to manage pulumi state:
+
+- For dev: `pulumi login s3://footprint-pulumi-state-dev`
+- For prod: `pulumi login s3://footprint-pulumi-state-prod`
+
 5. Make sure you've upgraded node, then:
 
 ```
@@ -164,20 +168,20 @@ To add a secret to pulumi, do the following:
 
 ```sh
 $ cd infra/
-$ pulumi --stack footprint/dev config set --secret --path <SECRET_NAME> <SECRET_VALUE?
-$ pulumi --stack footprint/prod config set --secret --path <SECRET_NAME> <SECRET_VALUE?
+$ pulumi --stack dev config set --secret --path <SECRET_NAME> <SECRET_VALUE>
+$ pulumi --stack prod config set --secret --path <SECRET_NAME> <SECRET_VALUE>
 ```
 
 For example
 
 ```sh
-$ AWS_PROFILE=dev pulumi --stack footprint/dev config set --secret --path constants.grafana.apiKey 'mySecretValue'
+$ AWS_PROFILE=dev pulumi --stack dev config set --secret --path constants.grafana.apiKey 'mySecretValue'
 ```
 
 You can similarly read existing secret values with
 
 ```
-$ AWS_PROFILE=dev pulumi --stack footprint/dev config get --path constants.grafana.apiKey
+$ AWS_PROFILE=dev pulumi --stack dev config get --path constants.grafana.apiKey
 ```
 
 - To add the secret to the container environment, first edit secrets.ts to add your new secret to StaticSecrets. Then, go to container.ts in the /infra/service directory and add your new secret following the existing structure to the containerDef.

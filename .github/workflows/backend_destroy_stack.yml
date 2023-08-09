@@ -35,12 +35,13 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Setup Pulumi CLI
-        uses: pulumi/setup-pulumi@v2.0.0
-        with:
-          pulumi-version: 3.48.0
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
 
-      - run: npm install
+      - name: Pulumi login
+        run: pulumi login ${{ secrets.PULUMI_CLOUD_URL }}
+
+      - run: yarn install
         working-directory: ./backend/infra
 
       - name: Extract stack name
@@ -53,10 +54,8 @@ jobs:
         id: get_stack_name
 
       # create our temp stack
-      - run: pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/dev" "footprint/${{ steps.get_stack_name.outputs.stack }}" || true
+      - run: pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "dev" "${{ steps.get_stack_name.outputs.stack }}" || true
         working-directory: ./backend/infra
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # copy our stack file just in case
       - run: cp Pulumi.dev.yaml Pulumi.${{ steps.get_stack_name.outputs.stack }}.yaml
@@ -67,30 +66,26 @@ jobs:
         shell: bash
         working-directory: ./backend/infra
         run: |
-          base=$(pulumi config --stack footprint/${{ steps.get_stack_name.outputs.stack }} get --path constants.domain.base)
+          base=$(pulumi config --stack ${{ steps.get_stack_name.outputs.stack }} get --path constants.domain.base)
           url="${{ steps.get_stack_name.outputs.stack }}.${base}"
           echo "##[set-output name=url;]$(echo ${url})"
         id: extract_env_url
 
-      - uses: pulumi/actions@v3
+      - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         with:
           command: refresh
           work-dir: ./backend/infra
-          stack-name: 'footprint/${{ steps.get_stack_name.outputs.stack }}'
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          stack-name: '${{ steps.get_stack_name.outputs.stack }}'
+          cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
 
-      - uses: pulumi/actions@v3
+      - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         with:
           command: destroy
           work-dir: ./backend/infra
-          stack-name: 'footprint/${{ steps.get_stack_name.outputs.stack }}'
+          stack-name: '${{ steps.get_stack_name.outputs.stack }}'
           message: 'Destroyed ephemeral environment https://${{ steps.extract_env_url.outputs.url }}'
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
 
       # rm our temp stack
-      - run: pulumi stack --stack footprint/${{ steps.get_stack_name.outputs.stack }} rm -y
+      - run: pulumi stack --stack ${{ steps.get_stack_name.outputs.stack }} rm -y
         working-directory: ./backend/infra
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
