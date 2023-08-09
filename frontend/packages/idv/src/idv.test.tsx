@@ -2,7 +2,6 @@
 import themes from '@onefootprint/design-tokens';
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { Layout } from '@onefootprint/idv-elements';
-import { withUserVaultValidate } from '@onefootprint/idv-elements/src/plugins/investor-profile/index.test.config';
 import {
   createUseRouterSpy,
   render,
@@ -45,6 +44,7 @@ import {
   withRequirements,
   withUserToken,
   withUserVault,
+  withUserVaultValidate,
 } from './idv.test.config';
 import { IdvProps } from './types';
 

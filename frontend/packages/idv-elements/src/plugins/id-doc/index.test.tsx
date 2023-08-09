@@ -13,7 +13,7 @@ import React from 'react';
 import FootprintProvider from 'src/components/footprint-provider';
 import { Layout } from 'src/components/layout';
 
-import { DeviceInfo } from '../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../hooks/ui/use-device-info';
 import { PluginContext } from '../base-plugin';
 import IdDoc from './index';
 import { IdDocCustomData, IdDocProps } from './types';

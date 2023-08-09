@@ -1,7 +1,7 @@
 import { IdvBootstrapData, OnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
 import { RequirementTargets, requiresAdditionalInfo } from './machine.utils';
 import { MachineContext, MachineEvents, Requirements } from './types';
 

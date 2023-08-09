@@ -7,7 +7,7 @@ import {
   OnboardingConfig,
 } from '@onefootprint/types';
 
-import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type BasicData = Required<
   Pick<BusinessDIData, BusinessDI.name | BusinessDI.tin>

@@ -166,6 +166,18 @@ export const withUserVault = () =>
     },
   });
 
+export const withUserVaultValidate = () => {
+  mockRequest({
+    method: 'post',
+    path: '/hosted/user/vault/validate',
+    response: {
+      data: {
+        data: 'success',
+      },
+    },
+  });
+};
+
 export const withAuthorize = () =>
   mockRequest({
     method: 'post',

@@ -1,4 +1,4 @@
-import { DeviceInfo } from '../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../hooks/ui/use-device-info';
 
 export type PluginContext<T> = {
   authToken: string;

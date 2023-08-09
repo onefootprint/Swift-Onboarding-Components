@@ -6,7 +6,7 @@ import {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 
-import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type MachineContext = {
   authToken: string;
