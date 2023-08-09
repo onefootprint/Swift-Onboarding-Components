@@ -42,7 +42,7 @@ describe('groupBySection', () => {
       createRiskSignal([RiskSignalAttribute.name, RiskSignalAttribute.email]),
       createRiskSignal([RiskSignalAttribute.dob]),
     ]);
-    expect(basicAndIdentity2.basic).toHaveLength(2);
+    expect(basicAndIdentity2.basic).toHaveLength(1);
     expect(basicAndIdentity2.identity).toHaveLength(1);
     expect(basicAndIdentity2.address).toHaveLength(0);
 

@@ -13,20 +13,22 @@ const groupBySection = (risksSignals: RiskSignal[]) => {
     document: [],
   };
   risksSignals.forEach(riskSignal => {
-    riskSignal.scopes.forEach(signalAttribute => {
-      if (isBasic(signalAttribute)) {
-        sections.basic.push(riskSignal);
-      }
-      if (isIdentity(signalAttribute)) {
-        sections.identity.push(riskSignal);
-      }
-      if (isAddress(signalAttribute)) {
-        sections.address.push(riskSignal);
-      }
-      if (isDocument(signalAttribute)) {
-        sections.document.push(riskSignal);
-      }
-    });
+    if (riskSignal.scopes.some(signalAttribute => isBasic(signalAttribute))) {
+      sections.basic.push(riskSignal);
+    }
+    if (
+      riskSignal.scopes.some(signalAttribute => isIdentity(signalAttribute))
+    ) {
+      sections.identity.push(riskSignal);
+    }
+    if (riskSignal.scopes.some(signalAttribute => isAddress(signalAttribute))) {
+      sections.address.push(riskSignal);
+    }
+    if (
+      riskSignal.scopes.some(signalAttribute => isDocument(signalAttribute))
+    ) {
+      sections.document.push(riskSignal);
+    }
   });
   return sections;
 };
