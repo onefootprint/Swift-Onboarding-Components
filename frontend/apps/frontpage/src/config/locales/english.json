@@ -1044,6 +1044,136 @@
         "title": "There are no updates yet."
       },
       "go-back": "Back to all posts"
+    },
+    "vaulting": {
+      "html-title": "Footprint - Vaulting",
+      "hero": {
+        "title": "Securely store customer data",
+        "subtitle": "Footprint securely vaults three types of data: identity data, payment card data, and custom key-value data.",
+        "bullets": {
+          "confidential": {
+            "title": "Confidential computing",
+            "subtitle": "Nitro Enclaves provide isolated compute environments that are designed for processing highly sensitive data."
+          },
+          "trusted": {
+            "title": "Trusted execution environment",
+            "subtitle": "All interactions produce a signature which asserts there has been no tampering to the underlying environment."
+          },
+          "vaulted": {
+            "title": "Vaulted immediately",
+            "subtitle": "When a user goes through the Footprint KYC flow, their data is automatically vaulted."
+          },
+          "built-in": {
+            "title": "Built-in permissions",
+            "subtitle": "Create unlimited roles to make sure the right people in your org have access to the right data."
+          }
+        }
+      },
+      "all-data": {
+        "title": "All of your customer data.",
+        "subtitle": "The Footprint dashboard brings good security into an intuitive and interactive dashboard.",
+        "decrypted": "Decrypted",
+        "encrypted": "Encrypted",
+        "toggle": {
+          "user-data": "User data",
+          "business-data": "Business data"
+        }
+      },
+      "audit-trail": {
+        "title": "Audit trail timeline",
+        "subtitle": "Compliance regimes can export records with a click of a button.",
+        "trail": {
+          "item-1": {
+            "date": "05/01/23",
+            "time": "08:48am",
+            "collected": "Collected",
+            "tags": {
+              "name": "Name",
+              "phone-number": "Phone number",
+              "date-of-bird": "Date of birth",
+              "address": "Address",
+              "ssn-full": "SSN (full)"
+            }
+          },
+          "item-2": {
+            "date": "05/01/23",
+            "time": "08:51m",
+            "livenes-check": "Liveness check succeeded",
+            "checks": {
+              "attested": "Attested by Apple & Footprint",
+              "iPhone": "iPhone 13 Pro Max, iOS 15.5",
+              "ip": "34.36.156.118 (IP address)",
+              "san-francisco": "San Francisco, California"
+            }
+          },
+          "item-3": {
+            "date": "05/01/23",
+            "time": "08:53am",
+            "collected": "Collected",
+            "id-card": "ID card"
+          },
+          "item-4": {
+            "date": "05/01/23",
+            "time": "08:54am",
+            "automatically-verified": "Automatically verified by Footprint",
+            "checks": {
+              "name": "Name",
+              "phone-number": "Phone number",
+              "date-of-bird": "Date of birth",
+              "address": "Address",
+              "ssn-full": "SSN (full)"
+            },
+            "width": "with IDology and Twilio"
+          }
+        }
+      },
+      "device-insights": {
+        "title": "Device insights",
+        "subtitle": "Goodbye heuristics. Hello real people."
+      },
+      "all-features": {
+        "title": "We've got all the features",
+        "subtitle": "See why product, engineering, risk, and security teams live in Footprint.",
+        "bullets": {
+          "manual-review": {
+            "title": "Manual review",
+            "subtitle": "In the event we can't automatically verify a user, you can easily review them yourself and make a pass/fail decision."
+          },
+          "auth-iam": {
+            "title": "Auth & IAM",
+            "subtitle": "Identity should not be limited to onboarding. Footprint helps you bridge the identity gap from onboarding to auth to IAM."
+          },
+          "fraud-risk": {
+            "title": "Fraud & risk",
+            "subtitle": "By tying security to fraud to KYC, we can create a bar to enter the digital ecosystem."
+          },
+          "security-logs": {
+            "title": "Security logs",
+            "subtitle": "Each time data is accessed in, it automatically gets appended in our security logs, which are always accessible via API."
+          },
+          "watchlists": {
+            "title": "Watchlists",
+            "subtitle": "Footprint makes it easy to visualize when watchlist checks were run for continuous monitoring."
+          },
+          "kyc-retrigger": {
+            "title": "KYC retrigger",
+            "subtitle": "Sometimes you need to re-run verifications. We make it easy."
+          },
+          "free-form-notes": {
+            "title": "Free-form notes",
+            "subtitle": "Everyone is different. Understand the decisions you made with custom notes."
+          },
+          "field-validations": {
+            "title": "Field validations",
+            "subtitle": "We make sure the data you collect is valid real time."
+          }
+        }
+      },
+      "banner": {
+        "title": "Onboard more customers and enjoy peace of mind. Today.",
+        "get-started": "Get started",
+        "book-a-demo": "Book a demo"
+      }
     }
   }
 }

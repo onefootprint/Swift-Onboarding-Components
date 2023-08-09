@@ -1,5 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoLinkedin24, IcoTwitter24 } from '@onefootprint/icons';
+import {
+  IcoLinkedin24,
+  IcoTwitter24,
+  ThemedLogoFpCompact,
+} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, Divider, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
@@ -35,12 +39,7 @@ const Footer = () => {
           <LeftContainer>
             <TopLeftLinks>
               <Link href="/">
-                <Image
-                  src="/footer/logo-fp-compact.svg"
-                  height={20}
-                  width={97}
-                  alt="Footprint logo"
-                />
+                <ThemedLogoFpCompact color="secondary" />
               </Link>
               <Typography variant="body-3" color="tertiary">
                 © {currentYear} {t('copyright')}

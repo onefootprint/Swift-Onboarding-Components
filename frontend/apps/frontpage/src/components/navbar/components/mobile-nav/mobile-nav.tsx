@@ -1,6 +1,10 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoClose24, IcoMenu24, LogoFpDefault } from '@onefootprint/icons';
+import {
+  IcoClose24,
+  IcoMenu24,
+  ThemedLogoFpDefault,
+} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
@@ -59,7 +63,7 @@ const MobileNav = ({ onOpen, onClose, entries }: MobileNavProps) => {
         <Menu>
           <Header>
             <Logo href="/" onClick={handleLinkClick}>
-              <LogoFpDefault />
+              <ThemedLogoFpDefault />
             </Logo>
             <NavTriggerButton
               aria-label={t('nav-toggle.open')}
@@ -101,7 +105,7 @@ const MobileNav = ({ onOpen, onClose, entries }: MobileNavProps) => {
       ) : (
         <Container>
           <Logo href="/" onClick={handleLinkClick}>
-            <LogoFpDefault />
+            <ThemedLogoFpDefault />
           </Logo>
           <NavTriggerButton
             aria-label={t('nav-toggle.close')}
