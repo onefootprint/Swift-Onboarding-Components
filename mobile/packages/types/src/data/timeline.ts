@@ -5,7 +5,7 @@ import {
   CollectedKycDataOption,
 } from './collected-data-option';
 import { DecryptedIdDocStatus } from './decrypted-id-doc';
-import IdDocType from './id-doc-type';
+import { SupportedIdDocTypes } from './id-doc-type';
 import { InsightEvent } from './insight-event';
 import { LivenessAttribute, LivenessSource } from './liveness';
 import { OnboardingDecision } from './onboarding-decision';
@@ -55,7 +55,7 @@ export type IdDocUploadedEvent = {
 };
 
 export type IdDocUploadedEventData = {
-  documentType: IdDocType;
+  documentType: SupportedIdDocTypes;
   id: string;
   selfieCollected: boolean;
   status: DecryptedIdDocStatus;

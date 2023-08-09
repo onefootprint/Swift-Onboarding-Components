@@ -1,8 +1,8 @@
 import {
   CountryCode,
   IdDocRequirement,
-  SubmitDocumentSide,
   SupportedIdDocTypes,
+  UploadDocumentSide,
 } from '@onefootprint/types';
 
 export type MachineContext = {
@@ -12,7 +12,7 @@ export type MachineContext = {
     type: SupportedIdDocTypes;
     docId: string;
   };
-  currentSide?: SubmitDocumentSide;
+  currentSide?: UploadDocumentSide;
 };
 
 export type MachineEvents =
@@ -29,7 +29,7 @@ export type MachineEvents =
   | {
       type: 'imageSubmitted';
       payload: {
-        nextSideToCollect?: SubmitDocumentSide;
+        nextSideToCollect?: UploadDocumentSide;
       };
     }
   | {

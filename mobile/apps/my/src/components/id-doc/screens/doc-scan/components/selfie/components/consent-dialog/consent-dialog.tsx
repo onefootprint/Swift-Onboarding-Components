@@ -80,7 +80,6 @@ const ConsentDialog = ({ authToken, onCompleted }: ConsentDialogProps) => {
   return (
     <StyledModal
       visible={open}
-      onRequestClose={onClose}
       animationType="slide"
       presentationStyle="formSheet"
     >

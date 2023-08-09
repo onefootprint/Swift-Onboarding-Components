@@ -3,7 +3,7 @@ import {
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '../data/collected-data-option';
-import IdDocType, { SupportedIdDocTypes } from '../data/id-doc-type';
+import { SupportedIdDocTypes } from '../data/id-doc-type';
 import { OnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {
@@ -62,7 +62,7 @@ export type OnboardingStatusRequest = {
 
 export type AuthorizeFields = {
   collectedData: CollectedKycDataOption[];
-  identityDocumentTypes: IdDocType[];
+  identityDocumentTypes: SupportedIdDocTypes[];
 };
 
 export type OnboardingStatusResponse = {

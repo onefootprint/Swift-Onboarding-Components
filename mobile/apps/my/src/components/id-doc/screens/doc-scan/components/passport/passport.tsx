@@ -25,7 +25,7 @@ const Passport = () => {
 
       const options = {};
       const result = detectDocument(frame, options);
-      if (result.is_document) {
+      if (result.isDocument) {
         detector.value = true;
         runOnJS(setObjectDetected)(true);
         runOnJS(setFeedback)('Hold still...');

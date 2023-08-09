@@ -1,4 +1,4 @@
-import { SubmitDocumentSide } from '@onefootprint/types';
+import { UploadDocumentSide } from '@onefootprint/types';
 import React, { useContext, useState } from 'react';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor } from 'react-native-vision-camera';
@@ -12,7 +12,7 @@ import Scan from '../scan';
 import ScanContext from '../scan-context';
 
 export type DriversLicenseProps = {
-  side: SubmitDocumentSide;
+  side: UploadDocumentSide;
 };
 
 const DEFAULT_ASPECT_RATIO = 1.586;

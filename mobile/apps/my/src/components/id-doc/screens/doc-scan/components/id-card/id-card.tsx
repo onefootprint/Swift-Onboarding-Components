@@ -1,4 +1,4 @@
-import { SubmitDocumentSide } from '@onefootprint/types';
+import { UploadDocumentSide } from '@onefootprint/types';
 import React, { useContext, useState } from 'react';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor } from 'react-native-vision-camera';
@@ -12,7 +12,7 @@ import Scan from '../scan';
 import ScanContext from '../scan-context';
 
 export type IdCardProps = {
-  side: SubmitDocumentSide;
+  side: UploadDocumentSide;
 };
 
 const DEFAULT_ASPECT_RATIO = 1.586;
@@ -23,21 +23,20 @@ const IdCard = ({ side }: IdCardProps) => {
   const [feedback, setFeedback] = useState('');
   const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
-
   const frameProcessor = useFrameProcessor(
     frame => {
       'worklet';
 
       const options = {};
       const result = detectDocument(frame, options);
-      if (result.is_document) {
+      if (result.isDocument) {
         detector.value = true;
         runOnJS(setObjectDetected)(true);
         runOnJS(setFeedback)('Hold still...');
       } else {
         detector.value = false;
-        runOnJS(setFeedback)('Position the document in view');
         runOnJS(setObjectDetected)(false);
+        runOnJS(setFeedback)('Position the document in view');
       }
     },
     [detector],

@@ -55,7 +55,6 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
         key={currentSide}
         authToken={authToken}
         country={country}
-        // get most updated version from this machine
         requirement={state.context.requirement}
         onDone={nextSideToCollect => {
           send('imageSubmitted', {

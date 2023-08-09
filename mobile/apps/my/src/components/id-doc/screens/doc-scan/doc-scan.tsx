@@ -54,6 +54,7 @@ const DocScan = ({
       }
     }, delayToShowConsentMS);
   }, []);
+
   const uploadMutation = useUploadDoc({
     onError: error => {
       setErrors([getErrorMessage(error)]);
