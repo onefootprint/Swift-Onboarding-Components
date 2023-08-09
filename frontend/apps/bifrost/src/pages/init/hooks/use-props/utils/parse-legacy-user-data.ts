@@ -1,7 +1,7 @@
 import { IdDI, IdvBootstrapData } from '@onefootprint/types';
 
 // Support legacy bootstrap data formats until Fractional migrates over
-const parseBootstrapData = (data: IdvBootstrapData) => {
+const parseLegacyUserData = (data: IdvBootstrapData) => {
   const legacyData = data as
     | { email?: string; phoneNumber?: string }
     | undefined;
@@ -9,7 +9,7 @@ const parseBootstrapData = (data: IdvBootstrapData) => {
   const legacyPhoneNumber = legacyData?.phoneNumber;
 
   // Convert legacy data to new format
-  if (legacyData?.email || legacyData?.phoneNumber) {
+  if (legacyEmail || legacyPhoneNumber) {
     return {
       [IdDI.email]: legacyEmail,
       [IdDI.phoneNumber]: legacyPhoneNumber,
@@ -18,4 +18,4 @@ const parseBootstrapData = (data: IdvBootstrapData) => {
   return data;
 };
 
-export default parseBootstrapData;
+export default parseLegacyUserData;

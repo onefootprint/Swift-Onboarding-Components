@@ -76,7 +76,8 @@ const initIframe = (rawProps: Props): Iframe => {
         'Footprint should be initialized in order to receive props',
       );
     }
-    child.call(PrivateEvent.propsReceived, getDataProps(props));
+    const dataProps = getDataProps(props);
+    child.call(PrivateEvent.propsReceived, dataProps);
   };
 
   const getOrCreateContainer = (): HTMLElement | null => {
