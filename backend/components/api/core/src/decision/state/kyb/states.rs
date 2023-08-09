@@ -40,6 +40,7 @@ impl KybDataCollection {
             wf_id: workflow.id,
             ob_id: ob.id,
             t_id: sv.tenant_id,
+            sv_id: sv.id,
         })
     }
 }
@@ -55,9 +56,10 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
     async fn execute_async_idempotent_actions(
         &self,
         _action: Authorize,
-        _state: &State,
+        state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        // TODO: write fingerprints here
+        common::write_authorized_fingerprints(state, &self.sv_id).await?;
+
         Ok(())
     }
 

@@ -208,12 +208,19 @@ pub fn create_user_and_populate_vault(
 }
 
 pub fn populate_business_vault(conn: &mut TxnPgConn, sb_id: &ScopedVaultId) {
-    let update = vec![(
-        BusinessDataKind::BeneficialOwners.into(),
-        PiiString::new(
-            "[{\"first_name\": \"Bob\", \"last_name\": \"Boberto\", \"ownership_stake\": 88}]".to_owned(),
+    let update = vec![
+        (
+            BusinessDataKind::BeneficialOwners.into(),
+            PiiString::new(
+                "[{\"first_name\": \"Bob\", \"last_name\": \"Boberto\", \"ownership_stake\": 88}]".to_owned(),
+            ),
         ),
-    )];
+        (
+            BusinessDataKind::Name.into(),
+            PiiString::new("Waffle House".to_owned()),
+        ),
+        (BusinessDataKind::Dba.into(), PiiString::new("Waho".to_owned())),
+    ];
 
     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, sb_id).unwrap();
     uvw.patch_data_test(conn, update, false).unwrap();

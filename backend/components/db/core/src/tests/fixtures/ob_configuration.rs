@@ -33,8 +33,8 @@ pub fn create_with_opts(
         conn,
         "Flerp config".to_owned(),
         tenant_id.clone(),
+        must_collect.clone(),
         must_collect,
-        vec![CollectedDataOption::PhoneNumber],
         is_live,
         cip_kind,
     )

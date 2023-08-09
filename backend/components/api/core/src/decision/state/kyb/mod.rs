@@ -8,7 +8,7 @@ use crate::{errors::ApiResult, State};
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
-use newtypes::{OnboardingId, TenantId, WorkflowId};
+use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 
 ///
 /// States
@@ -19,6 +19,7 @@ pub struct KybDataCollection {
     wf_id: WorkflowId,
     ob_id: OnboardingId,
     t_id: TenantId,
+    sv_id: ScopedVaultId,
 }
 
 #[derive(Clone)]

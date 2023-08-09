@@ -98,14 +98,13 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     let sv_biz_id = biz_ob.as_ref().map(|biz| biz.scoped_vault_id.clone());
     if let Some(sv_biz_id) = sv_biz_id {
         if set_biz_is_authorized {
-            // TODO: write these fingerprints in KYB WF
-            common::write_authorized_fingerprints(&state, &sv_biz_id).await?;
-
             // KYB workflows are currently still FF'd so if one exists, then we call the Authorize action on it here.
             // we only want to run this action once, when we actually authorized the business, and not on subsequent BO Bifrost flows that also have the business ob in their auth
             if let Some(biz_wf) = biz_wf {
                 let ww = WorkflowWrapper::init(&state, biz_wf.clone()).await?;
                 let _res = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
+            } else {
+                common::write_authorized_fingerprints(&state, &sv_biz_id).await?;
             }
         }
     }

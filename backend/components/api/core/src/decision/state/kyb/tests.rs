@@ -231,6 +231,9 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
+    let (_, wf, _, _, _, _, fingerprints) = query_data(state, &svid, &wfid).await;
+    assert_eq!(WorkflowState::Kyb(KybState::AwaitingBoKyc), wf.state);
+    assert!(!fingerprints.is_empty());
 
     let mut mock_ff_client = MockFeatureFlagClient::new();
     mock_ff_client
