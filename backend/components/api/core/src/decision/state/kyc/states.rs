@@ -21,7 +21,7 @@ use crate::decision::{
         common::{self, get_vres_id_for_fixture},
         WorkflowState,
     },
-    utils::execute_rules_for_document_only,
+    utils::should_execute_rules_for_document_only,
     vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
 };
 use crate::{
@@ -229,7 +229,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
     fn on_commit(self, ff_client: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
         let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
-        let execute_rules_for_real_document_decision_only = execute_rules_for_document_only(&v, &wf)?;
+        let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
         let decision = if let Some(fixture_decision) = fixture_decision {

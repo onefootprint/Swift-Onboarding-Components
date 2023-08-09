@@ -22,7 +22,7 @@ use crate::{
             rules::KycRuleExecutionConfig, Decision, DecisionResult, OnboardingRulesDecision,
             OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
         },
-        utils::{execute_rules_for_document_only, FixtureDecision},
+        utils::{should_execute_rules_for_document_only, FixtureDecision},
         vendor::{
             tenant_vendor_control::TenantVendorControl,
             vendor_api::{
@@ -271,7 +271,7 @@ pub fn get_decision(
     vault: &Vault,
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
     let include_doc = DocumentRequest::get(conn, &wf.id)?.is_some();
-    let document_only = execute_rules_for_document_only(vault, wf)?;
+    let document_only = should_execute_rules_for_document_only(vault, wf)?;
     let config = KycRuleExecutionConfig {
         include_doc,
         document_only,

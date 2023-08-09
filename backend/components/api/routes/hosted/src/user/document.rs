@@ -12,7 +12,7 @@ use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete}
 use api_core::errors::workflow::WorkflowError;
 use api_core::types::JsonApiResponse;
 use api_core::utils::file_upload::FileUpload;
-use api_core::utils::vault_wrapper::seal_file_and_upload_to_s3;
+use api_core::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VwArgs};
 use api_wire_types::document_request::DocumentRequest;
 use api_wire_types::DocumentResponse;
 use db::models::decision_intent::DecisionIntent;
@@ -21,7 +21,6 @@ use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
-use db::models::vault::Vault;
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::{DataIdentifier, DecisionIntentKind, WorkflowGuard};
@@ -49,17 +48,18 @@ pub async fn post(
     let su_id = user_auth.scoped_user.id.clone();
     let wf_id = wf.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
-    let (vault, doc_request, user_consent) = state
+    let (uvw, doc_request, user_consent) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             // If there's no pending doc requests, nothing to do here
             let doc_request =
                 DbDocumentRequest::get(conn, &wf_id)?.ok_or(OnboardingError::IdentityDocumentNotPending)?;
-            let vault = Vault::get(conn, &su_id)?;
+            let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
             let user_consent = UserConsent::latest_for_onboarding(conn, &ob_id)?;
-            Ok((vault, doc_request, user_consent))
+            Ok((uvw, doc_request, user_consent))
         })
         .await??;
+    let vault = uvw.vault.clone();
 
     if request.selfie_image.is_some() && !doc_request.should_collect_selfie {
         return Err(OnboardingError::NotExpectingSelfie.into());
@@ -106,12 +106,13 @@ pub async fn post(
         seal_file_and_upload_to_s3(&state, &file, di.clone(), user_auth.user(), &su_id).await?;
 
     // Check if we should be initiating requests (e.g. check if we are testing)
-    let should_initiate_reqs = decision::utils::should_initiate_requests_for_document(
-        state.feature_flag_client.clone(),
-        &vault,
+    let (should_initiate_reqs, ocr_fixture) = decision::utils::should_initiate_requests_for_document(
+        &state,
+        &uvw,
         &user_auth.tenant()?.id,
         request.fixture_result,
-    )?;
+    )
+    .await?;
     let fixture = request.fixture_result;
 
     // write a identity_document
@@ -169,9 +170,7 @@ pub async fn post(
                 if missing_sides.is_empty() {
                     let fixture = id_doc.fixture_result;
                     // Create fixture data once all of the sides are uploaded
-                    let ocr = serde_json::from_value(
-                        idv::incode::doc::response::FetchOCRResponse::fixture_response(None, None, None),
-                    )?;
+                    let ocr = decision::utils::fixture_ocr_response_for_incode(ocr_fixture)?;
                     let doc_type = request.document_type.into();
 
                     // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals

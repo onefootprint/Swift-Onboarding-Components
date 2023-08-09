@@ -7,7 +7,7 @@ use newtypes::{
 use crate::decision::onboarding::FeatureSet;
 
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct IncodeOcrComparisonDataFields {
     pub first_name: PiiString,
     pub last_name: PiiString,

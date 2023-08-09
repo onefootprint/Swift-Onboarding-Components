@@ -9,7 +9,7 @@ use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 
 use super::{DocumentState, MakeDecision};
 use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
-use crate::decision::utils::execute_rules_for_document_only;
+use crate::decision::utils::should_execute_rules_for_document_only;
 use crate::decision::{
     onboarding::rules::KycRuleGroup,
     rule::rule_sets,
@@ -161,7 +161,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         let (ff_client, vendor_results) = async_res;
         let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
-        let execute_rules_for_real_document_decision_only = execute_rules_for_document_only(&v, &wf)?;
+        let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
         let decision = if let Some(fixture_decision) = fixture_decision {

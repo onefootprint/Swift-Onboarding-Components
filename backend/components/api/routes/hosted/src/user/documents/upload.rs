@@ -16,7 +16,7 @@ use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
 use api_core::utils::file_upload::FileUpload;
 use api_core::utils::large_json::LargeJson;
-use api_core::utils::vault_wrapper::seal_file_and_upload_to_s3;
+use api_core::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VwArgs};
 use api_wire_types::{CreateIdentityDocumentUploadRequest, DocumentImageError, DocumentResponse};
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
@@ -62,15 +62,16 @@ pub async fn post(
 
     let su_id = user_auth.scoped_user.id.clone();
     let ob_id = user_auth.onboarding()?.id.clone();
-    let (id_doc, doc_request, vault, user_consent) = state
+    let (id_doc, doc_request, uvw, user_consent) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (id_doc, doc_request) = IdentityDocument::get(conn, &document_id)?;
-            let vault = Vault::get(conn, &su_id)?;
+            let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
             let user_consent = UserConsent::latest_for_onboarding(conn, &ob_id)?;
-            Ok((id_doc, doc_request, vault, user_consent))
+            Ok((id_doc, doc_request, uvw, user_consent))
         })
         .await??;
+    let vault = uvw.vault.clone();
 
     if side == DocumentSide::Selfie && !doc_request.should_collect_selfie {
         return Err(OnboardingError::NotExpectingSelfie.into());
@@ -98,9 +99,17 @@ pub async fn post(
     let ob_id = user_auth.onboarding()?.id.clone();
     let vault2 = vault.clone();
     let wf_id = wf.id.clone();
-    let ff_client = state.feature_flag_client.clone();
     let tenant_id = user_auth.tenant()?.id.clone();
     let is_sandbox = id_doc.fixture_result.is_some();
+    // Check if we should be initiating requests (e.g. check if we are testing)
+    let (should_initiate_reqs, ocr_fixture) = decision::utils::should_initiate_requests_for_document(
+        &state,
+        &uvw,
+        &tenant_id,
+        id_doc.fixture_result,
+    )
+    .await?;
+
     let (missing_sides, created_reqs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -128,14 +137,6 @@ pub async fn post(
                 .filter(|s| !existing_sides.contains(s))
                 .collect_vec();
 
-            // Check if we should be initiating requests (e.g. check if we are testing)
-            let should_initiate_reqs = decision::utils::should_initiate_requests_for_document(
-                ff_client,
-                &vault2,
-                &tenant_id,
-                id_doc.fixture_result,
-            )?;
-
             // Now that the document is created, either initiate IDV reqs or create fixture data
             let result = if should_initiate_reqs {
                 // Initiate IDV reqs once and only once for this id_doc
@@ -150,9 +151,7 @@ pub async fn post(
             } else {
                 if missing_sides.is_empty() {
                     // Create fixture data once all of the sides are uploaded
-                    let ocr = serde_json::from_value(
-                        idv::incode::doc::response::FetchOCRResponse::fixture_response(None, None, None),
-                    )?;
+                    let ocr = decision::utils::fixture_ocr_response_for_incode(ocr_fixture)?;
 
                     // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals
                     let fake_score_response =

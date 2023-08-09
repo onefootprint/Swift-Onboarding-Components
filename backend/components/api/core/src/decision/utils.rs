@@ -14,13 +14,23 @@ use db::{
     },
     PgConn, TxnPgConn,
 };
+use idv::incode::doc::response::FetchOCRResponse;
 use newtypes::{
-    DbActor, DecisionIntentId, DecisionStatus, IdentityDocumentFixtureResult, IdentityDocumentId,
-    OnboardingId, RiskSignalGroupKind, ScopedVaultId, TenantId, VaultKind, VendorAPI, WorkflowFixtureResult,
+    DataIdentifier, DbActor, DecisionIntentId, DecisionStatus, IdentityDataKind,
+    IdentityDocumentFixtureResult, IdentityDocumentId, OnboardingId, RiskSignalGroupKind, ScopedVaultId,
+    TenantId, VaultKind, VendorAPI, WorkflowFixtureResult,
 };
 
-use super::{sandbox, vendor};
-use crate::errors::{onboarding::OnboardingError, ApiError, ApiErrorKind, ApiResult};
+use super::{
+    features::incode_docv::IncodeOcrComparisonDataFields,
+    sandbox,
+    vendor::{self, incode::states::parse_dob},
+};
+use crate::{
+    errors::{onboarding::OnboardingError, ApiError, ApiErrorKind, ApiResult},
+    utils::vault_wrapper::{Person, VaultWrapper},
+    State,
+};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
 pub type CreateManualReview = bool;
@@ -58,7 +68,7 @@ pub fn get_fixture_data_decision(
     }
 }
 
-pub fn execute_rules_for_document_only(vault: &Vault, workflow: &Workflow) -> ApiResult<bool> {
+pub fn should_execute_rules_for_document_only(vault: &Vault, workflow: &Workflow) -> ApiResult<bool> {
     if !vault.is_live {
         let fixture_result = workflow
             .fixture_result
@@ -75,32 +85,61 @@ pub fn execute_rules_for_document_only(vault: &Vault, workflow: &Workflow) -> Ap
 type ShouldInitiateRealDocumentRequests = bool;
 
 /// Determines whether production identity document requests should be made, and if not, what the outcome should be
-pub fn should_initiate_requests_for_document(
-    ff_client: Arc<dyn FeatureFlagClient>,
-    vault: &Vault,
+pub async fn should_initiate_requests_for_document(
+    state: &State,
+    uvw: &VaultWrapper<Person>,
     tenant_id: &TenantId,
     document_decision: Option<IdentityDocumentFixtureResult>,
-) -> ApiResult<ShouldInitiateRealDocumentRequests> {
+) -> ApiResult<(
+    ShouldInitiateRealDocumentRequests,
+    Option<IncodeOcrComparisonDataFields>,
+)> {
     // We allow identity documents to be tested in sandbox against incode demo environment, if a tenant is flagged in
     // We use a flag since not all tenants should have this enabled by default (they might need to sign incode terms and be advised that they can only do this for testing purposes)
-    if !vault.is_live {
+    if !uvw.vault.is_live {
         // TODO: frontend not merged yet, enable this when it is
         // let d = document_decision
         //     // Ensure that each sandbox vault has a fixture result - we don't want to make real
         //     // requests for sandbox vaults
         //     .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
+        let ocr_data = if document_decision
+            .map(|d| !matches!(d, IdentityDocumentFixtureResult::Real))
+            .unwrap_or(false)
+        {
+            let vd = uvw
+                .decrypt_unchecked(
+                    &state.enclave_client,
+                    &[
+                        DataIdentifier::Id(IdentityDataKind::FirstName),
+                        DataIdentifier::Id(IdentityDataKind::LastName),
+                        DataIdentifier::Id(IdentityDataKind::Dob),
+                        // TODO: address
+                    ],
+                )
+                .await?;
 
-        let can_make_demo_incode_requests_in_sandbox =
-            ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(tenant_id));
+            Some(IncodeOcrComparisonDataFields {
+                first_name: vd.get_di(IdentityDataKind::FirstName)?,
+                last_name: vd.get_di(IdentityDataKind::LastName)?,
+                dob: vd.get_di(IdentityDataKind::Dob)?,
+            })
+        } else {
+            None
+        };
+
+        let can_make_demo_incode_requests_in_sandbox = state
+            .feature_flag_client
+            .flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(tenant_id));
         let should_initiate_sandbox = matches!(document_decision, Some(IdentityDocumentFixtureResult::Real))
             && can_make_demo_incode_requests_in_sandbox;
-        return Ok(should_initiate_sandbox);
+
+        return Ok((should_initiate_sandbox, ocr_data));
     // guard against prod vaults from providing document fixtures (we prevent this in the API route that starts the flow, but double checking never hurt nobody)
     } else if document_decision.is_some() {
         return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
     }
 
-    Ok(true)
+    Ok((true, None))
 }
 
 /// Helper to do some sanity checks when creating document verification requests
@@ -217,4 +256,21 @@ pub fn write_kyb_fixture_ob_decision(
     };
     Onboarding::update(biz_ob, conn, update)?;
     Ok(())
+}
+
+pub fn fixture_ocr_response_for_incode(
+    comparison_data: Option<IncodeOcrComparisonDataFields>,
+) -> ApiResult<FetchOCRResponse> {
+    let raw = if let Some(data) = comparison_data {
+        idv::incode::doc::response::FetchOCRResponse::fixture_response(
+            Some(data.first_name),
+            Some(data.last_name),
+            parse_dob(data.dob)?,
+        )
+    } else {
+        idv::incode::doc::response::FetchOCRResponse::fixture_response(None, None, None)
+    };
+
+    let parsed = serde_json::from_value(raw)?;
+    Ok(parsed)
 }

@@ -51,8 +51,8 @@ use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DataIdentifier, DecisionIntentKind, IdentityDataKind, IncodeFailureReason, IncodeVerificationSessionId,
-    IncodeVerificationSessionKind, ModernIdDocKind, PiiJsonValue, ScopedVaultId, ScrubbedPiiJsonValue,
-    ScrubbedPiiString, VendorAPI, WorkflowId,
+    IncodeVerificationSessionKind, ModernIdDocKind, PiiJsonValue, PiiString, ScopedVaultId,
+    ScrubbedPiiJsonValue, ScrubbedPiiString, VendorAPI, WorkflowId,
 };
 
 #[derive(Clone)]
@@ -184,10 +184,7 @@ pub async fn save_incode_fixtures(
     let first_name = vd.rm_di(IdentityDataKind::FirstName)?;
     let last_name = vd.rm_di(IdentityDataKind::LastName)?;
     let dob = vd.rm_di(IdentityDataKind::Dob)?;
-    let date_of_birth_timestamp = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")
-        .map_err(|_| ApiErrorKind::AssertionError("invalid date in fixture".into()))?
-        .and_hms_milli_opt(0, 0, 0, 0)
-        .map(|d| d.timestamp_millis());
+    let date_of_birth_timestamp = parse_dob(dob)?;
 
     state
         .db_pool
@@ -295,4 +292,13 @@ fn parse_type_of_id(
         return Ok(Err(IncodeFailureReason::CountryCodeMismatch));
     }
     Ok(Ok(id_doc_kind))
+}
+
+pub fn parse_dob(dob: PiiString) -> Result<Option<i64>, ApiError> {
+    let parsed = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")
+        .map_err(|_| ApiErrorKind::AssertionError("invalid date in fixture".into()))?
+        .and_hms_milli_opt(0, 0, 0, 0)
+        .map(|d| d.timestamp_millis());
+
+    Ok(parsed)
 }
