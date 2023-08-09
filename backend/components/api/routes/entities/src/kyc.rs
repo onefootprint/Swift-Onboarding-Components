@@ -88,7 +88,7 @@ pub async fn post(
                 None, // currently dont support KYB for NPV
             )?;
             let ob_id = ob.id.clone();
-            let wf_id = ob.workflow_id.ok_or(OnboardingError::NoWorkflow)?;
+            let wf_id = ob.workflow_id;
             let wf = Workflow::get(conn, &wf_id)?;
 
             // TODO: consolidate with /authorize code

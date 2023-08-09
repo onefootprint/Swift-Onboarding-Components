@@ -86,9 +86,9 @@ pub async fn post(
             if user_auth.workflow_id().is_none() {
                 // No need to add the workflow scope if we already have one from a redo flow
                 // TODO: one day we should just have the client not hit this endpoint for redo flows
-                if let Some(wf_id) = ob.workflow_id {
-                    new_scopes.push(UserAuthScope::Workflow { wf_id });
-                }
+                new_scopes.push(UserAuthScope::Workflow {
+                    wf_id: ob.workflow_id,
+                });
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob

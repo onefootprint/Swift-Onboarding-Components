@@ -392,7 +392,7 @@ table! {
         idv_reqs_initiated_at -> Nullable<Timestamptz>,
         decision_made_at -> Nullable<Timestamptz>,
         status -> Text,
-        workflow_id -> Nullable<Text>,
+        workflow_id -> Text,
     }
 }
 

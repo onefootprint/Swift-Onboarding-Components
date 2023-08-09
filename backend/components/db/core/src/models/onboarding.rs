@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub enum IsNew {
-    Yes(Option<Workflow>),
+    Yes(Workflow),
     No,
 }
 
@@ -42,7 +42,7 @@ pub struct Onboarding {
     pub idv_reqs_initiated_at: Option<DateTime<Utc>>,
     pub decision_made_at: Option<DateTime<Utc>>,
     pub status: OnboardingStatus,
-    pub workflow_id: Option<WorkflowId>,
+    pub workflow_id: WorkflowId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -53,7 +53,7 @@ struct NewOnboarding {
     start_timestamp: DateTime<Utc>,
     insight_event_id: Option<InsightEventId>,
     status: OnboardingStatus,
-    workflow_id: Option<WorkflowId>,
+    workflow_id: WorkflowId,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -286,7 +286,6 @@ impl Onboarding {
     pub fn get_or_create(
         conn: &mut TxnPgConn,
         args: OnboardingCreateArgs,
-        should_create_workflow: bool,
         fixture_result: Option<WorkflowFixtureResult>,
     ) -> DbResult<(Onboarding, IsNew)> {
         let ob = onboarding::table
@@ -299,26 +298,20 @@ impl Onboarding {
         }
 
         let v = Vault::get(conn.conn(), &args.scoped_vault_id)?;
-        // TODO: later have a KYB workflow and create that here as well
-        let wf = if should_create_workflow {
-            let (obc, _) = ObConfiguration::get(conn.conn(), &args.ob_configuration_id)?;
+        let (obc, _) = ObConfiguration::get(conn.conn(), &args.ob_configuration_id)?;
 
-            let config = match v.kind {
-                VaultKind::Person => {
-                    if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
-                        AlpacaKycConfig { is_redo: false }.into()
-                    } else {
-                        KycConfig { is_redo: false }.into()
-                    }
+        let config = match v.kind {
+            VaultKind::Person => {
+                if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
+                    AlpacaKycConfig { is_redo: false }.into()
+                } else {
+                    KycConfig { is_redo: false }.into()
                 }
-                VaultKind::Business => KybConfig {}.into(),
-            };
-
-            let wf = Workflow::create(conn, &args.scoped_vault_id, config, fixture_result)?;
-            Some(wf)
-        } else {
-            None
+            }
+            VaultKind::Business => KybConfig {}.into(),
         };
+
+        let wf = Workflow::create(conn, &args.scoped_vault_id, config, fixture_result)?;
 
         // Row doesn't exist for scoped_vault_id, ob_configuration_id - create a new one
         let insight_event_id = if let Some(insight_event) = args.insight_event {
@@ -332,7 +325,7 @@ impl Onboarding {
             start_timestamp: Utc::now(),
             insight_event_id,
             status: OnboardingStatus::Incomplete,
-            workflow_id: wf.as_ref().map(|w| w.id.clone()),
+            workflow_id: wf.id.clone(),
         };
         let ob = diesel::insert_into(onboarding::table)
             .values(new_ob)

@@ -52,7 +52,7 @@ async fn setup(
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let (ob, _, _, _) = Onboarding::get(conn, (&sb_svid, &sb_vid)).unwrap();
-            Ok(DbWorkflow::get(conn, &ob.workflow_id.unwrap()).unwrap())
+            Ok(DbWorkflow::get(conn, &ob.workflow_id).unwrap())
         })
         .await
         .unwrap();
@@ -86,7 +86,7 @@ async fn kyc_bo(state: &mut State, person_ob: &Onboarding) {
                     vendor_api: VendorAPI::MiddeskBusinessUpdateWebhook,
                 },
                 true,
-                wfid,
+                Some(wfid),
                 vec![],
             )
         })

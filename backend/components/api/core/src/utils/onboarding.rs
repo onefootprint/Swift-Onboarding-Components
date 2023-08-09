@@ -15,7 +15,7 @@ use newtypes::{
     Selfie, VaultId, VaultKind, VaultPublicKey, WorkflowFixtureResult,
 };
 
-use crate::errors::{onboarding::OnboardingError, ApiResult};
+use crate::errors::ApiResult;
 
 pub struct NewBusinessVaultArgs {
     pub public_key: VaultPublicKey,
@@ -42,7 +42,7 @@ pub fn get_or_start_onboarding(
 
     // TODO rm this when fixture result is passed in process
     let fixture_result = WorkflowFixtureResult::from_sandbox_id(user_vault.sandbox_id.as_ref());
-    let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, true, fixture_result)?;
+    let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, fixture_result)?;
     if let IsNew::Yes(ref wf) = is_new_ob {
         if let Some(doc_info) = obc
             .must_collect_data
@@ -55,10 +55,7 @@ pub fn get_or_start_onboarding(
         {
             // Create a `DocumentRequest` if specified in the ob config.
             // To prevent duplicate document requests, only create a doc request if the onboarding is new
-            let wf_id = wf
-                .as_ref()
-                .map(|wf| wf.id.clone())
-                .ok_or(OnboardingError::NoWorkflow)?;
+            let wf_id = wf.id.clone();
             let doc_type_restriction = if let DocTypeRestriction::Restrict(types) = doc_info.0.clone() {
                 Some(types)
             } else {
@@ -103,12 +100,7 @@ pub fn get_or_start_onboarding(
                 ob_configuration_id: obc.id.clone(),
                 insight_event,
             };
-            let (biz_ob, _) = Onboarding::get_or_create(
-                conn,
-                ob_create_args,
-                new_biz_args.should_create_workflow,
-                fixture_result,
-            )?;
+            let (biz_ob, _) = Onboarding::get_or_create(conn, ob_create_args, fixture_result)?;
             biz_ob
         };
         Some(biz_ob)

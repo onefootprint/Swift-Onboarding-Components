@@ -91,7 +91,7 @@ pub fn create_user_and_onboarding(
         },
     )
     .unwrap();
-    let wf = Workflow::get(conn, onboarding.workflow_id.as_ref().unwrap()).unwrap();
+    let wf = Workflow::get(conn, &onboarding.workflow_id).unwrap();
 
     (tenant, onboarding, uv, su, wf)
 }

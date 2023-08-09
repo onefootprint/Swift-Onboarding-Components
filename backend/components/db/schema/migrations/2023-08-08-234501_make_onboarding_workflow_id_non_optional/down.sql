@@ -1,0 +1,1 @@
+ALTER TABLE onboarding ALTER COLUMN workflow_id DROP NOT NULL;

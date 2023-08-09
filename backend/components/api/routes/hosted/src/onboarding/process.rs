@@ -117,7 +117,7 @@ async fn run_kyb_if_needed(state: &State, user_auth: CheckedUserObAuthContext) -
         .db_query(move |conn| -> ApiResult<_> {
             let ob = user_auth.business_onboarding(conn)?;
 
-            let wf = if let Some(biz_ob_wf_id) = ob.as_ref().and_then(|o| o.workflow_id.as_ref()) {
+            let wf = if let Some(biz_ob_wf_id) = ob.as_ref().map(|o| &o.workflow_id) {
                 Some(Workflow::get(conn, biz_ob_wf_id)?)
             } else {
                 None

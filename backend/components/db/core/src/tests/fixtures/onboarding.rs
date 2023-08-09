@@ -20,7 +20,7 @@ pub fn create(
         insight_event: Some(CreateInsightEvent { ..Default::default() }),
     };
 
-    Onboarding::get_or_create(conn, ob_args, true, fixture_result)
+    Onboarding::get_or_create(conn, ob_args, fixture_result)
         .unwrap()
         .0
 }

@@ -7,7 +7,6 @@ use crate::types::response::ResponseData;
 use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::decision::state::actions::WorkflowActions;
-use api_core::decision::state::common;
 use api_core::decision::state::Authorize;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::types::EmptyResponse;
@@ -60,7 +59,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     // mark person and business ob as authorized
     let ob_id = user_auth.onboarding()?.id.clone();
 
-    let (biz_ob, biz_wf, set_biz_is_authorized) = state
+    let (biz_wf, set_biz_is_authorized) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
             let ob = Onboarding::lock(c, &ob_id)?;
@@ -72,40 +71,30 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             };
 
             let biz_ob = user_auth.business_onboarding(c)?;
-            let (set_biz_is_authorized, bizob, biz_wf) = if let Some(biz_ob) = biz_ob {
+            let (set_biz_is_authorized, biz_wf) = if let Some(biz_ob) = biz_ob {
                 let b = Onboarding::lock(c, &biz_ob.id)?;
-                let (set_biz_is_authorized, bizob) = if b.authorized_at.is_none() {
-                    (true, Onboarding::update(b, c, OnboardingUpdate::is_authorized())?)
+                let set_biz_is_authorized = if b.authorized_at.is_none() {
+                    let _bizob = Onboarding::update(b, c, OnboardingUpdate::is_authorized())?;
+                    true
                 } else {
-                    (false, b.into_inner())
+                    false
                 };
 
-                let biz_wf = if let Some(biz_ob_wf_id) = biz_ob.workflow_id {
-                    Some(Workflow::get(c, &biz_ob_wf_id)?)
-                } else {
-                    None
-                };
+                let biz_wf = Workflow::get(c, &biz_ob.workflow_id)?;
 
-                (set_biz_is_authorized, Some(bizob), biz_wf)
+                (set_biz_is_authorized, Some(biz_wf))
             } else {
-                (false, biz_ob, None)
+                (false, None)
             };
 
-            Ok((bizob, biz_wf, set_biz_is_authorized))
+            Ok((biz_wf, set_biz_is_authorized))
         })
         .await?;
 
-    let sv_biz_id = biz_ob.as_ref().map(|biz| biz.scoped_vault_id.clone());
-    if let Some(sv_biz_id) = sv_biz_id {
+    if let Some(biz_wf) = biz_wf {
         if set_biz_is_authorized {
-            // KYB workflows are currently still FF'd so if one exists, then we call the Authorize action on it here.
-            // we only want to run this action once, when we actually authorized the business, and not on subsequent BO Bifrost flows that also have the business ob in their auth
-            if let Some(biz_wf) = biz_wf {
-                let ww = WorkflowWrapper::init(&state, biz_wf.clone()).await?;
-                let _res = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
-            } else {
-                common::write_authorized_fingerprints(&state, &sv_biz_id).await?;
-            }
+            let ww = WorkflowWrapper::init(&state, biz_wf.clone()).await?;
+            let _res = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
         }
     }
 

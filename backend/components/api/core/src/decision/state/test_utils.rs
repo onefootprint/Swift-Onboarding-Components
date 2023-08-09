@@ -123,7 +123,7 @@ pub async fn setup_data(
 
             let tu = fixtures::tenant_user::create(conn);
 
-            let wf = Workflow::get(conn, &ob.workflow_id.unwrap()).unwrap();
+            let wf = Workflow::get(conn, &ob.workflow_id).unwrap();
             Ok((wf, tu))
         })
         .await
