@@ -125,19 +125,21 @@ const initIframe = (rawProps: Props): Iframe => {
       container.innerHTML = '';
     }
 
+    const url = getURL(props);
     isRendered = true;
+
     setLoading(container, true);
     child = await new Postmate({
       classListArray: [`footprint-${variant}`, `footprint-${variant}-loading`],
       container,
       name: `footprint-iframe-${id}`,
-      url: getURL(props),
+      url,
       allow:
         'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
     });
+    setLoading(container, false);
 
     registerCallbackProps();
-    setLoading(container, false);
     child.on(PrivateEvent.started, () => {
       sendDataProps();
       setUpRefs();
