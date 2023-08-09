@@ -1,5 +1,6 @@
 import { defineConfig } from 'tsup';
 
+const isE2E = process.env.IS_E2E === 'true';
 const forceFootprintToUseLocal =
   process.env.FORCE_FOOTPRINT_JS_TO_USE_LOCAL === 'true';
 const currentBranch = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF;
@@ -13,6 +14,9 @@ const getBranchAsSlug = (branchName?: string) => {
 };
 
 const getBifrostUrl = (isLocal: boolean) => {
+  if (isE2E) {
+    return 'http://localhost:3000';
+  }
   if (isLocal) {
     return 'http://localhost:3000';
   }
@@ -41,8 +45,11 @@ const getComponentsUrl = (isLocal: boolean) => {
 };
 
 const getApiUrl = (isLocal: boolean) => {
+  if (isE2E) {
+    return 'https://api.dev.onefootprint.com';
+  }
   if (isLocal) {
-    return 'http://localhost:8000';
+    return 'https://api.dev.onefootprint.com';
   }
   if (isDevelopment || isPreview) {
     return 'https://api.dev.onefootprint.com';
