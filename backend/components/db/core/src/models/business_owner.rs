@@ -5,7 +5,7 @@ use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::{BoId, BoLinkId, BusinessOwnerKind, Locked, ObConfigurationId, TenantId, VaultId};
 
-use super::{onboarding::Onboarding, scoped_vault::ScopedVault, vault::Vault};
+use super::{onboarding::Onboarding, scoped_vault::ScopedVault, vault::Vault, workflow::Workflow};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = business_owner)]
@@ -101,18 +101,18 @@ impl BusinessOwner {
         conn: &mut PgConn,
         uv_id: &VaultId,
         ob_config_id: &ObConfigurationId,
-    ) -> DbResult<Vec<(BusinessOwner, (ScopedVault, Onboarding))>> {
-        use db_schema::schema::{onboarding, scoped_vault};
+    ) -> DbResult<Vec<(BusinessOwner, (ScopedVault, Workflow))>> {
+        use db_schema::schema::{scoped_vault, workflow};
         let result = business_owner::table
             .inner_join(
                 scoped_vault::table
                     .on(scoped_vault::vault_id.eq(business_owner::business_vault_id))
-                    .inner_join(onboarding::table),
+                    .inner_join(workflow::table),
             )
             .filter(business_owner::user_vault_id.eq(uv_id))
             // Only get the ScopedVault for the businesses that onboarded onto the
             // same ob config
-            .filter(scoped_vault::ob_configuration_id.eq(ob_config_id))
+            .filter(workflow::ob_configuration_id.eq(ob_config_id))
             .get_results(conn)?;
         Ok(result)
     }

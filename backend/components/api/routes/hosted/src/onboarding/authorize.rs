@@ -71,14 +71,13 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
                 let b = Onboarding::lock(c, &biz_ob.id)?;
                 let set_biz_is_authorized = if b.authorized_at.is_none() {
                     let update = OnboardingUpdate::is_authorized();
-                    Onboarding::update(b, c, Some(&biz_ob.workflow_id), update)?;
+                    Onboarding::update(b, c, Some(biz_ob.workflow_id(None)), update)?;
                     true
                 } else {
                     false
                 };
 
-                let biz_wf = Workflow::get(c, &biz_ob.workflow_id)?;
-
+                let biz_wf = Workflow::get(c, biz_ob.workflow_id(None))?;
                 (set_biz_is_authorized, Some(biz_wf))
             } else {
                 (false, None)

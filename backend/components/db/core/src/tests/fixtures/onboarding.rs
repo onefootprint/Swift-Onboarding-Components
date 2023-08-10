@@ -4,6 +4,7 @@ use crate::{
     models::{
         insight_event::CreateInsightEvent,
         onboarding::{Onboarding, OnboardingCreateArgs},
+        workflow::Workflow,
     },
     TxnPgConn,
 };
@@ -13,14 +14,13 @@ pub fn create(
     scoped_vault_id: ScopedVaultId,
     ob_configuration_id: ObConfigurationId,
     fixture_result: Option<WorkflowFixtureResult>,
-) -> Onboarding {
+) -> (Onboarding, Workflow) {
     let ob_args = OnboardingCreateArgs {
         scoped_vault_id,
         ob_configuration_id,
         insight_event: Some(CreateInsightEvent { ..Default::default() }),
     };
 
-    Onboarding::get_or_create(conn, ob_args, fixture_result)
-        .unwrap()
-        .0
+    let (ob, wf, _) = Onboarding::get_or_create(conn, ob_args, fixture_result).unwrap();
+    (ob, wf)
 }

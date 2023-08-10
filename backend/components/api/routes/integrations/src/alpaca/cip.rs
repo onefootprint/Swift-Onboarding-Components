@@ -17,7 +17,7 @@ use api_core::{
             vendor_result::VendorResult,
         },
     },
-    errors::{cip_error::CipError, ApiResult},
+    errors::{cip_error::CipError, onboarding::OnboardingError, ApiResult},
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::{DecryptUncheckedResult, TenantVw, VaultWrapper},
     ApiError, ApiErrorKind, State,
@@ -101,35 +101,30 @@ async fn create_cip_request(
         state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
-                let obd =
-                    OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?;
+                let fp_obd =
+                    OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?
+                        .ok_or(CipError::EntityDecisionDoesNotExist)?;
 
-                let (risk_signals, fp_obd, mr, manual_obd) = match obd {
-                    Some(obd) => {
-                        let risk_signals =
-                            RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &obd.id)?;
+                let risk_signals =
+                    RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
 
-                        match obd.status {
-                            DecisionStatus::Pass => (risk_signals, obd, None, None),
-                            DecisionStatus::Fail | DecisionStatus::StepUp => {
-                                // footprint decided as fail, see if a manual decision override exists
-                                let (mr, obd_manual) =
-                                    ManualReview::find_completed(conn, &obd.onboarding_id)?
-                                        .ok_or(CipError::EntityDecisionStatusNotPass)?;
+                let (risk_signals, mr, manual_obd) = match fp_obd.status {
+                    DecisionStatus::Pass => (risk_signals, None, None),
+                    DecisionStatus::Fail | DecisionStatus::StepUp => {
+                        // footprint decided as fail, see if a manual decision override exists
+                        let (mr, obd_manual) = ManualReview::find_completed(conn, &fp_obd.onboarding_id)?
+                            .ok_or(CipError::EntityDecisionStatusNotPass)?;
 
-                                if obd_manual.status != DecisionStatus::Pass {
-                                    return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
-                                }
-
-                                (risk_signals, obd, Some(mr), Some(obd_manual))
-                            }
+                        if obd_manual.status != DecisionStatus::Pass {
+                            return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
                         }
+
+                        (risk_signals, Some(mr), Some(obd_manual))
                     }
-                    None => return Err(CipError::EntityDecisionDoesNotExist)?,
                 };
 
                 let (ob, sv, _mr, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
-                let wf_id = &ob.workflow_id;
+                let wf_id = fp_obd.workflow_id.as_ref().ok_or(OnboardingError::NoWorkflow)?;
                 let collected_document = DocumentRequest::get(conn, wf_id)?.map(|d| d.should_collect_selfie);
                 let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
                 let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;

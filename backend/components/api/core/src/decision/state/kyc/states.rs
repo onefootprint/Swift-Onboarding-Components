@@ -254,7 +254,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             conn,
             &self.ob_id,
             &self.sv_id,
-            &self.wf_id,
+            &wf,
             self.vendor_results
                 .iter()
                 .map(|vr| vr.verification_result_id.clone())

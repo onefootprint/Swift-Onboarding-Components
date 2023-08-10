@@ -24,7 +24,6 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::models::workflow::Workflow;
 use newtypes::{
@@ -92,8 +91,7 @@ async fn make_vendor_calls(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let uv = Vault::get(conn, &scoped_user.id)?;
-            let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
+            let (ob, _, _, _) = Onboarding::get(conn, &scoped_user.id)?;
 
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
 
@@ -182,9 +180,8 @@ async fn make_decision(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let uv = Vault::get(conn, &scoped_user.id)?;
-            let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
-            let is_sandbox = !uv.is_live;
+            let (ob, _, _, _) = Onboarding::get(conn, &scoped_user.id)?;
+            let is_sandbox = !scoped_user.is_live;
             let wf = Workflow::latest(conn, &scoped_user.id)?.ok_or(WorkflowError::AuthMissingWorkflow)?;
             Ok((ob, is_sandbox, wf))
         })
@@ -233,7 +230,7 @@ async fn make_decision(
                 rules_output.into(),
                 verification_result_ids,
                 is_sandbox,
-                Some(wf.id.clone()),
+                Some(&wf),
                 vec![],
             )?;
 
@@ -274,8 +271,7 @@ async fn shadow_run(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let uv = Vault::get(conn, &scoped_user.id)?;
-            let (ob, _, _, _) = Onboarding::get(conn, (&scoped_user.id, &uv.id))?;
+            let (ob, _, _, _) = Onboarding::get(conn, &scoped_user.id)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 

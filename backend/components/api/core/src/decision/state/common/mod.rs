@@ -47,8 +47,7 @@ pub async fn get_onboarding_for_workflow(
     let svid = workflow.scoped_vault_id.clone();
     db_pool
         .db_query(move |conn| -> DbResult<_> {
-            let sv = ScopedVault::get(conn, &svid)?;
-            let (ob, _, _, _) = Onboarding::get(conn, (&sv.id, &sv.vault_id))?;
+            let (ob, sv, _, _) = Onboarding::get(conn, &svid)?;
             Ok((ob, sv))
         })
         .await?
@@ -283,7 +282,7 @@ pub fn save_kyc_decision(
     conn: &mut TxnPgConn,
     ob_id: &OnboardingId,
     sv_id: &ScopedVaultId,
-    workflow_id: &WorkflowId,
+    workflow: &Workflow,
     verification_result_ids: Vec<VerificationResultId>,
     rules_output: OnboardingRulesDecision,
     is_sandbox: bool,
@@ -296,7 +295,7 @@ pub fn save_kyc_decision(
         rules_output,
         verification_result_ids,
         is_sandbox,
-        Some(workflow_id.clone()),
+        Some(workflow),
         review_reasons,
     )?;
     Ok(())
