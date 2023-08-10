@@ -17,13 +17,17 @@ const Layout = ({ children }: LayoutProps) => {
   const tenantPk = useTenantPublicKey();
   const { config } = state.context;
   const isSandbox = config?.isLive === false;
+  const handleClose = () => {
+    footprint.cancel();
+    footprint.close();
+  };
 
   return (
     <AppLayout
       options={{ hasDesktopBorderRadius: true }}
       isSandbox={isSandbox}
       tenantPk={tenantPk}
-      onClose={footprint.cancel}
+      onClose={handleClose}
     >
       {children}
     </AppLayout>

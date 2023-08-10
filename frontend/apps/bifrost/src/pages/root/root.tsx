@@ -31,6 +31,11 @@ const Root = () => {
     }
   };
 
+  const handleClose = () => {
+    footprint.cancel();
+    footprint.close();
+  };
+
   return (
     <Layout>
       <AppErrorBoundary
@@ -44,7 +49,7 @@ const Root = () => {
             obConfigAuth={obConfigAuth}
             bootstrapData={bootstrapData}
             onComplete={handleComplete}
-            onClose={footprint.cancel}
+            onClose={handleClose}
             showCompletionPage={showCompletionPage}
             showLogo={showLogo}
           />
