@@ -13,6 +13,7 @@ import React from 'react';
 import type { Fieldset } from '../../../../vault.types';
 import Nationality from './components/nationality';
 import SSN from './components/ssn';
+import State from './components/state';
 
 const useFieldsets = (): Fieldset => {
   const { t } = useTranslation('pages.user.vault');
@@ -56,7 +57,12 @@ const useFieldsets = (): Fieldset => {
         { di: IdDI.addressLine2 },
         { di: IdDI.city },
         { di: IdDI.zip },
-        { di: IdDI.state },
+        {
+          di: IdDI.state,
+          renderCustomField: ({ di, entity }) => (
+            <State di={di} entity={entity} />
+          ),
+        },
       ],
     },
     investorProfile: {
