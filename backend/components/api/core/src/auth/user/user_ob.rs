@@ -83,23 +83,31 @@ impl ExtractableAuthSession for ParsedUserObSession {
             }
         }?;
 
-        // Get the obc information from either the scoped vault or the onboarding
-        let obc_id = scoped_user
-            .ob_configuration_id
+        let workflow = if let Some(wf_id) = user_session.workflow_id() {
+            Some(Workflow::get(conn, &wf_id)?)
+        } else {
+            None
+        };
+
+        // Get the obc ID first from the workflow, the real source of truth.
+        // Otherwise, get from OrgOnboarding scope, otherwise the onboarding.
+        // TODO clean this up
+        let scope_obc_id = user_session.ob_configuration_id();
+        let obc_id = workflow
             .as_ref()
-            .or_else(|| onboarding.as_ref().map(|ob| &ob.ob_configuration_id));
+            .and_then(|wf| wf.ob_configuration_id.as_ref())
+            .or_else(|| {
+                scope_obc_id
+                    .as_ref()
+                    .or_else(|| onboarding.as_ref().map(|ob| &ob.ob_configuration_id))
+            });
+
         let (ob_config, tenant) = if let Some(obc_id) = obc_id {
             // Confirm that the ob config is active
             let (ob_config, tenant) = ObConfiguration::get_enabled(conn, obc_id)?;
             (Some(ob_config), Some(tenant))
         } else {
             (None, None)
-        };
-
-        let workflow = if let Some(wf_id) = user_session.workflow_id() {
-            Some(Workflow::get(conn, &wf_id)?)
-        } else {
-            None
         };
 
         let onboarding_session = UserObSession {
@@ -197,14 +205,6 @@ impl UserObSession {
         // workflow state, otherwise this could be stale
         let allowed_guards = if let Some(wf) = self.workflow.as_ref() {
             wf.state.allowed_guards()
-        } else if let Ok(ob) = self.onboarding() {
-            // Some legacy logic that translates the old onboarding state to which guards are allowed
-            // TODO deprecate this when we backfill workflows
-            if ob.idv_reqs_initiated_at.is_none() {
-                vec![WorkflowGuard::AddData, WorkflowGuard::AddDocument]
-            } else {
-                vec![]
-            }
         } else {
             // If the auth token isn't associated with a workflow, allow everything for legacy.
             // This allows adding an email as soon as the vault is created

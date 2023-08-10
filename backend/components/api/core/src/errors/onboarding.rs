@@ -28,8 +28,8 @@ pub enum OnboardingError {
     IdentityDocumentNotPending,
     #[error("Cannot create a document when no document request exists")]
     NoDocumentRequestFound,
-    #[error("Cannot onboard a non-portable scoped user onto any ob config")]
-    NonPortableScopedUser,
+    #[error("No onboarding config provided for onboarding")]
+    NoObConfig,
     #[error("Cannot edit completed onboarding")]
     AlreadyCompleted,
     #[error("User consent not found for onboarding")]

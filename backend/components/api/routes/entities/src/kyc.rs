@@ -79,7 +79,7 @@ pub async fn post(
                 return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
             }
 
-            let (ob, biz_ob) = api_core::utils::onboarding::get_or_start_onboarding(
+            let (ob, wf, biz_ob) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
                 &sv.vault_id,
                 &sv.id,
@@ -88,15 +88,15 @@ pub async fn post(
                 None, // currently dont support KYB for NPV
             )?;
             let ob_id = ob.id.clone();
-            let wf_id = ob.workflow_id;
-            let wf = Workflow::get(conn, &wf_id)?;
 
             // TODO: consolidate with /authorize code
             let ob = Onboarding::lock(conn, &ob.id)?;
-            let ob = if ob.authorized_at.is_none() {
-                Onboarding::update(ob, conn, Some(&wf_id), OnboardingUpdate::is_authorized())?
+            let (ob, wf) = if ob.authorized_at.is_none() {
+                let ob = Onboarding::update(ob, conn, Some(&wf.id), OnboardingUpdate::is_authorized())?;
+                let wf = Workflow::get(conn, &wf.id)?;
+                (ob, wf)
             } else {
-                ob.into_inner()
+                (ob.into_inner(), wf)
             };
 
             let _ = NewLivenessEvent {
@@ -145,13 +145,20 @@ pub async fn post(
     } else {
         tracing::warn!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "[/kyc] Workflow has already been run");
     }
-
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
-    let ob_info = state
+    let (ob_info, wf) = state
         .db_pool
-        .db_query(move |conn| Onboarding::get(conn, &ob_id))
+        .db_query(move |conn| -> ApiResult<_> {
+            let ob_info = Onboarding::get(conn, &ob_id)?;
+            let wf = Workflow::get(conn, &wf.id)?;
+            Ok((ob_info, wf))
+        })
         .await??;
 
-    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db(ob_info)).json()
+    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((
+        ob_info,
+        Some(wf),
+    )))
+    .json()
 }

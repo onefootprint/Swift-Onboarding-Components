@@ -1,6 +1,7 @@
 use newtypes::ContactInfoId;
 use newtypes::OnboardingId;
 use newtypes::VaultId;
+use newtypes::WorkflowId;
 
 use crate::auth::user::UserAuthScope;
 
@@ -27,6 +28,7 @@ impl UserSession {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ValidateUserToken {
     pub ob_id: OnboardingId,
+    pub wf_id: Option<WorkflowId>,
 }
 
 /// Longer-lived session that is sent out in emails to verify ownership

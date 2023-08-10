@@ -109,7 +109,6 @@ pub async fn send_secondary_bo_links(
 #[tracing::instrument(skip(state))]
 pub async fn should_run_kyb(state: &State, biz_ob: &Onboarding, tenant: &Tenant) -> ApiResult<bool> {
     let svid = biz_ob.scoped_vault_id.clone();
-    let ob_config_id = biz_ob.ob_configuration_id.clone();
 
     let bvw = state
         .db_pool
@@ -117,7 +116,7 @@ pub async fn should_run_kyb(state: &State, biz_ob: &Onboarding, tenant: &Tenant)
         .await??;
 
     let dbo = bvw
-        .decrypt_business_owners(&state.db_pool, &state.enclave_client, Some(ob_config_id))
+        .decrypt_business_owners(&state.db_pool, &state.enclave_client, &tenant.id)
         .await?;
 
     let bo_kyc_is_complete = match dbo {

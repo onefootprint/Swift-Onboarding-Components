@@ -1,4 +1,4 @@
-use newtypes::{ScopedVaultId, VaultId, WorkflowId};
+use newtypes::{ObConfigurationId, ScopedVaultId, VaultId, WorkflowId};
 use paperclip::actix::Apiv2Schema;
 
 mod session;
@@ -21,6 +21,7 @@ pub enum UserAuthScope {
     SignUp,
     OrgOnboarding {
         id: ScopedVaultId,
+        ob_configuration_id: Option<ObConfigurationId>,
     },
     Business(ScopedVaultId),
     // We don't currently issue a token with this - was for my1fp
@@ -43,7 +44,7 @@ pub trait UserAuth {
 
 #[cfg(test)]
 mod test {
-    use newtypes::ScopedVaultId;
+    use newtypes::WorkflowId;
 
     use super::UserAuthScope;
 
@@ -51,13 +52,13 @@ mod test {
     fn test_serialize() {
         let expected_parsed = vec![
             UserAuthScope::SignUp,
-            UserAuthScope::OrgOnboarding {
-                id: ScopedVaultId::test_data("FLERP".to_owned()),
+            UserAuthScope::Workflow {
+                wf_id: WorkflowId::test_data("FLERP".to_owned()),
             },
         ];
 
         // Obviously should be able to deserialize OrgOnboarding into OrgOnboarding
-        let modern_value_str = "[\"SignUp\",{\"OrgOnboarding\":{\"id\":\"FLERP\"}}]";
+        let modern_value_str = "[\"SignUp\",{\"Workflow\":{\"wf_id\":\"FLERP\"}}]";
         let modern_value: Vec<UserAuthScope> = serde_json::de::from_str(modern_value_str).unwrap();
         assert_eq!(modern_value, expected_parsed);
 

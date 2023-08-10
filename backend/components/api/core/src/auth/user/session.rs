@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use db::{models::vault::Vault, PgConn};
 use itertools::Itertools;
-use newtypes::{ScopedVaultId, VaultId, VaultKind, WorkflowId};
+use newtypes::{ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId};
 use paperclip::actix::Apiv2Security;
 
 use super::{UserAuthGuard, UserAuthScope};
@@ -50,7 +50,21 @@ impl UserSessionContext {
         self.scopes
             .iter()
             .filter_map(|x| match x {
-                UserAuthScope::OrgOnboarding { id } => Some(id.clone()),
+                UserAuthScope::OrgOnboarding { id, .. } => Some(id.clone()),
+                _ => None,
+            })
+            .next()
+    }
+
+    /// Extracts the ob_configuration_id from the `UserAuthScope::OrgOnboarding` scope on this
+    /// session, if exists
+    pub fn ob_configuration_id(&self) -> Option<ObConfigurationId> {
+        self.scopes
+            .iter()
+            .filter_map(|x| match x {
+                UserAuthScope::OrgOnboarding {
+                    ob_configuration_id, ..
+                } => ob_configuration_id.clone(),
                 _ => None,
             })
             .next()

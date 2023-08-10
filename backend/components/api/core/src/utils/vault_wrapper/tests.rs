@@ -450,8 +450,9 @@ fn test_bvw_replacements(conn: &mut TestPgConn) {
 fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
+    let tenant2 = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant2.id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
     let su2 = fixtures::scoped_vault::create(conn, &uv.id, &ob_config2.id);
 
@@ -616,8 +617,9 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     // This specific race condition was solved in https://linear.app/footprint/issue/FP-2129/handle-onboarding-race-condition
     let uv = fixtures::vault::create_person(conn, true);
     let tenant = fixtures::tenant::create(conn);
+    let tenant2 = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let ob_config2 = fixtures::ob_configuration::create(conn, &tenant2.id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
     let su2 = fixtures::scoped_vault::create(conn, &uv.id, &ob_config2.id);
 

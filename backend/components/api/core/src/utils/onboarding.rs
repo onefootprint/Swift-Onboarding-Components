@@ -4,9 +4,10 @@ use db::{
         document_request::{DocumentRequest, NewDocumentRequestArgs},
         insight_event::CreateInsightEvent,
         ob_configuration::ObConfiguration,
-        onboarding::{IsNew, Onboarding, OnboardingCreateArgs},
+        onboarding::{Onboarding, OnboardingCreateArgs},
         scoped_vault::ScopedVault,
         vault::{NewVaultArgs, Vault},
+        workflow::Workflow,
     },
     TxnPgConn,
 };
@@ -30,7 +31,7 @@ pub fn get_or_start_onboarding(
     obc: &ObConfiguration,
     insight_event: Option<CreateInsightEvent>,
     new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
-) -> ApiResult<(Onboarding, Option<Onboarding>)> {
+) -> ApiResult<(Onboarding, Workflow, Option<Onboarding>)> {
     let user_vault = Vault::lock(conn, v_id)?;
 
     // Create the onboarding for this scoped user
@@ -42,8 +43,8 @@ pub fn get_or_start_onboarding(
 
     // TODO rm this when fixture result is passed in process
     let fixture_result = WorkflowFixtureResult::from_sandbox_id(user_vault.sandbox_id.as_ref());
-    let (ob, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, fixture_result)?;
-    if let IsNew::Yes(ref wf) = is_new_ob {
+    let (ob, wf, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, fixture_result)?;
+    if is_new_ob {
         if let Some(doc_info) = obc
             .must_collect_data
             .iter()
@@ -55,7 +56,6 @@ pub fn get_or_start_onboarding(
         {
             // Create a `DocumentRequest` if specified in the ob config.
             // To prevent duplicate document requests, only create a doc request if the onboarding is new
-            let wf_id = wf.id.clone();
             let doc_type_restriction = if let DocTypeRestriction::Restrict(types) = doc_info.0.clone() {
                 Some(types)
             } else {
@@ -64,7 +64,7 @@ pub fn get_or_start_onboarding(
             let args = NewDocumentRequestArgs {
                 scoped_vault_id: ob.scoped_vault_id.clone(),
                 ref_id: None,
-                workflow_id: wf_id,
+                workflow_id: wf.id.clone(),
                 should_collect_selfie: doc_info.2 == Selfie::RequireSelfie,
                 only_us: doc_info.1 == CountryRestriction::UsOnly,
                 doc_type_restriction,
@@ -100,7 +100,7 @@ pub fn get_or_start_onboarding(
                 ob_configuration_id: obc.id.clone(),
                 insight_event,
             };
-            let (biz_ob, _) = Onboarding::get_or_create(conn, ob_create_args, fixture_result)?;
+            let (biz_ob, _, _) = Onboarding::get_or_create(conn, ob_create_args, fixture_result)?;
             biz_ob
         };
         Some(biz_ob)
@@ -108,5 +108,5 @@ pub fn get_or_start_onboarding(
         None
     };
 
-    Ok((ob, biz_ob))
+    Ok((ob, wf, biz_ob))
 }

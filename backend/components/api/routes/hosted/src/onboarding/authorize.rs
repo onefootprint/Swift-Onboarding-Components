@@ -31,10 +31,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     span.record("tenant_name", &format!("{:?}", user_auth.tenant()?.id.as_str()));
     span.record("onboarding_id", &format!("{}", user_auth.onboarding()?.id));
     span.record("scoped_user_id", &format!("{}", user_auth.scoped_user.id));
-    span.record(
-        "ob_configuration_id",
-        &format!("{}", user_auth.onboarding()?.ob_configuration_id),
-    );
+    span.record("ob_configuration_id", &format!("{}", user_auth.ob_config()?.id));
     span.record(
         "workflow_id",
         &format!(
@@ -64,9 +61,10 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
             let ob = Onboarding::lock(c, &ob_id)?;
-            if ob.authorized_at.is_none() {
-                Onboarding::update(ob, c, wf_id.as_ref(), OnboardingUpdate::is_authorized())?;
-            }
+            // We're now updating the onboarding's authorized_at even if it's already set. This
+            // representation is a little strange now, but we'll move away from reading it as the
+            // source of truth shortly
+            Onboarding::update(ob, c, wf_id.as_ref(), OnboardingUpdate::is_authorized())?;
 
             let biz_ob = user_auth.business_onboarding(c)?;
             let (set_biz_is_authorized, biz_wf) = if let Some(biz_ob) = biz_ob {

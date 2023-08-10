@@ -53,17 +53,16 @@ pub async fn get_bo_obds(
     business_ob_id: &OnboardingId,
 ) -> Result<Vec<OnboardingDecision>, ApiError> {
     let obid = business_ob_id.clone();
-    let (ob, bvw) = db_pool
+    let (sv, bvw) = db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (ob, _, _, _) = Onboarding::get(conn, &obid)?;
+            let (ob, sv, _, _) = Onboarding::get(conn, &obid)?;
             let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &ob.scoped_vault_id)?;
-            Ok((ob, bvw))
+            Ok((sv, bvw))
         })
         .await??;
 
-    let ob_conf_id = ob.ob_configuration_id.clone();
     let dbo = bvw
-        .decrypt_business_owners(db_pool, enclave_client, Some(ob_conf_id))
+        .decrypt_business_owners(db_pool, enclave_client, &sv.tenant_id)
         .await?;
 
     let onboarding_ids = match dbo {

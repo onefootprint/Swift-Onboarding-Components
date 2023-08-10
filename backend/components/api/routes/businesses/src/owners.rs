@@ -44,7 +44,7 @@ pub async fn get(
         .await??;
 
     let decrypted_bos = vw
-        .decrypt_business_owners(&state.db_pool, &state.enclave_client, sv.ob_configuration_id)
+        .decrypt_business_owners(&state.db_pool, &state.enclave_client, &sv.tenant_id)
         .await?;
 
     let results = business_owner_infos(decrypted_bos)

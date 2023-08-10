@@ -23,6 +23,8 @@ pub enum TenantError {
     InvalidTriggerKind,
     #[error("Cannot trigger KYC for non-portable vault")]
     CannotTriggerKycForNonPortable,
+    #[error("Cannot redo KYC with no previous KYC")]
+    CannotRedoKyc,
     #[error("Cannot run KYC for portable vault")]
     CannotRunKycForPortable,
     #[error("Incorrect entity kind for KYC")]

@@ -220,7 +220,7 @@ pub async fn build_business_data_from_verification_request(
         .await??;
 
     // Get FirstName + LastName for BO's. For Single-KYC, we get this from the JSON VaultData. For Multi_KYC, we get this from each BO's Vault
-    let dbo = bvw.decrypt_business_owners(db_pool, enclave_client, sv.ob_configuration_id).await?;
+    let dbo = bvw.decrypt_business_owners(db_pool, enclave_client, &sv.tenant_id).await?;
     let business_owners = match dbo {
         DecryptedBusinessOwners::KYBStart { primary_bo: _, primary_bo_vault: _ } => return Err(ApiError::from(BusinessError::BoOnboardingNotComplete)),
         DecryptedBusinessOwners::SingleKYC { primary_bo: _, primary_bo_vault: _, primary_bo_data, secondary_bos } => {

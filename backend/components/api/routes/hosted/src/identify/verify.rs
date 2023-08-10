@@ -182,7 +182,7 @@ fn onboarding_scopes(
     // If we verified with a BoSessionAuth, update the corresponding BO
     let bo_scope = if let Some(bo) = ob_pk_auth.business_owner() {
         let bo = BusinessOwner::lock(conn, &bo.id)?.into_inner();
-        let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &obc.id))?;
+        let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &obc.tenant_id))?;
         if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
             // If uv on the BO, make sure it is the same UV that was located in identify flow
             if existing_uv_id != &uv.id {
@@ -198,10 +198,12 @@ fn onboarding_scopes(
         None
     };
 
-    // todo share logic
     Ok(vec![
         Some(UserAuthScope::SignUp),
-        Some(UserAuthScope::OrgOnboarding { id: su.id }),
+        Some(UserAuthScope::OrgOnboarding {
+            id: su.id,
+            ob_configuration_id: Some(obc.id.clone()),
+        }),
         // Business owner scope, if any
         bo_scope,
     ])

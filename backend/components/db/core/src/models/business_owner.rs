@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::{business_owner, vault};
 use diesel::prelude::*;
 use itertools::Itertools;
-use newtypes::{BoId, BoLinkId, BusinessOwnerKind, Locked, ObConfigurationId, VaultId};
+use newtypes::{BoId, BoLinkId, BusinessOwnerKind, Locked, ObConfigurationId, TenantId, VaultId};
 
 use super::{onboarding::Onboarding, scoped_vault::ScopedVault, vault::Vault};
 
@@ -76,7 +76,7 @@ impl BusinessOwner {
     pub fn list(
         conn: &mut PgConn,
         bv_id: &VaultId,
-        ob_config_id: &ObConfigurationId,
+        tenant_id: &TenantId,
     ) -> DbResult<Vec<(Self, Option<UserData>)>> {
         use db_schema::schema::{onboarding, scoped_vault};
         let result = business_owner::table
@@ -87,9 +87,9 @@ impl BusinessOwner {
                     .inner_join(onboarding::table)
                     .on(scoped_vault::vault_id.nullable()
                     .eq(business_owner::user_vault_id)
-                    // Only get the ScopedVault for the owner's user vault that onboarded onto the
-                    // same ob config
-                    .and(scoped_vault::ob_configuration_id.eq(ob_config_id))),
+                    // Get the ScopedVault for the owner's user vault that onboarded onto the same
+                    // tenant
+                    .and(scoped_vault::tenant_id.eq(tenant_id))),
             )
             .get_results(conn)?;
         Ok(result)

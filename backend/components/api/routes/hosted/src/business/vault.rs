@@ -111,11 +111,8 @@ async fn augment_bos(state: &State, sb_id: ScopedVaultId, kyced_bos: PiiString) 
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sb = ScopedVault::get(conn, &sb_id)?;
-            let ob_config_id = sb
-                .ob_configuration_id
-                .ok_or(AssertionError("Expected scoped user vault to have ob config id"))?;
             // Find the primary BO - it is not necessarily the authed user
-            let primary_bo = BusinessOwner::list(conn, &sb.vault_id, &ob_config_id)?
+            let primary_bo = BusinessOwner::list(conn, &sb.vault_id, &sb.tenant_id)?
                 .into_iter()
                 .find(|bo| bo.0.kind == BusinessOwnerKind::Primary)
                 .ok_or(AssertionError("Primary BO not found"))?;

@@ -16,20 +16,17 @@ use api_wire_types::TriggerRequest;
 use chrono::Duration;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
-use db::models::vault::Vault;
 use db::models::workflow::NewWorkflowArgs;
 use db::models::workflow::Workflow;
 use newtypes::AlpacaKycConfig;
-use newtypes::CipKind;
 use newtypes::DocumentConfig;
 use newtypes::FpId;
 use newtypes::KycConfig;
 use newtypes::TriggerInfo;
 use newtypes::VaultKind;
-use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowKind;
 use newtypes::WorkflowTriggeredInfo;
 use paperclip::actix::{api_v2_operation, post, web};
 
@@ -58,37 +55,31 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let cip_kind = if let Some(obc_id) = sv.ob_configuration_id {
-                let (obc, _) = ObConfiguration::get(conn, &obc_id)?;
-                obc.cip_kind
-            } else {
-                None
-            };
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
 
-            let vault = Vault::get(conn, &sv.vault_id)?;
             // TODO: Other validation conditions to trigger RedoKyc
-            if vault.kind != VaultKind::Person {
+            if vw.vault.kind != VaultKind::Person {
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
-            if !vault.is_portable {
+            if !vw.vault.is_portable {
                 return Err(TenantError::CannotTriggerKycForNonPortable.into());
             }
 
             let wf = match trigger {
                 TriggerInfo::RedoKyc => {
-                    let config = if matches!(cip_kind, Some(CipKind::Alpaca)) {
-                        AlpacaKycConfig { is_redo: true }.into()
-                    } else {
-                        KycConfig { is_redo: true }.into()
+                    let last_alpaca_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::AlpacaKyc)?;
+                    let last_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::Kyc)?;
+                    let (config, last_wf) = match (last_alpaca_kyc_wf, last_kyc_wf) {
+                        (Some(wf), _) => (AlpacaKycConfig { is_redo: true }.into(), wf),
+                        (None, Some(wf)) => (KycConfig { is_redo: true }.into(), wf),
+                        (None, None) => return Err(TenantError::CannotRedoKyc.into()),
                     };
-                    // TODO rm this when fixture result is passed in process
-                    let fixture_result = WorkflowFixtureResult::from_sandbox_id(vault.sandbox_id.as_ref());
+
                     let args = NewWorkflowArgs {
                         scoped_vault_id: sv.id.clone(),
                         config,
-                        fixture_result,
-                        ob_configuration_id: None,
+                        fixture_result: last_wf.fixture_result,
+                        ob_configuration_id: last_wf.ob_configuration_id,
                         insight_event_id: None,
                     };
                     Workflow::create(conn, args)?
@@ -125,10 +116,11 @@ pub async fn post(
             // Create an auth token for this workflow that we will send to the user
             let scopes = vec![
                 UserAuthScope::SignUp,
-                // NOTE: when we remove this OrgOnboarding scope, make sure we're able to
-                // look up the ob_config and tenant on UserObAuth via the Workflow scope
-                UserAuthScope::OrgOnboarding { id: sv.id.clone() },
                 UserAuthScope::Workflow { wf_id: wf.id },
+                UserAuthScope::OrgOnboarding {
+                    id: wf.scoped_vault_id,
+                    ob_configuration_id: wf.ob_configuration_id,
+                },
             ];
             let duration = Duration::days(1);
             let data = UserSession::make(sv.vault_id, scopes);

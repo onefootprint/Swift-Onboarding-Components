@@ -281,8 +281,10 @@ fn get_requirement_inner(
             }
         }
         OnboardingRequirementKind::Authorize => {
-            // TODO this has to be on the workflow too....
-            if args.onboarding.authorized_at.is_none() {
+            // TODO move wf to the source of truth after we migrate fully to KYB workflows
+            let wf_not_authorized = args.workflow.as_ref().map(|wf| wf.authorized_at.is_none());
+            let ob_not_authorized = args.onboarding.authorized_at.is_none();
+            if wf_not_authorized.unwrap_or(ob_not_authorized) {
                 let document_types = if ob_config.can_access_document() {
                     // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
                     let id_docs = IdentityDocument::list(conn, &args.onboarding.scoped_vault_id)?;

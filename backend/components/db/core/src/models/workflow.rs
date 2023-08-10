@@ -65,6 +65,8 @@ pub struct WorkflowUpdate {
     pub authorized_at: Option<Option<DateTime<Utc>>>,
 }
 
+pub type IsNew = bool;
+
 impl Workflow {
     #[tracing::instrument("Workflow::insert", skip_all)]
     pub fn insert(conn: &mut PgConn, new_workflow: NewWorkflow) -> DbResult<Self> {
@@ -73,6 +75,36 @@ impl Workflow {
             .get_result(conn)?;
 
         Ok(res)
+    }
+
+    #[tracing::instrument("Workflow::get_or_create", skip_all)]
+    pub fn get_or_create(
+        conn: &mut TxnPgConn,
+        scoped_vault_id: ScopedVaultId,
+        config: WorkflowConfig,
+        fixture_result: Option<WorkflowFixtureResult>,
+        ob_configuration_id: ObConfigurationId,
+        insight_event_id: Option<InsightEventId>,
+    ) -> DbResult<(Self, IsNew)> {
+        let wf = workflow::table
+            .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
+            .filter(workflow::ob_configuration_id.eq(&ob_configuration_id))
+            .first(conn.conn())
+            .optional()?;
+        if let Some(wf) = wf {
+            return Ok((wf, false));
+        }
+
+        let args = NewWorkflowArgs {
+            scoped_vault_id,
+            config,
+            fixture_result,
+            ob_configuration_id: Some(ob_configuration_id),
+            insight_event_id,
+        };
+
+        let wf = Self::create(conn, args)?;
+        Ok((wf, true))
     }
 
     #[tracing::instrument("Workflow::create", skip_all)]

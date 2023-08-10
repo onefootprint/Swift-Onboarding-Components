@@ -38,6 +38,7 @@ pub struct ScopedVault {
     /// Denormalized from the user vault just to make querying easier
     pub is_live: bool,
     // Only null when the vault is non-portable
+    // TODO deprecate
     pub ob_configuration_id: Option<ObConfigurationId>,
     pub status: Option<OnboardingStatus>,
 }
@@ -70,9 +71,9 @@ pub enum ScopedVaultIdentifier<'a> {
         t_id: &'a TenantId,
         is_live: IsLive,
     },
-    ObConfig {
+    Tenant {
         v_id: &'a VaultId,
-        ob_config_id: &'a ObConfigurationId,
+        t_id: &'a TenantId,
     },
 }
 
@@ -100,9 +101,9 @@ impl<'a> From<(&'a FpId, &'a TenantId, IsLive)> for ScopedVaultIdentifier<'a> {
     }
 }
 
-impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for ScopedVaultIdentifier<'a> {
-    fn from((v_id, ob_config_id): (&'a VaultId, &'a ObConfigurationId)) -> Self {
-        Self::ObConfig { v_id, ob_config_id }
+impl<'a> From<(&'a VaultId, &'a TenantId)> for ScopedVaultIdentifier<'a> {
+    fn from((v_id, t_id): (&'a VaultId, &'a TenantId)) -> Self {
+        Self::Tenant { v_id, t_id }
     }
 }
 
@@ -124,6 +125,7 @@ impl ScopedVault {
     pub fn get_or_create(
         conn: &mut TxnPgConn,
         uv: &Locked<Vault>,
+        // TODO change this to tenant_id
         ob_configuration_id: ObConfigurationId,
     ) -> DbResult<Self> {
         let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
@@ -137,10 +139,11 @@ impl ScopedVault {
         // Still protected by uniqueness constraints, but those are clunkier
         let scoped_vault = scoped_vault::table
             .filter(scoped_vault::vault_id.eq(&uv.id))
-            .filter(scoped_vault::ob_configuration_id.eq(&ob_configuration_id))
+            .filter(scoped_vault::tenant_id.eq(&ob_config.tenant_id))
             .first(conn.conn())
             .optional()?;
         if let Some(scoped_vault) = scoped_vault {
+            // TODO if SV already exists, we should make a new workflow rather than an onboarding
             return Ok(scoped_vault);
         }
         // Row doesn't exist for vault_id, tenant_id - create a new one
@@ -224,10 +227,10 @@ impl ScopedVault {
                     .filter(scoped_vault::tenant_id.eq(t_id))
                     .filter(scoped_vault::is_live.eq(is_live));
             }
-            ScopedVaultIdentifier::ObConfig { v_id, ob_config_id } => {
+            ScopedVaultIdentifier::Tenant { v_id, t_id } => {
                 query = query
                     .filter(scoped_vault::vault_id.eq(v_id))
-                    .filter(scoped_vault::ob_configuration_id.eq(ob_config_id));
+                    .filter(scoped_vault::tenant_id.eq(t_id));
             }
         }
         let result = query.first(conn)?;

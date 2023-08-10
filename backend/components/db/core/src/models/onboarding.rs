@@ -5,7 +5,7 @@ use super::scoped_vault::ScopedVault;
 use super::task::Task;
 use super::tenant::Tenant;
 use super::vault::Vault;
-use super::workflow::{NewWorkflowArgs, Workflow, WorkflowUpdate};
+use super::workflow::{Workflow, WorkflowUpdate};
 use crate::models::ob_configuration::ObConfiguration;
 use crate::PgConn;
 use crate::{DbResult, TxnPgConn};
@@ -23,10 +23,7 @@ use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub enum IsNew {
-    Yes(Workflow),
-    No,
-}
+pub type IsNew = bool;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = onboarding)]
@@ -42,6 +39,7 @@ pub struct Onboarding {
     pub idv_reqs_initiated_at: Option<DateTime<Utc>>,
     pub decision_made_at: Option<DateTime<Utc>>,
     pub status: OnboardingStatus,
+    // TODO get rid of this
     pub workflow_id: WorkflowId,
 }
 
@@ -65,10 +63,28 @@ pub struct OnboardingUpdate {
     pub status: Option<OnboardingStatus>,
 }
 
+#[derive(Debug)]
 pub struct OnboardingCreateArgs {
     pub scoped_vault_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event: Option<CreateInsightEvent>,
+}
+
+/// While we are migrating the source of truth to workflow, use these utils to read from either
+/// workflow or onboarding
+impl Onboarding {
+    pub fn status(&self, wf: Option<&Workflow>) -> OnboardingStatus {
+        wf.and_then(|wf| wf.status).unwrap_or(self.status)
+    }
+
+    pub fn ob_configuration_id<'a>(&'a self, wf: Option<&'a Workflow>) -> &'a ObConfigurationId {
+        wf.and_then(|wf| wf.ob_configuration_id.as_ref())
+            .unwrap_or(&self.ob_configuration_id)
+    }
+
+    pub fn workflow_id<'a>(&'a self, wf: Option<&'a Workflow>) -> &'a WorkflowId {
+        wf.map(|wf| &wf.id).unwrap_or(&self.workflow_id)
+    }
 }
 
 impl OnboardingUpdate {
@@ -287,23 +303,12 @@ impl Onboarding {
         conn: &mut TxnPgConn,
         args: OnboardingCreateArgs,
         fixture_result: Option<WorkflowFixtureResult>,
-    ) -> DbResult<(Onboarding, IsNew)> {
-        let ob = onboarding::table
-            .filter(onboarding::scoped_vault_id.eq(&args.scoped_vault_id))
-            .filter(onboarding::ob_configuration_id.eq(&args.ob_configuration_id))
-            .first(conn.conn())
-            .optional()?;
-        if let Some(ob) = ob {
-            return Ok((ob, IsNew::No));
-        }
-
-        // Row doesn't exist for scoped_vault_id, ob_configuration_id - create a new one
+    ) -> DbResult<(Onboarding, Workflow, IsNew)> {
         let insight_event_id = if let Some(insight_event) = args.insight_event {
             Some(insight_event.insert_with_conn(conn)?.id)
         } else {
             None
         };
-
         let v = Vault::get(conn.conn(), &args.scoped_vault_id)?;
         let (obc, _) = ObConfiguration::get(conn.conn(), &args.ob_configuration_id)?;
 
@@ -318,28 +323,38 @@ impl Onboarding {
             VaultKind::Business => KybConfig {}.into(),
         };
 
-        let wf_args = NewWorkflowArgs {
-            scoped_vault_id: args.scoped_vault_id.clone(),
+        let (wf, is_new) = Workflow::get_or_create(
+            conn,
+            args.scoped_vault_id.clone(),
             config,
             fixture_result,
-            ob_configuration_id: Some(obc.id),
-            insight_event_id: insight_event_id.clone(),
-        };
-        let wf = Workflow::create(conn, wf_args)?;
+            obc.id,
+            insight_event_id.clone(),
+        )?;
 
-        let new_ob = NewOnboarding {
-            scoped_vault_id: args.scoped_vault_id.clone(),
-            ob_configuration_id: args.ob_configuration_id,
-            start_timestamp: Utc::now(),
-            insight_event_id,
-            status: OnboardingStatus::Incomplete,
-            workflow_id: wf.id.clone(),
-        };
-        let ob = diesel::insert_into(onboarding::table)
-            .values(new_ob)
-            .get_result::<Onboarding>(conn.conn())?;
+        // Eventually, we'll get rid of onboarding and we'll just get_or_create the workflow here
+        let ob = onboarding::table
+            .filter(onboarding::scoped_vault_id.eq(&args.scoped_vault_id))
+            .first(conn.conn())
+            .optional()?;
 
-        Ok((ob, IsNew::Yes(wf)))
+        let ob = if let Some(ob) = ob {
+            ob
+        } else {
+            let new_ob = NewOnboarding {
+                scoped_vault_id: args.scoped_vault_id.clone(),
+                ob_configuration_id: args.ob_configuration_id,
+                start_timestamp: Utc::now(),
+                insight_event_id,
+                status: OnboardingStatus::Incomplete,
+                workflow_id: wf.id.clone(),
+            };
+            diesel::insert_into(onboarding::table)
+                .values(new_ob)
+                .get_result::<Onboarding>(conn.conn())?
+        };
+
+        Ok((ob, wf, is_new))
     }
 
     #[tracing::instrument("Onboarding::update", skip_all)]

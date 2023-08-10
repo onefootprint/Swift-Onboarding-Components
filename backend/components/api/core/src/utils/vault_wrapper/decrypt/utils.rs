@@ -9,7 +9,7 @@ use db::models::contact_info::ContactInfo;
 use db::DbPool;
 use newtypes::{
     BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, IdentityDataKind as IDK,
-    KycedBusinessOwnerData, ObConfigurationId, PhoneNumber,
+    KycedBusinessOwnerData, PhoneNumber, TenantId,
 };
 
 impl<Type> VaultWrapper<Type> {
@@ -71,19 +71,12 @@ impl VaultWrapper<Business> {
         &self,
         db_pool: &DbPool,
         enclave_client: &EnclaveClient,
-        ob_configuration_id: Option<ObConfigurationId>,
+        tenant_id: &TenantId,
     ) -> ApiResult<DecryptedBusinessOwners> {
         let vid = self.vault().id.clone();
+        let tid = tenant_id.clone();
         let mut bos = db_pool
-            .db_query(move |conn| -> ApiResult<_> {
-                let bos = ob_configuration_id
-                    .as_ref()
-                // Non-portable vaults don't have any BOs
-                .map(|ob_config_id| BusinessOwner::list(conn, &vid, ob_config_id))
-                .transpose()?
-                .unwrap_or_default();
-                Ok(bos)
-            })
+            .db_query(move |conn| BusinessOwner::list(conn, &vid, &tid))
             .await??;
 
         let dis = &[BDK::BeneficialOwners.into(), BDK::KycedBeneficialOwners.into()];

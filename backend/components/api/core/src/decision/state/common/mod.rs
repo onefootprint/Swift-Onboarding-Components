@@ -32,7 +32,7 @@ use crate::{
             vendor_result::VendorResult,
         },
     },
-    errors::{onboarding::OnboardingError, ApiErrorKind, ApiResult},
+    errors::{ApiErrorKind, ApiResult},
     utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs},
     State,
 };
@@ -66,10 +66,6 @@ pub fn setup_kyc_onboarding_vreqs(
     let ob = Onboarding::lock(conn, ob_id)?;
     // redundant with new workflow state updates, will eventually remove when Onboarding is removed
     if !is_redo {
-        if ob.idv_reqs_initiated_at.is_some() {
-            return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
-        }
-
         let update = OnboardingUpdate::idv_reqs_initiated();
         Onboarding::update(ob, conn, Some(wf_id), update)?;
     }
