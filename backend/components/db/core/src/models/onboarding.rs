@@ -369,11 +369,31 @@ impl Onboarding {
         // !! it's important that code in the same txn that is going to write a review does it before this update call
         let mr = ManualReview::get_active_for_onboarding(conn, &ob.id)?;
 
+        // Update the workflow to keep it in sync with the onboarding for now
+        if let Some(wf_id) = wf_id {
+            let update = WorkflowUpdate {
+                status: update.status,
+                authorized_at: update.authorized_at,
+            };
+            Workflow::update(conn, wf_id, update)?;
+        }
         if let Some(new_status) = update.status {
-            if ob.status != new_status {
+            let old_status = sv.status;
+            if old_status != Some(new_status) {
+                let old_status_has_decision = match old_status {
+                    None => false,
+                    Some(s) => s.has_decision(),
+                };
+
+                // Only set to non-decision status if the current status is a non-decision status
+                // This has the effect of never letting the scoped vault status go from a decision to a non-decision status
+                if !old_status_has_decision || new_status.has_decision() {
+                    ScopedVault::update_status(conn, &sv.id, new_status)?;
+                }
+
                 // Since the OnboardingCompletedPayload webhook has `requires_manual_review`, its semantics currently really mean we have to fire it when we make a
                 // decision for the first time or in a redo flow
-                if !ob.status.has_decision() && new_status.has_decision() {
+                if !old_status_has_decision && new_status.has_decision() {
                     let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                         fp_id: sv.fp_id.clone(),
                         footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
@@ -381,16 +401,13 @@ impl Onboarding {
                         status: new_status,
                         requires_manual_review: mr.is_some(),
                     });
-                    Task::create(
-                        conn,
-                        Utc::now(),
-                        TaskData::FireWebhook(FireWebhookArgs {
-                            scoped_vault_id: ob.scoped_vault_id.clone(),
-                            tenant_id: tenant.id.clone(),
-                            is_live: sv.is_live,
-                            webhook_event,
-                        }),
-                    )?;
+                    let task_data = TaskData::FireWebhook(FireWebhookArgs {
+                        scoped_vault_id: ob.scoped_vault_id.clone(),
+                        tenant_id: tenant.id.clone(),
+                        is_live: sv.is_live,
+                        webhook_event,
+                    });
+                    Task::create(conn, Utc::now(), task_data)?;
                 };
 
                 // fire a OnboardingStatusChanged webhook no matter what
@@ -400,38 +417,13 @@ impl Onboarding {
                     timestamp: Utc::now(),
                     new_status,
                 });
-                Task::create(
-                    conn,
-                    Utc::now(),
-                    TaskData::FireWebhook(FireWebhookArgs {
-                        scoped_vault_id: ob.scoped_vault_id.clone(),
-                        tenant_id: tenant.id,
-                        is_live: sv.is_live,
-                        webhook_event,
-                    }),
-                )?;
-            }
-        }
-
-        // Update the workflow to keep it in sync with the onboarding for now
-        if let Some(wf_id) = wf_id {
-            let update = WorkflowUpdate {
-                status: update.status,
-                authorized_at: update.authorized_at,
-            };
-            Workflow::update(conn, wf_id, update)?;
-        }
-        if let Some(status) = update.status {
-            if sv.status != Some(status) {
-                // Only set to non-decision status if the current status is a non-decision status
-                // This has the effect of never letting the scoped vault status go from a decision to a non-decision status
-                let should_update = match sv.status {
-                    None => true,
-                    Some(s) => !s.has_decision(),
-                } || status.has_decision();
-                if should_update {
-                    ScopedVault::update_status(conn, &sv.id, status)?;
-                }
+                let task_data = TaskData::FireWebhook(FireWebhookArgs {
+                    scoped_vault_id: ob.scoped_vault_id.clone(),
+                    tenant_id: tenant.id,
+                    is_live: sv.is_live,
+                    webhook_event,
+                });
+                Task::create(conn, Utc::now(), task_data)?;
             }
         }
         let result = diesel::update(onboarding::table)
