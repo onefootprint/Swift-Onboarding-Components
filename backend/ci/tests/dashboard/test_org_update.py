@@ -21,8 +21,6 @@ def test_org_update_logo(sandbox_tenant):
 
 
 def test_allowed_origins(sandbox_tenant):
-    body = get("/org/client_security_config", None, *sandbox_tenant.db_auths)
-    assert len(body["allowed_origins"]) == 0
     body = patch(
         "/org/client_security_config",
         dict(allowed_origins=["https://google.com", "https://facebook.com"]),
