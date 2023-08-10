@@ -58,6 +58,13 @@ pub struct NewWorkflowArgs {
     pub insight_event_id: Option<InsightEventId>,
 }
 
+#[derive(Debug, Clone, AsChangeset)]
+#[diesel(table_name = workflow)]
+pub struct WorkflowUpdate {
+    pub status: Option<OnboardingStatus>,
+    pub authorized_at: Option<Option<DateTime<Utc>>>,
+}
+
 impl Workflow {
     #[tracing::instrument("Workflow::insert", skip_all)]
     pub fn insert(conn: &mut PgConn, new_workflow: NewWorkflow) -> DbResult<Self> {
@@ -152,6 +159,15 @@ impl Workflow {
             .set(workflow::state.eq(new_state))
             .get_result(conn.conn())?;
         WorkflowEvent::create(conn, wf.id, wf.state, new_state)?;
+        Ok(result)
+    }
+
+    #[tracing::instrument("Workflow::update", skip_all)]
+    pub fn update(conn: &mut TxnPgConn, id: &WorkflowId, update: WorkflowUpdate) -> DbResult<Self> {
+        let result = diesel::update(workflow::table)
+            .filter(workflow::id.eq(id))
+            .set(update)
+            .get_result(conn.conn())?;
         Ok(result)
     }
 

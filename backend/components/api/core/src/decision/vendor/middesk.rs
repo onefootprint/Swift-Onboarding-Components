@@ -559,11 +559,13 @@ pub async fn run_kyb(
     tenant_id: &TenantId,
 ) -> Result<(), ApiError> {
     let bizobid = biz_ob_id.clone();
+    let wf_id = wf.id.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let ob = Onboarding::lock(conn, &bizobid)?;
-            Onboarding::update(ob, conn, OnboardingUpdate::set_status(OnboardingStatus::Pending))?;
+            let update = OnboardingUpdate::set_status(OnboardingStatus::Pending);
+            Onboarding::update(ob, conn, Some(&wf_id), update)?;
             Ok(())
         })
         .await?;
@@ -620,7 +622,7 @@ pub async fn init_middesk_request(
             if ob.idv_reqs_initiated_at.is_some() {
                 return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
             }
-            Onboarding::update(ob, conn, OnboardingUpdate::idv_reqs_initiated())?;
+            Onboarding::update(ob, conn, wf_id.as_ref(), OnboardingUpdate::idv_reqs_initiated())?;
 
             let decision_intent = if let Some(wf_id) = wf_id {
                 DecisionIntent::get_or_create_for_workflow_and_kind(

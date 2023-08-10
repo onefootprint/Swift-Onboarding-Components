@@ -72,13 +72,16 @@ pub async fn create_user_and_onboarding(
 
             // Mark the onboardings as authorized since they would be authorized in prod by the
             // time they're used here
+            let wf_id = ob.workflow_id;
             let ob = Onboarding::lock(conn, &ob.id)?;
-            let ob = Onboarding::update(ob, conn, OnboardingUpdate::is_authorized())?;
+            let ob = Onboarding::update(ob, conn, Some(&wf_id), OnboardingUpdate::is_authorized())?;
 
             let biz_ob = biz_ob
                 .map(|biz_ob| -> ApiResult<_> {
+                    let wf_id = biz_ob.workflow_id;
                     let biz_ob = Onboarding::lock(conn, &biz_ob.id)?;
-                    let biz_ob = Onboarding::update(biz_ob, conn, OnboardingUpdate::is_authorized())?;
+                    let biz_ob =
+                        Onboarding::update(biz_ob, conn, Some(&wf_id), OnboardingUpdate::is_authorized())?;
                     Ok(biz_ob)
                 })
                 .transpose()?;

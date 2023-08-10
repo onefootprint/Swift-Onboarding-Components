@@ -80,6 +80,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<Option<_>> {
             let fpid = fpid.clone();
+            // TODO how does this work when there are multiple KYC workflows for one scoped vault?
             decision::review::save_review_decision(conn, &fpid, &tenant_id, is_live, request, actor, None)
         })
         .await?;

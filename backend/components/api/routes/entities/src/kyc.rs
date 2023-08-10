@@ -94,7 +94,7 @@ pub async fn post(
             // TODO: consolidate with /authorize code
             let ob = Onboarding::lock(conn, &ob.id)?;
             let ob = if ob.authorized_at.is_none() {
-                Onboarding::update(ob, conn, OnboardingUpdate::is_authorized())?
+                Onboarding::update(ob, conn, Some(&wf_id), OnboardingUpdate::is_authorized())?
             } else {
                 ob.into_inner()
             };

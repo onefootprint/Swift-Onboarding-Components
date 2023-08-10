@@ -57,6 +57,7 @@ pub fn save_final_decision(
     };
 
     // Create decision
+    let wf_id = workflow_id.clone();
     let onboarding_decision = OnboardingDecisionCreateArgs {
         vault_id: scoped_user.vault_id,
         onboarding: &ob,
@@ -78,9 +79,10 @@ pub fn save_final_decision(
         }
     }
 
-    // Make a billable event here
+    // TODO: Make a billable event here
     // If this is the first time setting a decision, then write decision_made_at
     let update = OnboardingUpdate::set_decision(decision.decision_status, is_first_decision_for_onboarding);
-    Onboarding::update(ob, conn, update)?;
+    Onboarding::update(ob, conn, wf_id.as_ref(), update)?;
+
     Ok(obd)
 }

@@ -196,7 +196,9 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
     let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
 
-    Onboarding::update(biz_ob, conn, OnboardingUpdate::idv_reqs_initiated())?;
+    let update = OnboardingUpdate::idv_reqs_initiated();
+    let wf_id = biz_ob.workflow_id.clone();
+    Onboarding::update(biz_ob, conn, Some(&wf_id), update)?;
 
     let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
     let uv = Vault::get(conn, &sb.id)?;
@@ -254,7 +256,8 @@ pub fn write_kyb_fixture_ob_decision(
         decision_made_at: Some(Some(Utc::now())),
         status: Some(decision_status.into()),
     };
-    Onboarding::update(biz_ob, conn, update)?;
+    let wf_id = biz_ob.workflow_id.clone();
+    Onboarding::update(biz_ob, conn, Some(&wf_id), update)?;
     Ok(())
 }
 

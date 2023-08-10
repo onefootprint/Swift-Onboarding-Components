@@ -283,4 +283,13 @@ impl ScopedVault {
         let result_map = results.into_iter().map(|ob| (ob.0.id.clone(), ob)).collect();
         Ok(result_map)
     }
+
+    #[tracing::instrument("ScopedVault::update_status", skip_all)]
+    pub fn update_status(conn: &mut PgConn, id: &ScopedVaultId, status: OnboardingStatus) -> DbResult<Self> {
+        let result = diesel::update(scoped_vault::table)
+            .filter(scoped_vault::id.eq(id))
+            .set(scoped_vault::status.eq(status))
+            .get_result(conn)?;
+        Ok(result)
+    }
 }

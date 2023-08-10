@@ -82,15 +82,11 @@ pub fn create_user_and_onboarding(
     let suid = su.id.clone();
     let onboarding = fixtures::onboarding::create(conn, suid, ob_config_id, None);
     let ob = Onboarding::lock(conn, &onboarding.id).unwrap();
-    let onboarding = Onboarding::update(
-        ob,
-        conn,
-        OnboardingUpdate {
-            status: Some(onboarding_status),
-            ..Default::default()
-        },
-    )
-    .unwrap();
+    let update = OnboardingUpdate {
+        status: Some(onboarding_status),
+        ..Default::default()
+    };
+    let onboarding = Onboarding::update(ob, conn, Some(&onboarding.workflow_id), update).unwrap();
     let wf = Workflow::get(conn, &onboarding.workflow_id).unwrap();
 
     (tenant, onboarding, uv, su, wf)

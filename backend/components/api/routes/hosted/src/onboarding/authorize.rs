@@ -59,22 +59,21 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     // mark person and business ob as authorized
     let ob_id = user_auth.onboarding()?.id.clone();
 
+    let wf_id = user_auth.workflow().map(|wf| wf.id.clone());
     let (biz_wf, set_biz_is_authorized) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
             let ob = Onboarding::lock(c, &ob_id)?;
             if ob.authorized_at.is_none() {
-                Onboarding::update(ob, c, OnboardingUpdate::is_authorized())?;
-                true
-            } else {
-                false
-            };
+                Onboarding::update(ob, c, wf_id.as_ref(), OnboardingUpdate::is_authorized())?;
+            }
 
             let biz_ob = user_auth.business_onboarding(c)?;
             let (set_biz_is_authorized, biz_wf) = if let Some(biz_ob) = biz_ob {
                 let b = Onboarding::lock(c, &biz_ob.id)?;
                 let set_biz_is_authorized = if b.authorized_at.is_none() {
-                    let _bizob = Onboarding::update(b, c, OnboardingUpdate::is_authorized())?;
+                    let update = OnboardingUpdate::is_authorized();
+                    Onboarding::update(b, c, Some(&biz_ob.workflow_id), update)?;
                     true
                 } else {
                     false

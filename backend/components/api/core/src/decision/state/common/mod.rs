@@ -70,7 +70,8 @@ pub fn setup_kyc_onboarding_vreqs(
             return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
         }
 
-        Onboarding::update(ob, conn, OnboardingUpdate::idv_reqs_initiated())?;
+        let update = OnboardingUpdate::idv_reqs_initiated();
+        Onboarding::update(ob, conn, Some(wf_id), update)?;
     }
     // TODO: create new DI if is_redo
     let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(

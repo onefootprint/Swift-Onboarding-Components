@@ -5,7 +5,7 @@ use super::scoped_vault::ScopedVault;
 use super::task::Task;
 use super::tenant::Tenant;
 use super::vault::Vault;
-use super::workflow::{NewWorkflowArgs, Workflow};
+use super::workflow::{NewWorkflowArgs, Workflow, WorkflowUpdate};
 use crate::models::ob_configuration::ObConfiguration;
 use crate::PgConn;
 use crate::{DbResult, TxnPgConn};
@@ -343,9 +343,14 @@ impl Onboarding {
     }
 
     #[tracing::instrument("Onboarding::update", skip_all)]
-    pub fn update(ob: Locked<Onboarding>, conn: &mut TxnPgConn, update: OnboardingUpdate) -> DbResult<Self> {
+    pub fn update(
         // Intentionally consume the value so the stale version is not used
-
+        ob: Locked<Onboarding>,
+        conn: &mut TxnPgConn,
+        // While we're double writing status to wf_id, update it here if it exists
+        wf_id: Option<&WorkflowId>,
+        update: OnboardingUpdate,
+    ) -> DbResult<Self> {
         let sv = ScopedVault::get(conn, &ob.id)?;
         let tenant = Tenant::get(conn, &sv.tenant_id)?;
         // !! it's important that code in the same txn that is going to write a review does it before this update call
@@ -395,10 +400,31 @@ impl Onboarding {
             }
         }
 
+        // Update the workflow to keep it in sync with the onboarding for now
+        if let Some(wf_id) = wf_id {
+            let update = WorkflowUpdate {
+                status: update.status,
+                authorized_at: update.authorized_at,
+            };
+            Workflow::update(conn, wf_id, update)?;
+        }
+        if let Some(status) = update.status {
+            if sv.status != Some(status) {
+                // Only set to non-decision status if the current status is a non-decision status
+                // This has the effect of never letting the scoped vault status go from a decision to a non-decision status
+                let should_update = match sv.status {
+                    None => true,
+                    Some(s) => !s.has_decision(),
+                } || status.has_decision();
+                if should_update {
+                    ScopedVault::update_status(conn, &sv.id, status)?;
+                }
+            }
+        }
         let result = diesel::update(onboarding::table)
             .filter(onboarding::id.eq(&ob.id))
             .set(update)
-            .get_result(conn.conn())?;
+            .get_result::<Self>(conn.conn())?;
         Ok(result)
     }
 
