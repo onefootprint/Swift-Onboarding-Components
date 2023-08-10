@@ -9,8 +9,8 @@
       "loading-aria-label": "Loading..."
     },
     "transition-animation": {
-      "source": "Personal data collected",
-      "destination": "Now your investor profile!"
+      "source": "Almost there",
+      "destination": "A few more investing-specific questions"
     }
   },
   "pages": {
