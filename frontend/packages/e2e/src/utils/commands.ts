@@ -170,6 +170,8 @@ export const doLivenessCheck = async (
   expect(screenshotPath).toBeDefined();
 
   const qrCodeUrl = await readQrCode(screenshotPath);
+  expect(qrCodeUrl).toBeDefined();
+
   const popup = await browser.newPage();
   await popup.goto(qrCodeUrl);
   await popup.waitForLoadState();
