@@ -29,7 +29,7 @@ use db::{
     models::{
         document_request::DocumentRequest, insight_event::InsightEvent, manual_review::ManualReview,
         onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
-        scoped_vault::ScopedVault, verification_request::VerificationRequest,
+        scoped_vault::ScopedVault, verification_request::VerificationRequest, workflow::Workflow,
     },
 };
 use idv::ParsedResponse;
@@ -97,64 +97,63 @@ async fn create_cip_request(
     tenant_id: TenantId,
     is_live: bool,
 ) -> ApiResult<CipRequest> {
-    let (uvw, onboarding, decision, scoped_vault, actor, mr, risk_signals, insight, vres, collected_document) =
-        state
-            .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
-                let fp_obd =
-                    OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?
-                        .ok_or(CipError::EntityDecisionDoesNotExist)?;
+    let (uvw, wf, decision, scoped_vault, actor, mr, risk_signals, insight, vres, collected_document) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let fp_obd =
+                OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?
+                    .ok_or(CipError::EntityDecisionDoesNotExist)?;
 
-                let risk_signals =
-                    RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
+            let risk_signals = RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
 
-                let (risk_signals, mr, manual_obd) = match fp_obd.status {
-                    DecisionStatus::Pass => (risk_signals, None, None),
-                    DecisionStatus::Fail | DecisionStatus::StepUp => {
-                        // footprint decided as fail, see if a manual decision override exists
-                        let (mr, obd_manual) = ManualReview::find_completed(conn, &fp_obd.onboarding_id)?
-                            .ok_or(CipError::EntityDecisionStatusNotPass)?;
+            let (risk_signals, mr, manual_obd) = match fp_obd.status {
+                DecisionStatus::Pass => (risk_signals, None, None),
+                DecisionStatus::Fail | DecisionStatus::StepUp => {
+                    // footprint decided as fail, see if a manual decision override exists
+                    let (mr, obd_manual) = ManualReview::find_completed(conn, &fp_obd.onboarding_id)?
+                        .ok_or(CipError::EntityDecisionStatusNotPass)?;
 
-                        if obd_manual.status != DecisionStatus::Pass {
-                            return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
-                        }
-
-                        (risk_signals, Some(mr), Some(obd_manual))
+                    if obd_manual.status != DecisionStatus::Pass {
+                        return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
                     }
-                };
 
-                let (ob, sv, _mr, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
-                let wf_id = fp_obd.workflow_id.as_ref().ok_or(OnboardingError::NoWorkflow)?;
-                let collected_document = DocumentRequest::get(conn, wf_id)?.map(|d| d.should_collect_selfie);
-                let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-                let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;
+                    (risk_signals, Some(mr), Some(obd_manual))
+                }
+            };
 
-                let decision = manual_obd.unwrap_or(fp_obd);
+            let (ob, sv, _mr, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
+            let wf_id = fp_obd.workflow_id.as_ref().ok_or(OnboardingError::NoWorkflow)?;
+            let wf = Workflow::get(conn, wf_id)?;
+            let collected_document = DocumentRequest::get(conn, wf_id)?.map(|d| d.should_collect_selfie);
+            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+            let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;
 
-                // find the actor either via Manaul OBD or the FP OBD.
-                let actor = saturate_actors(conn, vec![decision.clone()])?
-                    .pop()
-                    .map(|(_, actor)| actor);
+            let decision = manual_obd.unwrap_or(fp_obd);
 
-                let vres = VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(
-                    conn,
-                    sv.id.clone(),
-                )?;
+            // find the actor either via Manaul OBD or the FP OBD.
+            let actor = saturate_actors(conn, vec![decision.clone()])?
+                .pop()
+                .map(|(_, actor)| actor);
 
-                Ok((
-                    uvw,
-                    ob,
-                    decision,
-                    sv,
-                    actor,
-                    mr,
-                    risk_signals,
-                    insight,
-                    vres,
-                    collected_document,
-                ))
-            })
-            .await??;
+            let vres = VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(
+                conn,
+                sv.id.clone(),
+            )?;
+
+            Ok((
+                uvw,
+                wf,
+                decision,
+                sv,
+                actor,
+                mr,
+                risk_signals,
+                insight,
+                vres,
+                collected_document,
+            ))
+        })
+        .await??;
 
     let user_vault_private_key = uvw.vault.e_private_key.clone();
     let document_check_created_at = vres
@@ -196,8 +195,8 @@ async fn create_cip_request(
     // build the cip object components
     let kyc = kyc(
         &scoped_vault,
-        &onboarding,
-        decision,
+        &wf,
+        &decision,
         insight,
         actor,
         default_approver,
@@ -206,12 +205,12 @@ async fn create_cip_request(
     )?;
     let watchlist = watchlist(
         &scoped_vault,
-        &onboarding,
+        &decision,
         &risk_signals,
         &vendor_results,
         mr.as_ref(),
     )?;
-    let identity = identity(&scoped_vault, &onboarding, risk_signals);
+    let identity = identity(&scoped_vault, &decision, risk_signals);
     let (document, photo) = if let Some(collected_selfie) = collected_document {
         document_and_photo(
             scoped_vault.clone(),
@@ -241,8 +240,8 @@ async fn create_cip_request(
 #[allow(clippy::too_many_arguments)]
 fn kyc(
     scoped_vault: &ScopedVault,
-    onboarding: &Onboarding,
-    decision: OnboardingDecision,
+    wf: &Workflow,
+    decision: &OnboardingDecision,
     insight: Option<InsightEvent>,
     actor: Option<SaturatedActor>,
     default_approver: PiiString,
@@ -300,10 +299,10 @@ fn kyc(
         },
         postal_code: decrypted_data.get_di(Zip)?,
         country_of_residency: decrypted_data.get_di(Country)?,
-        kyc_completed_at: onboarding.decision_made_at,
+        kyc_completed_at: Some(decision.created_at),
         ip_address: pii!(insight.and_then(|ie| ie.ip_address).unwrap_or("0.0.0.0".into())),
-        check_initiated_at: onboarding.authorized_at,
-        check_completed_at: onboarding.decision_made_at,
+        check_initiated_at: wf.authorized_at,
+        check_completed_at: Some(decision.created_at),
         approval_status: alpaca::ApprovalStatus::Approved,
         approved_by,
         approved_at: decision.created_at,
@@ -318,7 +317,7 @@ fn kyc(
 /// helper for building the alpaca idenity sub-response
 fn identity(
     scoped_vault: &ScopedVault,
-    onboarding: &Onboarding,
+    decision: &OnboardingDecision,
     risk_signals: Vec<RiskSignal>,
 ) -> alpaca::Identity {
     let (reason_codes, vendors): (Vec<_>, Vec<_>) = risk_signals
@@ -360,7 +359,7 @@ fn identity(
         id: scoped_vault.fp_id.clone(),
         result: overall_result,
         status: alpaca::CipStatus::Complete,
-        created_at: onboarding.decision_made_at.unwrap_or(chrono::Utc::now()),
+        created_at: decision.created_at,
         matched_address: matched_address_result,
         matched_addresses: vendors.clone(),
         date_of_birth: dob_result,
@@ -373,7 +372,7 @@ fn identity(
 /// helper for building the alpaca idenity sub-response
 fn watchlist(
     scoped_vault: &ScopedVault,
-    onboarding: &Onboarding,
+    decision: &OnboardingDecision,
     risk_signals: &[RiskSignal],
     vres: &[VendorResult],
     mr: Option<&ManualReview>,
@@ -446,7 +445,7 @@ fn watchlist(
         id: scoped_vault.fp_id.clone(),
         result: overall_result,
         status: alpaca::CipStatus::Complete,
-        created_at: onboarding.decision_made_at.unwrap_or(chrono::Utc::now()),
+        created_at: decision.created_at,
         politically_exposed_person: pep_result,
         monitored_lists: ofac_result,
         sanction: sanctions_result,
