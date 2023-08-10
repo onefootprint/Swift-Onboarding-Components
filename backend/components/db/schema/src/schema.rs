@@ -345,7 +345,6 @@ table! {
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        onboarding_id -> Nullable<Text>,
         completed_at -> Nullable<Timestamptz>,
         completed_by_decision_id -> Nullable<Text>,
         completed_by_actor -> Nullable<Jsonb>,
@@ -961,7 +960,6 @@ joinable!(identity_document -> document_request (request_id));
 joinable!(incode_verification_session_event -> incode_verification_session (incode_verification_session_id));
 joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> scoped_vault (scoped_vault_id));
-joinable!(manual_review -> onboarding (onboarding_id));
 joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
 joinable!(manual_review -> scoped_vault (scoped_vault_id));
 joinable!(manual_review -> workflow (workflow_id));

@@ -6,9 +6,7 @@ use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::prelude::*;
-use newtypes::{
-    DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId, ReviewReason, ScopedVaultId, WorkflowId,
-};
+use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, ReviewReason, ScopedVaultId, WorkflowId};
 use serde::{Deserialize, Serialize};
 
 use super::onboarding_decision::OnboardingDecision;
@@ -20,7 +18,6 @@ pub struct ManualReview {
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub onboarding_id: Option<OnboardingId>, // TODO: migrate to scoped_vault_id FP-4468
     /// When populated, means the ManualReview is no longer active
     pub completed_at: Option<DateTime<Utc>>,
     /// If the ManualReview was completed by making a new OnboardingDecision, is referenced here.
