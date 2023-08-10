@@ -14,7 +14,7 @@ const handleOpen = () => {
     publicKey,
     onComplete: (validationToken: string) => {
       const el = document.querySelector('[data-testid="result"]');
-      if (el) {
+      if (el && validationToken) {
         el.innerHTML = validationToken;
       }
     },
