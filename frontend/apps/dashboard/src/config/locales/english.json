@@ -1897,13 +1897,15 @@
         "client-certificate": {
           "title": "Client certificate authentication (mTLS)",
           "certificate": "Certificate",
-          "download": "Download client certificate"
+          "download": "Download client certificate",
+          "empty": "There's no client certificate authentication (mTLS)"
         },
         "pinned-server-certificates": {
           "title": "Pinned server certificates",
           "certificate": "Certificate",
           "download_one": "Download pinned server certificate",
-          "download_other": "Download {{count}} pinned server certificates"
+          "download_other": "Download {{count}} pinned server certificates",
+          "empty": "There's no pinned server certificates"
         },
         "ingress-vaulting": {
           "title": "Ingress vaulting",

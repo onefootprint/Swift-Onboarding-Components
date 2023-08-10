@@ -1,13 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDownload16 } from '@onefootprint/icons';
 import type { ProxyConfigDetails } from '@onefootprint/types';
-import { LinkButton } from '@onefootprint/ui';
+import { LinkButton, Typography } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
 import { Field } from 'src/components';
 
-type ClientCertificateProps = {
+export type ClientCertificateProps = {
   proxyConfig: ProxyConfigDetails;
 };
 
@@ -34,7 +34,9 @@ const ClientCertificate = ({ proxyConfig }: ClientCertificateProps) => {
         {t('download')}
       </LinkButton>
     </Field>
-  ) : null;
+  ) : (
+    <Typography variant="body-3">{t('empty')}</Typography>
+  );
 };
 
 export default ClientCertificate;

@@ -1,1 +1,4 @@
-export { default } from './pinned-server-certificates';
+export {
+  type PinnedServerCertificatesProps,
+  default,
+} from './pinned-server-certificates';

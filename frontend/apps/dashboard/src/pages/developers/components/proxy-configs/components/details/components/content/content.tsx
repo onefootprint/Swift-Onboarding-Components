@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
@@ -18,29 +19,31 @@ type ContentProps = {
 };
 
 const Content = ({ proxyConfig }: ContentProps) => {
+  const { t } = useTranslation('pages.proxy-configs.details');
+
   const sections = [
     {
-      title: 'Basic configuration',
+      title: t('basic-configuration.title'),
       Component: BasicConfiguration,
       Form: Forms.BasicConfiguration,
     },
     {
-      title: 'Custom headers',
+      title: t('custom-headers.title'),
       Component: CustomHeaders,
       Form: Forms.CustomHeaderValues,
     },
     {
-      title: 'Client certificates',
+      title: t('client-certificate.title'),
       Component: ClientCertificate,
       Form: Forms.ClientIdentity,
     },
     {
-      title: 'Pinned server certificates',
+      title: t('pinned-server-certificates.title'),
       Component: PinnedServerCertificates,
       Form: Forms.PinnedServerCertificates,
     },
     {
-      title: 'Ingress vaulting',
+      title: t('ingress-vaulting.title'),
       Component: IngressVaulting,
       Form: Forms.IngressVaulting,
     },
