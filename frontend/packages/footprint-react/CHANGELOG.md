@@ -1,5 +1,13 @@
 # @onefootprint/footprint-react
 
+## 5.1.2
+
+### Patch Changes
+
+- a55834376: Patch validationToken argument not getting passed into onComplete and fix errors for vanilla integration callbacks for verify-button components
+- Updated dependencies [a55834376]
+  - @onefootprint/footprint-js@3.1.2
+
 ## 5.1.1
 
 ### Patch Changes
