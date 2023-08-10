@@ -13,7 +13,9 @@ impl Validate for IPK {
         // Don't want anything to be empty
         let value = utils::validate_not_empty(value)?;
         let value = match self {
+            Self::EmploymentStatus => utils::parse_enum::<EmploymentStatus>(value)?,
             Self::Occupation => value,
+            Self::Employer => value,
             Self::BrokerageFirmEmployer => value,
             Self::AnnualIncome => utils::parse_enum::<AnnualIncome>(value)?,
             Self::NetWorth => utils::parse_enum::<NetWorth>(value)?,
@@ -29,6 +31,15 @@ impl Validate for IPK {
         };
         Ok(value)
     }
+}
+
+#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
+#[strum(serialize_all = "snake_case")]
+enum EmploymentStatus {
+    Employed,
+    Unemployed,
+    Student,
+    Retired,
 }
 
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]

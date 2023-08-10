@@ -6,7 +6,9 @@ use crate::{CollectedData, DataIdentifier, IsDataIdentifierDiscriminant};
 #[strum(serialize_all = "snake_case")]
 /// Represents data that is collected as part of a user's investor profile
 pub enum InvestorProfileKind {
+    EmploymentStatus,
     Occupation,
+    Employer,
     BrokerageFirmEmployer,
     AnnualIncome,
     NetWorth,
@@ -33,7 +35,11 @@ impl TryFrom<DataIdentifier> for InvestorProfileKind {
 
 impl IsDataIdentifierDiscriminant for InvestorProfileKind {
     fn is_optional(&self) -> bool {
-        matches!(self, Self::Occupation | Self::BrokerageFirmEmployer)
+        matches!(
+            self,
+            // TODO make employment status not null after migrating frontend
+            Self::Employer | Self::Occupation | Self::BrokerageFirmEmployer | Self::EmploymentStatus
+        )
     }
 
     fn parent(&self) -> Option<CollectedData> {
