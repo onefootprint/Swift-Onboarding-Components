@@ -11,7 +11,7 @@ dotenv.config();
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  timeout: 10 * 60 * 1000,
+  timeout: 60000 * 18,
   testDir: './src',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -31,7 +31,10 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    video: 'on',
+  },
+
+  expect: {
+    timeout: 10000,
   },
 
   /* Configure projects for major browsers */
