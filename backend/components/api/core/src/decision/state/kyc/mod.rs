@@ -49,6 +49,7 @@ pub struct KycDecisioning {
     wf_id: WorkflowId,
     #[allow(unused)]
     is_redo: bool,
+    #[allow(unused)]
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,

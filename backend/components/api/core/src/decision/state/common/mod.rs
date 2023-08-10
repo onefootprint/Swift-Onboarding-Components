@@ -47,7 +47,7 @@ pub async fn get_onboarding_for_workflow(
     let svid = workflow.scoped_vault_id.clone();
     db_pool
         .db_query(move |conn| -> DbResult<_> {
-            let (ob, sv, _) = Onboarding::get(conn, &svid)?;
+            let (ob, sv) = Onboarding::get(conn, &svid)?;
             Ok((ob, sv))
         })
         .await?
@@ -280,7 +280,6 @@ pub fn get_decision(
 #[allow(clippy::too_many_arguments)]
 pub fn save_kyc_decision(
     conn: &mut TxnPgConn,
-    ob_id: &OnboardingId,
     sv_id: &ScopedVaultId,
     workflow: &Workflow,
     verification_result_ids: Vec<VerificationResultId>,
@@ -288,14 +287,12 @@ pub fn save_kyc_decision(
     is_sandbox: bool,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
-    let (ob, _, _) = Onboarding::get(conn, ob_id)?;
     engine::save_onboarding_decision(
         conn,
-        &ob,
+        workflow,
         rules_output,
         verification_result_ids,
         is_sandbox,
-        Some(workflow),
         review_reasons,
     )?;
     Ok(())

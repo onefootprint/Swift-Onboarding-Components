@@ -105,8 +105,8 @@ async fn create_cip_request(
                     .ok_or(CipError::EntityDecisionDoesNotExist)?;
 
             let risk_signals = RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
-            let (ob, sv, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
             let wf = Workflow::get(conn, &fp_obd.workflow_id)?;
+            let (ob, sv) = Onboarding::get(conn, &wf.scoped_vault_id)?;
 
             let (risk_signals, mr, manual_obd) = match fp_obd.status {
                 DecisionStatus::Pass => (risk_signals, None, None),

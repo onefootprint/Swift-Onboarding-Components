@@ -5,7 +5,7 @@ use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::{BoId, BoLinkId, BusinessOwnerKind, Locked, ObConfigurationId, TenantId, VaultId};
 
-use super::{onboarding::Onboarding, scoped_vault::ScopedVault, vault::Vault, workflow::Workflow};
+use super::{scoped_vault::ScopedVault, vault::Vault, workflow::Workflow};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = business_owner)]
@@ -30,7 +30,7 @@ struct NewBusinessOwnerRow {
     link_id: BoLinkId,
 }
 
-pub type UserData = (ScopedVault, Vault, Onboarding);
+pub type UserData = (ScopedVault, Vault);
 
 impl BusinessOwner {
     #[tracing::instrument("BusinessOwner::create_primary", skip_all)]
@@ -76,20 +76,20 @@ impl BusinessOwner {
     pub fn list(
         conn: &mut PgConn,
         bv_id: &VaultId,
+        // by ob config ID?
+        // we really want to just return workflows here
         tenant_id: &TenantId,
     ) -> DbResult<Vec<(Self, Option<UserData>)>> {
-        use db_schema::schema::{onboarding, scoped_vault};
+        use db_schema::schema::scoped_vault;
         let result = business_owner::table
             .filter(business_owner::business_vault_id.eq(bv_id))
             .left_join(
                 scoped_vault::table
-                    .inner_join(vault::table)
-                    .inner_join(onboarding::table)
-                    .on(scoped_vault::vault_id.nullable()
-                    .eq(business_owner::user_vault_id)
-                    // Get the ScopedVault for the owner's user vault that onboarded onto the same
-                    // tenant
-                    .and(scoped_vault::tenant_id.eq(tenant_id))),
+                    .on(scoped_vault::vault_id
+                        .nullable()
+                        .eq(business_owner::user_vault_id)
+                        .and(scoped_vault::tenant_id.eq(tenant_id)))
+                    .inner_join(vault::table),
             )
             .get_results(conn)?;
         Ok(result)

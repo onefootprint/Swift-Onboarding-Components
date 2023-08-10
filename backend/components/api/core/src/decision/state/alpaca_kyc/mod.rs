@@ -83,6 +83,7 @@ impl HasRuleGroup for AlpacaKycWatchlistCheck {
 #[derive(Clone)]
 pub struct AlpacaKycPendingReview {
     wf_id: WorkflowId,
+    #[allow(unused)]
     sv_id: ScopedVaultId,
 }
 #[derive(Clone)]

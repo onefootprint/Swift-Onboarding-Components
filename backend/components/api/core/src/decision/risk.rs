@@ -1,4 +1,4 @@
-use newtypes::{DbActor, OnboardingId, ReviewReason, VerificationResultId, WorkflowId};
+use newtypes::{DbActor, ReviewReason, VerificationResultId, WorkflowId};
 
 use db::{
     models::{
@@ -6,15 +6,13 @@ use db::{
         onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
         scoped_vault::ScopedVault,
+        workflow::Workflow,
     },
     TxnPgConn,
 };
 
 use super::onboarding::Decision;
-use crate::{
-    errors::{ApiResult, AssertionError},
-    utils::vault_wrapper::VaultWrapper,
-};
+use crate::{errors::ApiResult, utils::vault_wrapper::VaultWrapper};
 
 /// Create our final decision from the features we created, set final onboarding status, and emit risk signals
 /// assert_is_first_decision_for_onboarding determines if an error should be thrown if the onboarding already has a decision made
@@ -24,21 +22,20 @@ use crate::{
 #[tracing::instrument(skip(conn))]
 pub fn save_final_decision(
     conn: &mut TxnPgConn,
-    ob_id: OnboardingId,
+    wf_id: WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
     decision: &Decision,
     // TODO make this non-null soon
-    wf_id: Option<WorkflowId>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<OnboardingDecision> {
     // TODO: Create our risk signals!
     // Save status
-    let ob = Onboarding::lock(conn, &ob_id)?;
-    let scoped_user = ScopedVault::get(conn, &ob.scoped_vault_id)?;
+    let wf = Workflow::lock(conn, &wf_id)?;
+    let scoped_user = ScopedVault::get(conn, &wf.scoped_vault_id)?;
 
     // If we should commit, portablize all data for the onboarding
     let seqno = if decision.should_commit {
-        let uvw = VaultWrapper::lock_for_onboarding(conn, &ob.scoped_vault_id)?;
+        let uvw = VaultWrapper::lock_for_onboarding(conn, &wf.scoped_vault_id)?;
         if uvw.vault.is_portable {
             let seqno = uvw.portablize_identity_data(conn)?;
             Some(seqno)
@@ -52,33 +49,33 @@ pub fn save_final_decision(
     // Create decision
     let onboarding_decision = OnboardingDecisionCreateArgs {
         vault_id: scoped_user.vault_id,
-        onboarding: &ob,
+        scoped_vault_id: scoped_user.id,
         logic_git_hash: crate::GIT_HASH.to_string(),
         status: decision.decision_status,
         result_ids: verification_result_ids,
         annotation_id: None,
         actor: DbActor::Footprint,
         seqno,
-        workflow_id: wf_id.as_ref().unwrap_or_else(|| ob.workflow_id(None)).clone(),
+        workflow_id: wf_id.clone(),
     };
     let obd = OnboardingDecision::create(conn, onboarding_decision)?;
 
     // Create ManualReview row if requested and an active one does not already exist
     if decision.create_manual_review {
-        let wf_id = wf_id
-            .as_ref()
-            .ok_or(AssertionError("No wf_id in save_final_decision"))?;
-        let existing_review = ManualReview::get_active(conn, wf_id)?;
+        let existing_review = ManualReview::get_active(conn, &wf_id)?;
         if existing_review.is_none() {
-            ManualReview::create(conn, review_reasons, wf_id.clone(), ob.scoped_vault_id.clone())?;
+            ManualReview::create(conn, review_reasons, wf_id.clone(), wf.scoped_vault_id.clone())?;
         }
     }
 
     // TODO: Make a billable event here
     // If this is the first time setting a decision, then write decision_made_at
+    // This logic is getting convoluted - soon will switch to just workflow update
+    let (ob, _) = Onboarding::get(conn, &wf.scoped_vault_id)?;
+    let ob = Onboarding::lock(conn, &ob.id)?;
     let is_first_decision_for_onboarding = ob.decision_made_at.is_none();
     let update = OnboardingUpdate::set_decision(decision.decision_status, is_first_decision_for_onboarding);
-    Onboarding::update(ob, conn, wf_id.as_ref(), update)?;
+    Onboarding::update(ob, conn, Some(&wf_id), update)?;
 
     Ok(obd)
 }

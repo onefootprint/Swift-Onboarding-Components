@@ -8,7 +8,6 @@ use db::models::{
     onboarding::{Onboarding, OnboardingUpdate},
     risk_signal::RiskSignal,
     risk_signal_group::RiskSignalGroup,
-    scoped_vault::ScopedVault,
     verification_result::VerificationResult,
     workflow::Workflow as DbWorkflow,
 };
@@ -283,7 +282,6 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 // If they hard fail, then we can immediatly save a Fail OBD/update onboarding.status = Fail
                 common::save_kyc_decision(
                     conn,
-                    &self.ob_id,
                     &self.sv_id,
                     &wf,
                     self.vendor_results
@@ -551,7 +549,6 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
 
         common::save_kyc_decision(
             conn,
-            &self.ob_id,
             &self.sv_id,
             &wf,
             vendor_results
@@ -620,16 +617,7 @@ impl OnAction<ReviewCompleted, AlpacaKycState> for AlpacaKycPendingReview {
     #[tracing::instrument("OnAction<ReviewCompleted, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         let (decision, actor) = async_res;
-        let sv = ScopedVault::get(conn, &self.sv_id)?;
-        save_review_decision(
-            conn,
-            &sv.fp_id,
-            &sv.tenant_id,
-            sv.is_live,
-            decision,
-            actor,
-            Some(self.wf_id),
-        )?;
+        save_review_decision(conn, self.wf_id, decision, actor)?;
         Ok(AlpacaKycState::from(AlpacaKycComplete))
     }
 }

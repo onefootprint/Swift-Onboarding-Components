@@ -139,7 +139,7 @@ pub async fn should_run_kyb(state: &State, biz_ob: &Onboarding, tenant: &Tenant)
             primary_bo_data: _,
             secondary_bos: _,
         } => {
-            tracing::info!(?biz_ob, primary_bo_ob=?primary_bo_vault.2, "[should_run_kyb] SingleKYC");
+            tracing::info!(?biz_ob, primary_bo_sv=?primary_bo_vault.0.id, "[should_run_kyb] SingleKYC");
             has_decision(primary_bo_vault.0.status)
         }
         // For Multi-KYC KYB, we need the primary BO and all secondary BOs to have completed KYC
@@ -149,7 +149,7 @@ pub async fn should_run_kyb(state: &State, biz_ob: &Onboarding, tenant: &Tenant)
             primary_bo_data: _,
             secondary_bos,
         } => {
-            tracing::info!(?biz_ob, primary_bo_ob=?primary_bo_vault.2, ?secondary_bos, "[should_run_kyb] MultiKYC");
+            tracing::info!(?biz_ob, primary_bo_sv=?primary_bo_vault.0.id, ?secondary_bos, "[should_run_kyb] MultiKYC");
             let all_secondary_not_initiated = secondary_bos.iter().all(|bo| bo.2.is_none());
             if all_secondary_not_initiated {
                 // If we are in authorize and all secondary BOs have no vault, we are in authorize

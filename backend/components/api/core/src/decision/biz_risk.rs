@@ -1,15 +1,9 @@
 use db::{
-    models::{onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal},
+    models::{onboarding_decision::OnboardingDecision, workflow::Workflow},
     DbPool,
 };
-use idv::middesk::response::business::BusinessResponse;
-use newtypes::{OnboardingId, RiskSignalGroupKind, VendorAPI, VerificationResultId};
+use newtypes::WorkflowId;
 
-use super::{
-    engine,
-    features::{self, kyb_features::KybFeatureVector},
-};
-use crate::decision::onboarding::FeatureVector;
 use crate::{
     enclave_client::EnclaveClient,
     errors::{onboarding::OnboardingError, ApiResult},
@@ -17,47 +11,17 @@ use crate::{
     ApiError,
 };
 
-pub async fn make_kyb_decision(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-    ob_id: OnboardingId,
-    business_response: &BusinessResponse,
-    vres_id: &VerificationResultId,
-    vendor_api: VendorAPI,
-) -> Result<(), ApiError> {
-    let obds = get_bo_obds(db_pool, enclave_client, &ob_id).await?;
-    let reason_codes = features::middesk::reason_codes(business_response);
-    let fv = KybFeatureVector::new(reason_codes.clone(), obds);
-    let rules_output = fv.evaluate()?;
-
-    let vresid = vres_id.clone();
-    db_pool
-        .db_transaction(move |conn| -> ApiResult<()> {
-            let (ob, sv, _) = Onboarding::get(conn, &ob_id)?;
-            let risk_signals = reason_codes
-                .into_iter()
-                .map(|rc| (rc, vendor_api, vresid.clone()))
-                .collect();
-            let _rs = RiskSignal::bulk_create(conn, &sv.id, risk_signals, RiskSignalGroupKind::Kyb, false)?;
-
-            engine::save_onboarding_decision(conn, &ob, rules_output, vec![vresid], false, None, vec![])?;
-            Ok(())
-        })
-        .await?;
-    Ok(())
-}
-
 pub async fn get_bo_obds(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
-    business_ob_id: &OnboardingId,
+    biz_wf_id: &WorkflowId,
 ) -> Result<Vec<OnboardingDecision>, ApiError> {
-    let obid = business_ob_id.clone();
-    let (sv, bvw) = db_pool
+    let wfid = biz_wf_id.clone();
+    let (wf, sv, bvw) = db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (_, sv, _) = Onboarding::get(conn, &obid)?;
+            let (wf, sv) = Workflow::get_all(conn, &wfid)?;
             let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sv.id)?;
-            Ok((sv, bvw))
+            Ok((wf, sv, bvw))
         })
         .await??;
 
@@ -65,7 +29,7 @@ pub async fn get_bo_obds(
         .decrypt_business_owners(db_pool, enclave_client, &sv.tenant_id)
         .await?;
 
-    let onboarding_ids = match dbo {
+    let sv_ids = match dbo {
         DecryptedBusinessOwners::KYBStart {
             primary_bo: _,
             primary_bo_vault: _,
@@ -75,44 +39,44 @@ pub async fn get_bo_obds(
             primary_bo_vault,
             primary_bo_data: _,
             secondary_bos: _,
-        } => Ok(vec![primary_bo_vault.2.id]),
+        } => Ok(vec![primary_bo_vault.0.id]),
         DecryptedBusinessOwners::MultiKYC {
             primary_bo: _,
             primary_bo_vault,
             primary_bo_data: _,
             secondary_bos,
         } => {
-            let mut v = vec![primary_bo_vault.2.id];
-            let secondary_bo_onboardings: Vec<_> = secondary_bos
+            let mut v = vec![primary_bo_vault.0.id];
+            let secondary_bo_wfs: Vec<_> = secondary_bos
                 .into_iter()
                 .map(|b| {
-                    if let Some((_, _, ob)) = b.2 {
-                        Ok(ob.id)
+                    if let Some((sv, _)) = b.2 {
+                        Ok(sv.id)
                     } else {
                         Err(ApiError::from(OnboardingError::MissingBoOnboarding))
                     }
                 })
                 .collect::<ApiResult<Vec<_>>>()?;
-            v.extend(secondary_bo_onboardings);
+            v.extend(secondary_bo_wfs);
             Ok(v)
         }
     }?;
 
-    let ob_ids = onboarding_ids.clone();
-    let obds: Vec<OnboardingDecision> = db_pool
-        .db_query(move |conn| OnboardingDecision::bulk_get_active(conn, &ob_ids))
+    let obc_id = wf.ob_configuration_id.ok_or(OnboardingError::NoObcForWorkflow)?;
+    let wfs = db_pool
+        .db_query(move |conn| Workflow::get_with_decisions(conn, sv_ids, &obc_id))
         .await??;
-
-    let onboardings_without_obd: Vec<_> = onboarding_ids
-        .into_iter()
-        .filter(|id| !obds.iter().any(|obd| obd.onboarding_id == *id))
+    let wfs_without_decision: Vec<_> = wfs
+        .iter()
+        .filter(|(_, obd)| obd.is_none())
+        .map(|(wf, _)| wf.id.clone())
         .collect();
-
-    if !onboardings_without_obd.is_empty() {
+    if !wfs_without_decision.is_empty() {
         return Err(ApiError::from(OnboardingError::MissingBoOnboardingDecision(
-            onboardings_without_obd.into(),
+            wfs_without_decision.into(),
         )));
     }
+    let obds = wfs.into_iter().flat_map(|(_, obd)| obd).collect();
 
     Ok(obds)
 }

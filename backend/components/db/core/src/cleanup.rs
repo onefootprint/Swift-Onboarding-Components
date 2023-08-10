@@ -164,35 +164,8 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(middesk_request::table)
-                .filter(middesk_request::onboarding_id.eq_any(ob_ids.clone()))
+                .filter(middesk_request::onboarding_id.eq_any(ob_ids))
                 .execute(conn.conn())?;
-
-            // Onboarding decisions
-            {
-                let decision_ids = onboarding_decision::table
-                    .filter(onboarding_decision::onboarding_id.eq_any(ob_ids.clone()))
-                    .select(onboarding_decision::id);
-
-                deleted_rows += diesel::delete(onboarding_decision_verification_result_junction::table)
-                    .filter(
-                        onboarding_decision_verification_result_junction::onboarding_decision_id
-                            .eq_any(decision_ids.clone()),
-                    )
-                    .execute(conn.conn())?;
-
-                deleted_rows += diesel::delete(risk_signal::table)
-                    .filter(risk_signal::onboarding_decision_id.eq_any(decision_ids.clone().nullable()))
-                    .filter(risk_signal::verification_result_id.is_null())
-                    .execute(conn.conn())?;
-
-                deleted_rows += diesel::delete(risk_signal_group::table)
-                    .filter(risk_signal_group::scoped_vault_id.eq_any(su_ids.clone()))
-                    .execute(conn.conn())?;
-
-                deleted_rows += diesel::delete(onboarding_decision::table)
-                    .filter(onboarding_decision::onboarding_id.eq_any(ob_ids.clone()))
-                    .execute(conn.conn())?;
-            }
 
             // Verification requests
             {
@@ -233,12 +206,39 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(manual_review::table)
-                .filter(manual_review::workflow_id.eq_any(workflow_ids))
+                .filter(manual_review::workflow_id.eq_any(workflow_ids.clone()))
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(workflow::table)
                 .filter(workflow::scoped_vault_id.eq_any(su_ids.clone()))
                 .execute(conn.conn())?;
+
+            // Onboarding decisions
+            {
+                let decision_ids = onboarding_decision::table
+                    .filter(onboarding_decision::workflow_id.eq_any(workflow_ids.clone()))
+                    .select(onboarding_decision::id);
+
+                deleted_rows += diesel::delete(onboarding_decision_verification_result_junction::table)
+                    .filter(
+                        onboarding_decision_verification_result_junction::onboarding_decision_id
+                            .eq_any(decision_ids.clone()),
+                    )
+                    .execute(conn.conn())?;
+
+                deleted_rows += diesel::delete(risk_signal::table)
+                    .filter(risk_signal::onboarding_decision_id.eq_any(decision_ids.clone().nullable()))
+                    .filter(risk_signal::verification_result_id.is_null())
+                    .execute(conn.conn())?;
+
+                deleted_rows += diesel::delete(risk_signal_group::table)
+                    .filter(risk_signal_group::scoped_vault_id.eq_any(su_ids.clone()))
+                    .execute(conn.conn())?;
+
+                deleted_rows += diesel::delete(onboarding_decision::table)
+                    .filter(onboarding_decision::workflow_id.eq_any(workflow_ids))
+                    .execute(conn.conn())?;
+            }
         }
 
         // delete scoped_users

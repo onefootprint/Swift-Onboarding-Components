@@ -23,7 +23,6 @@ use crate::{
 };
 use db::{
     models::{
-        onboarding::Onboarding,
         vault::Vault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
         verification_result::VerificationResult,
@@ -42,8 +41,7 @@ use idv::{
 
 use itertools::Itertools;
 use newtypes::{
-    ObConfigurationId, OnboardingId, PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId,
-    VerificationResultId,
+    OnboardingId, PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId, VerificationResultId,
 };
 use prometheus::labels;
 
@@ -287,21 +285,19 @@ pub fn calculate_decision(
 #[allow(clippy::too_many_arguments)]
 pub fn save_onboarding_decision(
     conn: &mut TxnPgConn,
-    ob: &Onboarding,
+    workflow: &Workflow,
     rules_output: OnboardingRulesDecision,
     verification_result_ids: Vec<VerificationResultId>,
     is_sandbox: bool,
-    workflow: Option<&Workflow>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
     let (final_decision, additional_evaluated) = rules_output.final_decision_and_additional_evaluated()?;
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     let onboarding_decision = risk::save_final_decision(
         conn,
-        ob.id.clone(),
+        workflow.id.clone(),
         verification_result_ids,
         &final_decision.decision,
-        workflow.map(|wf| wf.id.clone()),
         review_reasons,
     )?;
 
@@ -314,44 +310,25 @@ pub fn save_onboarding_decision(
 
     if !is_sandbox {
         // Log our canonical line
-        log_rule_evaluation(
-            &ob.id,
-            ob.ob_configuration_id(workflow),
-            &ob.scoped_vault_id,
-            &final_decision,
-            rule::CANONICAL_ONBOARDING_RULE_LINE,
-        );
+        log_rule_evaluation(workflow, &final_decision, rule::CANONICAL_ONBOARDING_RULE_LINE);
 
         // Log any additional decisions
-        additional_evaluated.into_iter().for_each(|output| {
-            log_rule_evaluation(
-                &ob.id,
-                ob.ob_configuration_id(workflow),
-                &ob.scoped_vault_id,
-                &output,
-                "additional_decisions_for_onboarding",
-            )
-        });
+        additional_evaluated
+            .into_iter()
+            .for_each(|output| log_rule_evaluation(workflow, &output, "additional_decisions_for_onboarding"));
     }
 
     Ok(())
 }
 
-fn log_rule_evaluation(
-    ob_id: &OnboardingId,
-    obc_id: &ObConfigurationId,
-    sv_id: &ScopedVaultId,
-    rule_output: &OnboardingRulesDecisionOutput,
-    msg: &str,
-) {
+fn log_rule_evaluation(wf: &Workflow, rule_output: &OnboardingRulesDecisionOutput, msg: &str) {
     tracing::info!(
        rules_triggered=%rule::rules_to_string(&rule_output.rules_triggered),
        rules_not_triggered=%rule::rules_to_string(&rule_output.rules_not_triggered),
        create_manual_review=%rule_output.decision.create_manual_review,
        decision=%rule_output.decision.decision_status,
-       onboarding_id=%ob_id,
-       scoped_user_id=%sv_id,
-       ob_configuration_id=%obc_id,
+       workflow_id=%wf.id,
+       scoped_user_id=%wf.scoped_vault_id,
        vendor_api=%rule_output.decision.vendor_api,
        msg
        // TODO: differentiate KYB vs KYC here

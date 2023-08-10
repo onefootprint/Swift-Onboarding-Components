@@ -9,40 +9,30 @@ use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
+use db::models::workflow::Workflow;
 use db::TxnPgConn;
 use newtypes::DbActor;
-use newtypes::FpId;
-use newtypes::TenantId;
 use newtypes::WorkflowId;
 
 pub fn save_review_decision(
     conn: &mut TxnPgConn,
-    fp_id: &FpId,
-    tenant_id: &TenantId,
-    is_live: bool,
+    wf_id: WorkflowId,
     decision_request: DecisionRequest,
     actor: AuthActor,
-    workflow_id: Option<WorkflowId>,
 ) -> ApiResult<()> {
     let DecisionRequest {
         annotation: CreateAnnotationRequest { note, is_pinned },
         status,
     } = decision_request;
 
-    let (ob, su, decision) = Onboarding::lock_for_tenant(conn, fp_id, tenant_id, is_live)?;
-    let manual_review = workflow_id
-        .as_ref()
-        .map(|wf_id| ManualReview::get_active(conn, wf_id))
-        .transpose()?
-        .flatten();
+    Workflow::lock(conn, &wf_id)?;
+    let (wf, su) = Workflow::get_all(conn, &wf_id)?;
+    let manual_review = ManualReview::get_active(conn, &wf_id)?;
 
-    if !ob.is_complete() {
+    if wf.authorized_at.is_none() {
         // Can't make a decision on an onboarding that doesn't already have one
         return Err(TenantError::CannotMakeDecision.into());
     }
-
-    // The status changed if either there is no current decision OR the status of the existing decision is different
-    let status_changed = decision.map(|d| d.status != status.into()).unwrap_or(true);
 
     // If a manual review will be cleared or we will create a new decision, the operation
     // is not a no-op and we should create an annotation in the DB
@@ -51,17 +41,14 @@ pub fn save_review_decision(
     // may be different
     let new_decision = OnboardingDecisionCreateArgs {
         vault_id: su.vault_id,
-        onboarding: &ob,
+        scoped_vault_id: su.id,
         logic_git_hash: crate::GIT_HASH.to_string(),
         result_ids: vec![],
         status: status.into(),
         annotation_id: Some(annotation.0.id),
         actor: DbActor::from(actor.clone()),
         seqno: None,
-        workflow_id: workflow_id
-            .as_ref()
-            .unwrap_or_else(|| ob.workflow_id(None))
-            .clone(),
+        workflow_id: wf_id.clone(),
     };
     let decision = OnboardingDecision::create(conn, new_decision)?;
 
@@ -72,9 +59,12 @@ pub fn save_review_decision(
         manual_review.complete(conn, actor, decision.id)?;
     }
 
-    if status_changed {
+    if wf.status != Some(status.into()) {
+        // This logic is getting convoluted - soon will switch to just workflow update
+        let (ob, _) = Onboarding::get(conn, &wf.scoped_vault_id)?;
+        let ob = Onboarding::lock(conn, &ob.id)?;
         let update = OnboardingUpdate::set_decision(status.into(), false);
-        Onboarding::update(ob, conn, workflow_id.as_ref(), update)?;
+        Onboarding::update(ob, conn, Some(&wf_id), update)?;
     }
 
     Ok(())

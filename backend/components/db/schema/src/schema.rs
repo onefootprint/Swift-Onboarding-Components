@@ -414,7 +414,7 @@ table! {
 
     onboarding_decision (id) {
         id -> Text,
-        onboarding_id -> Text,
+        onboarding_id -> Nullable<Text>,
         logic_git_hash -> Text,
         created_at -> Timestamptz,
         _created_at -> Timestamptz,

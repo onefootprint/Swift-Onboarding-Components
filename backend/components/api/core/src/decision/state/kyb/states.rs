@@ -329,7 +329,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         let bo_obds =
-            decision::biz_risk::get_bo_obds(&state.db_pool, &state.enclave_client, &self.ob_id).await?;
+            decision::biz_risk::get_bo_obds(&state.db_pool, &state.enclave_client, &self.wf_id).await?;
         Ok((state.feature_flag_client.clone(), bo_obds))
     }
 
@@ -363,7 +363,6 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
 
         common::save_kyc_decision(
             conn,
-            &self.ob_id,
             &sv.id,
             &wf,
             vres_ids,

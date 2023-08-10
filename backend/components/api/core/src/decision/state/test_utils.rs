@@ -14,7 +14,6 @@ use db::models::manual_review::ManualReview;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::{IncludeHidden, RiskSignal};
-use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
@@ -148,7 +147,7 @@ pub async fn query_data(
     state
         .db_pool
         .db_query(move |conn| {
-            let (ob, _, obd) = Onboarding::get(conn, &svid).unwrap();
+            let (ob, _) = Onboarding::get(conn, &svid).unwrap();
 
             let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, IncludeHidden(false))
                 .unwrap()
@@ -157,6 +156,7 @@ pub async fn query_data(
                 .collect();
 
             let wf = Workflow::get(conn, &wfid).unwrap();
+            let obd = OnboardingDecision::get_active(conn, &wfid).unwrap();
             let mr = ManualReview::get_active(conn, &wfid).unwrap();
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
 

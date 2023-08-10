@@ -252,7 +252,6 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         common::save_kyc_decision(
             conn,
-            &self.ob_id,
             &self.sv_id,
             &wf,
             self.vendor_results

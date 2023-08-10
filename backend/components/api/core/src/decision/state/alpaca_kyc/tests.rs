@@ -144,7 +144,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
     let obd = obd.unwrap();
@@ -308,7 +308,7 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
     // we commit in this case
@@ -493,7 +493,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
     let obd = obd.unwrap();
@@ -561,7 +561,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());

@@ -374,7 +374,7 @@ mod tests {
         // Case 2: only RS with Vres
         // Case 3: mix of RS with OBD and Vres
 
-        let (sv, di, ob, wf) = setup(conn);
+        let (sv, di, _, wf) = setup(conn);
 
         input_risk_signal_groups
             .into_iter()
@@ -395,7 +395,7 @@ mod tests {
                     conn,
                     OnboardingDecisionCreateArgs {
                         vault_id: sv.vault_id.clone(),
-                        onboarding: &ob,
+                        scoped_vault_id: sv.id.clone(),
                         logic_git_hash: "123".to_owned(),
                         status: DecisionStatus::Pass,
                         result_ids: vres_with_rs

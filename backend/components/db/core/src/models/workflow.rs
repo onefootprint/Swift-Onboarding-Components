@@ -9,6 +9,7 @@ use newtypes::{
     Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
 };
 
+use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
 use super::workflow_event::WorkflowEvent;
 use crate::models::vault::Vault;
@@ -210,6 +211,26 @@ impl Workflow {
             .into_iter()
             .map(|w| (w.id.clone(), w))
             .collect();
+
+        Ok(res)
+    }
+
+    #[tracing::instrument("Workflow::get_with_decisions", skip_all)]
+    pub fn get_with_decisions(
+        conn: &mut PgConn,
+        sv_ids: Vec<ScopedVaultId>,
+        obc_id: &ObConfigurationId,
+    ) -> DbResult<Vec<(Self, Option<OnboardingDecision>)>> {
+        use db_schema::schema::onboarding_decision;
+        let res = workflow::table
+            .filter(workflow::scoped_vault_id.eq_any(&sv_ids))
+            .filter(workflow::ob_configuration_id.eq(obc_id))
+            .left_join(
+                onboarding_decision::table.on(onboarding_decision::workflow_id
+                    .eq(workflow::id)
+                    .and(onboarding_decision::deactivated_at.is_null())),
+            )
+            .get_results(conn)?;
 
         Ok(res)
     }

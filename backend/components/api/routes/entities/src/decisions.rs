@@ -9,6 +9,7 @@ use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::ReviewCompleted;
 use api_core::decision::state::StateError;
 use api_core::decision::state::WorkflowWrapper;
+use api_core::errors::onboarding::OnboardingError;
 use api_core::task;
 
 use api_core::ApiErrorKind;
@@ -46,40 +47,32 @@ pub async fn post(
             Workflow::latest(conn, &sv.id)
         })
         .await??;
-    let wf_id = wf.as_ref().map(|wf| wf.id.clone());
+    let wf = wf.ok_or(OnboardingError::NoWorkflow)?;
 
-    if let Some(wf) = wf {
-        let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
-        // TODO: add a ww.expects_action method here to check if the workflow is expecting ReviewCompleted or not. If not, for now we should probably gracefully
-        // just continue and do what this route would have done anyway (ie call save_review_decision). But in the future, we may instead query here for
-        // an existing *active* workflow and if there is one, then strictly error if a review is being made when that workflow isn't expecting it
-        let request = request.clone();
-        let actor = actor.clone();
-        let res = ww
-            .run(
-                &state,
-                WorkflowActions::ReviewCompleted(ReviewCompleted {
-                    decision: request,
-                    actor,
-                }),
-            )
-            .await;
-        match res {
-            Ok(_) => return EmptyResponse::ok().json(),
-            Err(e) => match e.kind() {
-                ApiErrorKind::StateError(StateError::UnexpectedActionForState) => {
-                    tracing::info!(workflow_id=?wf.id, state=?wf.state, "ReviewCompleted called on workflow not expecting it");
-                }
-                _ => Err(e)?,
-            },
-        }
+    let wf_id = wf.id.clone();
+    let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
+    // TODO: add a ww.expects_action method here to check if the workflow is expecting ReviewCompleted or not. If not, for now we should probably gracefully
+    // just continue and do what this route would have done anyway (ie call save_review_decision). But in the future, we may instead query here for
+    // an existing *active* workflow and if there is one, then strictly error if a review is being made when that workflow isn't expecting it
+    let action = WorkflowActions::ReviewCompleted(ReviewCompleted {
+        decision: request.clone(),
+        actor: actor.clone(),
+    });
+    let res = ww.run(&state, action).await;
+    match res {
+        Ok(_) => return EmptyResponse::ok().json(),
+        Err(e) => match e.kind() {
+            ApiErrorKind::StateError(StateError::UnexpectedActionForState) => {
+                tracing::info!(workflow_id=?wf.id, state=?wf.state, "ReviewCompleted called on workflow not expecting it");
+            }
+            _ => Err(e)?,
+        },
     }
 
-    let fpid = fp_id.clone();
     state
         .db_pool
         // TODO how does this work when there are multiple KYC workflows for one scoped vault?
-        .db_transaction(move |conn| decision::review::save_review_decision(conn, &fpid, &tenant_id, is_live, request, actor, wf_id))
+        .db_transaction(|conn| decision::review::save_review_decision(conn, wf_id, request, actor))
         .await?;
     // Since we may have updated users onboarding status
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());

@@ -480,15 +480,12 @@ impl MiddeskState<Complete> {
         let di_id = self.state.business_response_vreq.decision_intent_id.clone();
         let (v, sv, wf) = state
             .db_pool
-            .db_query(move |conn| -> DbResult<_> {
+            .db_query(move |conn| -> ApiResult<_> {
                 let v = Vault::get(conn, &obid)?;
                 let sv = ScopedVault::get(conn, &obid)?;
                 let di = DecisionIntent::get(conn, &di_id)?;
-                let wf = if let Some(wf_id) = di.workflow_id {
-                    Some(Workflow::get(conn, &wf_id)?)
-                } else {
-                    None
-                };
+                let wf_id = di.workflow_id.ok_or(OnboardingError::NoWorkflow)?;
+                let wf = Workflow::get(conn, &wf_id)?;
                 Ok((v, sv, wf))
             })
             .await??;
@@ -515,38 +512,25 @@ impl MiddeskState<Complete> {
             _ => Err(MiddeskError::AssertionError("Unexpected VendorResult".into())),
         }?;
 
-        // KYB workflows are FF'd so if we don't have a workflow then we fall back to legacy logic here
-        if let Some(wf) = wf {
-            let risk_signals = decision::features::middesk::reason_codes(&business_response)
-                .into_iter()
-                .map(|rc| (rc, vendor_api, vendor_result.verification_result_id.clone()))
-                .collect();
-            state
-                .db_pool
-                .db_transaction(move |conn| {
-                    RiskSignal::bulk_create(conn, &sv.id, risk_signals, RiskSignalGroupKind::Kyb, false)
-                })
-                .await?;
+        let risk_signals = decision::features::middesk::reason_codes(&business_response)
+            .into_iter()
+            .map(|rc| (rc, vendor_api, vendor_result.verification_result_id.clone()))
+            .collect();
+        state
+            .db_pool
+            .db_transaction(move |conn| {
+                RiskSignal::bulk_create(conn, &sv.id, risk_signals, RiskSignalGroupKind::Kyb, false)
+            })
+            .await?;
 
-            let ww = WorkflowWrapper::init(state, wf).await?;
-            let _ww = ww
-                .run(
-                    state,
-                    WorkflowActions::AsyncVendorCallsCompleted(AsyncVendorCallsCompleted {}),
-                )
-                .await?;
-            Ok(())
-        } else {
-            decision::biz_risk::make_kyb_decision(
-                &state.db_pool,
-                &state.enclave_client,
-                self.middesk_request.onboarding_id,
-                &business_response,
-                &vendor_result.verification_result_id,
-                vendor_api,
+        let ww = WorkflowWrapper::init(state, wf).await?;
+        let _ww = ww
+            .run(
+                state,
+                WorkflowActions::AsyncVendorCallsCompleted(AsyncVendorCallsCompleted {}),
             )
-            .await
-        }
+            .await?;
+        Ok(())
     }
 }
 

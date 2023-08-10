@@ -1,5 +1,5 @@
-use newtypes::{output::Csv, CollectedDataOption, OnboardingId};
-use newtypes::{ModernIdDocKind, OnboardingRequirementKind};
+use newtypes::{output::Csv, CollectedDataOption};
+use newtypes::{ModernIdDocKind, OnboardingRequirementKind, WorkflowId};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -39,7 +39,7 @@ pub enum OnboardingError {
     #[error("Expected BO to have an Onboarding but it was not found")]
     MissingBoOnboarding,
     #[error("Expected 1 or more BO's to have an OnboardingDecision but it was not found: {0}")]
-    MissingBoOnboardingDecision(Csv<OnboardingId>),
+    MissingBoOnboardingDecision(Csv<WorkflowId>),
     #[error("Need to provide onboarding public key auth in order to start a sign-up session")]
     MissingObPkAuth,
     #[error("Not expecting a selfie image to be uploaded")]

@@ -1,6 +1,5 @@
 use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReview;
-use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
 use super::task::Task;
 use super::tenant::Tenant;
@@ -15,8 +14,8 @@ use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, FpId, InsightEventId, KybConfig, KycConfig,
-    Locked, ObConfigurationId, OnboardingCompletedPayload, OnboardingId, OnboardingStatusChangedPayload,
+    AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, InsightEventId, KybConfig, KycConfig, Locked,
+    ObConfigurationId, OnboardingCompletedPayload, OnboardingId, OnboardingStatusChangedPayload,
     ScopedVaultId, TaskData, TenantId, TenantScope, VaultId, WebhookEvent, WorkflowFixtureResult, WorkflowId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
@@ -164,7 +163,7 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a>
 pub struct OnboardingAndConfig(pub Onboarding, pub ObConfiguration);
 
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
-pub type BasicOnboardingInfo<ObT = Onboarding> = (ObT, ScopedVault, Option<OnboardingDecision>);
+pub type BasicOnboardingInfo<ObT = Onboarding> = (ObT, ScopedVault);
 
 impl Onboarding {
     #[tracing::instrument("Onboarding::get", skip_all)]
@@ -172,15 +171,8 @@ impl Onboarding {
     where
         T: Into<OnboardingIdentifier<'a>>,
     {
-        use db_schema::schema::{business_owner, onboarding_decision};
-        let mut query = onboarding::table
-            .inner_join(scoped_vault::table)
-            // Only fetch active onboarding decisions for this onboarding
-            .left_join(onboarding_decision::table.on(
-                onboarding_decision::onboarding_id.eq(onboarding::id)
-                .and(onboarding_decision::deactivated_at.is_null())
-            ))
-            .into_boxed();
+        use db_schema::schema::business_owner;
+        let mut query = onboarding::table.inner_join(scoped_vault::table).into_boxed();
 
         match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
@@ -222,29 +214,6 @@ impl Onboarding {
             .get_result(conn)?;
 
         Ok(res)
-    }
-
-    #[tracing::instrument("Onboarding::lock_for_tenant", skip_all)]
-    pub fn lock_for_tenant(
-        conn: &mut TxnPgConn,
-        fp_id: &FpId,
-        tenant_id: &TenantId,
-        is_live: bool,
-    ) -> DbResult<BasicOnboardingInfo<Locked<Onboarding>>> {
-        let scoped_vault_ids = scoped_vault::table
-            .filter(scoped_vault::fp_id.eq(fp_id))
-            .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .filter(scoped_vault::is_live.eq(is_live))
-            .select(scoped_vault::id);
-        // Lock first, then grab the related info
-        let ob = onboarding::table
-            .filter(onboarding::scoped_vault_id.eq_any(scoped_vault_ids))
-            .for_no_key_update()
-            .first::<Onboarding>(conn.conn())?;
-
-        // It's a bit precarious to make a FOR UPDATE statement with joins
-        let result = Self::get(conn, &ob.id)?;
-        Ok((Locked::new(result.0), result.1, result.2))
     }
 
     #[tracing::instrument("Onboarding::lock", skip_all)]

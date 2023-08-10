@@ -178,7 +178,6 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
 
         common::save_kyc_decision(
             conn,
-            &self.ob_id,
             &self.sv_id,
             &wf,
             vendor_results

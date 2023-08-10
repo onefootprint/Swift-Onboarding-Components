@@ -246,7 +246,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
     assert!(obd.unwrap().seqno.is_some());
