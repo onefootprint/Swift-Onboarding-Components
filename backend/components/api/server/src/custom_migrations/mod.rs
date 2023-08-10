@@ -21,9 +21,12 @@ trait CustomMigration {
     }
 }
 
+mod m080923_rm_multi_vaults;
+
 /// runs any active migrations that need to be run
-pub async fn run(_state: &State) -> ApiResult<()> {
+pub async fn run(state: &State) -> ApiResult<()> {
     // TODO Add any custom migrations here
+    run_migration(state, m080923_rm_multi_vaults::Migration).await?;
     Ok(())
 }
 

@@ -46,6 +46,9 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     deleted_rows += diesel::delete(business_owner::table)
         .filter(business_owner::user_vault_id.eq_any(&v_ids))
         .execute(conn.conn())?;
+    deleted_rows += diesel::delete(business_owner::table)
+        .filter(business_owner::business_vault_id.eq_any(&v_ids))
+        .execute(conn.conn())?;
 
     deleted_rows += diesel::delete(stytch_fingerprint_event::table)
         .filter(stytch_fingerprint_event::vault_id.eq_any(&v_ids))
