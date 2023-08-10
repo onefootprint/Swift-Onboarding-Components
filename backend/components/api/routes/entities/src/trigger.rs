@@ -20,6 +20,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
+use db::models::workflow::NewWorkflowArgs;
 use db::models::workflow::Workflow;
 use newtypes::AlpacaKycConfig;
 use newtypes::CipKind;
@@ -83,10 +84,24 @@ pub async fn post(
                     };
                     // TODO rm this when fixture result is passed in process
                     let fixture_result = WorkflowFixtureResult::from_sandbox_id(vault.sandbox_id.as_ref());
-                    Workflow::create(conn, &sv.id, config, fixture_result)?
+                    let args = NewWorkflowArgs {
+                        scoped_vault_id: sv.id.clone(),
+                        config,
+                        fixture_result,
+                        ob_configuration_id: None,
+                        insight_event_id: None,
+                    };
+                    Workflow::create(conn, args)?
                 }
                 TriggerInfo::IdDocument { collect_selfie } => {
-                    let wf = Workflow::create(conn, &sv.id, DocumentConfig {}.into(), None)?;
+                    let args = NewWorkflowArgs {
+                        scoped_vault_id: sv.id.clone(),
+                        config: DocumentConfig {}.into(),
+                        fixture_result: None,
+                        ob_configuration_id: None,
+                        insight_event_id: None,
+                    };
+                    let wf = Workflow::create(conn, args)?;
                     let args = NewDocumentRequestArgs {
                         scoped_vault_id: sv.id.clone(),
                         ref_id: None,

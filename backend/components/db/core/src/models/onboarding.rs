@@ -5,7 +5,7 @@ use super::scoped_vault::ScopedVault;
 use super::task::Task;
 use super::tenant::Tenant;
 use super::vault::Vault;
-use super::workflow::Workflow;
+use super::workflow::{NewWorkflowArgs, Workflow};
 use crate::models::ob_configuration::ObConfiguration;
 use crate::PgConn;
 use crate::{DbResult, TxnPgConn};
@@ -297,6 +297,13 @@ impl Onboarding {
             return Ok((ob, IsNew::No));
         }
 
+        // Row doesn't exist for scoped_vault_id, ob_configuration_id - create a new one
+        let insight_event_id = if let Some(insight_event) = args.insight_event {
+            Some(insight_event.insert_with_conn(conn)?.id)
+        } else {
+            None
+        };
+
         let v = Vault::get(conn.conn(), &args.scoped_vault_id)?;
         let (obc, _) = ObConfiguration::get(conn.conn(), &args.ob_configuration_id)?;
 
@@ -311,14 +318,15 @@ impl Onboarding {
             VaultKind::Business => KybConfig {}.into(),
         };
 
-        let wf = Workflow::create(conn, &args.scoped_vault_id, config, fixture_result)?;
-
-        // Row doesn't exist for scoped_vault_id, ob_configuration_id - create a new one
-        let insight_event_id = if let Some(insight_event) = args.insight_event {
-            Some(insight_event.insert_with_conn(conn)?.id)
-        } else {
-            None
+        let wf_args = NewWorkflowArgs {
+            scoped_vault_id: args.scoped_vault_id.clone(),
+            config,
+            fixture_result,
+            ob_configuration_id: Some(obc.id),
+            insight_event_id: insight_event_id.clone(),
         };
+        let wf = Workflow::create(conn, wf_args)?;
+
         let new_ob = NewOnboarding {
             scoped_vault_id: args.scoped_vault_id.clone(),
             ob_configuration_id: args.ob_configuration_id,

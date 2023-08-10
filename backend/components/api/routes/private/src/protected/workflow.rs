@@ -12,7 +12,7 @@ use api_core::ApiErrorKind;
 use chrono::Utc;
 use db::models::workflow::{NewWorkflow, Workflow};
 use db::DbError;
-use newtypes::{ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
+use newtypes::{OnboardingStatus, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct CreateWorkflowRequest {
@@ -52,6 +52,9 @@ async fn create_workflow(
                     state: wf_state,
                     config: wf_config,
                     fixture_result: None,
+                    status: Some(OnboardingStatus::Incomplete),
+                    ob_configuration_id: None,
+                    insight_event_id: None,
                 },
             )
         })

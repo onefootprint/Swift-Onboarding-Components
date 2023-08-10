@@ -2,9 +2,12 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::{AlpacaKycState, DocumentState, KybState, WorkflowFixtureResult};
-use newtypes::{Locked, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
-use serde::{Deserialize, Serialize};
+use newtypes::{
+    AlpacaKycState, DocumentState, InsightEventId, KybState, OnboardingStatus, WorkflowFixtureResult,
+};
+use newtypes::{
+    Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
+};
 
 use super::workflow_event::WorkflowEvent;
 use crate::models::vault::Vault;
@@ -12,7 +15,7 @@ use crate::{DbResult, PgConn, TxnPgConn};
 use db_schema::schema::workflow;
 use newtypes::KycState;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = workflow)]
 pub struct Workflow {
     pub id: WorkflowId,
@@ -24,9 +27,13 @@ pub struct Workflow {
     pub state: WorkflowState,
     pub config: WorkflowConfig,
     pub fixture_result: Option<WorkflowFixtureResult>,
+    pub status: Option<OnboardingStatus>,
+    pub ob_configuration_id: Option<ObConfigurationId>,
+    pub insight_event_id: Option<InsightEventId>,
+    pub authorized_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = workflow)]
 pub struct NewWorkflow {
     pub created_at: DateTime<Utc>,
@@ -36,6 +43,19 @@ pub struct NewWorkflow {
     pub config: WorkflowConfig,
     // One day we'll get rid of this
     pub fixture_result: Option<WorkflowFixtureResult>,
+    pub status: Option<OnboardingStatus>,
+    pub ob_configuration_id: Option<ObConfigurationId>,
+    pub insight_event_id: Option<InsightEventId>,
+}
+
+#[derive(Debug, Clone)]
+pub struct NewWorkflowArgs {
+    pub scoped_vault_id: ScopedVaultId,
+    pub config: WorkflowConfig,
+    // One day we'll get rid of this
+    pub fixture_result: Option<WorkflowFixtureResult>,
+    pub ob_configuration_id: Option<ObConfigurationId>,
+    pub insight_event_id: Option<InsightEventId>,
 }
 
 impl Workflow {
@@ -49,12 +69,14 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::create", skip_all)]
-    pub fn create(
-        conn: &mut PgConn,
-        sv_id: &ScopedVaultId,
-        config: WorkflowConfig,
-        fixture_result: Option<WorkflowFixtureResult>,
-    ) -> DbResult<Self> {
+    pub fn create(conn: &mut PgConn, args: NewWorkflowArgs) -> DbResult<Self> {
+        let NewWorkflowArgs {
+            scoped_vault_id,
+            config,
+            fixture_result,
+            ob_configuration_id,
+            insight_event_id,
+        } = args;
         let kind = config.kind();
         let initial_state = match kind {
             WorkflowKind::AlpacaKyc => WorkflowState::AlpacaKyc(AlpacaKycState::DataCollection),
@@ -64,11 +86,14 @@ impl Workflow {
         };
         let new_workflow = NewWorkflow {
             created_at: Utc::now(),
-            scoped_vault_id: sv_id.clone(),
+            scoped_vault_id,
             kind,
             state: initial_state,
             config,
             fixture_result,
+            status: Some(OnboardingStatus::Incomplete),
+            ob_configuration_id,
+            insight_event_id,
         };
 
         Self::insert(conn, new_workflow)
@@ -193,6 +218,9 @@ mod tests {
                 state: wf_state,
                 config,
                 fixture_result: None,
+                status: Some(OnboardingStatus::Incomplete),
+                ob_configuration_id: None,
+                insight_event_id: None,
             },
         )
         .unwrap();
@@ -214,6 +242,9 @@ mod tests {
                 state: s,
                 config,
                 fixture_result: None,
+                status: Some(OnboardingStatus::Incomplete),
+                ob_configuration_id: None,
+                insight_event_id: None,
             },
         )
         .unwrap();

@@ -14,7 +14,7 @@ use crate::State;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
-use db::models::workflow::Workflow;
+use db::models::workflow::{NewWorkflowArgs, Workflow};
 use db::test_helpers::assert_have_same_elements;
 use feature_flag::BoolFlag;
 use feature_flag::MockFeatureFlagClient;
@@ -218,7 +218,14 @@ async fn redo_document_and_pass(
     let wf = state
         .db_pool
         .db_query(move |conn| {
-            Workflow::create(conn, &sv_id, DocumentConfig {}.into(), fixture_result).unwrap()
+            let args = NewWorkflowArgs {
+                scoped_vault_id: sv_id.clone(),
+                config: DocumentConfig {}.into(),
+                fixture_result,
+                ob_configuration_id: None,
+                insight_event_id: None,
+            };
+            Workflow::create(conn, args).unwrap()
         })
         .await
         .unwrap();

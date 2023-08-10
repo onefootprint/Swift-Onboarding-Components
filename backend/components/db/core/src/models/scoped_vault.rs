@@ -16,8 +16,8 @@ use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingId, ScopedVaultId, TenantId,
-    VaultCreatedInfo, VaultId,
+    DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingId, OnboardingStatus, ScopedVaultId,
+    TenantId, VaultCreatedInfo, VaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -39,6 +39,7 @@ pub struct ScopedVault {
     pub is_live: bool,
     // Only null when the vault is non-portable
     pub ob_configuration_id: Option<ObConfigurationId>,
+    pub status: Option<OnboardingStatus>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

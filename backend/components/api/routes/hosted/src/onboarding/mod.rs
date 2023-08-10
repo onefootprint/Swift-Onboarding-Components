@@ -281,6 +281,7 @@ fn get_requirement_inner(
             }
         }
         OnboardingRequirementKind::Authorize => {
+            // TODO this has to be on the workflow too....
             if args.onboarding.authorized_at.is_none() {
                 let document_types = if ob_config.can_access_document() {
                     // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them

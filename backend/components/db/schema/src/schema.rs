@@ -553,6 +553,7 @@ table! {
         start_timestamp -> Timestamptz,
         is_live -> Bool,
         ob_configuration_id -> Nullable<Text>,
+        status -> Nullable<Text>,
     }
 }
 
@@ -892,6 +893,10 @@ table! {
         state -> Text,
         config -> Jsonb,
         fixture_result -> Nullable<Text>,
+        status -> Nullable<Text>,
+        ob_configuration_id -> Nullable<Text>,
+        insight_event_id -> Nullable<Text>,
+        authorized_at -> Nullable<Timestamptz>,
     }
 }
 
@@ -984,6 +989,8 @@ joinable!(watchlist_check -> scoped_vault (scoped_vault_id));
 joinable!(watchlist_check -> task (task_id));
 joinable!(webauthn_credential -> insight_event (insight_event_id));
 joinable!(webauthn_credential -> vault (vault_id));
+joinable!(workflow -> insight_event (insight_event_id));
+joinable!(workflow -> ob_configuration (ob_configuration_id));
 joinable!(workflow -> scoped_vault (scoped_vault_id));
 joinable!(workflow_event -> workflow (workflow_id));
 
