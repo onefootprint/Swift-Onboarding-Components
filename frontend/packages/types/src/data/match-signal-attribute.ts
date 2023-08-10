@@ -6,6 +6,11 @@ export enum MatchSignalAttribute {
   email = 'email',
   phone = 'phone',
   document = 'document',
+  businessName = 'businessName',
+  businessTIN = 'businessTin',
+  businessAddress = 'businessAddress',
+  businessBeneficialOwners = 'businessBeneficialOwners',
+  businessPhoneNumber = 'businessPhoneNumber',
 }
 
 export default MatchSignalAttribute;

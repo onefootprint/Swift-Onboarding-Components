@@ -879,7 +879,12 @@
                 "dob": "Date of birth",
                 "email": "Email",
                 "ssn": "SSN",
-                "document": "Document"
+                "document": "Document",
+                "businessName": "Business name",
+                "businessTin": "Business TIN",
+                "businessAddress": "Business address",
+                "businessBeneficialOwners": "Business beneficial owners",
+                "businessPhoneNumber": "Business phone number"
               },
               "match-level": {
                 "exact": "Matched",

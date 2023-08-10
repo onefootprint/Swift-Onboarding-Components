@@ -17,6 +17,7 @@ const FieldValidationDetails = () => {
         sx={{
           display: 'flex',
           alignContent: 'center',
+          alignItems: 'flex-end',
           justifyContent: 'center',
           gap: 2,
         }}
