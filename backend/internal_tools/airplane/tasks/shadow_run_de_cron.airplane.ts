@@ -19,7 +19,7 @@ export default airplane.task(
       [
         {
           tenant_id: 'org_e2FHVfOM5Hd3Ce492o5Aat',
-          fp_id: 'fp_id_iS6W4OFxASDTuhbnOQcYLg',
+          fp_id: 'fp_id_9DPVC5VUVk3uodYIn9OtBx',
         },
         'pass',
       ],
