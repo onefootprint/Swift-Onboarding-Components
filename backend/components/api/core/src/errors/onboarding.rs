@@ -52,6 +52,10 @@ pub enum OnboardingError {
     CannotCreateFixtureResultForNonSandbox,
     #[error("Sandbox vaults must have a fixture result")]
     NoFixtureResultForSandboxUser,
+    #[error("Workflow doesn't have an associated onboarding config")]
+    NoObcForWorkflow,
+    #[error("Workflow doesn't have an associated status")]
+    NoStatusForWorkflow,
     #[error("Can only provide one image at a time")]
     OnlyOneImageAllowed,
 }

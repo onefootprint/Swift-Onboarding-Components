@@ -36,16 +36,12 @@ pub async fn post(
         return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
     }
 
-    let ob_id = user_auth.onboarding()?.id.clone();
     let wf_id = user_auth.workflow()?.id.clone();
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let data = AuthSessionData::ValidateUserToken(ValidateUserToken {
-                ob_id,
-                wf_id: Some(wf_id),
-            });
+            let data = AuthSessionData::ValidateUserToken(ValidateUserToken { wf_id });
             let (token, _) = AuthSession::create_sync(conn, &session_key, data, Duration::minutes(15))?;
             Ok(token)
         })

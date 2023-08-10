@@ -133,11 +133,6 @@ pub enum OnboardingIdentifier<'a> {
         /// Note: the ID of the user vault that owns this business
         vault_id: &'a VaultId,
     },
-    /// Look up a business's onboarding from any of its owners' vault ID
-    BusinessOwner {
-        owner_vault_id: &'a VaultId,
-        ob_config_id: &'a ObConfigurationId,
-    },
     ConfigId {
         vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
@@ -199,17 +194,6 @@ impl Onboarding {
                 query = query
                     .filter(onboarding::scoped_vault_id.eq(sb_id))
                     .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
-            }
-            OnboardingIdentifier::BusinessOwner {
-                owner_vault_id,
-                ob_config_id,
-            } => {
-                let business_vault_ids = business_owner::table
-                    .filter(business_owner::user_vault_id.eq(owner_vault_id))
-                    .select(business_owner::business_vault_id);
-                query = query
-                    .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
-                    .filter(onboarding::ob_configuration_id.eq(ob_config_id))
             }
             OnboardingIdentifier::ConfigId {
                 vault_id,

@@ -3,12 +3,13 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::{
-    AlpacaKycState, DocumentState, InsightEventId, KybState, OnboardingStatus, WorkflowFixtureResult,
+    AlpacaKycState, DocumentState, InsightEventId, KybState, OnboardingStatus, VaultId, WorkflowFixtureResult,
 };
 use newtypes::{
     Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
 };
 
+use super::scoped_vault::ScopedVault;
 use super::workflow_event::WorkflowEvent;
 use crate::models::vault::Vault;
 use crate::{DbResult, PgConn, TxnPgConn};
@@ -63,6 +64,23 @@ pub struct NewWorkflowArgs {
 pub struct WorkflowUpdate {
     pub status: Option<OnboardingStatus>,
     pub authorized_at: Option<Option<DateTime<Utc>>>,
+}
+
+pub enum WorkflowIdentifier<'a> {
+    Id {
+        id: &'a WorkflowId,
+    },
+    /// Look up a business's workflow from any of its owners' vault IDs
+    BusinessOwner {
+        owner_vault_id: &'a VaultId,
+        ob_config_id: &'a ObConfigurationId,
+    },
+}
+
+impl<'a> From<&'a WorkflowId> for WorkflowIdentifier<'a> {
+    fn from(id: &'a WorkflowId) -> Self {
+        Self::Id { id }
+    }
 }
 
 pub type IsNew = bool;
@@ -143,6 +161,32 @@ impl Workflow {
         let res = workflow::table
             .filter(workflow::id.eq(workflow_id))
             .get_result(conn)?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument("Workflow::get", skip_all)]
+    pub fn get_all<'a, T: Into<WorkflowIdentifier<'a>>>(
+        conn: &mut PgConn,
+        id: T,
+    ) -> DbResult<(Self, ScopedVault)> {
+        use db_schema::schema::{business_owner, scoped_vault};
+        let mut query = workflow::table.inner_join(scoped_vault::table).into_boxed();
+        match id.into() {
+            WorkflowIdentifier::Id { id } => query = query.filter(workflow::id.eq(id)),
+            WorkflowIdentifier::BusinessOwner {
+                owner_vault_id,
+                ob_config_id,
+            } => {
+                let business_vault_ids = business_owner::table
+                    .filter(business_owner::user_vault_id.eq(owner_vault_id))
+                    .select(business_owner::business_vault_id);
+                query = query
+                    .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
+                    .filter(workflow::ob_configuration_id.eq(ob_config_id))
+            }
+        }
+        let res = query.get_result(conn)?;
 
         Ok(res)
     }

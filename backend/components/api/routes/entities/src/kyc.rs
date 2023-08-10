@@ -53,7 +53,7 @@ pub async fn post(
     } = request.into_inner();
 
     let ff_client = state.feature_flag_client.clone();
-    let (ob_id, wf) = state
+    let wf = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
@@ -88,7 +88,6 @@ pub async fn post(
                 None,
                 None, // currently dont support KYB for NPV
             )?;
-            let ob_id = ob.id.clone();
 
             // TODO: consolidate with /authorize code
             let ob = Onboarding::lock(conn, &ob.id)?;
@@ -130,7 +129,7 @@ pub async fn post(
                 return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
             }
 
-            Ok((ob_id, wf))
+            Ok(wf)
         })
         .await?;
 
@@ -142,20 +141,15 @@ pub async fn post(
     }
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
-    let (ob_info, mr, wf) = state
+    let (wf, sv, mr) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let ob_info = Onboarding::get(conn, &ob_id)?;
-            let wf = Workflow::get(conn, &wf.id)?;
+            let (wf, sv) = Workflow::get_all(conn, &wf.id)?;
             let mr = ManualReview::get_active(conn, &wf.id)?;
-            Ok((ob_info, mr, wf))
+            Ok((wf, sv, mr))
         })
         .await??;
 
-    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((
-        ob_info,
-        mr,
-        Some(wf),
-    )))
-    .json()
+    let status = wf.status.ok_or(OnboardingError::NoStatusForWorkflow)?;
+    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((status, sv, mr))).json()
 }

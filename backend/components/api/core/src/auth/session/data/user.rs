@@ -1,5 +1,4 @@
 use newtypes::ContactInfoId;
-use newtypes::OnboardingId;
 use newtypes::VaultId;
 use newtypes::WorkflowId;
 
@@ -27,8 +26,7 @@ impl UserSession {
 /// Short-lived token that represents the completion of an onboarding
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ValidateUserToken {
-    pub ob_id: OnboardingId,
-    pub wf_id: Option<WorkflowId>,
+    pub wf_id: WorkflowId,
 }
 
 /// Longer-lived session that is sent out in emails to verify ownership
