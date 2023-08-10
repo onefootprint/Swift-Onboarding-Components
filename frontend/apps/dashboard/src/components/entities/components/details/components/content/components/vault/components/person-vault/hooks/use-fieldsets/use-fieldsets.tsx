@@ -12,6 +12,7 @@ import React from 'react';
 
 import type { Fieldset } from '../../../../vault.types';
 import Nationality from './components/nationality';
+import SSN from './components/ssn';
 
 const useFieldsets = (): Fieldset => {
   const { t } = useTranslation('pages.user.vault');
@@ -30,7 +31,12 @@ const useFieldsets = (): Fieldset => {
       title: t('identity.title'),
       iconComponent: IcoUsers24,
       fields: [
-        { di: IdDI.ssn9 },
+        {
+          di: IdDI.ssn9,
+          renderCustomField: ({ di, entity }) => (
+            <SSN di={di} entity={entity} />
+          ),
+        },
         { di: IdDI.ssn4 },
         { di: IdDI.dob },
         {
