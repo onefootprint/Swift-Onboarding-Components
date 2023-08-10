@@ -1,0 +1,48 @@
+name: Frontend E2E Prod
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  pull_request:
+    paths:
+      - '.github/workflows/frontend_e2e_prod.yml'
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  CI: true
+  E2E_BASE_URL: https://demo.onefootprint.com
+  NEXT_PUBLIC_E2E_TENANT_PK: ob_test_XONuqUZ9p0DAqDQsR3e3GX
+
+jobs:
+  e2e:
+    timeout-minutes: 15
+    runs-on: frontend_runner
+    steps:
+      - name: Checkout the project
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        working-directory: ./frontend
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        working-directory: ./frontend
+
+      - name: Run Playwright tests
+        working-directory: ./frontend
+        run: yarn test:e2e:ci
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: ./frontend/packages/e2e/test-results/
+          retention-days: 1
