@@ -23,7 +23,7 @@ pub async fn get(state: web::Data<State>, business_auth: BoSessionAuth) -> JsonA
     let bvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (_, sb, _, _) = Onboarding::get(conn, (&bv_id, &ob_config_id))?;
+            let (_, sb, _) = Onboarding::get(conn, (&bv_id, &ob_config_id))?;
             let bvw = VaultWrapper::build_for_tenant(conn, &sb.id)?;
             Ok(bvw)
         })

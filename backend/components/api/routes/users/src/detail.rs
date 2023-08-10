@@ -6,7 +6,7 @@ use crate::types::ResponseData;
 use crate::State;
 use api_core::errors::ApiResult;
 use api_core::utils::db2api::DbToApi;
-use db::models::onboarding::Onboarding;
+use db::models::manual_review::ManualReview;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
@@ -26,16 +26,15 @@ pub async fn detail(
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
 
-    let ob_info = state
+    let (sv, mrs) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            // TODO get all manual reviews for the scoped vault
-            let basic_onboarding_info = Onboarding::get(conn, &sv.id)?;
-            Ok(basic_onboarding_info)
+            let mrs = ManualReview::get_active_for_sv(conn, &sv.id)?;
+            Ok((sv, mrs))
         })
         .await??;
 
-    let result = api_wire_types::User::from_db(ob_info);
+    let result = api_wire_types::User::from_db((sv, mrs));
     ResponseData::ok(result).json()
 }

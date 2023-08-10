@@ -6,7 +6,9 @@ use crate::PgConn;
 use chrono::{DateTime, Utc};
 use diesel::dsl::not;
 use diesel::prelude::*;
-use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId, ReviewReason};
+use newtypes::{
+    DbActor, ManualReviewId, OnboardingDecisionId, OnboardingId, ReviewReason, ScopedVaultId, WorkflowId,
+};
 use serde::{Deserialize, Serialize};
 
 use super::onboarding_decision::OnboardingDecision;
@@ -18,7 +20,7 @@ pub struct ManualReview {
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub onboarding_id: OnboardingId, // TODO: migrate to scoped_vault_id FP-4468
+    pub onboarding_id: Option<OnboardingId>, // TODO: migrate to scoped_vault_id FP-4468
     /// When populated, means the ManualReview is no longer active
     pub completed_at: Option<DateTime<Utc>>,
     /// If the ManualReview was completed by making a new OnboardingDecision, is referenced here.
@@ -27,14 +29,17 @@ pub struct ManualReview {
     /// If the ManualReview was completed by a tenant dashboard user, linked here
     pub completed_by_actor: Option<DbActor>,
     pub review_reasons: Vec<ReviewReason>,
+    pub workflow_id: WorkflowId,
+    pub scoped_vault_id: ScopedVaultId,
 }
 
 #[derive(Debug, Clone, Insertable, Default)]
 #[diesel(table_name = manual_review)]
 struct NewManualReview {
     timestamp: DateTime<Utc>,
-    onboarding_id: OnboardingId,
     review_reasons: Vec<ReviewReason>,
+    workflow_id: WorkflowId,
+    scoped_vault_id: ScopedVaultId,
 }
 
 #[derive(Debug, AsChangeset, Default, Serialize, Deserialize)]
@@ -49,15 +54,17 @@ impl ManualReview {
     #[tracing::instrument("ManualReview::create", skip_all)]
     pub fn create(
         conn: &mut PgConn,
-        onboarding_id: OnboardingId,
         review_reasons: Vec<ReviewReason>,
+        workflow_id: WorkflowId,
+        scoped_vault_id: ScopedVaultId,
     ) -> DbResult<Self> {
         // NOTE: We have a uniqueness constraint that won't allow us to create multiple active
         // ManualReview rows for one onboarding.
         let new = NewManualReview {
             timestamp: Utc::now(),
-            onboarding_id,
             review_reasons,
+            workflow_id,
+            scoped_vault_id,
         };
         let result = diesel::insert_into(manual_review::table)
             .values(new)
@@ -95,12 +102,16 @@ impl ManualReview {
     #[tracing::instrument("ManualReview::find_completed", skip_all)]
     pub fn find_completed(
         conn: &mut PgConn,
-        onboarding_id: &OnboardingId,
+        workflow_id: &WorkflowId,
     ) -> DbResult<Option<(ManualReview, OnboardingDecision)>> {
         let res: Option<(ManualReview, OnboardingDecision)> = manual_review::table
-            .filter(manual_review::onboarding_id.eq(onboarding_id))
+            .filter(manual_review::workflow_id.eq(workflow_id))
             .filter(not(manual_review::completed_at.is_null()))
-            .inner_join(onboarding_decision::table)
+            .inner_join(
+                onboarding_decision::table.on(manual_review::workflow_id
+                    .nullable()
+                    .eq(onboarding_decision::workflow_id)),
+            )
             .order_by(manual_review::completed_at.desc())
             .select((manual_review::all_columns, onboarding_decision::all_columns))
             .first(conn)
@@ -108,13 +119,23 @@ impl ManualReview {
         Ok(res)
     }
 
-    #[tracing::instrument("ManualReview::get_active_for_onboarding", skip_all)]
-    pub fn get_active_for_onboarding(conn: &mut PgConn, ob_id: &OnboardingId) -> DbResult<Option<Self>> {
+    #[tracing::instrument("ManualReview::get_active", skip_all)]
+    pub fn get_active(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
         let result = manual_review::table
-            .filter(manual_review::onboarding_id.eq(ob_id))
+            .filter(manual_review::workflow_id.eq(wf_id))
             .filter(manual_review::completed_at.is_null())
             .get_result(conn)
             .optional()?;
         Ok(result)
+    }
+
+    #[tracing::instrument("ManualReview::get_active_for_sv", skip_all)]
+    /// Return if there are any active manual reviews for the scoped vault across all workflows
+    pub fn get_active_for_sv(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+        let results = manual_review::table
+            .filter(manual_review::scoped_vault_id.eq(sv_id))
+            .filter(manual_review::completed_at.is_null())
+            .get_results(conn)?;
+        Ok(results)
     }
 }

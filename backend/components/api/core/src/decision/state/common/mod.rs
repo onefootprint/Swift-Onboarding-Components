@@ -47,7 +47,7 @@ pub async fn get_onboarding_for_workflow(
     let svid = workflow.scoped_vault_id.clone();
     db_pool
         .db_query(move |conn| -> DbResult<_> {
-            let (ob, sv, _, _) = Onboarding::get(conn, &svid)?;
+            let (ob, sv, _) = Onboarding::get(conn, &svid)?;
             Ok((ob, sv))
         })
         .await?
@@ -288,7 +288,7 @@ pub fn save_kyc_decision(
     is_sandbox: bool,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
-    let (ob, _, _, _) = Onboarding::get(conn, ob_id)?;
+    let (ob, _, _) = Onboarding::get(conn, ob_id)?;
     engine::save_onboarding_decision(
         conn,
         &ob,

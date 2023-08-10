@@ -91,7 +91,7 @@ async fn make_vendor_calls(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let (ob, _, _, _) = Onboarding::get(conn, &scoped_user.id)?;
+            let (ob, _, _) = Onboarding::get(conn, &scoped_user.id)?;
 
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
 
@@ -180,7 +180,7 @@ async fn make_decision(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let (ob, _, _, _) = Onboarding::get(conn, &scoped_user.id)?;
+            let (ob, _, _) = Onboarding::get(conn, &scoped_user.id)?;
             let is_sandbox = !scoped_user.is_live;
             let wf = Workflow::latest(conn, &scoped_user.id)?.ok_or(OnboardingError::NoWorkflow)?;
             Ok((ob, is_sandbox, wf))
@@ -271,7 +271,7 @@ async fn shadow_run(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let (ob, _, _, _) = Onboarding::get(conn, &scoped_user.id)?;
+            let (ob, _, _) = Onboarding::get(conn, &scoped_user.id)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 

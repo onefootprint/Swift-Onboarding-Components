@@ -148,7 +148,7 @@ pub async fn query_data(
     state
         .db_pool
         .db_query(move |conn| {
-            let (ob, _, mr, obd) = Onboarding::get(conn, &svid).unwrap();
+            let (ob, _, obd) = Onboarding::get(conn, &svid).unwrap();
 
             let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, IncludeHidden(false))
                 .unwrap()
@@ -157,6 +157,7 @@ pub async fn query_data(
                 .collect();
 
             let wf = Workflow::get(conn, &wfid).unwrap();
+            let mr = ManualReview::get_active(conn, &wfid).unwrap();
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
 
             let fps = Fingerprint::_list_for_scoped_vault(conn, &svid).unwrap();

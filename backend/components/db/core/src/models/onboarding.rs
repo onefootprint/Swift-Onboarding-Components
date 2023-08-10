@@ -169,8 +169,7 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a>
 pub struct OnboardingAndConfig(pub Onboarding, pub ObConfiguration);
 
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
-pub type BasicOnboardingInfo<ObT = Onboarding> =
-    (ObT, ScopedVault, Option<ManualReview>, Option<OnboardingDecision>);
+pub type BasicOnboardingInfo<ObT = Onboarding> = (ObT, ScopedVault, Option<OnboardingDecision>);
 
 impl Onboarding {
     #[tracing::instrument("Onboarding::get", skip_all)]
@@ -178,14 +177,9 @@ impl Onboarding {
     where
         T: Into<OnboardingIdentifier<'a>>,
     {
-        use db_schema::schema::{business_owner, manual_review, onboarding_decision};
+        use db_schema::schema::{business_owner, onboarding_decision};
         let mut query = onboarding::table
             .inner_join(scoped_vault::table)
-            // Only fetch active manual review for this onboarding
-            .left_join(manual_review::table.on(
-                manual_review::onboarding_id.eq(onboarding::id)
-                .and(manual_review::completed_at.is_null())
-            ))
             // Only fetch active onboarding decisions for this onboarding
             .left_join(onboarding_decision::table.on(
                 onboarding_decision::onboarding_id.eq(onboarding::id)
@@ -266,7 +260,7 @@ impl Onboarding {
 
         // It's a bit precarious to make a FOR UPDATE statement with joins
         let result = Self::get(conn, &ob.id)?;
-        Ok((Locked::new(result.0), result.1, result.2, result.3))
+        Ok((Locked::new(result.0), result.1, result.2))
     }
 
     #[tracing::instrument("Onboarding::lock", skip_all)]
@@ -367,7 +361,8 @@ impl Onboarding {
         let sv = ScopedVault::get(conn, &ob.id)?;
         let tenant = Tenant::get(conn, &sv.tenant_id)?;
         // !! it's important that code in the same txn that is going to write a review does it before this update call
-        let mr = ManualReview::get_active_for_onboarding(conn, &ob.id)?;
+        let mr_wf_id = wf_id.unwrap_or(&ob.workflow_id);
+        let mr = ManualReview::get_active(conn, mr_wf_id)?;
 
         // Update the workflow to keep it in sync with the onboarding for now
         if let Some(wf_id) = wf_id {

@@ -22,6 +22,7 @@ use api_route_hosted::onboarding::GetRequirementsArgs;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::TriggerKycRequest;
 use db::models::liveness_event::NewLivenessEvent;
+use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
@@ -141,17 +142,19 @@ pub async fn post(
     }
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
-    let (ob_info, wf) = state
+    let (ob_info, mr, wf) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let ob_info = Onboarding::get(conn, &ob_id)?;
             let wf = Workflow::get(conn, &wf.id)?;
-            Ok((ob_info, wf))
+            let mr = ManualReview::get_active(conn, &wf.id)?;
+            Ok((ob_info, mr, wf))
         })
         .await??;
 
     ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((
         ob_info,
+        mr,
         Some(wf),
     )))
     .json()

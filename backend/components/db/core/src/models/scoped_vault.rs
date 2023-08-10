@@ -274,8 +274,9 @@ impl ScopedVault {
                 .inner_join(ob_configuration::table)
                 .left_join(insight_event::table)
                 // Only fetch active manual review for this onboarding
+                // TODO this will do horrible things if a SV has two manual reviews
                 .left_join(manual_review::table.on(
-                    manual_review::onboarding_id.eq(onboarding::id)
+                    manual_review::scoped_vault_id.eq(onboarding::scoped_vault_id)
                     .and(manual_review::completed_at.is_null())
                 )),
             )

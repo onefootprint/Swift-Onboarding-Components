@@ -73,7 +73,7 @@ impl ExtractableAuthSession for ParsedUserObSession {
 
         let ob = Onboarding::get(conn, &scoped_user_id);
         let onboarding = match ob {
-            Ok((onboarding, _, _, _)) => Ok(Some(onboarding)),
+            Ok((onboarding, _, _)) => Ok(Some(onboarding)),
             Err(e) => {
                 if e.is_not_found() {
                     Ok(None)
@@ -177,7 +177,7 @@ impl CheckedUserObAuthContext {
             sb_id: &sb_id,
             vault_id: self.user_vault_id(),
         };
-        let (ob, _, _, _) = Onboarding::get(conn, identifier)?;
+        let (ob, _, _) = Onboarding::get(conn, identifier)?;
         Ok(Some(ob))
     }
 }

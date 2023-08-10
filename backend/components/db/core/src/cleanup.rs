@@ -155,10 +155,6 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .filter(onboarding::scoped_vault_id.eq_any(su_ids.clone()))
                 .select(onboarding::id);
 
-            deleted_rows += diesel::delete(manual_review::table)
-                .filter(manual_review::onboarding_id.eq_any(ob_ids.clone()))
-                .execute(conn.conn())?;
-
             deleted_rows += diesel::delete(user_consent::table)
                 .filter(user_consent::onboarding_id.eq_any(ob_ids.clone()))
                 .execute(conn.conn())?;
@@ -233,7 +229,11 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .select(workflow::id);
 
             deleted_rows += diesel::delete(workflow_event::table)
-                .filter(workflow_event::workflow_id.eq_any(workflow_ids))
+                .filter(workflow_event::workflow_id.eq_any(workflow_ids.clone()))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(manual_review::table)
+                .filter(manual_review::workflow_id.eq_any(workflow_ids))
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(workflow::table)

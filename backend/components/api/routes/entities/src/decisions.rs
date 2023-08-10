@@ -47,6 +47,7 @@ pub async fn post(
             Workflow::latest(conn, &sv.id)
         })
         .await??;
+    let wf_id = wf.as_ref().map(|wf| wf.id.clone());
 
     if let Some(wf) = wf {
         let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
@@ -81,7 +82,7 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<Option<_>> {
             let fpid = fpid.clone();
             // TODO how does this work when there are multiple KYC workflows for one scoped vault?
-            decision::review::save_review_decision(conn, &fpid, &tenant_id, is_live, request, actor, None)
+            decision::review::save_review_decision(conn, &fpid, &tenant_id, is_live, request, actor, wf_id)
         })
         .await?;
     // Since we may have updated users onboarding status

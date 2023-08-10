@@ -33,7 +33,7 @@ pub async fn make_kyb_decision(
     let vresid = vres_id.clone();
     db_pool
         .db_transaction(move |conn| -> ApiResult<()> {
-            let (ob, sv, _, _) = Onboarding::get(conn, &ob_id)?;
+            let (ob, sv, _) = Onboarding::get(conn, &ob_id)?;
             let risk_signals = reason_codes
                 .into_iter()
                 .map(|rc| (rc, vendor_api, vresid.clone()))
@@ -55,7 +55,7 @@ pub async fn get_bo_obds(
     let obid = business_ob_id.clone();
     let (sv, bvw) = db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (_, sv, _, _) = Onboarding::get(conn, &obid)?;
+            let (_, sv, _) = Onboarding::get(conn, &obid)?;
             let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sv.id)?;
             Ok((sv, bvw))
         })

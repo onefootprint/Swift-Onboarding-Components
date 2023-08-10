@@ -11,7 +11,10 @@ use db::{
 };
 
 use super::onboarding::Decision;
-use crate::{errors::ApiResult, utils::vault_wrapper::VaultWrapper};
+use crate::{
+    errors::{ApiResult, AssertionError},
+    utils::vault_wrapper::VaultWrapper,
+};
 
 /// Create our final decision from the features we created, set final onboarding status, and emit risk signals
 /// assert_is_first_decision_for_onboarding determines if an error should be thrown if the onboarding already has a decision made
@@ -24,6 +27,7 @@ pub fn save_final_decision(
     ob_id: OnboardingId,
     verification_result_ids: Vec<VerificationResultId>,
     decision: &Decision,
+    // TODO make this non-null soon
     workflow_id: Option<WorkflowId>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<OnboardingDecision> {
@@ -62,9 +66,12 @@ pub fn save_final_decision(
 
     // Create ManualReview row if requested and an active one does not already exist
     if decision.create_manual_review {
-        let existing_review = ManualReview::get_active_for_onboarding(conn, &ob_id)?;
+        let wf_id = wf_id
+            .as_ref()
+            .ok_or(AssertionError("No wf_id in save_final_decision"))?;
+        let existing_review = ManualReview::get_active(conn, wf_id)?;
         if existing_review.is_none() {
-            ManualReview::create(conn, ob_id, review_reasons)?;
+            ManualReview::create(conn, review_reasons, wf_id.clone(), ob.scoped_vault_id.clone())?;
         }
     }
 

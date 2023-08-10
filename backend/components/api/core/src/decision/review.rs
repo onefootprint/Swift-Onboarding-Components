@@ -4,6 +4,7 @@ use crate::errors::ApiResult;
 use api_wire_types::CreateAnnotationRequest;
 use api_wire_types::DecisionRequest;
 use db::models::annotation::Annotation;
+use db::models::manual_review::ManualReview;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::onboarding_decision::OnboardingDecision;
@@ -29,7 +30,12 @@ pub fn save_review_decision(
         status,
     } = decision_request;
 
-    let (ob, su, manual_review, decision) = Onboarding::lock_for_tenant(conn, fp_id, tenant_id, is_live)?;
+    let (ob, su, decision) = Onboarding::lock_for_tenant(conn, fp_id, tenant_id, is_live)?;
+    let manual_review = workflow_id
+        .as_ref()
+        .map(|wf_id| ManualReview::get_active(conn, wf_id))
+        .transpose()?
+        .flatten();
 
     if !ob.is_complete() {
         // Can't make a decision on an onboarding that doesn't already have one

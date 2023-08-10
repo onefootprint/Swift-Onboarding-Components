@@ -194,7 +194,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
 
     // TODO update the rest of the business ob
     let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
-    let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
+    let (_, sb, _) = Onboarding::get(conn, &biz_ob.id)?;
 
     let update = OnboardingUpdate::idv_reqs_initiated();
     let wf_id = biz_ob.workflow_id(None).clone();
@@ -233,7 +233,7 @@ pub fn write_kyb_fixture_ob_decision(
 ) -> ApiResult<()> {
     let biz_ob_id = biz_ob_id.clone();
     let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
-    let (_, sb, _, _) = Onboarding::get(conn, &biz_ob.id)?;
+    let (_, sb, _) = Onboarding::get(conn, &biz_ob.id)?;
 
     let (decision_status, _create_manual_review) = fixture_decision;
 

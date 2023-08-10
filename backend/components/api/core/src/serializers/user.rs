@@ -1,8 +1,5 @@
 use crate::utils::db2api::DbToApi;
-use db::models::{
-    onboarding::{BasicOnboardingInfo, Onboarding},
-    scoped_vault::ScopedVault,
-};
+use db::models::{manual_review::ManualReview, scoped_vault::ScopedVault};
 
 impl DbToApi<ScopedVault> for api_wire_types::UserId {
     fn from_db(target: ScopedVault) -> Self {
@@ -12,12 +9,12 @@ impl DbToApi<ScopedVault> for api_wire_types::UserId {
     }
 }
 
-impl DbToApi<BasicOnboardingInfo<Onboarding>> for api_wire_types::User {
-    fn from_db((_, sv, manual_review, _): BasicOnboardingInfo<Onboarding>) -> Self {
+impl DbToApi<(ScopedVault, Vec<ManualReview>)> for api_wire_types::User {
+    fn from_db((sv, manual_reviews): (ScopedVault, Vec<ManualReview>)) -> Self {
         Self {
             id: sv.fp_id,
             status: sv.status,
-            requires_manual_review: manual_review.is_some(),
+            requires_manual_review: !manual_reviews.is_empty(),
         }
     }
 }
