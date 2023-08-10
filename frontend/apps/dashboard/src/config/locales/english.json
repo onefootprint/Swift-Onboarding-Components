@@ -677,9 +677,9 @@
         "decrypt": "Decrypt",
         "not-allowed": "You're not allowed to decrypt data",
         "status": {
-          "error": "Failed",
-          "success": "Successful",
-          "warning": "Pending"
+          "error": "Upload Failed",
+          "success": "Upload Successful",
+          "warning": "Upload Pending"
         },
         "reason-dialog": {
           "title": "Decrypt data",

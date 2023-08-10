@@ -13,7 +13,11 @@ const DocumentStatusBadge = ({ status }: DocumentBadgeStatusProps) => {
 
   return status ? (
     <Badge variant={status}>
-      <Typography variant="caption-1" color={status}>
+      <Typography
+        variant="caption-1"
+        color={status}
+        sx={{ whiteSpace: 'nowrap' }}
+      >
         {t(status)}
       </Typography>
     </Badge>
