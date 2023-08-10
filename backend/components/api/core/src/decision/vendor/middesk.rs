@@ -577,6 +577,7 @@ pub async fn run_kyb(
         tenant_id,
     )?;
 
+    let wf_id = wf.id.clone();
     if let Some(fixture_decision) = fixture_decision {
         // Don't run prod middesk requests and instead just create fixture data for this business
         let bizobid = biz_ob_id.clone();
@@ -588,7 +589,7 @@ pub async fn run_kyb(
                     &bizobid,
                     fixture_decision,
                 )?;
-                decision::utils::write_kyb_fixture_ob_decision(conn, &biz_ob_id, fixture_decision)
+                decision::utils::write_kyb_fixture_ob_decision(conn, &biz_ob_id, fixture_decision, wf_id)
             })
             .await?;
     } else {

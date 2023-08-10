@@ -18,7 +18,7 @@ use idv::incode::doc::response::FetchOCRResponse;
 use newtypes::{
     DataIdentifier, DbActor, DecisionIntentId, DecisionStatus, IdentityDataKind,
     IdentityDocumentFixtureResult, IdentityDocumentId, OnboardingId, RiskSignalGroupKind, ScopedVaultId,
-    TenantId, VaultKind, VendorAPI, WorkflowFixtureResult,
+    TenantId, VaultKind, VendorAPI, WorkflowFixtureResult, WorkflowId,
 };
 
 use super::{
@@ -230,6 +230,7 @@ pub fn write_kyb_fixture_ob_decision(
     conn: &mut TxnPgConn,
     biz_ob_id: &OnboardingId,
     fixture_decision: FixtureDecision,
+    workflow_id: WorkflowId,
 ) -> ApiResult<()> {
     let biz_ob_id = biz_ob_id.clone();
     let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
@@ -246,7 +247,7 @@ pub fn write_kyb_fixture_ob_decision(
         annotation_id: None,
         actor: DbActor::Footprint,
         seqno: None,
-        workflow_id: None,
+        workflow_id,
     };
 
     OnboardingDecision::create(conn, new_decision)?;

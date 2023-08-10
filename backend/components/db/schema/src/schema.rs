@@ -423,7 +423,7 @@ table! {
         status -> Text,
         actor -> Jsonb,
         seqno -> Nullable<Int8>,
-        workflow_id -> Nullable<Text>,
+        workflow_id -> Text,
     }
 }
 

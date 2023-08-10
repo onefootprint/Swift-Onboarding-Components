@@ -276,6 +276,7 @@ mod tests {
     use crate::models::scoped_vault::ScopedVault;
     use crate::models::verification_request::VerificationRequest;
     use crate::models::verification_result::VerificationResult;
+    use crate::models::workflow::Workflow;
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::fixtures;
     use crate::tests::prelude::*;
@@ -286,12 +287,12 @@ mod tests {
     use newtypes::{DbActor, DecisionIntentId, DecisionStatus, ScopedVaultId};
     use serde_json::json;
 
-    fn setup(conn: &mut TestPgConn) -> (ScopedVault, DecisionIntent, Locked<Onboarding>) {
+    fn setup(conn: &mut TestPgConn) -> (ScopedVault, DecisionIntent, Locked<Onboarding>, Workflow) {
         let t = fixtures::tenant::create(conn);
         let obc = fixtures::ob_configuration::create(conn, &t.id, true);
         let uv = fixtures::vault::create_person(conn, true).into_inner();
         let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
-        let wf = fixtures::workflow::create(conn, &sv.id);
+        let (ob, wf) = fixtures::onboarding::create(conn, sv.id.clone(), obc.id, None);
         let di = crate::models::decision_intent::DecisionIntent::get_or_create_for_workflow_and_kind(
             conn,
             &sv.id,
@@ -299,10 +300,9 @@ mod tests {
             DecisionIntentKind::OnboardingKyc,
         )
         .unwrap();
-        let (ob, _) = fixtures::onboarding::create(conn, sv.id.clone(), obc.id, None);
         let ob = Onboarding::lock(conn, &ob.id).unwrap();
 
-        (sv, di, ob)
+        (sv, di, ob, wf)
     }
 
     fn create_vres(
@@ -374,7 +374,7 @@ mod tests {
         // Case 2: only RS with Vres
         // Case 3: mix of RS with OBD and Vres
 
-        let (sv, di, ob) = setup(conn);
+        let (sv, di, ob, wf) = setup(conn);
 
         input_risk_signal_groups
             .into_iter()
@@ -405,7 +405,7 @@ mod tests {
                         annotation_id: None,
                         actor: DbActor::Footprint,
                         seqno: None,
-                        workflow_id: None,
+                        workflow_id: wf.id.clone(),
                     },
                 )
                 .unwrap();

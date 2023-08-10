@@ -105,9 +105,8 @@ impl ManualReview {
             .filter(manual_review::workflow_id.eq(workflow_id))
             .filter(not(manual_review::completed_at.is_null()))
             .inner_join(
-                onboarding_decision::table.on(manual_review::workflow_id
-                    .nullable()
-                    .eq(onboarding_decision::workflow_id)),
+                onboarding_decision::table
+                    .on(manual_review::workflow_id.eq(onboarding_decision::workflow_id)),
             )
             .order_by(manual_review::completed_at.desc())
             .select((manual_review::all_columns, onboarding_decision::all_columns))

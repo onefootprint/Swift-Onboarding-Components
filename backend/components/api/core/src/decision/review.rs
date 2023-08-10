@@ -56,7 +56,6 @@ pub fn save_review_decision(
 
     let decision = if status_changed {
         // Create a new decision if the status is different
-        let wf_id = workflow_id.clone();
         let new_decision = OnboardingDecisionCreateArgs {
             vault_id: su.vault_id.clone(),
             onboarding: &ob,
@@ -66,11 +65,14 @@ pub fn save_review_decision(
             annotation_id: Some(annotation.0.id),
             actor: DbActor::from(actor.clone()),
             seqno: None,
-            workflow_id,
+            workflow_id: workflow_id
+                .as_ref()
+                .unwrap_or_else(|| ob.workflow_id(None))
+                .clone(),
         };
         let decision = OnboardingDecision::create(conn, new_decision)?;
         let update = OnboardingUpdate::set_decision(status.into(), false);
-        Onboarding::update(ob, conn, wf_id.as_ref(), update)?;
+        Onboarding::update(ob, conn, workflow_id.as_ref(), update)?;
         Some(decision)
     } else {
         // TODO should create some kind of UserTimeline event here since we are clearing a manual review

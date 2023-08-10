@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::actor::SaturatedActor;
 use crate::models::verification_request::VerificationRequest;
+use crate::models::workflow::Workflow;
 use crate::PgConn;
 use crate::TxnPgConn;
 use crate::{actor, DbResult};
@@ -41,7 +42,7 @@ pub struct OnboardingDecision {
     pub actor: DbActor,
     // Only non-null for pass decisions made by footprint
     pub seqno: Option<DataLifetimeSeqno>,
-    pub workflow_id: Option<WorkflowId>,
+    pub workflow_id: WorkflowId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -53,7 +54,7 @@ struct NewOnboardingDecisionRow {
     status: DecisionStatus,
     actor: DbActor,
     seqno: Option<DataLifetimeSeqno>,
-    workflow_id: Option<WorkflowId>,
+    workflow_id: WorkflowId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -73,7 +74,7 @@ pub struct OnboardingDecisionCreateArgs<'a> {
     pub annotation_id: Option<AnnotationId>,
     pub actor: DbActor,
     pub seqno: Option<DataLifetimeSeqno>,
-    pub workflow_id: Option<WorkflowId>,
+    pub workflow_id: WorkflowId,
 }
 
 pub type SaturatedOnboardingDecisionInfo = (
@@ -136,10 +137,10 @@ impl OnboardingDecision {
         conn: &mut PgConn,
         ids: Vec<&OnboardingDecisionId>,
     ) -> DbResult<HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>> {
-        use db_schema::schema::{ob_configuration, onboarding, verification_request, verification_result};
-        let results: Vec<(Self, (Onboarding, ObConfiguration), Option<ManualReview>)> =
+        use db_schema::schema::{ob_configuration, verification_request, verification_result, workflow};
+        let results: Vec<(Self, (Workflow, ObConfiguration), Option<ManualReview>)> =
             onboarding_decision::table
-                .inner_join(onboarding::table.inner_join(ob_configuration::table))
+                .inner_join(workflow::table.inner_join(ob_configuration::table))
                 .left_join(manual_review::table)
                 .filter(onboarding_decision::id.eq_any(ids))
                 .get_results(conn)?;

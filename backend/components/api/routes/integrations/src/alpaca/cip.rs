@@ -17,7 +17,7 @@ use api_core::{
             vendor_result::VendorResult,
         },
     },
-    errors::{cip_error::CipError, onboarding::OnboardingError, ApiResult},
+    errors::{cip_error::CipError, ApiResult},
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::{DecryptUncheckedResult, TenantVw, VaultWrapper},
     ApiError, ApiErrorKind, State,
@@ -106,8 +106,7 @@ async fn create_cip_request(
 
             let risk_signals = RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
             let (ob, sv, _) = Onboarding::get(conn, &fp_obd.onboarding_id)?;
-            let wf_id = fp_obd.workflow_id.as_ref().ok_or(OnboardingError::NoWorkflow)?;
-            let wf = Workflow::get(conn, wf_id)?;
+            let wf = Workflow::get(conn, &fp_obd.workflow_id)?;
 
             let (risk_signals, mr, manual_obd) = match fp_obd.status {
                 DecisionStatus::Pass => (risk_signals, None, None),
@@ -124,7 +123,7 @@ async fn create_cip_request(
                 }
             };
 
-            let collected_document = DocumentRequest::get(conn, wf_id)?.map(|d| d.should_collect_selfie);
+            let collected_document = DocumentRequest::get(conn, &wf.id)?.map(|d| d.should_collect_selfie);
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;
 

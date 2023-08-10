@@ -28,7 +28,7 @@ pub fn save_final_decision(
     verification_result_ids: Vec<VerificationResultId>,
     decision: &Decision,
     // TODO make this non-null soon
-    workflow_id: Option<WorkflowId>,
+    wf_id: Option<WorkflowId>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<OnboardingDecision> {
     // TODO: Create our risk signals!
@@ -50,7 +50,6 @@ pub fn save_final_decision(
     };
 
     // Create decision
-    let wf_id = workflow_id.clone();
     let onboarding_decision = OnboardingDecisionCreateArgs {
         vault_id: scoped_user.vault_id,
         onboarding: &ob,
@@ -60,7 +59,7 @@ pub fn save_final_decision(
         annotation_id: None,
         actor: DbActor::Footprint,
         seqno,
-        workflow_id,
+        workflow_id: wf_id.as_ref().unwrap_or_else(|| ob.workflow_id(None)).clone(),
     };
     let obd = OnboardingDecision::create(conn, onboarding_decision)?;
 
