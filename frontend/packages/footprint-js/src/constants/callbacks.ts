@@ -17,6 +17,9 @@ export const ComponentCallbacksByEvent: Record<
   },
   [ComponentKind.VerifyButton]: {
     [PublicEvent.clicked]: 'onClick',
+    [PublicEvent.closed]: 'onClose',
+    [PublicEvent.canceled]: 'onCancel',
+    [PublicEvent.completed]: 'onComplete',
   },
   [ComponentKind.Render]: {},
 };

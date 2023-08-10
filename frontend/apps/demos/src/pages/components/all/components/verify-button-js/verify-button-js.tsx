@@ -10,6 +10,15 @@ const VerifyButtonJsIntegration = () => {
       variant: 'inline',
       containerId: 'verify-button-js',
       publicKey,
+      onComplete: (validationToken: string) => {
+        console.log('complete ', validationToken);
+      },
+      onClose: () => {
+        console.log('close');
+      },
+      onCancel: () => {
+        console.log('cancel');
+      },
     });
     component.render();
 

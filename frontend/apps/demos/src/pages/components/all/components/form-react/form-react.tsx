@@ -9,11 +9,10 @@ const FormReactIntegration = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 
-  const closeModal = () => {
-    setIsModalVisible(false);
-  };
-  const closeDrawer = () => {
+  const handleEvent = (name: string) => {
+    console.log(name);
     setIsDrawerVisible(false);
+    setIsModalVisible(false);
   };
 
   return (
@@ -26,9 +25,9 @@ const FormReactIntegration = () => {
             variant="modal"
             authToken={COMPONENTS_AUTH_TOKEN ?? ''}
             type={FootprintFormType.cardAndZip}
-            onComplete={closeModal}
-            onCancel={closeModal}
-            onClose={closeModal}
+            onComplete={() => handleEvent('complete')}
+            onCancel={() => handleEvent('cancel')}
+            onClose={() => handleEvent('close')}
           />
         )}
         {isDrawerVisible && (
@@ -36,9 +35,9 @@ const FormReactIntegration = () => {
             variant="drawer"
             authToken={COMPONENTS_AUTH_TOKEN ?? ''}
             type={FootprintFormType.cardOnly}
-            onComplete={closeDrawer}
-            onCancel={closeDrawer}
-            onClose={closeDrawer}
+            onComplete={() => handleEvent('complete')}
+            onCancel={() => handleEvent('cancel')}
+            onClose={() => handleEvent('close')}
           />
         )}
       </Container>

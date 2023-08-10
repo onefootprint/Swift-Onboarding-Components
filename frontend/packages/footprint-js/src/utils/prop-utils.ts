@@ -125,8 +125,9 @@ export const getCallbackProps = (
       kind === ComponentKind.VerifyButton &&
       publicEvent === PublicEvent.clicked;
 
-    modifiedCallbacks[publicEvent] = () => {
-      callback();
+    // Make sure to pass any callback arguments through
+    modifiedCallbacks[publicEvent] = (args?: any) => {
+      callback(args);
       if (shouldDestroy) {
         onDestroy?.();
       }

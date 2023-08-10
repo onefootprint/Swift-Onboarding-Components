@@ -17,6 +17,15 @@ const VerifyJsIntegration = () => {
         [IdDI.firstName]: 'Johnny',
         [IdDI.lastName]: 'Appleseed',
       },
+      onComplete: (validationToken: string) => {
+        console.log('complete ', validationToken);
+      },
+      onClose: () => {
+        console.log('close');
+      },
+      onCancel: () => {
+        console.log('cancel');
+      },
     });
     component.render();
   };
@@ -26,6 +35,15 @@ const VerifyJsIntegration = () => {
       kind: FootprintComponentKind.Verify,
       variant: 'modal',
       publicKey,
+      onComplete: (validationToken: string) => {
+        console.log('complete ', validationToken);
+      },
+      onClose: () => {
+        console.log('close');
+      },
+      onCancel: () => {
+        console.log('cancel');
+      },
     });
     component.render();
   };
