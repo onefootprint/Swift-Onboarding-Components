@@ -698,6 +698,18 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    tenant_client_config (id) {
+        id -> Text,
+        tenant_id -> Text,
+        is_live -> Bool,
+        deactivated_at -> Nullable<Timestamptz>,
+        allowed_origins -> Array<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     tenant_role (id) {
         id -> Text,
         tenant_id -> Text,
@@ -986,6 +998,7 @@ joinable!(stytch_fingerprint_event -> verification_result (verification_result_i
 joinable!(task_execution -> task (task_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key -> tenant_role (role_id));
+joinable!(tenant_client_config -> tenant (tenant_id));
 joinable!(tenant_role -> tenant (tenant_id));
 joinable!(tenant_rolebinding -> tenant (tenant_id));
 joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
@@ -1053,6 +1066,7 @@ allow_tables_to_appear_in_same_query!(
     task_execution,
     tenant,
     tenant_api_key,
+    tenant_client_config,
     tenant_role,
     tenant_rolebinding,
     tenant_user,

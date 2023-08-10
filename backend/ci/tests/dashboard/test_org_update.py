@@ -1,6 +1,6 @@
 import os
 
-from tests.utils import put
+from tests.utils import put, patch, get
 
 
 def _logo_path():
@@ -18,3 +18,22 @@ def test_org_update_logo(sandbox_tenant):
     )
 
     assert body["logo_url"]
+
+
+def test_allowed_origins(sandbox_tenant):
+    body = get("/org/client_security_config", None, *sandbox_tenant.db_auths)
+    assert len(body["allowed_origins"]) == 0
+    body = patch(
+        "/org/client_security_config",
+        dict(allowed_origins=["https://google.com", "https://facebook.com"]),
+        *sandbox_tenant.db_auths,
+    )
+    assert set(body["allowed_origins"]) == set(
+        ["https://google.com", "https://facebook.com"]
+    )
+    body = patch(
+        "/org/client_security_config",
+        dict(allowed_origins=["https://onefootprint.com"]),
+        *sandbox_tenant.db_auths,
+    )
+    assert set(body["allowed_origins"]) == set(["https://onefootprint.com"])

@@ -200,3 +200,8 @@ define_newtype_id!(
 );
 define_newtype_id!(StytchVisitorId, String, "Stytch generated visitor_id");
 define_newtype_id!(TaskExecutionId, String, "Identifier for a task_execution");
+define_newtype_id!(
+    TenantClientConfigId,
+    String,
+    "Identifier for a tenant's client configuration"
+);

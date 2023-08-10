@@ -3,6 +3,7 @@ use paperclip::actix::web;
 mod access_events;
 mod api_keys;
 mod authn;
+mod client_security_config;
 mod index;
 mod logo;
 mod member;
@@ -34,7 +35,9 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(settings::get)
         .service(access_events::get)
         .service(logo::put)
-        .service(webhook_portal::get);
+        .service(webhook_portal::get)
+        .service(client_security_config::get)
+        .service(client_security_config::patch);
 
     onboarding_configs::routes(config);
     authn::routes(config);

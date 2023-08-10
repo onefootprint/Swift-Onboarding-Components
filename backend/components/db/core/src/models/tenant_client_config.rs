@@ -1,0 +1,60 @@
+use crate::{DbResult, PgConn, TxnPgConn};
+use chrono::{DateTime, Utc};
+use db_schema::schema::tenant_client_config;
+use diesel::ExpressionMethods;
+use diesel::{Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
+use newtypes::{TenantClientConfigId, TenantId};
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable, PartialEq, Eq)]
+#[diesel(table_name = tenant_client_config)]
+pub struct TenantClientConfig {
+    pub id: TenantClientConfigId,
+    pub tenant_id: TenantId,
+    pub is_live: bool,
+    pub deactivated_at: Option<DateTime<Utc>>,
+    pub allowed_origins: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[diesel(table_name = tenant_client_config)]
+pub struct UpdateTenantClientConfig {
+    pub tenant_id: TenantId,
+    pub is_live: bool,
+    pub allowed_origins: Vec<String>,
+}
+
+impl UpdateTenantClientConfig {
+    #[tracing::instrument("UpdateTenantClientConfig::create", skip_all)]
+    pub fn create_or_update(self, conn: &mut TxnPgConn) -> DbResult<TenantClientConfig> {
+        diesel::update(tenant_client_config::table)
+            .filter(tenant_client_config::tenant_id.eq(&self.tenant_id))
+            .filter(tenant_client_config::deactivated_at.is_null())
+            .filter(tenant_client_config::is_live.eq(&self.is_live))
+            .set(tenant_client_config::deactivated_at.eq(Utc::now()))
+            .execute(conn.conn())?;
+
+        let config = diesel::insert_into(tenant_client_config::table)
+            .values(self)
+            .get_result(conn.conn())?;
+
+        Ok(config)
+    }
+}
+
+impl TenantClientConfig {
+    #[tracing::instrument("TenantClientConfig::get", skip_all)]
+    pub fn get(
+        conn: &mut PgConn,
+        tenant_id: TenantId,
+        is_live: bool,
+    ) -> Result<Option<Self>, crate::DbError> {
+        let control: Option<Self> = tenant_client_config::table
+            .filter(tenant_client_config::tenant_id.eq(tenant_id))
+            .filter(tenant_client_config::deactivated_at.is_null())
+            .filter(tenant_client_config::is_live.eq(is_live))
+            .first(conn)
+            .optional()?;
+        Ok(control)
+    }
+}

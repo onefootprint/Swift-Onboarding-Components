@@ -1,7 +1,7 @@
 import pytest
 import requests
 from requests.auth import HTTPBasicAuth
-from tests.utils import post, get, url
+from tests.utils import post, get, patch, url
 from tests.constants import CUSTODIAN_AUTH
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER

@@ -1,0 +1,1 @@
+DROP TABLE tenant_client_config;

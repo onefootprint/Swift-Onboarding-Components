@@ -55,4 +55,6 @@ pub enum TenantError {
     DataDoesntExist(DataIdentifier),
     #[error("User {0} does not exist")]
     VaultDoesntExist(FpId),
+    #[error("Allowed origins must be HTTPS in live-mode")]
+    AllowedOriginsMustBeHttpsInLive,
 }
