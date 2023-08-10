@@ -285,7 +285,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                     conn,
                     &self.ob_id,
                     &self.sv_id,
-                    &self.wf_id,
+                    &wf,
                     self.vendor_results
                         .iter()
                         .map(|vr| vr.verification_result_id.clone())
@@ -553,7 +553,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             conn,
             &self.ob_id,
             &self.sv_id,
-            &self.wf_id,
+            &wf,
             vendor_results
                 .iter()
                 .map(|vr| vr.verification_result_id.clone()) // TODO: a little funky- we maybe dont need the OBD<>VRes junction table anymore 

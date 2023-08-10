@@ -71,7 +71,7 @@ impl ExtractableAuthSession for ParsedUserObSession {
         // Confirm that the onboarding in the auth token belongs to the user
         let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &user_session.user.id))?;
 
-        let ob = Onboarding::get(conn, (&scoped_user_id, &user_session.user.id));
+        let ob = Onboarding::get(conn, &scoped_user_id);
         let onboarding = match ob {
             Ok((onboarding, _, _, _)) => Ok(Some(onboarding)),
             Err(e) => {
@@ -97,9 +97,11 @@ impl ExtractableAuthSession for ParsedUserObSession {
             .as_ref()
             .and_then(|wf| wf.ob_configuration_id.as_ref())
             .or_else(|| {
-                scope_obc_id
-                    .as_ref()
-                    .or_else(|| onboarding.as_ref().map(|ob| &ob.ob_configuration_id))
+                scope_obc_id.as_ref().or_else(|| {
+                    onboarding
+                        .as_ref()
+                        .map(|ob| ob.ob_configuration_id(workflow.as_ref()))
+                })
             });
 
         let (ob_config, tenant) = if let Some(obc_id) = obc_id {

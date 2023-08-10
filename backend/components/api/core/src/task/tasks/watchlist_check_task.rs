@@ -15,7 +15,6 @@ use crate::{
 };
 use async_trait::async_trait;
 use chrono::Utc;
-use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
@@ -96,15 +95,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     wc
                 } else {
                     let sv = ScopedVault::get(conn, &sv_id)?;
-                    let ob = if sv.ob_configuration_id.is_some() {
-                        let (ob, _, _, _) = Onboarding::get(conn, (&sv_id, &sv.vault_id))?;
-                        Some(ob)
-                    } else {
-                        // vault-only vaults do not have an onboarding
-                        None
-                    };
-
-                    WatchlistCheckTask::create_new_watchlist_check(conn, &sv_id, &task_id, &sv, &ob, &uvw)?
+                    WatchlistCheckTask::create_new_watchlist_check(conn, &sv_id, &task_id, &sv, &uvw)?
                 };
 
                 Ok((tenant, sv, uvw, wc))
@@ -217,7 +208,6 @@ impl WatchlistCheckTask {
         sv_id: &ScopedVaultId,
         task_id: &TaskId,
         sv: &ScopedVault,
-        ob: &Option<Onboarding>,
         uvw: &VaultWrapper<Person>,
     ) -> Result<WatchlistCheckVreq, TaskError> {
         let requirements_satisfied = idv::requirements::vendor_api_requirements_are_satisfied(
@@ -225,12 +215,9 @@ impl WatchlistCheckTask {
             uvw.populated().as_slice(),
         );
 
-        let has_non_pass_onboarding_status = ob
-            .as_ref()
-            .map(|o| !matches!(o.status, OnboardingStatus::Pass))
-            .unwrap_or(false);
-
-        let status = if has_non_pass_onboarding_status {
+        let has_onboarding_in_non_pass_status =
+            uvw.vault.is_portable && sv.status != Some(OnboardingStatus::Pass);
+        let status = if has_onboarding_in_non_pass_status {
             WatchlistCheckStatus::NotNeeded(WatchlistCheckNotNeededReason::VaultOffboarded)
         } else if !sv.is_live {
             WatchlistCheckStatus::NotNeeded(WatchlistCheckNotNeededReason::VaultNotLive)

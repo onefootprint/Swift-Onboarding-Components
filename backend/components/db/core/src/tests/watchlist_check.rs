@@ -103,14 +103,14 @@ fn make_vault(
         let sv = fixtures::scoped_vault::create(conn, &uvid, &ob_config.id);
         let svid = sv.id.clone();
         if let Some(ob_decision_made_at) = ob_decision_made_at {
-            let onboarding = fixtures::onboarding::create(conn, svid, ob_config.id, None);
-            let ob = Onboarding::lock(conn, &onboarding.id).unwrap();
+            let (ob, wf) = fixtures::onboarding::create(conn, svid, ob_config.id, None);
+            let ob = Onboarding::lock(conn, &ob.id).unwrap();
             let update = OnboardingUpdate {
                 decision_made_at: Some(Some(ob_decision_made_at)),
                 status: Some(OnboardingStatus::Pass),
                 ..Default::default()
             };
-            Onboarding::update(ob, conn, Some(&onboarding.workflow_id), update).unwrap();
+            Onboarding::update(ob, conn, Some(&wf.id), update).unwrap();
         }
         sv
     } else {

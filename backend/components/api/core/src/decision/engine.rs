@@ -27,6 +27,7 @@ use db::{
         vault::Vault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
         verification_result::VerificationResult,
+        workflow::Workflow,
     },
     DbError, DbPool, TxnPgConn,
 };
@@ -42,7 +43,7 @@ use idv::{
 use itertools::Itertools;
 use newtypes::{
     ObConfigurationId, OnboardingId, PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId,
-    VerificationResultId, WorkflowId,
+    VerificationResultId,
 };
 use prometheus::labels;
 
@@ -290,7 +291,7 @@ pub fn save_onboarding_decision(
     rules_output: OnboardingRulesDecision,
     verification_result_ids: Vec<VerificationResultId>,
     is_sandbox: bool,
-    workflow_id: Option<WorkflowId>,
+    workflow: Option<&Workflow>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
     let (final_decision, additional_evaluated) = rules_output.final_decision_and_additional_evaluated()?;
@@ -300,7 +301,7 @@ pub fn save_onboarding_decision(
         ob.id.clone(),
         verification_result_ids,
         &final_decision.decision,
-        workflow_id,
+        workflow.map(|wf| wf.id.clone()),
         review_reasons,
     )?;
 
@@ -315,7 +316,7 @@ pub fn save_onboarding_decision(
         // Log our canonical line
         log_rule_evaluation(
             &ob.id,
-            &ob.ob_configuration_id,
+            ob.ob_configuration_id(workflow),
             &ob.scoped_vault_id,
             &final_decision,
             rule::CANONICAL_ONBOARDING_RULE_LINE,
@@ -325,7 +326,7 @@ pub fn save_onboarding_decision(
         additional_evaluated.into_iter().for_each(|output| {
             log_rule_evaluation(
                 &ob.id,
-                &ob.ob_configuration_id,
+                ob.ob_configuration_id(workflow),
                 &ob.scoped_vault_id,
                 &output,
                 "additional_decisions_for_onboarding",

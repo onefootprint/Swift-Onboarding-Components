@@ -11,7 +11,7 @@ pub struct UserId {
 pub struct User {
     pub id: FpId,
     pub requires_manual_review: bool,
-    pub status: OnboardingStatus,
+    pub status: Option<OnboardingStatus>,
 }
 
 export_schema!(UserId);

@@ -59,7 +59,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     } else {
         None
     };
-    let (tenant, ob, uv, su, _) = create_kyc_user_and_onboarding(
+    let (tenant, ob, wf, uv, su, _) = create_kyc_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         must_collect_data,
@@ -74,7 +74,6 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     let (di, id_doc) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let wf = db::tests::fixtures::workflow::create(conn, &su_id);
             let di = DecisionIntent::get_or_create_for_workflow_and_kind(
                 conn,
                 &su_id,
@@ -303,7 +302,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
     } else {
         None
     };
-    let (tenant, ob, uv, su, _) = create_kyc_user_and_onboarding(
+    let (tenant, ob, wf, uv, su, _) = create_kyc_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         must_collect_data,
@@ -318,7 +317,6 @@ async fn test_fail(state: &State, is_selfie: bool) {
     let (di, id_doc) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let wf = db::tests::fixtures::workflow::create(conn, &suid);
             let di = DecisionIntent::get_or_create_for_workflow_and_kind(
                 conn,
                 &suid,

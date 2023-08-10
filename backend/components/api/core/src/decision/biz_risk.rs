@@ -55,8 +55,8 @@ pub async fn get_bo_obds(
     let obid = business_ob_id.clone();
     let (sv, bvw) = db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (ob, sv, _, _) = Onboarding::get(conn, &obid)?;
-            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &ob.scoped_vault_id)?;
+            let (_, sv, _, _) = Onboarding::get(conn, &obid)?;
+            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sv.id)?;
             Ok((sv, bvw))
         })
         .await??;

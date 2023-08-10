@@ -64,6 +64,7 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             fp_id,
             start_timestamp,
             ordering_id,
+            status,
             ..
         } = sv;
 
@@ -75,7 +76,7 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             attributes,
             start_timestamp,
             watchlist_check: watchlist_check.map(api_wire_types::WatchlistCheck::from_db),
-            onboarding: onboarding_info.map(api_wire_types::Onboarding::from_db),
+            onboarding: onboarding_info.map(|o| api_wire_types::Onboarding::from_db((o, status))),
             ordering_id,
             decrypted_attributes,
             decryptable_attributes,
