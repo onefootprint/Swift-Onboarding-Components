@@ -8,6 +8,7 @@ import React, { useEffect } from 'react';
 
 import DocScan from './screens/doc-scan';
 import DocSelection from './screens/doc-selection';
+import TooManyAttempts from './screens/too-many-attempts';
 import createMachine from './utils/state-machine';
 
 export type IdDocProps = {
@@ -29,6 +30,9 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
     }
   }, [state, onDone]);
 
+  if (state.matches('tooManyAttempts')) {
+    return <TooManyAttempts />;
+  }
   if (state.matches('docSelection')) {
     return (
       <DocSelection
@@ -60,6 +64,9 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
           send('imageSubmitted', {
             payload: { nextSideToCollect },
           });
+        }}
+        onRetryLimitExceeded={() => {
+          send('retryLimitExceeded');
         }}
         onConsentCompleted={() => {
           send('consentCompleted');

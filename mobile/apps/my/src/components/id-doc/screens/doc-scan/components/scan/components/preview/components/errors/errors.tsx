@@ -16,7 +16,7 @@ const Errors = ({ errors }: ErrorsProps) => {
         {t('title')}
       </Typography>
       <Typography variant="body-2" color="secondary" center>
-        {errors.join(',')}
+        {errors.join(' ')}
       </Typography>
     </Box>
   );

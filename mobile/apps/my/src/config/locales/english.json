@@ -3,6 +3,10 @@
     "front": "Front side",
     "back": "Back side"
   },
+  "side": {
+    "front": "front",
+    "back": "back"
+  },
   "di": {
     "id.name": "Name",
     "id.phone_number": "Phone number",
@@ -20,7 +24,7 @@
     "id.zip": "Zip code"
   },
   "id-doc": {
-    "driver_license": "driver's license",
+    "drivers_license": "driver's license",
     "id_card": "ID Card",
     "passport": "Passport"
   },
@@ -135,6 +139,10 @@
           "selfie_has_lenses": "We detected glasses in your selfie. Please remove your glasses and try again.",
           "selfie_has_face_mask": "We detected a face mask in your selfie. Please remove all face coverings and try again.",
           "unknown_error": "An error occurred. Please try again."
+        },
+        "too-many-attempts": {
+          "title": "Too many attempts",
+          "description": "Sorry, we can't continue onboarding as you've tried to submit your document images too many times. We'll reach out if we need more info."
         }
       },
       "drivers-license": {

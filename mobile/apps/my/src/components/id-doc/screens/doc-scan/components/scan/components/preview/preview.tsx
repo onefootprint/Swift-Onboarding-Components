@@ -61,7 +61,7 @@ const Preview = ({ title, subtitle, onReset, photo, size }: PreviewProps) => {
               </Typography>
             )}
           </Box>
-          <Box height={imageHeight}>
+          <Box height={imageHeight} marginBottom={7}>
             <PreviewImg
               hasError={isError}
               height={imageHeight}

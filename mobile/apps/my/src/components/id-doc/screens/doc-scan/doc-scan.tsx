@@ -22,6 +22,7 @@ export type DocScanProps = {
   authToken: string;
   country: CountryRecord;
   onDone: (nextSideToCollect: UploadDocumentSide) => void;
+  onRetryLimitExceeded: () => void;
   side: UploadDocumentSide;
   type: SupportedIdDocTypes;
   docId: string;
@@ -40,6 +41,7 @@ const DocScan = ({
   docId,
   requirement,
   onConsentCompleted,
+  onRetryLimitExceeded,
 }: DocScanProps) => {
   const { t, allT } = useTranslation('components.scan.preview.errors');
   const [errors, setErrors] = useState([]);
@@ -77,12 +79,20 @@ const DocScan = ({
       {
         onSuccess: response => {
           if (response.errors.length > 0) {
-            const documentType = allT(`document-type.${type}`);
+            const documentType = allT(`id-doc.${type}`);
+            const docSide = allT(`side.${side}`);
             setErrors(
               response.errors.map(error =>
-                t(error, { documentType, countryName: country.label }),
+                t(error, {
+                  documentType,
+                  countryName: country.label,
+                  side: docSide,
+                }),
               ),
             );
+            if (response.isRetryLimitExceeded) {
+              onRetryLimitExceeded();
+            }
           } else {
             setTimeout(() => {
               onDone(response.nextSideToCollect);

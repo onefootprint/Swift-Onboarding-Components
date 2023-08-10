@@ -26,6 +26,7 @@ export interface Typegen0 {
     | 'docSelection'
     | 'frontImage'
     | 'init'
-    | 'selfie';
+    | 'selfie'
+    | 'tooManyAttempts';
   tags: never;
 }

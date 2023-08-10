@@ -30,8 +30,12 @@ export type MachineEvents =
       type: 'imageSubmitted';
       payload: {
         nextSideToCollect?: UploadDocumentSide;
+        isRetryLimitExceeded?: boolean;
       };
     }
   | {
       type: 'consentCompleted';
+    }
+  | {
+      type: 'retryLimitExceeded';
     };

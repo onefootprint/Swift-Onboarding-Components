@@ -43,10 +43,14 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
             },
           },
         },
+        tooManyAttempts: {},
         frontImage: {
           on: {
             consentCompleted: {
               actions: 'assignConsent',
+            },
+            retryLimitExceeded: {
+              target: 'tooManyAttempts',
             },
             backButtonTapped: {
               target: 'docSelection',
@@ -75,6 +79,9 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
             consentCompleted: {
               actions: 'assignConsent',
             },
+            retryLimitExceeded: {
+              target: 'tooManyAttempts',
+            },
             imageSubmitted: [
               {
                 target: 'selfie',
@@ -93,6 +100,9 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
           on: {
             consentCompleted: {
               actions: 'assignConsent',
+            },
+            retryLimitExceeded: {
+              target: 'tooManyAttempts',
             },
             imageSubmitted: [
               {
