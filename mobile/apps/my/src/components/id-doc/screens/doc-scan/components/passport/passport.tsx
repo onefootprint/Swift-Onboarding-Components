@@ -9,10 +9,15 @@ import Frame from '../default-frame';
 import DocInstructions from '../doc-instructions';
 import Scan from '../scan';
 import ScanContext from '../scan-context';
+import { StepperProps } from '../stepper';
 
 const DEFAULT_ASPECT_RATIO = 1.42;
 
-const Passport = () => {
+type PassportProps = {
+  stepperValues: StepperProps;
+};
+
+const Passport = ({ stepperValues }: PassportProps) => {
   const { t } = useTranslation('components.scan.passport');
   const { country } = useContext(ScanContext);
   const [feedback, setFeedback] = useState('');
@@ -39,12 +44,16 @@ const Passport = () => {
   );
 
   return (
-    <DocInstructions title={t('instructions', { country: country.value3 })}>
+    <DocInstructions
+      title={t('instructions', { country: country.value3 })}
+      stepperValues={stepperValues}
+    >
       <Scan
         feedback={feedback}
         frameProcessor={frameProcessor}
         isObjectDetected={objectedDetected}
         title={t('title')}
+        stepperValues={stepperValues}
       >
         <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
       </Scan>

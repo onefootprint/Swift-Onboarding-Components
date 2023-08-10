@@ -10,12 +10,19 @@ import React, { useState } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
+import Stepper, { StepperProps } from '../stepper';
+
 type DocInstructionsProps = {
   title: string;
   children?: React.ReactNode;
+  stepperValues: StepperProps;
 };
 
-const DocInstructions = ({ title, children }: DocInstructionsProps) => {
+const DocInstructions = ({
+  title,
+  children,
+  stepperValues,
+}: DocInstructionsProps) => {
   const { t } = useTranslation('components.scan.instructions.document');
   const [show, setShow] = useState(false);
   const options = [
@@ -37,6 +44,8 @@ const DocInstructions = ({ title, children }: DocInstructionsProps) => {
     },
   ];
 
+  const { value, max } = stepperValues;
+
   const handleContinue = () => {
     setShow(true);
   };
@@ -48,6 +57,11 @@ const DocInstructions = ({ title, children }: DocInstructionsProps) => {
       <Box flex={1} justifyContent="space-between">
         <Box>
           <Box center>
+            {max > 1 && (
+              <Box paddingTop={5} paddingBottom={8}>
+                <Stepper value={value} max={max} />
+              </Box>
+            )}
             <IcoIdFront40 />
             <Typography variant="heading-3" marginVertical={7} center>
               {title}

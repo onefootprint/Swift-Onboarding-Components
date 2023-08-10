@@ -7,12 +7,17 @@ import { detectFace } from 'vision-camera-plugin-face-detection';
 import useTranslation from '@/hooks/use-translation';
 
 import Camera from '../scan';
+import { StepperProps } from '../stepper';
 import Frame from './components/frame';
 import Instructions from './components/instructions';
 
-const { width, height } = Dimensions.get('window');
+export type SelfieProps = {
+  stepperValues: StepperProps;
+};
 
-const Selfie = () => {
+const Selfie = ({ stepperValues }: SelfieProps) => {
+  const { width, height } = Dimensions.get('window');
+
   const { t } = useTranslation('components.scan.selfie');
   const [feedback, setFeedback] = useState('');
   const [objectedDetected, setObjectDetected] = useState(false);
@@ -55,7 +60,7 @@ const Selfie = () => {
   );
 
   return (
-    <Instructions>
+    <Instructions stepperValues={stepperValues}>
       <Camera
         feedback={feedback}
         frameProcessor={frameProcessor}
@@ -63,6 +68,7 @@ const Selfie = () => {
         size="large"
         title={t('title')}
         type="front"
+        stepperValues={stepperValues}
       >
         <Frame detector={detector} />
       </Camera>

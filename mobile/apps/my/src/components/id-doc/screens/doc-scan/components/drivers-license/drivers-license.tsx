@@ -10,14 +10,16 @@ import Frame from '../default-frame';
 import DocInstructions from '../doc-instructions';
 import Scan from '../scan';
 import ScanContext from '../scan-context';
+import { StepperProps } from '../stepper';
 
 export type DriversLicenseProps = {
   side: UploadDocumentSide;
+  stepperValues: StepperProps;
 };
 
 const DEFAULT_ASPECT_RATIO = 1.586;
 
-const DriversLicense = ({ side }: DriversLicenseProps) => {
+const DriversLicense = ({ side, stepperValues }: DriversLicenseProps) => {
   const { t, allT } = useTranslation('components.scan.drivers-license');
   const { country } = useContext(ScanContext);
   const [feedback, setFeedback] = useState('');
@@ -46,6 +48,7 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
   return (
     <DocInstructions
       title={t(`instructions.${side}`, { country: country.value3 })}
+      stepperValues={stepperValues}
     >
       <Scan
         feedback={feedback}
@@ -53,6 +56,7 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
         isObjectDetected={objectedDetected}
         subtitle={allT(`doc-side.${side}`)}
         title={t('title')}
+        stepperValues={stepperValues}
       >
         <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
       </Scan>

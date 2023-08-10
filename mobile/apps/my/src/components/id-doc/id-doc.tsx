@@ -9,6 +9,7 @@ import React, { useEffect } from 'react';
 import DocScan from './screens/doc-scan';
 import DocSelection from './screens/doc-selection';
 import TooManyAttempts from './screens/too-many-attempts';
+import getStepperValues from './utils/get-stepper-values';
 import createMachine from './utils/state-machine';
 
 export type IdDocProps = {
@@ -23,6 +24,8 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
   const country = getCountryFromCode(
     collectingDocumentMeta?.countryCode ?? DEFAULT_COUNTRY.value,
   );
+  const { shouldCollectSelfie } = requirement;
+  const { type } = collectingDocumentMeta;
 
   useEffect(() => {
     if (state.done) {
@@ -48,11 +51,18 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
       />
     );
   }
+
   if (
     state.matches('frontImage') ||
     state.matches('backImage') ||
     state.matches('selfie')
   ) {
+    const stepperValues = getStepperValues({
+      currentSide,
+      type,
+      shouldCollectSelfie,
+    });
+
     return (
       <DocScan
         docId={collectingDocumentMeta.docId}
@@ -71,6 +81,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
         onConsentCompleted={() => {
           send('consentCompleted');
         }}
+        stepperValues={stepperValues}
         side={currentSide}
         type={collectingDocumentMeta.type}
       />

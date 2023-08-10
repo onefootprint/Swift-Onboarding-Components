@@ -10,14 +10,16 @@ import Frame from '../default-frame';
 import DocInstructions from '../doc-instructions';
 import Scan from '../scan';
 import ScanContext from '../scan-context';
+import { StepperProps } from '../stepper';
 
 export type IdCardProps = {
   side: UploadDocumentSide;
+  stepperValues: StepperProps;
 };
 
 const DEFAULT_ASPECT_RATIO = 1.586;
 
-const IdCard = ({ side }: IdCardProps) => {
+const IdCard = ({ side, stepperValues }: IdCardProps) => {
   const { t, allT } = useTranslation('components.scan.id-card');
   const { country } = useContext(ScanContext);
   const [feedback, setFeedback] = useState('');
@@ -45,8 +47,10 @@ const IdCard = ({ side }: IdCardProps) => {
   return (
     <DocInstructions
       title={t(`instructions.${side}`, { country: country.value3 })}
+      stepperValues={stepperValues}
     >
       <Scan
+        stepperValues={stepperValues}
         feedback={feedback}
         frameProcessor={frameProcessor}
         isObjectDetected={objectedDetected}

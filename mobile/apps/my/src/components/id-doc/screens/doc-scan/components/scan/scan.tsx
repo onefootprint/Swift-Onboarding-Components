@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PhotoFile } from 'react-native-vision-camera';
 
+import { StepperProps } from '../stepper';
 import Camera from './components/camera';
 import Preview from './components/preview';
 import type { ScanSize, ScanType } from './scan.types';
@@ -15,6 +16,7 @@ type ScanProps = {
   title: string;
   subtitle?: string;
   type?: ScanType;
+  stepperValues: StepperProps;
 };
 
 const Scan = ({
@@ -27,6 +29,7 @@ const Scan = ({
   title,
   subtitle,
   type = 'back',
+  stepperValues,
 }: ScanProps) => {
   const [photo, setPhoto] = useState<PhotoFile | null>(null);
   const showPreview = !!photo;
@@ -46,6 +49,7 @@ const Scan = ({
       size={size}
       subtitle={subtitle}
       title={title}
+      stepperValues={stepperValues}
     />
   ) : (
     <Camera

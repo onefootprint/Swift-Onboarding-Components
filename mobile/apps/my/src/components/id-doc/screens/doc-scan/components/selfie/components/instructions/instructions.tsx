@@ -9,11 +9,14 @@ import React, { useState } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
+import Stepper, { type StepperProps } from '../../../stepper';
+
 type InstructionsProps = {
   children?: React.ReactNode;
+  stepperValues: StepperProps;
 };
 
-const Instructions = ({ children }: InstructionsProps) => {
+const Instructions = ({ children, stepperValues }: InstructionsProps) => {
   const { t } = useTranslation('components.scan.instructions.selfie');
   const [show, setShow] = useState(false);
   const options = [
@@ -31,6 +34,7 @@ const Instructions = ({ children }: InstructionsProps) => {
     },
   ];
 
+  const { value, max } = stepperValues;
   const handleContinue = () => {
     setShow(true);
   };
@@ -42,6 +46,11 @@ const Instructions = ({ children }: InstructionsProps) => {
       <Box flex={1} justifyContent="space-between">
         <Box>
           <Box center>
+            {max > 1 && (
+              <Box paddingTop={5} paddingBottom={8}>
+                <Stepper value={value} max={max} />
+              </Box>
+            )}
             <IcoSelfie40 />
             <Typography variant="heading-3" marginVertical={7} center>
               {t('title')}

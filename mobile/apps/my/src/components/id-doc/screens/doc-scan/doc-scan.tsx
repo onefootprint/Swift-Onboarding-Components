@@ -16,6 +16,7 @@ import Passport from './components/passport';
 import Context from './components/scan-context';
 import Selfie from './components/selfie';
 import ConsentDialog from './components/selfie/components/consent-dialog';
+import { StepperProps } from './components/stepper';
 import useUploadDoc from './hooks/use-upload-doc';
 
 export type DocScanProps = {
@@ -28,6 +29,7 @@ export type DocScanProps = {
   docId: string;
   requirement: IdDocRequirement;
   onConsentCompleted: () => void;
+  stepperValues: StepperProps;
 };
 
 const delayToShowConsentMS = 500;
@@ -42,6 +44,7 @@ const DocScan = ({
   requirement,
   onConsentCompleted,
   onRetryLimitExceeded,
+  stepperValues,
 }: DocScanProps) => {
   const { t, allT } = useTranslation('components.scan.preview.errors');
   const [errors, setErrors] = useState([]);
@@ -123,15 +126,20 @@ const DocScan = ({
       {showConsent && (
         <ConsentDialog authToken={authToken} onCompleted={onConsentCompleted} />
       )}
+
       {side === UploadDocumentSide.Selfie ? (
-        <Selfie />
+        <Selfie stepperValues={stepperValues} />
       ) : (
         <>
           {type === SupportedIdDocTypes.driversLicense && (
-            <DriversLicense side={side} />
+            <DriversLicense side={side} stepperValues={stepperValues} />
           )}
-          {type === SupportedIdDocTypes.idCard && <IdCard side={side} />}
-          {type === SupportedIdDocTypes.passport && <Passport />}
+          {type === SupportedIdDocTypes.idCard && (
+            <IdCard side={side} stepperValues={stepperValues} />
+          )}
+          {type === SupportedIdDocTypes.passport && (
+            <Passport stepperValues={stepperValues} />
+          )}
         </>
       )}
     </Context.Provider>
