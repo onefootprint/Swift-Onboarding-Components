@@ -170,7 +170,7 @@ pub async fn post(
                 if missing_sides.is_empty() {
                     let fixture = id_doc.fixture_result;
                     // Create fixture data once all of the sides are uploaded
-                    let ocr = decision::utils::fixture_ocr_response_for_incode(ocr_fixture)?;
+                    let ocr = decision::utils::fixture_ocr_response_for_incode(ocr_fixture.clone())?;
                     let doc_type = request.document_type.into();
 
                     // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals
@@ -194,7 +194,7 @@ pub async fn post(
                         doc_type,
                         ocr,
                         fake_score_response,
-                        IncodeOcrComparisonDataFields::default(),
+                        ocr_fixture.unwrap_or(IncodeOcrComparisonDataFields::default()),
                         doc_request.should_collect_selfie,
                         vres.id.clone(),
                         vres.id,
