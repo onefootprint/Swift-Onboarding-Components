@@ -167,6 +167,8 @@ export const doLivenessCheck = async (
     .screenshot({ path: `./src/media/qr-${flowId}.png` });
 
   const screenshotPath = path.join(__dirname, `../media/qr-${flowId}.png`);
+  expect(screenshotPath).toBeDefined();
+
   const qrCodeUrl = await readQrCode(screenshotPath);
   const popup = await browser.newPage();
   await popup.goto(qrCodeUrl);
