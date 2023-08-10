@@ -85,7 +85,6 @@ async fn kyc_bo(state: &mut State, person_ob: &Onboarding) {
                     create_manual_review: false,
                     vendor_api: VendorAPI::MiddeskBusinessUpdateWebhook,
                 },
-                true,
                 Some(wfid),
                 vec![],
             )

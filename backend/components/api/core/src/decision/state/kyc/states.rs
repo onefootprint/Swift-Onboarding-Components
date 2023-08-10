@@ -260,7 +260,6 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 .map(|vr| vr.verification_result_id.clone())
                 .collect(),
             decision.into(),
-            self.is_redo,
             fixture_decision.is_some(),
             vec![],
         )?;

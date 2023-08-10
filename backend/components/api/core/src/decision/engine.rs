@@ -289,7 +289,6 @@ pub fn save_onboarding_decision(
     ob: &Onboarding,
     rules_output: OnboardingRulesDecision,
     verification_result_ids: Vec<VerificationResultId>,
-    assert_is_first_decision_for_onboarding: bool,
     is_sandbox: bool,
     workflow_id: Option<WorkflowId>,
     review_reasons: Vec<ReviewReason>,
@@ -301,7 +300,6 @@ pub fn save_onboarding_decision(
         ob.id.clone(),
         verification_result_ids,
         &final_decision.decision,
-        assert_is_first_decision_for_onboarding,
         workflow_id,
         review_reasons,
     )?;

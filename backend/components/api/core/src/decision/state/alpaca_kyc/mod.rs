@@ -64,6 +64,7 @@ impl HasRuleGroup for AlpacaKycDecisioning {
 #[derive(Clone)]
 pub struct AlpacaKycWatchlistCheck {
     wf_id: WorkflowId, // TODO: make a common ctx type of dealio for all these shared things each state is using
+    #[allow(unused)]
     is_redo: bool,
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,

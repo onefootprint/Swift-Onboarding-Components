@@ -232,7 +232,6 @@ async fn make_decision(
                 &ob,
                 rules_output.into(),
                 verification_result_ids,
-                false,
                 is_sandbox,
                 Some(wf.id.clone()),
                 vec![],

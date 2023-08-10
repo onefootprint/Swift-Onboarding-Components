@@ -290,7 +290,6 @@ pub fn save_kyc_decision(
     workflow_id: &WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
     rules_output: OnboardingRulesDecision,
-    is_redo: bool,
     is_sandbox: bool,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
@@ -300,7 +299,6 @@ pub fn save_kyc_decision(
         &ob,
         rules_output,
         verification_result_ids,
-        !is_redo, // TODO: refactor this completely and just don't update or assert an Onboarding stuff is is_redo. later, remove Onboarding compeltely
         is_sandbox,
         Some(workflow_id.clone()),
         review_reasons,

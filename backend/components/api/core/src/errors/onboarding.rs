@@ -16,8 +16,6 @@ pub enum OnboardingError {
     NoWorkflow,
     #[error("IDV reqs have already been initiated")]
     IdvReqsAlreadyInitiated,
-    #[error("Onboarding does not need a decision")]
-    OnboardingDecisionNotNeeded,
     #[error("Tenant does not match")]
     TenantMismatch,
     #[error("Unmet onboarding requirements: {0}")]

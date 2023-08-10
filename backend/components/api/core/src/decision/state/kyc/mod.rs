@@ -47,6 +47,7 @@ pub struct KycVendorCalls {
 #[derive(Clone)]
 pub struct KycDecisioning {
     wf_id: WorkflowId,
+    #[allow(unused)]
     is_redo: bool,
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,

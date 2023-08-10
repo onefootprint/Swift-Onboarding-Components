@@ -40,16 +40,7 @@ pub async fn make_kyb_decision(
                 .collect();
             let _rs = RiskSignal::bulk_create(conn, &sv.id, risk_signals, RiskSignalGroupKind::Kyb, false)?;
 
-            engine::save_onboarding_decision(
-                conn,
-                &ob,
-                rules_output,
-                vec![vresid],
-                true,
-                false,
-                None,
-                vec![],
-            )?;
+            engine::save_onboarding_decision(conn, &ob, rules_output, vec![vresid], false, None, vec![])?;
             Ok(())
         })
         .await?;

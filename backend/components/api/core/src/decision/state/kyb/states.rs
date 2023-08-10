@@ -368,7 +368,6 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             &self.wf_id,
             vres_ids,
             decision,
-            false, // dont support redo KYB at the moment
             fixture_decision.is_some(),
             vec![],
         )?;
