@@ -1,1 +1,0 @@
-CREATE UNIQUE INDEX unique_scoped_vault_per_tenant_vault ON scoped_vault (tenant_id, vault_id);

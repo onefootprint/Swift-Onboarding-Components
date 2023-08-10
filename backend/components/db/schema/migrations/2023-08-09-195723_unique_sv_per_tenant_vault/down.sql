@@ -1,1 +1,0 @@
-DROP INDEX unique_scoped_vault_per_tenant_vault;
