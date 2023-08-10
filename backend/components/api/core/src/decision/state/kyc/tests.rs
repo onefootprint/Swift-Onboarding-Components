@@ -34,7 +34,7 @@ use newtypes::{KycState, WorkflowFixtureResult, WorkflowId, WorkflowState};
 use std::sync::Arc;
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
-    let (_, _, _, _, sv, _) = test_helpers::create_kyc_user_and_onboarding(
+    let (_, _, _, sv, _) = test_helpers::create_kyc_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         None,
@@ -248,7 +248,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 
     let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
-    assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Pass, ob.status);
     assert!(obd.unwrap().seqno.is_some());
     assert!(mr.is_none());
 
@@ -428,7 +428,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     assert!(obd.status == DecisionStatus::Fail);
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert!(obd.seqno.is_none());
-    assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(ob.decision_made_at.is_some());
     if expect_review {
         assert!(mr.is_some());
@@ -589,7 +589,7 @@ async fn redo_and_pass(
     assert!(obd.status == DecisionStatus::Pass);
     assert!(obd.seqno.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
-    assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Pass, ob.status);
     // redo flow hasn't modified timestamps on ob
     assert!(prior_ob.authorized_at == ob.authorized_at);
     assert!(prior_ob.idv_reqs_initiated_at == ob.idv_reqs_initiated_at);

@@ -299,7 +299,7 @@ mod tests {
             DecisionIntentKind::OnboardingKyc,
         )
         .unwrap();
-        let (ob, _) = fixtures::onboarding::create(conn, sv.id.clone(), obc.id, None);
+        let ob = fixtures::onboarding::create(conn, sv.id.clone(), obc.id, None);
         let ob = Onboarding::lock(conn, &ob.id).unwrap();
 
         (sv, di, ob)

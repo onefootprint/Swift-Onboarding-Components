@@ -39,7 +39,7 @@ pub struct ScopedVault {
     pub is_live: bool,
     // Only null when the vault is non-portable
     // TODO deprecate
-    ob_configuration_id: Option<ObConfigurationId>,
+    pub ob_configuration_id: Option<ObConfigurationId>,
     pub status: Option<OnboardingStatus>,
 }
 

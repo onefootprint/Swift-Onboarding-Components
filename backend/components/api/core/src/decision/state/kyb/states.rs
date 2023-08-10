@@ -365,7 +365,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             conn,
             &self.ob_id,
             &sv.id,
-            &wf,
+            &self.wf_id,
             vres_ids,
             decision,
             fixture_decision.is_some(),

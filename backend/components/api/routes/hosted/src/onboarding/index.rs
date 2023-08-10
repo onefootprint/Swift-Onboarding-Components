@@ -69,7 +69,7 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (_, wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
+            let (_, wf, biz_ob) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
                 &scoped_user.vault_id,
                 &scoped_user.id,
@@ -88,9 +88,9 @@ pub async fn post(
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
-            if let Some(biz_wf) = biz_wf {
+            if let Some(biz_ob) = biz_ob {
                 // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
-                new_scopes.push(UserAuthScope::Business(biz_wf.scoped_vault_id));
+                new_scopes.push(UserAuthScope::Business(biz_ob.scoped_vault_id));
             }
             let data = user_auth.data.clone().session_with_added_scopes(new_scopes);
             user_auth.update_session(conn, &session_key, data)?;

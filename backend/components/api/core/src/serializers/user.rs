@@ -13,10 +13,10 @@ impl DbToApi<ScopedVault> for api_wire_types::UserId {
 }
 
 impl DbToApi<BasicOnboardingInfo<Onboarding>> for api_wire_types::User {
-    fn from_db((_, sv, manual_review, _): BasicOnboardingInfo<Onboarding>) -> Self {
+    fn from_db((ob, sv, manual_review, _): BasicOnboardingInfo<Onboarding>) -> Self {
         Self {
             id: sv.fp_id,
-            status: sv.status,
+            status: ob.status,
             requires_manual_review: manual_review.is_some(),
         }
     }

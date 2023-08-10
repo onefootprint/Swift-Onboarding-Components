@@ -180,7 +180,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             conn,
             &self.ob_id,
             &self.sv_id,
-            &wf,
+            &self.wf_id,
             vendor_results
                 .into_iter()
                 .map(|vr| vr.verification_result_id)

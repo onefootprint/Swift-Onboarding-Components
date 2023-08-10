@@ -79,7 +79,7 @@ pub async fn post(
                 return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
             }
 
-            let (ob, wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
+            let (ob, wf, biz_ob) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
                 &sv.vault_id,
                 &sv.id,
@@ -119,7 +119,7 @@ pub async fn post(
                     ob_config: obc.clone(),
                     onboarding: ob,
                     workflow: Some(wf.clone()),
-                    sb_id: biz_wf.map(|ob| ob.scoped_vault_id),
+                    sb_id: biz_ob.map(|ob| ob.scoped_vault_id),
                 },
                 None, // /kyc endpoint currently does not properly handle IPK doc requirements!
                 ff_client,

@@ -80,14 +80,14 @@ pub fn create_user_and_onboarding(
     let (uv, su) = create_user_and_populate_vault(conn, is_live, tenant_id, Some(ob_config), idks);
 
     let suid = su.id.clone();
-    let (ob, wf) = fixtures::onboarding::create(conn, suid, ob_config_id, None);
-    let ob = Onboarding::lock(conn, &ob.id).unwrap();
+    let onboarding = fixtures::onboarding::create(conn, suid, ob_config_id, None);
+    let ob = Onboarding::lock(conn, &onboarding.id).unwrap();
     let update = OnboardingUpdate {
         status: Some(onboarding_status),
         ..Default::default()
     };
-    let onboarding = Onboarding::update(ob, conn, Some(&wf.id), update).unwrap();
-    let wf = Workflow::get(conn, &wf.id).unwrap();
+    let onboarding = Onboarding::update(ob, conn, Some(&onboarding.workflow_id), update).unwrap();
+    let wf = Workflow::get(conn, &onboarding.workflow_id).unwrap();
 
     (tenant, onboarding, uv, su, wf)
 }

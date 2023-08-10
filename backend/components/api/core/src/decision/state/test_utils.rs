@@ -104,7 +104,7 @@ pub async fn setup_data(
 ) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
     // TODO: create sandbox vs demo vs real, diff sandbox fixues
     let is_live = matches!(user_kind, UserKind::Live | UserKind::Demo);
-    let (tenant, _, wf, _, _, obc) = test_helpers::create_kyc_user_and_onboarding(
+    let (tenant, ob, _, _, obc) = test_helpers::create_kyc_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         Some(vec![CDO::PhoneNumber, CDO::FullAddress]), // so we can meet min req for kyc vendor calls
@@ -115,13 +115,16 @@ pub async fn setup_data(
     .await;
 
     let tid = tenant.id.clone();
-    let tu = state
+    let (wf, tu) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // only enable Idology for this dummy test merchant
             TenantVendorControl::create(conn, tid, true, false, None, None).unwrap();
+
             let tu = fixtures::tenant_user::create(conn);
-            Ok(tu)
+
+            let wf = Workflow::get(conn, &ob.workflow_id).unwrap();
+            Ok((wf, tu))
         })
         .await
         .unwrap();
@@ -148,9 +151,10 @@ pub async fn query_data(
     state
         .db_pool
         .db_query(move |conn| {
-            let (ob, _, mr, obd) = Onboarding::get(conn, &svid).unwrap();
+            let sv = ScopedVault::get(conn, &svid).unwrap();
+            let (ob, _, mr, obd) = Onboarding::get(conn, (&sv.id, &sv.vault_id)).unwrap();
 
-            let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, IncludeHidden(false))
+            let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, IncludeHidden(false))
                 .unwrap()
                 .into_iter()
                 .map(|(_, rs)| rs)

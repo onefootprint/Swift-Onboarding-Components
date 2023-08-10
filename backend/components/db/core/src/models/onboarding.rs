@@ -30,19 +30,17 @@ pub type IsNew = bool;
 pub struct Onboarding {
     pub id: OnboardingId,
     pub scoped_vault_id: ScopedVaultId,
-    // TODO rm
-    ob_configuration_id: ObConfigurationId,
+    pub ob_configuration_id: ObConfigurationId,
     pub start_timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-
-    // TODO get rid of these
     pub insight_event_id: Option<InsightEventId>,
     pub authorized_at: Option<DateTime<Utc>>,
     pub idv_reqs_initiated_at: Option<DateTime<Utc>>,
     pub decision_made_at: Option<DateTime<Utc>>,
-    status: OnboardingStatus,
-    workflow_id: WorkflowId,
+    pub status: OnboardingStatus,
+    // TODO get rid of this
+    pub workflow_id: WorkflowId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -126,7 +124,8 @@ impl OnboardingUpdate {
 pub enum OnboardingIdentifier<'a> {
     Id(&'a OnboardingId),
     ScopedVaultId {
-        sv_id: &'a ScopedVaultId,
+        su_id: &'a ScopedVaultId,
+        vault_id: &'a VaultId,
     },
     ScopedBusinessId {
         sb_id: &'a ScopedVaultId,
@@ -150,9 +149,10 @@ impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
     }
 }
 
-impl<'a> From<&'a ScopedVaultId> for OnboardingIdentifier<'a> {
-    fn from(sv_id: &'a ScopedVaultId) -> Self {
-        Self::ScopedVaultId { sv_id }
+// TODO change this to su_id, vault_id?
+impl<'a> From<(&'a ScopedVaultId, &'a VaultId)> for OnboardingIdentifier<'a> {
+    fn from((su_id, vault_id): (&'a ScopedVaultId, &'a VaultId)) -> Self {
+        Self::ScopedVaultId { su_id, vault_id }
     }
 }
 
@@ -195,8 +195,10 @@ impl Onboarding {
 
         match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
-            OnboardingIdentifier::ScopedVaultId { sv_id } => {
-                query = query.filter(onboarding::scoped_vault_id.eq(sv_id))
+            OnboardingIdentifier::ScopedVaultId { su_id, vault_id } => {
+                query = query
+                    .filter(onboarding::scoped_vault_id.eq(su_id))
+                    .filter(scoped_vault::vault_id.eq(vault_id))
             }
             OnboardingIdentifier::ScopedBusinessId { sb_id, vault_id } => {
                 let business_vault_ids = business_owner::table

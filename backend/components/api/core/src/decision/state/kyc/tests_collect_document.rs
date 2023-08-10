@@ -145,7 +145,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     }
 
     assert!(matches!(obd.actor, DbActor::Footprint));
-    assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Fail, ob.status);
     assert!(ob.decision_made_at.is_some());
     if doc_upload_failed {
         assert!(mr.is_some());
@@ -290,7 +290,7 @@ async fn redo_document_and_pass(
         assert!(obd.seqno.is_none())
     };
     assert!(matches!(obd.actor, DbActor::Footprint));
-    assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Pass, ob.status);
     // redo flow hasn't modified timestamps on ob
     assert!(prior_ob.authorized_at == ob.authorized_at);
     assert!(prior_ob.idv_reqs_initiated_at == ob.idv_reqs_initiated_at);

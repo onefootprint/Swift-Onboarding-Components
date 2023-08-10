@@ -31,7 +31,7 @@ pub fn get_or_start_onboarding(
     obc: &ObConfiguration,
     insight_event: Option<CreateInsightEvent>,
     new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
-) -> ApiResult<(Onboarding, Workflow, Option<Workflow>)> {
+) -> ApiResult<(Onboarding, Workflow, Option<Onboarding>)> {
     let user_vault = Vault::lock(conn, v_id)?;
 
     // Create the onboarding for this scoped user
@@ -76,7 +76,7 @@ pub fn get_or_start_onboarding(
     // If the ob config has business fields, create a business vault, scoped vault, and ob
     let biz_ob = if let Some(new_biz_args) = new_biz_args {
         let existing_businesses = BusinessOwner::list_businesses(conn, &user_vault.id, &obc.id)?;
-        let biz_wf = if let Some(existing) = existing_businesses.into_iter().next() {
+        let biz_ob = if let Some(existing) = existing_businesses.into_iter().next() {
             // If the user has already started onboarding their business onto this exact
             // ob config, we should locate it.
             // Note, this isn't quite portablizing the business since we only locate it
@@ -100,10 +100,10 @@ pub fn get_or_start_onboarding(
                 ob_configuration_id: obc.id.clone(),
                 insight_event,
             };
-            let (_, biz_wf, _) = Onboarding::get_or_create(conn, ob_create_args, fixture_result)?;
-            biz_wf
+            let (biz_ob, _, _) = Onboarding::get_or_create(conn, ob_create_args, fixture_result)?;
+            biz_ob
         };
-        Some(biz_wf)
+        Some(biz_ob)
     } else {
         None
     };

@@ -30,8 +30,7 @@ pub async fn detail(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            // TODO get all manual reviews for the scoped vault
-            let basic_onboarding_info = Onboarding::get(conn, &sv.id)?;
+            let basic_onboarding_info = Onboarding::get(conn, (&sv.id, &sv.vault_id))?;
             Ok(basic_onboarding_info)
         })
         .await??;

@@ -18,6 +18,7 @@ use db::models::onboarding::Onboarding;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow as DbWorkflow;
 use db::tests::test_db_pool::TestDbPool;
+use db::DbResult;
 use feature_flag::BoolFlag;
 use feature_flag::MockFeatureFlagClient;
 use itertools::Itertools;
@@ -34,9 +35,9 @@ use std::sync::Arc;
 async fn setup(
     state: &State,
     fixture_result: Option<WorkflowFixtureResult>,
-) -> (DbWorkflow, Tenant, ObConfiguration, (Onboarding, DbWorkflow)) {
+) -> (DbWorkflow, Tenant, ObConfiguration, Onboarding) {
     let is_live = fixture_result.is_none();
-    let (t, ob, wf, _v, _sv, obc, biz_wf) = test_helpers::create_kyb_user_and_onboarding(
+    let (t, ob, _v, _sv, obc, sbv) = test_helpers::create_kyb_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         None,
@@ -45,10 +46,21 @@ async fn setup(
     )
     .await;
 
-    (biz_wf, t, obc, (ob, wf))
+    let sb_svid = sbv.id.clone();
+    let sb_vid = sbv.vault_id.clone();
+    let wf = state
+        .db_pool
+        .db_transaction(move |conn| -> DbResult<_> {
+            let (ob, _, _, _) = Onboarding::get(conn, (&sb_svid, &sb_vid)).unwrap();
+            Ok(DbWorkflow::get(conn, &ob.workflow_id).unwrap())
+        })
+        .await
+        .unwrap();
+
+    (wf, t, obc, ob)
 }
 
-async fn kyc_bo(state: &mut State, person_ob: &Onboarding, person_wf: &DbWorkflow) {
+async fn kyc_bo(state: &mut State, person_ob: &Onboarding) {
     mock_webhooks(
         state,
         vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
@@ -59,7 +71,7 @@ async fn kyc_bo(state: &mut State, person_ob: &Onboarding, person_wf: &DbWorkflo
     );
 
     let obid = person_ob.id.clone();
-    let wfid = person_wf.id.clone();
+    let wfid = person_ob.workflow_id.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -107,7 +119,7 @@ async fn authorize(state: &mut State) {
 #[tokio::test(flavor = "multi_thread")]
 async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
     // SETUP
-    let (wf, tenant, _, (person_ob, person_wf)) = setup(state, Some(fixture_result)).await;
+    let (wf, tenant, _, person_ob) = setup(state, Some(fixture_result)).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
@@ -125,7 +137,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
     state.set_ff_client(Arc::new(mock_ff_client));
 
     // BoKycCompleted
-    kyc_bo(state, &person_ob, &person_wf).await;
+    kyc_bo(state, &person_ob).await;
     mock_webhooks(
         state,
         vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
@@ -143,7 +155,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
 
     let (ob, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::VendorCalls), wf.state);
-    assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Pending, ob.status);
     assert!(ob.idv_reqs_initiated_at.is_none());
     assert!(ob.decision_made_at.is_none());
 
@@ -202,7 +214,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
     assert!(ob.decision_made_at.is_some());
     assert!(mr.is_none());
-    assert_eq!(expected_status, wf.status.unwrap());
+    assert_eq!(expected_status, ob.status);
 }
 
 #[test_state_case(TerminalDecisionStatus::Pass)]
@@ -210,7 +222,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
 #[tokio::test(flavor = "multi_thread")]
 async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     // SETUP
-    let (wf, tenant, obc, (person_ob, person_wf)) = setup(state, None).await;
+    let (wf, tenant, obc, person_ob) = setup(state, None).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
@@ -236,7 +248,7 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     state.set_ff_client(Arc::new(mock_ff_client));
 
     // BoKycCompleted
-    kyc_bo(state, &person_ob, &person_wf).await;
+    kyc_bo(state, &person_ob).await;
     mock_webhooks(
         state,
         vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
@@ -254,7 +266,7 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
 
     let (ob, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::VendorCalls), wf.state);
-    assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Pending, ob.status);
     assert!(ob.idv_reqs_initiated_at.is_none());
     assert!(ob.decision_made_at.is_none());
 
@@ -321,11 +333,11 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     match terminal_status {
         TerminalDecisionStatus::Pass => {
             assert!(mr.is_none());
-            assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
+            assert_eq!(OnboardingStatus::Pass, ob.status);
         }
         TerminalDecisionStatus::Fail => {
             assert!(mr.is_some());
-            assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
+            assert_eq!(OnboardingStatus::Fail, ob.status);
             expected_rs.push((
                 VendorAPI::MiddeskBusinessUpdateWebhook,
                 FootprintReasonCode::BusinessNameWatchlistHit,

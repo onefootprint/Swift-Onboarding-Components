@@ -14,7 +14,7 @@ use db::models::business_owner::BusinessOwner;
 use db::models::onboarding::Onboarding;
 use db::models::tenant::Tenant;
 use futures::FutureExt;
-use newtypes::{BusinessOwnerKind, OnboardingStatus, PiiString};
+use newtypes::{BusinessOwnerKind, PiiString};
 
 /// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form
 pub async fn send_secondary_bo_links(
@@ -119,11 +119,6 @@ pub async fn should_run_kyb(state: &State, biz_ob: &Onboarding, tenant: &Tenant)
         .decrypt_business_owners(&state.db_pool, &state.enclave_client, &tenant.id)
         .await?;
 
-    let has_decision = |s: Option<OnboardingStatus>| match s {
-        None => false,
-        Some(s) => s.has_decision(),
-    };
-
     let bo_kyc_is_complete = match dbo {
         DecryptedBusinessOwners::KYBStart {
             primary_bo: _,
@@ -140,7 +135,7 @@ pub async fn should_run_kyb(state: &State, biz_ob: &Onboarding, tenant: &Tenant)
             secondary_bos: _,
         } => {
             tracing::info!(?biz_ob, primary_bo_ob=?primary_bo_vault.2, "[should_run_kyb] SingleKYC");
-            has_decision(primary_bo_vault.0.status)
+            primary_bo_vault.2.status.has_decision()
         }
         // For Multi-KYC KYB, we need the primary BO and all secondary BOs to have completed KYC
         DecryptedBusinessOwners::MultiKYC {
@@ -157,10 +152,10 @@ pub async fn should_run_kyb(state: &State, biz_ob: &Onboarding, tenant: &Tenant)
                 let secondary_bos = secondary_bos.iter().map(|bo| bo.1.clone()).collect();
                 send_secondary_bo_links(state, &bvw, tenant, secondary_bos).await?;
             }
-            has_decision(primary_bo_vault.0.status)
+            primary_bo_vault.2.status.has_decision()
                 && secondary_bos
                     .into_iter()
-                    .all(|b| b.2.map(|d| has_decision(d.0.status)).unwrap_or(false))
+                    .all(|b| b.2.map(|d| d.2.status.has_decision()).unwrap_or(false))
         }
     };
 
