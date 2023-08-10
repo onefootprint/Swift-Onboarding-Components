@@ -91,12 +91,11 @@ pub async fn post(
 
             // TODO: consolidate with /authorize code
             let ob = Onboarding::lock(conn, &ob.id)?;
-            let (ob, wf) = if ob.authorized_at.is_none() {
-                let ob = Onboarding::update(ob, conn, Some(&wf.id), OnboardingUpdate::is_authorized())?;
-                let wf = Workflow::get(conn, &wf.id)?;
-                (ob, wf)
+            let wf = if ob.authorized_at.is_none() {
+                Onboarding::update(ob, conn, Some(&wf.id), OnboardingUpdate::is_authorized())?;
+                Workflow::get(conn, &wf.id)? // refresh from DB
             } else {
-                (ob.into_inner(), wf)
+                wf
             };
 
             let _ = NewLivenessEvent {
@@ -112,18 +111,13 @@ pub async fn post(
                     TenantError::UnsupportedObcForNpv("Investor Profile not allowed".to_owned()).into(),
                 );
             }
-            let reqs = get_requirements_inner(
-                conn,
-                uvw,
-                GetRequirementsArgs {
-                    ob_config: obc.clone(),
-                    onboarding: ob,
-                    workflow: Some(wf.clone()),
-                    sb_id: biz_wf.map(|ob| ob.scoped_vault_id),
-                },
-                None, // /kyc endpoint currently does not properly handle IPK doc requirements!
-                ff_client,
-            )?;
+            let args = GetRequirementsArgs {
+                ob_config: obc.clone(),
+                workflow: wf.clone(),
+                sb_id: biz_wf.map(|ob| ob.scoped_vault_id),
+            };
+            // /kyc endpoint currently does not properly handle IPK doc requirements!
+            let reqs = get_requirements_inner(conn, uvw, args, None, ff_client)?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs
                 .into_iter()

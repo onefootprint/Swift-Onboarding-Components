@@ -32,10 +32,7 @@ pub async fn post(
     } = request.into_inner();
 
     let su_id = user_auth.scoped_user.id.clone();
-    let wf_id = user_auth
-        .workflow()
-        .map(|wf| wf.id.clone())
-        .ok_or(OnboardingError::NoWorkflow)?;
+    let wf_id = user_auth.workflow()?.id.clone();
     let id_doc = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {

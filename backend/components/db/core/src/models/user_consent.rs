@@ -58,25 +58,8 @@ impl UserConsent {
         Ok(new_user_consent)
     }
 
-    #[tracing::instrument("UserConsent::latest_for_onboarding", skip_all)]
-    pub fn latest_for_onboarding(
-        conn: &mut PgConn,
-        onboarding_id: &OnboardingId,
-    ) -> DbResult<Option<UserConsent>> {
-        let res = user_consent::table
-            .filter(user_consent::onboarding_id.eq(onboarding_id))
-            .order_by(user_consent::timestamp.desc())
-            .first(conn)
-            .optional()?;
-
-        Ok(res)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub fn latest_for_scoped_vault(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-    ) -> DbResult<Option<UserConsent>> {
+    #[tracing::instrument("UserConsent::latest", skip_all)]
+    pub fn latest(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<UserConsent>> {
         let res = scoped_vault::table
             .filter(scoped_vault::id.eq(scoped_vault_id))
             .inner_join(onboarding::table.inner_join(user_consent::table))

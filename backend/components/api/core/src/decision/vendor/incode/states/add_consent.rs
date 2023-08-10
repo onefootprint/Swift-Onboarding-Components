@@ -30,7 +30,7 @@ impl IncodeStateTransition for AddConsent {
         };
         let sv_id = ctx.sv_id.clone();
         let consent = db_pool
-            .db_query(move |conn| UserConsent::latest_for_scoped_vault(conn, &sv_id))
+            .db_query(move |conn| UserConsent::latest(conn, &sv_id))
             .await??
             .ok_or(AssertionError("User consent not found"))?;
         let privacy_request = IncodeAddPrivacyConsentRequest {

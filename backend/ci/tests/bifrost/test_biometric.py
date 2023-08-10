@@ -39,7 +39,11 @@ def test_d2p_biometric(twilio, sandbox_tenant):
     post("hosted/onboarding/d2p/generate", None, bifrost.auth_token)
     post("hosted/onboarding/d2p/generate", dict(), bifrost.auth_token)
     # Get new auth token in d2p/generate endpoint
-    meta = dict(opener="mobile", style_params="lots of CSS things", sandbox_id_doc_outcome="success")
+    meta = dict(
+        opener="mobile",
+        style_params="lots of CSS things",
+        sandbox_id_doc_outcome="success",
+    )
     body = post("hosted/onboarding/d2p/generate", dict(meta=meta), bifrost.auth_token)
     d2p_auth_token = FpAuth(body["auth_token"])
 
@@ -114,4 +118,4 @@ def test_identify_login_repeat_customer_biometric(sandbox_user):
     auth_token = inherit_user_biometric(sandbox_user)
 
     # Should be able to use the auth token
-    get("hosted/onboarding/status", None, auth_token)
+    post("hosted/onboarding", None, auth_token)

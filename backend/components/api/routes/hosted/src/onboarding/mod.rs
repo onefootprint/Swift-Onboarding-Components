@@ -9,8 +9,8 @@ use api_core::{
 use db::{
     models::{
         document_request::DocumentRequest, identity_document::IdentityDocument,
-        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, onboarding::Onboarding,
-        user_consent::UserConsent, workflow::Workflow,
+        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, user_consent::UserConsent,
+        workflow::Workflow,
     },
     PgConn,
 };
@@ -55,8 +55,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
 
 pub struct GetRequirementsArgs {
     pub ob_config: ObConfiguration,
-    pub onboarding: Onboarding,
-    pub workflow: Option<Workflow>,
+    pub workflow: Workflow,
     pub sb_id: Option<ScopedVaultId>,
 }
 
@@ -64,8 +63,7 @@ impl GetRequirementsArgs {
     fn from(value: &CheckedUserObAuthContext) -> ApiResult<Self> {
         Ok(Self {
             ob_config: value.ob_config()?.clone(),
-            onboarding: value.onboarding()?.clone(),
-            workflow: value.workflow().cloned(),
+            workflow: value.workflow()?.clone(),
             sb_id: value.scoped_business_id(),
         })
     }
@@ -81,7 +79,7 @@ pub async fn get_requirements(
     args: GetRequirementsArgs,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     // Fetch the UVW and use it to decrypt IPK::Declarations, if they exist
-    let su_id = args.onboarding.scoped_vault_id.clone();
+    let su_id = args.workflow.scoped_vault_id.clone();
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -146,11 +144,7 @@ pub fn get_requirements_inner(
     let only_us_dl = ff_client.flag(BoolFlag::RestrictToUsDriversLicense(&args.ob_config.tenant_id));
 
     // Depending on the workflow that we are running, we only want to show a subset of requirements
-    let relevant_requirement_kinds = args
-        .workflow
-        .as_ref()
-        .map(|wf| wf.state.relevant_requirements())
-        .unwrap_or_else(|| OnboardingRequirementKind::iter().collect());
+    let relevant_requirement_kinds = args.workflow.state.relevant_requirements();
 
     // For each requirement kind that might be shown by this workflow, generate a requirement if
     // necessary
@@ -162,7 +156,7 @@ pub fn get_requirements_inner(
         .flatten()
         .collect();
 
-    tracing::info!(onboarding_id=%args.onboarding.id, requirements=%format!("{:?}", requirements), scoped_user_id=%args.onboarding.scoped_vault_id, "get_requirements result");
+    tracing::info!(workflow_id=%args.workflow.id, requirements=%format!("{:?}", requirements), scoped_user_id=%args.workflow.scoped_vault_id, "get_requirements result");
 
     Ok(requirements)
 }
@@ -247,13 +241,9 @@ fn get_requirement_inner(
                 .then_some(OnboardingRequirement::Liveness)
         }
         OnboardingRequirementKind::CollectDocument => {
-            let wf_id = args.workflow.as_ref().map(|wf| &wf.id);
-            let dr = wf_id
-                .map(|wf_id| DocumentRequest::get(conn, wf_id))
-                .transpose()?
-                .flatten();
+            let dr = DocumentRequest::get(conn, &args.workflow.id)?;
             if let Some(dr) = dr {
-                let user_consent = UserConsent::latest_for_onboarding(conn, &args.onboarding.id)?;
+                let user_consent = UserConsent::latest(conn, &args.workflow.scoped_vault_id)?;
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
                 // Show a CollectDocument requirement if there's no id_document or the existing
                 // id_document is still Pending
@@ -281,13 +271,10 @@ fn get_requirement_inner(
             }
         }
         OnboardingRequirementKind::Authorize => {
-            // TODO move wf to the source of truth after we migrate fully to KYB workflows
-            let wf_not_authorized = args.workflow.as_ref().map(|wf| wf.authorized_at.is_none());
-            let ob_not_authorized = args.onboarding.authorized_at.is_none();
-            if wf_not_authorized.unwrap_or(ob_not_authorized) {
+            if args.workflow.authorized_at.is_none() {
                 let document_types = if ob_config.can_access_document() {
                     // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-                    let id_docs = IdentityDocument::list(conn, &args.onboarding.scoped_vault_id)?;
+                    let id_docs = IdentityDocument::list(conn, &args.workflow.scoped_vault_id)?;
                     id_docs.iter().map(|id| id.document_type).unique().collect()
                 } else {
                     vec![]
@@ -303,7 +290,7 @@ fn get_requirement_inner(
             }
         }
         OnboardingRequirementKind::Process => {
-            if args.workflow.as_ref().map(|wf| wf.state.requires_user_input()) == Some(true) {
+            if args.workflow.state.requires_user_input() {
                 // If the worfklow is in a state that requires user input, make a Process requirement
                 Some(OnboardingRequirement::Process)
             } else {

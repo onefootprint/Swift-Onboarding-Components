@@ -15,7 +15,7 @@ use api_core::decision::onboarding::rules::KycRuleExecutionConfig;
 use api_core::decision::onboarding::{rules::KycRuleGroup, Decision, OnboardingRulesDecisionOutput};
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::decision::vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results;
-use api_core::errors::workflow::WorkflowError;
+use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::AssertionError;
 use api_core::{task, ApiErrorKind};
 use chrono::Utc;
@@ -182,7 +182,7 @@ async fn make_decision(
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
             let (ob, _, _, _) = Onboarding::get(conn, &scoped_user.id)?;
             let is_sandbox = !scoped_user.is_live;
-            let wf = Workflow::latest(conn, &scoped_user.id)?.ok_or(WorkflowError::AuthMissingWorkflow)?;
+            let wf = Workflow::latest(conn, &scoped_user.id)?.ok_or(OnboardingError::NoWorkflow)?;
             Ok((ob, is_sandbox, wf))
         })
         .await?;

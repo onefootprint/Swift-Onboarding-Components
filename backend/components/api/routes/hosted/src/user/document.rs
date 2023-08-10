@@ -9,7 +9,6 @@ use crate::{decision, State};
 use api_core::auth::user::UserObAuthContext;
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
-use api_core::errors::workflow::WorkflowError;
 use api_core::types::JsonApiResponse;
 use api_core::utils::file_upload::FileUpload;
 use api_core::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VwArgs};
@@ -42,12 +41,11 @@ pub async fn post(
 ) -> JsonApiResponse<DocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
-    let wf = user_auth.workflow().ok_or(WorkflowError::AuthMissingWorkflow)?;
+    let wf = user_auth.workflow()?;
     let request = request.0;
 
     let su_id = user_auth.scoped_user.id.clone();
     let wf_id = wf.id.clone();
-    let ob_id = user_auth.onboarding()?.id.clone();
     let (uvw, doc_request, user_consent) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -55,7 +53,7 @@ pub async fn post(
             let doc_request =
                 DbDocumentRequest::get(conn, &wf_id)?.ok_or(OnboardingError::IdentityDocumentNotPending)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
-            let user_consent = UserConsent::latest_for_onboarding(conn, &ob_id)?;
+            let user_consent = UserConsent::latest(conn, &su_id)?;
             Ok((uvw, doc_request, user_consent))
         })
         .await??;

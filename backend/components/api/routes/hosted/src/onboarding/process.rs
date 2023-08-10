@@ -18,7 +18,6 @@ use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::workflow::WorkflowError;
 use api_core::errors::ApiResult;
-use api_core::errors::AssertionError;
 use api_core::task;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
@@ -57,9 +56,7 @@ pub async fn post(
     }
 
     // Update the fixture result on the workflow, if provided
-    let wf = user_auth
-        .workflow()
-        .ok_or(AssertionError("User doesn't have a workflow"))?;
+    let wf = user_auth.workflow()?;
     let wf = if let Some(fixture_result) = fixture_result {
         if user_auth.user().is_live {
             return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
@@ -107,10 +104,7 @@ pub async fn post(
 async fn run_kyb_if_needed(state: &State, user_auth: CheckedUserObAuthContext) -> ApiResult<()> {
     // Run KYB
     let tenant = user_auth.tenant()?.clone();
-    let wf = user_auth
-        .workflow()
-        .ok_or(WorkflowError::AuthMissingWorkflow)?
-        .clone();
+    let wf = user_auth.workflow()?.clone();
     let uv = user_auth.user().clone();
     let (biz_ob, biz_wf) = state
         .db_pool

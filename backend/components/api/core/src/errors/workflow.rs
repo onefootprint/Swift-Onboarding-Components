@@ -6,6 +6,4 @@ pub enum WorkflowError {
     WorkflowCannotProceed(newtypes::WorkflowState),
     #[error("Workflow state does not allow {0}")]
     MissingGuard(newtypes::WorkflowGuard),
-    #[error("Auth missing Workflow")]
-    AuthMissingWorkflow,
 }

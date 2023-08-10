@@ -11,7 +11,6 @@ use api_core::decision::vendor;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
 use api_core::decision::vendor::incode::{get_config_id, IncodeContext, IncodeStateMachine};
-use api_core::errors::workflow::WorkflowError;
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
 use api_core::utils::file_upload::FileUpload;
@@ -50,7 +49,7 @@ pub async fn post(
     tracing::info!("Starting handler");
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
-    let wf = user_auth.workflow().ok_or(WorkflowError::AuthMissingWorkflow)?;
+    let wf = user_auth.workflow()?;
     let document_id: IdentityDocumentId = document_id.into_inner();
     tracing::info!("Before unpacking request");
     let CreateIdentityDocumentUploadRequest {
@@ -61,13 +60,12 @@ pub async fn post(
     tracing::info!("After unpacking request");
 
     let su_id = user_auth.scoped_user.id.clone();
-    let ob_id = user_auth.onboarding()?.id.clone();
     let (id_doc, doc_request, uvw, user_consent) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (id_doc, doc_request) = IdentityDocument::get(conn, &document_id)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
-            let user_consent = UserConsent::latest_for_onboarding(conn, &ob_id)?;
+            let user_consent = UserConsent::latest(conn, &su_id)?;
             Ok((id_doc, doc_request, uvw, user_consent))
         })
         .await??;
