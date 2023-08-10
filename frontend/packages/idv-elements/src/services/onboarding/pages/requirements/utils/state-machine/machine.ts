@@ -1,4 +1,8 @@
-import { IdvBootstrapData, OnboardingConfig } from '@onefootprint/types';
+import {
+  IdDocOutcomes,
+  IdvBootstrapData,
+  OnboardingConfig,
+} from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
@@ -12,6 +16,7 @@ export type OnboardingRequirementsMachineArgs = {
   authToken: string;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
+  idDocOutcome?: IdDocOutcomes;
 };
 
 const defaultRequirements: Requirements = {};
@@ -23,6 +28,7 @@ const createOnboardingRequirementsMachine = ({
   config,
   bootstrapData,
   isTransfer,
+  idDocOutcome,
 }: OnboardingRequirementsMachineArgs) =>
   createMachine(
     {
@@ -42,6 +48,7 @@ const createOnboardingRequirementsMachine = ({
           config,
           bootstrapData,
           isTransfer,
+          idDocOutcome,
         },
         requirements: { ...defaultRequirements },
         startedDataCollection: false,

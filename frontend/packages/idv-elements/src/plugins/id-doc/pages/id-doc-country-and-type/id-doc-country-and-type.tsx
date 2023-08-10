@@ -35,7 +35,7 @@ const IdDocCountryAndType = () => {
   const { t } = useTranslation('pages.country-and-type-selection');
   const [state, send] = useIdDocMachine();
   const submitDocTypeMutation = useSubmitDocType();
-  const { idDoc: defaultCountryDoc, authToken } = state.context;
+  const { idDoc: defaultCountryDoc, authToken, sandboxOutcome } = state.context;
   const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
   const requestErrorToast = useRequestErrorToast();
   const [country, setCountry] = useState<CountryRecord>(
@@ -97,6 +97,7 @@ const IdDocCountryAndType = () => {
         authToken,
         documentType: docType,
         countryCode: selectedCountry,
+        fixtureResult: sandboxOutcome,
       },
       {
         onSuccess: handleSubmitDocTypeSuccess,

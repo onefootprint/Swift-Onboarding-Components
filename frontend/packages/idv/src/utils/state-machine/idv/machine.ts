@@ -1,4 +1,9 @@
-import { IdDI, IdvBootstrapData, ObConfigAuth } from '@onefootprint/types';
+import {
+  IdDI,
+  IdDocOutcomes,
+  IdvBootstrapData,
+  ObConfigAuth,
+} from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
@@ -12,6 +17,7 @@ export type IdvMachineArgs = {
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void;
   showLogo?: boolean;
+  idDocOutcome?: IdDocOutcomes;
 };
 
 const createIdvMachine = (args: IdvMachineArgs) =>
@@ -56,6 +62,7 @@ const createIdvMachine = (args: IdvMachineArgs) =>
                   'assignUserFound',
                   'assignEmail',
                   'assignPhoneNumber',
+                  'assignIdDocOutcome',
                 ],
               },
             ],
@@ -113,6 +120,10 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           ...context,
           validationToken: event.payload.validationToken,
         })),
+        assignIdDocOutcome: assign((context, event) => {
+          context.idDocOutcome = event.payload.idDocOutcome;
+          return context;
+        }),
       },
     },
   );

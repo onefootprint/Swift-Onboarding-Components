@@ -1,5 +1,6 @@
 import type { DeviceInfo } from '@onefootprint/idv-elements';
 import {
+  IdDocOutcomes,
   IdvBootstrapData,
   ObConfigAuth,
   OnboardingConfig,
@@ -17,6 +18,7 @@ export type MachineContext = {
   userFound?: boolean;
   showCompletionPage?: boolean;
   showLogo?: boolean;
+  idDocOutcome?: IdDocOutcomes;
 };
 
 export type MachineEvents =
@@ -37,6 +39,7 @@ export type MachineEvents =
         userFound: boolean;
         email?: string;
         phoneNumber?: string;
+        idDocOutcome?: IdDocOutcomes;
       };
     }
   | {

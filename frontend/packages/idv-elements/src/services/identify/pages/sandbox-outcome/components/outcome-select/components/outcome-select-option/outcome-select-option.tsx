@@ -6,6 +6,7 @@ import { useHover } from 'usehooks-ts';
 export type OutcomeOptionFields = {
   title: string;
   value: string;
+  disabled?: boolean;
 };
 
 export type OutcomeSelectOptionProps = OutcomeOptionFields & {
@@ -18,6 +19,7 @@ const OutcomeSelectOption = ({
   title,
   selected,
   onClick,
+  disabled,
 }: OutcomeSelectOptionProps) => {
   const optionRef = useRef(null);
   const isHovered = useHover(optionRef);
@@ -37,16 +39,21 @@ const OutcomeSelectOption = ({
       type="button"
       ref={optionRef}
       hovered={isHovered}
+      disabled={disabled}
     >
-      <Typography variant="label-4" color="primary">
+      <Typography variant="label-4" color={disabled ? 'quaternary' : 'primary'}>
         {title}
       </Typography>
     </Option>
   );
 };
 
-const Option = styled.button<{ selected?: boolean; hovered?: boolean }>`
-  ${({ theme, selected, hovered }) => {
+const Option = styled.button<{
+  selected?: boolean;
+  hovered?: boolean;
+  disabled?: boolean;
+}>`
+  ${({ theme, selected, hovered, disabled }) => {
     const {
       components: { radioSelect },
     } = theme;
@@ -62,8 +69,31 @@ const Option = styled.button<{ selected?: boolean; hovered?: boolean }>`
       justify-content: center;
       padding: ${theme.spacing[3]};
       transition: all 0.2s ease-out;
+      align-items: center;
+
+      ${disabled &&
+      !selected &&
+      css`
+        z-index: 1;
+        cursor: not-allowed;
+        background-color: ${theme.backgroundColor.secondary};
+        border-color: ${theme.borderColor.tertiary};
+      `}
+
+      ${disabled &&
+      selected &&
+      css`
+        z-index: 1;
+        cursor: not-allowed;
+        background-color: ${theme.backgroundColor.secondary};
+        border-color: ${theme.borderColor.primary};
+        border-width: calc(
+          ${theme.borderWidth[1]} / 2 + ${theme.borderWidth[1]}
+        );
+      `}
 
       ${selected &&
+      !disabled &&
       css`
         z-index: 1;
         background-color: ${radioSelect.selected.bg};
@@ -72,6 +102,7 @@ const Option = styled.button<{ selected?: boolean; hovered?: boolean }>`
 
       ${hovered &&
       !selected &&
+      !disabled &&
       css`
         background-color: ${radioSelect.hover.default.bg};
         border-color: ${radioSelect.hover.default.borderColor};

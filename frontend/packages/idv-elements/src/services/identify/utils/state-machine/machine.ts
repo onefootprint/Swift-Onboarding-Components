@@ -267,6 +267,7 @@ const createIdentifyMachine = ({
         }),
         assignSandboxOutcome: assign((context, event) => {
           context.identify.sandboxId = event.payload.sandboxId;
+          context.idDocOutcome = event.payload.idDocOutcome;
           return context;
         }),
         assignEmail: assign((context, event) => {

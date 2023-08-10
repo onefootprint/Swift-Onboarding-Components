@@ -24,6 +24,7 @@ const MobileApp = ({ context, onDone }: TransferProps) => {
       payload: {
         authToken,
         device,
+        idDocOutcome: context.customData?.idDocOutcome,
         config: customData.config,
       },
     });

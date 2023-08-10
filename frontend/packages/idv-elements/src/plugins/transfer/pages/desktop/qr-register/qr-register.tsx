@@ -18,13 +18,15 @@ const QRRegister = () => {
   const { t } = useTranslation('pages.desktop.qr-register');
   const translationSource = useTranslationSourceForRequirements();
   const [state, send] = useDesktopMachine();
-  const { authToken, device, config, scopedAuthToken } = state.context;
+  const { authToken, device, config, scopedAuthToken, idDocOutcome } =
+    state.context;
   const url = useCreateHandoffUrl(scopedAuthToken, config?.isAppClipEnabled);
 
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
     authToken,
     device,
     config,
+    idDocOutcome,
     onSuccess: (data: D2PGenerateResponse) => {
       send({
         type: 'scopedAuthTokenGenerated',

@@ -1,4 +1,5 @@
 import {
+  IdDocOutcomes,
   IdDocRequirement,
   LivenessRequirement,
   OnboardingConfig,
@@ -14,6 +15,7 @@ export type TransferRequirements = {
 export type TransferCustomData = {
   config: OnboardingConfig;
   missingRequirements: TransferRequirements;
+  idDocOutcome?: IdDocOutcomes;
 };
 
 export type TransferProps = BasePluginProps<TransferCustomData>;

@@ -26,6 +26,7 @@ const DesktopApp = ({ context, onDone }: TransferProps) => {
         device,
         config: customData.config,
         missingRequirements: { ...customData.missingRequirements },
+        idDocOutcome: customData.idDocOutcome,
       },
     });
   });

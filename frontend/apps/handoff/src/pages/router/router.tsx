@@ -13,7 +13,7 @@ import Init from '../init';
 
 const Router = () => {
   const [state, send] = useHandoffMachine();
-  const { authToken, onboardingConfig } = state.context;
+  const { authToken, onboardingConfig, idDocOutcome } = state.context;
   const tenantPk = onboardingConfig?.key;
 
   const obConfigAuth = tenantPk && {
@@ -60,6 +60,7 @@ const Router = () => {
             onComplete={() => {
               send({ type: 'idvCompleted' });
             }}
+            idDocOutcome={idDocOutcome}
           />
         )}
         {state.matches('complete') && <Complete />}

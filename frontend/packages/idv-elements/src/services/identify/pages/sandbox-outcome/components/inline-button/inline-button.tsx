@@ -8,6 +8,7 @@ type InlineButtonProps = {
   tooltipText?: string;
   onClick?: () => void;
   disabled?: boolean;
+  ariaLabel?: string;
 };
 
 const InlineButton = ({
@@ -15,12 +16,19 @@ const InlineButton = ({
   tooltipText,
   onClick,
   disabled,
+  ariaLabel,
 }: InlineButtonProps) => {
   const icon = Icon && <Icon color={disabled ? 'quaternary' : 'primary'} />;
 
   return onClick ? (
     <Tooltip text={tooltipText} disabled={disabled}>
-      <Container role="button" onClick={onClick}>
+      <Container
+        role="button"
+        onClick={onClick}
+        aria-label={ariaLabel}
+        data-disabled={disabled}
+        aria-disabled={disabled}
+      >
         {icon}
       </Container>
     </Tooltip>
@@ -74,6 +82,10 @@ const Container = styled.div`
         background-color: ${theme.backgroundColor.senary};
         z-index: 0;
       }
+    }
+
+    &[data-disabled='true'] {
+      pointer-events: none;
     }
   `}
 `;

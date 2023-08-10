@@ -1,4 +1,4 @@
-import { IdDIData, OnboardingConfig } from '@onefootprint/types';
+import { IdDIData, IdDocOutcomes, OnboardingConfig } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
@@ -10,6 +10,7 @@ export type MachineContext = {
   userFound?: boolean;
   isTransfer?: boolean;
   validationToken?: string;
+  idDocOutcome?: IdDocOutcomes;
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void;
 };

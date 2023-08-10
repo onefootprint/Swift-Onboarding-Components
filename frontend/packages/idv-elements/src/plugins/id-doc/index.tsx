@@ -19,6 +19,7 @@ const App = ({ context, onDone }: IdDocProps) => {
     return null;
   }
 
+  const { sandboxOutcome } = customData;
   const { shouldCollectSelfie: isSelfieRequired } = customData.requirement;
 
   const initialContext: MachineContext = {
@@ -33,6 +34,7 @@ const App = ({ context, onDone }: IdDocProps) => {
           ? customData.requirement.supportedDocumentTypes[0]
           : undefined,
     },
+    sandboxOutcome,
   };
 
   return (

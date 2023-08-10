@@ -13,13 +13,15 @@ import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-
 const NewTabRequest = () => {
   const { t } = useTranslation('pages.mobile.new-tab-requested');
   const [state, send] = useMobileMachine();
-  const { authToken, device, config, scopedAuthToken } = state.context;
+  const { authToken, device, config, scopedAuthToken, idDocOutcome } =
+    state.context;
   const url = useCreateHandoffUrl(scopedAuthToken, config?.isAppClipEnabled);
 
   const { mutation } = useGenerateScopedAuthToken({
     authToken,
     device,
     config,
+    idDocOutcome,
     onSuccess: (data: D2PGenerateResponse) => {
       send({
         type: 'scopedAuthTokenGenerated',

@@ -25,6 +25,7 @@ const Router = ({ onDone }: RouterProps) => {
     bootstrapData,
     isTransfer,
     validationToken,
+    idDocOutcome,
   } = state.context;
   useLogStateMachine('onboarding', state);
 
@@ -49,6 +50,7 @@ const Router = ({ onDone }: RouterProps) => {
           authToken={authToken}
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}
+          idDocOutcome={idDocOutcome}
           onDone={() => {
             send({
               type: 'requirementsCompleted',

@@ -92,6 +92,7 @@ const createMobileMachine = () =>
           ...context,
           device: event.payload.device,
           authToken: event.payload.authToken,
+          idDocOutcome: event.payload.idDocOutcome,
           config: event.payload.config,
         })),
         assignScopedAuthToken: assign((context, event) => ({

@@ -25,6 +25,7 @@ const Router = () => {
     onClose,
     onComplete,
     showLogo,
+    idDocOutcome,
   } = state.context;
   useLogStateMachine('idv', state);
   const isDone = state.matches('complete');
@@ -73,6 +74,7 @@ const Router = () => {
           userFound={userFound}
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}
+          idDocOutcome={idDocOutcome}
           onClose={onClose}
           onComplete={onComplete}
           onDone={payload => {

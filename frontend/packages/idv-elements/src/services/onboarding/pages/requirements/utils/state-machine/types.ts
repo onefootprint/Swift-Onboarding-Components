@@ -3,6 +3,7 @@ import {
   CollectInvestorProfileRequirement,
   CollectKybDataRequirement,
   CollectKycDataRequirement,
+  IdDocOutcomes,
   IdDocRequirement,
   IdvBootstrapData,
   LivenessRequirement,
@@ -31,6 +32,7 @@ export type MachineContext = {
     authToken: string;
     isTransfer?: boolean;
     bootstrapData?: IdvBootstrapData;
+    idDocOutcome?: IdDocOutcomes;
   };
   /// The first time the router sends to a page, we'll mark `startedDataCollection` as true.
   /// There are a few pieces of logic that behave differently after we've started collecting data

@@ -3,13 +3,14 @@ import React from 'react';
 
 import OutcomeSelectOption, {
   OutcomeOptionFields,
-} from './outcome-select-option';
+} from './components/outcome-select-option';
 
 export type OutcomeSelectProps = {
   options: OutcomeOptionFields[];
   value?: string;
   onChange?: (value: string) => void;
   testID?: string;
+  disabled?: boolean;
 };
 
 const OutcomeSelect = ({
@@ -17,6 +18,7 @@ const OutcomeSelect = ({
   value,
   onChange,
   testID,
+  disabled,
 }: OutcomeSelectProps) =>
   options.length > 0 ? (
     <OptionsContainer data-testid={testID}>
@@ -29,6 +31,7 @@ const OutcomeSelect = ({
             onChange?.(optionValue);
           }}
           selected={optionValue === value}
+          disabled={disabled}
         />
       ))}
     </OptionsContainer>

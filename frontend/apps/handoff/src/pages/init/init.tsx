@@ -56,6 +56,7 @@ const Init = () => {
         const { meta } = data;
         const opener = meta?.opener ?? 'unknown';
         const bifrostSessionId = meta?.sessionId ?? '';
+        const { sandboxIdDocOutcome: idDocOutcome } = meta;
         observeCollector.setAppContext({
           opener,
           bifrostSessionId,
@@ -65,6 +66,7 @@ const Init = () => {
           type: 'initContextUpdated',
           payload: {
             opener,
+            idDocOutcome,
           },
         });
       },

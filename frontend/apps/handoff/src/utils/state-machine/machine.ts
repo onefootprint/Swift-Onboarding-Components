@@ -82,7 +82,8 @@ export const createHandoffMachine = () =>
     {
       actions: {
         assignInitContext: assign((context, event) => {
-          const { authToken, opener, onboardingConfig } = event.payload;
+          const { authToken, opener, onboardingConfig, idDocOutcome } =
+            event.payload;
           context.opener = opener !== undefined ? opener : context.opener;
           context.authToken =
             authToken !== undefined ? authToken : context.authToken;
@@ -90,7 +91,10 @@ export const createHandoffMachine = () =>
             onboardingConfig !== undefined
               ? onboardingConfig
               : context.onboardingConfig;
-
+          context.idDocOutcome =
+            idDocOutcome !== undefined
+              ? event.payload.idDocOutcome
+              : context.idDocOutcome;
           return context;
         }),
         resetContext: assign(() => ({})),

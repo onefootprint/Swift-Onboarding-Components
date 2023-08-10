@@ -52,6 +52,7 @@ export * from './risk-signal';
 export { default as RiskSignalAttribute } from './risk-signal-attribute';
 export * from './role';
 export * from './rolebinding';
+export * from './sandbox-outcomes-type';
 export * from './timeline';
 export * from './vault';
 export { default as Vendor } from './vendor';

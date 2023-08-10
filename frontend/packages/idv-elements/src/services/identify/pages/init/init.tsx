@@ -41,9 +41,12 @@ const Init = () => {
           payload: {
             config: {
               ...config,
-              mustCollectData: config.mustCollectData.map(
-                (attr: string) => CollectedDataOptionLabels[attr],
-              ),
+              mustCollectData: config.mustCollectData.map((attr: string) => {
+                if (attr.includes('document'))
+                  // Since we added new cdos in the format document.<something>.<something>.<something>; need to cleanup later
+                  return CollectedDataOptionLabels.document;
+                return CollectedDataOptionLabels[attr];
+              }),
               canAccessData: config.canAccessData.map(
                 (attr: string) => CollectedDataOptionLabels[attr],
               ),

@@ -1,4 +1,4 @@
-import { OnboardingConfig } from '@onefootprint/types';
+import { IdDocOutcomes, OnboardingConfig } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import { TransferRequirements } from '../../types';
@@ -10,6 +10,7 @@ export type MachineContext = {
   device?: DeviceInfo;
   missingRequirements: TransferRequirements;
   config?: OnboardingConfig;
+  idDocOutcome?: IdDocOutcomes;
 };
 
 export type MachineEvents =
@@ -20,6 +21,7 @@ export type MachineEvents =
         device: DeviceInfo;
         config: OnboardingConfig;
         missingRequirements: TransferRequirements;
+        idDocOutcome?: IdDocOutcomes;
       };
     }
   | {

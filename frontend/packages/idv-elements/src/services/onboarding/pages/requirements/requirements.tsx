@@ -15,6 +15,7 @@ const Requirements = ({
   config,
   bootstrapData,
   isTransfer,
+  idDocOutcome,
   onDone,
 }: RequirementsProps) => {
   if (!device || !authToken || !config) {
@@ -29,6 +30,7 @@ const Requirements = ({
       config={config}
       bootstrapData={bootstrapData}
       isTransfer={isTransfer}
+      idDocOutcome={idDocOutcome}
     >
       <Router onDone={onDone} />
     </RequirementsMachineProvider>

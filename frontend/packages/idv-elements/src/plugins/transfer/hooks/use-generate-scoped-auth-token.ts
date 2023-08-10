@@ -1,6 +1,10 @@
 import { useAppearance } from '@onefootprint/appearance';
 import { getSessionId } from '@onefootprint/dev-tools';
-import { D2PGenerateResponse, OnboardingConfig } from '@onefootprint/types';
+import {
+  D2PGenerateResponse,
+  IdDocOutcomes,
+  OnboardingConfig,
+} from '@onefootprint/types';
 import { useEffect } from 'react';
 
 import useD2PGenerate from '../../../hooks/api/hosted/onboarding/d2p/use-d2p-generate';
@@ -11,12 +15,14 @@ type GenerateScopedAuthTokenArgs = {
   device?: DeviceInfo;
   config?: OnboardingConfig;
   onSuccess?: (data: D2PGenerateResponse) => void;
+  idDocOutcome?: IdDocOutcomes;
 };
 
 const useGenerateScopedAuthToken = ({
   authToken,
   device,
   onSuccess,
+  idDocOutcome,
 }: GenerateScopedAuthTokenArgs) => {
   const d2pGenerateMutation = useD2PGenerate();
   const opener = device?.type ?? 'unknown';
@@ -39,6 +45,7 @@ const useGenerateScopedAuthToken = ({
           opener,
           sessionId,
           styleParams,
+          sandboxIdDocOutcome: idDocOutcome,
         },
       },
       {

@@ -2,6 +2,7 @@ import {
   CountryCode,
   IdDocImageError,
   IdDocImageTypes,
+  IdDocOutcomes,
   IdDocRequirement,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
@@ -20,6 +21,7 @@ export type MachineContext = {
   };
   id?: string;
   errors?: IdDocImageError[];
+  sandboxOutcome?: IdDocOutcomes;
 };
 
 export type ProccessingSucceededEvent = {

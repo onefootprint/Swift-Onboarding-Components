@@ -2,6 +2,7 @@ import {
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
   CollectedKycDataOption,
+  IdDocOutcomes,
   IdentifyBootstrapData,
   OnboardingConfig,
   OnboardingConfigStatus,
@@ -480,6 +481,7 @@ describe('Identify Machine Tests', () => {
         type: 'sandboxOutcomeSubmitted',
         payload: {
           sandboxId: 'suffix',
+          idDocOutcome: IdDocOutcomes.success,
         },
       });
       expect(state.value).toEqual('emailIdentification');
@@ -508,6 +510,7 @@ describe('Identify Machine Tests', () => {
         type: 'sandboxOutcomeSubmitted',
         payload: {
           sandboxId: 'suffix',
+          idDocOutcome: IdDocOutcomes.success,
         },
       });
 

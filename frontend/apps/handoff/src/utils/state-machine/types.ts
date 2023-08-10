@@ -1,9 +1,14 @@
-import { D2PStatus, OnboardingConfig } from '@onefootprint/types';
+import {
+  D2PStatus,
+  IdDocOutcomes,
+  OnboardingConfig,
+} from '@onefootprint/types';
 
 export type MachineContext = {
   opener?: string;
   authToken?: string;
   onboardingConfig?: OnboardingConfig;
+  idDocOutcome?: IdDocOutcomes;
 };
 
 export type MachineEvents =
@@ -31,5 +36,6 @@ export type InitContextUpdatedEvent = {
     authToken?: string;
     opener?: string;
     onboardingConfig?: OnboardingConfig;
+    idDocOutcome?: IdDocOutcomes;
   };
 };

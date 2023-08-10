@@ -1,5 +1,6 @@
 import {
   ChallengeKind,
+  IdDocOutcomes,
   Identifier,
   IdentifyBootstrapData,
   ObConfigAuth,
@@ -16,6 +17,7 @@ export type MachineContext = {
   identify: MachineIdentifyContext;
   challenge: MachineChallengeContext;
   showLogo?: boolean;
+  idDocOutcome?: IdDocOutcomes;
 };
 
 export type MachineIdentifyContext = {
@@ -47,6 +49,7 @@ export type MachineEvents =
       type: 'sandboxOutcomeSubmitted';
       payload: {
         sandboxId: string;
+        idDocOutcome: IdDocOutcomes;
       };
     }
   | {

@@ -17,6 +17,7 @@ const Onboarding = ({
   bootstrapData,
   userFound,
   isTransfer,
+  idDocOutcome,
   onDone,
 }: OnboardingProps) => {
   if (!authToken) {
@@ -31,6 +32,7 @@ const Onboarding = ({
           authToken={authToken}
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}
+          idDocOutcome={idDocOutcome}
         >
           <Router onDone={onDone} />
         </OnboardingMachineProvider>
