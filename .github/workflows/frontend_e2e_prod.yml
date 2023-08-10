@@ -51,12 +51,8 @@ jobs:
           path: ./frontend/packages/e2e/test-results/
           retention-days: 1
 
-  notify_failure:
-    needs: e2e
-    if: always() && (needs.e2e.result == 'failure' || needs.e2e.result == 'cancelled')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify BetterStack on Failure or Timeout
+      - name: Notify BetterStack on Failure
+        if: failure()
         run: |
           curl --request POST \
             --url https://uptime.betterstack.com/api/v2/incidents \
