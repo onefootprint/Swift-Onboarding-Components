@@ -621,7 +621,7 @@ impl OnAction<ReviewCompleted, AlpacaKycState> for AlpacaKycPendingReview {
     fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         let (decision, actor) = async_res;
         let sv = ScopedVault::get(conn, &self.sv_id)?;
-        let _obd = save_review_decision(
+        save_review_decision(
             conn,
             &sv.fp_id,
             &sv.tenant_id,

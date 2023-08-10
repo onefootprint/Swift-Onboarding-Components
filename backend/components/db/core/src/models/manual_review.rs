@@ -75,14 +75,14 @@ impl ManualReview {
         self,
         conn: &mut TxnPgConn,
         actor: T,
-        decision_id: Option<OnboardingDecisionId>,
+        decision_id: OnboardingDecisionId,
     ) -> DbResult<()>
     where
         T: Into<DbActor>,
     {
         let update = ManualReviewUpdate {
             completed_at: Some(Some(Utc::now())),
-            completed_by_decision_id: Some(decision_id),
+            completed_by_decision_id: Some(Some(decision_id)),
             completed_by_actor: Some(Some(actor.into())),
         };
         let results = diesel::update(manual_review::table)

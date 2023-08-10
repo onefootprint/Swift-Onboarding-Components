@@ -1,7 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::errors::ApiResult;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::State;
@@ -77,13 +76,10 @@ pub async fn post(
     }
 
     let fpid = fp_id.clone();
-    let _decision = state
+    state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<Option<_>> {
-            let fpid = fpid.clone();
-            // TODO how does this work when there are multiple KYC workflows for one scoped vault?
-            decision::review::save_review_decision(conn, &fpid, &tenant_id, is_live, request, actor, wf_id)
-        })
+        // TODO how does this work when there are multiple KYC workflows for one scoped vault?
+        .db_transaction(move |conn| decision::review::save_review_decision(conn, &fpid, &tenant_id, is_live, request, actor, wf_id))
         .await?;
     // Since we may have updated users onboarding status
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());

@@ -9,7 +9,6 @@ use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingUpdate;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
-use db::models::scoped_vault::ScopedVault;
 use db::TxnPgConn;
 use newtypes::DbActor;
 use newtypes::FpId;
@@ -24,7 +23,7 @@ pub fn save_review_decision(
     decision_request: DecisionRequest,
     actor: AuthActor,
     workflow_id: Option<WorkflowId>,
-) -> ApiResult<Option<(OnboardingDecision, ScopedVault)>> {
+) -> ApiResult<()> {
     let DecisionRequest {
         annotation: CreateAnnotationRequest { note, is_pinned },
         status,
@@ -42,47 +41,41 @@ pub fn save_review_decision(
         return Err(TenantError::CannotMakeDecision.into());
     }
 
-    let need_to_clear_manual_review = manual_review.is_some();
     // The status changed if either there is no current decision OR the status of the existing decision is different
     let status_changed = decision.map(|d| d.status != status.into()).unwrap_or(true);
 
-    if !need_to_clear_manual_review && !status_changed {
-        // The operation is a no-op
-        return Ok(None);
-    }
     // If a manual review will be cleared or we will create a new decision, the operation
     // is not a no-op and we should create an annotation in the DB
     let annotation = Annotation::create(conn, note, is_pinned, su.id.clone(), actor.clone())?;
-
-    let decision = if status_changed {
-        // Create a new decision if the status is different
-        let new_decision = OnboardingDecisionCreateArgs {
-            vault_id: su.vault_id.clone(),
-            onboarding: &ob,
-            logic_git_hash: crate::GIT_HASH.to_string(),
-            result_ids: vec![],
-            status: status.into(),
-            annotation_id: Some(annotation.0.id),
-            actor: DbActor::from(actor.clone()),
-            seqno: None,
-            workflow_id: workflow_id
-                .as_ref()
-                .unwrap_or_else(|| ob.workflow_id(None))
-                .clone(),
-        };
-        let decision = OnboardingDecision::create(conn, new_decision)?;
-        let update = OnboardingUpdate::set_decision(status.into(), false);
-        Onboarding::update(ob, conn, workflow_id.as_ref(), update)?;
-        Some(decision)
-    } else {
-        // TODO should create some kind of UserTimeline event here since we are clearing a manual review
-        None
+    // Make the decision regardless of whether the status changed - the actor of the decision
+    // may be different
+    let new_decision = OnboardingDecisionCreateArgs {
+        vault_id: su.vault_id,
+        onboarding: &ob,
+        logic_git_hash: crate::GIT_HASH.to_string(),
+        result_ids: vec![],
+        status: status.into(),
+        annotation_id: Some(annotation.0.id),
+        actor: DbActor::from(actor.clone()),
+        seqno: None,
+        workflow_id: workflow_id
+            .as_ref()
+            .unwrap_or_else(|| ob.workflow_id(None))
+            .clone(),
     };
+    let decision = OnboardingDecision::create(conn, new_decision)?;
 
     // If there is an outstanding review, creating this override decision clears it
+    // This has to happen before we update the status below, otherwise the webhook will incorrectly
+    // show manual review is required
     if let Some(manual_review) = manual_review {
-        manual_review.complete(conn, actor, decision.as_ref().map(|d| d.id.clone()))?;
+        manual_review.complete(conn, actor, decision.id)?;
     }
 
-    Ok(decision.map(|d| (d, su)))
+    if status_changed {
+        let update = OnboardingUpdate::set_decision(status.into(), false);
+        Onboarding::update(ob, conn, workflow_id.as_ref(), update)?;
+    }
+
+    Ok(())
 }
