@@ -248,8 +248,7 @@ pub struct PreciseMatch {
     // get this from cross core
     #[serde(serialize_with = "scrub_pii_value")]
     pub addresses: Option<PiiJsonValue>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub phones: Option<PiiJsonValue>,
+    pub phones: Option<PhoneMatch>,
     #[serde(rename(deserialize = "consumerID"))]
     pub consumer_id: Option<ConsumerIdMatch>,
     // get this from cross core
@@ -297,6 +296,29 @@ pub struct DateOfBirthMatchSummary {
     pub year_of_birth: Option<ScrubbedPiiString>,
 }
 
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PhoneMatch {
+    pub phone: Option<Vec<PhoneMatchItem>>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PhoneMatchItem {
+    pub summary: Option<PhoneMatchItemSummary>,
+    // has a lot of good stuff in here we could potentially use
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub detail: Option<PiiJsonValue>,
+}
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PhoneMatchItemSummary {
+    pub verification_result: Option<ValueCodeDatum>,
+    pub classification: Option<ValueCodeDatum>,
+    pub high_risk_result: Option<ValueCodeDatum>,
+    pub counts: Option<serde_json::Value>,
+}
+
 pub(crate) fn log_unknown_match_code(code: &str, attribute: &str) {
     tracing::warn!(attribute=%attribute, code=%code, "Unknown match code received")
 }
@@ -336,7 +358,8 @@ mod tests {
     fn test_parses() {
         let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response("656"))
             .expect("could not parse experian precise id");
-
-        assert!(r.precise_match.unwrap().consumer_id.unwrap().summary.is_some());
+        let pm = r.precise_match.unwrap();
+        assert!(pm.clone().consumer_id.unwrap().summary.is_some());
+        assert!(pm.phones.unwrap().phone.unwrap().pop().unwrap().summary.is_some());
     }
 }
