@@ -105,6 +105,7 @@ describe.skip('<CollectKybData />', () => {
           kind: OnboardingRequirementKind.collectKycData,
           missingAttributes: kycAttributes,
           populatedAttributes: [],
+          optionalAttributes: [],
         },
         kycBootstrapData: {
           [IdDI.email]: 'piip@onefootprint.com',

@@ -23,7 +23,8 @@ describe('computeRequirementsToShow', () => {
       metRequirements: [
         {
           kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [] as CollectedKycDataOption[],
+          missingAttributes: [],
+          optionalAttributes: [],
           populatedAttributes: [CollectedKycDataOption.name],
         },
       ] as OnboardingRequirement[],
@@ -85,8 +86,9 @@ describe('computeRequirementsToShow', () => {
       metRequirements: [
         {
           kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [] as CollectedKycDataOption[],
+          missingAttributes: [],
           populatedAttributes: [CollectedKycDataOption.name],
+          optionalAttributes: [],
         },
       ] as OnboardingRequirement[],
       // Not used

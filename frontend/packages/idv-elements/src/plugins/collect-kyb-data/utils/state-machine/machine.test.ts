@@ -50,6 +50,7 @@ describe('Collect KYB Data Machine Tests', () => {
         kind: OnboardingRequirementKind.collectKycData,
         missingAttributes: missingKycAttributes,
         populatedAttributes: [],
+        optionalAttributes: [],
       },
       data: {},
     };

@@ -25,6 +25,7 @@ export type CollectKycDataRequirement = {
   kind: OnboardingRequirementKind.collectKycData;
   missingAttributes: CollectedKycDataOption[];
   populatedAttributes: CollectedKycDataOption[];
+  optionalAttributes: CollectedKycDataOption[];
 };
 
 export type CollectInvestorProfileRequirement = {

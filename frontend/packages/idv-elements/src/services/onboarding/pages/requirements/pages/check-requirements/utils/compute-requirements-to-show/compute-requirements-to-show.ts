@@ -10,7 +10,7 @@ type AlreadyDisplayedRequirements = {
 };
 
 /// Given the list of requirements from the backend and some information about which requirements
-/// we've already displayed, computes the frontend,
+/// we've already displayed, computes the frontend
 const computeRequirementsToShow = (
   isTransfer: boolean,
   startedDataCollection: boolean,

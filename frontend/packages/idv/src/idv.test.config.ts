@@ -83,6 +83,7 @@ const RequirementsFixture: OnboardingRequirement[] = [
       CollectedKycDataOption.ssn9,
     ],
     populatedAttributes: [],
+    optionalAttributes: [],
   },
 ];
 

@@ -39,6 +39,7 @@ describe('Collect KYC Data Machine Tests', () => {
         kind: OnboardingRequirementKind.collectKycData,
         missingAttributes,
         populatedAttributes: [],
+        optionalAttributes: [],
       },
       device: {
         type: deviceType ?? 'desktop',

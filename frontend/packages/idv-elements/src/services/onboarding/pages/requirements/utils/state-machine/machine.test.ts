@@ -7,7 +7,7 @@ import {
   LivenessRequirement,
   OnboardingConfig,
   OnboardingConfigStatus,
-  SupportedIdDocTypes,
+  OnboardingRequirementKind,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -22,15 +22,18 @@ const idDocRequirement = {
   shouldCollectConsent: true,
 } as IdDocRequirement;
 
-// TODO test showing this requirement when met
-const kycRequirement = {
+const kycRequirement: CollectKycDataRequirement = {
+  kind: OnboardingRequirementKind.collectKycData,
   missingAttributes: [CollectedKycDataOption.name],
-} as CollectKycDataRequirement;
+  populatedAttributes: [],
+  optionalAttributes: [],
+};
 
-const authorizeRequirement = {
+const authorizeRequirement: AuthorizeRequirement = {
+  kind: OnboardingRequirementKind.authorize,
   fieldsToAuthorize: {
     collectedData: [CollectedKycDataOption.name],
-    documentTypes: [] as SupportedIdDocTypes[],
+    documentTypes: [],
   },
 } as AuthorizeRequirement;
 
