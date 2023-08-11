@@ -112,6 +112,10 @@ impl IncodeStateMachine {
         // Run StartOnboarding immediately - it sets up some data that all other states need
         if matches!(session.state, IncodeVerificationSessionState::StartOnboarding) {
             let credentials = tenant_vendor_control.incode_credentials(is_sandbox);
+
+            if is_sandbox {
+                tracing::info!(tenant_name=%tenant_vendor_control.tenant_identifier(), sv_id=%ctx.sv_id.clone(), "sandbox incode request");
+            }
             StartOnboarding::run(state, &ctx, session, credentials, configuration_id).await?;
         }
 

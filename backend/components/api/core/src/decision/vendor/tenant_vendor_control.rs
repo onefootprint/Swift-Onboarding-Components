@@ -194,7 +194,7 @@ impl TenantVendorControl {
         apis
     }
 
-    fn tenant_identifier(&self) -> String {
+    pub fn tenant_identifier(&self) -> String {
         format!("{}:{}", self.tenant_id, self.tenant_name)
     }
 }
