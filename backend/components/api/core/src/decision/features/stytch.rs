@@ -36,13 +36,16 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
 pub fn lookup_response_to_footprint_reason_codes(res: &LookupResponse) -> Vec<FootprintReasonCode> {
     let mut reason_codes = vec![action_to_footprint_reason_code(&res.verdict.action)];
 
-    if let Some(reasons) = res.verdict.reasons.clone() {
-        reason_codes = reason_codes
-            .into_iter()
-            .chain(reasons.iter().flat_map(reason_to_footprint_reason_code))
-            .unique()
-            .collect();
-    }
+    reason_codes = reason_codes
+        .into_iter()
+        .chain(
+            res.verdict
+                .reasons()
+                .iter()
+                .flat_map(reason_to_footprint_reason_code),
+        )
+        .unique()
+        .collect();
 
     reason_codes
 }
@@ -86,7 +89,7 @@ mod test {
                 action,
                 detected_device_type: None,
                 is_authentic_device: None,
-                reasons: Some(reasons),
+                reasons: Some(reasons.iter().map(|r| r.to_string()).collect()),
             },
             created_at: None,
             expires_at: None,
