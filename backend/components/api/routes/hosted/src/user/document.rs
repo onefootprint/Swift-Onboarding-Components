@@ -26,8 +26,6 @@ use newtypes::{DataIdentifier, DecisionIntentKind, WorkflowGuard};
 use newtypes::{DocumentKind, DocumentSide, IdentityDocumentStatus};
 use paperclip::actix::{self, api_v2_operation, web};
 
-use super::documents::temporary_should_skip_consent_always;
-
 /// Backend APIs for working with identity documents.
 /// See API specs here: https://www.notion.so/onefootprint/Bifrost-v2-APIs-d0ec80951ff94753a7ddd8ca62e3b734
 /// TODO: rename to /hosted/user/identity_document or find a way to merge in with new generic doc upload endpoint
@@ -62,15 +60,8 @@ pub async fn post(
     if request.selfie_image.is_some() && !doc_request.should_collect_selfie {
         return Err(OnboardingError::NotExpectingSelfie.into());
     }
-    // TEMPORARY until appclip supports consent always
-    // if appclip enabled && sandbox && !selfie
-    let temp_appclip_readiness_should_skip_consent = temporary_should_skip_consent_always(
-        state.feature_flag_client.clone(),
-        &user_auth.scoped_user.tenant_id,
-        &vault,
-    );
 
-    if user_consent.is_none() && !temp_appclip_readiness_should_skip_consent {
+    if user_consent.is_none() {
         return Err(OnboardingError::UserConsentNotFound.into());
     }
 
