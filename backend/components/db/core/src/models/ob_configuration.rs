@@ -33,6 +33,7 @@ pub struct ObConfiguration {
     pub can_access_data: Vec<CDO>,
     pub appearance_id: Option<AppearanceId>,
     pub cip_kind: Option<CipKind>,
+    pub optional_data: Vec<CDO>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
@@ -47,6 +48,7 @@ struct NewObConfiguration {
     must_collect_data: Vec<CDO>,
     can_access_data: Vec<CDO>,
     cip_kind: Option<CipKind>,
+    optional_data: Vec<CDO>,
 }
 
 #[derive(Debug)]
@@ -180,6 +182,7 @@ impl ObConfiguration {
         name: String,
         tenant_id: TenantId,
         must_collect_data: Vec<CDO>,
+        optional_data: Vec<CDO>,
         can_access_data: Vec<CDO>,
         is_live: bool,
         cip_kind: Option<CipKind>,
@@ -194,6 +197,7 @@ impl ObConfiguration {
             status: ApiKeyStatus::Enabled,
             created_at: Utc::now(),
             cip_kind,
+            optional_data,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)

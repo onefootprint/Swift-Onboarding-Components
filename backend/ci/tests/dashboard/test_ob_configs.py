@@ -113,41 +113,66 @@ def test_config_create(sandbox_tenant, twilio):
 
 
 @pytest.mark.parametrize(
-    "must_collect,can_access,expected_status",
+    "must_collect,optional_data,can_access,expected_error",
     [
-        (["ssn4", "name", "full_address", "email", "phone_number"], [], 200),
+        (["ssn4", "name", "full_address", "email", "phone_number"], [], [], None),
         (
             ["ssn4", "ssn9", "name", "full_address", "email", "phone_number"],
             [],
-            400,
+            [],
+            "Validation error: Cannot provide both ssn4 and ssn9",
         ),
         (
             ["full_address", "partial_address", "name", "email", "phone_number"],
             [],
-            400,
+            [],
+            "Validation error: Cannot provide both full_address and partial_address",
         ),
         (
             ["name", "email", "phone_number", "full_address"],
+            [],
             ["ssn9"],
-            400,
+            "Validation error: Decryptable Ssn fields must be a subset of collected fields",
         ),  # can_access must be < must_collect
+        (
+            ["name","full_address", "email", "phone_number"],
+            ["ssn9"],
+            ["name", "ssn9"],
+            None,
+        ), # data in optional_data should be allowed in can_access
+        (
+            ["name", "full_address", "email", "phone_number", "ssn9"],
+            ["ssn4"],
+            ["name"],
+            "Validation error: Field Ssn cannot be included in both must_collect_data and optional_data",
+        ),
+         (
+            ["name","full_address", "email", "phone_number"],
+            ["dob"],
+            [],
+            "Validation error: [Dob] cannot be optional",
+        ), # for now only let ssn4/ssn9 be optional, not any arbritary CDO
     ],
 )
 def test_config_create_validation(
-    sandbox_tenant, must_collect, can_access, expected_status
+    sandbox_tenant, must_collect, optional_data, can_access, expected_error
 ):
     # Test validation errors
     data = dict(
         name="Acme Bank Loan",
         must_collect_data=must_collect,
+        optional_data=optional_data,
         can_access_data=can_access,
     )
-    post(
+    res = post(
         "org/onboarding_configs",
         data,
         *sandbox_tenant.db_auths,
-        status_code=expected_status,
+        status_code=200 if expected_error is None else 400,
     )
+
+    if expected_error:
+        assert res["error"]["message"] == expected_error
 
 
 def test_config_update(sandbox_tenant, ob_configuration):

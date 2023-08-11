@@ -387,6 +387,7 @@ table! {
         can_access_data -> Array<Text>,
         appearance_id -> Nullable<Text>,
         cip_kind -> Nullable<Text>,
+        optional_data -> Array<Text>,
     }
 }
 

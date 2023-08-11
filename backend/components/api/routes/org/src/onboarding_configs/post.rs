@@ -23,12 +23,14 @@ use strum::IntoEnumIterator;
 pub struct CreateOnboardingConfigurationRequest {
     name: String,
     must_collect_data: Vec<CDO>,
+    optional_data: Option<Vec<CDO>>,
     can_access_data: Vec<CDO>,
     cip_kind: Option<CipKind>,
 }
 
 impl CreateOnboardingConfigurationRequest {
     const REQUIRED_FIELDS: [CDO; 4] = [CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber];
+    const ALLOWED_OPTIONAL_FIELDS: [CDO; 2] = [CDO::Ssn4, CDO::Ssn9];
     /// Core validation business logic, separated from checking simple required fields
     fn validate_inner(&self) -> ApiResult<()> {
         let group_by_parent = |cdos: Vec<CDO>| {
@@ -52,46 +54,78 @@ impl CreateOnboardingConfigurationRequest {
             .collect::<ApiResult<HashMap<_, _>>>()
         };
 
-        // Make sure there's only one CDO per CD, and create a map of CD -> selected CDO
-        let must_collect = group_by_parent(self.must_collect_data.clone())?;
-        let can_access = group_by_parent(self.can_access_data.clone())?;
-
-        // Make sure all decryption permissions are a subset of collected data
-        let invalid_cd = CD::iter().find(|cd| {
-            let is_valid = match (must_collect.get(cd), can_access.get(cd)) {
-                // The fun case - if we have a collect and an access CDO for the same CD, make sure
-                // the collect CDO is "more complete" than the access CDO
-                (Some(collect), Some(access)) => {
-                    match cd {
-                        CD::Document => {
-                            // TODO document permissions are a little different since we don't
-                            // represent the options. Here, we only allow decrypting either what's
-                            // collected or nothing at all
-                            collect == access
-                        }
-                        _ => {
-                            // The options for each CD are ordered in ascending "completeness"
-                            let collect_idx = cd.options().iter().position(|cdo| cdo == collect);
-                            let access_idx = cd.options().iter().position(|cdo| cdo == access);
-                            // maybe enforce doc permissions are all or npthingj
-                            collect_idx >= access_idx
-                        }
-                    }
-                }
-                // No problems if we want to collect more than we want to decrypt
-                (Some(_), None) | (None, None) => true,
-                // Not allowed to decrypt a CD that is never collected
-                (None, Some(_)) => false,
-            };
-            !is_valid
-        });
-        if let Some(cd) = invalid_cd {
+        let optional_data = self.optional_data.clone().unwrap_or(vec![]);
+        let unallowed_optional_data_cdos: Vec<_> = optional_data
+            .iter()
+            .filter(|cdo| !Self::ALLOWED_OPTIONAL_FIELDS.contains(cdo))
+            .collect();
+        if !unallowed_optional_data_cdos.is_empty() {
             return Err(TenantError::ValidationError(format!(
-                "Decryptable {} fields must be a subset of collected fields",
-                cd
+                "{:?} cannot be optional",
+                unallowed_optional_data_cdos
             ))
             .into());
         }
+
+        // Make sure there's only one CDO per CD, and create a map of CD -> selected CDO
+        let must_collect = group_by_parent(self.must_collect_data.clone())?;
+        let optional_data = group_by_parent(optional_data)?;
+        let can_access = group_by_parent(self.can_access_data.clone())?;
+
+        // Make sure all decryption permissions are a subset of collected data
+        CD::iter()
+            .map(|cd| {
+                let must_collect_cdo = must_collect.get(&cd);
+                let optional_cdo = optional_data.get(&cd);
+                let can_access_cdo = can_access.get(&cd);
+
+                let collectable_cdo = match (must_collect_cdo, optional_cdo) {
+                    (None, None) => Ok::<_, ApiError>(None),
+                    (None, Some(c)) => Ok(Some(c)),
+                    (Some(c), None) => Ok(Some(c)),
+                    (Some(_), Some(_)) => Err(TenantError::ValidationError(format!(
+                        "Field {} cannot be included in both must_collect_data and optional_data",
+                        cd
+                    ))
+                    .into()),
+                }?;
+
+                let is_valid = match (collectable_cdo, can_access_cdo) {
+                    // The fun case - if we have a collect and an access CDO for the same CD, make sure
+                    // the collect CDO is "more complete" than the access CDO
+                    (Some(collect), Some(access)) => {
+                        match cd {
+                            CD::Document => {
+                                // TODO document permissions are a little different since we don't
+                                // represent the options. Here, we only allow decrypting either what's
+                                // collected or nothing at all
+                                collect == access
+                            }
+                            _ => {
+                                // The options for each CD are ordered in ascending "completeness"
+                                let collect_idx = cd.options().iter().position(|cdo| cdo == collect);
+                                let access_idx = cd.options().iter().position(|cdo| cdo == access);
+                                // maybe enforce doc permissions are all or npthingj
+                                collect_idx >= access_idx
+                            }
+                        }
+                    }
+                    // No problems if we want to collect more than we want to decrypt
+                    (Some(_), None) | (None, None) => true,
+                    // Not allowed to decrypt a CD that is never collected
+                    (None, Some(_)) => false,
+                };
+                if !is_valid {
+                    Err(TenantError::ValidationError(format!(
+                        "Decryptable {} fields must be a subset of collected fields",
+                        cd
+                    ))
+                    .into())
+                } else {
+                    Ok(())
+                }
+            })
+            .collect::<ApiResult<Vec<_>>>()?;
         Ok(())
     }
 
@@ -130,6 +164,7 @@ pub async fn post(
     let CreateOnboardingConfigurationRequest {
         name,
         must_collect_data,
+        optional_data,
         can_access_data,
         cip_kind,
     } = request.into_inner();
@@ -154,6 +189,7 @@ pub async fn post(
                 name,
                 tenant_id,
                 must_collect_data,
+                optional_data.unwrap_or(vec![]),
                 can_access_data,
                 is_live,
                 cip_kind,
@@ -188,21 +224,32 @@ mod test {
     };
     use test_case::test_case;
 
-    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => true)]
-    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![CDO::Name, CDO::Ssn4, CDO::PartialAddress, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))] => false)] // could be true, but client doesn't do this
-    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![] => true)]
-    #[test_case(vec![CDO::Ssn4, CDO::Ssn9], vec![] => false)]
-    #[test_case(vec![CDO::PartialAddress, CDO::FullAddress], vec![] => false)]
-    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None)), CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![] => false)]
-    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => true)]
-    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))] => false)] // could be true, but client doesn't do this
-    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => false)]
-    #[test_case(vec![CDO::Ssn4], vec![CDO::Ssn9] => false)]
-    #[test_case(vec![CDO::PartialAddress], vec![CDO::FullAddress] => false)]
-    fn test(must_collect_data: Vec<CDO>, can_access_data: Vec<CDO>) -> bool {
+    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![], vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => true)]
+    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![], vec![CDO::Name, CDO::Ssn4, CDO::PartialAddress, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))] => false)] // could be true, but client doesn't do this
+    #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![], vec![] => true)]
+    #[test_case(vec![CDO::Ssn4, CDO::Ssn9], vec![], vec![] => false)]
+    #[test_case(vec![CDO::PartialAddress, CDO::FullAddress], vec![], vec![] => false)]
+    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None)), CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![], vec![] => false)]
+    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![], vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => true)]
+    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![], vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))] => false)] // could be true, but client doesn't do this
+    #[test_case(vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![], vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => false)]
+    #[test_case(vec![CDO::Ssn4], vec![], vec![CDO::Ssn9] => false)]
+    #[test_case(vec![CDO::PartialAddress], vec![], vec![CDO::FullAddress] => false)]
+    // optional_data
+    #[test_case(vec![CDO::Name], vec![CDO::Ssn9], vec![] => true; "allow Ssn9 to be optional")]
+    #[test_case(vec![CDO::Name], vec![CDO::Ssn4], vec![] => true; "allow Ssn4 to be optional")]
+    #[test_case(vec![CDO::Email], vec![CDO::Name], vec![] => false; "don't allow non-SSN CDO's to be optional, for now")]
+    #[test_case(vec![CDO::Name, CDO::Ssn9], vec![CDO::Ssn9], vec![] => false; "can't duplicate across must_collect_data and optional_data")]
+    #[test_case(vec![CDO::Name, CDO::Ssn9], vec![CDO::Ssn4], vec![] => false; "can't duplicate CDO's with identical parents across must_collect_data and optional_data")]
+    #[test_case(vec![CDO::Name], vec![CDO::Ssn9], vec![CDO::Name, CDO::Ssn9] => true; "can_access_data can include CDO's in optional_data")]
+    // same basic validations done on must_collect are done on optional_data
+    #[test_case(vec![CDO::Name], vec![CDO::Ssn4, CDO::Ssn9], vec![] => false)]
+    #[test_case(vec![CDO::Name], vec![CDO::Ssn4], vec![CDO::Ssn9] => false)]
+    fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: Vec<CDO>) -> bool {
         let req = CreateOnboardingConfigurationRequest {
             name: "Flerp".to_owned(),
             must_collect_data,
+            optional_data: Some(optional_data),
             can_access_data,
             cip_kind: None,
         };
