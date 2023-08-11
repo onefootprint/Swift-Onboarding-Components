@@ -1,4 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
+import { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
 import { AppErrorBoundary, useGetD2PStatus } from '@onefootprint/idv-elements';
 import { CLIENT_PUBLIC_KEY_HEADER, GetD2PResponse } from '@onefootprint/types';
@@ -11,7 +12,11 @@ import Complete from '../complete';
 import Expired from '../expired';
 import Init from '../init';
 
-const Router = () => {
+type RouterProps = {
+  variant?: FootprintVariant;
+};
+
+const Router = ({ variant }: RouterProps) => {
   const [state, send] = useHandoffMachine();
   const { authToken, onboardingConfig, idDocOutcome } = state.context;
   const tenantPk = onboardingConfig?.key;
@@ -45,7 +50,7 @@ const Router = () => {
   });
 
   return (
-    <Layout>
+    <Layout variant={variant}>
       <AppErrorBoundary
         onReset={() => {
           send({ type: 'reset' });

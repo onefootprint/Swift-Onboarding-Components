@@ -1,3 +1,4 @@
+import { FootprintVariant } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React, { forwardRef, HTMLAttributes } from 'react';
@@ -5,6 +6,7 @@ import React, { forwardRef, HTMLAttributes } from 'react';
 import use100vh from './hooks/use-100vh';
 
 type FullHeightContainerProps = HTMLAttributes<HTMLDivElement> & {
+  variant?: FootprintVariant;
   hasBorderRadius?: boolean;
 };
 
@@ -17,7 +19,7 @@ type FullHeightContainerProps = HTMLAttributes<HTMLDivElement> & {
 const FullHeightContainer = forwardRef<
   HTMLDivElement,
   FullHeightContainerProps
->(({ id, hasBorderRadius, children }, ref) => {
+>(({ variant = 'modal', id, hasBorderRadius, children }, ref) => {
   const viewportHeight = use100vh();
   const height = viewportHeight ? `${viewportHeight}px` : '100vh';
 
@@ -27,6 +29,7 @@ const FullHeightContainer = forwardRef<
       ref={ref}
       hasBorderRadius={!!hasBorderRadius}
       height={height}
+      data-variant={variant}
     >
       {children}
     </Container>
@@ -43,7 +46,7 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
     overflow-y: auto;
     position: relative;
 
-    body[data-variant='modal'] & {
+    &[data-variant='modal'] {
       height: ${height};
       width: 100%;
 
@@ -54,7 +57,7 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
       `}
     }
 
-    body[data-variant='drawer'] & {
+    &[data-variant='drawer'] {
       height: ${height};
       width: 100%;
 

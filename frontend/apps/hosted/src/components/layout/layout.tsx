@@ -1,3 +1,4 @@
+import { FootprintVariant } from '@onefootprint/footprint-js';
 import { Layout as AppLayout } from '@onefootprint/idv-elements';
 import styled from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
@@ -9,9 +10,10 @@ import SandboxBanner from './components/sandbox-banner';
 
 type LayoutProps = {
   children: React.ReactNode;
+  variant?: FootprintVariant;
 };
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, variant }: LayoutProps) => {
   const [state] = useHostedMachine();
   const { onboardingConfig } = state.context;
   const isSandbox = onboardingConfig?.isLive === false;
@@ -23,6 +25,7 @@ const Layout = ({ children }: LayoutProps) => {
       <Content>
         <AppLayout
           tenantPk={key}
+          variant={variant}
           isSandbox={isSandbox}
           options={{
             hideDesktopSandboxBanner: true,

@@ -1,3 +1,4 @@
+import { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
 import { AppErrorBoundary } from '@onefootprint/idv-elements';
 import { IdDI } from '@onefootprint/types';
@@ -10,14 +11,18 @@ import Init from './init';
 import Intro from './intro';
 import InvalidUrl from './invalid-url';
 
-const Root = () => {
+type RootProps = {
+  variant?: FootprintVariant;
+};
+
+const Root = ({ variant }: RootProps) => {
   const [state, send] = useHostedMachine();
   const { businessBoKycData, obConfigAuth, authToken } = state.context;
   const { invited } = businessBoKycData || {};
   const { email, phoneNumber } = invited || {};
 
   return (
-    <Layout>
+    <Layout variant={variant}>
       <AppErrorBoundary
         onReset={() => {
           send({ type: 'reset' });

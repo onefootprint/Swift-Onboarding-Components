@@ -1,3 +1,4 @@
+import { FootprintVariant } from '@onefootprint/footprint-js';
 import {
   Layout as AppLayout,
   useFootprintProvider,
@@ -9,9 +10,10 @@ import { useBifrostMachine } from '../bifrost-machine-provider';
 
 type LayoutProps = {
   children: React.ReactNode;
+  variant?: FootprintVariant;
 };
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, variant }: LayoutProps) => {
   const footprint = useFootprintProvider();
   const [state] = useBifrostMachine();
   const tenantPk = useTenantPublicKey();
@@ -24,6 +26,7 @@ const Layout = ({ children }: LayoutProps) => {
 
   return (
     <AppLayout
+      variant={variant}
       options={{ hasDesktopBorderRadius: true }}
       isSandbox={isSandbox}
       tenantPk={tenantPk}

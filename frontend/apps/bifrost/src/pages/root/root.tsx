@@ -1,5 +1,6 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import { useLogStateMachine } from '@onefootprint/dev-tools';
+import { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
 import {
   AppErrorBoundary,
@@ -14,7 +15,11 @@ import useTenantPublicKey from 'src/hooks/use-tenant-public-key';
 
 import Init from '../init';
 
-const Root = () => {
+type RootProps = {
+  variant?: FootprintVariant;
+};
+
+const Root = ({ variant }: RootProps) => {
   const footprint = useFootprintProvider();
   const [state, send] = useBifrostMachine();
   const tenantPk = useTenantPublicKey();
@@ -37,7 +42,7 @@ const Root = () => {
   };
 
   return (
-    <Layout>
+    <Layout variant={variant}>
       <AppErrorBoundary
         onReset={() => {
           send({ type: 'reset' });
