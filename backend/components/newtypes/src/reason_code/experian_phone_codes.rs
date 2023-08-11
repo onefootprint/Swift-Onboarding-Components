@@ -170,9 +170,12 @@ experian_reason_code_enum! {
         // Default no match
         #[ser = "NX"]
         #[footprint_reason_codes = ExpPhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
-        NX
+        NX,
+        // Missing phone
+        #[ser = "MX"]
+        #[footprint_reason_codes = vec![]]
+        MX
     }
-
 }
 
 #[cfg(test)]

@@ -111,12 +111,19 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
     .into_iter()
     .flatten();
 
+    let phone_codes = if let Ok(code) = resp.phone_match_reason_codes() {
+        std::convert::Into::<Vec<FootprintReasonCode>>::into(&code)
+    } else {
+        vec![]
+    };
+
     let mut reason_codes: Vec<FootprintReasonCode> = fraud_shield_reason_codes
         .into_iter()
         .chain(dob_reason_codes)
         .chain(name_and_address_reason_codes.into_iter())
         .chain(ssn_reason_codes.into_iter())
         .chain(watchlist_codes.into_iter())
+        .chain(phone_codes.into_iter())
         .unique()
         .collect();
 
@@ -159,6 +166,7 @@ impl TryFrom<(&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap)> for Expe
 
 #[cfg(test)]
 mod tests {
+    use db::test_helpers::assert_have_same_elements;
     use idv::experian::{
         cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore,
     };
@@ -168,7 +176,7 @@ mod tests {
     };
     use test_case::test_case;
 
-    #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::EA, ExperianWatchlistReasonCodes::R1 => vec![
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::EA, ExperianWatchlistReasonCodes::R1, vec![
         // from fraud shield
         FootprintReasonCode::SubjectDeceased,
         // dob match
@@ -179,8 +187,10 @@ mod tests {
         FootprintReasonCode::SsnMatches,
         // from score
         FootprintReasonCode::IdNotLocated,
-    ]; "address code says no match, but we opt for ssn codes since it's present")]
-    #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::MX, ExperianWatchlistReasonCodes::R7 => vec![
+        // from phone
+        FootprintReasonCode::PhoneLocatedMatches,
+    ] => (); "address code says no match, but we opt for ssn codes since it's present")]
+    #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::MX, ExperianWatchlistReasonCodes::R7, vec![
         // from fraud shield
         FootprintReasonCode::SubjectDeceased,
         // dob match
@@ -199,12 +209,15 @@ mod tests {
         FootprintReasonCode::WatchlistHitOfac,
         // from score
         FootprintReasonCode::IdNotLocated,
-    ]; "no ssn is provided, so we take address codes")]
+        // from phone
+        FootprintReasonCode::PhoneLocatedMatches,
+    ] => (); "no ssn is provided, so we take address codes")]
     fn test_reason_codes(
         address_code: ExperianAddressAndNameMatchReasonCodes,
         ssn_code: ExperianSSNReasonCodes,
         watchlist_code: ExperianWatchlistReasonCodes,
-    ) -> Vec<FootprintReasonCode> {
+        expected_reason_codes: Vec<FootprintReasonCode>,
+    ) {
         let r: CrossCoreAPIResponse =
             serde_json::from_value(idv::test_fixtures::cross_core_response_with_fraud_shield_codes(
                 address_code,
@@ -218,6 +231,6 @@ mod tests {
             PreciseIDParsedScore::Score(269)
         );
 
-        super::footprint_reason_codes(r)
+        assert_have_same_elements(super::footprint_reason_codes(r), expected_reason_codes);
     }
 }
