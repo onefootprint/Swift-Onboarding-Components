@@ -8,6 +8,12 @@ const parseTestID = (suffix: string) => {
       testID: suffix.replace('manualreview', ''),
     };
   }
+  if (suffix.startsWith('document_decision')) {
+    return {
+      outcome: 'Based on ID decision',
+      testID: suffix.replace('document_decision', ''),
+    };
+  }
   return { outcome: 'Success', testID: suffix };
 };
 
