@@ -45,13 +45,15 @@ impl VendorResult {
             .zip(decrypted_responses.into_iter())
             .map(
                 |((request, result, _e), decrypted_response)| -> Result<VendorResult, ApiError> {
+                    let raw_decrypted_response = decrypted_response.into_leak();
                     let parsed_response =
-                        deserialize_from_vendor_api(decrypted_response.into_leak(), request.vendor_api)?;
+                        deserialize_from_vendor_api(raw_decrypted_response.clone(), request.vendor_api)?;
                     let res = VendorResult {
                         response: VendorResponse {
                             response: parsed_response,
-                            // When we are loading the response from DB, the response has been scrubbed
-                            raw_response: result.response.into(),
+                            // TODO: get rid of this, and just use parsed response for vendor map
+                            // https://linear.app/footprint/issue/FP-5624/just-use-parsed-resonse-and-stop-using-raw-response-on-vendor-result
+                            raw_response: raw_decrypted_response.into(),
                         },
                         verification_request_id: request.id,
                         verification_result_id: result.id,
