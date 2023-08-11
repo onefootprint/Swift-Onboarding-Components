@@ -14,7 +14,7 @@ const useConvertFormData = () => {
     CollectedKycDataOption.ssn9,
   );
 
-  return (formData: FormData) => {
+  return (formData: FormData, isSkipped?: boolean) => {
     const convertedData: KycData = {};
     const { ssn4, ssn9 } = formData;
 
@@ -22,12 +22,12 @@ const useConvertFormData = () => {
     if (requiresSsn9) {
       if (ssn9 && !isSsn9Disabled) {
         convertedData[IdDI.ssn9] = {
-          value: ssn9,
+          value: isSkipped ? '' : ssn9,
         };
       }
     } else if (ssn4 && !isSsn4Disabled) {
       convertedData[IdDI.ssn4] = {
-        value: ssn4,
+        value: isSkipped ? '' : ssn4,
       };
     }
 

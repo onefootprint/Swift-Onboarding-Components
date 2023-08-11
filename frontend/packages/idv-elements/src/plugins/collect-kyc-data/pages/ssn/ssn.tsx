@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
+import { useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -9,7 +10,7 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import allAttributes from '../../utils/all-attributes';
+import getSsnKind from '../../utils/ssn-utils';
 import SSN4 from './components/ssn4';
 import SSN9 from './components/ssn9';
 import useConvertFormData from './hooks/use-convert-form-data';
@@ -30,17 +31,20 @@ const SSN = ({
   onComplete,
   onCancel,
 }: SSNProps) => {
+  const { t } = useTranslation('pages.ssn');
+  const confirmationDialog = useConfirmationDialog();
   const [state, send] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
   const { mutation, syncData } = useSyncData();
   const convertFormData = useConvertFormData();
+  const ssnKind = getSsnKind(requirement);
+  const isOptional =
+    requirement.optionalAttributes.includes(CollectedKycDataOption.ssn9) ||
+    requirement.optionalAttributes.includes(CollectedKycDataOption.ssn4);
 
-  const { t } = useTranslation('pages.ssn');
-  const requiresSsn9 = allAttributes(requirement).includes(
-    CollectedKycDataOption.ssn9,
-  );
-  const title = requiresSsn9 ? t('full.title') : t('last-four.title');
-  const subtitle = requiresSsn9 ? t('full.subtitle') : t('last-four.subtitle');
+  const title = ssnKind === 'ssn9' ? t('full.title') : t('last-four.title');
+  const subtitle =
+    ssnKind === 'ssn9' ? t('full.subtitle') : t('last-four.subtitle');
 
   const methods = useForm<FormData>({
     defaultValues: {
@@ -48,10 +52,11 @@ const SSN = ({
       ssn4: data[IdDI.ssn4]?.value,
     },
   });
+  const { getValues } = methods;
   const isSsn4Disabled = data?.[IdDI.ssn4]?.disabled;
   const isSsn9Disabled = data?.[IdDI.ssn9]?.disabled;
 
-  const onSubmitFormData = (formData: FormData) => {
+  const onSubmitForm = (formData: FormData) => {
     const convertedData = convertFormData(formData);
     syncData({
       data: convertedData,
@@ -66,13 +71,36 @@ const SSN = ({
     });
   };
 
+  const onSubmitSkippedForm = () => {
+    const convertedData = convertFormData(getValues(), true);
+    send({
+      type: 'dataSubmitted',
+      payload: convertedData,
+    });
+    onComplete?.();
+  };
+
+  const handleSkip = () => {
+    confirmationDialog.open({
+      title: t('skip.confirmation.title'),
+      description: t('skip.confirmation.description'),
+      primaryButton: {
+        label: t('skip.confirmation.yes'),
+        onClick: onSubmitSkippedForm,
+      },
+      secondaryButton: {
+        label: t('skip.confirmation.no'),
+      },
+    });
+  };
+
   return (
     <>
       {!hideHeader && <NavigationHeader />}
       <FormProvider {...methods}>
-        <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
+        <Form onSubmit={methods.handleSubmit(onSubmitForm)}>
           {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
-          {requiresSsn9 ? (
+          {ssnKind === 'ssn9' ? (
             <SSN9 hideDisclaimer={hideDisclaimer} disabled={isSsn9Disabled} />
           ) : (
             <SSN4 disabled={isSsn4Disabled} />
@@ -80,7 +108,9 @@ const SSN = ({
           <EditableFormButtonContainer
             isLoading={mutation.isLoading}
             onCancel={onCancel}
+            onSkip={isOptional ? handleSkip : undefined}
             ctaLabel={ctaLabel}
+            skipLabel={t('skip.cta')}
           />
         </Form>
       </FormProvider>

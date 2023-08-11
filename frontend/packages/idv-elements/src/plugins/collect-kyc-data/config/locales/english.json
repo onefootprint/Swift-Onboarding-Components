@@ -119,6 +119,15 @@
           "placeholder": "XXXX",
           "error": "SSN cannot be empty or is invalid"
         }
+      },
+      "skip": {
+        "cta": "I don't have a SSN",
+        "confirmation": {
+          "title": "Are you sure?",
+          "description": "Not providing a SSN might make your verification take a few days.",
+          "yes": "Yes",
+          "no": "No"
+        }
       }
     },
     "cta": {
@@ -151,7 +160,8 @@
       "identity": {
         "title": "Identity",
         "ssn9": "SSN",
-        "ssn4": "SSN (last 4)"
+        "ssn4": "SSN (last 4)",
+        "ssn-skipped-subtext": "You don't have a SSN"
       }
     }
   }
