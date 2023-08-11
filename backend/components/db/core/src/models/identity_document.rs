@@ -9,8 +9,9 @@ use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
-    DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, IdentityDocumentFixtureResult, IdentityDocumentId,
-    IdentityDocumentStatus, ModernIdDocKind, ScopedVaultId,
+    DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentScanDeviceType,
+    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ModernIdDocKind,
+    ScopedVaultId,
 };
 
 use super::document_request::DocumentRequest;
@@ -39,6 +40,10 @@ pub struct IdentityDocument {
     pub ocr_confidence_score: Option<f64>,
     pub status: IdentityDocumentStatus,
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
+    // Indicating that the client cannot collect selfie for some reason
+    pub skip_selfie: Option<bool>,
+    // the device type that was used to collect this document (currently provided by bifrost, in the future perhaps derived from Stytch)
+    pub device_type: Option<DocumentScanDeviceType>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -48,6 +53,8 @@ pub struct NewIdentityDocumentArgs {
     pub document_type: ModernIdDocKind,
     pub country_code: String,
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
+    pub skip_selfie: Option<bool>,
+    pub device_type: Option<DocumentScanDeviceType>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -59,6 +66,8 @@ struct NewIdentityDocumentRow {
     created_at: DateTime<Utc>,
     status: IdentityDocumentStatus,
     fixture_result: Option<IdentityDocumentFixtureResult>,
+    skip_selfie: bool,
+    device_type: Option<DocumentScanDeviceType>,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -93,6 +102,8 @@ impl IdentityDocument {
             document_type,
             country_code,
             fixture_result,
+            skip_selfie,
+            device_type,
         } = args;
         let new = NewIdentityDocumentRow {
             request_id,
@@ -101,6 +112,8 @@ impl IdentityDocument {
             created_at: Utc::now(),
             status: IdentityDocumentStatus::Pending,
             fixture_result,
+            skip_selfie: skip_selfie.unwrap_or(false),
+            device_type,
         };
         let result = diesel::insert_into(identity_document::table)
             .values(new)
@@ -124,6 +137,8 @@ impl IdentityDocument {
                 document_type,
                 country_code,
                 fixture_result,
+                skip_selfie,
+                device_type,
             } = args;
             let new = NewIdentityDocumentRow {
                 request_id,
@@ -132,6 +147,8 @@ impl IdentityDocument {
                 created_at: Utc::now(),
                 status: IdentityDocumentStatus::Pending,
                 fixture_result,
+                skip_selfie: skip_selfie.unwrap_or(false),
+                device_type,
             };
             diesel::insert_into(identity_document::table)
                 .values(new)

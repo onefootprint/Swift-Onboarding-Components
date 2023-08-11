@@ -1,0 +1,1 @@
+ALTER TABLE identity_document DROP COLUMN skip_selfie, DROP COLUMN device_type;

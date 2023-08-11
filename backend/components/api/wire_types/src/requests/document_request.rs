@@ -1,7 +1,8 @@
 use crate::export_schema;
 use newtypes::{
-    idology::IdologyImageCaptureErrors, DocumentSide, IdDocKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason, ModernIdDocKind, PiiString,
+    idology::IdologyImageCaptureErrors, DocumentScanDeviceType, DocumentSide, IdDocKind,
+    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason,
+    ModernIdDocKind, PiiString,
 };
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -34,6 +35,8 @@ pub struct CreateIdentityDocumentRequest {
     pub document_type: ModernIdDocKind,
     pub country_code: String, // TODO this should be an enum
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
+    pub skip_selfie: Option<bool>,
+    pub device_type: Option<DocumentScanDeviceType>,
 }
 
 #[derive(Debug, Apiv2Schema, serde::Serialize)]
@@ -71,7 +74,6 @@ pub struct DocumentResponse {
     pub is_retry_limit_exceeded: bool,
 }
 
-/// Image errors from idology. See status_code/idology.rs for descriptions
 #[derive(Debug, Apiv2Schema, JsonSchema, serde::Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentImageError {

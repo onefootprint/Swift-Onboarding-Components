@@ -16,6 +16,8 @@ pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> Id
         document_type: ModernIdDocKind::DriversLicense,
         country_code: "Flerp country code".to_owned(),
         fixture_result: None,
+        skip_selfie: None,
+        device_type: None,
     };
     let doc = IdentityDocument::get_or_create(conn, args).unwrap();
     let key = SealedVaultDataKey(vec![]);

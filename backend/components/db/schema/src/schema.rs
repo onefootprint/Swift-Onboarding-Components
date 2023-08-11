@@ -168,18 +168,6 @@ table! {
 table! {
     use diesel::sql_types::*;
 
-    duplicate_vaults (vault_id) {
-        tenant_name -> Nullable<Text>,
-        tenant_id -> Nullable<Text>,
-        vault_id -> Text,
-        is_live -> Nullable<Bool>,
-        count -> Nullable<Int8>,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-
     fingerprint (id) {
         id -> Text,
         sh_data -> Bytea,
@@ -231,6 +219,8 @@ table! {
         ocr_confidence_score -> Nullable<Float8>,
         status -> Text,
         fixture_result -> Nullable<Text>,
+        skip_selfie -> Nullable<Bool>,
+        device_type -> Nullable<Text>,
     }
 }
 
@@ -1034,7 +1024,6 @@ allow_tables_to_appear_in_same_query!(
     document_data,
     document_request,
     document_upload,
-    duplicate_vaults,
     fingerprint,
     fingerprint_visit_event,
     identity_document,

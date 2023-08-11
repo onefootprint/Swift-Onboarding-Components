@@ -119,6 +119,8 @@ pub async fn post(
                 document_type: request.document_type.into(),
                 country_code: request.country_code.clone(),
                 fixture_result: fixture,
+                skip_selfie: None,
+                device_type: None,
             };
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
             if id_doc.status != IdentityDocumentStatus::Pending {

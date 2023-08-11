@@ -29,6 +29,8 @@ pub async fn post(
         document_type,
         country_code,
         fixture_result,
+        skip_selfie,
+        device_type,
     } = request.into_inner();
 
     let su_id = user_auth.scoped_user.id.clone();
@@ -53,11 +55,18 @@ pub async fn post(
             if vault.is_live && fixture_result.is_some() {
                 return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
             }
+
+            if skip_selfie == Some(true) {
+                tracing::info!(sv_id=%su_id, tenant=%user_auth.tenant()?.id.clone(), wf_id=%wf_id, device_type=?device_type, requires_selfie=%doc_request.should_collect_selfie, "User skipping selfie");
+            }
+            
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request.id,
                 document_type,
                 country_code,
                 fixture_result,
+                skip_selfie,
+                device_type
             };
 
             let id_doc = IdentityDocument::create(conn, args)?;
