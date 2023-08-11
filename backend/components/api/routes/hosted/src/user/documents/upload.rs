@@ -69,8 +69,10 @@ pub async fn post(
         })
         .await??;
     let vault = uvw.vault.clone();
+    // We support the flow
+    let should_collect_selfie = doc_request.should_collect_selfie && !id_doc.should_skip_selfie();
 
-    if side == DocumentSide::Selfie && !doc_request.should_collect_selfie {
+    if side == DocumentSide::Selfie && !should_collect_selfie {
         return Err(OnboardingError::NotExpectingSelfie.into());
     }
 
@@ -121,7 +123,7 @@ pub async fn post(
                 .document_type
                 .sides()
                 .into_iter()
-                .chain(doc_request.should_collect_selfie.then_some(DocumentSide::Selfie))
+                .chain(should_collect_selfie.then_some(DocumentSide::Selfie))
                 .collect_vec();
             let missing_sides = required_sides
                 .into_iter()
@@ -163,7 +165,7 @@ pub async fn post(
                         ocr,
                         fake_score_response,
                         ocr_fixture.unwrap_or(IncodeOcrComparisonDataFields::default()),
-                        doc_request.should_collect_selfie,
+                        should_collect_selfie,
                         vres.id.clone(),
                         vres.id,
                     )?;
@@ -179,7 +181,17 @@ pub async fn post(
     let response = if let Some((di, doc_request, id_doc_id)) = created_reqs {
         // Not sandbox - make our request to vendors!
         let t_id = user_auth.scoped_user.tenant_id.clone();
-        handle_incode_request(&state, id_doc_id, t_id, di.id, vault, doc_request, is_sandbox).await?
+        handle_incode_request(
+            &state,
+            id_doc_id,
+            t_id,
+            di.id,
+            vault,
+            doc_request,
+            is_sandbox,
+            should_collect_selfie,
+        )
+        .await?
     } else {
         // Fixture response - we always complete successfully!
         let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
@@ -207,6 +219,7 @@ pub(in crate::user) async fn handle_incode_request(
     vault: Vault,
     doc_request: DocumentRequest,
     is_sandbox: bool,
+    should_collect_selfie: bool,
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
 
@@ -224,7 +237,7 @@ pub(in crate::user) async fn handle_incode_request(
         state,
         tenant_id,
         // TODO: upstream this somewhere based on OBC
-        get_config_id(&state.config, doc_request.should_collect_selfie, is_sandbox),
+        get_config_id(&state.config, should_collect_selfie, is_sandbox),
         ctx,
         is_sandbox,
     )

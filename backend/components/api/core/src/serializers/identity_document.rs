@@ -4,21 +4,19 @@ use crate::utils::db2api::DbToApi;
 
 impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::IdentityDocumentTimelineEvent {
     fn from_db((identity_doc, document_request): (IdentityDocument, DocumentRequest)) -> Self {
+        let skip_selfie = identity_doc.should_skip_selfie();
         let IdentityDocument {
             document_type,
             status,
             ..
         } = identity_doc;
 
-        let DocumentRequest {
-            should_collect_selfie,
-            ..
-        } = document_request;
+        let selfie_collected = document_request.should_collect_selfie && !skip_selfie;
 
         Self {
             status,
             document_type,
-            selfie_collected: should_collect_selfie,
+            selfie_collected,
         }
     }
 }

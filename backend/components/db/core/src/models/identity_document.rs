@@ -46,6 +46,12 @@ pub struct IdentityDocument {
     pub device_type: Option<DocumentScanDeviceType>,
 }
 
+impl IdentityDocument {
+    pub fn should_skip_selfie(&self) -> bool {
+        matches!(self.skip_selfie, Some(true))
+    }
+}
+
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = identity_document)]
 pub struct NewIdentityDocumentArgs {

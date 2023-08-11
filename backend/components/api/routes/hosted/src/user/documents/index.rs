@@ -9,6 +9,7 @@ use api_wire_types::{CreateIdentityDocumentRequest, CreateIdentityDocumentRespon
 use db::models::document_request::DocumentRequest as DbDocumentRequest;
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::vault::Vault;
+use feature_flag::BoolFlag;
 use newtypes::output::Csv;
 use newtypes::WorkflowGuard;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -34,7 +35,9 @@ pub async fn post(
     } = request.into_inner();
 
     let su_id = user_auth.scoped_user.id.clone();
+    let tenant_id = user_auth.tenant()?.id.clone();
     let wf_id = user_auth.workflow()?.id.clone();
+    let ff_client = state.feature_flag_client.clone();
     let id_doc = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -56,16 +59,31 @@ pub async fn post(
                 return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
             }
 
-            if skip_selfie == Some(true) {
-                tracing::info!(sv_id=%su_id, tenant=%user_auth.tenant()?.id.clone(), wf_id=%wf_id, device_type=?device_type, requires_selfie=%doc_request.should_collect_selfie, "User skipping selfie");
-            }
+            // we don't want any tenant to be able to skip selfie by default, eventually this will
+            // be in the OBC
+            let can_tenant_skip_selfie = ff_client
+                .flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id));
+ 
+            let should_skip_selfie = if skip_selfie == Some(true) && doc_request.should_collect_selfie {
+                if can_tenant_skip_selfie {
+                    tracing::info!(sv_id=%su_id, tenant=%tenant_id, wf_id=%wf_id, device_type=?device_type, requires_selfie=%doc_request.should_collect_selfie, "User skipping selfie");
+                    true
+                } else {
+                    tracing::warn!(sv_id=%su_id, tenant=%tenant_id, wf_id=%wf_id, device_type=?device_type, "User tried skipping selfie, but tenant is not allowed");
+                    false
+                }
+
+            } else {
+                false
+            };
+            
             
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request.id,
                 document_type,
                 country_code,
                 fixture_result,
-                skip_selfie,
+                skip_selfie: Some(should_skip_selfie),
                 device_type
             };
 

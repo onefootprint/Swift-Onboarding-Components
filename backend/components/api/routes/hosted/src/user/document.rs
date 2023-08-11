@@ -201,6 +201,7 @@ pub async fn post(
     let response = if let Some((di, doc_request, id_doc_id)) = created_reqs {
         // Not sandbox - make our request to vendors!
         let t_id = user_auth.scoped_user.tenant_id.clone();
+        let should_collect_selfie = doc_request.should_collect_selfie;
         handle_incode_request(
             &state,
             id_doc_id,
@@ -209,6 +210,7 @@ pub async fn post(
             vault,
             doc_request,
             fixture.is_some(),
+            should_collect_selfie,
         )
         .await?
     } else {

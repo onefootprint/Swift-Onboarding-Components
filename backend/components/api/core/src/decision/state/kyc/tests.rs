@@ -525,7 +525,7 @@ async fn redo_and_pass(
         .db_pool
         .db_query(move |conn| {
             let args = NewWorkflowArgs {
-                scoped_vault_id: sv_id.clone(),
+                scoped_vault_id: sv_id,
                 config: KycConfig { is_redo: true }.into(),
                 fixture_result: None,
                 ob_configuration_id: None,
