@@ -544,6 +544,43 @@ footprint_reason_code_enum! {
         #[note = "Mobile status absent", severity = SignalSeverity::Low,  description = "The mobile account is absent."]
         PhoneNumberMobileAccountStatusAbsent,
 
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[note = "Phone located matches phone number provided", severity = SignalSeverity::Info,  description = "The phone number provided matches the phone number on file."]
+        PhoneLocatedMatches,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[note = "Phone located partially matches phone number provided", severity = SignalSeverity::Info,  description = "The phone number provided partially matches the phone number on file."]
+        PhoneLocatedPartiallyMatches,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[note = "Phone located does not match phone number provided", severity = SignalSeverity::Info,  description = "The phone number provided does not match the phone number on file."]
+        PhoneLocatedDoesNotMatch,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[note = "Name associated with the phone number matches input", severity = SignalSeverity::Info,  description = "The name associated with the phone number is the same as the name provided"]
+        PhoneLocatedNameMatches,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+        #[note = "Name associated with the phone number partially matches input name", severity = SignalSeverity::Info,  description = "The name associated with the phone number partially matches the name provided"]
+        PhoneLocatedNamePartiallyMatches,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+        #[note = "Name associated with the phone number does not match input name", severity = SignalSeverity::Low,  description = "The name associated with the phone number does not match the name provided"]
+        PhoneLocatedNameDoesNotMatch,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[note = "Address associated with the phone number matches input", severity = SignalSeverity::Info,  description = "The address associated with the phone number is the same as the address provided"]
+        PhoneLocatedAddressMatches,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+        #[note = "Address associated with the phone number partially matches input address", severity = SignalSeverity::Info,  description = "The address associated with the phone number partially matches the address provided"]
+        PhoneLocatedAddressPartiallyMatches,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+        #[note = "Address associated with the phone number does not match input address", severity = SignalSeverity::Low,  description = "The address associated with the phone number does not match the address provided"]
+        PhoneLocatedAddressDoesNotMatch,
+
+
         // ~~~~~~~~~~~~ Identity ~~~~~~~~~~~~
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]

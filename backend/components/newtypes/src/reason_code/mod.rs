@@ -1,5 +1,6 @@
 mod experian;
 mod experian_address_codes;
+mod experian_phone_codes;
 mod experian_reason_code_helpers;
 mod experian_ssn_codes;
 mod idology;
@@ -11,6 +12,7 @@ use std::str::FromStr;
 
 pub use experian::*;
 pub use experian_address_codes::*;
+pub use experian_phone_codes::*;
 pub use experian_ssn_codes::*;
 pub use idology::*;
 pub use signal::*;

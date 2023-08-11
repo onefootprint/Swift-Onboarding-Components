@@ -73,6 +73,19 @@ impl NameGrouping {
             },
         }
     }
+
+    #[allow(unused)]
+    fn phone_codes(self) -> Vec<FootprintReasonCode> {
+        match self {
+            NameGrouping::FullNameSimple(ml) => match ml {
+                MatchLevel::NoMatch => vec![FootprintReasonCode::PhoneLocatedNameDoesNotMatch],
+                MatchLevel::Partial => vec![FootprintReasonCode::PhoneLocatedNamePartiallyMatches],
+                MatchLevel::Exact => vec![FootprintReasonCode::PhoneLocatedNameMatches],
+                _ => vec![],
+            },
+            _ => vec![],
+        }
+    }
 }
 
 #[derive(strum::EnumIter, PartialEq, Eq, Clone)]
@@ -188,11 +201,21 @@ impl AddressGrouping {
             },
         }
     }
+
+    #[allow(unused)]
+    fn phone_codes(self) -> Vec<FootprintReasonCode> {
+        match self {
+            AddressGrouping::FullAddressSimple(ml) => match ml {
+                MatchLevel::NoMatch => vec![FootprintReasonCode::PhoneLocatedAddressDoesNotMatch],
+                MatchLevel::Partial => vec![FootprintReasonCode::PhoneLocatedAddressPartiallyMatches],
+                MatchLevel::Exact => vec![FootprintReasonCode::PhoneLocatedAddressMatches],
+                _ => vec![],
+            },
+            _ => vec![],
+        }
+    }
 }
 
-// pub(crate)
-// SSN reported as deceased
-// last 4
 pub enum SsnTypes {
     // there are no partial cases for this
     Ssn4ExactMatch,
@@ -263,6 +286,38 @@ impl From<ExpSsnRCH> for Vec<FootprintReasonCode> {
     }
 }
 
+pub(crate) struct ExpPhRCH {
+    pub phone_match_level: MatchLevel,
+    #[allow(unused)]
+    name: NameGrouping,
+    #[allow(unused)]
+    address: AddressGrouping,
+}
+impl ExpPhRCH {
+    pub fn new(phone_match_level: MatchLevel, name: NameGrouping, address: AddressGrouping) -> Self {
+        Self {
+            phone_match_level,
+            name,
+            address,
+        }
+    }
+}
+
+impl From<ExpPhRCH> for Vec<FootprintReasonCode> {
+    fn from(erch: ExpPhRCH) -> Self {
+        // TODO: we don't know exactly how this interplays with existing reason codes, so we
+        // will just show the phone code only for now
+        // let name_codes = erch.name.phone_codes().into_iter();
+        // let address_codes = erch.address.phone_codes().into_iter();
+        match erch.phone_match_level {
+            MatchLevel::NoMatch => vec![FootprintReasonCode::PhoneLocatedDoesNotMatch],
+            MatchLevel::Partial => vec![FootprintReasonCode::PhoneLocatedPartiallyMatches],
+            MatchLevel::Exact => vec![FootprintReasonCode::PhoneLocatedMatches],
+            _ => vec![],
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -287,6 +342,14 @@ mod tests {
 
     fn test_name(name_grouping: NameGrouping) -> Vec<FootprintReasonCode> {
         name_grouping.codes()
+    }
+
+    #[test_case(NameGrouping::FullNameSimple(MatchLevel::Exact) => vec![PhoneLocatedNameMatches])]
+    #[test_case(NameGrouping::FullNameSimple(MatchLevel::NoMatch) => vec![PhoneLocatedNameDoesNotMatch])]
+    #[test_case(NameGrouping::FullNameSimple(MatchLevel::Partial) => vec![PhoneLocatedNamePartiallyMatches])]
+
+    fn test_name_phone_codes(name_grouping: NameGrouping) -> Vec<FootprintReasonCode> {
+        name_grouping.phone_codes()
     }
 
     #[test_case(AddressGrouping::SingleAddress((AddressAttribute::StreetName, MatchLevel::Exact)) => vec![AddressStreetNameMatches])]
@@ -318,6 +381,14 @@ mod tests {
     fn test_address(address_grouping: AddressGrouping) -> Vec<FootprintReasonCode> {
         address_grouping.codes()
     }
+
+    #[test_case(AddressGrouping::FullAddressSimple(MatchLevel::NoMatch) => vec![PhoneLocatedAddressDoesNotMatch])]
+    #[test_case(AddressGrouping::FullAddressSimple(MatchLevel::Partial) => vec![PhoneLocatedAddressPartiallyMatches])]
+    #[test_case(AddressGrouping::FullAddressSimple(MatchLevel::Exact) => vec![PhoneLocatedAddressMatches])]
+    fn test_address_phone_codes(address_grouping: AddressGrouping) -> Vec<FootprintReasonCode> {
+        address_grouping.phone_codes()
+    }
+
     #[test_case(SsnTypes::SsnIsItin => vec![SsnInputIsItin])]
     #[test_case(SsnTypes::SsnInvalid => vec![SsnInputIsInvalid])]
     #[test_case(SsnTypes::Ssn4ExactMatch => vec![SsnMatches])]
