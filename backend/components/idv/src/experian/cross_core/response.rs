@@ -1,6 +1,6 @@
 use newtypes::{
     ExperianAddressAndNameMatchReasonCodes, ExperianDobMatchReasonCodes, ExperianFraudShieldCodes,
-    ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
+    ExperianPhoneMatchReasonCodes, ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
 };
 
 use crate::experian::{
@@ -89,6 +89,12 @@ impl CrossCoreAPIResponse {
 
     pub fn ssn_match_reason_codes(&self) -> Result<ExperianSSNReasonCodes, Error> {
         let code = self.precise_id_response()?.ssn_match_reason_code();
+
+        Ok(code)
+    }
+
+    pub fn phone_match_reason_codes(&self) -> Result<ExperianPhoneMatchReasonCodes, Error> {
+        let code = self.precise_id_response()?.phone_match_reason_code();
 
         Ok(code)
     }
@@ -329,6 +335,7 @@ mod tests {
         let address_and_name_match = r.name_and_address_match_reason_codes().unwrap();
         let ssn_match = r.ssn_match_reason_codes().unwrap();
         let watchlist_match = r.watchlist_match_reason_codes().unwrap();
+        let phone_match = r.phone_match_reason_codes().unwrap();
 
         assert_have_same_elements(fs_matches, vec![ExperianFraudShieldCodes::InputSSNDeceased]);
 
@@ -336,6 +343,7 @@ mod tests {
         assert_eq!(address_and_name_match, ExperianAddressAndNameMatchReasonCodes::A1);
         assert_eq!(ssn_match, ExperianSSNReasonCodes::EA);
         assert_eq!(watchlist_match, ExperianWatchlistReasonCodes::R1);
+        assert_eq!(phone_match, ExperianPhoneMatchReasonCodes::EA);
 
         let response_with_not_parsable_address = cross_core_response_with_fraud_shield_codes(
             ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch,

@@ -1,6 +1,6 @@
 use newtypes::{
     scrub_pii_value, scrub_value, ExperianDobMatchReasonCodes, ExperianFraudShieldCodes,
-    ExperianSSNReasonCodes, PiiJsonValue, ScrubbedPiiString,
+    ExperianPhoneMatchReasonCodes, ExperianSSNReasonCodes, PiiJsonValue, ScrubbedPiiString,
 };
 
 use crate::experian::error::Error as ExperianError;
@@ -161,6 +161,32 @@ impl PreciseIDAPIResponse {
                 }
             })
             .unwrap_or(ExperianSSNReasonCodes::NX)
+    }
+
+    pub fn phone_match_reason_code(&self) -> ExperianPhoneMatchReasonCodes {
+        self.precise_match
+            .as_ref()
+            .and_then(|pm| pm.phones.as_ref())
+            .and_then(|ps: &PhoneMatch| ps.phone.as_ref())
+            .and_then(|pmi| {
+                pmi.clone()
+                    .get(0)
+                    .and_then(|item| item.summary.as_ref())
+                    .and_then(|s| s.verification_result.as_ref())
+                    .and_then(|mr| mr.code.as_ref())
+                    .and_then(|phone_code| {
+                        let deser = ExperianPhoneMatchReasonCodes::try_from(phone_code.as_str().trim());
+                        match deser {
+                            Ok(code) => Some(code),
+                            Err(_) => {
+                                // not erroring because we expect them
+                                log_unknown_match_code(phone_code, "phone");
+                                None
+                            }
+                        }
+                    })
+            })
+            .unwrap_or(ExperianPhoneMatchReasonCodes::NX)
     }
 }
 

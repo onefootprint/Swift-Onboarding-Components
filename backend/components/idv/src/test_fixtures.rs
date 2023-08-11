@@ -1327,7 +1327,7 @@ pub fn cross_core_response_with_fraud_shield_codes(
                                                             "summary": {
                                                                 "verificationResult": {
                                                                     "value": "",
-                                                                    "code": "NX"
+                                                                    "code": "EA"
                                                                 },
                                                                 "classification": {
                                                                     "value": "",
