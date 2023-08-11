@@ -287,8 +287,24 @@ fn get_requirement_inner(
                     vec![]
                 };
 
+                let collected_data = ob_config
+                    .can_access_data
+                    .iter()
+                    .filter(|cdo| {
+                        // Only include CDO's from optional_data if they were collected
+                        if ob_config.optional_data.contains(cdo) {
+                            cdo.required_data_identifiers()
+                                .into_iter()
+                                .all(|di| uvw.has_field(di))
+                        } else {
+                            true
+                        }
+                    })
+                    .cloned()
+                    .collect();
+
                 let fields_to_authorize = AuthorizeFields {
-                    collected_data: ob_config.can_access_data.clone(),
+                    collected_data,
                     document_types,
                 };
                 Some(OnboardingRequirement::Authorize { fields_to_authorize })

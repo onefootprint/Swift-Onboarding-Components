@@ -60,3 +60,6 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn):
     if submit_ssn:
         expected_populated_attributes.append("ssn9")
     assert set(met_requirements['populated_attributes']) == set(expected_populated_attributes)
+
+    authorize_requirement = get_requirement_from_requirements("authorize", bifrost.get_status()["requirements"])
+    assert set(authorize_requirement['fields_to_authorize']['collected_data']) == set(expected_populated_attributes)
