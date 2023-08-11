@@ -361,10 +361,11 @@ def create_tenant(org_data, ob_conf_data):
     return tenant
 
 
-def create_ob_config(tenant, name, must_collect_data, can_access_data, cip_kind=None):
+def create_ob_config(tenant, name, must_collect_data, can_access_data, cip_kind=None, optional_data=None):
     ob_conf_data = {
         "name": name,
         "must_collect_data": must_collect_data,
+        "optional_data": optional_data,
         "can_access_data": can_access_data,
         "cip_kind": cip_kind,
     }

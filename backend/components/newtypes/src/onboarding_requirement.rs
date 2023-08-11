@@ -12,6 +12,7 @@ pub enum OnboardingRequirement {
     /// There is missing identity data that must be collected
     CollectData {
         missing_attributes: Vec<CollectedDataOption>,
+        optional_attributes: Vec<CollectedDataOption>,
         populated_attributes: Vec<CollectedDataOption>,
     },
     /// There is missing investor profile data that must be collected
@@ -47,6 +48,7 @@ impl OnboardingRequirement {
         match self {
             Self::CollectData {
                 missing_attributes,
+                optional_attributes: _,
                 populated_attributes: _,
             } => missing_attributes.is_empty(),
             Self::CollectInvestorProfile {

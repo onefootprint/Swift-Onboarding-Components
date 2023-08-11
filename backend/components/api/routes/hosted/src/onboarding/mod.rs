@@ -14,7 +14,6 @@ use db::{
     },
     PgConn,
 };
-use either::Either;
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
 use newtypes::{AuthorizeFields, IdentityDocumentStatus, OnboardingRequirement, OnboardingRequirementKind};
@@ -112,21 +111,28 @@ fn get_progress<Type>(
     ob_config: &ObConfiguration,
     di_kind: DID,
 ) -> RequirementProgress {
-    let (populated_attributes, missing_attributes) = ob_config
+    let mut populated_attributes = Vec::new();
+    let mut missing_attributes = Vec::new();
+
+    ob_config
         .must_collect_data
         .iter()
-        .filter(|cdo| cdo.parent().data_identifier_kind() == di_kind)
-        .cloned()
-        .partition_map(|cdo| {
+        .map(|cdo| (cdo, true))
+        .chain(ob_config.optional_data.iter().map(|cdo| (cdo, false)))
+        .filter(|(cdo, _)| cdo.parent().data_identifier_kind() == di_kind)
+        .for_each(|(cdo, must_collect)| {
             let has_all_dis = cdo
                 .required_data_identifiers()
                 .into_iter()
                 .all(|di| vw.has_field(di));
-            match has_all_dis {
-                true => Either::Left(cdo),
-                false => Either::Right(cdo),
+
+            if has_all_dis {
+                populated_attributes.push(cdo.clone());
+            } else if must_collect {
+                missing_attributes.push(cdo.clone());
             }
         });
+
     RequirementProgress {
         populated_attributes,
         missing_attributes,
@@ -181,6 +187,7 @@ fn get_requirement_inner(
                 // if ob config needs to collect id data
                 OnboardingRequirement::CollectData {
                     missing_attributes,
+                    optional_attributes: ob_config.optional_data.clone(),
                     populated_attributes,
                 }
             })
