@@ -40,7 +40,6 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
     background: ${theme.components.bifrost.dialog.bg};
     display: flex;
     flex-direction: column;
-    margin: 0;
     overflow-y: auto;
     position: relative;
 
@@ -52,25 +51,20 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
         height: auto;
         max-height: calc(100% - (2 * ${theme.spacing[9]}));
         width: 480px;
-        margin: ${theme.spacing[9]};
-        margin: 0;
       `}
-
-      > div {
-        height: 100%;
-      }
     }
 
     body[data-variant='drawer'] & {
-      width: 460px;
-      height: 100vh;
-      max-height: unset;
-      position: fixed;
-      right: 0;
+      height: ${height};
+      width: 100%;
 
-      > div {
-        height: 100%;
-      }
+      ${media.greaterThan('md')`
+        width: 460px;
+        height: 100vh;
+        max-height: unset;
+        position: fixed;
+        right: 0;
+      `}
     }
   `}
 
