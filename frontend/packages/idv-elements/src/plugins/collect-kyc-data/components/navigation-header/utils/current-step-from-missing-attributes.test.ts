@@ -61,7 +61,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
     ).toEqual(0);
   });
 
-  it('returns 1 if showing the page with only missing attribute', () => {
+  it('returns 1 if showing the page with only missing or optional attribute', () => {
     expect(
       getCurrentStepFromMissingAttributes(
         {
@@ -79,9 +79,22 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [CollectedKycDataOption.partialAddress],
+          missingAttributes: [CollectedKycDataOption.ssn4],
           populatedAttributes: [],
           optionalAttributes: [],
+        },
+        {},
+        'ssn',
+      ),
+    ).toEqual(1);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [],
+          populatedAttributes: [],
+          optionalAttributes: [CollectedKycDataOption.ssn9],
         },
         {},
         'ssn',
@@ -182,6 +195,19 @@ describe('getCurrentStepFromMissingAttributes', () => {
         'confirm',
       ),
     ).toEqual(2);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [CollectedKycDataOption.dob],
+          populatedAttributes: [],
+          optionalAttributes: [CollectedKycDataOption.ssn4],
+        },
+        {},
+        'ssn',
+      ),
+    ).toEqual(2);
   });
 
   it('calculates correctly when initData is populated', () => {
@@ -255,6 +281,32 @@ describe('getCurrentStepFromMissingAttributes', () => {
           [IdDI.state]: { value: 'NY' },
           [IdDI.zip]: { value: '10001' },
           [IdDI.country]: { value: 'US' },
+        },
+        'confirm',
+      ),
+    ).toEqual(0);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.fullAddress,
+          ],
+          populatedAttributes: [],
+          optionalAttributes: [CollectedKycDataOption.ssn4],
+        },
+        {
+          [IdDI.firstName]: { value: 'John' },
+          [IdDI.lastName]: { value: 'John' },
+          [IdDI.dob]: { value: '1990-01-01' },
+          [IdDI.addressLine1]: { value: '123 Main St' },
+          [IdDI.city]: { value: 'New York' },
+          [IdDI.state]: { value: 'NY' },
+          [IdDI.zip]: { value: '10001' },
+          [IdDI.country]: { value: 'US' },
+          [IdDI.ssn4]: { value: '1234' },
         },
         'confirm',
       ),

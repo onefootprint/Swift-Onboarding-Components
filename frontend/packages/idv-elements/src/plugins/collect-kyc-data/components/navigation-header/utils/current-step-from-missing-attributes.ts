@@ -15,31 +15,34 @@ const getCurrentStepFromMissingAttributes = (
   initData: KycData,
   state: StateValue,
 ) => {
-  const { missingAttributes } = requirement;
+  const attributesToCollect = [
+    ...requirement.missingAttributes,
+    ...requirement.optionalAttributes,
+  ];
   // Use init data below to figure out which pages we visited previously
-  if (!hasMissingAttributes(missingAttributes, initData)) {
+  if (!hasMissingAttributes(attributesToCollect, initData)) {
     return 0;
   }
   let currentStep = 0;
-  if (isMissingEmailAttribute(missingAttributes, initData)) {
+  if (isMissingEmailAttribute(attributesToCollect, initData)) {
     currentStep += 1;
     if (state === 'email') {
       return currentStep;
     }
   }
-  if (isMissingBasicAttribute(missingAttributes, initData)) {
+  if (isMissingBasicAttribute(attributesToCollect, initData)) {
     currentStep += 1;
     if (state === 'basicInformation') {
       return currentStep;
     }
   }
-  if (isMissingResidentialAttribute(missingAttributes, initData)) {
+  if (isMissingResidentialAttribute(attributesToCollect, initData)) {
     currentStep += 1;
     if (state === 'residentialAddress') {
       return currentStep;
     }
   }
-  if (isMissingSsnAttribute(missingAttributes, initData)) {
+  if (isMissingSsnAttribute(attributesToCollect, initData)) {
     currentStep += 1;
     if (state === 'ssn') {
       return currentStep;

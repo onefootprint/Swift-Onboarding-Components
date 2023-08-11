@@ -18,7 +18,6 @@ const Confirm = () => {
 
   const [state, send] = useCollectKycDataMachine();
   const { authToken, data, requirement, initialData } = state.context;
-  const { missingAttributes } = requirement;
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
   const isLoading = syncEmailMutation.isLoading || syncDataMutation.isLoading;
@@ -46,7 +45,11 @@ const Confirm = () => {
   const handleConfirm = () => {
     // If email is missing, we need to sync it successfully before we can
     // sync the rest of the kyc data.
-    if (!isMissingEmailAttribute(missingAttributes)) {
+    const attributes = [
+      ...requirement.missingAttributes,
+      ...requirement.optionalAttributes,
+    ];
+    if (!isMissingEmailAttribute(attributes)) {
       handleSyncData();
       return;
     }
