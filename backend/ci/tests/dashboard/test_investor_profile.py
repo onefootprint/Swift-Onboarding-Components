@@ -9,8 +9,7 @@ from tests.constants import IP_DATA
 def sb_user_with_investor_profile(sandbox_tenant, investor_profile_ob_config, twilio):
     bifrost = BifrostClient.new(investor_profile_ob_config, twilio)
     user = bifrost.run()
-    body = get("entities", dict(kind="person"), *sandbox_tenant.db_auths)
-    entity = body["data"][0]
+    entity = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
     assert set(entity["attributes"]) > set(IP_DATA)
     return user
 

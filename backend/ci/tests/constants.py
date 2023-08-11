@@ -110,7 +110,9 @@ BUSINESS_DATA = {
 }
 
 IP_DATA = {
+    "investor_profile.employment_status": "employed",
     "investor_profile.occupation": "Neurosurgeon",
+    "investor_profile.employer": "Hayes Valley Hospital",
     "investor_profile.annual_income": "lt50k",
     "investor_profile.net_worth": "gt1m",
     "investor_profile.investment_goals": '["grow_long_term_wealth", "buy_a_home"]',
@@ -160,7 +162,9 @@ CDO_TO_DIS = {
     "business_kyced_beneficial_owners": ["business.kyced_beneficial_owners"],
     "business_corporation_type": ["business.corporation_type"],
     "investor_profile": [
+        "investor_profile.employment_status",
         "investor_profile.occupation",
+        "investor_profile.employer",
         "investor_profile.brokerage_firm_employer",
         "investor_profile.annual_income",
         "investor_profile.net_worth",
