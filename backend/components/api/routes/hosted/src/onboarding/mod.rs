@@ -16,7 +16,10 @@ use db::{
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
-use newtypes::{AuthorizeFields, IdentityDocumentStatus, OnboardingRequirement, OnboardingRequirementKind};
+use newtypes::{
+    AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, OnboardingRequirement,
+    OnboardingRequirementKind, Selfie,
+};
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
     InvestorProfileKind as IPK, ModernIdDocKind, PiiString, ScopedVaultId,
@@ -279,12 +282,15 @@ fn get_requirement_inner(
         }
         OnboardingRequirementKind::Authorize => {
             if args.workflow.authorized_at.is_none() {
-                let document_types = if ob_config.can_access_document() {
+                let (document_types, skipped_selfie) = if ob_config.can_access_document() {
                     // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
                     let id_docs = IdentityDocument::list(conn, &args.workflow.scoped_vault_id)?;
-                    id_docs.iter().map(|id| id.document_type).unique().collect()
+                    let doc_types = id_docs.iter().map(|id| id.document_type).unique().collect();
+                    // unless all were skipped, we need to authorize since we may have collected it
+                    let selfie_skipped = id_docs.iter().all(|id| id.should_skip_selfie());
+                    (doc_types, selfie_skipped)
                 } else {
-                    vec![]
+                    (vec![], false)
                 };
 
                 let collected_data = ob_config
@@ -299,6 +305,12 @@ fn get_requirement_inner(
                         } else {
                             true
                         }
+                    })
+                    .filter(|cdo| {
+                        !(matches!(
+                            cdo,
+                            CollectedDataOption::Document(DocumentCdoInfo(_, _, Selfie::RequireSelfie))
+                        ) && skipped_selfie)
                     })
                     .cloned()
                     .collect();

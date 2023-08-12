@@ -1,4 +1,5 @@
 use db::models::{document_request::DocumentRequest, identity_document::IdentityDocument};
+use newtypes::DocumentScanDeviceType;
 
 use crate::utils::db2api::DbToApi;
 
@@ -8,6 +9,7 @@ impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::IdentityDo
         let IdentityDocument {
             document_type,
             status,
+            device_type,
             ..
         } = identity_doc;
 
@@ -17,6 +19,7 @@ impl DbToApi<(IdentityDocument, DocumentRequest)> for api_wire_types::IdentityDo
             status,
             document_type,
             selfie_collected,
+            device_type: device_type.unwrap_or(DocumentScanDeviceType::Mobile),
         }
     }
 }

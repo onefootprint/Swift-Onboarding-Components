@@ -63,7 +63,8 @@ pub async fn post(
             // be in the OBC
             let can_tenant_skip_selfie = ff_client
                 .flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id));
- 
+
+            
             let should_skip_selfie = if skip_selfie == Some(true) && doc_request.should_collect_selfie {
                 if can_tenant_skip_selfie {
                     tracing::info!(sv_id=%su_id, tenant=%tenant_id, wf_id=%wf_id, device_type=?device_type, requires_selfie=%doc_request.should_collect_selfie, "User skipping selfie");
