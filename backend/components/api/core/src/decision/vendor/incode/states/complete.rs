@@ -25,6 +25,7 @@ use newtypes::DataIdentifier;
 use newtypes::DataRequest;
 use newtypes::DocumentKind;
 use newtypes::DocumentSide;
+use newtypes::FootprintReasonCode;
 use newtypes::IdentityDocumentId;
 use newtypes::IdentityDocumentStatus;
 use newtypes::ModernIdDocKind;
@@ -146,10 +147,28 @@ impl Complete {
             .into_iter()
             .map(|r| (r, VendorAPI::IncodeFetchOCR, ocr_verification_result_id.clone()));
 
+        let additional_reason_codes = vec![
+            id_doc.should_skip_selfie().then_some((
+                FootprintReasonCode::DocumentSelfieWasSkipped,
+                VendorAPI::IncodeFetchScores,
+                score_verification_result_id.clone(),
+            )),
+            id_doc.collected_on_desktop().then_some((
+                FootprintReasonCode::DocumentCollectedViaDesktop,
+                VendorAPI::IncodeFetchScores,
+                score_verification_result_id.clone(),
+            )),
+        ]
+        .into_iter()
+        .flatten();
+
         RiskSignal::bulk_create(
             conn,
             sv_id,
-            score_reason_codes.chain(ocr_reason_codes).collect(),
+            score_reason_codes
+                .chain(ocr_reason_codes)
+                .chain(additional_reason_codes)
+                .collect(),
             newtypes::RiskSignalGroupKind::Doc,
             false,
         )?;

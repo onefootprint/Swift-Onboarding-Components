@@ -754,6 +754,14 @@ footprint_reason_code_enum! {
         #[note = "Document image does not match selfie", severity = SignalSeverity::High,  description = "The image on the document does not match the captured selfie."]
         DocumentSelfieDoesNotMatch,
 
+        #[scope = SignalScope::Selfie, additional_scopes = vec![], match_level = None]
+        #[note = "Selfie was skipped", severity = SignalSeverity::High,  description = "Although requested, selfie image was not captured because the user completed the onboarding on a device that did not have a camera available"]
+        DocumentSelfieWasSkipped,
+
+        #[scope = SignalScope::Selfie, additional_scopes = vec![], match_level = None]
+        #[note = "Document was collected on a desktop device", severity = SignalSeverity::Medium,  description = "Document was collected on a desktop device"]
+        DocumentCollectedViaDesktop,
+
         // OCR matching
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
         #[note = "Document OCR name does not match input", severity = SignalSeverity::Medium,  description = "The OCR name does not match the name that was input."]

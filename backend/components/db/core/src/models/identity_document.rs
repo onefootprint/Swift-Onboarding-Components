@@ -50,6 +50,10 @@ impl IdentityDocument {
     pub fn should_skip_selfie(&self) -> bool {
         matches!(self.skip_selfie, Some(true))
     }
+
+    pub fn collected_on_desktop(&self) -> bool {
+        matches!(self.device_type, Some(DocumentScanDeviceType::Desktop))
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]
