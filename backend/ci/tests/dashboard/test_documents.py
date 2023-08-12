@@ -219,7 +219,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
         assert not body["errors"]
     # now check what fields we have to authorize
     status_after_doc = bifrost.get_status()
-    fields_to_authorize = get_requirement_from_requirements("authorize", status['requirements'])["fields_to_authorize"]["collected_data"]
+    fields_to_authorize = get_requirement_from_requirements("authorize", status_after_doc['requirements'])["fields_to_authorize"]["collected_data"]
     
     # we didn't authorize selfie
     # TODO: i think this should authorize document but not doc + selfie. will check with frontend

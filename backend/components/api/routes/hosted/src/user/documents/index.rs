@@ -62,7 +62,7 @@ pub async fn post(
             // we don't want any tenant to be able to skip selfie by default, eventually this will
             // be in the OBC
             let can_tenant_skip_selfie = ff_client
-                .flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id));
+                .flag(BoolFlag::CanSkipSelfie(&tenant_id));
 
             
             let should_skip_selfie = if skip_selfie == Some(true) && doc_request.should_collect_selfie {
