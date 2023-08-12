@@ -4,13 +4,6 @@ apply plugin: "com.facebook.react"
 import com.android.build.OutputFile
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
-def expoDebuggableVariants = ['debug']
-// Override `debuggableVariants` for expo-updates debugging
-if (System.getenv('EX_UPDATES_NATIVE_DEBUG') == "1") {
-  react {
-    expoDebuggableVariants = []
-  }
-}
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -19,7 +12,7 @@ if (System.getenv('EX_UPDATES_NATIVE_DEBUG') == "1") {
 react {
     reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
     hermesCommand = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
-    debuggableVariants = expoDebuggableVariants
+    
     /* Folders */
     //   The root of your project, i.e. where "package.json" lives. Default is '..'
     // root = file("../")
@@ -66,7 +59,7 @@ react {
 
 // Override `hermesEnabled` by `expo.jsEngine`
 ext {
-  hermesEnabled = (findProperty('expo.jsEngine') ?: "hermes") == "hermes"
+  hermesEnabled = (findProperty('jsEngine') ?: "hermes") == "hermes"
 }
 
 /**
@@ -192,21 +185,6 @@ dependencies {
     implementation project(':react-native-passkey')
     implementation project(':react-native-community_masked-view')
     implementation project(':react-native-async-storage_async-storage')
-    implementation project(':expo-updates-interface')
-    implementation project(':expo-splash-screen')
-    implementation project(':expo-modules-core')
-    implementation project(':expo-manifests')
-    implementation project(':expo-keep-awake')
-    implementation project(':expo-json-utils')
-    implementation project(':expo-font')
-    implementation project(':expo-file-system')
-    implementation project(':expo-dev-menu-interface')
-    implementation project(':expo-dev-menu')
-    implementation project(':expo-dev-launcher')
-    implementation project(':expo-dev-client')
-    implementation project(':expo-constants')
-    implementation project(':expo-application')
-    implementation project(':expo')
 
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")

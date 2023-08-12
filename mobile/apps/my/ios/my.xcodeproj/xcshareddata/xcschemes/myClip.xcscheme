@@ -31,7 +31,7 @@
    </TestAction>
    <LaunchAction
       buildConfiguration = "Release"
-      appClipInvocationURLString = "https://handoff.onefootprint.com/?r=140#tok_04ZJD2Wndzyyu34wduC4NS3SCcpdDBugAt"
+      appClipInvocationURLString = "https://handoff.onefootprint.com/appclip?r=283#tok_yJhpOBELlrOjVMCV62sJiTdez8qJgUtXWU"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -53,14 +53,14 @@
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "_XCAppClipURL"
-            value = "https://handoff.onefootprint.com/?r=140#tok_04ZJD2Wndzyyu34wduC4NS3SCcpdDBugAt"
+            value = "https://handoff.onefootprint.com/appclip?r=283#tok_yJhpOBELlrOjVMCV62sJiTdez8qJgUtXWU"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
-      appClipInvocationURLString = "https://handoff.onefootprint.com/?r=140#tok_04ZJD2Wndzyyu34wduC4NS3SCcpdDBugAt"
+      appClipInvocationURLString = "https://handoff.onefootprint.com/appclip?r=283#tok_yJhpOBELlrOjVMCV62sJiTdez8qJgUtXWU"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"

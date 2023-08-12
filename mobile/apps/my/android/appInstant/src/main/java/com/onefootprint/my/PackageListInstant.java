@@ -21,8 +21,8 @@ import com.horcrux.svg.SvgPackage;
 import com.reactnativepasskey.PasskeyPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import expo.modules.ExpoModulesPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
+import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
 public class PackageListInstant {
     private Application application;
@@ -77,8 +77,8 @@ public class PackageListInstant {
                 new PasskeyPackage(),
                 new RNCMaskedViewPackage(),
                 new AsyncStoragePackage(),
-                new ExpoModulesPackage(),
-                new ReanimatedPackage()
+                new ReanimatedPackage(),
+                new SplashScreenReactPackage()
         ));
     }
 }

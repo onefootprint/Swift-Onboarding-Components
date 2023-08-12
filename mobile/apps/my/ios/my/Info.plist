@@ -54,8 +54,14 @@
 	<string>$(PRODUCT_NAME) needs access to your Motion.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Need to access your photo library to select a photo add and update profile picture</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>DMSans-Bold.otf</string>
+		<string>DMSans-Medium.otf</string>
+		<string>DMSans-Regular.otf</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
-	<string>SplashScreen</string>
+	<string>LaunchScreen.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

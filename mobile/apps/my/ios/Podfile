@@ -1,4 +1,3 @@
-require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
 require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
 require File.join(File.dirname(`node --print "require.resolve('@react-native-community/cli-platform-ios/package.json')"`), "native_modules")
 # @generated begin react-native-app-clip-1 - expo prebuild (DO NOT MODIFY) sync-1d1ec847ac0bec07679d00caec26c10e9d724b2d
@@ -44,14 +43,9 @@ def use_native_modules_app_clip!(config = nil)
   project_root = Pathname.new(config["project"]["ios"]["sourceDir"])
 
   packages = config["dependencies"]
-  idv_packages = ["@expo-google-fonts/dm-sans", "@tanstack/react-query", "expo-splash-screen", 
-                    "@shopify/flash-list", "expo", "expo-dev-client", "expo-linking", "expo-splash-screen", "expo-fon", 
-                    "react-native-app-clip", "react-native-passkey", "react-native-svg", "react-native-vision-camera", "vision-camera-plugin-document",
-                    "vision-camera-plugin-face-detection", "expo-status-bar", "react-native-reanimated", "react-native-screens", "react-native-safe-area-context"]
-  filtered_packages = packages.select { |key, _| idv_packages.include?(key) }
   found_pods = []
 
-  filtered_packages.each do |package_name, package|
+  packages.each do |package_name, package|
     next unless package_config = package["platforms"]["ios"]
 
     podspec_path = package_config["podspecPath"]
@@ -172,7 +166,6 @@ require 'json'
 podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties.json'))) rescue {}
 
 ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '1' : '0'
-ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] = '1' if podfile_properties['EX_DEV_CLIENT_NETWORK_INSPECTOR'] == 'true'
 
 platform :ios, podfile_properties['ios.deploymentTarget'] || '13.0'
 install! 'cocoapods',
@@ -205,7 +198,6 @@ elsif podfile_properties.key?('ios.flipper') then
 end
 
 target 'my' do
-  use_expo_modules!
   config = use_native_modules!
 
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
@@ -216,7 +208,7 @@ target 'my' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    :hermes_enabled => podfile_properties['expo.jsEngine'] == nil || podfile_properties['expo.jsEngine'] == 'hermes',
+    :hermes_enabled => podfile_properties['jsEngine'] == nil || podfile_properties['jsEngine'] == 'hermes',
     :fabric_enabled => flags[:fabric_enabled],
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/..",
@@ -245,20 +237,11 @@ target 'my' do
       end
     end
   end
-
-  post_integrate do |installer|
-    begin
-      expo_patch_react_imports!(installer)
-    rescue => e
-      Pod::UI.warn e
-    end
-  end
 end
 
 # @generated begin react-native-app-clip-2 - expo prebuild (DO NOT MODIFY) sync-1157cc43c07f4d654f09ac6089b909a501d32dec
 
-target 'myClip' do          
-  use_expo_modules!
+target 'myClip' do 
   config = use_native_modules_app_clip!
   
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
@@ -269,7 +252,7 @@ target 'myClip' do
   
   use_react_native!(
     :path => config[:reactNativePath],
-    :hermes_enabled => podfile_properties['expo.jsEngine'] == nil || podfile_properties['expo.jsEngine'] == 'hermes',
+    :hermes_enabled => podfile_properties['jsEngine'] == nil || podfile_properties['jsEngine'] == 'hermes',
     :fabric_enabled => flags[:fabric_enabled],
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/..",

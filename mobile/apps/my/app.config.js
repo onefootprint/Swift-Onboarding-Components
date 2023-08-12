@@ -33,12 +33,6 @@ module.exports = {
   },
   plugins: [
     [
-      'react-native-app-clip',
-      {
-        name: 'My App Clip',
-      },
-    ],
-    [
       'react-native-vision-camera',
       {
         cameraPermissionText: '$(PRODUCT_NAME) needs access to your Camera.',
