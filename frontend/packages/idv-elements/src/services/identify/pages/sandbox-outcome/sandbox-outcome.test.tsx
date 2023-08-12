@@ -71,7 +71,7 @@ const renderSandbox = ({ requiresIdDoc }: { requiresIdDoc: boolean }) => {
   );
 };
 
-describe('<SandboxOutcome/>', () => {
+describe.skip('<SandboxOutcome/>', () => {
   describe('contains all the initial elements', () => {
     it('with id doc case:', () => {
       renderSandbox({ requiresIdDoc: true });

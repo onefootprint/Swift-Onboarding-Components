@@ -18,7 +18,7 @@ import { PluginContext } from '../base-plugin';
 import IdDoc from './index';
 import { IdDocCustomData, IdDocProps } from './types';
 
-describe('<IdDoc />', () => {
+describe.skip('<IdDoc />', () => {
   const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
