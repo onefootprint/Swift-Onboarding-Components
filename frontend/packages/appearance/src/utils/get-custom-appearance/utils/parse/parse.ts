@@ -1,10 +1,6 @@
-import DOMPurify from 'isomorphic-dompurify';
-
 const parse = (params: string) => {
-  const sanitizedParams = DOMPurify.sanitize(params);
-
   try {
-    const parsed = JSON.parse(decodeURIComponent(sanitizedParams));
+    const parsed = JSON.parse(decodeURIComponent(params));
     return parsed;
   } catch (_) {
     console.warn(`Could not parse appearance rules. They will be ignored.`);

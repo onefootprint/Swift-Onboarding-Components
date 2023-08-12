@@ -21,8 +21,7 @@
     "@onefootprint/footprint-js": "*",
     "@onefootprint/styled": "*",
     "@onefootprint/types": "*",
-    "@onefootprint/ui": "*",
-    "isomorphic-dompurify": "^1.8.0"
+    "@onefootprint/ui": "*"
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
