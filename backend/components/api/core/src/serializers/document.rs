@@ -1,5 +1,6 @@
 use api_wire_types::DocumentImageError;
 use db::models::{document_upload::DocumentUpload, identity_document::IdentityDocument};
+use newtypes::DocumentScanDeviceType;
 
 use crate::utils::db2api::DbToApi;
 
@@ -15,6 +16,7 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             selfie_score,
             ocr_confidence_score,
             status,
+            device_type,
             ..
         } = identity_doc;
 
@@ -32,6 +34,8 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             document_score,
             selfie_score,
             ocr_confidence_score,
+            // TODO: Should we have default here? I think so
+            device_type: device_type.unwrap_or(DocumentScanDeviceType::Mobile),
         }
     }
 }

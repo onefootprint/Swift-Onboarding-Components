@@ -11,6 +11,7 @@ pub struct Document {
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
+    pub device_type: DocumentScanDeviceType,
 }
 
 #[derive(Debug, Serialize, Apiv2Schema, JsonSchema)]
