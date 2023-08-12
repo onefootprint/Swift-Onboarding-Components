@@ -251,7 +251,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 .find(|(req, _)| req.vendor_api == VendorAPI::IncodeFetchScores)
                 .unwrap();
             let score_result = IncodeAPIResult::<FetchScoresResponse>::try_from(
-                score_vres.clone().unwrap().response.inner(),
+                score_vres.clone().unwrap().response_for_test().inner(),
             )
             .unwrap()
             .into_success()
@@ -483,11 +483,12 @@ async fn test_fail(state: &State, is_selfie: bool) {
                 .into_iter()
                 .find(|(req, _)| req.vendor_api == VendorAPI::IncodeFetchScores)
                 .unwrap();
-            let score_result =
-                IncodeAPIResult::<FetchScoresResponse>::try_from(score_vres.unwrap().response.inner())
-                    .unwrap()
-                    .into_success()
-                    .unwrap();
+            let score_result = IncodeAPIResult::<FetchScoresResponse>::try_from(
+                score_vres.unwrap().response_for_test().inner(),
+            )
+            .unwrap()
+            .into_success()
+            .unwrap();
             let parsed_tests = score_result.get_id_tests();
             assert_eq!(
                 parsed_tests.get(&IncodeTest::FirstNameMatch).unwrap(),

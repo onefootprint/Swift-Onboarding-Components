@@ -18,12 +18,18 @@ pub struct VerificationResult {
     pub id: VerificationResultId,
     pub request_id: VerificationRequestId,
     #[diesel(deserialize_as = serde_json::Value)]
-    pub response: ScrubbedPiiJsonValue,
+    response: ScrubbedPiiJsonValue,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub e_response: Option<SealedVaultBytes>,
     pub is_error: bool,
+}
+
+impl VerificationResult {
+    pub fn response_for_test(&self) -> ScrubbedPiiJsonValue {
+        self.response.clone()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
