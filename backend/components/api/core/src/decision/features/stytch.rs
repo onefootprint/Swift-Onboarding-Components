@@ -29,6 +29,7 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
         Reason::UserAgentDeception => Some(FootprintReasonCode::BrowserTampering),
         Reason::IpRateLimitExceededCritical => None,
         Reason::TuningRuleMatch => None,
+        Reason::AwsDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
         Reason::Unknown(_) => None,
     }
 }

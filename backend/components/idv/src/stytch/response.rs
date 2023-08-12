@@ -101,6 +101,7 @@ pub enum Reason {
     UserAgentDeception,
     IpRateLimitExceededCritical,
     TuningRuleMatch,
+    AwsDatacenterIp,
     #[strum(default)]
     Unknown(String),
 }
