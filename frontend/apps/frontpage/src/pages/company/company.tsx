@@ -108,12 +108,6 @@ const Company = () => {
       twitter: 'https://twitter.com/elliottvforde',
     },
     {
-      name: 'Filipe Botti',
-      avatarSrc: '/team/member-filipe.png',
-      linkedin: 'https://www.linkedin.com/in/filipe-botti/',
-      role: 'Engineering',
-    },
-    {
       name: 'Keagan Long',
       avatarSrc: '/team/member-keagan.png',
       role: 'Engineering',
