@@ -21,7 +21,7 @@
     ],
     "target": {
       "namespace": "web",
-      "site": "https://handoff.onefootprint.com/appclip"
+      "site": "https://onefootprint.com"
     }
   }
 ]
