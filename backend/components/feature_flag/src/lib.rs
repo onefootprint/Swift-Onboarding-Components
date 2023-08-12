@@ -75,7 +75,7 @@ impl LaunchDarklyFeatureFlagClient {
             Ok(ref result) => {
                 tracing::info!(flag_name=%flag_name, detail=format!("{:?}", result), "LaunchDarkly flag result")
             }
-            Err(ref err) => tracing::warn!(flag_name=%flag_name, err=%err, "LaunchDarklyError"),
+            Err(ref err) => tracing::warn!(flag_name=%flag_name, error=%err, "LaunchDarklyError"),
         }
     }
 }

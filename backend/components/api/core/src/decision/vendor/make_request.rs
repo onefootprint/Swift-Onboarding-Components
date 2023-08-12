@@ -500,9 +500,9 @@ pub async fn make_vendor_requests(
             match res {
                 Ok(vr) => Ok((reqs[idx].clone(), vr)),
                 Err(e) => {
-                    tracing::warn!(
+                    tracing::error!(
+                        error = ?e,
                         vendor_api = %e.vendor_api,
-                        err = format!("{:?}", e.error),
                         log_msg
                     );
 

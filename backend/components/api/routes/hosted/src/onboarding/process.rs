@@ -83,7 +83,7 @@ pub async fn post(
                     tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "[Authorize] Ran workflow");
                 }
                 Err(e) => {
-                    tracing::error!(error=%e, "[Authorize] Error running workflow");
+                    tracing::error!(error=?e, "[Authorize] Error running workflow");
                 }
             };
         }
@@ -136,7 +136,7 @@ async fn run_kyb_if_needed(state: &State, user_auth: CheckedUserObAuthContext) -
                         tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran KYB workflow");
                     }
                     Err(e) => {
-                        tracing::error!(error=%e, "Error running KYB workflow");
+                        tracing::error!(error=?e, "Error running KYB workflow");
                     }
                 };
             } else {
@@ -145,7 +145,7 @@ async fn run_kyb_if_needed(state: &State, user_auth: CheckedUserObAuthContext) -
                 let kyb_res =
                     decision::vendor::middesk::run_kyb(state, biz_ob.id, &uv, &wf, &tenant.id).await;
                 if let Err(e) = kyb_res {
-                    tracing::error!(error=%e, "Error kicking off KYB")
+                    tracing::error!(error=?e, "Error kicking off KYB")
                 }
                 // temporary until we migrate to a KYB workflow
                 task::execute_webhook_tasks(state.clone());

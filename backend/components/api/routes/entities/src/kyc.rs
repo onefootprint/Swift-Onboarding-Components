@@ -137,7 +137,7 @@ pub async fn post(
     if matches!(ww.state, WorkflowKind::Kyc(KycState::DataCollection(_))) {
         ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
     } else {
-        tracing::warn!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "[/kyc] Workflow has already been run");
+        tracing::error!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "[/kyc] Workflow has already been run");
     }
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 

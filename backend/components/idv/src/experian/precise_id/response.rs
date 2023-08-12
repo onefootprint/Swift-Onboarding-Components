@@ -106,7 +106,7 @@ impl PreciseIDAPIResponse {
                             match res {
                                 c @ Ok(_) => c.ok(),
                                 Err(e) => {
-                                    tracing::error!(code=%c, err=%e, "could not parse response code for experian");
+                                    tracing::error!(code=%c, error=?e, "could not parse response code for experian");
                                     None
                                 }
                             }
@@ -346,7 +346,7 @@ pub struct PhoneMatchItemSummary {
 }
 
 pub(crate) fn log_unknown_match_code(code: &str, attribute: &str) {
-    tracing::warn!(attribute=%attribute, code=%code, "Unknown match code received")
+    tracing::error!(attribute=%attribute, code=%code, "Unknown match code received")
 }
 
 #[cfg(test)]

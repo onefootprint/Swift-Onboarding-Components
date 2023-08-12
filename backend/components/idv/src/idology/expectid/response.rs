@@ -73,7 +73,7 @@ impl Restriction {
                 .filter_map(|r| match r {
                     Ok(h) => Some(h),
                     Err(e) => {
-                        tracing::error!(err=%e, "Error parsing Idology watchlist hit");
+                        tracing::error!(error=?e, "Error parsing Idology watchlist hit");
                         None
                     }
                 })

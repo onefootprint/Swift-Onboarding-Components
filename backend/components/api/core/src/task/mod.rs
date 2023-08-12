@@ -83,7 +83,7 @@ pub async fn poll_and_execute_tasks(
                 None
             }
             Err(e) => {
-                tracing::error!(err=?e, task_id=%t.id, num_attempts=t.num_attempts, "Task failed");
+                tracing::error!(error=?e, task_id=%t.id, num_attempts=t.num_attempts, "Task failed");
                 Some(format!("{:?}", e))
             }
         };

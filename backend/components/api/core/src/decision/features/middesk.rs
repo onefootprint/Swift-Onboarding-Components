@@ -506,7 +506,7 @@ pub fn reason_codes(business_response: &BusinessResponse) -> Vec<FootprintReason
                     match task_kind {
                         Ok(tk) => Into::<Option<FootprintReasonCode>>::into(tk),
                         Err(e) => {
-                            tracing::warn!(err=%e, "Error parsing Middesk TaskKind");
+                            tracing::error!(error=%e, "Error parsing Middesk TaskKind");
                             None
                         }
                     }

@@ -102,7 +102,7 @@ impl State {
             }
             Err(err) => {
                 tracing::warn!(
-                    err = format!("{:?}", err),
+                    error=?err,
                     "FeatureFlagClient failed to initialize"
                 );
                 feature_flag_client

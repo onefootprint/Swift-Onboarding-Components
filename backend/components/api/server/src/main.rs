@@ -174,6 +174,6 @@ async fn socure_reason_code_check(config: &Config) {
                 tracing::warn!(reason_code_discrepancies = format!("{:?}", reason_code_discrepancies), "[Socure Reason Code check] found discrepancies between latest API response and defined enum");
             }
         }
-        Err(err) => tracing::warn!(err = format!("{:?}", err), "[Socure Reason Code check] Error"),
+        Err(err) => tracing::warn!(error=?err, "[Socure Reason Code check] Error"),
     }
 }
