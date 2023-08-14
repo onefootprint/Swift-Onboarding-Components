@@ -92,7 +92,7 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 	-X POST \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
 	-d '{
-			"fields": ["id.last_name", "id.dob", "id.ssn9", "custom.ach_account"],
+			"fields": ["id.last_name`, `id.dob`, `id.ssn9`, `custom.ach_account"],
 			"reason": "direct deposit verification"
 		}'
 ```
@@ -217,27 +217,77 @@ For listing, decrypting, and updating -- all the APIs above are identical for st
 
 Footprint's vaulting aims to be flexible while providing base-level validation logic for structured vault data such as Identity or PCI data. Below we outline the validation rules enforced by vaults.
 
-| Data Identifier              | Class    | Rules                                                                                                                                                                                        |
-| ---------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id.phone_number`            | Identity | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number                                                                                                               |
-| `id.email`                   | Identity | [Email address](https://datatracker.ietf.org/doc/html/rfc3696)                                                                                                                               |
-| `id.first_name`              | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
-| `id.last_name`               | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
-| `id.ssn9`                    | Identity | `9` digit string (note hyphens will be ignored and stripped out)                                                                                                                             |
-| `id.ssn4`                    | Identity | `4` digit string                                                                                                                                                                             |
-| `id.dob`                     | Identity | Date of birth formatted as `%Y-%m-%d`                                                                                                                                                        |
-| `id.address_line1`           | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
-| `id.address_line2`           | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
-| `id.city`                    | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
-| `id.state`                   | Identity | Any valid UTF-8 String <1KB                                                                                                                                                                  |
-| `id.zip`                     | Identity | Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                                                            |
-| `id.country`                 | Identity | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                                                              |
-| `id.nationality`             | Identity | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                                                              |
-| `card.*.name`                | PCI      | Any UTF-8 String <200B                                                                                                                                                                       |
-| `card.*.number`              | PCI      | Valid credit or debit card number (length and Luhn check). Supports: Visa, Mastercard, Amex, MIR, Diners Club, Discover, UnionPay, JCB, Visa Electron, Maestro, Forbrugsforeningen, Dankort. |
-| `card.*.cvc`                 | PCI      | Valid `3` or `4` digit string card security code relative to the number if provided (Amex is 4 digits, others are 3)                                                                         |
-| `card.*.expiration`          | PCI      | Any valid expiration date `MM/YYYY`,`MM/YY`, `MM-YY`, or `MM-YYYY`. Note: always stored as`MM/YYYY`.                                                                                         |
-| `card.*.number_last4`        | PCI      | `4` digit string                                                                                                                                                                             |
-| `card.*.billing_address.zip` | PCI      | Same as `id.zip`                                                                                                                                                                             |
-| `card.*.issuer`              | PCI      | Automatically populated when a recognized number is supplied. See `card.*.number` for supported issuers.                                                                                     |
-| `custom.*`                   | Custom   | Any UTF-8 String. Note that custom field name represented by `*` can be any string matching `^([A-Za-z0-9\-_\.]+)$`.                                                                         |
+### Identity fields
+
+| Data Identifier    | Rules                                                                           |
+| ------------------ | ------------------------------------------------------------------------------- |
+| `id.phone_number`  | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number  |
+| `id.email`         | [Email address](https://datatracker.ietf.org/doc/html/rfc3696)                  |
+| `id.first_name`    | Any valid UTF-8 String <1KB                                                     |
+| `id.last_name`     | Any valid UTF-8 String <1KB                                                     |
+| `id.ssn9`          | `9` digit string (note hyphens will be ignored and stripped out)                |
+| `id.ssn4`          | `4` digit string                                                                |
+| `id.dob`           | Date of birth formatted as `%Y-%m-%d`                                           |
+| `id.address_line1` | Any valid UTF-8 String <1KB                                                     |
+| `id.address_line2` | Any valid UTF-8 String <1KB                                                     |
+| `id.city`          | Any valid UTF-8 String <1KB                                                     |
+| `id.state`         | Any valid UTF-8 String <1KB                                                     |
+| `id.zip`           | Postal code `^([A-Za-z0-9\- ]*)$`                                               |
+| `id.country`       | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes) |
+
+### Business fields
+
+| Data Identifier                    | Rules                                                                                                                                                                         |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `business.name`                    | Any valid UTF-8 String <1KB                                                                                                                                                   |
+| `business.dba`                     | Doing business as alias. Any valid UTF-8 String <1KB                                                                                                                          |
+| `business.website`                 | Business website.                                                                                                                                                             |
+| `business.phone_number`            | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number                                                                                                |
+| `business.tin`                     | Taxpayer identification number. Must include 9 digits, can include hyphens (-).                                                                                               |
+| `business.address_line1`           | Registered business address. Any valid UTF-8 String <1KB                                                                                                                      |
+| `business.address_line2`           | Registered business address. Any valid UTF-8 String <1KB                                                                                                                      |
+| `business.city`                    | Registered business address. Any valid UTF-8 String <1KB                                                                                                                      |
+| `business.state`                   | Registered business address. Any valid UTF-8 String <1KB                                                                                                                      |
+| `business.zip`                     | Registered business address. Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                |
+| `business.country`                 | Registered business address. Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                  |
+| `business.beneficial_owners`       | An array of business owners with `first_name` (string), `last_name` (string) and `ownership_stake` (numeric and > 0) fields.                                                  |
+| `business.kyced_beneficial_owners` | An array of business owners that should be KYC'ed. Business owner entries include `first_name` (string), `last_name` (string) and `ownership_stake` (numeric and > 0) fields. |
+| `business.corporation_type`        | One of `corporation`, `llc`, `partnership`, `sole_proprietorship`, `non_profit`, `unknown`, `trust`, `agent`                                                                  |
+
+### Investor profile fields
+
+| Data Identifier                            | Rules                                                                                                                                   |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `investor_profile.employment_status`       | One of `employed`, `unemployed`, `student`, `retired`                                                                                   |
+| `investor_profile.employer`                | Any valid UTF-8 String <1KB                                                                                                             |
+| `investor_profile.occupation`              | Any valid UTF-8 String <1KB                                                                                                             |
+| `investor_profile.brokerage_firm_employer` | Any valid UTF-8 String <1KB                                                                                                             |
+| `investor_profile.annual_income`           | One of `lt50k`, `s50k_to100k`, `s100k_to250k`, `s250k_to500k`, `gt500k`                                                                 |
+| `investor_profile.net_worth`               | One of `lt50k`, `s50k_to100k`, `s100k_to250k`, `s250k_to500k`, `s500k_to1m`, `gt1m`                                                     |
+| `investor_profile.investment_goals`        | An array of `grow_long_term_wealth`, `save_for_retirement`, `support_loved_ones`, `buy_a_home`, `pay_off_debt`, `start_my_own_business` |
+| `investor_profile.risk_tolerance`          | One of `conservative`, `moderate`, `aggressive`                                                                                         |
+| `investor_profile.declarations`            | An array of `affiliated_with_us_broker`, `senior_executive`, `senior_political_figure`, `family_of_political_figure`                    |
+
+### Document fields
+
+| Data Identifier                    | Rules                                                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `document.finra_compliance_letter` | Required if `investor_profile.declarations` includes `affiliated_with_us_broker` or `senior_executive`. |
+
+### Card fields
+
+| Data Identifier              | Rules                                                                                                                                                                                        |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `card.*.name`                | Any UTF-8 String <200B                                                                                                                                                                       |
+| `card.*.number`              | Valid credit or debit card number (length and Luhn check). Supports: Visa, Mastercard, Amex, MIR, Diners Club, Discover, UnionPay, JCB, Visa Electron, Maestro, Forbrugsforeningen, Dankort. |
+| `card.*.cvc`                 | Valid `3` or `4` digit string card security code relative to the number if provided (Amex is 4 digits, others are 3)                                                                         |
+| `card.*.expiration`          | Any valid expiration date `MM/YYYY`,`MM/YY`, `MM-YY`, or `MM-YYYY`. Note: always stored as`MM/YYYY`.                                                                                         |
+| `card.*.number_last4`        | `4` digit string                                                                                                                                                                             |
+| `card.*.billing_address.zip` | Same as `id.zip`                                                                                                                                                                             |
+| `card.*.issuer`              | Automatically populated when a recognized number is supplied. See `card.*.number` for supported issuers.                                                                                     |
+
+### Custom fields
+
+| Data Identifier | Rules                                                                                                                      |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `custom.*`      | Any UTF-8 String. Note that custom field name represented by `*` can be any UTF-8 string matching `^([A-Za-z0-9\-_\.]+)$`. |
