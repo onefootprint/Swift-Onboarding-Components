@@ -23,6 +23,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
             status,
             can_access_data,
             is_live,
+            optional_data,
             ..
         } = ob_config;
         let Tenant {
@@ -43,6 +44,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
             logo_url,
             privacy_policy_url,
             must_collect_data,
+            optional_data,
             can_access_data,
             is_live,
             created_at,

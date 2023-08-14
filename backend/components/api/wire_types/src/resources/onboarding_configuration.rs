@@ -12,6 +12,7 @@ pub struct OnboardingConfiguration {
     pub logo_url: Option<String>,
     pub privacy_policy_url: Option<String>,
     pub must_collect_data: Vec<CollectedDataOption>,
+    pub optional_data: Vec<CollectedDataOption>,
     pub can_access_data: Vec<CollectedDataOption>,
     pub is_live: bool,
     pub created_at: DateTime<Utc>,
