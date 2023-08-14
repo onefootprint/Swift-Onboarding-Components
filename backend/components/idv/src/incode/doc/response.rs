@@ -575,10 +575,6 @@ mod tests {
             &IncodeStatus::Fail
         );
         assert_eq!(
-            parsed_tests.get(&IncodeTest::PostitCheck).unwrap(),
-            &IncodeStatus::Ok
-        );
-        assert_eq!(
             parsed_tests.get(&IncodeTest::DocumentClassification).unwrap(),
             &IncodeStatus::Warn
         );

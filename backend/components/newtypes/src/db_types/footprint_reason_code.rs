@@ -703,12 +703,21 @@ footprint_reason_code_enum! {
         DocumentInvalidTemplateLayout,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document image possible tampering", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being physically manipulated or tampered."]
+        #[note = "Document image possible tampering", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being manipulated or tampered."]
         DocumentPossibleImageTampering,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document has no signs of physical tampering", severity = SignalSeverity::Info,  description = "The image of the document has no sign of being physically manipulated or tampered."]
+        #[note = "Document has no signs of physical tampering", severity = SignalSeverity::Info,  description = "The image of the document has no sign of being manipulated or tampered."]
         DocumentNoImageTampering,
+
+
+        #[scope = SignalScope::Selfie, additional_scopes = vec![SignalScope::Document], match_level = None]
+        #[note = "Selfie used with different information", severity = SignalSeverity::Medium,  description = "The face from the selfie image has been used with different information across Footprint's network."]
+        DocumentSelfieUsedWithDifferentInformation,
+
+        #[scope = SignalScope::Selfie, additional_scopes = vec![SignalScope::Document], match_level = None]
+        #[note = "Selfie not used with different information", severity = SignalSeverity::Info,  description = "The face from the selfie image not been used with different information across Footprint's network."]
+        DocumentSelfieNotUsedWithDifferentInformation,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document image possible fake", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being a fake document. For example: slight difference in layout of the ID, different font or font size."]

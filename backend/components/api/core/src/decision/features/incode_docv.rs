@@ -278,7 +278,8 @@ mod tests {
             DocumentBarcodeCouldBeRead,
             DocumentNotFakeImage,
             DocumentOcrSuccessful,
-            DocumentSelfieMatches
+            DocumentSelfieMatches,
+            DocumentSelfieNotUsedWithDifferentInformation
         ], true; "everything passes")]
         #[test_case(
             DocTestOpts {
@@ -305,7 +306,8 @@ mod tests {
                 DocumentBarcodeCouldNotBeRead,
                 DocumentPossibleFakeImage,
                 DocumentOcrNotSuccessful,
-                DocumentSelfieDoesNotMatch
+                DocumentSelfieDoesNotMatch,
+                DocumentSelfieNotUsedWithDifferentInformation
             ], true; "everything fails")]
         #[test_case(
             DocTestOpts {
@@ -332,7 +334,8 @@ mod tests {
                 DocumentBarcodeCouldNotBeRead,
                 DocumentNotFakeImage,
                 DocumentOcrSuccessful,
-                DocumentSelfieDoesNotMatch
+                DocumentSelfieDoesNotMatch,
+                DocumentSelfieNotUsedWithDifferentInformation
             ], true; "mix of things")]
             #[test_case(
                 DocTestOpts {
@@ -359,6 +362,7 @@ mod tests {
                     DocumentBarcodeCouldBeRead,
                     DocumentNotFakeImage,
                     DocumentOcrSuccessful,
+                    DocumentSelfieNotUsedWithDifferentInformation // not quite correct, but this just won't appear in ID tests if we don't send selfie so we won't get any id test
                     // no selfie code
                 ], false; "everything passes, but selfie isn't collected")]  
     fn test_reason_codes_from_score_response(doc_opts: DocTestOpts, expected: Vec<FootprintReasonCode>, expect_selfie: bool) {

@@ -1,16 +1,11 @@
 use chrono::Utc;
 use db::{
     models::{
-        data_lifetime::DataLifetime,
-        decision_intent::DecisionIntent,
-        document_request::{DocumentRequest, NewDocumentRequestArgs},
-        document_upload::DocumentUpload,
-        identity_document::IdentityDocument,
+        data_lifetime::DataLifetime, decision_intent::DecisionIntent, document_request::DocumentRequest,
+        document_upload::DocumentUpload, identity_document::IdentityDocument,
         incode_verification_session::IncodeVerificationSession,
-        incode_verification_session_event::IncodeVerificationSessionEvent,
-        risk_signal::RiskSignal,
-        user_consent::UserConsent,
-        verification_request::VerificationRequest,
+        incode_verification_session_event::IncodeVerificationSessionEvent, insight_event::InsightEvent,
+        risk_signal::RiskSignal, user_consent::UserConsent, verification_request::VerificationRequest,
     },
     test_helpers::assert_have_same_elements,
     DbError, DbResult,
@@ -68,6 +63,8 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         None,
     )
     .await;
+    let wf_id = wf.id.clone();
+    let ob_id = ob.id.clone();
 
     // Needed for db constraints
     let su_id = su.id.clone();
@@ -82,17 +79,11 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
             )
             .unwrap();
 
-            let args = NewDocumentRequestArgs {
-                scoped_vault_id: su_id,
-                ref_id: None,
-                workflow_id: wf.id,
-                should_collect_selfie: is_selfie,
-                only_us: false,
-                doc_type_restriction: None,
-            };
-            let doc_request = DocumentRequest::create(conn.conn(), args).unwrap();
+            let ie = InsightEvent::get_by_onboarding_id(conn, &ob_id)?.unwrap();
+            let doc_request = DocumentRequest::get(conn.conn(), &wf_id)?.unwrap();
+
             let note = "I, Bob Boberto, consent to NOTHING".into();
-            UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id.unwrap(), note, false)?;
+            UserConsent::create(conn, Utc::now(), ob.id, ie.id, note, false)?;
 
             Ok((
                 di,
@@ -311,6 +302,8 @@ async fn test_fail(state: &State, is_selfie: bool) {
         None,
     )
     .await;
+    let wf_id = wf.id.clone();
+    let ob_id = ob.id.clone();
 
     // Needed for db constraints
     let suid = su.id.clone();
@@ -324,19 +317,12 @@ async fn test_fail(state: &State, is_selfie: bool) {
                 DecisionIntentKind::DocScan,
             )
             .unwrap();
+            let ie = InsightEvent::get_by_onboarding_id(conn, &ob_id)?.unwrap();
 
-            let args = NewDocumentRequestArgs {
-                scoped_vault_id: suid,
-                ref_id: None,
-                workflow_id: wf.id,
-                should_collect_selfie: is_selfie,
-                only_us: false,
-                doc_type_restriction: None,
-            };
-            let doc_request = DocumentRequest::create(conn.conn(), args).unwrap();
+            let doc_request = DocumentRequest::get(conn.conn(), &wf_id)?.unwrap();
 
             let note = "I, Bob Boberto, consent to NOTHING".into();
-            UserConsent::create(conn, Utc::now(), ob.id, ob.insight_event_id.unwrap(), note, false)?;
+            UserConsent::create(conn, Utc::now(), ob.id, ie.id, note, false)?;
 
             let id_doc = db::tests::fixtures::identity_document::create(conn, Some(doc_request.id));
             assert!(!id_doc.images(conn, true)?.is_empty());

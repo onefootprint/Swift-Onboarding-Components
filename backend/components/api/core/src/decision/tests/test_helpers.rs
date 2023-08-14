@@ -1,6 +1,7 @@
 use db::{
     models::{
         contact_info::ContactInfo,
+        insight_event::CreateInsightEvent,
         ob_configuration::ObConfiguration,
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
@@ -68,9 +69,15 @@ pub async fn create_user_and_onboarding(
 
             let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), kyc_fixture_result);
 
-            let (ob, wf, biz_wf) =
-                utils::onboarding::get_or_start_onboarding(conn, &uv.id, &su.id, &ob_config, None, biz_args)
-                    .unwrap();
+            let (ob, wf, biz_wf) = utils::onboarding::get_or_start_onboarding(
+                conn,
+                &uv.id,
+                &su.id,
+                &ob_config,
+                Some(CreateInsightEvent { ..Default::default() }),
+                biz_args,
+            )
+            .unwrap();
 
             // Mark the onboardings as authorized since they would be authorized in prod by the
             // time they're used here

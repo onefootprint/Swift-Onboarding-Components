@@ -66,10 +66,27 @@ incode_reason_code_enum! {
         #[ser = "tamperCheck"]
         #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageTampering, FRC::DocumentPossibleImageTampering))]
         TamperCheck,
-        // Only available in demo. Related to digital tampering
-        #[ser = "postitCheck"]
-        #[footprint_reason_code = None]
-        PostitCheck,
+        // Legacy naming of the Id alteration check
+        #[ser = "postitCheckFront"]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageTampering, FRC::DocumentPossibleImageTampering))]
+        PostitCheckFront,
+        #[ser = "postitCheckBack"]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageTampering, FRC::DocumentPossibleImageTampering))]
+        PostitCheckBack,
+        // This is the new postitCheck.
+        // Not sure if this is the right FRC, but it's close enough.
+        #[ser = "idAlterationCheckFront"]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageTampering, FRC::DocumentPossibleImageTampering))]
+        IdAlterationCheckFront,
+        #[ser = "idAlterationCheckBack"]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageTampering, FRC::DocumentPossibleImageTampering))]
+        IdAlterationCheckBack,
+        // this is the "selfie duplicate" check
+        // this is done relative to all of footprint's sessions. If a tenant is having issues with duplicate fraud/malicious actors
+        // we should provision them their own environment so the checks are on a smaller surface area and more signalful
+        #[ser = "idAlreadyUsedCheck"]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentSelfieNotUsedWithDifferentInformation, FRC::DocumentSelfieUsedWithDifferentInformation))]
+        IdAlreadyUsedCheck,
         // Alignment:
         // the picture is badly aligned and the correcting algorithm for alignment and cropping could not correct it for processing, and also when cropped captured image of ID  is near the edges.
         #[ser = "alignment"]
