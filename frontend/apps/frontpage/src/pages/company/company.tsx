@@ -108,6 +108,12 @@ const Company = () => {
       twitter: 'https://twitter.com/elliottvforde',
     },
     {
+      name: 'Amanda Lee',
+      avatarSrc: '/team/member-amanda.png',
+      role: 'Engineering',
+      linkedin: 'https://www.linkedin.com/in/a7e/',
+    },
+    {
       name: 'Keagan Long',
       avatarSrc: '/team/member-keagan.png',
       role: 'Engineering',
