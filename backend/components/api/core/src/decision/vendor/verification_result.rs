@@ -15,7 +15,7 @@ use newtypes::{
 
 use super::{
     make_request::VerificationRequestWithVendorResponse,
-    vendor_api::vendor_api_response::scrub_raw_vendor_response,
+    vendor_api::vendor_api_response::scrub_raw_error_vendor_response,
 };
 
 /// Save a verification result, encrypting the response payload in the process
@@ -63,7 +63,7 @@ pub fn save_error_verification_results(
 
             Ok(NewVerificationResult {
                 request_id: req.id.clone(),
-                response: scrub_raw_vendor_response(&req.vendor_api, &r)?,
+                response: scrub_raw_error_vendor_response(&req.vendor_api, &r)?,
                 timestamp: now,
                 e_response: Some(e_response),
                 is_error: true,
@@ -80,6 +80,16 @@ pub fn save_verification_result(
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
 ) -> Result<VerificationResult, ApiError> {
     save_verification_results(conn, slice::from_ref(vendor_response), user_vault_public_key)?
+        .pop()
+        .ok_or(ApiError::from(DbError::IncorrectNumberOfRowsUpdated))
+}
+
+pub fn save_error_verification_result(
+    conn: &mut PgConn,
+    vendor_response: &(VerificationRequest, Option<PiiJsonValue>),
+    user_vault_public_key: &VaultPublicKey,
+) -> Result<VerificationResult, ApiError> {
+    save_error_verification_results(conn, slice::from_ref(vendor_response), user_vault_public_key)?
         .pop()
         .ok_or(ApiError::from(DbError::IncorrectNumberOfRowsUpdated))
 }

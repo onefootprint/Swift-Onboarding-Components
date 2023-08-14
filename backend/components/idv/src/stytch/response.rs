@@ -14,7 +14,7 @@ pub fn parse_response(value: serde_json::Value) -> Result<LookupResponse, Error>
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(untagged)]
 #[allow(clippy::large_enum_variant)]
 pub enum Response {
@@ -22,7 +22,7 @@ pub enum Response {
     Error(StytchErrorResponse),
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct StytchErrorResponse {
     pub error_message: StytchError,
     pub status_code: Option<u16>,

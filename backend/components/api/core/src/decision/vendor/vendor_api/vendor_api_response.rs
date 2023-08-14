@@ -1,5 +1,5 @@
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
-use idv::stytch::response::LookupResponse;
+use idv::stytch;
 use newtypes::{
     EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI,
     VerificationRequestId, VerificationResultId,
@@ -82,7 +82,7 @@ where
     Ok(scrubbed)
 }
 
-pub fn scrub_raw_vendor_response(
+pub fn scrub_raw_error_vendor_response(
     vendor_api: &VendorAPI,
     raw_response: &PiiJsonValue,
 ) -> Result<ScrubbedPiiJsonValue, serde_json::Error> {
@@ -360,7 +360,7 @@ impl TypedMapKey<VendorAPIResponseMarker> for IncodeProcessFace {
     type Value = ProcessFaceResponse;
 }
 impl TypedMapKey<VendorAPIResponseMarker> for StytchLookup {
-    type Value = LookupResponse;
+    type Value = stytch::response::Response;
 }
 
 /// Verification Request and Result map, used in conjunction with the above map for reason codes

@@ -27,7 +27,7 @@ impl StytchClient {
             "https://telemetry.stytch.com/v1/fingerprint/lookup?telemetry_id={}",
             telemetry_id
         );
-
+        tracing::info!(?telemetry_id, ?url, project_id=?self.project_id, "StytchClient::lookup");
         let res = self
             .client
             .get(url)
