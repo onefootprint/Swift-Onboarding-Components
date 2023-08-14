@@ -19,7 +19,7 @@ use newtypes::TenantId;
 use newtypes::WorkflowId;
 use newtypes::{
     AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo,
-    OnboardingId, VaultId, VerificationResultId,
+    VaultId, VerificationResultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -31,7 +31,6 @@ use super::user_timeline::UserTimeline;
 #[diesel(table_name = onboarding_decision)]
 pub struct OnboardingDecision {
     pub id: OnboardingDecisionId,
-    pub onboarding_id: Option<OnboardingId>,
     pub logic_git_hash: String,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
