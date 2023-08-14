@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoClock16 } from '@onefootprint/icons';
+import { IcoPencil16 } from '@onefootprint/icons';
 import { Tab, Tabs } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -14,8 +14,8 @@ const ManualReviewNavigator = () => {
 
   const manualReviewRoute = {
     href: '/manual-review',
-    Icon: IcoClock16,
-    text: t('manual-review'),
+    Icon: IcoPencil16,
+    text: t('manual-reviews'),
   };
 
   return (

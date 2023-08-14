@@ -262,7 +262,11 @@
         "developers": "Developers",
         "settings": "Settings",
         "log-out": "Log out",
-        "manual-review": "Manual review"
+        "manual-reviews": "Manual reviews",
+        "sandbox": {
+          "label": "Sandbox mode",
+          "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
+        }
       },
       "sandbox-banner": {
         "title": "Sandbox mode.",
@@ -1222,10 +1226,6 @@
         "subtitle": {
           "live": "You're viewing live keys. Enable sandbox mode to view test keys.",
           "sandbox": "You're viewing test keys. Disable sandbox mode to view live keys."
-        },
-        "toggle-sandbox": {
-          "label": "Sandbox mode",
-          "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
         }
       },
       "tabs": {

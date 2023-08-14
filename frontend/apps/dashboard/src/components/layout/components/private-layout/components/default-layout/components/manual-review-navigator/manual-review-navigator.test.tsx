@@ -26,7 +26,7 @@ describe('<ManualReviewNavigator />', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Manual review (0)')).toBeInTheDocument();
+        expect(screen.getByText('Manual reviews (0)')).toBeInTheDocument();
       });
     });
 
@@ -41,7 +41,7 @@ describe('<ManualReviewNavigator />', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Manual review (2)')).toBeInTheDocument();
+        expect(screen.getByText('Manual reviews (2)')).toBeInTheDocument();
       });
     });
 
@@ -54,7 +54,7 @@ describe('<ManualReviewNavigator />', () => {
       });
 
       const manualReview = screen.getByRole('tab', {
-        name: 'Manual review',
+        name: 'Manual reviews',
       }) as HTMLAnchorElement;
       expect(manualReview.href.endsWith('/manual-review')).toBeTruthy();
     });

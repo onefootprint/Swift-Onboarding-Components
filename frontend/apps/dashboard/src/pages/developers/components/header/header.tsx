@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Box, Toggle, Tooltip, Typography } from '@onefootprint/ui';
+import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 import useOrgSession from 'src/hooks/use-org-session';
 
@@ -22,21 +22,6 @@ const Header = () => {
             ? t('header.subtitle.sandbox')
             : t('header.subtitle.live')}
         </Typography>
-      </Box>
-      <Box>
-        <Tooltip
-          disabled={sandbox.canToggle}
-          text={t('header.toggle-sandbox.tooltip')}
-          alignment="end"
-          position="bottom"
-        >
-          <Toggle
-            checked={sandbox.isSandbox}
-            disabled={!sandbox.canToggle}
-            label={t('header.toggle-sandbox.label')}
-            onChange={sandbox.toggle}
-          />
-        </Tooltip>
       </Box>
     </HeaderContainer>
   );

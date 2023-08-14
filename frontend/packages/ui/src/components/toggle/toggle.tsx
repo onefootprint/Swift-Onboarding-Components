@@ -158,7 +158,7 @@ const Label = styled.label<{ size: 'default' | 'compact' }>`
   ${({ theme, size }) => css`
     ${size === 'compact'
       ? createFontStyles('body-4')
-      : createFontStyles('label-3')};
+      : createFontStyles('body-3')};
     color: ${theme.color.primary};
     cursor: pointer;
 

@@ -8,7 +8,15 @@ import {
   ThemedLogoFpCompact,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Container, Tab, Tabs, Typography } from '@onefootprint/ui';
+import {
+  Box,
+  Container,
+  Tab,
+  Tabs,
+  Toggle,
+  Tooltip,
+  Typography,
+} from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -27,7 +35,7 @@ type DefaultLayoutProps = {
 const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   const { t } = useTranslation('components.private-layout.nav');
   const router = useRouter();
-  const { data } = useOrgSession();
+  const { data, sandbox } = useOrgSession();
 
   const routes = [
     { href: '/users', Icon: IcoUsers16, text: t('users') },
@@ -76,8 +84,24 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
                   {text}
                 </Tab>
               ))}
+              <ManualReviewNavigator />
             </Tabs>
-            <ManualReviewNavigator />
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Tooltip
+                disabled={sandbox.canToggle}
+                text={t('sandbox.tooltip')}
+                alignment="end"
+                position="bottom"
+              >
+                <Toggle
+                  size="compact"
+                  checked={sandbox.isSandbox}
+                  disabled={!sandbox.canToggle}
+                  label={t('sandbox.label')}
+                  onChange={sandbox.toggle}
+                />
+              </Tooltip>
+            </Box>
           </Container>
         </Nav>
         <Container>{children}</Container>
