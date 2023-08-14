@@ -188,9 +188,6 @@ const Container = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: none;
-  user-select: none;
-  touch-action: none;
 `;
 
 const Replay = styled(motion.button)`

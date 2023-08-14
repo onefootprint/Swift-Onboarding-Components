@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoHeart24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
@@ -19,7 +20,7 @@ const MoreThanExpect = () => {
       <SectionTitle
         title={t('title')}
         subtitle={t('subtitle')}
-        icon="/home/icons/heart.png"
+        icon={IcoHeart24}
       />
       <Grid>
         <FeatureCard

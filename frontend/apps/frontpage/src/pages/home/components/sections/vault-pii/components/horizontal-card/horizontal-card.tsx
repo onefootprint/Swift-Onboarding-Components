@@ -1,6 +1,7 @@
+import { primitives } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { media, Typography } from '@onefootprint/ui';
+import { createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 
 type HorizontalCardProps = {
@@ -24,18 +25,24 @@ const HorizontalCard = ({
       <TextContainer>
         <Title>
           {icon}
-          <Typography variant="label-2" as="h3" color="quinary">
-            {title}
-          </Typography>
+          <TitleText>{title}</TitleText>
         </Title>
-        <Typography variant="body-2" as="p" color="quinary">
-          {subtitle}
-        </Typography>
+        <SubtitleText>{subtitle}</SubtitleText>
       </TextContainer>
       <ImageContainer>{children}</ImageContainer>
     </Container>
   );
 };
+
+const TitleText = styled.h3`
+  ${createFontStyles('label-2')};
+  color: ${primitives.Gray0};
+`;
+
+const SubtitleText = styled.p`
+  ${createFontStyles('body-2')};
+  color: ${primitives.Gray100};
+`;
 
 const Container = styled.div<{ gridArea?: string }>`
   ${({ gridArea, theme }) => css`
@@ -43,9 +50,9 @@ const Container = styled.div<{ gridArea?: string }>`
     width: 100%;
     grid-area: ${gridArea};
     border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid #20264f;
+    border: ${theme.borderWidth[1]} solid ${primitives.Gray700};
     overflow: hidden;
-    background-color: #0b0f2b99;
+    background-color: ${primitives.Gray900};
     z-index: 1;
     grid-template-columns: 100%;
     grid-template-rows: 1fr fit-content(100%);
@@ -58,13 +65,14 @@ const Container = styled.div<{ gridArea?: string }>`
       grid-template-rows: 100%;
       grid-template-areas: 'text image';
       height: 480px;
-      background-color: #0b0f2b;
+      background-color: ${primitives.Gray900};
     `}
   `}
 `;
 
 const TextContainer = styled.div`
   ${({ theme }) => css`
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[4]};
@@ -76,12 +84,13 @@ const TextContainer = styled.div`
 
     ${media.greaterThan('md')`
       padding: ${theme.spacing[10]};
-      background: linear-gradient(90deg, #141a42 0%, transparent 100%);
+      background-blend-mode: multiply;
+      background: radial-gradient(
+          60% 100% at 50% 50%,
+          ${primitives.Gray800} 0%,
+          transparent 100%
+        );
     `}
-
-    p {
-      opacity: 0.75;
-    }
   `}
 `;
 

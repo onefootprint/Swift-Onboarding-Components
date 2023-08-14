@@ -1,3 +1,4 @@
+import { primitives } from '@onefootprint/design-tokens';
 import { IcoFootprint40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { motion } from 'framer-motion';
@@ -9,75 +10,57 @@ type KnobProps = {
   className?: string;
 };
 
+const rings = [
+  {
+    delay: 0,
+    diameter: 1.7,
+  },
+  {
+    delay: 2,
+    diameter: 1.4,
+  },
+  {
+    delay: 4,
+    diameter: 1.2,
+  },
+  {
+    delay: 6,
+    diameter: 1,
+  },
+  {
+    delay: 8,
+    diameter: 0.7,
+  },
+];
+
 const Knob = ({ width, className }: KnobProps) => (
   <Container className={className} width={width}>
-    <Ring
-      diameter={width * 1.7}
-      opacity={0.5}
-      initial={{
-        width,
-        height: width,
-        opacity: 0,
-        transform: 'translate(-50%, -50%)',
-      }}
-      animate={{
-        transform: 'translate(-50%, -50%)',
-        width: width * 2,
-        height: width * 2,
-        opacity: [0, 1, 0],
-      }}
-      transition={{
-        repeat: Infinity,
-        ease: 'easeInOut',
-        duration: 6,
-      }}
-    />
-    <Ring
-      diameter={width * 1.45}
-      opacity={0.7}
-      initial={{
-        width: width * 1.5,
-        height: width * 1.5,
-        opacity: 0,
-        transform: 'translate(-50%, -50%)',
-      }}
-      animate={{
-        transform: 'translate(-50%, -50%)',
-        width: width * 2.4,
-        height: width * 2.4,
-        opacity: [0, 1, 0],
-      }}
-      transition={{
-        repeat: Infinity,
-        ease: 'easeInOut',
-        duration: 8,
-        delay: 1,
-      }}
-    />
-    <Ring
-      diameter={width * 1.2}
-      opacity={1}
-      initial={{
-        width: width * 1.2,
-        height: width * 1.2,
-        opacity: 0.8,
-        transform: 'translate(-50%, -50%)',
-      }}
-      animate={{
-        transform: 'translate(-50%, -50%)',
-        width: width * 1.4,
-        height: width * 1.4,
-        opacity: 1,
-      }}
-      transition={{
-        repeat: Infinity,
-        ease: 'easeInOut',
-        repeatType: 'reverse',
-        duration: 8,
-        delay: 1,
-      }}
-    />
+    {rings.map(({ delay, diameter }) => (
+      <Ring
+        key={delay}
+        diameter={width * diameter}
+        initial={{
+          width,
+          height: width,
+          opacity: 0,
+          transform: 'translate(-50%, -50%)',
+        }}
+        animate={{
+          transform: 'translate(-50%, -50%)',
+          width: width * 2,
+          height: width * 2,
+          opacity: [0, 0.8, 0],
+        }}
+        transition={{
+          repeat: Infinity,
+          ease: 'easeInOut',
+          duration: 10,
+          delay,
+        }}
+      />
+    ))}
     <CenterKnob>
+      <Center diameter={width * 0.9} />
       <Grid
         src="/home/vault-proxy/knob/grid.svg"
         height={400}
@@ -86,25 +69,19 @@ const Knob = ({ width, className }: KnobProps) => (
         alt="Knob"
         priority
       />
-      <Center diameter={width * 0.9} />
     </CenterKnob>
     <IcoFootprint40 color="quinary" />
   </Container>
 );
 
-const Ring = styled(motion.div)<{ diameter?: number; opacity?: number }>`
-  ${({ diameter, theme, opacity }) => css`
+const Ring = styled(motion.div)<{ diameter?: number }>`
+  ${({ diameter }) => css`
     height: ${diameter}px;
     width: ${diameter}px;
-    background: radial-gradient(
-      150% 150% at 50% 50%,
-      rgba(48, 69, 122, 0.8) 0%,
-      rgba(30, 52, 107, 0) 100%
-    );
-    box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.2);
-    filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.5));
-    border-radius: ${theme.borderRadius.full};
-    opacity: ${opacity};
+    background-color: rgba(255, 255, 255, 0.2);
+    background-blend-mode: soft-light;
+    box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.2) inset;
+    border-radius: 50%;
   `}
 `;
 
@@ -113,10 +90,15 @@ const Center = styled.div<{ diameter?: number }>`
     height: ${diameter}px;
     width: ${diameter}px;
     border-radius: ${theme.borderRadius.full};
-    background: linear-gradient(180deg, #0b0e2e 0%, rgba(18, 21, 48, 0) 200%);
-    box-shadow: inset 1px 1px 4px #000000,
-      inset -0.3px -0.5px 0px rgba(255, 255, 255, 0.4),
-      inset 0.3px 0.5px 0px rgba(255, 255, 255, 0.1);
+    background: linear-gradient(
+        180deg,
+        ${primitives.Gray1000} 0%,
+        ${primitives.Gray800} 100%
+      ),
+      ${primitives.Gray1000};
+    box-shadow: 0.3px 0.5px 0px 0px rgba(255, 255, 255, 0.1) inset,
+      -0.3px -0.5px 0px 0px rgba(255, 255, 255, 0.4) inset,
+      1px 1px 4px 0px ${primitives.Gray1000} inset;
   `}
 `;
 
@@ -147,7 +129,12 @@ const Grid = styled(Image)`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  mask: radial-gradient(50% 40% at 50% 50%, white 0%, transparent 100%);
+  mask: radial-gradient(
+    50% 40% at 50% 50%,
+    transparent 0%,
+    black 80%,
+    transparent 90%
+  );
   mask-mode: alpha;
 `;
 

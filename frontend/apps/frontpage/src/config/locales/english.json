@@ -61,6 +61,21 @@
         "aria-label": "Save logo"
       },
       "entries": {
+        "products": {
+          "text": "Products",
+          "links": {
+            "kyc": {
+              "text": "KYC",
+              "subtext": "Know Your Customer",
+              "href": "/kyc"
+            },
+            "vaulting": {
+              "text": "Vaulting",
+              "subtext": "PII vaulting, KYC data storage, and more",
+              "href": "/vaulting"
+            }
+          }
+        },
         "compare": {
           "text": "Compare",
           "href": "/compare"

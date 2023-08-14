@@ -49,15 +49,15 @@ const TabletIllustration = () => (
     />
     <Knob width={180} />
     <Label data-id="snn">
-      <IcoIdCard24 color="quinary" />
+      <IcoIdCard24 color="primary" />
       {values.snn.value}
     </Label>
     <Label data-id="credit-card">
-      <IcoCreditcard24 color="quinary" />
+      <IcoCreditcard24 color="primary" />
       {values.cc.value}
     </Label>
     <Label data-id="address">
-      <IcoPin24 color="quinary" />
+      <IcoPin24 color="primary" />
       {values.address.value}
     </Label>
     <Label data-id="token-snn">{values.snn.token}</Label>
@@ -120,13 +120,13 @@ const Container = styled.div`
 const Label = styled.div`
   ${({ theme }) => css`
     ${createFontStyles('snippet-2', 'code')}
-    color: ${theme.color.quinary};
+    color: ${theme.color.primary};
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
     gap: ${theme.spacing[4]};
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: ${theme.backgroundColor.secondary};
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
     border-radius: ${theme.borderRadius.full};
     opacity: 1;
@@ -137,9 +137,9 @@ const Label = styled.div`
       position: absolute;
       width: 100%;
       height: 100%;
-      background-color: ${theme.backgroundColor.tertiary};
+      background-color: ${theme.backgroundColor.secondary};
       z-index: -1;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid ${theme.borderColor.tertiary};
       border-radius: ${theme.borderRadius.default};
     }
 

@@ -1,3 +1,4 @@
+import { primitives } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
@@ -7,7 +8,7 @@ type MicroFeatureCardProps = {
   title: string;
   subtitle: string;
   gridArea?: string;
-  darkTheme?: boolean;
+  isDark?: boolean;
   icon?: Icon;
 };
 
@@ -15,29 +16,30 @@ const MicroFeatureCard = ({
   title,
   subtitle,
   gridArea,
-  darkTheme,
+  isDark,
   icon: Icon,
 }: MicroFeatureCardProps) => {
-  const icon = Icon && <Icon color={darkTheme ? 'quinary' : 'primary'} />;
+  const icon = Icon && <Icon />;
   return (
-    <Container gridArea={gridArea} darkTheme={darkTheme}>
-      <Title darkTheme={darkTheme}>
+    <Container gridArea={gridArea} isDark={isDark}>
+      <Title isDark={isDark}>
         {icon}
         {title}
       </Title>
-      <TextBlock darkTheme={darkTheme}>{subtitle}</TextBlock>
+      <TextBlock isDark={isDark}>{subtitle}</TextBlock>
     </Container>
   );
 };
 
-const Container = styled.div<{ gridArea?: string; darkTheme?: boolean }>`
-  ${({ gridArea, theme, darkTheme }) => css`
+const Container = styled.div<{ gridArea?: string; isDark?: boolean }>`
+  ${({ gridArea, theme, isDark }) => css`
+    position: relative;
     display: flex;
     flex-direction: column;
     grid-area: ${gridArea};
-    position: relative;
     padding: ${theme.spacing[7]};
     gap: ${theme.spacing[2]};
+    height: fit-content;
 
     ${media.greaterThan('md')`
       padding: ${theme.spacing[9]};
@@ -50,25 +52,19 @@ const Container = styled.div<{ gridArea?: string; darkTheme?: boolean }>`
       top: 0;
       height: 100%;
       width: ${theme.borderWidth[1]};
-      background: ${darkTheme
-        ? `radial-gradient(
+      background: radial-gradient(
         50% 50% at 50% 40%,
-        #323964 0%,
-        ${theme.backgroundColor.tertiary} 100%
-      )`
-        : `radial-gradient(
-        50% 50% at 50% 40%,
-        ${theme.borderColor.primary} 0%,
+        ${isDark ? primitives.Gray700 : theme.borderColor.primary} 0%,
         ${theme.backgroundColor.transparent} 100%
-      )`};
+      );
     }
   `}
 `;
 
-const Title = styled.span<{ darkTheme?: boolean }>`
-  ${({ theme, darkTheme }) => css`
+const Title = styled.span<{ isDark?: boolean }>`
+  ${({ theme, isDark }) => css`
     ${createFontStyles('label-3')}
-    color: ${darkTheme ? theme.color.quinary : theme.color.primary};
+    color: ${isDark ? primitives.Gray100 : theme.color.secondary};
     display: flex;
     align-items: center;
     gap: ${theme.spacing[3]};
@@ -81,20 +77,31 @@ const Title = styled.span<{ darkTheme?: boolean }>`
       top: 0;
       height: 100%;
       width: ${theme.borderWidth[1]};
-      background: ${darkTheme ? '#9B85EB' : theme.color.accent};
+      background: ${isDark
+        ? primitives.Purple300
+        : theme.backgroundColor.accent};
 
       ${media.greaterThan('md')`
         left: calc(-1 * ${theme.spacing[9]});
       `}
     }
+
+    & {
+      svg {
+        path {
+           {
+            fill: ${isDark && primitives.Gray0};
+          }
+        }
+      }
+    }
   `}
 `;
 
-const TextBlock = styled.span<{ darkTheme?: boolean }>`
-  ${({ theme, darkTheme }) => css`
+const TextBlock = styled.span<{ isDark?: boolean }>`
+  ${({ theme, isDark }) => css`
     ${createFontStyles('body-3')}
-    color: ${darkTheme ? theme.color.quinary : theme.color.secondary};
-    opacity: ${darkTheme ? 0.75 : 1};
+    color: ${isDark ? primitives.Gray200 : theme.color.secondary};
     position: relative;
   `}
 `;

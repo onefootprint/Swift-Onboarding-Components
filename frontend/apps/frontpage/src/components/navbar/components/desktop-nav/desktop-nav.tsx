@@ -1,6 +1,7 @@
+import { primitives } from '@onefootprint/design-tokens';
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css, keyframes } from '@onefootprint/styled';
+import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
@@ -14,37 +15,69 @@ import LogoCopyAssets from './components/logo-copy-assets';
 
 type DesktopNavProps = {
   entries: NavEntry[];
+  isOnDarkSection?: boolean;
 };
 
-const DesktopNav = ({ entries }: DesktopNavProps) => {
+const DesktopNav = ({ entries, isOnDarkSection }: DesktopNavProps) => {
   const { t } = useTranslation('components.navbar');
 
   return (
     <Container delayDuration={0}>
       <MainNav>
-        <LogoCopyAssets />
+        <LogoCopyAssets isOnDarkSection={isOnDarkSection} />
         {entries.map(entry => {
           if (isNavLink(entry)) {
-            return <DesktopNavLink link={entry} key={entry.text} />;
+            return (
+              <DesktopNavLink
+                link={entry}
+                key={entry.text}
+                isOnDarkSection={isOnDarkSection}
+              />
+            );
           }
           if (isNavMenu(entry)) {
-            return <DesktopNavMenu menu={entry} key={entry.text} />;
+            return (
+              <DesktopNavMenu
+                menu={entry}
+                key={entry.text}
+                isOnDarkSection={isOnDarkSection}
+              />
+            );
           }
           return null;
         })}
       </MainNav>
       <SecondaryNav>
-        <Login href={`${DASHBOARD_BASE_URL}/login`}>{t('login')}</Login>
-        <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`} size="compact">
+        <Login
+          href={`${DASHBOARD_BASE_URL}/login`}
+          isOnDarkSection={isOnDarkSection}
+        >
+          {t('login')}
+        </Login>
+        <StyledLinkButton
+          href={`${DASHBOARD_BASE_URL}/sign-up`}
+          size="compact"
+          data-is-dark={isOnDarkSection}
+        >
           {t('sign-up')}
-        </LinkButton>
+        </StyledLinkButton>
       </SecondaryNav>
-      <ViewportPosition>
-        <Viewport />
-      </ViewportPosition>
     </Container>
   );
 };
+
+const StyledLinkButton = styled(LinkButton)`
+  && {
+    &[data-is-dark='true'] {
+      background-color: ${primitives.Gray0};
+      color: ${primitives.Gray1000};
+
+      &:hover {
+        background-color: ${primitives.Gray100};
+      }
+    }
+  }
+`;
 
 const Container = styled(NavigationMenu.Root)`
   ${({ theme }) => css`
@@ -83,68 +116,10 @@ const SecondaryNav = styled(NavigationMenu.List)`
   `}
 `;
 
-const ViewportPosition = styled.div`
-  ${({ theme }) => css`
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    top: 100%;
-    margin-top: calc(-1 * ${theme.spacing[3]});
-    left: 0;
-  `}
-`;
-
-const Viewport = styled(NavigationMenu.Viewport)`
-  ${({ theme }) => css`
-    position: relative;
-    transform-origin: top center;
-    border-radius: ${theme.borderRadius.default};
-    overflow: hidden;
-    box-shadow: ${theme.elevation[2]};
-    padding: ${theme.spacing[3]};
-    background-color: ${theme.backgroundColor.primary};
-
-    &[data-state='open'] {
-      animation-name: ${slideIn};
-      animation-duration: 0.08s;
-      animation-timing-function: ease-out;
-    }
-
-    &[data-state='closed'] {
-      animation-name: ${slideOut};
-      animation-duration: 0.08s;
-      animation-timing-function: ease-in;
-    }
-  `}
-`;
-
-const slideIn = keyframes`
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-`;
-
-const slideOut = keyframes`
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-`;
-
-const Login = styled(Link)`
-  ${({ theme }) => css`
+const Login = styled(Link)<{ isOnDarkSection?: boolean }>`
+  ${({ theme, isOnDarkSection }) => css`
     ${createFontStyles('label-2')};
-    color: ${theme.color.primary};
+    color: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
     text-decoration: none;
     transition: color 0.2s ease-in-out;
     padding: ${theme.spacing[3]} ${theme.spacing[4]};

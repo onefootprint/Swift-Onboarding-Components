@@ -1,6 +1,7 @@
+import { primitives } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles, Typography } from '@onefootprint/ui';
+import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 
 type VerticalCardProps = {
@@ -20,7 +21,7 @@ const VerticalCard = ({
   gridArea,
   hideFadeOutMask = false,
 }: VerticalCardProps) => {
-  const renderedIcon = Icon && <Icon color="quinary" />;
+  const renderedIcon = Icon && <Icon color="primary" />;
   return (
     <Container gridArea={gridArea}>
       <ImageContainer hideFadeOutMask={hideFadeOutMask}>
@@ -30,26 +31,35 @@ const VerticalCard = ({
         <Title>
           {renderedIcon} {title}
         </Title>
-        <Typography variant="body-2" color="quinary" as="p">
-          {subtitle}
-        </Typography>
+        <SubtitleText>{subtitle}</SubtitleText>
       </TextContainer>
     </Container>
   );
 };
 
+const SubtitleText = styled.p`
+  ${createFontStyles('body-2')}
+  color: ${primitives.Gray100};
+`;
+
 const Container = styled.div<{ gridArea?: string }>`
   ${({ theme, gridArea }) => css`
     position: relative;
     border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid #20264f;
-    background-color: #0b0f2a;
+    border: ${theme.borderWidth[1]} solid ${primitives.Gray700};
     display: flex;
     flex-direction: column;
     overflow: hidden;
     grid-area: ${gridArea};
     isolation: isolate;
     z-index: 1;
+    background: radial-gradient(
+        60% 50% at 50% 10%,
+        ${primitives.Gray800} 0%,
+        ${primitives.Gray800} 40%,
+        transparent 100%
+      ),
+      ${primitives.Gray900};
   `}
 `;
 
@@ -68,6 +78,7 @@ const Title = styled.h2`
     display: flex;
     align-items: center;
     gap: ${theme.spacing[4]};
+    color: ${theme.color.primary};
   `}
 `;
 
@@ -80,11 +91,11 @@ const ImageContainer = styled.div<{ hideFadeOutMask?: boolean }>`
     z-index: 1;
     mask: ${hideFadeOutMask
       ? `linear-gradient(180deg, white 90%, transparent 95%)`
-      : `linear-gradient(180deg, white 65%, transparent 95%)`};
+      : `linear-gradient(180deg, white 75%, transparent 100%)`};
     mask-mode: alpha;
     background: radial-gradient(
       100% 100% at 100% 30%,
-      rgba(75, 38, 218, 0.3) 0%,
+      rgba(${primitives.Gray900}, 0.2) 0%,
       transparent 100%
     );
   `}

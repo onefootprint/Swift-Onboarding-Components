@@ -3,6 +3,7 @@ import {
   IcoChartUp16,
   IcoCode16,
   IcoFaceid16,
+  IcoIdCard24,
   IcoSparkles16,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
@@ -22,7 +23,7 @@ const NewApproach = () => {
       <SectionTitle
         title={t('title')}
         subtitle={t('subtitle')}
-        icon="/home/icons/id.png"
+        icon={IcoIdCard24}
       />
       <Grid>
         <FeatureCard

@@ -1,6 +1,8 @@
+import { primitives } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCreditcard16,
+  IcoDatabase24,
   IcoFileText16,
   IcoUserCircle16,
 } from '@onefootprint/icons';
@@ -18,14 +20,15 @@ import VerticalCard from './components/vertical-card';
 
 const VaultPii = () => {
   const { t } = useTranslation('pages.home.vault-pii');
+
   return (
-    <Section>
+    <Section id="vault">
       <SectionTitle
         title={t('title')}
         subtitle={t('subtitle')}
         cta={t('cta')}
-        icon="/home/icons/layers.png"
-        darkTheme
+        icon={IcoDatabase24}
+        isDark
       />
       <Grid>
         <HorizontalCard
@@ -41,7 +44,6 @@ const VaultPii = () => {
           title={t('card-data.title')}
           subtitle={t('card-data.subtitle')}
           iconComponent={IcoCreditcard16}
-          hideFadeOutMask
         >
           <PaymentCardData />
         </VerticalCard>
@@ -61,13 +63,13 @@ const VaultPii = () => {
   );
 };
 
-const Section = styled.section`
+const Section = styled.div`
   ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.tertiary};
-    color: ${theme.color.quinary};
+    background-color: ${primitives.Gray900};
+    color: ${primitives.Gray0};
     padding: ${theme.spacing[12]} 0;
     position: relative;
-    overflow: hidden;
+    overflow-x: clip;
   `}
 `;
 

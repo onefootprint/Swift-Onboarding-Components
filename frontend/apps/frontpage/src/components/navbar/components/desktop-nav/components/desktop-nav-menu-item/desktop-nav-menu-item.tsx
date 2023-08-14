@@ -1,5 +1,6 @@
+import { primitives } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
-import { Typography } from '@onefootprint/ui';
+import { createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 
@@ -7,16 +8,18 @@ import { NavMenuItem } from '../../../../types';
 
 type DesktopNavMenuItemProps = {
   item: NavMenuItem;
+  isOnDarkSection?: boolean;
 };
 
-const DesktopNavMenuItem = ({ item }: DesktopNavMenuItemProps) => (
-  <StyledLink href={item.href}>
+const DesktopNavMenuItem = ({
+  item,
+  isOnDarkSection,
+}: DesktopNavMenuItemProps) => (
+  <StyledLink href={item.href} isOnDarkSection={isOnDarkSection}>
     <item.iconComponent />
     <ItemText>
-      <Typography variant="label-3">{item.text}</Typography>
-      <Typography variant="body-3" color="tertiary">
-        {item.subtext}
-      </Typography>
+      <Title isOnDarkSection={isOnDarkSection}>{item.text}</Title>
+      <Subtitle isOnDarkSection={isOnDarkSection}>{item.subtext}</Subtitle>
     </ItemText>
   </StyledLink>
 );
@@ -30,8 +33,26 @@ const ItemText = styled.div`
   `}
 `;
 
-const StyledLink = styled(NavigationMenu.Link)`
-  ${({ theme }) => css`
+const Title = styled.p<{ isOnDarkSection?: boolean }>`
+  ${({ theme, isOnDarkSection }) => css`
+    ${createFontStyles('label-3')}
+    color: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+    text-decoration: none;
+    display: flex;
+  `}
+`;
+
+const Subtitle = styled.p<{ isOnDarkSection?: boolean }>`
+  ${({ theme, isOnDarkSection }) => css`
+    ${createFontStyles('body-3')}
+    color: ${isOnDarkSection ? primitives.Gray200 : theme.color.tertiary};
+    text-decoration: none;
+    display: flex;
+  `}
+`;
+
+const StyledLink = styled(NavigationMenu.Link)<{ isOnDarkSection?: boolean }>`
+  ${({ theme, isOnDarkSection }) => css`
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -44,15 +65,27 @@ const StyledLink = styled(NavigationMenu.Link)`
 
     @media (hover: hover) {
       :hover {
-        background-color: ${theme.backgroundColor.secondary};
+        background-color: ${
+          isOnDarkSection ? primitives.Gray800 : theme.backgroundColor.secondary
+        };
       }
     }
     :focus {
-      background-color: ${theme.backgroundColor.secondary};
+      background-color: ${
+        isOnDarkSection ? primitives.Gray800 : theme.backgroundColor.secondary
+      };
     }
 
     > svg {
       align-self: flex-start;
+    }
+
+    && {
+      svg {
+        path {
+          fill: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+        }
+      }
     }
   `}
 `;

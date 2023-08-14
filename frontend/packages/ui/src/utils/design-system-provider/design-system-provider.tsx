@@ -1,5 +1,4 @@
 import type { Theme } from '@onefootprint/design-tokens';
-import themes from '@onefootprint/design-tokens';
 import { createGlobalStyle, css, ThemeProvider } from '@onefootprint/styled';
 import React from 'react';
 
@@ -180,10 +179,7 @@ const GlobalStyle = createGlobalStyle`
  `}
 `;
 
-const DesignSystemProvider = ({
-  children,
-  theme = themes.light,
-}: BootstrapProps) => (
+const DesignSystemProvider = ({ children, theme }: BootstrapProps) => (
   <ThemeProvider theme={theme}>
     <GlobalStyle />
     <ConfirmationDialogProvider>

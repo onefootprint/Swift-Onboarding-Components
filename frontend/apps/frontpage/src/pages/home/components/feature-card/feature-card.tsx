@@ -65,7 +65,7 @@ const FeatureCard = ({
         <Title size={size}>{title}</Title>
         <Typography
           variant={size === 'compact' ? 'body-2' : 'body-1'}
-          color="tertiary"
+          color="secondary"
         >
           {subtitle}
         </Typography>
@@ -94,8 +94,8 @@ const Container = styled.div<{
     position: relative;
     background: ${
       invertedGradient
-        ? `linear-gradient(0deg, #fafafa 0%, transparent 100%)`
-        : `linear-gradient(180deg, #fafafa 0%, transparent 100%)`
+        ? `linear-gradient(0deg, ${theme.backgroundColor.secondary} 0%, transparent 100%)`
+        : `linear-gradient(180deg, ${theme.backgroundColor.secondary} 0%, transparent 100%)`
     };
 
     &:not(:last-child) {
@@ -113,9 +113,8 @@ const Container = styled.div<{
             ${theme.borderColor.transparent} 100%
           );
         }
-    `}
+      `}
     }
-
 
     &::before {
       content: '';
@@ -129,7 +128,7 @@ const Container = styled.div<{
         ${theme.borderColor.primary} 0%,
         ${theme.backgroundColor.primary} 100%
       );
-  `}
+    `}
 `;
 
 const Title = styled.span<{ size: 'compact' | 'default' }>`

@@ -82,7 +82,7 @@ const Title = styled.h2`
       position: sticky;
       text-align: left;
       width: 100%;
-      top: 0%;
+      top: 20%;
       grid-area: left;
     `}
   `}

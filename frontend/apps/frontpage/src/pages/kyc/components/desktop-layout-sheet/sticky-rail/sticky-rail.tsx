@@ -39,9 +39,6 @@ const StickyFrame = styled.div<{ containerHeight: number }>`
     height: ${containerHeight}px;
     position: sticky;
     isolation: isolate;
-    pointer-events: none;
-    user-select: none;
-    touch-action: none;
   `};
 `;
 

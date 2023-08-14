@@ -4,6 +4,7 @@ import {
   IcoFileText16,
   IcoHeart16,
   IcoLayer0116,
+  IcoSparkles24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
@@ -49,7 +50,7 @@ const Customizable = () => {
         title={t('title')}
         subtitle={t('subtitle')}
         cta={t('cta')}
-        icon="/home/icons/customizable.png"
+        icon={IcoSparkles24}
         href="https://docs.onefootprint.com"
       />
       <Grid>

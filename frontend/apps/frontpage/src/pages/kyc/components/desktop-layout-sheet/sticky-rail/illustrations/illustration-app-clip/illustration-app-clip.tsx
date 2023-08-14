@@ -104,6 +104,9 @@ const Container = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
+  user-select: none;
+  touch-action: none;
 `;
 
 const PhoneContainer = styled.div`

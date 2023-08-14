@@ -1,3 +1,4 @@
+import { primitives } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
@@ -7,19 +8,20 @@ import { NavLink } from '../../../../types';
 
 type DesktopNavLinkProps = {
   link: NavLink;
+  isOnDarkSection?: boolean;
 };
-const DesktopNavLink = ({ link }: DesktopNavLinkProps) => (
+const DesktopNavLink = ({ link, isOnDarkSection }: DesktopNavLinkProps) => (
   <NavigationMenu.Item asChild>
-    <StyledLink asChild>
+    <StyledLink asChild isOnDarkSection={isOnDarkSection}>
       <Link href={link.href}>{link.text}</Link>
     </StyledLink>
   </NavigationMenu.Item>
 );
 
-const StyledLink = styled(NavigationMenu.Link)`
-  ${({ theme }) => css`
+const StyledLink = styled(NavigationMenu.Link)<{ isOnDarkSection?: boolean }>`
+  ${({ theme, isOnDarkSection }) => css`
     position: relative;
-    color: ${theme.color.primary};
+    color: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
     text-decoration: none;
     display: flex;
     padding: ${theme.spacing[3]} ${theme.spacing[4]};

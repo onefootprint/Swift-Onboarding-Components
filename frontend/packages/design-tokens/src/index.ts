@@ -6,4 +6,5 @@ export default {
   dark,
 };
 
+export * as primitives from './primitives';
 export * from './themes/types';

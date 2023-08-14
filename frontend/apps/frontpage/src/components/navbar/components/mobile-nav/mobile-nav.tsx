@@ -22,9 +22,15 @@ type MobileNavProps = {
   onOpen: () => void;
   onClose: () => void;
   entries: NavEntry[];
+  isOnDarkSection?: boolean;
 };
 
-const MobileNav = ({ onOpen, onClose, entries }: MobileNavProps) => {
+const MobileNav = ({
+  onOpen,
+  onClose,
+  entries,
+  isOnDarkSection,
+}: MobileNavProps) => {
   const { t } = useTranslation('components.navbar');
   const breakpoint = useMediaQuery({ minWidth: 'lg', maxWidth: 'xl' });
   const [isOpen, setOpen] = useState(false);
@@ -63,7 +69,7 @@ const MobileNav = ({ onOpen, onClose, entries }: MobileNavProps) => {
         <Menu>
           <Header>
             <Logo href="/" onClick={handleLinkClick}>
-              <ThemedLogoFpDefault />
+              <ThemedLogoFpDefault color="primary" />
             </Logo>
             <NavTriggerButton
               aria-label={t('nav-toggle.open')}
@@ -105,14 +111,16 @@ const MobileNav = ({ onOpen, onClose, entries }: MobileNavProps) => {
       ) : (
         <Container>
           <Logo href="/" onClick={handleLinkClick}>
-            <ThemedLogoFpDefault />
+            <ThemedLogoFpDefault
+              color={isOnDarkSection ? 'quinary' : 'primary'}
+            />
           </Logo>
           <NavTriggerButton
             aria-label={t('nav-toggle.close')}
             onClick={handleToggle}
             type="button"
           >
-            <IcoMenu24 />
+            <IcoMenu24 color={isOnDarkSection ? 'quinary' : 'primary'} />
           </NavTriggerButton>
         </Container>
       )}

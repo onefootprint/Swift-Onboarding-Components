@@ -1,3 +1,4 @@
+import { primitives } from '@onefootprint/design-tokens';
 import { IcoCreditcard16, IcoIdCard16, IcoPin16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
@@ -104,13 +105,13 @@ const Container = styled.div`
 const Label = styled.div`
   ${({ theme }) => css`
     ${createFontStyles('snippet-2', 'code')}
-    color: ${theme.color.quinary};
+    color: ${primitives.Gray0};
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
     gap: ${theme.spacing[4]};
-    background-color: #070c28;
+    background-color: ${primitives.Gray800};
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
     border-radius: ${theme.borderRadius.full};
     opacity: 1;
@@ -121,9 +122,9 @@ const Label = styled.div`
       position: absolute;
       width: 100%;
       height: 100%;
-      background-color: ${theme.backgroundColor.tertiary};
+      background-color: ${primitives.Gray800};
       z-index: -1;
-      border: 1px solid #282e57;
+      border: ${theme.borderWidth[1]} solid ${primitives.Gray700};
       border-radius: ${theme.borderRadius.default};
     }
 

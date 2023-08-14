@@ -1,8 +1,15 @@
+import { primitives } from '@onefootprint/design-tokens';
 import { useHasScroll, useToggle, useTranslation } from '@onefootprint/hooks';
-import { IcoBook24, IcoMegaphone24, IcoWriting24 } from '@onefootprint/icons';
+import {
+  IcoFileText24,
+  IcoKey24,
+  IcoMegaphone24,
+  IcoUser24,
+  IcoWriting24,
+} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
@@ -11,9 +18,27 @@ import { NavEntry } from './types';
 const Navbar = () => {
   const { t } = useTranslation('components.navbar');
   const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
+  const [isOnDarkSection, setIsOnDarkSection] = useState(false);
   const hasScroll = useHasScroll();
 
   const entries: NavEntry[] = [
+    {
+      text: t('entries.products.text'),
+      items: [
+        {
+          text: t('entries.products.links.kyc.text'),
+          subtext: t('entries.products.links.kyc.subtext'),
+          href: t('entries.products.links.kyc.href'),
+          iconComponent: IcoUser24,
+        },
+        {
+          text: t('entries.products.links.vaulting.text'),
+          subtext: t('entries.products.links.vaulting.subtext'),
+          href: t('entries.products.links.vaulting.href'),
+          iconComponent: IcoKey24,
+        },
+      ],
+    },
     { text: t('entries.compare.text'), href: t('entries.compare.href') },
     { text: t('entries.pricing.text'), href: t('entries.pricing.href') },
     { text: t('entries.docs.text'), href: t('entries.docs.href') },
@@ -40,7 +65,7 @@ const Navbar = () => {
           text: t('entries.writing.links.library.text'),
           href: t('entries.writing.links.library.href'),
           subtext: t('entries.writing.links.library.subtext'),
-          iconComponent: IcoBook24,
+          iconComponent: IcoFileText24,
         },
       ],
     },
@@ -48,38 +73,72 @@ const Navbar = () => {
     { text: t('entries.changelog.text'), href: t('entries.changelog.href') },
   ];
 
+  const handleScroll = () => {
+    const darkStart = document.getElementById('dark-start');
+    const darkEnd = document.getElementById('dark-end');
+
+    if (darkStart && darkEnd) {
+      const rectStart = darkStart.getBoundingClientRect();
+      const rectEnd = darkEnd.getBoundingClientRect();
+
+      if (rectStart.top < 50 && rectEnd.top > 50) {
+        setIsOnDarkSection(true);
+      } else {
+        setIsOnDarkSection(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
-    <Header isFloating={hasScroll && isFloatingEnabled}>
+    <Header
+      isFloating={hasScroll && isFloatingEnabled}
+      isOnDarkSection={isOnDarkSection}
+    >
       <Container>
-        <Inner>
+        <Inner id="navbar">
           <MobileNav
             onOpen={disableFloating}
             onClose={enableFloating}
             entries={entries}
+            isOnDarkSection={isOnDarkSection}
           />
-          <DesktopNav entries={entries} />
+          <DesktopNav entries={entries} isOnDarkSection={isOnDarkSection} />
         </Inner>
       </Container>
     </Header>
   );
 };
 
-const Header = styled.header<{ isFloating: boolean }>`
-  left: 0;
-  position: fixed;
-  right: 0;
-  top: 0;
-  transition: background 200ms ease 0s;
-  ${({ theme }) => css`
+const Header = styled.header<{
+  isFloating: boolean;
+  isOnDarkSection?: boolean;
+}>`
+  ${({ theme, isFloating, isOnDarkSection }) => css`
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    transition: background 200ms ease 0s;
     z-index: ${theme.zIndex.overlay};
-  `}
-  ${({ theme, isFloating }) =>
-    isFloating &&
+
+    ${isFloating &&
     css`
       backdrop-filter: blur(15px) saturate(125%);
-      background-color: rgba(${theme.backgroundColor.primary} 0.75);
-      border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
+      background-color: rgba(
+        ${isOnDarkSection ? primitives.Gray0 : theme.backgroundColor.primary}
+          0.75
+      );
+      border-bottom: ${theme.borderWidth[1]} solid
+        ${isOnDarkSection ? primitives.Gray700 : theme.borderColor.primary};
     `}
+  `}
 `;
 
 const Inner = styled.div`

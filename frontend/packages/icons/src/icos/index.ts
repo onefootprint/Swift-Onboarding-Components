@@ -291,6 +291,7 @@ export { default as IcoUserCircle24 } from './ico-user-circle-24';
 export { default as IcoUsers16 } from './ico-users-16';
 export { default as IcoUsers24 } from './ico-users-24';
 export { default as IcoUserstore24 } from './ico-userstore-24';
+export { default as IcoVaultLock40 } from './ico-vault-lock-40';
 export { default as IcoVisa16 } from './ico-visa-colored-16';
 export { default as IcoVisa24 } from './ico-visa-colored-24';
 export { default as IcoVisaelectron16 } from './ico-visaelectron-colored-16';

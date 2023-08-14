@@ -1,5 +1,11 @@
+import { primitives } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoDollar16, IcoEye16, IcoShield16 } from '@onefootprint/icons';
+import {
+  IcoDollar16,
+  IcoEye16,
+  IcoLayer0124,
+  IcoShield16,
+} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
@@ -29,8 +35,8 @@ const VaultProxy = () => {
         title={t('title')}
         subtitle={t('subtitle')}
         cta={t('cta')}
-        icon="/home/icons/vault.png"
-        darkTheme
+        icon={IcoLayer0124}
+        isDark
       />
       <IllustrationContainer>
         <DynamicDesktopIllustration />
@@ -42,19 +48,19 @@ const VaultProxy = () => {
           title={t('features.enhanced-security.title')}
           subtitle={t('features.enhanced-security.subtitle')}
           icon={IcoShield16}
-          darkTheme
+          isDark
         />
         <MicroFeatureCard
           title={t('features.reduced-liability.title')}
           subtitle={t('features.reduced-liability.subtitle')}
           icon={IcoEye16}
-          darkTheme
+          isDark
         />
         <MicroFeatureCard
           title={t('features.less-money.title')}
           subtitle={t('features.less-money.subtitle')}
           icon={IcoDollar16}
-          darkTheme
+          isDark
         />
       </Grid>
     </Background>
@@ -63,7 +69,7 @@ const VaultProxy = () => {
 
 const Background = styled.div`
   ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.tertiary};
+    background-color: ${primitives.Gray900};
     padding: ${theme.spacing[9]} 0 ${theme.spacing[11]} 0;
     display: flex;
     flex-direction: column;

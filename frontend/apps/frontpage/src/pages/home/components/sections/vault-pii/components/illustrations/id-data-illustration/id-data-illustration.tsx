@@ -1,3 +1,4 @@
+import { primitives } from '@onefootprint/design-tokens';
 import styled from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import Image from 'next/image';
@@ -13,23 +14,23 @@ const IdDataIllustration = () => (
     />
     <CardGrid>
       <CardTopLeft
-        src="/home/vault-pii/id-data/card1.png"
+        src="/home/vault-pii/id-data/basic-data.png"
         alt="decorative"
-        width={475}
-        height={196}
+        width={408}
+        height={180}
         priority
       />
       <CardBottomLeft
-        src="/home/vault-pii/id-data/card2.png"
+        src="/home/vault-pii/id-data/id-data.png"
         alt="decorative"
-        width={475}
-        height={166}
+        width={408}
+        height={180}
         priority
       />
       <CardRight
-        src="/home/vault-pii/id-data/card3.png"
+        src="/home/vault-pii/id-data/address.png"
         alt="decorative"
-        width={475}
+        width={408}
         height={376}
         priority
       />
@@ -42,25 +43,24 @@ const BackgroundDots = styled(Image)`
   z-index: 0;
   mask: radial-gradient(
     circle at 50% 30%,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0.7) 50%,
-    rgba(255, 255, 255, 0) 90%
+    ${primitives.Gray800} 0%,
+    transparent 90%
   );
   mask-mode: alpha;
 
   ${media.greaterThan('md')`
-    background: radial-gradient(
-      circle,
-      rgba(75, 38, 218, 0.3) 0%,
-      rgba(75, 38, 218, 0) 100%
-    );
-    mask: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  `}
+        background: radial-gradient(
+          circle,
+          ${primitives.Gray800} 0%,
+          transparent 100%
+        );
+        mask: radial-gradient(
+        circle,
+        ${primitives.Gray800} 0%,
+        ${primitives.Gray800} 50%,
+        transparent 100%
+      );
+    `}
 `;
 
 const CardGrid = styled.div`
@@ -68,7 +68,7 @@ const CardGrid = styled.div`
   gap: 14px;
   scale: 0.8;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 196px 166px;
+  grid-template-rows: 180px 180px;
   grid-template-areas:
     'top-left right'
     'bottom-left right';

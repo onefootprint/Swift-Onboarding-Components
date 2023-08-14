@@ -1,3 +1,5 @@
+import { primitives } from '@onefootprint/design-tokens';
+import type { Icon } from '@onefootprint/icons';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -6,57 +8,54 @@ import {
   LinkButton,
   media,
 } from '@onefootprint/ui';
-import Image from 'next/image';
 import React from 'react';
 
 type SectionTitleProps = {
   title: string;
   subtitle: string;
-  icon?: string;
-  darkTheme?: boolean;
+  icon?: Icon;
   cta?: string;
   href?: string;
+  isDark?: boolean;
 };
 
 const SectionTitle = ({
   title,
   subtitle,
-  icon,
-  darkTheme,
+  icon: Icon,
   cta,
   href,
-}: SectionTitleProps) => (
-  <Container>
-    <WidthContainer darkTheme={darkTheme}>
-      {icon && (
-        <Image
-          src={icon}
-          alt={`${title} section icon`}
-          width={42}
-          height={42}
-        />
-      )}
-      <TextContainer>
-        <Title darkTheme={darkTheme}>{title}</Title>
-        <Subtitle darkTheme={darkTheme}>{subtitle}</Subtitle>
-      </TextContainer>
-      {cta && (
-        <LinkButton
-          iconComponent={IcoArrowRightSmall16}
-          href={href}
-          target="_blank"
-        >
-          {cta}
-        </LinkButton>
-      )}
-    </WidthContainer>
-  </Container>
-);
+  isDark,
+}: SectionTitleProps) => {
+  const renderedIcon = Icon && <Icon />;
+  return (
+    <Container>
+      <TitleContainer isDark={isDark}>
+        <SectionIcon isDark={isDark}>
+          <IconOutline isDark={isDark}>{renderedIcon}</IconOutline>
+        </SectionIcon>
+        <TextContainer>
+          <Title isDark={isDark}>{title}</Title>
+          <Subtitle isDark={isDark}>{subtitle}</Subtitle>
+        </TextContainer>
+        {cta && (
+          <LinkButton
+            iconComponent={IcoArrowRightSmall16}
+            href={href}
+            target="_blank"
+          >
+            {cta}
+          </LinkButton>
+        )}
+      </TitleContainer>
+    </Container>
+  );
+};
 
-const Title = styled.div<{ darkTheme?: boolean }>`
-  ${({ theme, darkTheme }) => css`
+const Title = styled.div<{ isDark?: boolean }>`
+  ${({ theme, isDark }) => css`
     ${createFontStyles('display-3')}
-    color: ${darkTheme ? theme.color.quinary : theme.color.primary};
+    color: ${isDark ? primitives.Gray0 : theme.color.primary};
 
     ${media.greaterThan('md')`
       ${createFontStyles('display-2')}
@@ -64,38 +63,33 @@ const Title = styled.div<{ darkTheme?: boolean }>`
   `}
 `;
 
-const Subtitle = styled.div<{ darkTheme?: boolean }>`
-  ${({ theme, darkTheme }) => css`
+const Subtitle = styled.div<{ isDark?: boolean }>`
+  ${({ theme, isDark }) => css`
     ${createFontStyles('display-4')}
-    color: ${darkTheme ? theme.color.quinary : theme.color.secondary};
+    color: ${isDark ? primitives.Gray100 : theme.color.secondary};
   `}
 `;
 
-const WidthContainer = styled.div<{
-  darkTheme?: boolean;
-}>`
-  ${({ theme, darkTheme }) => css`
+const TitleContainer = styled.div<{ isDark?: boolean }>`
+  ${({ theme, isDark }) => css`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
     gap: ${theme.spacing[8]};
-    max-width: 600px;
 
-    p {
-      opacity: ${darkTheme ? 0.75 : 1};
-    }
+    && {
+      width: fit-content;
+      max-width: 600px;
 
-    && button {
-      color: ${darkTheme ? '#9B85EB' : undefined};
-      transition: opacity 0.1s ease-in-out;
-
-      path {
-        fill: ${darkTheme ? '#816ccd' : undefined};
+      button {
+        color: ${isDark ? primitives.Purple300 : theme.color.accent};
       }
 
-      &:hover {
-        opacity: 0.8;
+      svg {
+        path {
+          fill: ${isDark && primitives.Purple300};
+        }
       }
     }
   `}
@@ -106,6 +100,42 @@ const TextContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};
+  `}
+`;
+
+const SectionIcon = styled.div<{ isDark?: boolean }>`
+  ${({ theme, isDark }) => css`
+    width: 48px;
+    height: 48px;
+    background-color: ${isDark
+      ? primitives.Gray800
+      : theme.backgroundColor.secondary};
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & {
+      svg {
+        path {
+           {
+            fill: ${isDark && primitives.Purple300};
+          }
+        }
+      }
+    }
+  `}
+`;
+
+const IconOutline = styled.div<{ isDark?: boolean }>`
+  ${({ theme, isDark }) => css`
+    border: 1.5px solid
+      ${isDark ? primitives.Purple300 : theme.borderColor.secondary};
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
   `}
 `;
 
