@@ -120,10 +120,23 @@ pub async fn complete_post(
     let webauthn = LivenessWebauthnConfig::new(&state.config);
     let cas = AttestationCaList::apple_and_android();
 
-    let reg = serde_json::from_str(&request.device_response_json)?;
-    let cred = webauthn
-        .webauthn()
-        .register_credential(&reg, &reg_state, Some(&cas))?;
+    let reg: RegisterPublicKeyCredential = serde_json::from_str(&request.device_response_json)?;
+
+    // TEMPORARY: workaround
+    let is_android = serde_json::from_slice::<serde_json::Value>(&reg.response.client_data_json.0)?
+        .as_object()
+        .map(|map| map.get("androidPackageName").is_some())
+        .unwrap_or(false);
+
+    let cred = if is_android {
+        webauthn
+            .android_workaround()
+            .register_credential(&reg, &reg_state, Some(&cas))?
+    } else {
+        webauthn
+            .webauthn()
+            .register_credential(&reg, &reg_state, Some(&cas))?
+    };
 
     // this is the format of the stored attestation data
     #[derive(Debug, Serialize)]
@@ -378,5 +391,10 @@ mod tests {
                 assert_eq!(metadata.os.unwrap(), "16.0");
             }
         };
+    }
+
+    #[test]
+    fn test_android_origin_workaround() {
+        let origin = "android:apk-key-hash:D_woKFaP1yeRthdVOKrD03l1Dx6xKjgv7cCoE13UXcg";
     }
 }
