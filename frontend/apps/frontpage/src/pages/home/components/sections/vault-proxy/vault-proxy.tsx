@@ -36,6 +36,7 @@ const VaultProxy = () => {
         subtitle={t('subtitle')}
         cta={t('cta')}
         icon={IcoLayer0124}
+        href="/vaulting"
         isDark
       />
       <IllustrationContainer>

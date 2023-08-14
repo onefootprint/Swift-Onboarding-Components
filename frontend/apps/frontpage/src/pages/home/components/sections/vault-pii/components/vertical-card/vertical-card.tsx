@@ -21,7 +21,7 @@ const VerticalCard = ({
   gridArea,
   hideFadeOutMask = false,
 }: VerticalCardProps) => {
-  const renderedIcon = Icon && <Icon color="primary" />;
+  const renderedIcon = Icon && <Icon color="quinary" />;
   return (
     <Container gridArea={gridArea}>
       <ImageContainer hideFadeOutMask={hideFadeOutMask}>
@@ -78,7 +78,7 @@ const Title = styled.h2`
     display: flex;
     align-items: center;
     gap: ${theme.spacing[4]};
-    color: ${theme.color.primary};
+    color: ${primitives.Gray0};
   `}
 `;
 

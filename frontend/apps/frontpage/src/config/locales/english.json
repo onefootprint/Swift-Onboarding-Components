@@ -304,7 +304,7 @@
       "vault-pii": {
         "title": "Vault PII, PCI, and custom data",
         "subtitle": "Footprint securely vaults three types of data: identity data, payment card data, and custom key-value data.",
-        "cta": "See documentation",
+        "cta": "Learn more",
         "identity-data": {
           "title": "Identity data (PII)",
           "subtitle": "Identity data that originates from user and business embedded onboarding flows (KYC and KYB) is verified with our decisioning platform and then vaulted. Identity data is comprised of specific attributes that are validated, vaulted, tokenized, and in some attribute types fingerprinted to become matchable."
@@ -321,7 +321,7 @@
       "vault-proxy": {
         "title": "Next-gen vault proxy",
         "subtitle": "Send PII data to third parties from Footprint without having to decrypt it yourself.",
-        "cta": "See documentation",
+        "cta": "Learn more",
         "features": {
           "enhanced-security": {
             "title": "Enhanced security",

@@ -27,7 +27,7 @@ const SectionTitle = ({
   href,
   isDark,
 }: SectionTitleProps) => {
-  const renderedIcon = Icon && <Icon />;
+  const renderedIcon = Icon && <Icon color="accent" />;
   return (
     <Container>
       <TitleContainer isDark={isDark}>
@@ -82,7 +82,8 @@ const TitleContainer = styled.div<{ isDark?: boolean }>`
       width: fit-content;
       max-width: 600px;
 
-      button {
+      button,
+      a {
         color: ${isDark ? primitives.Purple300 : theme.color.accent};
       }
 

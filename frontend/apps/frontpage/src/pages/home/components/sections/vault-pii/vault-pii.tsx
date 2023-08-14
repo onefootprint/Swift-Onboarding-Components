@@ -28,6 +28,7 @@ const VaultPii = () => {
         subtitle={t('subtitle')}
         cta={t('cta')}
         icon={IcoDatabase24}
+        href="/vaulting"
         isDark
       />
       <Grid>
