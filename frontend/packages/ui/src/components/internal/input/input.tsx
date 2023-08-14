@@ -83,7 +83,8 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             $sx={sxStyles}
             aria-required={required}
             as={mask ? undefined : 'input'}
-            className={`fp-input ${className}`}
+            /** Do not change/remove these classes */
+            className={`${className} fp-input fp-custom-appearance`}
             data-has-error={hasError}
             data-has-focus={hasFocus}
             data-size={size}

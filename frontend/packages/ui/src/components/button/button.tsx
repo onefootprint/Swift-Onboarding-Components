@@ -66,7 +66,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <ButtonContainer
-        className="fp-button"
+        /** Do not change/remove these classes */
+        className="fp-button fp-custom-appearance"
         data-full-width={fullWidth}
         data-loading={loading}
         data-size={size}

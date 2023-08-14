@@ -30,7 +30,8 @@ const Label = ({
 }: LabelProps) => (
   <LabelContainer>
     <StyledLabel
-      className="fp-label"
+      /** Do not change/remove these classes */
+      className="fp-label fp-custom-appearance"
       data-has-error={hasError}
       data-size={size}
       htmlFor={htmlFor}

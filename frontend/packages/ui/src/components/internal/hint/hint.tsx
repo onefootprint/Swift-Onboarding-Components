@@ -20,7 +20,7 @@ const Hint = ({
 }: HintProps) => (
   <HintContainer
     id={id}
-    className={`${className} fp-hint`}
+    className={`${className} fp-hint fp-custom-appearance`}
     data-has-error={hasError}
     data-size={size}
   >

@@ -14,7 +14,7 @@ describe('createAppearanceRules', () => {
           'button:hover': { background: 'green' },
         }),
       ).toEqual(
-        '.fp-button{background:red;} .fp-button:hover{background:green;}',
+        '.fp-custom-appearance.fp-button{background:red;} .fp-custom-appearance.fp-button:hover{background:green;}',
       );
     });
   });
@@ -52,17 +52,17 @@ describe('createAppearanceRules', () => {
         getSelector('button', {
           button: '.fp-button',
         }),
-      ).toEqual('.fp-button');
+      ).toEqual('.fp-custom-appearance.fp-button');
       expect(
         getSelector('button:hover', {
           button: '.fp-button',
         }),
-      ).toEqual('.fp-button:hover');
+      ).toEqual('.fp-custom-appearance.fp-button:hover');
       expect(
         getSelector('button:after', {
           button: '.fp-button',
         }),
-      ).toEqual('.fp-button:after');
+      ).toEqual('.fp-custom-appearance.fp-button:after');
     });
   });
 
@@ -99,7 +99,7 @@ describe('createAppearanceRules', () => {
       };
       const result = createStylesFromRules(rules);
       expect(result).toEqual(
-        `.fp-button{background-color:red;} .fp-button:hover{text-decoration:underline;}`,
+        `.fp-custom-appearance.fp-button{background-color:red;} .fp-custom-appearance.fp-button:hover{text-decoration:underline;}`,
       );
     });
   });

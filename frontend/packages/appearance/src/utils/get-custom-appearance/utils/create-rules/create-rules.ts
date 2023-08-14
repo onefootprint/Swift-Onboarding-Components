@@ -31,9 +31,9 @@ export const getSelector = (
     const separatorPosition = selector.indexOf(':');
     const component = selector.slice(0, separatorPosition);
     const pseudoSelector = selector.slice(separatorPosition, selector.length);
-    return `${selectors[component]}${pseudoSelector}`;
+    return `.fp-custom-appearance${selectors[component]}${pseudoSelector}`;
   }
-  return selectors[selector];
+  return `.fp-custom-appearance${selectors[selector]}`;
 };
 
 export const convertObjectToCSS = (rules: Record<string, any>) => {

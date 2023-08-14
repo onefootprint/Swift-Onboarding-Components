@@ -58,7 +58,8 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
     return (
       <LinkButtonStyled
         aria-label={ariaLabel}
-        className="fp-link-button"
+        /** Do not change/remove these classes */
+        className="fp-link-button fp-custom-appearance"
         data-icon-position={iconPosition}
         data-size={size}
         data-testid={testID}

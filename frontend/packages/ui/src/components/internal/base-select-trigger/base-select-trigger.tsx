@@ -36,7 +36,8 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       onClick={onClick}
       ref={ref}
       type="button"
-      className="fp-input"
+      /** Do not change/remove these classes */
+      className="fp-input fp-custom-appearance"
     >
       <Content data-private={isPrivate} data-testid={testID}>
         {children}
