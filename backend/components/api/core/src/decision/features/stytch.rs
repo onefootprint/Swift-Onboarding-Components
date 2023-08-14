@@ -30,7 +30,6 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
         Reason::IpRateLimitExceededCritical => None,
         Reason::TuningRuleMatch => None,
         Reason::AwsDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
-        Reason::Unknown(_) => None,
     }
 }
 
@@ -61,7 +60,6 @@ mod test {
     #[test_case(Action::Block, vec![] => vec![FootprintReasonCode::DeviceHighRisk])]
     #[test_case(Action::Challenge, vec![] => vec![FootprintReasonCode::DeviceMediumRisk])]
     #[test_case(Action::Allow, vec![] => vec![FootprintReasonCode::DeviceLowRisk])]
-    #[test_case(Action::Challenge, vec![Reason::Unknown("yo".to_owned())] => vec![FootprintReasonCode::DeviceMediumRisk])]
     #[test_case(Action::Challenge, vec![Reason::TuningRuleMatch] => vec![FootprintReasonCode::DeviceMediumRisk])]
     #[test_case(Action::Challenge, vec![Reason::KnownDatacenterIp] => vec![FootprintReasonCode::DeviceMediumRisk, FootprintReasonCode::IpAlertDataCenter])]
     #[test_case(Action::Challenge, vec![Reason::HeadlessBrowserAutomation] => vec![FootprintReasonCode::DeviceMediumRisk, FootprintReasonCode::BrowserAutomation])]

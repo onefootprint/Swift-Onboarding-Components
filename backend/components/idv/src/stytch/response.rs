@@ -102,8 +102,6 @@ pub enum Reason {
     IpRateLimitExceededCritical,
     TuningRuleMatch,
     AwsDatacenterIp,
-    #[strum(default)]
-    Unknown(String),
 }
 
 #[cfg(test)]
@@ -143,7 +141,7 @@ mod tests {
     }
 
     #[test_case(example_response1() => (Action::Allow, vec![]))]
-    #[test_case(example_response2() => (Action::Challenge, vec![Reason::KnownDatacenterIp, Reason::Unknown(String::from("SOMETHING_ELSE_YO"))]))]
+    #[test_case(example_response2() => (Action::Challenge, vec![Reason::KnownDatacenterIp]))]
     fn parse_success(json: serde_json::Value) -> (Action, Vec<Reason>) {
         let parsed = parse_response(json).unwrap();
 
