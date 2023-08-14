@@ -5,21 +5,6 @@
       "delegate_permission/common.get_login_creds"
     ],
     "target": {
-      "namespace": "android_app",
-      "package_name": "com.onefootprint.my",
-      "sha256_cert_fingerprints": [
-        "89:A0:BA:FB:71:98:85:F2:99:13:D3:03:DF:47:B6:E3:A4:D8:CB:66:C8:5E:D5:C9:63:38:96:28:88:66:49:41",
-        "0F:FC:28:28:56:8F:D7:27:91:B6:17:55:38:AA:C3:D3:79:75:0F:1E:B1:2A:38:2F:ED:C0:A8:13:5D:D4:5D:C8",
-        "C9:2D:DF:DB:65:AF:C4:20:9D:ED:85:0F:34:14:28:9D:3F:75:37:1C:3B:3F:04:FF:D6:2F:30:94:10:85:CB:E3"
-      ]
-    }
-  },
-  {
-    "relation": [
-      "delegate_permission/common.handle_all_urls",
-      "delegate_permission/common.get_login_creds"
-    ],
-    "target": {
       "namespace": "web",
       "site": "https://onefootprint.com"
     }
@@ -30,8 +15,13 @@
       "delegate_permission/common.get_login_creds"
     ],
     "target": {
-      "namespace": "web",
-      "site": "https://handoff.onefootprint.com/appclip"
+      "namespace": "android_app",
+      "package_name": "com.onefootprint.my",
+      "sha256_cert_fingerprints": [
+        "89:A0:BA:FB:71:98:85:F2:99:13:D3:03:DF:47:B6:E3:A4:D8:CB:66:C8:5E:D5:C9:63:38:96:28:88:66:49:41",
+        "0F:FC:28:28:56:8F:D7:27:91:B6:17:55:38:AA:C3:D3:79:75:0F:1E:B1:2A:38:2F:ED:C0:A8:13:5D:D4:5D:C8",
+        "C9:2D:DF:DB:65:AF:C4:20:9D:ED:85:0F:34:14:28:9D:3F:75:37:1C:3B:3F:04:FF:D6:2F:30:94:10:85:CB:E3"
+      ]
     }
-  }
+  },
 ]
