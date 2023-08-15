@@ -64,7 +64,6 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     )
     .await;
     let wf_id = wf.id.clone();
-    let ob_id = ob.id.clone();
 
     // Needed for db constraints
     let su_id = su.id.clone();
@@ -79,7 +78,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
             )
             .unwrap();
 
-            let ie = InsightEvent::get_by_onboarding_id(conn, &ob_id)?.unwrap();
+            let ie = InsightEvent::get(conn, &wf_id)?.unwrap();
             let doc_request = DocumentRequest::get(conn.conn(), &wf_id)?.unwrap();
 
             let note = "I, Bob Boberto, consent to NOTHING".into();
@@ -303,7 +302,6 @@ async fn test_fail(state: &State, is_selfie: bool) {
     )
     .await;
     let wf_id = wf.id.clone();
-    let ob_id = ob.id.clone();
 
     // Needed for db constraints
     let suid = su.id.clone();
@@ -317,7 +315,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
                 DecisionIntentKind::DocScan,
             )
             .unwrap();
-            let ie = InsightEvent::get_by_onboarding_id(conn, &ob_id)?.unwrap();
+            let ie = InsightEvent::get(conn, &wf_id)?.unwrap();
 
             let doc_request = DocumentRequest::get(conn.conn(), &wf_id)?.unwrap();
 

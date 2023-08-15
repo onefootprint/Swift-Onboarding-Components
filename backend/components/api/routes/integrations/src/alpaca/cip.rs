@@ -28,8 +28,8 @@ use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
         document_request::DocumentRequest, insight_event::InsightEvent, manual_review::ManualReview,
-        onboarding::Onboarding, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
-        scoped_vault::ScopedVault, verification_request::VerificationRequest, workflow::Workflow,
+        onboarding_decision::OnboardingDecision, risk_signal::RiskSignal, scoped_vault::ScopedVault,
+        verification_request::VerificationRequest, workflow::Workflow,
     },
 };
 use idv::ParsedResponse;
@@ -105,8 +105,7 @@ async fn create_cip_request(
                     .ok_or(CipError::EntityDecisionDoesNotExist)?;
 
             let risk_signals = RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
-            let wf = Workflow::get(conn, &fp_obd.workflow_id)?;
-            let (ob, sv) = Onboarding::get(conn, &wf.scoped_vault_id)?;
+            let (wf, sv) = Workflow::get_all(conn, &fp_obd.workflow_id)?;
 
             let (risk_signals, mr, manual_obd) = match fp_obd.status {
                 DecisionStatus::Pass => (risk_signals, None, None),
@@ -125,7 +124,7 @@ async fn create_cip_request(
 
             let collected_document = DocumentRequest::get(conn, &wf.id)?.map(|d| d.should_collect_selfie);
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-            let insight = InsightEvent::get_by_onboarding_id(conn, &ob.id)?;
+            let insight = InsightEvent::get(conn, &wf.id)?;
 
             let decision = manual_obd.unwrap_or(fp_obd);
 

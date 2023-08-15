@@ -33,8 +33,8 @@ pub struct Onboarding {
     pub _updated_at: DateTime<Utc>,
 
     // TODO rm
-    // There are still some reads of these in DB queries that we have to rm first
     insight_event_id: Option<InsightEventId>,
+    // There are still some reads of these in DB queries that we have to rm first
     authorized_at: Option<DateTime<Utc>>,
     idv_reqs_initiated_at: Option<DateTime<Utc>>,
     decision_made_at: Option<DateTime<Utc>>,

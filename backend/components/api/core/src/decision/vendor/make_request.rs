@@ -458,7 +458,7 @@ pub async fn make_vendor_requests(
                     SocureDeviceSession::latest_for_onboarding(conn, &ob_id)?.map(|d| d.device_session_id);
 
                 // TODO this is stale
-                let ip_address = InsightEvent::get_by_onboarding_id(conn, &ob_id)?
+                let ip_address = InsightEvent::get(conn, &wfid)?
                     .and_then(|ie| ie.ip_address.map(PiiString::from));
 
                 let obc_key = ObConfiguration::get(conn, &wfid)?.0.key;

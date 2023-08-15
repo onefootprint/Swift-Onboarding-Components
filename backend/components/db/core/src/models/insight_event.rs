@@ -3,10 +3,10 @@ use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::insight_event;
-use db_schema::schema::onboarding;
+use db_schema::schema::workflow;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable, RunQueryDsl};
-use newtypes::{InsightEventId, OnboardingId};
+use newtypes::{InsightEventId, WorkflowId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -79,14 +79,11 @@ impl CreateInsightEvent {
 }
 
 impl InsightEvent {
-    #[tracing::instrument("InsightEvent::get_by_onboarding_id", skip_all)]
-    pub fn get_by_onboarding_id(
-        conn: &mut PgConn,
-        onboarding_id: &OnboardingId,
-    ) -> DbResult<Option<InsightEvent>> {
-        let insight_event: Option<InsightEvent> = onboarding::table
+    #[tracing::instrument("InsightEvent::get", skip_all)]
+    pub fn get(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<InsightEvent>> {
+        let insight_event: Option<InsightEvent> = workflow::table
             .inner_join(insight_event::table)
-            .filter(onboarding::id.eq(onboarding_id))
+            .filter(workflow::id.eq(wf_id))
             .select(insight_event::all_columns)
             .get_result(conn)
             .optional()?;
