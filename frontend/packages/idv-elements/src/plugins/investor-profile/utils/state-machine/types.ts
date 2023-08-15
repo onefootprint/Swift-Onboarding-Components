@@ -4,7 +4,9 @@ import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type EmploymentData = Pick<
   InvestorProfileData,
-  InvestorProfileDI.occupation
+  | InvestorProfileDI.status
+  | InvestorProfileDI.occupation
+  | InvestorProfileDI.employer
 >;
 
 export type EmployedByBrokerageData = Pick<

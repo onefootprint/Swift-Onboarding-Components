@@ -26,51 +26,112 @@ describe('<EmploymentForm />', () => {
     );
   };
 
-  it('should trigger onSubmit when form is submitted', async () => {
-    const onSubmit = jest.fn();
-    renderForm({ onSubmit });
+  describe('when selecting an employed status', () => {
+    it('should trigger onSubmit with occupation and employer', async () => {
+      const onSubmit = jest.fn();
+      renderForm({ onSubmit });
 
-    const button = screen.getByRole('button', { name: 'Continue' });
+      const occupation = screen.getByLabelText('Occupation');
+      await userEvent.type(occupation, 'Doctor');
 
-    await userEvent.click(button);
-    expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDI.occupation]: '',
-    });
+      const employeer = screen.getByLabelText('Employer');
+      await userEvent.type(employeer, 'Acme');
 
-    const trigger = screen.getByRole('button', { name: 'Unemployed' });
-    await selectEvents.select(trigger, 'Employed');
-    expect(screen.getByText('Employed')).toBeInTheDocument();
+      const button = screen.getByRole('button', { name: 'Continue' });
+      await userEvent.click(button);
 
-    const occupation = screen.getByLabelText('Occupation');
-    await userEvent.type(occupation, 'Doctor');
-
-    await userEvent.click(button);
-    expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDI.occupation]: 'Doctor',
+      expect(onSubmit).toHaveBeenCalledWith({
+        [InvestorProfileDI.status]: 'employed',
+        [InvestorProfileDI.occupation]: 'Doctor',
+        [InvestorProfileDI.employer]: 'Acme',
+      });
     });
   });
 
-  describe('renders default values correctly', () => {
-    it('when there is an occupation', async () => {
+  describe('when selecting an unemployed status', () => {
+    it('should trigger onSubmit with occupation and employer empty', async () => {
+      const onSubmit = jest.fn();
+      renderForm({ onSubmit });
+
+      const trigger = screen.getByRole('button', { name: 'Employed' });
+      await selectEvents.select(trigger, 'Unemployed');
+
+      const button = screen.getByRole('button', { name: 'Continue' });
+      await userEvent.click(button);
+
+      expect(onSubmit).toHaveBeenCalledWith({
+        [InvestorProfileDI.status]: 'unemployed',
+        [InvestorProfileDI.occupation]: '',
+        [InvestorProfileDI.employer]: '',
+      });
+    });
+  });
+
+  describe('when selecting a retired status', () => {
+    it('should trigger onSubmit with occupation and employer empty', async () => {
+      const onSubmit = jest.fn();
+      renderForm({ onSubmit });
+
+      const trigger = screen.getByRole('button', { name: 'Employed' });
+      await selectEvents.select(trigger, 'Retired');
+
+      const button = screen.getByRole('button', { name: 'Continue' });
+      await userEvent.click(button);
+
+      expect(onSubmit).toHaveBeenCalledWith({
+        [InvestorProfileDI.status]: 'retired',
+        [InvestorProfileDI.occupation]: '',
+        [InvestorProfileDI.employer]: '',
+      });
+    });
+  });
+
+  describe('when selecting a student status', () => {
+    it('should trigger onSubmit with occupation and employer empty', async () => {
+      const onSubmit = jest.fn();
+      renderForm({ onSubmit });
+
+      const trigger = screen.getByRole('button', { name: 'Employed' });
+      await selectEvents.select(trigger, 'Student');
+
+      const button = screen.getByRole('button', { name: 'Continue' });
+      await userEvent.click(button);
+
+      expect(onSubmit).toHaveBeenCalledWith({
+        [InvestorProfileDI.status]: 'student',
+        [InvestorProfileDI.occupation]: '',
+        [InvestorProfileDI.employer]: '',
+      });
+    });
+  });
+
+  describe('default values correctly', () => {
+    it('should render the occupation and employer when is employed', async () => {
       renderForm({
         defaultValues: {
+          [InvestorProfileDI.status]: 'employed',
           [InvestorProfileDI.occupation]: 'Doctor',
+          [InvestorProfileDI.employer]: 'Acme',
         },
       });
 
+      const status = screen.getByText('Employed');
+      expect(status).toBeInTheDocument();
+
       const occupation = screen.getByLabelText('Occupation');
       expect(occupation).toHaveValue('Doctor');
-      expect(screen.getByText('Employed')).toBeInTheDocument();
+
+      const employer = screen.getByLabelText('Employer');
+      expect(employer).toHaveValue('Acme');
     });
 
-    it('when there are no default values', async () => {
+    it('should default to employed when is empty', async () => {
       renderForm({
         defaultValues: {},
       });
 
-      const occupation = screen.queryByLabelText('Occupation');
-      expect(occupation).not.toBeInTheDocument();
-      expect(screen.getByText('Unemployed')).toBeInTheDocument();
+      const status = screen.getByText('Employed');
+      expect(status).toBeInTheDocument();
     });
   });
 

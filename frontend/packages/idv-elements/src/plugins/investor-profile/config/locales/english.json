@@ -30,6 +30,11 @@
         "label": "Occupation",
         "placeholder": "Select your occupation",
         "error": "Occupation is required"
+      },
+      "employer": {
+        "label": "Employer",
+        "placeholder": "Acme Bank",
+        "error": "Employer is required"
       }
     },
     "brokerage-employment": {

@@ -60,7 +60,9 @@ const Employment = () => {
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
+          [InvestorProfileDI.status]: data?.[InvestorProfileDI.status],
           [InvestorProfileDI.occupation]: data?.[InvestorProfileDI.occupation],
+          [InvestorProfileDI.employer]: data?.[InvestorProfileDI.employer],
         }}
       />
     </>

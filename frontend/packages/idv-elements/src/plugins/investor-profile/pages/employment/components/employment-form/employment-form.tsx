@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { InvestorProfileData, InvestorProfileDI } from '@onefootprint/types';
+import { InvestorProfileDI } from '@onefootprint/types';
 import { Select, SelectOption, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -8,7 +8,7 @@ import CustomForm from '../../../../components/custom-form';
 import { EmploymentData } from '../../../../utils/state-machine/types';
 
 export type EmploymentFormProps = {
-  defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.occupation>;
+  defaultValues?: Partial<EmploymentData>;
   isLoading?: boolean;
   onSubmit: (data: EmploymentData) => void;
 };
@@ -16,6 +16,7 @@ export type EmploymentFormProps = {
 type FormData = {
   status: SelectOption;
   occupation?: string;
+  employer?: string;
 };
 
 const EmploymentForm = ({
@@ -43,15 +44,11 @@ const EmploymentForm = ({
     },
   ];
 
-  const defaultOccupation = defaultValues?.[InvestorProfileDI.occupation];
-  const hasDefaultOccupation =
-    typeof defaultOccupation === 'string' && defaultOccupation.length > 0;
-  const defaultEmploymentStatus = hasDefaultOccupation
-    ? 'employed'
-    : 'unemployed';
-  const defaultOption = options.find(
-    option => option.value === defaultEmploymentStatus,
+  const defaultStatus = options.find(
+    ({ value }) => value === defaultValues?.[InvestorProfileDI.status],
   );
+  const defaultOccupation = defaultValues?.[InvestorProfileDI.occupation];
+  const defaultEmployer = defaultValues?.[InvestorProfileDI.employer];
 
   const {
     register,
@@ -61,19 +58,20 @@ const EmploymentForm = ({
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      status: defaultOption ?? options[0],
+      status: defaultStatus || options.at(0),
       occupation: defaultOccupation,
+      employer: defaultEmployer,
     },
   });
 
   const employmentStatus = watch('status') as SelectOption;
   const handleBeforeSubmit = (formData: FormData) => {
-    const {
-      status: { value },
-      occupation = '',
-    } = formData;
+    const { status, occupation = '', employer = '' } = formData;
+    const isEmployed = status.value === 'employed';
     onSubmit({
-      [InvestorProfileDI.occupation]: value === 'employed' ? occupation : '',
+      [InvestorProfileDI.status]: status.value,
+      [InvestorProfileDI.occupation]: isEmployed ? occupation : '',
+      [InvestorProfileDI.employer]: isEmployed ? employer : '',
     });
   };
 
@@ -105,16 +103,28 @@ const EmploymentForm = ({
         )}
       />
       {employmentStatus.value === 'employed' && (
-        <TextInput
-          data-private
-          hasError={!!errors.occupation}
-          hint={errors.occupation ? t('occupation.error') : undefined}
-          label={t('occupation.label')}
-          placeholder={t('occupation.placeholder')}
-          {...register('occupation', {
-            required: true,
-          })}
-        />
+        <>
+          <TextInput
+            data-private
+            hasError={!!errors.occupation}
+            hint={errors.occupation ? t('occupation.error') : undefined}
+            label={t('occupation.label')}
+            placeholder={t('occupation.placeholder')}
+            {...register('occupation', {
+              required: true,
+            })}
+          />
+          <TextInput
+            data-private
+            hasError={!!errors.employer}
+            hint={errors.employer ? t('employer.error') : undefined}
+            label={t('employer.label')}
+            placeholder={t('employer.placeholder')}
+            {...register('employer', {
+              required: true,
+            })}
+          />
+        </>
       )}
     </CustomForm>
   );
