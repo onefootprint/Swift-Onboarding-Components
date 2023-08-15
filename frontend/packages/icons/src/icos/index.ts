@@ -26,6 +26,8 @@ export { default as IcoAmex24 } from './ico-amex-colored-24';
 export { default as IcoAndroid16 } from './ico-android-16';
 export { default as IcoAndroid24 } from './ico-android-24';
 export { default as IcoApex24 } from './ico-apex-24';
+export { default as IcoAppclip16 } from './ico-appclip-colored-16';
+export { default as IcoAppclip24 } from './ico-appclip-colored-24';
 export { default as IcoApple16 } from './ico-apple-16';
 export { default as IcoApple24 } from './ico-apple-24';
 export { default as IcoApple40 } from './ico-apple-colored-40';
