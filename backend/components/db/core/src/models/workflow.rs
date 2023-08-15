@@ -36,6 +36,8 @@ pub struct Workflow {
     pub ob_configuration_id: Option<ObConfigurationId>,
     pub insight_event_id: Option<InsightEventId>,
     pub authorized_at: Option<DateTime<Utc>>,
+    /// The time at which the first Footprint decision was made, if any
+    pub decision_made_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -68,6 +70,7 @@ pub struct NewWorkflowArgs {
 pub struct WorkflowUpdate {
     pub status: Option<OnboardingStatus>,
     pub authorized_at: Option<Option<DateTime<Utc>>>,
+    pub decision_made_at: Option<Option<DateTime<Utc>>>,
 }
 
 pub enum WorkflowIdentifier<'a> {

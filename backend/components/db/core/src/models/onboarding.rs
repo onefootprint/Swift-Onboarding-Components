@@ -262,6 +262,7 @@ impl Onboarding {
             let update = WorkflowUpdate {
                 status: update.status,
                 authorized_at: update.authorized_at,
+                decision_made_at: None,
             };
             Workflow::update(conn, wf_id, update)?;
         }

@@ -14,6 +14,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::FpId;
+use newtypes::Locked;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::WorkflowId;
@@ -26,6 +27,7 @@ use serde::{Deserialize, Serialize};
 use super::manual_review::ManualReview;
 use super::ob_configuration::ObConfiguration;
 use super::user_timeline::UserTimeline;
+use super::workflow::WorkflowUpdate;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = onboarding_decision)]
@@ -84,7 +86,21 @@ pub type SaturatedOnboardingDecisionInfo = (
 
 impl OnboardingDecision {
     #[tracing::instrument("OnboardingDecision::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, args: OnboardingDecisionCreateArgs) -> DbResult<Self> {
+    pub fn create(
+        wf: &Locked<Workflow>,
+        conn: &mut TxnPgConn,
+        args: OnboardingDecisionCreateArgs,
+    ) -> DbResult<Self> {
+        // Update the workflow's decision_made_at if this is the first Footprint decision
+        if wf.decision_made_at.is_none() && matches!(args.actor, DbActor::Footprint) {
+            let update = WorkflowUpdate {
+                decision_made_at: Some(Some(Utc::now())),
+                status: None,
+                authorized_at: None,
+            };
+            Workflow::update(conn, &wf.id, update)?;
+        }
+
         // Deactivate the last decision
         diesel::update(onboarding_decision::table)
             .filter(onboarding_decision::workflow_id.eq(&args.workflow_id))

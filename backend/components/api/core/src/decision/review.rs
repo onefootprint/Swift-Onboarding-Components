@@ -25,8 +25,8 @@ pub fn save_review_decision(
         status,
     } = decision_request;
 
-    Workflow::lock(conn, &wf_id)?;
-    let (wf, su) = Workflow::get_all(conn, &wf_id)?;
+    let wf = Workflow::lock(conn, &wf_id)?;
+    let (_, su) = Workflow::get_all(conn, &wf_id)?;
     let manual_review = ManualReview::get_active(conn, &wf_id)?;
 
     if wf.authorized_at.is_none() {
@@ -50,7 +50,7 @@ pub fn save_review_decision(
         seqno: None,
         workflow_id: wf_id.clone(),
     };
-    let decision = OnboardingDecision::create(conn, new_decision)?;
+    let decision = OnboardingDecision::create(&wf, conn, new_decision)?;
 
     // If there is an outstanding review, creating this override decision clears it
     // This has to happen before we update the status below, otherwise the webhook will incorrectly

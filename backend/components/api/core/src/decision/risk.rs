@@ -58,7 +58,7 @@ pub fn save_final_decision(
         seqno,
         workflow_id: wf_id.clone(),
     };
-    let obd = OnboardingDecision::create(conn, onboarding_decision)?;
+    let obd = OnboardingDecision::create(&wf, conn, onboarding_decision)?;
 
     // Create ManualReview row if requested and an active one does not already exist
     if decision.create_manual_review {
