@@ -20,7 +20,7 @@ const useRouterSpy = createUseRouterSpy();
 const id = 'fp_id_yCZehsWNeywHnk5JqL20u';
 
 const entity: Entity = { ...entityFixture, kind: EntityKind.person };
-const entityWithoutOnboarding: Entity = { ...entity, onboarding: undefined };
+const entityWithNoInsightEvent: Entity = { ...entity, insightEvent: undefined };
 
 describe('<DeviceInsights />', () => {
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe('<DeviceInsights />', () => {
     beforeAll(withCurrentEntityLivenessEmpty);
 
     it('Shows empty device insights if the onboarding is undefined', async () => {
-      renderDeviceInsights(entityWithoutOnboarding);
+      renderDeviceInsights(entityWithNoInsightEvent);
 
       await waitFor(() => {
         const emptyMessage = screen.getByText('No device insights available');
@@ -79,7 +79,7 @@ describe('<DeviceInsights />', () => {
     beforeAll(withCurrentEntityLivenessData);
 
     it('Shows non-empty device insights even if the onboarding is not defined', async () => {
-      renderDeviceInsights(entityWithoutOnboarding);
+      renderDeviceInsights(entityWithNoInsightEvent);
 
       await waitFor(() => {
         const ipField = screen.getByText('IP address');

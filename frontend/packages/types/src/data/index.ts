@@ -40,7 +40,6 @@ export * from './liveness';
 export * from './liveness-check-info';
 export * from './match-signal';
 export * from './ob-config-auth';
-export * from './onboarding';
 export * from './onboarding-config';
 export * from './onboarding-decision';
 export { default as OnboardingStatus } from './onboarding-status';

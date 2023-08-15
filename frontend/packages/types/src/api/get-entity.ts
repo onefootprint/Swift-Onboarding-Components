@@ -1,7 +1,7 @@
-import { Entity } from '../data';
+import { Entity, OnboardingStatus } from '../data';
 
 export type GetEntityRequest = {
   id: string;
 };
 
-export type GetEntityResponse = Entity;
+export type GetEntityResponse = Entity<OnboardingStatus | undefined>;

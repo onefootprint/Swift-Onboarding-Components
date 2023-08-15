@@ -4,7 +4,6 @@ import {
   Entity,
   EntityKind,
   EntityStatus,
-  OnboardingStatus,
 } from '@onefootprint/types';
 
 export const entityFixture: Entity = {
@@ -38,36 +37,27 @@ export const entityFixture: Entity = {
     BusinessDI.zip,
   ],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
-  onboarding: {
-    id: 'ob_Y3gPIFuPyhqK4f9w2f8QF7',
-    isAuthorized: true,
-    name: '[Test] Business',
-    configId: 'ob_config_id_RccCUPbZVaarmtjfNwM9vo',
-    requiresManualReview: false,
-    status: OnboardingStatus.pass,
-    timestamp: '2023-03-27T14:43:47.446874Z',
-    insightEvent: {
-      timestamp: '2023-04-03T17:42:30.799202Z',
-      ipAddress: '67.243.21.56',
-      city: 'New York',
-      country: 'United States',
-      region: 'NY',
-      regionName: 'New York',
-      latitude: 40.7365,
-      longitude: -74.0055,
-      metroCode: '501',
-      postalCode: '10014',
-      timeZone: 'America/New_York',
-      userAgent:
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Safari/605.1.15',
-    },
-  },
-  requiresManualReview: false,
-  status: EntityStatus.pass,
   decryptedAttributes: {
     [BusinessDI.name]: 'Acme Inc.',
   },
   watchlistCheck: null,
+  requiresManualReview: false,
+  status: EntityStatus.pass,
+  insightEvent: {
+    timestamp: '2023-04-03T17:42:30.799202Z',
+    ipAddress: '67.243.21.56',
+    city: 'New York',
+    country: 'United States',
+    region: 'NY',
+    regionName: 'New York',
+    latitude: 40.7365,
+    longitude: -74.0055,
+    metroCode: '501',
+    postalCode: '10014',
+    timeZone: 'America/New_York',
+    userAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Safari/605.1.15',
+  },
 };
 
 export const withBusinessOwnersError = (entity = entityFixture) =>

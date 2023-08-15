@@ -13,7 +13,7 @@ export type ContentProps = WithEntityProps;
 const DeviceInsights = ({ entity }: ContentProps) => {
   const { t } = useTranslation('pages.entity.device-insights');
   const { error, data, isSuccess } = useCurrentEntityLiveness();
-  const onboardingInsightEvent = entity.onboarding?.insightEvent;
+  const onboardingInsightEvent = entity.insightEvent;
   const biometricCred = data?.[0];
 
   return (

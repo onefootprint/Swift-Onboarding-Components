@@ -1,6 +1,7 @@
 import { DataIdentifier, DocumentDI, InvestorProfileDI } from './di';
 import { EntityCard } from './entity-cards';
-import { Onboarding } from './onboarding';
+import { InsightEvent } from './insight-event';
+import OnboardingStatus from './onboarding-status';
 import { WatchlistCheckEventData } from './timeline';
 import { VaultValue } from './vault';
 
@@ -24,18 +25,18 @@ export enum EntityStatus {
   none = 'none', // Onboarding hasn't started for this vault
 }
 
-export type Entity = {
+export type Entity<TStatus = EntityStatus> = {
   attributes: DataIdentifier[];
   decryptableAttributes: DataIdentifier[];
   id: string;
   isPortable: boolean;
   kind: EntityKind;
-  onboarding?: Onboarding;
-  requiresManualReview: boolean;
   startTimestamp: string;
-  status: EntityStatus;
   decryptedAttributes: EntityVault;
   watchlistCheck: WatchlistCheckEventData | null;
+  status: TStatus;
+  requiresManualReview: boolean;
+  insightEvent?: InsightEvent;
 };
 
 export const hasEntityInvestorProfile = (entity: Entity) => {
@@ -64,22 +65,16 @@ export const hasEntityDocuments = (entity: Entity) => {
   );
 };
 
-export const augmentEntityWithOnboardingInfo = (entity: Entity) => ({
+export const augmentEntityWithOnboardingInfo = (
+  entity: Entity<OnboardingStatus | undefined>,
+) => ({
   ...entity,
-  requiresManualReview: getEntityManualReview(entity),
   status: getEntityStatus(entity),
 });
 
-const getEntityStatus = (entity: Entity): EntityStatus => {
-  if (!entity.onboarding) {
-    return EntityStatus.none;
-  }
-  return (entity.onboarding.status ||
-    EntityStatus.incomplete) as unknown as EntityStatus;
-};
-
-const getEntityManualReview = (entity: Entity) => {
-  const userStatus = getEntityStatus(entity);
-  const requiresManualReview = !!entity.onboarding?.requiresManualReview;
-  return requiresManualReview && userStatus !== EntityStatus.incomplete;
-};
+const getEntityStatus = (
+  entity: Entity<OnboardingStatus | undefined>,
+): EntityStatus =>
+  entity.status
+    ? (entity.status as unknown as EntityStatus)
+    : EntityStatus.none;

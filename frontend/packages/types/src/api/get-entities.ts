@@ -1,4 +1,4 @@
-import { Entity, EntityKind } from '../data';
+import { Entity, EntityKind, OnboardingStatus } from '../data';
 
 export type GetEntitiesRequest = {
   kind?: EntityKind;
@@ -11,4 +11,4 @@ export type GetEntitiesRequest = {
   requires_manual_review?: string;
 };
 
-export type GetEntitiesResponse = Entity[];
+export type GetEntitiesResponse = Entity<OnboardingStatus | undefined>[];
