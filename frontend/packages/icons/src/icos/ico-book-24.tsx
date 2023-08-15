@@ -16,11 +16,10 @@ const IcoBook24 = ({ color = 'primary', className, testID }: IconProps) => {
       aria-hidden="true"
     >
       <path
-        d="M19.25 5.75a1 1 0 0 0-1-1H14a2 2 0 0 0-2 2v12.5l.828-.828a4 4 0 0 1 2.829-1.172h2.593a1 1 0 0 0 1-1V5.75ZM4.75 5.75a1 1 0 0 1 1-1H10a2 2 0 0 1 2 2v12.5l-.828-.828a4 4 0 0 0-2.829-1.172H5.75a1 1 0 0 1-1-1V5.75Z"
-        stroke={theme.color[color]}
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M6.5 6.75c0-.69.56-1.25 1.25-1.25H9v12H7.75c-.69 0-1.25-.56-1.25-1.25v-9.5ZM9 19v.25a.75.75 0 0 0 1.5 0V19h5.75A2.75 2.75 0 0 0 19 16.25v-9.5A2.75 2.75 0 0 0 16.25 4h-8.5A2.75 2.75 0 0 0 5 6.75v9.5A2.75 2.75 0 0 0 7.75 19H9Zm1.5-13.5h5.75c.69 0 1.25.56 1.25 1.25v9.5c0 .69-.56 1.25-1.25 1.25H10.5v-12ZM13.75 8a.75.75 0 0 0 0 1.5h.5a.75.75 0 0 0 0-1.5h-.5ZM13 11.75a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1-.75-.75Z"
+        fill={theme.color[color]}
       />
     </svg>
   );
