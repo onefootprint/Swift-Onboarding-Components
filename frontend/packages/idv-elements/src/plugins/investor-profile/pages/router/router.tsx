@@ -2,7 +2,6 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
-import BrokerageEmployment from '../brokerage-employment';
 import Declarations from '../declarations';
 import Employment from '../employment';
 import Income from '../income';
@@ -27,9 +26,6 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('employment')) {
     return <Employment />;
-  }
-  if (state.matches('brokerageEmployment')) {
-    return <BrokerageEmployment />;
   }
   if (state.matches('income')) {
     return <Income />;

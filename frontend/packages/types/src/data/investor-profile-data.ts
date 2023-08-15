@@ -11,7 +11,6 @@ export type InvestorProfileData = Partial<{
   [InvestorProfileDI.status]: string;
   [InvestorProfileDI.occupation]: string;
   [InvestorProfileDI.employer]: string;
-  [InvestorProfileDI.employedByBrokerageFirm]: string;
   [InvestorProfileDI.annualIncome]: InvestorProfileAnnualIncome;
   [InvestorProfileDI.netWorth]: InvestorProfileNetWorth;
   [InvestorProfileDI.investmentGoals]: InvestorProfileInvestmentGoal[];

@@ -1452,7 +1452,6 @@
             "label": "Ask investor profile questions",
             "questions": {
               "employment": "What's your employment status and occupation?",
-              "brokerage-employment": "Are you employed by a brokerage firm?",
               "income": "What's your annual income?",
               "net-worth": "What's your net worth?",
               "investment-goals": "What are your investment goals?",

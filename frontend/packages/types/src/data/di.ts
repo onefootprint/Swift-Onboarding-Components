@@ -19,7 +19,6 @@ export enum InvestorProfileDI {
   status = 'investor_profile.employment_status',
   occupation = 'investor_profile.occupation',
   employer = 'investor_profile.employer',
-  employedByBrokerageFirm = 'investor_profile.brokerage_firm_employer',
   annualIncome = 'investor_profile.annual_income',
   netWorth = 'investor_profile.net_worth',
   investmentGoals = 'investor_profile.investment_goals',

@@ -586,7 +586,6 @@ describe('<Details />', () => {
           beforeEach(() => {
             withDecrypt(entityFixture.id, {
               [InvestorProfileDI.occupation]: 'Engineer',
-              [InvestorProfileDI.employedByBrokerageFirm]: 'Yes',
               [InvestorProfileDI.annualIncome]: 'gt500k',
               [InvestorProfileDI.riskTolerance]: 'moderate',
               [InvestorProfileDI.netWorth]: 'lt50k',

@@ -37,19 +37,6 @@
         "error": "Employer is required"
       }
     },
-    "brokerage-employment": {
-      "title": "Are you employed by a brokerage firm?",
-      "subtitle": "We're legally required to collect this information.",
-      "status": {
-        "yes": "Yes, I am",
-        "no": "No, I am not"
-      },
-      "firm": {
-        "label": "Firm",
-        "placeholder": "Spark Investments, Inc.",
-        "error": "Firm is required"
-      }
-    },
     "income": {
       "title": "What's your annual income?",
       "subtitle": "We're legally required to collect this information.",

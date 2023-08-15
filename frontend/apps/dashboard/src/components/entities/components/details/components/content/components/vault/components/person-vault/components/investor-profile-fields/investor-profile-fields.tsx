@@ -27,12 +27,6 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
         <FieldSection title={t('occupation.title')}>
           <Field di={InvestorProfileDI.occupation} entity={entity} />
         </FieldSection>
-        <FieldSection title={t('brokerage-firm.title')}>
-          <Field
-            di={InvestorProfileDI.employedByBrokerageFirm}
-            entity={entity}
-          />
-        </FieldSection>
         <FieldSection title={t('annual-income.title')}>
           <Field
             di={InvestorProfileDI.annualIncome}

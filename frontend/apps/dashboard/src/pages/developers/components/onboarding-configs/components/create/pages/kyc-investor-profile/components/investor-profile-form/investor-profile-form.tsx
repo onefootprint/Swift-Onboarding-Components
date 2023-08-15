@@ -14,7 +14,6 @@ const InvestorProfileForm = ({ isExpanded }: InvestorProfileFormProps) => {
   );
   const questions = [
     t('questions.employment'),
-    t('questions.brokerage-employment'),
     t('questions.income'),
     t('questions.net-worth'),
     t('questions.investment-goals'),

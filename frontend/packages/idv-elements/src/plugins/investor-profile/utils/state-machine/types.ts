@@ -9,11 +9,6 @@ export type EmploymentData = Pick<
   | InvestorProfileDI.employer
 >;
 
-export type EmployedByBrokerageData = Pick<
-  InvestorProfileData,
-  InvestorProfileDI.employedByBrokerageFirm
->;
-
 export type IncomeData = Required<
   Pick<InvestorProfileData, InvestorProfileDI.annualIncome>
 >;
@@ -56,10 +51,6 @@ export type MachineEvents =
   | {
       type: 'employmentSubmitted';
       payload: EmploymentData;
-    }
-  | {
-      type: 'brokerageEmploymentSubmitted';
-      payload: EmployedByBrokerageData;
     }
   | {
       type: 'incomeSubmitted';

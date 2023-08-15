@@ -70,7 +70,6 @@ const useFieldsets = (): Fieldset => {
       iconComponent: IcoDollar24,
       fields: [
         { di: InvestorProfileDI.occupation },
-        { di: InvestorProfileDI.employedByBrokerageFirm },
         { di: InvestorProfileDI.annualIncome },
         { di: InvestorProfileDI.netWorth },
         { di: InvestorProfileDI.investmentGoals },

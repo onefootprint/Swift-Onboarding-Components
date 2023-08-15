@@ -30,7 +30,7 @@ const createCollectInvestorProfileDataMachine = () =>
           on: {
             employmentSubmitted: [
               {
-                target: 'brokerageEmployment',
+                target: 'income',
                 actions: 'assignData',
                 cond: (context, event) =>
                   !!event.payload[InvestorProfileDI.occupation],
@@ -42,17 +42,6 @@ const createCollectInvestorProfileDataMachine = () =>
             ],
           },
         },
-        brokerageEmployment: {
-          on: {
-            brokerageEmploymentSubmitted: {
-              target: 'income',
-              actions: 'assignData',
-            },
-            navigatedToPrevPage: {
-              target: 'employment',
-            },
-          },
-        },
         income: {
           on: {
             incomeSubmitted: {
@@ -60,7 +49,7 @@ const createCollectInvestorProfileDataMachine = () =>
               actions: 'assignData',
             },
             navigatedToPrevPage: {
-              target: 'brokerageEmployment',
+              target: 'employment',
             },
           },
         },

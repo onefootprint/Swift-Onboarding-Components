@@ -14,7 +14,6 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignData:
-      | 'brokerageEmploymentSubmitted'
       | 'declarationsSubmitted'
       | 'employmentSubmitted'
       | 'incomeSubmitted'
@@ -27,7 +26,6 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'brokerageEmployment'
     | 'completed'
     | 'declarations'
     | 'employment'

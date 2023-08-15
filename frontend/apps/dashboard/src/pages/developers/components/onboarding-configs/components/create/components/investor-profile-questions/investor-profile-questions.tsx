@@ -11,7 +11,6 @@ const InvestorProfileQuestions = () => {
   return (
     <QuestionsContainer>
       <Question>{t('employment')}</Question>
-      <Question>{t('brokerage-employment')}</Question>
       <Question>{t('income')}</Question>
       <Question>{t('net-worth')}</Question>
       <Question>{t('investment-goals')}</Question>
