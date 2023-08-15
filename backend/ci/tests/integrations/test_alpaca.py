@@ -56,8 +56,6 @@ def test_alpaca_cip(
         review_annotation = "Piip is very trustworthy"  # extra annotation should not be included in the CIP response
 
     if review_annotation:
-        # Check that the review_reasons are correctly populated in /entities for showing in the review UI
-        entities_body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
         # Complete review
         post(
             f"entities/{user.fp_id}/decisions",
@@ -89,10 +87,6 @@ def test_alpaca_cip(
                     "canned_response": "Watchlist hit deemed low risk or false-positive",
                 },
             ]
-        assert (
-            entities_body["onboarding"]["manual_review"]["review_reasons"]
-            == expected_review_reasons
-        )
         assert (
             timeline[0]["event"]["data"]["decision"]["manual_review"]["review_reasons"]
             == expected_review_reasons

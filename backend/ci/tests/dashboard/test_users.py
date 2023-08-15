@@ -56,7 +56,7 @@ def test_get_users_list(incomplete_user, sandbox_user2, vault_user, sandbox_user
     for fp_id in [sandbox_user.fp_id, sandbox_user2.fp_id]:
         scoped_user = next(u for u in scoped_users if u["id"] == fp_id)
         assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
-        assert scoped_user["onboarding"]["status"] == "pass"
+        assert scoped_user["status"] == "pass"
 
 
 def test_get_users_by_fp_id_query(sandbox_user):
@@ -241,8 +241,7 @@ def test_override_onboarding_decision(sandbox_user):
     tenant = sandbox_user.tenant
 
     scoped_user = get(f"entities/{sandbox_user.fp_id}", None, *tenant.db_auths)
-    onboarding = scoped_user["onboarding"]
-    assert onboarding["status"] == "pass"
+    assert scoped_user["status"] == "pass"
 
     event_kinds = dict(kinds="onboarding_decision")
     events = get(
@@ -259,8 +258,7 @@ def test_override_onboarding_decision(sandbox_user):
     post(f"entities/{sandbox_user.fp_id}/decisions", decision_data, *tenant.db_auths)
 
     scoped_user = get(f"entities/{sandbox_user.fp_id}", None, *tenant.db_auths)
-    onboarding = scoped_user["onboarding"]
-    assert onboarding["status"] == "fail"
+    assert scoped_user["status"] == "fail"
     # Assert the latest decision is a manual decision
     events = get(
         f"entities/{sandbox_user.fp_id}/timeline", event_kinds, *tenant.db_auths

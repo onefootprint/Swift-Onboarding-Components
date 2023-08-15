@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use super::insight_event::InsightEvent;
 use super::manual_review::ManualReview;
 use super::ob_configuration::{IsLive, ObConfiguration};
-use super::onboarding::Onboarding;
 use super::user_timeline::UserTimeline;
 use super::vault::NewVaultArgs;
 use super::vault::Vault;
@@ -109,26 +108,8 @@ impl<'a> From<(&'a VaultId, &'a TenantId)> for ScopedVaultIdentifier<'a> {
     }
 }
 
-pub type SerializableOnboarding = (
-    Onboarding,
-    ObConfiguration,
-    Option<InsightEvent>,
-    Option<ManualReview>,
-);
-
-pub type SerializableWorkflow = (
-    Workflow,
-    ObConfiguration,
-    Option<InsightEvent>,
-    Option<ManualReview>,
-);
-
-pub type SerializableEntity = (
-    ScopedVault,
-    Option<WatchlistCheck>,
-    Option<SerializableOnboarding>,
-    Vec<SerializableWorkflow>,
-);
+pub type SerializableWorkflow = (Workflow, Option<InsightEvent>, Option<ManualReview>);
+pub type SerializableEntity = (ScopedVault, Option<WatchlistCheck>, Vec<SerializableWorkflow>);
 
 impl ScopedVault {
     /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
@@ -270,37 +251,19 @@ impl ScopedVault {
         conn: &mut PgConn,
         ids: Vec<ScopedVaultId>,
     ) -> DbResult<HashMap<ScopedVaultId, SerializableEntity>> {
-        use db_schema::schema::{
-            insight_event, manual_review, ob_configuration, onboarding, watchlist_check, workflow,
-        };
-        let results: Vec<(
-            ScopedVault,
-            Option<WatchlistCheck>,
-            Option<SerializableOnboarding>,
-        )> = scoped_vault::table
+        use db_schema::schema::{insight_event, manual_review, watchlist_check, workflow};
+        let results: Vec<(ScopedVault, Option<WatchlistCheck>)> = scoped_vault::table
             .left_join(
                 watchlist_check::table.on(watchlist_check::scoped_vault_id
                     .eq(scoped_vault::id)
                     .and(watchlist_check::deactivated_at.is_null())
                     .and(not(watchlist_check::completed_at.is_null()))),
             )
-            .left_join(
-                onboarding::table
-                .inner_join(ob_configuration::table)
-                .left_join(insight_event::table)
-                // Only fetch active manual review for this onboarding
-                // TODO this will do horrible things if a SV has two manual reviews
-                .left_join(manual_review::table.on(
-                    manual_review::scoped_vault_id.eq(onboarding::scoped_vault_id)
-                    .and(manual_review::completed_at.is_null())
-                )),
-            )
             .filter(scoped_vault::id.eq_any(&ids))
             .load(conn)?;
 
         let mut workflows = workflow::table
             .filter(workflow::scoped_vault_id.eq_any(&ids))
-            .inner_join(ob_configuration::table)
             .left_join(insight_event::table)
             .left_join(
                 manual_review::table.on(manual_review::workflow_id
@@ -317,7 +280,7 @@ impl ScopedVault {
             .into_iter()
             .map(|i| {
                 let sv_id = i.0.id.clone();
-                let entity = (i.0, i.1, i.2, workflows.remove(&sv_id).unwrap_or_default());
+                let entity = (i.0, i.1, workflows.remove(&sv_id).unwrap_or_default());
                 (sv_id, entity)
             })
             .collect();

@@ -15,7 +15,6 @@ pub struct Entity {
     pub attributes: Vec<DataIdentifier>,
     pub start_timestamp: DateTime<Utc>,
     pub watchlist_check: Option<WatchlistCheck>,
-    pub onboarding: Option<Onboarding>,
     pub ordering_id: i64,
     /// The list of attributes and their values that are decrypted by default
     pub decrypted_attributes: HashMap<DataIdentifier, PiiString>,

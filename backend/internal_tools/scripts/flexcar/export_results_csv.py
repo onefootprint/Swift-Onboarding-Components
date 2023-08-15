@@ -122,9 +122,9 @@ async def build_user_row(user):
     match_level_map = results[1]
     (fc_sub_id, fc_order_id) = results[2]
 
-    if "onboarding" in user and user["onboarding"] is not None:
-        status = user["onboarding"]["status"]
-        manual_review = str(user["onboarding"]["requires_manual_review"])
+    if user["status"] is not None:
+        status = user["status"]
+        manual_review = str(user["requires_manual_review"])
     else:
         status = "data_incomplete"
         manual_review = None

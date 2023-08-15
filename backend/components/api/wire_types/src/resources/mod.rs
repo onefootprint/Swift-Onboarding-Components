@@ -19,9 +19,6 @@ pub use self::liveness_event::*;
 mod identity_document_timeline_event;
 pub use self::identity_document_timeline_event::*;
 
-mod onboarding;
-pub use self::onboarding::*;
-
 mod onboarding_configuration;
 pub use self::onboarding_configuration::*;
 

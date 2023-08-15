@@ -32,7 +32,7 @@ pub type EntityDetailMore<'a> = (
 
 impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
     fn from_db((entity, vw, auth, decrypted_attrs): EntityDetailMore) -> Self {
-        let (sv, watchlist_check, onboarding_info, wfs) = entity;
+        let (sv, watchlist_check, wfs) = entity;
         let attributes = vw.get_visible_populated_fields();
 
         let auth_scopes = auth.scopes();
@@ -68,10 +68,10 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             ..
         } = sv;
         // TODO should we determine requires_manual_review in another way?
-        let requires_manual_review = wfs.iter().any(|(_, _, _, mr)| mr.is_some());
+        let requires_manual_review = wfs.iter().any(|(_, _, mr)| mr.is_some());
         let insight_event = wfs
             .into_iter()
-            .filter_map(|wf| wf.2.map(|ie| (wf.0, ie)))
+            .filter_map(|wf| wf.1.map(|ie| (wf.0, ie)))
             .max_by_key(|wf| wf.0.created_at)
             .map(|(_, ie)| ie);
 
@@ -89,8 +89,6 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             status,
             insight_event: insight_event.map(api_wire_types::InsightEvent::from_db),
             requires_manual_review,
-            // TODO rm
-            onboarding: onboarding_info.map(|o| api_wire_types::Onboarding::from_db((o, status))),
         }
     }
 }
