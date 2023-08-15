@@ -23,18 +23,18 @@ const Navbar = () => {
 
   const entries: NavEntry[] = [
     {
-      text: t('entries.products.text'),
+      text: t('entries.platform.text'),
       items: [
         {
-          text: t('entries.products.links.kyc.text'),
-          subtext: t('entries.products.links.kyc.subtext'),
-          href: t('entries.products.links.kyc.href'),
+          text: t('entries.platform.links.kyc.text'),
+          subtext: t('entries.platform.links.kyc.subtext'),
+          href: t('entries.platform.links.kyc.href'),
           iconComponent: IcoUser24,
         },
         {
-          text: t('entries.products.links.vaulting.text'),
-          subtext: t('entries.products.links.vaulting.subtext'),
-          href: t('entries.products.links.vaulting.href'),
+          text: t('entries.platform.links.vaulting.text'),
+          subtext: t('entries.platform.links.vaulting.subtext'),
+          href: t('entries.platform.links.vaulting.href'),
           iconComponent: IcoKey24,
         },
       ],
