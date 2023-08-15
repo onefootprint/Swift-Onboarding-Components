@@ -95,10 +95,8 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
-    assert!(ob.authorized_at.is_some());
-    assert!(ob.idv_reqs_initiated_at.is_some());
-    assert!(ob.decision_made_at.is_none());
+    let (_, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    assert!(wf.authorized_at.is_some());
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 
@@ -118,11 +116,10 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, _, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
+    let (_, _, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
     // Assert no OBD is created yet and ob status is pending
     assert!(obd.is_none());
     assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
-    assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
 
     // MakeWatchlistCheckCall
@@ -253,10 +250,8 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
-    assert!(ob.authorized_at.is_some());
-    assert!(ob.idv_reqs_initiated_at.is_some());
-    assert!(ob.decision_made_at.is_none());
+    let (_, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    assert!(wf.authorized_at.is_some());
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 
@@ -276,12 +271,11 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (ob, _, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
+    let (_, _, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
     // Assert no OBD is created yet and ob status is pending
 
     assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
     assert!(obd.is_none());
-    assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
     // Some risk signals are unhidden now
     let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
@@ -462,14 +456,12 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, obd, _, fps) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, obd, _, fps) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection), wf.state);
-    assert!(ob.authorized_at.is_some());
-    assert!(ob.idv_reqs_initiated_at.is_some());
+    assert!(wf.authorized_at.is_some());
     // Assert no OBD is created yet and ob status is pending
     assert!(obd.is_none());
     assert_eq!(OnboardingStatus::Incomplete, wf.status.unwrap());
-    assert!(ob.decision_made_at.is_none());
     assert!(mr.is_none());
     assert!(!fps.is_empty()); //fingerprints were written
 
@@ -633,10 +625,8 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
-    assert!(ob.authorized_at.is_some());
-    assert!(ob.idv_reqs_initiated_at.is_some());
-    assert!(ob.decision_made_at.is_none());
+    let (_, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    assert!(wf.authorized_at.is_some());
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 
@@ -674,14 +664,13 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert!(obd.seqno.is_none());
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
-    assert!(ob.decision_made_at.is_some());
     assert!(mr.is_none());
 
     match user_kind {

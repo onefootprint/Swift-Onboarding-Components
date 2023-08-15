@@ -11,7 +11,6 @@ use crate::decision::state::WorkflowWrapper;
 use crate::decision::state::{DocCollected, MakeDecision};
 
 use crate::State;
-use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
 use db::models::workflow::{NewWorkflowArgs, Workflow};
@@ -92,10 +91,8 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
-    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
-    assert!(ob.authorized_at.is_some());
-    assert!(ob.idv_reqs_initiated_at.is_some());
-    assert!(ob.decision_made_at.is_none());
+    let (_, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    assert!(wf.authorized_at.is_some());
     assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 
@@ -134,7 +131,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
@@ -146,7 +143,6 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
 
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
-    assert!(ob.decision_made_at.is_some());
     if doc_upload_failed {
         assert!(mr.is_some());
     } else {
@@ -156,16 +152,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
             // redo document
-            redo_document_and_pass(
-                state,
-                user_kind,
-                &ob,
-                &obd,
-                &tenant.id,
-                risk_signals_for_doc,
-                wf.fixture_result,
-            )
-            .await
+            redo_document_and_pass(state, user_kind, &wf, &obd, &tenant.id, risk_signals_for_doc).await
         }
         UserKind::Live => {
             assert_have_same_elements(
@@ -189,16 +176,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
             );
 
             // redo document
-            redo_document_and_pass(
-                state,
-                user_kind,
-                &ob,
-                &obd,
-                &tenant.id,
-                risk_signals_for_doc,
-                None,
-            )
-            .await
+            redo_document_and_pass(state, user_kind, &wf, &obd, &tenant.id, risk_signals_for_doc).await
         }
     }
 }
@@ -207,14 +185,15 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
 async fn redo_document_and_pass(
     state: &mut State,
     user_kind: UserKind,
-    prior_ob: &Onboarding,
+    prior_wf: &Workflow,
     prior_obd: &OnboardingDecision,
     tenant_id: &TenantId,
     previous_risk_signals: Vec<RiskSignal>,
-    fixture_result: Option<WorkflowFixtureResult>,
 ) {
     // Trigger Redo workflow
-    let sv_id = prior_ob.scoped_vault_id.clone();
+    let sv_id = prior_wf.scoped_vault_id.clone();
+    let fixture_result = prior_wf.fixture_result;
+    let obc_id = prior_wf.ob_configuration_id.clone();
     let wf = state
         .db_pool
         .db_query(move |conn| {
@@ -222,7 +201,7 @@ async fn redo_document_and_pass(
                 scoped_vault_id: sv_id.clone(),
                 config: DocumentConfig {}.into(),
                 fixture_result,
-                ob_configuration_id: None,
+                ob_configuration_id: obc_id,
                 insight_event_id: None,
             };
             Workflow::create(conn, args).unwrap()
@@ -275,7 +254,7 @@ async fn redo_document_and_pass(
         .await
         .unwrap();
 
-    let (ob, wf, _, _, obd, rs, _) = query_data(state, &svid2, &wfid).await;
+    let (_, wf, _, _, obd, rs, _) = query_data(state, &svid2, &wfid).await;
     assert_eq!(
         WorkflowState::Document(newtypes::DocumentState::Complete),
         wf.state
@@ -291,10 +270,6 @@ async fn redo_document_and_pass(
     };
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
-    // redo flow hasn't modified timestamps on ob
-    assert!(prior_ob.authorized_at == ob.authorized_at);
-    assert!(prior_ob.idv_reqs_initiated_at == ob.idv_reqs_initiated_at);
-    assert!(prior_ob.decision_made_at == ob.decision_made_at);
 
     // check RSG is different
     let rs_passing_doc = query_risk_signals(state, &svid2, RiskSignalGroupKind::Doc).await;

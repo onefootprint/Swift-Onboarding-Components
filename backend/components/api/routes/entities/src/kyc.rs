@@ -91,7 +91,7 @@ pub async fn post(
 
             // TODO: consolidate with /authorize code
             let ob = Onboarding::lock(conn, &ob.id)?;
-            let wf = if ob.authorized_at.is_none() {
+            let wf = if wf.authorized_at.is_none() {
                 Onboarding::update(ob, conn, Some(&wf.id), OnboardingUpdate::is_authorized())?;
                 Workflow::get(conn, &wf.id)? // refresh from DB
             } else {

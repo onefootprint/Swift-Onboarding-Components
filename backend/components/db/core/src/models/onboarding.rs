@@ -32,11 +32,12 @@ pub struct Onboarding {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
 
-    // TODO get rid of these
-    pub insight_event_id: Option<InsightEventId>,
-    pub authorized_at: Option<DateTime<Utc>>,
-    pub idv_reqs_initiated_at: Option<DateTime<Utc>>,
-    pub decision_made_at: Option<DateTime<Utc>>,
+    // TODO rm
+    // There are still some reads of these in DB queries that we have to rm first
+    insight_event_id: Option<InsightEventId>,
+    authorized_at: Option<DateTime<Utc>>,
+    idv_reqs_initiated_at: Option<DateTime<Utc>>,
+    decision_made_at: Option<DateTime<Utc>>,
     workflow_id: WorkflowId,
 }
 
@@ -96,8 +97,8 @@ impl OnboardingUpdate {
         }
     }
 
-    pub fn set_decision(decision_status: DecisionStatus, is_first_decision: bool) -> Self {
-        let decision_made_at = is_first_decision.then_some(Some(Utc::now()));
+    pub fn set_decision(decision_status: DecisionStatus, ob: &Onboarding) -> Self {
+        let decision_made_at = ob.decision_made_at.is_none().then_some(Some(Utc::now()));
         Self {
             status: Some(decision_status.into()),
             decision_made_at,
@@ -377,12 +378,5 @@ impl Onboarding {
             .select(count_star())
             .get_result(conn)?;
         Ok(count)
-    }
-
-    /// Returns true if this onboarding has been entirely completed by the customer
-    pub fn is_complete(&self) -> bool {
-        self.idv_reqs_initiated_at.is_some()
-            && self.decision_made_at.is_some()
-            && self.authorized_at.is_some()
     }
 }

@@ -203,10 +203,8 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
         .await
         .unwrap();
 
-    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
-    assert!(ob.authorized_at.is_some());
-    assert!(ob.idv_reqs_initiated_at.is_some());
-    assert!(ob.decision_made_at.is_none());
+    let (_, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    assert!(wf.authorized_at.is_some());
     assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 
@@ -216,8 +214,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
         .await
         .unwrap();
 
-    let (ob, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
-    assert!(ob.decision_made_at.is_none());
+    let (_, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Decisioning), wf.state);
     let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
     assert!(!rs.is_empty());
@@ -378,10 +375,8 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
-    let (ob, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
-    assert!(ob.authorized_at.is_some());
-    assert!(ob.idv_reqs_initiated_at.is_some());
-    assert!(ob.decision_made_at.is_none());
+    let (_, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    assert!(wf.authorized_at.is_some());
     assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
 

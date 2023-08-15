@@ -139,11 +139,9 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
         WorkflowKind::Kyb(kyb::KybState::VendorCalls(_))
     ));
 
-    let (ob, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::VendorCalls), wf.state);
     assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
-    assert!(ob.idv_reqs_initiated_at.is_none());
-    assert!(ob.decision_made_at.is_none());
 
     // MakeVendorCalls
     let (ww, _) = ww
@@ -156,10 +154,8 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
         WorkflowKind::Kyb(kyb::KybState::Decisioning(_))
     ));
 
-    let (ob, wf, _, _, _, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, _, _, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::Decisioning), wf.state);
-    assert!(ob.idv_reqs_initiated_at.is_some());
-    assert!(ob.decision_made_at.is_none());
 
     // Appropriate KYB passing risk signals are produced and not hidden
     let expected_severity = match fixture_result {
@@ -196,9 +192,8 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, _, _, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
-    assert!(ob.decision_made_at.is_some());
     assert!(mr.is_none());
     assert_eq!(expected_status, wf.status.unwrap());
 }
@@ -250,11 +245,9 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
         WorkflowKind::Kyb(kyb::KybState::VendorCalls(_))
     ));
 
-    let (ob, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::VendorCalls), wf.state);
     assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
-    assert!(ob.idv_reqs_initiated_at.is_none());
-    assert!(ob.decision_made_at.is_none());
 
     // MakeVendorCalls
     let business_id = "business123yo".to_owned();
@@ -270,10 +263,8 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
         WorkflowKind::Kyb(kyb::KybState::AwaitingAsyncVendors(_))
     ));
 
-    let (ob, wf, _, _, _, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, _, _, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::AwaitingAsyncVendors), wf.state);
-    assert!(ob.idv_reqs_initiated_at.is_some());
-    assert!(ob.decision_made_at.is_none());
     assert!(rs.is_empty());
 
     // Simulate Middesk webhook incoming. Middesk state machine should complete and then call the KYB workflow
@@ -298,9 +289,8 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     .await
     .unwrap();
 
-    let (ob, wf, _, mr, _, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, _, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
-    assert!(ob.decision_made_at.is_some());
 
     let mut expected_rs = vec![
         (

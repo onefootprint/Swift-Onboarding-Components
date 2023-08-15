@@ -73,8 +73,7 @@ pub fn save_final_decision(
     // This logic is getting convoluted - soon will switch to just workflow update
     let (ob, _) = Onboarding::get(conn, &wf.scoped_vault_id)?;
     let ob = Onboarding::lock(conn, &ob.id)?;
-    let is_first_decision_for_onboarding = ob.decision_made_at.is_none();
-    let update = OnboardingUpdate::set_decision(decision.decision_status, is_first_decision_for_onboarding);
+    let update = OnboardingUpdate::set_decision(decision.decision_status, &ob);
     Onboarding::update(ob, conn, Some(&wf_id), update)?;
 
     Ok(obd)

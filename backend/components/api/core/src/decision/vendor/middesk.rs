@@ -11,7 +11,6 @@ use crate::decision::state::{AsyncVendorCallsCompleted, WorkflowWrapper};
 use crate::enclave_client::EnclaveClient;
 use crate::{decision, State};
 
-use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::vendor_clients::VendorClient;
 
@@ -538,9 +537,6 @@ pub async fn init_middesk_request(
         .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &ob_id)?;
             let sv_id = ob.scoped_vault_id.clone();
-            if ob.idv_reqs_initiated_at.is_some() {
-                return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
-            }
             Onboarding::update(ob, conn, Some(&wf_id), OnboardingUpdate::idv_reqs_initiated())?;
 
             let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
