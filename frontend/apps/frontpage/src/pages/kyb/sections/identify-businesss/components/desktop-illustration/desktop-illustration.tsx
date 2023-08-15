@@ -5,28 +5,35 @@ import React from 'react';
 
 const DesktopIllustration = () => (
   <Grid>
-    <ImageContainer>
+    <ImageContainer data-grid-area="hey-there">
       <Image
-        src="/kyb/verify-people/basic-data.png"
+        src="/kyb/verify-businesses/hey-there.png"
         alt="Basic Data"
-        width={320}
-        height={650}
+        width={336.8}
+        height={265}
+      />
+      <Image
+        src="/kyb/verify-businesses/basic-data.png"
+        alt="Basic Data"
+        width={336.8}
+        height={358.75}
       />
     </ImageContainer>
-    <ImageContainer>
+    <ImageContainer data-grid-area="business-address">
       <Image
-        src="/kyb/verify-people/residential-address.png"
-        alt="Residential Address"
-        width={320}
-        height={650}
-      />
-    </ImageContainer>
-    <ImageContainer>
-      <Image
-        src="/kyb/verify-people/app-clip.png"
+        src="/kyb/verify-businesses/business-address.png"
         alt="App Clip"
-        width={320}
-        height={650}
+        width={336.8}
+        height={497.7}
+        data-grid-area="business-address"
+      />
+    </ImageContainer>
+    <ImageContainer data-grid-area="bos">
+      <Image
+        src="/kyb/verify-businesses/bos.png"
+        alt="Residential Address"
+        width={336.8}
+        height={391}
       />
     </ImageContainer>
   </Grid>
@@ -37,24 +44,27 @@ const Grid = styled.div`
     display: none;
 
     ${media.greaterThan('md')`
-      display: grid;
       padding-right: ${theme.spacing[9]};
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
       grid-template-rows: 1fr;
-      gap: ${theme.spacing[6]};
+      gap: ${theme.spacing[5]};
       mask: linear-gradient(180deg, black 0%, black 60%, transparent 90%);
       mask-mode: alpha;
       height: 650px;
       overflow: hidden;
-      align-items: center;
-      justify-content: center;
-      grid-template-columns: 1fr 1fr 1fr;
+      align-items: flex-start;
+      justify-content: flex-start;
     `}
   `}
 `;
 
 const ImageContainer = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[5]};
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
+
     img {
       object-fit: contain;
       width: 100%;

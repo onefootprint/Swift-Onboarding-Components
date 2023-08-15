@@ -4,7 +4,7 @@ import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
 import TimelineLayout from '../../components/timeline-layout';
-import TimelineTitle from '../../components/timeline-title/timeline-title';
+import TimelineTitle from '../../components/timeline-title';
 import DesktopIllustration from './components/desktop-illustration';
 import MobileIllustration from './components/mobile-illustration';
 

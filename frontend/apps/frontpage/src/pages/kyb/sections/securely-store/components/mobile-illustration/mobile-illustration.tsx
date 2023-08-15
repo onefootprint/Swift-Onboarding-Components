@@ -26,7 +26,7 @@ const ImageFrame = styled.div`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     background-color: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.default};
-    height: 240px;
+    height: 300px;
     width: 100%;
     position: relative;
     overflow: hidden;
@@ -41,8 +41,8 @@ const ImageContainer = styled.div`
   ${({ theme }) => css`
     position: absolute;
     display: block;
-    top: 16px;
-    left: 16px;
+    top: 20px;
+    left: 20px;
     height: 200%;
     width: 200%;
     box-shadow: ${theme.elevation[2]};

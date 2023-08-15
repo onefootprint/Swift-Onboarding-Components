@@ -3,93 +3,72 @@ import { media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 
+const GAP = 56;
+
 const MobileIllustration = () => (
-  <Container>
-    <Grid>
-      <ImageContainer data-grid-area="hey-there">
-        <Image
-          src="/kyb/verify-businesses/hey-there.png"
-          alt="Basic Data"
-          width={336.8}
-          height={265}
-        />
-      </ImageContainer>
-      <ImageContainer data-grid-area="basic-data">
-        <Image
-          src="/kyb/verify-businesses/basic-data.png"
-          alt="Basic Data"
-          width={336.8}
-          height={358.75}
-        />
-      </ImageContainer>
-      <ImageContainer data-grid-area="bos">
-        <Image
-          src="/kyb/verify-businesses/bos.png"
-          alt="Residential Address"
-          width={336.8}
-          height={391}
-        />
-      </ImageContainer>
-      <ImageContainer data-grid-area="business-address">
-        <Image
-          src="/kyb/verify-businesses/business-address.png"
-          alt="App Clip"
-          width={336.8}
-          height={497.7}
-          data-grid-area="business-address"
-        />
-      </ImageContainer>
-    </Grid>
-  </Container>
+  <Grid>
+    <ImageContainer layer={0}>
+      <Image
+        src="/kyb/verify-people/basic-data.png"
+        alt="Basic Data"
+        width={320}
+        height={650}
+      />
+    </ImageContainer>
+    <ImageContainer layer={1}>
+      <Image
+        src="/kyb/verify-people/residential-address.png"
+        alt="Residential Address"
+        width={320}
+        height={650}
+      />
+    </ImageContainer>
+    <ImageContainer layer={2}>
+      <Image
+        src="/kyb/verify-people/app-clip.png"
+        alt="App Clip"
+        width={320}
+        height={650}
+      />
+    </ImageContainer>
+  </Grid>
 );
 
-const Container = styled.div`
+const Grid = styled.div`
   position: relative;
-  height: 520px;
-  overflow: hidden;
-  mask: linear-gradient(
-    180deg,
-    transparent 0%,
-    black 10%,
-    black 50%,
-    black 90%,
-    transparent 100%
-  );
+  height: 320px;
+  mask-image: linear-gradient(180deg, black 0%, black 80%, transparent 100%);
   mask-mode: alpha;
 
   ${media.greaterThan('md')`
-    display: none;
-  `}
-`;
-
-const Grid = styled.div`
-  ${({ theme }) => css`
-    position: absolute;
-    top: 0%;
-    height: 100%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-    align-items: flex-start;
-    justify-content: flex-start;
-
-    ${media.greaterThan('md')`
       display: none;
     `}
-  `}
 `;
 
-const ImageContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
+const ImageContainer = styled.div<{ layer: number }>`
+  ${({ theme, layer }) => css`
+    height: auto;
+    width: 56%;
+    position: absolute;
+    top: ${layer * GAP}px;
+    left: ${layer * GAP}px;
+    z-index: ${layer};
 
     img {
-      object-fit: contain;
-      width: 100%;
       height: 100%;
+      width: 100%;
+      object-fit: contain;
+      position: relative;
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        box-shadow: ${theme.elevation[2]};
+      }
     }
   `}
 `;

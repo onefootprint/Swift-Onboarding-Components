@@ -5,35 +5,28 @@ import React from 'react';
 
 const DesktopIllustration = () => (
   <Grid>
-    <ImageContainer data-grid-area="hey-there">
+    <ImageContainer>
       <Image
-        src="/kyb/verify-businesses/hey-there.png"
+        src="/kyb/verify-people/basic-data.png"
         alt="Basic Data"
-        width={336.8}
-        height={265}
-      />
-      <Image
-        src="/kyb/verify-businesses/basic-data.png"
-        alt="Basic Data"
-        width={336.8}
-        height={358.75}
+        width={320}
+        height={650}
       />
     </ImageContainer>
-    <ImageContainer data-grid-area="bos">
+    <ImageContainer>
       <Image
-        src="/kyb/verify-businesses/bos.png"
+        src="/kyb/verify-people/residential-address.png"
         alt="Residential Address"
-        width={336.8}
-        height={391}
+        width={320}
+        height={650}
       />
     </ImageContainer>
-    <ImageContainer data-grid-area="business-address">
+    <ImageContainer>
       <Image
-        src="/kyb/verify-businesses/business-address.png"
+        src="/kyb/verify-people/app-clip.png"
         alt="App Clip"
-        width={336.8}
-        height={497.7}
-        data-grid-area="business-address"
+        width={320}
+        height={650}
       />
     </ImageContainer>
   </Grid>
@@ -44,26 +37,24 @@ const Grid = styled.div`
     display: none;
 
     ${media.greaterThan('md')`
-      padding-right: ${theme.spacing[9]};
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      padding-right: ${theme.spacing[9]};
       grid-template-rows: 1fr;
-      gap: ${theme.spacing[5]};
+      gap: ${theme.spacing[6]};
       mask: linear-gradient(180deg, black 0%, black 60%, transparent 90%);
       mask-mode: alpha;
       height: 650px;
       overflow: hidden;
-      align-items: flex-start;
-      justify-content: flex-start;
+      align-items: center;
+      justify-content: center;
+      grid-template-columns: 1fr 1fr 1fr;
     `}
   `}
 `;
 
 const ImageContainer = styled.div`
   ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
+    padding: ${theme.spacing[5]};
     img {
       object-fit: contain;
       width: 100%;
