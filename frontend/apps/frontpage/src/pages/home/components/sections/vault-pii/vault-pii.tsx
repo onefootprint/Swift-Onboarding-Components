@@ -28,8 +28,8 @@ const VaultPii = () => {
         subtitle={t('subtitle')}
         cta={t('cta')}
         icon={IcoDatabase24}
+        isOnDarkSection
         href="/vaulting"
-        isDark
       />
       <Grid>
         <HorizontalCard

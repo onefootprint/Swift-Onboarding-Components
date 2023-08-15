@@ -10,13 +10,15 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 
+import SectionIcon from '../../../../components/section-icon';
+
 type SectionTitleProps = {
   title: string;
   subtitle: string;
   icon?: Icon;
   cta?: string;
   href?: string;
-  isDark?: boolean;
+  isOnDarkSection?: boolean;
 };
 
 const SectionTitle = ({
@@ -25,37 +27,33 @@ const SectionTitle = ({
   icon: Icon,
   cta,
   href,
-  isDark,
-}: SectionTitleProps) => {
-  const renderedIcon = Icon && <Icon color="accent" />;
-  return (
-    <Container>
-      <TitleContainer isDark={isDark}>
-        <SectionIcon isDark={isDark}>
-          <IconOutline isDark={isDark}>{renderedIcon}</IconOutline>
-        </SectionIcon>
-        <TextContainer>
-          <Title isDark={isDark}>{title}</Title>
-          <Subtitle isDark={isDark}>{subtitle}</Subtitle>
-        </TextContainer>
-        {cta && (
-          <LinkButton
-            iconComponent={IcoArrowRightSmall16}
-            href={href}
-            target="_blank"
-          >
-            {cta}
-          </LinkButton>
-        )}
-      </TitleContainer>
-    </Container>
-  );
-};
 
-const Title = styled.div<{ isDark?: boolean }>`
-  ${({ theme, isDark }) => css`
+  isOnDarkSection,
+}: SectionTitleProps) => (
+  <Container>
+    <TitleContainer isOnDarkSection={isOnDarkSection}>
+      <SectionIcon icon={Icon} isOnDarkSection={isOnDarkSection} />
+      <TextContainer>
+        <Title isOnDarkSection={isOnDarkSection}>{title}</Title>
+        <Subtitle isOnDarkSection={isOnDarkSection}>{subtitle}</Subtitle>
+      </TextContainer>
+      {cta && (
+        <LinkButton
+          iconComponent={IcoArrowRightSmall16}
+          href={href}
+          target="_blank"
+        >
+          {cta}
+        </LinkButton>
+      )}
+    </TitleContainer>
+  </Container>
+);
+
+const Title = styled.div<{ isOnDarkSection?: boolean }>`
+  ${({ theme, isOnDarkSection }) => css`
     ${createFontStyles('display-3')}
-    color: ${isDark ? primitives.Gray0 : theme.color.primary};
+    color: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
 
     ${media.greaterThan('md')`
       ${createFontStyles('display-2')}
@@ -63,15 +61,15 @@ const Title = styled.div<{ isDark?: boolean }>`
   `}
 `;
 
-const Subtitle = styled.div<{ isDark?: boolean }>`
-  ${({ theme, isDark }) => css`
+const Subtitle = styled.div<{ isOnDarkSection?: boolean }>`
+  ${({ theme, isOnDarkSection }) => css`
     ${createFontStyles('display-4')}
-    color: ${isDark ? primitives.Gray100 : theme.color.secondary};
+    color: ${isOnDarkSection ? primitives.Gray100 : theme.color.secondary};
   `}
 `;
 
-const TitleContainer = styled.div<{ isDark?: boolean }>`
-  ${({ theme, isDark }) => css`
+const TitleContainer = styled.div<{ isOnDarkSection?: boolean }>`
+  ${({ theme, isOnDarkSection }) => css`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -84,12 +82,12 @@ const TitleContainer = styled.div<{ isDark?: boolean }>`
 
       button,
       a {
-        color: ${isDark ? primitives.Purple300 : theme.color.accent};
+        color: ${isOnDarkSection ? primitives.Purple300 : theme.color.accent};
       }
 
       svg {
         path {
-          fill: ${isDark && primitives.Purple300};
+          fill: ${isOnDarkSection && primitives.Purple300};
         }
       }
     }
@@ -101,42 +99,6 @@ const TextContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};
-  `}
-`;
-
-const SectionIcon = styled.div<{ isDark?: boolean }>`
-  ${({ theme, isDark }) => css`
-    width: 48px;
-    height: 48px;
-    background-color: ${isDark
-      ? primitives.Gray800
-      : theme.backgroundColor.secondary};
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    & {
-      svg {
-        path {
-           {
-            fill: ${isDark && primitives.Purple300};
-          }
-        }
-      }
-    }
-  `}
-`;
-
-const IconOutline = styled.div<{ isDark?: boolean }>`
-  ${({ theme, isDark }) => css`
-    border: 1.5px solid
-      ${isDark ? primitives.Purple300 : theme.borderColor.secondary};
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
   `}
 `;
 

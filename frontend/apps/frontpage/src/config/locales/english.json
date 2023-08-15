@@ -73,6 +73,11 @@
               "text": "Vaulting",
               "subtext": "PII vaulting, KYC data storage, and more",
               "href": "/vaulting"
+            },
+            "kyb": {
+              "text": "KYB",
+              "subtext": "Know Your Business",
+              "href": "/kyb"
             }
           }
         },
@@ -432,7 +437,7 @@
       "book-a-demo": "Book a demo",
       "onboard-users": {
         "title": "Onboard new users at speed of light",
-        "subtitle": "We're removing the toggle between fraud and friction through UX that builds trust.",
+        "subtitle": "We leverage in the best available tools to verify the identity of your users easily and accurately.",
         "bullets": {
           "user-experience": "World-class user experience: delight your users with an easy-to-use, optimized solution.",
           "developer-experience": "World-class developer experience: integrate quickly and easily. Hassle-free.",
@@ -502,6 +507,44 @@
           "users": "Users",
           "user-details": "User details",
           "settings": "Settings"
+        }
+      },
+      "banner": {
+        "title": "Onboard more customers and enjoy peace of mind. Today.",
+        "get-started": "Get started",
+        "book-a-demo": "Book a demo"
+      }
+    },
+    "kyb": {
+      "html-title": "Footprint - KYB",
+      "hero": {
+        "title": "Know Your Business (KYB)",
+        "subtitle": "Verify businesses, and the people behind the business quickly and securely.",
+        "get-started": "Get started",
+        "book-a-demo": "Book a demo"
+      },
+      "identify-businesses": {
+        "title": "Verify businesses",
+        "subtitle": "A process designed to work seamlessly with our existing integrated KYC (Know Your Customer) and PII (Personally Identifiable Information) vaulting capabilities."
+      },
+      "identify-bos": {
+        "title": "Verify the people behind the business",
+        "subtitle": "Stay ahead of regulations and customer expectations with our best-in-class technology to KYC each business owner.",
+        "cta": "Learn more"
+      },
+      "securely-store": {
+        "title": "Securely store their data",
+        "subtitle": "We securely vault identity data, payment card data, and custom key-value data.",
+        "linke": "Learn more"
+      },
+      "developer-experience": {
+        "title": "Developer experience like no other",
+        "subtitle": "Just five lines of code, Footprint is quick and easy to integrate into your product",
+        "see-documentation": "See documentation",
+        "tabs": {
+          "configuration": "Configuration",
+          "customization": "Customization",
+          "documentation": "Documentation"
         }
       },
       "banner": {

@@ -14,7 +14,7 @@ const KYC = () => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/pricing" />
+      <SEO title={t('html-title')} slug="/kyc" />
       <Hero />
       <SplitLayoutSheet />
       <MobileLayoutSheet />

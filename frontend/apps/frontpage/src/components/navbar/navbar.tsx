@@ -4,6 +4,7 @@ import {
   IcoFileText24,
   IcoKey24,
   IcoMegaphone24,
+  // IcoStore24,
   IcoUser24,
   IcoWriting24,
 } from '@onefootprint/icons';
@@ -37,6 +38,12 @@ const Navbar = () => {
           href: t('entries.platform.links.vaulting.href'),
           iconComponent: IcoKey24,
         },
+        // {
+        //   text: t('entries.products.links.kyb.text'),
+        //   subtext: t('entries.products.links.kyb.subtext'),
+        //   href: t('entries.products.links.kyb.href'),
+        //   iconComponent: IcoStore24,
+        // },
       ],
     },
     { text: t('entries.compare.text'), href: t('entries.compare.href') },

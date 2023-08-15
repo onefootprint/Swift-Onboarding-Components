@@ -36,8 +36,8 @@ const VaultProxy = () => {
         subtitle={t('subtitle')}
         cta={t('cta')}
         icon={IcoLayer0124}
+        isOnDarkSection
         href="/vaulting"
-        isDark
       />
       <IllustrationContainer>
         <DynamicDesktopIllustration />
