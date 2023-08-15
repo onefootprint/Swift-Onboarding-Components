@@ -105,15 +105,7 @@ async fn run_kyb_if_needed(state: &State, user_auth: CheckedUserObAuthContext) -
     let tenant = user_auth.tenant()?.clone();
     let biz_wf = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let ob = user_auth.business_onboarding(conn)?;
-            let wf = if let Some(biz_ob_wf_id) = ob.as_ref().map(|o| o.workflow_id(None)) {
-                Some(Workflow::get(conn, biz_ob_wf_id)?)
-            } else {
-                None
-            };
-            Ok(wf)
-        })
+        .db_query(move |conn| user_auth.business_workflow(conn))
         .await??;
 
     if let Some(biz_wf) = biz_wf {

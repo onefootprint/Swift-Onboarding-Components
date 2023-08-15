@@ -16,7 +16,7 @@ use diesel::{Insertable, Queryable};
 use newtypes::{
     AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, InsightEventId, KybConfig, KycConfig, Locked,
     ObConfigurationId, OnboardingCompletedPayload, OnboardingId, OnboardingStatusChangedPayload,
-    ScopedVaultId, TaskData, TenantId, VaultId, WebhookEvent, WorkflowFixtureResult, WorkflowId,
+    ScopedVaultId, TaskData, TenantId, WebhookEvent, WorkflowFixtureResult, WorkflowId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
@@ -117,17 +117,8 @@ impl OnboardingUpdate {
 #[derive(Debug)]
 pub enum OnboardingIdentifier<'a> {
     Id(&'a OnboardingId),
-    ScopedVaultId {
-        sv_id: &'a ScopedVaultId,
-    },
-    ScopedBusinessId {
-        sb_id: &'a ScopedVaultId,
-        /// Note: the ID of the user vault that owns this business
-        vault_id: &'a VaultId,
-    },
-    WorkflowId {
-        wf_id: &'a WorkflowId,
-    },
+    ScopedVaultId { sv_id: &'a ScopedVaultId },
+    WorkflowId { wf_id: &'a WorkflowId },
 }
 
 impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
@@ -157,21 +148,12 @@ impl Onboarding {
     where
         T: Into<OnboardingIdentifier<'a>>,
     {
-        use db_schema::schema::business_owner;
         let mut query = onboarding::table.inner_join(scoped_vault::table).into_boxed();
 
         match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
             OnboardingIdentifier::ScopedVaultId { sv_id } => {
                 query = query.filter(onboarding::scoped_vault_id.eq(sv_id))
-            }
-            OnboardingIdentifier::ScopedBusinessId { sb_id, vault_id } => {
-                let business_vault_ids = business_owner::table
-                    .filter(business_owner::user_vault_id.eq(vault_id))
-                    .select(business_owner::business_vault_id);
-                query = query
-                    .filter(onboarding::scoped_vault_id.eq(sb_id))
-                    .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
             }
             // TODO this is just for easier migration from ob -> wf
             OnboardingIdentifier::WorkflowId { wf_id } => {

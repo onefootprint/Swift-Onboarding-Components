@@ -215,7 +215,7 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
         if let Some(fixture_decision) = fixture_decision {
             decision::utils::write_kyb_fixture_vendor_result_and_risk_signals(
                 conn,
-                &self.ob_id,
+                &self.wf_id,
                 fixture_decision,
             )?;
             Ok(KybState::from(KybDecisioning {

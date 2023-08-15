@@ -60,15 +60,15 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             // source of truth shortly
             Onboarding::update(ob, c, Some(&wf_id), OnboardingUpdate::is_authorized())?;
 
-            let biz_ob = user_auth.business_onboarding(c)?;
-            let (set_biz_is_authorized, biz_wf) = if let Some(biz_ob) = biz_ob {
-                let b = Onboarding::lock(c, &biz_ob.id)?;
-                let biz_wf = Workflow::get(c, biz_ob.workflow_id(None))?;
+            let biz_wf = user_auth.business_workflow(c)?;
+            let (set_biz_is_authorized, biz_wf) = if let Some(biz_wf) = biz_wf {
+                let (biz_ob, _) = Onboarding::get(c, &biz_wf.id)?;
+                let biz_ob = Onboarding::lock(c, &biz_ob.id)?;
                 let (set_biz_is_authorized, biz_wf) = if biz_wf.authorized_at.is_none() {
                     let update = OnboardingUpdate::is_authorized();
-                    Onboarding::update(b, c, Some(biz_ob.workflow_id(None)), update)?;
+                    Onboarding::update(biz_ob, c, Some(&biz_wf.id), update)?;
                     // Refresh from DB
-                    let biz_wf = Workflow::get(c, biz_ob.workflow_id(None))?;
+                    let biz_wf = Workflow::get(c, &biz_wf.id)?;
                     (true, biz_wf)
                 } else {
                     (false, biz_wf)

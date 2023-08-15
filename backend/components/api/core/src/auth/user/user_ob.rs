@@ -4,11 +4,11 @@ use super::{UserAuth, UserAuthGuard};
 use db::{
     models::{
         ob_configuration::ObConfiguration,
-        onboarding::{Onboarding, OnboardingIdentifier},
+        onboarding::Onboarding,
         scoped_vault::ScopedVault,
         tenant::Tenant,
         vault::Vault,
-        workflow::Workflow,
+        workflow::{Workflow, WorkflowIdentifier},
     },
     PgConn,
 };
@@ -160,19 +160,18 @@ impl CheckedUserObAuthContext {
             .next()
     }
 
-    /// Extracts the business onboarding from the `UserAuthScope::Business` scope on this session,
+    /// Extracts the business workflow from the `UserAuthScope::Business` scope on this session,
     /// if exists
-    pub fn business_onboarding(&self, conn: &mut PgConn) -> ApiResult<Option<Onboarding>> {
-        // TODO change this to business_wf
+    pub fn business_workflow(&self, conn: &mut PgConn) -> ApiResult<Option<Workflow>> {
         let Some(sb_id) = self.scoped_business_id() else {
             return Ok(None);
         };
-        let identifier = OnboardingIdentifier::ScopedBusinessId {
+        let identifier = WorkflowIdentifier::ScopedBusinessId {
             sb_id: &sb_id,
             vault_id: self.user_vault_id(),
         };
-        let (ob, _) = Onboarding::get(conn, identifier)?;
-        Ok(Some(ob))
+        let (wf, _) = Workflow::get_all(conn, identifier)?;
+        Ok(Some(wf))
     }
 }
 

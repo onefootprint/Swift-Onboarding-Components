@@ -15,8 +15,8 @@ use db::{
 use idv::incode::doc::response::FetchOCRResponse;
 use newtypes::{
     DataIdentifier, DecisionIntentId, DecisionStatus, IdentityDataKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, OnboardingId, RiskSignalGroupKind, ScopedVaultId, TenantId, VaultKind, VendorAPI,
-    WorkflowFixtureResult,
+    IdentityDocumentId, RiskSignalGroupKind, ScopedVaultId, TenantId, VaultKind, VendorAPI,
+    WorkflowFixtureResult, WorkflowId,
 };
 
 use super::{
@@ -185,18 +185,15 @@ pub fn decision_status(fixture_result: WorkflowFixtureResult) -> FixtureDecision
 #[tracing::instrument(skip_all)]
 pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     conn: &mut TxnPgConn,
-    biz_ob_id: &OnboardingId,
+    biz_wf_id: &WorkflowId,
     fixture_decision: FixtureDecision,
 ) -> ApiResult<()> {
-    let biz_ob_id = biz_ob_id.clone();
-
     // TODO update the rest of the business ob
-    let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
-    let (_, sb) = Onboarding::get(conn, &biz_ob.id)?;
+    let (biz_ob, sb) = Onboarding::get(conn, biz_wf_id)?;
+    let biz_ob = Onboarding::lock(conn, &biz_ob.id)?;
 
     let update = OnboardingUpdate::idv_reqs_initiated();
-    let wf_id = biz_ob.workflow_id(None).clone();
-    Onboarding::update(biz_ob, conn, Some(&wf_id), update)?;
+    Onboarding::update(biz_ob, conn, Some(biz_wf_id), update)?;
 
     let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
     let uv = Vault::get(conn, &sb.id)?;
