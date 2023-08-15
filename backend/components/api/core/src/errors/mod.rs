@@ -345,10 +345,10 @@ impl actix_web::ResponseError for ApiError {
         let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR
             && crate::config::SERVICE_CONFIG.is_production()
         {
-            tracing::error!(error=?self, support_id=support_id.to_string(), status_code, "returning api ISE");
+            tracing::error!(error=?self, support_id=support_id.to_string(), status_code, "returning api 500: {}", self.to_string());
             ErrorMessage::String("something went wrong".to_string())
         } else {
-            tracing::info!(error=?self, support_id=support_id.to_string(), status_code, "returning api error");
+            tracing::info!(error=?self, support_id=support_id.to_string(), status_code, "returning api {}", status_code);
             self.message()
         };
 
