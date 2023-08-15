@@ -4,6 +4,8 @@ import { Button, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 
+import Dialog from './components/dialog';
+
 const Playbooks = () => {
   const { t } = useTranslation('pages.playbooks');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -28,7 +30,9 @@ const Playbooks = () => {
       <Typography variant="body-2">{t('header.subtitle')}</Typography>
       <br />
       <Typography variant="body-2">{t('empty-description')}</Typography>
-      {dialogOpen && <div>DIALOG PLACEHOLDER</div>}
+      {dialogOpen && (
+        <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
+      )}
     </>
   );
 };
