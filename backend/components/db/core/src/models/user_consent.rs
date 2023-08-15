@@ -7,6 +7,7 @@ use db_schema::schema::user_consent;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::ScopedVaultId;
+use newtypes::WorkflowId;
 use newtypes::{InsightEventId, OnboardingId, UserConsentId};
 use serde::{Deserialize, Serialize};
 
@@ -21,6 +22,7 @@ pub struct UserConsent {
     pub _updated_at: DateTime<Utc>,
     pub onboarding_id: OnboardingId,
     pub ml_consent: bool,
+    pub workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Insertable, Default)]
@@ -31,6 +33,7 @@ pub struct NewUserConsent {
     pub consent_language_text: String,
     pub onboarding_id: OnboardingId,
     pub ml_consent: bool,
+    pub workflow_id: WorkflowId,
 }
 
 impl UserConsent {
@@ -42,6 +45,7 @@ impl UserConsent {
         insight_event_id: InsightEventId,
         consent_language_text: String,
         ml_consent: bool,
+        workflow_id: WorkflowId,
     ) -> Result<UserConsent, crate::DbError> {
         let new_user_consent = NewUserConsent {
             timestamp,
@@ -49,6 +53,7 @@ impl UserConsent {
             consent_language_text,
             onboarding_id,
             ml_consent,
+            workflow_id,
         };
 
         let new_user_consent = diesel::insert_into(db_schema::schema::user_consent::table)

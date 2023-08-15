@@ -771,6 +771,7 @@ table! {
         _updated_at -> Timestamptz,
         onboarding_id -> Text,
         ml_consent -> Bool,
+        workflow_id -> Nullable<Text>,
     }
 }
 
@@ -991,6 +992,7 @@ joinable!(tenant_rolebinding -> tenant_user (tenant_user_id));
 joinable!(tenant_vendor_control -> tenant (tenant_id));
 joinable!(user_consent -> insight_event (insight_event_id));
 joinable!(user_consent -> onboarding (onboarding_id));
+joinable!(user_consent -> workflow (workflow_id));
 joinable!(user_timeline -> scoped_vault (scoped_vault_id));
 joinable!(user_timeline -> vault (vault_id));
 joinable!(vault_data -> data_lifetime (lifetime_id));
