@@ -1,0 +1,1 @@
+ALTER TABLE middesk_request DROP COLUMN onboarding_id;

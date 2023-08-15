@@ -1,0 +1,1 @@
+ALTER TABLE middesk_request ADD COLUMN onboarding_id TEXT;
