@@ -1,4 +1,5 @@
 import {
+  DeviceType,
   Document,
   DocumentDI,
   EntityVault,
@@ -11,6 +12,44 @@ export const entityVaultWithIdCard: EntityVault = {
   [`${DocumentDI.latestIdCardFront}:675`]: 'test ID front URL',
   [`${DocumentDI.latestIdCardBack}:676`]: 'test ID back URL',
   [`${DocumentDI.latestIdCardSelfie}:677`]: 'test ID selfie URL',
+};
+
+export const idCardMobile: Document = {
+  completedVersion: 3,
+  kind: SupportedIdDocTypes.idCard,
+  startedAt: '2020-01-01T00:00:00.000Z',
+  status: IdDocStatus.complete,
+  documentScore: null,
+  selfieScore: null,
+  ocrConfidenceScore: null,
+  deviceType: DeviceType.Mobile,
+  uploads: [
+    {
+      version: 675,
+      failureReasons: [],
+      side: IdDocImageTypes.front,
+      timestamp: '2022-05-06T06:12:00.000Z',
+    },
+  ],
+};
+
+export const idCardDesktop: Document = {
+  completedVersion: 3,
+  kind: SupportedIdDocTypes.idCard,
+  startedAt: '2020-01-01T00:00:00.000Z',
+  status: IdDocStatus.complete,
+  documentScore: null,
+  selfieScore: null,
+  ocrConfidenceScore: null,
+  deviceType: DeviceType.Desktop,
+  uploads: [
+    {
+      version: 675,
+      failureReasons: [],
+      side: IdDocImageTypes.front,
+      timestamp: '2022-05-06T06:12:00.000Z',
+    },
+  ],
 };
 
 export const successfulIDCardDocument: Document = {

@@ -5,6 +5,8 @@ import Uploads, { UploadsProps } from './uploads';
 import {
   entityVaultWithIdCard,
   failedIdCardDocument,
+  idCardDesktop,
+  idCardMobile,
   successfulIDCardDocument,
 } from './uploads.test.config';
 
@@ -12,7 +14,7 @@ const renderUploads = ({ vault, currentDocument }: UploadsProps) =>
   customRender(<Uploads vault={vault} currentDocument={currentDocument} />);
 
 describe('<Uploads />', () => {
-  it('Should show correct labels for each upload if successful', () => {
+  it('should show correct labels for each upload if successful', () => {
     renderUploads({
       vault: entityVaultWithIdCard,
       currentDocument: successfulIDCardDocument,
@@ -29,7 +31,7 @@ describe('<Uploads />', () => {
     ).toBeInTheDocument();
   });
 
-  it('Should show correct labels for each upload if failed', () => {
+  it('should show correct labels for each upload if failed', () => {
     renderUploads({
       vault: entityVaultWithIdCard,
       currentDocument: failedIdCardDocument,
@@ -40,7 +42,7 @@ describe('<Uploads />', () => {
     expect(screen.getByText('Selfie upload failed')).toBeInTheDocument();
   });
 
-  it('Should show correct date format for each upload', () => {
+  it('should show correct date format for each upload', () => {
     renderUploads({
       vault: entityVaultWithIdCard,
       currentDocument: successfulIDCardDocument,
@@ -51,7 +53,7 @@ describe('<Uploads />', () => {
     expect(screen.getByText('05:27 am')).toBeInTheDocument();
   });
 
-  it('Should render each image', () => {
+  it('should render each image', () => {
     renderUploads({
       vault: entityVaultWithIdCard,
       currentDocument: successfulIDCardDocument,
@@ -63,5 +65,29 @@ describe('<Uploads />', () => {
     );
     expect(images[1]?.src).toContain('data:image/jpg;base64,test ID back URL');
     expect(images[2]?.src).toContain('data:image/jpg;base64,test ID front URL');
+  });
+
+  it('should show proper device type for mobile uploads', () => {
+    renderUploads({
+      vault: entityVaultWithIdCard,
+      currentDocument: idCardMobile,
+    });
+    expect(screen.getByText('Uploaded from mobile')).toBeInTheDocument();
+  });
+
+  it('should show proper device type for desktop uploads', () => {
+    renderUploads({
+      vault: entityVaultWithIdCard,
+      currentDocument: idCardDesktop,
+    });
+    expect(screen.getByText('Uploaded from desktop')).toBeInTheDocument();
+  });
+
+  it('should show mobile upload for unspecified upload', () => {
+    renderUploads({
+      vault: entityVaultWithIdCard,
+      currentDocument: successfulIDCardDocument,
+    });
+    expect(screen.getByText('Uploaded from mobile')).toBeInTheDocument();
   });
 });

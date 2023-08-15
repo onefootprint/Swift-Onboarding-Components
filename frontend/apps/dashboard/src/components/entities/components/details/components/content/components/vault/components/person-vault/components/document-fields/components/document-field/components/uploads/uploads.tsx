@@ -1,5 +1,5 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
-import { IcoIdFront16, IcoUpload24 } from '@onefootprint/icons';
+import { IcoIdFront16, IcoInfo16, IcoUpload24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   DataIdentifier,
@@ -51,16 +51,33 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
     )}`;
   };
 
+  const { deviceType } = currentDocument;
+
   const uploadsSortedByDate = currentDocument.uploads.sort(
     (a, b) => Number(new Date(b.timestamp)) - Number(new Date(a.timestamp)),
   );
 
   return (
     <Section>
-      <LabelContainer>
-        <IcoUpload24 />
-        <Typography variant="label-2">{t(`title`)}</Typography>
-      </LabelContainer>
+      <Header>
+        <LabelContainer>
+          <IcoUpload24 />
+          <Typography variant="label-2">{t(`title`)}</Typography>
+        </LabelContainer>
+        <DocumentUploadContainer>
+          <IcoInfo16 color="info" />
+          <Typography
+            color="info"
+            variant="body-4"
+            sx={{ whiteSpace: 'nowrap' }}
+          >
+            {`${t('uploaded-from')} ${t(
+              // should show 'Uploaded from mobile' if unspecified
+              `device-type.${deviceType ?? 'mobile'}`,
+            )}`}
+          </Typography>
+        </DocumentUploadContainer>
+      </Header>
       {uploadsSortedByDate.map((upload, i) => (
         <Row key={upload.timestamp}>
           <Time>
@@ -107,6 +124,26 @@ const LabelContainer = styled.div`
     width: 100%;
     padding-bottom: ${theme.spacing[5]};
   `};
+`;
+
+const DocumentUploadContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacing[2]};
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    padding-bottom: ${theme.spacing[5]};
+  `};
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 `;
 
 const Section = styled.div`

@@ -11,6 +11,11 @@ export type DocumentUpload = {
   timestamp: string;
 };
 
+export enum DeviceType {
+  Mobile = 'mobile',
+  Desktop = 'desktop',
+}
+
 export type Document = {
   completedVersion: number | null;
   kind: SupportedIdDocTypes;
@@ -20,4 +25,5 @@ export type Document = {
   documentScore: number | null;
   selfieScore: number | null;
   ocrConfidenceScore: number | null;
+  deviceType?: DeviceType;
 };

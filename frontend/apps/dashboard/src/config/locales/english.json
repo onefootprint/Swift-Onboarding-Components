@@ -649,6 +649,11 @@
               "success": "successfully uploaded",
               "failed": "upload failed",
               "image-alt": "Upload image",
+              "uploaded-from": "Uploaded from",
+              "device-type": {
+                "mobile": "mobile",
+                "desktop": "desktop"
+              },
               "document-types": {
                 "id_card": "ID",
                 "drivers_license": "driver's license",
