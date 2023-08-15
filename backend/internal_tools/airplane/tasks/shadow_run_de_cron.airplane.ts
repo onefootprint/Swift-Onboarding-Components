@@ -18,15 +18,13 @@ export default airplane.task(
     const TEST_CASES = [
       [
         {
-          tenant_id: 'org_e2FHVfOM5Hd3Ce492o5Aat',
-          fp_id: 'fp_id_9DPVC5VUVk3uodYIn9OtBx',
+          wf_id: 'wf_OmtQqCeYNbf94oYS3PNUZ',
         },
         'pass',
       ],
       [
         {
-          tenant_id: 'org_e2FHVfOM5Hd3Ce492o5Aat',
-          fp_id: 'fp_id_Sympj5XJ6XmUq1VnEtA4pL',
+          wf_id: 'wf_AEhn9GSvpKqL1Uyt66QrBC',
         },
         'fail',
       ],
