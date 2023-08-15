@@ -538,9 +538,9 @@ impl MiddeskState<Complete> {
 pub async fn init_middesk_request(
     db_pool: &DbPool,
     ob_id: OnboardingId,
-    wf_id: Option<&WorkflowId>,
+    wf_id: WorkflowId,
 ) -> ApiResult<MiddeskState<PendingCreateBusinessCall>> {
-    let wf_id = wf_id.cloned();
+    let wf_id = wf_id.clone();
     let (middesk_request, create_business_vreq) = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &ob_id)?;
@@ -548,18 +548,14 @@ pub async fn init_middesk_request(
             if ob.idv_reqs_initiated_at.is_some() {
                 return Err(OnboardingError::IdvReqsAlreadyInitiated.into());
             }
-            Onboarding::update(ob, conn, wf_id.as_ref(), OnboardingUpdate::idv_reqs_initiated())?;
+            Onboarding::update(ob, conn, Some(&wf_id), OnboardingUpdate::idv_reqs_initiated())?;
 
-            let decision_intent = if let Some(wf_id) = wf_id {
-                DecisionIntent::get_or_create_for_workflow_and_kind(
-                    conn,
-                    &sv_id,
-                    &wf_id,
-                    DecisionIntentKind::OnboardingKyb,
-                )?
-            } else {
-                DecisionIntent::get_or_create_onboarding_kyb(conn, &sv_id)?
-            };
+            let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
+                conn,
+                &sv_id,
+                &wf_id,
+                DecisionIntentKind::OnboardingKyb,
+            )?;
 
             let vreq = VerificationRequest::create(
                 conn,
@@ -571,6 +567,7 @@ pub async fn init_middesk_request(
             let middesk_request = MiddeskRequest::create(
                 conn,
                 ob_id,
+                wf_id,
                 decision_intent.id,
                 MiddeskRequestState::PendingCreateBusinessCall,
             )?;

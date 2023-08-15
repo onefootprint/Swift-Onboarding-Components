@@ -357,6 +357,7 @@ table! {
         business_id -> Nullable<Text>,
         state -> Text,
         completed_at -> Nullable<Timestamptz>,
+        workflow_id -> Nullable<Text>,
     }
 }
 
@@ -955,6 +956,7 @@ joinable!(manual_review -> scoped_vault (scoped_vault_id));
 joinable!(manual_review -> workflow (workflow_id));
 joinable!(middesk_request -> decision_intent (decision_intent_id));
 joinable!(middesk_request -> onboarding (onboarding_id));
+joinable!(middesk_request -> workflow (workflow_id));
 joinable!(ob_configuration -> appearance (appearance_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));

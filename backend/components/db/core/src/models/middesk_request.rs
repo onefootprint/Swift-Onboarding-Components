@@ -2,7 +2,7 @@ use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::middesk_request;
 use diesel::prelude::*;
-use newtypes::{DecisionIntentId, MiddeskRequestId, MiddeskRequestState, OnboardingId};
+use newtypes::{DecisionIntentId, MiddeskRequestId, MiddeskRequestState, OnboardingId, WorkflowId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
@@ -17,6 +17,7 @@ pub struct MiddeskRequest {
     pub business_id: Option<String>,
     pub state: MiddeskRequestState,
     pub completed_at: Option<DateTime<Utc>>,
+    pub workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -26,6 +27,7 @@ pub struct NewMiddeskRequest {
     pub onboarding_id: OnboardingId,
     pub decision_intent_id: DecisionIntentId,
     pub state: MiddeskRequestState,
+    pub workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -59,6 +61,7 @@ impl MiddeskRequest {
     pub fn create(
         conn: &mut TxnPgConn,
         onboarding_id: OnboardingId,
+        workflow_id: WorkflowId,
         decision_intent_id: DecisionIntentId,
         state: MiddeskRequestState,
     ) -> DbResult<Self> {
@@ -67,6 +70,7 @@ impl MiddeskRequest {
             onboarding_id,
             decision_intent_id,
             state,
+            workflow_id: Some(workflow_id),
         };
 
         let res = diesel::insert_into(middesk_request::table)

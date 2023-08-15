@@ -190,7 +190,7 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
             let middesk_state = decision::vendor::middesk::init_middesk_request(
                 &state.db_pool,
                 self.ob_id.clone(),
-                Some(&self.wf_id),
+                self.wf_id.clone(),
             )
             .await?;
 
