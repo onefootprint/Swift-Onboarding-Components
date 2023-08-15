@@ -559,6 +559,7 @@ pub async fn init_middesk_request(
 
             let middesk_request = MiddeskRequest::create(
                 conn,
+                ob_id,
                 wf_id,
                 decision_intent.id,
                 MiddeskRequestState::PendingCreateBusinessCall,

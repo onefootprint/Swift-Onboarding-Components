@@ -1,1 +1,0 @@
-ALTER TABLE middesk_request ALTER COLUMN onboarding_id DROP NOT NULL;
