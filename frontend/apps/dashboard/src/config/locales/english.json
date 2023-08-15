@@ -259,6 +259,7 @@
         "users": "Users",
         "businesses": "Businesses",
         "security-logs": "Security Logs",
+        "playbooks": "Playbooks",
         "developers": "Developers",
         "settings": "Settings",
         "log-out": "Log out",
@@ -1034,6 +1035,15 @@
           "title": "Registered business address"
         }
       }
+    },
+    "playbooks": {
+      "page-title": "Footprint | Playbooks",
+      "header": {
+        "title": "Playbooks",
+        "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
+      },
+      "create-button": "Create Playbook",
+      "empty-description": "You haven't created any Playbooks just yet."
     },
     "manual-review": {
       "page-title": "Footprint | Manual Review",
