@@ -33,6 +33,14 @@ const EmploymentForm = ({
       label: t('employment-status.unemployed'),
       value: 'unemployed',
     },
+    {
+      label: t('employment-status.retired'),
+      value: 'retired',
+    },
+    {
+      label: t('employment-status.student'),
+      value: 'student',
+    },
   ];
 
   const defaultOccupation = defaultValues?.[InvestorProfileDI.occupation];

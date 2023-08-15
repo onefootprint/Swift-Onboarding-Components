@@ -20,6 +20,8 @@
       "employment-status": {
         "employed": "Employed",
         "unemployed": "Unemployed",
+        "retired": "Retired",
+        "student": "Student",
         "label": "Employment status",
         "placeholder": "Select your employment status",
         "error": "Employment status is required"
