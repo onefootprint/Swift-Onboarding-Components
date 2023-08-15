@@ -6,13 +6,13 @@ use crate::TxnPgConn;
 use crate::{DbError, DbResult};
 use chrono::{DateTime, Utc};
 use db_schema::schema::ob_configuration::BoxedQuery;
-use db_schema::schema::{ob_configuration, onboarding, tenant};
+use db_schema::schema::{ob_configuration, tenant};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::AppearanceId;
 use newtypes::WorkflowId;
 use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant};
-use newtypes::{AppearanceId, OnboardingId};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
@@ -242,17 +242,6 @@ impl ObConfiguration {
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
-    }
-
-    #[tracing::instrument("ObConfiguration::get_by_onboarding_id", skip_all)]
-    pub fn get_by_onboarding_id(conn: &mut PgConn, onboarding_id: &OnboardingId) -> DbResult<Self> {
-        let ob_config: ObConfiguration = onboarding::table
-            .inner_join(ob_configuration::table)
-            .filter(onboarding::id.eq(onboarding_id))
-            .select(ob_configuration::all_columns)
-            .get_result(conn)?;
-
-        Ok(ob_config)
     }
 }
 

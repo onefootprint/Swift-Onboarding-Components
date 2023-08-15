@@ -12,22 +12,22 @@ pub struct MiddeskRequest {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
-    pub onboarding_id: OnboardingId,
+    onboarding_id: Option<OnboardingId>,
     pub decision_intent_id: DecisionIntentId,
     pub business_id: Option<String>,
     pub state: MiddeskRequestState,
     pub completed_at: Option<DateTime<Utc>>,
-    pub workflow_id: Option<WorkflowId>,
+    pub workflow_id: WorkflowId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = middesk_request)]
-pub struct NewMiddeskRequest {
-    pub created_at: DateTime<Utc>,
-    pub onboarding_id: OnboardingId,
-    pub decision_intent_id: DecisionIntentId,
-    pub state: MiddeskRequestState,
-    pub workflow_id: Option<WorkflowId>,
+struct NewMiddeskRequest {
+    created_at: DateTime<Utc>,
+    onboarding_id: OnboardingId,
+    decision_intent_id: DecisionIntentId,
+    state: MiddeskRequestState,
+    workflow_id: WorkflowId,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -70,7 +70,7 @@ impl MiddeskRequest {
             onboarding_id,
             decision_intent_id,
             state,
-            workflow_id: Some(workflow_id),
+            workflow_id,
         };
 
         let res = diesel::insert_into(middesk_request::table)

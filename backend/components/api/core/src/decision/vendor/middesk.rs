@@ -20,8 +20,6 @@ use db::models::middesk_request::{MiddeskRequest, UpdateMiddeskRequest};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::{Onboarding, OnboardingUpdate};
 use db::models::risk_signal::RiskSignal;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
 use db::DbPool;
@@ -214,7 +212,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         tenant_id: &TenantId,
     ) -> Result<MiddeskState<AwaitingBusinessUpdateWebhook>, ApiError> {
         let vreq_id = self.state.create_business_vreq.id.clone();
-        let ob_id = self.middesk_request.onboarding_id;
+        let wf_id = self.middesk_request.workflow_id;
 
         let business_data = build_request::build_business_data_from_verification_request(
             db_pool,
@@ -224,8 +222,9 @@ impl MiddeskState<PendingCreateBusinessCall> {
         .await?;
 
         let ob_configuration_key = db_pool
-            .db_query(move |conn| ObConfiguration::get_by_onboarding_id(conn, &ob_id))
+            .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
             .await??
+            .0
             .key;
 
         let res = send_middesk_call(
@@ -425,15 +424,13 @@ impl MiddeskState<PendingGetBusinessCall> {
             .business_id
             .clone()
             .ok_or(DbError::ObjectNotFound)?;
-        let ob_id = self.middesk_request.onboarding_id.clone();
+        let wfid = self.middesk_request.workflow_id.clone();
         let middesk_request_id = self.middesk_request.id.clone();
 
-        let obid = ob_id.clone();
-        let tenant_id = db_pool
-            .db_query(move |conn| ScopedVault::get(conn, &obid))
-            .await??
-            .tenant_id;
-        let tvc = TenantVendorControl::new(tenant_id, db_pool, config, enclave_client).await?;
+        let (wf, sv) = db_pool
+            .db_query(move |conn| Workflow::get_all(conn, &wfid))
+            .await??;
+        let tvc = TenantVendorControl::new(sv.tenant_id, db_pool, config, enclave_client).await?;
         let get_business_res = middesk_client
             .make_request(MiddeskGetBusinessRequest {
                 business_id,
@@ -451,7 +448,7 @@ impl MiddeskState<PendingGetBusinessCall> {
         let vr = (self.state.get_business_vreq.clone(), vendor_response.clone());
         let (updated_middesk_request, business_response_vres) = db_pool
             .db_query(move |conn| -> ApiResult<_> {
-                let uv = Vault::get(conn, &ob_id)?;
+                let (_, uv) = Workflow::get_with_vault(conn, &wf.id)?;
                 let vres = verification_result::save_verification_result(conn, &vr, &uv.public_key)?;
 
                 let updated_middesk_request = MiddeskRequest::update(
@@ -476,16 +473,12 @@ impl MiddeskState<PendingGetBusinessCall> {
 
 impl MiddeskState<Complete> {
     pub async fn run_kyb_decisioning(self, state: &State) -> ApiResult<()> {
-        let obid = self.middesk_request.onboarding_id.clone();
-        let di_id = self.state.business_response_vreq.decision_intent_id.clone();
+        let wfid = self.middesk_request.workflow_id.clone();
         let (v, sv, wf) = state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
-                let v = Vault::get(conn, &obid)?;
-                let sv = ScopedVault::get(conn, &obid)?;
-                let di = DecisionIntent::get(conn, &di_id)?;
-                let wf_id = di.workflow_id.ok_or(OnboardingError::NoWorkflow)?;
-                let wf = Workflow::get(conn, &wf_id)?;
+                let (_, v) = Workflow::get_with_vault(conn, &wfid)?;
+                let (wf, sv) = Workflow::get_all(conn, &wfid)?;
                 Ok((v, sv, wf))
             })
             .await??;

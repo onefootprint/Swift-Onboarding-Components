@@ -352,12 +352,12 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
-        onboarding_id -> Text,
+        onboarding_id -> Nullable<Text>,
         decision_intent_id -> Text,
         business_id -> Nullable<Text>,
         state -> Text,
         completed_at -> Nullable<Timestamptz>,
-        workflow_id -> Nullable<Text>,
+        workflow_id -> Text,
     }
 }
 

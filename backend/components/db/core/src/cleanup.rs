@@ -163,10 +163,6 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .filter(socure_device_session::onboarding_id.eq_any(ob_ids.clone()))
                 .execute(conn.conn())?;
 
-            deleted_rows += diesel::delete(middesk_request::table)
-                .filter(middesk_request::onboarding_id.eq_any(ob_ids))
-                .execute(conn.conn())?;
-
             // Verification requests
             {
                 let verification_request_ids = verification_request::table
@@ -222,6 +218,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
             deleted_rows += diesel::delete(manual_review::table)
                 .filter(manual_review::workflow_id.eq_any(workflow_ids.clone()))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(middesk_request::table)
+                .filter(middesk_request::workflow_id.eq_any(workflow_ids.clone()))
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(onboarding_decision::table)
