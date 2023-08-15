@@ -75,8 +75,8 @@ pub async fn get(
                 db::scoped_vault::list_and_count_authorized_for_tenant(conn, params, cursor, page_size)?;
             let vws: HashMap<ScopedVaultId, TenantVw> =
                 VaultWrapper::multi_get_for_tenant(conn, svs.clone(), &tenant_id, None)?;
-            let scoped_vault_ids: Vec<_> = svs.iter().map(|su| &su.0.id).collect();
-            let entities = ScopedVault::bulk_get_serializable_info(conn, scoped_vault_ids.clone())?;
+            let scoped_vault_ids: Vec<_> = svs.iter().map(|su| su.0.id.clone()).collect();
+            let entities = ScopedVault::bulk_get_serializable_info(conn, scoped_vault_ids)?;
             Ok((svs, entities, vws, count))
         })
         .await??;

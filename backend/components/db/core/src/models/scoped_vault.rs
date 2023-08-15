@@ -8,6 +8,7 @@ use super::user_timeline::UserTimeline;
 use super::vault::NewVaultArgs;
 use super::vault::Vault;
 use super::watchlist_check::WatchlistCheck;
+use super::workflow::Workflow;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -15,6 +16,7 @@ use db_schema::schema::scoped_vault;
 use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use itertools::Itertools;
 use newtypes::{
     DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingId, OnboardingStatus, ScopedVaultId,
     TenantId, VaultCreatedInfo, VaultId,
@@ -113,10 +115,19 @@ pub type SerializableOnboarding = (
     Option<InsightEvent>,
     Option<ManualReview>,
 );
+
+pub type SerializableWorkflow = (
+    Workflow,
+    ObConfiguration,
+    Option<InsightEvent>,
+    Option<ManualReview>,
+);
+
 pub type SerializableEntity = (
     ScopedVault,
     Option<WatchlistCheck>,
     Option<SerializableOnboarding>,
+    Vec<SerializableWorkflow>,
 );
 
 impl ScopedVault {
@@ -257,12 +268,16 @@ impl ScopedVault {
     #[tracing::instrument("ScopedVault::bulk_get_serializable_info", skip_all)]
     pub fn bulk_get_serializable_info(
         conn: &mut PgConn,
-        ids: Vec<&ScopedVaultId>,
+        ids: Vec<ScopedVaultId>,
     ) -> DbResult<HashMap<ScopedVaultId, SerializableEntity>> {
         use db_schema::schema::{
-            insight_event, manual_review, ob_configuration, onboarding, watchlist_check,
+            insight_event, manual_review, ob_configuration, onboarding, watchlist_check, workflow,
         };
-        let results: Vec<SerializableEntity> = scoped_vault::table
+        let results: Vec<(
+            ScopedVault,
+            Option<WatchlistCheck>,
+            Option<SerializableOnboarding>,
+        )> = scoped_vault::table
             .left_join(
                 watchlist_check::table.on(watchlist_check::scoped_vault_id
                     .eq(scoped_vault::id)
@@ -280,11 +295,32 @@ impl ScopedVault {
                     .and(manual_review::completed_at.is_null())
                 )),
             )
-            .filter(scoped_vault::id.eq_any(ids))
+            .filter(scoped_vault::id.eq_any(&ids))
             .load(conn)?;
 
+        let mut workflows = workflow::table
+            .filter(workflow::scoped_vault_id.eq_any(&ids))
+            .inner_join(ob_configuration::table)
+            .left_join(insight_event::table)
+            .left_join(
+                manual_review::table.on(manual_review::workflow_id
+                    .eq(workflow::id)
+                    .and(manual_review::completed_at.is_null())),
+            )
+            .get_results::<SerializableWorkflow>(conn)?
+            .into_iter()
+            .map(|i| (i.0.scoped_vault_id.clone(), i))
+            .into_group_map();
+
         // Turn the Vec of OnboardingInfo into a hashmap of ScopedVaultId -> Vec<SerializableEntity>
-        let result_map = results.into_iter().map(|ob| (ob.0.id.clone(), ob)).collect();
+        let result_map = results
+            .into_iter()
+            .map(|i| {
+                let sv_id = i.0.id.clone();
+                let entity = (i.0, i.1, i.2, workflows.remove(&sv_id).unwrap_or_default());
+                (sv_id, entity)
+            })
+            .collect();
         Ok(result_map)
     }
 

@@ -52,7 +52,7 @@ pub async fn get(
                 .pop()
                 .ok_or(ApiErrorKind::ResourceNotFound)?;
             let vw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-            let entity = ScopedVault::bulk_get_serializable_info(conn, vec![&sv.id])?
+            let entity = ScopedVault::bulk_get_serializable_info(conn, vec![sv.id.clone()])?
                 .remove(&sv.id)
                 .ok_or(ApiErrorKind::ResourceNotFound)?;
 

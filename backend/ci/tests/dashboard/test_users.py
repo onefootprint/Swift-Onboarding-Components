@@ -56,6 +56,7 @@ def test_get_users_list(incomplete_user, sandbox_user2, vault_user, sandbox_user
     for fp_id in [sandbox_user.fp_id, sandbox_user2.fp_id]:
         scoped_user = next(u for u in scoped_users if u["id"] == fp_id)
         assert set(["id.first_name", "id.last_name"]) < set(scoped_user["attributes"])
+        assert scoped_user["onboarding"]["status"] == "pass"
 
 
 def test_get_users_by_fp_id_query(sandbox_user):

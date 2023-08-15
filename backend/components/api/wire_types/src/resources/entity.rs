@@ -21,6 +21,10 @@ pub struct Entity {
     pub decrypted_attributes: HashMap<DataIdentifier, PiiString>,
     /// The list of attributes that are allowed to be decrypted by the authed user
     pub decryptable_attributes: Vec<DataIdentifier>,
+    // These are a representation of the associated workflows
+    pub status: Option<OnboardingStatus>,
+    pub insight_event: Option<InsightEvent>,
+    pub requires_manual_review: bool,
 }
 
 export_schema!(Entity);
