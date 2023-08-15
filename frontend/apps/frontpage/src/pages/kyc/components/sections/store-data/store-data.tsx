@@ -24,13 +24,13 @@ const StoreData = () => {
     {
       label: t('sections.users'),
       value: 'users',
-      image: '/kyc/storage/user-details.png',
+      image: '/kyc/storage/users.png',
       icon: IcoUsers16,
     },
     {
       label: t('sections.user-details'),
       value: 'user-details',
-      image: '/kyc/storage/users.png',
+      image: '/kyc/storage/user-details.png',
       icon: IcoUser16,
     },
     {
