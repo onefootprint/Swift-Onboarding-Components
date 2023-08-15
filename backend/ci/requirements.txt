@@ -16,7 +16,7 @@ platformdirs==2.5.2
 fido2==0.8.1
 cryptography==39.0.1
 twilio==7.9.2
-aiohttp==3.8.3
+aiohttp==3.8.5
 asyncio==3.4.3
 svix==0.78.0
 alpaca-py==0.8.2
