@@ -352,7 +352,6 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
-        onboarding_id -> Nullable<Text>,
         decision_intent_id -> Text,
         business_id -> Nullable<Text>,
         state -> Text,
@@ -955,7 +954,6 @@ joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
 joinable!(manual_review -> scoped_vault (scoped_vault_id));
 joinable!(manual_review -> workflow (workflow_id));
 joinable!(middesk_request -> decision_intent (decision_intent_id));
-joinable!(middesk_request -> onboarding (onboarding_id));
 joinable!(middesk_request -> workflow (workflow_id));
 joinable!(ob_configuration -> appearance (appearance_id));
 joinable!(ob_configuration -> tenant (tenant_id));
