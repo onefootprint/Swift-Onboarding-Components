@@ -2,11 +2,14 @@ import {
   createUseRouterSpy,
   customRender,
   screen,
+  userEvent,
+  waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
 import {
   asAdminUserInLive,
   asAdminUserInSandbox,
+  asAdminUserInSandboxAndRestricted,
   resetUser,
 } from 'src/config/tests';
 
@@ -45,6 +48,32 @@ describe('<Developers />', () => {
       );
       expect(warning).toBeInTheDocument();
     });
+
+    describe('when its restricted to use only the sandbox mode', () => {
+      it('should disable the toggle and show a tooltip explaining', async () => {
+        asAdminUserInSandboxAndRestricted();
+        renderDevelopers();
+
+        const toggle = screen.getByRole('switch') as HTMLButtonElement;
+        expect(toggle.disabled).toBeTruthy();
+      });
+    });
+  });
+
+  describe('when toggling', () => {
+    it('should go to the sandbox to the live mode', async () => {
+      renderDevelopers();
+
+      const toggle = screen.getByRole('switch');
+      await userEvent.click(toggle);
+
+      await waitFor(() => {
+        const warning = screen.getByText(
+          "You're viewing live keys. Enable sandbox mode to view test keys.",
+        );
+        expect(warning).toBeInTheDocument();
+      });
+    });
   });
 
   describe('when is in live mode', () => {
@@ -59,6 +88,21 @@ describe('<Developers />', () => {
       );
 
       expect(info).toBeInTheDocument();
+    });
+
+    describe('when toggling', () => {
+      it('should go to live to the sandbox mode', async () => {
+        renderDevelopers();
+        const toggle = screen.getByRole('switch');
+        await userEvent.click(toggle);
+
+        await waitFor(() => {
+          const warning = screen.getByText(
+            "You're viewing test keys. Disable sandbox mode to view live keys.",
+          );
+          expect(warning).toBeInTheDocument();
+        });
+      });
     });
   });
 });
