@@ -41,7 +41,7 @@ describe('<EmploymentForm />', () => {
       await userEvent.click(button);
 
       expect(onSubmit).toHaveBeenCalledWith({
-        [InvestorProfileDI.status]: 'employed',
+        [InvestorProfileDI.employmentStatus]: 'employed',
         [InvestorProfileDI.occupation]: 'Doctor',
         [InvestorProfileDI.employer]: 'Acme',
       });
@@ -60,7 +60,7 @@ describe('<EmploymentForm />', () => {
       await userEvent.click(button);
 
       expect(onSubmit).toHaveBeenCalledWith({
-        [InvestorProfileDI.status]: 'unemployed',
+        [InvestorProfileDI.employmentStatus]: 'unemployed',
         [InvestorProfileDI.occupation]: '',
         [InvestorProfileDI.employer]: '',
       });
@@ -79,7 +79,7 @@ describe('<EmploymentForm />', () => {
       await userEvent.click(button);
 
       expect(onSubmit).toHaveBeenCalledWith({
-        [InvestorProfileDI.status]: 'retired',
+        [InvestorProfileDI.employmentStatus]: 'retired',
         [InvestorProfileDI.occupation]: '',
         [InvestorProfileDI.employer]: '',
       });
@@ -98,7 +98,7 @@ describe('<EmploymentForm />', () => {
       await userEvent.click(button);
 
       expect(onSubmit).toHaveBeenCalledWith({
-        [InvestorProfileDI.status]: 'student',
+        [InvestorProfileDI.employmentStatus]: 'student',
         [InvestorProfileDI.occupation]: '',
         [InvestorProfileDI.employer]: '',
       });
@@ -109,7 +109,7 @@ describe('<EmploymentForm />', () => {
     it('should render the occupation and employer when is employed', async () => {
       renderForm({
         defaultValues: {
-          [InvestorProfileDI.status]: 'employed',
+          [InvestorProfileDI.employmentStatus]: 'employed',
           [InvestorProfileDI.occupation]: 'Doctor',
           [InvestorProfileDI.employer]: 'Acme',
         },

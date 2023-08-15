@@ -49,7 +49,7 @@ const Employment = () => {
         secondIcon={IcoDollar40}
         firstText={allT('components.transition-animation.source')}
         secondText={allT('components.transition-animation.destination')}
-        timeout={5500}
+        timeout={4000}
         onAnimationEnd={() => setShowAnimation(false)}
       />
     </AnimationContainer>
@@ -60,7 +60,8 @@ const Employment = () => {
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDI.status]: data?.[InvestorProfileDI.status],
+          [InvestorProfileDI.employmentStatus]:
+            data?.[InvestorProfileDI.employmentStatus],
           [InvestorProfileDI.occupation]: data?.[InvestorProfileDI.occupation],
           [InvestorProfileDI.employer]: data?.[InvestorProfileDI.employer],
         }}

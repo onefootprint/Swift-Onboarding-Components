@@ -35,4 +35,5 @@ export enum InvestorProfileDeclaration {
   seniorExecutive = 'senior_executive',
   seniorPoliticalFigure = 'senior_political_figure',
   familyOfPoliticalFigure = 'family_of_political_figure',
+  none = 'none',
 }

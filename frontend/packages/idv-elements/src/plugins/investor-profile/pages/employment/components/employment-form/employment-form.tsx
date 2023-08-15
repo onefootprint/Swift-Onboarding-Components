@@ -45,7 +45,8 @@ const EmploymentForm = ({
   ];
 
   const defaultStatus = options.find(
-    ({ value }) => value === defaultValues?.[InvestorProfileDI.status],
+    ({ value }) =>
+      value === defaultValues?.[InvestorProfileDI.employmentStatus],
   );
   const defaultOccupation = defaultValues?.[InvestorProfileDI.occupation];
   const defaultEmployer = defaultValues?.[InvestorProfileDI.employer];
@@ -69,7 +70,7 @@ const EmploymentForm = ({
     const { status, occupation = '', employer = '' } = formData;
     const isEmployed = status.value === 'employed';
     onSubmit({
-      [InvestorProfileDI.status]: status.value,
+      [InvestorProfileDI.employmentStatus]: status.value,
       [InvestorProfileDI.occupation]: isEmployed ? occupation : '',
       [InvestorProfileDI.employer]: isEmployed ? employer : '',
     });

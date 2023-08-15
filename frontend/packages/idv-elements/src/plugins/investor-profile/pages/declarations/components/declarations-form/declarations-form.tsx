@@ -35,10 +35,17 @@ const DeclarationsForm = ({
   const affiliatedWithUsBroker = watch(
     InvestorProfileDeclaration.affiliatedWithUsBroker,
   );
+  const checkboxes = watch([
+    InvestorProfileDeclaration.affiliatedWithUsBroker,
+    InvestorProfileDeclaration.seniorExecutive,
+    InvestorProfileDeclaration.seniorPoliticalFigure,
+    InvestorProfileDeclaration.familyOfPoliticalFigure,
+  ]);
   const seniorExecutive = watch(InvestorProfileDeclaration.seniorExecutive);
   const shouldRequireUpload = affiliatedWithUsBroker || seniorExecutive;
   const [shouldShowUploadError, setShouldShowUploadError] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const hasSelectedAnyOption = Object.values(checkboxes).some(value => value);
 
   const handleUploadChange = (newFiles: File[]) => {
     if (newFiles.length > 0) {
@@ -72,6 +79,7 @@ const DeclarationsForm = ({
       title={t('title')}
       subtitle={t('subtitle')}
       isLoading={isLoading}
+      ctaLabel={hasSelectedAnyOption ? undefined : t('cta-none')}
       formAttributes={{
         encType: 'multipart/form-data',
         onSubmit: handleSubmit(handleBeforeSubmit),

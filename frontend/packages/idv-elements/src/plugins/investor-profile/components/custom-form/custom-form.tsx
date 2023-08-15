@@ -7,28 +7,30 @@ import ContinueButton from './components/continue-button';
 import Error from './components/error';
 
 type OptionsContainerProps = {
-  title: string;
-  subtitle: string;
   children: React.ReactNode;
-  isLoading?: boolean;
-  formAttributes?: FormHTMLAttributes<HTMLFormElement>;
+  ctaLabel?: string;
   error?: string; // Form-wide errors
+  formAttributes?: FormHTMLAttributes<HTMLFormElement>;
+  isLoading?: boolean;
+  subtitle: string;
+  title: string;
 };
 
 const CustomForm = ({
-  title,
-  subtitle,
   children,
-  isLoading,
+  ctaLabel,
   error,
   formAttributes,
+  isLoading,
+  subtitle,
+  title,
 }: OptionsContainerProps) => (
   // eslint-disable-next-line react/jsx-props-no-spreading
   <StyledForm {...formAttributes}>
     <HeaderTitle title={title} subtitle={subtitle} />
     <Container data-private>{children}</Container>
     {error && <Error label={error} />}
-    <ContinueButton isLoading={isLoading} />
+    <ContinueButton isLoading={isLoading} label={ctaLabel} />
   </StyledForm>
 );
 

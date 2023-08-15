@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import { useTimeout } from 'usehooks-ts';
 
-import CustomCheckIcon from './custom-check-icon';
 import {
   firstIconContainerVariants,
   firstTextContainerVariants,
@@ -45,7 +44,6 @@ const GenericTransition = ({
         >
           {renderedFirstIcon}
         </IconContainer>
-        <CustomCheckIcon />
         <IconContainer
           variants={secondIconContainerVariants}
           initial="initial"

@@ -16,7 +16,7 @@ export enum BusinessDI {
 }
 
 export enum InvestorProfileDI {
-  status = 'investor_profile.employment_status',
+  employmentStatus = 'investor_profile.employment_status',
   occupation = 'investor_profile.occupation',
   employer = 'investor_profile.employer',
   annualIncome = 'investor_profile.annual_income',

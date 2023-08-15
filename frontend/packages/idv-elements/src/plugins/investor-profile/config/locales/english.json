@@ -9,8 +9,8 @@
       "loading-aria-label": "Loading..."
     },
     "transition-animation": {
-      "source": "Almost there",
-      "destination": "A few more investing-specific questions"
+      "source": "Almost there...",
+      "destination": "A few more investing-specific questions!"
     }
   },
   "pages": {
@@ -92,6 +92,7 @@
         "senior_political_figure": "I'm a senior political figure",
         "family_of_political_figure": "I'm a family member or relative of a senior political figure"
       },
+      "cta-none": "None of these apply to me",
       "doc-upload": {
         "label": "Upload a compliance letter (PDF)",
         "cta": "Choose file to upload",

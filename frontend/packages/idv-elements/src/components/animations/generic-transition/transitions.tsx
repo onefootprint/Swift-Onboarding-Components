@@ -1,4 +1,4 @@
-const STEP_DURATION = 3;
+const STEP_DURATION = 2;
 const TRANSITION_DURATION = 0.2;
 
 export const firstIconContainerVariants = {

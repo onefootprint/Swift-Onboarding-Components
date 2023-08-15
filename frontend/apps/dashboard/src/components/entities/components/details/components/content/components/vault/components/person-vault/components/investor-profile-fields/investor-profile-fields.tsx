@@ -24,6 +24,21 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
   return (
     <Grid>
       <Column>
+        <FieldSection title={t('employment-status.title')}>
+          <Field
+            di={InvestorProfileDI.employmentStatus}
+            entity={entity}
+            renderValue={(value, isValueDecrypted) =>
+              !isValueDecrypted ? (
+                <FieldOrPlaceholder data={value} />
+              ) : (
+                <FieldOrPlaceholder
+                  data={t(`employment-status.options.${value}`)}
+                />
+              )
+            }
+          />
+        </FieldSection>
         <FieldSection title={t('occupation.title')}>
           <Field di={InvestorProfileDI.occupation} entity={entity} />
         </FieldSection>
@@ -99,6 +114,11 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
             entity={entity}
             renderValue={value => {
               if (Array.isArray(value)) {
+                if (value.length === 0) {
+                  return (
+                    <FieldOrPlaceholder data={t('declarations.options.none')} />
+                  );
+                }
                 return (
                   <FieldOrPlaceholder
                     data={createCapitalStringList(

@@ -4,9 +4,10 @@ import React from 'react';
 
 type ContinueButtonProps = {
   isLoading?: boolean;
+  label?: string;
 };
 
-const ContinueButton = ({ isLoading }: ContinueButtonProps) => {
+const ContinueButton = ({ label, isLoading }: ContinueButtonProps) => {
   const { t } = useTranslation('components.continue-button');
 
   return (
@@ -16,7 +17,7 @@ const ContinueButton = ({ isLoading }: ContinueButtonProps) => {
       loading={isLoading}
       loadingAriaLabel={t('loading-aria-label')}
     >
-      {t('label')}
+      {label || t('label')}
     </Button>
   );
 };
