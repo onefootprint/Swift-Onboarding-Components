@@ -131,7 +131,7 @@ macro_rules! list_query {
             if !$params.statuses.is_empty() {
                 // Filter on non-portable users
                 let q_none_status = if $params.statuses.contains(&OnboardingStatusFilter::None) {
-                    Some(onboarding::id.is_null())
+                    Some(scoped_vault::status.is_null())
                 } else {
                     None
                 };
@@ -143,7 +143,7 @@ macro_rules! list_query {
                     .collect();
 
                 let q_onboarding_status = if !onboarding_status.is_empty() {
-                    Some(onboarding::status.eq_any(onboarding_status))
+                    Some(scoped_vault::status.eq_any(onboarding_status))
                 } else {
                     None
                 };

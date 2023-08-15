@@ -387,7 +387,6 @@ table! {
     onboarding (id) {
         id -> Text,
         scoped_vault_id -> Text,
-        ob_configuration_id -> Text,
         start_timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -395,7 +394,6 @@ table! {
         authorized_at -> Nullable<Timestamptz>,
         idv_reqs_initiated_at -> Nullable<Timestamptz>,
         decision_made_at -> Nullable<Timestamptz>,
-        status -> Text,
         workflow_id -> Text,
     }
 }
@@ -958,7 +956,6 @@ joinable!(middesk_request -> workflow (workflow_id));
 joinable!(ob_configuration -> appearance (appearance_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
-joinable!(onboarding -> ob_configuration (ob_configuration_id));
 joinable!(onboarding -> scoped_vault (scoped_vault_id));
 joinable!(onboarding -> workflow (workflow_id));
 joinable!(onboarding_decision -> workflow (workflow_id));

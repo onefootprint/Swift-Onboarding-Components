@@ -79,11 +79,24 @@ pub enum WorkflowIdentifier<'a> {
         owner_vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
     },
+    ConfigId {
+        vault_id: &'a VaultId,
+        ob_config_id: &'a ObConfigurationId,
+    },
 }
 
 impl<'a> From<&'a WorkflowId> for WorkflowIdentifier<'a> {
     fn from(id: &'a WorkflowId) -> Self {
         Self::Id { id }
+    }
+}
+
+impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for WorkflowIdentifier<'a> {
+    fn from((vault_id, ob_config_id): (&'a VaultId, &'a ObConfigurationId)) -> Self {
+        Self::ConfigId {
+            vault_id,
+            ob_config_id,
+        }
     }
 }
 
@@ -189,6 +202,14 @@ impl Workflow {
                     .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
                     .filter(workflow::ob_configuration_id.eq(ob_config_id))
             }
+            WorkflowIdentifier::ConfigId {
+                vault_id,
+                ob_config_id,
+            } => {
+                query = query
+                    .filter(scoped_vault::vault_id.eq(vault_id))
+                    .filter(workflow::ob_configuration_id.eq(ob_config_id))
+            }
         }
         let res = query.get_result(conn)?;
 
@@ -271,7 +292,7 @@ impl Workflow {
         Ok(result)
     }
 
-    #[tracing::instrument("Workflow::update_state", skip_all)]
+    #[tracing::instrument("Workflow::update_fixture_result", skip_all)]
     pub fn update_fixture_result(
         conn: &mut TxnPgConn,
         id: &WorkflowId,

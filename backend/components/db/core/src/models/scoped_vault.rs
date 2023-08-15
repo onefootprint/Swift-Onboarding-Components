@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use super::insight_event::InsightEvent;
 use super::manual_review::ManualReview;
 use super::ob_configuration::{IsLive, ObConfiguration};
+use super::tenant::Tenant;
 use super::user_timeline::UserTimeline;
 use super::vault::NewVaultArgs;
 use super::vault::Vault;
@@ -262,6 +263,7 @@ impl ScopedVault {
             .filter(scoped_vault::id.eq_any(&ids))
             .load(conn)?;
 
+        // Fetch workflows separately since there may be multiple for one scoped vault
         let mut workflows = workflow::table
             .filter(workflow::scoped_vault_id.eq_any(&ids))
             .left_join(insight_event::table)
@@ -302,5 +304,24 @@ impl ScopedVault {
             .set(scoped_vault::status.eq(status))
             .get_result(conn)?;
         Ok(result)
+    }
+}
+
+pub type AuthorizedTenant = (Workflow, ScopedVault, ObConfiguration, Tenant);
+
+impl ScopedVault {
+    /// List all authorized onboardings for a given vault
+    #[tracing::instrument("ScopedVault::list_authorized", skip_all)]
+    pub fn list_authorized(conn: &mut PgConn, v_id: &VaultId) -> DbResult<Vec<AuthorizedTenant>> {
+        use db_schema::schema::{ob_configuration, tenant, workflow};
+        let results = workflow::table
+            .inner_join(scoped_vault::table)
+            .inner_join(ob_configuration::table)
+            .inner_join(tenant::table.on(tenant::id.eq(ob_configuration::tenant_id)))
+            .filter(scoped_vault::vault_id.eq(v_id))
+            .filter(not(workflow::authorized_at.is_null()))
+            .order_by(workflow::created_at.desc())
+            .get_results(conn)?;
+        Ok(results)
     }
 }

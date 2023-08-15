@@ -28,8 +28,6 @@ pub type IsNew = bool;
 pub struct Onboarding {
     pub id: OnboardingId,
     pub scoped_vault_id: ScopedVaultId,
-    // TODO rm
-    ob_configuration_id: ObConfigurationId,
     pub start_timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -39,7 +37,6 @@ pub struct Onboarding {
     pub authorized_at: Option<DateTime<Utc>>,
     pub idv_reqs_initiated_at: Option<DateTime<Utc>>,
     pub decision_made_at: Option<DateTime<Utc>>,
-    status: OnboardingStatus,
     workflow_id: WorkflowId,
 }
 
@@ -47,15 +44,20 @@ pub struct Onboarding {
 #[diesel(table_name = onboarding)]
 struct NewOnboarding {
     scoped_vault_id: ScopedVaultId,
-    ob_configuration_id: ObConfigurationId,
     start_timestamp: DateTime<Utc>,
     insight_event_id: Option<InsightEventId>,
-    status: OnboardingStatus,
     workflow_id: WorkflowId,
 }
 
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = onboarding)]
+struct OnboardingUpdateRow {
+    authorized_at: Option<Option<DateTime<Utc>>>,
+    idv_reqs_initiated_at: Option<Option<DateTime<Utc>>>,
+    decision_made_at: Option<Option<DateTime<Utc>>>,
+}
+
+#[derive(Debug, Default)]
 pub struct OnboardingUpdate {
     pub authorized_at: Option<Option<DateTime<Utc>>>,
     pub idv_reqs_initiated_at: Option<Option<DateTime<Utc>>>,
@@ -73,15 +75,6 @@ pub struct OnboardingCreateArgs {
 /// While we are migrating the source of truth to workflow, use these utils to read from either
 /// workflow or onboarding
 impl Onboarding {
-    pub fn status(&self, wf: Option<&Workflow>) -> OnboardingStatus {
-        wf.and_then(|wf| wf.status).unwrap_or(self.status)
-    }
-
-    pub fn ob_configuration_id<'a>(&'a self, wf: Option<&'a Workflow>) -> &'a ObConfigurationId {
-        wf.and_then(|wf| wf.ob_configuration_id.as_ref())
-            .unwrap_or(&self.ob_configuration_id)
-    }
-
     pub fn workflow_id<'a>(&'a self, wf: Option<&'a Workflow>) -> &'a WorkflowId {
         wf.map(|wf| &wf.id).unwrap_or(&self.workflow_id)
     }
@@ -131,10 +124,6 @@ pub enum OnboardingIdentifier<'a> {
         /// Note: the ID of the user vault that owns this business
         vault_id: &'a VaultId,
     },
-    ConfigId {
-        vault_id: &'a VaultId,
-        ob_config_id: &'a ObConfigurationId,
-    },
     WorkflowId {
         wf_id: &'a WorkflowId,
     },
@@ -152,23 +141,11 @@ impl<'a> From<&'a ScopedVaultId> for OnboardingIdentifier<'a> {
     }
 }
 
-impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a> {
-    fn from((vault_id, ob_config_id): (&'a VaultId, &'a ObConfigurationId)) -> Self {
-        Self::ConfigId {
-            vault_id,
-            ob_config_id,
-        }
-    }
-}
-
 impl<'a> From<&'a WorkflowId> for OnboardingIdentifier<'a> {
     fn from(wf_id: &'a WorkflowId) -> Self {
         Self::WorkflowId { wf_id }
     }
 }
-
-#[derive(Clone)]
-pub struct OnboardingAndConfig(pub Onboarding, pub ObConfiguration);
 
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
 pub type BasicOnboardingInfo<ObT = Onboarding> = (ObT, ScopedVault);
@@ -195,14 +172,6 @@ impl Onboarding {
                     .filter(onboarding::scoped_vault_id.eq(sb_id))
                     .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
             }
-            OnboardingIdentifier::ConfigId {
-                vault_id,
-                ob_config_id,
-            } => {
-                query = query
-                    .filter(scoped_vault::vault_id.eq(vault_id))
-                    .filter(onboarding::ob_configuration_id.eq(ob_config_id))
-            }
             // TODO this is just for easier migration from ob -> wf
             OnboardingIdentifier::WorkflowId { wf_id } => {
                 use db_schema::schema::workflow;
@@ -216,20 +185,6 @@ impl Onboarding {
         let result = query.first(conn)?;
 
         Ok(result)
-    }
-
-    // Generally we need to query by scoped vault AND user vault in authed endpoints,
-    // to prove ownership, so this is broken out
-    #[tracing::instrument("Onboarding::get_by_scoped_vault_internal_lookup_only", skip_all)]
-    pub fn get_by_scoped_vault_internal_lookup_only(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-    ) -> DbResult<Self> {
-        let res = onboarding::table
-            .filter(onboarding::scoped_vault_id.eq(scoped_vault_id))
-            .get_result(conn)?;
-
-        Ok(res)
     }
 
     #[tracing::instrument("Onboarding::lock", skip_all)]
@@ -287,10 +242,8 @@ impl Onboarding {
         } else {
             let new_ob = NewOnboarding {
                 scoped_vault_id: args.scoped_vault_id.clone(),
-                ob_configuration_id: args.ob_configuration_id,
                 start_timestamp: Utc::now(),
                 insight_event_id,
-                status: OnboardingStatus::Incomplete,
                 workflow_id: wf.id.clone(),
             };
             diesel::insert_into(onboarding::table)
@@ -378,10 +331,26 @@ impl Onboarding {
                 Task::create(conn, Utc::now(), task_data)?;
             }
         }
-        let result = diesel::update(onboarding::table)
-            .filter(onboarding::id.eq(&ob.id))
-            .set(update)
-            .get_result::<Self>(conn.conn())?;
+        let OnboardingUpdate {
+            authorized_at,
+            idv_reqs_initiated_at,
+            decision_made_at,
+            ..
+        } = update;
+        let result =
+            if authorized_at.is_some() || idv_reqs_initiated_at.is_some() || decision_made_at.is_some() {
+                let update = OnboardingUpdateRow {
+                    authorized_at,
+                    idv_reqs_initiated_at,
+                    decision_made_at,
+                };
+                diesel::update(onboarding::table)
+                    .filter(onboarding::id.eq(&ob.id))
+                    .set(update)
+                    .get_result::<Self>(conn.conn())?
+            } else {
+                ob.into_inner()
+            };
         Ok(result)
     }
 
@@ -415,23 +384,5 @@ impl Onboarding {
         self.idv_reqs_initiated_at.is_some()
             && self.decision_made_at.is_some()
             && self.authorized_at.is_some()
-    }
-}
-
-pub type AuthorizedOnboarding = (Onboarding, ScopedVault, ObConfiguration, Tenant);
-
-impl Onboarding {
-    /// List all authorized onboardings for a given vault
-    pub fn list_authorized(conn: &mut PgConn, v_id: &VaultId) -> DbResult<Vec<AuthorizedOnboarding>> {
-        use db_schema::schema::{ob_configuration, tenant};
-        let results = onboarding::table
-            .inner_join(scoped_vault::table)
-            .inner_join(ob_configuration::table)
-            .inner_join(tenant::table.on(tenant::id.eq(ob_configuration::tenant_id)))
-            .filter(scoped_vault::vault_id.eq(v_id))
-            .filter(onboarding::status.eq(OnboardingStatus::Pass))
-            .order_by(onboarding::start_timestamp.desc())
-            .get_results(conn)?;
-        Ok(results)
     }
 }

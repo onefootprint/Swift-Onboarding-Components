@@ -8,7 +8,7 @@ use api_core::types::ResponseData;
 use api_core::utils::vault_wrapper::{Business, VaultWrapper};
 use api_core::{auth::ob_config::BoSessionAuth, utils::vault_wrapper::TenantVw};
 use api_wire_types::hosted::business::{HostedBusiness, Invited, Inviter};
-use db::models::onboarding::Onboarding;
+use db::models::workflow::Workflow;
 use newtypes::{BoLinkId, BusinessDataKind as BDK, KycedBusinessOwnerData, PiiString};
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -23,7 +23,7 @@ pub async fn get(state: web::Data<State>, business_auth: BoSessionAuth) -> JsonA
     let bvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (_, sb) = Onboarding::get(conn, (&bv_id, &ob_config_id))?;
+            let (_, sb) = Workflow::get_all(conn, (&bv_id, &ob_config_id))?;
             let bvw = VaultWrapper::build_for_tenant(conn, &sb.id)?;
             Ok(bvw)
         })

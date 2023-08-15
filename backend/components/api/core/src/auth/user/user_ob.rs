@@ -90,19 +90,12 @@ impl ExtractableAuthSession for ParsedUserObSession {
         };
 
         // Get the obc ID first from the workflow, the real source of truth.
-        // Otherwise, get from OrgOnboarding scope, otherwise the onboarding.
-        // TODO clean this up
+        // Otherwise, get from OrgOnboarding scope.
         let scope_obc_id = user_session.ob_configuration_id();
         let obc_id = workflow
             .as_ref()
             .and_then(|wf| wf.ob_configuration_id.as_ref())
-            .or_else(|| {
-                scope_obc_id.as_ref().or_else(|| {
-                    onboarding
-                        .as_ref()
-                        .map(|ob| ob.ob_configuration_id(workflow.as_ref()))
-                })
-            });
+            .or(scope_obc_id.as_ref());
 
         let (ob_config, tenant) = if let Some(obc_id) = obc_id {
             // Confirm that the ob config is active
