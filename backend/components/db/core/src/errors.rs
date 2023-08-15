@@ -13,19 +13,19 @@ pub enum TransactionError<E> {
 /// Note: the error messages here are publicly visible to the API
 pub enum DbError {
     // Wrapped errors
-    #[error("Db interact error")]
+    #[error("Db interact error: {0}")]
     DbInteract(#[from] deadpool_diesel::InteractError),
-    #[error("database error")]
+    #[error("Database error: {0}")]
     DbError(#[from] diesel::result::Error),
-    #[error("Pool error")]
+    #[error("Pool error: {0}")]
     PoolGet(#[from] deadpool_diesel::PoolError),
-    #[error("Pool init error")]
+    #[error("Pool init error: {0}")]
     PoolInit(#[from] deadpool::managed::BuildError<deadpool_diesel::Error>),
-    #[error("Connection error")]
+    #[error("Connection error: {0}")]
     ConnectionError(#[from] diesel::ConnectionError),
-    #[error("Migration error")]
+    #[error("Migration error: {0}")]
     MigrationError(#[from] diesel_migrations::MigrationError),
-    #[error("Migration failed")]
+    #[error("Migration failed: {0}")]
     MigrationFailed(Box<dyn std::error::Error + Send + Sync>),
 
     // Application errors
