@@ -1,8 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
+import PermissionGate from 'src/components/permission-gate';
 
 import Dialog from './components/dialog';
 
@@ -23,9 +25,14 @@ const Playbooks = () => {
         <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
           {t('header.title')}
         </Typography>
-        <Button size="small" onClick={onCreatePlaybook}>
-          {t('create-button')}
-        </Button>
+        <PermissionGate
+          fallbackText={t('cta-not-allowed')}
+          scopeKind={RoleScopeKind.onboardingConfiguration}
+        >
+          <Button size="small" onClick={onCreatePlaybook}>
+            {t('create-button')}
+          </Button>
+        </PermissionGate>
       </HeaderContainer>
       <Typography variant="body-2">{t('header.subtitle')}</Typography>
       <br />

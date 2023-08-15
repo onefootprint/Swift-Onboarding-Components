@@ -1044,7 +1044,8 @@
         "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
       },
       "create-button": "Create Playbook",
-      "empty-description": "You haven't created any Playbooks just yet."
+      "empty-description": "You haven't created any Playbooks just yet.",
+      "cta-not-allowed": "You're not allowed to create Playbooks"
     },
     "manual-review": {
       "page-title": "Footprint | Manual Review",
