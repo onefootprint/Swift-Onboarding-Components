@@ -8,7 +8,7 @@ impl<Type> TenantVw<Type> {
     /// Returns true if the DI was request to be collected by the onboarding config
     fn is_in_must_collect(&self, di: &DataIdentifier) -> bool {
         let must_collect = self
-            .onboarding
+            .workflows
             .iter()
             .flat_map(|ob| ob.must_collect_scopes())
             .collect_vec();
@@ -46,9 +46,9 @@ impl<Type> TenantVw<Type> {
             // If the piece of data was requested to be collected, it is decryptable as long as the
             // workflow was authorized and the field is in can_decrypt
             let can_decrypt_scopes = self
-                .onboarding
+                .workflows
                 .iter()
-                .flat_map(|ob| ob.can_decrypt_scopes())
+                .flat_map(|wf| wf.can_decrypt_scopes())
                 .collect_vec();
             CanDecrypt::single(di).is_met(&can_decrypt_scopes)
         } else {

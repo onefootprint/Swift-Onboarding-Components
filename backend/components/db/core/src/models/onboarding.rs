@@ -16,11 +16,10 @@ use diesel::{Insertable, Queryable};
 use newtypes::{
     AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, InsightEventId, KybConfig, KycConfig, Locked,
     ObConfigurationId, OnboardingCompletedPayload, OnboardingId, OnboardingStatusChangedPayload,
-    ScopedVaultId, TaskData, TenantId, TenantScope, VaultId, WebhookEvent, WorkflowFixtureResult, WorkflowId,
+    ScopedVaultId, TaskData, TenantId, VaultId, WebhookEvent, WorkflowFixtureResult, WorkflowId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 pub type IsNew = bool;
 
@@ -159,9 +158,6 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a>
     }
 }
 
-#[derive(Clone)]
-pub struct OnboardingAndConfig(pub Onboarding, pub ObConfiguration);
-
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
 pub type BasicOnboardingInfo<ObT = Onboarding> = (ObT, ScopedVault);
 
@@ -223,24 +219,6 @@ impl Onboarding {
             .for_no_key_update()
             .get_result(conn.conn())?;
         Ok(Locked::new(result))
-    }
-
-    #[tracing::instrument("Onboarding::bulk_get_for_users", skip_all)]
-    pub fn bulk_get_for_users(
-        conn: &mut PgConn,
-        scoped_vault_ids: Vec<&ScopedVaultId>,
-    ) -> DbResult<HashMap<ScopedVaultId, OnboardingAndConfig>> {
-        // For now, this will be either 0 or 1 result per user
-        use db_schema::schema::ob_configuration;
-        let results = onboarding::table
-            .inner_join(ob_configuration::table)
-            .filter(onboarding::scoped_vault_id.eq_any(scoped_vault_ids))
-            .get_results::<(Self, ObConfiguration)>(conn)?
-            .into_iter()
-            .map(|(ob, obc)| (ob.scoped_vault_id.clone(), OnboardingAndConfig(ob, obc)))
-            .collect();
-
-        Ok(results)
     }
 
     #[tracing::instrument("Onboarding::get_or_create", skip_all)]
@@ -429,30 +407,5 @@ impl Onboarding {
             .order_by(onboarding::start_timestamp.desc())
             .get_results(conn)?;
         Ok(results)
-    }
-}
-
-impl OnboardingAndConfig {
-    /// returns the TenantScopes to which this ObConfiguration (upon authorization!) grants access
-    /// to decrypt.
-    pub fn can_decrypt_scopes(&self) -> Vec<TenantScope> {
-        let Self(ob, obc) = &self;
-        if ob.authorized_at.is_none() {
-            // Only authorized onboardings give permission to decrypt data
-            vec![]
-        } else {
-            let cdos = obc.can_access_data.clone();
-            cdos.into_iter().map(|cdo| cdo.permission()).collect()
-        }
-    }
-
-    // Returns the TenantScopes that this ObConfiguration requires to be collected
-    pub fn must_collect_scopes(&self) -> Vec<TenantScope> {
-        self.1
-            .must_collect_data
-            .clone()
-            .into_iter()
-            .map(|cdo| cdo.permission())
-            .collect()
     }
 }

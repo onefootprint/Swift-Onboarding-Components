@@ -2,13 +2,16 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
+use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, DocumentState, InsightEventId, KybState, OnboardingStatus, VaultId, WorkflowFixtureResult,
+    AlpacaKycState, DocumentState, InsightEventId, KybState, OnboardingStatus, TenantScope, VaultId,
+    WorkflowFixtureResult,
 };
 use newtypes::{
     Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
 };
 
+use super::ob_configuration::ObConfiguration;
 use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
 use super::workflow_event::WorkflowEvent;
@@ -372,5 +375,52 @@ mod tests {
         let wfe = wfe.first().unwrap();
         assert!(wfe.from_state == WorkflowState::Kyc(KycState::VendorCalls));
         assert!(wfe.to_state == WorkflowState::Kyc(KycState::Decisioning));
+    }
+}
+
+impl Workflow {
+    #[tracing::instrument("Workflow::bulk_get_for_users", skip_all)]
+    pub fn bulk_get_for_users(
+        conn: &mut PgConn,
+        scoped_vault_ids: Vec<&ScopedVaultId>,
+    ) -> DbResult<HashMap<ScopedVaultId, Vec<WorkflowAndConfig>>> {
+        use db_schema::schema::ob_configuration;
+        let results = workflow::table
+            .inner_join(ob_configuration::table)
+            .filter(workflow::scoped_vault_id.eq_any(scoped_vault_ids))
+            .get_results::<(Self, ObConfiguration)>(conn)?
+            .into_iter()
+            .map(|(wf, obc)| (wf.scoped_vault_id.clone(), WorkflowAndConfig(wf, obc)))
+            .into_group_map();
+
+        Ok(results)
+    }
+}
+
+#[derive(Clone)]
+pub struct WorkflowAndConfig(pub Workflow, pub ObConfiguration);
+
+impl WorkflowAndConfig {
+    /// returns the TenantScopes to which this ObConfiguration (upon authorization!) grants access
+    /// to decrypt.
+    pub fn can_decrypt_scopes(&self) -> Vec<TenantScope> {
+        let Self(wf, obc) = &self;
+        if wf.authorized_at.is_none() {
+            // Only authorized onboardings give permission to decrypt data
+            vec![]
+        } else {
+            let cdos = obc.can_access_data.clone();
+            cdos.into_iter().map(|cdo| cdo.permission()).collect()
+        }
+    }
+
+    // Returns the TenantScopes that this ObConfiguration requires to be collected
+    pub fn must_collect_scopes(&self) -> Vec<TenantScope> {
+        self.1
+            .must_collect_data
+            .clone()
+            .into_iter()
+            .map(|cdo| cdo.permission())
+            .collect()
     }
 }

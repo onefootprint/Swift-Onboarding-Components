@@ -4,10 +4,10 @@ use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
-use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::vault_data::VaultData;
+use db::models::workflow::Workflow;
 use db::HasLifetime;
 use db::PgConn;
 use newtypes::{DataLifetimeSeqno, ScopedVaultId, TenantId};
@@ -30,12 +30,14 @@ impl<Type> VaultWrapper<Type> {
             VwArgs::Tenant(sv_id)
         };
         let uvw = Self::build(conn, args)?;
-        let onboarding = Onboarding::bulk_get_for_users(conn, vec![sv_id])?.remove(sv_id);
+        let workflows = Workflow::bulk_get_for_users(conn, vec![sv_id])?
+            .remove(sv_id)
+            .unwrap_or_default();
         let scoped_vault = ScopedVault::get(conn, sv_id)?;
         Ok(TenantVw {
             uvw,
             scoped_vault,
-            onboarding,
+            workflows,
         })
     }
 
@@ -59,7 +61,7 @@ impl<Type> VaultWrapper<Type> {
         // VaultWrapper for each User
         let vds = VaultData::bulk_get(conn, &active_lifetime_list)?;
         let scoped_vault_ids = users.iter().map(|(sv, _)| &sv.id).collect();
-        let onboarding_map = Onboarding::bulk_get_for_users(conn, scoped_vault_ids)?;
+        let workflows_map = Workflow::bulk_get_for_users(conn, scoped_vault_ids)?;
         let document_datas = DocumentData::bulk_get_by_lifetime_ids(
             conn,
             active_lifetime_list.iter().map(|lt| &lt.id).collect(),
@@ -73,11 +75,7 @@ impl<Type> VaultWrapper<Type> {
                 let uvw = Self::build_internal(
                     uv,
                     None,
-                    // Fetch data by UserVaultId. It is possible that multiple ScopedUsers have the
-                    // same UserVaultId.
-                    // TODO: all of these should really be keyed on ScopedVaultId, otherwise
-                    // speculative data for ScopedUser A will show for ScopedUser B within the same
-                    // tenant
+                    // Fetch data by UserVaultId.
                     vds.get(&uv_id).cloned().unwrap_or_default(),
                     document_datas.get(&uv_id).cloned().unwrap_or_default(),
                     uv_id_to_active_lifetimes.get(&uv_id).cloned().unwrap_or_default(),
@@ -85,7 +83,7 @@ impl<Type> VaultWrapper<Type> {
                 let sv_id = sv.id.clone();
                 let uvw = TenantVw {
                     uvw,
-                    onboarding: onboarding_map.get(&sv.id).cloned(),
+                    workflows: workflows_map.get(&sv.id).cloned().unwrap_or_default(),
                     scoped_vault: sv,
                 };
                 Ok((sv_id, uvw))

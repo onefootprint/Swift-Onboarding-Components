@@ -5,7 +5,7 @@ mod decrypt;
 mod decrypt_request;
 mod delete;
 
-use db::models::{onboarding::OnboardingAndConfig, scoped_vault::ScopedVault};
+use db::models::{scoped_vault::ScopedVault, workflow::WorkflowAndConfig};
 
 pub use bulk_decrypt::*;
 pub use decrypt_request::DecryptRequest;
@@ -23,5 +23,5 @@ pub struct TenantVw<Type = Any> {
     #[deref]
     uvw: VaultWrapper<Type>,
     pub scoped_vault: ScopedVault,
-    pub onboarding: Option<OnboardingAndConfig>,
+    pub workflows: Vec<WorkflowAndConfig>,
 }
