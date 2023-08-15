@@ -2,12 +2,13 @@ use db::{
     models::{
         decision_intent::DecisionIntent,
         document_request::DocumentRequest,
+        ob_configuration::ObConfiguration,
         onboarding::{Onboarding, OnboardingUpdate},
         scoped_vault::ScopedVault,
         vault::Vault,
         workflow::Workflow,
     },
-    DbError, DbPool, DbResult, TxnPgConn,
+    DbPool, DbResult, TxnPgConn,
 };
 use newtypes::{
     DecisionIntentKind, DecisionStatus, FootprintReasonCode, OnboardingId, ReviewReason, ScopedVaultId,
@@ -32,7 +33,7 @@ use crate::{
             vendor_result::VendorResult,
         },
     },
-    errors::{ApiErrorKind, ApiResult},
+    errors::{onboarding::OnboardingError, ApiErrorKind, ApiResult},
     utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs},
     State,
 };
@@ -299,15 +300,20 @@ pub fn save_kyc_decision(
 }
 
 #[tracing::instrument(skip(state))]
-pub async fn write_authorized_fingerprints(state: &State, sv_id: &ScopedVaultId) -> ApiResult<()> {
-    let sv_id = sv_id.clone();
+pub async fn write_authorized_fingerprints(state: &State, wf_id: &WorkflowId) -> ApiResult<()> {
+    let wf_id = wf_id.clone();
     let (obc, vw) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let uvw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv_id)?;
-            let obc = uvw.onboarding.clone().ok_or(DbError::ObjectNotFound)?;
-            Ok((obc.1, uvw))
+            let wf = Workflow::get(conn, &wf_id)?;
+            let uvw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &wf.scoped_vault_id)?;
+            let obc_id = wf
+                .ob_configuration_id
+                .as_ref()
+                .ok_or(OnboardingError::NoObcForWorkflow)?;
+            let (obc, _) = ObConfiguration::get(conn, obc_id)?;
+            Ok((obc, uvw))
         })
         .await??;
-    vw.create_authorized_fingerprints(state, obc.clone()).await
+    vw.create_authorized_fingerprints(state, obc).await
 }

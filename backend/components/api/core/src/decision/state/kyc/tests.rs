@@ -11,7 +11,6 @@ use crate::decision::state::WorkflowWrapper;
 use crate::decision::tests::test_helpers;
 use crate::{decision::state::kyc, State};
 use chrono::Utc;
-use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
 use db::models::workflow::Workflow;
@@ -34,7 +33,7 @@ use newtypes::{KycState, WorkflowFixtureResult, WorkflowId, WorkflowState};
 use std::sync::Arc;
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
-    let (_, _, _, _, sv, _) = test_helpers::create_kyc_user_and_onboarding(
+    let (_, _, _, _, sv, obc) = test_helpers::create_kyc_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         None,
@@ -57,7 +56,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
                     config: WorkflowConfig::Kyc(KycConfig { is_redo: false }),
                     fixture_result: None,
                     status: Some(OnboardingStatus::Incomplete),
-                    ob_configuration_id: None,
+                    ob_configuration_id: Some(obc.id),
                     insight_event_id: None,
                 },
             )
@@ -422,14 +421,13 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert!(obd.seqno.is_none());
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
-    assert!(ob.decision_made_at.is_some());
     if expect_review {
         assert!(mr.is_some());
     } else {
@@ -495,7 +493,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
                 redo_and_pass(
                     state,
                     user_kind,
-                    &ob,
+                    &wf,
                     &obd,
                     &tenant.id,
                     &obc.key,
@@ -512,7 +510,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
 async fn redo_and_pass(
     state: &mut State,
     user_kind: UserKind,
-    prior_ob: &Onboarding,
+    prior_wf: &Workflow,
     prior_obd: &OnboardingDecision,
     tenant_id: &TenantId,
     ob_config_key: &ObConfigurationKey,
@@ -520,15 +518,17 @@ async fn redo_and_pass(
     doc_requested: bool,
 ) {
     // Trigger Redo workflow
-    let sv_id = prior_ob.scoped_vault_id.clone();
+    let sv_id = prior_wf.scoped_vault_id.clone();
+    let fixture_result = prior_wf.fixture_result;
+    let obc_id = prior_wf.ob_configuration_id.clone();
     let wf = state
         .db_pool
         .db_query(move |conn| {
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id,
                 config: KycConfig { is_redo: true }.into(),
-                fixture_result: None,
-                ob_configuration_id: None,
+                fixture_result,
+                ob_configuration_id: obc_id,
                 insight_event_id: None,
             };
             Workflow::create(conn, args).unwrap()
@@ -581,7 +581,7 @@ async fn redo_and_pass(
         .await
         .unwrap();
 
-    let (ob, wf, _, _, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, _, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     // new obd was written
     let obd = obd.unwrap();
@@ -590,10 +590,6 @@ async fn redo_and_pass(
     assert!(obd.seqno.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
-    // redo flow hasn't modified timestamps on ob
-    assert!(prior_ob.authorized_at == ob.authorized_at);
-    assert!(prior_ob.idv_reqs_initiated_at == ob.idv_reqs_initiated_at);
-    assert!(prior_ob.decision_made_at == ob.decision_made_at);
 
     // check RSG is different
     let rs_passing = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;

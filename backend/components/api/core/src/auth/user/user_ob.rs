@@ -170,6 +170,7 @@ impl CheckedUserObAuthContext {
     /// Extracts the business onboarding from the `UserAuthScope::Business` scope on this session,
     /// if exists
     pub fn business_onboarding(&self, conn: &mut PgConn) -> ApiResult<Option<Onboarding>> {
+        // TODO change this to business_wf
         let Some(sb_id) = self.scoped_business_id() else {
             return Ok(None);
         };

@@ -87,7 +87,7 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         // Write fingerprints
-        common::write_authorized_fingerprints(state, &self.sv_id).await?;
+        common::write_authorized_fingerprints(state, &self.wf_id).await?;
 
         let tid = self.t_id.clone();
         let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;

@@ -66,7 +66,7 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         // Write fingerprints
-        common::write_authorized_fingerprints(state, &self.sv_id).await?;
+        common::write_authorized_fingerprints(state, &self.wf_id).await?;
 
         // Create TVC for use in writing vreqs in `on_commit`
         let tid = self.t_id.clone();

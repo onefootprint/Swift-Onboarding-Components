@@ -59,7 +59,7 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
         _action: Authorize,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        common::write_authorized_fingerprints(state, &self.sv_id).await?;
+        common::write_authorized_fingerprints(state, &self.wf_id).await?;
 
         Ok(())
     }

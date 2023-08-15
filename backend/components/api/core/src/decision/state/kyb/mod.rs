@@ -19,6 +19,7 @@ pub struct KybDataCollection {
     wf_id: WorkflowId,
     ob_id: OnboardingId,
     t_id: TenantId,
+    #[allow(unused)]
     sv_id: ScopedVaultId,
 }
 

@@ -13,7 +13,6 @@ use crate::decision::state::WorkflowWrapper;
 use crate::{decision::state::alpaca_kyc::*, State};
 use api_wire_types::{CreateAnnotationRequest, DecisionRequest, TerminalDecisionStatus};
 
-use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
 
 use db::models::workflow::{NewWorkflowArgs, Workflow};
@@ -371,7 +370,7 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (ob, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     match review_decision {
@@ -388,7 +387,7 @@ async fn pass_then_watchlist_hit(
                 // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
                 UserKind::Demo | UserKind::Sandbox(_) => {}
                 UserKind::Live => {
-                    redo_and_pass(state, user_kind, &ob, &obd.unwrap(), &tenant.id, &obc.key).await;
+                    redo_and_pass(state, user_kind, &wf, &obd.unwrap(), &tenant.id, &obc.key).await;
                 }
             }
         }
@@ -714,7 +713,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
         UserKind::Demo | UserKind::Sandbox(_) => {}
         UserKind::Live => {
-            redo_and_pass(state, user_kind, &ob, &obd, &tenant.id, &obc.key).await;
+            redo_and_pass(state, user_kind, &wf, &obd, &tenant.id, &obc.key).await;
         }
     }
 }
@@ -722,21 +721,23 @@ async fn fail(state: &mut State, user_kind: UserKind) {
 async fn redo_and_pass(
     state: &mut State,
     user_kind: UserKind,
-    prior_ob: &Onboarding,
+    prior_wf: &Workflow,
     prior_obd: &OnboardingDecision,
     tenant_id: &TenantId,
     ob_config_key: &ObConfigurationKey,
 ) {
     // Trigger Redo workflow
-    let sv_id = prior_ob.scoped_vault_id.clone();
+    let sv_id = prior_wf.scoped_vault_id.clone();
+    let fixture_result = prior_wf.fixture_result;
+    let obc_id = prior_wf.ob_configuration_id.clone();
     let wf = state
         .db_pool
         .db_query(move |conn| {
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id,
                 config: AlpacaKycConfig { is_redo: true }.into(),
-                fixture_result: None,
-                ob_configuration_id: None,
+                fixture_result,
+                ob_configuration_id: obc_id,
                 insight_event_id: None,
             };
             Workflow::create(conn, args).unwrap()
@@ -790,7 +791,7 @@ async fn redo_and_pass(
         .await
         .unwrap();
 
-    let (ob, wf, _, _, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (_, wf, _, _, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     // new obd was written
     let obd = obd.unwrap();
@@ -799,10 +800,6 @@ async fn redo_and_pass(
     assert!(obd.seqno.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
-    // redo flow hasn't modified timestamps on ob
-    assert!(prior_ob.authorized_at == ob.authorized_at);
-    assert!(prior_ob.idv_reqs_initiated_at == ob.idv_reqs_initiated_at);
-    assert!(prior_ob.decision_made_at == ob.decision_made_at);
 
     assert_have_same_elements(
         vec![
