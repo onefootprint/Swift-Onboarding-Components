@@ -70,7 +70,7 @@ export default {
     size: {
       control: 'select',
       description: 'The size of the dialog',
-      options: ['default', 'compact', 'large'],
+      options: ['default', 'compact', 'large', 'full-screen'],
       table: {
         type: { summary: 'string', required: false },
         defaultValue: { summary: 'default' },

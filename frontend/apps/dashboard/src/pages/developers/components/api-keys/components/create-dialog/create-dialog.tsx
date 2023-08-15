@@ -49,7 +49,6 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
 
   return (
     <Dialog
-      size="large"
       testID="create-dialog"
       title={t('title')}
       primaryButton={{

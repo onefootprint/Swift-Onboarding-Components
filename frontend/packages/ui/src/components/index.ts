@@ -85,6 +85,8 @@ export * from './select';
 export { default as Select } from './select';
 export * from './shimmer';
 export { default as Shimmer } from './shimmer';
+export * from './stepper';
+export { default as Stepper } from './stepper';
 export * from './table';
 export { default as Table } from './table';
 export * from './tabs';

@@ -23,33 +23,33 @@ export type DialogLinkButton = {
   type?: 'button' | 'submit' | 'reset';
 };
 
-export type Size = 'small' | 'compact' | 'default' | 'large';
+export type DialogSize = 'compact' | 'default' | 'large' | 'full-screen';
 
-export type OnlyPrimaryButton = {
+export type DialogOnlyPrimaryButton = {
   primaryButton: DialogButton;
   secondaryButton?: never;
   linkButton?: never;
 };
 
-export type OnlyButtons = {
+export type DialogOnlyButtons = {
   primaryButton: DialogButton;
   secondaryButton: DialogButton;
   linkButton?: never;
 };
 
-export type PrimaryAndLinkButtons = {
+export type DialogPrimaryAndLinkButtons = {
   primaryButton: DialogButton;
   secondaryButton?: never;
   linkButton: DialogLinkButton;
 };
 
-export type NoButtons = {
+export type DialogNoButtons = {
   primaryButton?: never;
   secondaryButton?: never;
   linkButton?: never;
 };
 
-export type AllButtons = {
+export type DialogAllButtons = {
   primaryButton: DialogButton;
   secondaryButton: DialogButton;
   linkButton?: DialogButton;

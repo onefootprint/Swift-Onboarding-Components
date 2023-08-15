@@ -95,6 +95,9 @@ const handleOpen = () => {
     options: {
       showCompletionPage: true,
     },
+    userData: {
+      'id.email': 'rafael@onefootprint.com',
+    },
     appearance: {
       fontSrc:
         'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',

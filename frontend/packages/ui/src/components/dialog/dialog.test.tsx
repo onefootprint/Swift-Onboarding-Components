@@ -139,22 +139,12 @@ describe('<Dialog />', () => {
       });
     });
 
-    it('should render the right width when is large', async () => {
-      renderDialog({ open: true, size: 'large', isConfirmation: false });
-      await waitFor(() => {
-        const dialog = screen.getByRole('dialog');
-        expect(dialog).toHaveStyle({
-          width: '650px',
-        });
-      });
-    });
-
     it('should render the right width when is default', async () => {
       renderDialog({ open: true, size: 'default', isConfirmation: false });
       const dialog = screen.getByRole('dialog');
       await waitFor(() => {
         expect(dialog).toHaveStyle({
-          width: '800px',
+          width: '650px',
         });
       });
     });
