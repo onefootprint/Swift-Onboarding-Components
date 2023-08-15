@@ -42,6 +42,7 @@ use idv::{
 use itertools::Itertools;
 use newtypes::{
     OnboardingId, PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId, VerificationResultId,
+    WorkflowId,
 };
 use prometheus::labels;
 
@@ -49,14 +50,14 @@ pub async fn save_vendor_responses(
     db_pool: &DbPool,
     vendor_responses: &[VerificationRequestWithVendorResponse],
     vendor_error_responses: Vec<(VerificationRequest, Option<PiiJsonValue>)>,
-    onboarding_id: &OnboardingId,
+    wf_id: &WorkflowId,
 ) -> ApiResult<Vec<VendorResult>> {
-    let obid = onboarding_id.clone();
+    let wf_id = wf_id.clone();
 
     let responses = vendor_responses.to_owned();
     let results = db_pool
         .db_transaction(move |conn| -> ApiResult<Vec<VendorResult>> {
-            let uv = Vault::get(conn, &obid)?;
+            let (_, uv) = Workflow::get_with_vault(conn, &wf_id)?;
             let vres = verification_result::save_verification_results(conn, &responses, &uv.public_key)?;
             verification_result::save_error_verification_results(
                 conn,
@@ -222,7 +223,7 @@ fn partition_vendor_errors(
 #[tracing::instrument(skip_all)]
 pub async fn make_vendor_requests(
     db_pool: &DbPool,
-    onboarding_id: &OnboardingId,
+    wf_id: &WorkflowId,
     enclave_client: &EnclaveClient,
     is_production: bool,
     requests: Vec<VerificationRequest>,
@@ -244,7 +245,7 @@ pub async fn make_vendor_requests(
     // Make requests
     let results = vendor::make_request::make_vendor_requests(
         requests,
-        onboarding_id,
+        wf_id,
         db_pool,
         enclave_client,
         is_production,

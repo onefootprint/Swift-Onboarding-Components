@@ -135,6 +135,9 @@ pub enum OnboardingIdentifier<'a> {
         vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
     },
+    WorkflowId {
+        wf_id: &'a WorkflowId,
+    },
 }
 
 impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
@@ -157,6 +160,15 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a>
         }
     }
 }
+
+impl<'a> From<&'a WorkflowId> for OnboardingIdentifier<'a> {
+    fn from(wf_id: &'a WorkflowId) -> Self {
+        Self::WorkflowId { wf_id }
+    }
+}
+
+#[derive(Clone)]
+pub struct OnboardingAndConfig(pub Onboarding, pub ObConfiguration);
 
 /// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
 pub type BasicOnboardingInfo<ObT = Onboarding> = (ObT, ScopedVault);
@@ -190,6 +202,14 @@ impl Onboarding {
                 query = query
                     .filter(scoped_vault::vault_id.eq(vault_id))
                     .filter(onboarding::ob_configuration_id.eq(ob_config_id))
+            }
+            // TODO this is just for easier migration from ob -> wf
+            OnboardingIdentifier::WorkflowId { wf_id } => {
+                use db_schema::schema::workflow;
+                let sv_ids = workflow::table
+                    .filter(workflow::id.eq(wf_id))
+                    .select(workflow::scoped_vault_id);
+                query = query.filter(onboarding::scoped_vault_id.eq_any(sv_ids))
             }
         }
 

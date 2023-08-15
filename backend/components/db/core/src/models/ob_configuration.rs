@@ -6,11 +6,12 @@ use crate::TxnPgConn;
 use crate::{DbError, DbResult};
 use chrono::{DateTime, Utc};
 use db_schema::schema::ob_configuration::BoxedQuery;
-use db_schema::schema::{ob_configuration, onboarding, scoped_vault, tenant};
+use db_schema::schema::{ob_configuration, onboarding, tenant};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant, ScopedVaultId};
+use newtypes::WorkflowId;
+use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant};
 use newtypes::{AppearanceId, OnboardingId};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
@@ -60,6 +61,7 @@ pub enum ObConfigIdentifier<'a> {
         tenant_id: &'a TenantId,
         is_live: bool,
     },
+    Workflow(&'a WorkflowId),
 }
 
 impl<'a> From<&'a ObConfigurationId> for ObConfigIdentifier<'a> {
@@ -81,6 +83,12 @@ impl<'a> From<(&'a ObConfigurationId, &'a TenantId, bool)> for ObConfigIdentifie
             tenant_id,
             is_live,
         }
+    }
+}
+
+impl<'a> From<&'a WorkflowId> for ObConfigIdentifier<'a> {
+    fn from(id: &'a WorkflowId) -> Self {
+        Self::Workflow(id)
     }
 }
 
@@ -156,6 +164,13 @@ impl ObConfiguration {
                     .filter(ob_configuration::id.eq(id))
                     .filter(ob_configuration::tenant_id.eq(tenant_id))
                     .filter(ob_configuration::is_live.eq(is_live))
+            }
+            ObConfigIdentifier::Workflow(id) => {
+                use db_schema::schema::workflow;
+                let obc_ids = workflow::table
+                    .filter(workflow::id.eq(id))
+                    .select(workflow::ob_configuration_id);
+                query = query.filter(ob_configuration::id.nullable().eq_any(obc_ids))
             }
         }
 
@@ -234,17 +249,6 @@ impl ObConfiguration {
         let ob_config: ObConfiguration = onboarding::table
             .inner_join(ob_configuration::table)
             .filter(onboarding::id.eq(onboarding_id))
-            .select(ob_configuration::all_columns)
-            .get_result(conn)?;
-
-        Ok(ob_config)
-    }
-
-    #[tracing::instrument("ObConfiguration::get_by_scoped_vault_id", skip_all)]
-    pub fn get_by_scoped_vault_id(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Self> {
-        let ob_config: ObConfiguration = scoped_vault::table
-            .filter(scoped_vault::id.eq(scoped_vault_id))
-            .inner_join(ob_configuration::table)
             .select(ob_configuration::all_columns)
             .get_result(conn)?;
 

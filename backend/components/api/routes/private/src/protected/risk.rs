@@ -28,13 +28,13 @@ use db::models::verification_request::VerificationRequest;
 use db::models::workflow::Workflow;
 use newtypes::{
     DecisionIntentId, DecisionStatus, FpId, TenantId, Vendor, VerificationRequestId, VerificationResultId,
+    WorkflowId,
 };
 use std::str::FromStr;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct MakeVendorCallsRequest {
-    pub tenant_id: TenantId,
-    pub fp_id: FpId,
+    pub wf_id: WorkflowId,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -81,41 +81,37 @@ async fn make_vendor_calls(
     _: ProtectedCustodianAuthContext,
     request: Json<MakeVendorCallsRequest>,
 ) -> actix_web::Result<Json<ResponseData<MakeVendorCallsResponse>>, ApiError> {
-    let MakeVendorCallsRequest { tenant_id, fp_id } = request.into_inner();
-    let tid = tenant_id.clone();
+    let MakeVendorCallsRequest { wf_id } = request.into_inner();
+    let (wf, sv) = state
+        .db_pool
+        .db_query(move |conn| Workflow::get_all(conn, &wf_id))
+        .await??;
+    let tid = sv.tenant_id.clone();
     let tenant_vendor_control =
         TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
     let tenant_vendor_control2 = tenant_vendor_control.clone();
 
-    let (requests, ob) = state
+    let requests = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let (ob, _) = Onboarding::get(conn, &scoped_user.id)?;
-
-            let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
-
-            let decision_intent = DecisionIntent::create(
-                conn,
-                newtypes::DecisionIntentKind::ManualRunKyc,
-                &scoped_user.id,
-                None,
-            )?;
+            let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
+            let decision_intent =
+                DecisionIntent::create(conn, newtypes::DecisionIntentKind::ManualRunKyc, &sv.id, None)?;
             let requests = vendor::build_verification_requests_and_checkpoint(
                 conn,
                 &uvw,
-                &scoped_user.id,
+                &sv.id,
                 &decision_intent.id,
                 &tenant_vendor_control2,
             )?;
 
-            Ok((requests, ob))
+            Ok(requests)
         })
         .await?;
 
     let vendor_results = decision::engine::make_vendor_requests(
         &state.db_pool,
-        &ob.id,
+        &wf.id,
         &state.enclave_client,
         state.config.service_config.is_production(),
         requests,
@@ -136,7 +132,7 @@ async fn make_vendor_calls(
         &state.db_pool,
         &vendor_results.successful,
         vendor_results.all_errors_with_parsable_requests(),
-        &ob.id,
+        &wf.id,
     )
     .await?;
     let rule_group = KycRuleGroup::default();
@@ -244,8 +240,7 @@ async fn make_decision(
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct ShadowRunRequest {
-    pub tenant_id: TenantId,
-    pub fp_id: FpId,
+    pub wf_id: WorkflowId,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -259,19 +254,20 @@ async fn shadow_run(
     _: ProtectedCustodianAuthContext,
     request: Json<ShadowRunRequest>,
 ) -> actix_web::Result<Json<ResponseData<ShadowRunResult>>, ApiError> {
-    let ShadowRunRequest { tenant_id, fp_id } = request.into_inner();
-
-    let tid = tenant_id.clone();
+    let ShadowRunRequest { wf_id } = request.into_inner();
+    let (wf, sv) = state
+        .db_pool
+        .db_query(move |conn| Workflow::get_all(conn, &wf_id))
+        .await??;
+    let tid = sv.tenant_id.clone();
     let tenant_vendor_control =
         TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
     let tenant_vendor_control2 = tenant_vendor_control.clone();
 
-    let (ob, requests) = state
+    let requests = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let (ob, _) = Onboarding::get(conn, &scoped_user.id)?;
-            let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&scoped_user.id))?;
+            let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
             let vendor_apis = vendor::get_vendor_apis_for_verification_requests(
@@ -290,19 +286,19 @@ async fn shadow_run(
                     vendor_api: v,
                     uvw_snapshot_seqno: seqno,
                     identity_document_id: None,
-                    scoped_vault_id: scoped_user.id.clone(),
+                    scoped_vault_id: sv.id.clone(),
                     decision_intent_id: DecisionIntentId::from_str("fake in-memory-only DecisionIntent")
                         .unwrap(),
                 })
                 .collect();
 
-            Ok((ob, memory_only_requests))
+            Ok(memory_only_requests)
         })
         .await?;
 
     let vendor_results = decision::engine::make_vendor_requests(
         &state.db_pool,
-        &ob.id,
+        &wf.id,
         &state.enclave_client,
         state.config.service_config.is_production(),
         requests,

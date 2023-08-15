@@ -11,6 +11,7 @@ use crate::metrics;
 use crate::vendor_clients::VendorClient;
 use crate::{errors::ApiError, State};
 use db::DbPool;
+use db::models::onboarding::Onboarding;
 use db::{
     models::{
         insight_event::InsightEvent, ob_configuration::ObConfiguration,
@@ -25,7 +26,7 @@ use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
 use newtypes::idology::IdologyScanOnboardingCaptureResult;
-use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, VendorAPI};
+use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, VendorAPI, WorkflowId};
 use prometheus::labels;
 
 #[tracing::instrument(skip(
@@ -107,11 +108,12 @@ pub async fn send_idv_request(
 }
 
 /// Send a request to vendors for document verification
+/// TODO this isn't used, can i rm?
 #[tracing::instrument(skip_all)]
 pub async fn send_docv_request(
     state: &State,
     request: VerificationRequest,
-    onboarding_id: &OnboardingId,
+    workflow_id: &WorkflowId,
     data: DocVData,
 ) -> Result<VendorResponse, ApiError> {
     tracing::info!(
@@ -119,7 +121,7 @@ pub async fn send_docv_request(
         request_id = request.id.clone().to_string(),
         vendor_api = request.vendor_api.clone().to_string(),
         scoped_user_id = %request.scoped_vault_id,
-        onboarding_id = %onboarding_id,
+        workflow_id = %workflow_id,
     );
     // Make the request to the DocV vendor
     // TODO implement mocking for these once we use scan verify
@@ -134,7 +136,7 @@ pub async fn send_docv_request(
             idv::idology::poll_scan_verify_results_request(&state.idology_client, ref_id).await?
         }
         VendorAPI::IdologyScanOnboarding => {
-            send_scan_onboarding_docv_request(state, onboarding_id, data).await?
+            send_scan_onboarding_docv_request(state, workflow_id, data).await?
         }
         api => {
             let err = format!("send_docv_request not implemented for {}", api);
@@ -328,23 +330,21 @@ pub async fn send_experian_idv_request(
 #[tracing::instrument(skip_all)]
 pub async fn send_scan_onboarding_docv_request(
     state: &State,
-    onboarding_id: &OnboardingId,
+    workflow_id: &WorkflowId,
     data: DocVData,
 ) -> Result<VendorResponse, ApiError> {
     let ff_client = state.feature_flag_client.clone();
 
-    let obid = onboarding_id.clone();
-    let ob_configuration_key = state
+    let wfid = workflow_id.clone();
+    let obc_key = state
         .db_pool
-        .db_query(move |conn| -> Result<ObConfigurationKey, DbError> {
-            Ok(ObConfiguration::get_by_onboarding_id(conn, &obid)?.key)
-        })
-        .await??;
+        .db_query(move |conn| ObConfiguration::get(conn, &wfid))
+        .await??.0.key;
 
     if ff_client.flag(BoolFlag::DisableAllScanOnboarding) {
         Err(ApiError::from(idv::Error::VendorCallsDisabledError))
     } else if state.config.service_config.is_production()
-        || ff_client.flag(BoolFlag::EnableScanOnboardingInNonProd(&ob_configuration_key))
+        || ff_client.flag(BoolFlag::EnableScanOnboardingInNonProd(&obc_key))
     {
         idv::idology::send_scan_onboarding_request(&state.idology_client, data)
             .await
@@ -369,7 +369,7 @@ pub async fn send_scan_onboarding_docv_request(
 #[tracing::instrument(skip_all)]
 pub async fn make_idv_request(
     request: VerificationRequest,
-    onboarding_id: &OnboardingId,
+    wf_id: &WorkflowId,
     data: IdvData,
     socure_data: SocureData,
     ob_configuration_key: ObConfigurationKey,
@@ -395,7 +395,7 @@ pub async fn make_idv_request(
         request_id = request.id.clone().to_string(),
         vendor_api = vendor_api.clone().to_string(),
         scoped_user_id = %request.scoped_vault_id,
-        onboarding_id = %onboarding_id,
+        workflow_id = %wf_id,
     );
 
     let vendor_response = send_idv_request(
@@ -425,7 +425,7 @@ pub type VerificationRequestWithVendorError = (VerificationRequest, ApiError);
 ]
 pub async fn make_vendor_requests(
     requests: Vec<VerificationRequest>,
-    onboarding_id: &OnboardingId,
+    wf_id: &WorkflowId,
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
     is_production: bool,
@@ -448,20 +448,22 @@ pub async fn make_vendor_requests(
     let requests_with_data =
         build_request::bulk_build_data_from_requests(db_pool, enclave_client, requests).await?;
 
-    let obid = onboarding_id.clone();
+    let wfid = wf_id.clone();
 
-    let (socure_device_session_id, ip_address, ob_configuration_key) = db_pool
+    let (socure_device_session_id, ip_address, obc_key) = db_pool
         .db_query(
             move |conn| -> Result<(Option<String>, Option<PiiString>, ObConfigurationKey), DbError> {
+                let ob_id = Onboarding::get(conn, &wfid)?.0.id;
                 let socure_device_session_id =
-                    SocureDeviceSession::latest_for_onboarding(conn, &obid)?.map(|d| d.device_session_id);
+                    SocureDeviceSession::latest_for_onboarding(conn, &ob_id)?.map(|d| d.device_session_id);
 
-                let ip_address = InsightEvent::get_by_onboarding_id(conn, &obid)?
+                // TODO this is stale
+                let ip_address = InsightEvent::get_by_onboarding_id(conn, &ob_id)?
                     .and_then(|ie| ie.ip_address.map(PiiString::from));
 
-                let ob_configuration_key = ObConfiguration::get_by_onboarding_id(conn, &obid)?.key;
+                let obc_key = ObConfiguration::get(conn, &wfid)?.0.key;
 
-                Ok((socure_device_session_id, ip_address, ob_configuration_key))
+                Ok((socure_device_session_id, ip_address, obc_key))
             },
         )
         .await??;
@@ -474,10 +476,10 @@ pub async fn make_vendor_requests(
             r.clone(),
             make_idv_request(
                 r,
-                onboarding_id,
+                wf_id,
                 data,
                 socure_data.clone(),
-                ob_configuration_key.clone(),
+                obc_key.clone(),
                 is_production,
                 ff_client.clone(),
                 idology_client.clone(),

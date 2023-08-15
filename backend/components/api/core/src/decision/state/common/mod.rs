@@ -97,10 +97,10 @@ pub async fn make_outstanding_kyc_vendor_calls(
     ob_id: &OnboardingId,
     t_id: &TenantId,
 ) -> ApiResult<Vec<VendorResult>> {
-    let wf_id = wf_id.clone();
+    let wfid = wf_id.clone();
     let (wf, v) = state
         .db_pool
-        .db_query(move |conn| Workflow::get_with_vault(conn, &wf_id))
+        .db_query(move |conn| Workflow::get_with_vault(conn, &wfid))
         .await??;
     let ff_client = state.feature_flag_client.clone();
     let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, t_id)?;
@@ -123,7 +123,7 @@ pub async fn make_outstanding_kyc_vendor_calls(
         // TODO: we could refactor this to return just the plaintext raw responses and then encrypt and save them in the on_commit txn
         decision::engine::make_vendor_requests(
             &state.db_pool,
-            ob_id,
+            wf_id,
             &state.enclave_client,
             state.config.service_config.is_production(),
             vendor_requests.outstanding_requests,
@@ -146,7 +146,7 @@ pub async fn make_outstanding_kyc_vendor_calls(
     // TODO: For failed vres's, we should create new Vreq's for those
     let err_vres = vendor_results.all_errors_with_parsable_requests();
     let completed_oustanding_vendor_responses =
-        decision::engine::save_vendor_responses(&state.db_pool, &vendor_results.successful, err_vres, ob_id)
+        decision::engine::save_vendor_responses(&state.db_pool, &vendor_results.successful, err_vres, wf_id)
             .await?;
 
     if has_critical_error {
