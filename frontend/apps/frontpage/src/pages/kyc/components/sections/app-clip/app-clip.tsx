@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoSquareFrame24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
@@ -22,7 +23,7 @@ const AppClip = () => {
         title={t('title')}
         subtitle={t('subtitle')}
         items={bulletPointContent}
-        sectionIcon="onboard-users"
+        icon={IcoSquareFrame24}
       />
     </Section>
   );

@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoUsers24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
@@ -21,7 +22,7 @@ const OnboardNewCustomers = () => {
         title={t('title')}
         subtitle={t('subtitle')}
         items={bulletPointContent}
-        sectionIcon="onboard-users"
+        icon={IcoUsers24}
       />
     </Section>
   );

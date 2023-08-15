@@ -1,29 +1,25 @@
+import type { Icon } from '@onefootprint/icons';
 import { IcoCheck16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media, Typography } from '@onefootprint/ui';
-import Image from 'next/image';
 import React from 'react';
+import SectionIcon from 'src/components/section-icon';
 
 type SectionTextProps = {
   title: string;
   subtitle: string;
   items: string[];
-  sectionIcon: string;
+  icon: Icon;
 };
 
 const SectionText = ({
   title,
   subtitle,
   items,
-  sectionIcon,
+  icon: Icon,
 }: SectionTextProps) => (
   <Container>
-    <SectionIcon
-      src={`/kyc/section-icons/${sectionIcon}.png`}
-      height={40}
-      width={40}
-      alt={title}
-    />
+    <SectionIcon icon={Icon} />
     <TitleContainer>
       <Title>{title}</Title>
       <Subtitle>{subtitle}</Subtitle>
@@ -72,12 +68,6 @@ const Container = styled.div`
   `}
 `;
 
-const SectionIcon = styled(Image)`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[4]};
-  `}
-`;
-
 const Title = styled.h3`
   position: relative;
   ${createFontStyles('heading-2')}
@@ -110,6 +100,7 @@ const TitleContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[4]};
+    margin-top: ${theme.spacing[4]};
   `}
 `;
 
