@@ -61,7 +61,8 @@ describe('<Developers />', () => {
   });
 
   describe('when toggling', () => {
-    it('should go to the sandbox to the live mode', async () => {
+    it('should go from the sandbox to the live mode', async () => {
+      asAdminUserInSandbox();
       renderDevelopers();
 
       const toggle = screen.getByRole('switch');
