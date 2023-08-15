@@ -51,6 +51,7 @@ const Employment = () => {
         secondText={allT('components.transition-animation.destination')}
         timeout={4000}
         onAnimationEnd={() => setShowAnimation(false)}
+        showFeedbackIcon
       />
     </AnimationContainer>
   ) : (
