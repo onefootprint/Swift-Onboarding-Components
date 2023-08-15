@@ -19,8 +19,8 @@ def foo_sandbox_tenant():
         "name": "Footprint Sandbox Integration Testing Foo",
         "is_live": False,
     }
-    # Specifically don't request nationality
-    fields = ["name", "ssn9", "full_address", "email", "phone_number"]
+    # Specifically don't request nationality and ssn9
+    fields = ["name", "ssn4", "full_address", "email", "phone_number"]
     ob_conf_data = {
         "name": "Foo Credit Card",
         "must_collect_data": fields,
@@ -33,6 +33,7 @@ def foo_sandbox_tenant():
 class DualOnboardedUser(NamedTuple):
     fp_id: str
     foo_fp_id: str
+    user: any
 
 
 @pytest.fixture(scope="module")
@@ -45,18 +46,9 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
     #
     phone_number = sandbox_user_real_phone.client.data["id.phone_number"]
     sandbox_id = sandbox_user_real_phone.client.sandbox_id
-    inherited_auth_token = inherit_user(
-        twilio,
-        phone_number,
-        foo_sandbox_tenant.default_ob_config.key,
-        SandboxId(sandbox_id),
+    foo_bifrost = BifrostClient.inherit(
+        foo_sandbox_tenant.default_ob_config, twilio, phone_number, sandbox_id
     )
-    foo_bifrost = BifrostClient.new(foo_sandbox_tenant.default_ob_config, twilio)
-    # Manually initialize the onboarding and overwrite the auth token on the BifrostClient.
-    # The behavior of BifrostClient is still a little undefined in this case, though - don't do
-    # this unless you know what you're doing
-    post("hosted/onboarding", None, inherited_auth_token)
-    foo_bifrost.auth_token = inherited_auth_token
 
     foo_user = foo_bifrost.run()
     foo_fp_id = foo_user.fp_id
@@ -70,7 +62,7 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
         "collect_data"
     }
 
-    return DualOnboardedUser(fp_id, foo_fp_id)
+    return DualOnboardedUser(fp_id, foo_fp_id, sandbox_user_real_phone)
 
 
 def test_fp_id(dual_onboarded_user):
@@ -147,12 +139,40 @@ def test_cant_see_speculative_fingerprints(
         assert not len(body["data"])
 
 
+def test_cant_see_unrequested_portable(dual_onboarded_user, foo_sandbox_tenant):
+    # Now, we shouldn't be able to see nationality or ssn9 since they weren't requested by foo_sandbox_tenant
+    fp_id = dual_onboarded_user.foo_fp_id
+    body = get(f"entities/{fp_id}", None, *foo_sandbox_tenant.db_auths)
+    assert "id.ssn4" in body["attributes"]
+    assert "id.ssn9" not in body["attributes"]
+    assert "id.nationality" not in body["attributes"]
+
+    assert "id.ssn4" in body["decryptable_attributes"]
+    assert "id.ssn9" not in body["decryptable_attributes"]
+    assert "id.nationality" not in body["decryptable_attributes"]
+
+
 def test_cant_decrypt_unrequested_portable(dual_onboarded_user, foo_sandbox_tenant):
-    # Now, we shouldn't be able to decrypt nationality since it wasn't requested by foo_sandbox_tenant
+    # Now, we shouldn't be able to decrypt nationality or ssn9 since they weren't requested by foo_sandbox_tenant
+    fp_id = dual_onboarded_user.foo_fp_id
+
     data = dict(fields=["id.nationality"], reason="Hello")
     post(
-        f"entities/{dual_onboarded_user.foo_fp_id}/vault/decrypt",
+        f"entities/{fp_id}/vault/decrypt",
         data,
         *foo_sandbox_tenant.db_auths,
         status_code=401,
     )
+
+    data = dict(fields=["id.ssn9"], reason="Hello")
+    post(
+        f"entities/{fp_id}/vault/decrypt",
+        data,
+        *foo_sandbox_tenant.db_auths,
+        status_code=401,
+    )
+
+    # But, ssn4 is visible
+    data = dict(fields=["id.ssn4"], reason="Hello")
+    body = post(f"entities/{fp_id}/vault/decrypt", data, *foo_sandbox_tenant.db_auths)
+    assert body["id.ssn4"] == dual_onboarded_user.user.client.decrypted_data["id.ssn4"]

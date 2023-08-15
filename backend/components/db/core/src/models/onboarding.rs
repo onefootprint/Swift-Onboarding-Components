@@ -446,24 +446,13 @@ impl OnboardingAndConfig {
         }
     }
 
-    /// Returns the TenantScopes that this onboarding is _not_ allowed to decrypt.
-    /// This is subtly different from the inverse of `can_decrypt_scopes` above.
-    pub fn cannot_decrypt_scopes(&self) -> Vec<TenantScope> {
-        let Self(ob, obc) = &self;
-        let cdos = if ob.authorized_at.is_none() {
-            // If the onboarding isn't authorized, we shouldn't be able to decrypt all of the data requested.
-            // But, data requested outside of onboarding should always be decryptable.
-            obc.must_collect_data.clone()
-        } else {
-            // If the onboarding is authorized, we just restrict decrypting the fields that were not
-            // explicitly authorized.
-            // Again, all data collected outside of onboarding will be decryptable.
-            obc.must_collect_data
-                .clone()
-                .into_iter()
-                .filter(|cdo| !obc.can_access_data.contains(cdo))
-                .collect()
-        };
-        cdos.into_iter().map(|cdo| cdo.permission()).collect()
+    // Returns the TenantScopes that this ObConfiguration requires to be collected
+    pub fn must_collect_scopes(&self) -> Vec<TenantScope> {
+        self.1
+            .must_collect_data
+            .clone()
+            .into_iter()
+            .map(|cdo| cdo.permission())
+            .collect()
     }
 }

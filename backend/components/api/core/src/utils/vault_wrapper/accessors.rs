@@ -1,4 +1,5 @@
 use super::VaultWrapper;
+use db::models::data_lifetime::DataLifetime;
 use db::models::vault::Vault;
 use db::HasLifetime;
 use db::VaultedData;
@@ -47,6 +48,13 @@ impl<Type> VaultWrapper<Type> {
         T: Into<DataIdentifier> + Clone,
     {
         self.speculative.get(id.clone()).or_else(|| self.portable.get(id))
+    }
+
+    /// Returns the visible liftime for the given DI, if exists
+    pub fn get_lifetime<T: Into<DataIdentifier> + Clone>(&self, id: T) -> Option<&DataLifetime> {
+        self.speculative
+            .get_lifetime(id.clone())
+            .or_else(|| self.portable.get_lifetime(id))
     }
 
     /// If the provided DI is a document, return the mime type

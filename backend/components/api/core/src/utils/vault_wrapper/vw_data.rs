@@ -120,6 +120,14 @@ impl<Type> VwData<Type> {
             .map(|d| d.mime_type.leak())
     }
 
+    pub(super) fn get_lifetime<T>(&self, di: T) -> Option<&DataLifetime>
+    where
+        T: Into<DataIdentifier>,
+    {
+        let d = self.get(di)?;
+        self.lifetimes.get(d.lifetime_id())
+    }
+
     pub(super) fn get_lifetimes<VecT, T>(&self, kinds: VecT) -> Vec<&DataLifetime>
     where
         VecT: IntoIterator<Item = T>,
@@ -127,8 +135,7 @@ impl<Type> VwData<Type> {
     {
         kinds
             .into_iter()
-            .flat_map(|k| self.get(k))
-            .flat_map(|d| self.lifetimes.get(d.lifetime_id()))
+            .flat_map(|k| self.get_lifetime(k.into()))
             .collect()
     }
 }

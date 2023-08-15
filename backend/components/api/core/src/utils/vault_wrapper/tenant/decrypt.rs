@@ -7,11 +7,11 @@ use newtypes::{DataIdentifier, PiiString};
 use std::collections::HashMap;
 
 impl<Type> TenantVw<Type> {
-    /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
-    /// don't allow the tenant to know if data is set without having permission for the the value
+    // Before decrypting, asserts that the requested fields are decryptable by this VW
     pub fn check_ob_config_access(&self, ids: Vec<&DataIdentifier>) -> ApiResult<()> {
         let cannot_access = ids
             .into_iter()
+            .filter(|x| self.has_field((*x).clone()))
             .filter(|x| !self.can_decrypt((*x).clone()))
             .collect_vec();
         if !cannot_access.is_empty() {
