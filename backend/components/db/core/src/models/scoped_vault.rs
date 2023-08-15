@@ -288,6 +288,14 @@ impl ScopedVault {
         Ok(result_map)
     }
 
+    pub fn lock(conn: &mut PgConn, id: &ScopedVaultId) -> DbResult<Self> {
+        let result = scoped_vault::table
+            .filter(scoped_vault::id.eq(id))
+            .for_no_key_update()
+            .get_result(conn)?;
+        Ok(result)
+    }
+
     #[tracing::instrument("ScopedVault::update_status", skip_all)]
     pub fn update_status(conn: &mut PgConn, id: &ScopedVaultId, status: OnboardingStatus) -> DbResult<Self> {
         let result = diesel::update(scoped_vault::table)

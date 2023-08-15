@@ -247,6 +247,7 @@ impl Onboarding {
         args: OnboardingCreateArgs,
         fixture_result: Option<WorkflowFixtureResult>,
     ) -> DbResult<(Onboarding, Workflow, IsNew)> {
+        let sv = ScopedVault::lock(conn, &args.scoped_vault_id)?;
         let insight_event_id = if let Some(insight_event) = args.insight_event {
             Some(insight_event.insert_with_conn(conn)?.id)
         } else {
@@ -297,6 +298,11 @@ impl Onboarding {
                 .get_result::<Onboarding>(conn.conn())?
         };
 
+        // In locked transaction, update scoped vault status to Incomplete if it's null
+        if sv.status.is_none() {
+            ScopedVault::update_status(conn, &sv.id, OnboardingStatus::Incomplete)?;
+        }
+
         Ok((ob, wf, is_new))
     }
 
@@ -309,7 +315,7 @@ impl Onboarding {
         wf_id: Option<&WorkflowId>,
         update: OnboardingUpdate,
     ) -> DbResult<Self> {
-        let sv = ScopedVault::get(conn, &ob.id)?;
+        let sv = ScopedVault::lock(conn, &ob.scoped_vault_id)?;
         let tenant = Tenant::get(conn, &sv.tenant_id)?;
         // !! it's important that code in the same txn that is going to write a review does it before this update call
         let mr_wf_id = wf_id.unwrap_or(&ob.workflow_id);
