@@ -20,7 +20,7 @@ use tracing::instrument;
 pub struct ScopedVaultListQueryParams<TSearch = (PiiString, Vec<Fingerprint>)> {
     pub tenant_id: TenantId,
     pub is_live: bool,
-    /// When true, only returns the scoped users that are either (1) authorized or (2) non-portable
+    /// When true, only returns the scoped users that either are (1) authorized or (2) non-portable
     pub only_billable: bool,
     pub statuses: Vec<OnboardingStatusFilter>,
     pub search: Option<TSearch>,
@@ -89,13 +89,16 @@ macro_rules! list_query {
                 .filter(scoped_vault::is_live.eq($params.is_live))
                 .into_boxed();
             if $params.only_billable {
+                let scoped_vault_ids =
+                    workflow::table
+                    .filter(not(workflow::authorized_at.is_null()))
+                    .select(workflow::scoped_vault_id);
                 query = query
                     // Don't bill for business vaults
                     .filter(vault::kind.eq(VaultKind::Person))
-                    // Only allow seeing any authorized scoped users for portable vaults OR non-portable vaults
+                    // Only allow billing authorized scoped users for portable vaults OR non-portable vaults
                     // owned by the tenant
-                    .filter(not(onboarding::authorized_at.is_null())
-                    .or(vault::is_portable.eq(false)));
+                    .filter(scoped_vault::id.eq_any(scoped_vault_ids).or(vault::is_portable.eq(false)));
             }
 
             // Filter on whether user is in manual review
