@@ -24,8 +24,8 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
+use db::DbPool;
 use db::{models::verification_request::VerificationRequest, DbError};
-use db::{DbPool, DbResult};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
 use idv::middesk::response::business::BusinessResponse;
@@ -40,8 +40,8 @@ use idv::middesk::{
 use idv::{ParsedResponse, VendorResponse};
 
 use newtypes::{
-    BusinessData, DecisionIntentKind, MiddeskRequestState, ObConfigurationKey, OnboardingStatus,
-    PiiJsonValue, RiskSignalGroupKind, TenantId, VendorAPI, WorkflowId,
+    BusinessData, DecisionIntentKind, MiddeskRequestState, ObConfigurationKey, PiiJsonValue,
+    RiskSignalGroupKind, TenantId, VendorAPI, WorkflowId,
 };
 
 #[derive(Debug)]
@@ -532,65 +532,6 @@ impl MiddeskState<Complete> {
             .await?;
         Ok(())
     }
-}
-
-// Insertion point 1: All BO's have completed Bifrost and we are now initiating the Middesk flow by making a POST /business call
-pub async fn run_kyb(
-    state: &State,
-    biz_ob_id: OnboardingId,
-    person_vault: &Vault,
-    wf: &Workflow,
-    tenant_id: &TenantId,
-) -> Result<(), ApiError> {
-    let bizobid = biz_ob_id.clone();
-    let wf_id = wf.id.clone();
-    state
-        .db_pool
-        .db_transaction(move |conn| -> DbResult<_> {
-            let ob = Onboarding::lock(conn, &bizobid)?;
-            let update = OnboardingUpdate::set_status(OnboardingStatus::Pending);
-            Onboarding::update(ob, conn, Some(&wf_id), update)?;
-            Ok(())
-        })
-        .await?;
-
-    let fixture_decision = decision::utils::get_fixture_data_decision(
-        state.feature_flag_client.clone(),
-        person_vault,
-        wf,
-        tenant_id,
-    )?;
-
-    let wf_id = wf.id.clone();
-    if let Some(fixture_decision) = fixture_decision {
-        // Don't run prod middesk requests and instead just create fixture data for this business
-        let bizobid = biz_ob_id.clone();
-        state
-            .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
-                decision::utils::write_kyb_fixture_vendor_result_and_risk_signals(
-                    conn,
-                    &bizobid,
-                    fixture_decision,
-                )?;
-                decision::utils::write_kyb_fixture_ob_decision(conn, &biz_ob_id, fixture_decision, wf_id)
-            })
-            .await?;
-    } else {
-        let middesk_state = init_middesk_request(&state.db_pool, biz_ob_id, None).await?;
-
-        let _middesk_state = middesk_state
-            .make_create_business_call(
-                &state.db_pool,
-                &state.config,
-                &state.enclave_client,
-                state.feature_flag_client.clone(),
-                state.vendor_clients.middesk_create_business.clone(),
-                tenant_id,
-            )
-            .await?;
-    }
-    Ok(())
 }
 
 // Create middesk_request and vreq for POST /business call

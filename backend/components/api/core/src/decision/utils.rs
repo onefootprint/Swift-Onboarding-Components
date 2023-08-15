@@ -1,11 +1,9 @@
 use std::sync::Arc;
 
-use chrono::Utc;
 use db::{
     models::{
         decision_intent::DecisionIntent,
         onboarding::{Onboarding, OnboardingUpdate},
-        onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
         risk_signal::RiskSignal,
         vault::Vault,
         verification_request::VerificationRequest,
@@ -16,9 +14,9 @@ use db::{
 };
 use idv::incode::doc::response::FetchOCRResponse;
 use newtypes::{
-    DataIdentifier, DbActor, DecisionIntentId, DecisionStatus, IdentityDataKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, OnboardingId, RiskSignalGroupKind, ScopedVaultId,
-    TenantId, VaultKind, VendorAPI, WorkflowFixtureResult, WorkflowId,
+    DataIdentifier, DecisionIntentId, DecisionStatus, IdentityDataKind, IdentityDocumentFixtureResult,
+    IdentityDocumentId, OnboardingId, RiskSignalGroupKind, ScopedVaultId, TenantId, VaultKind, VendorAPI,
+    WorkflowFixtureResult,
 };
 
 use super::{
@@ -221,44 +219,6 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
         RiskSignalGroupKind::Kyb,
         false,
     )?;
-    Ok(())
-}
-
-#[tracing::instrument(skip_all)]
-// TODO: merge with risk::save_final_decision / decision::biz_risk::make_kyb_decision
-pub fn write_kyb_fixture_ob_decision(
-    conn: &mut TxnPgConn,
-    biz_ob_id: &OnboardingId,
-    fixture_decision: FixtureDecision,
-    workflow_id: WorkflowId,
-) -> ApiResult<()> {
-    let biz_ob_id = biz_ob_id.clone();
-    let biz_ob = Onboarding::lock(conn, &biz_ob_id)?;
-    let (_, sb) = Onboarding::get(conn, &biz_ob.id)?;
-
-    let (decision_status, _create_manual_review) = fixture_decision;
-
-    let new_decision = OnboardingDecisionCreateArgs {
-        vault_id: sb.vault_id,
-        scoped_vault_id: sb.id,
-        logic_git_hash: crate::GIT_HASH.to_string(),
-        status: decision_status,
-        result_ids: vec![],
-        annotation_id: None,
-        actor: DbActor::Footprint,
-        seqno: None,
-        workflow_id,
-    };
-
-    OnboardingDecision::create(conn, new_decision)?;
-    let update = OnboardingUpdate {
-        authorized_at: None,
-        idv_reqs_initiated_at: None,
-        decision_made_at: Some(Some(Utc::now())),
-        status: Some(decision_status.into()),
-    };
-    let wf_id = biz_ob.workflow_id(None).clone();
-    Onboarding::update(biz_ob, conn, Some(&wf_id), update)?;
     Ok(())
 }
 

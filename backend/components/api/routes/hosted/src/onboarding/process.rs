@@ -18,7 +18,6 @@ use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::workflow::WorkflowError;
 use api_core::errors::ApiResult;
-use api_core::task;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use api_core::utils::actix::OptionalJson;
@@ -104,52 +103,35 @@ pub async fn post(
 async fn run_kyb_if_needed(state: &State, user_auth: CheckedUserObAuthContext) -> ApiResult<()> {
     // Run KYB
     let tenant = user_auth.tenant()?.clone();
-    let wf = user_auth.workflow()?.clone();
-    let uv = user_auth.user().clone();
-    let (biz_ob, biz_wf) = state
+    let biz_wf = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let ob = user_auth.business_onboarding(conn)?;
-
             let wf = if let Some(biz_ob_wf_id) = ob.as_ref().map(|o| o.workflow_id(None)) {
                 Some(Workflow::get(conn, biz_ob_wf_id)?)
             } else {
                 None
             };
-
-            Ok((ob, wf))
+            Ok(wf)
         })
         .await??;
 
-    if let Some(biz_ob) = biz_ob {
-        let should_run_kyb = business::utils::should_run_kyb(state, &biz_ob, &tenant).await?;
+    if let Some(biz_wf) = biz_wf {
+        let should_run_kyb = business::utils::should_run_kyb(state, &biz_wf, &tenant).await?;
         tracing::info!(should_run_kyb, "should_run_kyb");
         if should_run_kyb {
-            // KYB workflows are still behind a FF, so we check here if one exists and if not we fall back to our legacy non-WF logic
-            if let Some(biz_wf) = biz_wf {
-                let ww = WorkflowWrapper::init(state, biz_wf.clone()).await?;
-                let res = ww
-                    .run(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
-                    .await;
-                match res {
-                    Ok(ww) => {
-                        tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran KYB workflow");
-                    }
-                    Err(e) => {
-                        tracing::error!(error=?e, "Error running KYB workflow");
-                    }
-                };
-            } else {
-                // We pass the user's KYC wf in here - for now, we are just piggybacking the KYB decision
-                // off of the KYC decision, but one day we'll probably want to send a fixture KYB decision
-                let kyb_res =
-                    decision::vendor::middesk::run_kyb(state, biz_ob.id, &uv, &wf, &tenant.id).await;
-                if let Err(e) = kyb_res {
-                    tracing::error!(error=?e, "Error kicking off KYB")
+            let ww = WorkflowWrapper::init(state, biz_wf.clone()).await?;
+            let res = ww
+                .run(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
+                .await;
+            match res {
+                Ok(ww) => {
+                    tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran KYB workflow");
                 }
-                // temporary until we migrate to a KYB workflow
-                task::execute_webhook_tasks(state.clone());
-            }
+                Err(e) => {
+                    tracing::error!(error=?e, "Error running KYB workflow");
+                }
+            };
         }
     }
     Ok(())
