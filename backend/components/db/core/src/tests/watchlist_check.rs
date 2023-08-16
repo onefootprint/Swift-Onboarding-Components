@@ -105,7 +105,7 @@ fn make_vault(
         let sv = fixtures::scoped_vault::create(conn, &uvid, &ob_config.id);
         let svid = sv.id.clone();
         if let Some(ob_decision_made_at) = ob_decision_made_at {
-            let (_, wf) = fixtures::onboarding::create(conn, svid.clone(), ob_config.id, None);
+            let wf = fixtures::workflow::create(conn, svid.clone(), ob_config.id, None);
             let decision = NewDecisionArgs {
                 vault_id: uv.id.clone(),
                 logic_git_hash: "".to_string(),

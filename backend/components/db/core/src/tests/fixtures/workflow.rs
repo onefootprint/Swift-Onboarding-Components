@@ -1,18 +1,24 @@
-use newtypes::{KycConfig, ScopedVaultId, WorkflowConfig};
+use newtypes::{ObConfigurationId, ScopedVaultId, WorkflowFixtureResult};
 
 use crate::{
-    models::workflow::{NewWorkflowArgs, Workflow},
+    models::{
+        insight_event::CreateInsightEvent,
+        workflow::{OnboardingWorkflowArgs, Workflow},
+    },
     TxnPgConn,
 };
 
-pub fn create(conn: &mut TxnPgConn, sv_id: &ScopedVaultId) -> Workflow {
-    let config = WorkflowConfig::Kyc(KycConfig { is_redo: false });
-    let args = NewWorkflowArgs {
-        scoped_vault_id: sv_id.clone(),
-        config,
-        fixture_result: None,
-        ob_configuration_id: None,
-        insight_event_id: None,
+pub fn create(
+    conn: &mut TxnPgConn,
+    sv_id: ScopedVaultId,
+    obc_id: ObConfigurationId,
+    fixture_result: Option<WorkflowFixtureResult>,
+) -> Workflow {
+    let args = OnboardingWorkflowArgs {
+        scoped_vault_id: sv_id,
+        ob_configuration_id: obc_id,
+        insight_event: Some(CreateInsightEvent { ..Default::default() }),
     };
-    Workflow::create(conn, args).unwrap()
+    let (wf, _) = Workflow::get_or_create_onboarding(conn, args, fixture_result).unwrap();
+    wf
 }

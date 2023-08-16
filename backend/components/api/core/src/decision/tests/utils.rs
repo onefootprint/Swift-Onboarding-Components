@@ -17,7 +17,7 @@ async fn test_handle_setup(state: &mut State) {
     let (tenant, vault, wf) = state
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
-            let (tenant, _, vault, _, wf) =
+            let (tenant, vault, _, wf) =
                 fixtures::lib::create_user_and_onboarding(conn, true, OnboardingStatus::Pass, vec![]);
             Ok((tenant, vault, wf))
         })
@@ -48,7 +48,7 @@ async fn test_handle_setup(state: &mut State) {
     let (tenant, vault, wf) = state
         .db_pool
         .db_transaction(move |conn| -> db::DbResult<_> {
-            let (tenant, _, vault, _, wf) =
+            let (tenant, vault, _, wf) =
                 fixtures::lib::create_user_and_onboarding(conn, true, OnboardingStatus::Pass, vec![]);
             Ok((tenant, vault, wf))
         })

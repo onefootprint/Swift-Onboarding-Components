@@ -69,7 +69,7 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (_, wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
+            let (wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
                 &scoped_user.vault_id,
                 &scoped_user.id,

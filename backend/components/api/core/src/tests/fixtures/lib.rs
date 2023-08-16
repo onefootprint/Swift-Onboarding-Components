@@ -1,6 +1,5 @@
 use crate::utils::vault_wrapper::{Any, VaultWrapper};
 use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
@@ -71,7 +70,7 @@ pub fn create_user_and_onboarding(
     is_live: bool,
     onboarding_status: OnboardingStatus,
     idks: Vec<IDK>,
-) -> (Tenant, Onboarding, Vault, ScopedVault, Workflow) {
+) -> (Tenant, Vault, ScopedVault, Workflow) {
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, is_live);
     let ob_config_id = ob_config.id.clone();
@@ -80,10 +79,10 @@ pub fn create_user_and_onboarding(
     let (uv, su) = create_user_and_populate_vault(conn, is_live, tenant_id, Some(ob_config), idks);
 
     let suid = su.id.clone();
-    let (ob, wf) = fixtures::onboarding::create(conn, suid, ob_config_id, None);
+    let wf = fixtures::workflow::create(conn, suid, ob_config_id, None);
     let wf = Workflow::lock(conn, &wf.id).unwrap();
     let update = WorkflowUpdate::set_status(onboarding_status);
     let wf = Workflow::update(wf, conn, update).unwrap();
 
-    (tenant, ob, uv, su, wf)
+    (tenant, uv, su, wf)
 }

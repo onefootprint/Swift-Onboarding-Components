@@ -339,7 +339,7 @@ async fn setup(
 ) {
     let (sv, task) = db_pool
         .db_transaction(move |conn| -> DbResult<_> {
-            let (_, _, _, sv, _) = crate::tests::fixtures::lib::create_user_and_onboarding(
+            let (_, _, sv, _) = crate::tests::fixtures::lib::create_user_and_onboarding(
                 conn,
                 is_live,
                 onboarding_status,

@@ -79,7 +79,7 @@ pub async fn post(
                 return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
             }
 
-            let (_, wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
+            let (wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
                 &sv.vault_id,
                 &sv.id,

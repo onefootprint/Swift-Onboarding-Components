@@ -33,15 +33,9 @@ use newtypes::{KycState, WorkflowFixtureResult, WorkflowId, WorkflowState};
 use std::sync::Arc;
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
-    let (_, _, _, _, sv, obc) = test_helpers::create_kyc_user_and_onboarding(
-        &state.db_pool,
-        &state.enclave_client,
-        None,
-        None,
-        true,
-        None,
-    )
-    .await;
+    let (_, _, _, sv, obc) =
+        test_helpers::create_kyc_user_and_wf(&state.db_pool, &state.enclave_client, None, None, true, None)
+            .await;
 
     state
         .db_pool

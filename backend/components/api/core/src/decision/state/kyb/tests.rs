@@ -14,7 +14,6 @@ use crate::errors::ApiResult;
 use crate::{decision::tests::test_helpers, State};
 use api_wire_types::TerminalDecisionStatus;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding::Onboarding;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow as DbWorkflow;
 use db::tests::test_db_pool::TestDbPool;
@@ -34,9 +33,9 @@ use std::sync::Arc;
 async fn setup(
     state: &State,
     fixture_result: Option<WorkflowFixtureResult>,
-) -> (DbWorkflow, Tenant, ObConfiguration, (Onboarding, DbWorkflow)) {
+) -> (DbWorkflow, Tenant, ObConfiguration, DbWorkflow) {
     let is_live = fixture_result.is_none();
-    let (t, ob, wf, _v, _sv, obc, biz_wf) = test_helpers::create_kyb_user_and_onboarding(
+    let (t, wf, _v, _sv, obc, biz_wf) = test_helpers::create_kyb_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         None,
@@ -45,7 +44,7 @@ async fn setup(
     )
     .await;
 
-    (biz_wf, t, obc, (ob, wf))
+    (biz_wf, t, obc, wf)
 }
 
 async fn kyc_bo(state: &mut State, person_wf: &DbWorkflow) {
@@ -105,7 +104,7 @@ async fn authorize(state: &mut State) {
 #[tokio::test(flavor = "multi_thread")]
 async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
     // SETUP
-    let (wf, tenant, _, (_, person_wf)) = setup(state, Some(fixture_result)).await;
+    let (wf, tenant, _, person_wf) = setup(state, Some(fixture_result)).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
@@ -203,7 +202,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
 #[tokio::test(flavor = "multi_thread")]
 async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     // SETUP
-    let (wf, tenant, obc, (_, person_wf)) = setup(state, None).await;
+    let (wf, tenant, obc, person_wf) = setup(state, None).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();

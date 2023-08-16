@@ -4,10 +4,9 @@ use db::{
         document_request::{DocumentRequest, NewDocumentRequestArgs},
         insight_event::CreateInsightEvent,
         ob_configuration::ObConfiguration,
-        onboarding::{Onboarding, OnboardingCreateArgs},
         scoped_vault::ScopedVault,
         vault::{NewVaultArgs, Vault},
-        workflow::Workflow,
+        workflow::{OnboardingWorkflowArgs, Workflow},
     },
     TxnPgConn,
 };
@@ -32,11 +31,11 @@ pub fn get_or_start_onboarding(
     obc: &ObConfiguration,
     insight_event: Option<CreateInsightEvent>,
     new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
-) -> ApiResult<(Onboarding, Workflow, Option<Workflow>)> {
+) -> ApiResult<(Workflow, Option<Workflow>)> {
     let user_vault = Vault::lock(conn, v_id)?;
 
     // Create the onboarding for this scoped user
-    let ob_create_args = OnboardingCreateArgs {
+    let ob_create_args = OnboardingWorkflowArgs {
         scoped_vault_id: sv_id.clone(),
         ob_configuration_id: obc.id.clone(),
         insight_event: insight_event.clone(),
@@ -44,7 +43,7 @@ pub fn get_or_start_onboarding(
 
     // TODO rm this when fixture result is passed in process
     let fixture_result = WorkflowFixtureResult::from_sandbox_id(user_vault.sandbox_id.as_ref());
-    let (ob, wf, is_new_ob) = Onboarding::get_or_create(conn, ob_create_args, fixture_result)?;
+    let (wf, is_new_ob) = Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result)?;
     if is_new_ob {
         if let Some(doc_info) = obc
             .must_collect_data
@@ -64,7 +63,7 @@ pub fn get_or_start_onboarding(
             };
 
             let args = NewDocumentRequestArgs {
-                scoped_vault_id: ob.scoped_vault_id.clone(),
+                scoped_vault_id: wf.scoped_vault_id.clone(),
                 ref_id: None,
                 workflow_id: wf.id.clone(),
                 should_collect_selfie: doc_info.2 == Selfie::RequireSelfie,
@@ -82,7 +81,7 @@ pub fn get_or_start_onboarding(
     }
 
     // If the ob config has business fields, create a business vault, scoped vault, and ob
-    let biz_ob = if let Some(new_biz_args) = new_biz_args {
+    let biz_wf = if let Some(new_biz_args) = new_biz_args {
         let existing_businesses = BusinessOwner::list_businesses(conn, &user_vault.id, &obc.id)?;
         let biz_wf = if let Some(existing) = existing_businesses.into_iter().next() {
             // If the user has already started onboarding their business onto this exact
@@ -103,12 +102,12 @@ pub fn get_or_start_onboarding(
             let business_vault = Vault::create(conn, args)?;
             BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;
             let sb = ScopedVault::get_or_create(conn, &business_vault, obc.id.clone())?;
-            let ob_create_args = OnboardingCreateArgs {
+            let ob_create_args = OnboardingWorkflowArgs {
                 scoped_vault_id: sb.id,
                 ob_configuration_id: obc.id.clone(),
                 insight_event,
             };
-            let (_, biz_wf, _) = Onboarding::get_or_create(conn, ob_create_args, fixture_result)?;
+            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result)?;
             biz_wf
         };
         Some(biz_wf)
@@ -116,5 +115,5 @@ pub fn get_or_start_onboarding(
         None
     };
 
-    Ok((ob, wf, biz_ob))
+    Ok((wf, biz_wf))
 }

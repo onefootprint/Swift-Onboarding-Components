@@ -102,7 +102,7 @@ pub async fn setup_data(
 ) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
     // TODO: create sandbox vs demo vs real, diff sandbox fixues
     let is_live = matches!(user_kind, UserKind::Live | UserKind::Demo);
-    let (tenant, _, wf, _, _, obc) = test_helpers::create_kyc_user_and_onboarding(
+    let (tenant, wf, _, _, obc) = test_helpers::create_kyc_user_and_wf(
         &state.db_pool,
         &state.enclave_client,
         Some(vec![CDO::PhoneNumber, CDO::FullAddress]), // so we can meet min req for kyc vendor calls

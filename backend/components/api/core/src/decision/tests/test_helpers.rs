@@ -3,7 +3,6 @@ use db::{
         contact_info::ContactInfo,
         insight_event::CreateInsightEvent,
         ob_configuration::ObConfiguration,
-        onboarding::Onboarding,
         scoped_vault::ScopedVault,
         tenant::Tenant,
         vault::Vault,
@@ -38,7 +37,6 @@ pub async fn create_user_and_onboarding(
     create_business: bool,
 ) -> (
     Tenant,
-    Onboarding,
     Workflow,
     Vault,
     ScopedVault,
@@ -69,7 +67,7 @@ pub async fn create_user_and_onboarding(
 
             let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), kyc_fixture_result);
 
-            let (ob, wf, biz_wf) = utils::onboarding::get_or_start_onboarding(
+            let (wf, biz_wf) = utils::onboarding::get_or_start_onboarding(
                 conn,
                 &uv.id,
                 &su.id,
@@ -97,23 +95,23 @@ pub async fn create_user_and_onboarding(
                 populate_business_vault(conn, &sbv.id);
             }
 
-            Ok((tenant, ob, wf, uv, su, ob_config, biz_wf))
+            Ok((tenant, wf, uv, su, ob_config, biz_wf))
         })
         .await
         .unwrap()
 }
 
-pub async fn create_kyc_user_and_onboarding(
+pub async fn create_kyc_user_and_wf(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
     must_collect_data: Option<Vec<CollectedDataOption>>,
     cip_kind: Option<CipKind>,
     is_live: bool,
     fixture_result: Option<WorkflowFixtureResult>,
-) -> (Tenant, Onboarding, Workflow, Vault, ScopedVault, ObConfiguration) {
+) -> (Tenant, Workflow, Vault, ScopedVault, ObConfiguration) {
     let must_collect_data: Vec<CollectedDataOption> =
         must_collect_data.unwrap_or(vec![CollectedDataOption::PhoneNumber]);
-    let (t, ob, wf, v, sv, obc, _) = create_user_and_onboarding(
+    let (t, wf, v, sv, obc, _) = create_user_and_onboarding(
         db_pool,
         enclave_client,
         must_collect_data,
@@ -123,7 +121,7 @@ pub async fn create_kyc_user_and_onboarding(
         false,
     )
     .await;
-    (t, ob, wf, v, sv, obc)
+    (t, wf, v, sv, obc)
 }
 
 pub async fn create_kyb_user_and_onboarding(
@@ -134,7 +132,6 @@ pub async fn create_kyb_user_and_onboarding(
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> (
     Tenant,
-    Onboarding,
     Workflow,
     Vault,
     ScopedVault,
@@ -147,7 +144,7 @@ pub async fn create_kyb_user_and_onboarding(
         CollectedDataOption::BusinessName,
         CollectedDataOption::BusinessBeneficialOwners,
     ]);
-    let (t, ob, wf, v, sv, obc, biz_wf) = create_user_and_onboarding(
+    let (t, wf, v, sv, obc, biz_wf) = create_user_and_onboarding(
         db_pool,
         enclave_client,
         must_collect_data,
@@ -158,7 +155,7 @@ pub async fn create_kyb_user_and_onboarding(
     )
     .await;
 
-    (t, ob, wf, v, sv, obc, biz_wf.unwrap())
+    (t, wf, v, sv, obc, biz_wf.unwrap())
 }
 
 pub fn create_user_and_populate_vault(

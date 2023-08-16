@@ -5,14 +5,16 @@ use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, DbActor, DocumentState, FireWebhookArgs, InsightEventId, KybState,
-    OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload, TaskData, TenantId,
-    TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowFixtureResult,
+    AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DocumentState, FireWebhookArgs, InsightEventId,
+    KybConfig, KybState, KycConfig, OnboardingCompletedPayload, OnboardingStatus,
+    OnboardingStatusChangedPayload, TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent,
+    WorkflowFixtureResult,
 };
 use newtypes::{
     Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
 };
 
+use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReview;
 use super::ob_configuration::ObConfiguration;
 use super::onboarding_decision::{NewDecisionArgs, OnboardingDecision};
@@ -152,6 +154,13 @@ impl<'a> From<(&'a VaultId, &'a ObConfigurationId)> for WorkflowIdentifier<'a> {
     }
 }
 
+#[derive(Debug)]
+pub struct OnboardingWorkflowArgs {
+    pub scoped_vault_id: ScopedVaultId,
+    pub ob_configuration_id: ObConfigurationId,
+    pub insight_event: Option<CreateInsightEvent>,
+}
+
 pub type IsNew = bool;
 
 impl Workflow {
@@ -164,15 +173,40 @@ impl Workflow {
         Ok(res)
     }
 
-    #[tracing::instrument("Workflow::get_or_create", skip_all)]
-    pub fn get_or_create(
+    /// get_or_create a workflow for the purpose of onboarding onto a specific ob config
+    #[tracing::instrument("Workflow::get_or_create_onboarding", skip_all)]
+    pub fn get_or_create_onboarding(
         conn: &mut TxnPgConn,
-        scoped_vault_id: ScopedVaultId,
-        config: WorkflowConfig,
+        args: OnboardingWorkflowArgs,
         fixture_result: Option<WorkflowFixtureResult>,
-        ob_configuration_id: ObConfigurationId,
-        insight_event_id: Option<InsightEventId>,
     ) -> DbResult<(Self, IsNew)> {
+        let OnboardingWorkflowArgs {
+            scoped_vault_id,
+            ob_configuration_id,
+            insight_event,
+        } = args;
+
+        let sv = ScopedVault::lock(conn, &scoped_vault_id)?;
+        let insight_event_id = if let Some(insight_event) = insight_event {
+            Some(insight_event.insert_with_conn(conn)?.id)
+        } else {
+            None
+        };
+        let v = Vault::get(conn.conn(), &scoped_vault_id)?;
+        let (obc, _) = ObConfiguration::get(conn.conn(), &ob_configuration_id)?;
+
+        let config = match v.kind {
+            VaultKind::Person => {
+                if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
+                    AlpacaKycConfig { is_redo: false }.into()
+                } else {
+                    KycConfig { is_redo: false }.into()
+                }
+            }
+            VaultKind::Business => KybConfig {}.into(),
+        };
+
+        // Check if a workflow exists for this ob config
         let wf = workflow::table
             .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
             .filter(workflow::ob_configuration_id.eq(&ob_configuration_id))
@@ -182,6 +216,7 @@ impl Workflow {
             return Ok((wf, false));
         }
 
+        // Create a new workflow
         let args = NewWorkflowArgs {
             scoped_vault_id,
             config,
@@ -189,8 +224,13 @@ impl Workflow {
             ob_configuration_id: Some(ob_configuration_id),
             insight_event_id,
         };
-
         let wf = Self::create(conn, args)?;
+
+        // In locked transaction, update scoped vault status to Incomplete if it's null
+        if sv.status.is_none() {
+            ScopedVault::update_status(conn, &sv.id, OnboardingStatus::Incomplete)?;
+        }
+
         Ok((wf, true))
     }
 
