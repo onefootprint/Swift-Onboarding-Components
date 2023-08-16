@@ -9,7 +9,6 @@ export default airplane.task(
       wf_id: {
         name: 'wf_id',
         required: true,
-        default: 'wf_id_123',
         type: 'shorttext',
       },
     },

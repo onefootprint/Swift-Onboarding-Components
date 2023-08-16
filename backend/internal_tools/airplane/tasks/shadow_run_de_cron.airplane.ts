@@ -44,10 +44,7 @@ export default airplane.task(
     for (const [params, expected_decision_status] of TEST_CASES) {
       let error;
       try {
-        const run = await airplane.execute<object>('shadow_run_de', {
-          tenant_id: params['tenant_id'],
-          fp_id: params['fp_id'],
-        });
+        const run = await airplane.execute<object>('shadow_run_de', params);
 
         const decision_status = run.output['decision_status'];
         if (decision_status != expected_decision_status) {
