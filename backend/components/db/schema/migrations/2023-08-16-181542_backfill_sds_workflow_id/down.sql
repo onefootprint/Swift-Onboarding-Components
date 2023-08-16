@@ -1,0 +1,1 @@
+ALTER TABLE socure_device_session ALTER COLUMN workflow_id DROP NOT NULL;

@@ -149,58 +149,47 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
             .filter(decision_intent::scoped_vault_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
-        // Onboardings
+        // Verification requests
         {
-            let ob_ids = onboarding::table
-                .filter(onboarding::scoped_vault_id.eq_any(su_ids.clone()))
-                .select(onboarding::id);
+            let verification_request_ids = verification_request::table
+                .filter(verification_request::scoped_vault_id.eq_any(su_ids.clone()))
+                .select(verification_request::id);
 
-            deleted_rows += diesel::delete(socure_device_session::table)
-                .filter(socure_device_session::onboarding_id.eq_any(ob_ids.clone()))
+            let verification_result_ids = verification_result::table
+                .filter(verification_result::request_id.eq_any(verification_request_ids.clone()))
+                .select(verification_result::id);
+
+            deleted_rows += diesel::delete(onboarding_decision_verification_result_junction::table)
+                .filter(
+                    onboarding_decision_verification_result_junction::verification_result_id
+                        .eq_any(verification_result_ids.clone()),
+                )
                 .execute(conn.conn())?;
 
-            // Verification requests
-            {
-                let verification_request_ids = verification_request::table
-                    .filter(verification_request::scoped_vault_id.eq_any(su_ids.clone()))
-                    .select(verification_request::id);
+            deleted_rows += diesel::delete(risk_signal::table)
+                .filter(risk_signal::verification_result_id.eq_any(verification_result_ids.clone()))
+                .execute(conn.conn())?;
 
-                let verification_result_ids = verification_result::table
-                    .filter(verification_result::request_id.eq_any(verification_request_ids.clone()))
-                    .select(verification_result::id);
+            deleted_rows += diesel::delete(risk_signal_group::table)
+                .filter(risk_signal_group::scoped_vault_id.eq_any(su_ids.clone()))
+                .execute(conn.conn())?;
 
-                deleted_rows += diesel::delete(onboarding_decision_verification_result_junction::table)
-                    .filter(
-                        onboarding_decision_verification_result_junction::verification_result_id
-                            .eq_any(verification_result_ids.clone()),
-                    )
-                    .execute(conn.conn())?;
+            deleted_rows += diesel::delete(risk_signal::table)
+                .filter(risk_signal::verification_result_id.eq_any(verification_result_ids.clone()))
+                .execute(conn.conn())?;
 
-                deleted_rows += diesel::delete(risk_signal::table)
-                    .filter(risk_signal::verification_result_id.eq_any(verification_result_ids.clone()))
-                    .execute(conn.conn())?;
+            deleted_rows += diesel::delete(verification_result::table)
+                .filter(verification_result::request_id.eq_any(verification_request_ids))
+                .execute(conn.conn())?;
 
-                deleted_rows += diesel::delete(risk_signal_group::table)
-                    .filter(risk_signal_group::scoped_vault_id.eq_any(su_ids.clone()))
-                    .execute(conn.conn())?;
-
-                deleted_rows += diesel::delete(risk_signal::table)
-                    .filter(risk_signal::verification_result_id.eq_any(verification_result_ids.clone()))
-                    .execute(conn.conn())?;
-
-                deleted_rows += diesel::delete(verification_result::table)
-                    .filter(verification_result::request_id.eq_any(verification_request_ids))
-                    .execute(conn.conn())?;
-
-                deleted_rows += diesel::delete(verification_request::table)
-                    .filter(verification_request::scoped_vault_id.eq_any(su_ids.clone()))
-                    .execute(conn.conn())?;
-            }
-
-            deleted_rows += diesel::delete(onboarding::table)
-                .filter(onboarding::scoped_vault_id.eq_any(su_ids.clone()))
+            deleted_rows += diesel::delete(verification_request::table)
+                .filter(verification_request::scoped_vault_id.eq_any(su_ids.clone()))
                 .execute(conn.conn())?;
         }
+
+        deleted_rows += diesel::delete(onboarding::table)
+            .filter(onboarding::scoped_vault_id.eq_any(su_ids.clone()))
+            .execute(conn.conn())?;
 
         // Workflows
         {
@@ -218,6 +207,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
             deleted_rows += diesel::delete(middesk_request::table)
                 .filter(middesk_request::workflow_id.eq_any(workflow_ids.clone()))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(socure_device_session::table)
+                .filter(socure_device_session::workflow_id.eq_any(workflow_ids.clone()))
                 .execute(conn.conn())?;
 
             deleted_rows += diesel::delete(onboarding_decision::table)

@@ -11,12 +11,12 @@ use serde::{Deserialize, Serialize};
 #[diesel(table_name = socure_device_session)]
 pub struct SocureDeviceSession {
     pub id: SocureDeviceSessionId,
-    pub onboarding_id: OnboardingId,
+    pub onboarding_id: Option<OnboardingId>,
     pub device_session_id: String,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub workflow_id: Option<WorkflowId>,
+    pub workflow_id: WorkflowId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -56,14 +56,8 @@ impl SocureDeviceSession {
 
     #[tracing::instrument("SocureDeviceSession::latest_for_onboarding", skip_all)]
     pub fn latest(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<SocureDeviceSession>> {
-        // TODO migrate to new foreign key
-        use db_schema::schema::{onboarding, workflow};
-        let ob_ids = onboarding::table
-            .inner_join(workflow::table.on(workflow::scoped_vault_id.eq(onboarding::scoped_vault_id)))
-            .filter(workflow::id.eq(wf_id))
-            .select(onboarding::id);
         let res = socure_device_session::table
-            .filter(socure_device_session::onboarding_id.eq_any(ob_ids))
+            .filter(socure_device_session::workflow_id.eq(wf_id))
             .order_by(socure_device_session::created_at.desc())
             .first(conn)
             .optional()?;

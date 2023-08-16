@@ -48,6 +48,16 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    backup_onboardings_08_15 (id) {
+        id -> Text,
+        scoped_vault_id -> Nullable<Text>,
+        workflow_id -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     business_owner (id) {
         id -> Text,
         user_vault_id -> Nullable<Text>,
@@ -572,12 +582,12 @@ table! {
 
     socure_device_session (id) {
         id -> Text,
-        onboarding_id -> Text,
+        onboarding_id -> Nullable<Text>,
         device_session_id -> Text,
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        workflow_id -> Nullable<Text>,
+        workflow_id -> Text,
     }
 }
 
@@ -1010,6 +1020,7 @@ allow_tables_to_appear_in_same_query!(
     access_event,
     annotation,
     appearance,
+    backup_onboardings_08_15,
     business_owner,
     contact_info,
     custom_migration,
