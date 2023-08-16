@@ -6,16 +6,10 @@ export default airplane.task(
     slug: 'make_vendor_calls',
     name: 'Creates new VerificationRequests, re-pings all vendors, and writes VerificationResults for the passed in fp_id',
     parameters: {
-      fp_id: {
-        name: 'fp_id',
+      wf_id: {
+        name: 'wf_id',
         required: true,
-        default: 'fp_id_123',
-        type: 'shorttext',
-      },
-      tenant_id: {
-        name: 'tenant_id',
-        required: true,
-        default: 'org_123',
+        default: 'wf_id_123',
         type: 'shorttext',
       },
     },
