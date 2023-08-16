@@ -1,5 +1,7 @@
+import { primitives } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
 import { motion } from 'framer-motion';
+import { useTheme } from 'next-themes';
 import React, { useState } from 'react';
 
 import ProgressBar from './components/progress-bar';
@@ -24,6 +26,7 @@ const Form = ({ onComplete }: FormProps) => {
   const stepsCount = steps.length;
   const maxStep = stepsCount - 1;
   const { Step, id } = steps[step];
+  const isDarkTheme = useTheme().theme === 'dark';
 
   const handleComplete = () => {
     if (step === maxStep) {
@@ -46,6 +49,7 @@ const Form = ({ onComplete }: FormProps) => {
       transition={{
         layout: { duration: 0.1, ease: 'linear' },
       }}
+      isDarkTheme={isDarkTheme}
     >
       <motion.span key={id} initial={{ scale: 1 }} animate={{ scale: 1 }}>
         <Step id={id} onComplete={handleComplete} />
@@ -58,8 +62,8 @@ const Form = ({ onComplete }: FormProps) => {
   );
 };
 
-const Container = styled(motion.div)`
-  ${({ theme }) => css`
+const Container = styled(motion.div)<{ isDarkTheme: boolean }>`
+  ${({ theme, isDarkTheme }) => css`
     background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
@@ -70,16 +74,24 @@ const Container = styled(motion.div)`
     width: 500px;
 
     &[data-step='welcome-form'] {
-      background: 
-      url('/onboarding/noise.svg'),
-      linear-gradient(
-        0deg,
-        ${theme.backgroundColor.primary} 0%,
-        transparent 50%
-      ),
-      radial-gradient(at 0% 0%, #f9dff7 20%, transparent 60%),
-      radial-gradient(at 100% 50%,#f0fdff  20%, transparent 60%),
-      radial-gradient(at 100% 0%, #e9e2ff 40%, transparent 60%);
+      background-blend-mode: overlay;
+      background: url('/onboarding/noise.svg'),
+        ${isDarkTheme
+          ? `
+            linear-gradient(
+              180deg,
+              ${primitives.Gray825} 0%,
+              transparent 100%
+            );
+            `
+          : `
+            linear-gradient(
+                180deg,
+                ${primitives.Purple100} 0%,
+                transparent 100%
+              );
+          `};
+    }
   `}
 `;
 

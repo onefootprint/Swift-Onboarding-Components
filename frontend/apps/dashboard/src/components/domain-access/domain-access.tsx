@@ -127,7 +127,8 @@ const Container = styled.div`
     gap: ${theme.spacing[5]};
     align-self: stretch;
     border-radius: ${theme.borderRadius.default};
-    background: ${theme.backgroundColor.secondary};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    background: ${theme.backgroundColor.primary};
   `}
 `;
 
