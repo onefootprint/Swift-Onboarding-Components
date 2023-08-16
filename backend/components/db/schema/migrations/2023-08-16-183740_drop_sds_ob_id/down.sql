@@ -1,0 +1,1 @@
+ALTER TABLE socure_device_session ADD COLUMN onboarding_id TEXT;

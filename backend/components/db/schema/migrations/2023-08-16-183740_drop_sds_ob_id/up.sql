@@ -1,0 +1,1 @@
+ALTER TABLE socure_device_session DROP COLUMN onboarding_id;
