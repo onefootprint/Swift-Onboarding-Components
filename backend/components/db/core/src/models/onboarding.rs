@@ -37,7 +37,7 @@ pub struct Onboarding {
     authorized_at: Option<DateTime<Utc>>,
     idv_reqs_initiated_at: Option<DateTime<Utc>>,
     decision_made_at: Option<DateTime<Utc>>,
-    workflow_id: WorkflowId,
+    workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -70,14 +70,6 @@ pub struct OnboardingCreateArgs {
     pub scoped_vault_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event: Option<CreateInsightEvent>,
-}
-
-/// While we are migrating the source of truth to workflow, use these utils to read from either
-/// workflow or onboarding
-impl Onboarding {
-    pub fn workflow_id<'a>(&'a self, wf: Option<&'a Workflow>) -> &'a WorkflowId {
-        wf.map(|wf| &wf.id).unwrap_or(&self.workflow_id)
-    }
 }
 
 impl OnboardingUpdate {
