@@ -23,7 +23,21 @@ pub struct DocumentRequest {
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
     pub only_us: bool,
-    pub doc_type_restriction: Option<Vec<ModernIdDocKind>>,
+    // Document types that are accepted across all countries, except if overridden in country_doc_type_restrictions
+    pub global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
+    // if !empty, restrict to only these countries
+    pub country_restrictions: Option<Vec<String>>,
+    // if key for a country is present, will include the subset of global_doc_types_accepted for a specific countrys
+    pub country_doc_type_restrictions: Option<serde_json::Value>,
+}
+
+impl DocumentRequest {
+    pub fn only_us(&self) -> bool {
+        self.country_restrictions
+            .as_ref()
+            .map(|cr| cr.len() == 1 && cr.first() == Some(&"US".to_string()))
+            .unwrap_or(false)
+    }
 }
 
 impl DocumentRequest {
@@ -35,7 +49,9 @@ impl DocumentRequest {
             workflow_id,
             should_collect_selfie,
             only_us,
-            doc_type_restriction,
+            global_doc_types_accepted,
+            country_restrictions,
+            country_doc_type_restrictions,
         } = args;
         let new = NewDocumentRequestRow {
             scoped_vault_id,
@@ -44,7 +60,9 @@ impl DocumentRequest {
             should_collect_selfie,
             workflow_id,
             only_us,
-            doc_type_restriction,
+            global_doc_types_accepted,
+            country_restrictions,
+            country_doc_type_restrictions,
         };
         let result = diesel::insert_into(document_request::table)
             .values(new)
@@ -69,7 +87,10 @@ pub struct NewDocumentRequestArgs {
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
     pub only_us: bool,
-    pub doc_type_restriction: Option<Vec<ModernIdDocKind>>,
+    pub global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
+    // TODO: enum
+    pub country_restrictions: Vec<String>,
+    pub country_doc_type_restrictions: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -81,5 +102,8 @@ struct NewDocumentRequestRow {
     should_collect_selfie: bool,
     workflow_id: WorkflowId,
     only_us: bool,
-    doc_type_restriction: Option<Vec<ModernIdDocKind>>,
+    global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
+    // TODO: enum
+    country_restrictions: Vec<String>,
+    country_doc_type_restrictions: Option<serde_json::Value>,
 }

@@ -61,13 +61,20 @@ pub fn get_or_start_onboarding(
             } else {
                 None
             };
+
+            let us_only = doc_info.1 == CountryRestriction::UsOnly;
             let args = NewDocumentRequestArgs {
                 scoped_vault_id: ob.scoped_vault_id.clone(),
                 ref_id: None,
                 workflow_id: wf.id.clone(),
                 should_collect_selfie: doc_info.2 == Selfie::RequireSelfie,
-                only_us: doc_info.1 == CountryRestriction::UsOnly,
-                doc_type_restriction,
+                only_us: us_only,
+                global_doc_types_accepted: doc_type_restriction,
+                country_restrictions: vec![us_only.then_some("US".to_string())]
+                    .into_iter()
+                    .flatten()
+                    .collect(),
+                country_doc_type_restrictions: None,
             };
             DocumentRequest::create(conn, args)?;
         }

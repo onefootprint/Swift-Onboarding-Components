@@ -1,0 +1,3 @@
+ALTER TABLE document_request RENAME COLUMN global_doc_types_accepted TO doc_type_restriction;
+ALTER TABLE document_request DROP COLUMN country_doc_type_restrictions;
+ALTER TABLE document_request DROP COLUMN country_restrictions;

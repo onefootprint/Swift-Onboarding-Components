@@ -318,7 +318,9 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                     // TODO: should come from a config
                     should_collect_selfie: true,
                     only_us: true,
-                    doc_type_restriction: None,
+                    global_doc_types_accepted: None,
+                    country_restrictions: vec!["US".into()],
+                    country_doc_type_restrictions: None,
                 };
                 DocumentRequest::create(conn, args)?;
 

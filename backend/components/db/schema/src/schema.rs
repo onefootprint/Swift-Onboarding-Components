@@ -143,7 +143,9 @@ table! {
         should_collect_selfie -> Bool,
         workflow_id -> Text,
         only_us -> Bool,
-        doc_type_restriction -> Nullable<Array<Text>>,
+        global_doc_types_accepted -> Nullable<Array<Text>>,
+        country_restrictions -> Nullable<Array<Text>>,
+        country_doc_type_restrictions -> Nullable<Jsonb>,
     }
 }
 

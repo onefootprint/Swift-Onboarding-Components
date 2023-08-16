@@ -48,7 +48,7 @@ pub async fn post(
             if doc_request.only_us && country_code != "US" {
                 return Err(OnboardingError::UnsupportedNonUSDocumentCountry.into());
             }
-            if let Some(doc_types) = doc_request.doc_type_restriction.clone() {
+            if let Some(doc_types) = doc_request.global_doc_types_accepted.clone() {
                 if !doc_types.contains(&document_type) {
                     return Err(OnboardingError::UnsupportedDocumentType(Csv::from(doc_types)).into());
                 }
