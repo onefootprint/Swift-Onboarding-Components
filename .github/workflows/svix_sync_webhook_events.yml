@@ -32,6 +32,11 @@ jobs:
         with:
           toolchain: stable
 
+      - uses: rui314/setup-mold@7f56dbde35ee02a3fe0287e7ddd310922eb5f553
+        with:
+          mold-version: 2.0.0
+          make-default: false
+
       - name: Generate Schemas
         working-directory: ./backend
         run: cargo test --package webhooks --lib -- tests::sync_webhook_event_types --exact --nocapture --ignored
