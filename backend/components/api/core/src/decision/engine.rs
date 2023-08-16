@@ -163,6 +163,15 @@ impl VendorResults {
             )
             .collect()
     }
+
+    pub fn has_sufficient_results_for_kyc(&self) -> bool {
+        self.successful.iter().any(|(vreq, _)| {
+            matches!(
+                vreq.vendor_api,
+                VendorAPI::IdologyExpectID | VendorAPI::ExperianPreciseID
+            )
+        })
+    }
 }
 
 impl VendorResults {

@@ -156,7 +156,9 @@ pub async fn make_outstanding_kyc_vendor_calls(
             tenant_id = %t_id,
             "VendorRequestsFailed"
         );
-        return Err(ApiErrorKind::VendorRequestsFailed)?;
+        if !vendor_results.has_sufficient_results_for_kyc() {
+            return Err(ApiErrorKind::VendorRequestsFailed.into());
+        }
     }
 
     let all_vendor_results: Vec<VendorResult> = vendor_requests
