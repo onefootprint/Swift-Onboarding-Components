@@ -1,0 +1,1 @@
+ALTER TABLE user_consent ADD COLUMN onboarding_id TEXT;
