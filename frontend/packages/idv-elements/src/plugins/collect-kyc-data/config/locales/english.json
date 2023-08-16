@@ -121,10 +121,10 @@
         }
       },
       "skip": {
-        "cta": "I don't have a SSN",
+        "cta": "I don't have an SSN",
         "confirmation": {
           "title": "Are you sure?",
-          "description": "Not providing a SSN might make your verification take a few days.",
+          "description": "Not providing an SSN might make your verification take a few days.",
           "yes": "Yes",
           "no": "No"
         }
