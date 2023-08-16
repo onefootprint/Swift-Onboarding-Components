@@ -4,7 +4,6 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::user_consent;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::OnboardingId;
 use newtypes::WorkflowId;
 use newtypes::{InsightEventId, UserConsentId};
 use serde::{Deserialize, Serialize};
@@ -18,8 +17,6 @@ pub struct UserConsent {
     pub consent_language_text: String,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    // not written or used, to be deprecated
-    pub onboarding_id: Option<OnboardingId>,
     pub ml_consent: bool,
     pub workflow_id: WorkflowId,
 }
