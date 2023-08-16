@@ -70,13 +70,9 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     let (di, id_doc) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let di = DecisionIntent::get_or_create_for_workflow_and_kind(
-                conn,
-                &su_id,
-                &wf.id,
-                DecisionIntentKind::DocScan,
-            )
-            .unwrap();
+            let di =
+                DecisionIntent::get_or_create_for_workflow(conn, &su_id, &wf.id, DecisionIntentKind::DocScan)
+                    .unwrap();
 
             let ie = InsightEvent::get(conn, &wf_id)?.unwrap();
             let doc_request = DocumentRequest::get(conn.conn(), &wf_id)?.unwrap();
@@ -308,13 +304,9 @@ async fn test_fail(state: &State, is_selfie: bool) {
     let (di, id_doc) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let di = DecisionIntent::get_or_create_for_workflow_and_kind(
-                conn,
-                &suid,
-                &wf.id,
-                DecisionIntentKind::DocScan,
-            )
-            .unwrap();
+            let di =
+                DecisionIntent::get_or_create_for_workflow(conn, &suid, &wf.id, DecisionIntentKind::DocScan)
+                    .unwrap();
             let ie = InsightEvent::get(conn, &wf_id)?.unwrap();
 
             let doc_request = DocumentRequest::get(conn.conn(), &wf_id)?.unwrap();

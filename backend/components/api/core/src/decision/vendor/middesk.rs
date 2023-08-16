@@ -538,7 +538,7 @@ pub async fn init_middesk_request(
             let wf = Workflow::update(wf, conn, update)?;
             let sv_id = &wf.scoped_vault_id;
 
-            let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
+            let decision_intent = DecisionIntent::get_or_create_for_workflow(
                 conn,
                 sv_id,
                 &wf_id,

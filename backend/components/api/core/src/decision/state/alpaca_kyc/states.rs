@@ -399,7 +399,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let (wf, v) = DbWorkflow::get_with_vault(conn, &wf_id)?;
-                let di = DecisionIntent::get_or_create_for_workflow_and_kind(
+                let di = DecisionIntent::get_or_create_for_workflow(
                     conn,
                     &sv_id,
                     &wf_id,

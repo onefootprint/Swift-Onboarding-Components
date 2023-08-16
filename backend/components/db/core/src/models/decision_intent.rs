@@ -54,8 +54,8 @@ impl DecisionIntent {
         Ok(result)
     }
 
-    #[tracing::instrument("DecisionIntent::get_or_create_for_kind_by_workflow_id", skip_all)]
-    fn get_or_create_for_kind_by_workflow_id(
+    #[tracing::instrument("DecisionIntent::get_or_create_for_workflow", skip_all)]
+    pub fn get_or_create_for_workflow(
         conn: &mut TxnPgConn,
         sv_id: &ScopedVaultId,
         wf_id: &WorkflowId,
@@ -85,13 +85,12 @@ impl DecisionIntent {
         Ok(new_di)
     }
 
-    // Legacy query now just used for KYB since this has not been migrated to Workflows yet
-    #[tracing::instrument("DecisionIntent::get_or_create_for_kind_by_scoped_vault_id", skip_all)]
-    fn get_or_create_for_kind_by_scoped_vault_id(
+    #[tracing::instrument("DecisionIntent::get_or_create_onboarding_kyb", skip_all)]
+    pub fn get_or_create_onboarding_kyb(
         conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,
-        kind: DecisionIntentKind,
     ) -> DbResult<Self> {
+        let kind = DecisionIntentKind::OnboardingKyb;
         let new_di = NewDecisionIntent {
             created_at: Utc::now(),
             kind,
@@ -115,28 +114,6 @@ impl DecisionIntent {
 
         Ok(new_di)
     }
-
-    #[tracing::instrument("DecisionIntent::get_or_create_onboarding_kyc", skip_all)]
-    pub fn get_or_create_for_workflow_and_kind(
-        conn: &mut TxnPgConn,
-        scoped_vault_id: &ScopedVaultId,
-        workflow_id: &WorkflowId,
-        kind: DecisionIntentKind,
-    ) -> DbResult<Self> {
-        Self::get_or_create_for_kind_by_workflow_id(conn, scoped_vault_id, workflow_id, kind)
-    }
-
-    #[tracing::instrument("DecisionIntent::get_or_create_onboarding_kyb", skip_all)]
-    pub fn get_or_create_onboarding_kyb(
-        conn: &mut TxnPgConn,
-        scoped_vault_id: &ScopedVaultId,
-    ) -> DbResult<Self> {
-        Self::get_or_create_for_kind_by_scoped_vault_id(
-            conn,
-            scoped_vault_id,
-            DecisionIntentKind::OnboardingKyb,
-        )
-    }
 }
 
 #[cfg(test)]
@@ -151,14 +128,14 @@ mod tests {
     fn test_get_or_create_onboarding_kyc(conn: &mut TestPgConn) {
         let sv_id = ScopedVaultId::from_str("123").unwrap();
         let wf_id = WorkflowId::from_str("456").unwrap();
-        let di1 = DecisionIntent::get_or_create_for_workflow_and_kind(
+        let di1 = DecisionIntent::get_or_create_for_workflow(
             conn,
             &sv_id,
             &wf_id,
             DecisionIntentKind::OnboardingKyc,
         )
         .unwrap();
-        let di2 = DecisionIntent::get_or_create_for_workflow_and_kind(
+        let di2 = DecisionIntent::get_or_create_for_workflow(
             conn,
             &sv_id,
             &wf_id,

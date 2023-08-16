@@ -294,7 +294,7 @@ mod tests {
         let uv = fixtures::vault::create_person(conn, true).into_inner();
         let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
         let (ob, wf) = fixtures::onboarding::create(conn, sv.id.clone(), obc.id, None);
-        let di = crate::models::decision_intent::DecisionIntent::get_or_create_for_workflow_and_kind(
+        let di = crate::models::decision_intent::DecisionIntent::get_or_create_for_workflow(
             conn,
             &sv.id,
             &wf.id,

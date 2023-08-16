@@ -150,7 +150,7 @@ pub async fn post(
             let result = if should_initiate_reqs {
                 // Initiate IDV reqs once and only once for this id_doc
                 let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
-                let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
+                let decision_intent = DecisionIntent::get_or_create_for_workflow(
                     conn,
                     &su_id,
                     &wf_id,

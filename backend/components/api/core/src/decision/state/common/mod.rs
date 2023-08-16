@@ -66,12 +66,8 @@ pub fn setup_kyc_onboarding_vreqs(
     let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
     let wf = Workflow::update(wf, conn, update)?;
     // TODO: create new DI if is_redo
-    let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
-        conn,
-        sv_id,
-        &wf.id,
-        DecisionIntentKind::OnboardingKyc,
-    )?;
+    let decision_intent =
+        DecisionIntent::get_or_create_for_workflow(conn, sv_id, &wf.id, DecisionIntentKind::OnboardingKyc)?;
 
     let uvw = VaultWrapper::build(conn, VwArgs::Tenant(sv_id))?;
 
