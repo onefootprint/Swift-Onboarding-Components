@@ -81,10 +81,9 @@ macro_rules! list_query {
             // Filter out onboardings that haven't been explicitly authorized by the user - these should
             // not be visible in the dashboard since the tenant doesn't have permissions to view anything
             // about the user
-            use db_schema::schema::{manual_review, onboarding, scoped_vault, vault, watchlist_check, workflow};
+            use db_schema::schema::{manual_review, scoped_vault, vault, watchlist_check, workflow};
             let mut query = scoped_vault::table
                 .inner_join(vault::table)
-                .left_join(onboarding::table)
                 .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
                 .filter(scoped_vault::is_live.eq($params.is_live))
                 .into_boxed();

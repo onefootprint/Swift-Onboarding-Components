@@ -2,7 +2,7 @@ use crate::{DbError, PgConn};
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::vault::{self, BoxedQuery};
-use db_schema::schema::{onboarding, scoped_vault};
+use db_schema::schema::{scoped_vault};
 use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -10,7 +10,7 @@ use diesel::upsert::on_constraint;
 use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, OnboardingId, SandboxId,
+    EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, SandboxId,
     ScopedVaultId, TenantId, VaultId, VaultKind, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
@@ -49,7 +49,6 @@ pub enum VaultIdentifier<'a> {
         tenant_id: &'a TenantId,
         is_live: IsLive,
     },
-    OnboardingId(&'a OnboardingId),
 }
 
 impl<'a> From<&'a VaultId> for VaultIdentifier<'a> {
@@ -74,12 +73,6 @@ impl<'a> From<(&'a FpId, &'a TenantId, IsLive)> for VaultIdentifier<'a> {
     }
 }
 
-impl<'a> From<&'a OnboardingId> for VaultIdentifier<'a> {
-    fn from(id: &'a OnboardingId) -> Self {
-        Self::OnboardingId(id)
-    }
-}
-
 impl Vault {
     fn query(id: VaultIdentifier) -> BoxedQuery<Pg> {
         match id {
@@ -100,14 +93,6 @@ impl Vault {
                     .filter(scoped_vault::tenant_id.eq(tenant_id))
                     .filter(scoped_vault::is_live.eq(is_live))
                     .select(scoped_vault::vault_id);
-                vault::table.filter(vault::id.eq_any(uv_ids)).into_boxed()
-            }
-            VaultIdentifier::OnboardingId(onboarding_id) => {
-                let uv_ids = onboarding::table
-                    .filter(onboarding::id.eq(onboarding_id))
-                    .inner_join(scoped_vault::table)
-                    .select(scoped_vault::vault_id);
-
                 vault::table.filter(vault::id.eq_any(uv_ids)).into_boxed()
             }
         }

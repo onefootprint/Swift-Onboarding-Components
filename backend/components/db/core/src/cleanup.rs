@@ -14,7 +14,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
         access_event, annotation, business_owner, contact_info, data_lifetime, decision_intent,
         document_data, document_request, document_upload, fingerprint, fingerprint_visit_event,
         identity_document, incode_verification_session, incode_verification_session_event, liveness_event,
-        manual_review, middesk_request, onboarding, onboarding_decision,
+        manual_review, middesk_request, onboarding_decision,
         onboarding_decision_verification_result_junction, risk_signal, risk_signal_group, scoped_vault,
         socure_device_session, stytch_fingerprint_event, user_consent, user_timeline, vault, vault_data,
         verification_request, verification_result, watchlist_check, webauthn_credential, workflow,
@@ -186,10 +186,6 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .filter(verification_request::scoped_vault_id.eq_any(su_ids.clone()))
                 .execute(conn.conn())?;
         }
-
-        deleted_rows += diesel::delete(onboarding::table)
-            .filter(onboarding::scoped_vault_id.eq_any(su_ids.clone()))
-            .execute(conn.conn())?;
 
         // Workflows
         {

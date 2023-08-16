@@ -18,8 +18,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingId, OnboardingStatus, ScopedVaultId,
-    TenantId, VaultCreatedInfo, VaultId, WorkflowId,
+    DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus, ScopedVaultId, TenantId,
+    VaultCreatedInfo, VaultId, WorkflowId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -61,9 +61,6 @@ pub enum ScopedVaultIdentifier<'a> {
     Id {
         id: &'a ScopedVaultId,
     },
-    OnboardingId {
-        id: &'a OnboardingId,
-    },
     WorkflowId {
         id: &'a WorkflowId,
     },
@@ -85,12 +82,6 @@ pub enum ScopedVaultIdentifier<'a> {
 impl<'a> From<&'a ScopedVaultId> for ScopedVaultIdentifier<'a> {
     fn from(id: &'a ScopedVaultId) -> Self {
         Self::Id { id }
-    }
-}
-
-impl<'a> From<&'a OnboardingId> for ScopedVaultIdentifier<'a> {
-    fn from(id: &'a OnboardingId) -> Self {
-        Self::OnboardingId { id }
     }
 }
 
@@ -211,13 +202,6 @@ impl ScopedVault {
 
         match id.into() {
             ScopedVaultIdentifier::Id { id } => query = query.filter(scoped_vault::id.eq(id)),
-            ScopedVaultIdentifier::OnboardingId { id } => {
-                use db_schema::schema::onboarding;
-                let scoped_user_ids = onboarding::table
-                    .filter(onboarding::id.eq(id))
-                    .select(onboarding::scoped_vault_id);
-                query = query.filter(scoped_vault::id.eq_any(scoped_user_ids))
-            }
             ScopedVaultIdentifier::WorkflowId { id } => {
                 use db_schema::schema::workflow;
                 let scoped_user_ids = workflow::table

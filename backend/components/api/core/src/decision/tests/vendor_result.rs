@@ -4,7 +4,7 @@ use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::tests::prelude::*;
 use macros::db_test;
-use newtypes::{OnboardingId, PiiJsonValue, SealedVaultBytes, VendorAPI};
+use newtypes::{PiiJsonValue, SealedVaultBytes, VendorAPI};
 use std::str::FromStr;
 
 // TODO: rebase test and re-enable after test refactoring/utils merged in (https://github.com/onefootprint/monorepo/pull/2039)
