@@ -16,6 +16,7 @@ pub struct SocureDeviceSession {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -24,6 +25,7 @@ struct NewSocureDeviceSession {
     pub onboarding_id: OnboardingId,
     pub device_session_id: String,
     pub created_at: DateTime<Utc>,
+    pub workflow_id: WorkflowId,
 }
 
 impl SocureDeviceSession {
@@ -44,6 +46,7 @@ impl SocureDeviceSession {
             onboarding_id,
             device_session_id,
             created_at: Utc::now(),
+            workflow_id: wf_id,
         };
         let result = diesel::insert_into(socure_device_session::table)
             .values(new_result)

@@ -577,6 +577,7 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        workflow_id -> Nullable<Text>,
     }
 }
 
@@ -972,6 +973,7 @@ joinable!(scoped_vault -> ob_configuration (ob_configuration_id));
 joinable!(scoped_vault -> tenant (tenant_id));
 joinable!(scoped_vault -> vault (vault_id));
 joinable!(socure_device_session -> onboarding (onboarding_id));
+joinable!(socure_device_session -> workflow (workflow_id));
 joinable!(stytch_fingerprint_event -> scoped_vault (scoped_vault_id));
 joinable!(stytch_fingerprint_event -> vault (vault_id));
 joinable!(stytch_fingerprint_event -> verification_result (verification_result_id));
