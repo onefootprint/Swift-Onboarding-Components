@@ -80,6 +80,7 @@ async fn patch_inner(
         .into_inner()
         .clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
     let is_fixture = user_auth.user().is_fixture;
+    let tenant_id = user_auth.tenant()?.id.clone();
     let su_id = user_auth.data.scoped_user.id;
     let email = request
         .get(&IDK::Email.into())
@@ -108,7 +109,7 @@ async fn patch_inner(
             .into_iter()
             .find(|(di, _)| di == &DataIdentifier::from(IDK::Email))
         {
-            send_email_challenge(&state, ci.id, &email.email).await?;
+            send_email_challenge(&state, &tenant_id, ci.id, &email.email).await?;
         }
     }
 

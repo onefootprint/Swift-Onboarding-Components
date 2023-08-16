@@ -41,6 +41,8 @@ pub enum BoolFlag<'a> {
     CanMakeDemoIncodeRequestsInSandbox(&'a TenantId),
     #[strum(to_string = "CanSkipSelfie")]
     CanSkipSelfie(&'a TenantId),
+    #[strum(to_string = "OmitEmailVerification")]
+    OmitEmailVerification(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -69,6 +71,7 @@ impl<'a> BoolFlag<'a> {
             Self::IsAppClipEnabled(k) => Some(k.to_string()),
             Self::CanMakeDemoIncodeRequestsInSandbox(k) => Some(k.to_string()),
             Self::CanSkipSelfie(k) => Some(k.to_string()),
+            Self::OmitEmailVerification(k) => Some(k.to_string()),
         }
     }
 
@@ -93,6 +96,7 @@ impl<'a> BoolFlag<'a> {
             Self::IsAppClipEnabled(_) => false,
             Self::CanMakeDemoIncodeRequestsInSandbox(_) => false,
             Self::CanSkipSelfie(_) => false,
+            Self::OmitEmailVerification(_) => false,
         }
     }
 }

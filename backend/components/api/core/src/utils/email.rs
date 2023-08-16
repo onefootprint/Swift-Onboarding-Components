@@ -3,7 +3,8 @@ use crate::errors::{ApiError, ApiErrorKind};
 use crate::State;
 use crate::{auth::session::AuthSessionData, errors::ApiResult};
 use crypto::random::gen_random_alphanumeric_code;
-use newtypes::{ContactInfoId, PiiString};
+use feature_flag::BoolFlag;
+use newtypes::{ContactInfoId, PiiString, TenantId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use std::collections::HashMap;
@@ -197,9 +198,18 @@ impl SendgridClient {
 
 pub async fn send_email_challenge(
     state: &web::Data<State>,
+    tenant_id: &TenantId,
     email_id: ContactInfoId,
     email_address: &PiiString,
 ) -> Result<(), ApiError> {
+    // Some tenants don't ever want to verify email
+    // TODO we'll want to ignore this on no-phone OBCs
+    let omit_email_verification = state
+        .feature_flag_client
+        .flag(BoolFlag::OmitEmailVerification(tenant_id));
+    if omit_email_verification {
+        return Ok(());
+    }
     let session_data = AuthSessionData::EmailVerify(EmailVerifySession { email_id });
 
     // create new session
