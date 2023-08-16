@@ -261,13 +261,14 @@ fn get_requirement_inner(
                     || id_doc
                         .into_iter()
                         .any(|d| d.status == IdentityDocumentStatus::Pending);
+                let only_us_dr = dr.only_us();
                 should_render.then_some(OnboardingRequirement::CollectDocument {
                     document_request_id: dr.id,
                     should_collect_selfie: dr.should_collect_selfie,
                     should_collect_consent: user_consent.is_none(),
                     // TODO remove only_us_dl feature flag when all of flexcar is migrated.
                     // For now, regardless of what's on the DR for flexcar, restrict to US
-                    only_us_supported: dr.only_us || only_us_dl,
+                    only_us_supported: only_us_dr || only_us_dl,
                     supported_document_types: if let Some(doc_types) = dr.global_doc_types_accepted {
                         doc_types
                     } else if only_us_dl {

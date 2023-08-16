@@ -1,0 +1,4 @@
+ALTER TABLE document_request
+    ADD COLUMN only_us BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE document_request ALTER COLUMN only_us DROP DEFAULT;

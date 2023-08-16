@@ -65,7 +65,7 @@ pub async fn post(
         return Err(OnboardingError::UserConsentNotFound.into());
     }
 
-    if doc_request.only_us && request.country_code != "US" {
+    if doc_request.only_us() && request.country_code != "US" {
         return Err(OnboardingError::UnsupportedNonUSDocumentCountry.into());
     }
     if let Some(doc_types) = doc_request.global_doc_types_accepted.clone() {

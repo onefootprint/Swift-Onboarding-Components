@@ -22,8 +22,8 @@ pub struct DocumentRequest {
     pub _updated_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
-    pub only_us: bool,
     // Document types that are accepted across all countries, except if overridden in country_doc_type_restrictions
+    // These drive the frontend UI and are generated in get_requirements. If this is None, we fall back to accepting any ModerIdDocKind
     pub global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
     // if !empty, restrict to only these countries
     pub country_restrictions: Option<Vec<String>>,
@@ -48,7 +48,6 @@ impl DocumentRequest {
             ref_id,
             workflow_id,
             should_collect_selfie,
-            only_us,
             global_doc_types_accepted,
             country_restrictions,
             country_doc_type_restrictions,
@@ -59,7 +58,6 @@ impl DocumentRequest {
             created_at: Utc::now(),
             should_collect_selfie,
             workflow_id,
-            only_us,
             global_doc_types_accepted,
             country_restrictions,
             country_doc_type_restrictions,
@@ -86,7 +84,6 @@ pub struct NewDocumentRequestArgs {
     pub ref_id: Option<String>,
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
-    pub only_us: bool,
     pub global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
     // TODO: enum
     pub country_restrictions: Vec<String>,
@@ -101,7 +98,6 @@ struct NewDocumentRequestRow {
     created_at: DateTime<Utc>,
     should_collect_selfie: bool,
     workflow_id: WorkflowId,
-    only_us: bool,
     global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
     // TODO: enum
     country_restrictions: Vec<String>,

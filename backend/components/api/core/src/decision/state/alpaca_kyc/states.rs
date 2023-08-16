@@ -317,7 +317,6 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                     workflow_id: self.wf_id.clone(),
                     // TODO: should come from a config
                     should_collect_selfie: true,
-                    only_us: true,
                     global_doc_types_accepted: None,
                     country_restrictions: vec!["US".into()],
                     country_doc_type_restrictions: None,

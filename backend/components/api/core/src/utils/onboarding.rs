@@ -68,7 +68,6 @@ pub fn get_or_start_onboarding(
                 ref_id: None,
                 workflow_id: wf.id.clone(),
                 should_collect_selfie: doc_info.2 == Selfie::RequireSelfie,
-                only_us: us_only,
                 global_doc_types_accepted: doc_type_restriction,
                 country_restrictions: vec![us_only.then_some("US".to_string())]
                     .into_iter()

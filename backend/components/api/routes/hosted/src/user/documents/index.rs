@@ -45,7 +45,7 @@ pub async fn post(
             let doc_request =
                 DbDocumentRequest::get(conn, &wf_id)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
             // Validate that the type of document uploaded matches what's required by the doc request
-            if doc_request.only_us && country_code != "US" {
+            if doc_request.only_us() && country_code != "US" {
                 return Err(OnboardingError::UnsupportedNonUSDocumentCountry.into());
             }
             if let Some(doc_types) = doc_request.global_doc_types_accepted.clone() {

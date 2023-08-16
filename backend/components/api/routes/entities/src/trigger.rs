@@ -99,7 +99,6 @@ pub async fn post(
                         workflow_id: wf.id.clone(),
                         should_collect_selfie: collect_selfie,
                         // TODO should these come from the last doc request? or be tenant-specific? or from workflow?
-                        only_us: false,
                         global_doc_types_accepted: None,
                         country_restrictions: vec![],
                         country_doc_type_restrictions: None,
