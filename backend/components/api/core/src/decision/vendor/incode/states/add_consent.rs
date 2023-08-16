@@ -28,9 +28,9 @@ impl IncodeStateTransition for AddConsent {
             // isn't provided
             return Ok(None);
         };
-        let sv_id = ctx.sv_id.clone();
+        let wf_id = ctx.wf_id.clone();
         let consent = db_pool
-            .db_query(move |conn| UserConsent::latest(conn, &sv_id))
+            .db_query(move |conn| UserConsent::get_for_workflow(conn, &wf_id))
             .await??
             .ok_or(AssertionError("User consent not found"))?;
         let privacy_request = IncodeAddPrivacyConsentRequest {

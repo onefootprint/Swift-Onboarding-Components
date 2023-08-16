@@ -48,6 +48,7 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let wf = user_auth.workflow()?;
+    let wf_id = wf.id.clone();
     let document_id: IdentityDocumentId = document_id.into_inner();
     tracing::info!("Before unpacking request");
     let CreateIdentityDocumentUploadRequest {
@@ -63,7 +64,7 @@ pub async fn post(
         .db_query(move |conn| -> ApiResult<_> {
             let (id_doc, doc_request) = IdentityDocument::get(conn, &document_id)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
-            let user_consent = UserConsent::latest(conn, &su_id)?;
+            let user_consent = UserConsent::get_for_workflow(conn, &wf_id)?;
             Ok((id_doc, doc_request, uvw, user_consent))
         })
         .await??;
@@ -90,6 +91,7 @@ pub async fn post(
     // Create uploads for the document
     let vault2 = vault.clone();
     let wf_id = wf.id.clone();
+    let wf_id2 = wf.id.clone();
     let tenant_id = user_auth.tenant()?.id.clone();
     let is_sandbox = id_doc.fixture_result.is_some();
     // Check if we should be initiating requests (e.g. check if we are testing)
@@ -187,6 +189,7 @@ pub async fn post(
             doc_request,
             is_sandbox,
             should_collect_selfie,
+            &wf_id2,
         )
         .await?
     } else {
@@ -217,6 +220,7 @@ pub(in crate::user) async fn handle_incode_request(
     doc_request: DocumentRequest,
     is_sandbox: bool,
     should_collect_selfie: bool,
+    workflow_id: &WorkflowId,
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
 
@@ -225,6 +229,7 @@ pub(in crate::user) async fn handle_incode_request(
         di_id: decision_intent_id,
         sv_id: doc_request.scoped_vault_id.clone(),
         id_doc_id: identity_document_id,
+        wf_id: workflow_id.clone(),
         vault,
         docv_data,
         doc_request_id: doc_request.id,

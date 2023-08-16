@@ -253,7 +253,7 @@ fn get_requirement_inner(
         OnboardingRequirementKind::CollectDocument => {
             let dr = DocumentRequest::get(conn, &args.workflow.id)?;
             if let Some(dr) = dr {
-                let user_consent = UserConsent::latest(conn, &args.workflow.scoped_vault_id)?;
+                let user_consent = UserConsent::get_for_workflow(conn, &args.workflow.id)?;
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
                 // Show a CollectDocument requirement if there's no id_document or the existing
                 // id_document is still Pending

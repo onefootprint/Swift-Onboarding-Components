@@ -765,9 +765,9 @@ table! {
         consent_language_text -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        onboarding_id -> Text,
+        onboarding_id -> Nullable<Text>,
         ml_consent -> Bool,
-        workflow_id -> Nullable<Text>,
+        workflow_id -> Text,
     }
 }
 

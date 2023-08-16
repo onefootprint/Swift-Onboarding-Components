@@ -54,7 +54,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     } else {
         None
     };
-    let (tenant, ob, wf, uv, su, _) = create_kyc_user_and_onboarding(
+    let (tenant, _, wf, uv, su, _) = create_kyc_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
         must_collect_data,
@@ -64,6 +64,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     )
     .await;
     let wf_id = wf.id.clone();
+    let wf_id2 = wf.id.clone();
 
     // Needed for db constraints
     let su_id = su.id.clone();
@@ -105,6 +106,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         di_id: di.id.clone(),
         sv_id: su.id.clone(),
         id_doc_id: id_doc.id.clone(),
+        wf_id: wf_id2,
         vault: uv.clone(),
         docv_data,
         doc_request_id: id_doc.request_id,
@@ -298,6 +300,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
     )
     .await;
     let wf_id = wf.id.clone();
+    let wf_id2 = wf.id.clone();
 
     // Needed for db constraints
     let suid = su.id.clone();
@@ -339,6 +342,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         di_id: di.id.clone(),
         sv_id: su.id.clone(),
         id_doc_id: id_doc.id.clone(),
+        wf_id: wf_id2,
         vault: uv.clone(),
         docv_data,
         doc_request_id: id_doc.request_id.clone(),

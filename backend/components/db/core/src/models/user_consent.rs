@@ -1,14 +1,12 @@
 use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
-use db_schema::schema::onboarding;
-use db_schema::schema::scoped_vault;
 use db_schema::schema::user_consent;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::ScopedVaultId;
+use newtypes::OnboardingId;
 use newtypes::WorkflowId;
-use newtypes::{InsightEventId, OnboardingId, UserConsentId};
+use newtypes::{InsightEventId, UserConsentId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Queryable, Default, Serialize, Deserialize)]
@@ -20,9 +18,10 @@ pub struct UserConsent {
     pub consent_language_text: String,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub onboarding_id: OnboardingId,
+    // not written or used, to be deprecated
+    pub onboarding_id: Option<OnboardingId>,
     pub ml_consent: bool,
-    pub workflow_id: Option<WorkflowId>,
+    pub workflow_id: WorkflowId,
 }
 
 #[derive(Debug, Clone, Insertable, Default)]
@@ -31,7 +30,6 @@ pub struct NewUserConsent {
     pub timestamp: DateTime<Utc>,
     pub insight_event_id: InsightEventId,
     pub consent_language_text: String,
-    pub onboarding_id: OnboardingId,
     pub ml_consent: bool,
     pub workflow_id: WorkflowId,
 }
@@ -46,19 +44,10 @@ impl UserConsent {
         ml_consent: bool,
         workflow_id: WorkflowId,
     ) -> Result<UserConsent, crate::DbError> {
-        // TODO migrate
-        use db_schema::schema::{onboarding, workflow};
-        let onboarding_id = onboarding::table
-            .inner_join(workflow::table.on(workflow::scoped_vault_id.eq(onboarding::scoped_vault_id)))
-            .filter(workflow::id.eq(&workflow_id))
-            .select(onboarding::id)
-            .get_result(conn)?;
-
         let new_user_consent = NewUserConsent {
             timestamp,
             insight_event_id,
             consent_language_text,
-            onboarding_id,
             ml_consent,
             workflow_id,
         };
@@ -70,14 +59,11 @@ impl UserConsent {
         Ok(new_user_consent)
     }
 
-    #[tracing::instrument("UserConsent::latest", skip_all)]
-    pub fn latest(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<UserConsent>> {
-        let res = scoped_vault::table
-            .filter(scoped_vault::id.eq(scoped_vault_id))
-            .inner_join(onboarding::table.inner_join(user_consent::table))
-            .order_by(user_consent::timestamp.desc())
-            .select(user_consent::all_columns)
-            .first(conn)
+    #[tracing::instrument("UserConsent::get_for_workflow", skip_all)]
+    pub fn get_for_workflow(conn: &mut PgConn, workflow_id: &WorkflowId) -> DbResult<Option<UserConsent>> {
+        let res = user_consent::table
+            .filter(user_consent::workflow_id.eq(workflow_id))
+            .get_result(conn)
             .optional()?;
 
         Ok(res)

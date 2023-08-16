@@ -50,7 +50,7 @@ pub async fn post(
             let doc_request =
                 DbDocumentRequest::get(conn, &wf_id)?.ok_or(OnboardingError::IdentityDocumentNotPending)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
-            let user_consent = UserConsent::latest(conn, &su_id)?;
+            let user_consent = UserConsent::get_for_workflow(conn, &wf_id)?;
             Ok((uvw, doc_request, user_consent))
         })
         .await??;
@@ -107,6 +107,7 @@ pub async fn post(
     let su_id = user_auth.scoped_user.id.clone();
     let vault2 = vault.clone();
     let wf_id = wf.id.clone();
+    let wf_id2 = wf.id.clone();
     let (missing_sides, created_reqs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -208,6 +209,7 @@ pub async fn post(
             doc_request,
             fixture.is_some(),
             should_collect_selfie,
+            &wf_id2,
         )
         .await?
     } else {

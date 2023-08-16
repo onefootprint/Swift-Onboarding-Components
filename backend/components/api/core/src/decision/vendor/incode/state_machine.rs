@@ -14,7 +14,7 @@ use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DecisionIntentId, DocVData, DocumentRequestId, IdentityDocumentId, IncodeConfigurationId,
     IncodeFailureReason, IncodeVerificationSessionKind, IncodeVerificationSessionState, ScopedVaultId,
-    TenantId,
+    TenantId, WorkflowId,
 };
 
 pub type IsReady = bool;
@@ -25,6 +25,7 @@ pub struct IncodeContext {
     pub di_id: DecisionIntentId,
     pub sv_id: ScopedVaultId,
     pub id_doc_id: IdentityDocumentId,
+    pub wf_id: WorkflowId,
     pub vault: Vault,
     pub docv_data: DocVData,
     pub doc_request_id: DocumentRequestId,
