@@ -390,11 +390,6 @@ table! {
         start_timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        insight_event_id -> Nullable<Text>,
-        authorized_at -> Nullable<Timestamptz>,
-        idv_reqs_initiated_at -> Nullable<Timestamptz>,
-        decision_made_at -> Nullable<Timestamptz>,
-        workflow_id -> Nullable<Text>,
     }
 }
 
@@ -957,9 +952,7 @@ joinable!(middesk_request -> decision_intent (decision_intent_id));
 joinable!(middesk_request -> workflow (workflow_id));
 joinable!(ob_configuration -> appearance (appearance_id));
 joinable!(ob_configuration -> tenant (tenant_id));
-joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> scoped_vault (scoped_vault_id));
-joinable!(onboarding -> workflow (workflow_id));
 joinable!(onboarding_decision -> workflow (workflow_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));

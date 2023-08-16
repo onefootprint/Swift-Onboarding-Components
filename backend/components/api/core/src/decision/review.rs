@@ -63,7 +63,7 @@ pub fn save_review_decision(
         // This logic is getting convoluted - soon will switch to just workflow update
         let (ob, _) = Onboarding::get(conn, &wf.scoped_vault_id)?;
         let ob = Onboarding::lock(conn, &ob.id)?;
-        let update = OnboardingUpdate::set_decision(status.into(), &ob);
+        let update = OnboardingUpdate::set_decision(status.into());
         Onboarding::update(ob, conn, &wf_id, update)?;
     }
 

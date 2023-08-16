@@ -108,7 +108,6 @@ fn make_vault(
             let (ob, wf) = fixtures::onboarding::create(conn, svid, ob_config.id, None);
             let ob = Onboarding::lock(conn, &ob.id).unwrap();
             let update = OnboardingUpdate {
-                decision_made_at: Some(Some(ob_decision_made_at)),
                 status: Some(OnboardingStatus::Pass),
                 ..Default::default()
             };

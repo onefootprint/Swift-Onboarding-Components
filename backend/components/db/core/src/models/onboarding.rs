@@ -13,7 +13,7 @@ use db_schema::schema::{onboarding, scoped_vault};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, InsightEventId, KybConfig, KycConfig, Locked,
+    AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, KybConfig, KycConfig, Locked,
     ObConfigurationId, OnboardingCompletedPayload, OnboardingId, OnboardingStatusChangedPayload,
     ScopedVaultId, TaskData, WebhookEvent, WorkflowFixtureResult, WorkflowId,
 };
@@ -30,14 +30,6 @@ pub struct Onboarding {
     pub start_timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-
-    // TODO rm
-    insight_event_id: Option<InsightEventId>,
-    // There are still some reads of these in DB queries that we have to rm first
-    authorized_at: Option<DateTime<Utc>>,
-    idv_reqs_initiated_at: Option<DateTime<Utc>>,
-    decision_made_at: Option<DateTime<Utc>>,
-    workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -45,23 +37,12 @@ pub struct Onboarding {
 struct NewOnboarding {
     scoped_vault_id: ScopedVaultId,
     start_timestamp: DateTime<Utc>,
-    insight_event_id: Option<InsightEventId>,
-    workflow_id: WorkflowId,
-}
-
-#[derive(Debug, AsChangeset, Default)]
-#[diesel(table_name = onboarding)]
-struct OnboardingUpdateRow {
-    authorized_at: Option<Option<DateTime<Utc>>>,
-    idv_reqs_initiated_at: Option<Option<DateTime<Utc>>>,
-    decision_made_at: Option<Option<DateTime<Utc>>>,
 }
 
 #[derive(Debug, Default)]
 pub struct OnboardingUpdate {
     pub authorized_at: Option<Option<DateTime<Utc>>>,
     pub idv_reqs_initiated_at: Option<Option<DateTime<Utc>>>,
-    pub decision_made_at: Option<Option<DateTime<Utc>>>,
     pub status: Option<OnboardingStatus>,
 }
 
@@ -88,11 +69,9 @@ impl OnboardingUpdate {
         }
     }
 
-    pub fn set_decision(decision_status: DecisionStatus, ob: &Onboarding) -> Self {
-        let decision_made_at = ob.decision_made_at.is_none().then_some(Some(Utc::now()));
+    pub fn set_decision(decision_status: DecisionStatus) -> Self {
         Self {
             status: Some(decision_status.into()),
-            decision_made_at,
             ..Self::default()
         }
     }
@@ -202,7 +181,7 @@ impl Onboarding {
             config,
             fixture_result,
             obc.id,
-            insight_event_id.clone(),
+            insight_event_id,
         )?;
 
         // Eventually, we'll get rid of onboarding and we'll just get_or_create the workflow here
@@ -217,8 +196,6 @@ impl Onboarding {
             let new_ob = NewOnboarding {
                 scoped_vault_id: args.scoped_vault_id.clone(),
                 start_timestamp: Utc::now(),
-                insight_event_id,
-                workflow_id: wf.id.clone(),
             };
             diesel::insert_into(onboarding::table)
                 .values(new_ob)
@@ -303,26 +280,6 @@ impl Onboarding {
                 Task::create(conn, Utc::now(), task_data)?;
             }
         }
-        let OnboardingUpdate {
-            authorized_at,
-            idv_reqs_initiated_at,
-            decision_made_at,
-            ..
-        } = update;
-        let result =
-            if authorized_at.is_some() || idv_reqs_initiated_at.is_some() || decision_made_at.is_some() {
-                let update = OnboardingUpdateRow {
-                    authorized_at,
-                    idv_reqs_initiated_at,
-                    decision_made_at,
-                };
-                diesel::update(onboarding::table)
-                    .filter(onboarding::id.eq(&ob.id))
-                    .set(update)
-                    .get_result::<Self>(conn.conn())?
-            } else {
-                ob.into_inner()
-            };
-        Ok(result)
+        Ok(ob.into_inner())
     }
 }
