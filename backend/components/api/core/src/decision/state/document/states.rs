@@ -1,10 +1,11 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
 
 use feature_flag::FeatureFlagClient;
-use newtypes::DocumentConfig;
+use newtypes::{DocumentConfig, Locked};
 use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 
 use super::{DocumentState, MakeDecision};
@@ -44,6 +45,7 @@ pub struct DocumentDataCollection {
 
 #[derive(Clone)]
 pub struct DocumentDecisioning {
+    #[allow(unused)]
     wf_id: WorkflowId,
     ob_id: OnboardingId,
     sv_id: ScopedVaultId,
@@ -100,7 +102,12 @@ impl OnAction<DocCollected, DocumentState> for DocumentDataCollection {
     }
 
     #[tracing::instrument("OnAction<DocCollected, DocumentState>::on_commit", skip_all)]
-    fn on_commit(self, _tvc: TenantVendorControl, _conn: &mut db::TxnPgConn) -> ApiResult<DocumentState> {
+    fn on_commit(
+        self,
+        _wf: Locked<DbWorkflow>,
+        _tvc: TenantVendorControl,
+        _conn: &mut db::TxnPgConn,
+    ) -> ApiResult<DocumentState> {
         Ok(DocumentState::from(DocumentDecisioning {
             wf_id: self.wf_id,
             sv_id: self.sv_id,
@@ -157,9 +164,14 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
     }
 
     #[tracing::instrument("OnAction<MakeDecision, DocumentState>::on_commit", skip_all)]
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<DocumentState> {
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        async_res: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<DocumentState> {
         let (ff_client, vendor_results) = async_res;
-        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+        let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;

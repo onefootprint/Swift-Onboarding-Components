@@ -10,6 +10,7 @@ use api_core::decision::state::ReviewCompleted;
 use api_core::decision::state::StateError;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::onboarding::OnboardingError;
+use api_core::errors::ApiResult;
 use api_core::task;
 
 use api_core::ApiErrorKind;
@@ -72,7 +73,11 @@ pub async fn post(
     state
         .db_pool
         // TODO how does this work when there are multiple KYC workflows for one scoped vault?
-        .db_transaction(|conn| decision::review::save_review_decision(conn, wf_id, request, actor))
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let wf = Workflow::lock(conn, &wf_id)?;
+            decision::review::save_review_decision(conn, wf, request, actor)?;
+            Ok(())
+        })
         .await?;
     // Since we may have updated users onboarding status
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());

@@ -17,7 +17,7 @@ use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     AlpacaKycConfig, DecisionIntentKind, DecisionStatus, FootprintReasonCode, Iso3166TwoDigitCountryCode,
-    OnboardingStatus, ReviewReason, RiskSignalGroupKind, VendorAPI, VerificationResultId,
+    Locked, OnboardingStatus, ReviewReason, RiskSignalGroupKind, VendorAPI, VerificationResultId,
 };
 
 use crate::{
@@ -96,8 +96,13 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
     }
 
     #[tracing::instrument("OnAction<Authorize, AlpacaKycState>::on_commit", skip_all)]
-    fn on_commit(self, tvc: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
-        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id, &self.wf_id)?;
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        tvc: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<AlpacaKycState> {
+        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id, wf)?;
 
         Ok(AlpacaKycState::from(AlpacaKycVendorCalls {
             wf_id: self.wf_id,
@@ -164,9 +169,14 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
     }
 
     #[tracing::instrument("OnAction<MakeVendorCalls, AlpacaKycState>::on_commit", skip_all)]
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        async_res: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<AlpacaKycState> {
         let (vendor_results, ff_client) = async_res;
-        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+        let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> =
             if let Some(fd) = fixture_decision {
@@ -256,9 +266,12 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
     }
 
     #[tracing::instrument("OnAction<MakeDecision, AlpacaKycState>::on_commit", skip_all)]
-    fn on_commit(self, ff_client: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
-        // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
-        let wf = DbWorkflow::lock(conn, &self.wf_id)?;
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        ff_client: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<AlpacaKycState> {
         let v = Vault::get(conn, &self.sv_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
@@ -438,10 +451,15 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
     }
 
     #[tracing::instrument("OnAction<MakeWatchlistCheckCall, AlpacaKycState>::on_commit", skip_all)]
-    fn on_commit(self, res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        res: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<AlpacaKycState> {
         // TODO save Risk Signals + determine if we transition to PendingReview or Complete
         let (watchlist_res, vendor_results) = res;
-        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+        let v = Vault::get(conn, &wf.scoped_vault_id)?;
 
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
@@ -611,9 +629,14 @@ impl OnAction<ReviewCompleted, AlpacaKycState> for AlpacaKycPendingReview {
     }
 
     #[tracing::instrument("OnAction<ReviewCompleted, AlpacaKycState>::on_commit", skip_all)]
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        async_res: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<AlpacaKycState> {
         let (decision, actor) = async_res;
-        save_review_decision(conn, self.wf_id, decision, actor)?;
+        save_review_decision(conn, wf, decision, actor)?;
         Ok(AlpacaKycState::from(AlpacaKycComplete))
     }
 }
@@ -663,7 +686,12 @@ impl OnAction<DocCollected, AlpacaKycState> for AlpacaKycDocCollection {
     }
 
     #[tracing::instrument("OnAction<DocCollected, AlpacaKycState>::on_commit", skip_all)]
-    fn on_commit(self, _async_res: Self::AsyncRes, _conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
+    fn on_commit(
+        self,
+        _wf: Locked<DbWorkflow>,
+        _async_res: Self::AsyncRes,
+        _conn: &mut db::TxnPgConn,
+    ) -> ApiResult<AlpacaKycState> {
         Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
             wf_id: self.wf_id,
             is_redo: self.is_redo,

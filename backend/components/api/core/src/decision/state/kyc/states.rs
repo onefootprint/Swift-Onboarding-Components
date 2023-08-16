@@ -2,11 +2,12 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use db::models::{
-    risk_signal::RiskSignal, risk_signal_group::RiskSignalGroup, workflow::Workflow as DbWorkflow,
+    risk_signal::RiskSignal, risk_signal_group::RiskSignalGroup, vault::Vault,
+    workflow::Workflow as DbWorkflow,
 };
 
 use feature_flag::FeatureFlagClient;
-use newtypes::{KycConfig, RiskSignalGroupKind, VaultKind};
+use newtypes::{KycConfig, Locked, RiskSignalGroupKind, VaultKind};
 
 use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
@@ -76,8 +77,13 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
     }
 
     #[tracing::instrument("OnAction<Authorize, KycState>::on_commit", skip_all)]
-    fn on_commit(self, tvc: TenantVendorControl, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
-        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id, &self.wf_id)?;
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        tvc: TenantVendorControl,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<KycState> {
+        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id, wf)?;
 
         Ok(KycState::from(KycVendorCalls {
             wf_id: self.wf_id,
@@ -144,9 +150,14 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     }
 
     #[tracing::instrument("OnAction<MakeVendorCalls, KycState>::on_commit", skip_all)]
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        async_res: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<KycState> {
         let (vendor_results, ff_client) = async_res;
-        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+        let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> =
             if let Some(fd) = fixture_decision {
@@ -226,8 +237,13 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
     }
 
     #[tracing::instrument("OnAction<MakeDecision, KycState>::on_commit", skip_all)]
-    fn on_commit(self, ff_client: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
-        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        ff_client: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<KycState> {
+        let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;

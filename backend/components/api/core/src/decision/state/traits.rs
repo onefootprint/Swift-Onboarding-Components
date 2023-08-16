@@ -7,6 +7,7 @@ use crate::{errors::ApiResult, State};
 use async_trait::async_trait;
 use db::{models::workflow::Workflow as DbWorkflow, TxnPgConn};
 use enum_dispatch::enum_dispatch;
+use newtypes::Locked;
 use newtypes::WorkflowId;
 
 // These are needed for enum_dispatch to work properly
@@ -45,7 +46,12 @@ pub(super) trait OnAction<TAction, TWorkflow>: WorkflowState + Clone {
     ) -> ApiResult<Self::AsyncRes>;
     // TODO: maybe in future this could be modeled as Actions vs Transitions. So OnAction, you perform the action and then return a Transition
     // which actually encapsulates the new state and whatever other writes need to occur for that state
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut TxnPgConn) -> ApiResult<TWorkflow>;
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        async_res: Self::AsyncRes,
+        conn: &mut TxnPgConn,
+    ) -> ApiResult<TWorkflow>;
 }
 
 #[async_trait]
@@ -82,8 +88,14 @@ where
                 if wf.state != current_state {
                     Err(StateError::ConcurrentStateChange(current_state, wf.state))?
                 }
-                let new_state = self.on_commit(r, conn)?;
-                DbWorkflow::update_state(conn, wf, newtypes::WorkflowState::from(&new_state.clone().into()))?;
+                let wf_id = Locked::new(wf.id.clone());
+                let new_state = self.on_commit(wf, r, conn)?;
+                DbWorkflow::update_state(
+                    conn,
+                    wf_id,
+                    current_state,
+                    newtypes::WorkflowState::from(&new_state.clone().into()),
+                )?;
                 Ok(new_state)
             })
             .await?;

@@ -3,6 +3,7 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
 use db::models::workflow::{Workflow as DbWorkflow, WorkflowUpdate};
 
 use super::{
@@ -25,7 +26,7 @@ use crate::decision::{
 use crate::{decision::state::OnAction, errors::ApiResult, State};
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
-use newtypes::{KybConfig, OnboardingStatus};
+use newtypes::{KybConfig, Locked, OnboardingStatus};
 
 /////////////////////
 /// DataCollection
@@ -64,7 +65,12 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
     }
 
     #[tracing::instrument("KybDataCollection#OnAction<Authorize, KybState>::on_commit", skip_all)]
-    fn on_commit(self, _async_res: (), _conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
+    fn on_commit(
+        self,
+        _wf: Locked<DbWorkflow>,
+        _async_res: (),
+        _conn: &mut db::TxnPgConn,
+    ) -> ApiResult<KybState> {
         Ok(KybState::from(KybAwaitingBoKyc {
             wf_id: self.wf_id,
             ob_id: self.ob_id,
@@ -117,9 +123,12 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
     }
 
     #[tracing::instrument("KybAwaitingBoKyc#OnAction<BoKycCompleted, KybState>::on_commit", skip_all)]
-    fn on_commit(self, _async_res: (), conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
-        // TODO get this from the workflow wrapper
-        let wf = DbWorkflow::lock(conn, &self.wf_id)?;
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        _async_res: (),
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<KybState> {
         let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
         DbWorkflow::update(wf, conn, update)?;
 
@@ -207,7 +216,12 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
     }
 
     #[tracing::instrument("KybVendorCalls#OnAction<MakeVendorCalls, KybState>::on_commit", skip_all)]
-    fn on_commit(self, fixture_decision: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
+    fn on_commit(
+        self,
+        _wf: Locked<DbWorkflow>,
+        fixture_decision: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<KybState> {
         if let Some(fixture_decision) = fixture_decision {
             decision::utils::write_kyb_fixture_vendor_result_and_risk_signals(
                 conn,
@@ -276,7 +290,12 @@ impl OnAction<AsyncVendorCallsCompleted, KybState> for KybAwaitingAsyncVendors {
         "KybAwaitingAsyncVendors#OnAction<AsyncVendorCallsCompleted, KybState>::on_commit",
         skip_all
     )]
-    fn on_commit(self, _async_res: (), _conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
+    fn on_commit(
+        self,
+        _wf: Locked<DbWorkflow>,
+        _async_res: (),
+        _conn: &mut db::TxnPgConn,
+    ) -> ApiResult<KybState> {
         Ok(KybState::from(KybDecisioning {
             wf_id: self.wf_id,
             ob_id: self.ob_id,
@@ -330,9 +349,14 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
     }
 
     #[tracing::instrument("KybDecisioning#OnAction<MakeDecision, KybState>::on_commit", skip_all)]
-    fn on_commit(self, async_res: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
+    fn on_commit(
+        self,
+        wf: Locked<DbWorkflow>,
+        async_res: Self::AsyncRes,
+        conn: &mut db::TxnPgConn,
+    ) -> ApiResult<KybState> {
         let (ff_client, bo_obds) = async_res;
-        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+        let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
 
         let sv = ScopedVault::get(conn, &self.ob_id)?;

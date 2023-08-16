@@ -11,8 +11,8 @@ use db::{
     DbPool, DbResult, TxnPgConn,
 };
 use newtypes::{
-    DecisionIntentKind, DecisionStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, ReviewReason,
-    ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
+    DecisionIntentKind, DecisionStatus, FootprintReasonCode, Locked, OnboardingId, OnboardingStatus,
+    ReviewReason, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -61,17 +61,15 @@ pub fn setup_kyc_onboarding_vreqs(
     is_redo: bool,
     ob_id: &OnboardingId,
     sv_id: &ScopedVaultId,
-    wf_id: &WorkflowId,
+    wf: Locked<Workflow>,
 ) -> ApiResult<()> {
-    // TODO get this from the workflow wrapper
-    let wf = Workflow::lock(conn, wf_id)?;
     let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
-    Workflow::update(wf, conn, update)?;
+    let wf = Workflow::update(wf, conn, update)?;
     // TODO: create new DI if is_redo
     let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
         conn,
         sv_id,
-        wf_id,
+        &wf.id,
         DecisionIntentKind::OnboardingKyc,
     )?;
 

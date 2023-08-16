@@ -335,15 +335,16 @@ impl Workflow {
     #[tracing::instrument("Workflow::update_state", skip_all)]
     pub fn update_state(
         conn: &mut TxnPgConn,
-        workflow: Locked<Self>,
+        id: Locked<WorkflowId>, // The caller passes of the locked wf, so let's just take the ID
+        old_state: WorkflowState,
         new_state: WorkflowState,
     ) -> DbResult<Self> {
-        let wf = workflow.into_inner();
+        let id = id.into_inner();
         let result = diesel::update(workflow::table)
-            .filter(workflow::id.eq(&wf.id))
+            .filter(workflow::id.eq(&id))
             .set(workflow::state.eq(new_state))
             .get_result(conn.conn())?;
-        WorkflowEvent::create(conn, wf.id, wf.state, new_state)?;
+        WorkflowEvent::create(conn, id, old_state, new_state)?;
         Ok(result)
     }
 
@@ -560,8 +561,10 @@ mod tests {
         .unwrap();
 
         let wf = Workflow::lock(conn, &wf.id).unwrap();
+        let id = Locked::new(wf.id.clone());
         let wfid = wf.id.clone();
-        let updated_wf = Workflow::update_state(conn, wf, WorkflowState::Kyc(KycState::Decisioning)).unwrap();
+        let updated_wf =
+            Workflow::update_state(conn, id, wf.state, WorkflowState::Kyc(KycState::Decisioning)).unwrap();
         assert!(updated_wf.state == WorkflowState::Kyc(KycState::Decisioning));
 
         let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
