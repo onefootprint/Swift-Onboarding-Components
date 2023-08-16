@@ -582,7 +582,6 @@ table! {
 
     socure_device_session (id) {
         id -> Text,
-        onboarding_id -> Nullable<Text>,
         device_session_id -> Text,
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
@@ -982,7 +981,6 @@ joinable!(risk_signal_group -> scoped_vault (scoped_vault_id));
 joinable!(scoped_vault -> ob_configuration (ob_configuration_id));
 joinable!(scoped_vault -> tenant (tenant_id));
 joinable!(scoped_vault -> vault (vault_id));
-joinable!(socure_device_session -> onboarding (onboarding_id));
 joinable!(socure_device_session -> workflow (workflow_id));
 joinable!(stytch_fingerprint_event -> scoped_vault (scoped_vault_id));
 joinable!(stytch_fingerprint_event -> vault (vault_id));
