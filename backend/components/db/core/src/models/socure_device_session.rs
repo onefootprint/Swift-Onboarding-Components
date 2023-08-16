@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::socure_device_session;
 use diesel::prelude::*;
 use diesel::Insertable;
-use newtypes::{OnboardingId, SocureDeviceSessionId};
+use newtypes::{OnboardingId, SocureDeviceSessionId, WorkflowId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -31,8 +31,15 @@ impl SocureDeviceSession {
     pub fn create(
         conn: &mut PgConn,
         device_session_id: String, //TODO: make this a wrapped type?
-        onboarding_id: OnboardingId,
+        wf_id: WorkflowId,
     ) -> Result<SocureDeviceSession, DbError> {
+        // TODO migrate
+        use db_schema::schema::{onboarding, workflow};
+        let onboarding_id = onboarding::table
+            .inner_join(workflow::table.on(workflow::scoped_vault_id.eq(onboarding::scoped_vault_id)))
+            .filter(workflow::id.eq(&wf_id))
+            .select(onboarding::id)
+            .get_result(conn)?;
         let new_result = NewSocureDeviceSession {
             onboarding_id,
             device_session_id,
@@ -45,12 +52,15 @@ impl SocureDeviceSession {
     }
 
     #[tracing::instrument("SocureDeviceSession::latest_for_onboarding", skip_all)]
-    pub fn latest_for_onboarding(
-        conn: &mut PgConn,
-        onboarding_id: &OnboardingId,
-    ) -> DbResult<Option<SocureDeviceSession>> {
+    pub fn latest(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<SocureDeviceSession>> {
+        // TODO migrate to new foreign key
+        use db_schema::schema::{onboarding, workflow};
+        let ob_ids = onboarding::table
+            .inner_join(workflow::table.on(workflow::scoped_vault_id.eq(onboarding::scoped_vault_id)))
+            .filter(workflow::id.eq(wf_id))
+            .select(onboarding::id);
         let res = socure_device_session::table
-            .filter(socure_device_session::onboarding_id.eq(onboarding_id))
+            .filter(socure_device_session::onboarding_id.eq_any(ob_ids))
             .order_by(socure_device_session::created_at.desc())
             .first(conn)
             .optional()?;

@@ -139,7 +139,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
         WorkflowKind::Kyb(kyb::KybState::VendorCalls(_))
     ));
 
-    let (_, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::VendorCalls), wf.state);
     assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
 
@@ -154,7 +154,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
         WorkflowKind::Kyb(kyb::KybState::Decisioning(_))
     ));
 
-    let (_, wf, _, _, _, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::Decisioning), wf.state);
 
     // Appropriate KYB passing risk signals are produced and not hidden
@@ -192,7 +192,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
         .await
         .unwrap();
 
-    let (_, wf, _, mr, _, _, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
     assert!(mr.is_none());
     assert_eq!(expected_status, wf.status.unwrap());
@@ -211,7 +211,7 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
-    let (_, wf, _, _, _, _, fingerprints) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _, fingerprints) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::AwaitingBoKyc), wf.state);
     assert!(!fingerprints.is_empty());
 
@@ -245,7 +245,7 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
         WorkflowKind::Kyb(kyb::KybState::VendorCalls(_))
     ));
 
-    let (_, wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::VendorCalls), wf.state);
     assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
 
@@ -263,7 +263,7 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
         WorkflowKind::Kyb(kyb::KybState::AwaitingAsyncVendors(_))
     ));
 
-    let (_, wf, _, _, _, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::AwaitingAsyncVendors), wf.state);
     assert!(rs.is_empty());
 
@@ -289,7 +289,7 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     .await
     .unwrap();
 
-    let (_, wf, _, mr, _, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, _, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
 
     let mut expected_rs = vec![

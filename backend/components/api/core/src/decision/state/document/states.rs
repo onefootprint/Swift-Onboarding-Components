@@ -6,7 +6,7 @@ use db::models::workflow::Workflow as DbWorkflow;
 
 use feature_flag::FeatureFlagClient;
 use newtypes::{DocumentConfig, Locked};
-use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
+use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 
 use super::{DocumentState, MakeDecision};
 use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
@@ -39,7 +39,6 @@ use crate::{
 pub struct DocumentDataCollection {
     wf_id: WorkflowId,
     sv_id: ScopedVaultId,
-    ob_id: OnboardingId,
     t_id: TenantId,
 }
 
@@ -47,7 +46,6 @@ pub struct DocumentDataCollection {
 pub struct DocumentDecisioning {
     #[allow(unused)]
     wf_id: WorkflowId,
-    ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
@@ -71,12 +69,11 @@ pub struct DocumentComplete;
 impl DocumentDataCollection {
     #[tracing::instrument("DocumentDataCollection::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, _config: DocumentConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(DocumentDataCollection {
             wf_id: workflow.id,
-            sv_id: sv.id,
-            ob_id: ob.id,
+            sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
         })
     }
@@ -111,7 +108,6 @@ impl OnAction<DocCollected, DocumentState> for DocumentDataCollection {
         Ok(DocumentState::from(DocumentDecisioning {
             wf_id: self.wf_id,
             sv_id: self.sv_id,
-            ob_id: self.ob_id,
             t_id: self.t_id,
         }))
     }
@@ -133,12 +129,11 @@ impl WorkflowState for DocumentDataCollection {
 impl DocumentDecisioning {
     #[tracing::instrument("DocumentDecisioning::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, _config: DocumentConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(DocumentDecisioning {
             wf_id: workflow.id,
-            ob_id: ob.id,
-            sv_id: sv.id,
+            sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
         })
     }
@@ -157,8 +152,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let vendor_results =
-            common::assert_kyc_vendor_calls_completed(state, &self.ob_id, &self.sv_id).await?;
+        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &self.sv_id).await?;
 
         Ok((state.feature_flag_client.clone(), vendor_results))
     }

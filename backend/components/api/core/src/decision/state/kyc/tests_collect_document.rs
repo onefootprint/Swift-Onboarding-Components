@@ -91,7 +91,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
-    let (_, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(wf.authorized_at.is_some());
     assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
@@ -131,7 +131,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         .await
         .unwrap();
 
-    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
@@ -254,7 +254,7 @@ async fn redo_document_and_pass(
         .await
         .unwrap();
 
-    let (_, wf, _, _, obd, rs, _) = query_data(state, &svid2, &wfid).await;
+    let (wf, _, _, obd, rs, _) = query_data(state, &svid2, &wfid).await;
     assert_eq!(
         WorkflowState::Document(newtypes::DocumentState::Complete),
         wf.state

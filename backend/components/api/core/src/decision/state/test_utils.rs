@@ -11,7 +11,6 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::{DocumentRequest, NewDocumentRequestArgs};
 use db::models::fingerprint::Fingerprint;
 use db::models::manual_review::ManualReview;
-use db::models::onboarding::Onboarding;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::{IncludeHidden, RiskSignal};
 use db::models::vault::Vault;
@@ -134,7 +133,6 @@ pub async fn query_data(
     wf_id: &WorkflowId,
 ) -> (
     // TODO: probably make a struct for this output
-    Onboarding,
     Workflow,
     Vec<WorkflowEvent>,
     Option<ManualReview>,
@@ -147,8 +145,6 @@ pub async fn query_data(
     state
         .db_pool
         .db_query(move |conn| {
-            let (ob, _) = Onboarding::get(conn, &svid).unwrap();
-
             let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, IncludeHidden(false))
                 .unwrap()
                 .into_iter()
@@ -162,7 +158,7 @@ pub async fn query_data(
 
             let fps = Fingerprint::_list_for_scoped_vault(conn, &svid).unwrap();
 
-            (ob, wf, wfe, mr, obd, rs, fps)
+            (wf, wfe, mr, obd, rs, fps)
         })
         .await
         .unwrap()

@@ -41,8 +41,7 @@ use idv::{
 
 use itertools::Itertools;
 use newtypes::{
-    OnboardingId, PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId, VerificationResultId,
-    WorkflowId,
+    PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId, VerificationResultId, WorkflowId,
 };
 use prometheus::labels;
 
@@ -95,7 +94,6 @@ pub struct VendorRequests {
 
 #[tracing::instrument(skip(db_pool, enclave_client))]
 pub async fn get_latest_verification_requests_and_results(
-    onboarding_id: &OnboardingId,
     scoped_user_id: &ScopedVaultId,
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
@@ -109,8 +107,8 @@ pub async fn get_latest_verification_requests_and_results(
         })
         .await??;
 
-    let obid = onboarding_id.clone();
-    let uv = db_pool.db_query(move |conn| Vault::get(conn, &obid)).await??;
+    let su_id = scoped_user_id.clone();
+    let uv = db_pool.db_query(move |conn| Vault::get(conn, &su_id)).await??;
 
     let previous_results = vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
         requests_and_results.clone(),

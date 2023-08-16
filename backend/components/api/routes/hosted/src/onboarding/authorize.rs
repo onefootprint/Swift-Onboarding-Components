@@ -28,7 +28,6 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     let span = tracing::Span::current();
     span.record("tenant_id", &format!("{:?}", user_auth.tenant()?.id.as_str()));
     span.record("tenant_name", &format!("{:?}", user_auth.tenant()?.id.as_str()));
-    span.record("onboarding_id", &format!("{}", user_auth.onboarding()?.id));
     span.record("scoped_user_id", &format!("{}", user_auth.scoped_user.id));
     span.record("ob_configuration_id", &format!("{}", user_auth.ob_config()?.id));
     span.record("workflow_id", &format!("{}", user_auth.workflow()?.id));

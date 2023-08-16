@@ -24,7 +24,6 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     let wf_id = user_auth.workflow()?.clone();
-    let ob_id = user_auth.onboarding()?.id.clone();
 
     let ConsentRequest {
         consent_language_text,
@@ -37,10 +36,9 @@ pub async fn post(
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
             let ml_consent = ml_consent.unwrap_or(false);
-            let _user_consent = UserConsent::create(
+            UserConsent::create(
                 conn,
                 Utc::now(),
-                ob_id,
                 insight_event.id,
                 consent_language_text,
                 ml_consent,

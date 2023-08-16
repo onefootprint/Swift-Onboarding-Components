@@ -3,7 +3,6 @@ use db::{
         decision_intent::DecisionIntent,
         document_request::DocumentRequest,
         ob_configuration::ObConfiguration,
-        onboarding::Onboarding,
         scoped_vault::ScopedVault,
         vault::Vault,
         workflow::{Workflow, WorkflowUpdate},
@@ -11,8 +10,8 @@ use db::{
     DbPool, DbResult, TxnPgConn,
 };
 use newtypes::{
-    DecisionIntentKind, DecisionStatus, FootprintReasonCode, Locked, OnboardingId, OnboardingStatus,
-    ReviewReason, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
+    DecisionIntentKind, DecisionStatus, FootprintReasonCode, Locked, OnboardingStatus, ReviewReason,
+    ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -41,16 +40,10 @@ use crate::{
 use super::{traits::HasRuleGroup, StateError};
 
 #[tracing::instrument(skip(db_pool))]
-pub async fn get_onboarding_for_workflow(
-    db_pool: &DbPool,
-    workflow: &Workflow,
-) -> DbResult<(Onboarding, ScopedVault)> {
+pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> DbResult<ScopedVault> {
     let svid = workflow.scoped_vault_id.clone();
     db_pool
-        .db_query(move |conn| -> DbResult<_> {
-            let (ob, sv) = Onboarding::get(conn, &svid)?;
-            Ok((ob, sv))
-        })
+        .db_query(move |conn| ScopedVault::get(conn, &svid))
         .await?
 }
 
@@ -58,8 +51,6 @@ pub async fn get_onboarding_for_workflow(
 pub fn setup_kyc_onboarding_vreqs(
     conn: &mut TxnPgConn,
     tvc: TenantVendorControl,
-    is_redo: bool,
-    ob_id: &OnboardingId,
     sv_id: &ScopedVaultId,
     wf: Locked<Workflow>,
 ) -> ApiResult<()> {
@@ -85,8 +76,6 @@ pub fn setup_kyc_onboarding_vreqs(
 pub async fn make_outstanding_kyc_vendor_calls(
     state: &State,
     wf_id: &WorkflowId,
-    sv_id: &ScopedVaultId,
-    ob_id: &OnboardingId,
     t_id: &TenantId,
 ) -> ApiResult<Vec<VendorResult>> {
     let wfid = wf_id.clone();
@@ -98,8 +87,7 @@ pub async fn make_outstanding_kyc_vendor_calls(
     let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, t_id)?;
 
     let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
-        ob_id,
-        sv_id,
+        &wf.scoped_vault_id,
         &state.db_pool,
         &state.enclave_client,
     )
@@ -144,7 +132,7 @@ pub async fn make_outstanding_kyc_vendor_calls(
     if has_critical_error {
         tracing::error!(
             errors = error_message,
-            scoped_vault_id = %sv_id,
+            scoped_vault_id = %wf.scoped_vault_id,
             tenant_id = %t_id,
             "VendorRequestsFailed"
         );
@@ -165,11 +153,9 @@ pub async fn make_outstanding_kyc_vendor_calls(
 #[tracing::instrument(skip(state))]
 pub async fn assert_kyc_vendor_calls_completed(
     state: &State,
-    ob_id: &OnboardingId,
     sv_id: &ScopedVaultId,
 ) -> ApiResult<Vec<VendorResult>> {
     let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
-        ob_id,
         sv_id,
         &state.db_pool,
         &state.enclave_client,

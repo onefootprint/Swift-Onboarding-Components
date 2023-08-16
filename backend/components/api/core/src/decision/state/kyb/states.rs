@@ -35,13 +35,12 @@ use newtypes::{KybConfig, Locked, OnboardingStatus};
 impl KybDataCollection {
     #[tracing::instrument("KybDataCollection::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybDataCollection {
             wf_id: workflow.id,
-            ob_id: ob.id,
             t_id: sv.tenant_id,
-            sv_id: sv.id,
+            sv_id: workflow.scoped_vault_id.clone(),
         })
     }
 }
@@ -73,7 +72,6 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
     ) -> ApiResult<KybState> {
         Ok(KybState::from(KybAwaitingBoKyc {
             wf_id: self.wf_id,
-            ob_id: self.ob_id,
             t_id: self.t_id,
         }))
     }
@@ -96,11 +94,10 @@ impl WorkflowState for KybDataCollection {
 impl KybAwaitingBoKyc {
     #[tracing::instrument("KybAwaitingBoKyc::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybAwaitingBoKyc {
             wf_id: workflow.id,
-            ob_id: ob.id,
             t_id: sv.tenant_id,
         })
     }
@@ -134,7 +131,6 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
 
         Ok(KybState::from(KybVendorCalls {
             wf_id: self.wf_id,
-            ob_id: self.ob_id,
             t_id: self.t_id,
         }))
     }
@@ -157,11 +153,10 @@ impl WorkflowState for KybAwaitingBoKyc {
 impl KybVendorCalls {
     #[tracing::instrument("KybVendorCalls::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybVendorCalls {
             wf_id: workflow.id,
-            ob_id: ob.id,
             t_id: sv.tenant_id,
         })
     }
@@ -231,13 +226,11 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
             Ok(KybState::from(KybDecisioning {
                 wf_id: self.wf_id,
                 t_id: self.t_id,
-                ob_id: self.ob_id,
             }))
         } else {
             Ok(KybState::from(KybAwaitingAsyncVendors {
                 wf_id: self.wf_id,
                 t_id: self.t_id,
-                ob_id: self.ob_id,
             }))
         }
     }
@@ -260,11 +253,10 @@ impl WorkflowState for KybVendorCalls {
 impl KybAwaitingAsyncVendors {
     #[tracing::instrument("KybAwaitingAsyncVendors::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybAwaitingAsyncVendors {
             wf_id: workflow.id,
-            ob_id: ob.id,
             t_id: sv.tenant_id,
         })
     }
@@ -298,7 +290,6 @@ impl OnAction<AsyncVendorCallsCompleted, KybState> for KybAwaitingAsyncVendors {
     ) -> ApiResult<KybState> {
         Ok(KybState::from(KybDecisioning {
             wf_id: self.wf_id,
-            ob_id: self.ob_id,
             t_id: self.t_id,
         }))
     }
@@ -320,11 +311,10 @@ impl WorkflowState for KybAwaitingAsyncVendors {
 impl KybDecisioning {
     #[tracing::instrument("KybDecisioning::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybDecisioning {
             wf_id: workflow.id,
-            ob_id: ob.id,
             t_id: sv.tenant_id,
         })
     }
@@ -359,7 +349,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
 
-        let sv = ScopedVault::get(conn, &self.ob_id)?;
+        let sv = ScopedVault::get(conn, &self.wf_id)?;
         let rsfd = decision::features::risk_signals::fetch_latest_risk_signals_map(conn, &sv.id)?;
         let kyb_rsg = rsfd
             .kyb

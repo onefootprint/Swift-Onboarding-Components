@@ -41,12 +41,19 @@ impl UserConsent {
     pub fn create(
         conn: &mut PgConn,
         timestamp: DateTime<Utc>,
-        onboarding_id: OnboardingId,
         insight_event_id: InsightEventId,
         consent_language_text: String,
         ml_consent: bool,
         workflow_id: WorkflowId,
     ) -> Result<UserConsent, crate::DbError> {
+        // TODO migrate
+        use db_schema::schema::{onboarding, workflow};
+        let onboarding_id = onboarding::table
+            .inner_join(workflow::table.on(workflow::scoped_vault_id.eq(onboarding::scoped_vault_id)))
+            .filter(workflow::id.eq(&workflow_id))
+            .select(onboarding::id)
+            .get_result(conn)?;
+
         let new_user_consent = NewUserConsent {
             timestamp,
             insight_event_id,

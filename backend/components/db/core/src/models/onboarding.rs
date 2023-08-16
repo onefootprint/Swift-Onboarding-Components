@@ -3,15 +3,14 @@ use super::scoped_vault::ScopedVault;
 use super::vault::Vault;
 use super::workflow::Workflow;
 use crate::models::ob_configuration::ObConfiguration;
-use crate::PgConn;
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::{onboarding, scoped_vault};
+use db_schema::schema::onboarding;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
     AlpacaKycConfig, CipKind, KybConfig, KycConfig, ObConfigurationId, OnboardingId, ScopedVaultId,
-    WorkflowFixtureResult, WorkflowId,
+    WorkflowFixtureResult,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
@@ -42,62 +41,7 @@ pub struct OnboardingCreateArgs {
     pub insight_event: Option<CreateInsightEvent>,
 }
 
-#[derive(Debug)]
-pub enum OnboardingIdentifier<'a> {
-    Id(&'a OnboardingId),
-    ScopedVaultId { sv_id: &'a ScopedVaultId },
-    WorkflowId { wf_id: &'a WorkflowId },
-}
-
-impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
-    fn from(id: &'a OnboardingId) -> Self {
-        Self::Id(id)
-    }
-}
-
-impl<'a> From<&'a ScopedVaultId> for OnboardingIdentifier<'a> {
-    fn from(sv_id: &'a ScopedVaultId) -> Self {
-        Self::ScopedVaultId { sv_id }
-    }
-}
-
-impl<'a> From<&'a WorkflowId> for OnboardingIdentifier<'a> {
-    fn from(wf_id: &'a WorkflowId) -> Self {
-        Self::WorkflowId { wf_id }
-    }
-}
-
-/// Wrapper around the very basic pieces of information generally needed when fetching an Onboarding
-pub type BasicOnboardingInfo<ObT = Onboarding> = (ObT, ScopedVault);
-
 impl Onboarding {
-    #[tracing::instrument("Onboarding::get", skip_all)]
-    pub fn get<'a, T>(conn: &'a mut PgConn, id: T) -> DbResult<BasicOnboardingInfo>
-    where
-        T: Into<OnboardingIdentifier<'a>>,
-    {
-        let mut query = onboarding::table.inner_join(scoped_vault::table).into_boxed();
-
-        match id.into() {
-            OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
-            OnboardingIdentifier::ScopedVaultId { sv_id } => {
-                query = query.filter(onboarding::scoped_vault_id.eq(sv_id))
-            }
-            // TODO this is just for easier migration from ob -> wf
-            OnboardingIdentifier::WorkflowId { wf_id } => {
-                use db_schema::schema::workflow;
-                let sv_ids = workflow::table
-                    .filter(workflow::id.eq(wf_id))
-                    .select(workflow::scoped_vault_id);
-                query = query.filter(onboarding::scoped_vault_id.eq_any(sv_ids))
-            }
-        }
-
-        let result = query.first(conn)?;
-
-        Ok(result)
-    }
-
     #[tracing::instrument("Onboarding::get_or_create", skip_all)]
     pub fn get_or_create(
         conn: &mut TxnPgConn,

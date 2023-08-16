@@ -19,14 +19,14 @@ pub async fn post(
     request: Json<SocureDeviceSessionIdRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
-    let ob_id = user_auth.onboarding()?.id.clone();
+    let wf_id = user_auth.workflow()?.id.clone();
 
     let SocureDeviceSessionIdRequest { device_session_id } = request.into_inner();
 
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            SocureDeviceSession::create(conn, device_session_id, ob_id)?;
+            SocureDeviceSession::create(conn, device_session_id, wf_id)?;
 
             Ok(())
         })

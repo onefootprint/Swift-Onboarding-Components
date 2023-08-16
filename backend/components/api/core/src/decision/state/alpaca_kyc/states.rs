@@ -61,13 +61,13 @@ use super::{
 impl AlpacaKycDataCollection {
     #[tracing::instrument("AlpacaKycDataCollection::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(AlpacaKycDataCollection {
             wf_id: workflow.id,
             is_redo: config.is_redo,
-            sv_id: sv.id,
-            ob_id: ob.id,
+            sv_id: workflow.scoped_vault_id.clone(),
+            // TODO can probably get rid of t_id on these states too
             t_id: sv.tenant_id,
         })
     }
@@ -102,13 +102,12 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
         tvc: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<AlpacaKycState> {
-        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id, wf)?;
+        common::setup_kyc_onboarding_vreqs(conn, tvc, &self.sv_id, wf)?;
 
         Ok(AlpacaKycState::from(AlpacaKycVendorCalls {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
             sv_id: self.sv_id,
-            ob_id: self.ob_id,
             t_id: self.t_id,
         }))
     }
@@ -130,13 +129,12 @@ impl WorkflowState for AlpacaKycDataCollection {
 impl AlpacaKycVendorCalls {
     #[tracing::instrument("AlpacaKycVendorCalls::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(AlpacaKycVendorCalls {
             wf_id: workflow.id,
             is_redo: config.is_redo,
-            sv_id: sv.id,
-            ob_id: ob.id,
+            sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
         })
     }
@@ -156,14 +154,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         Ok((
-            common::make_outstanding_kyc_vendor_calls(
-                state,
-                &self.wf_id,
-                &self.sv_id,
-                &self.ob_id,
-                &self.t_id,
-            )
-            .await?,
+            common::make_outstanding_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?,
             state.feature_flag_client.clone(),
         ))
     }
@@ -203,7 +194,6 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         Ok(AlpacaKycState::from(AlpacaKycDecisioning {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
-            ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
             vendor_results,
@@ -228,9 +218,9 @@ impl WorkflowState for AlpacaKycVendorCalls {
 impl AlpacaKycDecisioning {
     #[tracing::instrument("AlpacaKycDecisioning::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
-        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
+        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &sv.id).await?;
         let svid = sv.id.clone();
         let risk_signals = state
             .db_pool
@@ -240,8 +230,7 @@ impl AlpacaKycDecisioning {
         Ok(AlpacaKycDecisioning {
             wf_id: workflow.id,
             is_redo: config.is_redo,
-            ob_id: ob.id,
-            sv_id: sv.id,
+            sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
             vendor_results,
             risk_signals,
@@ -315,7 +304,6 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
                     wf_id: self.wf_id,
                     is_redo: self.is_redo,
-                    ob_id: self.ob_id,
                     sv_id: self.sv_id,
                     t_id: self.t_id,
                 }))
@@ -339,7 +327,6 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 Ok(AlpacaKycState::from(AlpacaKycDocCollection {
                     wf_id: self.wf_id,
                     is_redo: self.is_redo,
-                    ob_id: self.ob_id,
                     sv_id: self.sv_id,
                     t_id: self.t_id,
                 }))
@@ -364,13 +351,12 @@ impl WorkflowState for AlpacaKycDecisioning {
 impl AlpacaKycWatchlistCheck {
     #[tracing::instrument("AlpacaKycWatchlistCheck::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(AlpacaKycWatchlistCheck {
             wf_id: workflow.id,
             is_redo: config.is_redo,
-            ob_id: ob.id,
-            sv_id: sv.id,
+            sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
         })
     }
@@ -444,8 +430,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             )
         };
 
-        let vendor_results =
-            common::assert_kyc_vendor_calls_completed(state, &self.ob_id, &self.sv_id).await?;
+        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &self.sv_id).await?;
 
         Ok((watchlist_res, vendor_results))
     }
@@ -600,10 +585,9 @@ impl WorkflowState for AlpacaKycWatchlistCheck {
 /// ////////////////
 impl AlpacaKycPendingReview {
     #[tracing::instrument("AlpacaKycPendingReview::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: AlpacaKycConfig) -> ApiResult<Self> {
-        let (_, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+    pub async fn init(_state: &State, workflow: DbWorkflow, _config: AlpacaKycConfig) -> ApiResult<Self> {
         Ok(AlpacaKycPendingReview {
-            sv_id: sv.id,
+            sv_id: workflow.scoped_vault_id.clone(),
             wf_id: workflow.id,
         })
     }
@@ -657,13 +641,12 @@ impl WorkflowState for AlpacaKycPendingReview {
 impl AlpacaKycDocCollection {
     #[tracing::instrument("AlpacaKycDocCollection::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(AlpacaKycDocCollection {
             wf_id: workflow.id,
             is_redo: config.is_redo,
-            ob_id: ob.id,
-            sv_id: sv.id,
+            sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
         })
     }
@@ -695,7 +678,6 @@ impl OnAction<DocCollected, AlpacaKycState> for AlpacaKycDocCollection {
         Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
-            ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
         }))

@@ -4,7 +4,6 @@ use super::{UserAuth, UserAuthGuard};
 use db::{
     models::{
         ob_configuration::ObConfiguration,
-        onboarding::Onboarding,
         scoped_vault::ScopedVault,
         tenant::Tenant,
         vault::Vault,
@@ -34,7 +33,6 @@ use super::{ParsedUserSessionContext, UserAuthScope, UserSessionContext};
 pub struct UserObSession {
     user_session: UserSessionContext,
     pub scoped_user: ScopedVault,
-    onboarding: Option<Onboarding>,
     ob_config: Option<ObConfiguration>,
     tenant: Option<Tenant>,
     workflow: Option<Workflow>,
@@ -71,18 +69,6 @@ impl ExtractableAuthSession for ParsedUserObSession {
         // Confirm that the onboarding in the auth token belongs to the user
         let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &user_session.user.id))?;
 
-        let ob = Onboarding::get(conn, &scoped_user_id);
-        let onboarding = match ob {
-            Ok((onboarding, _)) => Ok(Some(onboarding)),
-            Err(e) => {
-                if e.is_not_found() {
-                    Ok(None)
-                } else {
-                    Err(e)
-                }
-            }
-        }?;
-
         let workflow = if let Some(wf_id) = user_session.workflow_id() {
             Some(Workflow::get(conn, &wf_id)?)
         } else {
@@ -108,7 +94,6 @@ impl ExtractableAuthSession for ParsedUserObSession {
         let onboarding_session = UserObSession {
             user_session,
             scoped_user,
-            onboarding,
             ob_config,
             tenant,
             workflow,
@@ -176,11 +161,6 @@ impl CheckedUserObAuthContext {
 }
 
 impl UserObSession {
-    pub fn onboarding(&self) -> ApiResult<&Onboarding> {
-        let ob = self.onboarding.as_ref().ok_or(OnboardingError::NoOnboarding)?;
-        Ok(ob)
-    }
-
     pub fn ob_config(&self) -> ApiResult<&ObConfiguration> {
         let obc = self.ob_config.as_ref().ok_or(OnboardingError::NoOnboarding)?;
         Ok(obc)

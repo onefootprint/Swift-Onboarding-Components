@@ -20,7 +20,7 @@ use crate::{
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
-use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
+use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 
 ///
 /// States
@@ -31,7 +31,6 @@ pub struct KycDataCollection {
     wf_id: WorkflowId,
     is_redo: bool,
     sv_id: ScopedVaultId,
-    ob_id: OnboardingId,
     t_id: TenantId,
 }
 
@@ -40,7 +39,6 @@ pub struct KycVendorCalls {
     wf_id: WorkflowId,
     is_redo: bool,
     sv_id: ScopedVaultId,
-    ob_id: OnboardingId,
     t_id: TenantId,
 }
 
@@ -51,7 +49,6 @@ pub struct KycDecisioning {
     #[allow(unused)]
     is_redo: bool,
     #[allow(unused)]
-    ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
     vendor_results: Vec<VendorResult>,

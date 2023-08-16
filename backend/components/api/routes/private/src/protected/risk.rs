@@ -22,7 +22,6 @@ use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
-use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
 use db::models::workflow::Workflow;
@@ -172,20 +171,18 @@ async fn make_decision(
 ) -> actix_web::Result<Json<ResponseData<MakeDecisionResponse>>, ApiError> {
     let MakeDecisionRequest { tenant_id, fp_id } = request.into_inner();
 
-    let (ob, is_sandbox, wf) = state
+    let (is_sandbox, wf) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let (ob, _) = Onboarding::get(conn, &scoped_user.id)?;
             let is_sandbox = !scoped_user.is_live;
             let wf = Workflow::latest(conn, &scoped_user.id)?.ok_or(OnboardingError::NoWorkflow)?;
-            Ok((ob, is_sandbox, wf))
+            Ok((is_sandbox, wf))
         })
         .await?;
 
     let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
-        &ob.id,
-        &ob.scoped_vault_id,
+        &wf.scoped_vault_id,
         &state.db_pool,
         &state.enclave_client,
     )
@@ -211,9 +208,9 @@ async fn make_decision(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            save_risk_signals(conn, &ob.scoped_vault_id, &risk_signals, false)?;
+            save_risk_signals(conn, &wf.scoped_vault_id, &risk_signals, false)?;
             let rule_group = KycRuleGroup::default();
-            let risk_signals = fetch_latest_risk_signals_map(conn, &ob.scoped_vault_id)?;
+            let risk_signals = fetch_latest_risk_signals_map(conn, &wf.scoped_vault_id)?;
             let include_doc = DocumentRequest::get(conn, &wf.id)?.is_some();
             let config = KycRuleExecutionConfig {
                 include_doc,

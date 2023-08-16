@@ -44,13 +44,12 @@ use crate::{
 impl KycDataCollection {
     #[tracing::instrument("KycDataCollection::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycDataCollection {
             wf_id: workflow.id,
             is_redo: config.is_redo,
-            sv_id: sv.id,
-            ob_id: ob.id,
+            sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
         })
     }
@@ -83,13 +82,12 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
         tvc: TenantVendorControl,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KycState> {
-        common::setup_kyc_onboarding_vreqs(conn, tvc, self.is_redo, &self.ob_id, &self.sv_id, wf)?;
+        common::setup_kyc_onboarding_vreqs(conn, tvc, &self.sv_id, wf)?;
 
         Ok(KycState::from(KycVendorCalls {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
             sv_id: self.sv_id,
-            ob_id: self.ob_id,
             t_id: self.t_id,
         }))
     }
@@ -111,13 +109,12 @@ impl WorkflowState for KycDataCollection {
 impl KycVendorCalls {
     #[tracing::instrument("KycVendorCalls::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycVendorCalls {
             wf_id: workflow.id,
             is_redo: config.is_redo,
-            sv_id: sv.id,
-            ob_id: ob.id,
+            sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
         })
     }
@@ -137,14 +134,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         Ok((
-            common::make_outstanding_kyc_vendor_calls(
-                state,
-                &self.wf_id,
-                &self.sv_id,
-                &self.ob_id,
-                &self.t_id,
-            )
-            .await?,
+            common::make_outstanding_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?,
             state.feature_flag_client.clone(),
         ))
     }
@@ -181,7 +171,6 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         Ok(KycState::from(KycDecisioning {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
-            ob_id: self.ob_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
             vendor_results,
@@ -205,15 +194,14 @@ impl WorkflowState for KycVendorCalls {
 impl KycDecisioning {
     #[tracing::instrument("KycDecisioning::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
-        let (ob, sv) = common::get_onboarding_for_workflow(&state.db_pool, &workflow).await?;
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
-        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &ob.id, &sv.id).await?;
+        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &sv.id).await?;
 
         Ok(KycDecisioning {
             wf_id: workflow.id,
             is_redo: config.is_redo,
-            ob_id: ob.id,
-            sv_id: sv.id,
+            sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
             vendor_results,
         })

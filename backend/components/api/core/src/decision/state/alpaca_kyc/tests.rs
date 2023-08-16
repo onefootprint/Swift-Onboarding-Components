@@ -95,7 +95,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (_, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(wf.authorized_at.is_some());
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
@@ -116,7 +116,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (_, _, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
+    let (_, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
     // Assert no OBD is created yet and ob status is pending
     assert!(obd.is_none());
     assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
@@ -140,7 +140,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
     let obd = obd.unwrap();
@@ -250,7 +250,7 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (_, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(wf.authorized_at.is_some());
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
@@ -271,7 +271,7 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (_, _, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
+    let (_, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
     // Assert no OBD is created yet and ob status is pending
 
     assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
@@ -301,7 +301,7 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
     // we commit in this case
@@ -364,7 +364,7 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     match review_decision {
@@ -456,7 +456,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (_, wf, _, mr, obd, _, fps) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, _, fps) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection), wf.state);
     assert!(wf.authorized_at.is_some());
     // Assert no OBD is created yet and ob status is pending
@@ -484,7 +484,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
     let obd = obd.unwrap();
@@ -552,7 +552,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
@@ -625,7 +625,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (_, wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(wf.authorized_at.is_some());
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
     assert!(!fps.is_empty()); //fingerprints were written
@@ -664,7 +664,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (_, wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
@@ -780,7 +780,7 @@ async fn redo_and_pass(
         .await
         .unwrap();
 
-    let (_, wf, _, _, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
     // new obd was written
     let obd = obd.unwrap();

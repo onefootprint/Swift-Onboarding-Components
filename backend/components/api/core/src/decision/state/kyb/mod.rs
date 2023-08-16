@@ -8,7 +8,7 @@ use crate::{errors::ApiResult, State};
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
-use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
+use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 
 ///
 /// States
@@ -17,7 +17,6 @@ use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
 #[derive(Clone)]
 pub struct KybDataCollection {
     wf_id: WorkflowId,
-    ob_id: OnboardingId,
     t_id: TenantId,
     #[allow(unused)]
     sv_id: ScopedVaultId,
@@ -26,28 +25,24 @@ pub struct KybDataCollection {
 #[derive(Clone)]
 pub struct KybAwaitingBoKyc {
     wf_id: WorkflowId,
-    ob_id: OnboardingId,
     t_id: TenantId,
 }
 
 #[derive(Clone)]
 pub struct KybVendorCalls {
     wf_id: WorkflowId,
-    ob_id: OnboardingId,
     t_id: TenantId,
 }
 
 #[derive(Clone)]
 pub struct KybAwaitingAsyncVendors {
     wf_id: WorkflowId,
-    ob_id: OnboardingId,
     t_id: TenantId,
 }
 
 #[derive(Clone)]
 pub struct KybDecisioning {
     wf_id: WorkflowId,
-    ob_id: OnboardingId,
     t_id: TenantId,
 }
 

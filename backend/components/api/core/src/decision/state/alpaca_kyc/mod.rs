@@ -17,7 +17,7 @@ use crate::{
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
-use newtypes::{OnboardingId, ScopedVaultId, TenantId, WorkflowId};
+use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 
 // For illustrative purposes currently
 
@@ -30,7 +30,6 @@ pub struct AlpacaKycDataCollection {
     wf_id: WorkflowId,
     is_redo: bool,
     sv_id: ScopedVaultId,
-    ob_id: OnboardingId,
     t_id: TenantId,
 }
 #[derive(Clone)]
@@ -38,14 +37,12 @@ pub struct AlpacaKycVendorCalls {
     wf_id: WorkflowId,
     is_redo: bool,
     sv_id: ScopedVaultId,
-    ob_id: OnboardingId,
     t_id: TenantId,
 }
 #[derive(Clone)]
 pub struct AlpacaKycDecisioning {
     wf_id: WorkflowId,
     is_redo: bool,
-    ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
     vendor_results: Vec<VendorResult>,
@@ -66,7 +63,6 @@ pub struct AlpacaKycWatchlistCheck {
     wf_id: WorkflowId, // TODO: make a common ctx type of dealio for all these shared things each state is using
     #[allow(unused)]
     is_redo: bool,
-    ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
@@ -91,7 +87,6 @@ pub struct AlpacaKycPendingReview {
 pub struct AlpacaKycDocCollection {
     wf_id: WorkflowId,
     is_redo: bool,
-    ob_id: OnboardingId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }

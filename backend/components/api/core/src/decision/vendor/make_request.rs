@@ -11,7 +11,6 @@ use crate::metrics;
 use crate::vendor_clients::VendorClient;
 use crate::{errors::ApiError, State};
 use db::DbPool;
-use db::models::onboarding::Onboarding;
 use db::{
     models::{
         insight_event::InsightEvent, ob_configuration::ObConfiguration,
@@ -453,9 +452,8 @@ pub async fn make_vendor_requests(
     let (socure_device_session_id, ip_address, obc_key) = db_pool
         .db_query(
             move |conn| -> Result<(Option<String>, Option<PiiString>, ObConfigurationKey), DbError> {
-                let ob_id = Onboarding::get(conn, &wfid)?.0.id;
                 let socure_device_session_id =
-                    SocureDeviceSession::latest_for_onboarding(conn, &ob_id)?.map(|d| d.device_session_id);
+                    SocureDeviceSession::latest(conn, &wfid)?.map(|d| d.device_session_id);
 
                 // TODO this is stale
                 let ip_address = InsightEvent::get(conn, &wfid)?
