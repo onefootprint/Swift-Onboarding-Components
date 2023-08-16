@@ -23,6 +23,7 @@ export * from './pressable';
 export * from './radio-select';
 export * from './segmented-control';
 export * from './select';
+export * from './status-bar';
 export * from './table';
 export * from './tag';
 export * from './text-input';

@@ -73,7 +73,9 @@ const Instructions = ({ children, stepperValues }: InstructionsProps) => {
             {options.map(({ Icon, label }) => (
               <Box gap={3} key={label} flexDirection="row" align-items="center">
                 <Icon />
-                <Typography variant="label-3">{label}</Typography>
+                <Box flexShrink={1}>
+                  <Typography variant="label-3">{label}</Typography>
+                </Box>
               </Box>
             ))}
           </Box>

@@ -1,12 +1,5 @@
-import { IcoClose32 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import {
-  Box,
-  Button,
-  Checkbox,
-  IconButton,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, Button, Checkbox, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import {
   Modal,
@@ -38,10 +31,6 @@ const ConsentDialog = ({ authToken, onCompleted }: ConsentDialogProps) => {
 
   const handleThirdParty = () => {
     setIsThirdPartyConsented(previousValue => !previousValue);
-  };
-
-  const onClose = () => {
-    setOpen(false);
   };
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -87,20 +76,8 @@ const ConsentDialog = ({ authToken, onCompleted }: ConsentDialogProps) => {
         <Typography variant="label-2" center paddingBottom={5} paddingTop={5}>
           {showSheetHeader ? t('title') : ''}
         </Typography>
-        <Box position="absolute" right={12} top={12}>
-          <IconButton aria-label="Close" onPress={onClose}>
-            <IcoClose32 />
-          </IconButton>
-        </Box>
       </Box>
-
-      <Box
-        marginHorizontal={5}
-        gap={3}
-        marginBottom={6}
-        paddingBottom={8}
-        flex={1}
-      >
+      <Box gap={3} marginBottom={6} paddingBottom={7} flex={1}>
         <ScrollView onScroll={onScroll} scrollEventThrottle={25}>
           <Box marginBottom={3}>
             <Typography variant="heading-3" center>
@@ -110,7 +87,7 @@ const ConsentDialog = ({ authToken, onCompleted }: ConsentDialogProps) => {
           <Typography variant="label-4" center>
             {t('subtitle')}
           </Typography>
-          <Box marginTop={5}>
+          <Box marginTop={5} paddingHorizontal={6}>
             <Typography variant="body-3">{t('description')}</Typography>
             <Box
               backgroundColor="secondary"
@@ -126,14 +103,16 @@ const ConsentDialog = ({ authToken, onCompleted }: ConsentDialogProps) => {
             </Box>
           </Box>
         </ScrollView>
-        <Button
-          disabled={!hasReadConsent}
-          onPress={handleSubmit}
-          marginTop={7}
-          loading={consentMutation.isLoading}
-        >
-          {hasReadConsent ? t('agree-and-continue') : t('scroll-to-agree')}
-        </Button>
+        <Box marginHorizontal={5}>
+          <Button
+            disabled={!hasReadConsent}
+            onPress={handleSubmit}
+            marginTop={6}
+            loading={consentMutation.isLoading}
+          >
+            {hasReadConsent ? t('agree-and-continue') : t('scroll-to-agree')}
+          </Button>
+        </Box>
       </Box>
     </StyledModal>
   );

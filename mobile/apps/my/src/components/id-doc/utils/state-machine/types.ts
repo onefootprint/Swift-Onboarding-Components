@@ -21,6 +21,7 @@ export type MachineEvents =
       payload: {
         documentType: SupportedIdDocTypes;
         countryCode: CountryCode;
+        docId: string;
       };
     }
   | {

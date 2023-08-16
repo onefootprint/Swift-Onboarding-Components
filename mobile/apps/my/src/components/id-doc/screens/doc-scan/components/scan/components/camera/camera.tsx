@@ -1,6 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
+import { StatusBar } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
-import { StatusBar } from 'react-native';
 import {
   Camera as VisionCamera,
   PhotoFile,
@@ -74,7 +74,7 @@ const Camera = ({
 
   return (
     <>
-      <StatusBar barStyle="light-content" />
+      <StatusBar variant={disabled ? 'default' : 'on-camera'} />
       <CameraContainer>
         {subtitle ? (
           <Header>

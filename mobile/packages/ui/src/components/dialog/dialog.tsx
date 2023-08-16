@@ -6,6 +6,7 @@ import Modal from 'react-native-modal';
 import { Box } from '../box';
 import { Button } from '../button';
 import { IconButton } from '../icon-button';
+import { StatusBar } from '../status-bar';
 import { Typography } from '../typography';
 
 export type DialogProps = {
@@ -30,41 +31,44 @@ const Dialog = ({
   disableClose,
 }: DialogProps) => {
   return (
-    <StyledModal
-      backdropOpacity={0.3}
-      isVisible={open}
-      onBackdropPress={disableClose ? undefined : onClose}
-      onSwipeComplete={disableClose ? undefined : onClose}
-      swipeDirection={['down']}
-      useNativeDriverForBackdrop
-    >
-      <Box backgroundColor="primary" borderRadius="large">
-        <Box
-          alignItems="flex-end"
-          marginBottom={2}
-          marginHorizontal={5}
-          marginTop={4}
-          height={32}
-        >
-          {disableClose ? null : (
-            <IconButton aria-label="Close" onPress={onClose}>
-              <IcoClose32 />
-            </IconButton>
-          )}
+    <>
+      <StatusBar variant={open ? 'on-dialog' : 'default'} />
+      <StyledModal
+        backdropOpacity={0.3}
+        isVisible={open}
+        onBackdropPress={disableClose ? undefined : onClose}
+        onSwipeComplete={disableClose ? undefined : onClose}
+        swipeDirection={['down']}
+        useNativeDriverForBackdrop
+      >
+        <Box backgroundColor="primary" borderRadius="large">
+          <Box
+            alignItems="flex-end"
+            marginBottom={2}
+            marginHorizontal={5}
+            marginTop={4}
+            height={32}
+          >
+            {disableClose ? null : (
+              <IconButton aria-label="Close" onPress={onClose}>
+                <IcoClose32 />
+              </IconButton>
+            )}
+          </Box>
+          <Box marginHorizontal={5} gap={3} marginBottom={6}>
+            <Typography variant="heading-3" center>
+              {title}
+            </Typography>
+            <Box>{children}</Box>
+            {cta && (
+              <Button onPress={cta.onPress} marginTop={7} loading={cta.loading}>
+                {cta.label}
+              </Button>
+            )}
+          </Box>
         </Box>
-        <Box marginHorizontal={5} gap={3} marginBottom={6}>
-          <Typography variant="heading-3" center>
-            {title}
-          </Typography>
-          <Box>{children}</Box>
-          {cta && (
-            <Button onPress={cta.onPress} marginTop={7} loading={cta.loading}>
-              {cta.label}
-            </Button>
-          )}
-        </Box>
-      </Box>
-    </StyledModal>
+      </StyledModal>
+    </>
   );
 };
 
