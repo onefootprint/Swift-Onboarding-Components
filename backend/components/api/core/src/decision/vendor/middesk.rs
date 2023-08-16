@@ -17,10 +17,9 @@ use crate::vendor_clients::VendorClient;
 use db::models::decision_intent::DecisionIntent;
 use db::models::middesk_request::{MiddeskRequest, UpdateMiddeskRequest};
 use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding::{Onboarding, OnboardingUpdate};
 use db::models::risk_signal::RiskSignal;
 use db::models::verification_result::VerificationResult;
-use db::models::workflow::Workflow;
+use db::models::workflow::{Workflow, WorkflowUpdate};
 use db::DbPool;
 use db::{models::verification_request::VerificationRequest, DbError};
 use feature_flag::{BoolFlag, FeatureFlagClient};
@@ -37,8 +36,8 @@ use idv::middesk::{
 use idv::{ParsedResponse, VendorResponse};
 
 use newtypes::{
-    BusinessData, DecisionIntentKind, MiddeskRequestState, ObConfigurationKey, PiiJsonValue,
-    RiskSignalGroupKind, TenantId, VendorAPI, WorkflowId,
+    BusinessData, DecisionIntentKind, MiddeskRequestState, ObConfigurationKey, OnboardingStatus,
+    PiiJsonValue, RiskSignalGroupKind, TenantId, VendorAPI, WorkflowId,
 };
 
 #[derive(Debug)]
@@ -529,26 +528,26 @@ impl MiddeskState<Complete> {
 // Create middesk_request and vreq for POST /business call
 pub async fn init_middesk_request(
     db_pool: &DbPool,
-    ob_id: OnboardingId,
     wf_id: WorkflowId,
 ) -> ApiResult<MiddeskState<PendingCreateBusinessCall>> {
-    let wf_id = wf_id.clone();
     let (middesk_request, create_business_vreq) = db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let ob = Onboarding::lock(conn, &ob_id)?;
-            let sv_id = ob.scoped_vault_id.clone();
-            Onboarding::update(ob, conn, &wf_id, OnboardingUpdate::idv_reqs_initiated())?;
+            let wf = Workflow::lock(conn, &wf_id)?;
+            // TODO should these state transitions be handled by the ww machines?
+            let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
+            let wf = Workflow::update(wf, conn, update)?;
+            let sv_id = &wf.scoped_vault_id;
 
             let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
                 conn,
-                &sv_id,
+                sv_id,
                 &wf_id,
                 DecisionIntentKind::OnboardingKyb,
             )?;
 
             let vreq = VerificationRequest::create(
                 conn,
-                &sv_id,
+                sv_id,
                 &decision_intent.id,
                 VendorAPI::MiddeskCreateBusiness,
             )?;

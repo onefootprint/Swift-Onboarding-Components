@@ -3,16 +3,16 @@ use db::{
         decision_intent::DecisionIntent,
         document_request::DocumentRequest,
         ob_configuration::ObConfiguration,
-        onboarding::{Onboarding, OnboardingUpdate},
+        onboarding::Onboarding,
         scoped_vault::ScopedVault,
         vault::Vault,
-        workflow::Workflow,
+        workflow::{Workflow, WorkflowUpdate},
     },
     DbPool, DbResult, TxnPgConn,
 };
 use newtypes::{
-    DecisionIntentKind, DecisionStatus, FootprintReasonCode, OnboardingId, ReviewReason, ScopedVaultId,
-    TenantId, VendorAPI, VerificationResultId, WorkflowId,
+    DecisionIntentKind, DecisionStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, ReviewReason,
+    ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -63,12 +63,10 @@ pub fn setup_kyc_onboarding_vreqs(
     sv_id: &ScopedVaultId,
     wf_id: &WorkflowId,
 ) -> ApiResult<()> {
-    let ob = Onboarding::lock(conn, ob_id)?;
-    // redundant with new workflow state updates, will eventually remove when Onboarding is removed
-    if !is_redo {
-        let update = OnboardingUpdate::idv_reqs_initiated();
-        Onboarding::update(ob, conn, wf_id, update)?;
-    }
+    // TODO get this from the workflow wrapper
+    let wf = Workflow::lock(conn, wf_id)?;
+    let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
+    Workflow::update(wf, conn, update)?;
     // TODO: create new DI if is_redo
     let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
         conn,

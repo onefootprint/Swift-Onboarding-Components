@@ -5,11 +5,10 @@ use api_wire_types::CreateAnnotationRequest;
 use api_wire_types::DecisionRequest;
 use db::models::annotation::Annotation;
 use db::models::manual_review::ManualReview;
-use db::models::onboarding::Onboarding;
-use db::models::onboarding::OnboardingUpdate;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
 use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
 use db::TxnPgConn;
 use newtypes::DbActor;
 use newtypes::WorkflowId;
@@ -50,22 +49,18 @@ pub fn save_review_decision(
         seqno: None,
         workflow_id: wf_id.clone(),
     };
-    let decision = OnboardingDecision::create(&wf, conn, new_decision)?;
+    let decision = OnboardingDecision::create(conn, new_decision)?;
 
     // If there is an outstanding review, creating this override decision clears it
     // This has to happen before we update the status below, otherwise the webhook will incorrectly
     // show manual review is required
     if let Some(manual_review) = manual_review {
-        manual_review.complete(conn, actor, decision.id)?;
+        manual_review.complete(conn, actor, decision.id.clone())?;
     }
 
-    if wf.status != Some(status.into()) {
-        // This logic is getting convoluted - soon will switch to just workflow update
-        let (ob, _) = Onboarding::get(conn, &wf.scoped_vault_id)?;
-        let ob = Onboarding::lock(conn, &ob.id)?;
-        let update = OnboardingUpdate::set_decision(status.into());
-        Onboarding::update(ob, conn, &wf_id, update)?;
-    }
+    // NOTE: must do this after completing the manual review
+    let update = WorkflowUpdate::set_decision(&wf, &decision);
+    Workflow::update(wf, conn, update)?;
 
     Ok(())
 }

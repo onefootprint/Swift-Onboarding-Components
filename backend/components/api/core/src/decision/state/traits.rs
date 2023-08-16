@@ -77,6 +77,7 @@ where
         let result = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
+                // TODO pass the workflow into `on_commit` so we don't have to fetch + lock again
                 let wf = DbWorkflow::lock(conn, &workflow_id)?;
                 if wf.state != current_state {
                     Err(StateError::ConcurrentStateChange(current_state, wf.state))?
@@ -86,7 +87,7 @@ where
                 Ok(new_state)
             })
             .await?;
-        // Various workflows can do Onboarding::update which creates Task's for webhooks
+        // Various workflows can do Workflow::update which creates Task's for webhooks
         // Until we get comfortable with a proper daemon/worker machines executing these Tasks continually, we need to manually prompt execution
         task::execute_webhook_tasks(state.clone());
         Ok(result)

@@ -11,9 +11,8 @@ use api_core::decision::state::Authorize;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
-use db::models::onboarding::Onboarding;
-use db::models::onboarding::OnboardingUpdate;
 use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
 use itertools::Itertools;
 use newtypes::OnboardingRequirement;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -47,33 +46,25 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
     }
 
-    // mark person and business ob as authorized
-    let ob_id = user_auth.onboarding()?.id.clone();
-
+    // mark person and business wf as authorized
     let wf_id = user_auth.workflow()?.id.clone();
     let (biz_wf, set_biz_is_authorized) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
-            let ob = Onboarding::lock(c, &ob_id)?;
-            // We're now updating the onboarding's authorized_at even if it's already set. This
-            // representation is a little strange now, but we'll move away from reading it as the
-            // source of truth shortly
-            Onboarding::update(ob, c, &wf_id, OnboardingUpdate::is_authorized())?;
+            let wf = Workflow::lock(c, &wf_id)?;
+            if wf.authorized_at.is_none() {
+                Workflow::update(wf, c, WorkflowUpdate::is_authorized())?;
+            }
 
             let biz_wf = user_auth.business_workflow(c)?;
             let (set_biz_is_authorized, biz_wf) = if let Some(biz_wf) = biz_wf {
-                let (biz_ob, _) = Onboarding::get(c, &biz_wf.id)?;
-                let biz_ob = Onboarding::lock(c, &biz_ob.id)?;
+                let biz_wf = Workflow::lock(c, &biz_wf.id)?;
                 let (set_biz_is_authorized, biz_wf) = if biz_wf.authorized_at.is_none() {
-                    let update = OnboardingUpdate::is_authorized();
-                    Onboarding::update(biz_ob, c, &biz_wf.id, update)?;
-                    // Refresh from DB
-                    let biz_wf = Workflow::get(c, &biz_wf.id)?;
+                    let biz_wf = Workflow::update(biz_wf, c, WorkflowUpdate::is_authorized())?;
                     (true, biz_wf)
                 } else {
-                    (false, biz_wf)
+                    (false, biz_wf.into_inner())
                 };
-
                 (set_biz_is_authorized, Some(biz_wf))
             } else {
                 (false, None)
@@ -83,6 +74,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
         })
         .await?;
 
+    // TODO why do we do this here? Should we just rely on POST /process?
     if let Some(biz_wf) = biz_wf {
         if set_biz_is_authorized {
             let ww = WorkflowWrapper::init(&state, biz_wf.clone()).await?;

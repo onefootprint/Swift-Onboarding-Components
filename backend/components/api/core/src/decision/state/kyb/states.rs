@@ -1,10 +1,9 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use db::models::onboarding::{Onboarding, OnboardingUpdate};
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::Workflow as DbWorkflow;
+use db::models::workflow::{Workflow as DbWorkflow, WorkflowUpdate};
 
 use super::{
     KybAwaitingAsyncVendors, KybAwaitingBoKyc, KybComplete, KybDataCollection, KybDecisioning, KybState,
@@ -119,9 +118,10 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
 
     #[tracing::instrument("KybAwaitingBoKyc#OnAction<BoKycCompleted, KybState>::on_commit", skip_all)]
     fn on_commit(self, _async_res: (), conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
-        let update = OnboardingUpdate::set_status(OnboardingStatus::Pending);
-        let ob = Onboarding::lock(conn, &self.ob_id)?;
-        Onboarding::update(ob, conn, &self.wf_id, update)?;
+        // TODO get this from the workflow wrapper
+        let wf = DbWorkflow::lock(conn, &self.wf_id)?;
+        let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
+        DbWorkflow::update(wf, conn, update)?;
 
         Ok(KybState::from(KybVendorCalls {
             wf_id: self.wf_id,
@@ -187,12 +187,8 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
             // and then in the on_commit txn save the vreq + vres + MiddeskRequest with the business_id from the response all at once.
 
             // TODO: make this get_or_create
-            let middesk_state = decision::vendor::middesk::init_middesk_request(
-                &state.db_pool,
-                self.ob_id.clone(),
-                self.wf_id.clone(),
-            )
-            .await?;
+            let middesk_state =
+                decision::vendor::middesk::init_middesk_request(&state.db_pool, self.wf_id.clone()).await?;
 
             // TODO: match on MiddeskStates and only call this if AwaitingBusinessUpdateWebhook
             let _middesk_state = middesk_state

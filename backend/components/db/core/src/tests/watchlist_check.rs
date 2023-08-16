@@ -1,5 +1,5 @@
-use crate::models::onboarding::Onboarding;
-use crate::models::onboarding::OnboardingUpdate;
+use crate::models::onboarding_decision::OnboardingDecision;
+use crate::models::onboarding_decision::OnboardingDecisionCreateArgs;
 use crate::models::task::NewTask;
 use crate::models::task::Task;
 use crate::models::watchlist_check::NewWatchlistCheck;
@@ -13,7 +13,8 @@ use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
 use macros::db_test;
-use newtypes::OnboardingStatus;
+use newtypes::DbActor;
+use newtypes::DecisionStatus;
 use newtypes::ScopedVaultId;
 use newtypes::TaskData;
 use newtypes::TaskStatus;
@@ -105,19 +106,31 @@ fn make_vault(
         let sv = fixtures::scoped_vault::create(conn, &uvid, &ob_config.id);
         let svid = sv.id.clone();
         if let Some(ob_decision_made_at) = ob_decision_made_at {
-            let (ob, wf) = fixtures::onboarding::create(conn, svid, ob_config.id, None);
-            let ob = Onboarding::lock(conn, &ob.id).unwrap();
-            let update = OnboardingUpdate {
-                status: Some(OnboardingStatus::Pass),
-                ..Default::default()
+            let (_, wf) = fixtures::onboarding::create(conn, svid.clone(), ob_config.id, None);
+            let decision = OnboardingDecisionCreateArgs {
+                vault_id: uv.id.clone(),
+                scoped_vault_id: svid,
+                logic_git_hash: "".to_string(),
+                status: DecisionStatus::Pass,
+                result_ids: vec![],
+                annotation_id: None,
+                actor: DbActor::Footprint,
+                seqno: None,
+                workflow_id: wf.id.clone(),
             };
-            Onboarding::update(ob, conn, &wf.id, update).unwrap();
-            let update = WorkflowUpdate {
-                decision_made_at: Some(Some(ob_decision_made_at)),
-                status: None,
-                authorized_at: None,
-            };
-            Workflow::update(conn, &wf.id, update).unwrap();
+            let obd = OnboardingDecision::create(conn, decision).unwrap();
+            use db_schema::schema::workflow;
+            use diesel::prelude::*;
+
+            let wf = Workflow::lock(conn, &wf.id).unwrap();
+            let update = WorkflowUpdate::set_decision(&wf, &obd);
+            let wf = Workflow::update(wf, conn, update).unwrap();
+            // Patch the decision_made_at to make it look like it was made earlier
+            diesel::update(workflow::table)
+                .filter(workflow::id.eq(&wf.id))
+                .set(workflow::decision_made_at.eq(ob_decision_made_at))
+                .execute(conn.conn())
+                .unwrap();
         }
         sv
     } else {

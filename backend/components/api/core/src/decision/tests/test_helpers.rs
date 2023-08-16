@@ -3,11 +3,11 @@ use db::{
         contact_info::ContactInfo,
         insight_event::CreateInsightEvent,
         ob_configuration::ObConfiguration,
-        onboarding::{Onboarding, OnboardingUpdate},
+        onboarding::Onboarding,
         scoped_vault::ScopedVault,
         tenant::Tenant,
         vault::Vault,
-        workflow::Workflow,
+        workflow::{Workflow, WorkflowUpdate},
     },
     tests::fixtures,
     DbPool, TxnPgConn,
@@ -81,18 +81,13 @@ pub async fn create_user_and_onboarding(
 
             // Mark the onboardings as authorized since they would be authorized in prod by the
             // time they're used here
-            let ob = Onboarding::lock(conn, &ob.id)?;
-            let ob = Onboarding::update(ob, conn, &wf.id, OnboardingUpdate::is_authorized())?;
-            let wf = Workflow::get(conn, &wf.id)?;
+            let wf = Workflow::lock(conn, &wf.id)?;
+            let wf = Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?;
 
             let biz_wf = biz_wf
                 .map(|biz_wf| -> ApiResult<_> {
-                    // TODO clean this up when we get rid of OB
-                    let wf_id = biz_wf.id;
-                    let biz_ob = Onboarding::get(conn, &biz_wf.scoped_vault_id)?.0;
-                    let biz_ob = Onboarding::lock(conn, &biz_ob.id)?;
-                    Onboarding::update(biz_ob, conn, &wf_id, OnboardingUpdate::is_authorized())?;
-                    let biz_wf = Workflow::get(conn, &wf_id)?;
+                    let biz_wf = Workflow::lock(conn, &biz_wf.id)?;
+                    let biz_wf = Workflow::update(biz_wf, conn, WorkflowUpdate::is_authorized())?;
                     Ok(biz_wf)
                 })
                 .transpose()?;

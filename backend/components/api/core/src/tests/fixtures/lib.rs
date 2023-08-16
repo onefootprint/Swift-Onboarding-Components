@@ -1,10 +1,10 @@
 use crate::utils::vault_wrapper::{Any, VaultWrapper};
 use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding::{Onboarding, OnboardingUpdate};
+use db::models::onboarding::Onboarding;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
-use db::models::workflow::Workflow;
+use db::models::workflow::{Workflow, WorkflowUpdate};
 use db::tests::fixtures;
 use db::TxnPgConn;
 use itertools::Itertools;
@@ -81,13 +81,9 @@ pub fn create_user_and_onboarding(
 
     let suid = su.id.clone();
     let (ob, wf) = fixtures::onboarding::create(conn, suid, ob_config_id, None);
-    let ob = Onboarding::lock(conn, &ob.id).unwrap();
-    let update = OnboardingUpdate {
-        status: Some(onboarding_status),
-        ..Default::default()
-    };
-    let onboarding = Onboarding::update(ob, conn, &wf.id, update).unwrap();
-    let wf = Workflow::get(conn, &wf.id).unwrap();
+    let wf = Workflow::lock(conn, &wf.id).unwrap();
+    let update = WorkflowUpdate::set_status(onboarding_status);
+    let wf = Workflow::update(wf, conn, update).unwrap();
 
-    (tenant, onboarding, uv, su, wf)
+    (tenant, ob, uv, su, wf)
 }

@@ -5,16 +5,20 @@ use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, DocumentState, InsightEventId, KybState, OnboardingStatus, TenantId, TenantScope,
-    VaultId, VaultKind, WorkflowFixtureResult,
+    AlpacaKycState, DbActor, DocumentState, FireWebhookArgs, InsightEventId, KybState,
+    OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload, TaskData, TenantId,
+    TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowFixtureResult,
 };
 use newtypes::{
     Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
 };
 
+use super::manual_review::ManualReview;
 use super::ob_configuration::ObConfiguration;
 use super::onboarding_decision::OnboardingDecision;
 use super::scoped_vault::ScopedVault;
+use super::task::Task;
+use super::tenant::Tenant;
 use super::workflow_event::WorkflowEvent;
 use crate::models::vault::Vault;
 use crate::{DbResult, PgConn, TxnPgConn};
@@ -66,12 +70,40 @@ pub struct NewWorkflowArgs {
     pub insight_event_id: Option<InsightEventId>,
 }
 
-#[derive(Debug, Clone, AsChangeset)]
+#[derive(Debug, Clone, Default, AsChangeset)]
 #[diesel(table_name = workflow)]
 pub struct WorkflowUpdate {
     pub status: Option<OnboardingStatus>,
     pub authorized_at: Option<Option<DateTime<Utc>>>,
     pub decision_made_at: Option<Option<DateTime<Utc>>>,
+}
+
+impl WorkflowUpdate {
+    pub fn set_status(status: OnboardingStatus) -> Self {
+        Self {
+            status: Some(status),
+            ..Default::default()
+        }
+    }
+
+    /// Similar to set_decision, but updates based on information from the OBD
+    pub fn set_decision(wf: &Locked<Workflow>, decision: &OnboardingDecision) -> Self {
+        // TODO maybe this should just have the decision args and clear manual review
+        let is_first_fp_decision =
+            wf.decision_made_at.is_none() && matches!(decision.actor, DbActor::Footprint);
+        Self {
+            status: Some(decision.status.into()),
+            decision_made_at: is_first_fp_decision.then_some(Some(Utc::now())),
+            ..Default::default()
+        }
+    }
+
+    pub fn is_authorized() -> Self {
+        Self {
+            authorized_at: Some(Some(Utc::now())),
+            ..Self::default()
+        }
+    }
 }
 
 pub enum WorkflowIdentifier<'a> {
@@ -305,11 +337,69 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::update", skip_all)]
-    pub fn update(conn: &mut TxnPgConn, id: &WorkflowId, update: WorkflowUpdate) -> DbResult<Self> {
+    pub fn update(wf: Locked<Self>, conn: &mut TxnPgConn, update: WorkflowUpdate) -> DbResult<Self> {
+        // !! it's important that code in the same txn that is going to write a review does it before this update call
+        let mr = ManualReview::get_active(conn, &wf.id)?;
+        let new_status = update.status;
+        // TODO short circuit if nothing changed? like status is the same?
         let result = diesel::update(workflow::table)
-            .filter(workflow::id.eq(id))
+            .filter(workflow::id.eq(&wf.id))
             .set(update)
             .get_result(conn.conn())?;
+
+        if let Some(new_status) = new_status {
+            // Must lock to make sure scoped vault status isn't stale
+            let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
+            let tenant = Tenant::get(conn, &sv.tenant_id)?;
+            let old_status = sv.status;
+            if old_status != Some(new_status) {
+                let old_status_has_decision = match old_status {
+                    None => false,
+                    Some(s) => s.has_decision(),
+                };
+
+                // Since the OnboardingCompletedPayload webhook has `requires_manual_review`, its semantics currently really mean we have to fire it when we make a
+                // decision for the first time or in a redo flow
+                if !old_status_has_decision && new_status.has_decision() {
+                    let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
+                        fp_id: sv.fp_id.clone(),
+                        footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
+                        timestamp: Utc::now(),
+                        status: new_status,
+                        requires_manual_review: mr.is_some(),
+                    });
+                    let task_data = TaskData::FireWebhook(FireWebhookArgs {
+                        scoped_vault_id: wf.scoped_vault_id.clone(),
+                        tenant_id: tenant.id.clone(),
+                        is_live: sv.is_live,
+                        webhook_event,
+                    });
+                    Task::create(conn, Utc::now(), task_data)?;
+                };
+
+                if !old_status_has_decision || new_status.has_decision() {
+                    // Only set to non-decision status if the current status is a non-decision status
+                    // This has the effect of never letting the scoped vault status go from a decision to a non-decision status
+                    ScopedVault::update_status(conn, &sv.id, new_status)?;
+
+                    // Only fire a OnboardingStatusChanged webhook if the scoped vault staus changes
+                    let webhook_event =
+                        WebhookEvent::OnboardingStatusChanged(OnboardingStatusChangedPayload {
+                            fp_id: sv.fp_id.clone(),
+                            footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
+                            timestamp: Utc::now(),
+                            new_status,
+                        });
+                    let task_data = TaskData::FireWebhook(FireWebhookArgs {
+                        scoped_vault_id: wf.scoped_vault_id.clone(),
+                        tenant_id: tenant.id,
+                        is_live: sv.is_live,
+                        webhook_event,
+                    });
+                    Task::create(conn, Utc::now(), task_data)?;
+                }
+            }
+        }
         Ok(result)
     }
 

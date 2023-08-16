@@ -3,10 +3,9 @@ use newtypes::{DbActor, ReviewReason, VerificationResultId, WorkflowId};
 use db::{
     models::{
         manual_review::ManualReview,
-        onboarding::{Onboarding, OnboardingUpdate},
         onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
         scoped_vault::ScopedVault,
-        workflow::Workflow,
+        workflow::{Workflow, WorkflowUpdate},
     },
     TxnPgConn,
 };
@@ -58,7 +57,7 @@ pub fn save_final_decision(
         seqno,
         workflow_id: wf_id.clone(),
     };
-    let obd = OnboardingDecision::create(&wf, conn, onboarding_decision)?;
+    let obd = OnboardingDecision::create(conn, onboarding_decision)?;
 
     // Create ManualReview row if requested and an active one does not already exist
     if decision.create_manual_review {
@@ -69,12 +68,9 @@ pub fn save_final_decision(
     }
 
     // TODO: Make a billable event here
-    // If this is the first time setting a decision, then write decision_made_at
-    // This logic is getting convoluted - soon will switch to just workflow update
-    let (ob, _) = Onboarding::get(conn, &wf.scoped_vault_id)?;
-    let ob = Onboarding::lock(conn, &ob.id)?;
-    let update = OnboardingUpdate::set_decision(decision.decision_status);
-    Onboarding::update(ob, conn, &wf_id, update)?;
+    // NOTE: must do this after completing the manual review
+    let update = WorkflowUpdate::set_decision(&wf, &obd);
+    Workflow::update(wf, conn, update)?;
 
     Ok(obd)
 }

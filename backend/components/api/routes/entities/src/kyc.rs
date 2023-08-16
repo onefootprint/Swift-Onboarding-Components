@@ -24,10 +24,9 @@ use api_wire_types::TriggerKycRequest;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding::Onboarding;
-use db::models::onboarding::OnboardingUpdate;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
 use db::DbError;
 use itertools::Itertools;
 use newtypes::DataIdentifierDiscriminant as DID;
@@ -80,7 +79,7 @@ pub async fn post(
                 return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
             }
 
-            let (ob, wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
+            let (_, wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
                 &sv.vault_id,
                 &sv.id,
@@ -90,12 +89,11 @@ pub async fn post(
             )?;
 
             // TODO: consolidate with /authorize code
-            let ob = Onboarding::lock(conn, &ob.id)?;
+            let wf = Workflow::lock(conn, &wf.id)?;
             let wf = if wf.authorized_at.is_none() {
-                Onboarding::update(ob, conn, &wf.id, OnboardingUpdate::is_authorized())?;
-                Workflow::get(conn, &wf.id)? // refresh from DB
+                Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?
             } else {
-                wf
+                wf.into_inner()
             };
 
             let _ = NewLivenessEvent {

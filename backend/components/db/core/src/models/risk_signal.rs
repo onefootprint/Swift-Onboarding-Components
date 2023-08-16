@@ -391,9 +391,7 @@ mod tests {
                     })
                     .collect::<Vec<_>>();
 
-                let wf = Workflow::lock(conn, &wf.id).unwrap();
                 let obd = OnboardingDecision::create(
-                    &wf,
                     conn,
                     OnboardingDecisionCreateArgs {
                         vault_id: sv.vault_id.clone(),

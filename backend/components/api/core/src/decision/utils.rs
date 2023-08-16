@@ -3,19 +3,19 @@ use std::sync::Arc;
 use db::{
     models::{
         decision_intent::DecisionIntent,
-        onboarding::{Onboarding, OnboardingUpdate},
         risk_signal::RiskSignal,
+        scoped_vault::ScopedVault,
         vault::Vault,
         verification_request::VerificationRequest,
         verification_result::VerificationResult,
-        workflow::Workflow,
+        workflow::{Workflow, WorkflowUpdate},
     },
     PgConn, TxnPgConn,
 };
 use idv::incode::doc::response::FetchOCRResponse;
 use newtypes::{
     DataIdentifier, DecisionIntentId, DecisionStatus, IdentityDataKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, RiskSignalGroupKind, ScopedVaultId, TenantId, VaultKind, VendorAPI,
+    IdentityDocumentId, OnboardingStatus, RiskSignalGroupKind, ScopedVaultId, TenantId, VaultKind, VendorAPI,
     WorkflowFixtureResult, WorkflowId,
 };
 
@@ -188,12 +188,11 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     biz_wf_id: &WorkflowId,
     fixture_decision: FixtureDecision,
 ) -> ApiResult<()> {
-    // TODO update the rest of the business ob
-    let (biz_ob, sb) = Onboarding::get(conn, biz_wf_id)?;
-    let biz_ob = Onboarding::lock(conn, &biz_ob.id)?;
-
-    let update = OnboardingUpdate::idv_reqs_initiated();
-    Onboarding::update(biz_ob, conn, biz_wf_id, update)?;
+    let biz_wf = Workflow::lock(conn, biz_wf_id)?;
+    let sb = ScopedVault::get(conn, biz_wf_id)?;
+    // TODO should these state transitions be handled by the ww machines?
+    let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
+    Workflow::update(biz_wf, conn, update)?;
 
     let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
     let uv = Vault::get(conn, &sb.id)?;

@@ -1,12 +1,12 @@
 use std::fmt::Display;
 
 use crate::{
-    errors::{ApiError, ApiResult, ApiErrorKind},
+    errors::{ApiError, ApiErrorKind, ApiResult},
     utils::vault_wrapper::{Person, VaultWrapper},
 };
 
 use db::{models::verification_request::VerificationRequest, TxnPgConn};
-use newtypes::{DecisionIntentId, IdentityDataKind, OnboardingId, ScopedVaultId, VendorAPI};
+use newtypes::{DecisionIntentId, IdentityDataKind, ScopedVaultId, VendorAPI};
 
 use self::tenant_vendor_control::TenantVendorControl;
 

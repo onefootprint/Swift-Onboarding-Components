@@ -5,11 +5,11 @@ use async_trait::async_trait;
 use db::models::{
     decision_intent::DecisionIntent,
     document_request::{DocumentRequest, NewDocumentRequestArgs},
-    onboarding::{Onboarding, OnboardingUpdate},
     risk_signal::RiskSignal,
     risk_signal_group::RiskSignalGroup,
+    vault::Vault,
     verification_result::VerificationResult,
-    workflow::Workflow as DbWorkflow,
+    workflow::{Workflow as DbWorkflow, WorkflowUpdate},
 };
 
 use either::Either;
@@ -258,7 +258,8 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
     #[tracing::instrument("OnAction<MakeDecision, AlpacaKycState>::on_commit", skip_all)]
     fn on_commit(self, ff_client: Self::AsyncRes, conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
         // TODO: pass in/otherwise specify that Watchlist reason codes should not be written based on the KYC vendor calls
-        let (wf, v) = DbWorkflow::get_with_vault(conn, &self.wf_id)?;
+        let wf = DbWorkflow::lock(conn, &self.wf_id)?;
+        let v = Vault::get(conn, &self.sv_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
         // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
         // TODO: load risk signals here, and use that to evaluate the rules
@@ -295,12 +296,9 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 Ok(AlpacaKycState::from(AlpacaKycComplete))
             }
             DecisionStatus::Pass => {
-                // we update ob.status = Pending but cannot write an OBD yet (need to do watchlist checks next)
-                if !self.is_redo {
-                    let ob = Onboarding::lock(conn, &self.ob_id)?;
-                    let update = OnboardingUpdate::set_status(OnboardingStatus::Pending);
-                    Onboarding::update(ob, conn, &self.wf_id, update)?;
-                }
+                // TODO Why set this to pending here? it should be pending already from vendor reqs
+                let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
+                DbWorkflow::update(wf, conn, update)?;
                 Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
                     wf_id: self.wf_id,
                     is_redo: self.is_redo,
@@ -310,12 +308,9 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 }))
             }
             DecisionStatus::StepUp => {
-                // we set ob.status = incomplete (should be a no-op) but don't write an OBD yet
-                if !self.is_redo {
-                    let ob = Onboarding::lock(conn, &self.ob_id)?;
-                    let update = OnboardingUpdate::set_status(OnboardingStatus::Incomplete);
-                    Onboarding::update(ob, conn, &self.wf_id, update)?;
-                }
+                // we set wf.status = incomplete (should be a no-op) but don't write an OBD yet
+                let update = WorkflowUpdate::set_status(OnboardingStatus::Incomplete);
+                DbWorkflow::update(wf, conn, update)?;
                 let args = NewDocumentRequestArgs {
                     scoped_vault_id: self.sv_id.clone(),
                     ref_id: None,
