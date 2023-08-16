@@ -18,11 +18,11 @@ export type ContentProps = {
 };
 
 const Content = ({ data }: ContentProps) => {
-  const { systemTheme } = useTheme();
+  const { theme } = useTheme();
 
   return (
     <AppPortal
-      darkMode={systemTheme === 'dark'}
+      darkMode={theme === 'dark'}
       fontFamily="DM Sans"
       fullSize
       url={data.url}
