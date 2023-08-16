@@ -15,7 +15,11 @@ const TimelineTitle = ({ title, subtitle, cta, href }: TimelineTitleProps) => (
     <Title>{title}</Title>
     <Subtitle>{subtitle}</Subtitle>
     {cta && (
-      <LinkButton href={href} iconComponent={IcoArrowRightSmall16}>
+      <LinkButton
+        href={href}
+        iconComponent={IcoArrowRightSmall16}
+        target="_blank"
+      >
         {cta}
       </LinkButton>
     )}

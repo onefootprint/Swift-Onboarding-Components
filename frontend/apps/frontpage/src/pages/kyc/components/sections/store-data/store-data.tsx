@@ -14,9 +14,12 @@ import {
   Tabs,
   Typography,
 } from '@onefootprint/ui';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
+
+import settingsImage from './images/settings.png';
+import userDetailsImage from './images/user-details.png';
+import usersImage from './images/users.png';
 
 const StoreData = () => {
   const { t } = useTranslation('pages.kyc.storage');
@@ -24,19 +27,19 @@ const StoreData = () => {
     {
       label: t('sections.users'),
       value: 'users',
-      image: '/kyc/storage/users.png',
+      image: usersImage,
       icon: IcoUsers16,
     },
     {
       label: t('sections.user-details'),
       value: 'user-details',
-      image: '/kyc/storage/user-details.png',
+      image: userDetailsImage,
       icon: IcoUser16,
     },
     {
       label: t('sections.settings'),
       value: 'settings',
-      image: '/kyc/storage/settings.png',
+      image: settingsImage,
       icon: IcoSettings16,
     },
   ];
@@ -50,7 +53,7 @@ const StoreData = () => {
 
   useEffect(() => {
     const foundOption = options.find(option => option.value === segment);
-    setImage(foundOption ? foundOption.image : '');
+    setImage(foundOption ? foundOption.image : options[0].image);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [segment]);
 
@@ -65,7 +68,7 @@ const StoreData = () => {
         </Typography>
         <LinkButton
           iconComponent={IcoArrowRightSmall16}
-          href="https://docs.onefootprint.com"
+          href="/vaulting"
           target="_blank"
         >
           {t('learn-more')}
@@ -84,19 +87,15 @@ const StoreData = () => {
           </Tab>
         ))}
       </Tabs>
-      <ImageContainer
-        key={segment}
-        initial={{
-          opacity: 0,
-        }}
-        animate={{
-          opacity: 1,
-        }}
-        transition={{
-          duration: 0.5,
-        }}
-      >
-        <Image src={image} alt={segment} height={838} width={1280} />
+      <ImageContainer>
+        <Image
+          src={image}
+          alt={segment}
+          height={838}
+          width={1280}
+          priority
+          placeholder="blur"
+        />
       </ImageContainer>
     </SectionContainer>
   );
@@ -131,7 +130,7 @@ const SectionContainer = styled(Container)`
   `}
 `;
 
-const ImageContainer = styled(motion.div)`
+const ImageContainer = styled.div`
   width: 100%;
   height: 100%;
   display: flex;

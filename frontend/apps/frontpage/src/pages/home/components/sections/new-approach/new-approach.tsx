@@ -31,6 +31,7 @@ const NewApproach = () => {
           subtitle={t('kyc.subtitle')}
           gridArea="top-left"
           cta={t('kyc.cta')}
+          href={t('kyc.href')}
         >
           <KycIllustration />
         </FeatureCard>
@@ -39,6 +40,7 @@ const NewApproach = () => {
           subtitle={t('kyb.subtitle')}
           gridArea="top-right"
           cta={t('kyb.cta')}
+          href={t('kyb.href')}
         >
           <KybIllustration />
         </FeatureCard>

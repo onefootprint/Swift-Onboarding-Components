@@ -16,12 +16,14 @@ type FeatureCardProps = {
   children: React.ReactNode;
   gridArea?: string;
   size?: 'compact' | 'default';
+  href?: string;
 };
 
 const FeatureCard = ({
   title,
   subtitle,
   cta,
+  href,
   children,
   gridArea,
   size = 'default',
@@ -72,7 +74,7 @@ const FeatureCard = ({
         {cta && (
           <LinkButton
             iconComponent={IcoArrowRightSmall16}
-            href="https://docs.onefootprint.com/"
+            href={href}
             target="_blank"
           >
             {cta}

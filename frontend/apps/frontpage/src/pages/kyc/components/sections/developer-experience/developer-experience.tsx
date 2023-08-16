@@ -14,9 +14,12 @@ import {
   Tabs,
   Typography,
 } from '@onefootprint/ui';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
+
+import configurationImage from './images/configuration.png';
+import customizationImage from './images/customization.png';
+import documentationImage from './images/documentation.png';
 
 const DeveloperExperience = () => {
   const { t } = useTranslation('pages.kyc.developer-experience');
@@ -24,19 +27,19 @@ const DeveloperExperience = () => {
     {
       label: t('sections.configuration'),
       value: 'configuration',
-      image: '/kyc/developer-experience/configuration.png',
+      image: configurationImage,
       icon: IcoSettings16,
     },
     {
       label: t('sections.customization'),
       value: 'customization',
-      image: '/kyc/developer-experience/customization.png',
+      image: customizationImage,
       icon: IcoPencil16,
     },
     {
       label: t('sections.documentation'),
       value: 'documentation',
-      image: '/kyc/developer-experience/documentation.png',
+      image: documentationImage,
       icon: IcoFileText16,
     },
   ];
@@ -50,7 +53,7 @@ const DeveloperExperience = () => {
 
   useEffect(() => {
     const foundOption = options.find(option => option.value === segment);
-    setImage(foundOption ? foundOption.image : '');
+    setImage(foundOption ? foundOption.image : options[0].image);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [segment]);
 
@@ -88,19 +91,15 @@ const DeveloperExperience = () => {
           </Tabs>
         </Pop>
       </Scrubber>
-      <ImageContainer
-        key={segment}
-        initial={{
-          opacity: 0,
-        }}
-        animate={{
-          opacity: 1,
-        }}
-        transition={{
-          duration: 0.5,
-        }}
-      >
-        <Image src={image} alt={segment} height={838} width={1280} priority />
+      <ImageContainer>
+        <Image
+          src={image}
+          alt={segment}
+          height={838}
+          width={1280}
+          priority
+          placeholder="blur"
+        />
       </ImageContainer>
     </SectionContainer>
   );
@@ -152,7 +151,7 @@ const Scrubber = styled.div`
   }
 `;
 
-const Pop = styled(motion.div)`
+const Pop = styled.div`
   ${({ theme }) => css`
     display: flex;
     padding: 0 ${theme.spacing[5]};
@@ -166,7 +165,7 @@ const Pop = styled(motion.div)`
   `}
 `;
 
-const ImageContainer = styled(motion.div)`
+const ImageContainer = styled.div`
   max-width: 100%;
   height: 100%;
   display: flex;

@@ -260,13 +260,15 @@
           "title": "Know Your Customer (KYC)",
           "subtitle": "Verify real people, not typed information.",
           "alt-image": "A phone with an authorization screen and face ID validation",
-          "cta": "See documentation"
+          "cta": "Learn more",
+          "href": "/kyc"
         },
         "kyb": {
           "title": "Know Your Business (KYB)",
           "subtitle": "Verify businesses, and the people behind the business.",
           "alt-image": "A phone with details about a business",
-          "cta": "See documentation"
+          "cta": "Learn more",
+          "href": "/kyb"
         },
         "passkeys": {
           "title": "Passkeys.",
