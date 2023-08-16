@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Duration, Utc};
-use db_schema::schema::{onboarding, scoped_vault, task, vault, watchlist_check};
+use db_schema::schema::{scoped_vault, task, vault, watchlist_check};
 use diesel::{
     dsl::{count, count_star, not},
     prelude::*,
 };
 use newtypes::{
     DecisionIntentId, FootprintReasonCode, ScopedVaultId, TaskId, TenantId, VaultKind, WatchlistCheckId,
-    WatchlistCheckStatus, WatchlistCheckStatusKind,
+    WatchlistCheckStatus, WatchlistCheckStatusKind, WorkflowKind,
 };
 use serde::{Deserialize, Serialize};
 
@@ -192,17 +192,18 @@ impl WatchlistCheck {
     #[tracing::instrument("WatchlistCheck::get_overdue_scoped_vaults", skip_all)]
     pub fn get_overdue_scoped_vaults(conn: &mut PgConn, tenant_id: TenantId) -> DbResult<Vec<ScopedVaultId>> {
         let thirty_days_ago = Utc::now() - Duration::days(30);
+        use db_schema::schema::workflow;
 
         let res = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(true))
-            .inner_join(vault::table.on(vault::id.eq(scoped_vault::vault_id)))
+            .inner_join(vault::table)
             .filter(vault::kind.eq(VaultKind::Person))
-            .select(scoped_vault::id)
             .left_join(
-                onboarding::table.on(onboarding::scoped_vault_id
+                workflow::table.on(workflow::scoped_vault_id
                     .eq(scoped_vault::id)
-                    .and(onboarding::decision_made_at.ge(thirty_days_ago))),
+                    .and(workflow::kind.eq_any(&[WorkflowKind::Kyc, WorkflowKind::AlpacaKyc]))
+                    .and(workflow::decision_made_at.ge(thirty_days_ago))),
             )
             .left_join(
                 watchlist_check::table.on(watchlist_check::scoped_vault_id
@@ -220,12 +221,15 @@ impl WatchlistCheck {
                     )
                     .and(task::created_at.ge(thirty_days_ago))),
             )
+            .select(scoped_vault::id)
             .group_by(scoped_vault::id)
             .having(
-                count(onboarding::id)
+                // No KYC workflow with a decision made more recently than 30 days ago
+                count(workflow::id)
                     .eq(0)
-                    .and(count(watchlist_check::id).eq(0))
-                    .and(count(task::id).eq(0)),
+                    // No watchlist check created more recently than 30 days ago AND
+                    // No watchlist_check task created more recently than 30 days ago
+                    .and(count(watchlist_check::id).eq(0).and(count(task::id).eq(0))),
             )
             .get_results(conn)?;
 

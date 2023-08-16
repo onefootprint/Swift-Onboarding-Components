@@ -4,6 +4,8 @@ use crate::models::task::NewTask;
 use crate::models::task::Task;
 use crate::models::watchlist_check::NewWatchlistCheck;
 use crate::models::watchlist_check::WatchlistCheck;
+use crate::models::workflow::Workflow;
+use crate::models::workflow::WorkflowUpdate;
 use crate::test_helpers::have_same_elements;
 use crate::tests::fixtures;
 use crate::tests::prelude::*;
@@ -111,6 +113,12 @@ fn make_vault(
                 ..Default::default()
             };
             Onboarding::update(ob, conn, Some(&wf.id), update).unwrap();
+            let update = WorkflowUpdate {
+                decision_made_at: Some(Some(ob_decision_made_at)),
+                status: None,
+                authorized_at: None,
+            };
+            Workflow::update(conn, &wf.id, update).unwrap();
         }
         sv
     } else {
