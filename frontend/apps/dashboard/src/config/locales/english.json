@@ -1045,7 +1045,37 @@
       },
       "create-button": "Create Playbook",
       "empty-description": "You haven't created any Playbooks just yet.",
-      "cta-not-allowed": "You're not allowed to create Playbooks"
+      "cta-not-allowed": "You're not allowed to create Playbooks",
+      "dialog": {
+        "title": "Create Playbook",
+        "router": {
+          "stepper": {
+            "aria-label": "Progress indicator for Playbooks"
+          },
+          "who-to-onboard": "Who to onboard",
+          "your-playbook": "Your Playbook"
+        },
+        "who-to-onboard": {
+          "title": "Who would you like to onboard?",
+          "subtitle": "This helps us better recommend which data to collect.",
+          "kyc": {
+            "title": "Onboard people",
+            "description": "Know Your Customer (KYC) is the obligation of banks, businesses, and other financial institutions to identify and authenticate a person's identity before doing business with them."
+          },
+          "kyb": {
+            "title": "Onboard businesses and their beneficial owners",
+            "description": "Know Your Business (KYB) is the obligation to verify the identity of any entity that you do business with."
+          },
+          "buttons": {
+            "back": "Back",
+            "continue": "Continue"
+          }
+        },
+        "your-playbook": {
+          "title": "Your Playbook recommendation",
+          "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        }
+      }
     },
     "manual-review": {
       "page-title": "Footprint | Manual Review",

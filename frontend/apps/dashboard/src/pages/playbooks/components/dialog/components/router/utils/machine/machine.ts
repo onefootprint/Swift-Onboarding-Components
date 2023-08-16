@@ -12,25 +12,31 @@ export const createPlaybookMachine = () =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'type',
+      initial: 'whoToOnboard',
       context: {},
       states: {
-        type: {
+        whoToOnboard: {
           on: {
-            typeSubmitted: {
-              target: 'name',
-              actions: ['assignType'],
+            whoToOnboardSubmitted: {
+              target: 'yourPlaybook',
+              actions: ['assignWhoToOnboard'],
             },
           },
         },
-        name: {},
+        yourPlaybook: {
+          on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+            },
+          },
+        },
       },
     },
     {
       actions: {
-        assignType: assign((context, event) => ({
+        assignWhoToOnboard: assign((context, event) => ({
           ...context,
-          type: event.payload.type,
+          kind: event.payload.kind,
         })),
       },
     },
