@@ -537,7 +537,7 @@ pub async fn init_middesk_request(
         .db_transaction(move |conn| -> ApiResult<_> {
             let ob = Onboarding::lock(conn, &ob_id)?;
             let sv_id = ob.scoped_vault_id.clone();
-            Onboarding::update(ob, conn, Some(&wf_id), OnboardingUpdate::idv_reqs_initiated())?;
+            Onboarding::update(ob, conn, &wf_id, OnboardingUpdate::idv_reqs_initiated())?;
 
             let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(
                 conn,

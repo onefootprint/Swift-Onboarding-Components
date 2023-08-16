@@ -58,7 +58,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
             // We're now updating the onboarding's authorized_at even if it's already set. This
             // representation is a little strange now, but we'll move away from reading it as the
             // source of truth shortly
-            Onboarding::update(ob, c, Some(&wf_id), OnboardingUpdate::is_authorized())?;
+            Onboarding::update(ob, c, &wf_id, OnboardingUpdate::is_authorized())?;
 
             let biz_wf = user_auth.business_workflow(c)?;
             let (set_biz_is_authorized, biz_wf) = if let Some(biz_wf) = biz_wf {
@@ -66,7 +66,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
                 let biz_ob = Onboarding::lock(c, &biz_ob.id)?;
                 let (set_biz_is_authorized, biz_wf) = if biz_wf.authorized_at.is_none() {
                     let update = OnboardingUpdate::is_authorized();
-                    Onboarding::update(biz_ob, c, Some(&biz_wf.id), update)?;
+                    Onboarding::update(biz_ob, c, &biz_wf.id, update)?;
                     // Refresh from DB
                     let biz_wf = Workflow::get(c, &biz_wf.id)?;
                     (true, biz_wf)

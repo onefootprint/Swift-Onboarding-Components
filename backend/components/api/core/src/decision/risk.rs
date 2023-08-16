@@ -74,7 +74,7 @@ pub fn save_final_decision(
     let (ob, _) = Onboarding::get(conn, &wf.scoped_vault_id)?;
     let ob = Onboarding::lock(conn, &ob.id)?;
     let update = OnboardingUpdate::set_decision(decision.decision_status, &ob);
-    Onboarding::update(ob, conn, Some(&wf_id), update)?;
+    Onboarding::update(ob, conn, &wf_id, update)?;
 
     Ok(obd)
 }

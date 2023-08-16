@@ -67,7 +67,7 @@ pub fn setup_kyc_onboarding_vreqs(
     // redundant with new workflow state updates, will eventually remove when Onboarding is removed
     if !is_redo {
         let update = OnboardingUpdate::idv_reqs_initiated();
-        Onboarding::update(ob, conn, Some(wf_id), update)?;
+        Onboarding::update(ob, conn, wf_id, update)?;
     }
     // TODO: create new DI if is_redo
     let decision_intent = DecisionIntent::get_or_create_for_workflow_and_kind(

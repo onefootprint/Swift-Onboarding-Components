@@ -121,7 +121,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
     fn on_commit(self, _async_res: (), conn: &mut db::TxnPgConn) -> ApiResult<KybState> {
         let update = OnboardingUpdate::set_status(OnboardingStatus::Pending);
         let ob = Onboarding::lock(conn, &self.ob_id)?;
-        Onboarding::update(ob, conn, Some(&self.wf_id), update)?;
+        Onboarding::update(ob, conn, &self.wf_id, update)?;
 
         Ok(KybState::from(KybVendorCalls {
             wf_id: self.wf_id,

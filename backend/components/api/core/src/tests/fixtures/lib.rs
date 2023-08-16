@@ -86,7 +86,7 @@ pub fn create_user_and_onboarding(
         status: Some(onboarding_status),
         ..Default::default()
     };
-    let onboarding = Onboarding::update(ob, conn, Some(&wf.id), update).unwrap();
+    let onboarding = Onboarding::update(ob, conn, &wf.id, update).unwrap();
     let wf = Workflow::get(conn, &wf.id).unwrap();
 
     (tenant, onboarding, uv, su, wf)

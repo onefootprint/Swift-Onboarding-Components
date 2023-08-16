@@ -247,24 +247,21 @@ impl Onboarding {
         ob: Locked<Onboarding>,
         conn: &mut TxnPgConn,
         // While we're double writing status to wf_id, update it here if it exists
-        wf_id: Option<&WorkflowId>,
+        wf_id: &WorkflowId,
         update: OnboardingUpdate,
     ) -> DbResult<Self> {
         let sv = ScopedVault::lock(conn, &ob.scoped_vault_id)?;
         let tenant = Tenant::get(conn, &sv.tenant_id)?;
         // !! it's important that code in the same txn that is going to write a review does it before this update call
-        let mr_wf_id = wf_id.unwrap_or(&ob.workflow_id);
-        let mr = ManualReview::get_active(conn, mr_wf_id)?;
+        let mr = ManualReview::get_active(conn, wf_id)?;
 
         // Update the workflow to keep it in sync with the onboarding for now
-        if let Some(wf_id) = wf_id {
-            let update = WorkflowUpdate {
-                status: update.status,
-                authorized_at: update.authorized_at,
-                decision_made_at: None,
-            };
-            Workflow::update(conn, wf_id, update)?;
-        }
+        let wf_update = WorkflowUpdate {
+            status: update.status,
+            authorized_at: update.authorized_at,
+            decision_made_at: None,
+        };
+        Workflow::update(conn, wf_id, wf_update)?;
         if let Some(new_status) = update.status {
             let old_status = sv.status;
             if old_status != Some(new_status) {

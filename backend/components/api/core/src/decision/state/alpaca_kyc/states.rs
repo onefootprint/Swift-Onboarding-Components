@@ -299,7 +299,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 if !self.is_redo {
                     let ob = Onboarding::lock(conn, &self.ob_id)?;
                     let update = OnboardingUpdate::set_status(OnboardingStatus::Pending);
-                    Onboarding::update(ob, conn, Some(&self.wf_id), update)?;
+                    Onboarding::update(ob, conn, &self.wf_id, update)?;
                 }
                 Ok(AlpacaKycState::from(AlpacaKycWatchlistCheck {
                     wf_id: self.wf_id,
@@ -314,7 +314,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                 if !self.is_redo {
                     let ob = Onboarding::lock(conn, &self.ob_id)?;
                     let update = OnboardingUpdate::set_status(OnboardingStatus::Incomplete);
-                    Onboarding::update(ob, conn, Some(&self.wf_id), update)?;
+                    Onboarding::update(ob, conn, &self.wf_id, update)?;
                 }
                 let args = NewDocumentRequestArgs {
                     scoped_vault_id: self.sv_id.clone(),

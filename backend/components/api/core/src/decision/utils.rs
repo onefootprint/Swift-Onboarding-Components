@@ -193,7 +193,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     let biz_ob = Onboarding::lock(conn, &biz_ob.id)?;
 
     let update = OnboardingUpdate::idv_reqs_initiated();
-    Onboarding::update(biz_ob, conn, Some(biz_wf_id), update)?;
+    Onboarding::update(biz_ob, conn, biz_wf_id, update)?;
 
     let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
     let uv = Vault::get(conn, &sb.id)?;

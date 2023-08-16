@@ -82,7 +82,7 @@ pub async fn create_user_and_onboarding(
             // Mark the onboardings as authorized since they would be authorized in prod by the
             // time they're used here
             let ob = Onboarding::lock(conn, &ob.id)?;
-            let ob = Onboarding::update(ob, conn, Some(&wf.id), OnboardingUpdate::is_authorized())?;
+            let ob = Onboarding::update(ob, conn, &wf.id, OnboardingUpdate::is_authorized())?;
             let wf = Workflow::get(conn, &wf.id)?;
 
             let biz_wf = biz_wf
@@ -91,7 +91,7 @@ pub async fn create_user_and_onboarding(
                     let wf_id = biz_wf.id;
                     let biz_ob = Onboarding::get(conn, &biz_wf.scoped_vault_id)?.0;
                     let biz_ob = Onboarding::lock(conn, &biz_ob.id)?;
-                    Onboarding::update(biz_ob, conn, Some(&wf_id), OnboardingUpdate::is_authorized())?;
+                    Onboarding::update(biz_ob, conn, &wf_id, OnboardingUpdate::is_authorized())?;
                     let biz_wf = Workflow::get(conn, &wf_id)?;
                     Ok(biz_wf)
                 })

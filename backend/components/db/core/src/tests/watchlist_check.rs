@@ -112,7 +112,7 @@ fn make_vault(
                 status: Some(OnboardingStatus::Pass),
                 ..Default::default()
             };
-            Onboarding::update(ob, conn, Some(&wf.id), update).unwrap();
+            Onboarding::update(ob, conn, &wf.id, update).unwrap();
             let update = WorkflowUpdate {
                 decision_made_at: Some(Some(ob_decision_made_at)),
                 status: None,
