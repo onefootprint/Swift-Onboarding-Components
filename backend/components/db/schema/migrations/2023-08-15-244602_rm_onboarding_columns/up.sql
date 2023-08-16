@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS backup_onboardings AS SELECT * FROM onboarding;
+ALTER TABLE backup_onboardings DROP CONSTRAINT IF EXISTS backup_onboardings_pk;
 ALTER TABLE backup_onboardings ADD CONSTRAINT backup_onboardings_pk PRIMARY KEY (id);
 
 ALTER TABLE onboarding
