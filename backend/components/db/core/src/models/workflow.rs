@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
+use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, DocumentState, InsightEventId, KybState, OnboardingStatus, TenantScope, VaultId,
-    WorkflowFixtureResult,
+    AlpacaKycState, DocumentState, InsightEventId, KybState, OnboardingStatus, TenantId, TenantScope,
+    VaultId, VaultKind, WorkflowFixtureResult,
 };
 use newtypes::{
     Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
@@ -349,6 +350,31 @@ impl Workflow {
             .first(conn)
             .optional()?;
         Ok(res)
+    }
+
+    #[tracing::instrument("Workflow::get_billable_count", skip_all)]
+    pub fn get_billable_count(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        start_date: DateTime<Utc>,
+        end_date: DateTime<Utc>,
+        kind: VaultKind,
+    ) -> DbResult<i64> {
+        use db_schema::schema::{scoped_vault, vault};
+        let count = workflow::table
+            .inner_join(scoped_vault::table.inner_join(vault::table))
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .filter(scoped_vault::is_live.eq(true))
+            .filter(vault::kind.eq(kind))
+            // We won't charge tenants for workflows that didn't finish authorizing, even if we
+            // already ran KYC checks
+            .filter(not(workflow::authorized_at.is_null()))
+            // Filter for workflows that had their final decision made during this billing period
+            .filter(workflow::decision_made_at.ge(start_date))
+            .filter(workflow::decision_made_at.lt(end_date))
+            .select(count_star())
+            .get_result(conn)?;
+        Ok(count)
     }
 }
 

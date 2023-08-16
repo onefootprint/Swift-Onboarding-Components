@@ -7,9 +7,9 @@ use crate::State;
 use actix_web::{post, web};
 use billing::{BillingCounts, BillingInfo};
 use chrono::{Duration, NaiveDate, Utc};
-use db::models::onboarding::Onboarding;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
+use db::models::workflow::Workflow;
 use db::scoped_vault::{count_authorized_for_tenant, ScopedVaultListQueryParams};
 use feature_flag::BoolFlag;
 use newtypes::{StripeCustomerId, TenantId, VaultKind};
@@ -117,8 +117,8 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let pii = count_authorized_for_tenant(conn, params)?;
-            let kyc = Onboarding::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
-            let kyb = Onboarding::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
+            let kyc = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
+            let kyb = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
             let watchlist_checks = WatchlistCheck::get_billable_count(conn, &t_id, i.start, i.end)?;
             let counts = BillingCounts {
                 pii,

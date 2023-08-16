@@ -10,13 +10,12 @@ use crate::PgConn;
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{onboarding, scoped_vault};
-use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
     AlpacaKycConfig, CipKind, DecisionStatus, FireWebhookArgs, InsightEventId, KybConfig, KycConfig, Locked,
     ObConfigurationId, OnboardingCompletedPayload, OnboardingId, OnboardingStatusChangedPayload,
-    ScopedVaultId, TaskData, TenantId, WebhookEvent, WorkflowFixtureResult, WorkflowId,
+    ScopedVaultId, TaskData, WebhookEvent, WorkflowFixtureResult, WorkflowId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
 use serde::{Deserialize, Serialize};
@@ -336,30 +335,5 @@ impl Onboarding {
                 ob.into_inner()
             };
         Ok(result)
-    }
-
-    #[tracing::instrument("Onboarding::get_billable_count", skip_all)]
-    pub fn get_billable_count(
-        conn: &mut PgConn,
-        tenant_id: &TenantId,
-        start_date: DateTime<Utc>,
-        end_date: DateTime<Utc>,
-        kind: VaultKind,
-    ) -> DbResult<i64> {
-        use db_schema::schema::{onboarding, scoped_vault, vault};
-        let count = onboarding::table
-            .inner_join(scoped_vault::table.inner_join(vault::table))
-            .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .filter(scoped_vault::is_live.eq(true))
-            .filter(vault::kind.eq(kind))
-            // We won't charge tenants for onboardings that didn't finish authorizing, even if we
-            // already ran KYC checks
-            .filter(not(onboarding::authorized_at.is_null()))
-            // Filter for onboardings that had their final decision made during this billing period
-            .filter(onboarding::decision_made_at.ge(start_date))
-            .filter(onboarding::decision_made_at.lt(end_date))
-            .select(count_star())
-            .get_result(conn)?;
-        Ok(count)
     }
 }
