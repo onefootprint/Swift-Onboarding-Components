@@ -1,5 +1,6 @@
 use diesel::Connection;
 
+pub use super::fixtures;
 use crate::test_helpers::test_db_conn;
 use crate::PgConn;
 use crate::TxnPgConn;

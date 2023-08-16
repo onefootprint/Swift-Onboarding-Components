@@ -270,7 +270,6 @@ enum NewRiskSignals {
 mod tests {
     use super::*;
     use crate::models::decision_intent::DecisionIntent;
-    use crate::models::onboarding::Onboarding;
     use crate::models::onboarding_decision::NewDecisionArgs;
     use crate::models::onboarding_decision::OnboardingDecision;
     use crate::models::scoped_vault::ScopedVault;
@@ -284,16 +283,15 @@ mod tests {
     use itertools::Itertools;
     use macros::db_test_case;
     use newtypes::DecisionIntentKind;
-    use newtypes::Locked;
     use newtypes::{DbActor, DecisionIntentId, DecisionStatus, ScopedVaultId};
     use serde_json::json;
 
-    fn setup(conn: &mut TestPgConn) -> (ScopedVault, DecisionIntent, Locked<Onboarding>, Workflow) {
+    fn setup(conn: &mut TestPgConn) -> (ScopedVault, DecisionIntent, Workflow) {
         let t = fixtures::tenant::create(conn);
         let obc = fixtures::ob_configuration::create(conn, &t.id, true);
         let uv = fixtures::vault::create_person(conn, true).into_inner();
         let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
-        let (ob, wf) = fixtures::onboarding::create(conn, sv.id.clone(), obc.id, None);
+        let (_, wf) = fixtures::onboarding::create(conn, sv.id.clone(), obc.id, None);
         let di = crate::models::decision_intent::DecisionIntent::get_or_create_for_workflow(
             conn,
             &sv.id,
@@ -301,9 +299,8 @@ mod tests {
             DecisionIntentKind::OnboardingKyc,
         )
         .unwrap();
-        let ob = Onboarding::lock(conn, &ob.id).unwrap();
 
-        (sv, di, ob, wf)
+        (sv, di, wf)
     }
 
     fn create_vres(
@@ -375,7 +372,7 @@ mod tests {
         // Case 2: only RS with Vres
         // Case 3: mix of RS with OBD and Vres
 
-        let (sv, di, _, wf) = setup(conn);
+        let (sv, di, wf) = setup(conn);
 
         input_risk_signal_groups
             .into_iter()

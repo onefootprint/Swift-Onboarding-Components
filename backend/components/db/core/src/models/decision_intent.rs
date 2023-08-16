@@ -5,6 +5,8 @@ use diesel::prelude::*;
 use newtypes::{DecisionIntentId, DecisionIntentKind, ScopedVaultId, WorkflowId};
 use serde::{Deserialize, Serialize};
 
+use super::workflow::Workflow;
+
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = decision_intent)]
 pub struct DecisionIntent {
@@ -61,6 +63,7 @@ impl DecisionIntent {
         wf_id: &WorkflowId,
         kind: DecisionIntentKind,
     ) -> DbResult<Self> {
+        Workflow::lock(conn, wf_id)?;
         let new_di = NewDecisionIntent {
             created_at: Utc::now(),
             kind,
@@ -122,23 +125,25 @@ mod tests {
     use super::*;
     use crate::tests::prelude::*;
     use macros::db_test;
-    use std::str::FromStr;
 
     #[db_test]
     fn test_get_or_create_onboarding_kyc(conn: &mut TestPgConn) {
-        let sv_id = ScopedVaultId::from_str("123").unwrap();
-        let wf_id = WorkflowId::from_str("456").unwrap();
+        let t = fixtures::tenant::create(conn);
+        let obc = fixtures::ob_configuration::create(conn, &t.id, true);
+        let uv = fixtures::vault::create_person(conn, true).into_inner();
+        let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
+        let (_, wf) = fixtures::onboarding::create(conn, sv.id.clone(), obc.id, None);
         let di1 = DecisionIntent::get_or_create_for_workflow(
             conn,
-            &sv_id,
-            &wf_id,
+            &sv.id,
+            &wf.id,
             DecisionIntentKind::OnboardingKyc,
         )
         .unwrap();
         let di2 = DecisionIntent::get_or_create_for_workflow(
             conn,
-            &sv_id,
-            &wf_id,
+            &sv.id,
+            &wf.id,
             DecisionIntentKind::OnboardingKyc,
         )
         .unwrap();

@@ -20,7 +20,6 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::IdentityDocument;
-use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
@@ -89,7 +88,6 @@ pub async fn post(
         seal_file_and_upload_to_s3(&state, &file, di.clone(), user_auth.user(), &su_id).await?;
 
     // Create uploads for the document
-    let ob_id = user_auth.onboarding()?.id.clone();
     let vault2 = vault.clone();
     let wf_id = wf.id.clone();
     let tenant_id = user_auth.tenant()?.id.clone();
@@ -133,7 +131,6 @@ pub async fn post(
             // Now that the document is created, either initiate IDV reqs or create fixture data
             let result = if should_initiate_reqs {
                 // Initiate IDV reqs once and only once for this id_doc
-                let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
                 let decision_intent = DecisionIntent::get_or_create_for_workflow(
                     conn,
                     &su_id,

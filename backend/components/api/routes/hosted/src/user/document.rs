@@ -18,7 +18,6 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest as DbDocumentRequest;
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
-use db::models::onboarding::Onboarding;
 use db::models::user_consent::UserConsent;
 use itertools::Itertools;
 use newtypes::output::Csv;
@@ -105,7 +104,6 @@ pub async fn post(
     let fixture = request.fixture_result;
 
     // write a identity_document
-    let ob_id = user_auth.onboarding()?.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
     let vault2 = vault.clone();
     let wf_id = wf.id.clone();
@@ -149,7 +147,6 @@ pub async fn post(
             // Now that the document is created, either initiate IDV reqs or create fixture data
             let result = if should_initiate_reqs {
                 // Initiate IDV reqs once and only once for this id_doc
-                let _ob = Onboarding::lock(conn, &ob_id)?; // Lock for DecisionIntent write
                 let decision_intent = DecisionIntent::get_or_create_for_workflow(
                     conn,
                     &su_id,

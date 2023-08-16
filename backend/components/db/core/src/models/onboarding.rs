@@ -10,7 +10,7 @@ use db_schema::schema::{onboarding, scoped_vault};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
-    AlpacaKycConfig, CipKind, KybConfig, KycConfig, Locked, ObConfigurationId, OnboardingId, ScopedVaultId,
+    AlpacaKycConfig, CipKind, KybConfig, KycConfig, ObConfigurationId, OnboardingId, ScopedVaultId,
     WorkflowFixtureResult, WorkflowId,
 };
 use newtypes::{OnboardingStatus, VaultKind};
@@ -96,15 +96,6 @@ impl Onboarding {
         let result = query.first(conn)?;
 
         Ok(result)
-    }
-
-    #[tracing::instrument("Onboarding::lock", skip_all)]
-    pub fn lock(conn: &mut TxnPgConn, id: &OnboardingId) -> DbResult<Locked<Self>> {
-        let result = onboarding::table
-            .filter(onboarding::id.eq(id))
-            .for_no_key_update()
-            .get_result(conn.conn())?;
-        Ok(Locked::new(result))
     }
 
     #[tracing::instrument("Onboarding::get_or_create", skip_all)]
