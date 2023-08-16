@@ -3607,6 +3607,175 @@ pub fn middesk_business_update_webhook_response() -> serde_json::Value {
     })
 }
 
+pub fn cross_core_response_with_error() -> serde_json::Value {
+    serde_json::json!({
+      "responseHeader": {
+        "category": null,
+        "tenantId": "105408b68cde455a92e95a3eaa989e",
+        "messageTime": "2023-08-16T03:38:14Z",
+        "requestType": "PreciseIdOnly",
+        "expRequestId": "RB000016347814",
+        "responseCode": "R0201",
+        "responseType": "INFO",
+        "overallResponse": {
+          "score": null,
+          "decision": null,
+          "decisionText": null,
+          "spareObjects": [],
+          "decisionReasons": [],
+          "recommendedNextActions": []
+        },
+        "responseMessage": "Workflow Complete.",
+        "clientReferenceId": "vreq_lWimW2PqVkq1LAPskZizP"
+      },
+      "originalRequestData": {
+        "control": [
+            {
+                "option": "PIDXML_VERSION",
+                "value": "06.00"
+            },
+            {
+                "option": "SUBSCRIBER_PREAMBLE",
+                "value": "TBD3"
+            },
+            {
+                "option": "SUBSCRIBER_OPERATOR_INITIAL",
+                "value": "OF"
+            },
+            {
+                "option": "SUBSCRIBER_SUB_CODE",
+                "value": "2956241"
+            },
+            {
+                "option": "PID_USERNAME",
+                "value": "ofp_demo"
+            },
+            {
+                "option": "PID_PASSWORD",
+                "value": "Y3lkamVqLTBXdXNkZS12dXJ3ZWM="
+            },
+            {
+                "option": "PRODUCT_OPTION",
+                "value": "01"
+            },
+            {
+                "option": "DETAIL_REQUEST",
+                "value": "D"
+            }
+        ],
+        "contacts": [
+            {
+                "id": "APPLICANT_CONTACT_ID_1",
+                "person": {
+                    "typeOfPerson": "APPLICANT",
+                    "personIdentifier": "1234",
+                    "personDetails": {
+                        "dateOfBirth": "1963-01-01"
+                    },
+                    "names": [
+                        {
+                            "firstName": "BRIAN",
+                            "middleNames": "P",
+                            "surName": "KURTH"
+                        }
+                    ]
+                },
+                "addresses": [
+                    {
+                        "id": "Main_Contact_Address_0",
+                        "addressType": "CURRENT",
+                        "street": "2010 SAINT NAZAIRE BLVD",
+                        "postTown": "HOMESTEAD",
+                        "postal": "33039",
+                        "stateProvinceCode": "FL"
+                    }
+                ],
+                "telephones": [
+                    {
+                        "id": "Main_Phone_0",
+                        "number": "+1 7818945369"
+                    }
+                ],
+                "emails": [
+                    {
+                        "id": "MAIN_EMAIL_0",
+                        "email": "John.Smith@Experian.com"
+                    }
+                ],
+                "identityDocuments": [
+                    {
+                        "documentNumber": "666810987",
+                        "documentType": "SSN"
+                    }
+                ]
+            }
+        ],
+        "application": {
+            "productDetails": {
+                "productType": "WRITTEN_INSTRUCTIONS"
+            },
+            "applicants": [
+                {
+                    "contactId": "APPLICANT_CONTACT_ID_1",
+                    "applicantType": "APPLICANT"
+                }
+            ]
+        }
+    },
+      "clientResponsePayload": {
+        "decisionElements": [
+          {
+            "matches": null,
+            "decisions": null,
+            "otherData": {
+              "json": {
+                "fraudSolutions": {
+                  "response": {
+                    "products": {
+                      "preciseIdServer": {
+                        "error": {
+                          "errorCode": "709",
+                          "reportDate": "08152023",
+                          "reportTime": "223821",
+                          "actionIndicator": {
+                            "code": "C",
+                            "value": ""
+                          },
+                          "referenceNumber": "vreq_lWimW2PqVkq1LAPskZizP",
+                          "errorDescription": "Invalid user id/password"
+                        },
+                        "header": "<SCRUBBED>",
+                        "summary": null,
+                        "glbDetail": null,
+                        "ipAddress": "<SCRUBBED>",
+                        "onFileSsn": "<SCRUBBED>",
+                        "sessionId": null,
+                        "preciseMatch": null,
+                        "pidxmlversion": "06.00"
+                      },
+                      "customerManagement": null
+                    }
+                  }
+                }
+              }
+            },
+            "applicantId": "Contact1",
+            "serviceName": "PreciseId",
+            "warningsErrors": [
+              {
+                "responseCode": "709",
+                "responseType": "ERROR",
+                "responseMessage": "Invalid user id/password"
+              }
+            ],
+            "normalizedScore": -1
+          }
+        ],
+        "orchestrationDecisions": []
+      }
+    })
+}
+
 pub struct DocTestOpts {
     pub screen: IncodeStatus,
     pub paper: IncodeStatus,

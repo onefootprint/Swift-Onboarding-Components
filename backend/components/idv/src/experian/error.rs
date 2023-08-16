@@ -34,6 +34,8 @@ pub enum Error {
     JwtTokenNeedsRefresh,
     #[error("Unknown Error")]
     UnknownError,
+    #[error("Username/Password Error")]
+    UserNamePasswordError,
 }
 
 impl Error {

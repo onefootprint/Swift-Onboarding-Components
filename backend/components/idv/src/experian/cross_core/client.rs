@@ -10,7 +10,7 @@ use crate::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::{Base64Data, Base64EncodedString};
 
 use super::request::{ControlOption, CrossCoreAPIRequest, PreciseIDRequestConfig};
-use super::response::CCErrorResponse;
+use super::response::{CCErrorResponse, CrossCoreAPIResponse};
 use super::validation;
 
 const REQUIRED_X_USER_DOMAIN_HEADER_VAL: &str = "onefootprint.com";
@@ -181,11 +181,31 @@ impl ExperianClientAdapter {
             Err(_) => Ok(()),
         }?;
 
+        // Catch errors from cc itself
+        match serde_json::from_value::<CrossCoreAPIResponse>(response.clone()) {
+            Ok(c) => {
+                let codes = c.error_codes();
+
+                if codes.contains(&"709".to_string()) {
+                    let err = Error::UserNamePasswordError;
+                    tracing::error!(error=?err, error_code=%"709", "send_precise_id_request error");
+                    Err(err)
+                } else {
+                    Ok(())
+                }
+            }
+            // we handle this elsewhere
+            Err(_) => Ok(()),
+        }?;
+
         Ok(response)
     }
 
-    fn token_needs_refresh(error: &Error) -> bool {
-        matches!(error, Error::JwtTokenNeedsRefresh | Error::UnknownError)
+    fn should_retry(error: &Error) -> bool {
+        matches!(
+            error,
+            Error::JwtTokenNeedsRefresh | Error::UnknownError | Error::UserNamePasswordError
+        )
     }
 
     pub(crate) async fn send_precise_id_request_with_retries(
@@ -198,7 +218,7 @@ impl ExperianClientAdapter {
         let response = RetryIf::spawn(
             retry_strategy,
             || self.send_precise_id_request(client, validated_idv_data.to_owned()),
-            Self::token_needs_refresh,
+            Self::should_retry,
         )
         .await
         .map_err(Error::from)?;

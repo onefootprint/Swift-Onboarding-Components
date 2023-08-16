@@ -113,6 +113,20 @@ impl CrossCoreAPIResponse {
         }
     }
 }
+
+impl CrossCoreAPIResponse {
+    pub fn error_codes(&self) -> Vec<String> {
+        self.get_precise_id_decision_element()
+            .ok()
+            .and_then(|de| de.warnings_errors.as_ref())
+            .map(|we| {
+                we.iter()
+                    .filter_map(|e| e.response_code.clone())
+                    .collect::<Vec<_>>()
+            })
+            .unwrap_or(vec![])
+    }
+}
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ResponseHeader {
@@ -283,7 +297,10 @@ mod tests {
 
     use super::*;
     use crate::{
-        test_fixtures::{cross_core_response_with_fraud_shield_codes, experian_cross_core_response},
+        test_fixtures::{
+            cross_core_response_with_error, cross_core_response_with_fraud_shield_codes,
+            experian_cross_core_response,
+        },
         tests::assert_have_same_elements,
     };
 
@@ -359,5 +376,14 @@ mod tests {
             address_and_name_match_not_parsable,
             ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch
         );
+    }
+
+    #[test]
+    fn test_error_codes() {
+        let response = cross_core_response_with_error();
+        let r: CrossCoreAPIResponse =
+            serde_json::from_value(response).expect("could not parse experian cross core");
+
+        assert_eq!(r.error_codes(), vec![String::from("709")])
     }
 }
