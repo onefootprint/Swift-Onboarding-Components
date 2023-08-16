@@ -303,7 +303,7 @@ pub fn save_onboarding_decision(
 ) -> ApiResult<()> {
     let (final_decision, additional_evaluated) = rules_output.final_decision_and_additional_evaluated()?;
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    let onboarding_decision = risk::save_final_decision(
+    risk::save_final_decision(
         conn,
         workflow.id.clone(),
         verification_result_ids,
@@ -311,7 +311,7 @@ pub fn save_onboarding_decision(
         review_reasons,
     )?;
 
-    let status = onboarding_decision.status.to_string();
+    let status = final_decision.decision.decision_status.to_string();
     if let Ok(metric) =
         metrics::DECISION_ENGINE_ONBOARDING_DECISION.get_metric_with(&labels! {"status" => status.as_str()})
     {

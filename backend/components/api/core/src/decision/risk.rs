@@ -2,8 +2,7 @@ use newtypes::{DbActor, ReviewReason, VerificationResultId, WorkflowId};
 
 use db::{
     models::{
-        manual_review::ManualReview,
-        onboarding_decision::{OnboardingDecision, OnboardingDecisionCreateArgs},
+        onboarding_decision::NewDecisionArgs,
         scoped_vault::ScopedVault,
         workflow::{Workflow, WorkflowUpdate},
     },
@@ -26,7 +25,7 @@ pub fn save_final_decision(
     decision: &Decision,
     // TODO make this non-null soon
     review_reasons: Vec<ReviewReason>,
-) -> ApiResult<OnboardingDecision> {
+) -> ApiResult<()> {
     // TODO: Create our risk signals!
     // Save status
     let wf = Workflow::lock(conn, &wf_id)?;
@@ -45,32 +44,21 @@ pub fn save_final_decision(
         None
     };
 
-    // Create decision
-    let onboarding_decision = OnboardingDecisionCreateArgs {
+    let decision = NewDecisionArgs {
         vault_id: scoped_user.vault_id,
-        scoped_vault_id: scoped_user.id,
         logic_git_hash: crate::GIT_HASH.to_string(),
         status: decision.decision_status,
         result_ids: verification_result_ids,
         annotation_id: None,
         actor: DbActor::Footprint,
         seqno,
-        workflow_id: wf_id.clone(),
+        create_manual_review_reasons: decision.create_manual_review.then_some(review_reasons),
     };
-    let obd = OnboardingDecision::create(conn, onboarding_decision)?;
-
-    // Create ManualReview row if requested and an active one does not already exist
-    if decision.create_manual_review {
-        let existing_review = ManualReview::get_active(conn, &wf_id)?;
-        if existing_review.is_none() {
-            ManualReview::create(conn, review_reasons, wf_id.clone(), wf.scoped_vault_id.clone())?;
-        }
-    }
 
     // TODO: Make a billable event here
     // NOTE: must do this after completing the manual review
-    let update = WorkflowUpdate::set_decision(&wf, &obd);
+    let update = WorkflowUpdate::set_decision(&wf, decision);
     Workflow::update(wf, conn, update)?;
 
-    Ok(obd)
+    Ok(())
 }

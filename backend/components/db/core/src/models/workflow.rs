@@ -15,7 +15,7 @@ use newtypes::{
 
 use super::manual_review::ManualReview;
 use super::ob_configuration::ObConfiguration;
-use super::onboarding_decision::OnboardingDecision;
+use super::onboarding_decision::{NewDecisionArgs, OnboardingDecision};
 use super::scoped_vault::ScopedVault;
 use super::task::Task;
 use super::tenant::Tenant;
@@ -70,39 +70,50 @@ pub struct NewWorkflowArgs {
     pub insight_event_id: Option<InsightEventId>,
 }
 
-#[derive(Debug, Clone, Default, AsChangeset)]
+#[derive(Debug, Default, AsChangeset)]
 #[diesel(table_name = workflow)]
+struct WorkflowUpdateRow {
+    status: Option<OnboardingStatus>,
+    authorized_at: Option<Option<DateTime<Utc>>>,
+    decision_made_at: Option<Option<DateTime<Utc>>>,
+}
+
+#[derive(Debug, Default)]
 pub struct WorkflowUpdate {
-    pub status: Option<OnboardingStatus>,
-    pub authorized_at: Option<Option<DateTime<Utc>>>,
-    pub decision_made_at: Option<Option<DateTime<Utc>>>,
+    update: WorkflowUpdateRow,
+    decision: Option<NewDecisionArgs>,
 }
 
 impl WorkflowUpdate {
     pub fn set_status(status: OnboardingStatus) -> Self {
-        Self {
+        let update = WorkflowUpdateRow {
             status: Some(status),
             ..Default::default()
-        }
+        };
+        let decision = None;
+        Self { update, decision }
     }
 
     /// Similar to set_decision, but updates based on information from the OBD
-    pub fn set_decision(wf: &Locked<Workflow>, decision: &OnboardingDecision) -> Self {
-        // TODO maybe this should just have the decision args and clear manual review
+    pub fn set_decision(wf: &Locked<Workflow>, decision: NewDecisionArgs) -> Self {
         let is_first_fp_decision =
             wf.decision_made_at.is_none() && matches!(decision.actor, DbActor::Footprint);
-        Self {
+        let update = WorkflowUpdateRow {
             status: Some(decision.status.into()),
             decision_made_at: is_first_fp_decision.then_some(Some(Utc::now())),
             ..Default::default()
-        }
+        };
+        let decision = Some(decision);
+        Self { update, decision }
     }
 
     pub fn is_authorized() -> Self {
-        Self {
+        let update = WorkflowUpdateRow {
             authorized_at: Some(Some(Utc::now())),
-            ..Self::default()
-        }
+            ..Default::default()
+        };
+        let decision = None;
+        Self { update, decision }
     }
 }
 
@@ -338,21 +349,47 @@ impl Workflow {
 
     #[tracing::instrument("Workflow::update", skip_all)]
     pub fn update(wf: Locked<Self>, conn: &mut TxnPgConn, update: WorkflowUpdate) -> DbResult<Self> {
-        // !! it's important that code in the same txn that is going to write a review does it before this update call
-        let mr = ManualReview::get_active(conn, &wf.id)?;
-        let new_status = update.status;
+        let new_status = update.update.status;
         // TODO short circuit if nothing changed? like status is the same?
         let result = diesel::update(workflow::table)
             .filter(workflow::id.eq(&wf.id))
-            .set(update)
+            .set(update.update)
             .get_result(conn.conn())?;
 
+        // Make the new OnboardingDecision if any
+        if let Some(decision) = update.decision {
+            let actor = decision.actor.clone();
+            let create_manual_review_reasons = decision.create_manual_review_reasons.clone();
+            let decision = OnboardingDecision::create(conn, &result, decision)?;
+            //
+            // NOTE
+            //
+            // Create or clear the manual review if needed
+            // MUST do all manual review bookkeeping before sending the webhooks below
+            let existing_review = ManualReview::get_active(conn, &result.id)?;
+            if let Some(review_reasons) = create_manual_review_reasons {
+                // If the decision requested to create a manual review, this creates one
+                if existing_review.is_none() {
+                    let sv_id = wf.scoped_vault_id.clone();
+                    ManualReview::create(conn, review_reasons, result.id.clone(), sv_id)?;
+                }
+            } else {
+                // If there is an outstanding review, creating this override decision clears it.
+                if let Some(manual_review) = existing_review {
+                    manual_review.complete(conn, actor, decision.id)?;
+                }
+            }
+        }
+
+        // Fire webhook
         if let Some(new_status) = new_status {
             // Must lock to make sure scoped vault status isn't stale
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
             let tenant = Tenant::get(conn, &sv.tenant_id)?;
             let old_status = sv.status;
             if old_status != Some(new_status) {
+                // !! it's important that code in the same txn that is going to write a review does it before this update call
+                let mr = ManualReview::get_active(conn, &wf.id)?;
                 let old_status_has_decision = match old_status {
                     None => false,
                     Some(s) => s.has_decision(),

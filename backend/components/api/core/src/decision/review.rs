@@ -4,9 +4,7 @@ use crate::errors::ApiResult;
 use api_wire_types::CreateAnnotationRequest;
 use api_wire_types::DecisionRequest;
 use db::models::annotation::Annotation;
-use db::models::manual_review::ManualReview;
-use db::models::onboarding_decision::OnboardingDecision;
-use db::models::onboarding_decision::OnboardingDecisionCreateArgs;
+use db::models::onboarding_decision::NewDecisionArgs;
 use db::models::workflow::Workflow;
 use db::models::workflow::WorkflowUpdate;
 use db::TxnPgConn;
@@ -26,7 +24,6 @@ pub fn save_review_decision(
 
     let wf = Workflow::lock(conn, &wf_id)?;
     let (_, su) = Workflow::get_all(conn, &wf_id)?;
-    let manual_review = ManualReview::get_active(conn, &wf_id)?;
 
     if wf.authorized_at.is_none() {
         // Can't make a decision on an onboarding that doesn't already have one
@@ -38,28 +35,19 @@ pub fn save_review_decision(
     let annotation = Annotation::create(conn, note, is_pinned, su.id.clone(), actor.clone())?;
     // Make the decision regardless of whether the status changed - the actor of the decision
     // may be different
-    let new_decision = OnboardingDecisionCreateArgs {
+    let new_decision = NewDecisionArgs {
         vault_id: su.vault_id,
-        scoped_vault_id: su.id,
         logic_git_hash: crate::GIT_HASH.to_string(),
         result_ids: vec![],
         status: status.into(),
         annotation_id: Some(annotation.0.id),
-        actor: DbActor::from(actor.clone()),
+        actor: DbActor::from(actor),
         seqno: None,
-        workflow_id: wf_id.clone(),
+        create_manual_review_reasons: None,
     };
-    let decision = OnboardingDecision::create(conn, new_decision)?;
-
-    // If there is an outstanding review, creating this override decision clears it
-    // This has to happen before we update the status below, otherwise the webhook will incorrectly
-    // show manual review is required
-    if let Some(manual_review) = manual_review {
-        manual_review.complete(conn, actor, decision.id.clone())?;
-    }
 
     // NOTE: must do this after completing the manual review
-    let update = WorkflowUpdate::set_decision(&wf, &decision);
+    let update = WorkflowUpdate::set_decision(&wf, new_decision);
     Workflow::update(wf, conn, update)?;
 
     Ok(())

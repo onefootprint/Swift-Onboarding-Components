@@ -14,7 +14,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::FpId;
-use newtypes::ScopedVaultId;
+use newtypes::ReviewReason;
 use newtypes::TenantId;
 use newtypes::WorkflowId;
 use newtypes::{
@@ -62,16 +62,16 @@ pub struct OnboardingDecisionJunction {
 }
 
 #[derive(Debug)]
-pub struct OnboardingDecisionCreateArgs {
+pub struct NewDecisionArgs {
     pub vault_id: VaultId,
-    pub scoped_vault_id: ScopedVaultId,
     pub logic_git_hash: String,
     pub status: DecisionStatus,
     pub result_ids: Vec<VerificationResultId>,
     pub annotation_id: Option<AnnotationId>,
     pub actor: DbActor,
     pub seqno: Option<DataLifetimeSeqno>,
-    pub workflow_id: WorkflowId,
+    /// When non-null, create a manual review with the provided reasons
+    pub create_manual_review_reasons: Option<Vec<ReviewReason>>,
 }
 
 pub type SaturatedOnboardingDecisionInfo = (
@@ -84,10 +84,10 @@ pub type SaturatedOnboardingDecisionInfo = (
 
 impl OnboardingDecision {
     #[tracing::instrument("OnboardingDecision::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, args: OnboardingDecisionCreateArgs) -> DbResult<Self> {
+    pub(super) fn create(conn: &mut TxnPgConn, wf: &Workflow, args: NewDecisionArgs) -> DbResult<Self> {
         // Deactivate the last decision
         diesel::update(onboarding_decision::table)
-            .filter(onboarding_decision::workflow_id.eq(&args.workflow_id))
+            .filter(onboarding_decision::workflow_id.eq(&wf.id))
             .filter(onboarding_decision::deactivated_at.is_null())
             .set(onboarding_decision::deactivated_at.eq(Utc::now()))
             .execute(conn.conn())?;
@@ -99,7 +99,7 @@ impl OnboardingDecision {
             status: args.status,
             actor: args.actor,
             seqno: args.seqno,
-            workflow_id: args.workflow_id,
+            workflow_id: wf.id.clone(),
         };
         let result = diesel::insert_into(onboarding_decision::table)
             .values(new)
@@ -123,7 +123,7 @@ impl OnboardingDecision {
             id: result.id.clone(),
             annotation_id: args.annotation_id,
         };
-        UserTimeline::create(conn, decision_info, args.vault_id, args.scoped_vault_id)?;
+        UserTimeline::create(conn, decision_info, args.vault_id, wf.scoped_vault_id.clone())?;
         Ok(result)
     }
 

@@ -271,12 +271,13 @@ mod tests {
     use super::*;
     use crate::models::decision_intent::DecisionIntent;
     use crate::models::onboarding::Onboarding;
+    use crate::models::onboarding_decision::NewDecisionArgs;
     use crate::models::onboarding_decision::OnboardingDecision;
-    use crate::models::onboarding_decision::OnboardingDecisionCreateArgs;
     use crate::models::scoped_vault::ScopedVault;
     use crate::models::verification_request::VerificationRequest;
     use crate::models::verification_result::VerificationResult;
     use crate::models::workflow::Workflow;
+    use crate::models::workflow::WorkflowUpdate;
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::fixtures;
     use crate::tests::prelude::*;
@@ -391,47 +392,44 @@ mod tests {
                     })
                     .collect::<Vec<_>>();
 
-                let obd = OnboardingDecision::create(
-                    conn,
-                    OnboardingDecisionCreateArgs {
-                        vault_id: sv.vault_id.clone(),
-                        scoped_vault_id: sv.id.clone(),
-                        logic_git_hash: "123".to_owned(),
-                        status: DecisionStatus::Pass,
-                        result_ids: vres_with_rs
-                            .iter()
-                            .map(|(vres, _, _, _)| vres.id.clone())
-                            .collect(),
-                        annotation_id: None,
-                        actor: DbActor::Footprint,
-                        seqno: None,
-                        workflow_id: wf.id.clone(),
-                    },
-                )
-                .unwrap();
+                let new_decision = NewDecisionArgs {
+                    vault_id: sv.vault_id.clone(),
+                    logic_git_hash: "123".to_owned(),
+                    status: DecisionStatus::Pass,
+                    result_ids: vres_with_rs
+                        .iter()
+                        .map(|(vres, _, _, _)| vres.id.clone())
+                        .collect(),
+                    annotation_id: None,
+                    actor: DbActor::Footprint,
+                    seqno: None,
+                    create_manual_review_reasons: None,
+                };
 
-                let _all_created_risk_signals = vres_with_rs
-                    .into_iter()
-                    .map(|(vres, vendor_api, reason_codes, key_type)| {
-                        let new_risk_signals = match key_type {
-                            KeyType::Obd => NewRiskSignals::LegacyObd {
-                                onboarding_decision_id: obd.id.clone(),
-                                signals: reason_codes
-                                    .iter()
-                                    .map(|rc| (rc.clone(), *vendor_api))
-                                    .collect_vec(),
-                            },
-                            KeyType::Vres => NewRiskSignals::NewVres {
-                                signals: reason_codes
-                                    .iter()
-                                    .map(|rc| (rc.clone(), *vendor_api, vres.id.clone()))
-                                    .collect_vec(),
-                            },
-                        };
+                let wf = Workflow::lock(conn, &wf.id).unwrap();
+                let update = WorkflowUpdate::set_decision(&wf, new_decision);
+                let wf = Workflow::update(wf, conn, update).unwrap();
+                let obd = OnboardingDecision::get_active(conn, &wf.id).unwrap().unwrap();
 
-                        RiskSignal::_bulk_create_for_test(conn, new_risk_signals).unwrap()
-                    })
-                    .collect::<Vec<_>>();
+                for (vres, vendor_api, reason_codes, key_type) in vres_with_rs {
+                    let new_risk_signals = match key_type {
+                        KeyType::Obd => NewRiskSignals::LegacyObd {
+                            onboarding_decision_id: obd.id.clone(),
+                            signals: reason_codes
+                                .iter()
+                                .map(|rc| (rc.clone(), *vendor_api))
+                                .collect_vec(),
+                        },
+                        KeyType::Vres => NewRiskSignals::NewVres {
+                            signals: reason_codes
+                                .iter()
+                                .map(|rc| (rc.clone(), *vendor_api, vres.id.clone()))
+                                .collect_vec(),
+                        },
+                    };
+
+                    RiskSignal::_bulk_create_for_test(conn, new_risk_signals).unwrap();
+                }
             });
 
         let latest_obd =

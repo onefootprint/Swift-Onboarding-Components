@@ -1,5 +1,4 @@
-use crate::models::onboarding_decision::OnboardingDecision;
-use crate::models::onboarding_decision::OnboardingDecisionCreateArgs;
+use crate::models::onboarding_decision::NewDecisionArgs;
 use crate::models::task::NewTask;
 use crate::models::task::Task;
 use crate::models::watchlist_check::NewWatchlistCheck;
@@ -107,25 +106,22 @@ fn make_vault(
         let svid = sv.id.clone();
         if let Some(ob_decision_made_at) = ob_decision_made_at {
             let (_, wf) = fixtures::onboarding::create(conn, svid.clone(), ob_config.id, None);
-            let decision = OnboardingDecisionCreateArgs {
+            let decision = NewDecisionArgs {
                 vault_id: uv.id.clone(),
-                scoped_vault_id: svid,
                 logic_git_hash: "".to_string(),
                 status: DecisionStatus::Pass,
                 result_ids: vec![],
                 annotation_id: None,
                 actor: DbActor::Footprint,
                 seqno: None,
-                workflow_id: wf.id.clone(),
+                create_manual_review_reasons: None,
             };
-            let obd = OnboardingDecision::create(conn, decision).unwrap();
-            use db_schema::schema::workflow;
-            use diesel::prelude::*;
-
             let wf = Workflow::lock(conn, &wf.id).unwrap();
-            let update = WorkflowUpdate::set_decision(&wf, &obd);
+            let update = WorkflowUpdate::set_decision(&wf, decision);
             let wf = Workflow::update(wf, conn, update).unwrap();
             // Patch the decision_made_at to make it look like it was made earlier
+            use db_schema::schema::workflow;
+            use diesel::prelude::*;
             diesel::update(workflow::table)
                 .filter(workflow::id.eq(&wf.id))
                 .set(workflow::decision_made_at.eq(ob_decision_made_at))

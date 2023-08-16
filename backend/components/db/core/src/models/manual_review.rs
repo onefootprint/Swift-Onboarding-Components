@@ -49,7 +49,7 @@ struct ManualReviewUpdate {
 
 impl ManualReview {
     #[tracing::instrument("ManualReview::create", skip_all)]
-    pub fn create(
+    pub(super) fn create(
         conn: &mut PgConn,
         review_reasons: Vec<ReviewReason>,
         workflow_id: WorkflowId,
@@ -71,7 +71,7 @@ impl ManualReview {
 
     /// Used to mark the manual review as complete
     #[tracing::instrument("ManualReview::complete", skip_all)]
-    pub fn complete<T>(
+    pub(super) fn complete<T>(
         self,
         conn: &mut TxnPgConn,
         actor: T,
