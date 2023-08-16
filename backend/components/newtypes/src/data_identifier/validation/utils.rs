@@ -21,7 +21,7 @@ pub(super) fn clean_and_validate_zip(input: PiiString) -> VResult<PiiString> {
 /// list of valid iso3166-alpha-2 country codes, from https://datahub.io/core/country-codes#data
 /// eventually we should maybe just pony up and pay for the subscription to iso: https://www.iso.org/publication/PUB500001.html
 /// Channel islands does not have a country code
-const ISO_3166_COUNTRIES: [&str; 249] = [
+pub const ISO_3166_COUNTRIES: [&str; 249] = [
     "TW", "AF", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ", "BS",
     "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BQ", "BA", "BW", "BV", "BR", "IO", "VG",
     "BN", "BG", "BF", "BI", "CV", "KH", "CM", "CA", "KY", "CF", "TD", "CL", "CN", "HK", "MO", "CX", "CC",

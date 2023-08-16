@@ -17,6 +17,9 @@ pub use docv::*;
 pub mod decision;
 pub use decision::*;
 
+pub mod country_codes;
+pub use country_codes::*;
+
 pub mod fields;
 pub use fields::*;
 

@@ -7,6 +7,7 @@ mod card;
 mod identity;
 mod investor_profile;
 mod utils;
+pub use utils::ISO_3166_COUNTRIES;
 
 pub use business::{BusinessOwnerData, KycedBusinessOwnerData};
 pub use card::{CardIssuer, Expiration as CardExpiration};
