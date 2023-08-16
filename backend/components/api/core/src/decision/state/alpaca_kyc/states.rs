@@ -16,8 +16,8 @@ use either::Either;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    AlpacaKycConfig, DecisionIntentKind, DecisionStatus, FootprintReasonCode, OnboardingStatus, ReviewReason,
-    RiskSignalGroupKind, VendorAPI, VerificationResultId,
+    AlpacaKycConfig, DecisionIntentKind, DecisionStatus, FootprintReasonCode, Iso3166TwoDigitCountryCode,
+    OnboardingStatus, ReviewReason, RiskSignalGroupKind, VendorAPI, VerificationResultId,
 };
 
 use crate::{
@@ -318,7 +318,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                     // TODO: should come from a config
                     should_collect_selfie: true,
                     global_doc_types_accepted: None,
-                    country_restrictions: vec!["US".into()],
+                    country_restrictions: vec![Iso3166TwoDigitCountryCode::US],
                     country_doc_type_restrictions: None,
                 };
                 DocumentRequest::create(conn, args)?;

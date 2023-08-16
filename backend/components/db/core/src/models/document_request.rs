@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::document_request;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ModernIdDocKind;
 use newtypes::WorkflowId;
 use newtypes::{DocumentRequestId, ScopedVaultId};
@@ -26,7 +27,7 @@ pub struct DocumentRequest {
     // These drive the frontend UI and are generated in get_requirements. If this is None, we fall back to accepting any ModerIdDocKind
     pub global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
     // if !empty, restrict to only these countries
-    pub country_restrictions: Option<Vec<String>>,
+    pub country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     // if key for a country is present, will include the subset of global_doc_types_accepted for a specific countrys
     pub country_doc_type_restrictions: Option<serde_json::Value>,
 }
@@ -35,7 +36,7 @@ impl DocumentRequest {
     pub fn only_us(&self) -> bool {
         self.country_restrictions
             .as_ref()
-            .map(|cr| cr.len() == 1 && cr.first() == Some(&"US".to_string()))
+            .map(|cr| cr.len() == 1 && cr.first() == Some(&Iso3166TwoDigitCountryCode::US))
             .unwrap_or(false)
     }
 }
@@ -85,8 +86,7 @@ pub struct NewDocumentRequestArgs {
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
     pub global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
-    // TODO: enum
-    pub country_restrictions: Vec<String>,
+    pub country_restrictions: Vec<Iso3166TwoDigitCountryCode>,
     pub country_doc_type_restrictions: Option<serde_json::Value>,
 }
 
@@ -99,7 +99,6 @@ struct NewDocumentRequestRow {
     should_collect_selfie: bool,
     workflow_id: WorkflowId,
     global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
-    // TODO: enum
-    country_restrictions: Vec<String>,
+    country_restrictions: Vec<Iso3166TwoDigitCountryCode>,
     country_doc_type_restrictions: Option<serde_json::Value>,
 }
