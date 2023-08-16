@@ -3,7 +3,6 @@ import React, { forwardRef, ReactNode, useId } from 'react';
 
 import { createFontStyles } from '../../utils/mixins';
 import Box from '../box';
-import Hint from '../internal/hint';
 import { createCheckedStyled, createPseudoStyles } from './checkbox.utils';
 
 export type CheckboxProps = {
@@ -75,9 +74,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           {label}
         </Label>
         {hint && (
-          <StyledHint hasError={hasError} id={`${id}-hint`} size="compact">
+          <Hint data-has-error={hasError} id={`${id}-hint`}>
             {hint}
-          </StyledHint>
+          </Hint>
         )}
       </Box>
     );
@@ -168,11 +167,22 @@ const Input = styled.input<Pick<CheckboxProps, 'hasError'>>`
   }}
 `;
 
-const StyledHint = styled(Hint)`
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[2]};
-    margin-left: calc(${theme.spacing[8]} - ${theme.spacing[1]});
-  `}
+const Hint = styled.div`
+  ${({ theme }) => {
+    const { hint } = theme.components;
+
+    return css`
+      ${createFontStyles('body-3')};
+      text-align: left;
+      color: ${hint.states.default.color};
+      margin-left: calc(${theme.spacing[8]} - ${theme.spacing[2]});
+      margin-top: ${theme.spacing[1]};
+
+      &[data-has-error='true'] {
+        color: ${hint.states.error.color};
+      }
+    `;
+  }}
 `;
 
 export default Checkbox;
