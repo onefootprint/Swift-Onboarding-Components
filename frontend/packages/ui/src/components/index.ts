@@ -30,6 +30,7 @@ export { default as DateRangeInput } from './date-range-input';
 export * from './dialog';
 export { default as Dialog } from './dialog';
 export { default as Divider } from './divider';
+export * from './divider';
 export * from './drawer';
 export { default as Drawer } from './drawer';
 export { default as Dropdown } from './dropdown';

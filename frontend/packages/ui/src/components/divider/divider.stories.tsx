@@ -1,14 +1,26 @@
-import { Meta, Story } from '@storybook/react';
+import { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
 
-import Divider from './divider';
+import Divider, { DividerProps } from './divider';
 
 export default {
-  component: Divider,
   title: 'Components/Divider',
-} as Meta;
+  component: Divider,
+  argTypes: {
+    variant: {
+      control: 'select',
+      description: 'Divider variant',
+      options: ['primary', 'secondary'],
+      required: true,
+    },
+  },
+} as ComponentMeta<typeof Divider>;
 
-const Template: Story = () => <Divider />;
+const Template: Story<DividerProps> = ({ variant }: DividerProps) => (
+  <Divider variant={variant} />
+);
 
-export const Base = Template.bind({});
-Base.args = {};
+export const Default = Template.bind({});
+Default.args = {
+  variant: 'primary',
+};

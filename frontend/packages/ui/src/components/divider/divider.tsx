@@ -1,17 +1,19 @@
 import styled, { css } from '@onefootprint/styled';
 
+export type DividerProps = {
+  variant?: 'primary' | 'secondary';
+};
+
 const Divider = styled.div.attrs({
   role: 'separator',
   'aria-orientation': 'horizontal',
-})`
-  ${({ theme }) => css`
-    background-color: ${theme.borderColor.tertiary};
-    height: ${theme.borderWidth[1]};
-    opacity: 1;
-    border-width: 0px 0px ${theme.borderWidth[1]};
-    border-image: initial;
+})<DividerProps>`
+  ${({ theme, variant = 'primary' }) => css`
     border-color: ${theme.borderColor.tertiary};
-    border-style: solid;
+    border-image: initial;
+    border-style: ${variant === 'primary' ? 'solid' : 'dashed'};
+    border-width: 0px 0px ${theme.borderWidth[1]};
+    opacity: 1;
     width: 100%;
   `}
 `;
