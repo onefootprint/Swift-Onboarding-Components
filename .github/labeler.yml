@@ -19,6 +19,7 @@ Enclave:
 FastEphemeral:
   - 'backend/infra/**/*'
   - 'backend/infra/*'
+  - '.github/workflows/backend_build_and_deploy.yml'
 
 FullEphemeral:
   - 'backend/infra/src/db.ts'

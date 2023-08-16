@@ -140,6 +140,7 @@ jobs:
       - name: build api container
         working-directory: ./backend
         run: |
+          rm .cargo/config.toml
           make api-release
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           componentVersion="${{ needs.extract_commit.outputs.apiComponentVersion }}"
@@ -183,6 +184,7 @@ jobs:
         working-directory: ./backend
         run: |
           git --version
+          rm .cargo/config.toml
           make build-enclave-proxy-release
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           componentVersion="${{ needs.extract_commit.outputs.enclaveComponentVersion }}"
