@@ -1,10 +1,11 @@
-import { Typography } from '@onefootprint/ui';
+import styled, { css } from '@onefootprint/styled';
+import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { Trans } from 'react-i18next';
 
 const LegalFooter = () => (
-  <Typography color="tertiary" sx={{ textAlign: 'center' }} variant="caption-2">
+  <StyledTypography>
     <Trans
       i18nKey="components.legal-footer.label"
       components={{
@@ -24,7 +25,21 @@ const LegalFooter = () => (
         ),
       }}
     />
-  </Typography>
+  </StyledTypography>
 );
+
+const StyledTypography = styled.p`
+  ${({ theme }) => css`
+    ${createFontStyles('caption-2')}
+    color: ${theme.color.tertiary};
+    text-align: center;
+    white-space: pre-wrap;
+
+    a {
+      text-decoration: none;
+      color: ${theme.color.accent};
+    }
+  `}
+`;
 
 export default LegalFooter;
