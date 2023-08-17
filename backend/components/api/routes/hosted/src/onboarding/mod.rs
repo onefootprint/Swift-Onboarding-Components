@@ -285,7 +285,7 @@ fn get_requirement_inner(
             if args.workflow.authorized_at.is_none() {
                 let (document_types, skipped_selfie) = if ob_config.can_access_document() {
                     // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-                    let id_docs = IdentityDocument::list(conn, &args.workflow.scoped_vault_id)?;
+                    let id_docs = IdentityDocument::list_by_wf_id(conn, &args.workflow.id)?;
                     let doc_types = id_docs.iter().map(|id| id.document_type).unique().collect();
                     // unless all were skipped, we need to authorize since we may have collected it
                     let selfie_skipped = id_docs.iter().all(|id| id.should_skip_selfie());

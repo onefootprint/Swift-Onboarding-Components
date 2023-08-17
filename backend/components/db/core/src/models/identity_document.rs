@@ -10,7 +10,7 @@ use std::collections::HashMap;
 
 use newtypes::{
     DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentScanDeviceType, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId,
+    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, WorkflowId,
 };
 
 use super::document_request::DocumentRequest;
@@ -225,6 +225,17 @@ impl IdentityDocument {
         let results = identity_document::table
             .inner_join(document_request::table)
             .filter(document_request::scoped_vault_id.eq(scoped_vault_id))
+            .select(identity_document::all_columns)
+            .get_results(conn)?;
+
+        Ok(results)
+    }
+
+    #[tracing::instrument("IdentityDocument::list_by_wf_id", skip_all)]
+    pub fn list_by_wf_id(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Vec<Self>> {
+        let results = identity_document::table
+            .inner_join(document_request::table)
+            .filter(document_request::workflow_id.eq(wf_id))
             .select(identity_document::all_columns)
             .get_results(conn)?;
 
