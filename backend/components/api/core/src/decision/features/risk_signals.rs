@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use db::models::risk_signal::{IncludeHidden, RiskSignal};
+use db::models::{
+    ob_configuration::ObConfiguration,
+    risk_signal::{IncludeHidden, RiskSignal},
+};
 use newtypes::{FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI, VerificationResultId};
 
 use super::{
@@ -10,6 +13,7 @@ use crate::{
     decision::vendor::vendor_api::vendor_api_response::{
         VendorAPIResponseIdentifiersMap, VendorAPIResponseMap,
     },
+    utils::vault_wrapper::VaultWrapper,
     ApiError,
 };
 use derive_more::Display;
@@ -58,17 +62,42 @@ where
     }
 }
 
+#[allow(dead_code)]
+pub struct VendorResultsAndVault {
+    response_map: VendorAPIResponseMap,
+    ids_map: VendorAPIResponseIdentifiersMap,
+    vw: VaultWrapper, // TODO: use these bad boys
+    obc: ObConfiguration,
+}
+
+impl VendorResultsAndVault {
+    pub fn new(
+        maps: (VendorAPIResponseMap, VendorAPIResponseIdentifiersMap),
+        vw: VaultWrapper,
+        obc: ObConfiguration,
+    ) -> Self {
+        Self {
+            response_map: maps.0,
+            ids_map: maps.1,
+            vw,
+            obc,
+        }
+    }
+}
+
 //
 // WRITE
 //
 pub fn create_risk_signals_from_vendor_results<T>(
     vendor_result_maps: (VendorAPIResponseMap, VendorAPIResponseIdentifiersMap),
+    vw: VaultWrapper,
+    obc: ObConfiguration,
 ) -> Result<RiskSignalGroupStruct<T>, ApiError>
 where
     T: Into<WrappedRiskSignalGroupKind> + Clone,
-    RiskSignalGroupStruct<T>: From<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)>,
+    RiskSignalGroupStruct<T>: From<VendorResultsAndVault>,
 {
-    let res = RiskSignalGroupStruct::<T>::from(vendor_result_maps);
+    let res = RiskSignalGroupStruct::<T>::from(VendorResultsAndVault::new(vendor_result_maps, vw, obc));
 
     Ok(res)
 }
@@ -94,9 +123,15 @@ where
     Ok(())
 }
 
-impl From<(VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)> for RiskSignalGroupStruct<Kyc> {
-    fn from(maps: (VendorAPIResponseMap, VendorAPIResponseIdentifiersMap)) -> Self {
-        let (response_map, ids_map) = maps;
+impl From<VendorResultsAndVault> for RiskSignalGroupStruct<Kyc> {
+    fn from(results: VendorResultsAndVault) -> Self {
+        let VendorResultsAndVault {
+            response_map,
+            ids_map,
+            vw: _,
+            obc: _,
+        } = results;
+
         let idology_features = IDologyFeatures::try_from((&response_map, &ids_map))
             .ok()
             .map(|f| {

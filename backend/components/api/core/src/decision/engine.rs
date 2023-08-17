@@ -19,10 +19,12 @@ use crate::{
     enclave_client::EnclaveClient,
     errors::{ApiError, ApiErrorKind, ApiResult},
     metrics,
+    utils::vault_wrapper::VaultWrapper,
     vendor_clients::VendorClient,
 };
 use db::{
     models::{
+        ob_configuration::ObConfiguration,
         vault::Vault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
         verification_result::VerificationResult,
@@ -271,11 +273,17 @@ pub async fn make_vendor_requests(
 /// Separate creating decision from saving decision. Used to "dry run" a decision before applying
 pub fn calculate_decision(
     vendor_results: Vec<VendorResult>,
+    vw: VaultWrapper,
+    obc: ObConfiguration,
     rule_group: KycRuleGroup,
 ) -> ApiResult<OnboardingRulesDecisionOutput> {
     let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
     let risk_signals = RiskSignalsForDecision {
-        kyc: Some(create_risk_signals_from_vendor_results(vendor_result_maps)?),
+        kyc: Some(create_risk_signals_from_vendor_results(
+            vendor_result_maps,
+            vw,
+            obc,
+        )?),
         ..Default::default()
     };
     let decision = rule_group.evaluate(

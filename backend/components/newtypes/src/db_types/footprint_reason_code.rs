@@ -397,6 +397,10 @@ footprint_reason_code_enum! {
         #[note = "Located SSN invalid", severity = SignalSeverity::High,  description = "The located SSN does not match the structure of a valid SSN."]
         SsnLocatedIsInvalid,
 
+        #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
+        #[note = "SSN not provided", severity = SignalSeverity::High,  description = "The user indicated they do not have an SSN."]
+        SsnNotProvided,
+
         // ~~~~~~~~~~~~ Name ~~~~~~~~~~~~
 
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
@@ -580,6 +584,9 @@ footprint_reason_code_enum! {
         #[note = "Address associated with the phone number does not match input address", severity = SignalSeverity::Low,  description = "The address associated with the phone number does not match the address provided"]
         PhoneLocatedAddressDoesNotMatch,
 
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
+        #[note = "Phone not provided", severity = SignalSeverity::Medium,  description = "The user indicated they do not have a phone."]
+        PhoneNotProvided,
 
         // ~~~~~~~~~~~~ Identity ~~~~~~~~~~~~
 

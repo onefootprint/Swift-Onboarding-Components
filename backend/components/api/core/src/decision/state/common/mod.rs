@@ -1,5 +1,6 @@
 use db::{
     models::{
+        data_lifetime::DataLifetime,
         decision_intent::DecisionIntent,
         document_request::DocumentRequest,
         ob_configuration::ObConfiguration,
@@ -45,6 +46,21 @@ pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> DbRes
     db_pool
         .db_query(move |conn| ScopedVault::get(conn, &svid))
         .await?
+}
+
+#[tracing::instrument(skip(conn))]
+pub fn get_vw_and_obc(
+    conn: &mut TxnPgConn,
+    sv_id: &ScopedVaultId,
+    wf_id: &WorkflowId,
+) -> ApiResult<(VaultWrapper, ObConfiguration)> {
+    let (obc, _) = ObConfiguration::get(conn, wf_id)?;
+
+    // TODO: store authorized_seqno and use this here and for the seqno in the Vreq's for the vendor calls
+    let seqno = DataLifetime::get_current_seqno(conn)?;
+    let vw = VaultWrapper::<_>::build(conn, VwArgs::Historical(sv_id, seqno))?;
+
+    Ok((vw, obc))
 }
 
 #[tracing::instrument(skip(conn, tvc))]

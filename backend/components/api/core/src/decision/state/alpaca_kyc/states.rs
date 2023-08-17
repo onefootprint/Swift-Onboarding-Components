@@ -167,8 +167,10 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<AlpacaKycState> {
         let (vendor_results, ff_client) = async_res;
-        let v = Vault::get(conn, &wf.scoped_vault_id)?;
-        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
+        let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
+
+        let fixture_decision =
+            decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
         let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> =
             if let Some(fd) = fixture_decision {
                 let reason_codes = decision::sandbox::get_fixture_reason_codes_alpaca(fd);
@@ -183,7 +185,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
                 }
             } else {
                 let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
-                create_risk_signals_from_vendor_results(vendor_result_maps)?
+                create_risk_signals_from_vendor_results(vendor_result_maps, vw, obc)?
             };
 
         save_risk_signals(conn, &self.sv_id, &risk_signals, true)?;

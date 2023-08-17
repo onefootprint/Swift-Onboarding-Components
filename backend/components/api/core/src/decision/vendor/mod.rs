@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::{
     errors::{ApiError, ApiErrorKind, ApiResult},
-    utils::vault_wrapper::{Person, VaultWrapper},
+    utils::vault_wrapper::VaultWrapper,
 };
 
 use db::{models::verification_request::VerificationRequest, TxnPgConn};
@@ -25,7 +25,7 @@ pub mod verification_result;
 #[tracing::instrument(skip(conn, uvw))]
 pub fn build_verification_requests_and_checkpoint(
     conn: &mut TxnPgConn,
-    uvw: &VaultWrapper<Person>,
+    uvw: &VaultWrapper,
     su_id: &ScopedVaultId,
     decision_intent_id: &DecisionIntentId,
     tenant_vendor_control: &TenantVendorControl,
