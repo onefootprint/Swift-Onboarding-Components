@@ -1,4 +1,5 @@
 import pytest
+from tests.utils import get
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER
 from tests.utils import _gen_random_n_digit_number
@@ -10,7 +11,7 @@ from tests.utils import _gen_random_n_digit_number
         ("fail", "fail", False),
         ("blah_123", "pass", False),
         ("manualreview12", "fail", True),
-        ("stepup12", "pending", False),
+        ("stepup12", "incomplete", False),
     ],
 )
 def test_deterministic_onboarding(
@@ -25,10 +26,13 @@ def test_deterministic_onboarding(
     bifrost = BifrostClient.create(
         sandbox_tenant.default_ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
     )
-    bifrost.run()
+    if expected_status == "incomplete":
+        bifrost.handle_requirements()
+    else:
+        bifrost.run()
 
-    assert bifrost.validate_response["user"]["status"] == expected_status
-    assert (
-        bifrost.validate_response["user"]["requires_manual_review"]
-        == expected_requires_manual_review
-    )
+        assert bifrost.validate_response["user"]["status"] == expected_status
+        assert (
+            bifrost.validate_response["user"]["requires_manual_review"]
+            == expected_requires_manual_review
+        )
