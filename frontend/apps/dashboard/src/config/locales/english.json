@@ -1151,6 +1151,24 @@
                 "ssn9": "Full",
                 "address-display": "Address line, Zip code, City, State"
               }
+            },
+            "business-information": {
+              "editing": {
+                "legal-entity-type": {
+                  "title": "Editing business information",
+                  "toggle": "Request users to provide their business legal entity type"
+                },
+                "website": {
+                  "title": "Website",
+                  "toggle": "Request users to provide their business website"
+                },
+                "phone-number": {
+                  "title": "Phone number",
+                  "toggle": "Request that users provide their business phone number"
+                },
+                "save": "Save",
+                "cancel": "Cancel"
+              }
             }
           }
         }
