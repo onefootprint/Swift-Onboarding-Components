@@ -6,7 +6,7 @@ import {
 import React from 'react';
 
 import {
-  defaultValues,
+  defaultValuesKYC,
   PersonalInformationAndDocs,
 } from '../../../../../../../../your-playbook.types';
 import DisplayValue from './display-value';
@@ -24,7 +24,7 @@ const renderDisplayValue = ({
     <DisplayValue
       field={field as keyof PersonalInformationAndDocs}
       personalInfoAndDocs={{
-        ...defaultValues.personalInformationAndDocs,
+        ...defaultValuesKYC.personalInformationAndDocs,
         ...personalInfoAndDocs,
       }}
     />,
@@ -34,9 +34,9 @@ const renderDisplayValue = ({
 describe('<DisplayValue />', () => {
   it('should render details for address', () => {
     renderDisplayValue({
-      field: 'address',
+      field: CollectedKycDataOption.fullAddress,
       personalInfoAndDocs: {
-        address: true,
+        [CollectedKycDataOption.fullAddress]: true,
       },
     });
     expect(
@@ -106,9 +106,9 @@ describe('<DisplayValue />', () => {
 
   it('should render check icon for included property', () => {
     renderDisplayValue({
-      field: 'nationality',
+      field: CollectedKycDataOption.nationality,
       personalInfoAndDocs: {
-        nationality: true,
+        [CollectedKycDataOption.nationality]: true,
       },
     });
     expect(screen.getByTestId('check-icon')).toBeInTheDocument();

@@ -1134,11 +1134,11 @@
               "preview": {
                 "edit": "Edit",
                 "email": "Email",
-                "phone": "Phone number",
+                "phone_number": "Phone number",
                 "name": "First & last name",
                 "dob": "Date of birth",
                 "nationality": "Nationality",
-                "address": "Address",
+                "full_address": "Address",
                 "idDoc": "ID document scan",
                 "idDocKind": "ID document scan",
                 "selfie": "Selfie",

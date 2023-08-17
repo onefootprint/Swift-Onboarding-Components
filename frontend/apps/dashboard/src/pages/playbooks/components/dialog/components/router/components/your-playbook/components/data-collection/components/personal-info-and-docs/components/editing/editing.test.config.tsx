@@ -2,7 +2,7 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import {
-  defaultValues,
+  defaultValuesKYC,
   FormData,
   Kind,
 } from '../../../../../../your-playbook.types';
@@ -13,7 +13,7 @@ export type EditingWithContextProps = {
 };
 
 const EditingWithContext = ({ kind }: EditingWithContextProps) => {
-  const formMethods = useForm<FormData>({ defaultValues });
+  const formMethods = useForm<FormData>({ defaultValues: defaultValuesKYC });
   return (
     <FormProvider {...formMethods}>
       <form>

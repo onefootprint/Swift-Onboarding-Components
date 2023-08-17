@@ -6,7 +6,11 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import { Kind } from '../../utils/machine/types';
 import DataCollection from './components/data-collection';
-import { defaultValues, FormData } from './your-playbook.types';
+import {
+  defaultValuesKYB,
+  defaultValuesKYC,
+  FormData,
+} from './your-playbook.types';
 
 type YourPlaybookProps = {
   kind: Kind;
@@ -14,6 +18,7 @@ type YourPlaybookProps = {
 
 const YourPlaybook = ({ kind }: YourPlaybookProps) => {
   const { t } = useTranslation('pages.playbooks.dialog.your-playbook');
+  const defaultValues = kind === Kind.KYB ? defaultValuesKYB : defaultValuesKYC;
   const formMethods = useForm<FormData>({ defaultValues });
   const { handleSubmit, register } = formMethods;
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import {
-  defaultValues,
+  defaultValuesKYC,
   FormData,
   Kind,
   PersonalInformationAndDocs,
@@ -20,9 +20,9 @@ const PersonalInfoAndDocsWithContext = ({
 }: PersonalInfoAndDocsWithContextProps) => {
   const formMethods = useForm<FormData>({
     defaultValues: {
-      ...defaultValues,
+      ...defaultValuesKYC,
       personalInformationAndDocs: {
-        ...defaultValues.personalInformationAndDocs,
+        ...defaultValuesKYC.personalInformationAndDocs,
         ...startingValues,
       },
     },
