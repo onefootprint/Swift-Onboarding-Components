@@ -34,8 +34,8 @@ impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
             ..
         } = tenant;
         let appearance = appearance.map(|a| a.data);
-        // TODO one day enable this per-ob config or per-tenant
         let is_app_clip_enabled = ff_client.flag(BoolFlag::IsAppClipEnabled(&tenant_id));
+        let is_instant_app_enabled = ff_client.flag(BoolFlag::IsInstantAppEnabled(&tenant_id));
         Self {
             id,
             key,
@@ -51,6 +51,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
             status,
             appearance,
             is_app_clip_enabled,
+            is_instant_app_enabled,
             tenant_id,
         }
     }

@@ -37,6 +37,8 @@ pub enum BoolFlag<'a> {
     RestrictToUsDriversLicense(&'a TenantId),
     #[strum(to_string = "IsAppClipEnabled")]
     IsAppClipEnabled(&'a TenantId),
+    #[strum(to_string = "IsInstantAppEnabled")]
+    IsInstantAppEnabled(&'a TenantId),
     #[strum(to_string = "CanMakeDemoIncodeRequestsInSandbox")]
     CanMakeDemoIncodeRequestsInSandbox(&'a TenantId),
     #[strum(to_string = "CanSkipSelfie")]
@@ -69,6 +71,7 @@ impl<'a> BoolFlag<'a> {
             Self::IsAlpacaTenant(k) => Some(k.to_string()),
             Self::RestrictToUsDriversLicense(k) => Some(k.to_string()),
             Self::IsAppClipEnabled(k) => Some(k.to_string()),
+            Self::IsInstantAppEnabled(k) => Some(k.to_string()),
             Self::CanMakeDemoIncodeRequestsInSandbox(k) => Some(k.to_string()),
             Self::CanSkipSelfie(k) => Some(k.to_string()),
             Self::OmitEmailVerification(k) => Some(k.to_string()),
@@ -94,6 +97,7 @@ impl<'a> BoolFlag<'a> {
             Self::IsAlpacaTenant(_) => false,
             Self::RestrictToUsDriversLicense(_) => false,
             Self::IsAppClipEnabled(_) => false,
+            Self::IsInstantAppEnabled(_) => false,
             Self::CanMakeDemoIncodeRequestsInSandbox(_) => false,
             Self::CanSkipSelfie(_) => false,
             Self::OmitEmailVerification(_) => false,
