@@ -49,7 +49,9 @@ import {
   SELFIE_LABEL,
   SELFIE_OPTION,
   SSN_FULL_LABEL,
+  SSN_FULL_OPTION,
   SSN_LAST_FOUR_LABEL,
+  SSN_LAST_FOUR_OPTION,
   toggleAccessOption,
   toggleCollectOption,
   withCreateOnboardingConfig,
@@ -219,8 +221,12 @@ describe('<Dialog />', () => {
         SSN_FULL_LABEL,
       ]);
 
-      await toggleCollectOption(SSN_LAST_FOUR_LABEL, SSN_LAST_FOUR_LABEL, true);
-      await toggleCollectOption(SSN_FULL_LABEL, SSN_FULL_LABEL, true);
+      await toggleCollectOption(
+        SSN_LAST_FOUR_OPTION,
+        SSN_LAST_FOUR_LABEL,
+        true,
+      );
+      await toggleCollectOption(SSN_FULL_OPTION, SSN_FULL_LABEL, true);
       await toggleCollectOption(NATIONALITY_OPTION, NATIONALITY_LABEL, true);
       await toggleCollectOption(NATIONALITY_OPTION, NATIONALITY_LABEL, false);
 

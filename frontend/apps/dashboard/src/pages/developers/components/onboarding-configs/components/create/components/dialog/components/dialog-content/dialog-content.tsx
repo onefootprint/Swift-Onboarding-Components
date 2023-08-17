@@ -72,15 +72,14 @@ const DialogContent = ({ onClose }: DialogContentProps) => {
   };
 
   const handleCreate = () => {
-    const { mustCollectData, canAccessData } = getOnboardingConfigFromContext(
-      state.context,
-    );
-
+    const { mustCollectData, canAccessData, optionalData } =
+      getOnboardingConfigFromContext(state.context);
     mutation.mutate(
       {
         name: name ?? DEFAULT_ONBOARDING_CONFIG_NAME,
         mustCollectData,
         canAccessData,
+        optionalData,
       },
       {
         onSuccess: () => {

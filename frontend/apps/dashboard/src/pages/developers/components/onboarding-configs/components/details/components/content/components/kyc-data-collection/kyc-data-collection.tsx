@@ -12,14 +12,18 @@ const KycDataCollection = ({ onboardingConfig }: KycDataCollectionProps) => {
   const { t } = useTranslation(
     'pages.developers.onboarding-configs.details.kyc-data-collection',
   );
-
   const collectedDataTags = onboardingConfig.mustCollectData;
+  const optionalCollectedDataTags = onboardingConfig.optionalData;
   const accessDataTags = onboardingConfig.canAccessData;
 
   return (
     <>
       <Field label={t('collected-data')}>
-        <CdoTagList testID="kyc-collected-data" cdos={collectedDataTags} />
+        <CdoTagList
+          testID="kyc-collected-data"
+          cdos={collectedDataTags}
+          optionalCdos={optionalCollectedDataTags}
+        />
       </Field>
       <Field label={t('accessed-data')}>
         {accessDataTags.length > 0 ? (

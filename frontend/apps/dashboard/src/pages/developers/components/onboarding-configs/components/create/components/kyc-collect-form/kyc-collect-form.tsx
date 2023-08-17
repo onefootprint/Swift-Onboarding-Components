@@ -1,23 +1,31 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
-  CollectedDataOption,
   CollectedKycDataOption,
   IdDocRegionality,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
-import { Checkbox, Radio, Typography } from '@onefootprint/ui';
+import {
+  Box,
+  Checkbox,
+  Divider,
+  Radio,
+  Toggle,
+  Typography,
+} from '@onefootprint/ui';
 import React from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
-import { getRequiredKycCollectFields } from '../../utils/get-onboarding-config-from-context';
 import CollectedDataSummary from '../collected-data-summary';
 import IdDocForm from '../id-doc-form';
 import { useOnboardingConfigMachine } from '../machine-provider';
+import getSummary from './utils/get-summary';
 
 type FormData = {
-  ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
+  requireSSN: boolean;
+  optionalSSN: boolean;
+  ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
   [CollectedKycDataOption.nationality]: boolean;
   idDocType: SupportedIdDocTypes[];
   regionality: IdDocRegionality;
@@ -34,50 +42,51 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
   );
   const [state, send] = useOnboardingConfigMachine();
   const { kycCollect } = state.context;
+  const defaultRequestSSN = kycCollect?.requireSSN ?? true;
+  const defaultOptionalSSN = kycCollect?.optionalSSN ?? false;
+  const defaultSSNKind = kycCollect?.ssnKind ?? CollectedKycDataOption.ssn9;
+  const defaultNationality = kycCollect?.[CollectedKycDataOption.nationality];
+  const defaultIdDocType = kycCollect?.idDoc?.types ?? [];
+  const defaultRegionality = kycCollect?.idDoc?.regionality;
+  const defaultSelfieRequired = kycCollect?.idDoc?.selfieRequired ?? false;
   const methods = useForm<FormData>({
     defaultValues: {
-      ssnKind: kycCollect ? kycCollect.ssnKind : CollectedKycDataOption.ssn9,
-      [CollectedKycDataOption.nationality]:
-        kycCollect?.[CollectedKycDataOption.nationality],
-      idDocType: kycCollect?.idDoc?.types || [],
-      regionality: kycCollect
-        ? kycCollect?.idDoc.regionality
-        : IdDocRegionality.international,
-      selfieRequired: kycCollect?.idDoc.selfieRequired || false,
+      requireSSN: defaultRequestSSN,
+      optionalSSN: defaultOptionalSSN,
+      ssnKind: defaultSSNKind,
+      [CollectedKycDataOption.nationality]: defaultNationality,
+      idDocType: defaultIdDocType,
+      regionality: defaultRegionality,
+      selfieRequired: defaultSelfieRequired,
     },
   });
-  const { register, handleSubmit, watch } = methods;
-  const collectedData: (CollectedDataOption | string)[] =
-    getRequiredKycCollectFields();
-  const ssnKind = watch('ssnKind');
-  collectedData.push(
-    ssnKind === CollectedKycDataOption.ssn4
-      ? CollectedKycDataOption.ssn4
-      : CollectedKycDataOption.ssn9,
-  );
-  const nationality = watch(CollectedKycDataOption.nationality);
-  if (nationality) {
-    collectedData.push(CollectedKycDataOption.nationality);
-  }
-  const idDoc = watch('idDocType');
-  const selfie = watch('selfieRequired');
+  const { register, handleSubmit, watch, control, setValue } = methods;
+  const collectedData = getSummary({
+    requireSSN: watch('requireSSN'),
+    ssnKind: watch('ssnKind'),
+    nationality: watch('nationality'),
+    idDocType: watch('idDocType'),
+    selfieRequired: watch('selfieRequired'),
+  });
+  const requireSSN = watch('requireSSN');
 
-  if (idDoc?.length) {
-    idDoc.forEach(doc => {
-      collectedData.push(doc);
-    });
-    if (selfie) {
-      collectedData.push('selfie');
+  const handleChangerequireSSN = (checked: boolean) => {
+    if (checked) {
+      setValue('ssnKind', CollectedKycDataOption.ssn9);
+      setValue('optionalSSN', false);
     }
-  }
+  };
 
   const handleBeforeSubmit = (formData: FormData) => {
+    const skipSSN = !formData.requireSSN;
     send({
       type: 'kycCollectSubmitted',
       payload: {
-        ssnKind: formData.ssnKind,
+        ssnKind: skipSSN ? undefined : formData.ssnKind,
         [CollectedKycDataOption.nationality]:
           formData[CollectedKycDataOption.nationality],
+        requireSSN: formData.requireSSN,
+        optionalSSN: formData.optionalSSN,
         idDoc: {
           regionality: formData.regionality,
           types: formData.idDocType,
@@ -97,19 +106,49 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
         <CollectedDataSummary collectedData={collectedData} />
         {title}
         <Section>
-          <Typography variant="label-3">{t('ssn')}</Typography>
-          <OptionsContainer>
-            <Radio
-              value={CollectedKycDataOption.ssn9}
-              label={allT('cdo.ssn9')}
-              {...register('ssnKind')}
+          <Typography variant="label-3">{t('ssn.title')}</Typography>
+          <Box sx={{ display: 'flex' }}>
+            <Controller
+              control={control}
+              name="requireSSN"
+              defaultValue={defaultRequestSSN}
+              render={({ field }) => (
+                <Toggle
+                  checked={field.value}
+                  label={t('ssn.request')}
+                  labelPlacement="right"
+                  onChange={e => {
+                    const { checked } = e.target;
+                    field.onChange(checked);
+                    handleChangerequireSSN(checked);
+                  }}
+                />
+              )}
             />
-            <Radio
-              value={CollectedKycDataOption.ssn4}
-              label={allT('cdo.ssn4')}
-              {...register('ssnKind')}
-            />
-          </OptionsContainer>
+          </Box>
+          {requireSSN ? (
+            <>
+              <Divider variant="secondary" />
+              <OptionsContainer>
+                <Radio
+                  value={CollectedKycDataOption.ssn9}
+                  label={t('ssn.ssn9')}
+                  {...register('ssnKind')}
+                />
+                <Radio
+                  value={CollectedKycDataOption.ssn4}
+                  label={t('ssn.ssn4')}
+                  {...register('ssnKind')}
+                />
+              </OptionsContainer>
+              <Divider variant="secondary" />
+              <Checkbox
+                label={t('ssn.no-ssn.label')}
+                hint={t('ssn.no-ssn.hint')}
+                {...register('optionalSSN')}
+              />
+            </>
+          ) : null}
         </Section>
         <Section>
           <Typography variant="label-3">{allT('cdo.nationality')}</Typography>

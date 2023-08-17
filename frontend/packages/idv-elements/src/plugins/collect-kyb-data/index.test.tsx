@@ -84,6 +84,7 @@ describe.skip('<CollectKybData />', () => {
     status: OnboardingConfigStatus.enabled,
     mustCollectData: mustCollectData ?? [],
     canAccessData: canAccessData ?? [],
+    optionalData: [],
     isAppClipEnabled: false,
   });
 

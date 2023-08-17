@@ -22,6 +22,7 @@ describe('getInitData', () => {
     status: OnboardingConfigStatus.enabled,
     mustCollectData: mustCollectData ?? [],
     canAccessData: mustCollectData ?? [],
+    optionalData: [],
     isAppClipEnabled: false,
   });
 

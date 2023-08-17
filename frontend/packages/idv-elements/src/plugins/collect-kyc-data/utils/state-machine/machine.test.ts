@@ -24,6 +24,7 @@ describe('Collect KYC Data Machine Tests', () => {
     status: OnboardingConfigStatus.enabled,
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
+    optionalData: [],
     isAppClipEnabled: false,
   };
 

@@ -88,6 +88,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     isLive: true,
     createdAt: '2023-04-11T17:59:54.816474Z',
     status: OnboardingConfigStatus.enabled,
+    optionalData: [],
     isAppClipEnabled: false,
   },
 ];

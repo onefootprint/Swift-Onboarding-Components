@@ -23,6 +23,7 @@ describe('handoff state machine', () => {
     status: OnboardingConfigStatus.enabled,
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
+    optionalData: [],
     isAppClipEnabled: false,
   };
 

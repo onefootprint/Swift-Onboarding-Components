@@ -17,6 +17,7 @@ type CdoTagListProps = {
   label?: string;
   testID?: string;
   cdos: (CollectedDataOption | string)[];
+  optionalCdos?: (CollectedDataOption | string)[];
   disableSort?: boolean;
 };
 
@@ -46,10 +47,24 @@ const tagOrder: (CollectedDataOption | SupportedIdDocTypes | 'selfie')[] = [
   'selfie',
 ];
 
-const CdoTagList = ({ label, testID, cdos, disableSort }: CdoTagListProps) => {
+const CdoTagList = ({
+  label,
+  testID,
+  cdos,
+  // TODO: This is temporaly and not ideal, I'll refactor this component
+  // https://linear.app/footprint/issue/FP-5714/refactor-cdo-tag-list-components
+  optionalCdos = [],
+  disableSort,
+}: CdoTagListProps) => {
   const { t } = useTranslation('cdo');
   const allCdos = getCdos(cdos);
-  const tagLabels = allCdos.map(cdo => t(cdo));
+  const optionalCdosList = getCdos(optionalCdos);
+  const allTagLabels = allCdos.map(cdo => t(cdo));
+  const optionalCdosLabels = optionalCdosList.map(
+    cdo => `${t(cdo)} ‧ Optional`,
+  );
+  const tagLabels = [...allTagLabels, ...optionalCdosLabels];
+
   const attributeLabels = tagOrder.map(attr => t(attr));
   if (!disableSort)
     tagLabels.sort(

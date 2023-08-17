@@ -1481,7 +1481,16 @@
           "kyc-collect-form": {
             "title": "Documentation",
             "description": "Select types of documents to request.",
-            "ssn": "ID Number",
+            "ssn": {
+              "title": "SSN",
+              "request": "Request users to provide their SSN",
+              "ssn9": "Full",
+              "ssn4": "Last 4 digits",
+              "no-ssn": {
+                "label": "Allow users without a SSN to proceed with the verification",
+                "hint": "They will need to be manually reviewed by you."
+              }
+            },
             "nationality": "Request users to specify their nationality",
             "id-doc": "Photo ID (optional)"
           },

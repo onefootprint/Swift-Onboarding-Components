@@ -11,6 +11,7 @@ const getOnboardingConfig = () => ({
   logoUrl: null,
   mustCollectData: [CollectedKycDataOption.ssn9],
   canAccessData: [CollectedKycDataOption.ssn9],
+  optionalData: [],
   isLive: true,
   createdAt: '2022-07-20T01:52:36.984290Z',
   status: OnboardingConfigStatus.enabled,

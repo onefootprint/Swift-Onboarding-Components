@@ -22,6 +22,7 @@ describe('useSandboxMode', () => {
     status: OnboardingConfigStatus.enabled,
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
+    optionalData: [],
     isAppClipEnabled: false,
   });
 

@@ -15,8 +15,10 @@ const KybBoDataCollection = ({
   const { t } = useTranslation(
     'pages.developers.onboarding-configs.details.kyb-bo-data-collection',
   );
-
   const collectedKycDataTags = onboardingConfig.mustCollectData.filter(
+    data => !isKybCdo(data),
+  );
+  const optionalCollectedKycDataTags = onboardingConfig.optionalData.filter(
     data => !isKybCdo(data),
   );
   const accessKycDataTags = onboardingConfig.canAccessData.filter(
@@ -29,6 +31,7 @@ const KybBoDataCollection = ({
         <CdoTagList
           testID="kyb-bo-collected-data"
           cdos={collectedKycDataTags}
+          optionalCdos={optionalCollectedKycDataTags}
         />
       </Field>
       <Field label={t('accessed-data')}>

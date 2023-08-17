@@ -31,12 +31,16 @@ export const getRequiredKycCollectFields = () => [
   CollectedKycDataOption.fullAddress,
 ];
 
-export const getOptionalKycCollectFields = (kycCollect?: KycCollectData) => {
+export const getConditionallyRequiredKycFields = (
+  kycCollect?: KycCollectData,
+) => {
   const mustCollectData: (CollectedKycDataOption | string)[] = [];
-  if (kycCollect?.ssnKind === CollectedKycDataOption.ssn4) {
-    mustCollectData.push(CollectedKycDataOption.ssn4);
-  } else if (kycCollect?.ssnKind === CollectedKycDataOption.ssn9) {
-    mustCollectData.push(CollectedKycDataOption.ssn9);
+  if (kycCollect?.requireSSN && !kycCollect?.optionalSSN) {
+    if (kycCollect?.ssnKind === CollectedKycDataOption.ssn4) {
+      mustCollectData.push(CollectedKycDataOption.ssn4);
+    } else if (kycCollect?.ssnKind === CollectedKycDataOption.ssn9) {
+      mustCollectData.push(CollectedKycDataOption.ssn9);
+    }
   }
   if (kycCollect?.[CollectedKycDataOption.nationality]) {
     mustCollectData.push(CollectedKycDataOption.nationality);
@@ -48,6 +52,18 @@ export const getOptionalKycCollectFields = (kycCollect?: KycCollectData) => {
   }
 
   return mustCollectData;
+};
+
+export const getOptionalKycCollectFields = (kycCollect?: KycCollectData) => {
+  const optionalData: (CollectedKycDataOption | string)[] = [];
+  if (kycCollect?.optionalSSN) {
+    if (kycCollect?.ssnKind === CollectedKycDataOption.ssn4) {
+      optionalData.push(CollectedKycDataOption.ssn4);
+    } else if (kycCollect?.ssnKind === CollectedKycDataOption.ssn9) {
+      optionalData.push(CollectedKycDataOption.ssn9);
+    }
+  }
+  return optionalData;
 };
 
 export const getRequiredKybCollectFields = () => [
@@ -115,9 +131,10 @@ const getKycAccessFields = (
 const getKycOnboardingConfigFromContext = (context: MachineContext) => {
   const { kycCollect, kycAccess, kycInvestorProfile } = context;
 
+  const optionalData = getOptionalKycCollectFields(kycCollect);
   const mustCollectData = [
     ...getRequiredKycCollectFields(),
-    ...getOptionalKycCollectFields(kycCollect),
+    ...getConditionallyRequiredKycFields(kycCollect),
   ];
   if (
     kycInvestorProfile?.[CollectedInvestorProfileDataOption.investorProfile]
@@ -129,11 +146,12 @@ const getKycOnboardingConfigFromContext = (context: MachineContext) => {
   if (kycAccess?.[CollectedInvestorProfileDataOption.investorProfile]) {
     canAccessData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
-  return { mustCollectData, canAccessData };
+  return { mustCollectData, canAccessData, optionalData };
 };
 
 const getKybOnboardingConfigFromContext = (context: MachineContext) => {
   const { kycCollect, kybCollect, kybAccess } = context;
+  const optionalData = getOptionalKycCollectFields(kycCollect);
 
   const mustCollectKybData = [
     ...getRequiredKybCollectFields(),
@@ -156,7 +174,7 @@ const getKybOnboardingConfigFromContext = (context: MachineContext) => {
   const mustCollectData = [
     ...mustCollectKybData,
     ...getRequiredKycCollectFields(),
-    ...getOptionalKycCollectFields(kycCollect),
+    ...getConditionallyRequiredKycFields(kycCollect),
   ];
 
   const canAccessData: CollectedDataOption[] = kybAccess?.allKybData
@@ -164,14 +182,14 @@ const getKybOnboardingConfigFromContext = (context: MachineContext) => {
     : [];
   canAccessData.push(...getKycAccessFields(context));
 
-  return { mustCollectData, canAccessData };
+  return { mustCollectData, canAccessData, optionalData };
 };
 
 const getOnboardingConfigFromContext = (
   context: MachineContext,
 ): Pick<
   OrgOnboardingConfigCreateRequest,
-  'mustCollectData' | 'canAccessData'
+  'mustCollectData' | 'canAccessData' | 'optionalData'
 > => {
   const { type } = context;
   if (type === 'kyb') {
@@ -180,7 +198,7 @@ const getOnboardingConfigFromContext = (
   if (type === 'kyc') {
     return getKycOnboardingConfigFromContext(context);
   }
-  return { mustCollectData: [], canAccessData: [] };
+  return { mustCollectData: [], canAccessData: [], optionalData: [] };
 };
 
 export default getOnboardingConfigFromContext;

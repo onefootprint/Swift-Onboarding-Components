@@ -7,6 +7,7 @@ export type OrgOnboardingConfigCreateRequest = {
   // eg: 'document.passport,id_card.regionality.selfie_required'.
   mustCollectData: CollectedDataOption[];
   canAccessData: CollectedDataOption[];
+  optionalData: CollectedDataOption[];
 };
 
 export type OrgOnboardingConfigCreateResponse = string;

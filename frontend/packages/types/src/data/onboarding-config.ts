@@ -22,5 +22,6 @@ export type OnboardingConfig = {
 
   mustCollectData: CollectedDataOption[];
   canAccessData: CollectedDataOption[];
+  optionalData: CollectedDataOption[];
   isAppClipEnabled: boolean;
 };

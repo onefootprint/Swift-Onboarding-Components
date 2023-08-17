@@ -97,6 +97,7 @@ describe.skip('<CollectKycData />', () => {
     status: OnboardingConfigStatus.enabled,
     mustCollectData: mustCollectData ?? [],
     canAccessData: canAccessData ?? [],
+    optionalData: [],
     isAppClipEnabled: false,
   });
 

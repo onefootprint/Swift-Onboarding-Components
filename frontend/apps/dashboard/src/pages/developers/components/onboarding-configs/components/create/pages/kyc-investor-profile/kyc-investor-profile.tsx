@@ -9,6 +9,7 @@ import CollectedDataSummary from '../../components/collected-data-summary';
 import { useOnboardingConfigMachine } from '../../components/machine-provider';
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import {
+  getConditionallyRequiredKycFields,
   getOptionalKycCollectFields,
   getRequiredKycCollectFields,
 } from '../../utils/get-onboarding-config-from-context';
@@ -33,6 +34,7 @@ const KycInvestorProfile = () => {
   const shouldCollect = watch('shouldCollect');
   const collectedData = [
     ...getRequiredKycCollectFields(),
+    ...getConditionallyRequiredKycFields(kycCollect),
     ...getOptionalKycCollectFields(kycCollect),
   ];
   if (shouldCollect) {

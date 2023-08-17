@@ -33,6 +33,7 @@ const getOnboardingConfig = (isLive = true): OnboardingConfig => ({
   status: OnboardingConfigStatus.enabled,
   mustCollectData: [CollectedDocumentDataOption.document],
   canAccessData: [CollectedKycDataOption.name],
+  optionalData: [],
   isAppClipEnabled: false,
 });
 

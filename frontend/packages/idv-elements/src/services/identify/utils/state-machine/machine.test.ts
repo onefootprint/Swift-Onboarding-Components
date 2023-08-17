@@ -25,6 +25,7 @@ describe('Identify Machine Tests', () => {
     status: OnboardingConfigStatus.enabled,
     mustCollectData: [CollectedKycDataOption.name],
     canAccessData: [CollectedKycDataOption.name],
+    optionalData: [],
     isAppClipEnabled: false,
   });
 

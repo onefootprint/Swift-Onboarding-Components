@@ -14,9 +14,11 @@ export type IdDocData = {
 };
 
 export type KycCollectData = {
-  ssnKind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
   [CollectedKycDataOption.nationality]: boolean;
   idDoc: IdDocData;
+  optionalSSN: boolean;
+  requireSSN: boolean;
+  ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
 };
 
 export type KycInvestorProfileData = {
