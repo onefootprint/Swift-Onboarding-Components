@@ -106,6 +106,9 @@ pub async fn post(
             let challenge_data = ChallengeData::Sms(challenge_state);
             (challenge_data, time_before_retry_s.num_seconds(), None)
         }
+        ChallengeKind::Email => {
+            return Err(ChallengeError::ChallengeKindNotAllowed("email".to_string()).into())
+        }
     };
 
     let challenge_state = ChallengeState {
@@ -123,7 +126,7 @@ pub async fn post(
             challenge_data: UserChallengeData {
                 challenge_kind,
                 challenge_token,
-                scrubbed_phone_number: phone_number.last_two(),
+                scrubbed_phone_number: Some(phone_number.last_two()),
                 biometric_challenge_json,
                 time_before_retry_s,
             },

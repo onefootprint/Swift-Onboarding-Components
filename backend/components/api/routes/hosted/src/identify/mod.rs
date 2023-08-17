@@ -6,6 +6,7 @@ use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::twilio::PhoneChallengeState;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::PiiString;
+use newtypes::SandboxId;
 use newtypes::TenantId;
 use strum::EnumDiscriminants;
 pub mod signup_challenge;
@@ -31,6 +32,7 @@ pub(crate) enum CreateChallengeRequest {
 pub(crate) enum ChallengeKind {
     Sms,
     Biometric,
+    Email,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -38,7 +40,7 @@ pub(crate) enum ChallengeKind {
 pub struct UserChallengeData {
     challenge_kind: ChallengeKind,
     challenge_token: ChallengeToken,
-    scrubbed_phone_number: PiiString,
+    scrubbed_phone_number: Option<PiiString>,
     biometric_challenge_json: Option<String>,
     time_before_retry_s: i64,
 }
@@ -49,6 +51,13 @@ pub struct BiometricChallengeState {
     pub user_vault_id: VaultId,
     #[serde(default)]
     pub non_synced_cred_ids: Vec<Base64UrlSafeData>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct EmailChallengeState {
+    pub email: PiiString,
+    pub sandbox_id: Option<SandboxId>,
+    pub h_code: Vec<u8>,
 }
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -67,9 +76,10 @@ pub struct ChallengeState {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, EnumDiscriminants)]
 #[strum_discriminants(name(ChallengeDataKind))]
 #[strum_discriminants(vis(pub))]
-pub enum ChallengeData<PhoneChallengeT = PhoneChallengeState> {
-    Sms(PhoneChallengeT),
+pub enum ChallengeData {
+    Sms(PhoneChallengeState),
     Biometric(BiometricChallengeState),
+    Email(EmailChallengeState),
 }
 
 impl ChallengeState {
@@ -77,6 +87,7 @@ impl ChallengeState {
         let ttl = match &self.data {
             ChallengeData::Sms(_) => Duration::minutes(5),
             ChallengeData::Biometric(_) => Duration::minutes(5),
+            ChallengeData::Email(_) => Duration::minutes(5),
         };
 
         Utc::now() + ttl

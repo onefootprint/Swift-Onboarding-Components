@@ -1,4 +1,9 @@
 import pytest
+from tests.headers import SandboxId
+from tests.headers import FpAuth
+from tests.constants import FIXTURE_PHONE_NUMBER
+from tests.utils import _gen_random_sandbox_id
+from tests.constants import EMAIL
 from tests.utils import patch, post
 from tests.utils import get_requirement_from_requirements
 from tests.bifrost_client import BifrostClient
@@ -15,8 +20,31 @@ def test_skip_phone(sandbox_tenant, twilio):
         optional_data=[],
         is_no_phone_flow=True,
     )
-    # TODO: dont create user via traditional path that auths via phone
-    bifrost = BifrostClient.new(obc, twilio, override_ob_config_auth=None)
+    headers = [obc.key, SandboxId(_gen_random_sandbox_id())]
+    res = post("hosted/identify/signup_challenge", dict(email=EMAIL), *headers)
+    challenge_token = res["challenge_data"]["challenge_token"]
+
+    # incorrect PIN fails
+    res = post(
+        "hosted/identify/verify",
+        dict(challenge_response="323232", challenge_token=challenge_token),
+        *headers,
+        status_code=400
+    )
+    assert res["error"]["message"] == "Incorrect PIN code"
+    # correct PIN suceeds and gives auth
+    res = post(
+        "hosted/identify/verify",
+        dict(challenge_response="424242", challenge_token=challenge_token),
+        *headers
+    )
+
+    auth_token = FpAuth(res["auth_token"])
+
+    # TODO: should probably give BifrostClient a concept of skip phone but this works for now
+    bifrost = BifrostClient(
+        obc, auth_token, FIXTURE_PHONE_NUMBER, _gen_random_sandbox_id(), True
+    )
 
     reqs = bifrost.get_status()["requirements"]
 
@@ -30,3 +58,5 @@ def test_skip_phone(sandbox_tenant, twilio):
     assert set(authorize_req["fields_to_authorize"]["collected_data"]) == set(
         collect_data
     )
+
+    _ = bifrost.run()

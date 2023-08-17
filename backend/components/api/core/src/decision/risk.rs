@@ -34,6 +34,7 @@ pub fn save_final_decision(
     // If we should commit, portablize all data for the onboarding
     let seqno = if decision.should_commit {
         let uvw = VaultWrapper::lock_for_onboarding(conn, &wf.scoped_vault_id)?;
+        // TODO: is_portable no longer means "should portabalize if possible". We need to add more logic here to not portabalize no-phone vaults
         if uvw.vault.is_portable {
             let seqno = uvw.portablize_identity_data(conn)?;
             Some(seqno)

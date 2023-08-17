@@ -1,4 +1,4 @@
-use super::{BiometricChallengeState, PhoneChallengeState};
+use super::BiometricChallengeState;
 use crate::auth::ob_config::ObConfigAuth;
 use crate::auth::user::UserAuthScope;
 use crate::errors::challenge::ChallengeError;
@@ -17,6 +17,7 @@ use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
 use api_core::errors::onboarding::OnboardingError;
+use api_core::utils::vault_wrapper::AuthedData;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::business_owner::BusinessOwner;
@@ -26,12 +27,14 @@ use db::models::vault::Vault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use itertools::Itertools;
+use newtypes::email::Email;
 use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::{
-    DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, Fingerprinter, IdentityDataKind as IDK,
+    DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, Fingerprinter, PhoneNumber, SandboxId,
     SessionAuthToken, VaultId, VaultPublicKey,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
+use std::str::FromStr;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct VerifyRequest {
@@ -80,35 +83,32 @@ pub async fn post(
     let challenge_kind = ChallengeDataKind::from(&challenge_state.data);
     let challenge_data = match challenge_state.data {
         ChallengeData::Sms(challenge_state) => {
-            // TODO this keypair won't always be used... but helps to generate this proactively.
-            let keypair = state.enclave_client.generate_sealed_keypair().await?;
-            let di = DataIdentifier::from(IDK::PhoneNumber);
-            let e164 = challenge_state.phone_number.clone();
-            let global_sh_phone_number = state
-                .compute_fingerprint(GlobalFingerprintKind::PhoneNumber, &e164)
-                .await?;
-            let ob_info = if let Some(ob_pk_auth) = ob_pk_auth.as_ref() {
-                // If we are in identify for a specific tenant, also look up by a tenant-scoped FP
-                let tenant_sh_phone_number = state
-                    .compute_fingerprint((&di, &ob_pk_auth.tenant().id), &e164)
-                    .await?;
-                let obc = ob_pk_auth.ob_config().clone();
-                Some(OnboardingInfo {
-                    obc,
-                    tenant_sh_phone_number,
-                })
-            } else {
-                None
-            };
-            let context = SmsContext {
-                challenge_state,
-                global_sh_phone_number,
-                ob_info,
-                keypair,
-            };
-            ChallengeData::Sms(context)
+            let authed_data = AuthedData::Phone(PhoneNumber::parse(challenge_state.phone_number.clone())?);
+            let sandbox_id = challenge_state.sandbox_id.clone();
+            let vault_context = make_vault_context(
+                &state,
+                ob_pk_auth.as_ref(),
+                authed_data,
+                sandbox_id,
+                challenge_state.h_code.clone(),
+            )
+            .await?;
+
+            ChallengeContext::Sms(vault_context)
         }
-        ChallengeData::Biometric(challenge_state) => ChallengeData::Biometric(challenge_state),
+        ChallengeData::Biometric(challenge_state) => ChallengeContext::Biometric(challenge_state),
+        ChallengeData::Email(challenge_state) => {
+            let vault_context = make_vault_context(
+                &state,
+                ob_pk_auth.as_ref(),
+                AuthedData::Email(Email::from_str(challenge_state.email.leak())?),
+                challenge_state.sandbox_id.clone(),
+                challenge_state.h_code.clone(),
+            )
+            .await?;
+
+            ChallengeContext::Email(vault_context)
+        }
     };
 
     let config = state.config.clone();
@@ -117,9 +117,11 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let (uv_id, user_kind) = match challenge_data {
-                ChallengeData::Sms(c_state) => validate_sms_challenge(conn, c_state, &challenge_response)?,
-                ChallengeData::Biometric(c_state) => {
-                    validate_biometric_challenge(conn, &config, c_state, &challenge_response)?
+                ChallengeContext::Sms(ctx) | ChallengeContext::Email(ctx) => {
+                    validate(conn, ctx, &challenge_response)?
+                }
+                ChallengeContext::Biometric(context) => {
+                    validate_biometric_challenge(conn, &config, context, &challenge_response)?
                 }
             };
 
@@ -165,6 +167,12 @@ pub async fn post(
             auth_token,
         },
     }))
+}
+
+pub enum ChallengeContext {
+    Sms(VaultContext),
+    Biometric(BiometricChallengeState),
+    Email(VaultContext),
 }
 
 /// Determines the auth scopes to issue to allow a user to complete onboarding
@@ -234,53 +242,89 @@ fn validate_biometric_challenge(
 }
 
 /// Info extracted when an onboarding config auth is provided that allows creating a new vault
-struct OnboardingInfo {
+pub struct OnboardingInfo {
     obc: ObConfiguration,
-    tenant_sh_phone_number: Fingerprint,
+    tenant_sh: Fingerprint,
 }
 
-struct SmsContext {
-    challenge_state: PhoneChallengeState,
-    global_sh_phone_number: Fingerprint,
-    // Only non-null when an ObConfigAuth was provided
-    ob_info: Option<OnboardingInfo>,
-    keypair: (VaultPublicKey, EncryptedVaultPrivateKey),
+pub struct VaultContext {
+    pub h_code: Vec<u8>,
+    pub authed_data: AuthedData,
+    pub keypair: (VaultPublicKey, EncryptedVaultPrivateKey),
+    pub global_sh: Fingerprint,
+    pub sandbox_id: Option<SandboxId>,
+    pub ob_info: Option<OnboardingInfo>,
 }
 
-fn validate_sms_challenge(
+async fn make_vault_context(
+    state: &State,
+    ob_pk_auth: Option<&ObConfigAuth>,
+    authed_data: AuthedData,
+    sandbox_id: Option<SandboxId>,
+    h_code: Vec<u8>,
+) -> ApiResult<VaultContext> {
+    // TODO this keypair won't always be used... but helps to generate this proactively.
+    let keypair = state.enclave_client.generate_sealed_keypair().await?;
+
+    let di: DataIdentifier = (&authed_data).into();
+    let data = authed_data.data();
+
+    let global_sh = state
+        .compute_fingerprint(GlobalFingerprintKind::try_from(di.clone())?, &data)
+        .await?;
+    let ob_info = if let Some(ob_pk_auth) = ob_pk_auth {
+        // If we are in identify for a specific tenant, also look up by a tenant-scoped FP
+        let tenant_sh = state
+            .compute_fingerprint((&di, &ob_pk_auth.tenant().id), &data)
+            .await?;
+        let obc = ob_pk_auth.ob_config().clone();
+        Some(OnboardingInfo { obc, tenant_sh })
+    } else {
+        None
+    };
+
+    Ok(VaultContext {
+        h_code,
+        authed_data,
+        keypair,
+        global_sh,
+        sandbox_id,
+        ob_info,
+    })
+}
+
+fn validate(
     conn: &mut TxnPgConn,
-    context: SmsContext,
+    ctx: VaultContext,
     challenge_response: &str,
 ) -> Result<(VaultId, VerifyKind), ApiError> {
-    if context.challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
+    if ctx.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
-    }
+    };
+
     let fps_to_search = vec![
-        Some(context.global_sh_phone_number.clone()),
-        context.ob_info.as_ref().map(|i| i.tenant_sh_phone_number.clone()),
+        Some(ctx.global_sh.clone()),
+        ctx.ob_info.as_ref().map(|i| i.tenant_sh.clone()),
     ]
     .into_iter()
     .flatten()
     .collect_vec();
-    let sandbox_id = context.challenge_state.sandbox_id;
-    let existing_user = Vault::find_portable(conn, &fps_to_search, sandbox_id.clone())?;
+
+    let existing_user = Vault::find_portable(conn, &fps_to_search, ctx.sandbox_id.clone())?;
     let result = match existing_user {
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
             // The user does not exist. Create a new user vault.
             // Must have ob_info to create a new user vault
-            let OnboardingInfo {
-                obc,
-                tenant_sh_phone_number,
-            } = context.ob_info.ok_or(OnboardingError::MissingObPkAuth)?;
+            let OnboardingInfo { obc, tenant_sh } = ctx.ob_info.ok_or(OnboardingError::MissingObPkAuth)?;
             let (uv, _) = VaultWrapper::create_user_vault(
                 conn,
-                context.keypair,
+                ctx.keypair,
                 obc,
-                context.challenge_state.phone_number,
-                context.global_sh_phone_number,
-                tenant_sh_phone_number,
-                sandbox_id,
+                ctx.authed_data,
+                ctx.global_sh,
+                tenant_sh,
+                ctx.sandbox_id,
             )?;
             (uv.into_inner().id, VerifyKind::UserCreated)
         }
