@@ -193,7 +193,7 @@ impl Workflow {
             None
         };
         let v = Vault::get(conn.conn(), &scoped_vault_id)?;
-        let (obc, _) = ObConfiguration::get(conn.conn(), &ob_configuration_id)?;
+        let (obc, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
 
         let config = match v.kind {
             VaultKind::Person => {

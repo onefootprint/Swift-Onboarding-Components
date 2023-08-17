@@ -39,9 +39,6 @@ pub struct ScopedVault {
     pub start_timestamp: DateTime<Utc>,
     /// Denormalized from the user vault just to make querying easier
     pub is_live: bool,
-    // Only null when the vault is non-portable
-    // TODO deprecate
-    ob_configuration_id: Option<ObConfigurationId>,
     pub status: Option<OnboardingStatus>,
 }
 
@@ -54,7 +51,6 @@ struct NewScopedVault {
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
     is_live: bool,
-    ob_configuration_id: Option<ObConfigurationId>,
 }
 
 pub enum ScopedVaultIdentifier<'a> {
@@ -118,9 +114,9 @@ impl ScopedVault {
     pub fn get_or_create(
         conn: &mut TxnPgConn,
         uv: &Locked<Vault>,
-        // TODO change this to tenant_id
         ob_configuration_id: ObConfigurationId,
     ) -> DbResult<Self> {
+        // Get the ob config to do some validation before we make the SV
         let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
         if uv.is_live != ob_config.is_live {
             return Err(DbError::SandboxMismatch);
@@ -147,7 +143,6 @@ impl ScopedVault {
             start_timestamp: Utc::now(),
             tenant_id: ob_config.tenant_id,
             is_live: ob_config.is_live,
-            ob_configuration_id: Some(ob_configuration_id),
         };
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
@@ -179,7 +174,6 @@ impl ScopedVault {
                 tenant_id,
                 is_live: uv.is_live,
                 vault_id: uv.id.clone(),
-                ob_configuration_id: None,
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)

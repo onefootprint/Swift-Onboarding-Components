@@ -559,7 +559,6 @@ table! {
         ordering_id -> Int8,
         start_timestamp -> Timestamptz,
         is_live -> Bool,
-        ob_configuration_id -> Nullable<Text>,
         status -> Nullable<Text>,
     }
 }
@@ -977,7 +976,6 @@ joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
 joinable!(risk_signal -> risk_signal_group (risk_signal_group_id));
 joinable!(risk_signal -> verification_result (verification_result_id));
 joinable!(risk_signal_group -> scoped_vault (scoped_vault_id));
-joinable!(scoped_vault -> ob_configuration (ob_configuration_id));
 joinable!(scoped_vault -> tenant (tenant_id));
 joinable!(scoped_vault -> vault (vault_id));
 joinable!(socure_device_session -> workflow (workflow_id));
