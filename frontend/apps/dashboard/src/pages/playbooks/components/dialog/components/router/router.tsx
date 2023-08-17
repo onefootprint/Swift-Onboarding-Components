@@ -4,8 +4,8 @@ import { Stepper } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
-import YourPlaybook from '../your-playbook';
 import WhoToOnboard from './components/who-to-onboard';
+import YourPlaybook from './components/your-playbook';
 import PlaybookMachine from './utils/machine/machine';
 import { Kind } from './utils/machine/types';
 
