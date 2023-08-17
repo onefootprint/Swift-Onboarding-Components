@@ -9,12 +9,20 @@ pub enum InvestorProfileKind {
     EmploymentStatus,
     Occupation,
     Employer,
-    BrokerageFirmEmployer,
     AnnualIncome,
     NetWorth,
     InvestmentGoals,
     RiskTolerance,
     Declarations,
+    // These IPKs are for metadata based on the declarations
+    /// If affiliated with a broker-dealer, the name of the brokerage
+    BrokerageFirmEmployer,
+    /// If a senior executive or shareholder at a publicly traded company, the list of symbols
+    SeniorExecutiveSymbols,
+    /// If a senior political figure, names of immediate family members
+    FamilyMemberNames,
+    /// If a senior political figure, name of the political organization
+    PoliticalOrganization,
 }
 
 impl From<InvestorProfileKind> for DataIdentifier {
@@ -37,8 +45,14 @@ impl IsDataIdentifierDiscriminant for InvestorProfileKind {
     fn is_optional(&self) -> bool {
         matches!(
             self,
-            // TODO make employment status not null after migrating frontend
-            Self::Employer | Self::Occupation | Self::BrokerageFirmEmployer | Self::EmploymentStatus
+            Self::Employer
+                | Self::Occupation
+                | Self::BrokerageFirmEmployer
+                // TODO make employment status not null after migrating frontend
+                | Self::EmploymentStatus
+                | Self::SeniorExecutiveSymbols
+                | Self::FamilyMemberNames
+                | Self::PoliticalOrganization
         )
     }
 

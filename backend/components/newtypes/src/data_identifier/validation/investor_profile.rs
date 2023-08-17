@@ -16,7 +16,6 @@ impl Validate for IPK {
             Self::EmploymentStatus => utils::parse_enum::<EmploymentStatus>(value)?,
             Self::Occupation => value,
             Self::Employer => value,
-            Self::BrokerageFirmEmployer => value,
             Self::AnnualIncome => utils::parse_enum::<AnnualIncome>(value)?,
             Self::NetWorth => utils::parse_enum::<NetWorth>(value)?,
             Self::InvestmentGoals => utils::parse_json_and_validate::<Vec<InvestmentGoal>, _>(value, |l| {
@@ -28,6 +27,22 @@ impl Validate for IPK {
             })?,
             Self::RiskTolerance => utils::parse_enum::<RiskTolerance>(value)?,
             Self::Declarations => utils::parse_json::<Vec<Declaration>>(value)?,
+            Self::BrokerageFirmEmployer => value,
+            Self::SeniorExecutiveSymbols => utils::parse_json_and_validate::<Vec<String>, _>(value, |l| {
+                if l.is_empty() || l.into_iter().any(|symbol| symbol.trim().is_empty()) {
+                    Err(Error::InvalidLength)
+                } else {
+                    Ok(())
+                }
+            })?,
+            Self::FamilyMemberNames => utils::parse_json_and_validate::<Vec<String>, _>(value, |l| {
+                if l.into_iter().any(|name| name.trim().is_empty()) {
+                    Err(Error::InvalidLength)
+                } else {
+                    Ok(())
+                }
+            })?,
+            Self::PoliticalOrganization => value,
         };
         Ok(value)
     }
@@ -66,11 +81,25 @@ enum NetWorth {
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
 #[strum(serialize_all = "snake_case")]
 enum InvestmentGoal {
+    Growth,
+    Income,
+    PreserveCapital,
+    Speculation,
+    Divserification,
+    Other,
+
+    // Can't remove these yet since some old vaults have these
+    /// DEPRECATED
     GrowLongTermWealth,
+    /// DEPRECATED
     SaveForRetirement,
+    /// DEPRECATED
     SupportLovedOnes,
+    /// DEPRECATED
     BuyAHome,
+    /// DEPRECATED
     PayOffDebt,
+    /// DEPRECATED
     StartMyOwnBusiness,
 }
 

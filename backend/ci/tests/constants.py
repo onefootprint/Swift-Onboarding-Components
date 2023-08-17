@@ -115,9 +115,13 @@ IP_DATA = {
     "investor_profile.employer": "Hayes Valley Hospital",
     "investor_profile.annual_income": "lt50k",
     "investor_profile.net_worth": "gt1m",
-    "investor_profile.investment_goals": '["grow_long_term_wealth", "buy_a_home"]',
+    "investor_profile.investment_goals": '["growth", "preserve_capital"]',
     "investor_profile.risk_tolerance": "conservative",
     "investor_profile.declarations": '["affiliated_with_us_broker", "family_of_political_figure"]',
+    "investor_profile.brokerage_firm_employer": "Robinhood",
+    "investor_profile.senior_executive_symbols": '["AAPL", "HOOD"]',
+    "investor_profile.family_member_names": '["Hayes Valley", "Piip Penguin"]',
+    "investor_profile.political_organization": "Enclave Party",
 }
 
 CREDIT_CARD_DATA = {
@@ -171,6 +175,9 @@ CDO_TO_DIS = {
         "investor_profile.investment_goals",
         "investor_profile.risk_tolerance",
         "investor_profile.declarations",
+        "investor_profile.senior_executive_symbols",
+        "investor_profile.family_member_names",
+        "investor_profile.political_organization",
     ],
 }
 
