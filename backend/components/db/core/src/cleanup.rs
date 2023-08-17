@@ -213,11 +213,12 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .filter(onboarding_decision::workflow_id.eq_any(workflow_ids.clone()))
                 .execute(conn.conn())?;
 
-            deleted_rows += diesel::delete(workflow::table)
-                .filter(workflow::scoped_vault_id.eq_any(su_ids.clone()))
-                .execute(conn.conn())?;
             deleted_rows += diesel::delete(user_consent::table)
                 .filter(user_consent::workflow_id.eq_any(workflow_ids))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(workflow::table)
+                .filter(workflow::scoped_vault_id.eq_any(su_ids.clone()))
                 .execute(conn.conn())?;
         }
 
