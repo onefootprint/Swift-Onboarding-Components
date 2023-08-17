@@ -119,7 +119,7 @@ IP_DATA = {
     "investor_profile.risk_tolerance": "conservative",
     "investor_profile.declarations": '["affiliated_with_us_broker", "family_of_political_figure"]',
     "investor_profile.brokerage_firm_employer": "Robinhood",
-    "investor_profile.senior_executive_symbols": '["AAPL", "HOOD"]',
+    "investor_profile.senior_executive_symbols": '["AAPL", "HOOOD", "SPY"]',
     "investor_profile.family_member_names": '["Hayes Valley", "Piip Penguin"]',
     "investor_profile.political_organization": "Enclave Party",
 }

@@ -5,6 +5,7 @@ use crate::NtResult;
 use crate::Validate;
 use crate::ValidateArgs;
 use crate::{InvestorProfileKind as IPK, PiiString};
+use itertools::Itertools;
 use serde_with::DeserializeFromStr;
 use strum_macros::EnumString;
 
@@ -28,11 +29,18 @@ impl Validate for IPK {
             Self::RiskTolerance => utils::parse_enum::<RiskTolerance>(value)?,
             Self::Declarations => utils::parse_json::<Vec<Declaration>>(value)?,
             Self::BrokerageFirmEmployer => value,
-            Self::SeniorExecutiveSymbols => utils::parse_json_and_validate::<Vec<String>, _>(value, |l| {
-                if l.is_empty() || l.into_iter().any(|symbol| symbol.trim().is_empty()) {
+            Self::SeniorExecutiveSymbols => utils::parse_json_and_map::<Vec<String>, _>(value, |l| {
+                if l.is_empty() || l.iter().any(|symbol| symbol.len() < 3 || symbol.len() > 5) {
                     Err(Error::InvalidLength)
+                } else if l
+                    .iter()
+                    .any(|symbol| symbol.chars().any(|c| !c.is_ascii_alphabetic()))
+                {
+                    Err(Error::InvalidCharacter)
                 } else {
-                    Ok(())
+                    let uppercase_symbols = l.iter().map(|s| s.to_uppercase()).collect_vec();
+                    let value = PiiString::from(serde_json::ser::to_string(&uppercase_symbols)?);
+                    Ok(value)
                 }
             })?,
             Self::FamilyMemberNames => utils::parse_json_and_validate::<Vec<String>, _>(value, |l| {

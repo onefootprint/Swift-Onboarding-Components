@@ -256,17 +256,21 @@ Footprint's vaulting aims to be flexible while providing base-level validation l
 
 ### Investor profile fields
 
-| Data Identifier                            | Rules                                                                                                                                   |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `investor_profile.employment_status`       | One of `employed`, `unemployed`, `student`, `retired`                                                                                   |
-| `investor_profile.employer`                | Any valid UTF-8 String <1KB                                                                                                             |
-| `investor_profile.occupation`              | Any valid UTF-8 String <1KB                                                                                                             |
-| `investor_profile.brokerage_firm_employer` | Any valid UTF-8 String <1KB                                                                                                             |
-| `investor_profile.annual_income`           | One of `lt50k`, `s50k_to100k`, `s100k_to250k`, `s250k_to500k`, `gt500k`                                                                 |
-| `investor_profile.net_worth`               | One of `lt50k`, `s50k_to100k`, `s100k_to250k`, `s250k_to500k`, `s500k_to1m`, `gt1m`                                                     |
-| `investor_profile.investment_goals`        | An array of `grow_long_term_wealth`, `save_for_retirement`, `support_loved_ones`, `buy_a_home`, `pay_off_debt`, `start_my_own_business` |
-| `investor_profile.risk_tolerance`          | One of `conservative`, `moderate`, `aggressive`                                                                                         |
-| `investor_profile.declarations`            | An array of `affiliated_with_us_broker`, `senior_executive`, `senior_political_figure`, `family_of_political_figure`                    |
+| Data Identifier                             | Rules                                                                                                                               |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `investor_profile.employment_status`        | One of `employed`, `unemployed`, `student`, `retired`                                                                               |
+| `investor_profile.employer`                 | Any valid UTF-8 String <1KB                                                                                                         |
+| `investor_profile.occupation`               | Any valid UTF-8 String <1KB                                                                                                         |
+| `investor_profile.brokerage_firm_employer`  | Any valid UTF-8 String <1KB                                                                                                         |
+| `investor_profile.annual_income`            | One of `lt50k`, `s50k_to100k`, `s100k_to250k`, `s250k_to500k`, `gt500k`                                                             |
+| `investor_profile.net_worth`                | One of `lt50k`, `s50k_to100k`, `s100k_to250k`, `s250k_to500k`, `s500k_to1m`, `gt1m`                                                 |
+| `investor_profile.investment_goals`         | A JSON-serialized array of `growth`, `income`, `preserve_capital`, `speculation`, `diversification`, `other`                        |
+| `investor_profile.risk_tolerance`           | One of `conservative`, `moderate`, `aggressive`                                                                                     |
+| `investor_profile.declarations`             | A JSON-serialized array of `affiliated_with_us_broker`, `senior_executive`, `senior_political_figure`, `family_of_political_figure` |
+| `investor_profile.brokerage_firm_employer`  | Any valid UTF-8 String <1KB                                                                                                         |
+| `investor_profile.senior_executive_symbols` | A JSON-serialized array of symbols, each 3-5 ASCII alphabetic characters                                                            |
+| `investor_profile.family_member_names`      | A JSON-serialized array of names, each UTF-8 Strings <1KB                                                                           |
+| `investor_profile.political_organization`   | Any valid UTF-8 String <1KB                                                                                                         |
 
 ### Document fields
 
