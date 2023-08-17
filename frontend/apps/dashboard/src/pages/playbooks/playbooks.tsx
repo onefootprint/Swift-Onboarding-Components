@@ -37,9 +37,7 @@ const Playbooks = () => {
       <Typography variant="body-2">{t('header.subtitle')}</Typography>
       <br />
       <Typography variant="body-2">{t('empty-description')}</Typography>
-      {dialogOpen && (
-        <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
-      )}
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </>
   );
 };
