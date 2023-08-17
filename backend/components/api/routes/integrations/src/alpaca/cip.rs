@@ -34,9 +34,9 @@ use db::{
 };
 use idv::ParsedResponse;
 use newtypes::{
-    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, FootprintReasonCode, FpId,
-    IdentityDataKind, MatchLevel, ModernIdDocKind, OcrDataKind, PiiJsonValue, PiiString, ReviewReason,
-    SignalScope, TenantId, Vendor, VendorAPI,
+    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, FootprintReasonCode, FpId, IdDocKind,
+    IdentityDataKind, MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId,
+    Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use DataIdentifier::*;
@@ -180,12 +180,9 @@ async fn create_cip_request(
                 Id(Nationality),
                 Id(Zip),
                 Id(Country),
-                Document(OcrData(
-                    ModernIdDocKind::DriversLicense,
-                    OcrDataKind::DocumentNumber,
-                )),
-                Document(OcrData(ModernIdDocKind::IdCard, OcrDataKind::DocumentNumber)),
-                Document(OcrData(ModernIdDocKind::Passport, OcrDataKind::DocumentNumber)),
+                Document(OcrData(IdDocKind::DriversLicense, OcrDataKind::DocumentNumber)),
+                Document(OcrData(IdDocKind::IdCard, OcrDataKind::DocumentNumber)),
+                Document(OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber)),
             ],
         )
         .await?;
@@ -272,9 +269,9 @@ fn kyc(
     };
     // find a gov't id number if we have one
     let id_number = vec![
-        OcrData(ModernIdDocKind::DriversLicense, OcrDataKind::DocumentNumber),
-        OcrData(ModernIdDocKind::IdCard, OcrDataKind::DocumentNumber),
-        OcrData(ModernIdDocKind::Passport, OcrDataKind::DocumentNumber),
+        OcrData(IdDocKind::DriversLicense, OcrDataKind::DocumentNumber),
+        OcrData(IdDocKind::IdCard, OcrDataKind::DocumentNumber),
+        OcrData(IdDocKind::Passport, OcrDataKind::DocumentNumber),
     ]
     .into_iter()
     .flat_map(|id| decrypted_data.get_di(id).ok())
@@ -488,7 +485,7 @@ fn document_and_photo(
     let type_of_id = ocr_response.type_of_id.as_ref().ok_or_else(|| {
         idv::Error::IncodeError(idv::incode::error::Error::OcrError("Missing type_of_id".into()))
     })?;
-    let document_type = ModernIdDocKind::try_from(type_of_id)?.into();
+    let document_type = IdDocKind::try_from(type_of_id)?.into();
     let dob = ocr_response
         .dob()
         .map_err(|e| ApiError::from(idv::Error::from(e)))?;

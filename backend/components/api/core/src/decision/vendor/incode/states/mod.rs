@@ -50,8 +50,8 @@ use db::DbPool;
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DataIdentifier, DecisionIntentKind, IdentityDataKind, IncodeFailureReason, IncodeVerificationSessionId,
-    IncodeVerificationSessionKind, ModernIdDocKind, PiiJsonValue, PiiString, ScopedVaultId,
+    DataIdentifier, DecisionIntentKind, IdDocKind, IdentityDataKind, IncodeFailureReason,
+    IncodeVerificationSessionId, IncodeVerificationSessionKind, PiiJsonValue, PiiString, ScopedVaultId,
     ScrubbedPiiJsonValue, ScrubbedPiiString, VendorAPI, WorkflowId,
 };
 
@@ -247,7 +247,7 @@ fn parse_type_of_id(
     ctx: &IncodeContext,
     type_of_id: Option<&IncodeDocumentType>,
     country_code: Option<&ScrubbedPiiString>,
-) -> ApiResult<Result<ModernIdDocKind, IncodeFailureReason>> {
+) -> ApiResult<Result<IdDocKind, IncodeFailureReason>> {
     // Validate the doc type matches what the client told us (and what we validated against the
     // doc request)
     let expected_doc_type = ctx
@@ -258,7 +258,7 @@ fn parse_type_of_id(
     let Some(type_of_id) = type_of_id else {
         return Ok(Err(IncodeFailureReason::UnknownDocumentType));
     };
-    let Ok(id_doc_kind) = ModernIdDocKind::try_from(type_of_id) else {
+    let Ok(id_doc_kind) = IdDocKind::try_from(type_of_id) else {
         return Ok(Err(IncodeFailureReason::UnsupportedDocumentType));
     };
     if id_doc_kind != expected_doc_type {

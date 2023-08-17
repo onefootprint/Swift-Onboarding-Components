@@ -26,9 +26,9 @@ use newtypes::DataRequest;
 use newtypes::DocumentKind;
 use newtypes::DocumentSide;
 use newtypes::FootprintReasonCode;
+use newtypes::IdDocKind;
 use newtypes::IdentityDocumentId;
 use newtypes::IdentityDocumentStatus;
-use newtypes::ModernIdDocKind;
 use newtypes::OcrDataKind as ODK;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
@@ -51,7 +51,7 @@ impl Complete {
         vault: &Vault,
         sv_id: &ScopedVaultId,
         id_doc_id: &IdentityDocumentId,
-        dk: ModernIdDocKind,
+        dk: IdDocKind,
         fetch_ocr_response: FetchOCRResponse,
         score_response: FetchScoresResponse,
         vault_data: IncodeOcrComparisonDataFields,

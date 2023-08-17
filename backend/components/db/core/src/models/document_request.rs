@@ -4,8 +4,8 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::document_request;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::IdDocKind;
 use newtypes::Iso3166TwoDigitCountryCode;
-use newtypes::ModernIdDocKind;
 use newtypes::WorkflowId;
 use newtypes::{DocumentRequestId, ScopedVaultId};
 
@@ -25,7 +25,7 @@ pub struct DocumentRequest {
     pub workflow_id: WorkflowId,
     // Document types that are accepted across all countries, except if overridden in country_doc_type_restrictions
     // These drive the frontend UI and are generated in get_requirements. If this is None, we fall back to accepting any ModerIdDocKind
-    pub global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
+    pub global_doc_types_accepted: Option<Vec<IdDocKind>>,
     // if !empty, restrict to only these countries
     pub country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     // if key for a country is present, will include the subset of global_doc_types_accepted for a specific countrys
@@ -85,7 +85,7 @@ pub struct NewDocumentRequestArgs {
     pub ref_id: Option<String>,
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
-    pub global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
+    pub global_doc_types_accepted: Option<Vec<IdDocKind>>,
     pub country_restrictions: Vec<Iso3166TwoDigitCountryCode>,
     pub country_doc_type_restrictions: Option<serde_json::Value>,
 }
@@ -98,7 +98,7 @@ struct NewDocumentRequestRow {
     created_at: DateTime<Utc>,
     should_collect_selfie: bool,
     workflow_id: WorkflowId,
-    global_doc_types_accepted: Option<Vec<ModernIdDocKind>>,
+    global_doc_types_accepted: Option<Vec<IdDocKind>>,
     country_restrictions: Vec<Iso3166TwoDigitCountryCode>,
     country_doc_type_restrictions: Option<serde_json::Value>,
 }

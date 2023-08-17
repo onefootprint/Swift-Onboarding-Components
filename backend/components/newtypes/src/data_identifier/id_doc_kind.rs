@@ -29,15 +29,15 @@ use crate::DocumentSide;
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum ModernIdDocKind {
+pub enum IdDocKind {
     IdCard,
     DriversLicense,
     Passport,
 }
 
-crate::util::impl_enum_string_diesel!(ModernIdDocKind);
+crate::util::impl_enum_string_diesel!(IdDocKind);
 
-impl ModernIdDocKind {
+impl IdDocKind {
     pub fn sides(&self) -> Vec<DocumentSide> {
         match self {
             Self::DriversLicense => vec![DocumentSide::Front, DocumentSide::Back],
@@ -56,12 +56,12 @@ pub enum AlpacaDocumentType {
     Visa,
 }
 
-impl From<ModernIdDocKind> for AlpacaDocumentType {
-    fn from(value: ModernIdDocKind) -> Self {
+impl From<IdDocKind> for AlpacaDocumentType {
+    fn from(value: IdDocKind) -> Self {
         match value {
-            ModernIdDocKind::IdCard => AlpacaDocumentType::NationalId,
-            ModernIdDocKind::DriversLicense => AlpacaDocumentType::DriversLicense,
-            ModernIdDocKind::Passport => AlpacaDocumentType::Passport,
+            IdDocKind::IdCard => AlpacaDocumentType::NationalId,
+            IdDocKind::DriversLicense => AlpacaDocumentType::DriversLicense,
+            IdDocKind::Passport => AlpacaDocumentType::Passport,
         }
     }
 }

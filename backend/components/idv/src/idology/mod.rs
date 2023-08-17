@@ -184,7 +184,7 @@ fn should_retry_request(err: &IdologyError::Error) -> bool {
 mod test {
     use super::*;
     use crate::idology::fixtures;
-    use newtypes::{DocVData, IDologyReasonCode, IdvData, ModernIdDocKind, PiiString};
+    use newtypes::{DocVData, IDologyReasonCode, IdDocKind, IdvData, PiiString};
 
     fn map_pii(s: String) -> Option<PiiString> {
         Some(PiiString::from(s))
@@ -244,7 +244,7 @@ mod test {
             back_image: map_pii(fixtures::images::scan_verify_test_image_document_verified()),
             selfie_image: None, // TODO: add selfie to this test or add another
             country_code: map_pii("USA".to_string()),
-            document_type: Some(ModernIdDocKind::DriversLicense),
+            document_type: Some(IdDocKind::DriversLicense),
             ..Default::default()
         };
 

@@ -1,4 +1,4 @@
-use crate::{CollectedDataOption, DocumentRequestId, ModernIdDocKind};
+use crate::{CollectedDataOption, DocumentRequestId, IdDocKind};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use strum::EnumDiscriminants;
@@ -35,7 +35,7 @@ pub enum OnboardingRequirement {
         should_collect_consent: bool,
         /// When true, should only allow collecting documents from the US
         only_us_supported: bool,
-        supported_document_types: Vec<ModernIdDocKind>,
+        supported_document_types: Vec<IdDocKind>,
     },
     /// The client needs to display the authorization consent page and confirm the user authorizes access
     Authorize { fields_to_authorize: AuthorizeFields },
@@ -80,5 +80,5 @@ impl OnboardingRequirement {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize, JsonSchema)]
 pub struct AuthorizeFields {
     pub collected_data: Vec<CollectedDataOption>,
-    pub document_types: Vec<ModernIdDocKind>,
+    pub document_types: Vec<IdDocKind>,
 }

@@ -1,7 +1,8 @@
 use crate::export_schema;
 use newtypes::{
-    idology::IdologyImageCaptureErrors, DocumentScanDeviceType, DocumentSide, IdentityDocumentFixtureResult,
-    IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason, ModernIdDocKind, PiiString,
+    idology::IdologyImageCaptureErrors, DocumentScanDeviceType, DocumentSide, IdDocKind,
+    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason,
+    PiiString,
 };
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -16,7 +17,7 @@ pub struct CreateIdentityDocumentUploadRequest {
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct CreateIdentityDocumentRequest {
-    pub document_type: ModernIdDocKind,
+    pub document_type: IdDocKind,
     pub country_code: String, // TODO this should be an enum
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
     pub skip_selfie: Option<bool>,

@@ -21,8 +21,8 @@ use newtypes::{
     OnboardingRequirementKind, Selfie,
 };
 use newtypes::{
-    CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
-    InvestorProfileKind as IPK, ModernIdDocKind, PiiString, ScopedVaultId,
+    CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind, IdDocKind,
+    InvestorProfileKind as IPK, PiiString, ScopedVaultId,
 };
 use paperclip::actix::web;
 use strum::IntoEnumIterator;
@@ -272,9 +272,9 @@ fn get_requirement_inner(
                     supported_document_types: if let Some(doc_types) = dr.global_doc_types_accepted {
                         doc_types
                     } else if only_us_dl {
-                        vec![ModernIdDocKind::DriversLicense]
+                        vec![IdDocKind::DriversLicense]
                     } else {
-                        ModernIdDocKind::iter().collect()
+                        IdDocKind::iter().collect()
                     },
                 })
             } else {

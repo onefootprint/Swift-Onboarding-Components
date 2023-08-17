@@ -1,4 +1,4 @@
-use crate::{FootprintReasonCode as FRC, ModernIdDocKind};
+use crate::{FootprintReasonCode as FRC, IdDocKind};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::Display;
 use strum_macros::EnumString;
@@ -284,7 +284,7 @@ pub enum IncodeDocumentType {
     NonParsableDocType(String),
 }
 
-impl<'a> TryFrom<&'a IncodeDocumentType> for ModernIdDocKind {
+impl<'a> TryFrom<&'a IncodeDocumentType> for IdDocKind {
     type Error = crate::Error;
     fn try_from(value: &'a IncodeDocumentType) -> Result<Self, Self::Error> {
         match value {
