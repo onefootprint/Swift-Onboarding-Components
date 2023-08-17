@@ -9,6 +9,7 @@ type EditableFormButtonContainerProps = {
   isLoading: boolean;
   ctaLabel?: string;
   skipLabel?: string;
+  submitButtonTestID?: string;
 };
 
 const EditableFormButtonContainer = ({
@@ -17,6 +18,7 @@ const EditableFormButtonContainer = ({
   isLoading,
   ctaLabel,
   skipLabel,
+  submitButtonTestID,
 }: EditableFormButtonContainerProps) => {
   const { t } = useTranslation('pages');
 
@@ -32,7 +34,12 @@ const EditableFormButtonContainer = ({
         >
           {t('cta.cancel')}
         </Button>
-        <Button size="small" type="submit" loading={isLoading}>
+        <Button
+          size="small"
+          type="submit"
+          loading={isLoading}
+          testID={submitButtonTestID}
+        >
           {t('cta.save')}
         </Button>
       </EndJustifiedButtons>
@@ -42,7 +49,12 @@ const EditableFormButtonContainer = ({
   if (onSkip && skipLabel) {
     return (
       <VerticalButtons>
-        <Button type="submit" fullWidth loading={isLoading}>
+        <Button
+          type="submit"
+          fullWidth
+          loading={isLoading}
+          testID={submitButtonTestID}
+        >
           {ctaLabel ?? t('cta.continue')}
         </Button>
         <LinkButton onClick={onSkip}>{skipLabel}</LinkButton>
@@ -51,7 +63,12 @@ const EditableFormButtonContainer = ({
   }
 
   return (
-    <Button type="submit" fullWidth loading={isLoading}>
+    <Button
+      type="submit"
+      fullWidth
+      loading={isLoading}
+      testID={submitButtonTestID}
+    >
       {ctaLabel ?? t('cta.continue')}
     </Button>
   );

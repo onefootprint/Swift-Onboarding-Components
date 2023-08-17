@@ -7,11 +7,15 @@ import {
 } from '../../utils/state-machine';
 
 type CollectKycDataMachineArgs = {
-  args: MachineContext;
+  initialContext: MachineContext;
+  initState?: string;
 };
 
-const useLocalCollectKycDataMachine = ({ args }: CollectKycDataMachineArgs) =>
-  useMachine(() => createCollectKycDataMachine(args));
+const useLocalCollectKycDataMachine = ({
+  initialContext,
+  initState,
+}: CollectKycDataMachineArgs) =>
+  useMachine(() => createCollectKycDataMachine(initialContext, initState));
 
 export const [MachineProvider, useCollectKycDataMachine] = constate(
   useLocalCollectKycDataMachine,

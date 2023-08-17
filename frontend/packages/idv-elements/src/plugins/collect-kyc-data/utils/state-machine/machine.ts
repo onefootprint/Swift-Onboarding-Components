@@ -12,7 +12,10 @@ import {
 } from '../missing-attributes';
 import { MachineContext, MachineEvents } from './types';
 
-const createCollectKycDataMachine = (initialContext: MachineContext) =>
+const createCollectKycDataMachine = (
+  initialContext: MachineContext,
+  initState?: string,
+) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -22,7 +25,7 @@ const createCollectKycDataMachine = (initialContext: MachineContext) =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'init',
+      initial: initState ?? 'init',
       context: { ...initialContext },
       states: {
         init: {

@@ -7,6 +7,7 @@ export type SectionAction = {
   label: string;
   onClick: () => void;
   isLoading?: boolean;
+  actionTestID?: string;
 };
 
 export type SectionProps = {
@@ -37,11 +38,16 @@ const Section = ({
         </TitleContainer>
         {hasActions && (
           <ActionsContainer>
-            {actions?.map(({ label, onClick, isLoading }) =>
+            {actions?.map(({ label, onClick, isLoading, actionTestID }) =>
               isLoading ? (
                 <LoadingIndicator key={label} />
               ) : (
-                <LinkButton key={label} onClick={onClick} disabled={isLoading}>
+                <LinkButton
+                  key={label}
+                  onClick={onClick}
+                  disabled={isLoading}
+                  testID={actionTestID}
+                >
                   {label}
                 </LinkButton>
               ),

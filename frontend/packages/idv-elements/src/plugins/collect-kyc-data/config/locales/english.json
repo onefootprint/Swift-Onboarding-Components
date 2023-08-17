@@ -141,6 +141,7 @@
         "subtitle": "Please make sure that your personal data is accurate and there are no typos before continuing.",
         "edit": "Edit",
         "reveal": "Reveal",
+        "hide": "Hide",
         "cta": "Confirm & Continue"
       },
       "email": {

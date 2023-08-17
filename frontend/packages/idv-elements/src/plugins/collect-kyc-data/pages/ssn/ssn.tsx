@@ -10,7 +10,7 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import getSsnKind from '../../utils/ssn-utils';
+import { getSsnKind } from '../../utils/ssn-utils';
 import SSN4 from './components/ssn4';
 import SSN9 from './components/ssn9';
 import useConvertFormData from './hooks/use-convert-form-data';
@@ -111,6 +111,7 @@ const SSN = ({
             onSkip={isOptional ? handleSkip : undefined}
             ctaLabel={ctaLabel}
             skipLabel={t('skip.cta')}
+            submitButtonTestID="ssn-save-edit-button"
           />
         </Form>
       </FormProvider>

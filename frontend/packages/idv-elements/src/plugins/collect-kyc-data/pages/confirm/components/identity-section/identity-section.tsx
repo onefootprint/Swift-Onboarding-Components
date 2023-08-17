@@ -1,7 +1,7 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { DecryptUserResponse, IdDI } from '@onefootprint/types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   type SectionItemProps,
@@ -11,10 +11,20 @@ import {
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useDecryptUser from '../../../../hooks/use-decrypt-user';
-import { getDisplayValue, KycData } from '../../../../utils/data-types';
-import getSsnKind from '../../../../utils/ssn-utils';
+import { KycData } from '../../../../utils/data-types';
+import {
+  getSsnKind,
+  getSsnValue,
+  ssnFormatter,
+} from '../../../../utils/ssn-utils';
 import Ssn from '../../../ssn';
 import useStepUp from './hooks/use-step-up';
+
+export enum SsnValue {
+  skipped,
+  hidden,
+  revealed,
+}
 
 const IdentitySection = () => {
   const { t, allT } = useTranslation('pages.confirm');
@@ -24,40 +34,41 @@ const IdentitySection = () => {
   const showRequestErrorToast = useRequestErrorToast();
   const decryptUserMutation = useDecryptUser();
   const ssnKind = getSsnKind(requirement);
+  const ssn = getSsnValue(data, ssnKind);
+
+  const getSsnValueType = () => {
+    if (ssn?.value) {
+      return SsnValue.hidden;
+    }
+    return ssn?.scrubbed ? SsnValue.hidden : SsnValue.skipped;
+  };
+  const [ssnValueType, setSsnValueType] = useState(getSsnValueType());
+
+  useEffect(() => {
+    if (ssn?.decrypted) {
+      // If newly decrypted, want to reveal immediately
+      setSsnValueType(SsnValue.revealed);
+    } else {
+      setSsnValueType(getSsnValueType());
+    }
+  }, [ssn]);
 
   const identity: SectionItemProps[] = [];
-  const ssn4 = data[IdDI.ssn4];
-  const ssn4DisplayVal = getDisplayValue(ssn4);
-
-  const ssn9 = data[IdDI.ssn9];
-  const ssn9DisplayVal = getDisplayValue(ssn9);
-
-  const isSsnEncrypted = ssn4?.scrubbed || ssn9?.scrubbed;
-
-  if (ssnKind === 'ssn9') {
-    if (ssn9DisplayVal) {
-      identity.push({
-        text: t('identity.ssn9'),
-        subtext: ssn9DisplayVal,
-      });
+  if (ssnKind) {
+    let ssnDisplayVal: string | undefined;
+    if (ssnValueType === SsnValue.skipped) {
+      ssnDisplayVal = t('identity.ssn-skipped-subtext');
     } else {
-      identity.push({
-        text: t('identity.ssn9'),
-        subtext: t('identity.ssn-skipped-subtext'),
-      });
+      ssnDisplayVal = ssnFormatter(
+        ssnKind,
+        ssn?.value,
+        ssnValueType === SsnValue.hidden,
+      );
     }
-  } else if (ssnKind === 'ssn4') {
-    if (ssn4DisplayVal) {
-      identity.push({
-        text: t('identity.ssn4'),
-        subtext: ssn4DisplayVal,
-      });
-    } else {
-      identity.push({
-        text: t('identity.ssn4'),
-        subtext: t('identity.ssn-skipped-subtext'),
-      });
-    }
+    identity.push({
+      text: ssnKind === 'ssn9' ? t('identity.ssn9') : t('identity.ssn4'),
+      subtext: ssnDisplayVal,
+    });
   }
 
   const stopEditing = () => {
@@ -76,7 +87,6 @@ const IdentitySection = () => {
           />
         ),
       );
-
       return identityItems;
     }
     return (
@@ -113,7 +123,7 @@ const IdentitySection = () => {
     });
 
     // If the user has already decrypted their SSN, we don't need to do it again
-    if (!isSsnEncrypted) {
+    if (!ssn?.scrubbed) {
       return;
     }
 
@@ -141,21 +151,44 @@ const IdentitySection = () => {
     onError: showRequestErrorToast,
   });
 
+  const shouldTriggerStepUp = ssn?.scrubbed && needsStepUp && canStepUp;
+  const handleReveal = () => {
+    if (ssn?.value) {
+      setSsnValueType(SsnValue.revealed);
+    } else if (shouldTriggerStepUp) {
+      stepUp();
+    } else {
+      console.error(
+        'Attempted to reveal SSN on confirm page when step up is not available',
+      );
+    }
+  };
+
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
       label: allT('pages.confirm.summary.edit'),
       onClick: () => setEditing(true),
+      actionTestID: 'identity-edit-button',
     });
-  }
 
-  const shouldShowReveal = isSsnEncrypted && needsStepUp && canStepUp;
-  if (isStepUpLoading || shouldShowReveal) {
-    actions.unshift({
-      label: allT('pages.confirm.summary.reveal'),
-      onClick: stepUp,
-      isLoading: isStepUpLoading,
-    });
+    const canReveal = ssn?.value || isStepUpLoading || shouldTriggerStepUp;
+    if (canReveal) {
+      if (ssnValueType === SsnValue.revealed) {
+        actions.unshift({
+          label: allT('pages.confirm.summary.hide'),
+          onClick: () => setSsnValueType(SsnValue.hidden),
+          actionTestID: 'identity-hide-button',
+        });
+      } else {
+        actions.unshift({
+          label: allT('pages.confirm.summary.reveal'),
+          onClick: handleReveal,
+          isLoading: isStepUpLoading,
+          actionTestID: 'identity-reveal-button',
+        });
+      }
+    }
   }
 
   return identity.length ? (

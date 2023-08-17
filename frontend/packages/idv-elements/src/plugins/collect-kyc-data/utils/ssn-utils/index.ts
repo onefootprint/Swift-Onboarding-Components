@@ -1,1 +1,1 @@
-export { default } from './ssn-utils';
+export * from './ssn-utils';

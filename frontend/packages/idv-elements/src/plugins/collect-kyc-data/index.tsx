@@ -32,7 +32,7 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
   };
 
   return (
-    <MachineProvider args={initContext}>
+    <MachineProvider initialContext={initContext}>
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
           <Router onDone={onDone} />
