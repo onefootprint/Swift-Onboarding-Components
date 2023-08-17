@@ -48,16 +48,6 @@ table! {
 table! {
     use diesel::sql_types::*;
 
-    backup_onboardings_08_15 (id) {
-        id -> Text,
-        scoped_vault_id -> Nullable<Text>,
-        workflow_id -> Nullable<Text>,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-
     business_owner (id) {
         id -> Text,
         user_vault_id -> Nullable<Text>,
@@ -389,18 +379,6 @@ table! {
         appearance_id -> Nullable<Text>,
         cip_kind -> Nullable<Text>,
         optional_data -> Array<Text>,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-
-    onboarding (id) {
-        id -> Text,
-        scoped_vault_id -> Text,
-        start_timestamp -> Timestamptz,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
     }
 }
 
@@ -961,7 +939,6 @@ joinable!(middesk_request -> decision_intent (decision_intent_id));
 joinable!(middesk_request -> workflow (workflow_id));
 joinable!(ob_configuration -> appearance (appearance_id));
 joinable!(ob_configuration -> tenant (tenant_id));
-joinable!(onboarding -> scoped_vault (scoped_vault_id));
 joinable!(onboarding_decision -> workflow (workflow_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
@@ -1014,7 +991,6 @@ allow_tables_to_appear_in_same_query!(
     access_event,
     annotation,
     appearance,
-    backup_onboardings_08_15,
     business_owner,
     contact_info,
     custom_migration,
@@ -1034,7 +1010,6 @@ allow_tables_to_appear_in_same_query!(
     manual_review,
     middesk_request,
     ob_configuration,
-    onboarding,
     onboarding_decision,
     onboarding_decision_verification_result_junction,
     proxy_config,
