@@ -35,8 +35,8 @@ const Stats = () => {
           title={'Portable IDs'}
           query={`
           SELECT count(distinct scoped_vault.id) FROM onboarding_decision
-          INNER JOIN onboarding on onboarding_decision.onboarding_id = onboarding.id
-          INNER JOIN scoped_vault on scoped_vault.id = onboarding.scoped_vault_id
+          INNER JOIN workflow on onboarding_decision.workflow_id = workflow.id
+          INNER JOIN scoped_vault on scoped_vault.id = workflow.scoped_vault_id
           INNER JOIN vault on vault.id = scoped_vault.vault_id
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
           WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND onboarding_decision.status = 'pass' AND vault.is_portable = 't';
@@ -46,8 +46,8 @@ const Stats = () => {
           title={'KYCed users'}
           query={`
           SELECT count(distinct scoped_vault.id) FROM onboarding_decision
-          INNER JOIN onboarding on onboarding_decision.onboarding_id = onboarding.id
-          INNER JOIN scoped_vault on scoped_vault.id = onboarding.scoped_vault_id
+          INNER JOIN workflow on onboarding_decision.workflow_id = workflow.id
+          INNER JOIN scoped_vault on scoped_vault.id = workflow.scoped_vault_id
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
           WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND onboarding_decision.status = 'pass';
           `}

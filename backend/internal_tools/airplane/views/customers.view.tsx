@@ -70,12 +70,12 @@ const OrgList = ({ onlyCorporate }: { onlyCorporate: boolean }) => {
             tenant._created_at,
             MAX(sv.start_timestamp) as last_user_created_at,
             COUNT(sv.id) FILTER (WHERE sv.is_live = 't') AS live_total,
-            COUNT(sv.id) FILTER (WHERE sv.is_live = 't' and ob.authorized_at IS NOT NULL) AS live_with_kyc,
+            COUNT(sv.id) FILTER (WHERE sv.is_live = 't' and wf.authorized_at IS NOT NULL) AS live_with_kyc,
             COUNT(sv.id) FILTER (WHERE sv.is_live = 'f') AS sandbox_total,
-            COUNT(sv.id) FILTER (WHERE sv.is_live = 't' and ob.authorized_at IS NOT NULL) AS sandbox_with_kyc
+            COUNT(sv.id) FILTER (WHERE sv.is_live = 'f' and wf.authorized_at IS NOT NULL) AS sandbox_with_kyc
           FROM tenant
             LEFT JOIN scoped_vault as sv ON sv.tenant_id=tenant.id
-            LEFT JOIN onboarding as ob ON ob.scoped_vault_id=sv.id
+            LEFT JOIN workflow as wf ON wf.scoped_vault_id = sv.id AND wf.kind in ('kyc', 'alpaca_kyc')
           WHERE tenant.id NOT LIKE '_private_it%'
           ${extraFilters}
           GROUP BY tenant.id

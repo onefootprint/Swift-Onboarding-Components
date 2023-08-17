@@ -24,17 +24,23 @@ export default airplane.task(
     const dbUrl = process.env.DATABASE_URL;
 
     let query = `
+      with max_decision_made_at_per_sv_id as (
+        select workflow.scoped_vault_id, max(workflow.decision_made_at) as max_decision_made_at
+        from workflow
+        where kind in ('kyc', 'alpaca_kyc')
+        group by 1
+      )
       select 
         sv.tenant_id,
         sv.id sv_id,
-        ob.decision_made_at onboarding_decision_made_at,
+        wf.max_decision_made_at wf_max_decision_made_at,
         wc.completed_at latest_watchlist_check_completed_at
       from 
         scoped_vault sv
         inner join vault v
           on sv.vault_id = v.id
-        left join onboarding ob
-          on ob.scoped_vault_id = sv.id
+        left join max_decision_made_at_per_sv_id wf
+          on wf.scoped_vault_id = sv.id
         left join watchlist_check wc
           on wc.scoped_vault_id = sv.id and wc.deactivated_at is null and wc.completed_at is not null
       where
@@ -42,7 +48,7 @@ export default airplane.task(
         and v.kind = 'person'
         and sv.tenant_id in ('org_PtnIJT4VR35BS9xy0wITgF')
         and (wc.completed_at is null or wc.completed_at < now() - interval '31 day')
-        and (ob.decision_made_at is not null and ob.decision_made_at < now() - interval '31 day');
+        and (wf.max_decision_made_at is not null and wf.max_decision_made_at < now() - interval '31 day');
     `;
 
     const rows = await pg_query(dbUrl, query);

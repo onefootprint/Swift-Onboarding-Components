@@ -32,17 +32,9 @@ export default airplane.task(
     console.log('got prefix: ', prefix);
 
     switch (prefix) {
-      case 'ob':
-        query = `
-        SELECT * from onboarding
-        INNER JOIN scoped_vault on scoped_vault.id=onboarding.scoped_vault_id
-        INNER JOIN tenant on tenant.id=scoped_vault.tenant_id
-        WHERE onboarding.id='${id}';`;
-        break;
       case 'su':
         query = `
         SELECT * from scoped_vault
-        INNER JOIN onboarding on onboarding.scoped_vault_id=scoped_vault.id
         INNER JOIN tenant on tenant.id=scoped_vault.tenant_id
         WHERE scoped_vault.id='${id}';`;
         break;
@@ -57,7 +49,6 @@ export default airplane.task(
       case 'fp_id':
         query = `
         SELECT * from scoped_vault
-        INNER JOIN onboarding on onboarding.scoped_vault_id=scoped_vault.id
         INNER JOIN tenant on tenant.id=scoped_vault.tenant_id
         WHERE scoped_vault.fp_id='${id}';`;
         break;
