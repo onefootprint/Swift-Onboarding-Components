@@ -10,6 +10,6 @@ export type BeneficialOwner = {
   [BeneficialOwnerDataAttribute.firstName]: string;
   [BeneficialOwnerDataAttribute.lastName]: string;
   [BeneficialOwnerDataAttribute.ownershipStake]: number;
-  [BeneficialOwnerDataAttribute.email]: string;
-  [BeneficialOwnerDataAttribute.phoneNumber]: string;
+  [BeneficialOwnerDataAttribute.email]?: string;
+  [BeneficialOwnerDataAttribute.phoneNumber]?: string;
 };

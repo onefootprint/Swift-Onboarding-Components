@@ -106,6 +106,12 @@ const Form = ({
       )
       .map(bo => ({
         ...bo,
+        // Send undefined instead of empty string for unknown phone/email. The primary BO is allowed
+        // to have no phone / email
+        [BeneficialOwnerDataAttribute.phoneNumber]:
+          bo[BeneficialOwnerDataAttribute.phoneNumber] || undefined,
+        [BeneficialOwnerDataAttribute.email]:
+          bo[BeneficialOwnerDataAttribute.email] || undefined,
         // Parse ownership stake from string to number
         [BeneficialOwnerDataAttribute.ownershipStake]: Number(
           bo[BeneficialOwnerDataAttribute.ownershipStake],
