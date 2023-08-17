@@ -21,7 +21,7 @@ env:
 
 jobs:
   svix_event_sync:
-    runs-on: 32core
+    runs-on: 16core
     # by default deploy to production as triggered
     environment: ${{ inputs.environment || 'production' }}
     steps:
