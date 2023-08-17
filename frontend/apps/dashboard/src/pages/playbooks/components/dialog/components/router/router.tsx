@@ -41,13 +41,15 @@ const Router = ({ onClose }: RouterProps) => {
         {state.matches('whoToOnboard') && (
           <WhoToOnboard
             onBack={onClose}
-            defaultKind={state.context?.kind ?? Kind.KYC}
+            defaultKind={state.context.kind}
             onSubmit={({ kind }) => {
               send('whoToOnboardSubmitted', { payload: { kind } });
             }}
           />
         )}
-        {state.matches('yourPlaybook') && <YourPlaybook />}
+        {state.matches('yourPlaybook') && (
+          <YourPlaybook kind={state.context.kind ?? Kind.KYC} />
+        )}
       </Content>
     </Container>
   );

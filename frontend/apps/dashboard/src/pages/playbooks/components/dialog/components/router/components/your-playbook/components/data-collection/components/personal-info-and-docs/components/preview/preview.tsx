@@ -1,19 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoPencil16 } from '@onefootprint/icons';
+import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { PersonalInformationAndDocs } from '../../../../../../your-playbook.types';
+import {
+  Kind,
+  PersonalInformationAndDocs,
+} from '../../../../../../your-playbook.types';
 import DisplayValue from './components/display-value';
 import useFormValues from './hooks/use-form-values';
 
 type PreviewProps = {
   startEditing: () => void;
+  kind: Kind;
 };
 
-const Preview = ({ startEditing }: PreviewProps) => {
+const Preview = ({ startEditing, kind }: PreviewProps) => {
   const { formValues } = useFormValues();
   const { getValues } = useFormContext();
   const { t } = useTranslation(
@@ -26,7 +30,20 @@ const Preview = ({ startEditing }: PreviewProps) => {
   return (
     <Container>
       <Header>
-        <Typography variant="label-3">{t('title')}</Typography>
+        {kind === Kind.KYB ? (
+          <TitleContainer>
+            <Typography variant="label-3">{t('title.kyb.main')}</Typography>
+            <Tooltip
+              position="right"
+              alignment="center"
+              text={t('title.kyb.tooltip')}
+            >
+              <IcoInfo16 testID="info-tooltip" />
+            </Tooltip>
+          </TitleContainer>
+        ) : (
+          <Typography variant="label-3">{t('title.kyc')}</Typography>
+        )}
         <LinkButton
           onClick={startEditing}
           iconComponent={IcoPencil16}
@@ -72,6 +89,15 @@ const CollectedInformation = styled.div`
     width: 100%;
     justify-content: space-between;
     gap: ${theme.spacing[10]};
+  `}
+`;
+
+const TitleContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: ${theme.spacing[2]};
   `}
 `;
 

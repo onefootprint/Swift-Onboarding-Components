@@ -1,15 +1,23 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { defaultValues, FormData } from '../../../../../../your-playbook.types';
+import {
+  defaultValues,
+  FormData,
+  Kind,
+} from '../../../../../../your-playbook.types';
 import Editing from './editing';
 
-const EditingWithContext = () => {
+export type EditingWithContextProps = {
+  kind?: Kind;
+};
+
+const EditingWithContext = ({ kind }: EditingWithContextProps) => {
   const formMethods = useForm<FormData>({ defaultValues });
   return (
     <FormProvider {...formMethods}>
       <form>
-        <Editing stopEditing={() => {}} />
+        <Editing stopEditing={() => {}} kind={kind ?? Kind.KYC} />
       </form>
     </FormProvider>
   );

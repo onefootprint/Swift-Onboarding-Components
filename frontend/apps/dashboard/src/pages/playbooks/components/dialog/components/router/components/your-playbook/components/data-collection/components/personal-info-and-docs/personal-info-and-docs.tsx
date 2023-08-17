@@ -1,10 +1,15 @@
 import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
 
+import { Kind } from '../../../../../../utils/machine/types';
 import Editing from './components/editing';
 import Preview from './components/preview';
 
-const PersonalInfoAndDocs = () => {
+type PersonalInfoAndDocsProps = {
+  kind: Kind;
+};
+
+const PersonalInfoAndDocs = ({ kind }: PersonalInfoAndDocsProps) => {
   const [editing, setEditing] = useState(false);
 
   const stopEditing = () => setEditing(false);
@@ -13,9 +18,9 @@ const PersonalInfoAndDocs = () => {
   return (
     <Container>
       {editing ? (
-        <Editing stopEditing={stopEditing} />
+        <Editing stopEditing={stopEditing} kind={kind} />
       ) : (
-        <Preview startEditing={startEditing} />
+        <Preview startEditing={startEditing} kind={kind} />
       )}
     </Container>
   );

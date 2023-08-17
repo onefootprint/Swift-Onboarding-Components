@@ -37,6 +37,7 @@ const WhoToOnboard = ({ onBack, onSubmit, defaultKind }: WhoToOnboardProps) => {
         <Controller
           control={control}
           name="kind"
+          defaultValue={Kind.KYC}
           render={({ field }) => (
             <RadioSelect
               options={[

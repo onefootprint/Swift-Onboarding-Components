@@ -1,15 +1,18 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import EditingWithContext from './editing.test.config';
+import { Kind } from '../../../../../../your-playbook.types';
+import EditingWithContext, {
+  EditingWithContextProps,
+} from './editing.test.config';
 
-const renderEditing = () => {
-  customRender(<EditingWithContext />);
+const renderEditing = ({ kind }: EditingWithContextProps) => {
+  customRender(<EditingWithContext kind={kind} />);
 };
 
 describe('<Editing />', () => {
   it('should show SSN options when toggling', async () => {
-    renderEditing();
+    renderEditing({});
     const ssnToggle = screen.getByRole('switch', {
       name: 'Request users to provide their SSN',
     });
@@ -29,7 +32,7 @@ describe('<Editing />', () => {
   });
 
   it('should show ID doc options when toggling', async () => {
-    renderEditing();
+    renderEditing({});
     const ssnToggle = screen.getByRole('switch', {
       name: 'Request users to scan an ID document',
     });
@@ -48,6 +51,20 @@ describe('<Editing />', () => {
       screen.getByRole('checkbox', {
         name: 'Passport (photo page)',
       }),
+    ).toBeInTheDocument();
+  });
+
+  it('should show correct title for KYC', async () => {
+    renderEditing({ kind: Kind.KYC });
+    expect(
+      screen.getByText('Edit personal information & docs'),
+    ).toBeInTheDocument();
+  });
+
+  it('should show correct title for KYB', async () => {
+    renderEditing({ kind: Kind.KYB });
+    expect(
+      screen.getByText('Edit KYC of a beneficial owner'),
     ).toBeInTheDocument();
   });
 });

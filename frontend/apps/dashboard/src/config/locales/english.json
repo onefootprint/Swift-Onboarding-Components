@@ -1096,8 +1096,17 @@
               "placeholder": "Name your playbook"
             },
             "personal-info-and-docs": {
-              "title": "Personal information & docs",
-              "editing": "Edit personal information & docs",
+              "title": {
+                "kyb": {
+                  "main": "KYC of a beneficial owner",
+                  "tooltip": "To successfully verify a business we also need to verify its beneficial owner's identity."
+                },
+                "kyc": "Personal information & docs"
+              },
+              "editing": {
+                "kyc": "Edit personal information & docs",
+                "kyb": "Edit KYC of a beneficial owner"
+              },
               "ssn": {
                 "title": "SSN",
                 "toggle": "Request users to provide their SSN",

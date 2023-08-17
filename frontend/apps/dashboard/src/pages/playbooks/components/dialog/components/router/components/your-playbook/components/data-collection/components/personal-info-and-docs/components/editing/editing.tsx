@@ -15,13 +15,17 @@ import {
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { type PersonalInformationAndDocs } from '../../../../../../your-playbook.types';
+import {
+  type PersonalInformationAndDocs,
+  Kind,
+} from '../../../../../../your-playbook.types';
 
 type EditingProps = {
   stopEditing: () => void;
+  kind: Kind;
 };
 
-const Editing = ({ stopEditing }: EditingProps) => {
+const Editing = ({ stopEditing, kind }: EditingProps) => {
   const { control, register, watch, setValue, getValues } = useFormContext();
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.form.personal-info-and-docs',
@@ -42,7 +46,11 @@ const Editing = ({ stopEditing }: EditingProps) => {
   return (
     <EditingContainer>
       <Section>
-        <Typography variant="label-3">{t('editing')}</Typography>
+        {kind === Kind.KYB ? (
+          <Typography variant="label-3">{t('editing.kyb')}</Typography>
+        ) : (
+          <Typography variant="label-3">{t('editing.kyc')}</Typography>
+        )}
         <Typography variant="label-3">{t('ssn.title')}</Typography>
         <Controller
           control={control}

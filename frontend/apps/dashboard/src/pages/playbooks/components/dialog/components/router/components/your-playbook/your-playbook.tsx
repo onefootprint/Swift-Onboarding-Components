@@ -4,10 +4,15 @@ import { TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { Kind } from '../../utils/machine/types';
 import DataCollection from './components/data-collection';
 import { defaultValues, FormData } from './your-playbook.types';
 
-const YourPlaybook = () => {
+type YourPlaybookProps = {
+  kind: Kind;
+};
+
+const YourPlaybook = ({ kind }: YourPlaybookProps) => {
   const { t } = useTranslation('pages.playbooks.dialog.your-playbook');
   const formMethods = useForm<FormData>({ defaultValues });
   const { handleSubmit, register } = formMethods;
@@ -39,7 +44,7 @@ const YourPlaybook = () => {
             label={t('form.name.label')}
             placeholder={t('form.name.placeholder')}
           />
-          <DataCollection />
+          <DataCollection kind={kind} />
         </Form>
       </FormProvider>
     </Container>

@@ -5,14 +5,19 @@ import {
   type PersonalInformationAndDocs,
   defaultValues,
   FormData,
+  Kind,
 } from '../../../../../../your-playbook.types';
 import Preview from './preview';
 
-type FormProps = {
-  startingValues: Partial<PersonalInformationAndDocs>;
+export type PreviewWithContextProps = {
+  startingValues?: Partial<PersonalInformationAndDocs>;
+  kind?: Kind;
 };
 
-const PreviewWithContext = ({ startingValues }: FormProps) => {
+const PreviewWithContext = ({
+  startingValues,
+  kind,
+}: PreviewWithContextProps) => {
   const formMethods = useForm<FormData>({
     defaultValues: {
       ...defaultValues,
@@ -25,7 +30,7 @@ const PreviewWithContext = ({ startingValues }: FormProps) => {
   return (
     <FormProvider {...formMethods}>
       <form>
-        <Preview startEditing={() => {}} />
+        <Preview startEditing={() => {}} kind={kind ?? Kind.KYC} />
       </form>
     </FormProvider>
   );

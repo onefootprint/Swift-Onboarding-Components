@@ -3,6 +3,8 @@ import {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 
+export { Kind } from '../../utils/machine/types';
+
 export type FormData = {
   name: string;
   personalInformationAndDocs: PersonalInformationAndDocs;
