@@ -245,10 +245,15 @@ fn get_requirement_inner(
         OnboardingRequirementKind::Liveness => {
             // TODO: force liveness checks to be re-done and not shared across tenants
             // RELATED: FP-1802 and FP-1800
-            let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.vault.id)?;
-            liveness_events
-                .is_empty()
-                .then_some(OnboardingRequirement::Liveness)
+
+            if ob_config.is_no_phone_flow {
+                None
+            } else {
+                let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.vault.id)?;
+                liveness_events
+                    .is_empty()
+                    .then_some(OnboardingRequirement::Liveness)
+            }
         }
         OnboardingRequirementKind::CollectDocument => {
             let dr = DocumentRequest::get(conn, &args.workflow.id)?;

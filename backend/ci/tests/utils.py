@@ -361,13 +361,22 @@ def create_tenant(org_data, ob_conf_data):
     return tenant
 
 
-def create_ob_config(tenant, name, must_collect_data, can_access_data, cip_kind=None, optional_data=None):
+def create_ob_config(
+    tenant,
+    name,
+    must_collect_data,
+    can_access_data,
+    cip_kind=None,
+    optional_data=None,
+    is_no_phone_flow=False,
+):
     ob_conf_data = {
         "name": name,
         "must_collect_data": must_collect_data,
         "optional_data": optional_data,
         "can_access_data": can_access_data,
         "cip_kind": cip_kind,
+        "is_no_phone_flow": is_no_phone_flow,
     }
     # TODO also make this get or create?
     body = post("org/onboarding_configs", ob_conf_data, *tenant.db_auths)
