@@ -6,16 +6,20 @@ use idv::idology::{
 };
 use itertools::Itertools;
 use newtypes::{
-    idology_match_codes, FootprintReasonCode, IDologyReasonCode, VendorAPI, VerificationResultId,
+    idology_match_codes, FootprintReasonCode, IDologyReasonCode, IdentityDataKind, VendorAPI,
+    VerificationResultId,
 };
 use strum::IntoEnumIterator;
 
-use crate::decision::{
-    onboarding::FeatureSet,
-    vendor::vendor_api::{
-        vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
-        vendor_api_struct::{IdologyExpectID, WrappedVendorAPI},
+use crate::{
+    decision::{
+        onboarding::FeatureSet,
+        vendor::vendor_api::{
+            vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
+            vendor_api_struct::{IdologyExpectID, WrappedVendorAPI},
+        },
     },
+    utils::vault_wrapper::VaultWrapper,
 };
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
@@ -35,8 +39,15 @@ impl FeatureSet for IDologyFeatures {
 }
 
 impl IDologyFeatures {
-    pub fn from(resp: ExpectIDResponse, verification_result_id: VerificationResultId) -> Self {
-        let footprint_reason_codes: Vec<FootprintReasonCode> = Self::footprint_reason_codes(resp);
+    pub fn from(
+        resp: ExpectIDResponse,
+        verification_result_id: VerificationResultId,
+        vw: VaultWrapper,
+    ) -> Self {
+        let dob_submitted = vw.has_field(IdentityDataKind::AddressLine1);
+        let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
+        let footprint_reason_codes: Vec<FootprintReasonCode> =
+            Self::footprint_reason_codes(resp, dob_submitted, ssn_submitted);
 
         Self {
             footprint_reason_codes,
@@ -44,7 +55,11 @@ impl IDologyFeatures {
         }
     }
 
-    pub fn footprint_reason_codes(resp: ExpectIDResponse) -> Vec<FootprintReasonCode> {
+    pub fn footprint_reason_codes(
+        resp: ExpectIDResponse,
+        dob_submitted: bool,
+        ssn_submitted: bool,
+    ) -> Vec<FootprintReasonCode> {
         //
         // first we compute all reason codes directly from the response
         //
@@ -84,13 +99,15 @@ impl IDologyFeatures {
         {
             return reason_codes;
         };
-        reason_codes = Self::add_top_level_match_reason_codes(reason_codes);
+        reason_codes = Self::add_top_level_match_reason_codes(reason_codes, dob_submitted, ssn_submitted);
 
         reason_codes
     }
 
     fn add_top_level_match_reason_codes(
         mut footprint_reason_codes: Vec<FootprintReasonCode>,
+        dob_submitted: bool,
+        ssn_submitted: bool,
     ) -> Vec<FootprintReasonCode> {
         // construct helpers
         let address_does_not_match = idology_match_codes::ADDRESS_DOES_NOT_MATCH_CODES
@@ -128,6 +145,7 @@ impl IDologyFeatures {
         } else if address_partially_matches {
             footprint_reason_codes.push(FootprintReasonCode::AddressPartiallyMatches);
         } else {
+            // address is always sent to Idology
             footprint_reason_codes.push(FootprintReasonCode::AddressMatches);
         };
 
@@ -135,7 +153,7 @@ impl IDologyFeatures {
             footprint_reason_codes.push(FootprintReasonCode::DobDoesNotMatch);
         } else if dob_partially_matches {
             footprint_reason_codes.push(FootprintReasonCode::DobPartialMatch);
-        } else {
+        } else if dob_submitted {
             footprint_reason_codes.push(FootprintReasonCode::DobMatches);
         };
 
@@ -143,7 +161,7 @@ impl IDologyFeatures {
             footprint_reason_codes.push(FootprintReasonCode::SsnDoesNotMatch);
         } else if ssn_partially_matches {
             footprint_reason_codes.push(FootprintReasonCode::SsnPartiallyMatches);
-        } else {
+        } else if ssn_submitted {
             footprint_reason_codes.push(FootprintReasonCode::SsnMatches);
         };
 
@@ -152,6 +170,7 @@ impl IDologyFeatures {
         } else if name_partially_matches {
             footprint_reason_codes.push(FootprintReasonCode::NamePartiallyMatches);
         } else {
+            // name is always sent to Idology
             footprint_reason_codes.push(FootprintReasonCode::NameMatches);
         };
 
@@ -204,12 +223,21 @@ impl IDologyFeatures {
     }
 }
 
-impl TryFrom<(&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap)> for IDologyFeatures {
+impl
+    TryFrom<(
+        (&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap),
+        VaultWrapper,
+    )> for IDologyFeatures
+{
     type Error = crate::decision::Error;
 
     fn try_from(
-        maps: (&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap),
+        value: (
+            (&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap),
+            VaultWrapper,
+        ),
     ) -> Result<Self, Self::Error> {
+        let (maps, vw) = value;
         let (response_map, ids_map) = maps;
         let v = IdologyExpectID;
         let f = response_map
@@ -226,6 +254,7 @@ impl TryFrom<(&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap)> for IDol
         Ok(IDologyFeatures::from(
             f.clone(),
             ids.verification_result_id.clone(),
+            vw,
         ))
     }
 }
@@ -287,7 +316,22 @@ mod test {
     ) -> Vec<FootprintReasonCode> {
         let resp = test_idology_response(result_key, include_watchlist, qualifier);
 
-        IDologyFeatures::footprint_reason_codes(resp)
+        IDologyFeatures::footprint_reason_codes(resp, true, true)
+    }
+
+    #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), true, true => vec![AddressMatches, DobMatches, SsnMatches, NameMatches])]
+    #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), true, false => vec![AddressMatches, DobMatches, NameMatches])]
+    #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), false, true => vec![AddressMatches, SsnMatches, NameMatches])]
+    #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), false, false => vec![AddressMatches, NameMatches])]
+    fn test_dob_ssn_filtering(
+        result_key: &str,
+        qualifier: serde_json::Value,
+        dob_submitted: bool,
+        ssn_submitted: bool,
+    ) -> Vec<FootprintReasonCode> {
+        let resp = test_idology_response(result_key, false, qualifier);
+
+        IDologyFeatures::footprint_reason_codes(resp, dob_submitted, ssn_submitted)
     }
 
     fn test_idology_response(

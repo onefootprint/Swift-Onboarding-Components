@@ -199,6 +199,10 @@ pub fn create_user_and_populate_vault(
         (IdentityDataKind::State.into(), PiiString::new("GA".to_owned())),
         (IdentityDataKind::Zip.into(), PiiString::new("30303".to_owned())),
         (IdentityDataKind::Country.into(), PiiString::new("US".to_owned())),
+        (
+            IdentityDataKind::Ssn9.into(),
+            PiiString::new("123456789".to_owned()),
+        ),
     ];
 
     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id).unwrap();

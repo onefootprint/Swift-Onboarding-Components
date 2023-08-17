@@ -128,11 +128,11 @@ impl From<VendorResultsAndVault> for RiskSignalGroupStruct<Kyc> {
         let VendorResultsAndVault {
             response_map,
             ids_map,
-            vw: _,
+            vw,
             obc: _,
         } = results;
 
-        let idology_features = IDologyFeatures::try_from((&response_map, &ids_map))
+        let idology_features = IDologyFeatures::try_from(((&response_map, &ids_map), vw))
             .ok()
             .map(|f| {
                 let vres = f.verification_result_id.clone();
