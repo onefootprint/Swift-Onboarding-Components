@@ -18,11 +18,11 @@ type PreviewProps = {
 };
 
 const Preview = ({ startEditing, kind }: PreviewProps) => {
-  const { formValues } = useFormValues();
-  const { getValues } = useFormContext();
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.form.personal-info-and-docs',
   );
+  const { formValues } = useFormValues();
+  const { getValues } = useFormContext();
   const personalInfoAndDocs: PersonalInformationAndDocs = getValues(
     'personalInformationAndDocs',
   );

@@ -28,24 +28,24 @@ export type PersonalInformationAndDocs = {
 
 export type BusinessInformation = {
   [CollectedKybDataOption.name]: boolean;
+  doingBusinessAs: boolean;
   [CollectedKybDataOption.beneficialOwners]: boolean;
   [CollectedKybDataOption.address]: boolean;
   [CollectedKybDataOption.tin]: boolean;
   [CollectedKybDataOption.corporationType]: boolean;
   [CollectedKybDataOption.website]: boolean;
   [CollectedKybDataOption.phoneNumber]: boolean;
-  doingBusinessAs: boolean;
 };
 
 export const defaultBusinessInformation = {
   [CollectedKybDataOption.name]: true,
+  doingBusinessAs: true,
   [CollectedKybDataOption.beneficialOwners]: true,
   [CollectedKybDataOption.address]: true,
   [CollectedKybDataOption.tin]: true,
   [CollectedKybDataOption.corporationType]: false,
   [CollectedKybDataOption.website]: false,
   [CollectedKybDataOption.phoneNumber]: false,
-  doingBusinessAs: true,
 };
 
 export const defaultValuesKYC: FormData = {

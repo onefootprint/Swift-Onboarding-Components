@@ -1168,6 +1168,19 @@
                 },
                 "save": "Save",
                 "cancel": "Cancel"
+              },
+              "preview": {
+                "title": "Business information",
+                "edit": "Edit",
+                "remove": "Remove",
+                "business_corporation_type": "Legal entity type",
+                "business_website": "Website",
+                "business_phone_number": "Phone number",
+                "business_name": "Legal business name",
+                "doingBusinessAs": "Doing Business As (optional)",
+                "business_beneficial_owners": "Beneficial owners",
+                "business_address": "Registered business address",
+                "business_tin": "EIN"
               }
             }
           }

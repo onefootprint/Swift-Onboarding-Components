@@ -5,7 +5,7 @@ import Editing from './components/editing';
 import Preview from './components/preview';
 
 const BusinessInformation = () => {
-  const [editing, setEditing] = useState(true);
+  const [editing, setEditing] = useState(false);
 
   const stopEditing = () => setEditing(false);
   const startEditing = () => setEditing(true);
