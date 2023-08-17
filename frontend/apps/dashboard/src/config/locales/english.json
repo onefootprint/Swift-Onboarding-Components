@@ -1078,6 +1078,18 @@
             "title": "Name your playbook",
             "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones."
           },
+          "data-collection": {
+            "title": "Data collection",
+            "subtitle": "We recommend the following configuration:",
+            "investor-profile": {
+              "title": "Investor profile questions",
+              "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
+              "toggle": {
+                "add": "Add",
+                "remove": "Remove"
+              }
+            }
+          },
           "form": {
             "name": {
               "label": "Playbook name",

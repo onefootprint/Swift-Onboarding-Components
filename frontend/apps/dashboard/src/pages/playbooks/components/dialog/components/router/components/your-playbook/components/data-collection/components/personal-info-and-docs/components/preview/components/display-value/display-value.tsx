@@ -3,7 +3,7 @@ import { IcoCheck24, IcoClose24 } from '@onefootprint/icons';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import { PersonalInformationAndDocs } from '../../../../../../your-playbook.types';
+import { PersonalInformationAndDocs } from '../../../../../../../../your-playbook.types';
 
 type DisplayValueProps = {
   field: keyof PersonalInformationAndDocs;

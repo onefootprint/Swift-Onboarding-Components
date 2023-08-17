@@ -5,7 +5,7 @@ import {
   type PersonalInformationAndDocs,
   defaultValues,
   FormData,
-} from '../../../../your-playbook.types';
+} from '../../../../../../your-playbook.types';
 import Preview from './preview';
 
 type FormProps = {

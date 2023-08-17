@@ -5,7 +5,7 @@ import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { PersonalInformationAndDocs } from '../../../../your-playbook.types';
+import { PersonalInformationAndDocs } from '../../../../../../your-playbook.types';
 import DisplayValue from './components/display-value';
 import useFormValues from './hooks/use-form-values';
 

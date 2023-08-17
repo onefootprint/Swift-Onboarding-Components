@@ -8,7 +8,7 @@ import React from 'react';
 import {
   defaultValues,
   PersonalInformationAndDocs,
-} from '../../../../../../your-playbook.types';
+} from '../../../../../../../../your-playbook.types';
 import DisplayValue from './display-value';
 
 type DisplayValueProps = {

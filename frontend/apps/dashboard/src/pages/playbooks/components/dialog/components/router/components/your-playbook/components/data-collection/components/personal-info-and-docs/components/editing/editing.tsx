@@ -15,7 +15,7 @@ import {
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { type PersonalInformationAndDocs } from '../../../../your-playbook.types';
+import { type PersonalInformationAndDocs } from '../../../../../../your-playbook.types';
 
 type EditingProps = {
   stopEditing: () => void;

@@ -4,7 +4,7 @@ import { TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import PersonalInfoAndDocs from './components/personal-info-and-docs';
+import DataCollection from './components/data-collection';
 import { defaultValues, FormData } from './your-playbook.types';
 
 const YourPlaybook = () => {
@@ -39,7 +39,7 @@ const YourPlaybook = () => {
             label={t('form.name.label')}
             placeholder={t('form.name.placeholder')}
           />
-          <PersonalInfoAndDocs />
+          <DataCollection />
         </Form>
       </FormProvider>
     </Container>

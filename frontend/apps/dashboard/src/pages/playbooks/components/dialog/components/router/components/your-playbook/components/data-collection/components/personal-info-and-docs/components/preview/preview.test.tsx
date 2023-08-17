@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 
-import { PersonalInformationAndDocs } from '../../../../your-playbook.types';
+import { PersonalInformationAndDocs } from '../../../../../../your-playbook.types';
 import PreviewWithContext from './preview.test.config';
 
 const renderForm = (startingValues: Partial<PersonalInformationAndDocs>) => {

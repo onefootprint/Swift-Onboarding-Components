@@ -1,6 +1,6 @@
 import { useFormContext } from 'react-hook-form';
 
-import { PersonalInformationAndDocs } from '../../../../../../your-playbook.types';
+import { PersonalInformationAndDocs } from '../../../../../../../../your-playbook.types';
 
 const useFormValues = () => {
   const { getValues } = useFormContext();

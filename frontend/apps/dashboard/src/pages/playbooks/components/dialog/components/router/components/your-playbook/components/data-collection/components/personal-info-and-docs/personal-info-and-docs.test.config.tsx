@@ -5,7 +5,7 @@ import {
   defaultValues,
   FormData,
   PersonalInformationAndDocs,
-} from '../../your-playbook.types';
+} from '../../../../your-playbook.types';
 import PersonalInfoAndDocs from './personal-info-and-docs';
 
 export type PersonalInfoAndDocsWithContextProps = {
