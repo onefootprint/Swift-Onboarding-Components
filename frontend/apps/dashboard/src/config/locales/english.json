@@ -1073,7 +1073,45 @@
         },
         "your-playbook": {
           "title": "Your Playbook recommendation",
-          "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+          "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+          "name-your-playbook": {
+            "title": "Name your playbook",
+            "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones."
+          },
+          "form": {
+            "name": {
+              "label": "Playbook name",
+              "placeholder": "Name your playbook"
+            },
+            "personal-info-and-docs": {
+              "title": "Personal information & docs",
+              "editing": "Edit personal information & docs",
+              "ssn": {
+                "title": "SSN",
+                "toggle": "Request users to provide their SSN",
+                "full": "Full",
+                "last4": "Last 4 digits"
+              },
+              "ssn-optional": {
+                "checkbox": "Allow users without a Social Security Number to proceed with the verification",
+                "warning": "They will need to be manually reviewed by you."
+              },
+              "nationality": {
+                "title": "Nationality, Citizenship, and Residence status",
+                "toggle": "Request users to provide their nationality, citizenship and residence status"
+              },
+              "id-doc": {
+                "title": "ID document scan (U.S. residents)",
+                "toggle": "Request users to scan an ID document",
+                "drivers_license": "Driver's license",
+                "id_card": "Identity card",
+                "passport": "Passport (photo page)",
+                "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow."
+              },
+              "save": "Save",
+              "cancel": "Cancel"
+            }
+          }
         }
       }
     },

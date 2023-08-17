@@ -121,10 +121,10 @@
         }
       },
       "skip": {
-        "cta": "I don't have an SSN",
+        "cta": "I don't have a Social Security Number",
         "confirmation": {
           "title": "Are you sure?",
-          "description": "Not providing an SSN might make your verification take a few days.",
+          "description": "Not providing a Social Security Number might make your verification take a few days.",
           "yes": "Yes",
           "no": "No"
         }
@@ -162,7 +162,7 @@
         "title": "Identity",
         "ssn9": "SSN",
         "ssn4": "SSN (last 4)",
-        "ssn-skipped-subtext": "You don't have a SSN"
+        "ssn-skipped-subtext": "You don't have a Social Security Number"
       }
     }
   }
