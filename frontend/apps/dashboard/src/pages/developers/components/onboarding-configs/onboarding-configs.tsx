@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, Pagination } from '@onefootprint/ui';
 import Head from 'next/head';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import SectionHeader from 'src/components/section-header';
 import WaveAnimation from 'src/components/wave-animation';
 
@@ -12,6 +12,7 @@ import Table from './components/table';
 import useOnboardingConfigs from './hooks/use-onboarding-configs';
 
 const OnboardingConfigs = () => {
+  const [hasHadObConfig, setHasHadObConfig] = useState(false);
   const { t } = useTranslation('pages.developers.onboarding-configs');
   const {
     data: response,
@@ -19,6 +20,12 @@ const OnboardingConfigs = () => {
     isLoading,
     pagination,
   } = useOnboardingConfigs();
+
+  useEffect(() => {
+    if (response && response?.data?.length > 0) {
+      setHasHadObConfig(true);
+    }
+  }, [response]);
 
   return (
     <>
@@ -29,7 +36,7 @@ const OnboardingConfigs = () => {
         <SectionHeader title={t('title')} subtitle={t('subtitle')}>
           <Wrapper>
             <Create />
-            {response?.data?.length === 0 && (
+            {!hasHadObConfig && (
               <>
                 <Divider />
                 <WaveAnimation width={140} />

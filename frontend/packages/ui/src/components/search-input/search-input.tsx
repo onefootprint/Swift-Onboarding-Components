@@ -59,7 +59,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         placeholder={placeholder}
         prefixComponent={<SearchIcon />}
         sx={{
-          paddingX: 8,
+          paddingLeft: 8,
           ...sx,
         }}
         ref={ref}

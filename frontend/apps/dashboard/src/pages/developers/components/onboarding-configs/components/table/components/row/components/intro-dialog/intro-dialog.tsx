@@ -18,6 +18,7 @@ const IntroDialog = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const shouldShowIntroDialog =
     configs?.data.length === 1 && entities?.data?.length === 0;
+  const [shouldShowWaves, setShouldShowWaves] = useState(shouldShowIntroDialog);
 
   useTimeout(() => {
     if (shouldShowIntroDialog) {
@@ -26,12 +27,13 @@ const IntroDialog = () => {
   }, TIME_TO_SHOW_DIALOG);
 
   const onClose = () => {
+    setShouldShowWaves(false);
     setIsDialogOpen(false);
   };
 
   return (
     <>
-      {shouldShowIntroDialog && <WaveAnimation width={140} />}
+      {shouldShowWaves && <WaveAnimation width={140} />}
       <Dialog
         title={t('heading')}
         open={isDialogOpen}
@@ -41,11 +43,13 @@ const IntroDialog = () => {
           label: t('cta'),
           onClick: () => {
             setIsDialogOpen(false);
+            setShouldShowWaves(true);
           },
         }}
         secondaryButton={{
           label: t('cancel'),
           onClick: () => {
+            setShouldShowWaves(false);
             setIsDialogOpen(false);
           },
         }}
