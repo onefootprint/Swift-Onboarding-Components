@@ -26,10 +26,10 @@ pub struct CreateOnboardingConfigurationRequest {
     optional_data: Option<Vec<CDO>>,
     can_access_data: Vec<CDO>,
     cip_kind: Option<CipKind>,
+    is_no_phone_flow: Option<bool>,
 }
 
 impl CreateOnboardingConfigurationRequest {
-    const REQUIRED_FIELDS: [CDO; 4] = [CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber];
     const ALLOWED_OPTIONAL_FIELDS: [CDO; 2] = [CDO::Ssn4, CDO::Ssn9];
     /// Core validation business logic, separated from checking simple required fields
     fn validate_inner(&self) -> ApiResult<()> {
@@ -65,6 +65,21 @@ impl CreateOnboardingConfigurationRequest {
                 unallowed_optional_data_cdos
             ))
             .into());
+        }
+
+        if self.is_no_phone_flow.unwrap_or(false) {
+            let collect_phone = self.must_collect_data.contains(&CDO::PhoneNumber)
+                || self
+                    .optional_data
+                    .as_ref()
+                    .map(|od| od.contains(&CDO::PhoneNumber))
+                    .unwrap_or(false);
+            if collect_phone {
+                return Err(TenantError::ValidationError(
+                    "Cannot collect phone if is_no_phone_flow is true".to_owned(),
+                )
+                .into());
+            }
         }
 
         // Make sure there's only one CDO per CD, and create a map of CD -> selected CDO
@@ -132,8 +147,14 @@ impl CreateOnboardingConfigurationRequest {
     fn validate(&self) -> ApiResult<()> {
         self.validate_inner()?;
 
+        let required_fields = if self.is_no_phone_flow.unwrap_or(false) {
+            vec![CDO::Name, CDO::FullAddress, CDO::Email]
+        } else {
+            vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber]
+        };
+
         // Check for required fields
-        let missing_required_fields: Vec<_> = Self::REQUIRED_FIELDS
+        let missing_required_fields: Vec<_> = required_fields
             .into_iter()
             .filter(|x| !self.must_collect_data.contains(x))
             .collect();
@@ -167,6 +188,7 @@ pub async fn post(
         optional_data,
         can_access_data,
         cip_kind,
+        is_no_phone_flow,
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -181,6 +203,19 @@ pub async fn post(
     if let Some(cip_kind) = cip_kind {
         validate_for_cip(cip_kind, &must_collect_data)?
     }
+
+    let can_make_no_phone_obc = !state.config.service_config.is_production()
+        || tenant.id.is_integration_test_tenant()
+        || state
+            .feature_flag_client
+            .flag(BoolFlag::TenantCanMakeNoPhoneObc(&tenant_id));
+    if !can_make_no_phone_obc && is_no_phone_flow.unwrap_or(false) {
+        return Err(TenantError::ValidationError(
+            "Unable to create config with is_no_phone_flow = true".to_owned(),
+        )
+        .into());
+    }
+
     let obc = state
         .db_pool
         .db_query(move |conn| {
@@ -193,6 +228,7 @@ pub async fn post(
                 can_access_data,
                 is_live,
                 cip_kind,
+                is_no_phone_flow.unwrap_or(false),
             )
         })
         .await??;
@@ -252,8 +288,29 @@ mod test {
             optional_data: Some(optional_data),
             can_access_data,
             cip_kind: None,
+            is_no_phone_flow: Some(false),
         };
         req.validate_inner().is_ok()
+    }
+
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email], vec![], vec![] => true)]
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], vec![], vec![] => false)]
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email], vec![CDO::PhoneNumber], vec![] => false)]
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email], vec![], vec![CDO::PhoneNumber] => false)]
+    fn test_is_no_phone_flow(
+        must_collect_data: Vec<CDO>,
+        optional_data: Vec<CDO>,
+        can_access_data: Vec<CDO>,
+    ) -> bool {
+        let req = CreateOnboardingConfigurationRequest {
+            name: "Flerp".to_owned(),
+            must_collect_data,
+            optional_data: Some(optional_data),
+            can_access_data,
+            cip_kind: None,
+            is_no_phone_flow: Some(true),
+        };
+        req.validate().is_ok()
     }
 
     #[test_case(CipKind::Alpaca, vec![CDO::Name, CDO::Dob] => false)]

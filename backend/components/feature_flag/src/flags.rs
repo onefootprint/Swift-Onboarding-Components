@@ -45,6 +45,8 @@ pub enum BoolFlag<'a> {
     CanSkipSelfie(&'a TenantId),
     #[strum(to_string = "OmitEmailVerification")]
     OmitEmailVerification(&'a TenantId),
+    #[strum(to_string = "IsAlpacaTenant")]
+    TenantCanMakeNoPhoneObc(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -75,6 +77,7 @@ impl<'a> BoolFlag<'a> {
             Self::CanMakeDemoIncodeRequestsInSandbox(k) => Some(k.to_string()),
             Self::CanSkipSelfie(k) => Some(k.to_string()),
             Self::OmitEmailVerification(k) => Some(k.to_string()),
+            Self::TenantCanMakeNoPhoneObc(k) => Some(k.to_string()),
         }
     }
 
@@ -101,6 +104,7 @@ impl<'a> BoolFlag<'a> {
             Self::CanMakeDemoIncodeRequestsInSandbox(_) => false,
             Self::CanSkipSelfie(_) => false,
             Self::OmitEmailVerification(_) => false,
+            Self::TenantCanMakeNoPhoneObc(_) => false,
         }
     }
 }

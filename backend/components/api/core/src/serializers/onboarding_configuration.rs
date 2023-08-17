@@ -24,6 +24,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
             can_access_data,
             is_live,
             optional_data,
+            is_no_phone_flow,
             ..
         } = ob_config;
         let Tenant {
@@ -53,6 +54,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
             is_app_clip_enabled,
             is_instant_app_enabled,
             tenant_id,
+            is_no_phone_flow,
         }
     }
 }

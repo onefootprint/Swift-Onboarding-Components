@@ -135,23 +135,23 @@ def test_config_create(sandbox_tenant, twilio):
             "Validation error: Decryptable Ssn fields must be a subset of collected fields",
         ),  # can_access must be < must_collect
         (
-            ["name","full_address", "email", "phone_number"],
+            ["name", "full_address", "email", "phone_number"],
             ["ssn9"],
             ["name", "ssn9"],
             None,
-        ), # data in optional_data should be allowed in can_access
+        ),  # data in optional_data should be allowed in can_access
         (
             ["name", "full_address", "email", "phone_number", "ssn9"],
             ["ssn4"],
             ["name"],
             "Validation error: Field Ssn cannot be included in both must_collect_data and optional_data",
         ),
-         (
-            ["name","full_address", "email", "phone_number"],
+        (
+            ["name", "full_address", "email", "phone_number"],
             ["dob"],
             [],
             "Validation error: [Dob] cannot be optional",
-        ), # for now only let ssn4/ssn9 be optional, not any arbritary CDO
+        ),  # for now only let ssn4/ssn9 be optional, not any arbritary CDO
     ],
 )
 def test_config_create_validation(
@@ -173,6 +173,28 @@ def test_config_create_validation(
 
     if expected_error:
         assert res["error"]["message"] == expected_error
+
+
+def test_no_phone_obc(sandbox_tenant):
+    collect_data = ["name", "full_address", "email"]
+    data = dict(
+        name="Let's skip the phone",
+        must_collect_data=["name", "full_address", "email"],
+        optional_data=[],
+        can_access_data=["name", "full_address", "email"],
+        is_no_phone_flow=True,
+    )
+    res = post(
+        "org/onboarding_configs",
+        data,
+        *sandbox_tenant.db_auths,
+        status_code=200,
+    )
+
+    assert res["is_no_phone_flow"] == True
+    assert res["must_collect_data"] == collect_data
+    assert res["optional_data"] == []
+    assert res["can_access_data"] == collect_data
 
 
 def test_config_update(sandbox_tenant, ob_configuration):

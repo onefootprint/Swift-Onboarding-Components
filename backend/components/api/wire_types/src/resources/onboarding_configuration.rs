@@ -23,6 +23,7 @@ pub struct OnboardingConfiguration {
     pub is_instant_app_enabled: bool,
     // Used to display a tenant-specific banner on the app clip
     pub tenant_id: TenantId,
+    pub is_no_phone_flow: bool,
 }
 
 export_schema!(OnboardingConfiguration);

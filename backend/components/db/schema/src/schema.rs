@@ -379,6 +379,7 @@ table! {
         appearance_id -> Nullable<Text>,
         cip_kind -> Nullable<Text>,
         optional_data -> Array<Text>,
+        is_no_phone_flow -> Bool,
     }
 }
 
