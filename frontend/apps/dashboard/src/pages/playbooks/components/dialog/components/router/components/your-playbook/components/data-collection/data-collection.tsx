@@ -25,7 +25,7 @@ const DataCollection = ({ kind }: DataCollectionProps) => {
       </Header>
       {kind === Kind.KYB && <BusinessInformation />}
       <PersonalInfoAndDocs kind={kind} />
-      <InvestorProfile />
+      {kind === Kind.KYC && <InvestorProfile />}
     </Container>
   );
 };
