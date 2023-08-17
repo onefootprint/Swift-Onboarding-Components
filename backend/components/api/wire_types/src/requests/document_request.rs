@@ -1,26 +1,10 @@
 use crate::export_schema;
 use newtypes::{
-    idology::IdologyImageCaptureErrors, DocumentScanDeviceType, DocumentSide, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason,
-    ModernIdDocKind, PiiString,
+    idology::IdologyImageCaptureErrors, DocumentScanDeviceType, DocumentSide, IdentityDocumentFixtureResult,
+    IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason, ModernIdDocKind, PiiString,
 };
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
-
-/// POST request body for sending Footprint identity document images
-#[derive(Debug, Apiv2Schema, serde::Deserialize)]
-pub struct DocumentRequest {
-    /// base64 standard encoded image bytes
-    pub front_image: Option<PiiString>,
-    /// base64 standard encoded image bytes!)
-    pub back_image: Option<PiiString>,
-    pub selfie_image: Option<PiiString>,
-    /// type of document
-    pub document_type: IdDocKind,
-    /// country of document
-    pub country_code: String, // TODO this should be an enum
-    pub fixture_result: Option<IdentityDocumentFixtureResult>,
-}
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct CreateIdentityDocumentUploadRequest {
