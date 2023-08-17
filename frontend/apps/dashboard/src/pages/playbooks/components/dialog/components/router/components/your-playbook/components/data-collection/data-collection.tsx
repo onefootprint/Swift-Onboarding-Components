@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Typography } from '@onefootprint/ui';
+import { InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import { Kind } from '../../../../utils/machine/types';
@@ -26,6 +26,9 @@ const DataCollection = ({ kind }: DataCollectionProps) => {
       {kind === Kind.KYB && <BusinessInformation />}
       <PersonalInfoAndDocs kind={kind} />
       {kind === Kind.KYC && <InvestorProfile />}
+      {kind === Kind.KYB && (
+        <InlineAlert variant="info">{t('alert')}</InlineAlert>
+      )}
     </Container>
   );
 };

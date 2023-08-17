@@ -36,4 +36,30 @@ describe('<DataCollection />', () => {
       screen.queryByText('Investor profile questions'),
     ).not.toBeInTheDocument();
   });
+
+  it('should show BO info alert for KYB', async () => {
+    renderDataCollection({
+      kind: Kind.KYB,
+      startingValues: {
+        ...defaultValuesKYC,
+        businessInformation: defaultValuesKYB.businessInformation,
+      },
+    });
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('should not show BO info alert for KYC', async () => {
+    renderDataCollection({ kind: Kind.KYC });
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        'Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business.',
+      ),
+    ).not.toBeInTheDocument();
+  });
 });
