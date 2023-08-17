@@ -12,20 +12,32 @@ import {
   Toggle,
   Typography,
 } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import { type PersonalInformationAndDocs } from '../../../../your-playbook.types';
+
 type EditingProps = {
-  setEditing: (editing: boolean) => void;
+  stopEditing: () => void;
 };
 
-const Editing = ({ setEditing }: EditingProps) => {
+const Editing = ({ stopEditing }: EditingProps) => {
+  const { control, register, watch, setValue, getValues } = useFormContext();
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.form.personal-info-and-docs',
   );
-  const { control, register, watch } = useFormContext();
   const ssnOpen = watch('personalInformationAndDocs.ssn');
   const idDocOpen = watch('personalInformationAndDocs.idDoc');
+
+  // need to store this so we don't re-fetch on add'l renders
+  const [initialValues] = useState<PersonalInformationAndDocs>({
+    ...getValues('personalInformationAndDocs'),
+  });
+
+  const onCancel = () => {
+    setValue('personalInformationAndDocs', initialValues);
+    stopEditing();
+  };
 
   return (
     <EditingContainer>
@@ -153,11 +165,11 @@ const Editing = ({ setEditing }: EditingProps) => {
           variant="primary"
           fullWidth
           size="compact"
-          onClick={() => setEditing(false)}
+          onClick={stopEditing}
         >
           {t('save')}
         </Button>
-        <Button variant="secondary" fullWidth size="compact">
+        <Button variant="secondary" fullWidth size="compact" onClick={onCancel}>
           {t('cancel')}
         </Button>
       </ButtonContainer>

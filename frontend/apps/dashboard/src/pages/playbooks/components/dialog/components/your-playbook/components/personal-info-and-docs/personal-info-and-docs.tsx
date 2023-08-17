@@ -5,11 +5,18 @@ import Editing from './components/editing';
 import Preview from './components/preview';
 
 const PersonalInfoAndDocs = () => {
-  const [editing, setEditing] = useState(true);
+  const [editing, setEditing] = useState(false);
+
+  const stopEditing = () => setEditing(false);
+  const startEditing = () => setEditing(true);
 
   return (
     <Container>
-      {editing ? <Editing setEditing={setEditing} /> : <Preview />}
+      {editing ? (
+        <Editing stopEditing={stopEditing} />
+      ) : (
+        <Preview startEditing={startEditing} />
+      )}
     </Container>
   );
 };

@@ -1,23 +1,10 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
 
-import { defaultValues, FormData } from '../../../../your-playbook';
-import Editing from './editing';
-
-const Form = () => {
-  const formMethods = useForm<FormData>({ defaultValues });
-  return (
-    <FormProvider {...formMethods}>
-      <form>
-        <Editing setEditing={() => {}} />
-      </form>
-    </FormProvider>
-  );
-};
+import EditingWithContext from './editing.test.config';
 
 const renderEditing = () => {
-  customRender(<Form />);
+  customRender(<EditingWithContext />);
 };
 
 describe('<Editing />', () => {

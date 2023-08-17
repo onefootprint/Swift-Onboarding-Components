@@ -1109,7 +1109,27 @@
                 "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow."
               },
               "save": "Save",
-              "cancel": "Cancel"
+              "cancel": "Cancel",
+              "preview": {
+                "edit": "Edit",
+                "email": "Email",
+                "phone": "Phone number",
+                "name": "First & last name",
+                "dob": "Date of birth",
+                "nationality": "Nationality",
+                "address": "Address",
+                "idDoc": "ID document scan",
+                "idDocKind": "ID document scan",
+                "selfie": "Selfie",
+                "drivers_license": "Driver's license",
+                "id_card": "Identity card",
+                "passport": "Passport",
+                "ssn": "SSN",
+                "ssnKind": "SSN",
+                "ssn4": "Last 4",
+                "ssn9": "Full",
+                "address-display": "Address line, Zip code, City, State"
+              }
             }
           }
         }

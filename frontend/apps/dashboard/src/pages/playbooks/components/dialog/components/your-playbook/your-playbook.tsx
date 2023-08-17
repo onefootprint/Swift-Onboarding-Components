@@ -1,49 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import {
-  CollectedKycDataOption,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
 import { TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import PersonalInfoAndDocs from './components/personal-info-and-docs';
-
-export type PersonalInformationAndDocs = {
-  email: boolean;
-  phone: boolean;
-  dob: boolean;
-  nationality: boolean;
-  address: boolean;
-  ssn: boolean;
-  ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
-  idDoc: boolean;
-  idDocKind: SupportedIdDocTypes[];
-  selfie?: boolean;
-  ssnOptional?: boolean;
-};
-
-export type FormData = {
-  name: string;
-  personalInformationAndDocs: PersonalInformationAndDocs;
-};
-
-export const defaultValues: FormData = {
-  name: '',
-  personalInformationAndDocs: {
-    email: true,
-    phone: true,
-    dob: true,
-    nationality: true,
-    address: true,
-    ssn: false,
-    idDoc: false,
-    ssnKind: CollectedKycDataOption.ssn9,
-    idDocKind: [],
-    selfie: true,
-  },
-};
+import { defaultValues, FormData } from './your-playbook.types';
 
 const YourPlaybook = () => {
   const { t } = useTranslation('pages.playbooks.dialog.your-playbook');
