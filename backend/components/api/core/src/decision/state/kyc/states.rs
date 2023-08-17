@@ -153,7 +153,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
         let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> =
             if let Some(fd) = fixture_decision {
-                let reason_codes = decision::sandbox::get_fixture_reason_codes(fd, VaultKind::Person);
+                let reason_codes =
+                    decision::sandbox::get_fixture_reason_codes(fd, VaultKind::Person, Some((&vw, &obc)));
                 let vres_id = get_vres_id_for_fixture(&vendor_results)?;
 
                 RiskSignalGroupStruct {

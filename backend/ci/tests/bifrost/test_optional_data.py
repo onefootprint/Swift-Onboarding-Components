@@ -1,4 +1,5 @@
 import pytest
+from tests.utils import get
 from tests.utils import patch, post
 from tests.utils import get_requirement_from_requirements
 from tests.bifrost_client import BifrostClient
@@ -63,3 +64,14 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn):
 
     authorize_requirement = get_requirement_from_requirements("authorize", bifrost.get_status()["requirements"])
     assert set(authorize_requirement['fields_to_authorize']['collected_data']) == set(expected_populated_attributes)
+
+    user = bifrost.run()
+
+    risk_signals = get(f"entities/{user.fp_id}/risk_signals", None, sandbox_tenant.sk.key)
+    reason_codes = [r['reason_code'] for r in risk_signals]
+
+    if submit_ssn:
+        assert 'ssn_not_provided' not in reason_codes
+    else:
+        assert 'ssn_not_provided' in reason_codes
+    

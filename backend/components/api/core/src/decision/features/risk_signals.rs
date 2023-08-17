@@ -4,7 +4,10 @@ use db::models::{
     ob_configuration::ObConfiguration,
     risk_signal::{IncludeHidden, RiskSignal},
 };
-use newtypes::{FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI, VerificationResultId};
+use newtypes::{
+    CollectedData, FootprintReasonCode, IdentityDataKind, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
+    VerificationResultId,
+};
 
 use super::{
     experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures,
@@ -123,14 +126,38 @@ where
     Ok(())
 }
 
+pub fn user_input_based_risk_signals(vw: &VaultWrapper, obc: &ObConfiguration) -> Vec<FootprintReasonCode> {
+    let mut frcs = Vec::<FootprintReasonCode>::new();
+
+    let cd = CollectedData::Ssn;
+    let cdos = cd.options();
+    let ssn_optional_and_missing = cdos.iter().any(|cdo| {
+        !cdo.required_data_identifiers()
+            .into_iter()
+            .all(|di| vw.has_field(di))
+            && obc.optional_data.contains(cdo)
+    });
+    if ssn_optional_and_missing {
+        frcs.push(FootprintReasonCode::SsnNotProvided);
+    }
+
+    if !vw.has_field(IdentityDataKind::PhoneNumber) {
+        frcs.push(FootprintReasonCode::PhoneNotProvided);
+    }
+    frcs
+}
+
 impl From<VendorResultsAndVault> for RiskSignalGroupStruct<Kyc> {
     fn from(results: VendorResultsAndVault) -> Self {
         let VendorResultsAndVault {
             response_map,
             ids_map,
             vw,
-            obc: _,
+            obc,
         } = results;
+
+        // Risk Signals that should be created for every vendor, based purely on data in vault + obc
+        let user_input_risk_signals = user_input_based_risk_signals(&vw, &obc);
 
         let idology_features = IDologyFeatures::try_from(((&response_map, &ids_map), vw))
             .ok()
@@ -139,6 +166,7 @@ impl From<VendorResultsAndVault> for RiskSignalGroupStruct<Kyc> {
 
                 f.footprint_reason_codes
                     .into_iter()
+                    .chain(user_input_risk_signals.clone().into_iter())
                     .map(|r| (r, VendorAPI::IdologyExpectID, vres.to_owned()))
                     .collect()
             })
@@ -150,6 +178,7 @@ impl From<VendorResultsAndVault> for RiskSignalGroupStruct<Kyc> {
 
                 f.footprint_reason_codes
                     .into_iter()
+                    .chain(user_input_risk_signals.clone().into_iter())
                     .map(|r| (r, VendorAPI::ExperianPreciseID, vres.to_owned()))
                     .collect()
             })

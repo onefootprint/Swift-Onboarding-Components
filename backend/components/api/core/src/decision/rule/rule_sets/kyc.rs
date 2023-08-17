@@ -86,6 +86,16 @@ pub fn idology_base_rules() -> Vec<Rule<IDologyFeatures>> {
             name: RuleName::SsnLocatedIsInvalid,
             action: Action::Fail,
         },
+        Rule {
+            rule: {
+                |f: &IDologyFeatures| {
+                    f.footprint_reason_codes
+                        .contains(&FootprintReasonCode::SsnNotProvided)
+                }
+            },
+            name: RuleName::SsnNotProvided,
+            action: Action::ManualReview,
+        },
         // This is an IDology recommended "always fail" rule
         Rule {
             rule: {
@@ -140,6 +150,16 @@ pub fn experian_base_rules() -> Vec<Rule<ExperianFeatures>> {
             },
             name: RuleName::SsnDoesNotMatch,
             action: Action::Fail,
+        },
+        Rule {
+            rule: {
+                |f: &ExperianFeatures| {
+                    f.footprint_reason_codes
+                        .contains(&FootprintReasonCode::SsnNotProvided)
+                }
+            },
+            name: RuleName::SsnNotProvided,
+            action: Action::ManualReview,
         },
     ]
 }

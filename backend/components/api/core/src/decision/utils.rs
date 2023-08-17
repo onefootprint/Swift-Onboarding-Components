@@ -204,7 +204,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     )?;
     let vres = VerificationResult::create(conn, vreq.id, raw.into(), e_response, false)?;
 
-    let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business);
+    let signals = sandbox::get_fixture_reason_codes(fixture_decision, VaultKind::Business, None);
     RiskSignal::bulk_create(
         conn,
         &sb.id,
