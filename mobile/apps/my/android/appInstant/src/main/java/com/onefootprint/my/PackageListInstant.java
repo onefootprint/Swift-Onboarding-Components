@@ -13,7 +13,7 @@ import java.util.Arrays;
 // Manual package linking
 import com.mrousavy.camera.CameraPackage;
 import com.visioncameraplugindocument.VisionCameraPluginDocumentPackage;
-import com.visioncamerapluginfacedetection.VisionCameraPluginFaceDetectionPackage;
+import com.visioncamerafacedetection.VisionCameraFaceDetectionPackage;
 import com.shopify.reactnative.flash_list.ReactNativeFlashListPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
@@ -69,7 +69,7 @@ public class PackageListInstant {
                 new MainReactPackage(mConfig),
                 new CameraPackage(),
                 new VisionCameraPluginDocumentPackage(),
-                new VisionCameraPluginFaceDetectionPackage(),
+                new VisionCameraFaceDetectionPackage(),
                 new ReactNativeFlashListPackage(),
                 new SafeAreaContextPackage(),
                 new RNScreensPackage(),

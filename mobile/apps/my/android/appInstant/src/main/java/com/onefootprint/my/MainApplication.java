@@ -8,7 +8,6 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
-
 import java.util.List;
 import com.google.android.gms.instantapps.InstantApps;
 

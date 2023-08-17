@@ -29,7 +29,6 @@ const Selfie = ({ stepperValues }: SelfieProps) => {
 
       const options = { width, height };
       const result = detectFace(frame, options);
-
       if (
         result.hasFace &&
         result.isFaceInCenter &&

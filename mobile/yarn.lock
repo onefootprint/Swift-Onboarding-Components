@@ -16114,9 +16114,9 @@ react-native-swipe-gestures@^1.0.5:
   integrity sha512-Ns7Bn9H/Tyw278+5SQx9oAblDZ7JixyzeOczcBK8dipQk2pD7Djkcfnf1nB/8RErAmMLL9iXgW0QHqiII8AhKw==
 
 react-native-vision-camera@^2.15.4:
-  version "2.15.4"
-  resolved "https://registry.npmjs.org/react-native-vision-camera/-/react-native-vision-camera-2.15.4.tgz"
-  integrity sha512-SJXSWH1pu4V3Kj4UuX/vSgOxc9d5wb5+nHqBHd+5iUtVyVLEp0F6Jbbaha7tDoU+kUBwonhlwr2o8oV6NZ7Ibg==
+  version "2.15.6"
+  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-2.15.6.tgz#50fe9b47117a257f2c8bf7c33994fdadb897d091"
+  integrity sha512-TEdriQ2SQAhF7byw7iDaOh8cJm/IECOUofBhcdswtAK9LSqCkVEIhX3pna2L3Obt6evc8zaFnYCVqhvC3UtKRg==
 
 react-native-web@^0.18.10:
   version "0.18.12"
@@ -18865,15 +18865,15 @@ vfile@^4.0.0:
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
 
-vision-camera-plugin-document@^0.8.0:
+vision-camera-plugin-document@0.8.0:
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/vision-camera-plugin-document/-/vision-camera-plugin-document-0.8.0.tgz#7bff3229b5c25f31ca25c3146cf8972b59bdfb1b"
   integrity sha512-Dx6bXORNX+jeP/OZsYZLoA3Dk+dwapEzPJwhTjRwAumAouY9PGNG5fomTROkZmdQXghPYfw39C5lr+u49oY1eA==
 
-vision-camera-plugin-face-detection@^0.8.2:
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/vision-camera-plugin-face-detection/-/vision-camera-plugin-face-detection-0.8.2.tgz#b895380b7d300fb58799612cbfb1dc9fdcbc8629"
-  integrity sha512-h/V7Qe5sSEyHBG4i/A20bY6nniyCzFhrf3MuQtfirHcSNJIbLG0eWJoU1PoBRqNXwp5uA5Q/8StgzRQrH5ZjnA==
+vision-camera-plugin-face-detection@0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/vision-camera-plugin-face-detection/-/vision-camera-plugin-face-detection-0.10.1.tgz#fc83ea478950cad70c2a9cda27ae8f6cbd5f26dc"
+  integrity sha512-KbPT9DNma3Qp75mIyeXH6fxAlA6CQba12PFlxGh3IMY275LEtsPCajOGNEpNE/2WmKuH8ozXdAMzdC1a7+lAnw==
 
 vlq@^1.0.0:
   version "1.0.1"

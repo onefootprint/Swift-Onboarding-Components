@@ -50,8 +50,8 @@
     "react-native-svg": "^13.9.0",
     "react-native-vision-camera": "^2.15.4",
     "url-parse": "^1.5.10",
-    "vision-camera-plugin-document": "^0.8.0",
-    "vision-camera-plugin-face-detection": "^0.8.2",
+    "vision-camera-plugin-document": "0.8.0",
+    "vision-camera-plugin-face-detection": "0.10.1",
     "xstate": "^4.37.1",
     "zustand": "^4.3.8"
   },
