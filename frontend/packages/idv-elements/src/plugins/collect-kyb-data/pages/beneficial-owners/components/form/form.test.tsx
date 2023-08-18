@@ -45,8 +45,8 @@ describe('<Form />', () => {
             [BeneficialOwnerDataAttribute.firstName]: 'John',
             [BeneficialOwnerDataAttribute.lastName]: 'Doe',
             [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-            [BeneficialOwnerDataAttribute.email]: '',
-            [BeneficialOwnerDataAttribute.phoneNumber]: '',
+            [BeneficialOwnerDataAttribute.email]: undefined,
+            [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
           },
           {
             [BeneficialOwnerDataAttribute.firstName]: 'Lily',
@@ -134,8 +134,8 @@ describe('<Form />', () => {
           [BeneficialOwnerDataAttribute.firstName]: 'John',
           [BeneficialOwnerDataAttribute.lastName]: 'Doe',
           [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-          [BeneficialOwnerDataAttribute.email]: '',
-          [BeneficialOwnerDataAttribute.phoneNumber]: '',
+          [BeneficialOwnerDataAttribute.email]: undefined,
+          [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
         },
         {
           [BeneficialOwnerDataAttribute.firstName]: 'Lily',
@@ -172,8 +172,8 @@ describe('<Form />', () => {
           [BeneficialOwnerDataAttribute.firstName]: 'John',
           [BeneficialOwnerDataAttribute.lastName]: 'Doe',
           [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-          [BeneficialOwnerDataAttribute.email]: '',
-          [BeneficialOwnerDataAttribute.phoneNumber]: '',
+          [BeneficialOwnerDataAttribute.email]: undefined,
+          [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
         },
       ]);
     });
@@ -333,8 +333,8 @@ describe('<Form />', () => {
               [BeneficialOwnerDataAttribute.firstName]: 'John',
               [BeneficialOwnerDataAttribute.lastName]: 'Doe',
               [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-              [BeneficialOwnerDataAttribute.email]: '',
-              [BeneficialOwnerDataAttribute.phoneNumber]: '',
+              [BeneficialOwnerDataAttribute.email]: undefined,
+              [BeneficialOwnerDataAttribute.phoneNumber]: undefined,
             },
           ]);
         });
