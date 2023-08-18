@@ -36,6 +36,7 @@ pub struct ObConfiguration {
     pub cip_kind: Option<CipKind>,
     pub optional_data: Vec<CDO>,
     pub is_no_phone_flow: bool,
+    pub is_doc_first: bool,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
@@ -52,6 +53,7 @@ struct NewObConfiguration {
     cip_kind: Option<CipKind>,
     optional_data: Vec<CDO>,
     is_no_phone_flow: bool,
+    is_doc_first: bool,
 }
 
 #[derive(Debug)]
@@ -204,6 +206,7 @@ impl ObConfiguration {
         is_live: bool,
         cip_kind: Option<CipKind>,
         is_no_phone_flow: bool,
+        is_doc_first: bool,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -217,6 +220,7 @@ impl ObConfiguration {
             cip_kind,
             optional_data,
             is_no_phone_flow,
+            is_doc_first,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)

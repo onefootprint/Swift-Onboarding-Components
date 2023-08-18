@@ -14,6 +14,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         is_live,
         None,
         false,
+        false,
     )
     .expect("Could not create ob config")
 }
@@ -40,6 +41,7 @@ pub fn create_with_opts(
         must_collect,
         is_live,
         cip_kind,
+        false,
         false,
     )
     .expect("Could not create ob config")

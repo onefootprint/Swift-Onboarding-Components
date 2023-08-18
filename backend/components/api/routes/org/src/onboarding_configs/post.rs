@@ -10,9 +10,9 @@ use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::CipKind;
 use newtypes::CollectedData as CD;
 use newtypes::CollectedDataOption as CDO;
+use newtypes::{CipKind, TenantId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::collections::HashMap;
@@ -27,6 +27,8 @@ pub struct CreateOnboardingConfigurationRequest {
     can_access_data: Vec<CDO>,
     cip_kind: Option<CipKind>,
     is_no_phone_flow: Option<bool>,
+    #[serde(default)]
+    is_doc_first_flow: bool,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -77,6 +79,19 @@ impl CreateOnboardingConfigurationRequest {
             if collect_phone {
                 return Err(TenantError::ValidationError(
                     "Cannot collect phone if is_no_phone_flow is true".to_owned(),
+                )
+                .into());
+            }
+        }
+        if self.is_doc_first_flow {
+            let doc_cdo = self
+                .must_collect_data
+                .iter()
+                .chain(self.optional_data.iter().flatten())
+                .find(|cdo| matches!(cdo, CDO::Document(_)));
+            if doc_cdo.is_none() {
+                return Err(TenantError::ValidationError(
+                    "Must collect document if is_doc_first is true".to_owned(),
                 )
                 .into());
             }
@@ -167,6 +182,40 @@ impl CreateOnboardingConfigurationRequest {
         }
         Ok(())
     }
+
+    fn validate_flags(&self, state: &State, tenant_id: &TenantId) -> ApiResult<()> {
+        let is_alpaca_tenant = state
+            .feature_flag_client
+            .flag(BoolFlag::IsAlpacaTenant(tenant_id));
+        // TODO: throw error if is_alpaca_tenant and another cip_kind sent up? TODO: restrict cip_kind to integration tenants now?
+        let cip_kind = self.cip_kind.or(is_alpaca_tenant.then_some(CipKind::Alpaca));
+        if let Some(cip_kind) = cip_kind {
+            validate_for_cip(cip_kind, &self.must_collect_data)?
+        }
+
+        let can_make_no_phone_obc = !state.config.service_config.is_production()
+            || tenant_id.is_integration_test_tenant()
+            || state
+                .feature_flag_client
+                .flag(BoolFlag::TenantCanMakeNoPhoneObc(tenant_id));
+        if self.is_no_phone_flow.unwrap_or(false) && !can_make_no_phone_obc {
+            return Err(TenantError::ValidationError(
+                "Unable to create config with is_no_phone_flow = true".to_owned(),
+            )
+            .into());
+        }
+
+        let can_make_doc_first = state
+            .feature_flag_client
+            .flag(BoolFlag::TenantCanMakeDocFirstObc(tenant_id));
+        if self.is_doc_first_flow && !can_make_doc_first {
+            return Err(TenantError::ValidationError(
+                "Unable to create config with is_doc_first = true".to_owned(),
+            )
+            .into());
+        }
+        Ok(())
+    }
 }
 
 #[api_v2_operation(
@@ -182,6 +231,7 @@ pub async fn post(
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     request.validate()?;
     let tenant = auth.tenant().clone();
+    request.validate_flags(&state, &tenant.id)?;
     let CreateOnboardingConfigurationRequest {
         name,
         must_collect_data,
@@ -189,31 +239,12 @@ pub async fn post(
         can_access_data,
         cip_kind,
         is_no_phone_flow,
+        is_doc_first_flow,
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
     if is_live && tenant.is_prod_ob_config_restricted {
         return Err(TenantError::CannotCreateProdObConfigs.into());
-    }
-    let is_alpaca_tenant = state
-        .feature_flag_client
-        .flag(BoolFlag::IsAlpacaTenant(&tenant_id));
-    // TODO: throw error if is_alpaca_tenant and another cip_kind sent up? TODO: restrict cip_kind to integration tenants now?
-    let cip_kind = cip_kind.or(is_alpaca_tenant.then_some(CipKind::Alpaca));
-    if let Some(cip_kind) = cip_kind {
-        validate_for_cip(cip_kind, &must_collect_data)?
-    }
-
-    let can_make_no_phone_obc = !state.config.service_config.is_production()
-        || tenant.id.is_integration_test_tenant()
-        || state
-            .feature_flag_client
-            .flag(BoolFlag::TenantCanMakeNoPhoneObc(&tenant_id));
-    if !can_make_no_phone_obc && is_no_phone_flow.unwrap_or(false) {
-        return Err(TenantError::ValidationError(
-            "Unable to create config with is_no_phone_flow = true".to_owned(),
-        )
-        .into());
     }
 
     let obc = state
@@ -229,6 +260,7 @@ pub async fn post(
                 is_live,
                 cip_kind,
                 is_no_phone_flow.unwrap_or(false),
+                is_doc_first_flow,
             )
         })
         .await??;
@@ -289,6 +321,7 @@ mod test {
             can_access_data,
             cip_kind: None,
             is_no_phone_flow: Some(false),
+            is_doc_first_flow: false,
         };
         req.validate_inner().is_ok()
     }
@@ -309,6 +342,22 @@ mod test {
             can_access_data,
             cip_kind: None,
             is_no_phone_flow: Some(true),
+            is_doc_first_flow: false,
+        };
+        req.validate().is_ok()
+    }
+
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![] => true)]
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], vec![] => false)]
+    fn test_is_doc_first(must_collect_data: Vec<CDO>, can_access_data: Vec<CDO>) -> bool {
+        let req = CreateOnboardingConfigurationRequest {
+            name: "Flerp".to_owned(),
+            must_collect_data,
+            optional_data: None,
+            can_access_data,
+            cip_kind: None,
+            is_no_phone_flow: Some(false),
+            is_doc_first_flow: true,
         };
         req.validate().is_ok()
     }

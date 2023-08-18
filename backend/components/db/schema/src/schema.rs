@@ -381,6 +381,7 @@ table! {
         cip_kind -> Nullable<Text>,
         optional_data -> Array<Text>,
         is_no_phone_flow -> Bool,
+        is_doc_first -> Bool,
     }
 }
 
