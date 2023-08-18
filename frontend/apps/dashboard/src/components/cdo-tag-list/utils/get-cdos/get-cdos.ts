@@ -20,8 +20,7 @@ const getCdos = (cdos: string[]) => {
   const compositeDocumentCdos = documentCdos.filter(
     cdo =>
       cdo.startsWith('document') &&
-      cdo !== CollectedDocumentDataOption.documentAndSelfie &&
-      cdo !== CollectedDocumentDataOption.document,
+      cdo !== CollectedDocumentDataOption.documentAndSelfie,
   );
 
   const processedDocumentCdos: string[] = [];
