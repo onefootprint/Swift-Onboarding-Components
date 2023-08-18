@@ -5,7 +5,7 @@ use crate::{auth::session::AuthSessionData, utils::session::AuthSession};
 
 use crate::errors::ApiError;
 use crate::State;
-use db::models::contact_info::ContactInfo;
+use db::models::contact_info::{ContactInfo, VerificationLevel};
 use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -39,7 +39,9 @@ pub async fn post(
 
     state
         .db_pool
-        .db_query(move |conn| ContactInfo::mark_verified(conn, &data.email_id))
+        .db_query(move |conn| {
+            ContactInfo::mark_verified(conn, &data.email_id, VerificationLevel::NonOtpVerified)
+        })
         .await??;
 
     Ok(Json(ResponseData::ok(EmptyResponse {})))

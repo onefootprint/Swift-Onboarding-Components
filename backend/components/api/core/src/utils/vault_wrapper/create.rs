@@ -2,7 +2,7 @@ use super::{Any, PatchDataResult, Person, VaultWrapper};
 use crate::enclave_client::VaultKeyPair;
 use crate::errors::user::UserError;
 use crate::errors::{ApiResult, AssertionError};
-use db::models::contact_info::ContactInfo;
+use db::models::contact_info::{ContactInfo, VerificationLevel};
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
@@ -116,7 +116,7 @@ impl VaultWrapper<Person> {
             .into_iter()
             .find(|(d, _)| d == &DataIdentifier::from(&authed_data))
             .ok_or(AssertionError("No CI made with new vault"))?;
-        ContactInfo::mark_verified(conn, &ci.id)?;
+        ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
         DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
 
         Ok((uv, su))

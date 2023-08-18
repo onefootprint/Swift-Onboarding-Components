@@ -69,6 +69,7 @@ table! {
         lifetime_id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        is_otp_verified -> Bool,
     }
 }
 

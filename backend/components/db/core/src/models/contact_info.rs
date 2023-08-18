@@ -17,14 +17,38 @@ pub struct ContactInfo {
     pub lifetime_id: DataLifetimeId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub is_otp_verified: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = contact_info)]
 pub struct NewContactInfoArgs {
     pub is_verified: bool,
+    pub is_otp_verified: bool,
     pub priority: ContactInfoPriority,
     pub lifetime_id: DataLifetimeId,
+}
+
+pub enum VerificationLevel {
+    OtpVerified,
+    NonOtpVerified,
+}
+
+#[derive(AsChangeset)]
+#[diesel(table_name = contact_info)]
+struct ContactInfoUpdate {
+    is_verified: Option<bool>,
+    is_otp_verified: Option<bool>,
+}
+
+impl From<VerificationLevel> for ContactInfoUpdate {
+    fn from(value: VerificationLevel) -> Self {
+        let is_otp_verified = matches!(value, VerificationLevel::OtpVerified).then(|| true);
+        ContactInfoUpdate {
+            is_verified: Some(true),
+            is_otp_verified,
+        }
+    }
 }
 
 impl ContactInfo {
@@ -37,10 +61,10 @@ impl ContactInfo {
     }
 
     #[tracing::instrument("ContactInfo::mark_verified", skip_all)]
-    pub fn mark_verified(conn: &mut PgConn, id: &ContactInfoId) -> DbResult<()> {
+    pub fn mark_verified(conn: &mut PgConn, id: &ContactInfoId, level: VerificationLevel) -> DbResult<()> {
         diesel::update(contact_info::table)
             .filter(contact_info::id.eq(id))
-            .set(contact_info::is_verified.eq(true))
+            .set(ContactInfoUpdate::from(level))
             .execute(conn)?;
         Ok(())
     }

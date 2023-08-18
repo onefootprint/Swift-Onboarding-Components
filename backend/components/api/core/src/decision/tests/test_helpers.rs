@@ -1,6 +1,6 @@
 use db::{
     models::{
-        contact_info::ContactInfo,
+        contact_info::{ContactInfo, VerificationLevel},
         insight_event::CreateInsightEvent,
         ob_configuration::ObConfiguration,
         scoped_vault::ScopedVault,
@@ -211,7 +211,7 @@ pub fn create_user_and_populate_vault(
         .into_iter()
         .find(|(di, _)| di == &DataIdentifier::from(IdentityDataKind::PhoneNumber))
         .unwrap();
-    ContactInfo::mark_verified(conn, &ci.id).unwrap();
+    ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified).unwrap();
 
     (uv.into_inner(), su)
 }

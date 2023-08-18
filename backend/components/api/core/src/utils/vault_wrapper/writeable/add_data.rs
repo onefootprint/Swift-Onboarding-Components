@@ -95,6 +95,7 @@ impl<Type> WriteableVw<Type> {
             })
             .map(|vd| NewContactInfoArgs {
                 is_verified: false,
+                is_otp_verified: false,
                 priority: ContactInfoPriority::Primary,
                 lifetime_id: vd.lifetime_id.clone(),
             })
