@@ -8,6 +8,7 @@ use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::{TenantVw, VaultWrapper};
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
+use db::models::ob_configuration::ObConfiguration;
 use db::{DbPool, TxnPgConn};
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use idv::incode::doc::{IncodeFetchOCRRequest, IncodeFetchScoresRequest};
@@ -17,7 +18,7 @@ use strum::IntoEnumIterator;
 pub struct FetchScores {
     ocr_response: FetchOCRResponse,
     score_response: FetchScoresResponse,
-    vault_data: IncodeOcrComparisonDataFields,
+    vault_data: Option<IncodeOcrComparisonDataFields>,
     score_verification_result_id: VerificationResultId,
     ocr_verification_result_id: VerificationResultId,
 }
@@ -74,27 +75,37 @@ impl IncodeStateTransition for FetchScores {
             .into_success()
             .map_err(map_to_api_err)?;
 
-        // Set up reason codes
-        let sv_id = ctx.sv_id.clone();
-        let uvw: TenantVw = db_pool
-            .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
+        let wf_id = ctx.wf_id.clone();
+        let (obc, _) = db_pool
+            .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
             .await??;
-        let vd = uvw
-            .decrypt_unchecked(
-                &ctx.enclave_client,
-                &[
-                    DataIdentifier::Id(IdentityDataKind::FirstName),
-                    DataIdentifier::Id(IdentityDataKind::LastName),
-                    DataIdentifier::Id(IdentityDataKind::Dob),
-                    // TODO: address
-                ],
-            )
-            .await?;
 
-        let vault_data = IncodeOcrComparisonDataFields {
-            first_name: vd.get_di(IdentityDataKind::FirstName)?,
-            last_name: vd.get_di(IdentityDataKind::LastName)?,
-            dob: vd.get_di(IdentityDataKind::Dob)?,
+        // If the ID data already exists in the vault, extract it so we can use it to generate
+        // OCR data risk signals
+        let vault_data = if !obc.is_doc_first {
+            let sv_id = ctx.sv_id.clone();
+            let uvw: TenantVw = db_pool
+                .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
+                .await??;
+            let vd = uvw
+                .decrypt_unchecked(
+                    &ctx.enclave_client,
+                    &[
+                        DataIdentifier::Id(IdentityDataKind::FirstName),
+                        DataIdentifier::Id(IdentityDataKind::LastName),
+                        DataIdentifier::Id(IdentityDataKind::Dob),
+                        // TODO: address
+                    ],
+                )
+                .await?;
+            let vault_data = IncodeOcrComparisonDataFields {
+                first_name: vd.get_di(IdentityDataKind::FirstName)?,
+                last_name: vd.get_di(IdentityDataKind::LastName)?,
+                dob: vd.get_di(IdentityDataKind::Dob)?,
+            };
+            Some(vault_data)
+        } else {
+            None
         };
 
         Ok(Some(Self {

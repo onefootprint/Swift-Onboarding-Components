@@ -1,7 +1,7 @@
 use super::utils;
 use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
-use crate::{AllData, IdentityDataKind as IDK, PhoneNumber, PiiString, ValidateArgs};
+use crate::{AllData, IdentityDataKind as IDK, PhoneNumber, PiiString, ValidateArgs, DATE_FORMAT};
 use chrono::{Datelike, NaiveDate, Utc};
 use std::str::FromStr;
 
@@ -40,7 +40,7 @@ fn clean_and_validate_phone(value: PiiString) -> NtResult<PiiString> {
 }
 
 fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
-    let date = NaiveDate::parse_from_str(input.leak(), "%Y-%m-%d").map_err(|_| Error::InvalidDate)?;
+    let date = NaiveDate::parse_from_str(input.leak(), DATE_FORMAT).map_err(|_| Error::InvalidDate)?;
     if for_bifrost {
         if date.year() < 1900 {
             return Err(Error::ImprobableDob);
@@ -53,7 +53,7 @@ fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiStr
             return Err(Error::ImprobableDobTooYoung);
         }
     }
-    Ok(PiiString::new(date.format("%Y-%m-%d").to_string()))
+    Ok(PiiString::new(date.format(DATE_FORMAT).to_string()))
 }
 
 fn validate_name(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {

@@ -1,6 +1,6 @@
 use crate::idology::error as IdologyError;
 use chrono::{Datelike, NaiveDate};
-use newtypes::{IdvData, PiiString};
+use newtypes::{IdvData, PiiString, DATE_FORMAT};
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -41,7 +41,7 @@ impl RequestData {
         let address = address_line1.ok_or(IdologyError::ConversionError::MissingAddress)?;
         // TODO: pull this out in common util
         let (dob_month, dob_year, dob_day) = if let Some(dob) = dob {
-            let dob = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")
+            let dob = NaiveDate::parse_from_str(dob.leak(), DATE_FORMAT)
                 .map_err(|_| IdologyError::ConversionError::CantParseDob)?;
             (
                 Some(PiiString::new(dob.month().to_string())),

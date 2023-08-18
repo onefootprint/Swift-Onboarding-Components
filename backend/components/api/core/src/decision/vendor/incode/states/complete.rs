@@ -7,12 +7,14 @@ use crate::decision::vendor::incode::state::StateResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
 use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::IncodeClients;
 
 use async_trait::async_trait;
 use db::models::identity_document::IdentityDocument;
 use db::models::identity_document::IdentityDocumentUpdate;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::RiskSignal;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
@@ -27,12 +29,14 @@ use newtypes::DocumentKind;
 use newtypes::DocumentSide;
 use newtypes::FootprintReasonCode;
 use newtypes::IdDocKind;
+use newtypes::IdentityDataKind as IDK;
 use newtypes::IdentityDocumentId;
 use newtypes::IdentityDocumentStatus;
 use newtypes::OcrDataKind as ODK;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::ScrubbedPiiString;
+use newtypes::Validate;
 use newtypes::ValidateArgs;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
@@ -54,13 +58,14 @@ impl Complete {
         dk: IdDocKind,
         fetch_ocr_response: FetchOCRResponse,
         score_response: FetchScoresResponse,
-        vault_data: IncodeOcrComparisonDataFields,
+        vault_data: Option<IncodeOcrComparisonDataFields>,
         expect_selfie: bool,
         ocr_verification_result_id: VerificationResultId,
         score_verification_result_id: VerificationResultId,
     ) -> ApiResult<()> {
         let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
-        let (id_doc, _) = IdentityDocument::get(conn, id_doc_id)?;
+        let (id_doc, doc_request) = IdentityDocument::get(conn, id_doc_id)?;
+        let (obc, _) = ObConfiguration::get(conn, &doc_request.workflow_id)?;
 
         // Create a timeline event
         let info = newtypes::IdentityDocumentUploadedInfo {
@@ -109,8 +114,46 @@ impl Complete {
         .flatten()
         .collect_vec();
 
-        let data = HashMap::from_iter(data);
-        let data = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(vault.is_live))?;
+        // For doc-first onboardings, populate identity data
+        let mut validate_args = ValidateArgs::for_bifrost(vault.is_live);
+        // A little bit of a hack to allow vaulting all address fields that exist
+        validate_args.allow_dangling_keys = true;
+        let id_data: Vec<(DataIdentifier, PiiString)> = if obc.is_doc_first {
+            let r = fetch_ocr_response.clone();
+            let name = r.name.as_ref();
+            let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
+            vec![
+                (
+                    IDK::FirstName,
+                    // TODO given name seems to include middle name and be all uppercase
+                    name.and_then(|n| n.given_name_mrz.as_ref().or(n.given_name.as_ref())),
+                ),
+                (
+                    IDK::LastName,
+                    name.and_then(|n| n.last_name_mrz.as_ref().or(n.paternal_last_name.as_ref())),
+                ),
+                (IDK::AddressLine1, address.and_then(|n| n.street.as_ref())),
+                (IDK::City, address.and_then(|n| n.city.as_ref())),
+                (IDK::State, address.and_then(|n| n.state.as_ref())),
+                (IDK::Zip, address.and_then(|n| n.postal_code.as_ref())),
+                // TODO i don't see another way to extract country ...
+                // TODO need to translate from three-digit to two-digit country code
+                // (IDK::Country, r.issuing_country.as_ref()),
+                (IDK::Dob, r.dob().ok().as_ref()),
+            ]
+            .into_iter()
+            .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))
+            // Don't add OCR data that fails validation - don't want it to block sign up
+            .flat_map(|(k, v)| k.validate(v.clone(), validate_args, &HashMap::new()).is_ok().then_some((k, v)))
+            // Don't add OCR data to the vault that already exists
+            .filter(|(k, _)| !uvw.has_field(k.clone()))
+            .collect()
+        } else {
+            vec![]
+        };
+
+        let data = HashMap::from_iter(data.into_iter().chain(id_data.into_iter()));
+        let data = DataRequest::clean_and_validate(data, validate_args)?;
         let data = data.no_fingerprints();
         let completed_seqno = uvw.patch_data(conn, data)?.seqno;
 
@@ -143,9 +186,17 @@ impl Complete {
                         score_verification_result_id.clone(),
                     )
                 });
-        let ocr_reason_codes = incode_docv::reason_codes_from_ocr_response(fetch_ocr_response, vault_data)?
-            .into_iter()
-            .map(|r| (r, VendorAPI::IncodeFetchOCR, ocr_verification_result_id.clone()));
+
+        let ocr_reason_codes = if !obc.is_doc_first {
+            // Only calculate OCR reason codes if we have already collected ID data
+            let vault_data = vault_data.ok_or(AssertionError("Vault data not provided"))?;
+            incode_docv::reason_codes_from_ocr_response(fetch_ocr_response, vault_data)?
+                .into_iter()
+                .map(|r| (r, VendorAPI::IncodeFetchOCR, ocr_verification_result_id.clone()))
+                .collect_vec()
+        } else {
+            vec![]
+        };
 
         let additional_reason_codes = vec![
             id_doc.should_skip_selfie().then_some((
@@ -166,7 +217,7 @@ impl Complete {
             conn,
             sv_id,
             score_reason_codes
-                .chain(ocr_reason_codes)
+                .chain(ocr_reason_codes.into_iter())
                 .chain(additional_reason_codes)
                 .collect(),
             newtypes::RiskSignalGroupKind::Doc,

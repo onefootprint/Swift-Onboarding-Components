@@ -1,4 +1,4 @@
-use crate::{BusinessOwnerData, IdentityDataKind, PiiString, VerificationRequestId};
+use crate::{BusinessOwnerData, IdentityDataKind, PiiString, VerificationRequestId, DATE_FORMAT};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
@@ -61,7 +61,7 @@ impl IdvData {
     pub fn dob(&self) -> Result<Option<NaiveDate>, chrono::ParseError> {
         self.dob
             .as_ref()
-            .map(|d| NaiveDate::parse_from_str(d.leak(), "%Y-%m-%d"))
+            .map(|d| NaiveDate::parse_from_str(d.leak(), DATE_FORMAT))
             .transpose()
     }
 

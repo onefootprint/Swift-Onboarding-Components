@@ -20,6 +20,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::IdentityDocument;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
@@ -59,13 +60,14 @@ pub async fn post(
     tracing::info!("After unpacking request");
 
     let su_id = user_auth.scoped_user.id.clone();
-    let (id_doc, doc_request, uvw, user_consent) = state
+    let (id_doc, doc_request, uvw, user_consent, obc) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (id_doc, doc_request) = IdentityDocument::get(conn, &document_id)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
+            let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
             let user_consent = UserConsent::get_for_workflow(conn, &wf_id)?;
-            Ok((id_doc, doc_request, uvw, user_consent))
+            Ok((id_doc, doc_request, uvw, user_consent, obc))
         })
         .await??;
     let vault = uvw.vault.clone();
@@ -153,6 +155,8 @@ pub async fn post(
                         .map_err(idv::Error::from)?;
                     let res = serde_json::to_value(fake_score_response.clone())?;
                     let vres = save_vres_for_fixture_risk_signals(conn, &su_id, &vault2, &wf_id, res)?;
+                    let id_data = (!obc.is_doc_first)
+                        .then_some(ocr_fixture.unwrap_or(IncodeOcrComparisonDataFields::default()));
 
                     // Enter the complete state
                     Complete::enter(
@@ -163,7 +167,7 @@ pub async fn post(
                         id_doc.document_type,
                         ocr,
                         fake_score_response,
-                        ocr_fixture.unwrap_or(IncodeOcrComparisonDataFields::default()),
+                        id_data,
                         should_collect_selfie,
                         vres.id.clone(),
                         vres.id,

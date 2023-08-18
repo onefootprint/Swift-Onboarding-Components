@@ -52,7 +52,7 @@ use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DataIdentifier, DecisionIntentKind, IdDocKind, IdentityDataKind, IncodeFailureReason,
     IncodeVerificationSessionId, IncodeVerificationSessionKind, PiiJsonValue, PiiString, ScopedVaultId,
-    ScrubbedPiiJsonValue, ScrubbedPiiString, VendorAPI, WorkflowId,
+    ScrubbedPiiJsonValue, ScrubbedPiiString, VendorAPI, WorkflowId, DATE_FORMAT,
 };
 
 #[derive(Clone)]
@@ -291,7 +291,7 @@ fn parse_type_of_id(
 }
 
 pub fn parse_dob(dob: PiiString) -> Result<Option<i64>, ApiError> {
-    let parsed = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")
+    let parsed = NaiveDate::parse_from_str(dob.leak(), DATE_FORMAT)
         .map_err(|_| ApiErrorKind::AssertionError("invalid date in fixture".into()))?
         .and_hms_milli_opt(0, 0, 0, 0)
         .map(|d| d.timestamp_millis());

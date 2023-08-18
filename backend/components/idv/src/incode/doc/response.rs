@@ -8,7 +8,7 @@ use chrono::{NaiveDate, NaiveDateTime, Utc};
 use newtypes::{
     incode::{IncodeDocumentType, IncodeStatus, IncodeTest},
     IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind, PiiString,
-    ScrubbedPiiString,
+    ScrubbedPiiString, DATE_FORMAT,
 };
 
 /// Response we get back from adding a document image
@@ -299,13 +299,23 @@ impl APIResponseToIncodeError for AddSelfieResponse {
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
+pub struct CheckedAddress {
+    pub street: Option<ScrubbedPiiString>,
+    pub colony: Option<ScrubbedPiiString>,
+    pub postal_code: Option<ScrubbedPiiString>,
+    pub city: Option<ScrubbedPiiString>,
+    pub state: Option<ScrubbedPiiString>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
+#[serde(rename_all = "camelCase")]
 // TODO need to PiiStringify eeeeeverything
 pub struct FetchOCRResponse {
     pub name: Option<OCRName>,
     // Address as read from id. Address can have two or three lines. Lines are separated by \n.
     pub address: Option<ScrubbedPiiString>,
     pub checked_address: Option<ScrubbedPiiString>,
-    pub checked_address_bean: Option<serde_json::Value>,
+    pub checked_address_bean: Option<OCRAddress>,
     pub address_fields: Option<OCRAddress>,
     // Image was classified as one of the following:
     // Unknown, Passport, Visa, DriversLicense, IdentificationCard, Permit, Currency, ResidenceDocument, TravelDocument, BirthCertificate, VehicleRegistration,
@@ -356,7 +366,7 @@ impl FetchOCRResponse {
         let naive = NaiveDateTime::from_timestamp_opt(expiration_timestamp / 1000, 0)
             .ok_or(IncodeError::OcrError("could not parse timestamp".into()))?;
 
-        Ok(ScrubbedPiiString::from(naive.format("%Y-%m-%d")))
+        Ok(ScrubbedPiiString::from(naive.format(DATE_FORMAT)))
     }
 
     pub fn expiration_date(&self) -> Result<ScrubbedPiiString, IncodeError> {
@@ -377,11 +387,11 @@ impl FetchOCRResponse {
             "could not parse birth_date timestamp".into(),
         ))?;
 
-        Ok(ScrubbedPiiString::from(naive.format("%Y-%m-%d")))
+        Ok(ScrubbedPiiString::from(naive.format(DATE_FORMAT)))
     }
 
     pub fn age(&self) -> Result<i64, IncodeError> {
-        let dob = NaiveDate::parse_from_str(self.dob()?.leak(), "%Y-%m-%d")
+        let dob = NaiveDate::parse_from_str(self.dob()?.leak(), DATE_FORMAT)
             .map_err(|_| IncodeError::OcrError("error parsing dob".into()))?;
 
         let today = Utc::now().naive_utc().date();
@@ -435,8 +445,8 @@ impl FetchOCRResponse {
             "issuingState":"CALIFORNIA",
             "name":{
                 "firstName":first_name,
-                "fullName":first_name,
-                "givenName":full_name,
+                "fullName":full_name,
+                "givenName":first_name,
                 "givenNameMrz":null,
                 "lastNameMrz":null,
                 "machineReadableFullName":full_name,

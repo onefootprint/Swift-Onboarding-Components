@@ -15,6 +15,8 @@ pub use investor_profile::Declaration;
 
 pub type AllData = HashMap<DataIdentifier, PiiString>;
 
+pub const DATE_FORMAT: &str = "%Y-%m-%d";
+
 pub trait Validate {
     /// Performs basic cleaning and validation for all data that we store in our vaults.
     fn validate(&self, value: PiiString, args: ValidateArgs, all_data: &AllData) -> NtResult<PiiString>;

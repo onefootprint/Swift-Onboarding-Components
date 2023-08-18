@@ -100,7 +100,7 @@ pub async fn should_initiate_requests_for_document(
         //     // Ensure that each sandbox vault has a fixture result - we don't want to make real
         //     // requests for sandbox vaults
         //     .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
-        let ocr_data = if document_decision
+        let fixture_ocr_data = if document_decision
             .map(|d| !matches!(d, IdentityDocumentFixtureResult::Real))
             .unwrap_or(false)
         {
@@ -115,12 +115,18 @@ pub async fn should_initiate_requests_for_document(
                     ],
                 )
                 .await?;
-
-            Some(IncodeOcrComparisonDataFields {
-                first_name: vd.get_di(IdentityDataKind::FirstName)?,
-                last_name: vd.get_di(IdentityDataKind::LastName)?,
-                dob: vd.get_di(IdentityDataKind::Dob)?,
-            })
+            match (
+                vd.get_di(IdentityDataKind::FirstName).ok(),
+                vd.get_di(IdentityDataKind::LastName).ok(),
+                vd.get_di(IdentityDataKind::Dob).ok(),
+            ) {
+                (Some(first_name), Some(last_name), Some(dob)) => Some(IncodeOcrComparisonDataFields {
+                    first_name,
+                    last_name,
+                    dob,
+                }),
+                _ => None,
+            }
         } else {
             None
         };
@@ -131,7 +137,7 @@ pub async fn should_initiate_requests_for_document(
         let should_initiate_sandbox = matches!(document_decision, Some(IdentityDocumentFixtureResult::Real))
             && can_make_demo_incode_requests_in_sandbox;
 
-        return Ok((should_initiate_sandbox, ocr_data));
+        return Ok((should_initiate_sandbox, fixture_ocr_data));
     // guard against prod vaults from providing document fixtures (we prevent this in the API route that starts the flow, but double checking never hurt nobody)
     } else if document_decision.is_some() {
         return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
