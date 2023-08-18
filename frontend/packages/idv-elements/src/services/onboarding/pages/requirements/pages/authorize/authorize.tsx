@@ -41,10 +41,9 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     return <div />;
   }
 
-  const collectedIdDocTypes = requirement.fieldsToAuthorize.documentTypes;
-
-  const { orgName: tenantName, canAccessData } = config;
-  const kycData = canAccessData.filter(
+  const { collectedData, documentTypes } = requirement.fieldsToAuthorize;
+  const { orgName: tenantName } = config;
+  const kycData = collectedData.filter(
     data => isKycCdo(data) || isDocCdo(data) || isInvestorProfileCdo(data),
   ) as (
     | CollectedKycDataOption
@@ -52,7 +51,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     | CollectedInvestorProfileDataOption
   )[];
 
-  const kybData = canAccessData.filter(data =>
+  const kybData = collectedData.filter(data =>
     isKybCdo(data),
   ) as CollectedKybDataOption[];
   const hasBothSections = kycData.length > 0 && kybData.length > 0;
@@ -84,7 +83,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
         <KycFields
           showTitle={hasBothSections}
           data={kycData}
-          documentTypes={collectedIdDocTypes}
+          documentTypes={documentTypes}
         />
         {hasBothSections && <Divider />}
         <KybFields showTitle={hasBothSections} data={kybData} />

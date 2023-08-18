@@ -1,4 +1,5 @@
 import {
+  CollectedDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -68,7 +69,7 @@ export type OnboardingStatusRequest = {
 };
 
 export type AuthorizeFields = {
-  collectedData: CollectedKycDataOption[];
+  collectedData: CollectedDataOption[];
   documentTypes: SupportedIdDocTypes[];
 };
 
