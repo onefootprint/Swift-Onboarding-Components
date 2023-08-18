@@ -1,0 +1,1 @@
+ALTER TABLE contact_info ALTER COLUMN is_otp_verified SET DEFAULT false;
