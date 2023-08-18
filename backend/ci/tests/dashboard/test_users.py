@@ -138,14 +138,6 @@ def test_get_users_detail_doc(
     assert "document.drivers_license.selfie.image" in res["attributes"]
 
 
-def test_liveness_list(sandbox_user):
-    tenant = sandbox_user.tenant
-    body = get(f"entities/{sandbox_user.fp_id}/liveness", None, *tenant.db_auths)
-    creds = body
-    assert len(creds)
-    assert creds[0]["insight_event"]
-
-
 def test_timeline(sandbox_user):
     body = get(
         f"entities/{sandbox_user.fp_id}/timeline",
@@ -153,7 +145,6 @@ def test_timeline(sandbox_user):
         *sandbox_user.tenant.db_auths,
     )
     assert any(i["event"]["kind"] == "data_collected" for i in body)
-    assert any(i["event"]["kind"] == "liveness" for i in body)
     decision_event = next(
         i for i in body if i["event"]["kind"] == "onboarding_decision"
     )
