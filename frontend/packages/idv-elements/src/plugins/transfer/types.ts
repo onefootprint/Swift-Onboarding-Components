@@ -1,8 +1,8 @@
 import {
   IdDocOutcomes,
   IdDocRequirement,
-  RegisterPasskeyRequirement,
   OnboardingConfig,
+  RegisterPasskeyRequirement,
 } from '@onefootprint/types';
 
 import { BasePluginProps } from '../base-plugin';
