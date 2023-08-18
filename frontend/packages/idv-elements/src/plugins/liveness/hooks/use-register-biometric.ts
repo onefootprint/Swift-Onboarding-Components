@@ -46,7 +46,7 @@ const biometricInit = async (payload: BiometricRegisterRequest) => {
     challengeJson: string;
   }>({
     method: 'POST',
-    url: '/hosted/user/biometric/init',
+    url: '/hosted/user/passkey/register',
     data: payload,
     headers: {
       [AUTH_HEADER]: authToken,
@@ -58,7 +58,7 @@ const biometricInit = async (payload: BiometricRegisterRequest) => {
 
   const response = await request<BiometricRegisterResponse>({
     method: 'POST',
-    url: '/hosted/user/biometric',
+    url: '/hosted/user/passkey',
     data: {
       deviceResponseJson,
       challengeToken,

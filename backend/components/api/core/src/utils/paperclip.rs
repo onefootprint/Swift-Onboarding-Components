@@ -45,7 +45,7 @@ macro_rules! api_headers_schema {
 
                     #[allow(unused)]
                     $(#[doc = $r_doc])*
-                    pub fn [<raw_get_$r_name>]<'b>(req: &'b actix_web::http::header::HeaderMap) -> Option<&'b str> {
+                    pub fn [<raw_get_$r_name>](req: & actix_web::http::header::HeaderMap) -> Option<&str> {
                         req.get($r_header)
                         $(
                             .or(req.get($r_alias))
@@ -55,7 +55,7 @@ macro_rules! api_headers_schema {
 
                     #[allow(unused)]
                     $(#[doc = $r_doc])*
-                    pub fn [<raw_get_all_$r_name>]<'b>(req: &'b actix_web::http::header::HeaderMap) -> Vec<&'b actix_web::http::header::HeaderValue> {
+                    pub fn [<raw_get_all_$r_name>](req: &actix_web::http::header::HeaderMap) -> Vec<& actix_web::http::header::HeaderValue> {
                         req.get_all($r_header)
                         $(
                             .chain(req.get_all($r_alias))
@@ -70,7 +70,7 @@ macro_rules! api_headers_schema {
 
                     #[allow(unused)]
                     $(#[doc = $o_doc])*
-                    pub fn [<raw_get_$o_name>]<'b>(req: &'b actix_web::http::header::HeaderMap) -> Option<&'b str> {
+                    pub fn [<raw_get_$o_name>](req: & actix_web::http::header::HeaderMap) -> Option<& str> {
                         req.get($o_header)
                         $(
                             .or(req.get($o_alias))
@@ -80,7 +80,7 @@ macro_rules! api_headers_schema {
 
                     #[allow(unused)]
                     $(#[doc = $o_doc])*
-                    pub fn [<raw_get_all_$o_name>]<'b>(req: &'b actix_web::http::header::HeaderMap) -> Vec<&'b actix_web::http::header::HeaderValue> {
+                    pub fn [<raw_get_all_$o_name>](req: &actix_web::http::header::HeaderMap) -> Vec<& actix_web::http::header::HeaderValue> {
                         req.get_all($o_header)
                         $(
                             .chain(req.get_all($o_alias))

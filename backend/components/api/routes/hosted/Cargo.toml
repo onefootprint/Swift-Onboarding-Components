@@ -14,12 +14,12 @@ enclave_proxy = { path = "../../../enclave/proxy" }
 newtypes = { path = "../../../newtypes" }
 app-attest = { path = "../../../app_attest" }
 db = { path = "../../../db/core" }
-twilio = { path = "../../../twilio"}
+twilio = { path = "../../../twilio" }
 idv = { path = "../../../idv" }
 privacy_pass = { path = "../../../privacy_pass" }
 feature_flag = { path = "../../../feature_flag" }
-webhooks = { path = "../../../webhooks"}
-billing = { path = "../../../billing"}
+webhooks = { path = "../../../webhooks" }
+billing = { path = "../../../billing" }
 api_wire_types = { path = "../../wire_types" }
 
 actix-web = { workspace = true }
@@ -34,9 +34,9 @@ serde = { workspace = true }
 serde_with = "2.2.0"
 
 derive_more = { workspace = true }
-aws-config =  { workspace = true }
-aws-sdk-s3 =  { workspace = true }
-aws-sdk-kms =  { workspace = true }
+aws-config = { workspace = true }
+aws-sdk-s3 = { workspace = true }
+aws-sdk-kms = { workspace = true }
 
 thiserror = { workspace = true }
 
@@ -72,12 +72,12 @@ jsonpath_lib = "0.3.0"
 urlencoding = "2.1.2"
 actix-multipart = "0.5.0"
 rand = { workspace = true }
+macros = { path = "../../../macros" }
 
 
 [dev-dependencies]
 test-case = { workspace = true }
-enclave = { path = "../../../enclave/enclave"}
+enclave = { path = "../../../enclave/enclave" }
 portpicker = "0.1.1"
 tokio-test = "0.4.2"
 mockall = { workspace = true }
-macros = { path = "../../../macros" }

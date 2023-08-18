@@ -2,12 +2,12 @@ use webauthn_rs_core::WebauthnCore;
 
 use crate::config::Config;
 
-pub struct LivenessWebauthnConfig {
+pub struct WebauthnConfig {
     webauthn: WebauthnCore,
     android_webauthn: WebauthnCore,
 }
 
-impl LivenessWebauthnConfig {
+impl WebauthnConfig {
     pub fn new(config: &Config) -> Self {
         let scheme = if config.rp_id.as_str() == "localhost" {
             "http"

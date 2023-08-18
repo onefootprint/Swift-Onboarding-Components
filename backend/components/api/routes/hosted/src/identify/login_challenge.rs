@@ -6,7 +6,7 @@ use crate::identify::ChallengeData;
 use crate::identify::EmailChallengeState;
 use crate::types::response::ResponseData;
 use crate::utils::challenge::Challenge;
-use crate::utils::liveness::LivenessWebauthnConfig;
+use crate::utils::liveness::WebauthnConfig;
 use crate::State;
 use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
@@ -215,7 +215,7 @@ async fn initiate_biometric_challenge_for_user(
         .collect();
 
     // generate the challenge and return it
-    let webauthn = LivenessWebauthnConfig::new(&state.config);
+    let webauthn = WebauthnConfig::new(&state.config);
     let (challenge, auth_state) = webauthn
         .webauthn()
         .generate_challenge_authenticate_options(creds, None)?;

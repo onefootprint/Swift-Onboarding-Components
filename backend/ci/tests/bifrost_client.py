@@ -259,8 +259,8 @@ class BifrostClient:
             assert not body["errors"]
 
     def handle_liveness(self):
-        """Register the biometric credential"""
-        body = post("hosted/user/biometric/init", None, self.auth_token)
+        """Register the passkey credential"""
+        body = post("hosted/user/passkey/register", None, self.auth_token)
         chal_token = body["challenge_token"]
         chal = override_webauthn_challenge(json.loads(body["challenge_json"]))
         attestation = self.webauthn_device.create(chal, TEST_URL)
@@ -268,7 +268,7 @@ class BifrostClient:
         data = dict(
             challenge_token=chal_token, device_response_json=json.dumps(attestation)
         )
-        post("hosted/user/biometric", data, self.auth_token)
+        post("hosted/user/passkey", data, self.auth_token)
 
     def handle_authorize(self, **kwargs):
         post("hosted/onboarding/authorize", None, self.auth_token, **kwargs)

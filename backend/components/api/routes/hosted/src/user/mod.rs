@@ -2,11 +2,10 @@ use paperclip::actix::web;
 
 mod access_events;
 mod authorized_orgs;
-mod biometric;
 mod consent;
 mod documents;
 mod email;
-mod liveness;
+mod passkey;
 mod token;
 mod upload;
 mod vault;
@@ -22,13 +21,15 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(vault::decrypt::post)
         .service(access_events::get)
         .service(authorized_orgs::get)
-        .service(biometric::init_post)
-        .service(biometric::complete_post)
+        .service(passkey::init_post)
+        .service(passkey::complete_post)
         .service(documents::index::post)
         .service(documents::upload::post)
-        .service(liveness::get)
         .service(token::get)
         .service(email::verify::post)
         .service(consent::post)
         .service(upload::post);
+
+    passkey::configure_init_post_aliases(config);
+    passkey::configure_complete_post_aliases(config);
 }

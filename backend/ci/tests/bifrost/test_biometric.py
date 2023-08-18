@@ -69,7 +69,7 @@ def test_d2p_biometric(twilio, sandbox_tenant):
 
     # Add a biometric credential using the d2p token
     _update_status("in_progress")
-    body = post("hosted/user/biometric/init", None, d2p_auth_token)
+    body = post("hosted/user/passkey/register", None, d2p_auth_token)
     chal_token = body["challenge_token"]
     chal = override_webauthn_challenge(json.loads(body["challenge_json"]))
     attestation = WEBAUTHN_DEVICE.create(chal, TEST_URL)
@@ -79,7 +79,7 @@ def test_d2p_biometric(twilio, sandbox_tenant):
     data = dict(
         challenge_token=chal_token, device_response_json=json.dumps(attestation)
     )
-    post("hosted/user/biometric", data, d2p_auth_token)
+    post("hosted/user/passkey", data, d2p_auth_token)
 
     # Check that the status is updated
     _update_status("completed")
@@ -89,8 +89,8 @@ def test_d2p_biometric(twilio, sandbox_tenant):
     _update_status("canceled", status_code=400)
 
     # Shouldn't be able to add a second biometric credential
-    post("hosted/user/biometric/init", None, d2p_auth_token, status_code=400)
-    post("hosted/user/biometric", data, d2p_auth_token, status_code=400)
+    post("hosted/user/passkey/register", None, d2p_auth_token, status_code=400)
+    post("hosted/user/passkey", data, d2p_auth_token, status_code=400)
 
     # Make sure the liveness requirement is met
     assert not any(

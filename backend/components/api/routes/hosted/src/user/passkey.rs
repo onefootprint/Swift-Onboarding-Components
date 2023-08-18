@@ -5,7 +5,7 @@ use crate::{
     utils::{
         challenge::{Challenge, ChallengeToken},
         headers::InsightHeaders,
-        liveness::LivenessWebauthnConfig,
+        liveness::WebauthnConfig,
     },
     State,
 };
@@ -22,6 +22,7 @@ use db::models::{
     vault::Vault,
     webauthn_credential::{NewWebauthnCredential, WebauthnCredential},
 };
+use macros::route_alias;
 use newtypes::Base64Data;
 use newtypes::{AttestationType, LivenessAttributes, LivenessInfo, LivenessIssuer};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -45,8 +46,14 @@ pub struct WebAuthnInitResponse {
     challenge_token: ChallengeToken,
 }
 
-#[api_v2_operation(description = "Generates a registration challenge.", tags(Hosted))]
-#[post("/hosted/user/biometric/init")]
+//TODO: remove alias once frontend updates
+#[route_alias(post(
+    "/hosted/user/biometric/init",
+    tags(Hosted),
+    description = "Generates a passkey registration challenge",
+))]
+#[api_v2_operation(description = "Generates a passkey registration challenge.", tags(Hosted))]
+#[post("/hosted/user/passkey/register")]
 pub async fn init_post(
     // TODO only allow registering webauthn credentials if you have no previous credentials OR if
     // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
@@ -66,7 +73,7 @@ pub async fn init_post(
     }
 
     // generate the challenge and return it
-    let webauthn = LivenessWebauthnConfig::new(&state.config);
+    let webauthn = WebauthnConfig::new(&state.config);
     let vault_id = user_auth.user_vault_id();
     let (challenge, reg_state) = webauthn.webauthn().generate_challenge_register_options(
         vault_id.to_string().as_bytes(),
@@ -106,8 +113,17 @@ pub struct WebauthnRegisterRequest {
     attested_metadata_json: Option<Base64Data>,
 }
 
-#[api_v2_operation(tags(Hosted), description = "Accepts a response to a registration challenge")]
-#[post("/hosted/user/biometric")]
+//TODO: remove alias once frontend updates
+#[route_alias(post(
+    "/hosted/user/biometric",
+    tags(Hosted),
+    description = "Accepts a response to a passkey registration challenge",
+))]
+#[api_v2_operation(
+    tags(Hosted),
+    description = "Accepts a response to a passkey registration challenge"
+)]
+#[post("/hosted/user/passkey")]
 pub async fn complete_post(
     request: Json<WebauthnRegisterRequest>,
     user_auth: UserAuthContext,
@@ -120,7 +136,7 @@ pub async fn complete_post(
     let reg_state = challenge_data.data;
 
     // generate the challenge and return it
-    let webauthn = LivenessWebauthnConfig::new(&state.config);
+    let webauthn = WebauthnConfig::new(&state.config);
     let cas = AttestationCaList::apple_and_android();
 
     let reg: RegisterPublicKeyCredential = serde_json::from_str(&request.device_response_json)?;
@@ -236,6 +252,7 @@ pub async fn complete_post(
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
 
             // if we're in an onboarding, optimisticaly try to submit a liveness event if the webauthn
+            // attestation gives liveness
             if let Some(su_id) = user_auth.scoped_user_id() {
                 let liveness_event = if let Some(attributes) = liveness_event_attributes {
                     NewLivenessEvent {
@@ -304,6 +321,7 @@ struct AppleDeviceMetadata {
     os: Option<String>,
 }
 
+#[allow(non_camel_case_types)]
 #[derive(Debug, PartialEq, Clone, Copy, Serialize_repr, Deserialize_repr, Apiv2Schema)]
 #[repr(u8)]
 enum LocationMatchType {
@@ -367,7 +385,7 @@ fn is_android(client_data_json: &[u8]) -> ApiResult<bool> {
 
 #[cfg(test)]
 mod tests {
-    use api_core::utils::liveness::LivenessWebauthnConfig;
+    use api_core::utils::liveness::WebauthnConfig;
 
     use super::{is_android, try_attest_apple_app_attestation, WebauthnRegisterRequest};
 
@@ -421,7 +439,7 @@ mod tests {
 
         assert!(is_android(&reg.response.client_data_json.0).expect("failed to check android"));
 
-        let config = LivenessWebauthnConfig::android_config("onefootprint.com");
+        let config = WebauthnConfig::android_config("onefootprint.com");
 
         let reg_state = serde_json::json!({
           "policy": "required",

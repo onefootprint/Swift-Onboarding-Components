@@ -6,7 +6,7 @@ use crate::errors::{ApiError, ApiResult};
 use crate::identify::{ChallengeData, ChallengeDataKind, ChallengeState};
 use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
-use crate::utils::liveness::LivenessWebauthnConfig;
+use crate::utils::liveness::WebauthnConfig;
 use crate::utils::session::AuthSession;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
@@ -224,7 +224,7 @@ fn validate_biometric_challenge(
     challenge_response: &str,
 ) -> ApiResult<(VaultId, VerifyKind)> {
     // Decode and validate the response to the biometric challenge
-    let webauthn = LivenessWebauthnConfig::new(config);
+    let webauthn = WebauthnConfig::new(config);
     let auth_resp = serde_json::from_str(challenge_response)?;
 
     let result = webauthn
