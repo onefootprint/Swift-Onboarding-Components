@@ -18,8 +18,8 @@ describe('getInitialCountry', () => {
       label: 'Brazil',
       value3: 'BRA',
       passport: true,
-      idCard: true,
-      driversLicense: true,
+      idCard: false,
+      driversLicense: false,
     });
   });
 });
