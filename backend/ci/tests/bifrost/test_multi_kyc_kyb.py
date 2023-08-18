@@ -99,7 +99,7 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     # But not for a different user
     phone_number = primary_bo.client.data["id.phone_number"]
     sandbox_id_h = SandboxId(primary_bo.client.sandbox_id)
-    identify_user(phone_number, kyb_sandbox_ob_config.key, sandbox_id_h)
+    identify_user(dict(phone_number=phone_number), kyb_sandbox_ob_config.key, sandbox_id_h)
     challenge_data = challenge_user(
         phone_number, "sms", kyb_sandbox_ob_config.key, sandbox_id_h
     )

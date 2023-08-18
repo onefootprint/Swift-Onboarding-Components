@@ -1,4 +1,4 @@
-use newtypes::{DataIdentifier, IdentityDataKind};
+use newtypes::{ContactInfoKind, DataIdentifier, IdentityDataKind};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -11,6 +11,10 @@ pub enum UserError {
     CannotDecrypt(DataIdentifier),
     #[error("Cannot send SMS communications to a phone number that isn't verified")]
     PhoneNumberNotVerified,
+    #[error("Cannot send email communications to an email that isn't verified")]
+    EmailNotVerified,
+    #[error("Cannot send communications to a {0} that isn't verified")]
+    ContactInfoKindNotVerified(ContactInfoKind),
     #[error("Document type not provided")]
     NoDocumentType,
 

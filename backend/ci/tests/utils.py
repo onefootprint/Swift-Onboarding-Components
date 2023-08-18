@@ -153,7 +153,7 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
 
 
 def inherit_user(twilio, phone_number, *headers):
-    body = identify_user(phone_number, *headers)
+    body = identify_user(dict(phone_number=phone_number), *headers)
     assert "sms" in body["available_challenge_kinds"]
     challenge_data = challenge_user(phone_number, "sms", *headers)
 
@@ -172,7 +172,7 @@ def inherit_user_biometric(user):
     sandbox_id = user.client.sandbox_id
     sandbox_id_h = [SandboxId(sandbox_id)] if sandbox_id else []
 
-    body = identify_user(phone_number, user.client.ob_config.key, *sandbox_id_h)
+    body = identify_user(dict(phone_number=phone_number), user.client.ob_config.key, *sandbox_id_h)
     assert "biometric" in body["available_challenge_kinds"]
     challenge_data = challenge_user(
         phone_number, "biometric", user.client.ob_config.key, *sandbox_id_h
@@ -182,6 +182,24 @@ def inherit_user_biometric(user):
     )
     assert body["kind"] == "user_inherited"
     return FpAuth(body["auth_token"])
+
+
+def inherit_user_email(user):
+    email = user.client.data["id.email"]
+    sandbox_id = user.client.sandbox_id
+    sandbox_id_h = [SandboxId(sandbox_id)] if sandbox_id else []
+
+    body = identify_user(dict(email=email), user.client.ob_config.key, *sandbox_id_h)
+    assert "email" in body["available_challenge_kinds"]
+    body = post("hosted/identify/login_challenge", dict(
+            identifier=dict(email=email),
+            preferred_challenge_kind="email",
+        ), user.client.ob_config.key, *sandbox_id_h)
+
+    verify_res = post("hosted/identify/verify", dict(challenge_response="424242", challenge_token=body['challenge_data']['challenge_token']), user.client.ob_config.key, *sandbox_id_h)
+
+    return FpAuth(verify_res["auth_token"])
+
 
 
 def step_up_user_biometric(auth_token, user):
@@ -228,9 +246,7 @@ def biometric_challenge_response(challenge_data, user, *headers):
     return body
 
 
-def identify_user(phone_number, *headers):
-    identifier = dict(phone_number=phone_number)
-
+def identify_user(identifier, *headers):
     def identify():
         data = dict(
             identifier=identifier,

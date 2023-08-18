@@ -5,6 +5,7 @@ use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::twilio::PhoneChallengeState;
 use db::models::webauthn_credential::WebauthnCredential;
+use newtypes::ContactInfoKind;
 use newtypes::PiiString;
 use newtypes::SandboxId;
 use newtypes::TenantId;
@@ -15,7 +16,6 @@ use crate::errors::ApiError;
 use crate::utils::challenge::ChallengeToken;
 use crate::State;
 use chrono::{DateTime, Duration, Utc};
-use newtypes::IdentityDataKind;
 use newtypes::VaultId;
 use paperclip::actix::{web, Apiv2Schema};
 use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
@@ -112,15 +112,32 @@ async fn get_user_challenge_context(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let uvw = VaultWrapper::build(conn, VwArgs::Vault(&existing_user.id))?;
+
             let creds = WebauthnCredential::get_for_user_vault(conn, &uvw.vault.id)?;
             Ok((uvw, creds))
         })
         .await??;
 
     let mut kinds: Vec<ChallengeKind> = Vec::new();
-    if uvw.has_field(IdentityDataKind::PhoneNumber) {
+
+    if uvw
+        .decrypt_contact_info(state, ContactInfoKind::Phone)
+        .await?
+        .map(|(_, ci)| ci.is_verified)
+        .unwrap_or(false)
+    {
         kinds.push(ChallengeKind::Sms);
     }
+
+    if uvw
+        .decrypt_contact_info(state, ContactInfoKind::Email)
+        .await?
+        .map(|(_, ci)| ci.is_verified)
+        .unwrap_or(false)
+    {
+        kinds.push(ChallengeKind::Email);
+    }
+
     if !creds.is_empty() {
         kinds.push(ChallengeKind::Biometric);
     }

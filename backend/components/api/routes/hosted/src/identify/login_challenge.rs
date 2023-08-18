@@ -3,6 +3,7 @@ use crate::errors::challenge::ChallengeError;
 use crate::errors::onboarding::OnboardingError;
 use crate::identify::get_user_challenge_context;
 use crate::identify::ChallengeData;
+use crate::identify::EmailChallengeState;
 use crate::types::response::ResponseData;
 use crate::utils::challenge::Challenge;
 use crate::utils::liveness::LivenessWebauthnConfig;
@@ -16,6 +17,7 @@ use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::headers::SandboxId;
 use api_wire_types::IdentifyId;
 use crypto::serde_cbor;
+use crypto::sha256;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::VaultId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
@@ -82,34 +84,67 @@ pub async fn post(
         };
 
     // If we need to create a challenge, extract the phone number for the user
-    let phone_number = uvw.get_decrypted_primary_phone(&state).await?;
     let sandbox_id = uvw.vault.sandbox_id.clone();
 
-    // Initiate the challenge of the requested type
-    let challenge_kind = if creds.is_empty() {
+    let challenge_kind = match preferred_challenge_kind {
         // Fall back to SMS if the user requested webauthn but doesn't have any creds
-        ChallengeKind::Sms
-    } else {
-        preferred_challenge_kind
-    };
-    let (challenge_state_data, time_before_retry_s, biometric_challenge_json) = match challenge_kind {
         ChallengeKind::Biometric => {
-            let challenge = initiate_biometric_challenge_for_user(&state, &uvw.vault.id, creds).await?;
-            let challenge_data = ChallengeData::Biometric(challenge.state);
-            (challenge_data, 0, Some(challenge.challenge_json))
+            if creds.is_empty() {
+                ChallengeKind::Sms
+            } else {
+                ChallengeKind::Biometric
+            }
         }
-        ChallengeKind::Sms => {
-            let tenant_name = tenant.map(|t| t.name.clone());
-            let (challenge_state, time_before_retry_s) = twilio_client
-                .send_challenge(&state, tenant_name, &phone_number, sandbox_id)
-                .await?;
-            let challenge_data = ChallengeData::Sms(challenge_state);
-            (challenge_data, time_before_retry_s.num_seconds(), None)
-        }
-        ChallengeKind::Email => {
-            return Err(ChallengeError::ChallengeKindNotAllowed("email".to_string()).into())
-        }
+        ck => ck,
     };
+
+    let (challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =
+        match challenge_kind {
+            ChallengeKind::Biometric => {
+                let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
+                let challenge = initiate_biometric_challenge_for_user(&state, &uvw.vault.id, creds).await?;
+                let challenge_data = ChallengeData::Biometric(challenge.state);
+                (
+                    challenge_data,
+                    0,
+                    Some(phone_number),
+                    Some(challenge.challenge_json),
+                )
+            }
+            ChallengeKind::Sms => {
+                let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
+                let tenant_name = tenant.map(|t| t.name.clone());
+                let (challenge_state, time_before_retry_s) = twilio_client
+                    .send_challenge(&state, tenant_name, &phone_number, sandbox_id)
+                    .await?;
+                let challenge_data = ChallengeData::Sms(challenge_state);
+                (
+                    challenge_data,
+                    time_before_retry_s.num_seconds(),
+                    Some(phone_number),
+                    None,
+                )
+            }
+            ChallengeKind::Email => {
+                let email = uvw.get_decrypted_verified_email(&state).await?;
+                // TODO: consolidate with signup_challenge
+                let code = "424242".to_string();
+                let h_code = sha256(code.as_bytes()).to_vec();
+
+                let challenge_data = ChallengeData::Email(EmailChallengeState {
+                    email: email.email,
+                    sandbox_id,
+                    h_code,
+                });
+
+                (
+                    challenge_data,
+                    state.config.time_s_between_sms_challenges,
+                    None,
+                    None,
+                )
+            }
+        };
 
     let challenge_state = ChallengeState {
         data: challenge_state_data,
@@ -126,7 +161,7 @@ pub async fn post(
             challenge_data: UserChallengeData {
                 challenge_kind,
                 challenge_token,
-                scrubbed_phone_number: Some(phone_number.last_two()),
+                scrubbed_phone_number: phone_number.map(|p| p.last_two()),
                 biometric_challenge_json,
                 time_before_retry_s,
             },

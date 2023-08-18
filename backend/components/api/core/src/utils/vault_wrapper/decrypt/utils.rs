@@ -3,40 +3,72 @@ use crate::enclave_client::EnclaveClient;
 use crate::errors::business::BusinessError;
 use crate::errors::user::UserError;
 use crate::errors::ApiResult;
-use crate::{ApiErrorKind, State};
+use crate::{ApiError, ApiErrorKind, State};
 use db::models::business_owner::{BusinessOwner, UserData};
 use db::models::contact_info::ContactInfo;
-use db::DbPool;
+use db::{DbError, DbPool};
+use newtypes::email::Email;
 use newtypes::{
-    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, IdentityDataKind as IDK,
-    KycedBusinessOwnerData, PhoneNumber, TenantId,
+    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, ContactInfoKind, IdentityDataKind as IDK,
+    KycedBusinessOwnerData, PhoneNumber, PiiString, TenantId,
 };
+use std::str::FromStr;
 
 impl<Type> VaultWrapper<Type> {
-    pub async fn get_decrypted_primary_phone(&self, state: &State) -> ApiResult<PhoneNumber> {
-        let phone_lifetime_id = self
-            .get(IDK::PhoneNumber)
-            .ok_or(ApiErrorKind::NoPhoneNumberForVault)?
-            .lifetime_id()
-            .clone();
-        let ci = state
-            .db_pool
-            .db_query(move |conn| ContactInfo::get(conn, &phone_lifetime_id))
-            .await??;
+    pub async fn decrypt_contact_info(
+        &self,
+        state: &State,
+        kind: ContactInfoKind,
+    ) -> ApiResult<Option<(PiiString, ContactInfo)>> {
+        if let Some(di_id) = self.get(IDK::from(kind.clone())) {
+            let di_id = di_id.lifetime_id().clone();
+            let ci = state
+                .db_pool
+                .db_query(move |conn| ContactInfo::get(conn, &di_id))
+                .await??;
+
+            let data = self
+                .decrypt_unchecked_single(&state.enclave_client, IDK::from(kind.clone()).into())
+                .await?
+                .ok_or(ApiError::from(DbError::ObjectNotFound))?;
+            Ok(Some((data, ci)))
+        } else {
+            Ok(None)
+        }
+    }
+
+    // TODO: can later have a function return whatever CI is available for the user and then have notification callsites support either
+    async fn decrypt_verified_contact_info(
+        &self,
+        state: &State,
+        kind: ContactInfoKind,
+    ) -> ApiResult<PiiString> {
+        let (data, ci) = self
+            .decrypt_contact_info(state, kind.clone())
+            .await?
+            .ok_or(ApiErrorKind::ContactInfoKindNotInVault(kind.clone()))?;
+
         if !ci.is_verified {
             // Many of the communications we send out give either OTPs or links that allow authing
-            // as the user. So, we want to make sure a tenant can't update the user's phonen number
-            // and then send themselves OTPs. First, check that the phone number is verified to
+            // as the user. So, we want to make sure a tenant can't update the user's phone number/email
+            // and then send themselves OTPs. First, check that the phone number/email is verified to
             // be owned by the user
-            return Err(UserError::PhoneNumberNotVerified.into());
+            Err(UserError::ContactInfoKindNotVerified(kind).into())
+        } else {
+            Ok(data)
         }
+    }
 
-        let e164 = self
-            .decrypt_unchecked_single(&state.enclave_client, IDK::PhoneNumber.into())
-            .await?
-            .ok_or(ApiErrorKind::NoPhoneNumberForVault)?;
-        let phone_number = PhoneNumber::parse(e164)?;
-        Ok(phone_number)
+    pub async fn get_decrypted_verified_primary_phone(&self, state: &State) -> ApiResult<PhoneNumber> {
+        self.decrypt_verified_contact_info(state, ContactInfoKind::Phone)
+            .await
+            .and_then(|p| PhoneNumber::parse(p).map_err(ApiError::from))
+    }
+
+    pub async fn get_decrypted_verified_email(&self, state: &State) -> ApiResult<Email> {
+        self.decrypt_verified_contact_info(state, ContactInfoKind::Email)
+            .await
+            .and_then(|e| Email::from_str(e.leak()).map_err(ApiError::from))
     }
 }
 

@@ -47,7 +47,7 @@ pub async fn handler(
             Ok(uvw)
         })
         .await??;
-    let phone_number = uvw.get_decrypted_primary_phone(&state).await?;
+    let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
 
     let time_before_retry_s = state
         .twilio_client

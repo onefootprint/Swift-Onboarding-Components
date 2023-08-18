@@ -4,7 +4,7 @@ use actix_web::{
 };
 
 use db::errors::DbError;
-use newtypes::{output::Csv, DataIdentifier, ErrorMessage, Uuid};
+use newtypes::{output::Csv, ContactInfoKind, DataIdentifier, ErrorMessage, Uuid};
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
@@ -96,6 +96,10 @@ pub enum ApiErrorKind {
     Webauthn(#[from] WebauthnError),
     #[error("No phone number for vault")]
     NoPhoneNumberForVault,
+    #[error("No email for vault")]
+    NoEmailForVault,
+    #[error("No {0} in vault")]
+    ContactInfoKindNotInVault(ContactInfoKind),
     #[error("{0}")]
     ReqwestError(#[from] reqwest::Error),
     #[error("Sendgrid error: {0}")]
@@ -280,6 +284,8 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
             ApiErrorKind::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::NoEmailForVault => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::ContactInfoKindNotInVault(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::HandoffError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::Twilio(e) => e.status_code(),

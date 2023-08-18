@@ -130,7 +130,7 @@ pub async fn post(
         })
         .await?;
 
-    let phone_number = vw.get_decrypted_primary_phone(&state).await?;
+    let phone_number = vw.get_decrypted_verified_primary_phone(&state).await?;
     let url = state
         .config
         .service_config
