@@ -82,7 +82,7 @@ const Drawer = ({
 
 const DrawerContainer = styled.div`
   ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.primary};
+    background-color: ${theme.surfaceColor[3]};
     box-shadow: ${theme.elevation[3]};
     height: 100vh;
     position: fixed;

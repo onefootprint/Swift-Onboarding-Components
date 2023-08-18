@@ -169,7 +169,7 @@ const DialogContainer = styled(Fade)<{
   onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 }>`
   ${({ theme, disableResponsiveness }) => css`
-    background-color: ${theme.backgroundColor.primary};
+    background-color: ${theme.surfaceColor[2]};
     display: flex;
     flex-direction: column;
     isolation: isolate;
@@ -272,7 +272,7 @@ const Footer = styled.footer`
     justify-content: space-between;
     padding: ${theme.spacing[5]} ${theme.spacing[7]};
     flex-shrink: 0;
-    background-color: ${theme.backgroundColor.primary};
+    background-color: ${theme.surfaceColor[2]};
     width: 100%;
     z-index: 1;
     position: sticky;

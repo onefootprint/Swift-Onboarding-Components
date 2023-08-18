@@ -12,7 +12,6 @@ const Tag = styled.span<TagProps>`
     ${createFontStyles('body-4')};
     color: ${theme.color.neutral};
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
-    background-color: ${theme.backgroundColor.primary};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     border-radius: ${theme.borderRadius.full};
     white-space: nowrap;

@@ -15,16 +15,16 @@ const radioSelect: RadioSelect = {
   color: textColor.accent,
   hover: {
     default: {
-      bg: surfaceColor[11],
-      borderColor: borderColor.tertiary,
+      bg: surfaceColor[3],
+      borderColor: borderColor.primary,
     },
     selected: {
-      bg: surfaceColor[41],
+      bg: surfaceColor[2],
       borderColor: borderColor.tertiary,
     },
   },
   selected: {
-    bg: surfaceColor[4],
+    bg: surfaceColor[1],
     borderColor: borderColor.secondary,
   },
   components: {

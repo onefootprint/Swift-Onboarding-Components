@@ -26,7 +26,7 @@ export const primaryBtnBackgroundColor = {
 };
 
 export const secondaryBtnBackgroundColor = {
-  default: `${c.Gray900}`,
+  default: `transparent`,
   hover: `${c.Gray800}`,
   active: `${c.Gray700}`,
   disabled: `${c.Gray900}`,
