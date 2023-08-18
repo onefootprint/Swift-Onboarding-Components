@@ -123,7 +123,7 @@ async fn get_user_challenge_context(
     if uvw
         .decrypt_contact_info(state, ContactInfoKind::Phone)
         .await?
-        .map(|(_, ci)| ci.is_verified)
+        .map(|(_, ci)| ci.is_otp_verified)
         .unwrap_or(false)
     {
         kinds.push(ChallengeKind::Sms);
@@ -132,7 +132,7 @@ async fn get_user_challenge_context(
     if uvw
         .decrypt_contact_info(state, ContactInfoKind::Email)
         .await?
-        .map(|(_, ci)| ci.is_verified)
+        .map(|(_, ci)| ci.is_otp_verified)
         .unwrap_or(false)
     {
         kinds.push(ChallengeKind::Email);

@@ -48,7 +48,7 @@ impl<Type> VaultWrapper<Type> {
             .await?
             .ok_or(ApiErrorKind::ContactInfoKindNotInVault(kind.clone()))?;
 
-        if !ci.is_verified {
+        if !ci.is_otp_verified {
             // Many of the communications we send out give either OTPs or links that allow authing
             // as the user. So, we want to make sure a tenant can't update the user's phone number/email
             // and then send themselves OTPs. First, check that the phone number/email is verified to

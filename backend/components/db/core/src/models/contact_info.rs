@@ -12,7 +12,8 @@ use newtypes::{ContactInfoId, DataLifetimeId};
 /// Contains supplemental information for contact information stored inside the vault_data table
 pub struct ContactInfo {
     pub id: ContactInfoId,
-    pub is_verified: bool,
+    #[allow(dead_code)]
+    is_verified: bool,
     pub priority: ContactInfoPriority,
     pub lifetime_id: DataLifetimeId,
     pub _created_at: DateTime<Utc>,
