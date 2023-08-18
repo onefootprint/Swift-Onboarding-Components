@@ -4,10 +4,10 @@ import {
   CollectKycDataRequirement,
   IdDI,
   IdDocRequirement,
-  LivenessRequirement,
   OnboardingConfig,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
+  RegisterPasskeyRequirement,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -15,7 +15,7 @@ import createOnboardingRequirementsMachine, {
   OnboardingRequirementsMachineArgs,
 } from './machine';
 
-const livenessRequirement = {} as LivenessRequirement;
+const livenessRequirement = {} as RegisterPasskeyRequirement;
 
 const idDocRequirement = {
   shouldCollectSelfie: true,

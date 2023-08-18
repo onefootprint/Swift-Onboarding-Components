@@ -6,14 +6,20 @@ use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
+use macros::route_alias;
 use newtypes::WorkflowGuard;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{api_v2_operation, post, web};
 
+#[route_alias(post(
+    "/hosted/onboarding/skip_liveness",
+    tags(Hosted),
+    description = "Allows skipping passkeys if the device doesn't support it"
+))] // TODO: remove alias once deploys
 #[api_v2_operation(
     tags(Hosted),
-    description = "Allows skipping liveness checks for an onboarding. Only temporary"
+    description = "Tells us that a passkey registration was skipped"
 )]
-#[actix::post("/hosted/onboarding/skip_liveness")]
+#[post("/hosted/onboarding/skip_passkey_register")]
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserObAuthContext,
@@ -21,7 +27,7 @@ pub async fn post(
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
-
+    
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {

@@ -46,7 +46,7 @@ pub async fn post(
     let unmet_reqs = reqs
         .into_iter()
         .filter(|r| !r.is_met())
-        // Process requirement shouldn't block the process endpoint
+        // Process requirement shouldn't block the process endpoint        
         .filter(|r| !matches!(r, OnboardingRequirement::Process))
         .collect_vec();
     if !unmet_reqs.is_empty() {

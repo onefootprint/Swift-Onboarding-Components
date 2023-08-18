@@ -41,7 +41,7 @@ use webauthn_rs_proto::{
 /// Contains the payload for the frontend to communicate to the device via webauthn
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema)]
 pub struct WebAuthnInitResponse {
-    // TODO do we have to explicitly convert this to JSON?
+    /// NOTE: this json needs to be a string as we need to be able to compute it's hash    
     challenge_json: String,
     challenge_token: ChallengeToken,
 }

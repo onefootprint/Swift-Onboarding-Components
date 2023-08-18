@@ -697,7 +697,7 @@ describe.skip('<Idv />', () => {
       withRequirements(
         [
           {
-            kind: OnboardingRequirementKind.liveness,
+            kind: OnboardingRequirementKind.registerPasskey,
           },
         ],
         [],

@@ -10,14 +10,14 @@ use db::{
     models::{
         document_request::DocumentRequest, identity_document::IdentityDocument,
         liveness_event::LivenessEvent, ob_configuration::ObConfiguration, user_consent::UserConsent,
-        workflow::Workflow,
+        webauthn_credential::WebauthnCredential, workflow::Workflow,
     },
     PgConn,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
 use newtypes::{
-    AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, OnboardingRequirement,
+    AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, LivenessSource, OnboardingRequirement,
     OnboardingRequirementKind, Selfie,
 };
 use newtypes::{
@@ -33,7 +33,7 @@ mod fingerprint_visit;
 mod index;
 mod pat;
 mod process;
-mod skip_liveness;
+mod skip_passkey_register;
 mod socure_device;
 mod status;
 mod stytch;
@@ -44,7 +44,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(index::post)
         .service(authorize::post)
         .service(status::get)
-        .service(skip_liveness::post)
+        .service(skip_passkey_register::post)
         .service(fingerprint_visit::post)
         .service(pat::get)
         .service(socure_device::post)
@@ -241,18 +241,25 @@ fn get_requirement_inner(
                 })
                 .transpose()?
         }
-        // TODO the below requirements we will never include when met, kind of confusing
-        OnboardingRequirementKind::Liveness => {
-            // TODO: force liveness checks to be re-done and not shared across tenants
-            // RELATED: FP-1802 and FP-1800
-
+        // The below requirements we will never include when met
+        // (kind of confusing in that we are checking in real-time if they've been satisifed)
+        OnboardingRequirementKind::RegisterPasskey => {
+            // skip passkey registration on no-phone flows
             if ob_config.is_no_phone_flow {
                 None
             } else {
-                let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.vault.id)?;
-                liveness_events
-                    .is_empty()
-                    .then_some(OnboardingRequirement::Liveness)
+                let credentials = WebauthnCredential::get_for_user_vault(conn, &uvw.vault().id)?;
+
+                // Note: we should probably represent this another way, but for now we can determine if we want to skip passkey reg
+                // by checking for this liveness event on the scoped_vault
+                let liveness_skip_events =
+                    LivenessEvent::get_by_scoped_vault_id(conn, &args.workflow.scoped_vault_id)?
+                        .into_iter()
+                        .filter(|evt| matches!(evt.liveness_source, LivenessSource::Skipped))
+                        .collect_vec();
+
+                (liveness_skip_events.is_empty() && credentials.is_empty())
+                    .then_some(OnboardingRequirement::RegisterPasskey)
             }
         }
         OnboardingRequirementKind::CollectDocument => {

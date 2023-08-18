@@ -23,7 +23,7 @@ def test_skip_liveness(twilio, sandbox_tenant):
     body = bifrost.get_status()
     assert list(r for r in body["requirements"] if r["kind"] == "liveness")
 
-    post("hosted/onboarding/skip_liveness", None, bifrost.auth_token)
+    post("hosted/onboarding/skip_passkey_register", None, bifrost.auth_token)
 
     # After skipping, liveness requirement does not exist
     body = bifrost.get_status()

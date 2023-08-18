@@ -32,7 +32,7 @@ const computeRequirementsToShow = (
       remainingRequirements.kyb = req;
     } else if (req.kind === OnboardingRequirementKind.collectKycData) {
       remainingRequirements.kyc = req;
-    } else if (req.kind === OnboardingRequirementKind.liveness) {
+    } else if (req.kind === OnboardingRequirementKind.registerPasskey) {
       remainingRequirements.liveness = req;
     } else if (req.kind === OnboardingRequirementKind.idDoc) {
       remainingRequirements.idDoc = req;

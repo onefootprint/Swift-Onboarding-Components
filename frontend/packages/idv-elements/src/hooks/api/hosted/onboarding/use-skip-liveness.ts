@@ -7,7 +7,7 @@ import { AUTH_HEADER } from '../../../../config/constants';
 const skipLiveness = async (payload: SkipLivenessRequest) => {
   const response = await request<SkipLivenessResponse>({
     method: 'POST',
-    url: '/hosted/onboarding/skip_liveness',
+    url: '/hosted/onboarding/skip_passkey_register',
     data: payload,
     headers: {
       [AUTH_HEADER]: payload.authToken,

@@ -54,6 +54,17 @@ impl LivenessEvent {
         Ok(results)
     }
 
+    #[tracing::instrument("LivenessEvent::get_by_scoped_vault_id", skip_all)]
+    pub fn get_by_scoped_vault_id(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+    ) -> Result<Vec<LivenessEvent>, DbError> {
+        let results = liveness_event::table
+            .filter(liveness_event::scoped_vault_id.eq(scoped_vault_id))
+            .get_results(conn)?;
+        Ok(results)
+    }
+
     #[tracing::instrument("LivenessEvent::get_for_scoped_user", skip_all)]
     pub fn get_for_scoped_user(
         conn: &mut PgConn,

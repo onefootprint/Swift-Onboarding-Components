@@ -7,7 +7,7 @@ import { SupportedIdDocTypes } from '../data/id-doc-type';
 import { OnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {
-  liveness = 'liveness',
+  registerPasskey = 'liveness', // TODO: eventually we need to synchronously rename `liveness` or create a duplicate
   idDoc = 'collect_document',
   collectKycData = 'collect_data',
   collectKybData = 'collect_business_data',
@@ -41,8 +41,8 @@ export type IdDocRequirement = {
   supportedDocumentTypes: SupportedIdDocTypes[];
 };
 
-export type LivenessRequirement = {
-  kind: OnboardingRequirementKind.liveness;
+export type RegisterPasskeyRequirement = {
+  kind: OnboardingRequirementKind.registerPasskey;
 };
 
 export type AuthorizeRequirement = {
@@ -59,7 +59,7 @@ export type OnboardingRequirement =
   | CollectKycDataRequirement
   | CollectInvestorProfileRequirement
   | IdDocRequirement
-  | LivenessRequirement
+  | RegisterPasskeyRequirement
   | AuthorizeRequirement
   | ProcessRequirement;
 

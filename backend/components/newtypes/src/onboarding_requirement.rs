@@ -26,8 +26,11 @@ pub enum OnboardingRequirement {
         missing_attributes: Vec<CollectedDataOption>,
         populated_attributes: Vec<CollectedDataOption>,
     },
-    /// Perform liveness checks
-    Liveness,
+    /// Register a passkey    
+    #[serde(rename = "liveness")]
+    #[strum(to_string = "liveness")]
+    #[strum_discriminants(strum(to_string = "liveness"))]
+    RegisterPasskey,
     /// A document needs to be collected
     CollectDocument {
         document_request_id: DocumentRequestId,
@@ -61,7 +64,7 @@ impl OnboardingRequirement {
                 populated_attributes: _,
             } => missing_attributes.is_empty(),
             // The below requirements only exist when they are unmet, so they are always unmet
-            Self::Liveness => false,
+            Self::RegisterPasskey => false,
             Self::CollectDocument {
                 document_request_id: _,
                 should_collect_consent: _,

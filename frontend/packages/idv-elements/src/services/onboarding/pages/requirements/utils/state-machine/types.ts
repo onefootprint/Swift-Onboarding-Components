@@ -6,9 +6,9 @@ import {
   IdDocOutcomes,
   IdDocRequirement,
   IdvBootstrapData,
-  LivenessRequirement,
   OnboardingConfig,
   ProcessRequirement,
+  RegisterPasskeyRequirement,
 } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
@@ -18,7 +18,7 @@ export type Requirements = {
   kyc?: CollectKycDataRequirement;
   isKycMet?: boolean;
   investorProfile?: CollectInvestorProfileRequirement;
-  liveness?: LivenessRequirement;
+  liveness?: RegisterPasskeyRequirement;
   idDoc?: IdDocRequirement;
   authorize?: AuthorizeRequirement;
   process?: ProcessRequirement;
