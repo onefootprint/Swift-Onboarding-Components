@@ -33,6 +33,9 @@ export type MachineEvents =
   | { type: 'qrCodeCanceled' }
   | { type: 'qrCodeLinkSentViaSms' }
   | { type: 'qrCodeScanned' }
+  | { type: 'confirmationRequired' }
+  | { type: 'continueOnDesktop' }
+  | { type: 'continueOnMobile' }
   | { type: 'qrRegisterSucceeded' }
   | { type: 'qrRegisterFailed' }
   | { type: 'statusPollingErrored' };

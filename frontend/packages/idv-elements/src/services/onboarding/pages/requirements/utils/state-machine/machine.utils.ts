@@ -102,7 +102,11 @@ const shouldRunTransfer = (context: MachineContext) => {
       device: { type },
       isTransfer,
     },
+    didRunTransfer,
   } = context;
+  if (didRunTransfer) {
+    return false;
+  }
   if (isTransfer) {
     return false;
   }

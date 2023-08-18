@@ -111,6 +111,7 @@ const createOnboardingRequirementsMachine = ({
           },
         },
         transfer: {
+          exit: ['markDidRunTransfer'],
           on: {
             requirementCompleted: {
               target: 'checkRequirements',
@@ -155,6 +156,10 @@ const createOnboardingRequirementsMachine = ({
         assignRequirements: assign((context, event) => ({
           ...context,
           requirements: { ...event.payload },
+        })),
+        markDidRunTransfer: assign(context => ({
+          ...context,
+          didRunTransfer: true,
         })),
         startDataCollection: assign(context => ({
           ...context,

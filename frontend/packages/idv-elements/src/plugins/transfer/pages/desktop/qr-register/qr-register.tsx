@@ -1,7 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { D2PGenerateResponse } from '@onefootprint/types';
-import { Button, Divider, Shimmer, Typography } from '@onefootprint/ui';
+import {
+  Button,
+  Divider,
+  LinkButton,
+  Shimmer,
+  Typography,
+} from '@onefootprint/ui';
 import { QRCodeSVG } from 'qrcode.react';
 import React from 'react';
 
@@ -18,9 +24,16 @@ const QRRegister = () => {
   const { t } = useTranslation('pages.desktop.qr-register');
   const translationSource = useTranslationSourceForRequirements();
   const [state, send] = useDesktopMachine();
-  const { authToken, device, config, scopedAuthToken, idDocOutcome } =
-    state.context;
+  const {
+    authToken,
+    device,
+    config,
+    scopedAuthToken,
+    idDocOutcome,
+    missingRequirements: { idDoc },
+  } = state.context;
   const url = useCreateHandoffUrl(scopedAuthToken, config?.isAppClipEnabled);
+  const isDesktopIdDocEnabled = false; // TODO: remove flag when we release findigs desktop id doc flows
 
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
     authToken,
@@ -66,6 +79,20 @@ const QRRegister = () => {
     );
   };
 
+  const handleContinueOnDesktop = () => {
+    if (idDoc) {
+      // If the missing requirements include ID doc, let's show a confirmation page
+      send({
+        type: 'confirmationRequired',
+      });
+      return;
+    }
+
+    send({
+      type: 'continueOnDesktop',
+    });
+  };
+
   return (
     <>
       <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
@@ -87,7 +114,6 @@ const QRRegister = () => {
         <Typography variant="body-4" color="tertiary">
           {t('qr-code.instructions')}
         </Typography>
-        <Divider />
         <Typography variant="body-2" color="secondary">
           {t('sms.instructions')}
         </Typography>
@@ -98,10 +124,38 @@ const QRRegister = () => {
         >
           {t('sms.cta')}
         </Button>
+
+        {isDesktopIdDocEnabled && (
+          <>
+            <Divider variant="secondary" />
+            <ContinueOnDesktop>
+              <Typography variant="body-3" color="tertiary">
+                {t('continue-on-desktop.title')}
+              </Typography>
+              <LinkButton
+                onClick={handleContinueOnDesktop}
+                size="compact"
+                sx={{ height: '100%' }}
+              >
+                {t('continue-on-desktop.cta')}
+              </LinkButton>
+            </ContinueOnDesktop>
+          </>
+        )}
       </Container>
     </>
   );
 };
+
+const ContinueOnDesktop = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: ${theme.spacing[3]};
+    text-align: center;
+  `}
+`;
 
 const QRCodeContainer = styled.div`
   align-items: center;
@@ -109,7 +163,7 @@ const QRCodeContainer = styled.div`
   justify-content: center;
 `;
 
-const Container = styled.form`
+const Container = styled.div`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[7]};

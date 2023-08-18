@@ -2,6 +2,7 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
+import ConfirmContinueOnDesktop from '../confirm-continue-on-desktop';
 import QRCodeScanned from '../qr-code-scanned';
 import QRCodeSent from '../qr-code-sent';
 import QRRegister from '../qr-register';
@@ -21,19 +22,16 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches('qrCodeScanned')) {
-    return <QRCodeScanned />;
-  }
-
-  if (state.matches('qrCodeSent')) {
-    return <QRCodeSent />;
-  }
-
-  if (state.matches('qrRegister')) {
-    return <QRRegister />;
-  }
-
-  return null;
+  return (
+    <>
+      {state.matches('qrCodeScanned') && <QRCodeScanned />}
+      {state.matches('qrCodeSent') && <QRCodeSent />}
+      {state.matches('qrRegister') && <QRRegister />}
+      {state.matches('confirmContinueOnDesktop') && (
+        <ConfirmContinueOnDesktop />
+      )}
+    </>
+  );
 };
 
 export default Router;

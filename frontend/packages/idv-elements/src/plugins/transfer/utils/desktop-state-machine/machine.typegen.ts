@@ -21,6 +21,7 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
+    | 'confirmContinueOnDesktop'
     | 'deviceSupport'
     | 'failure'
     | 'init'

@@ -66,6 +66,22 @@ const createDesktopMachine = () =>
             statusPollingErrored: {
               actions: ['clearScopedAuthToken'],
             },
+            continueOnDesktop: {
+              target: 'success',
+            },
+            confirmationRequired: {
+              target: 'confirmContinueOnDesktop',
+            },
+          },
+        },
+        confirmContinueOnDesktop: {
+          on: {
+            continueOnDesktop: {
+              target: 'success',
+            },
+            continueOnMobile: {
+              target: 'qrRegister',
+            },
           },
         },
         qrCodeScanned: {

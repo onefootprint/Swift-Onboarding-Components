@@ -39,6 +39,10 @@
         "sms": {
           "instructions": "Alternatively, we can send you a link to your phone and you can continue from there.",
           "cta": "Send a link to phone"
+        },
+        "continue-on-desktop": {
+          "title": "You don't own a smartphone?",
+          "cta": "Continue on desktop"
         }
       },
       "qr-code-scanned": {
@@ -66,6 +70,15 @@
         },
         "subtitle": "Link sent to phone. Please continue from there.",
         "cancel": "Cancel"
+      },
+      "confirm-continue-on-desktop": {
+        "title": "Other ways to continue",
+        "subtitle": "In case you don't have a smartphone, you can manually upload the documents we need from your computer for now and finish the rest of the validations later.",
+        "warning": "We highly recommend you to continue from your phone, if possible, since it will significantly expedite the identity verification process.",
+        "cta": {
+          "mobile": "Continue on mobile",
+          "desktop": "Continue on desktop"
+        }
       }
     }
   }

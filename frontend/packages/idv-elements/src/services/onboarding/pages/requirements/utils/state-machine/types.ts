@@ -41,6 +41,9 @@ export type MachineContext = {
   // One day, when more plugins have confirm screens, we'l l need this information to determine
   // whether to render the plugin for a requirement that's already been met
   collectedKycData?: boolean;
+  // Record whether transfer plugin already ran. If the user chose to continue on desktop,
+  // don't render transfer again
+  didRunTransfer?: boolean;
   requirements: Requirements;
 };
 
