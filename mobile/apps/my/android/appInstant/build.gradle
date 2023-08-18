@@ -185,7 +185,7 @@ dependencies {
     implementation project(':react-native-passkey')
     implementation project(':react-native-community_masked-view')
     implementation project(':react-native-async-storage_async-storage')
-
+    implementation project(':bam.tech_react-native-image-resizer')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

@@ -27,7 +27,6 @@ const uploadDoc = async ({
   return response.data;
 };
 
-const useUploadDoc = ({ onError }: { onError: (error: unknown) => void }) =>
-  useMutation(uploadDoc, { onError });
+const useUploadDoc = () => useMutation(uploadDoc);
 
 export default useUploadDoc;

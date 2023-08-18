@@ -66,7 +66,9 @@ const Camera = ({
     if (!camera.current) return;
     setIsFlashing(true);
     setShowFeedback(false);
-    const newPhoto = await camera.current.takePhoto({});
+    const newPhoto = await camera.current.takePhoto({
+      qualityPrioritization: 'balanced',
+    });
     resetAutoCapture();
     onPhotoTaken(newPhoto);
     setIsFlashing(false);

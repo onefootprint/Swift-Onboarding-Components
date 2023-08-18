@@ -51,6 +51,7 @@ const DocScan = ({
   const [showConsent, setShowConsent] = useState(false);
   const { shouldCollectConsent } = requirement;
   const isAppStoreReview = authToken === REVIEW_AUTH_TOKEN;
+  const uploadMutation = useUploadDoc();
 
   useEffect(() => {
     setTimeout(() => {
@@ -59,12 +60,6 @@ const DocScan = ({
       }
     }, delayToShowConsentMS);
   }, []);
-
-  const uploadMutation = useUploadDoc({
-    onError: error => {
-      setErrors([getErrorMessage(error)]);
-    },
-  });
 
   const handleResetErrors = () => {
     setErrors([]);
@@ -77,7 +72,7 @@ const DocScan = ({
         image,
         authToken,
         side,
-        mimeType: 'image/png',
+        mimeType: 'image/jpeg',
       },
       {
         onSuccess: response => {
@@ -101,6 +96,9 @@ const DocScan = ({
               onDone(response.nextSideToCollect);
             }, 1500);
           }
+        },
+        onError: (error: unknown) => {
+          setErrors([getErrorMessage(error)]);
         },
       },
     );

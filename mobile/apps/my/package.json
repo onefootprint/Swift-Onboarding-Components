@@ -18,7 +18,7 @@
     "start": "react-native start"
   },
   "dependencies": {
-    "@expo-google-fonts/dm-sans": "^0.2.3",
+    "@bam.tech/react-native-image-resizer": "^3.0.5",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/icons": "*",

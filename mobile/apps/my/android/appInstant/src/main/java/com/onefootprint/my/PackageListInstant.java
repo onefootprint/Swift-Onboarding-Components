@@ -23,6 +23,7 @@ import org.reactnative.maskedview.RNCMaskedViewPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
+import com.reactnativeimageresizer.ImageResizerPackage;
 
 public class PackageListInstant {
     private Application application;
@@ -78,7 +79,8 @@ public class PackageListInstant {
                 new RNCMaskedViewPackage(),
                 new AsyncStoragePackage(),
                 new ReanimatedPackage(),
-                new SplashScreenReactPackage()
+                new SplashScreenReactPackage(),
+                new ImageResizerPackage()
         ));
     }
 }
