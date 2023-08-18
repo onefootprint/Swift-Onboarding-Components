@@ -92,16 +92,6 @@ impl Validate for DocumentKind {
 }
 
 impl IsDataIdentifierDiscriminant for DocumentKind {
-    fn is_optional(&self) -> bool {
-        match self {
-            DocumentKind::FinraComplianceLetter
-            | DocumentKind::OcrData(_, _)
-            | DocumentKind::Image(_, _)
-            | DocumentKind::MimeType(_, _)
-            | DocumentKind::LatestUpload(_, _) => true,
-        }
-    }
-
     fn parent(&self) -> Option<CollectedData> {
         match self {
             DocumentKind::Image(_, _) => Some(CollectedData::Document),

@@ -41,8 +41,8 @@ impl TryFrom<DataIdentifier> for InvestorProfileKind {
     }
 }
 
-impl IsDataIdentifierDiscriminant for InvestorProfileKind {
-    fn is_optional(&self) -> bool {
+impl InvestorProfileKind {
+    pub fn is_optional(&self) -> bool {
         matches!(
             self,
             Self::Employer
@@ -55,7 +55,9 @@ impl IsDataIdentifierDiscriminant for InvestorProfileKind {
                 | Self::PoliticalOrganization
         )
     }
+}
 
+impl IsDataIdentifierDiscriminant for InvestorProfileKind {
     fn parent(&self) -> Option<CollectedData> {
         Some(CollectedData::InvestorProfile)
     }

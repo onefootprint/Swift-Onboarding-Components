@@ -48,12 +48,6 @@ impl TryFrom<DataIdentifier> for CardInfo {
 }
 
 impl IsDataIdentifierDiscriminant for CardInfo {
-    // This really needs to be per CDO
-    fn is_optional(&self) -> bool {
-        // TODO
-        true
-    }
-
     fn parent(&self) -> Option<CollectedData> {
         // TODO
         None

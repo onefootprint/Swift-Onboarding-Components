@@ -82,27 +82,11 @@ pub enum DataIdentifier {
 pub trait IsDataIdentifierDiscriminant:
     Hash + Eq + Clone + TryFrom<DataIdentifier> + Into<DataIdentifier> + Validate
 {
-    /// When true, will not be required in order to satisfy the parent CD/CDO
-    fn is_optional(&self) -> bool;
-
     /// Maps the DI variant to the CollectedData variant that contains this DI
     fn parent(&self) -> Option<CollectedData>;
 }
 
 impl DataIdentifier {
-    /// When true, will not be required in order to satisfy the parent CD/CDO
-    fn is_optional(&self) -> bool {
-        // TODO is more a function of the CDO
-        match self {
-            Self::Id(s) => s.is_optional(),
-            Self::Custom(s) => s.is_optional(),
-            Self::Business(s) => s.is_optional(),
-            Self::InvestorProfile(s) => s.is_optional(),
-            Self::Document(s) => s.is_optional(),
-            Self::Card(s) => s.is_optional(),
-        }
-    }
-
     pub fn parent(&self) -> Option<CollectedData> {
         match self {
             Self::Id(s) => s.parent(),

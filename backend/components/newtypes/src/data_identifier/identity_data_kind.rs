@@ -57,10 +57,6 @@ impl IsDataIdentifierDiscriminant for IdentityDataKind {
             Self::Nationality => Some(CollectedData::Nationality),
         }
     }
-
-    fn is_optional(&self) -> bool {
-        matches!(self, Self::AddressLine2)
-    }
 }
 
 impl IdentityDataKind {

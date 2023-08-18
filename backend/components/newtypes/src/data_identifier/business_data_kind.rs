@@ -44,10 +44,6 @@ impl TryFrom<DataIdentifier> for BusinessDataKind {
 }
 
 impl IsDataIdentifierDiscriminant for BusinessDataKind {
-    fn is_optional(&self) -> bool {
-        matches!(self, Self::Dba | Self::AddressLine2)
-    }
-
     fn parent(&self) -> Option<CollectedData> {
         let result = match self {
             Self::Name => CollectedData::BusinessName,

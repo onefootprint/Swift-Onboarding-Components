@@ -215,9 +215,48 @@ impl CollectedDataOption {
     /// Maps the CDO to the list of DIs that are required and are represented by the CDO, if self
     /// represents T. Otherwise, returns an empty list.
     pub fn required_data_identifiers(&self) -> Vec<DataIdentifier> {
-        self.data_identifiers()
-            .map(|dis| dis.into_iter().filter(|k| !k.is_optional()).collect())
-            .unwrap_or_default()
+        match self {
+            Self::Name => vec![IDK::FirstName.into(), IDK::LastName.into()],
+            Self::Dob => vec![IDK::Dob.into()],
+            Self::Ssn9 => vec![IDK::Ssn9.into(), IDK::Ssn4.into()],
+            Self::Ssn4 => vec![IDK::Ssn4.into()],
+            Self::FullAddress => vec![
+                IDK::AddressLine1.into(),
+                IDK::City.into(),
+                IDK::State.into(),
+                IDK::Zip.into(),
+                IDK::Country.into(),
+            ],
+            Self::PartialAddress => vec![IDK::Zip.into(), IDK::Country.into()],
+            Self::Email => vec![IDK::Email.into()],
+            Self::PhoneNumber => vec![IDK::PhoneNumber.into()],
+            Self::BusinessName => vec![BDK::Name.into()],
+            Self::BusinessTin => vec![BDK::Tin.into()],
+            Self::BusinessAddress => vec![
+                BDK::AddressLine1.into(),
+                BDK::City.into(),
+                BDK::State.into(),
+                BDK::Zip.into(),
+                BDK::Country.into(),
+            ],
+            Self::BusinessPhoneNumber => vec![BDK::PhoneNumber.into()],
+            Self::BusinessWebsite => vec![BDK::Website.into()],
+            Self::BusinessBeneficialOwners => vec![BDK::BeneficialOwners.into()],
+            Self::BusinessKycedBeneficialOwners => vec![BDK::KycedBeneficialOwners.into()],
+            Self::BusinessCorporationType => vec![BDK::CorporationType.into()],
+
+            Self::InvestorProfile => IPK::iter()
+                .filter(|x| !x.is_optional())
+                .map(|x| x.into())
+                .collect(),
+
+            Self::Document(_) => vec![],
+
+            // TODO we should associate this with types of data
+            Self::Card => vec![],
+
+            Self::Nationality => vec![IDK::Nationality.into()],
+        }
     }
 
     /// Given a list of DataIdentifiers (maybe collected via API), computes the set of

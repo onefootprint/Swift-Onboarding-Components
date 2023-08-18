@@ -20,11 +20,6 @@ impl TryFrom<DataIdentifier> for KvDataKey {
 }
 
 impl IsDataIdentifierDiscriminant for KvDataKey {
-    fn is_optional(&self) -> bool {
-        // Doesn't really apply to custom data
-        false
-    }
-
     fn parent(&self) -> Option<CollectedData> {
         None
     }
