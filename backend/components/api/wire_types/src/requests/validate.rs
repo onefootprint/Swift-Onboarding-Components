@@ -59,9 +59,12 @@ impl paperclip::v2::schema::Apiv2Schema for ValidateResponse {
         ShadowValidateResponse::description()
     }
     fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-        ShadowValidateResponse::raw_schema()
+        let mut schema = ShadowValidateResponse::raw_schema();
+        schema.name = Self::name();
+        schema
     }
 }
+impl paperclip::actix::OperationModifier for ValidateResponse {}
 
 // This struct isn't used anywhere - its auto-generated Apiv2Schema is simply used in place of
 // autogenerating one for ValidateResponse above - there doesn't seem to be a way to hide the
