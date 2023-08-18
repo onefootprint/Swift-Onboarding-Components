@@ -1,9 +1,9 @@
 use super::{BiometricChallengeState, ChallengeKind, UserChallengeData};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::onboarding::OnboardingError;
+use crate::identify;
 use crate::identify::get_user_challenge_context;
 use crate::identify::ChallengeData;
-use crate::identify::EmailChallengeState;
 use crate::types::response::ResponseData;
 use crate::utils::challenge::Challenge;
 use crate::utils::liveness::WebauthnConfig;
@@ -17,7 +17,6 @@ use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::headers::SandboxId;
 use api_wire_types::IdentifyId;
 use crypto::serde_cbor;
-use crypto::sha256;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::VaultId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
@@ -127,15 +126,10 @@ pub async fn post(
             }
             ChallengeKind::Email => {
                 let email = uvw.get_decrypted_verified_email(&state).await?;
-                // TODO: consolidate with signup_challenge
-                let code = "424242".to_string();
-                let h_code = sha256(code.as_bytes()).to_vec();
+                let tenant = tenant.ok_or(OnboardingError::MissingObPkAuth)?;
 
-                let challenge_data = ChallengeData::Email(EmailChallengeState {
-                    email: email.email,
-                    sandbox_id,
-                    h_code,
-                });
+                let challenge_data =
+                    identify::send_email_challenge(&state, &email, tenant, sandbox_id).await?;
 
                 (
                     challenge_data,

@@ -2,7 +2,7 @@ import pytest
 from tests.utils import inherit_user_email
 from tests.headers import SandboxId
 from tests.headers import FpAuth
-from tests.constants import FIXTURE_PHONE_NUMBER
+from tests.constants import FIXTURE_PHONE_NUMBER, INTEGRATION_SANDBOX_EMAIL_OTP_PIN
 from tests.utils import _gen_random_sandbox_id
 from tests.constants import EMAIL
 from tests.utils import patch, post
@@ -33,7 +33,10 @@ def no_phone_user(skip_phone_obc):
 
     res = post(
         "hosted/identify/verify",
-        dict(challenge_response="424242", challenge_token=challenge_token),
+        dict(
+            challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
+            challenge_token=challenge_token,
+        ),
         *headers,
     )
 
@@ -65,7 +68,10 @@ def test_new_user(skip_phone_obc):
     # correct PIN suceeds and gives auth
     res = post(
         "hosted/identify/verify",
-        dict(challenge_response="424242", challenge_token=challenge_token),
+        dict(
+            challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
+            challenge_token=challenge_token,
+        ),
         *headers,
     )
 

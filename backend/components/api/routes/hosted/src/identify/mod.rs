@@ -2,9 +2,12 @@
 pub mod identify;
 pub mod login_challenge;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
+use api_core::errors::ApiResult;
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::twilio::PhoneChallengeState;
+use db::models::tenant::Tenant;
 use db::models::webauthn_credential::WebauthnCredential;
+use newtypes::email::Email;
 use newtypes::ContactInfoKind;
 use newtypes::PiiString;
 use newtypes::SandboxId;
@@ -143,4 +146,33 @@ async fn get_user_challenge_context(
     }
 
     Ok(Some((uvw, creds, kinds)))
+}
+
+pub async fn send_email_challenge(
+    state: &State,
+    email: &Email,
+    tenant: &Tenant,
+    sandbox_id: Option<SandboxId>, // pointless pass through for now, but may use later with a fixture email
+) -> ApiResult<ChallengeData> {
+    // we can't currently view sent emails from our integration tests, so this temporarily allows us to still OTP emails from integration tests. sandbox check as a lil extra precaution
+    let code = if tenant.id.is_integration_test_tenant() && sandbox_id.is_some() {
+        "424242".to_owned()
+    } else {
+        crypto::random::gen_rand_n_digit_code(6)
+    };
+
+    let h_code = crypto::sha256(code.as_bytes()).to_vec();
+
+    let tenant_url = tenant.website_url.as_ref().unwrap_or(&tenant.name); // better to default name here than error probably?
+
+    state
+        .sendgrid_client
+        .send_email_otp_verify_email(email.email.clone(), code, tenant_url.to_string())
+        .await?;
+
+    Ok(ChallengeData::Email(EmailChallengeState {
+        email: email.email.clone(),
+        sandbox_id,
+        h_code,
+    }))
 }

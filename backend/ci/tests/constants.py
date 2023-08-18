@@ -40,6 +40,8 @@ CUSTODIAN_KEY = get_secret("CUSTODIAN_KEY") or "onefootprint"
 CUSTODIAN_AUTH = CustodianAuth(CUSTODIAN_KEY)
 SVIX_AUTH_TOKEN = get_secret("SVIX_AUTH_TOKEN")
 
+INTEGRATION_SANDBOX_EMAIL_OTP_PIN = "424242"
+
 FIELDS_TO_DECRYPT = [
     ["id.last_name", "id.ssn9"],
     ["id.address_line1"],

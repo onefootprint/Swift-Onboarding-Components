@@ -13,6 +13,7 @@ from tests.constants import (
     CUSTODIAN_AUTH,
     TEST_URL,
     FIXTURE_PHONE_NUMBER,
+    INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
 )
 
 url = lambda path: "{}/{}".format(TEST_URL, path.strip("/"))
@@ -172,7 +173,9 @@ def inherit_user_biometric(user):
     sandbox_id = user.client.sandbox_id
     sandbox_id_h = [SandboxId(sandbox_id)] if sandbox_id else []
 
-    body = identify_user(dict(phone_number=phone_number), user.client.ob_config.key, *sandbox_id_h)
+    body = identify_user(
+        dict(phone_number=phone_number), user.client.ob_config.key, *sandbox_id_h
+    )
     assert "biometric" in body["available_challenge_kinds"]
     challenge_data = challenge_user(
         phone_number, "biometric", user.client.ob_config.key, *sandbox_id_h
@@ -191,15 +194,27 @@ def inherit_user_email(user):
 
     body = identify_user(dict(email=email), user.client.ob_config.key, *sandbox_id_h)
     assert "email" in body["available_challenge_kinds"]
-    body = post("hosted/identify/login_challenge", dict(
+    body = post(
+        "hosted/identify/login_challenge",
+        dict(
             identifier=dict(email=email),
             preferred_challenge_kind="email",
-        ), user.client.ob_config.key, *sandbox_id_h)
+        ),
+        user.client.ob_config.key,
+        *sandbox_id_h,
+    )
 
-    verify_res = post("hosted/identify/verify", dict(challenge_response="424242", challenge_token=body['challenge_data']['challenge_token']), user.client.ob_config.key, *sandbox_id_h)
+    verify_res = post(
+        "hosted/identify/verify",
+        dict(
+            challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
+            challenge_token=body["challenge_data"]["challenge_token"],
+        ),
+        user.client.ob_config.key,
+        *sandbox_id_h,
+    )
 
     return FpAuth(verify_res["auth_token"])
-
 
 
 def step_up_user_biometric(auth_token, user):

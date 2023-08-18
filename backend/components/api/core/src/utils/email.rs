@@ -78,6 +78,8 @@ impl SendgridClient {
     const MAGIC_LINK_TEMPLATE_ID: &str = "d-a631e0eb72984e28a39940aa8f3bbe60";
     const KYC_BUSINESS_OWNER_TEMPLATE_ID: &str = "d-104270bd3b7c4c62a6ed95e295c7822b";
     pub const TRIGGER_TEMPLATE_ID: &str = "d-93e21bd5b4a54aa187755f23fefa9fb7";
+    const OTP_VERIFY_TEMPLATE_ID: &str = "d-d4707e4a976449e1af1753de5f05289d";
+
     const FROM_EMAIL: &str = "noreply@noreply.onefootprint.com";
 
     pub fn new(api_key: String) -> Self {
@@ -153,6 +155,20 @@ impl SendgridClient {
             .flatten(),
         );
         self.send_template(to_email, Self::KYC_BUSINESS_OWNER_TEMPLATE_ID, d)
+            .await
+    }
+
+    pub async fn send_email_otp_verify_email(
+        &self,
+        to_email: PiiString,
+        code: String,
+        tenant_url: String,
+    ) -> ApiResult<()> {
+        let template_data = HashMap::from([
+            ("code".to_string(), code.into()),
+            ("tenant_url".to_string(), tenant_url.into()),
+        ]);
+        self.send_template(to_email, Self::OTP_VERIFY_TEMPLATE_ID, template_data)
             .await
     }
 

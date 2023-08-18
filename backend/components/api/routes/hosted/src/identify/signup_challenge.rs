@@ -1,5 +1,5 @@
 use super::{ChallengeKind, UserChallengeData};
-use crate::identify::{ChallengeData, EmailChallengeState};
+use crate::identify::{self, ChallengeData};
 use crate::types::response::ResponseData;
 use crate::utils::challenge::Challenge;
 use crate::State;
@@ -9,7 +9,6 @@ use api_core::errors::challenge::ChallengeError;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ApiResult;
 use api_core::utils::headers::SandboxId;
-use crypto::sha256;
 use newtypes::email::Email;
 use newtypes::PhoneNumber;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
@@ -76,28 +75,20 @@ pub async fn post(
             Ok(challenge_data)
         }
         SignupChallengeRequest::Email(req) => {
-            let obc = ob_context
-                .as_ref()
-                .ok_or(OnboardingError::MissingObPkAuth)?
-                .ob_config()
-                .clone();
+            let auth = ob_context.as_ref().ok_or(OnboardingError::MissingObPkAuth)?;
+            let obc = auth.ob_config();
+            let tenant = auth.tenant();
+
             if !obc.is_no_phone_flow {
                 return Err(ApiError::from(ChallengeError::ChallengeKindNotAllowed(
                     "email".to_string(),
                 )));
             };
 
-            // TODO: crypto::random::gen_rand_n_digit_code(6) + send email
-            let code = "424242".to_string();
-            let h_code = sha256(code.as_bytes()).to_vec();
+            let challenge_data =
+                identify::send_email_challenge(&state, &req.email, tenant, sandbox_id.0).await?;
 
-            let challenge_state = ChallengeState {
-                data: ChallengeData::Email(EmailChallengeState {
-                    email: req.email.email,
-                    sandbox_id: sandbox_id.0,
-                    h_code,
-                }),
-            };
+            let challenge_state = ChallengeState { data: challenge_data };
 
             let challenge_token = Challenge {
                 expires_at: challenge_state.expires_at(),
