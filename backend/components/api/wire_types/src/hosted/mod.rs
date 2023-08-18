@@ -1,5 +1,6 @@
 pub mod business;
 pub mod consent;
+pub mod device_attestation;
 pub mod fingerprint_visit;
 pub mod onboarding;
 pub mod onboarding_status;

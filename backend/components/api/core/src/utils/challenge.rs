@@ -24,7 +24,7 @@ impl<C: Serialize + DeserializeOwned + std::fmt::Debug> Challenge<C> {
         let vec = key.seal(self)?.0;
         Ok(ChallengeToken(Base64Data(vec).to_string()))
     }
-
+    
     pub fn unseal(key: &ScopedSealingKey, sealed: &ChallengeToken) -> Result<Self, ApiError> {
         let sealed = AeadSealedBytes(Base64Data::from_str(&sealed.0).map_err(crypto::Error::from)?.0);
         let unsealed: Self = key.unseal(sealed)?;

@@ -1,6 +1,7 @@
 use paperclip::actix::web;
 
 mod access_events;
+mod attest_device;
 mod authorized_orgs;
 mod consent;
 mod documents;
@@ -28,7 +29,9 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(token::get)
         .service(email::verify::post)
         .service(consent::post)
-        .service(upload::post);
+        .service(upload::post)
+        .service(attest_device::post_challenge)
+        .service(attest_device::post_attestation);
 
     passkey::configure_init_post_aliases(config);
     passkey::configure_complete_post_aliases(config);
