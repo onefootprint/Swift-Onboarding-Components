@@ -7,8 +7,8 @@ use crate::{
 use actix_web::http::StatusCode;
 use chrono::{Duration, Utc};
 use crypto::sha256;
+use newtypes::SandboxId;
 use newtypes::{PhoneNumber, PiiString};
-use newtypes::{SandboxId, TriggerKind};
 use thiserror::Error;
 
 use self::rate_limit::RateLimit;
@@ -86,7 +86,7 @@ impl TwilioClient {
     #[tracing::instrument(skip_all)]
     /// Rate limits sending messages to the destination phone number and then spawns an async task
     /// to send the message_body
-    async fn send_message(
+    pub async fn send_message(
         &self,
         state: &State,
         message_body: PiiString,
@@ -180,44 +180,6 @@ impl TwilioClient {
 
         Ok(())
     }
-
-    #[tracing::instrument(skip_all)]
-    pub async fn send_trigger<'a>(
-        &self,
-        state: &State,
-        destination: &PhoneNumber,
-        note: Option<String>,
-        org_name: String,
-        kind: TriggerKind,
-        link: PiiString,
-    ) -> ApiResult<()> {
-        // TODO copy
-        let message_body = match kind {
-            TriggerKind::RedoKyc => PiiString::from(format!(
-                "{}Re-verify your identity for {} here: {}",
-                note.map(|n| format!("{}\n\n", n)).unwrap_or_default(),
-                org_name,
-                link.leak()
-            )),
-            TriggerKind::IdDocument => PiiString::from(format!(
-                "{}To verify your identity for {}, provide a photo of your ID here: {}",
-                note.map(|n| format!("{}\n\n", n)).unwrap_or_default(),
-                org_name,
-                link.leak()
-            )),
-            TriggerKind::RedoKyb => PiiString::from(format!(
-                "{}Re-verify your business for {} here: {}",
-                note.map(|n| format!("{}\n\n", n)).unwrap_or_default(),
-                org_name,
-                link.leak()
-            )),
-        };
-
-        self.send_message(state, message_body, destination, rate_limit::DASHBOARD_TRIGGER)
-            .await?;
-
-        Ok(())
-    }
 }
 
 pub struct BoSessionSmsInfo<'a> {
@@ -238,9 +200,10 @@ pub struct PhoneChallengeState {
     pub h_code: Vec<u8>,
 }
 
-mod rate_limit {
+pub mod rate_limit {
     use super::*;
 
+    // TODO: probably just enum these dudes
     pub const BO_SESSION: &str = "bo_session";
     pub const DASHBOARD_TRIGGER: &str = "dashboard_trigger";
     pub const D2P_LINK: &str = "d2p_session";

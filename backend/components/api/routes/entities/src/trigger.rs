@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
@@ -9,6 +11,9 @@ use api_core::auth::user::UserAuthScope;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::types::EmptyResponse;
+use api_core::utils;
+use api_core::utils::contact::{EmailMessage, SmsMessage};
+use api_core::utils::email::SendgridClient;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -24,7 +29,9 @@ use newtypes::AlpacaKycConfig;
 use newtypes::DocumentConfig;
 use newtypes::FpId;
 use newtypes::KycConfig;
+use newtypes::PiiString;
 use newtypes::TriggerInfo;
+use newtypes::TriggerKind;
 use newtypes::VaultKind;
 use newtypes::WorkflowKind;
 use newtypes::WorkflowTriggeredInfo;
@@ -130,16 +137,93 @@ pub async fn post(
         })
         .await?;
 
-    let phone_number = vw.get_decrypted_verified_primary_phone(&state).await?;
-    let url = state
+    let link: newtypes::PiiString = state
         .config
         .service_config
         .generate_verify_link(auth_token, "user");
     let org_name = auth.tenant().name.clone();
-    state
-        .twilio_client
-        .send_trigger(&state, &phone_number, note, org_name, trigger_kind, url)
-        .await?;
+
+    let trigger_message = TriggerMessage {
+        note,
+        org_name,
+        trigger_kind,
+        link,
+    };
+
+    utils::contact::send_to_primary_verified_contact_info(
+        &state,
+        &vw,
+        trigger_message.clone(),
+        trigger_message,
+    )
+    .await?;
 
     ResponseData::ok(EmptyResponse {}).json()
+}
+
+#[derive(Clone)]
+struct TriggerMessage {
+    note: Option<String>,
+    org_name: String,
+    trigger_kind: TriggerKind,
+    link: PiiString,
+}
+
+impl TriggerMessage {
+    fn message_body(&self) -> PiiString {
+        match self.trigger_kind {
+            TriggerKind::RedoKyc => PiiString::from(format!(
+                "{}Re-verify your identity for {} here: {}",
+                self.note
+                    .as_ref()
+                    .map(|n| format!("{}\n\n", n))
+                    .unwrap_or_default(),
+                self.org_name,
+                self.link.leak()
+            )),
+            TriggerKind::IdDocument => PiiString::from(format!(
+                "{}To verify your identity for {}, provide a photo of your ID here: {}",
+                self.note
+                    .as_ref()
+                    .map(|n| format!("{}\n\n", n))
+                    .unwrap_or_default(),
+                self.org_name,
+                self.link.leak()
+            )),
+            TriggerKind::RedoKyb => PiiString::from(format!(
+                "{}Re-verify your business for {} here: {}",
+                self.note
+                    .as_ref()
+                    .map(|n| format!("{}\n\n", n))
+                    .unwrap_or_default(),
+                self.org_name,
+                self.link.leak()
+            )),
+        }
+    }
+}
+
+impl<'a> From<TriggerMessage> for SmsMessage<'a> {
+    fn from(value: TriggerMessage) -> Self {
+        SmsMessage {
+            message_body: value.message_body(),
+            rate_limit_scope: api_core::utils::twilio::rate_limit::DASHBOARD_TRIGGER,
+        }
+    }
+}
+
+impl<'a> From<TriggerMessage> for EmailMessage<'a> {
+    fn from(value: TriggerMessage) -> Self {
+        // TODO: later we'll have a real sendgrid template here and need more fields
+        let template_data = HashMap::from_iter(
+            vec![Some(("message_body".to_string(), value.message_body()))]
+                .into_iter()
+                .flatten(),
+        );
+
+        EmailMessage {
+            template_id: SendgridClient::TRIGGER_TEMPLATE_ID,
+            template_data,
+        }
+    }
 }

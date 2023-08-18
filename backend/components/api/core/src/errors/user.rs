@@ -15,6 +15,8 @@ pub enum UserError {
     EmailNotVerified,
     #[error("Cannot send communications to a {0} that isn't verified")]
     ContactInfoKindNotVerified(ContactInfoKind),
+    #[error("No verified contact info found for user")]
+    NoVerifiedContactInfoForUser,
     #[error("Document type not provided")]
     NoDocumentType,
 

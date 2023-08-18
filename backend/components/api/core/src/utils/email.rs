@@ -77,6 +77,7 @@ impl SendgridClient {
     const EMAIL_VERIFY_TEMPLATE_ID: &str = "d-c558e640dad04726a31e6710c7ffc57c";
     const MAGIC_LINK_TEMPLATE_ID: &str = "d-a631e0eb72984e28a39940aa8f3bbe60";
     const KYC_BUSINESS_OWNER_TEMPLATE_ID: &str = "d-104270bd3b7c4c62a6ed95e295c7822b";
+    pub const TRIGGER_TEMPLATE_ID: &str = "d-93e21bd5b4a54aa187755f23fefa9fb7";
     const FROM_EMAIL: &str = "noreply@noreply.onefootprint.com";
 
     pub fn new(api_key: String) -> Self {
@@ -156,7 +157,7 @@ impl SendgridClient {
     }
 
     #[tracing::instrument(skip_all)]
-    async fn send_template(
+    pub async fn send_template(
         &self,
         to_email: PiiString,
         template_id: &str,

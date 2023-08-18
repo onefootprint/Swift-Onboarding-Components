@@ -3,14 +3,14 @@ use std::time::Duration;
 use newtypes::PiiString;
 use request::send_message::SendMessage;
 use reqwest::{RequestBuilder, Method, IntoUrl};
-use response::{decode_response, lookup::{LookupResponse}, message::Message};
+use response::{decode_response, lookup::LookupResponse, message::Message};
 
 pub mod error;
 pub mod request;
 pub mod response;
 
 use tokio_retry::strategy::{jitter, ExponentialBackoff};
-use tokio_retry::{Retry};
+use tokio_retry::Retry;
 
 use crate::error::Error;
 use crate::response::message::Status;

@@ -34,7 +34,7 @@ def no_phone_user(skip_phone_obc):
     res = post(
         "hosted/identify/verify",
         dict(challenge_response="424242", challenge_token=challenge_token),
-        *headers
+        *headers,
     )
 
     bifrost = BifrostClient(
@@ -59,14 +59,14 @@ def test_new_user(skip_phone_obc):
         "hosted/identify/verify",
         dict(challenge_response="323232", challenge_token=challenge_token),
         *headers,
-        status_code=400
+        status_code=400,
     )
     assert res["error"]["message"] == "Incorrect PIN code"
     # correct PIN suceeds and gives auth
     res = post(
         "hosted/identify/verify",
         dict(challenge_response="424242", challenge_token=challenge_token),
-        *headers
+        *headers,
     )
 
     auth_token = FpAuth(res["auth_token"])
@@ -130,4 +130,14 @@ def test_phone_user_cannot_inherit_from_email(sandbox_user):
         sandbox_user.client.ob_config.key,
         sandbox_id,
         status_code=400,
+    )
+
+
+def test_trigger(no_phone_user):
+    # Should not error because the user is missing phone (we should email them instead)
+    # TODO: later could use something like mailtrap/mailslurp to strongly assert the email was sent
+    post(
+        f"entities/{no_phone_user.fp_id}/trigger",
+        dict(trigger=dict(kind="redo_kyc"), note="yo"),
+        *no_phone_user.tenant.db_auths,
     )
