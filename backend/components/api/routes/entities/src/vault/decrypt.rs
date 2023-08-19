@@ -14,7 +14,10 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::{flat_api_object_map_type, DataLifetimeSeqno, PiiString, VersionedDataIdentifier};
+use newtypes::{
+    flat_api_object_map_type, DataLifetimeSeqno, PiiJsonValue, PiiString, PiiValue, PiiValueKind,
+    VersionedDataIdentifier,
+};
 use newtypes::{FilterFunction, FpId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
@@ -45,7 +48,7 @@ pub struct ClientDecryptRequest {
 }
 
 flat_api_object_map_type!(
-    DecryptResponse<VersionedDataIdentifier, Option<PiiString>>,
+    DecryptResponse<VersionedDataIdentifier, Option<PiiValue>>,
     description="A key-value map with the corresponding decrypted values",
     example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
 );
@@ -201,7 +204,28 @@ pub(super) async fn post_inner(
             results.insert(id, result);
         }
     }
-    let out = DecryptResponse { map: results };
+    let out = DecryptResponse::from(results);
 
     ResponseData::ok(out).json()
+}
+
+impl From<HashMap<VersionedDataIdentifier, Option<PiiString>>> for DecryptResponse {
+    fn from(value: HashMap<VersionedDataIdentifier, Option<PiiString>>) -> Self {
+        let map = value
+            .into_iter()
+            .map(|(k, v)| {
+                let value = match k.di.serialization() {
+                    PiiValueKind::String => v.map(PiiValue::String),
+                    PiiValueKind::Json => v.map(|v| {
+                        PiiJsonValue::try_from(&v)
+                            .map(PiiValue::Json)
+                            // If the value isn't json serializable, just return it as a string
+                            .unwrap_or(PiiValue::String(v))
+                    }),
+                };
+                (k, value)
+            })
+            .collect();
+        Self { map }
+    }
 }

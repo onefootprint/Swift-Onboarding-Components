@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-use crate::PiiBytes;
+use crate::{PiiBytes, PiiString};
 
 /// Represents a struct that hides PII contained in JsonValues (usually from vendor responses)
 #[derive(Clone, Default, PartialEq, Eq, Deserialize, Serialize)]
@@ -47,6 +47,14 @@ impl TryFrom<Vec<u8>> for PiiJsonValue {
 
     fn try_from(vec: Vec<u8>) -> Result<Self, Self::Error> {
         serde_json::from_slice(vec.as_slice()).map(Self::new)
+    }
+}
+
+impl<'a> TryFrom<&'a PiiString> for PiiJsonValue {
+    type Error = serde_json::Error;
+
+    fn try_from(value: &'a PiiString) -> Result<Self, Self::Error> {
+        serde_json::from_str(value.leak()).map(Self::new)
     }
 }
 

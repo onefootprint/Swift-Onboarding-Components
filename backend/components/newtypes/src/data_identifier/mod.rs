@@ -33,7 +33,8 @@ pub use self::{
     investor_profile_kind::*, validation::Error as ValidationError, validation::*,
 };
 use crate::{
-    util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, ValidateArgs, VaultKind,
+    util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, PiiValueKind, ValidateArgs,
+    VaultKind,
 };
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -357,6 +358,13 @@ impl DataIdentifier {
             // Custom data won't always be VaultData anymore - will sometimes be document
             | DataIdentifier::Custom(_)
             | DataIdentifier::Card(_) => StorageType::VaultData,
+        }
+    }
+
+    pub fn serialization(&self) -> PiiValueKind {
+        match self {
+            Self::Id(IdentityDataKind::Citizenships) => PiiValueKind::Json,
+            _ => PiiValueKind::String,
         }
     }
 }

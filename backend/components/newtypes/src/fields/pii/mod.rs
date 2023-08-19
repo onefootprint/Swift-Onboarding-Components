@@ -1,12 +1,15 @@
 mod bytes;
 mod json;
 mod string;
+mod value;
+
 #[macro_use]
 pub mod macros;
 
 pub use bytes::*;
 pub use json::*;
 pub use string::*;
+pub use value::*;
 
 pub fn scrub_value<S>(_v: &Option<serde_json::Value>, s: S) -> Result<S::Ok, S::Error>
 where
