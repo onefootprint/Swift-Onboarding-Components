@@ -163,6 +163,7 @@ pub fn get_requirements_inner(
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
         .flatten()
+        .sorted_by_key(|r| OnboardingRequirementKind::from(r).priority(args.ob_config.is_doc_first))
         .collect();
 
     tracing::info!(workflow_id=%args.workflow.id, requirements=%format!("{:?}", requirements), scoped_user_id=%args.workflow.scoped_vault_id, "get_requirements result");

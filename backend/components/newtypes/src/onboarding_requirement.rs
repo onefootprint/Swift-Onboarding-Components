@@ -46,6 +46,33 @@ pub enum OnboardingRequirement {
     Process,
 }
 
+impl OnboardingRequirementKind {
+    pub fn priority(&self, is_doc_first: bool) -> usize {
+        if !is_doc_first {
+            match self {
+                Self::CollectBusinessData => 0,
+                Self::CollectData => 1,
+                Self::CollectInvestorProfile => 2,
+                Self::RegisterPasskey => 3,
+                Self::CollectDocument => 4,
+                Self::Authorize => 5,
+                Self::Process => 6,
+            }
+        } else {
+            // For a doc-first config, we show passkey and doc collection first
+            match self {
+                Self::RegisterPasskey => 0,
+                Self::CollectDocument => 1,
+                Self::CollectBusinessData => 2,
+                Self::CollectData => 3,
+                Self::CollectInvestorProfile => 4,
+                Self::Authorize => 5,
+                Self::Process => 6,
+            }
+        }
+    }
+}
+
 impl OnboardingRequirement {
     pub fn is_met(&self) -> bool {
         match self {
@@ -84,4 +111,25 @@ impl OnboardingRequirement {
 pub struct AuthorizeFields {
     pub collected_data: Vec<CollectedDataOption>,
     pub document_types: Vec<IdDocKind>,
+}
+
+#[cfg(test)]
+mod test {
+    use crate::OnboardingRequirementKind;
+    use itertools::Itertools;
+    use strum::IntoEnumIterator;
+    use test_case::test_case;
+
+    #[test_case(true)]
+    #[test_case(false)]
+    fn test_priority(is_doc_first: bool) {
+        // Make sure each requirement has its own unique priority
+        assert_eq!(
+            OnboardingRequirementKind::iter()
+                .map(|i| i.priority(is_doc_first))
+                .unique()
+                .count(),
+            OnboardingRequirementKind::iter().len()
+        )
+    }
 }

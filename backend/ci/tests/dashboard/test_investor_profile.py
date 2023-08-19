@@ -11,6 +11,14 @@ def sb_user_with_investor_profile(sandbox_tenant, investor_profile_ob_config, tw
     user = bifrost.run()
     entity = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
     assert set(entity["attributes"]) > set(IP_DATA)
+    # The requirements should be returned and handled in a specific order
+    assert [i["kind"] for i in bifrost.handled_requirements] == [
+        "collect_data",
+        "collect_investor_profile",
+        "liveness",
+        "authorize",
+        "process",
+    ]
     return user
 
 

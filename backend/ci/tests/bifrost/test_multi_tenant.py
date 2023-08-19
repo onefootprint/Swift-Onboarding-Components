@@ -53,14 +53,12 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
     foo_user = foo_bifrost.run()
     foo_fp_id = foo_user.fp_id
 
-    assert set(i["kind"] for i in foo_bifrost.handled_requirements) == {
+    assert [i["kind"] for i in foo_bifrost.handled_requirements] == [
         "authorize",
         "process",
-    }
+    ]
 
-    assert set(i["kind"] for i in foo_bifrost.already_met_requirements) == {
-        "collect_data"
-    }
+    assert [i["kind"] for i in foo_bifrost.already_met_requirements] == ["collect_data"]
 
     return DualOnboardedUser(fp_id, foo_fp_id, sandbox_user_real_phone)
 

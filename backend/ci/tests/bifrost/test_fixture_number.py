@@ -47,10 +47,10 @@ def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
         ob_config2, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
     )
     bifrost2.run()
-    assert set(i["kind"] for i in bifrost2.handled_requirements) == {
+    assert [i["kind"] for i in bifrost2.handled_requirements] == [
         "authorize",
         "process",
-    }
+    ]
     assert set(i["kind"] for i in bifrost2.already_met_requirements) == {"collect_data"}
 
 

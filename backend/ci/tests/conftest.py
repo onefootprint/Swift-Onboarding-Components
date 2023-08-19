@@ -176,7 +176,15 @@ def sandbox_user(sandbox_tenant, twilio):
     from tests.bifrost_client import BifrostClient
 
     bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
-    return bifrost.run()
+    user = bifrost.run()
+    # These should be ordered
+    assert [i["kind"] for i in bifrost.handled_requirements] == [
+        "collect_data",
+        "liveness",
+        "authorize",
+        "process",
+    ]
+    return user
 
 
 @pytest.fixture(scope="module")
