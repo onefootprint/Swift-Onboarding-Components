@@ -5,7 +5,8 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use crate::{auth::user::UserAuthGuard, onboarding::GetRequirementsArgs};
 use api_core::auth::user::UserObAuthContext;
-use api_wire_types::hosted::onboarding_status::OnboardingStatusResponse;
+use api_wire_types::hosted::onboarding_status::{ApiOnboardingRequirement, OnboardingStatusResponse};
+use itertools::Itertools;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(tags(Hosted, Bifrost), description = "Returns the status of the onboarding.")]
@@ -17,13 +18,21 @@ pub async fn get(
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
-    let (met_requirements, requirements) = reqs.into_iter().partition(|r| r.is_met());
+    let all_requirements = reqs
+        .into_iter()
+        .map(|r| ApiOnboardingRequirement {
+            is_met: r.is_met(),
+            requirement: r,
+        })
+        .collect_vec();
+    let (met_requirements, requirements) = all_requirements.iter().cloned().partition(|r| r.is_met);
     let ob_config = user_auth.ob_config()?.clone();
     let tenant = user_auth.tenant()?.clone();
     let ff_client = state.feature_flag_client.clone();
     let ob_config = api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None, ff_client));
 
     ResponseData::ok(OnboardingStatusResponse {
+        all_requirements,
         requirements,
         met_requirements,
         // This is only used by the handoff app - we might be able to rm and move elsewhere
