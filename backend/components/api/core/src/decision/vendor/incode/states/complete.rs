@@ -97,11 +97,11 @@ impl Complete {
             di(ODK::Dob, r.dob().ok()),
             di(ODK::ExpiresAt, r.expiration_date().ok()),
             di(ODK::IssuedAt, r.issue_date().ok()),
+            di(ODK::IssuingCountry, r.issuing_country_two_digit()),
             di(ODK::Gender, r.gender),
             di(ODK::FullAddress, r.address),
             di(ODK::DocumentNumber, r.document_number),
             di(ODK::IssuingState, r.issuing_state),
-            di(ODK::IssuingCountry, r.issuing_country),
             di(ODK::RefNumber, r.ref_number),
             di(ODK::Nationality, r.nationality_mrz.or(r.nationality)),
             di(
@@ -117,6 +117,7 @@ impl Complete {
         // For doc-first onboardings, populate identity data
         let mut validate_args = ValidateArgs::for_bifrost(vault.is_live);
         // A little bit of a hack to allow vaulting all address fields that exist
+        // But, bifrost will display an empty address screen if ANY address field is missing
         validate_args.allow_dangling_keys = true;
         let id_data: Vec<(DataIdentifier, PiiString)> = if obc.is_doc_first {
             let r = fetch_ocr_response.clone();
@@ -136,9 +137,7 @@ impl Complete {
                 (IDK::City, address.and_then(|n| n.city.as_ref())),
                 (IDK::State, address.and_then(|n| n.state.as_ref())),
                 (IDK::Zip, address.and_then(|n| n.postal_code.as_ref())),
-                // TODO i don't see another way to extract country ...
-                // TODO need to translate from three-digit to two-digit country code
-                // (IDK::Country, r.issuing_country.as_ref()),
+                (IDK::Country, r.issuing_country_two_digit().as_ref()),
                 (IDK::Dob, r.dob().ok().as_ref()),
             ]
             .into_iter()

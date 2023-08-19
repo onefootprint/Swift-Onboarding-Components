@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, str::FromStr};
 
 use crate::{
     incode::{error::Error as IncodeError, response::Error, APIResponseToIncodeError},
@@ -7,8 +7,8 @@ use crate::{
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use newtypes::{
     incode::{IncodeDocumentType, IncodeStatus, IncodeTest},
-    IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind, PiiString,
-    ScrubbedPiiString, DATE_FORMAT,
+    IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
+    Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiString, DATE_FORMAT,
 };
 
 /// Response we get back from adding a document image
@@ -377,6 +377,14 @@ impl FetchOCRResponse {
         Self::format_date(self.issued_at.as_ref())
     }
 
+    pub fn issuing_country_two_digit(&self) -> Option<ScrubbedPiiString> {
+        self.issuing_country
+            .as_ref()
+            .and_then(|i| Iso3166ThreeDigitCountryCode::from_str(i.leak()).ok())
+            .map(Iso3166TwoDigitCountryCode::from)
+            .map(ScrubbedPiiString::from)
+    }
+
     pub fn dob(&self) -> Result<ScrubbedPiiString, IncodeError> {
         let date = self
             .birth_date
@@ -441,7 +449,7 @@ impl FetchOCRResponse {
             "gender":"M",
             "issueDate":2022,
             "issuingAuthority":null,
-            "issuingCountry":"US",
+            "issuingCountry":"USA",
             "issuingState":"CALIFORNIA",
             "name":{
                 "firstName":first_name,
