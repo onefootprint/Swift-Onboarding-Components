@@ -14,7 +14,6 @@ pub enum CollectedData {
     Address,
     Email,
     PhoneNumber,
-    Nationality,
     Document,
 
     // TODO: maybe nest these
@@ -28,6 +27,8 @@ pub enum CollectedData {
 
     InvestorProfile,
     Card,
+
+    UsLegalStatus,
 }
 
 impl CollectedData {
@@ -44,7 +45,6 @@ impl CollectedData {
             // contain fewer fields are first
             Self::Ssn => vec![Ssn4, Ssn9],
             Self::Address => vec![PartialAddress, FullAddress],
-            Self::Nationality => vec![Nationality],
             Self::BusinessName => vec![BusinessName],
             Self::BusinessTin => vec![BusinessTin],
             Self::BusinessAddress => vec![BusinessAddress],
@@ -56,6 +56,8 @@ impl CollectedData {
             Self::Card => vec![Card],
             // TODO it would be great if we didn't have to specify this here. could likely wipe this list
             Self::Document => vec![],
+            // TODO Nationality as a CDO is deprecated
+            Self::UsLegalStatus => vec![Nationality, UsLegalStatus],
         }
     }
 
@@ -74,7 +76,7 @@ impl CollectedData {
             | Self::Address
             | Self::Email
             | Self::PhoneNumber
-            | Self::Nationality => DataIdentifierDiscriminant::Id,
+            | Self::UsLegalStatus => DataIdentifierDiscriminant::Id,
             Self::Document => DataIdentifierDiscriminant::Document,
             Self::InvestorProfile => DataIdentifierDiscriminant::InvestorProfile,
             Self::Card => DataIdentifierDiscriminant::Card,

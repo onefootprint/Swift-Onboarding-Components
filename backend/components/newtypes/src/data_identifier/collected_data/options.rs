@@ -43,6 +43,7 @@ pub enum CollectedDataOption {
     Email,
     PhoneNumber,
     Nationality,
+    UsLegalStatus,
 
     Document(DocumentCdoInfo),
 
@@ -119,7 +120,6 @@ impl TryFrom<CollectedDataOptionKind> for CollectedDataOption {
             CollectedDataOptionKind::PartialAddress => Self::PartialAddress,
             CollectedDataOptionKind::Email => Self::Email,
             CollectedDataOptionKind::PhoneNumber => Self::PhoneNumber,
-            CollectedDataOptionKind::Nationality => Self::Nationality,
             CollectedDataOptionKind::BusinessName => Self::BusinessName,
             CollectedDataOptionKind::BusinessTin => Self::BusinessTin,
             CollectedDataOptionKind::BusinessAddress => Self::BusinessAddress,
@@ -130,6 +130,8 @@ impl TryFrom<CollectedDataOptionKind> for CollectedDataOption {
             CollectedDataOptionKind::BusinessCorporationType => Self::BusinessCorporationType,
             CollectedDataOptionKind::InvestorProfile => Self::InvestorProfile,
             CollectedDataOptionKind::Card => Self::Card,
+            CollectedDataOptionKind::Nationality => Self::Nationality,
+            CollectedDataOptionKind::UsLegalStatus => Self::UsLegalStatus,
             CollectedDataOptionKind::Document => {
                 return Err(crate::Error::Custom("Cannot convert".to_owned()))
             }
@@ -147,7 +149,6 @@ impl CollectedDataOption {
             Self::FullAddress | Self::PartialAddress => CollectedData::Address,
             Self::Email => CollectedData::Email,
             Self::PhoneNumber => CollectedData::PhoneNumber,
-            Self::Nationality => CollectedData::Nationality,
             Self::Document(_) => CollectedData::Document,
             Self::BusinessName => CollectedData::BusinessName,
             Self::BusinessTin => CollectedData::BusinessTin,
@@ -159,6 +160,8 @@ impl CollectedDataOption {
             Self::BusinessCorporationType => CollectedData::BusinessCorporationType,
             Self::InvestorProfile => CollectedData::InvestorProfile,
             Self::Card => CollectedData::Card,
+            Self::Nationality => CollectedData::UsLegalStatus,
+            Self::UsLegalStatus => CollectedData::UsLegalStatus,
         }
     }
 
@@ -180,7 +183,6 @@ impl CollectedDataOption {
             Self::PartialAddress => Some(vec![IDK::Zip.into(), IDK::Country.into()]),
             Self::Email => Some(vec![IDK::Email.into()]),
             Self::PhoneNumber => Some(vec![IDK::PhoneNumber.into()]),
-            Self::Nationality => Some(vec![IDK::Nationality.into()]),
             Self::BusinessName => Some(vec![BDK::Name.into(), BDK::Dba.into()]),
             Self::BusinessTin => Some(vec![BDK::Tin.into()]),
             Self::BusinessAddress => Some(vec![
@@ -209,6 +211,15 @@ impl CollectedDataOption {
 
             // TODO we should associate this with types of data
             Self::Card => None,
+
+            Self::Nationality => Some(vec![IDK::Nationality.into()]),
+            Self::UsLegalStatus => Some(vec![
+                IDK::UsLegalStatus.into(),
+                IDK::Nationality.into(),
+                IDK::VisaKind.into(),
+                IDK::VisaExpirationDate.into(),
+                IDK::Citizenships.into(),
+            ]),
         }
     }
 
@@ -256,6 +267,7 @@ impl CollectedDataOption {
             Self::Card => vec![],
 
             Self::Nationality => vec![IDK::Nationality.into()],
+            Self::UsLegalStatus => vec![IDK::UsLegalStatus.into()],
         }
     }
 
@@ -310,6 +322,8 @@ impl CollectedDataOption {
             Self::Ssn4 => Some(Self::Ssn9),
             Self::PartialAddress => Some(Self::FullAddress),
             Self::BusinessBeneficialOwners => Some(Self::BusinessKycedBeneficialOwners),
+            // TODO just until we deprecate
+            Self::Nationality => Some(Self::UsLegalStatus),
             _ => None,
         }
     }

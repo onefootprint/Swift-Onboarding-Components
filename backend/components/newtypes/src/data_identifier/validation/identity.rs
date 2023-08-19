@@ -1,9 +1,14 @@
 use super::utils;
 use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
-use crate::{AllData, IdentityDataKind as IDK, PhoneNumber, PiiString, ValidateArgs, DATE_FORMAT};
+use crate::{
+    AllData, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, PhoneNumber, PiiString, ValidateArgs,
+    DATE_FORMAT,
+};
 use chrono::{Datelike, NaiveDate, Utc};
+use serde_with::DeserializeFromStr;
 use std::str::FromStr;
+use strum_macros::EnumString;
 
 impl Validate for IDK {
     fn validate(&self, value: PiiString, args: ValidateArgs, _: &AllData) -> NtResult<PiiString> {
@@ -24,6 +29,17 @@ impl Validate for IDK {
             IDK::Email => clean_and_validate_email(value)?,
             IDK::PhoneNumber => clean_and_validate_phone(value)?,
             IDK::Nationality => utils::clean_and_validate_country(value)?,
+            IDK::UsLegalStatus => utils::parse_enum::<UsLegalStatus>(value)?,
+            IDK::VisaKind => value, // TODO validation
+            IDK::VisaExpirationDate => clean_and_validate_date(value)?,
+            IDK::Citizenships => {
+                utils::parse_json_and_validate::<Vec<Iso3166TwoDigitCountryCode>, _>(value, |v| {
+                    if v.is_empty() {
+                        return Err(Error::InvalidLength);
+                    }
+                    Ok(())
+                })?
+            }
         };
         Ok(result)
     }
@@ -37,6 +53,11 @@ fn clean_and_validate_email(value: PiiString) -> NtResult<PiiString> {
 fn clean_and_validate_phone(value: PiiString) -> NtResult<PiiString> {
     let phone = PhoneNumber::parse(value)?;
     Ok(phone.e164())
+}
+
+fn clean_and_validate_date(input: PiiString) -> VResult<PiiString> {
+    let date = NaiveDate::parse_from_str(input.leak(), "%Y-%m-%d").map_err(|_| Error::InvalidDate)?;
+    Ok(PiiString::new(date.format("%Y-%m-%d").to_string()))
 }
 
 fn clean_and_validate_dob(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
@@ -97,6 +118,15 @@ fn clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
         return Err(Error::NonDigitCharacter);
     }
     Ok(input)
+}
+
+#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
+#[strum(serialize_all = "snake_case")]
+enum UsLegalStatus {
+    Citizen,
+    PermanentResident,
+    Visa,
+    Other,
 }
 
 #[cfg(test)]
