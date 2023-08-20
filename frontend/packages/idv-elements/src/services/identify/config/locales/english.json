@@ -7,7 +7,7 @@
     "legal-footer": {
       "label": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and \n  acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."
     },
-    "sms-challenge-verification": {
+    "pin-verification": {
       "error": "Incorrect code",
       "verifying": "Verifying...",
       "success": "Success!",

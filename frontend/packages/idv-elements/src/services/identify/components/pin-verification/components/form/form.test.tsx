@@ -1,13 +1,13 @@
 import { MockDate, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
-import { renderIdentify } from '../../../../../../config/tests/render';
-import Verification, { VerificationProps } from './verification';
+import { renderIdentify } from '../../../../config/tests/render';
+import Form, { FormProps } from './form';
 
 const testDate = new Date('2023-01-19T14:10:20.503Z');
 const futureDate = new Date('2043-01-19T14:10:20.503Z');
 
-describe.skip('<Verification />', () => {
+describe('<Form />', () => {
   beforeAll(() => {
     MockDate.set(testDate);
   });
@@ -16,7 +16,7 @@ describe.skip('<Verification />', () => {
     MockDate.reset();
   });
 
-  const renderVerification = ({
+  const renderForm = ({
     title,
     isVerifying,
     isSuccess,
@@ -25,9 +25,9 @@ describe.skip('<Verification />', () => {
     resendDisabledUntil,
     onResend = () => {},
     isResendLoading,
-  }: Partial<VerificationProps>) =>
+  }: Partial<FormProps>) =>
     renderIdentify(
-      <Verification
+      <Form
         title={title}
         isVerifying={isVerifying}
         isSuccess={isSuccess}
@@ -40,11 +40,11 @@ describe.skip('<Verification />', () => {
     );
 
   it('renders default state with title correctly', () => {
-    renderVerification({ title: 'Title' });
+    renderForm({ title: 'Title' });
     expect(screen.getByText('Title')).toBeInTheDocument();
     expect(screen.getByText('Resend code')).toBeInTheDocument();
     expect(
-      screen.getByTestId('sms-challenge-verification-pin-input'),
+      screen.getByTestId('verification-form-pin-input'),
     ).toBeInTheDocument();
     const button = screen.getByRole('button', { name: 'Resend code' });
     expect(button).toBeInTheDocument();
@@ -52,28 +52,28 @@ describe.skip('<Verification />', () => {
   });
 
   it('renders verifying correctly', () => {
-    renderVerification({ isVerifying: true });
+    renderForm({ isVerifying: true });
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.getByText('Verifying...')).toBeInTheDocument();
     expect(screen.queryByText('Resend code')).not.toBeInTheDocument();
     expect(
-      screen.queryByTestId('sms-challenge-verification-pin-input'),
+      screen.queryByTestId('verification-form-pin-input'),
     ).not.toBeInTheDocument();
   });
 
   it('renders success correctly', () => {
-    renderVerification({ isSuccess: true });
+    renderForm({ isSuccess: true });
     expect(screen.getByText('Success!')).toBeInTheDocument();
     expect(screen.queryByText('Resend code')).not.toBeInTheDocument();
     expect(
-      screen.queryByTestId('sms-challenge-verification-pin-input'),
+      screen.queryByTestId('verification-form-pin-input'),
     ).not.toBeInTheDocument();
   });
 
   it('renders error correctly', () => {
-    renderVerification({ hasError: true });
+    renderForm({ hasError: true });
     expect(
-      screen.getByTestId('sms-challenge-verification-pin-input'),
+      screen.getByTestId('verification-form-pin-input'),
     ).toBeInTheDocument();
     const button = screen.getByRole('button', { name: 'Resend code' });
     expect(button).toBeInTheDocument();
@@ -83,7 +83,7 @@ describe.skip('<Verification />', () => {
 
   it('calls onComplete correctly', async () => {
     const onComplete = jest.fn();
-    renderVerification({ onComplete });
+    renderForm({ onComplete });
     const firstInput = document.getElementsByTagName('input')[0];
     firstInput.focus();
     await userEvent.keyboard('123456');
@@ -92,14 +92,14 @@ describe.skip('<Verification />', () => {
 
   it('calls onResend correctly', async () => {
     const onResend = jest.fn();
-    renderVerification({ onResend });
+    renderForm({ onResend });
     const button = screen.getByRole('button', { name: 'Resend code' });
     await userEvent.click(button);
     expect(onResend).toHaveBeenCalled();
   });
 
   it('renders button correctly when resend is enabled', () => {
-    renderVerification({});
+    renderForm({});
     const button = screen.getByRole('button', { name: 'Resend code' });
     expect(button).toBeInTheDocument();
     expect(button).not.toBeDisabled();
@@ -107,16 +107,16 @@ describe.skip('<Verification />', () => {
 
   it('renders button correctly when resend is loading', async () => {
     const onResend = jest.fn();
-    renderVerification({ onResend, isResendLoading: true });
+    renderForm({ onResend, isResendLoading: true });
     expect(
-      screen.getByTestId('sms-challenge-verification-pin-input'),
+      screen.getByTestId('verification-form-pin-input'),
     ).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('renders button correctly when resend is disabled', async () => {
     const onResend = jest.fn();
-    renderVerification({ onResend, resendDisabledUntil: futureDate });
+    renderForm({ onResend, resendDisabledUntil: futureDate });
     const button = screen.getByRole('button', { name: 'Resend code' });
     expect(button).toBeInTheDocument();
     expect(button).not.toBeDisabled();

@@ -7,7 +7,7 @@ import ResendButton, { ResendButtonProps } from './components/resend-button';
 import Success from './components/success';
 import Verifying from './components/verifying';
 
-export type VerificationProps = ResendButtonProps & {
+export type FormProps = ResendButtonProps & {
   title?: string;
   isVerifying?: boolean;
   isSuccess?: boolean;
@@ -16,7 +16,7 @@ export type VerificationProps = ResendButtonProps & {
   onComplete: (code: string) => void;
 };
 
-const Verification = ({
+const Form = ({
   title,
   isPending,
   isVerifying,
@@ -26,8 +26,8 @@ const Verification = ({
   resendDisabledUntil,
   onResend,
   isResendLoading,
-}: VerificationProps) => {
-  const { t } = useTranslation('components.sms-challenge-verification');
+}: FormProps) => {
+  const { t } = useTranslation('components.pin-verification');
 
   if (isSuccess) {
     return <Success />;
@@ -38,7 +38,11 @@ const Verification = ({
   }
 
   return (
-    <Form autoComplete="off" role="presentation" data-pending={!!isPending}>
+    <StyledForm
+      autoComplete="off"
+      role="presentation"
+      data-pending={!!isPending}
+    >
       {title && (
         <Typography variant="body-2" color="secondary" as="h3">
           {title}
@@ -48,18 +52,18 @@ const Verification = ({
         onComplete={onComplete}
         hasError={hasError}
         hint={hasError ? t('error') : undefined}
-        testID="sms-challenge-verification-pin-input"
+        testID="verification-form-pin-input"
       />
       <ResendButton
         isResendLoading={isResendLoading}
         resendDisabledUntil={resendDisabledUntil}
         onResend={onResend}
       />
-    </Form>
+    </StyledForm>
   );
 };
 
-const Form = styled.form`
+const StyledForm = styled.form`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
@@ -70,4 +74,4 @@ const Form = styled.form`
   `}
 `;
 
-export default Verification;
+export default Form;

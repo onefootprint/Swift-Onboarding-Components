@@ -14,9 +14,7 @@ const ResendButton = ({
   resendDisabledUntil,
   onResend,
 }: ResendButtonProps) => {
-  const { t } = useTranslation(
-    'components.sms-challenge-verification.resend-button',
-  );
+  const { t } = useTranslation('components.pin-verification.resend-button');
   const { setDate, countdown } = useCountdown();
   const [resendClicked, setResendClicked] = useState(false);
   const [internalDate, setInternalDate] = useState<Date | undefined>();

@@ -5,7 +5,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const Success = () => {
-  const { t } = useTranslation('components.sms-challenge-verification');
+  const { t } = useTranslation('components.pin-verification');
 
   return (
     <Container>
