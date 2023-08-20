@@ -2,6 +2,7 @@ import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import {
   ChallengeData,
   ChallengeKind,
+  Identifier,
   IdentifyVerifyResponse,
   LoginChallengeResponse,
 } from '@onefootprint/types';
@@ -21,6 +22,7 @@ type PinVerificationProps = {
   onReceiveChallenge?: (challenge: ChallengeData) => void;
   onChallengeSucceed: (authToken: string) => void;
   preferredChallengeKind: ChallengeKind;
+  identifier: Identifier;
 };
 
 const PinVerification = ({
@@ -28,17 +30,12 @@ const PinVerification = ({
   onReceiveChallenge,
   onChallengeSucceed,
   preferredChallengeKind,
+  identifier,
 }: PinVerificationProps) => {
-  const { t } = useTranslation('pages.sms-challenge');
+  const { t } = useTranslation('components.pin-verification');
   const [state] = useIdentifyMachine();
   const {
-    identify: {
-      phoneNumber,
-      email,
-      userFound,
-      successfulIdentifier,
-      sandboxId,
-    },
+    identify: { email, userFound, sandboxId },
     obConfigAuth,
   } = state.context;
   const [challengeData, setChallengeData] = useState<ChallengeData>();
@@ -86,12 +83,15 @@ const PinVerification = ({
   }: IdentifyVerifyResponse) => {
     if (!authToken) {
       console.error(
-        'Received empty auth token from successful sms pin verification.',
+        'Received empty auth token from successful challenge pin verification.',
       );
       return;
     }
 
-    if (userFound) {
+    // If user already had a vault, no need to save the email again
+    // If the new user signup challenge was initiated with an email OTP,
+    // the backend will automatically save the email to the vault for us
+    if (userFound || 'email' in identifier) {
       complete(authToken);
       return;
     }
@@ -132,7 +132,7 @@ const PinVerification = ({
 
     if (payload.challengeData.challengeKind !== preferredChallengeKind) {
       console.error(
-        'Received biometric challenge after requesting login SMS challenge',
+        'Received biometric challenge after requesting login challenge',
       );
       return;
     }
@@ -142,16 +142,9 @@ const PinVerification = ({
   };
 
   const initiateSignupChallenge = () => {
-    if (!phoneNumber) {
-      console.error(
-        'No phone number found while initiating signup SMS challenge',
-      );
-      return;
-    }
-
     signupChallengeMutation.mutate(
       {
-        phoneNumber,
+        ...identifier,
         obConfigAuth,
         sandboxId,
       },
@@ -163,17 +156,10 @@ const PinVerification = ({
   };
 
   const initiateLoginChallenge = () => {
-    if (!successfulIdentifier) {
-      console.error(
-        'No successful identifier found while initiating login SMS challenge',
-      );
-      return;
-    }
-
     loginChallengeMutation.mutate(
       {
-        identifier: successfulIdentifier,
-        preferredChallengeKind: ChallengeKind.sms,
+        identifier,
+        preferredChallengeKind,
         obConfigAuth,
         sandboxId,
       },
@@ -185,6 +171,11 @@ const PinVerification = ({
   };
 
   const initiateChallenge = () => {
+    if (!identifier) {
+      console.error('No identifier found while initiating challenge');
+      return;
+    }
+
     if (userFound) {
       initiateLoginChallenge();
     } else {

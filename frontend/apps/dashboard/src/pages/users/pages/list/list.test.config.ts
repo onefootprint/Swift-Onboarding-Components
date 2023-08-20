@@ -90,6 +90,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     createdAt: '2023-04-11T17:59:54.816474Z',
     status: OnboardingConfigStatus.enabled,
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   },
 ];
 

@@ -16,6 +16,7 @@ const getOnboardingConfig = () => ({
   createdAt: '2022-07-20T01:52:36.984290Z',
   status: OnboardingConfigStatus.enabled,
   isAppClipEnabled: false,
+  isNoPhoneFlow: false,
   privacyPolicyUrl: null,
 });
 

@@ -25,6 +25,7 @@ describe('handoff state machine', () => {
     canAccessData: [CollectedKycDataOption.name],
     optionalData: [],
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   };
 
   it('stays in init until all required info is collected', () => {

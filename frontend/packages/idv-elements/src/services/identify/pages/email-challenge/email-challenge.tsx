@@ -17,7 +17,7 @@ const EmailChallenge = () => {
   const {
     config,
     bootstrapData,
-    identify: { userFound, email },
+    identify: { userFound, email = '' },
   } = state.context;
   const isBootstrap = !!bootstrapData?.email;
   const title = userFound ? t('welcome-back-title') : t('title');
@@ -40,14 +40,15 @@ const EmailChallenge = () => {
   return (
     <Container>
       <ChallengeHeader
-        shouldShowBack={isBootstrap}
+        shouldShowBack={!isBootstrap}
         title={title}
         subtitle={subtitle}
       />
       <PinVerification
         title={t('prompt', { email })}
         onChallengeSucceed={handleChallengeSuceed}
-        preferredChallengeKind={ChallengeKind.sms}
+        preferredChallengeKind={ChallengeKind.email}
+        identifier={{ email }}
       />
       {isBootstrap && <LegalFooter />}
     </Container>

@@ -26,6 +26,7 @@ describe('Collect KYC Data Machine Tests', () => {
     canAccessData: [CollectedKycDataOption.name],
     optionalData: [],
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   };
 
   const createMachine = (

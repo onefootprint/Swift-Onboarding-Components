@@ -9,7 +9,7 @@ import { useMutation } from '@tanstack/react-query';
 import getRetryDisabledUntil from './utils/get-retry-disabled-until';
 
 const signupChallenge = async (payload: SignupChallengeRequest) => {
-  const { obConfigAuth, phoneNumber, sandboxId } = payload;
+  const { obConfigAuth, sandboxId, ...identifier } = payload;
   const headers: Record<string, string> = { ...obConfigAuth };
   if (sandboxId) {
     headers[SANDBOX_ID_HEADER] = sandboxId;
@@ -18,7 +18,7 @@ const signupChallenge = async (payload: SignupChallengeRequest) => {
     method: 'POST',
     url: '/hosted/identify/signup_challenge',
     data: {
-      phoneNumber,
+      ...identifier,
     },
     headers,
   });

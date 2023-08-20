@@ -23,6 +23,7 @@ export const onboardingConfigDetailsFixture: OnboardingConfig = {
   status: OnboardingConfigStatus.disabled,
   optionalData: [],
   isAppClipEnabled: false,
+  isNoPhoneFlow: false,
 };
 
 export const withOnboardingConfigDetails = (

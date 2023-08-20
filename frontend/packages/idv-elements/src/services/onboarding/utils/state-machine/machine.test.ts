@@ -24,6 +24,7 @@ describe('Onboarding Machine Tests', () => {
     canAccessData: [CollectedKycDataOption.name],
     optionalData: [],
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   };
 
   const defaultBootstrapData = {

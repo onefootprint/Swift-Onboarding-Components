@@ -39,7 +39,7 @@ const BiometricChallenge = () => {
   return (
     <Container>
       <ChallengeHeader
-        shouldShowBack={isBootstrap}
+        shouldShowBack={!isBootstrap}
         title={title}
         subtitle={subtitle}
       />

@@ -1,7 +1,6 @@
-import { ChallengeData, ObConfigAuth } from '../data';
+import { ChallengeData, Identifier, ObConfigAuth } from '../data';
 
-export type SignupChallengeRequest = {
-  phoneNumber: string;
+export type SignupChallengeRequest = Identifier & {
   obConfigAuth: ObConfigAuth;
   sandboxId?: string;
 };

@@ -55,6 +55,7 @@ describe('Onboarding Requirements Machine Tests', () => {
     canAccessData: [CollectedKycDataOption.name],
     optionalData: [],
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   };
 
   describe('with an existing user', () => {

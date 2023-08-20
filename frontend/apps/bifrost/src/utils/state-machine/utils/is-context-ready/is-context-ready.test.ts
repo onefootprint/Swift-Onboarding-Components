@@ -22,6 +22,7 @@ describe('isContextReady', () => {
     canAccessData: [CollectedKycDataOption.name],
     optionalData: [],
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   };
 
   describe('when init context info is complete', () => {

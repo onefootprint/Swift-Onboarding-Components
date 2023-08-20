@@ -93,6 +93,13 @@ const createIdentifyMachine = ({
             },
             identifyFailed: [
               {
+                target: 'emailChallenge',
+                actions: ['assignEmail', 'assignPhone'],
+                description:
+                  'Initiate a signup challenge for the email in no-phone flows',
+                cond: context => !!context.config?.isNoPhoneFlow,
+              },
+              {
                 target: 'smsChallenge',
                 actions: ['assignEmail', 'assignPhone'],
                 description:
@@ -116,6 +123,13 @@ const createIdentifyMachine = ({
             ],
             identified: [
               {
+                target: 'emailChallenge',
+                actions: ['assignIdentifySuccessResult'],
+                description:
+                  'Initiate a signup challenge for the email in no-phone flows',
+                cond: context => !!context.config?.isNoPhoneFlow,
+              },
+              {
                 target: 'biometricChallenge',
                 actions: ['assignIdentifySuccessResult'],
                 cond: (context, event) =>
@@ -138,6 +152,13 @@ const createIdentifyMachine = ({
         emailIdentification: {
           on: {
             identified: [
+              {
+                target: 'emailChallenge',
+                actions: ['assignIdentifySuccessResult'],
+                description:
+                  'Do not collect phone number and just initiate email OTP',
+                cond: context => !!context.config?.isNoPhoneFlow,
+              },
               {
                 target: 'phoneIdentification',
                 actions: ['assignIdentifySuccessResult'],

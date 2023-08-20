@@ -14,6 +14,12 @@
       "resend-button": {
         "cta": "Resend code",
         "disabled": "Please wait {{seconds}} seconds to resend it..."
+      },
+      "toast": {
+        "success": {
+          "title": "Success",
+          "description": "We sent you a new code."
+        }
       }
     }
   },
@@ -118,18 +124,20 @@
     },
     "sms-challenge": {
       "label": "SMS",
-      "toast": {
-        "success": {
-          "title": "Success",
-          "description": "We sent you a new code."
-        }
-      },
       "title": "Verify your phone number",
       "welcome-back-title": "Welcome back! 🎉",
       "bootstrap-subtitle": "We found a Footprint account with the information you provided to {{tenantName}}. Validate your identity to continue.",
       "subtitle": "Validate your identity to continue.",
       "prompt-with-phone": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
       "prompt-without-phone": "Enter the 6-digit code sent to your phone."
+    },
+    "email-challenge": {
+      "label": "Email",
+      "title": "Verify your email",
+      "welcome-back-title": "Welcome back! 🎉",
+      "bootstrap-subtitle": "We found a Footprint account with the information you provided to {{tenantName}}. Validate your identity to continue.",
+      "subtitle": "Validate your identity to continue.",
+      "prompt": "Enter the 6-digit code sent to {{email}}."
     },
     "biometric-challenge": {
       "label": "Passkey",
@@ -142,20 +150,6 @@
       "bootstrap-subtitle": "We found a Footprint account with the information you provided to {{tenantName}}. Validate your identity to continue.",
       "login-with-different-account": "Login with a different account",
       "login-with-sms": "Login with SMS"
-    },
-    "email-challenge": {
-      "label": "Email",
-      "toast": {
-        "success": {
-          "title": "Success",
-          "description": "We sent you a new code."
-        }
-      },
-      "title": "Verify your email",
-      "welcome-back-title": "Welcome back! 🎉",
-      "bootstrap-subtitle": "We found a Footprint account with the information you provided to {{tenantName}}. Validate your identity to continue.",
-      "subtitle": "Validate your identity to continue.",
-      "prompt-with-phone": "Enter the 6-digit code sent to {{email}}."
     }
   }
 }

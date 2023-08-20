@@ -24,6 +24,7 @@ describe('getInitData', () => {
     canAccessData: mustCollectData ?? [],
     optionalData: [],
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   });
 
   it('should return an empty object if no bootstrap data is provided', () => {

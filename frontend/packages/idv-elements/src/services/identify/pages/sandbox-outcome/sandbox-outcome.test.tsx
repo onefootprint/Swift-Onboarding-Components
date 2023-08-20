@@ -35,6 +35,7 @@ const getOnboardingConfig = (isLive = true): OnboardingConfig => ({
   canAccessData: [CollectedKycDataOption.name],
   optionalData: [],
   isAppClipEnabled: false,
+  isNoPhoneFlow: false,
 });
 
 let submittedFormData: FormDataType = {

@@ -24,6 +24,7 @@ describe('Bifrost Machine Tests', () => {
     canAccessData: [CollectedKycDataOption.name],
     optionalData: [],
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   };
 
   const testBootstrapData: IdvBootstrapData = {

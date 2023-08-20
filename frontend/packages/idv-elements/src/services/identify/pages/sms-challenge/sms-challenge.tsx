@@ -22,7 +22,7 @@ const SmsChallenge = () => {
     bootstrapData,
     challenge,
     device,
-    identify: { phoneNumber, successfulIdentifier, userFound },
+    identify: { phoneNumber = '', successfulIdentifier, userFound },
   } = state.context;
   const isBootstrap = bootstrapData?.email || bootstrapData?.phoneNumber;
   const title = userFound ? t('welcome-back-title') : t('title');
@@ -76,6 +76,7 @@ const SmsChallenge = () => {
         onReceiveChallenge={handleReceiveChallengeData}
         onChallengeSucceed={handleChallengeSuceed}
         preferredChallengeKind={ChallengeKind.sms}
+        identifier={successfulIdentifier ?? { phoneNumber }}
       />
       {isBootstrap && <LegalFooter />}
     </Container>

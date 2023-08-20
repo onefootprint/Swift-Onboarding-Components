@@ -99,6 +99,7 @@ describe.skip('<CollectKycData />', () => {
     canAccessData: canAccessData ?? [],
     optionalData: [],
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   });
 
   const getContext = (

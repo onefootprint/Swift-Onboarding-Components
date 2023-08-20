@@ -24,6 +24,7 @@ describe('useSandboxMode', () => {
     canAccessData: [CollectedKycDataOption.name],
     optionalData: [],
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   });
 
   describe('when it is using a live key', () => {

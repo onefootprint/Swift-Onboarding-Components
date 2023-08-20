@@ -25,6 +25,7 @@ describe('isContextReady', () => {
     canAccessData: [CollectedKycDataOption.name],
     optionalData: [],
     isAppClipEnabled: false,
+    isNoPhoneFlow: false,
   };
 
   const testBusinessBoKycData: BusinessBoKycData = {
