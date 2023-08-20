@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import BiometricChallenge from '../biometric-challenge';
 import ConfigInvalid from '../config-invalid';
+import EmailChallenge from '../email-challenge';
 import EmailIdentification from '../email-identification';
 import Init from '../init';
 import InitBootstrap from '../init-bootstrap';
@@ -60,6 +61,7 @@ const Router = ({ onDone }: RouterProps) => {
       {state.matches('phoneIdentification') && <PhoneIdentification />}
       {state.matches('smsChallenge') && <SmsChallenge />}
       {state.matches('biometricChallenge') && <BiometricChallenge />}
+      {state.matches('emailChallenge') && <EmailChallenge />}
     </>
   );
 };

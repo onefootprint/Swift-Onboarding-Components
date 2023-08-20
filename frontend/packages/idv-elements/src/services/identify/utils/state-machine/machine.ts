@@ -249,6 +249,17 @@ const createIdentifyMachine = ({
             ],
           },
         },
+        emailChallenge: {
+          on: {
+            challengeSucceeded: {
+              target: 'success',
+              actions: ['assignAuthToken'],
+            },
+            navigatedToPrevPage: {
+              target: 'emailIdentification',
+            },
+          },
+        },
         configInvalid: {
           type: 'final',
         },

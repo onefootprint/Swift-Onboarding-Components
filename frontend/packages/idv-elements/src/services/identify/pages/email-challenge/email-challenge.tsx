@@ -1,19 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import { ChallengeKind } from '@onefootprint/types';
 import React from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
 import LegalFooter from '../../components/legal-footer';
+import PinVerification from '../../components/pin-verification';
+
+const IS_TEST = typeof jest !== 'undefined';
+const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 0 : 1500;
 
 const EmailChallenge = () => {
   const { t } = useTranslation('pages.email-challenge');
-  const [state] = useIdentifyMachine();
+  const [state, send] = useIdentifyMachine();
   const {
     config,
     bootstrapData,
-
-    identify: { userFound },
+    identify: { userFound, email },
   } = state.context;
   const isBootstrap = !!bootstrapData?.email;
   const title = userFound ? t('welcome-back-title') : t('title');
@@ -22,6 +26,17 @@ const EmailChallenge = () => {
       ? t('bootstrap-subtitle', { tenantName: config?.orgName })
       : t('subtitle');
 
+  const handleChallengeSuceed = (authToken: string) => {
+    setTimeout(() => {
+      send({
+        type: 'challengeSucceeded',
+        payload: {
+          authToken,
+        },
+      });
+    }, SUCCESS_EVENT_DELAY_MS);
+  };
+
   return (
     <Container>
       <ChallengeHeader
@@ -29,12 +44,11 @@ const EmailChallenge = () => {
         title={title}
         subtitle={subtitle}
       />
-      {/* <PinVerification
-        title={formTitle}
-        onReceiveChallenge={handleReceiveChallengeData}
+      <PinVerification
+        title={t('prompt', { email })}
         onChallengeSucceed={handleChallengeSuceed}
         preferredChallengeKind={ChallengeKind.sms}
-      /> */}
+      />
       {isBootstrap && <LegalFooter />}
     </Container>
   );

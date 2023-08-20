@@ -142,6 +142,20 @@
       "bootstrap-subtitle": "We found a Footprint account with the information you provided to {{tenantName}}. Validate your identity to continue.",
       "login-with-different-account": "Login with a different account",
       "login-with-sms": "Login with SMS"
+    },
+    "email-challenge": {
+      "label": "Email",
+      "toast": {
+        "success": {
+          "title": "Success",
+          "description": "We sent you a new code."
+        }
+      },
+      "title": "Verify your email",
+      "welcome-back-title": "Welcome back! 🎉",
+      "bootstrap-subtitle": "We found a Footprint account with the information you provided to {{tenantName}}. Validate your identity to continue.",
+      "subtitle": "Validate your identity to continue.",
+      "prompt-with-phone": "Enter the 6-digit code sent to {{email}}."
     }
   }
 }

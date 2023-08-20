@@ -27,6 +27,7 @@ export interface Typegen0 {
   matchesStates:
     | 'biometricChallenge'
     | 'configInvalid'
+    | 'emailChallenge'
     | 'emailIdentification'
     | 'init'
     | 'initBootstrap'

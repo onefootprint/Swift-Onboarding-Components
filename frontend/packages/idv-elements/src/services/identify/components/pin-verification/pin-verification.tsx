@@ -18,7 +18,7 @@ import Form from './components/form';
 
 type PinVerificationProps = {
   title: string;
-  onReceiveChallenge: (challenge: ChallengeData) => void;
+  onReceiveChallenge?: (challenge: ChallengeData) => void;
   onChallengeSucceed: (authToken: string) => void;
   preferredChallengeKind: ChallengeKind;
 };
@@ -137,7 +137,7 @@ const PinVerification = ({
       return;
     }
 
-    onReceiveChallenge(payload.challengeData);
+    onReceiveChallenge?.(payload.challengeData);
     setChallengeData(payload.challengeData);
   };
 
