@@ -15,13 +15,15 @@ import {
   bootstrapExistingUser,
   bootstrapExistingUserWithPasskey,
   bootstrapNewUser,
+  expectShimmer,
+  fillChallengePin,
   fillIdentifyEmail,
   fillIdentifyPhone,
   fillSandboxOutcome,
-  fillSmsPin,
   liveOnboardingConfigFixture,
   mockGetBiometricChallengeResponse,
   mockUseDeviceInfo,
+  noPhoneOnboardingConfigFixture,
   sandboxOnboardingConfigFixture,
   withIdentify,
   withIdentifyVerify,
@@ -43,7 +45,7 @@ jest.mock('./utils/biometrics/get-biometric-challenge-response', () => ({
 
 const useRouterSpy = createUseRouterSpy();
 
-describe.skip('<Identify />', () => {
+describe('<Identify />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: '/',
@@ -72,83 +74,10 @@ describe.skip('<Identify />', () => {
       withIdentify(false);
     });
 
-    it('shows sandbox outcome selection page', async () => {
-      renderIdentify();
-
-      await waitFor(() => {
-        expect(screen.getByText('Select test outcome')).toBeInTheDocument();
-      });
-
-      const testIDField = screen.getByLabelText('Test ID');
-      await userEvent.type(testIDField, '$wag');
-      await userEvent.click(screen.getByText('Continue'));
-      await waitFor(() => {
-        expect(
-          screen.getByText(
-            'Test ID is invalid. Please remove spaces and special characters.',
-          ),
-        ).toBeInTheDocument();
-      });
-    });
-
-    it('will flag backslash as invalid test ID config number', async () => {
-      renderIdentify();
-
-      await waitFor(() => {
-        expect(screen.getByText('Select test outcome')).toBeInTheDocument();
-      });
-
-      const testIDField = screen.getByLabelText('Test ID');
-      await userEvent.type(testIDField, 'm\\');
-      await userEvent.click(screen.getByText('Continue'));
-      await waitFor(() => {
-        expect(
-          screen.getByText(
-            'Test ID is invalid. Please remove spaces and special characters.',
-          ),
-        ).toBeInTheDocument();
-      });
-    });
-
-    it('shows errors if sandbox test id is empty or invalid', async () => {
-      renderIdentify();
-
-      await waitFor(() => {
-        expect(screen.getByText('Select test outcome')).toBeInTheDocument();
-      });
-
-      const continueButton = screen.getByText('Continue');
-      await userEvent.click(continueButton);
-
-      await waitFor(() => {
-        expect(screen.getByText('Test ID is required')).toBeInTheDocument();
-      });
-
-      const testIDField = screen.getByLabelText('Test ID');
-      await userEvent.type(testIDField, '$wag');
-      await userEvent.click(continueButton);
-      await waitFor(() => {
-        expect(
-          screen.getByText(
-            'Test ID is invalid. Please remove spaces and special characters.',
-          ),
-        ).toBeInTheDocument();
-      });
-
-      await userEvent.type(testIDField, '$wag');
-      await userEvent.click(continueButton);
-      await waitFor(() => {
-        expect(
-          screen.getByText(
-            'Test ID is invalid. Please remove spaces and special characters.',
-          ),
-        ).toBeInTheDocument();
-      });
-    });
-
     it('proceeds to email identification when sandbox outcome was successful', async () => {
       renderIdentify();
 
+      await expectShimmer();
       await fillSandboxOutcome();
 
       await waitFor(() => {
@@ -182,6 +111,7 @@ describe.skip('<Identify />', () => {
             onDone,
           );
 
+          await expectShimmer();
           await fillSandboxOutcome();
           await bootstrapNewUser();
           await waitFor(() => {
@@ -212,6 +142,7 @@ describe.skip('<Identify />', () => {
             onDone,
           );
 
+          await expectShimmer();
           await fillSandboxOutcome();
           await bootstrapExistingUserWithPasskey();
 
@@ -247,6 +178,7 @@ describe.skip('<Identify />', () => {
             onDone,
           );
 
+          await expectShimmer();
           await bootstrapExistingUser();
           await waitFor(() => {
             expect(onDone).toHaveBeenCalled();
@@ -273,18 +205,20 @@ describe.skip('<Identify />', () => {
             onDone,
           );
 
+          await expectShimmer();
           await waitFor(() => {
             expect(
               screen.getByText('piip@onefootprint.com'),
             ).toBeInTheDocument();
           });
           await fillIdentifyPhone();
+
           await waitFor(() => {
             expect(
               screen.getByTestId('navigation-back-button'),
             ).toBeInTheDocument();
           });
-          await fillSmsPin();
+          await fillChallengePin();
 
           await waitFor(() => {
             expect(onDone).toHaveBeenCalled();
@@ -312,6 +246,7 @@ describe.skip('<Identify />', () => {
             onDone,
           );
 
+          await expectShimmer();
           await bootstrapExistingUser();
           await waitFor(() => {
             expect(onDone).toHaveBeenCalled();
@@ -338,6 +273,7 @@ describe.skip('<Identify />', () => {
             onDone,
           );
 
+          await expectShimmer();
           await waitFor(() => {
             expect(screen.getByLabelText('Email')).toBeInTheDocument();
           });
@@ -353,7 +289,7 @@ describe.skip('<Identify />', () => {
           ).toBeInTheDocument();
           await userEvent.click(screen.getByText('Continue'));
 
-          await fillSmsPin();
+          await fillChallengePin();
 
           await waitFor(() => {
             expect(onDone).toHaveBeenCalled();
@@ -385,6 +321,7 @@ describe.skip('<Identify />', () => {
             onDone,
           );
 
+          await expectShimmer();
           await bootstrapExistingUserWithPasskey();
           await waitFor(() => {
             expect(onDone).toHaveBeenCalled();
@@ -413,10 +350,129 @@ describe.skip('<Identify />', () => {
             onDone,
           );
 
+          await expectShimmer();
           await bootstrapNewUser();
           await waitFor(() => {
             expect(onDone).toHaveBeenCalled();
           });
+        });
+      });
+    });
+  });
+
+  describe('when running a no phone onboarding config', () => {
+    describe('when there is an existing user vault', () => {
+      beforeEach(() => {
+        withOnboardingConfig(noPhoneOnboardingConfigFixture);
+        withIdentify(true, [ChallengeKind.email]);
+        withLoginChallenge(ChallengeKind.email);
+        withIdentifyVerify();
+      });
+
+      it('shows email challenge page', async () => {
+        const onDone = jest.fn();
+        renderIdentify({}, onDone);
+
+        await expectShimmer();
+        await fillIdentifyEmail();
+        await fillChallengePin();
+        await waitFor(() => {
+          expect(screen.getByText('Success!')).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
+        });
+      });
+
+      it('can bootstrap', async () => {
+        const onDone = jest.fn();
+        const email = 'piip@onefootprint.com';
+        renderIdentify({ email }, onDone);
+
+        await expectShimmer();
+        await bootstrapExistingUser();
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
+        });
+      });
+
+      it('can resend email challenge', async () => {
+        const onDone = jest.fn();
+        renderIdentify({}, onDone);
+
+        await expectShimmer();
+        await fillIdentifyEmail();
+
+        // Wait until the login challenge request succeeds
+        await waitFor(() => {
+          expect(screen.getByRole('presentation')).toHaveAttribute(
+            'data-pending',
+            'false',
+          );
+        });
+        await userEvent.click(screen.getByText('Resend code'));
+        await waitFor(() => {
+          expect(
+            screen.getByText('We sent you a new code.'),
+          ).toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when the user vault is new', () => {
+      beforeEach(() => {
+        withOnboardingConfig(noPhoneOnboardingConfigFixture);
+        withIdentify(false);
+        withSignupChallenge(ChallengeKind.email);
+        withIdentifyVerify();
+      });
+
+      it('shows email challenge page', async () => {
+        const onDone = jest.fn();
+        renderIdentify({}, onDone);
+
+        await expectShimmer();
+        await fillIdentifyEmail();
+        await fillChallengePin();
+        await waitFor(() => {
+          expect(screen.getByText('Success!')).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
+        });
+      });
+
+      it('can bootstrap', async () => {
+        const onDone = jest.fn();
+        const email = 'piip@onefootprint.com';
+        renderIdentify({ email }, onDone);
+
+        await expectShimmer();
+        await bootstrapNewUser(true);
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
+        });
+      });
+
+      it('can resend email challenge', async () => {
+        const onDone = jest.fn();
+        renderIdentify({}, onDone);
+
+        await expectShimmer();
+        await fillIdentifyEmail();
+
+        // Wait until the login challenge request succeeds
+        await waitFor(() => {
+          expect(screen.getByRole('presentation')).toHaveAttribute(
+            'data-pending',
+            'false',
+          );
+        });
+        await userEvent.click(screen.getByText('Resend code'));
+        await waitFor(() => {
+          expect(
+            screen.getByText('We sent you a new code.'),
+          ).toBeInTheDocument();
         });
       });
     });

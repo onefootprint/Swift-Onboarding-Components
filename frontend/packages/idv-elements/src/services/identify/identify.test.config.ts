@@ -45,7 +45,7 @@ const useDeviceInfoImpl = (onComplete: (deviceInfo: any) => void) => {
 export const mockUseDeviceInfo = () =>
   jest.spyOn(useDeviceInfo, 'default').mockImplementation(useDeviceInfoImpl);
 
-export const getOnboardingConfig = (isLive?: boolean) => ({
+export const getOnboardingConfig = (isLive?: boolean, noPhone?: boolean) => ({
   id: 'ob_config_id_18RIzpIPRAL3pYlnO4Cgeb',
   key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
   name: 'Acme Bank',
@@ -56,10 +56,12 @@ export const getOnboardingConfig = (isLive?: boolean) => ({
   is_live: !!isLive,
   created_at: '2022-07-20T01:52:36.984290Z',
   status: 'enabled',
+  is_no_phone_flow: !!noPhone,
 });
 
 export const liveOnboardingConfigFixture = getOnboardingConfig(true);
 export const sandboxOnboardingConfigFixture = getOnboardingConfig(false);
+export const noPhoneOnboardingConfigFixture = getOnboardingConfig(true, true);
 
 export const withOnboardingConfig = (data = sandboxOnboardingConfigFixture) =>
   mockRequest({
@@ -96,7 +98,7 @@ export const withLoginChallenge = (challengeKind: string) =>
     },
   });
 
-export const withSignupChallenge = () =>
+export const withSignupChallenge = (challengeKind?: string) =>
   mockRequest({
     method: 'post',
     path: '/hosted/identify/signup_challenge',
@@ -104,7 +106,7 @@ export const withSignupChallenge = () =>
       challengeData: {
         scrubbedPhoneNumber: '+1 (•••) •••-••99',
         challengeToken: 'token',
-        challengeKind: 'sms',
+        challengeKind: challengeKind ?? 'sms',
       },
     },
   });
@@ -131,10 +133,8 @@ export const withUserVault = () =>
 
 export const fillSandboxOutcome = async () => {
   await waitFor(() => {
-    expect(screen.getByText('Select test outcome')).toBeInTheDocument();
+    expect(screen.getByText('Test outcomes')).toBeInTheDocument();
   });
-  const testIDField = screen.getByLabelText('Test ID');
-  await userEvent.type(testIDField, 'testId');
   await userEvent.click(screen.getByText('Continue'));
 };
 
@@ -152,11 +152,11 @@ export const fillIdentifyPhone = async () => {
     expect(screen.getByText('Phone number')).toBeInTheDocument();
   });
   const inputPhone = screen.getByText('Phone number');
-  await userEvent.type(inputPhone, '9999999999');
+  await userEvent.type(inputPhone, '6504600799');
   await userEvent.click(screen.getByText('Continue'));
 };
 
-export const fillSmsPin = async () => {
+export const fillChallengePin = async () => {
   // Wait until the login challenge request succeeds
   await waitFor(() => {
     expect(screen.getByRole('presentation')).toHaveAttribute(
@@ -168,20 +168,29 @@ export const fillSmsPin = async () => {
   const firstInput = document.getElementsByTagName('input')[0];
   expect(firstInput).toBeInTheDocument();
   firstInput.focus();
+
   await userEvent.keyboard('123456');
+  await waitFor(() => {
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+  });
+
+  await waitFor(() => {
+    expect(screen.getByText('Success!')).toBeInTheDocument();
+  });
 };
 
-export const bootstrapNewUser = async () => {
+export const bootstrapNewUser = async (isNoPhone?: boolean) => {
   await waitFor(() => {
-    expect(screen.getByText('Verify your phone number')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        isNoPhone ? 'Verify your email' : 'Verify your phone number',
+      ),
+    ).toBeInTheDocument();
   });
   await waitFor(() => {
     expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
   });
-  await fillSmsPin();
-  await waitFor(() => {
-    expect(screen.getByText('Success!')).toBeInTheDocument();
-  });
+  await fillChallengePin();
 };
 
 export const bootstrapExistingUser = async () => {
@@ -191,10 +200,7 @@ export const bootstrapExistingUser = async () => {
   await waitFor(() => {
     expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
   });
-  await fillSmsPin();
-  await waitFor(() => {
-    expect(screen.getByText('Success!')).toBeInTheDocument();
-  });
+  await fillChallengePin();
 };
 
 export const bootstrapExistingUserWithPasskey = async () => {
@@ -208,4 +214,10 @@ export const bootstrapExistingUserWithPasskey = async () => {
     expect(screen.getByText('Launch passkey')).toBeInTheDocument();
   });
   await userEvent.click(screen.getByText('Launch passkey'));
+};
+
+export const expectShimmer = async () => {
+  await waitFor(() => {
+    expect(screen.getAllByRole('progressbar').length).toBeGreaterThan(0);
+  });
 };
