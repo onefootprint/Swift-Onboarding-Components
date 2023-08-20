@@ -126,6 +126,7 @@ const PinVerification = ({
   };
 
   const handleRequestChallengeSuccess = (payload: LoginChallengeResponse) => {
+    // Check whether is resend, but isResend state might not have updated yet
     if (challengeData) {
       showResendConfirmation();
     }
@@ -162,6 +163,8 @@ const PinVerification = ({
         preferredChallengeKind,
         obConfigAuth,
         sandboxId,
+        // Check whether is resend, but isResend state might not have updated yet
+        isResend: !!challengeData,
       },
       {
         onSuccess: handleRequestChallengeSuccess,

@@ -45,7 +45,8 @@ const useLoginChallenge = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    (payload: LoginChallengeRequest) => {
+    (challengeRequest: LoginChallengeRequest) => {
+      const { isResend, ...payload } = challengeRequest;
       const queryKey = getQueryKeyForPayload(payload);
       const queryState =
         queryClient.getQueryState<LoginChallengeResponse>(queryKey);
@@ -54,6 +55,14 @@ const useLoginChallenge = () => {
       }
 
       const { data } = queryState;
+      // If we want to retry the challenge and rate limiting allows it,
+      // then initiate a new challenge
+      const disabledUntil = data?.challengeData.retryDisabledUntil;
+      if (isResend && disabledUntil && disabledUntil < new Date(Date.now())) {
+        return loginChallenge(payload);
+      }
+
+      // If there is an existing challenge, just use it
       if (data) {
         return Promise.resolve(data);
       }

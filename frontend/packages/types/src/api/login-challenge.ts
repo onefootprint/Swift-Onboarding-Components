@@ -10,6 +10,7 @@ export type LoginChallengeRequest = {
   preferredChallengeKind: ChallengeKind;
   obConfigAuth: ObConfigAuth;
   sandboxId?: string;
+  isResend?: boolean;
 };
 
 export type LoginChallengeResponse = {
