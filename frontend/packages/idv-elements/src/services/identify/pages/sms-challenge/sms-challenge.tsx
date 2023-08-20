@@ -1,59 +1,82 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import React from 'react';
+import { ChallengeData, ChallengeKind } from '@onefootprint/types';
+import React, { useState } from 'react';
 
-import HeaderTitle from '../../../../components/layout/components/header-title';
-import NavigationHeader from '../../../../components/layout/components/navigation-header';
+import ChallengeHeader from '../../components/challenge-header';
 import LegalFooter from '../../components/legal-footer';
-import Logo from '../../components/logo';
+import PinVerification from '../../components/pin-verification';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import { getCanChallengeBiometrics } from '../../utils/biometrics';
-import Sms from './components/sms/sms';
+import getScrubbedPhoneNumber from '../../utils/get-scrubbed-phone-number';
+
+const IS_TEST = typeof jest !== 'undefined';
+const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 0 : 1500;
 
 const SmsChallenge = () => {
   const { t } = useTranslation('pages.sms-challenge');
   const [state, send] = useIdentifyMachine();
+  const [challengeData, setChallengeData] = useState<ChallengeData>();
   const {
     config,
+    bootstrapData,
     challenge,
     device,
-    bootstrapData,
-    identify: { userFound },
-    showLogo,
+    identify: { phoneNumber, successfulIdentifier, userFound },
   } = state.context;
   const isBootstrap = bootstrapData?.email || bootstrapData?.phoneNumber;
-  const logoUrl = config?.logoUrl;
-  const orgName = config?.orgName;
-  const shouldShowBack =
-    !isBootstrap || getCanChallengeBiometrics(challenge, device);
   const title = userFound ? t('welcome-back-title') : t('title');
   const subtitle =
     isBootstrap && userFound
       ? t('bootstrap-subtitle', { tenantName: config?.orgName })
       : t('subtitle');
 
-  const handleBack = () => {
-    send({
-      type: 'navigatedToPrevPage',
-    });
+  // Either scrub the phone number collected from the previous steps, or use the
+  // challenge data scrubbed number
+  const scrubbedPhoneNumber = getScrubbedPhoneNumber({
+    successfulIdentifier,
+    phoneNumber,
+    challengeData,
+  });
+  // Sometimes, a new challenge may not have been re-generated upon mount because
+  // of rate limiting (they recently sent a code), to avoid shifting the components
+  // up and down, still show a generic title if we don't have the scrubbed phone number.
+  // The user can always resend the code if they didn't already receive it.
+  const formTitle = scrubbedPhoneNumber
+    ? t('prompt-with-phone', { scrubbedPhoneNumber })
+    : t('prompt-without-phone');
+
+  const handleChallengeSuceed = (authToken: string) => {
+    setTimeout(() => {
+      send({
+        type: 'challengeSucceeded',
+        payload: {
+          authToken,
+        },
+      });
+    }, SUCCESS_EVENT_DELAY_MS);
   };
+
+  const handleReceiveChallengeData = (data: ChallengeData) => {
+    setChallengeData(data);
+  };
+
+  const shouldShowBack =
+    !isBootstrap || getCanChallengeBiometrics(challenge, device);
 
   return (
     <Container>
-      <NavigationHeader
-        button={
-          shouldShowBack
-            ? { variant: 'back', onBack: handleBack }
-            : { variant: 'close' }
-        }
+      <ChallengeHeader
+        shouldShowBack={shouldShowBack}
+        title={title}
+        subtitle={subtitle}
       />
-      <ContentHeader>
-        {showLogo && orgName && (
-          <Logo orgName={orgName} logoUrl={logoUrl ?? undefined} />
-        )}
-        <HeaderTitle data-private title={title} subtitle={subtitle} />
-      </ContentHeader>
-      <Sms />
+      <PinVerification
+        title={formTitle}
+        onReceiveChallenge={handleReceiveChallengeData}
+        onChallengeSucceed={handleChallengeSuceed}
+        preferredChallengeKind={ChallengeKind.sms}
+      />
       {isBootstrap && <LegalFooter />}
     </Container>
   );
@@ -65,14 +88,6 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: ${theme.spacing[7]};
-  `}
-`;
-
-const ContentHeader = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
     gap: ${theme.spacing[7]};
   `}
 `;
