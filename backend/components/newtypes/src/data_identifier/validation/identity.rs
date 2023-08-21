@@ -30,7 +30,7 @@ impl Validate for IDK {
             IDK::PhoneNumber => clean_and_validate_phone(value)?,
             IDK::Nationality => utils::clean_and_validate_country(value)?,
             IDK::UsLegalStatus => utils::parse_enum::<UsLegalStatus>(value)?,
-            IDK::VisaKind => value, // TODO validation
+            IDK::VisaKind => utils::parse_enum::<VisaKind>(value)?,
             IDK::VisaExpirationDate => clean_and_validate_date(value)?,
             IDK::Citizenships => {
                 utils::parse_json_and_validate::<Vec<Iso3166TwoDigitCountryCode>, _>(value, |v| {
@@ -126,6 +126,21 @@ pub enum UsLegalStatus {
     Citizen,
     PermanentResident,
     Visa,
+    Other,
+}
+
+#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
+#[strum(serialize_all = "snake_case")]
+pub enum VisaKind {
+    E1,
+    E2,
+    E3,
+    F1,
+    G4,
+    H1B,
+    L1,
+    O1,
+    TN1,
     Other,
 }
 
