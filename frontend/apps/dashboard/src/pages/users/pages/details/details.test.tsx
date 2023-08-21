@@ -589,8 +589,7 @@ describe('<Details />', () => {
               [InvestorProfileDI.annualIncome]: 'gt500k',
               [InvestorProfileDI.riskTolerance]: 'moderate',
               [InvestorProfileDI.netWorth]: 'lt50k',
-              [InvestorProfileDI.investmentGoals]:
-                '["grow_long_term_wealth","save_for_retirement","buy_a_home","support_loved_ones","pay_off_debt","start_my_own_business"]',
+              [InvestorProfileDI.investmentGoals]: '["growth"]',
               [InvestorProfileDI.declarations]: '["affiliated_with_us_broker"]',
               [DocumentDI.finraComplianceLetter]: 'base64',
             });
@@ -650,8 +649,7 @@ describe('<Details />', () => {
             await waitFor(() => {
               const investmentGoals = getTextByRow({
                 name: 'Investment goals',
-                value:
-                  'Grow long-term wealth, save for retirement, buy a home, support my loved ones, pay off debt and start my own business',
+                value: 'Growth',
                 container,
               });
               expect(investmentGoals).toBeInTheDocument();

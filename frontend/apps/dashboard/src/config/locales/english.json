@@ -1293,12 +1293,12 @@
           "investment-goals": {
             "title": "What are your investment goals?",
             "options": {
-              "grow_long_term_wealth": "Grow long-term wealth",
-              "save_for_retirement": "Save for retirement",
-              "support_loved_ones": "Support my loved ones",
-              "buy_a_home": "Buy a home",
-              "pay_off_debt": "Pay off debt",
-              "start_my_own_business": "Start my own business"
+              "growth": "Growth",
+              "income": "Income",
+              "preserve_capital": "Preserve capital",
+              "speculation": "Speculation",
+              "diversification": "Diversification",
+              "other": "Other"
             }
           },
           "risk-tolerance": {

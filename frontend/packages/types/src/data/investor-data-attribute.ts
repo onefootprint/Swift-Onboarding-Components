@@ -16,12 +16,12 @@ export enum InvestorProfileNetWorth {
 }
 
 export enum InvestorProfileInvestmentGoal {
-  growLongTermWealth = 'grow_long_term_wealth',
-  saveForRetirement = 'save_for_retirement',
-  supportLovedOnes = 'support_loved_ones',
-  buyAHome = 'buy_a_home',
-  payOffDebt = 'pay_off_debt',
-  startMyOwnBusiness = 'start_my_own_business',
+  growth = 'growth',
+  income = 'income',
+  preserveCapital = 'preserve_capital',
+  speculation = 'speculation',
+  diversification = 'diversification',
+  other = 'other',
 }
 
 export enum InvestorProfileRiskTolerance {

@@ -36,37 +36,33 @@ describe('<InvestmentGoalsForm />', () => {
       onSubmit,
     });
 
-    const longTerm = screen.getByLabelText(
-      'Grow long-term wealth',
-    ) as HTMLInputElement;
-    expect(longTerm.checked).toBe(false);
-    await userEvent.click(longTerm);
-    expect(longTerm.checked).toBe(true);
+    const growth = screen.getByLabelText('Growth') as HTMLInputElement;
+    expect(growth.checked).toBe(false);
+    await userEvent.click(growth);
+    expect(growth.checked).toBe(true);
 
-    const saveForRetirement = screen.getByLabelText(
-      'Save for retirement',
-    ) as HTMLInputElement;
-    expect(saveForRetirement.checked).toBe(false);
+    const income = screen.getByLabelText('Income') as HTMLInputElement;
+    expect(income.checked).toBe(false);
 
-    const supportLovedOnes = screen.getByLabelText(
-      'Support my loved ones',
+    const preserveCapital = screen.getByLabelText(
+      'Preserve capital',
     ) as HTMLInputElement;
-    expect(supportLovedOnes.checked).toBe(false);
-    await userEvent.click(supportLovedOnes);
-    expect(supportLovedOnes.checked).toBe(true);
+    expect(preserveCapital.checked).toBe(false);
+    await userEvent.click(preserveCapital);
+    expect(preserveCapital.checked).toBe(true);
 
-    const buyAHome = screen.getByLabelText('Buy a home') as HTMLInputElement;
-    expect(buyAHome.checked).toBe(false);
-
-    const payOffDebt = screen.getByLabelText(
-      'Pay off debt',
+    const speculation = screen.getByLabelText(
+      'Speculation',
     ) as HTMLInputElement;
-    expect(payOffDebt.checked).toBe(false);
+    expect(speculation.checked).toBe(false);
 
-    const startMyOwnBusiness = screen.getByLabelText(
-      'Start my own business',
+    const diversification = screen.getByLabelText(
+      'Diversification',
     ) as HTMLInputElement;
-    expect(startMyOwnBusiness.checked).toBe(false);
+    expect(diversification.checked).toBe(false);
+
+    const other = screen.getByLabelText('Other') as HTMLInputElement;
+    expect(other.checked).toBe(false);
 
     const button = screen.getByRole('button', {
       name: 'Continue',
@@ -74,8 +70,8 @@ describe('<InvestmentGoalsForm />', () => {
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
       [InvestorProfileDI.investmentGoals]: [
-        InvestorProfileInvestmentGoal.growLongTermWealth,
-        InvestorProfileInvestmentGoal.supportLovedOnes,
+        InvestorProfileInvestmentGoal.growth,
+        InvestorProfileInvestmentGoal.preserveCapital,
       ],
     });
   });
@@ -86,39 +82,35 @@ describe('<InvestmentGoalsForm />', () => {
       onSubmit,
       defaultValues: {
         [InvestorProfileDI.investmentGoals]: [
-          InvestorProfileInvestmentGoal.buyAHome,
-          InvestorProfileInvestmentGoal.payOffDebt,
+          InvestorProfileInvestmentGoal.preserveCapital,
+          InvestorProfileInvestmentGoal.speculation,
         ],
       },
     });
 
-    const longTerm = screen.getByLabelText(
-      'Grow long-term wealth',
-    ) as HTMLInputElement;
-    expect(longTerm.checked).toBe(false);
+    const growth = screen.getByLabelText('Growth') as HTMLInputElement;
+    expect(growth.checked).toBe(false);
 
-    const saveForRetirement = screen.getByLabelText(
-      'Save for retirement',
-    ) as HTMLInputElement;
-    expect(saveForRetirement.checked).toBe(false);
+    const income = screen.getByLabelText('Income') as HTMLInputElement;
+    expect(income.checked).toBe(false);
 
-    const supportLovedOnes = screen.getByLabelText(
-      'Support my loved ones',
+    const preserveCapital = screen.getByLabelText(
+      'Preserve capital',
     ) as HTMLInputElement;
-    expect(supportLovedOnes.checked).toBe(false);
+    expect(preserveCapital.checked).toBe(true);
 
-    const buyAHome = screen.getByLabelText('Buy a home') as HTMLInputElement;
-    expect(buyAHome.checked).toBe(true);
-
-    const payOffDebt = screen.getByLabelText(
-      'Pay off debt',
+    const speculation = screen.getByLabelText(
+      'Speculation',
     ) as HTMLInputElement;
-    expect(payOffDebt.checked).toBe(true);
+    expect(speculation.checked).toBe(true);
 
-    const startMyOwnBusiness = screen.getByLabelText(
-      'Start my own business',
+    const diversification = screen.getByLabelText(
+      'Diversification',
     ) as HTMLInputElement;
-    expect(startMyOwnBusiness.checked).toBe(false);
+    expect(diversification.checked).toBe(false);
+
+    const other = screen.getByLabelText('Other') as HTMLInputElement;
+    expect(other.checked).toBe(false);
 
     const button = screen.getByRole('button', {
       name: 'Continue',
@@ -126,8 +118,8 @@ describe('<InvestmentGoalsForm />', () => {
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
       [InvestorProfileDI.investmentGoals]: [
-        InvestorProfileInvestmentGoal.buyAHome,
-        InvestorProfileInvestmentGoal.payOffDebt,
+        InvestorProfileInvestmentGoal.preserveCapital,
+        InvestorProfileInvestmentGoal.speculation,
       ],
     });
   });

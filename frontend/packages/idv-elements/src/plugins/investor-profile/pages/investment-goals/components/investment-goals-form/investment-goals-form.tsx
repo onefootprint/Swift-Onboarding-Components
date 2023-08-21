@@ -28,31 +28,24 @@ const InvestmentGoalsForm = ({
   const defaultEntries = (
     defaultValues?.[InvestorProfileDI.investmentGoals] ?? []
   ).map(goal => [goal, true]);
+
   const { handleSubmit, register, watch } = useForm<FormData>({
     defaultValues: Object.fromEntries(defaultEntries),
   });
   const [showError, setShowError] = useState(false);
-  const growLongTermWealth = watch(
-    InvestorProfileInvestmentGoal.growLongTermWealth,
-  );
-  const saveForRetirement = watch(
-    InvestorProfileInvestmentGoal.saveForRetirement,
-  );
-  const buyAHome = watch(InvestorProfileInvestmentGoal.buyAHome);
-  const payOffDebt = watch(InvestorProfileInvestmentGoal.payOffDebt);
-  const supportLovedOnes = watch(
-    InvestorProfileInvestmentGoal.supportLovedOnes,
-  );
-  const startMyOwnBusiness = watch(
-    InvestorProfileInvestmentGoal.startMyOwnBusiness,
-  );
+  const growth = watch(InvestorProfileInvestmentGoal.growth);
+  const income = watch(InvestorProfileInvestmentGoal.income);
+  const preserve = watch(InvestorProfileInvestmentGoal.preserveCapital);
+  const speculation = watch(InvestorProfileInvestmentGoal.speculation);
+  const diversification = watch(InvestorProfileInvestmentGoal.diversification);
+  const other = watch(InvestorProfileInvestmentGoal.other);
   const hasEmptySelection =
-    !growLongTermWealth &&
-    !saveForRetirement &&
-    !supportLovedOnes &&
-    !buyAHome &&
-    !payOffDebt &&
-    !startMyOwnBusiness;
+    !growth &&
+    !income &&
+    !diversification &&
+    !preserve &&
+    !speculation &&
+    !other;
 
   const handleBeforeSubmit = (data: FormData) => {
     if (hasEmptySelection) {
@@ -78,28 +71,28 @@ const InvestmentGoalsForm = ({
       error={hasEmptySelection && showError ? t('empty-selection') : undefined}
     >
       <Checkbox
-        label={t(InvestorProfileInvestmentGoal.growLongTermWealth)}
-        {...register(InvestorProfileInvestmentGoal.growLongTermWealth)}
+        label={t(InvestorProfileInvestmentGoal.growth)}
+        {...register(InvestorProfileInvestmentGoal.growth)}
       />
       <Checkbox
-        label={t(InvestorProfileInvestmentGoal.saveForRetirement)}
-        {...register(InvestorProfileInvestmentGoal.saveForRetirement)}
+        label={t(InvestorProfileInvestmentGoal.income)}
+        {...register(InvestorProfileInvestmentGoal.income)}
       />
       <Checkbox
-        label={t(InvestorProfileInvestmentGoal.buyAHome)}
-        {...register(InvestorProfileInvestmentGoal.buyAHome)}
+        label={t(InvestorProfileInvestmentGoal.preserveCapital)}
+        {...register(InvestorProfileInvestmentGoal.preserveCapital)}
       />
       <Checkbox
-        label={t(InvestorProfileInvestmentGoal.supportLovedOnes)}
-        {...register(InvestorProfileInvestmentGoal.supportLovedOnes)}
+        label={t(InvestorProfileInvestmentGoal.speculation)}
+        {...register(InvestorProfileInvestmentGoal.speculation)}
       />
       <Checkbox
-        label={t(InvestorProfileInvestmentGoal.payOffDebt)}
-        {...register(InvestorProfileInvestmentGoal.payOffDebt)}
+        label={t(InvestorProfileInvestmentGoal.diversification)}
+        {...register(InvestorProfileInvestmentGoal.diversification)}
       />
       <Checkbox
-        label={t(InvestorProfileInvestmentGoal.startMyOwnBusiness)}
-        {...register(InvestorProfileInvestmentGoal.startMyOwnBusiness)}
+        label={t(InvestorProfileInvestmentGoal.other)}
+        {...register(InvestorProfileInvestmentGoal.other)}
       />
     </CustomForm>
   );
