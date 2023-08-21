@@ -122,7 +122,7 @@ fn clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
 
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
 #[strum(serialize_all = "snake_case")]
-enum UsLegalStatus {
+pub enum UsLegalStatus {
     Citizen,
     PermanentResident,
     Visa,

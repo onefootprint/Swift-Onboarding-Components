@@ -57,7 +57,7 @@ pub(super) fn parse_enum<T>(value: PiiString) -> VResult<PiiString>
 where
     T: FromStr<Err = strum::ParseError>,
 {
-    T::from_str(value.leak())?;
+    value.parse_into::<T>()?;
     Ok(value)
 }
 

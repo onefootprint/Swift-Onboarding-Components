@@ -95,6 +95,13 @@ impl PiiString {
         PiiString(self.0.trim().to_lowercase())
     }
 
+    pub fn parse_into<T>(&self) -> Result<T, <T as FromStr>::Err>
+    where
+        T: FromStr,
+    {
+        T::from_str(self.leak())
+    }
+
     pub fn deserialize<T>(&self) -> serde_json::error::Result<T>
     where
         T: serde::de::DeserializeOwned,

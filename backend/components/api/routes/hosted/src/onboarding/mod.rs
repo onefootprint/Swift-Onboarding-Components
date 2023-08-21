@@ -4,6 +4,7 @@ use crate::utils::vault_wrapper::{Business, Person, VaultWrapper, VwArgs};
 use api_core::{
     auth::user::CheckedUserObAuthContext,
     errors::{business::BusinessError, ApiResult},
+    utils::vault_wrapper::DecryptUncheckedResult,
     State,
 };
 use db::{
@@ -18,11 +19,11 @@ use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
 use newtypes::{
     AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, LivenessSource, OnboardingRequirement,
-    OnboardingRequirementKind, Selfie,
+    OnboardingRequirementKind, Selfie, UsLegalStatus,
 };
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind, IdDocKind,
-    InvestorProfileKind as IPK, PiiString, ScopedVaultId,
+    IdentityDataKind as IDK, InvestorProfileKind as IPK, ScopedVaultId,
 };
 use paperclip::actix::web;
 use strum::IntoEnumIterator;
@@ -71,6 +72,18 @@ impl GetRequirementsArgs {
     }
 }
 
+impl GetRequirementsArgs {
+    /// Fetch various values from the vault that may conditionally affect requirements
+    pub async fn get_decrypted_values(
+        state: &State,
+        uvw: &VaultWrapper<Person>,
+    ) -> ApiResult<DecryptUncheckedResult> {
+        let values = vec![IPK::Declarations.into(), IDK::UsLegalStatus.into()];
+        let decrypted_values = uvw.decrypt_unchecked(&state.enclave_client, &values).await?;
+        Ok(decrypted_values)
+    }
+}
+
 #[tracing::instrument(skip_all)]
 /// Gets a list of requirements to onboard onto this ob config.
 /// NOTE: this returns a list of both met and unmet requirements - you should check.
@@ -89,15 +102,13 @@ pub async fn get_requirements(
             Ok(uvw)
         })
         .await??;
-    let declarations = uvw
-        .decrypt_unchecked_single(&state.enclave_client, IPK::Declarations.into())
-        .await?;
+    let decrypted_values = GetRequirementsArgs::get_decrypted_values(state, &uvw).await?;
 
     let ff_client = state.feature_flag_client.clone();
     let requirements = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let requirements = get_requirements_inner(conn, uvw, args, declarations, ff_client)?;
+            let requirements = get_requirements_inner(conn, uvw, args, decrypted_values, ff_client)?;
             Ok(requirements)
         })
         .await??;
@@ -113,6 +124,7 @@ fn get_progress<Type>(
     vw: &VaultWrapper<Type>,
     ob_config: &ObConfiguration,
     di_kind: DID,
+    decrypted_values: &DecryptUncheckedResult,
 ) -> RequirementProgress {
     let mut populated_attributes = Vec::new();
     let mut missing_attributes = Vec::new();
@@ -124,10 +136,33 @@ fn get_progress<Type>(
         .chain(ob_config.optional_data.iter().map(|cdo| (cdo, false)))
         .filter(|(cdo, _)| cdo.parent().data_identifier_kind() == di_kind)
         .for_each(|(cdo, must_collect)| {
-            let has_all_dis = cdo
-                .required_data_identifiers()
-                .into_iter()
-                .all(|di| vw.has_field(di));
+            let mut required_dis = cdo.required_data_identifiers();
+            // Also check if optional DIs (based on selected values) are met
+            if cdo == &CollectedDataOption::UsLegalStatus {
+                if let Ok(legal_status) = decrypted_values.get_di(IDK::UsLegalStatus) {
+                    match legal_status.parse_into::<UsLegalStatus>() {
+                        Ok(UsLegalStatus::Citizen) => (),
+                        Ok(UsLegalStatus::PermanentResident) | Ok(UsLegalStatus::Other) => {
+                            required_dis
+                                .extend([IDK::Nationality.into(), IDK::Citizenships.into()].into_iter());
+                        }
+                        Ok(UsLegalStatus::Visa) => {
+                            let addl_dis = [
+                                IDK::Nationality.into(),
+                                IDK::Citizenships.into(),
+                                IDK::VisaKind.into(),
+                                IDK::VisaExpirationDate.into(),
+                            ];
+                            required_dis.extend(addl_dis.into_iter());
+                        }
+                        Err(e) => {
+                            tracing::error!(e=%e, "Couldn't parse UsLegalStatus in requirement fetching")
+                        }
+                    }
+                }
+            }
+
+            let has_all_dis = required_dis.into_iter().all(|di| vw.has_field(di));
 
             if has_all_dis {
                 populated_attributes.push(cdo.clone());
@@ -147,7 +182,7 @@ pub fn get_requirements_inner(
     conn: &mut PgConn,
     uvw: VaultWrapper<Person>,
     args: GetRequirementsArgs,
-    declarations: Option<PiiString>,
+    decrypted_values: DecryptUncheckedResult,
     ff_client: Arc<dyn FeatureFlagClient>,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     let only_us_dl = ff_client.flag(BoolFlag::RestrictToUsDriversLicense(&args.ob_config.tenant_id));
@@ -159,7 +194,7 @@ pub fn get_requirements_inner(
     // necessary
     let requirements = relevant_requirement_kinds
         .into_iter()
-        .map(|k| get_requirement_inner(k, conn, &uvw, &args, declarations.as_ref(), only_us_dl))
+        .map(|k| get_requirement_inner(k, conn, &uvw, &args, &decrypted_values, only_us_dl))
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
         .flatten()
@@ -177,7 +212,7 @@ fn get_requirement_inner(
     conn: &mut PgConn,
     uvw: &VaultWrapper<Person>,
     args: &GetRequirementsArgs,
-    declarations: Option<&PiiString>,
+    decrypted_values: &DecryptUncheckedResult,
     only_us_dl: bool,
 ) -> ApiResult<Option<OnboardingRequirement>> {
     let ob_config = &args.ob_config;
@@ -187,7 +222,7 @@ fn get_requirement_inner(
                 let RequirementProgress {
                     populated_attributes,
                     missing_attributes,
-                } = get_progress(uvw, ob_config, DID::Id);
+                } = get_progress(uvw, ob_config, DID::Id, decrypted_values);
                 // if ob config needs to collect id data
                 OnboardingRequirement::CollectData {
                     missing_attributes,
@@ -203,8 +238,9 @@ fn get_requirement_inner(
                     let RequirementProgress {
                         populated_attributes,
                         missing_attributes,
-                    } = get_progress(uvw, ob_config, DID::InvestorProfile);
-                    let missing_document = if let Some(declarations) = declarations.as_ref() {
+                    } = get_progress(uvw, ob_config, DID::InvestorProfile, decrypted_values);
+                    let declarations = decrypted_values.get_di(IPK::Declarations).ok();
+                    let missing_document = if let Some(declarations) = declarations {
                         let declarations: Vec<Declaration> = declarations.deserialize()?;
                         // The finra compliance doc is missing if any of the declarations require a doc and we don't
                         // yet have one on file
@@ -234,7 +270,7 @@ fn get_requirement_inner(
                     let RequirementProgress {
                         populated_attributes,
                         missing_attributes,
-                    } = get_progress(&bvw, ob_config, DID::Business);
+                    } = get_progress(&bvw, ob_config, DID::Business, decrypted_values);
                     Ok(OnboardingRequirement::CollectBusinessData {
                         missing_attributes,
                         populated_attributes,

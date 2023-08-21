@@ -51,19 +51,29 @@ pub async fn post(
         onboarding_config_key,
     } = request.into_inner();
 
+    let (uvw, sv) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv.id))?;
+            Ok((uvw, sv))
+        })
+        .await??;
+
+    if uvw.vault.kind != VaultKind::Person {
+        return Err(TenantError::IncorrectVaultKindForKyc.into());
+    }
+    if uvw.vault.is_portable {
+        return Err(TenantError::CannotRunKycForPortable.into());
+    }
+
+    let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &uvw).await?;
+
+    let tenant_id = auth.tenant().id.clone();
     let ff_client = state.feature_flag_client.clone();
     let wf = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv.id))?;
-
-            if uvw.vault.kind != VaultKind::Person {
-                return Err(TenantError::IncorrectVaultKindForKyc.into());
-            }
-            if uvw.vault.is_portable {
-                return Err(TenantError::CannotRunKycForPortable.into());
-            }
             let (obc, tenant) = ObConfiguration::get_enabled(conn, &onboarding_config_key)
                 .map_err(|_| DbError::ApiKeyNotFound)?;
             if tenant.id != tenant_id {
@@ -115,7 +125,7 @@ pub async fn post(
                 sb_id: biz_wf.map(|ob| ob.scoped_vault_id),
             };
             // /kyc endpoint currently does not properly handle IPK doc requirements!
-            let reqs = get_requirements_inner(conn, uvw, args, None, ff_client)?;
+            let reqs = get_requirements_inner(conn, uvw, args, decrypted_values, ff_client)?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs
                 .into_iter()

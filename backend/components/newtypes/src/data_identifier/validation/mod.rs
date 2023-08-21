@@ -11,6 +11,7 @@ pub use utils::ISO_3166_COUNTRIES;
 
 pub use business::{BusinessOwnerData, KycedBusinessOwnerData};
 pub use card::{CardIssuer, Expiration as CardExpiration};
+pub use identity::UsLegalStatus;
 pub use investor_profile::Declaration;
 
 pub type AllData = HashMap<DataIdentifier, PiiString>;
