@@ -5,6 +5,8 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 
+import { Kind } from '@/playbooks/utils/machine/types';
+
 import PersonalScopesWithContext, {
   PersonalScopesWithContextProps,
 } from './personal-scopes.test.config';
@@ -12,11 +14,13 @@ import PersonalScopesWithContext, {
 const renderPersonalScopes = ({
   startingPersonalValues,
   investorProfile,
+  kind,
 }: PersonalScopesWithContextProps) => {
   customRender(
     <PersonalScopesWithContext
       startingPersonalValues={startingPersonalValues}
       investorProfile={investorProfile}
+      kind={kind}
     />,
   );
 };
@@ -86,6 +90,14 @@ describe('<PersonalScopes />', () => {
 
   it('should not show investor profile if not collecting', () => {
     renderPersonalScopes({ investorProfile: false });
+    const investorProfile = screen.queryByRole('checkbox', {
+      name: 'Investor profile',
+    });
+    expect(investorProfile).not.toBeInTheDocument();
+  });
+
+  it('should not show investor profile if KYB', () => {
+    renderPersonalScopes({ investorProfile: true, kind: Kind.KYB });
     const investorProfile = screen.queryByRole('checkbox', {
       name: 'Investor profile',
     });

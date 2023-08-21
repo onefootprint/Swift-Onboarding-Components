@@ -74,6 +74,7 @@ const Router = ({ onClose }: RouterProps) => {
         )}
         {state.matches('authorizedScopes') && (
           <AuthorizedScopes
+            kind={state.context.kind}
             playbook={state.context.playbook ?? defaultPlaybookValues}
             onBack={() => send('yourPlaybookSelected')}
           />

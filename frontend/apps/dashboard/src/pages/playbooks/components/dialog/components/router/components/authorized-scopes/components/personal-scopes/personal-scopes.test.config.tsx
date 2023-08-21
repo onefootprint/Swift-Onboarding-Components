@@ -6,6 +6,7 @@ import {
   AuthorizedScopesFormData,
   defaultAuthorizedScopesValues,
   defaultPlaybookValuesKYC,
+  Kind,
   PersonalInformationAndDocs,
 } from '@/playbooks/utils/machine/types';
 
@@ -14,11 +15,13 @@ import PersonalScopes from './personal-scopes';
 export type PersonalScopesWithContextProps = {
   startingPersonalValues?: Partial<PersonalInformationAndDocs>;
   investorProfile?: boolean;
+  kind?: Kind;
 };
 
 const PersonalScopesWithContext = ({
   startingPersonalValues,
   investorProfile,
+  kind = Kind.KYC,
 }: PersonalScopesWithContextProps) => {
   const formMethods = useForm<AuthorizedScopesFormData>({
     defaultValues: defaultAuthorizedScopesValues,
@@ -28,6 +31,7 @@ const PersonalScopesWithContext = ({
     <FormProvider {...formMethods}>
       <form>
         <PersonalScopes
+          kind={kind}
           playbook={{
             ...defaultPlaybookValuesKYC,
             personalInformationAndDocs: {

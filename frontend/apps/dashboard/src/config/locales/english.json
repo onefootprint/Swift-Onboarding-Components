@@ -1097,7 +1097,9 @@
               "title": "Authorized scopes",
               "subtitle": "Select the data attributes you need read access to after an onboarding. During onboarding, the user will 'authorize' access to the scopes you choose below. If you are not sure what you will need, leave all the default fields selected.",
               "back": "Back",
-              "next": "Next"
+              "next": "Next",
+              "all-business-info": "All business information",
+              "beneficial-owner": "Beneficial owner"
             }
           },
           "form": {

@@ -7,17 +7,24 @@ import { FormProvider, useForm } from 'react-hook-form';
 import {
   AuthorizedScopesFormData,
   defaultAuthorizedScopesValues,
+  Kind,
   PlaybookFormData,
 } from '@/playbooks/utils/machine/types';
 
+import BusinessScopes from './components/business-scopes';
 import PersonalScopes from './components/personal-scopes';
 
 type AuthorizedScopesProps = {
   onBack: () => void;
   playbook: PlaybookFormData;
+  kind?: Kind;
 };
 
-const AuthorizedScopes = ({ onBack, playbook }: AuthorizedScopesProps) => {
+const AuthorizedScopes = ({
+  onBack,
+  playbook,
+  kind = Kind.KYC,
+}: AuthorizedScopesProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.data-collection.authorized-scopes',
   );
@@ -36,8 +43,9 @@ const AuthorizedScopes = ({ onBack, playbook }: AuthorizedScopesProps) => {
       </Header>
       <FormProvider {...formMethods}>
         <Form>
+          {kind === Kind.KYB && <BusinessScopes />}
           <OptionsContainer>
-            <PersonalScopes playbook={playbook} />
+            <PersonalScopes playbook={playbook} kind={kind} />
           </OptionsContainer>
           <ButtonContainer>
             <Button size="compact" variant="secondary" onClick={onBack}>

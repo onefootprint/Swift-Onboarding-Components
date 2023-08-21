@@ -8,13 +8,14 @@ import { Box, Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { PlaybookFormData } from '@/playbooks/utils/machine/types';
+import { Kind, PlaybookFormData } from '@/playbooks/utils/machine/types';
 
 type PersonalScopesProps = {
   playbook: PlaybookFormData;
+  kind: Kind;
 };
 
-const PersonalScopes = ({ playbook }: PersonalScopesProps) => {
+const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
   const { register } = useFormContext();
   const { allT } = useTranslation(
     'pages.playbooks.dialog.your-playbook.data-collection.authorized-scopes',
@@ -25,7 +26,8 @@ const PersonalScopes = ({ playbook }: PersonalScopesProps) => {
     personalInformationAndDocs;
 
   const isCollectingInvestorProfile =
-    playbook[CollectedInvestorProfileDataOption.investorProfile];
+    playbook[CollectedInvestorProfileDataOption.investorProfile] &&
+    kind === Kind.KYC;
 
   return (
     <>
