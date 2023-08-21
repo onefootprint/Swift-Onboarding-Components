@@ -68,21 +68,48 @@ enum EmploymentStatus {
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
 #[strum(serialize_all = "snake_case")]
 enum AnnualIncome {
+    Le25k,
+    Gt25kLe50k,
+    Gt50kLe100k,
+    Gt100kLe200k,
+    Gt200kLe300k,
+    Gt300kLe500k,
+    Gt500kLe1200k,
+    Gt1200k,
+
+    /// DEPRECATED
     Lt50k,
+    /// DEPRECATED
     S50kTo100k,
+    /// DEPRECATED
     S100kTo250k,
+    /// DEPRECATED
     S250kTo500k,
+    /// DEPRECATED
     Gt500k,
 }
 
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
 #[strum(serialize_all = "snake_case")]
 enum NetWorth {
+    Le50k,
+    Gt50kLe100k,
+    Gt100kLe200k,
+    Gt500kLe1m,
+    Gt1mLe5m,
+    Gt5m,
+
+    /// DEPRECATED
     Lt50k,
+    /// DEPRECATED
     S50kTo100k,
+    /// DEPRECATED
     S100kTo250k,
+    /// DEPRECATED
     S250kTo500k,
+    /// DEPRECATED
     S500kTo1m,
+    /// DEPRECATED
     Gt1m,
 }
 
