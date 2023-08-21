@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoCheck24, IcoClose24 } from '@onefootprint/icons';
+import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import { CollectedKycDataOption } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -36,7 +36,7 @@ const DisplayValue = ({ field, personalInfoAndDocs }: DisplayValueProps) => {
     if (value) {
       return <IcoCheck24 testID="check-icon" />;
     }
-    return <IcoClose24 testID="close-icon" />;
+    return <IcoCloseSmall24 testID="close-icon" />;
   }
 
   return null;

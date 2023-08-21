@@ -1126,7 +1126,7 @@
                 "last4": "Last 4 digits"
               },
               "ssn-optional": {
-                "checkbox": "Allow users without a Social Security Number to proceed with the verification",
+                "checkbox": "Allow users without an SSN to proceed with the verification",
                 "warning": "They will need to be manually reviewed by you."
               },
               "nationality": {
@@ -1610,7 +1610,7 @@
               "ssn9": "Full",
               "ssn4": "Last 4 digits",
               "no-ssn": {
-                "label": "Allow users without a SSN to proceed with the verification",
+                "label": "Allow users without an SSN to proceed with the verification",
                 "hint": "They will need to be manually reviewed by you."
               }
             },

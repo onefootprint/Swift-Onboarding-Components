@@ -17,17 +17,13 @@ const renderEditing = ({ kind, startingValues }: EditingWithContextProps) => {
 describe('<Editing />', () => {
   it('should show SSN options when toggling', async () => {
     renderEditing({});
-    const ssnToggle = screen.getByRole('switch', {
-      name: 'Request users to provide their SSN',
-    });
-    await userEvent.click(ssnToggle);
     expect(screen.getByRole('radio', { name: 'Full' })).toBeInTheDocument();
     expect(
       screen.getByRole('radio', { name: 'Last 4 digits' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('checkbox', {
-        name: 'Allow users without a Social Security Number to proceed with the verification',
+        name: 'Allow users without an SSN to proceed with the verification',
       }),
     ).toBeInTheDocument();
     expect(

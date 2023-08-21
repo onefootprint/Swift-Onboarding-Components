@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled from '@onefootprint/styled';
+import styled, { css } from '@onefootprint/styled';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -17,14 +17,15 @@ const Playbooks = () => {
   };
 
   return (
-    <>
+    <Container>
       <Head>
         <title>{t('page-title')}</title>
       </Head>
       <HeaderContainer>
-        <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
-          {t('header.title')}
-        </Typography>
+        <Title>
+          <Typography variant="heading-3">{t('header.title')}</Typography>
+          <Typography variant="body-2">{t('header.subtitle')}</Typography>
+        </Title>
         <PermissionGate
           fallbackText={t('cta-not-allowed')}
           scopeKind={RoleScopeKind.onboardingConfiguration}
@@ -34,18 +35,33 @@ const Playbooks = () => {
           </Button>
         </PermissionGate>
       </HeaderContainer>
-      <Typography variant="body-2">{t('header.subtitle')}</Typography>
-      <br />
       <Typography variant="body-2">{t('empty-description')}</Typography>
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
-    </>
+    </Container>
   );
 };
+
+const Title = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[2]};
+  `};
+`;
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[8]};
+  `};
+`;
 
 const HeaderContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 `;
 
 export default Playbooks;

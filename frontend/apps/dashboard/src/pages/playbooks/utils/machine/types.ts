@@ -71,7 +71,7 @@ export const defaultPlaybookValuesKYC: PlaybookFormData = {
     [CollectedKycDataOption.dob]: true,
     [CollectedKycDataOption.nationality]: true,
     [CollectedKycDataOption.fullAddress]: true,
-    ssn: false,
+    ssn: true,
     idDoc: false,
     ssnKind: CollectedKycDataOption.ssn9,
     idDocKind: [],

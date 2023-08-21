@@ -1,4 +1,4 @@
-import { IcoCheck24, IcoClose24 } from '@onefootprint/icons';
+import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import React from 'react';
 
 import { BusinessInformation } from '@/playbooks/utils/machine/types';
@@ -15,7 +15,7 @@ const DisplayValue = ({ field, businessInformation }: DisplayValueProps) => {
     if (value) {
       return <IcoCheck24 testID="check-icon" />;
     }
-    return <IcoClose24 testID="close-icon" />;
+    return <IcoCloseSmall24 testID="close-icon" />;
   }
 
   return null;

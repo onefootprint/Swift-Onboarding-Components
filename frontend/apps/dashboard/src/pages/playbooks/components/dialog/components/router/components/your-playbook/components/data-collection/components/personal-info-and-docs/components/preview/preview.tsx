@@ -49,7 +49,7 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
           onClick={startEditing}
           iconComponent={IcoPencil16}
           iconPosition="left"
-          size="compact"
+          size="tiny"
         >
           {t('preview.edit')}
         </LinkButton>
@@ -90,6 +90,7 @@ const CollectedInformation = styled.div`
     width: 100%;
     justify-content: space-between;
     gap: ${theme.spacing[10]};
+    height: ${theme.spacing[7]};
   `}
 `;
 
