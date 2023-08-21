@@ -13,7 +13,7 @@ const installation = `npm install @onefootprint/footprint-js
 
 const basic = `import '@onefootprint/footprint-js/dist/footprint-js.css';
 import { appearance, publicKey } from './config';
-import footprint from '@onefooprint/footprint-js';
+import footprint from '@onefootprint/footprint-js';
 
 const Page = () => {
   const handleOpen = () => {

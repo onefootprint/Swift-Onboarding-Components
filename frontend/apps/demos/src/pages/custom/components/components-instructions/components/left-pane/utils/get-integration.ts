@@ -3,7 +3,7 @@ export const getReactIntegration =
 import './app.css';
 import { appearance } from './config';
 import { FootprintFormType } from '@onefootprint/footprint-js';
-import { FootprintForm } from '@onefooprint/footprint-react';
+import { FootprintForm } from '@onefootprint/footprint-react';
 
 const secretKey = process.env.FOOTPRINT_API_SECRET_KEY;
 

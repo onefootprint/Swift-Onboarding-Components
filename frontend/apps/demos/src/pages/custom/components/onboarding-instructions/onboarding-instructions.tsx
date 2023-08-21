@@ -28,7 +28,7 @@ npm install @onefootprint/footprint-react
 const basic = `import '@onefootprint/footprint-js/dist/footprint-js.css';
 import './app.css';
 import { appearance, publicKey } from './config';
-import { FootprintVerifyButton } from '@onefooprint/footprint-react';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 const Page = () => {
   const handleCompleted = (validationToken: string) => {
     // Send validationToken to your backend
