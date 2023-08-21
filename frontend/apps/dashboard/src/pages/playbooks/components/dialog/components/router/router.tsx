@@ -32,8 +32,6 @@ const Router = ({ onClose }: RouterProps) => {
     state.context.kind === Kind.KYB
       ? defaultPlaybookValuesKYB
       : defaultPlaybookValuesKYC;
-  const playbookStartingValues =
-    state.context.playbook ?? defaultPlaybookValues;
 
   const step = getStep({ value: state.value as string });
   const stepperValue = options[step];
@@ -66,7 +64,7 @@ const Router = ({ onClose }: RouterProps) => {
         )}
         {state.matches('yourPlaybook') && state.context.kind && (
           <YourPlaybook
-            defaultValues={playbookStartingValues}
+            defaultValues={state.context.playbook ?? defaultPlaybookValues}
             kind={state.context.kind}
             onSubmit={data => {
               send('playbookSubmitted', { payload: { playbook: data } });
@@ -75,7 +73,10 @@ const Router = ({ onClose }: RouterProps) => {
           />
         )}
         {state.matches('authorizedScopes') && (
-          <AuthorizedScopes onBack={() => send('yourPlaybookSelected')} />
+          <AuthorizedScopes
+            playbook={state.context.playbook ?? defaultPlaybookValues}
+            onBack={() => send('yourPlaybookSelected')}
+          />
         )}
       </Content>
     </Container>

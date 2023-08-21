@@ -7,16 +7,23 @@ import { FormProvider, useForm } from 'react-hook-form';
 import {
   AuthorizedScopesFormData,
   defaultAuthorizedScopesValues,
+  PlaybookFormData,
 } from '@/playbooks/utils/machine/types';
+
+import PersonalScopes from './components/personal-scopes';
 
 type AuthorizedScopesProps = {
   onBack: () => void;
+  playbook: PlaybookFormData;
 };
 
-const AuthorizedScopes = ({ onBack }: AuthorizedScopesProps) => {
+const AuthorizedScopes = ({ onBack, playbook }: AuthorizedScopesProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.data-collection.authorized-scopes',
   );
+
+  // defaultValues populates only the fields that are in the form
+  // so we can set everything to true and only the fields we display will submit
   const formMethods = useForm<AuthorizedScopesFormData>({
     defaultValues: defaultAuthorizedScopesValues,
   });
@@ -29,7 +36,9 @@ const AuthorizedScopes = ({ onBack }: AuthorizedScopesProps) => {
       </Header>
       <FormProvider {...formMethods}>
         <Form>
-          <OptionsContainer />
+          <OptionsContainer>
+            <PersonalScopes playbook={playbook} />
+          </OptionsContainer>
           <ButtonContainer>
             <Button size="compact" variant="secondary" onClick={onBack}>
               {t('back')}
