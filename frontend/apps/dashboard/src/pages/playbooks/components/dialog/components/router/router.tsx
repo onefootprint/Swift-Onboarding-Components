@@ -4,15 +4,17 @@ import { Stepper } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
+import PlaybookMachine from '@/playbooks/utils/machine';
 import {
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
   Kind,
 } from '@/playbooks/utils/machine/types';
 
-import PlaybookMachine from '../../../../utils/machine';
+import AuthorizedScopes from './components/authorized-scopes';
 import WhoToOnboard from './components/who-to-onboard';
 import YourPlaybook from './components/your-playbook';
+import getStep from './utils/get-step';
 
 type RouterProps = {
   onClose: () => void;
@@ -24,13 +26,17 @@ const Router = ({ onClose }: RouterProps) => {
   const options = [
     { value: 'whoToOnboard', label: t('who-to-onboard') },
     { value: 'yourPlaybook', label: t('your-playbook') },
+    { value: 'authorizedScopes', label: t('authorized-scopes') },
   ];
   const defaultPlaybookValues =
     state.context.kind === Kind.KYB
       ? defaultPlaybookValuesKYB
       : defaultPlaybookValuesKYC;
-  const playbookDefaultValues = state.context.playbook ?? defaultPlaybookValues;
-  const stepperValue = state.matches('whoToOnboard') ? options[0] : options[1];
+  const playbookStartingValues =
+    state.context.playbook ?? defaultPlaybookValues;
+
+  const step = getStep({ value: state.value as string });
+  const stepperValue = options[step];
 
   return (
     <Container>
@@ -40,6 +46,8 @@ const Router = ({ onClose }: RouterProps) => {
           onChange={option => {
             if (option.value === 'whoToOnboard') {
               send('whoToOnboardSelected');
+            } else if (option.value === 'yourPlaybook') {
+              send('yourPlaybookSelected');
             }
           }}
           value={stepperValue}
@@ -58,13 +66,16 @@ const Router = ({ onClose }: RouterProps) => {
         )}
         {state.matches('yourPlaybook') && state.context.kind && (
           <YourPlaybook
-            defaultValues={playbookDefaultValues}
+            defaultValues={playbookStartingValues}
             kind={state.context.kind}
             onSubmit={data => {
               send('playbookSubmitted', { payload: { playbook: data } });
             }}
             onBack={() => send('whoToOnboardSelected')}
           />
+        )}
+        {state.matches('authorizedScopes') && (
+          <AuthorizedScopes onBack={() => send('yourPlaybookSelected')} />
         )}
       </Content>
     </Container>

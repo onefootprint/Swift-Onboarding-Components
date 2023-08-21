@@ -1,4 +1,5 @@
 import {
+  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -10,6 +11,20 @@ export type PlaybookFormData = {
   personalInformationAndDocs: PersonalInformationAndDocs;
   businessInformation?: BusinessInformation;
   [CollectedInvestorProfileDataOption.investorProfile]: boolean;
+};
+
+export type AuthorizedScopesFormData = {
+  [CollectedKycDataOption.name]: boolean;
+  [CollectedKycDataOption.email]: boolean;
+  [CollectedKycDataOption.phoneNumber]: boolean;
+  [CollectedKycDataOption.name]: boolean;
+  [CollectedKycDataOption.dob]: boolean;
+  [CollectedKycDataOption.fullAddress]: boolean;
+  [CollectedKycDataOption.ssn4]?: boolean;
+  [CollectedKycDataOption.ssn9]?: boolean;
+  [CollectedKycDataOption.nationality]?: boolean;
+  [CollectedDocumentDataOption.document]?: SupportedIdDocTypes;
+  [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
 };
 
 export type PersonalInformationAndDocs = {
@@ -68,6 +83,19 @@ export const defaultPlaybookValuesKYC: PlaybookFormData = {
 export const defaultPlaybookValuesKYB: PlaybookFormData = {
   ...defaultPlaybookValuesKYC,
   businessInformation: defaultBusinessInformation,
+};
+
+export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
+  [CollectedKycDataOption.email]: true,
+  [CollectedKycDataOption.phoneNumber]: true,
+  [CollectedKycDataOption.name]: true,
+  [CollectedKycDataOption.dob]: true,
+  [CollectedKycDataOption.fullAddress]: true,
+  [CollectedKycDataOption.ssn4]: true,
+  [CollectedKycDataOption.ssn9]: true,
+  [CollectedKycDataOption.nationality]: true,
+  [CollectedDocumentDataOption.document]: SupportedIdDocTypes.driversLicense,
+  [CollectedInvestorProfileDataOption.investorProfile]: true,
 };
 
 export enum Kind {

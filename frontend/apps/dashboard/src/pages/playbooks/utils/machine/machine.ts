@@ -34,7 +34,16 @@ export const createPlaybookMachine = () =>
             },
           },
         },
-        authorizedScopes: {},
+        authorizedScopes: {
+          on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+            },
+            yourPlaybookSelected: {
+              target: 'yourPlaybook',
+            },
+          },
+        },
       },
     },
     {
