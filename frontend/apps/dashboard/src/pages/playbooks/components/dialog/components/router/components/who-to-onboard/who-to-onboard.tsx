@@ -5,7 +5,7 @@ import { Button, RadioSelect, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { Kind } from '../../utils/machine/types';
+import { Kind } from '@/playbooks/utils/machine/types';
 
 export type WhoToOnboardProps = {
   onBack: () => void;

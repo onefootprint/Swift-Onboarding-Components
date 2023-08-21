@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import { Kind } from '../../../../../../your-playbook.types';
+import { Kind } from '@/playbooks/utils/machine/types';
+
 import EditingWithContext, {
   EditingWithContextProps,
 } from './editing.test.config';

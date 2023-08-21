@@ -4,13 +4,14 @@ import { TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { Kind } from '../../utils/machine/types';
-import DataCollection from './components/data-collection';
 import {
-  defaultValuesKYB,
-  defaultValuesKYC,
-  FormData,
-} from './your-playbook.types';
+  defaultPlaybookValuesKYB,
+  defaultPlaybookValuesKYC,
+  Kind,
+  PlaybookFormData,
+} from '@/playbooks/utils/machine/types';
+
+import DataCollection from './components/data-collection';
 
 type YourPlaybookProps = {
   kind: Kind;
@@ -18,8 +19,9 @@ type YourPlaybookProps = {
 
 const YourPlaybook = ({ kind }: YourPlaybookProps) => {
   const { t } = useTranslation('pages.playbooks.dialog.your-playbook');
-  const defaultValues = kind === Kind.KYB ? defaultValuesKYB : defaultValuesKYC;
-  const formMethods = useForm<FormData>({ defaultValues });
+  const defaultValues =
+    kind === Kind.KYB ? defaultPlaybookValuesKYB : defaultPlaybookValuesKYC;
+  const formMethods = useForm<PlaybookFormData>({ defaultValues });
   const { handleSubmit, register } = formMethods;
 
   // should come from props later

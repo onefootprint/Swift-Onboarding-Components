@@ -5,7 +5,8 @@ import React from 'react';
 import {
   BusinessInformation,
   defaultBusinessInformation,
-} from '../../../../../../../../your-playbook.types';
+} from '@/playbooks/utils/machine/types';
+
 import DisplayValue from './display-value';
 
 type DisplayValueProps = {

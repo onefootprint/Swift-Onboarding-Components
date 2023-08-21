@@ -2,10 +2,11 @@ import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
 import {
-  defaultValuesKYB,
-  defaultValuesKYC,
+  defaultPlaybookValuesKYB,
+  defaultPlaybookValuesKYC,
   Kind,
-} from '../../your-playbook.types';
+} from '@/playbooks/utils/machine/types';
+
 import DataCollectionWithContext, {
   DataCollectionWithContextProps,
 } from './data-collection.test.config';
@@ -28,8 +29,8 @@ describe('<DataCollection />', () => {
     renderDataCollection({
       kind: Kind.KYB,
       startingValues: {
-        ...defaultValuesKYC,
-        businessInformation: defaultValuesKYB.businessInformation,
+        ...defaultPlaybookValuesKYC,
+        businessInformation: defaultPlaybookValuesKYB.businessInformation,
       },
     });
     expect(
@@ -41,8 +42,8 @@ describe('<DataCollection />', () => {
     renderDataCollection({
       kind: Kind.KYB,
       startingValues: {
-        ...defaultValuesKYC,
-        businessInformation: defaultValuesKYB.businessInformation,
+        ...defaultPlaybookValuesKYC,
+        businessInformation: defaultPlaybookValuesKYB.businessInformation,
       },
     });
     expect(screen.getByRole('alert')).toBeInTheDocument();

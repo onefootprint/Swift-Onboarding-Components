@@ -4,10 +4,11 @@ import { Stepper } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
+import { Kind } from '@/playbooks/utils/machine/types';
+
+import PlaybookMachine from '../../../../utils/machine';
 import WhoToOnboard from './components/who-to-onboard';
 import YourPlaybook from './components/your-playbook';
-import PlaybookMachine from './utils/machine/machine';
-import { Kind } from './utils/machine/types';
 
 type RouterProps = {
   onClose: () => void;

@@ -5,7 +5,8 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 
-import { Kind } from '../../../../../../your-playbook.types';
+import { Kind } from '@/playbooks/utils/machine/types';
+
 import PreviewWithContext, {
   PreviewWithContextProps,
 } from './preview.test.config';

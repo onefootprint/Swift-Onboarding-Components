@@ -1,11 +1,16 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { defaultValuesKYC, FormData, Kind } from '../../your-playbook.types';
+import {
+  defaultPlaybookValuesKYC,
+  Kind,
+  PlaybookFormData,
+} from '@/playbooks/utils/machine/types';
+
 import DataCollection from './data-collection';
 
 export type DataCollectionWithContextProps = {
-  startingValues?: Partial<FormData>;
+  startingValues?: Partial<PlaybookFormData>;
   kind: Kind;
 };
 
@@ -13,9 +18,9 @@ const DataCollectionWithContext = ({
   startingValues,
   kind,
 }: DataCollectionWithContextProps) => {
-  const formMethods = useForm<FormData>({
+  const formMethods = useForm<PlaybookFormData>({
     defaultValues: {
-      ...defaultValuesKYC,
+      ...defaultPlaybookValuesKYC,
       ...startingValues,
     },
   });

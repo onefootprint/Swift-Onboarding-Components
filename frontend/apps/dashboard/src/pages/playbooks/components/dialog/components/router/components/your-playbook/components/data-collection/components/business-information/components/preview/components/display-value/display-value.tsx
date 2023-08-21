@@ -1,7 +1,7 @@
 import { IcoCheck24, IcoClose24 } from '@onefootprint/icons';
 import React from 'react';
 
-import { BusinessInformation } from '../../../../../../../../your-playbook.types';
+import { BusinessInformation } from '@/playbooks/utils/machine/types';
 
 type DisplayValueProps = {
   field: keyof BusinessInformation;

@@ -1,15 +1,15 @@
 import {
+  CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 
-export { Kind } from '../../utils/machine/types';
-
-export type FormData = {
+export type PlaybookFormData = {
   name: string;
   personalInformationAndDocs: PersonalInformationAndDocs;
   businessInformation?: BusinessInformation;
+  [CollectedInvestorProfileDataOption.investorProfile]: boolean;
 };
 
 export type PersonalInformationAndDocs = {
@@ -19,7 +19,7 @@ export type PersonalInformationAndDocs = {
   [CollectedKycDataOption.nationality]: boolean;
   [CollectedKycDataOption.fullAddress]: boolean;
   ssn: boolean;
-  ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
+  ssnKind?: CollectedKycDataOption;
   idDoc: boolean;
   idDocKind: SupportedIdDocTypes[];
   selfie?: boolean;
@@ -48,7 +48,7 @@ export const defaultBusinessInformation = {
   [CollectedKybDataOption.phoneNumber]: false,
 };
 
-export const defaultValuesKYC: FormData = {
+export const defaultPlaybookValuesKYC: PlaybookFormData = {
   name: '',
   personalInformationAndDocs: {
     email: true,
@@ -62,9 +62,31 @@ export const defaultValuesKYC: FormData = {
     idDocKind: [],
     selfie: true,
   },
+  [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
-export const defaultValuesKYB: FormData = {
-  ...defaultValuesKYC,
+export const defaultPlaybookValuesKYB: PlaybookFormData = {
+  ...defaultPlaybookValuesKYC,
   businessInformation: defaultBusinessInformation,
 };
+
+export enum Kind {
+  KYB = 'kyb',
+  KYC = 'kyc',
+}
+
+export type MachineContext = {
+  kind?: Kind;
+  name?: string;
+};
+
+export type MachineEvents =
+  | {
+      type: 'whoToOnboardSubmitted';
+      payload: {
+        kind: Kind;
+      };
+    }
+  | {
+      type: 'whoToOnboardSelected';
+    };

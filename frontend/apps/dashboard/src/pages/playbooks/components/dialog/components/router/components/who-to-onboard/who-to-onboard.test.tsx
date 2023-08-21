@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import { Kind } from '../../utils/machine/types';
+import { Kind } from '@/playbooks/utils/machine/types';
+
 import WhoToOnboard, { WhoToOnboardProps } from './who-to-onboard';
 
 const renderWhoToOnboard = ({ onBack, onSubmit }: WhoToOnboardProps) =>

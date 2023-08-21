@@ -8,7 +8,8 @@ import { useFormContext } from 'react-hook-form';
 import {
   Kind,
   PersonalInformationAndDocs,
-} from '../../../../../../your-playbook.types';
+} from '@/playbooks/utils/machine/types';
+
 import DisplayValue from './components/display-value';
 import useFormValues from './hooks/use-form-values';
 

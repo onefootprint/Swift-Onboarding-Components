@@ -10,6 +10,7 @@
       "@/proxy-configs/*": ["./src/pages/developers/components/proxy-configs/*"],
       "@/entities/*": ["./src/components/entities/*"],
       "@/entity/*": ["./src/components/entities/components/details/*"],
+      "@/playbooks/*": ["./src/pages/playbooks/*"],
     }
   },
   "include": ["src", "next-env.d.ts"]

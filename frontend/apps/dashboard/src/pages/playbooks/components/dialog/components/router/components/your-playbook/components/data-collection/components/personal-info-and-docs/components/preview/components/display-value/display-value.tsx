@@ -4,7 +4,7 @@ import { CollectedKycDataOption } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import { PersonalInformationAndDocs } from '../../../../../../../../your-playbook.types';
+import { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
 
 type DisplayValueProps = {
   field: keyof PersonalInformationAndDocs;

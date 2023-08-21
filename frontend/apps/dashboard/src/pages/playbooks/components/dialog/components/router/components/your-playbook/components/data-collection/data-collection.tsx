@@ -3,7 +3,8 @@ import styled, { css } from '@onefootprint/styled';
 import { InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import { Kind } from '../../../../utils/machine/types';
+import { Kind } from '@/playbooks/utils/machine/types';
+
 import BusinessInformation from './components/business-information';
 import InvestorProfile from './components/investor-profile';
 import PersonalInfoAndDocs from './components/personal-info-and-docs';

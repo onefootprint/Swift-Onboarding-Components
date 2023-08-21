@@ -3,9 +3,10 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import {
   BusinessInformation,
-  defaultValuesKYB,
-  FormData,
-} from '../../../../your-playbook.types';
+  defaultPlaybookValuesKYB,
+  PlaybookFormData,
+} from '@/playbooks/utils/machine/types';
+
 import BusinessInformationComponent from '.';
 
 export type BusinessInformationWithContext = {
@@ -15,11 +16,11 @@ export type BusinessInformationWithContext = {
 const BusinesssInformationWithContext = ({
   startingValues,
 }: BusinessInformationWithContext) => {
-  const formMethods = useForm<FormData>({
+  const formMethods = useForm<PlaybookFormData>({
     defaultValues: {
-      ...defaultValuesKYB,
+      ...defaultPlaybookValuesKYB,
       businessInformation: {
-        ...defaultValuesKYB.businessInformation,
+        ...defaultPlaybookValuesKYB.businessInformation,
         ...startingValues,
       },
     },

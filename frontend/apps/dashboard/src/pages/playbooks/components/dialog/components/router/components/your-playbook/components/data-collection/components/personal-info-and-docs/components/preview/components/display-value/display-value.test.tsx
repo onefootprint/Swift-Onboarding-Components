@@ -6,9 +6,10 @@ import {
 import React from 'react';
 
 import {
-  defaultValuesKYC,
+  defaultPlaybookValuesKYC,
   PersonalInformationAndDocs,
-} from '../../../../../../../../your-playbook.types';
+} from '@/playbooks/utils/machine/types';
+
 import DisplayValue from './display-value';
 
 type DisplayValueProps = {
@@ -24,7 +25,7 @@ const renderDisplayValue = ({
     <DisplayValue
       field={field as keyof PersonalInformationAndDocs}
       personalInfoAndDocs={{
-        ...defaultValuesKYC.personalInformationAndDocs,
+        ...defaultPlaybookValuesKYC.personalInformationAndDocs,
         ...personalInfoAndDocs,
       }}
     />,

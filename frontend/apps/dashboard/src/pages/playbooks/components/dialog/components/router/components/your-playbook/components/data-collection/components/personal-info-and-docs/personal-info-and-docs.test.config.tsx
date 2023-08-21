@@ -2,11 +2,12 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import {
-  defaultValuesKYC,
-  FormData,
+  defaultPlaybookValuesKYC,
   Kind,
   PersonalInformationAndDocs,
-} from '../../../../your-playbook.types';
+  PlaybookFormData,
+} from '@/playbooks/utils/machine/types';
+
 import PersonalInfoAndDocs from './personal-info-and-docs';
 
 export type PersonalInfoAndDocsWithContextProps = {
@@ -18,11 +19,11 @@ const PersonalInfoAndDocsWithContext = ({
   startingValues,
   kind,
 }: PersonalInfoAndDocsWithContextProps) => {
-  const formMethods = useForm<FormData>({
+  const formMethods = useForm<PlaybookFormData>({
     defaultValues: {
-      ...defaultValuesKYC,
+      ...defaultPlaybookValuesKYC,
       personalInformationAndDocs: {
-        ...defaultValuesKYC.personalInformationAndDocs,
+        ...defaultPlaybookValuesKYC.personalInformationAndDocs,
         ...startingValues,
       },
     },
