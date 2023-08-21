@@ -9,11 +9,9 @@ use crate::config::Config;
 use crate::decision::state::actions::WorkflowActions;
 use crate::decision::state::{AsyncVendorCallsCompleted, WorkflowWrapper};
 use crate::enclave_client::EnclaveClient;
-use crate::{decision, State};
-
 use crate::errors::ApiError;
 use crate::vendor_clients::VendorClient;
-
+use crate::{decision, State};
 use db::models::decision_intent::DecisionIntent;
 use db::models::middesk_request::{MiddeskRequest, UpdateMiddeskRequest};
 use db::models::ob_configuration::ObConfiguration;
@@ -39,6 +37,7 @@ use newtypes::{
     BusinessData, DecisionIntentKind, MiddeskRequestState, ObConfigurationKey, OnboardingStatus,
     PiiJsonValue, RiskSignalGroupKind, TenantId, VendorAPI, WorkflowId,
 };
+use strum_macros::EnumDiscriminants;
 
 #[derive(Debug)]
 pub struct MiddeskState<T> {
@@ -68,7 +67,8 @@ pub struct Complete {
     business_response_vres: VerificationResult,
 }
 
-#[derive(Debug, strum_macros::Display)]
+#[derive(Debug, strum_macros::Display, EnumDiscriminants)]
+#[strum_discriminants(name(MiddeskStatesKind), vis(pub), derive(strum_macros::Display))]
 pub enum MiddeskStates {
     PendingCreateBusinessCall(MiddeskState<PendingCreateBusinessCall>),
     AwaitingBusinessUpdateWebhook(MiddeskState<AwaitingBusinessUpdateWebhook>),
@@ -90,8 +90,10 @@ enum MiddeskVendorApi {
 pub enum MiddeskError {
     #[error("{0} is not a Middesk API")]
     VendorAPIConversionError(VendorAPI),
-    #[error("Unexpected state: {0}")]
-    UnexpectedState(String),
+    #[error("Unexpected state: {0}, webhook_id: {1:?}, business_id: {2:?}")]
+    UnexpectedState(MiddeskStatesKind, Option<String>, Option<String>),
+    #[error("{0}")]
+    StateInitError(String),
     #[error("Response missing expected field: {0}")]
     ResponseMissingExpectedData(String),
     #[error("{0}")]
@@ -133,7 +135,7 @@ impl MiddeskStates {
         let latest_vreq_vres = middesk_vreq_vres.pop();
 
         let Some((api, (vreq, vres))) = latest_vreq_vres else {
-            return Err(MiddeskError::UnexpectedState("No Middesk vreq's found".into()).into());
+            return Err(MiddeskError::StateInitError("No Middesk vreq's found".into()).into());
         };
 
         match (api, vres) {
@@ -145,7 +147,7 @@ impl MiddeskStates {
                     },
                 }))
             }
-            (MiddeskVendorApi::CreateBusiness, Some(_vres)) => Err(MiddeskError::UnexpectedState(
+            (MiddeskVendorApi::CreateBusiness, Some(_vres)) => Err(MiddeskError::StateInitError(
                 "CreateBusiness vres found, but no outstanding vreq found".into(),
             )
             .into()),
@@ -172,7 +174,7 @@ impl MiddeskStates {
                     state: AwaitingTinRetry { tin_retry_vreq: vreq },
                 }))
             }
-            (MiddeskVendorApi::TinRetriedWebhook, Some(_vres)) => Err(MiddeskError::UnexpectedState(
+            (MiddeskVendorApi::TinRetriedWebhook, Some(_vres)) => Err(MiddeskError::StateInitError(
                 "TinRetriedWebhook vres found, but no outstanding vreq found".into(),
             )
             .into()),
@@ -604,13 +606,7 @@ pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> Re
                 )
                 .await
         }
-        (s, r) => Err(MiddeskError::UnexpectedState(format!(
-            "state = {}, webhook_id = {:?}, business_id = {:?}",
-            s,
-            r.webhook_id(),
-            r.business_id()
-        ))
-        .into()),
+        (s, r) => Err(MiddeskError::UnexpectedState(s.into(), r.webhook_id(), r.business_id()).into()),
     }?;
 
     match next_state {

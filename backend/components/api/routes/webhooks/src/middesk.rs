@@ -1,7 +1,8 @@
 use actix_web::{web, FromRequest};
 use api_core::auth::AuthError;
+use api_core::decision::vendor::middesk::{MiddeskError, MiddeskStatesKind};
 use api_core::types::{EmptyResponse, JsonApiResponse};
-use api_core::{decision, task, State};
+use api_core::{decision, ApiErrorKind, State};
 use crypto::hex;
 use futures_util::Future;
 use paperclip::actix::Apiv2Header;
@@ -14,9 +15,24 @@ async fn handle_webhook(
     webhook_signature: MiddeskWebhookSignature,
     state: web::Data<State>,
 ) -> JsonApiResponse<EmptyResponse> {
-    decision::vendor::middesk::handle_middesk_webhook(&state, webhook_signature.request).await?;
-    // temporary until we migrate to a KYB workflow
-    task::execute_webhook_tasks((*state.clone().into_inner()).clone());
+    let res = decision::vendor::middesk::handle_middesk_webhook(&state, webhook_signature.request).await;
+
+    match res {
+        Ok(_) => {}
+        Err(error) => {
+            // We are sometimes getting extraneous webhooks for businesses we've already completed verification for. For these cases
+            // we still want to log the error, but we want to return a 200 response to middesk doesn't keep retrying the webhook
+            if matches!(
+                error.kind(),
+                ApiErrorKind::MiddeskError(MiddeskError::UnexpectedState(MiddeskStatesKind::Complete, _, _))
+            ) {
+                tracing::error!(?error, "Received webhook for completed middesk_request");
+            } else {
+                Err(error)?;
+            }
+        }
+    }
+
     EmptyResponse::ok().json()
 }
 
