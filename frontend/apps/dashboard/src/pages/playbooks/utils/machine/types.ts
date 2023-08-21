@@ -78,6 +78,7 @@ export enum Kind {
 export type MachineContext = {
   kind?: Kind;
   name?: string;
+  playbook?: PlaybookFormData;
 };
 
 export type MachineEvents =
@@ -89,4 +90,13 @@ export type MachineEvents =
     }
   | {
       type: 'whoToOnboardSelected';
+    }
+  | {
+      type: 'yourPlaybookSelected';
+    }
+  | {
+      type: 'playbookSubmitted';
+      payload: {
+        playbook: PlaybookFormData;
+      };
     };

@@ -1,15 +1,20 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import { CollectedInvestorProfileDataOption } from '@onefootprint/types';
 import { LinkButton, Typography } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
 
 const InvestorProfile = () => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.data-collection.investor-profile',
   );
-  const [added, setAdded] = useState(false);
-  const handleClick = () => setAdded(!added);
+  const { register, setValue, watch } = useFormContext();
+
+  const added = watch(CollectedInvestorProfileDataOption.investorProfile);
+  const handleClick = () =>
+    setValue(CollectedInvestorProfileDataOption.investorProfile, !added);
 
   return (
     <Container>
@@ -18,11 +23,10 @@ const InvestorProfile = () => {
         <input
           aria-hidden="true"
           checked={added}
-          name="investorProfile"
-          onChange={handleClick}
           aria-checked={added}
           role="switch"
           type="hidden"
+          {...register(CollectedInvestorProfileDataOption.investorProfile)}
         />
         {added ? (
           <LinkButton

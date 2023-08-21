@@ -28,8 +28,13 @@ export const createPlaybookMachine = () =>
             whoToOnboardSelected: {
               target: 'whoToOnboard',
             },
+            playbookSubmitted: {
+              target: 'authorizedScopes',
+              actions: 'assignPlaybook',
+            },
           },
         },
+        authorizedScopes: {},
       },
     },
     {
@@ -37,6 +42,10 @@ export const createPlaybookMachine = () =>
         assignWhoToOnboard: assign((context, event) => ({
           ...context,
           kind: event.payload.kind,
+        })),
+        assignPlaybook: assign((context, event) => ({
+          ...context,
+          playbook: event.payload.playbook,
         })),
       },
     },

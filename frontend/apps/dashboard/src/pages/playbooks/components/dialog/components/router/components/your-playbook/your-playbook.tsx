@@ -1,33 +1,31 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { TextInput, Typography } from '@onefootprint/ui';
+import { Button, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import {
-  defaultPlaybookValuesKYB,
-  defaultPlaybookValuesKYC,
-  Kind,
-  PlaybookFormData,
-} from '@/playbooks/utils/machine/types';
+import { Kind, PlaybookFormData } from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
 
 type YourPlaybookProps = {
   kind: Kind;
+  onSubmit: (data: PlaybookFormData) => void;
+  onBack: () => void;
+  defaultValues: PlaybookFormData;
 };
 
-const YourPlaybook = ({ kind }: YourPlaybookProps) => {
+const YourPlaybook = ({
+  kind,
+  onSubmit,
+  onBack,
+  defaultValues,
+}: YourPlaybookProps) => {
   const { t } = useTranslation('pages.playbooks.dialog.your-playbook');
-  const defaultValues =
-    kind === Kind.KYB ? defaultPlaybookValuesKYB : defaultPlaybookValuesKYC;
-  const formMethods = useForm<PlaybookFormData>({ defaultValues });
+  const formMethods = useForm<PlaybookFormData>({
+    defaultValues,
+  });
   const { handleSubmit, register } = formMethods;
-
-  // should come from props later
-  const onSubmit = () => {
-    console.log('whoopee');
-  };
 
   return (
     <Container>
@@ -52,11 +50,26 @@ const YourPlaybook = ({ kind }: YourPlaybookProps) => {
             placeholder={t('form.name.placeholder')}
           />
           <DataCollection kind={kind} />
+          <ButtonContainer>
+            <Button size="compact" variant="secondary" onClick={onBack}>
+              {t('back')}
+            </Button>
+            <Button size="compact" type="submit">
+              {t('next')}
+            </Button>
+          </ButtonContainer>
         </Form>
       </FormProvider>
     </Container>
   );
 };
+
+const ButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
 
 const Form = styled.form`
   ${({ theme }) => css`

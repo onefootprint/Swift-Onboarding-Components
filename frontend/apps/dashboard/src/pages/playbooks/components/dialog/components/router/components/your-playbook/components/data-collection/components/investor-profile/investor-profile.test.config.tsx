@@ -1,0 +1,37 @@
+import { CollectedInvestorProfileDataOption } from '@onefootprint/types';
+import React from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+
+import {
+  defaultPlaybookValuesKYC,
+  PlaybookFormData,
+} from '@/playbooks/utils/machine/types';
+
+import InvestorProfile from './investor-profile';
+
+export type InvestorProfileWithContextProps = {
+  investorProfileAdded: boolean;
+};
+
+const InvestorProfileWithContext = ({
+  investorProfileAdded,
+}: InvestorProfileWithContextProps) => {
+  const defaultValues = {
+    ...defaultPlaybookValuesKYC,
+    [CollectedInvestorProfileDataOption.investorProfile]: investorProfileAdded,
+  };
+
+  const formMethods = useForm<PlaybookFormData>({
+    defaultValues,
+  });
+
+  return (
+    <FormProvider {...formMethods}>
+      <form>
+        <InvestorProfile />
+      </form>
+    </FormProvider>
+  );
+};
+
+export default InvestorProfileWithContext;

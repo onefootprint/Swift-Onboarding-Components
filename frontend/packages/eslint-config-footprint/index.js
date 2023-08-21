@@ -37,6 +37,7 @@ module.exports = {
           'Field',
           'FormProvider',
           'Input',
+          'input',
           'RealInput',
           'NativeSelect',
           'PhoneInput',

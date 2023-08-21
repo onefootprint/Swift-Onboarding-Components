@@ -13,11 +13,12 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignPlaybook: 'playbookSubmitted';
     assignWhoToOnboard: 'whoToOnboardSubmitted';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'whoToOnboard' | 'yourPlaybook';
+  matchesStates: 'authorizedScopes' | 'whoToOnboard' | 'yourPlaybook';
   tags: never;
 }

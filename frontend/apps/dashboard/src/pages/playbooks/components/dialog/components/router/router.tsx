@@ -4,7 +4,11 @@ import { Stepper } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
-import { Kind } from '@/playbooks/utils/machine/types';
+import {
+  defaultPlaybookValuesKYB,
+  defaultPlaybookValuesKYC,
+  Kind,
+} from '@/playbooks/utils/machine/types';
 
 import PlaybookMachine from '../../../../utils/machine';
 import WhoToOnboard from './components/who-to-onboard';
@@ -21,7 +25,11 @@ const Router = ({ onClose }: RouterProps) => {
     { value: 'whoToOnboard', label: t('who-to-onboard') },
     { value: 'yourPlaybook', label: t('your-playbook') },
   ];
-
+  const defaultPlaybookValues =
+    state.context.kind === Kind.KYB
+      ? defaultPlaybookValuesKYB
+      : defaultPlaybookValuesKYC;
+  const playbookDefaultValues = state.context.playbook ?? defaultPlaybookValues;
   const stepperValue = state.matches('whoToOnboard') ? options[0] : options[1];
 
   return (
@@ -48,8 +56,15 @@ const Router = ({ onClose }: RouterProps) => {
             }}
           />
         )}
-        {state.matches('yourPlaybook') && (
-          <YourPlaybook kind={state.context.kind ?? Kind.KYC} />
+        {state.matches('yourPlaybook') && state.context.kind && (
+          <YourPlaybook
+            defaultValues={playbookDefaultValues}
+            kind={state.context.kind}
+            onSubmit={data => {
+              send('playbookSubmitted', { payload: { playbook: data } });
+            }}
+            onBack={() => send('whoToOnboardSelected')}
+          />
         )}
       </Content>
     </Container>
