@@ -1139,7 +1139,8 @@
                 "drivers_license": "Driver's license",
                 "id_card": "Identity card",
                 "passport": "Passport (photo page)",
-                "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow."
+                "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
+                "no-id-doc-selected": "You must select at least one ID document type."
               },
               "save": "Save",
               "cancel": "Cancel",

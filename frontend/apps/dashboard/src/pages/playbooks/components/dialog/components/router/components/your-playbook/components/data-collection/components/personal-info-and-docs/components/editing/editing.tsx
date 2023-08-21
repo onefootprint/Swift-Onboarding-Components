@@ -30,13 +30,25 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.form.personal-info-and-docs',
   );
+  const [unselectedIDDoc, setUnselectedIDDoc] = useState(false);
   const ssnOpen = watch('personalInformationAndDocs.ssn');
   const idDocOpen = watch('personalInformationAndDocs.idDoc');
+  const idDocKind = watch('personalInformationAndDocs.idDocKind');
 
   // need to store this so we don't re-fetch on add'l renders
   const [initialValues] = useState<PersonalInformationAndDocs>({
     ...getValues('personalInformationAndDocs'),
   });
+
+  const onSave = () => {
+    if (idDocOpen && idDocKind?.length >= 1) {
+      stopEditing();
+    } else if (!idDocOpen) {
+      stopEditing();
+    } else {
+      setUnselectedIDDoc(true);
+    }
+  };
 
   const onCancel = () => {
     setValue('personalInformationAndDocs', initialValues);
@@ -160,6 +172,15 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
                 label={t('id-doc.passport')}
                 {...register('personalInformationAndDocs.idDocKind')}
               />
+              {idDocKind?.length < 1 && unselectedIDDoc && (
+                <Typography
+                  color="error"
+                  variant="body-3"
+                  sx={{ paddingTop: 5 }}
+                >
+                  {t('id-doc.no-id-doc-selected')}
+                </Typography>
+              )}
             </OptionsContainer>
           </Subsection>
         ) : (
@@ -169,12 +190,7 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
         )}
       </Section>
       <ButtonContainer>
-        <Button
-          variant="primary"
-          fullWidth
-          size="compact"
-          onClick={stopEditing}
-        >
+        <Button variant="primary" fullWidth size="compact" onClick={onSave}>
           {t('save')}
         </Button>
         <Button variant="secondary" fullWidth size="compact" onClick={onCancel}>

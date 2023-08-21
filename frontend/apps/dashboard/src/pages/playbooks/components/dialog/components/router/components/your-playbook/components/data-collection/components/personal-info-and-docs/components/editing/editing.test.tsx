@@ -1,4 +1,5 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
 import { Kind } from '@/playbooks/utils/machine/types';
@@ -7,8 +8,10 @@ import EditingWithContext, {
   EditingWithContextProps,
 } from './editing.test.config';
 
-const renderEditing = ({ kind }: EditingWithContextProps) => {
-  customRender(<EditingWithContext kind={kind} />);
+const renderEditing = ({ kind, startingValues }: EditingWithContextProps) => {
+  customRender(
+    <EditingWithContext startingValues={startingValues} kind={kind} />,
+  );
 };
 
 describe('<Editing />', () => {
@@ -53,6 +56,40 @@ describe('<Editing />', () => {
         name: 'Passport (photo page)',
       }),
     ).toBeInTheDocument();
+  });
+
+  it('should show warning if ID doc not selected', async () => {
+    renderEditing({ startingValues: { idDoc: true, idDocKind: [] } });
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(
+      screen.getByText('You must select at least one ID document type.'),
+    ).toBeInTheDocument();
+  });
+
+  it('should not show warning if ID doc selected', async () => {
+    renderEditing({
+      startingValues: {
+        idDoc: true,
+        idDocKind: [SupportedIdDocTypes.driversLicense],
+      },
+    });
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(
+      screen.queryByText('You must select at least one ID document type.'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('should show warning if ID doc not selected and hide once any selected', async () => {
+    renderEditing({ startingValues: { idDoc: true, idDocKind: [] } });
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(
+      screen.getByText('You must select at least one ID document type.'),
+    ).toBeInTheDocument();
+    const idCard = screen.getByRole('checkbox', { name: 'Identity card' });
+    await userEvent.click(idCard);
+    expect(
+      screen.queryByText('You must select at least one ID document type.'),
+    ).not.toBeInTheDocument();
   });
 
   it('should show correct title for KYC', async () => {
