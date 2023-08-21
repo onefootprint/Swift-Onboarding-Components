@@ -291,6 +291,9 @@ impl<'a> TryFrom<&'a IncodeDocumentType> for IdDocKind {
             IncodeDocumentType::Passport => Ok(Self::Passport),
             IncodeDocumentType::DriversLicense => Ok(Self::DriversLicense),
             IncodeDocumentType::IdentificationCard => Ok(Self::IdCard),
+            IncodeDocumentType::Permit => Ok(Self::Permit),
+            IncodeDocumentType::Visa => Ok(Self::Visa),
+            IncodeDocumentType::ResidenceDocument => Ok(Self::ResidenceDocument),
             _ => Err(crate::Error::Custom(format!(
                 "Incode document type {} not supported",
                 value

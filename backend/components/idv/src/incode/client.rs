@@ -410,11 +410,7 @@ impl AuthenticatedIncodeClientAdapter {
 
 fn url_path_for_document_side(document_type: &IdDocKind, document_side: &DocumentSide) -> String {
     // Not all documents have backs
-    let front_only = match document_type {
-        IdDocKind::IdCard => false,
-        IdDocKind::DriversLicense => false,
-        IdDocKind::Passport => true,
-    };
+    let front_only = document_type.front_only();
 
     match document_side {
         DocumentSide::Front => {

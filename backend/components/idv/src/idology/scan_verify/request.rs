@@ -62,6 +62,8 @@ impl From<IdDocKind> for ScanDocumentType {
             IdDocKind::DriversLicense => Self::DriverLicense,
             IdDocKind::IdCard => Self::IdCard,
             IdDocKind::Passport => Self::Passport,
+            // TODO: rm
+            _ => unimplemented!(),
         }
     }
 }

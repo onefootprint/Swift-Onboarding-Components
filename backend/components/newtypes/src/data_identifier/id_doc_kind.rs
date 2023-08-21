@@ -33,6 +33,9 @@ pub enum IdDocKind {
     IdCard,
     DriversLicense,
     Passport,
+    Permit,
+    Visa,
+    ResidenceDocument,
 }
 
 crate::util::impl_enum_string_diesel!(IdDocKind);
@@ -43,7 +46,16 @@ impl IdDocKind {
             Self::DriversLicense => vec![DocumentSide::Front, DocumentSide::Back],
             Self::IdCard => vec![DocumentSide::Front, DocumentSide::Back],
             Self::Passport => vec![DocumentSide::Front],
+            // Incode guidance for permit/visa/residence card
+            // https://onefootprint.slack.com/archives/C0514LEFUCS/p1692216160166659?thread_ts=1692213991.014079&cid=C0514LEFUCS
+            Self::Permit => vec![DocumentSide::Front, DocumentSide::Back],
+            Self::Visa => vec![DocumentSide::Front],
+            Self::ResidenceDocument => vec![DocumentSide::Front, DocumentSide::Back],
         }
+    }
+
+    pub fn front_only(&self) -> bool {
+        self.sides() == vec![DocumentSide::Front]
     }
 }
 
@@ -56,12 +68,21 @@ pub enum AlpacaDocumentType {
     Visa,
 }
 
-impl From<IdDocKind> for AlpacaDocumentType {
-    fn from(value: IdDocKind) -> Self {
+impl TryFrom<IdDocKind> for AlpacaDocumentType {
+    type Error = crate::Error;
+
+    fn try_from(value: IdDocKind) -> Result<Self, Self::Error> {
         match value {
-            IdDocKind::IdCard => AlpacaDocumentType::NationalId,
-            IdDocKind::DriversLicense => AlpacaDocumentType::DriversLicense,
-            IdDocKind::Passport => AlpacaDocumentType::Passport,
+            IdDocKind::IdCard => Ok(AlpacaDocumentType::NationalId),
+            IdDocKind::DriversLicense => Ok(AlpacaDocumentType::DriversLicense),
+            IdDocKind::Passport => Ok(AlpacaDocumentType::Passport),
+            IdDocKind::Visa => Ok(AlpacaDocumentType::Visa),
+            IdDocKind::Permit => Err(crate::Error::Custom(
+                "not a supported alpaca document type".into(),
+            )),
+            IdDocKind::ResidenceDocument => Err(crate::Error::Custom(
+                "not a supported alpaca document type".into(),
+            )),
         }
     }
 }

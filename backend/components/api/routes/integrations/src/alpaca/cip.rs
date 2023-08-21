@@ -485,7 +485,7 @@ fn document_and_photo(
     let type_of_id = ocr_response.type_of_id.as_ref().ok_or_else(|| {
         idv::Error::IncodeError(idv::incode::error::Error::OcrError("Missing type_of_id".into()))
     })?;
-    let document_type = IdDocKind::try_from(type_of_id)?.into();
+    let document_type = IdDocKind::try_from(type_of_id)?.try_into()?;
     let dob = ocr_response
         .dob()
         .map_err(|e| ApiError::from(idv::Error::from(e)))?;

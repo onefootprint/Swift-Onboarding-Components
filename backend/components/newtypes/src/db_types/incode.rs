@@ -126,10 +126,6 @@ impl IncodeVerificationSessionKind {
             IncodeVerificationSessionKind::Selfie => true,
         }
     }
-
-    pub fn requires_consent(&self) -> bool {
-        self.requires_selfie()
-    }
 }
 
 crate::util::impl_enum_str_diesel!(IncodeVerificationSessionState);
