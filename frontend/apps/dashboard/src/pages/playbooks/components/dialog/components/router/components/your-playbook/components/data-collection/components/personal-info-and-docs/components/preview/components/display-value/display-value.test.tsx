@@ -1,4 +1,4 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import {
   CollectedKycDataOption,
   SupportedIdDocTypes,
@@ -88,7 +88,21 @@ describe('<DisplayValue />', () => {
     expect(screen.getByText("Driver's license")).toBeInTheDocument();
   });
 
-  it('should display multiple ID docs properly', () => {
+  it('should display 2 ID docs properly', () => {
+    renderDisplayValue({
+      field: 'idDocKind',
+      personalInfoAndDocs: {
+        idDoc: true,
+        idDocKind: [
+          SupportedIdDocTypes.driversLicense,
+          SupportedIdDocTypes.passport,
+        ],
+      },
+    });
+    expect(screen.getByText("Driver's license, Passport")).toBeInTheDocument();
+  });
+
+  it('should display 3 ID docs properly', () => {
     renderDisplayValue({
       field: 'idDocKind',
       personalInfoAndDocs: {
@@ -103,6 +117,87 @@ describe('<DisplayValue />', () => {
     expect(
       screen.getByText("Driver's license, Passport, Identity card"),
     ).toBeInTheDocument();
+  });
+
+  it('should display 4 ID docs properly', async () => {
+    renderDisplayValue({
+      field: 'idDocKind',
+      personalInfoAndDocs: {
+        idDoc: true,
+        idDocKind: [
+          SupportedIdDocTypes.driversLicense,
+          SupportedIdDocTypes.passport,
+          SupportedIdDocTypes.idCard,
+          SupportedIdDocTypes.residenceDocument,
+        ],
+      },
+    });
+    expect(
+      screen.getByText("Driver's license, Passport, and"),
+    ).toBeInTheDocument();
+
+    const twoMore = screen.getByText('2 more');
+    expect(twoMore).toBeInTheDocument();
+    await userEvent.hover(twoMore);
+    const tooltip = screen.getByRole('tooltip', {
+      name: 'Identity card, Residence card',
+    });
+    expect(tooltip).toBeInTheDocument();
+  });
+
+  it('should display 5 ID docs properly', async () => {
+    renderDisplayValue({
+      field: 'idDocKind',
+      personalInfoAndDocs: {
+        idDoc: true,
+        idDocKind: [
+          SupportedIdDocTypes.driversLicense,
+          SupportedIdDocTypes.passport,
+          SupportedIdDocTypes.idCard,
+          SupportedIdDocTypes.residenceDocument,
+          SupportedIdDocTypes.workPermit,
+        ],
+      },
+    });
+    expect(
+      screen.getByText("Driver's license, Passport, and"),
+    ).toBeInTheDocument();
+
+    const threeMore = screen.getByText('3 more');
+    expect(threeMore).toBeInTheDocument();
+    await userEvent.hover(threeMore);
+    const tooltip = screen.getByRole('tooltip', {
+      name: 'Identity card, Residence card, Work permit',
+    });
+    expect(tooltip).toBeInTheDocument();
+  });
+
+  it('should display all 6 ID docs properly', async () => {
+    renderDisplayValue({
+      field: 'idDocKind',
+      personalInfoAndDocs: {
+        idDoc: true,
+        idDocKind: [
+          SupportedIdDocTypes.driversLicense,
+          SupportedIdDocTypes.passport,
+          SupportedIdDocTypes.idCard,
+          SupportedIdDocTypes.residenceDocument,
+          SupportedIdDocTypes.workPermit,
+          SupportedIdDocTypes.visa,
+        ],
+      },
+    });
+    expect(
+      screen.getByText("Driver's license, Passport, and"),
+    ).toBeInTheDocument();
+
+    const fourMore = screen.getByText('4 more');
+    expect(fourMore).toBeInTheDocument();
+    await userEvent.hover(fourMore);
+    const tooltip = screen.getByRole('tooltip', {
+      name: 'Identity card, Residence card, Work permit, Visa',
+    });
+    expect(tooltip).toBeInTheDocument();
   });
 
   it('should render check icon for included property', () => {
