@@ -262,8 +262,8 @@ Footprint's vaulting aims to be flexible while providing base-level validation l
 | `investor_profile.employer`                 | Any valid UTF-8 String <1KB                                                                                                         |
 | `investor_profile.occupation`               | Any valid UTF-8 String <1KB                                                                                                         |
 | `investor_profile.brokerage_firm_employer`  | Any valid UTF-8 String <1KB                                                                                                         |
-| `investor_profile.annual_income`            | One of `lt50k`, `s50k_to100k`, `s100k_to250k`, `s250k_to500k`, `gt500k`                                                             |
-| `investor_profile.net_worth`                | One of `lt50k`, `s50k_to100k`, `s100k_to250k`, `s250k_to500k`, `s500k_to1m`, `gt1m`                                                 |
+| `investor_profile.annual_income`            | One of `le25k`, `gt25k_le50k`, `gt50k_le100k`, `gt100k_le200k`, `gt200k_le300k`, `gt300k_le500k`, `gt500k_le1200k`, `gt1200k`       |
+| `investor_profile.net_worth`                | One of `le50k`, `gt50k_le100k`, `gt100k_le200k`, `gt200k_le500k`, `gt500k_le1m`, `gt1m_le5m`, `gt5m`                                |
 | `investor_profile.investment_goals`         | A JSON-serialized array of `growth`, `income`, `preserve_capital`, `speculation`, `diversification`, `other`                        |
 | `investor_profile.risk_tolerance`           | One of `conservative`, `moderate`, `aggressive`                                                                                     |
 | `investor_profile.declarations`             | A JSON-serialized array of `affiliated_with_us_broker`, `senior_executive`, `senior_political_figure`, `family_of_political_figure` |

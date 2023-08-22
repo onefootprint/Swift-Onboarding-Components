@@ -31,7 +31,7 @@ const NetWorthForm = ({
     defaultValues: {
       netWorth:
         defaultValues?.[InvestorProfileDI.netWorth] ??
-        InvestorProfileNetWorth.lt50k,
+        InvestorProfileNetWorth.le50k,
     },
   });
 
@@ -52,33 +52,38 @@ const NetWorthForm = ({
       isLoading={isLoading}
     >
       <Radio
-        value={InvestorProfileNetWorth.lt50k}
-        label={t(`${InvestorProfileNetWorth.lt50k}`)}
+        value={InvestorProfileNetWorth.le50k}
+        label={t(`${InvestorProfileNetWorth.le50k}`)}
         {...register('netWorth')}
       />
       <Radio
-        value={InvestorProfileNetWorth.s50kTo100k}
-        label={t(`${InvestorProfileNetWorth.s50kTo100k}`)}
+        value={InvestorProfileNetWorth.gt50kLe100k}
+        label={t(`${InvestorProfileNetWorth.gt50kLe100k}`)}
         {...register('netWorth')}
       />
       <Radio
-        value={InvestorProfileNetWorth.s100kTo250k}
-        label={t(`${InvestorProfileNetWorth.s100kTo250k}`)}
+        value={InvestorProfileNetWorth.gt100kLe200k}
+        label={t(`${InvestorProfileNetWorth.gt100kLe200k}`)}
         {...register('netWorth')}
       />
       <Radio
-        value={InvestorProfileNetWorth.s250kTo500k}
-        label={t(`${InvestorProfileNetWorth.s250kTo500k}`)}
+        value={InvestorProfileNetWorth.gt200kLe500k}
+        label={t(`${InvestorProfileNetWorth.gt200kLe500k}`)}
         {...register('netWorth')}
       />
       <Radio
-        value={InvestorProfileNetWorth.S500kTo1m}
-        label={t(`${InvestorProfileNetWorth.S500kTo1m}`)}
+        value={InvestorProfileNetWorth.gt500kLe1m}
+        label={t(`${InvestorProfileNetWorth.gt500kLe1m}`)}
         {...register('netWorth')}
       />
       <Radio
-        value={InvestorProfileNetWorth.gt1m}
-        label={t(`${InvestorProfileNetWorth.gt1m}`)}
+        value={InvestorProfileNetWorth.gt1mLe5m}
+        label={t(`${InvestorProfileNetWorth.gt1mLe5m}`)}
+        {...register('netWorth')}
+      />
+      <Radio
+        value={InvestorProfileNetWorth.gt5m}
+        label={t(`${InvestorProfileNetWorth.gt5m}`)}
         {...register('netWorth')}
       />
     </CustomForm>

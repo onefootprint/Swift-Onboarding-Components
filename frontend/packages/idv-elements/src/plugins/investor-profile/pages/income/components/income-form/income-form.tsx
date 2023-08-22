@@ -31,7 +31,7 @@ const IncomeForm = ({
     defaultValues: {
       income:
         defaultValues?.[InvestorProfileDI.annualIncome] ??
-        InvestorProfileAnnualIncome.lt50k,
+        InvestorProfileAnnualIncome.le25k,
     },
   });
 
@@ -52,28 +52,43 @@ const IncomeForm = ({
       }}
     >
       <Radio
-        value={InvestorProfileAnnualIncome.lt50k}
-        label={t(`${InvestorProfileAnnualIncome.lt50k}`)}
+        value={InvestorProfileAnnualIncome.le25k}
+        label={t(`${InvestorProfileAnnualIncome.le25k}`)}
         {...register('income')}
       />
       <Radio
-        value={InvestorProfileAnnualIncome.s50kTo100k}
-        label={t(`${InvestorProfileAnnualIncome.s50kTo100k}`)}
+        value={InvestorProfileAnnualIncome.gt25kLe50k}
+        label={t(`${InvestorProfileAnnualIncome.gt25kLe50k}`)}
         {...register('income')}
       />
       <Radio
-        value={InvestorProfileAnnualIncome.s100kTo250k}
-        label={t(`${InvestorProfileAnnualIncome.s100kTo250k}`)}
+        value={InvestorProfileAnnualIncome.gt50kLe100k}
+        label={t(`${InvestorProfileAnnualIncome.gt50kLe100k}`)}
         {...register('income')}
       />
       <Radio
-        value={InvestorProfileAnnualIncome.s250kTo500k}
-        label={t(`${InvestorProfileAnnualIncome.s250kTo500k}`)}
+        value={InvestorProfileAnnualIncome.gt100kLe200k}
+        label={t(`${InvestorProfileAnnualIncome.gt100kLe200k}`)}
         {...register('income')}
       />
       <Radio
-        value={InvestorProfileAnnualIncome.gt500k}
-        label={t(`${InvestorProfileAnnualIncome.gt500k}`)}
+        value={InvestorProfileAnnualIncome.gt200kLe300k}
+        label={t(`${InvestorProfileAnnualIncome.gt200kLe300k}`)}
+        {...register('income')}
+      />
+      <Radio
+        value={InvestorProfileAnnualIncome.gt300kLe500k}
+        label={t(`${InvestorProfileAnnualIncome.gt300kLe500k}`)}
+        {...register('income')}
+      />
+      <Radio
+        value={InvestorProfileAnnualIncome.gt500kLe1200k}
+        label={t(`${InvestorProfileAnnualIncome.gt500kLe1200k}`)}
+        {...register('income')}
+      />
+      <Radio
+        value={InvestorProfileAnnualIncome.gt1200k}
+        label={t(`${InvestorProfileAnnualIncome.gt1200k}`)}
         {...register('income')}
       />
     </FormWithOptions>

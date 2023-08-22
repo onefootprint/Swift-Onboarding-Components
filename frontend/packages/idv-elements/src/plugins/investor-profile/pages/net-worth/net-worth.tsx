@@ -42,7 +42,7 @@ const NetWorth = () => {
         onSubmit={handleSubmit}
         defaultValues={{
           [InvestorProfileDI.netWorth]:
-            data?.[InvestorProfileDI.netWorth] || InvestorProfileNetWorth.lt50k,
+            data?.[InvestorProfileDI.netWorth] || InvestorProfileNetWorth.le50k,
         }}
       />
     </>

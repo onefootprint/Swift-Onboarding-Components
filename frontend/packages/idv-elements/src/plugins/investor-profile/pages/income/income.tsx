@@ -43,7 +43,7 @@ const Income = () => {
         defaultValues={{
           [InvestorProfileDI.annualIncome]:
             data?.[InvestorProfileDI.annualIncome] ||
-            InvestorProfileAnnualIncome.lt50k,
+            InvestorProfileAnnualIncome.le25k,
         }}
       />
     </>

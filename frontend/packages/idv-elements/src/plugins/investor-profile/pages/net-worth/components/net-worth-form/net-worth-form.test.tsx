@@ -32,18 +32,18 @@ describe('<NetWorthForm />', () => {
     const onSubmit = jest.fn();
     renderForm({ onSubmit });
 
-    const s50kTo100k = screen.getByRole('radio', {
-      name: '$50,000 - $100,000',
+    const gt50kLe100k = screen.getByRole('radio', {
+      name: '$50,001 - $100,000',
     }) as HTMLInputElement;
-    await userEvent.click(s50kTo100k);
+    await userEvent.click(gt50kLe100k);
     await waitFor(() => {
-      expect(s50kTo100k.checked).toBe(true);
+      expect(gt50kLe100k.checked).toBe(true);
     });
 
     const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDI.netWorth]: InvestorProfileNetWorth.s50kTo100k,
+      [InvestorProfileDI.netWorth]: InvestorProfileNetWorth.gt50kLe100k,
     });
   });
 
@@ -51,73 +51,23 @@ describe('<NetWorthForm />', () => {
     it('when there are no defaults', async () => {
       renderForm({});
 
-      const lt50k = screen.getByRole('radio', {
+      const le50k = screen.getByRole('radio', {
         name: 'Under $50,000',
       }) as HTMLInputElement;
-      expect(lt50k.checked).toBe(true);
-
-      const s50kTo100k = screen.getByRole('radio', {
-        name: '$50,000 - $100,000',
-      }) as HTMLInputElement;
-      expect(s50kTo100k.checked).toBe(false);
-
-      const s100kTo250k = screen.getByRole('radio', {
-        name: '$100,000 - $250,000',
-      }) as HTMLInputElement;
-      expect(s100kTo250k.checked).toBe(false);
-
-      const s250kTo500k = screen.getByRole('radio', {
-        name: '$250,000 - $500,000',
-      }) as HTMLInputElement;
-      expect(s250kTo500k.checked).toBe(false);
-
-      const S500kTo1m = screen.getByRole('radio', {
-        name: '$500,000 - $1,000,000',
-      }) as HTMLInputElement;
-      expect(S500kTo1m.checked).toBe(false);
-
-      const gt1m = screen.getByRole('radio', {
-        name: '$1,000,000+',
-      }) as HTMLInputElement;
-      expect(gt1m.checked).toBe(false);
+      expect(le50k.checked).toBe(true);
     });
 
     it('when there is a default value prop', async () => {
       renderForm({
         defaultValues: {
-          [InvestorProfileDI.netWorth]: InvestorProfileNetWorth.s250kTo500k,
+          [InvestorProfileDI.netWorth]: InvestorProfileNetWorth.gt5m,
         },
       });
 
-      const lt50k = screen.getByRole('radio', {
-        name: 'Under $50,000',
+      const gt5m = screen.getByRole('radio', {
+        name: '$5,000,000+',
       }) as HTMLInputElement;
-      expect(lt50k.checked).toBe(false);
-
-      const s50kTo100k = screen.getByRole('radio', {
-        name: '$50,000 - $100,000',
-      }) as HTMLInputElement;
-      expect(s50kTo100k.checked).toBe(false);
-
-      const s100kTo250k = screen.getByRole('radio', {
-        name: '$100,000 - $250,000',
-      }) as HTMLInputElement;
-      expect(s100kTo250k.checked).toBe(false);
-
-      const s250kTo500k = screen.getByRole('radio', {
-        name: '$250,000 - $500,000',
-      }) as HTMLInputElement;
-      expect(s250kTo500k.checked).toBe(true);
-
-      const S500kTo1m = screen.getByRole('radio', {
-        name: '$500,000 - $1,000,000',
-      }) as HTMLInputElement;
-      expect(S500kTo1m.checked).toBe(false);
-
-      const gt1m = screen.getByRole('radio', {
-        name: '$1,000,000+',
-      }) as HTMLInputElement;
-      expect(gt1m.checked).toBe(false);
+      expect(gt5m.checked).toBe(true);
     });
   });
 
