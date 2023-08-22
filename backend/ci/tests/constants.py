@@ -74,6 +74,7 @@ ID_DATA = {
     "id.zip": "10009",
     "id.country": "US",
     "id.nationality": "US",
+    "id.us_legal_status": "citizen",
 }
 
 BUSINESS_DATA = {
@@ -152,6 +153,13 @@ CDO_TO_DIS = {
     "email": ["id.email"],
     "phone_number": ["id.phone_number"],
     "nationality": ["id.nationality"],
+    "us_legal_status": [
+        "id.us_legal_status",
+        "id.nationality",
+        "id.citizenships",
+        "id.visa_kind",
+        "id.visa_expiration_date",
+    ],
     "business_name": ["business.name", "business.dba"],
     "business_tin": ["business.tin"],
     "business_address": [

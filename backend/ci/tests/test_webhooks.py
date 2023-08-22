@@ -16,9 +16,8 @@ def create_hooky_url():
 def get_latest_webhook(hooky_url):
     response = requests.get(hooky_url)
     if response.status_code != 200:
-        raise HttpError(
-            response.status_code,
-            f"Invalid response from hooky.footprint.dev: {response.content}",
+        raise Exception(
+            f"Invalid response from hooky.footprint.dev: HTTP {response.status_code}\n{response.content}",
         )
     return response.json()
 

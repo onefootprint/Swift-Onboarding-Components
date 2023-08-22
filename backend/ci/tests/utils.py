@@ -24,9 +24,30 @@ EXPECTED_SERVER_VERSION_GIT_HASH = os.environ.get("EXPECTED_SERVER_VERSION", Non
 
 
 class HttpError(Exception):
-    def __init__(self, code, message):
-        self.code = code
-        super().__init__(f"HttpError {code}: {message}")
+    def __init__(
+        self,
+        method,
+        path,
+        status_code,
+        expected_status_code,
+        content,
+        data,
+        params,
+        headers,
+    ):
+        self.method = method
+        self.path = path
+        self.status_code = status_code
+        self.expected_status_code = expected_status_code
+        self.content = content
+        self.data = data
+        self.params = params
+        self.headers = headers
+        message = f"Incorrect status code in {method} {path}. Got {status_code}, expected {expected_status_code}:\n{content}\nPath: {path}\nData: {data}\nParams: {params}\nHeaders: {headers}\nResponse: {content}"
+        super().__init__(f"HttpError {status_code}: {message}")
+
+    def json(self):
+        return json.loads(self.content)
 
 
 class IncorrectServerVersion(Exception):
@@ -43,8 +64,14 @@ def _make_request(
     response = method(url(path), headers=headers, json=data, params=params, files=files)
     if response.status_code != status_code:
         raise HttpError(
+            method.__name__.upper(),
+            path,
             response.status_code,
-            f"Incorrect status code in {method.__name__.upper()} {path}. Got {response.status_code}, expected {status_code}:\n{response.content}\nPath: {path}\nData: {data}\nParams: {params}\nHeaders: {headers}\nResponse: {response.content}",
+            status_code,
+            response.content,
+            data,
+            params,
+            headers,
         )
     expected_version = EXPECTED_SERVER_VERSION_GIT_HASH
     actual_version = response.headers.get(SERVER_VERSION_HEADER)
