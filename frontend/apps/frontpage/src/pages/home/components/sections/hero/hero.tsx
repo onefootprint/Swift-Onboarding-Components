@@ -14,7 +14,7 @@ import React, { useState } from 'react';
 import ContactDialog from 'src/components/contact-dialog';
 import LinkingButton from 'src/components/linking-button';
 
-import DemoVideo from '../../demo-video';
+import DemoVideoReact from '../../demo-video';
 import DesktopIllustration from './components/desktop-illustration';
 import MobileIllustration from './components/mobile-illustration';
 import TabletIllustration from './components/tablet-illustration';
@@ -109,11 +109,10 @@ const Hero = () => {
           </WatchDemoContainer>
         </ButtonsContainer>
       </Container>
-      <DemoVideo
+      <DemoVideoReact
         link={DEMO_LINK}
-        onClose={toggleDemo}
-        title="Footprint Demo"
         open={isDemoVisible}
+        onClose={toggleDemo}
       />
       <DesktopIllustration />
       <TabletIllustration />
@@ -157,8 +156,8 @@ const GradientsContainer = styled.div`
     background-color: ${theme.backgroundColor.primary};
 
     ${media.greaterThan('md')`
-    background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
-  `}
+      background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+    `}
   `}
 `;
 
