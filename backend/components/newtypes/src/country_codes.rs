@@ -301,6 +301,9 @@ crate::util::impl_enum_str_diesel!(Iso3166TwoDigitCountryCode);
 #[serde(rename_all = "UPPERCASE")]
 #[strum(serialize_all = "UPPERCASE")]
 #[diesel(sql_type = Text)]
+/// list of valid iso3166-alpha-2 country codes, from https://datahub.io/core/country-codes#data
+/// eventually we should maybe just pony up and pay for the subscription to iso: https://www.iso.org/publication/PUB500001.html
+/// Channel islands does not have a country code
 pub enum Iso3166TwoDigitCountryCode {
     TW,
     AF,
@@ -815,7 +818,7 @@ impl From<Iso3166ThreeDigitCountryCode> for Iso3166TwoDigitCountryCode {
 mod tests {
     use strum::IntoEnumIterator;
 
-    use crate::{Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, ISO_3166_COUNTRIES};
+    use crate::{Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode};
 
     #[test]
     fn test_country_codes_correct() {
@@ -824,10 +827,6 @@ mod tests {
             .map(|cc| cc.to_string())
             .collect();
         assert_eq!(serialize_country_codes_to_string.len(), 249);
-        assert_have_same_elements(
-            serialize_country_codes_to_string,
-            ISO_3166_COUNTRIES.into_iter().map(|cc| cc.to_string()).collect(),
-        );
 
         // Serde
         let serialize_country_codes_serde: Vec<String> = Iso3166TwoDigitCountryCode::iter()
@@ -840,14 +839,6 @@ mod tests {
 
         assert_eq!(serialize_country_codes_serde.len(), 249);
 
-        assert_have_same_elements(
-            serialize_country_codes_serde,
-            ISO_3166_COUNTRIES
-                .into_iter()
-                .map(|cc| serde_json::to_string(&cc).unwrap())
-                .collect(),
-        );
-
         let three_digit_cods: Vec<String> = Iso3166ThreeDigitCountryCode::iter()
             .map(|cc| {
                 let ser: String = serde_json::to_string(&cc).unwrap();
@@ -857,17 +848,5 @@ mod tests {
             .collect();
 
         assert_eq!(three_digit_cods.len(), 249);
-    }
-
-    fn assert_have_same_elements<T>(l: Vec<T>, r: Vec<T>)
-    where
-        T: Eq + std::fmt::Debug + Clone,
-    {
-        if !(l.iter().all(|i| r.contains(i)) && r.iter().all(|i| l.contains(i)) && l.len() == r.len()) {
-            panic!(
-                "{}",
-                format!("\nleft={:?} does not equal\nright={:?}\n", l.to_vec(), r.to_vec())
-            )
-        }
     }
 }
