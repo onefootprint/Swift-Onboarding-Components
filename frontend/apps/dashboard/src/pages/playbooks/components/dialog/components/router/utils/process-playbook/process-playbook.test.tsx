@@ -16,7 +16,6 @@ import processPlaybook from './process-playbook';
 describe('processPlaybook', () => {
   it('should return required KYC fields in mustCollectData regardless of playbook values', () => {
     const { mustCollectData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYC,
         personalInformationAndDocs: {
@@ -40,7 +39,6 @@ describe('processPlaybook', () => {
 
   it('should return required KYB fields in mustCollectData regardless of playbook values', () => {
     const { mustCollectData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYB,
         businessInformation: {
@@ -63,7 +61,6 @@ describe('processPlaybook', () => {
 
   it('should include full SSN in optional data but not mustCollectData if it is optional', () => {
     const { mustCollectData, optionalData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYC,
         personalInformationAndDocs: {
@@ -85,7 +82,6 @@ describe('processPlaybook', () => {
 
   it('should include SSN last 4 in optional data but not mustCollectData if it is optional', () => {
     const { mustCollectData, optionalData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYC,
         personalInformationAndDocs: {
@@ -107,7 +103,6 @@ describe('processPlaybook', () => {
 
   it('should include full SSN in mustCollectData if required', () => {
     const { mustCollectData, optionalData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYC,
         personalInformationAndDocs: {
@@ -128,7 +123,6 @@ describe('processPlaybook', () => {
 
   it('should SSN last4 in mustCollectData if required', () => {
     const { mustCollectData, optionalData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYC,
         personalInformationAndDocs: {
@@ -151,7 +145,6 @@ describe('processPlaybook', () => {
 
   it('should include investor profile in mustCollectData if required', () => {
     const { mustCollectData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYC,
         personalInformationAndDocs: {
@@ -170,7 +163,6 @@ describe('processPlaybook', () => {
 
   it('should include corporation type if required', () => {
     const { mustCollectData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYB,
         businessInformation: {
@@ -187,7 +179,6 @@ describe('processPlaybook', () => {
 
   it('should not include corporation type if not required', () => {
     const { mustCollectData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYB,
         businessInformation: {
@@ -206,7 +197,6 @@ describe('processPlaybook', () => {
 
   it('should include website type if required', () => {
     const { mustCollectData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYB,
         businessInformation: {
@@ -223,7 +213,6 @@ describe('processPlaybook', () => {
 
   it('should not include website type if not required', () => {
     const { mustCollectData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYB,
         businessInformation: {
@@ -240,7 +229,6 @@ describe('processPlaybook', () => {
 
   it('should include phone number if required', () => {
     const { mustCollectData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYB,
         businessInformation: {
@@ -257,7 +245,6 @@ describe('processPlaybook', () => {
 
   it('should not include phone number if not required', () => {
     const { mustCollectData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYB,
         businessInformation: {
@@ -274,7 +261,6 @@ describe('processPlaybook', () => {
 
   it('should handle authorized scopes as expected for default KYC values', () => {
     const { canAccessData } = processPlaybook({
-      name: 'test',
       playbook: defaultPlaybookValuesKYC,
       kind: Kind.KYC,
       authorizedScopes: defaultAuthorizedScopesValues,
@@ -285,18 +271,20 @@ describe('processPlaybook', () => {
     expect(canAccessData).toContain(CollectedKycDataOption.name);
     expect(canAccessData).toContain(CollectedKycDataOption.dob);
     expect(canAccessData).toContain(CollectedKycDataOption.fullAddress);
-    expect(canAccessData).toContain(CollectedKycDataOption.ssn4);
-    expect(canAccessData).not.toContain(CollectedKycDataOption.ssn9);
+    expect(canAccessData).not.toContain(CollectedKycDataOption.ssn4);
+    expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
     // tk document case
-    expect(canAccessData).toContain(
+    expect(canAccessData).not.toContain(
       CollectedInvestorProfileDataOption.investorProfile,
     );
   });
 
   it('should handle authorized scopes as expected for non-default KYC values', () => {
     const { canAccessData } = processPlaybook({
-      name: 'test',
-      playbook: defaultPlaybookValuesKYC,
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        [CollectedInvestorProfileDataOption.investorProfile]: true,
+      },
       kind: Kind.KYC,
       authorizedScopes: {
         ...defaultAuthorizedScopesValues,
@@ -324,7 +312,6 @@ describe('processPlaybook', () => {
 
   it('should handle authorized scopes as expected for default KYB values', () => {
     const { canAccessData } = processPlaybook({
-      name: 'test',
       playbook: defaultPlaybookValuesKYB,
       kind: Kind.KYB,
       authorizedScopes: {
@@ -345,7 +332,6 @@ describe('processPlaybook', () => {
 
   it('should handle authorized scopes as expected when adding optional KYB values', () => {
     const { canAccessData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYB,
         businessInformation: {
@@ -374,7 +360,6 @@ describe('processPlaybook', () => {
 
   it('should handle authorized scopes as expected when not including access to business data', () => {
     const { canAccessData } = processPlaybook({
-      name: 'test',
       playbook: {
         ...defaultPlaybookValuesKYB,
         businessInformation: {

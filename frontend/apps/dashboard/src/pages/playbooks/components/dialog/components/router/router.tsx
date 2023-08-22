@@ -1,11 +1,12 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Stepper } from '@onefootprint/ui';
+import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
 import PlaybookMachine from '@/playbooks/utils/machine';
 import {
+  AuthorizedScopesFormData,
   defaultNameValue,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
@@ -17,14 +18,23 @@ import NameYourPlaybook from './components/name-your-playbook';
 import WhoToOnboard from './components/who-to-onboard';
 import YourPlaybook from './components/your-playbook';
 import getStep from './utils/get-step';
+import processPlaybook from './utils/process-playbook';
+import useCreatePlaybook from './utils/use-create-playbook';
 
 type RouterProps = {
   onClose: () => void;
+};
+type HandleCreateProps = {
+  authorizedScopes: AuthorizedScopesFormData;
 };
 
 const Router = ({ onClose }: RouterProps) => {
   const [state, send] = useMachine(PlaybookMachine);
   const { t } = useTranslation('pages.playbooks.dialog.router');
+  const toast = useToast();
+  const showRequestError = useRequestErrorToast();
+  const mutation = useCreatePlaybook();
+
   const options = [
     { value: 'nameYourPlaybook', label: t('name-your-playbook') },
     { value: 'whoToOnboard', label: t('who-to-onboard') },
@@ -38,6 +48,39 @@ const Router = ({ onClose }: RouterProps) => {
 
   const step = getStep({ value: state.value as string });
   const stepperValue = options[step];
+
+  // we can't break this out into a separate util b/c of hook dependencies
+  const createPlaybook = ({ authorizedScopes }: HandleCreateProps) => {
+    const { kind, playbook, name } = state.context;
+    if (!kind || !playbook || !authorizedScopes || !name) {
+      return;
+    }
+    const { mustCollectData, canAccessData, optionalData } = processPlaybook({
+      kind,
+      playbook,
+      authorizedScopes,
+    });
+    mutation.mutate(
+      {
+        name,
+        mustCollectData,
+        canAccessData,
+        optionalData,
+      },
+      {
+        onSuccess: () => {
+          toast.show({
+            title: t('feedback.success.title'),
+            description: t('feedback.success.description'),
+          });
+          onClose();
+        },
+        onError: (error: unknown) => {
+          showRequestError(error);
+        },
+      },
+    );
+  };
 
   return (
     <Container>
@@ -91,6 +134,12 @@ const Router = ({ onClose }: RouterProps) => {
             kind={state.context.kind}
             playbook={state.context.playbook ?? defaultPlaybookValues}
             onBack={() => send('yourPlaybookSelected')}
+            onSubmit={data => {
+              // avoid state machine call — we don't store authorized scopes in context
+              createPlaybook({
+                authorizedScopes: data,
+              });
+            }}
           />
         )}
       </Content>

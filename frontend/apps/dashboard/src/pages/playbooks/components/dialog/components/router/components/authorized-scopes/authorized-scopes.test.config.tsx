@@ -26,7 +26,12 @@ const AuthorizedScopesWithContext = ({
 
   return (
     <FormProvider {...formMethods}>
-      <AuthorizedScopes kind={kind} playbook={playbook} onBack={() => {}} />
+      <AuthorizedScopes
+        kind={kind}
+        playbook={playbook}
+        onBack={() => {}}
+        onSubmit={() => {}}
+      />
     </FormProvider>
   );
 };

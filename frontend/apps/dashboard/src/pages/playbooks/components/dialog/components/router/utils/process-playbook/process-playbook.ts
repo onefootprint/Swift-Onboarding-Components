@@ -13,7 +13,6 @@ import {
 } from '@/playbooks/utils/machine/types';
 
 type ProcessPlaybookProps = {
-  name: string;
   playbook: PlaybookFormData;
   kind: Kind;
   authorizedScopes: AuthorizedScopesFormData;
@@ -35,7 +34,6 @@ const getRequiredKycCollectFields = () => [
 ];
 
 const processPlaybook = ({
-  name,
   playbook,
   kind,
   authorizedScopes,
@@ -75,7 +73,11 @@ const processPlaybook = ({
 
   const authorizedScopesKeys = Object.keys(authorizedScopes);
   authorizedScopesKeys.forEach(key => {
-    if (authorizedScopes[key as keyof AuthorizedScopesFormData]) {
+    if (
+      authorizedScopes[key as keyof AuthorizedScopesFormData] &&
+      key !== 'allBusinessData' &&
+      mustCollectData.includes(key)
+    ) {
       canAccessData.push(key);
     }
   });
@@ -97,17 +99,20 @@ const processPlaybook = ({
       }
     });
 
-    if (authorizedScopes.allBusinessData) {
+    if (authorizedScopes?.allBusinessData) {
       canAccessData.push(...getRequiredKybCollectFields());
       optionalKYBFields.forEach(field => {
-        if (businessInformation[field as keyof BusinessInformation]) {
+        if (
+          businessInformation[field as keyof BusinessInformation] &&
+          mustCollectData.includes(field)
+        ) {
           canAccessData.push(field);
         }
       });
     }
   }
 
-  return { mustCollectData, canAccessData, optionalData, name };
+  return { mustCollectData, canAccessData, optionalData };
 };
 
 export default processPlaybook;

@@ -1,4 +1,4 @@
-import { screen, userEvent } from '@onefootprint/test-utils';
+import { mockRequest, screen, userEvent } from '@onefootprint/test-utils';
 
 export const enterName = async () => {
   const nameInput = screen.getByRole('textbox', { name: 'Playbook name' });
@@ -21,3 +21,11 @@ export const confirmPlaybookRecommendation = async () => {
   // stepper value and header
   expect(screen.getAllByText('Authorized scopes').length).toEqual(2);
 };
+
+export const withOnboardingConfigs = () =>
+  mockRequest({
+    method: 'post',
+    path: '/org/onboarding_configs',
+    delay: 50,
+    response: {},
+  });

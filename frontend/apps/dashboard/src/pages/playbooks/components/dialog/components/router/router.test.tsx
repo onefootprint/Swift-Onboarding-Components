@@ -1,4 +1,9 @@
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import Router from './router';
@@ -6,6 +11,7 @@ import {
   confirmPlaybookRecommendation,
   enterName,
   selectWhoToOnboard,
+  withOnboardingConfigs,
 } from './router.test.config';
 
 const renderRouter = ({ onClose }: { onClose: () => void }) =>
@@ -159,5 +165,25 @@ describe('<Router />', () => {
         'This helps you easily identify your Playbook, especially if you have multiple ones.',
       ),
     ).toBeInTheDocument();
+  });
+
+  it('should show toast on success', async () => {
+    const closeFn = jest.fn();
+    withOnboardingConfigs();
+    renderRouter({ onClose: closeFn });
+    await enterName();
+    await selectWhoToOnboard();
+    await confirmPlaybookRecommendation();
+    const createPlaybook = screen.getByRole('button', {
+      name: 'Create Playbook',
+    });
+    await userEvent.click(createPlaybook);
+    await waitFor(() => {
+      expect(screen.getByText('Success')).toBeInTheDocument();
+    });
+    expect(
+      screen.getByText('Playbook created successfully.'),
+    ).toBeInTheDocument();
+    expect(closeFn).toHaveBeenCalled();
   });
 });
