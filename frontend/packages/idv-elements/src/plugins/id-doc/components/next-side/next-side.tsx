@@ -26,7 +26,8 @@ const NextSide = ({
   }, TRANSITION_DELAY_DEFAULT);
 
   const side =
-    docType === SupportedIdDocTypes.passport && IdDocImageTypes.front
+    docType === SupportedIdDocTypes.passport &&
+    nextSideImageType === IdDocImageTypes.front
       ? 'one-side'
       : nextSideImageType;
 
