@@ -3819,7 +3819,12 @@ pub fn incode_fetch_scores_response(opts: DocTestOpts) -> serde_json::Value {
           {
             "value": "PASSED",
             "status": "OK",
-            "key": "postitCheck"
+            "key": "idAlterationCheckFront"
+          },
+          {
+            "value": "PASSED",
+            "status": "OK",
+            "key": "idAlterationCheckBack"
           },
           {
             "value": "PASSED",

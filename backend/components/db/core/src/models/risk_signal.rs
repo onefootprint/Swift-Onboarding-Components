@@ -62,8 +62,13 @@ impl RiskSignal {
     ) -> DbResult<Vec<Self>> {
         let rsg = RiskSignalGroup::create(conn.conn(), scoped_vault_id, risk_group_kind)?;
 
+        let duplicates = Self::generate_duplicate_frc_by_reason_code_and_vendor_api(signals.clone());
+        if !duplicates.is_empty() {
+            tracing::error!(reason_codes=format!("{:?}", duplicates), scoped_vault_id =%scoped_vault_id, "duplicate reason codes produced");
+        }
         let new_risk_signals: Vec<NewRiskSignal> = signals
             .into_iter()
+            .unique()
             .map(|(reason_code, vendor_api, vres_id)| NewRiskSignal {
                 onboarding_decision_id: None,
                 reason_code,
@@ -79,6 +84,26 @@ impl RiskSignal {
             .values(new_risk_signals)
             .get_results::<Self>(conn.conn())?;
         Ok(result)
+    }
+
+    fn generate_duplicate_frc_by_reason_code_and_vendor_api(
+        signals: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+    ) -> Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)> {
+        signals
+            .into_iter()
+            .fold(
+                HashMap::new(),
+                |mut acc: HashMap<_, _>, (reason_code, vendor_api, vres_id)| {
+                    *acc.entry((reason_code, vendor_api, vres_id)).or_insert(0) += 1;
+                    acc
+                },
+            )
+            .into_iter()
+            .filter(|(_, count)| *count > 1)
+            .collect::<HashMap<(FootprintReasonCode, VendorAPI, VerificationResultId), i32>>()
+            .keys()
+            .cloned()
+            .collect()
     }
 
     fn query<'a>(
@@ -438,5 +463,29 @@ mod tests {
             expected_risk_signals,
             rs.into_iter().map(|rs| (rs.vendor_api, rs.reason_code)).collect(),
         );
+    }
+
+    fn vres_id(s: &str) -> VerificationResultId {
+        VerificationResultId::from_str(s).unwrap()
+    }
+    #[db_test_case(vec![] => false)]
+    #[db_test_case(vec![
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID, vres_id("vres1")),
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::ExperianPreciseID, vres_id("vres2")),
+    ] => false)]
+    #[db_test_case(vec![
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID, vres_id("vres1")),
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID, vres_id("vres2")),
+    ] => false)]
+    #[db_test_case(vec![
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID, vres_id("vres1")),
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID, vres_id("vres1")),
+    ] => true)]
+    fn test_generate_duplicate_frc_by_reason_code_and_vendor_api(
+        _conn: &mut TestPgConn,
+        signals: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+    ) -> bool {
+        // duplicates exist if non-empty
+        !RiskSignal::generate_duplicate_frc_by_reason_code_and_vendor_api(signals).is_empty()
     }
 }

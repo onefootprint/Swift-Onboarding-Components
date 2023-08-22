@@ -68,18 +68,18 @@ incode_reason_code_enum! {
         TamperCheck,
         // Legacy naming of the Id alteration check
         #[ser = "postitCheckFront"]
-        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageTampering, FRC::DocumentPossibleImageTampering))]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageAlterationFront, FRC::DocumentPossibleImageAlterationFront))]
         PostitCheckFront,
         #[ser = "postitCheckBack"]
-        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageTampering, FRC::DocumentPossibleImageTampering))]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageAlterationBack, FRC::DocumentPossibleImageAlterationBack))]
         PostitCheckBack,
         // This is the new postitCheck.
         // Not sure if this is the right FRC, but it's close enough.
         #[ser = "idAlterationCheckFront"]
-        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageTampering, FRC::DocumentPossibleImageTampering))]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageAlterationFront, FRC::DocumentPossibleImageAlterationFront))]
         IdAlterationCheckFront,
         #[ser = "idAlterationCheckBack"]
-        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageTampering, FRC::DocumentPossibleImageTampering))]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageAlterationBack, FRC::DocumentPossibleImageAlterationBack))]
         IdAlterationCheckBack,
         // this is the "selfie duplicate" check
         // this is done relative to all of footprint's sessions. If a tenant is having issues with duplicate fraud/malicious actors

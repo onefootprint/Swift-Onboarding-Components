@@ -710,12 +710,30 @@ footprint_reason_code_enum! {
         DocumentInvalidTemplateLayout,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document image possible tampering", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being manipulated or tampered."]
+        #[note = "Document image possible physical tampering", severity = SignalSeverity::Medium,  description = "The image of the document has evidence or appearances of being physically manipulated or tampered."]
         DocumentPossibleImageTampering,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document has no signs of physical tampering", severity = SignalSeverity::Info,  description = "The image of the document has no sign of being manipulated or tampered."]
+        #[note = "Document has no signs of physical tampering", severity = SignalSeverity::Info,  description = "The image of the document has no sign of being physically manipulated or tampered."]
         DocumentNoImageTampering,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Front of document has no signs of digital alteration", severity = SignalSeverity::Info,  description = "The front of the document has no sign of being digitally manipulated or altered."]
+        DocumentNoImageAlterationFront,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Back of document has no signs of digital alteration", severity = SignalSeverity::Info,  description = "The back of the document has no sign of being digitally manipulated or altered."]
+        DocumentNoImageAlterationBack,
+
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Front of document has signs of digital alteration", severity = SignalSeverity::Medium,  description = "The front of the document has signs of being digitally manipulated or altered."]
+        DocumentPossibleImageAlterationFront,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Back of document has signs of digital alteration", severity = SignalSeverity::Medium,  description = "The back of the document has signs of being digitally manipulated or altered."]
+        DocumentPossibleImageAlterationBack,
+
 
 
         #[scope = SignalScope::Selfie, additional_scopes = vec![SignalScope::Document], match_level = None]
