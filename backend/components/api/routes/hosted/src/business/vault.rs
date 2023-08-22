@@ -14,7 +14,9 @@ use api_core::ApiErrorKind;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{BusinessDataKind as BDK, BusinessOwnerKind, PiiString, ScopedVaultId, WorkflowGuard};
+use newtypes::{
+    BusinessDataKind as BDK, BusinessOwnerKind, PiiJsonValue, PiiValue, ScopedVaultId, WorkflowGuard,
+};
 use newtypes::{KycedBusinessOwnerData, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -102,7 +104,7 @@ pub async fn patch(
 /// provided scoped business's primary BO's phone and email.
 /// This is some crazy logic needed to properly validate KYCed BOs since the client does not always
 /// know the primary BO's phone and email to send along
-async fn augment_bos(state: &State, sb_id: ScopedVaultId, kyced_bos: PiiString) -> ApiResult<PiiString> {
+async fn augment_bos(state: &State, sb_id: ScopedVaultId, kyced_bos: PiiValue) -> ApiResult<PiiValue> {
     use newtypes::{email::Email, IdentityDataKind as IDK, PhoneNumber};
 
     // If we are about to vault KycedBos, we should also fetch the primary BO's contact info to
@@ -136,8 +138,11 @@ async fn augment_bos(state: &State, sb_id: ScopedVaultId, kyced_bos: PiiString) 
 
     // Augment the request to include the primary BO's email and phone number
     type Bo = KycedBusinessOwnerData<Option<()>, Option<Email>, Option<PhoneNumber>>;
-    let new_bos: Vec<Bo> = kyced_bos
-        .deserialize::<Vec<Bo>>()?
+    let old_bos = match kyced_bos {
+        PiiValue::Json(s) => serde_json::value::from_value::<Vec<Bo>>(s.into_leak())?,
+        PiiValue::String(s) => s.deserialize::<Vec<Bo>>()?,
+    };
+    let new_bos: Vec<Bo> = old_bos
         .into_iter()
         .enumerate()
         .map(|(i, mut bo)| {
@@ -151,6 +156,6 @@ async fn augment_bos(state: &State, sb_id: ScopedVaultId, kyced_bos: PiiString) 
         })
         .collect();
 
-    let new_kyced_bos = PiiString::new(serde_json::to_string(&new_bos)?);
+    let new_kyced_bos = PiiValue::Json(PiiJsonValue::new(serde_json::to_value(new_bos)?));
     Ok(new_kyced_bos)
 }

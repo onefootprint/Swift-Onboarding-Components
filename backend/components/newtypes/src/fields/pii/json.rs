@@ -50,6 +50,14 @@ impl TryFrom<Vec<u8>> for PiiJsonValue {
     }
 }
 
+impl<'a> TryFrom<&'a PiiJsonValue> for PiiString {
+    type Error = serde_json::Error;
+
+    fn try_from(v: &'a PiiJsonValue) -> Result<Self, Self::Error> {
+        serde_json::ser::to_string(v.leak()).map(PiiString::new)
+    }
+}
+
 impl<'a> TryFrom<&'a PiiString> for PiiJsonValue {
     type Error = serde_json::Error;
 
