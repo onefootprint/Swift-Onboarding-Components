@@ -10,14 +10,12 @@ use api_core::errors::tenant::TenantError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::proxy::filter_function_to_transform;
 use api_core::utils::vault_wrapper::{bulk_decrypt, BulkDecryptReq, EnclaveDecryptOperation, TenantVw};
+use api_wire_types::DecryptResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::{
-    flat_api_object_map_type, DataLifetimeSeqno, PiiJsonValue, PiiString, PiiValue, PiiValueKind,
-    VersionedDataIdentifier,
-};
+use newtypes::{DataLifetimeSeqno, VersionedDataIdentifier};
 use newtypes::{FilterFunction, FpId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
@@ -46,12 +44,6 @@ pub struct ClientDecryptRequest {
     /// Omit or leave empty to apply no filters
     filters: Option<Vec<FilterFunction>>,
 }
-
-flat_api_object_map_type!(
-    DecryptResponse<VersionedDataIdentifier, Option<PiiValue>>,
-    description="A key-value map with the corresponding decrypted values",
-    example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
-);
 
 #[tracing::instrument(skip(state, auth))]
 #[route_alias(
@@ -207,25 +199,4 @@ pub(super) async fn post_inner(
     let out = DecryptResponse::from(results);
 
     ResponseData::ok(out).json()
-}
-
-impl From<HashMap<VersionedDataIdentifier, Option<PiiString>>> for DecryptResponse {
-    fn from(value: HashMap<VersionedDataIdentifier, Option<PiiString>>) -> Self {
-        let map = value
-            .into_iter()
-            .map(|(k, v)| {
-                let value = match k.di.serialization() {
-                    PiiValueKind::String => v.map(PiiValue::String),
-                    PiiValueKind::Json => v.map(|v| {
-                        PiiJsonValue::try_from(&v)
-                            .map(PiiValue::Json)
-                            // If the value isn't json serializable, just return it as a string
-                            .unwrap_or(PiiValue::String(v))
-                    }),
-                };
-                (k, value)
-            })
-            .collect();
-        Self { map }
-    }
 }

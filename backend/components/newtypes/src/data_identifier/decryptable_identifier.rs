@@ -11,6 +11,13 @@ pub struct VersionedDataIdentifier {
     pub version: Option<DataLifetimeSeqno>,
 }
 
+impl VersionedDataIdentifier {
+    /// Create a new VersionedDataIdentifier with no version
+    pub fn new(di: DataIdentifier) -> Self {
+        Self { di, version: None }
+    }
+}
+
 // For now, we don't want to expose VersionedDI in the api docs, so just pass through to the DI implementation
 impl paperclip::v2::schema::Apiv2Schema for VersionedDataIdentifier {
     fn name() -> Option<String> {

@@ -33,8 +33,8 @@ pub use self::{
     investor_profile_kind::*, validation::Error as ValidationError, validation::*,
 };
 use crate::{
-    util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, PiiValueKind, ValidateArgs,
-    VaultKind,
+    util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, PiiJsonValue, PiiString,
+    PiiValue, PiiValueKind, ValidateArgs, VaultKind,
 };
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -361,10 +361,24 @@ impl DataIdentifier {
         }
     }
 
-    pub fn serialization(&self) -> PiiValueKind {
+    fn serialization(&self) -> PiiValueKind {
         match self {
             Self::Id(IdentityDataKind::Citizenships) => PiiValueKind::Json,
             _ => PiiValueKind::String,
+        }
+    }
+
+    /// Serialize the PiiString value specifically to the type of data expecte to be found in this DI
+    pub fn serialize(&self, v: PiiString) -> PiiValue {
+        // TODO There's some fun overlap between PiiJsonValue and PiiString... should consolidate at some point
+        match self.serialization() {
+            PiiValueKind::String => PiiValue::String(v),
+            PiiValueKind::Json => {
+                PiiJsonValue::try_from(&v)
+                .map(PiiValue::Json)
+                // If the value isn't json serializable, just return it as a string
+                .unwrap_or(PiiValue::String(v))
+            }
         }
     }
 }

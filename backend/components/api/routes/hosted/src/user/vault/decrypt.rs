@@ -4,9 +4,9 @@ use crate::{errors::ApiError, State};
 use api_core::auth::user::{UserAuth, UserAuthContext};
 use api_core::auth::{Any, CanDecrypt};
 use api_core::utils::vault_wrapper::VwArgs;
+use api_wire_types::DecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
-use newtypes::{flat_api_object_map_type, PiiString};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::collections::{HashMap, HashSet};
@@ -16,12 +16,6 @@ pub struct DecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `business.name`
     fields: HashSet<DataIdentifier>,
 }
-
-flat_api_object_map_type!(
-    DecryptResponse<DataIdentifier, Option<PiiString>>,
-    description="A key-value map with the corresponding decrypted values",
-    example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
-);
 
 #[api_v2_operation(
     tags(Vault, User, Hosted),
@@ -61,7 +55,7 @@ pub async fn post(
             .into_iter()
             .map(|di| (di.clone(), results.remove(&di.into()))),
     );
-    let out = DecryptResponse { map: results };
+    let out = DecryptResponse::from(results);
 
     ResponseData::ok(out).json()
 }

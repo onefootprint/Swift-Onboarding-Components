@@ -10,6 +10,9 @@ pub use self::validate::*;
 pub mod document_request;
 pub use self::document_request::*;
 
+mod decrypt;
+pub use decrypt::*;
+
 pub mod decision;
 pub use self::decision::*;
 
