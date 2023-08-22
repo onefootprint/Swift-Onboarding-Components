@@ -1,7 +1,10 @@
 use std::{marker::PhantomData, pin::Pin};
 
 use actix_web::{web, FromRequest};
-use db::models::{ob_configuration::ObConfiguration, tenant::Tenant};
+use db::{
+    models::{ob_configuration::ObConfiguration, tenant::Tenant},
+    DbResult,
+};
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 
@@ -46,7 +49,7 @@ impl FromRequest for PublicOnboardingContext {
             let key2 = key.clone();
             let (ob_config, tenant) = state
                 .db_pool
-                .db_query(move |conn| ObConfiguration::get_enabled(conn, &key))
+                .db_query(move |conn| -> DbResult<_> { ObConfiguration::get_enabled(conn, &key) })
                 .await?
                 .map_err(|e| -> Self::Error {
                     if e.is_not_found() {

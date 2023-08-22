@@ -29,6 +29,7 @@ use paperclip::actix::web;
 use strum::IntoEnumIterator;
 
 mod authorize;
+mod config;
 mod d2p;
 mod fingerprint_visit;
 mod index;
@@ -51,8 +52,10 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(socure_device::post)
         .service(process::post)
         .service(validate::post)
-        .service(stytch::post);
+        .service(stytch::post)
+        .service(config::get);
 
+    config::configure_get_aliases(config);
     d2p::routes(config);
 }
 

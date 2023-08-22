@@ -101,7 +101,7 @@ pub async fn post(
 
     let ff_client = state.feature_flag_client.clone();
     let onboarding_config =
-        api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None, ff_client));
+        api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client));
     ResponseData::ok(OnboardingResponse {
         // Omit appearance serialization here
         onboarding_config,

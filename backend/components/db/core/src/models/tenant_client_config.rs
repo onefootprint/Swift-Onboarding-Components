@@ -27,6 +27,8 @@ pub struct UpdateTenantClientConfig {
 impl UpdateTenantClientConfig {
     #[tracing::instrument("UpdateTenantClientConfig::create", skip_all)]
     pub fn create_or_update(self, conn: &mut TxnPgConn) -> DbResult<TenantClientConfig> {
+        // deactivate the old ones
+        // this lets us keep a record of old values for security context
         diesel::update(tenant_client_config::table)
             .filter(tenant_client_config::tenant_id.eq(&self.tenant_id))
             .filter(tenant_client_config::deactivated_at.is_null())
@@ -34,6 +36,7 @@ impl UpdateTenantClientConfig {
             .set(tenant_client_config::deactivated_at.eq(Utc::now()))
             .execute(conn.conn())?;
 
+        // insert the new one
         let config = diesel::insert_into(tenant_client_config::table)
             .values(self)
             .get_result(conn.conn())?;

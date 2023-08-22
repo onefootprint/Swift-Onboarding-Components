@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS tenant_client_config_tenant_id;

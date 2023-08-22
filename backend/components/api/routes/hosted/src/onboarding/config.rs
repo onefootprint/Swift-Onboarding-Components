@@ -1,0 +1,77 @@
+use crate::auth::ob_config::ObConfigAuth;
+use crate::auth::Either;
+use crate::errors::ApiError;
+use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::auth::user::UserObAuthContext;
+use api_core::auth::Any;
+use db::{
+    models::{appearance::Appearance, tenant_client_config::TenantClientConfig},
+    DbResult,
+};
+use macros::route_alias;
+use paperclip::actix::{api_v2_operation, get, web, web::Json};
+
+#[route_alias(get(
+    "/org/onboarding_config",
+    tags(Hosted),
+    description = "Fetch an onboarding configuration",
+))] // TODO: remove alias once we migrate the endpoints
+#[api_v2_operation(
+    tags(Organization, Private),
+    description = "Get the details of an onboarding configuration."
+)]
+#[get("/hosted/onboarding/config")]
+pub fn get(
+    state: web::Data<State>,
+    auth: Either<ObConfigAuth, UserObAuthContext>,
+) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
+    let (tenant, ob_config) = match auth {
+        Either::Left(ob_pk_auth) => {
+            // Support auth that identifies an ob config
+            let tenant = ob_pk_auth.tenant().clone();
+            let ob_config = ob_pk_auth.ob_config().clone();
+            (tenant, ob_config)
+        }
+        Either::Right(user_ob_auth) => {
+            // Also take in a user auth token that has the onboarding scope that identifies an ob
+            // config
+            let user_ob_auth = user_ob_auth.check_guard(Any)?;
+            let ob_config = user_ob_auth.data.ob_config()?.clone();
+            let tenant = user_ob_auth.data.tenant()?.clone();
+            (tenant, ob_config)
+        }
+    };
+
+    let tenant_id = tenant.id.clone();
+    let appearance_id = ob_config.appearance_id.clone();
+    let is_live = ob_config.is_live;
+
+    // get other properties of our configuration relevant to rendering it
+    let (appearance, client_config) = state
+        .db_pool
+        .db_query(move |conn| -> DbResult<_> {
+            let appearance = if let Some(appearance_id) = appearance_id {
+                Some(Appearance::get(conn, &appearance_id, &tenant_id)?)
+            } else {
+                None
+            };
+            let client_config = TenantClientConfig::get(conn, tenant_id, is_live)?;
+
+            Ok((appearance, client_config))
+        })
+        .await??;
+
+    let ff_client = state.feature_flag_client.clone();
+
+    Ok(Json(ResponseData::ok(
+        api_wire_types::OnboardingConfiguration::from_db((
+            ob_config,
+            tenant,
+            client_config,
+            appearance,
+            ff_client,
+        )),
+    )))
+}

@@ -29,7 +29,7 @@ pub async fn get(
     let ob_config = user_auth.ob_config()?.clone();
     let tenant = user_auth.tenant()?.clone();
     let ff_client = state.feature_flag_client.clone();
-    let ob_config = api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None, ff_client));
+    let ob_config = api_wire_types::OnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client));
 
     ResponseData::ok(OnboardingStatusResponse {
         all_requirements,

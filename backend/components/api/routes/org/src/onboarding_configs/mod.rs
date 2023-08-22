@@ -6,7 +6,6 @@ mod post;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
-        .service(get::get_bifrost)
         .service(get::get_list)
         .service(get::get_detail)
         .service(patch::patch)

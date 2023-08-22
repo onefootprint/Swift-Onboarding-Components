@@ -8,7 +8,9 @@ use crate::{
     errors::ApiResult,
 };
 use db::{
-    models::{business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant},
+    models::{
+        business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant,
+    },
     PgConn,
 };
 use feature_flag::FeatureFlagClient;

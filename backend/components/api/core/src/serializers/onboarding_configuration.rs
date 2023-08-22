@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use db::models::{appearance::Appearance, ob_configuration::ObConfiguration, tenant::Tenant};
+use db::models::{
+    appearance::Appearance, ob_configuration::ObConfiguration, tenant::Tenant,
+    tenant_client_config::TenantClientConfig,
+};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
 use crate::utils::db2api::DbToApi;
@@ -8,12 +11,13 @@ use crate::utils::db2api::DbToApi;
 pub type ObConfigInfo = (
     ObConfiguration,
     Tenant,
+    Option<TenantClientConfig>,
     Option<Appearance>,
     Arc<dyn FeatureFlagClient>,
 );
 
 impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
-    fn from_db((ob_config, tenant, appearance, ff_client): ObConfigInfo) -> Self {
+    fn from_db((ob_config, tenant, tenant_client_config, appearance, ff_client): ObConfigInfo) -> Self {
         let ObConfiguration {
             id,
             key,
@@ -55,6 +59,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
             is_instant_app_enabled,
             tenant_id,
             is_no_phone_flow,
+            allowed_origins: tenant_client_config.map(|c| c.allowed_origins),
         }
     }
 }

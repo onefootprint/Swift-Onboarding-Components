@@ -24,6 +24,10 @@ pub struct OnboardingConfiguration {
     // Used to display a tenant-specific banner on the app clip
     pub tenant_id: TenantId,
     pub is_no_phone_flow: bool,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// allow list of origins permitted to host the embedded flow
+    pub allowed_origins: Option<Vec<String>>,
 }
 
 export_schema!(OnboardingConfiguration);
