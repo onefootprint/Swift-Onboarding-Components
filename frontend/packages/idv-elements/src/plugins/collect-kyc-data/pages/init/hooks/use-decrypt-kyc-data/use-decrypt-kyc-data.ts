@@ -1,5 +1,5 @@
 import {
-  CdoToDiMap,
+  CdoToAllDisMap,
   CollectedKycDataOption,
   DataIdentifier,
   IdDI,
@@ -37,7 +37,7 @@ const useDecryptKycData = ({
   onError,
 }: UseDecryptKycDataArgs) => {
   const decryptUserMutation = useDecryptUser();
-  const populatedDis = populatedCdos.flatMap(cdo => CdoToDiMap[cdo]);
+  const populatedDis = populatedCdos.flatMap(cdo => CdoToAllDisMap[cdo]);
 
   const handleDecryptedData = (
     decryptedData: Partial<Record<DataIdentifier, string | undefined>>,

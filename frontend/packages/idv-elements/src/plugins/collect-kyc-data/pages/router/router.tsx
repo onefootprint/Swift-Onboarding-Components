@@ -33,6 +33,9 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('basicInformation')) {
     return <BasicInformation />;
   }
+  // if (state.matches('usLegalStatus')) {
+  //   return <LegalStatus />;
+  // }
   if (state.matches('residentialAddress')) {
     return <Address />;
   }

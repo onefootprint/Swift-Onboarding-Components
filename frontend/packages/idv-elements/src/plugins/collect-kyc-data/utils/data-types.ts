@@ -15,6 +15,10 @@ export type KycData = Partial<{
   [IdDI.zip]: DataValue;
   [IdDI.phoneNumber]: DataValue;
   [IdDI.nationality]: DataValue;
+  [IdDI.usLegalStatus]: DataValue;
+  [IdDI.visaExpirationDate]: DataValue;
+  [IdDI.visaKind]: DataValue;
+  [IdDI.citizenships]: DataValue;
 }>;
 
 export type DataValue = {

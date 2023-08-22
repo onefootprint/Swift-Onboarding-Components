@@ -3,6 +3,7 @@ import {
   IcoBuilding24,
   IcoCake24,
   IcoCar24,
+  IcoCheckCircle24,
   IcoClipboard24,
   IcoDollar24,
   IcoEmail24,
@@ -40,6 +41,7 @@ const IconByCollectedKycDataOption: Record<CollectedKycDataOption, Icon> = {
   [CollectedKycDataOption.fullAddress]: IcoBuilding24,
   [CollectedKycDataOption.partialAddress]: IcoBuilding24,
   [CollectedKycDataOption.nationality]: IcoFlag24,
+  [CollectedKycDataOption.usLegalStatus]: IcoCheckCircle24, // placeholder, will add IcoGlobe
 };
 
 const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
@@ -74,6 +76,7 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [CollectedKycDataOption.fullAddress]: t('data-labels.address-full'),
     [CollectedKycDataOption.partialAddress]: t('data-labels.address-partial'),
     [CollectedKycDataOption.nationality]: t('data-labels.nationality'),
+    [CollectedKycDataOption.usLegalStatus]: t('data-labels.us-legal-status'),
   };
   const docTypeLabels: Record<SupportedIdDocTypes, string> = {
     [SupportedIdDocTypes.idCard]: t('data-labels.id-card'),

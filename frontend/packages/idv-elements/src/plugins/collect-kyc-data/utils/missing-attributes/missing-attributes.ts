@@ -12,6 +12,9 @@ const BASIC_ATTRIBUTES = [
   CollectedKycDataOption.nationality,
 ];
 
+// The list of CollectedKycDataOption that may be input on the basic info screen
+const US_LEGAL_STATUS_ATTRIBUTES = [CollectedKycDataOption.usLegalStatus];
+
 // The list of CollectedKycDataOption that may be input on the residential screen
 const RESIDENTIAL_ATTRIBUTES = [
   CollectedKycDataOption.fullAddress,
@@ -73,6 +76,11 @@ export const isMissingBasicAttribute = (
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
 ) => isMissing(BASIC_ATTRIBUTES, mustCollect, collectedData);
+
+export const isMissingUSLegalStatusAttribute = (
+  mustCollect: CollectedKycDataOption[],
+  collectedData?: KycData,
+) => isMissing(US_LEGAL_STATUS_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingResidentialAttribute = (
   mustCollect: CollectedKycDataOption[],

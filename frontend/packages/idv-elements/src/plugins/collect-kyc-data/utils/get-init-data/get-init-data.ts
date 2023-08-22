@@ -1,6 +1,6 @@
 import {
+  CdoToAllDisMap,
   CollectedKycDataOption,
-  CollectedKycDataOptionToRequiredAttributes,
   IdDI,
   IdDIData,
   OnboardingConfig,
@@ -40,7 +40,7 @@ const getInitData = (
     allKycCdos.has(cdo as CollectedKycDataOption),
   ) as CollectedKycDataOption[];
   const configKycAttributes = configKycCdos.flatMap(
-    cdo => CollectedKycDataOptionToRequiredAttributes[cdo],
+    cdo => CdoToAllDisMap[cdo],
   ) as IdDI[];
   const filteredData = pickBy(data, (_, key) =>
     configKycAttributes.includes(key as IdDI),

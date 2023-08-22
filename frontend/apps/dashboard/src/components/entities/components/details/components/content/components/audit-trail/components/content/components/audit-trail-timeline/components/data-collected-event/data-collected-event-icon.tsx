@@ -1,5 +1,6 @@
 import {
   IcoBuilding16,
+  IcoCheckCircle16,
   IcoDollar16,
   IcoEmail16,
   IcoFlag16,
@@ -35,6 +36,7 @@ const iconForAttribute: Record<
   [CollectedKycDataOption.fullAddress]: IcoBuilding16,
   [CollectedKycDataOption.partialAddress]: IcoBuilding16,
   [CollectedKycDataOption.nationality]: IcoFlag16,
+  [CollectedKycDataOption.usLegalStatus]: IcoCheckCircle16, // placeholder, will use IcoGlobe
   [CollectedKybDataOption.name]: IcoStore16,
   [CollectedKybDataOption.tin]: IcoStore16,
   [CollectedKybDataOption.address]: IcoBuilding16,

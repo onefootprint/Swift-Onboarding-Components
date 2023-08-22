@@ -32,6 +32,7 @@ export enum CollectedKycDataOption {
   email = 'email',
   phoneNumber = 'phone_number',
   nationality = 'nationality',
+  usLegalStatus = 'us_legal_status',
 }
 
 // TODO: update this
@@ -64,6 +65,7 @@ export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
   partial_address: CollectedKycDataOption.partialAddress,
   phone_number: CollectedKycDataOption.phoneNumber,
   nationality: CollectedKycDataOption.nationality,
+  usLegalStatus: CollectedKycDataOption.usLegalStatus,
   document: CollectedDocumentDataOption.document,
   document_and_selfie: CollectedDocumentDataOption.documentAndSelfie,
   business_name: CollectedKybDataOption.name,
@@ -118,4 +120,5 @@ export const CollectedKycDataOptionToRequiredAttributes: Record<
   [CollectedKycDataOption.email]: [IdDI.email],
   [CollectedKycDataOption.phoneNumber]: [IdDI.phoneNumber],
   [CollectedKycDataOption.nationality]: [IdDI.nationality],
+  [CollectedKycDataOption.usLegalStatus]: [IdDI.usLegalStatus],
 };

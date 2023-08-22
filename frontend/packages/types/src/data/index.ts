@@ -11,7 +11,7 @@ export * from './business-bo-kyc-data';
 export * from './business-di-data';
 export * from './business-owner';
 export * from './card-brands';
-export { default as CdoToDiMap } from './cdo-to-di-map';
+export { default as CdoToAllDisMap } from './cdo-to-di-map';
 export * from './challenge-data';
 export { default as ChallengeKind } from './challenge-kind';
 export * from './collected-data-option';

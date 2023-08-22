@@ -59,6 +59,7 @@
         "address-full": "Address",
         "address-partial": "Country & Zip Code",
         "nationality": "Nationality",
+        "us-legal-status": "U.S. Legal Status",
         "id-card": "ID Card",
         "passport": "Passport",
         "driversLicense": "Driver's License",
