@@ -95,6 +95,7 @@ enum NetWorth {
     Le50k,
     Gt50kLe100k,
     Gt100kLe200k,
+    Gt200kLe500k,
     Gt500kLe1m,
     Gt1mLe5m,
     Gt5m,
