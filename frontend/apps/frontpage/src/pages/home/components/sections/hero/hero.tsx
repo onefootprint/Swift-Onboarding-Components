@@ -19,7 +19,7 @@ import DesktopIllustration from './components/desktop-illustration';
 import MobileIllustration from './components/mobile-illustration';
 import TabletIllustration from './components/tablet-illustration';
 
-const DEMO_LINK = 'https://www.youtube.com/embed/ylHZgcW3fyI?autoplay=1';
+const DEMO_LINK = 'https://www.youtube.com/embed/SyK5lOg02xw?autoplay=1';
 const GET_FORM_URL =
   'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
 
