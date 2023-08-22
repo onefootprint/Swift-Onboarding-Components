@@ -99,6 +99,10 @@ pub enum DocumentImageError {
     SelfieGlare,
     SelfieHasLenses,
     SelfieHasFaceMask,
+    SelfieBlurry,
+    SelfieImageSizeUnsupported,
+    SelfieImageOrientationIncorrect,
+    SelfieBadImageCompression,
     UnknownCountryCode,
     CountryCodeMismatch,
     UnknownError,
@@ -146,6 +150,11 @@ impl From<IncodeFailureReason> for DocumentImageError {
             IncodeFailureReason::Other(_) => Self::UnknownError,
             IncodeFailureReason::DocumentGlare => Self::DocumentGlare,
             IncodeFailureReason::DocumentSharpness => Self::DocumentSharpness,
+            IncodeFailureReason::FaceCroppingFailure => Self::UnknownError,
+            IncodeFailureReason::SelfieBlurry => Self::SelfieBlurry,
+            IncodeFailureReason::SelfieImageSizeUnsupported => Self::SelfieImageSizeUnsupported,
+            IncodeFailureReason::SelfieImageOrientationIncorrect => Self::SelfieImageOrientationIncorrect,
+            IncodeFailureReason::SelfieBadImageCompression => Self::SelfieBadImageCompression,
         }
     }
 }

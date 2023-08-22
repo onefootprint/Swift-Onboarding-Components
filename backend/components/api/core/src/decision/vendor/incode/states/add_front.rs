@@ -1,6 +1,6 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddBack, IncodeStateTransition, ProcessId,
-    SaveVerificationResultArgs, VerificationSession,
+    map_to_api_err, save_incode_verification_result, AddBack, AddSideResponseHelper, IncodeStateTransition,
+    ProcessId, SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
@@ -9,12 +9,13 @@ use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
-use idv::incode::doc::response::AddSideResponse;
+
 use idv::incode::doc::IncodeAddFrontRequest;
-use newtypes::{DocVData, DocumentSide, VendorAPI};
+
+use newtypes::{DocVData, DocumentSide, IncodeFailureReason, VendorAPI};
 
 pub struct AddFront {
-    response: AddSideResponse,
+    add_side_response_helper: AddSideResponseHelper,
 }
 
 #[async_trait]
@@ -51,14 +52,42 @@ impl IncodeStateTransition for AddFront {
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeAddFront, ctx);
         save_incode_verification_result(db_pool, args).await?;
 
-        // Now ensure we don't have an error
-        let response = res
-            .map_err(map_to_api_err)?
-            .result
-            .into_success()
+        let response = res.map_err(map_to_api_err)?.result;
+
+        let (type_of_id, country_code, failure_reasons_from_response, failure_reasons_from_api_error) =
+            match response.into_success() {
+                // Incode returns 200 for upload failures, so catch these here
+                Ok(response) => Ok((
+                    response.type_of_id.clone(),
+                    response.country_code.clone(),
+                    response.failure_reasons(),
+                    vec![],
+                )),
+                // status is a mix of custom error codes and http status codes
+                Err(idv::incode::error::Error::APIResponseError(e)) => {
+                    let failure_reasons = match e.status {
+                        4019 => Ok(vec![IncodeFailureReason::SelfieFaceNotFound]),
+                        1003 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
+                        500 => Ok(vec![IncodeFailureReason::UnexpectedErrorOccurred]),
+                        // TODO there are probably more retryable errors in here
+                        _ => Err(idv::incode::error::Error::APIResponseError(e)),
+                    }
+                    .map_err(map_to_api_err)?;
+
+                    Ok((None, None, vec![], failure_reasons))
+                }
+                Err(e) => Err(e),
+            }
             .map_err(map_to_api_err)?;
 
-        Ok(Some(Self { response }))
+        Ok(Some(Self {
+            add_side_response_helper: AddSideResponseHelper {
+                type_of_id,
+                country_code,
+                failure_reasons_from_response,
+                failure_reasons_from_api_error,
+            },
+        }))
     }
 
     /// Perform any bookkeeping that must be atomic with the state transition. Can access any
@@ -70,10 +99,15 @@ impl IncodeStateTransition for AddFront {
         _session: &VerificationSession,
     ) -> ApiResult<StateResult> {
         // Ensure we've gotten a doc we can support
-        let type_of_id = self.response.type_of_id.as_ref();
-        let country_code = self.response.country_code.as_ref();
-        let mismatch_reason = super::parse_type_of_id(ctx, type_of_id, country_code)?.err();
-        let mut failure_reasons = self.response.failure_reasons();
+        let type_of_id = self.add_side_response_helper.type_of_id.as_ref();
+        let country_code = self.add_side_response_helper.country_code.as_ref();
+
+        let mismatch_reason = if self.add_side_response_helper.has_api_error() {
+            None
+        } else {
+            super::parse_type_of_id(ctx, type_of_id, country_code)?.err()
+        };
+        let mut failure_reasons = self.add_side_response_helper.failure_reasons();
         if let Some(reason) = mismatch_reason {
             failure_reasons.push(reason);
         }

@@ -50,8 +50,21 @@ impl IncodeStateTransition for AddSelfie {
         let failure_reasons = match response.into_success() {
             // Incode returns 200 for upload failures, so catch these here
             Ok(response) => Ok(response.failure_reasons()),
-            Err(idv::incode::error::Error::APIResponseError(e)) => match e.error.as_str() {
-                "Face not found." => Ok(vec![IncodeFailureReason::SelfieFaceNotFound]),
+            // status is a mix of custom error codes and http status codes
+            Err(idv::incode::error::Error::APIResponseError(e)) => match e.status {
+                4019 => Ok(vec![IncodeFailureReason::SelfieFaceNotFound]),
+                4010 => Ok(vec![IncodeFailureReason::SelfieFaceNotFound]),
+                1001 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
+                1003 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
+                3002 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
+                3004 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
+                3005 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
+                3006 => Ok(vec![IncodeFailureReason::SelfieBlurry]),
+                3007 => Ok(vec![IncodeFailureReason::SelfieGlare]),
+                3008 => Ok(vec![IncodeFailureReason::SelfieImageSizeUnsupported]),
+                3009 => Ok(vec![IncodeFailureReason::SelfieImageOrientationIncorrect]),
+                3010 => Ok(vec![IncodeFailureReason::SelfieBadImageCompression]),
+                500 => Ok(vec![IncodeFailureReason::UnexpectedErrorOccurred]),
                 // TODO there are probably more retryable errors in here
                 _ => Err(idv::incode::error::Error::APIResponseError(e)),
             },

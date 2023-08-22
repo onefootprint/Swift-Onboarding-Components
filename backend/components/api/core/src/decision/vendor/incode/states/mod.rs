@@ -298,3 +298,23 @@ pub fn parse_dob(dob: PiiString) -> Result<Option<i64>, ApiError> {
 
     Ok(parsed)
 }
+
+pub struct AddSideResponseHelper {
+    pub type_of_id: Option<IncodeDocumentType>,
+    pub country_code: Option<ScrubbedPiiString>,
+    pub failure_reasons_from_response: Vec<IncodeFailureReason>,
+    pub failure_reasons_from_api_error: Vec<IncodeFailureReason>,
+}
+impl AddSideResponseHelper {
+    pub fn failure_reasons(&self) -> Vec<IncodeFailureReason> {
+        self.failure_reasons_from_response
+            .iter()
+            .chain(self.failure_reasons_from_api_error.iter())
+            .cloned()
+            .collect()
+    }
+
+    pub fn has_api_error(&self) -> bool {
+        !self.failure_reasons_from_api_error.is_empty()
+    }
+}
