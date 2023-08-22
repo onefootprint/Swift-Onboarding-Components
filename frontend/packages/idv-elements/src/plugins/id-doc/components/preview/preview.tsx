@@ -3,6 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 
+import { DeviceKind } from '../camera/camera';
 import { CameraKind } from '../camera/utils/get-camera-options';
 
 type PreviewProps = {
@@ -11,6 +12,7 @@ type PreviewProps = {
   onConfirm: () => void;
   isLoading: boolean;
   cameraKind: CameraKind;
+  deviceKind: DeviceKind;
 };
 
 const Preview = ({
@@ -19,15 +21,20 @@ const Preview = ({
   onConfirm,
   isLoading,
   cameraKind,
+  deviceKind,
 }: PreviewProps) => {
   const { t } = useTranslation('components.preview');
 
   return (
     <Container>
-      <PreviewContainer>
-        <ImagePreview src={imageSrc} data-camera-kind={cameraKind} />
+      <PreviewContainer data-device-kind={deviceKind}>
+        <ImagePreview
+          src={imageSrc}
+          data-camera-kind={cameraKind}
+          data-device-kind={deviceKind}
+        />
       </PreviewContainer>
-      <ButtonsContainer>
+      <ButtonsContainer data-device-kind={deviceKind}>
         <Button
           fullWidth
           onClick={onConfirm}
@@ -69,7 +76,14 @@ const PreviewContainer = styled.div`
     justify-content: center;
     width: 100%;
     flex-grow: 1;
-    margin-bottom: ${theme.spacing[8]};
+
+    &[data-device-kind='mobile'] {
+      margin-bottom: ${theme.spacing[8]};
+    }
+
+    &[data-device-kind='desktop'] {
+      margin-bottom: ${theme.spacing[3]};
+    }
   `}
 `;
 
@@ -80,14 +94,25 @@ const ButtonsContainer = styled.div`
     align-items: center;
     flex-direction: column;
     width: 100%;
-    row-gap: ${theme.spacing[5]};
+
+    &[data-device-kind='mobile'] {
+      row-gap: ${theme.spacing[5]};
+    }
+
+    &[data-device-kind='desktop'] {
+      row-gap: ${theme.spacing[3]};
+    }
   `}
 `;
 
 const ImagePreview = styled.img`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.large};
+    border-radius: ${theme.borderRadius.default};
     width: 100%;
+
+    &[data-device-kind='mobile'] {
+      border-radius: ${theme.borderRadius.large};
+    }
 
     &[data-camera-kind='front'] {
       transform: scaleX(

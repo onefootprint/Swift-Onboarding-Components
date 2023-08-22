@@ -7,10 +7,10 @@ import { useEffectOnce } from 'usehooks-ts';
 import IdDocAnimation from '../../components/id-doc-animation';
 import Loading from '../../components/loading';
 import NextSide from '../../components/next-side';
+import RetryLimitExceeded from '../../components/retry-limit-exceeded';
 import Success from '../../components/success';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-import RetryLimitExceeded from './components/retry-limit-exceeded';
-import useSubmitDoc from './hooks/use-submit-doc';
+import useSubmitDoc from '../../hooks/use-submit-doc';
 
 const Processing = () => {
   const { t } = useTranslation('pages.processing');
@@ -99,6 +99,9 @@ const Processing = () => {
   };
 
   if (isMissingRequirements) {
+    console.error(
+      'Mobile web flow - id-doc image could not be processed due to missing requirements',
+    );
     return (
       <Typography variant="label-1" color="error" sx={{ textAlign: 'center' }}>
         {t('missing-requirement-error')}

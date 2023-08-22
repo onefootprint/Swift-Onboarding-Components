@@ -30,12 +30,19 @@ import { useIdDocMachine } from '../../components/machine-provider';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
 import useSubmitDocType from './hooks/use-submit-doc-type';
 import SupportedDocTypesByCountry from './supported-doc-types-by-country.constants';
+import detectWebcam from './utils/detect-webcam';
 
 const IdDocCountryAndType = () => {
   const { t } = useTranslation('pages.country-and-type-selection');
   const [state, send] = useIdDocMachine();
   const submitDocTypeMutation = useSubmitDocType();
-  const { idDoc: defaultCountryDoc, authToken, sandboxOutcome } = state.context;
+  const {
+    idDoc: defaultCountryDoc,
+    authToken,
+    sandboxOutcome,
+    device,
+  } = state.context;
+  const { type: deviceType } = device;
   const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
   const requestErrorToast = useRequestErrorToast();
   const [country, setCountry] = useState<CountryRecord>(
@@ -89,15 +96,18 @@ const IdDocCountryAndType = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const selectedCountry =
       getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value;
+    const hasWebcam = await detectWebcam();
     submitDocTypeMutation.mutate(
       {
         authToken,
         documentType: docType,
         countryCode: selectedCountry,
         fixtureResult: sandboxOutcome,
+        deviceType: deviceType === 'mobile' ? 'mobile' : 'desktop',
+        skipSelfie: !hasWebcam,
       },
       {
         onSuccess: handleSubmitDocTypeSuccess,

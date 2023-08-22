@@ -42,6 +42,7 @@ const SelfiePhoto = () => {
         outlineKind="corner"
         onComplete={onComplete}
         autocaptureKind="face"
+        deviceKind="mobile"
       />
     </>
   );

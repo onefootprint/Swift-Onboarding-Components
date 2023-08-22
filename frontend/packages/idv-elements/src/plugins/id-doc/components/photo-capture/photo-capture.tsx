@@ -1,8 +1,12 @@
+import { useTranslation } from '@onefootprint/hooks';
+import { Box } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
+import { HeaderTitle, NavigationHeader } from '../../../../components';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image';
 import Camera from '../camera';
+import { DeviceKind } from '../camera/camera';
 import { OutlineKind } from '../camera/components/overlay/overlay';
 import { AutocaptureKind } from '../camera/hooks/use-auto-capture';
 import { CameraKind } from '../camera/utils/get-camera-options';
@@ -15,6 +19,7 @@ type PhotoCaptureProps = {
   outlineKind: OutlineKind;
   onComplete: (imageString: string, mimeType: string) => void;
   autocaptureKind: AutocaptureKind;
+  deviceKind: DeviceKind;
 };
 
 const PhotoCapture = ({
@@ -24,7 +29,9 @@ const PhotoCapture = ({
   cameraKind,
   onComplete,
   autocaptureKind,
+  deviceKind,
 }: PhotoCaptureProps) => {
+  const { t } = useTranslation('components.photo-capture');
   const [, send] = useIdDocMachine();
   const [image, setImage] = useState<string | null>(null);
   const { processImageUrl, convertImageFileToStrippedBase64 } =
@@ -75,23 +82,44 @@ const PhotoCapture = ({
   };
 
   return image ? (
-    <Preview
-      imageSrc={image}
-      onRetake={handleRetake}
-      onConfirm={handleConfirm}
-      isLoading={isLoading}
-      cameraKind={cameraKind}
-    />
+    <>
+      {deviceKind === 'desktop' && (
+        <Box sx={{ marginBottom: 7 }}>
+          <NavigationHeader />
+          <HeaderTitle title={t('desktop-selfie.header.preview.title')} />
+        </Box>
+      )}
+      <Preview
+        imageSrc={image}
+        onRetake={handleRetake}
+        onConfirm={handleConfirm}
+        isLoading={isLoading}
+        cameraKind={cameraKind}
+        deviceKind={deviceKind}
+      />
+    </>
   ) : (
-    <Camera
-      onCapture={handleCapture}
-      onError={handleError}
-      cameraKind={cameraKind}
-      outlineWidthRatio={outlineWidthRatio}
-      outlineHeightRatio={outlineHeightRatio}
-      outlineKind={outlineKind}
-      autocaptureKind={autocaptureKind}
-    />
+    <>
+      {deviceKind === 'desktop' && (
+        <Box sx={{ marginBottom: 7 }}>
+          <NavigationHeader />
+          <HeaderTitle
+            title={t('desktop-selfie.header.camera.title')}
+            subtitle={t('desktop-selfie.header.camera.subtitle')}
+          />
+        </Box>
+      )}
+      <Camera
+        onCapture={handleCapture}
+        onError={deviceKind === 'mobile' ? handleError : undefined} // We just show a toast in desktop since we don't have a prompt page
+        cameraKind={cameraKind}
+        outlineWidthRatio={outlineWidthRatio}
+        outlineHeightRatio={outlineHeightRatio}
+        outlineKind={outlineKind}
+        autocaptureKind={autocaptureKind}
+        deviceKind={deviceKind}
+      />
+    </>
   );
 };
 

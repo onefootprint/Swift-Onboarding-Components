@@ -29,7 +29,7 @@ export * from './entity';
 export * from './entity-cards';
 export { default as HostedUrlType } from './hosted-url-type';
 export * from './id-di-data';
-export { default as IdDocImageError } from './id-doc-image-error-incode';
+export * from './id-doc-image-error';
 export * from './id-doc-type';
 export * from './identifier';
 export { default as IdentifyUserKind } from './identify-user-kind';

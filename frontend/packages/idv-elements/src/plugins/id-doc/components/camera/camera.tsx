@@ -4,6 +4,7 @@ import { LoadingIndicator } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTimeout } from 'usehooks-ts';
 
+import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 import CaptureButton from './components/capture-button';
 import Feedback from './components/feedback';
@@ -15,16 +16,20 @@ import useGetImageString from './hooks/use-get-image-string';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
 import { CameraKind } from './utils/get-camera-options';
+import getOutlineDimensions from './utils/get-outline-dimensions';
 import getVideoHeight from './utils/get-video-height';
+
+export type DeviceKind = 'mobile' | 'desktop';
 
 type CameraProps = {
   onCapture: (image: string) => void;
-  onError: () => void;
+  onError?: () => void;
   cameraKind: CameraKind;
   outlineWidthRatio: number; // with respect to the video width
   outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
   outlineKind: OutlineKind;
   autocaptureKind: AutocaptureKind;
+  deviceKind: DeviceKind;
 };
 
 const Camera = ({
@@ -35,6 +40,7 @@ const Camera = ({
   outlineHeightRatio,
   outlineKind,
   autocaptureKind,
+  deviceKind,
 }: CameraProps) => {
   const { t } = useTranslation('components.camera');
   const canvasRef = useRef<HTMLCanvasElement>();
@@ -55,14 +61,21 @@ const Camera = ({
 
   const mediaStream = useUserMedia(cameraKind, onError);
   const isCameraVisible = !!mediaStream && isVideoPlaying;
+  const { outlineWidth, outlineHeight } = getOutlineDimensions({
+    videoSize,
+    outlineHeightRatio,
+    outlineWidthRatio,
+    deviceKind,
+  });
 
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
     videoRef.current.srcObject = mediaStream;
   }
 
   useEffect(() => {
-    setVideoHeight(getVideoHeight());
-  }, []);
+    if (deviceKind === 'mobile') setVideoHeight(getVideoHeight());
+    else setVideoHeight(DESKTOP_INTERACTION_BOX_HEIGHT);
+  }, [deviceKind]);
 
   // Initially we show the instruction text for 1.5 seconds
   useEffect(() => {
@@ -153,8 +166,8 @@ const Camera = ({
     videoRef,
     canvasRef,
     mediaStream,
-    outlineWidth: videoSize ? videoSize.width * outlineWidthRatio : 0,
-    outlineHeight: videoSize ? videoSize.width * outlineHeightRatio : 0,
+    outlineWidth,
+    outlineHeight,
     onCapture: handleClick,
     onStatusChange: setAutocaptureFeedback,
     autocaptureKind,
@@ -175,18 +188,22 @@ const Camera = ({
   return (
     <>
       {!isCameraVisible && (
-        <LoadingContainer>
+        <LoadingContainer
+          data-device-kind={deviceKind}
+          desktopHeight={DESKTOP_INTERACTION_BOX_HEIGHT}
+        >
           <LoadingIndicator />
         </LoadingContainer>
       )}
       <Container data-visible={isCameraVisible}>
-        <VideoContainer>
+        <VideoContainer data-device-kind={deviceKind}>
           <Video
             ref={videoRef as React.Ref<HTMLVideoElement>}
             hidden={!isVideoPlaying}
             onCanPlay={handleCanPlay}
             height={videoHeight}
             data-camera-kind={cameraKind}
+            data-device-kind={deviceKind}
             autoPlay
             playsInline
             muted
@@ -197,12 +214,8 @@ const Camera = ({
                 width={videoSize?.width ?? 0}
                 height={videoSize?.height ?? 0}
                 outlineKind={outlineKind}
-                outlineWidth={
-                  videoSize ? videoSize.width * outlineWidthRatio : 0
-                }
-                outlineHeight={
-                  videoSize ? videoSize.width * outlineHeightRatio : 0
-                }
+                outlineWidth={outlineWidth}
+                outlineHeight={outlineHeight}
               />
               <Canvas
                 ref={canvasRef as React.Ref<HTMLCanvasElement>}
@@ -215,7 +228,13 @@ const Camera = ({
                   {t(`autocapture.feedback.${autocaptureFeedback}`)}
                 </Feedback>
               )}
-              <CaptureButton onClick={handleClick} disabled={!canCapture} />
+              {deviceKind === 'mobile' && (
+                <CaptureButton
+                  onClick={handleClick}
+                  disabled={!canCapture}
+                  variant="round"
+                />
+              )}
               {autocaptureKind === 'document' && (
                 <UploadButton
                   onUpload={onImageUpload}
@@ -229,17 +248,34 @@ const Camera = ({
             </ProcessingContainer>
           )}
         </VideoContainer>
+        {deviceKind === 'desktop' && (
+          <CaptureButton
+            onClick={handleClick}
+            disabled={!canCapture}
+            variant="default"
+          />
+        )}
       </Container>
     </>
   );
 };
 
-const LoadingContainer = styled.div`
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-content: center;
+const LoadingContainer = styled.div<{
+  desktopHeight: number;
+}>`
+  ${({ theme, desktopHeight }) => css`
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+
+    &[data-device-kind='desktop'] {
+      min-height: ${desktopHeight}px;
+      background-color: ${theme.backgroundColor.secondary};
+      border-radius: ${theme.borderRadius.default};
+    }
+  `}
 `;
 
 export const Container = styled.div`
@@ -251,7 +287,7 @@ export const Container = styled.div`
     justify-content: space-between;
     width: 100%;
     height: 100%;
-    row-gap: ${theme.spacing[5]};
+    row-gap: ${theme.spacing[7]};
 
     &[data-visible='true'] {
       visibility: visible;
@@ -267,11 +303,18 @@ const VideoContainer = styled.div`
     justify-content: flex-start;
     flex-grow: 1;
     flex-direction: column;
-    width: calc(100% + ${theme.spacing[8]});
-    margin-left: calc(-1 * ${theme.spacing[5]});
-    margin-right: calc(-1 * ${theme.spacing[5]});
-    margin-bottom: calc(-1 * ${theme.spacing[5]});
-    margin-top: calc(-1 * ${theme.spacing[5]});
+
+    &[data-device-kind='desktop'] {
+      width: calc(100% + ${theme.spacing[2]});
+    }
+
+    &[data-device-kind='mobile'] {
+      width: calc(100% + ${theme.spacing[8]});
+      margin-left: calc(-1 * ${theme.spacing[5]});
+      margin-right: calc(-1 * ${theme.spacing[5]});
+      margin-bottom: calc(-1 * ${theme.spacing[5]});
+      margin-top: calc(-1 * ${theme.spacing[5]});
+    }
   `}
 `;
 
@@ -281,7 +324,7 @@ export const Canvas = styled.canvas`
 `;
 
 const Video = styled.video<{ height: number }>`
-  ${({ height }) => css`
+  ${({ theme, height }) => css`
     height: ${height}px;
     width: 100%;
     object-fit: cover; // Should be "cover" for the math to work
@@ -290,6 +333,10 @@ const Video = styled.video<{ height: number }>`
       transform: scaleX(
         -1
       ); // Mirror the image only if we are using the front camera
+    }
+
+    &[data-device-kind='desktop'] {
+      border-radius: ${theme.borderRadius.default};
     }
 
     &::-webkit-media-controls-play-button {

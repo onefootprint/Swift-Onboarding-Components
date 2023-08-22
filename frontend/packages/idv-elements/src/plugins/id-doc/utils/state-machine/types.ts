@@ -1,7 +1,8 @@
 import {
   CountryCode,
-  IdDocImageError,
+  IdDocImageProcessingError,
   IdDocImageTypes,
+  IdDocImageUploadError,
   IdDocOutcomes,
   IdDocRequirement,
   SupportedIdDocTypes,
@@ -20,7 +21,7 @@ export type MachineContext = {
     country?: CountryCode;
   };
   id?: string;
-  errors?: IdDocImageError[];
+  errors?: (IdDocImageProcessingError | IdDocImageUploadError)[];
   sandboxOutcome?: IdDocOutcomes;
 };
 
@@ -56,7 +57,13 @@ export type MachineEvents =
   | {
       type: 'processingErrored';
       payload: {
-        errors: IdDocImageError[];
+        errors: IdDocImageProcessingError[];
+      };
+    }
+  | {
+      type: 'uploadErrored';
+      payload: {
+        errors: IdDocImageUploadError[];
       };
     }
   | {

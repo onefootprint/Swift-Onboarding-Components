@@ -56,6 +56,7 @@ const FrontPhotoCapture = () => {
         outlineKind="full-frame"
         onComplete={onComplete}
         autocaptureKind="document"
+        deviceKind="mobile"
       />
     </>
   );

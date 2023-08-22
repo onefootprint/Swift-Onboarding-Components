@@ -3,7 +3,6 @@ import { interpret } from 'xstate';
 
 import createIdDocMachine from './machine';
 import {
-  argsNonMobile,
   argsRegular,
   processingErrors,
   requirement,
@@ -11,16 +10,6 @@ import {
 
 describe('Id Doc Machine Tests', () => {
   describe('Auto transition to the correct state after initState', () => {
-    it('If the device in not mobile, it should transition to incompatible device final state', () => {
-      const machine = interpret(createIdDocMachine(argsNonMobile)).onTransition(
-        state => {
-          expect(state.value).toEqual('incompatibleDevice');
-        },
-      );
-      machine.start();
-      machine.stop();
-    });
-
     it('Otherwise, in regular case, it should transition to country and doc type select state', () => {
       const machine = interpret(createIdDocMachine(argsRegular)).onTransition(
         state => {
@@ -45,7 +34,7 @@ describe('Id Doc Machine Tests', () => {
           id: 'id',
         },
       });
-      expect(state.value).toEqual('frontImage');
+      expect(state.value).toEqual('frontImageMobile');
       expect(state.context.idDoc.country).toEqual('US');
 
       expect(state.context.idDoc.type).toEqual(
@@ -82,7 +71,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
       ]);
-      expect(state.value).toEqual('processing');
+      expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
         imageString: 'image',
         mimeType: 'image/png',
@@ -94,7 +83,7 @@ describe('Id Doc Machine Tests', () => {
           nextSideToCollect: 'back',
         },
       });
-      expect(state.value).toEqual('backImage');
+      expect(state.value).toEqual('backImageMobile');
 
       state = machine.send([
         {
@@ -111,7 +100,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
       ]);
-      expect(state.value).toEqual('processing');
+      expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
         imageString: 'image',
         mimeType: 'image/png',
@@ -123,12 +112,12 @@ describe('Id Doc Machine Tests', () => {
           nextSideToCollect: 'selfie',
         },
       });
-      expect(state.value).toEqual('selfiePrompt');
+      expect(state.value).toEqual('selfiePromptMobile');
 
       state = machine.send({
         type: 'startImageCapture',
       });
-      expect(state.value).toEqual('selfieImage');
+      expect(state.value).toEqual('selfieImageMobile');
 
       state = machine.send([
         {
@@ -139,7 +128,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
       ]);
-      expect(state.value).toEqual('processing');
+      expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
         imageString: 'image',
         mimeType: 'image/png',
@@ -184,7 +173,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
       ]);
-      expect(state.value).toEqual('processing');
+      expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
         imageString: 'image',
         mimeType: 'image/png',
@@ -234,7 +223,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
       ]);
-      expect(state.value).toEqual('processing');
+      expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
         imageString: 'image',
         mimeType: 'image/png',
@@ -271,7 +260,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
       ]);
-      expect(state.value).toEqual('frontImageRetry');
+      expect(state.value).toEqual('frontImageRetryMobile');
       expect(state.context.errors).toEqual(processingErrors);
 
       state = machine.send([
@@ -289,7 +278,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
       ]);
-      expect(state.value).toEqual('backImage');
+      expect(state.value).toEqual('backImageMobile');
       expect(state.context.errors).toEqual([]);
     });
 
@@ -323,7 +312,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
       ]);
-      expect(state.value).toEqual('selfiePrompt');
+      expect(state.value).toEqual('selfiePromptMobile');
     });
 
     it('Can terminate the flow after any side upload', () => {
@@ -382,7 +371,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'cameraErrored',
         },
       ]);
-      expect(state.value).toEqual('frontImage');
+      expect(state.value).toEqual('frontImageMobile');
     });
 
     it('Goes back to back image if camera errored', () => {
@@ -421,7 +410,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'cameraErrored',
         },
       ]);
-      expect(state.value).toEqual('backImage');
+      expect(state.value).toEqual('backImageMobile');
     });
 
     it('Goes back to selfie prompt if camera errored', () => {
@@ -460,7 +449,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'cameraErrored',
         },
       ]);
-      expect(state.value).toEqual('selfiePrompt');
+      expect(state.value).toEqual('selfiePromptMobile');
     });
 
     it('Does not start front image capture if consent was not provided', () => {
@@ -486,7 +475,7 @@ describe('Id Doc Machine Tests', () => {
         },
       ]);
 
-      expect(state.value).toEqual('frontImage');
+      expect(state.value).toEqual('frontImageMobile');
       expect(state.context.requirement.shouldCollectConsent).toEqual(true);
 
       state = machine.send([
@@ -497,7 +486,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'startImageCapture',
         },
       ]);
-      expect(state.value).toEqual('frontImageCapture');
+      expect(state.value).toEqual('frontImageCaptureMobile');
     });
 
     it('Terminate the flow when retry limit exceeds', () => {

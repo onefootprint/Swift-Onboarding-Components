@@ -5,6 +5,8 @@ export type SubmitDocTypeRequest = {
   documentType: SupportedIdDocTypes;
   countryCode: CountryCode;
   fixtureResult?: IdDocOutcomes;
+  skipSelfie?: boolean;
+  deviceType?: 'mobile' | 'desktop';
 };
 
 export type SubmitDocTypeResponse = {

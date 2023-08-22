@@ -10,9 +10,14 @@ import FeedbackIcon from '../feedback-icon';
 export type LoadingProps = {
   imageType: IdDocImageTypes;
   docType: SupportedIdDocTypes;
+  backgroundColor?: 'primary' | 'secondary';
 };
 
-const Loading = ({ imageType, docType }: LoadingProps) => {
+const Loading = ({
+  imageType,
+  docType,
+  backgroundColor = 'primary',
+}: LoadingProps) => {
   const { t } = useTranslation('components.loading');
 
   const side =
@@ -28,6 +33,7 @@ const Loading = ({ imageType, docType }: LoadingProps) => {
         statusIndicator={{
           component: <LoadingIndicator size="compact" color="warning" />,
           status: 'loading',
+          backgroundColor,
         }}
       />
       <Typography variant="label-1" sx={{ marginTop: 5, textAlign: 'center' }}>

@@ -3,7 +3,14 @@ import React, { useEffect } from 'react';
 
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import BackPhotoCapture from '../back-photo-capture';
-import DeviceWarning from '../device-warning';
+import DesktopBackPhoto from '../desktop-back-photo';
+import DesktopBackPhotoRetry from '../desktop-back-photo-retry';
+import DesktopConsent from '../desktop-consent';
+import DesktopFrontPhoto from '../desktop-front-photo';
+import DesktopFrontPhotoRetry from '../desktop-front-photo-retry';
+import DesktopProcessing from '../desktop-processing';
+import DesktopSelfie from '../desktop-selfie';
+import DesktopSelfieRetry from '../desktop-selfie-retry';
 import FrontPhotoCapture from '../front-photo-capture';
 import IdDocBackPhoto from '../id-doc-back-photo';
 import IdDocBackPhotoRetry from '../id-doc-back-photo-retry';
@@ -34,48 +41,76 @@ const Router = ({ onDone }: RouterProps) => {
     return <IdDocCountryAndType />;
   }
 
-  if (state.matches('frontImage')) {
+  if (state.matches('consentDesktop')) {
+    return <DesktopConsent />;
+  }
+
+  if (state.matches('frontImageMobile')) {
     return <IdDocFrontPhoto />;
   }
 
-  if (state.matches('frontImageCapture')) {
+  if (state.matches('frontImageCaptureMobile')) {
     return <FrontPhotoCapture />;
   }
 
-  if (state.matches('frontImageRetry')) {
+  if (state.matches('frontImageRetryMobile')) {
     return <IdDocFrontPhotoRetry />;
   }
 
-  if (state.matches('backImage')) {
+  if (state.matches('frontImageDesktop')) {
+    return <DesktopFrontPhoto />;
+  }
+
+  if (state.matches('frontImageRetryDesktop')) {
+    return <DesktopFrontPhotoRetry />;
+  }
+
+  if (state.matches('backImageMobile')) {
     return <IdDocBackPhoto />;
   }
 
-  if (state.matches('backImageCapture')) {
+  if (state.matches('backImageCaptureMobile')) {
     return <BackPhotoCapture />;
   }
 
-  if (state.matches('backImageRetry')) {
+  if (state.matches('backImageRetryMobile')) {
     return <IdDocBackPhotoRetry />;
   }
 
-  if (state.matches('selfiePrompt')) {
+  if (state.matches('backImageDesktop')) {
+    return <DesktopBackPhoto />;
+  }
+
+  if (state.matches('backImageRetryDesktop')) {
+    return <DesktopBackPhotoRetry />;
+  }
+
+  if (state.matches('selfiePromptMobile')) {
     return <SelfiePrompt />;
   }
 
-  if (state.matches('selfieImage')) {
+  if (state.matches('selfieImageMobile')) {
     return <SelfiePhoto />;
   }
 
-  if (state.matches('selfieImageRetry')) {
+  if (state.matches('selfieImageRetryMobile')) {
     return <SelfieRetryPrompt />;
   }
 
-  if (state.matches('processing')) {
+  if (state.matches('selfieImageDesktop')) {
+    return <DesktopSelfie />;
+  }
+
+  if (state.matches('selfieImageRetryDesktop')) {
+    return <DesktopSelfieRetry />;
+  }
+
+  if (state.matches('processingMobile')) {
     return <Processing />;
   }
 
-  if (state.matches('incompatibleDevice')) {
-    return <DeviceWarning />;
+  if (state.matches('processingDesktop')) {
+    return <DesktopProcessing />;
   }
 
   return null;

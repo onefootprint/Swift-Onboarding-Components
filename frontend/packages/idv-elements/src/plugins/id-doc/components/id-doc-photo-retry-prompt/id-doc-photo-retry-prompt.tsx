@@ -1,6 +1,7 @@
 import {
-  IdDocImageError,
+  IdDocImageProcessingError,
   IdDocImageTypes,
+  IdDocImageUploadError,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
@@ -14,7 +15,7 @@ type IdDocPhotoRetryPromptProps = {
   docType: SupportedIdDocTypes;
   countryName: string;
   imageType: IdDocImageTypes.front | IdDocImageTypes.back;
-  errors: IdDocImageError[];
+  errors: (IdDocImageProcessingError | IdDocImageUploadError)[];
   onComplete: (imageString: string, mimeType: string) => void;
 };
 

@@ -1,5 +1,5 @@
 import {
-  IdDocImageError,
+  IdDocImageProcessingError,
   IdDocImageTypes,
   IdDocRequirement,
   OnboardingRequirementKind,
@@ -48,4 +48,4 @@ export const argsUsOnlySingleDocType: MachineContext = {
   },
 };
 
-export const processingErrors = [IdDocImageError.documentNotReadable];
+export const processingErrors = [IdDocImageProcessingError.documentNotReadable];

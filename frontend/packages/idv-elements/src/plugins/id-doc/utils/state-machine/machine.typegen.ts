@@ -16,27 +16,34 @@ export interface Typegen0 {
     assignConsent: 'consentReceived';
     assignCountryAndType: 'receivedCountryAndType';
     assignId: 'receivedCountryAndType';
-    assignIdDocImageErrors: 'processingErrored';
+    assignIdDocImageErrors: 'processingErrored' | 'uploadErrored';
     assignImage: 'receivedImage';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'backImage'
-    | 'backImageCapture'
-    | 'backImageRetry'
+    | 'backImageCaptureMobile'
+    | 'backImageDesktop'
+    | 'backImageMobile'
+    | 'backImageRetryDesktop'
+    | 'backImageRetryMobile'
     | 'complete'
+    | 'consentDesktop'
     | 'countryAndType'
     | 'failure'
-    | 'frontImage'
-    | 'frontImageCapture'
-    | 'frontImageRetry'
-    | 'incompatibleDevice'
+    | 'frontImageCaptureMobile'
+    | 'frontImageDesktop'
+    | 'frontImageMobile'
+    | 'frontImageRetryDesktop'
+    | 'frontImageRetryMobile'
     | 'init'
-    | 'processing'
-    | 'selfieImage'
-    | 'selfieImageRetry'
-    | 'selfiePrompt';
+    | 'processingDesktop'
+    | 'processingMobile'
+    | 'selfieImageDesktop'
+    | 'selfieImageMobile'
+    | 'selfieImageRetryDesktop'
+    | 'selfieImageRetryMobile'
+    | 'selfiePromptMobile';
   tags: never;
 }

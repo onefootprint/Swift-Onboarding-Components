@@ -12,10 +12,16 @@ import FeedbackIcon from '../feedback-icon';
 type SuccessProps = {
   imageType: IdDocImageTypes;
   docType: SupportedIdDocTypes;
+  backgroundColor?: 'primary' | 'secondary';
   onComplete?: () => void;
 };
 
-const Success = ({ imageType, onComplete, docType }: SuccessProps) => {
+const Success = ({
+  imageType,
+  onComplete,
+  docType,
+  backgroundColor = 'primary',
+}: SuccessProps) => {
   const { t } = useTranslation('components.success');
 
   useEffect(() => {
@@ -38,6 +44,7 @@ const Success = ({ imageType, onComplete, docType }: SuccessProps) => {
         statusIndicator={{
           component: <IcoCheck16 color="success" />,
           status: 'success',
+          backgroundColor,
         }}
       />
       <Typography variant="label-1" sx={{ textAlign: 'center', marginTop: 5 }}>

@@ -2,8 +2,9 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
-  IdDocImageError,
+  IdDocImageProcessingError,
   IdDocImageTypes,
+  IdDocImageUploadError,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
@@ -16,12 +17,19 @@ import FeedbackIcon from '../feedback-icon';
 
 type ErrorProps = {
   imageType: IdDocImageTypes;
-  errors: IdDocImageError[];
+  errors: (IdDocImageProcessingError | IdDocImageUploadError)[];
   docType: SupportedIdDocTypes;
   countryName: string;
+  backgroundColor?: 'primary' | 'secondary';
 };
 
-const Error = ({ errors, imageType, docType, countryName }: ErrorProps) => {
+const Error = ({
+  errors,
+  imageType,
+  docType,
+  countryName,
+  backgroundColor = 'primary',
+}: ErrorProps) => {
   const { t } = useTranslation('components.error');
 
   const side =
@@ -29,12 +37,15 @@ const Error = ({ errors, imageType, docType, countryName }: ErrorProps) => {
       ? 'photo page'
       : `${imageType} side`;
 
-  const cleanedErrors =
-    errors.filter(error =>
-      new Set(Object.values(IdDocImageError)).has(error),
-    ) ?? [];
+  const imageErrorsSet: Set<IdDocImageProcessingError | IdDocImageUploadError> =
+    new Set([
+      ...Object.values(IdDocImageProcessingError),
+      ...Object.values(IdDocImageUploadError),
+    ]);
+
+  const cleanedErrors = errors.filter(error => imageErrorsSet.has(error)) ?? [];
   if (cleanedErrors.length === 0) {
-    cleanedErrors.push(IdDocImageError.unknownError);
+    cleanedErrors.push(IdDocImageProcessingError.unknownError);
   }
 
   return (
@@ -45,6 +56,7 @@ const Error = ({ errors, imageType, docType, countryName }: ErrorProps) => {
         statusIndicator={{
           component: <IcoWarning16 color="error" />,
           status: 'error',
+          backgroundColor,
         }}
       />
       <ErrorMessage>

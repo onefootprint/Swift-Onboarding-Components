@@ -33,7 +33,6 @@ const QRRegister = () => {
     missingRequirements: { idDoc },
   } = state.context;
   const url = useCreateHandoffUrl(scopedAuthToken, config?.isAppClipEnabled);
-  const isDesktopIdDocEnabled = false; // TODO: remove flag when we release findigs desktop id doc flows
 
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
     authToken,
@@ -124,24 +123,19 @@ const QRRegister = () => {
         >
           {t('sms.cta')}
         </Button>
-
-        {isDesktopIdDocEnabled && (
-          <>
-            <Divider variant="secondary" />
-            <ContinueOnDesktop>
-              <Typography variant="body-3" color="tertiary">
-                {t('continue-on-desktop.title')}
-              </Typography>
-              <LinkButton
-                onClick={handleContinueOnDesktop}
-                size="compact"
-                sx={{ height: '100%' }}
-              >
-                {t('continue-on-desktop.cta')}
-              </LinkButton>
-            </ContinueOnDesktop>
-          </>
-        )}
+        <Divider variant="secondary" />
+        <ContinueOnDesktop>
+          <Typography variant="body-3" color="tertiary">
+            {t('continue-on-desktop.title')}
+          </Typography>
+          <LinkButton
+            onClick={handleContinueOnDesktop}
+            size="compact"
+            sx={{ height: '100%' }}
+          >
+            {t('continue-on-desktop.cta')}
+          </LinkButton>
+        </ContinueOnDesktop>
       </Container>
     </>
   );

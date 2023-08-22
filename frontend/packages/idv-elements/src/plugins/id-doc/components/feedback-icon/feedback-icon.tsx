@@ -11,16 +11,21 @@ type FeedbackIconProps = {
   statusIndicator: {
     component: JSX.Element;
     status: 'loading' | 'error' | 'success';
+    backgroundColor?: 'primary' | 'secondary';
   };
 };
 
 const FeedbackIcon = ({
   imageIcon: { component: ImageIcon, color: imageIconColor },
-  statusIndicator: { component: statusIndicatorComponent, status },
+  statusIndicator: {
+    component: statusIndicatorComponent,
+    status,
+    backgroundColor = 'primary',
+  },
 }: FeedbackIconProps) => (
   <IconComponent>
     <ImageIcon color={imageIconColor} />
-    <StatusContainer data-status={status}>
+    <StatusContainer data-status={status} backgroundColor={backgroundColor}>
       {statusIndicatorComponent}
     </StatusContainer>
   </IconComponent>
@@ -35,14 +40,18 @@ const IconComponent = styled.div`
   `}
 `;
 
-const StatusContainer = styled.div`
-  ${({ theme }) => css`
+const StatusContainer = styled.div<{
+  backgroundColor: 'primary' | 'secondary';
+}>`
+  ${({ theme, backgroundColor }) => css`
     position: absolute;
     display: flex;
     justify-content: center;
     right: calc(-1 * ${theme.spacing[6]});
     bottom: calc(-1 * ${theme.spacing[4]} - ${theme.spacing[1]});
-    border: ${theme.spacing[2]} solid ${theme.backgroundColor.primary};
+    border-width: ${theme.spacing[2]};
+    border-style: solid;
+    border-color: ${theme.backgroundColor[backgroundColor]};
     border-radius: ${theme.borderRadius.full};
     padding: ${theme.spacing[2]};
 

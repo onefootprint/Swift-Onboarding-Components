@@ -56,8 +56,10 @@ const IdDocAnimation = ({
     if (mode === 'success') {
       setIsShowingSuccess(true);
       setTimeout(() => {
-        setIsShowingSuccess(false);
-        if (hasNextSide) setIsShowingNextSide(true);
+        if (hasNextSide) {
+          setIsShowingSuccess(false);
+          setIsShowingNextSide(true);
+        }
       }, TRANSITION_DELAY_DEFAULT);
     }
   }, [mode, hasNextSide]);

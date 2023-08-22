@@ -16,19 +16,19 @@ const assignCurrSide = (
   context.errors = [];
 };
 
-const NextSideTargets: MachineTarget[] = [
+export const NextSideTargetsMobile: MachineTarget[] = [
   {
-    target: 'frontImage',
+    target: 'frontImageMobile',
     cond: (context, event) => event.payload.nextSideToCollect === 'front',
     actions: assignCurrSide,
   },
   {
-    target: 'backImage',
+    target: 'backImageMobile',
     cond: (context, event) => event.payload.nextSideToCollect === 'back',
     actions: assignCurrSide,
   },
   {
-    target: 'selfiePrompt',
+    target: 'selfiePromptMobile',
     cond: (context, event) => event.payload.nextSideToCollect === 'selfie',
     actions: assignCurrSide,
   },
@@ -37,4 +37,23 @@ const NextSideTargets: MachineTarget[] = [
   },
 ];
 
-export default NextSideTargets;
+export const NextSideTargetsDesktop: MachineTarget[] = [
+  {
+    target: 'frontImageDesktop',
+    cond: (context, event) => event.payload.nextSideToCollect === 'front',
+    actions: assignCurrSide,
+  },
+  {
+    target: 'backImageDesktop',
+    cond: (context, event) => event.payload.nextSideToCollect === 'back',
+    actions: assignCurrSide,
+  },
+  {
+    target: 'selfieImageDesktop',
+    cond: (context, event) => event.payload.nextSideToCollect === 'selfie',
+    actions: assignCurrSide,
+  },
+  {
+    target: 'complete',
+  },
+];

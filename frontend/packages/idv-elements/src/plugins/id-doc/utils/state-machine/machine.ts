@@ -1,6 +1,6 @@
 import { assign, createMachine } from 'xstate';
 
-import NextSideTargets from './machine.utils';
+import { NextSideTargetsDesktop, NextSideTargetsMobile } from './machine.utils';
 import { MachineContext, MachineEvents } from './types';
 
 const createIdDocMachine = (args: MachineContext) =>
@@ -19,23 +19,38 @@ const createIdDocMachine = (args: MachineContext) =>
         init: {
           always: [
             {
-              target: 'incompatibleDevice',
-              cond: context => context.device.type !== 'mobile',
-            },
-            {
               target: 'countryAndType',
             },
           ],
         },
         countryAndType: {
           on: {
-            receivedCountryAndType: {
-              target: 'frontImage',
-              actions: ['assignCountryAndType', 'assignId'],
+            receivedCountryAndType: [
+              {
+                target: 'frontImageMobile',
+                cond: context => context.device.type === 'mobile',
+                actions: ['assignCountryAndType', 'assignId'],
+              },
+              {
+                target: 'consentDesktop',
+                cond: context => context.device.type !== 'mobile',
+                actions: ['assignCountryAndType', 'assignId'],
+              },
+            ],
+          },
+        },
+        consentDesktop: {
+          on: {
+            navigatedToPrev: {
+              target: 'countryAndType',
+            },
+            consentReceived: {
+              target: 'frontImageDesktop',
+              actions: 'assignConsent',
             },
           },
         },
-        frontImage: {
+        frontImageMobile: {
           on: {
             navigatedToPrev: {
               target: 'countryAndType',
@@ -44,120 +59,208 @@ const createIdDocMachine = (args: MachineContext) =>
               actions: 'assignConsent',
             },
             receivedImage: {
-              target: 'processing',
+              target: 'processingMobile',
               actions: 'assignImage',
             },
             startImageCapture: {
-              target: 'frontImageCapture',
+              target: 'frontImageCaptureMobile',
               cond: context => !context.requirement.shouldCollectConsent,
             },
           },
         },
-        frontImageCapture: {
+        frontImageDesktop: {
+          on: {
+            receivedImage: {
+              target: 'processingDesktop',
+              actions: 'assignImage',
+            },
+            uploadErrored: {
+              target: 'frontImageRetryDesktop',
+              actions: 'assignIdDocImageErrors',
+            },
+          },
+        },
+        frontImageCaptureMobile: {
           on: {
             navigatedToPrev: {
-              target: 'frontImage',
+              target: 'frontImageMobile',
             },
             cameraErrored: {
-              target: 'frontImage',
+              target: 'frontImageMobile',
             },
             receivedImage: {
-              target: 'processing',
+              target: 'processingMobile',
               actions: 'assignImage',
             },
           },
         },
-        frontImageRetry: {
+        frontImageRetryMobile: {
           on: {
             receivedImage: {
-              target: 'processing',
+              target: 'processingMobile',
               actions: 'assignImage',
             },
             startImageCapture: {
-              target: 'frontImageCapture',
+              target: 'frontImageCaptureMobile',
             },
           },
         },
-        backImage: {
+        frontImageRetryDesktop: {
           on: {
             receivedImage: {
-              target: 'processing',
+              target: 'processingDesktop',
+              actions: 'assignImage',
+            },
+            uploadErrored: {
+              target: 'frontImageRetryDesktop',
+              actions: 'assignIdDocImageErrors',
+            },
+          },
+        },
+        backImageMobile: {
+          on: {
+            receivedImage: {
+              target: 'processingMobile',
               actions: 'assignImage',
             },
             startImageCapture: {
-              target: 'backImageCapture',
+              target: 'backImageCaptureMobile',
             },
           },
         },
-        backImageCapture: {
+        backImageDesktop: {
+          on: {
+            receivedImage: {
+              target: 'processingDesktop',
+              actions: 'assignImage',
+            },
+            uploadErrored: {
+              target: 'backImageRetryDesktop',
+              actions: 'assignIdDocImageErrors',
+            },
+          },
+        },
+        backImageCaptureMobile: {
           on: {
             navigatedToPrev: {
-              target: 'backImage',
+              target: 'backImageMobile',
             },
             cameraErrored: {
-              target: 'backImage',
+              target: 'backImageMobile',
             },
             receivedImage: {
-              target: 'processing',
+              target: 'processingMobile',
               actions: 'assignImage',
             },
           },
         },
-        backImageRetry: {
+        backImageRetryDesktop: {
           on: {
             receivedImage: {
-              target: 'processing',
+              target: 'processingDesktop',
+              actions: 'assignImage',
+            },
+            uploadErrored: {
+              target: 'backImageRetryDesktop',
+              actions: 'assignIdDocImageErrors',
+            },
+          },
+        },
+        backImageRetryMobile: {
+          on: {
+            receivedImage: {
+              target: 'processingMobile',
               actions: 'assignImage',
             },
             startImageCapture: {
-              target: 'backImageCapture',
+              target: 'backImageCaptureMobile',
             },
           },
         },
-        selfiePrompt: {
+        selfiePromptMobile: {
           on: {
             startImageCapture: {
-              target: 'selfieImage',
+              target: 'selfieImageMobile',
             },
           },
         },
-        selfieImage: {
+        selfieImageMobile: {
           on: {
             navigatedToPrev: {
-              target: 'selfiePrompt',
+              target: 'selfiePromptMobile',
             },
             cameraErrored: {
-              target: 'selfiePrompt',
+              target: 'selfiePromptMobile',
             },
             receivedImage: {
-              target: 'processing',
+              target: 'processingMobile',
               actions: 'assignImage',
             },
           },
         },
-        selfieImageRetry: {
+        selfieImageDesktop: {
           on: {
-            startImageCapture: {
-              target: 'selfieImage',
+            receivedImage: {
+              target: 'processingDesktop',
+              actions: 'assignImage',
             },
           },
         },
-        processing: {
+        selfieImageRetryMobile: {
           on: {
-            processingSucceeded: NextSideTargets,
+            startImageCapture: {
+              target: 'selfieImageMobile',
+            },
+          },
+        },
+        selfieImageRetryDesktop: {
+          on: {
+            startImageCapture: {
+              target: 'selfieImageDesktop',
+            },
+          },
+        },
+        processingMobile: {
+          on: {
+            processingSucceeded: NextSideTargetsMobile,
             processingErrored: [
               {
-                target: 'frontImageRetry',
+                target: 'frontImageRetryMobile',
                 cond: context => context.currSide === 'front',
                 actions: 'assignIdDocImageErrors',
               },
               {
-                target: 'backImageRetry',
+                target: 'backImageRetryMobile',
                 cond: context => context.currSide === 'back',
                 actions: 'assignIdDocImageErrors',
               },
               {
-                target: 'selfieImageRetry',
+                target: 'selfieImageRetryMobile',
+                cond: context => context.currSide === 'selfie',
+                actions: 'assignIdDocImageErrors',
+              },
+            ],
+            retryLimitExceeded: {
+              target: 'failure',
+            },
+          },
+        },
+        processingDesktop: {
+          on: {
+            processingSucceeded: NextSideTargetsDesktop,
+            processingErrored: [
+              {
+                target: 'frontImageRetryDesktop',
+                cond: context => context.currSide === 'front',
+                actions: 'assignIdDocImageErrors',
+              },
+              {
+                target: 'backImageRetryDesktop',
+                cond: context => context.currSide === 'back',
+                actions: 'assignIdDocImageErrors',
+              },
+              {
+                target: 'selfieImageRetryDesktop',
                 cond: context => context.currSide === 'selfie',
                 actions: 'assignIdDocImageErrors',
               },
@@ -171,9 +274,6 @@ const createIdDocMachine = (args: MachineContext) =>
           type: 'final',
         },
         failure: {
-          type: 'final',
-        },
-        incompatibleDevice: {
           type: 'final',
         },
       },

@@ -20,7 +20,7 @@ import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { imageIcons } from '../../constants/image-types';
 import FadeInContainer from '../fade-in-container';
 import { useIdDocMachine } from '../machine-provider';
-import ImageConsent from './components/image-consent';
+import ConsentMobile from './components/consent-mobile';
 
 type IdDocPhotoPromptProps = {
   showGuidelines?: boolean;
@@ -109,7 +109,7 @@ const IdDocPhotoPrompt = ({
         <Button fullWidth onClick={handleTake}>
           {t('continue')}
         </Button>
-        <ImageConsent
+        <ConsentMobile
           open={consentVisible}
           onClose={handleClose}
           onConsent={handleConsent}

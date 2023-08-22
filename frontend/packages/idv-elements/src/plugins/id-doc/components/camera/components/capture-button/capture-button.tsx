@@ -1,4 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
+import { Button } from '@onefootprint/ui';
 import React from 'react';
 
 const DEFAULT_OUTER_RADIUS = 72;
@@ -7,21 +8,40 @@ const DEFAULT_INNER_RADIUS = 56;
 type CaptureButtonProps = {
   onClick: () => void;
   disabled?: boolean;
+  variant: 'default' | 'round';
 };
 
-const CaptureButton = ({ onClick, disabled = false }: CaptureButtonProps) => (
-  <RoundButton
-    aria-disabled={disabled}
-    data-disabled={disabled}
-    onClick={onClick}
-    outerRadius={DEFAULT_OUTER_RADIUS}
-  >
-    <InnerCircle
-      aria-disabled={disabled}
-      data-disabled={disabled}
-      innerRadius={DEFAULT_INNER_RADIUS}
-    />
-  </RoundButton>
+const CaptureButton = ({
+  onClick,
+  disabled = false,
+  variant,
+}: CaptureButtonProps) => (
+  <>
+    {variant === 'default' && (
+      <Button
+        fullWidth
+        aria-disabled={disabled}
+        data-disabled={disabled}
+        onClick={onClick}
+      >
+        Take photo
+      </Button>
+    )}
+    {variant === 'round' && (
+      <RoundButton
+        aria-disabled={disabled}
+        data-disabled={disabled}
+        onClick={onClick}
+        outerRadius={DEFAULT_OUTER_RADIUS}
+      >
+        <InnerCircle
+          aria-disabled={disabled}
+          data-disabled={disabled}
+          innerRadius={DEFAULT_INNER_RADIUS}
+        />
+      </RoundButton>
+    )}
+  </>
 );
 
 const RoundButton = styled.div<{
