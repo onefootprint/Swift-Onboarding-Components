@@ -4,12 +4,14 @@ type GetStepProps = {
 
 const getStep = ({ value }: GetStepProps) => {
   let step = 0;
-  if (value === 'whoToOnboard') {
+  if (value === 'nameYourPlaybook') {
     step = 0;
-  } else if (value === 'yourPlaybook') {
+  } else if (value === 'whoToOnboard') {
     step = 1;
-  } else if (value === 'authorizedScopes') {
+  } else if (value === 'yourPlaybook') {
     step = 2;
+  } else if (value === 'authorizedScopes') {
+    step = 3;
   }
   return step;
 };

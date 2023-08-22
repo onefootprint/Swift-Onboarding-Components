@@ -7,11 +7,16 @@ import {
 } from '@onefootprint/types';
 
 export type PlaybookFormData = {
-  name: string;
   personalInformationAndDocs: PersonalInformationAndDocs;
   businessInformation?: BusinessInformation;
   [CollectedInvestorProfileDataOption.investorProfile]: boolean;
 };
+
+export type NameFormData = {
+  name: string;
+};
+
+export const defaultNameValue = '';
 
 export type AuthorizedScopesFormData = {
   [CollectedKycDataOption.name]: boolean;
@@ -64,7 +69,6 @@ export const defaultBusinessInformation = {
 };
 
 export const defaultPlaybookValuesKYC: PlaybookFormData = {
-  name: '',
   personalInformationAndDocs: {
     email: true,
     [CollectedKycDataOption.phoneNumber]: true,
@@ -111,10 +115,19 @@ export type MachineContext = {
 
 export type MachineEvents =
   | {
+      type: 'nameYourPlaybookSubmitted';
+      payload: {
+        name: string;
+      };
+    }
+  | {
       type: 'whoToOnboardSubmitted';
       payload: {
         kind: Kind;
       };
+    }
+  | {
+      type: 'nameYourPlaybookSelected';
     }
   | {
       type: 'whoToOnboardSelected';

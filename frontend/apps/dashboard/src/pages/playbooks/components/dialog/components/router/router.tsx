@@ -6,12 +6,14 @@ import React from 'react';
 
 import PlaybookMachine from '@/playbooks/utils/machine';
 import {
+  defaultNameValue,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
   Kind,
 } from '@/playbooks/utils/machine/types';
 
 import AuthorizedScopes from './components/authorized-scopes';
+import NameYourPlaybook from './components/name-your-playbook';
 import WhoToOnboard from './components/who-to-onboard';
 import YourPlaybook from './components/your-playbook';
 import getStep from './utils/get-step';
@@ -24,6 +26,7 @@ const Router = ({ onClose }: RouterProps) => {
   const [state, send] = useMachine(PlaybookMachine);
   const { t } = useTranslation('pages.playbooks.dialog.router');
   const options = [
+    { value: 'nameYourPlaybook', label: t('name-your-playbook') },
     { value: 'whoToOnboard', label: t('who-to-onboard') },
     { value: 'yourPlaybook', label: t('your-playbook') },
     { value: 'authorizedScopes', label: t('authorized-scopes') },
@@ -42,7 +45,9 @@ const Router = ({ onClose }: RouterProps) => {
         <Stepper
           options={options}
           onChange={option => {
-            if (option.value === 'whoToOnboard') {
+            if (option.value === 'nameYourPlaybook') {
+              send('nameYourPlaybookSelected');
+            } else if (option.value === 'whoToOnboard') {
               send('whoToOnboardSelected');
             } else if (option.value === 'yourPlaybook') {
               send('yourPlaybookSelected');
@@ -53,9 +58,18 @@ const Router = ({ onClose }: RouterProps) => {
         />
       </StepperContainer>
       <Content>
+        {state.matches('nameYourPlaybook') && (
+          <NameYourPlaybook
+            defaultValues={{ name: state.context.name ?? defaultNameValue }}
+            onBack={onClose}
+            onSubmit={({ name }) => {
+              send('nameYourPlaybookSubmitted', { payload: { name } });
+            }}
+          />
+        )}
         {state.matches('whoToOnboard') && (
           <WhoToOnboard
-            onBack={onClose}
+            onBack={() => send('nameYourPlaybookSelected')}
             defaultKind={state.context.kind}
             onSubmit={({ kind }) => {
               send('whoToOnboardSubmitted', { payload: { kind } });

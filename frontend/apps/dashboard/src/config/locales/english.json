@@ -1052,6 +1052,7 @@
           "stepper": {
             "aria-label": "Progress indicator for Playbooks"
           },
+          "name-your-playbook": "Name your Playbook",
           "who-to-onboard": "Who to onboard",
           "your-playbook": "Your Playbook",
           "authorized-scopes": "Authorized scopes"
@@ -1072,13 +1073,21 @@
             "continue": "Continue"
           }
         },
+        "name-your-playbook": {
+          "title": "Name your playbook",
+          "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones.",
+          "back": "Back",
+          "next": "Next",
+          "form": {
+            "name": {
+              "label": "Playbook name",
+              "placeholder": "User ID verification"
+            }
+          }
+        },
         "your-playbook": {
           "title": "Your Playbook recommendation",
           "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-          "name-your-playbook": {
-            "title": "Name your playbook",
-            "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones."
-          },
           "back": "Back",
           "next": "Next",
           "data-collection": {
@@ -1112,10 +1121,6 @@
             }
           },
           "form": {
-            "name": {
-              "label": "Playbook name",
-              "placeholder": "Name your playbook"
-            },
             "personal-info-and-docs": {
               "title": {
                 "kyb": {

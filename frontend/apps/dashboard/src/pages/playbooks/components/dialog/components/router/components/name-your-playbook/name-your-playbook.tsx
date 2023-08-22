@@ -1,41 +1,42 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Button, Typography } from '@onefootprint/ui';
+import { Button, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { Kind, PlaybookFormData } from '@/playbooks/utils/machine/types';
+import { NameFormData } from '@/playbooks/utils/machine/types';
 
-import DataCollection from './components/data-collection';
-
-type YourPlaybookProps = {
-  kind: Kind;
-  onSubmit: (data: PlaybookFormData) => void;
+type NameYourPlaybookProps = {
+  onSubmit: (data: NameFormData) => void;
   onBack: () => void;
-  defaultValues: PlaybookFormData;
+  defaultValues: NameFormData;
 };
 
-const YourPlaybook = ({
-  kind,
+const NameYourPlaybook = ({
   onSubmit,
   onBack,
   defaultValues,
-}: YourPlaybookProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog.your-playbook');
-  const formMethods = useForm<PlaybookFormData>({
+}: NameYourPlaybookProps) => {
+  const { t } = useTranslation('pages.playbooks.dialog.name-your-playbook');
+  const formMethods = useForm<NameFormData>({
     defaultValues,
   });
-  const { handleSubmit } = formMethods;
+  const { handleSubmit, register } = formMethods;
 
   return (
     <Container>
-      <Header>
-        <Typography variant="label-1">{t('title')}</Typography>
-        <Typography variant="body-2">{t('subtitle')}</Typography>
-      </Header>
       <FormProvider {...formMethods}>
         <Form id="your-playbook-form" onSubmit={handleSubmit(onSubmit)}>
-          <DataCollection kind={kind} />
+          <Header>
+            <Typography variant="label-1">{t('title')}</Typography>
+            <Typography variant="body-2">{t('subtitle')}</Typography>
+          </Header>
+          <TextInput
+            autoFocus
+            {...register('name')}
+            label={t('form.name.label')}
+            placeholder={t('form.name.placeholder')}
+          />
           <ButtonContainer>
             <Button size="compact" variant="secondary" onClick={onBack}>
               {t('back')}
@@ -51,10 +52,13 @@ const YourPlaybook = ({
 };
 
 const ButtonContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+  ${({ theme }) => css`
+    padding-top: ${theme.spacing[5]};
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  `};
 `;
 
 const Form = styled.form`
@@ -83,4 +87,4 @@ const Container = styled.div`
   `};
 `;
 
-export default YourPlaybook;
+export default NameYourPlaybook;

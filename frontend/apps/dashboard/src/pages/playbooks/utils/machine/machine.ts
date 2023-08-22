@@ -12,14 +12,25 @@ export const createPlaybookMachine = () =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'whoToOnboard',
+      initial: 'nameYourPlaybook',
       context: {},
       states: {
+        nameYourPlaybook: {
+          on: {
+            nameYourPlaybookSubmitted: {
+              target: 'whoToOnboard',
+              actions: ['assignNameYourPlaybook'],
+            },
+          },
+        },
         whoToOnboard: {
           on: {
             whoToOnboardSubmitted: {
               target: 'yourPlaybook',
               actions: ['assignWhoToOnboard'],
+            },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
             },
           },
         },
@@ -32,6 +43,9 @@ export const createPlaybookMachine = () =>
               target: 'authorizedScopes',
               actions: 'assignPlaybook',
             },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
+            },
           },
         },
         authorizedScopes: {
@@ -42,12 +56,19 @@ export const createPlaybookMachine = () =>
             yourPlaybookSelected: {
               target: 'yourPlaybook',
             },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
+            },
           },
         },
       },
     },
     {
       actions: {
+        assignNameYourPlaybook: assign((context, event) => ({
+          ...context,
+          name: event.payload.name,
+        })),
         assignWhoToOnboard: assign((context, event) => ({
           ...context,
           kind: event.payload.kind,
