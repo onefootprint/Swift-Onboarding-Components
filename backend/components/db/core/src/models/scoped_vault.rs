@@ -138,7 +138,7 @@ impl ScopedVault {
         // Row doesn't exist for vault_id, tenant_id - create a new one
         let new = NewScopedVault {
             id: ScopedVaultId::generate(uv.kind),
-            fp_id: FpId::generate(uv.kind),
+            fp_id: FpId::generate(uv.kind, uv.is_live),
             vault_id: uv.id.clone(),
             start_timestamp: Utc::now(),
             tenant_id: ob_config.tenant_id,
@@ -169,7 +169,7 @@ impl ScopedVault {
         let su = if is_new_vault {
             let new = NewScopedVault {
                 id: ScopedVaultId::generate(uv.kind),
-                fp_id: FpId::generate(uv.kind),
+                fp_id: FpId::generate(uv.kind, uv.is_live),
                 start_timestamp: Utc::now(),
                 tenant_id,
                 is_live: uv.is_live,

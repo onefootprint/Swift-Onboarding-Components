@@ -1,5 +1,6 @@
 use crate::{
-    BoLinkId, BusinessOwnerKind, FpId, ObConfigurationKey, ScopedVaultId, TenantId, VaultId, VaultKind,
+    BoLinkId, BusinessOwnerKind, FpId, NtResult, ObConfigurationKey, ScopedVaultId, TenantId, VaultId,
+    VaultKind,
 };
 
 fn generate_random_id(prefix: &str, length: usize) -> String {
@@ -63,13 +64,28 @@ impl VaultId {
 
 impl FpId {
     const LENGTH: usize = 22;
+    const PREFIXES: &'static [&'static str] = &["fp_bid_test_", "fp_id_test_", "fp_bid_", "fp_id_"];
 
-    pub fn generate(kind: VaultKind) -> Self {
-        let prefix = match kind {
-            VaultKind::Person => "fp_id",
-            VaultKind::Business => "fp_bid",
+    pub fn generate(kind: VaultKind, is_live: bool) -> Self {
+        let prefix = match (kind, is_live) {
+            (VaultKind::Person, true) => "fp_id",
+            (VaultKind::Person, false) => "fp_id_test",
+            (VaultKind::Business, true) => "fp_bid",
+            (VaultKind::Business, false) => "fp_bid_test",
         };
         Self(generate_random_id(prefix, Self::LENGTH))
+    }
+
+    pub fn parse_with_prefix(s: &str) -> NtResult<Self> {
+        let s: String = s.into();
+        let Some(unique_part) = Self::PREFIXES.iter().filter_map(|p| s.strip_prefix(p)).next() else {
+            return Err(crate::Error::InvalidFpIdPrefix);
+        };
+
+        if !unique_part.chars().all(char::is_alphanumeric) || unique_part.is_empty() {
+            return Err(crate::Error::InvalidFpIdPrefix);
+        }
+        Ok(Self::from(s))
     }
 }
 
@@ -86,5 +102,21 @@ impl BoLinkId {
             // protection against accidentally changing the BOs
             BusinessOwnerKind::Secondary => Self(generate_random_id(Self::PREFIX, Self::LENGTH)),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{FpId, VaultKind};
+    use test_case::test_case;
+
+    #[test_case(VaultKind::Person, true, "fp_id")]
+    #[test_case(VaultKind::Person, false, "fp_id_test")]
+    #[test_case(VaultKind::Business, true, "fp_bid")]
+    #[test_case(VaultKind::Business, false, "fp_bid_test")]
+    fn test_fp_id(kind: VaultKind, is_live: bool, expected_prefix: &str) {
+        let fp_id = FpId::generate(kind, is_live);
+        assert!(fp_id.starts_with(expected_prefix));
+        FpId::parse_with_prefix(&format!("{}", fp_id)).unwrap();
     }
 }

@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use itertools::Itertools;
 
-use crate::{DataIdentifier, FilterFunction, FpId, PrefixId};
+use crate::{DataIdentifier, FilterFunction, FpId};
 
 /// A proxy token with zero or more applied filter functions:
 /// `<token> | filter1 | filter2 | ...`

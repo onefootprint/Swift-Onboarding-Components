@@ -73,6 +73,7 @@ pub trait PrefixId: From<String> {
     }
 }
 /// This macro implements a way to verify the prefix of an id
+#[allow(unused)]
 macro_rules! impl_verified_prefix_for_nt_id {
     ($name: ident, $prefix: literal) => {
         impl PrefixId for $name {
@@ -81,6 +82,7 @@ macro_rules! impl_verified_prefix_for_nt_id {
     };
 }
 
+#[allow(unused)]
 use impl_verified_prefix_for_nt_id;
 
 #[cfg(test)]

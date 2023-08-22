@@ -1,6 +1,4 @@
 use super::define_newtype_id;
-use super::impl_verified_prefix_for_nt_id;
-use super::PrefixId;
 
 define_newtype_id!(
     AuthTokenHash,
@@ -37,7 +35,7 @@ define_newtype_id!(UserProfileId, String, "Identifier for user basic info");
 define_newtype_id!(IdentityDataId, String, "Identifier for user identity data row");
 define_newtype_id!(ScopedVaultId, String, "Identifier for a ScopedUser");
 define_newtype_id!(IdempotencyId, String, "User-provided ID. When the same operation occurs with the same idempotency id, the same result is returned");
-define_newtype_id!(FpId, String, "Identifier for a ScopedUser");
+define_newtype_id!(FpId, String, "Identifier for a Footprint entity");
 define_newtype_id!(
     IncodeConfigurationId,
     String,
@@ -53,8 +51,6 @@ define_newtype_id!(
     String,
     "Authorization token for an incode session"
 );
-
-impl_verified_prefix_for_nt_id!(FpId, "fp_id_");
 
 define_newtype_id!(
     ObConfigurationId,

@@ -92,6 +92,8 @@ pub enum Error {
     ProxyTokenError(#[from] ProxyTokenError),
     #[error("Expected identifier with prefix: {0}")]
     IdPrefixError(&'static str),
+    #[error("Invalid FpId prefix")]
+    InvalidFpIdPrefix,
     #[error("{0}")]
     ParsingError(#[from] data_identifier::ValidationError),
     #[error("{0}")]
