@@ -4,14 +4,7 @@ import {
   CollectedKycDataOption,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
-import {
-  Button,
-  Checkbox,
-  InlineAlert,
-  Radio,
-  Toggle,
-  Typography,
-} from '@onefootprint/ui';
+import { Button, Checkbox, Radio, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
@@ -154,39 +147,68 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
             </ToggleContainer>
           )}
         />
-        {idDocOpen ? (
-          <Subsection>
-            <OptionsContainer>
-              <Checkbox
-                value={SupportedIdDocTypes.driversLicense}
-                label={t('id-doc.drivers_license')}
-                {...register('personalInformationAndDocs.idDocKind')}
-              />
-              <Checkbox
-                value={SupportedIdDocTypes.idCard}
-                label={t('id-doc.id_card')}
-                {...register('personalInformationAndDocs.idDocKind')}
-              />
-              <Checkbox
-                value={SupportedIdDocTypes.passport}
-                label={t('id-doc.passport')}
-                {...register('personalInformationAndDocs.idDocKind')}
-              />
-              {idDocKind?.length < 1 && unselectedIDDoc && (
+        {idDocOpen && (
+          <>
+            <Subsection>
+              <OptionsContainer>
+                <Checkbox
+                  value={SupportedIdDocTypes.driversLicense}
+                  label={t('id-doc.drivers_license')}
+                  {...register('personalInformationAndDocs.idDocKind')}
+                />
+                <Checkbox
+                  value={SupportedIdDocTypes.idCard}
+                  label={t('id-doc.id_card')}
+                  {...register('personalInformationAndDocs.idDocKind')}
+                />
+                <Checkbox
+                  value={SupportedIdDocTypes.passport}
+                  label={t('id-doc.passport')}
+                  {...register('personalInformationAndDocs.idDocKind')}
+                />
+                <Checkbox
+                  value={SupportedIdDocTypes.visa}
+                  label={t('id-doc.visa')}
+                  {...register('personalInformationAndDocs.idDocKind')}
+                />
+                <Checkbox
+                  value={SupportedIdDocTypes.residenceDocument}
+                  label={t('id-doc.residence_document')}
+                  {...register('personalInformationAndDocs.idDocKind')}
+                />
+                <Checkbox
+                  value={SupportedIdDocTypes.workPermit}
+                  label={t('id-doc.work_permit')}
+                  {...register('personalInformationAndDocs.idDocKind')}
+                />
+                {(!idDocKind || idDocKind.length === 0) && unselectedIDDoc && (
+                  <Typography
+                    color="error"
+                    variant="body-3"
+                    sx={{ paddingTop: 5 }}
+                  >
+                    {t('id-doc.no-id-doc-selected')}
+                  </Typography>
+                )}
+              </OptionsContainer>
+            </Subsection>
+            {idDocKind?.length > 0 && (
+              <Subsection>
+                <Checkbox
+                  value={false}
+                  label={t('selfie.checkbox')}
+                  {...register('personalInformationAndDocs.selfie')}
+                />
                 <Typography
-                  color="error"
+                  color="tertiary"
+                  sx={{ paddingLeft: 7, marginLeft: 2 }}
                   variant="body-3"
-                  sx={{ paddingTop: 5 }}
                 >
-                  {t('id-doc.no-id-doc-selected')}
+                  {t('selfie.warning')}
                 </Typography>
-              )}
-            </OptionsContainer>
-          </Subsection>
-        ) : (
-          <Subsection>
-            <InlineAlert variant="info">{t('id-doc.info')}</InlineAlert>
-          </Subsection>
+              </Subsection>
+            )}
+          </>
         )}
       </Section>
       <ButtonContainer>

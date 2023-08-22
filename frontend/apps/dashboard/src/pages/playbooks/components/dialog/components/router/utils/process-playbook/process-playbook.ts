@@ -1,5 +1,6 @@
 import {
   CollectedDataOption,
+  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
@@ -61,7 +62,15 @@ const processPlaybook = ({
     optionalData.push(personalInformationAndDocs.ssnKind);
   }
 
-  // id doc handling — WIP, pending on backend
+  // id doc handling
+  const { idDoc, idDocKind, selfie } = personalInformationAndDocs;
+  let docString = '';
+  if (idDoc && idDocKind?.length > 0) {
+    const docKinds = idDocKind.join(',');
+    const selfieParam = selfie ? 'require_selfie' : 'none';
+    docString = `document.${docKinds}.none.${selfieParam}`;
+    mustCollectData.push(docString);
+  }
 
   // investor profile handling
   if (
@@ -71,16 +80,22 @@ const processPlaybook = ({
     mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
 
+  // authorized scopes
   const authorizedScopesKeys = Object.keys(authorizedScopes);
   authorizedScopesKeys.forEach(key => {
     if (
       authorizedScopes[key as keyof AuthorizedScopesFormData] &&
       key !== 'allBusinessData' &&
+      key !== CollectedDocumentDataOption.document &&
       mustCollectData.includes(key)
     ) {
       canAccessData.push(key);
     }
   });
+
+  if (authorizedScopes[CollectedDocumentDataOption.document] && docString) {
+    canAccessData.push(docString);
+  }
 
   // KYB field handling;
   const optionalKYBFields = [

@@ -1,7 +1,9 @@
 import {
+  CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 import {
   defaultAuthorizedScopesValues,
@@ -386,5 +388,133 @@ describe('processPlaybook', () => {
     expect(canAccessData).not.toContain(CollectedKybDataOption.website);
     expect(canAccessData).not.toContain(CollectedKybDataOption.corporationType);
     expect(canAccessData).not.toContain(CollectedKybDataOption.phoneNumber);
+  });
+
+  it('should handle authorized scopes as expected for ID doc without selfie', () => {
+    const { canAccessData } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          idDoc: true,
+          idDocKind: [SupportedIdDocTypes.passport],
+          selfie: false,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: {
+        ...defaultAuthorizedScopesValues,
+        [CollectedDocumentDataOption.document]: true,
+      },
+    });
+
+    expect(canAccessData).toContain('document.passport.none.none');
+  });
+
+  it('should handle authorized scopes as expected for ID docs with selfie', () => {
+    const { canAccessData } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          idDoc: true,
+          idDocKind: [
+            SupportedIdDocTypes.passport,
+            SupportedIdDocTypes.driversLicense,
+          ],
+          selfie: true,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: {
+        ...defaultAuthorizedScopesValues,
+        [CollectedDocumentDataOption.document]: true,
+      },
+    });
+
+    expect(canAccessData).toContain(
+      'document.passport,drivers_license.none.require_selfie',
+    );
+  });
+  it('should handle single id doc type correctly without selfie', () => {
+    const { mustCollectData } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          idDoc: true,
+          idDocKind: [SupportedIdDocTypes.passport],
+          selfie: false,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+
+    expect(mustCollectData).toContain('document.passport.none.none');
+  });
+
+  it('should handle multiple id doc types correctly without selfie', () => {
+    const { mustCollectData } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          idDoc: true,
+          idDocKind: [
+            SupportedIdDocTypes.passport,
+            SupportedIdDocTypes.driversLicense,
+          ],
+          selfie: false,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+
+    expect(mustCollectData).toContain(
+      'document.passport,drivers_license.none.none',
+    );
+  });
+
+  it('should handle single id doc type correctly with selfie', () => {
+    const { mustCollectData } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          idDoc: true,
+          idDocKind: [SupportedIdDocTypes.passport],
+          selfie: true,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+
+    expect(mustCollectData).toContain('document.passport.none.require_selfie');
+  });
+
+  it('should handle multiple id doc types correctly with selfie', () => {
+    const { mustCollectData } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          idDoc: true,
+          idDocKind: [
+            SupportedIdDocTypes.passport,
+            SupportedIdDocTypes.driversLicense,
+          ],
+          selfie: true,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+
+    expect(mustCollectData).toContain(
+      'document.passport,drivers_license.none.require_selfie',
+    );
   });
 });

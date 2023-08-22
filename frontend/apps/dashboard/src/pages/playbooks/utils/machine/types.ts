@@ -28,7 +28,7 @@ export type AuthorizedScopesFormData = {
   [CollectedKycDataOption.ssn4]?: boolean;
   [CollectedKycDataOption.ssn9]?: boolean;
   [CollectedKycDataOption.nationality]?: boolean;
-  [CollectedDocumentDataOption.document]?: SupportedIdDocTypes;
+  [CollectedDocumentDataOption.document]?: boolean;
   [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
   allBusinessData?: boolean;
 };
@@ -99,7 +99,7 @@ export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
   [CollectedKycDataOption.ssn4]: false,
   [CollectedKycDataOption.ssn9]: true,
   [CollectedKycDataOption.nationality]: true,
-  [CollectedDocumentDataOption.document]: SupportedIdDocTypes.driversLicense,
+  [CollectedDocumentDataOption.document]: true,
   [CollectedInvestorProfileDataOption.investorProfile]: true,
   allBusinessData: true,
 };

@@ -52,6 +52,21 @@ describe('<Editing />', () => {
         name: 'Passport (photo page)',
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', {
+        name: 'Visa',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', {
+        name: 'Residence card',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', {
+        name: 'Work permit',
+      }),
+    ).toBeInTheDocument();
   });
 
   it('should show warning if ID doc not selected', async () => {
@@ -86,6 +101,25 @@ describe('<Editing />', () => {
     expect(
       screen.queryByText('You must select at least one ID document type.'),
     ).not.toBeInTheDocument();
+  });
+
+  it('should not show selfie option when just ID doc is open', async () => {
+    renderEditing({ startingValues: { idDoc: true, idDocKind: [] } });
+    expect(screen.queryByText('Request a selfie')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        'You can optionally request users to take a selfie to validate the ID document requested.',
+      ),
+    ).not.toBeInTheDocument();
+
+    const idCard = screen.getByRole('checkbox', { name: 'Identity card' });
+    await userEvent.click(idCard);
+    expect(screen.getByText('Request a selfie')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'You can optionally request users to take a selfie to validate the ID document requested.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('should show correct title for KYC', async () => {

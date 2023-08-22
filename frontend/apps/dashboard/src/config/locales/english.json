@@ -1150,6 +1150,10 @@
                 "checkbox": "Allow users without an SSN to proceed with the verification",
                 "warning": "They will need to be manually reviewed by you."
               },
+              "selfie": {
+                "checkbox": "Request a selfie",
+                "warning": "You can optionally request users to take a selfie to validate the ID document requested."
+              },
               "nationality": {
                 "title": "Nationality, Citizenship, and Residence status",
                 "toggle": "Request users to provide their nationality, citizenship and residence status"
@@ -1160,6 +1164,9 @@
                 "drivers_license": "Driver's license",
                 "id_card": "Identity card",
                 "passport": "Passport (photo page)",
+                "visa": "Visa",
+                "residence_document": "Residence card",
+                "work_permit": "Work permit",
                 "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
                 "no-id-doc-selected": "You must select at least one ID document type."
               },
