@@ -142,7 +142,7 @@ fn get_progress<Type>(
                 if let Ok(legal_status) = decrypted_values.get_di(IDK::UsLegalStatus) {
                     match legal_status.parse_into::<UsLegalStatus>() {
                         Ok(UsLegalStatus::Citizen) => (),
-                        Ok(UsLegalStatus::PermanentResident) | Ok(UsLegalStatus::Other) => {
+                        Ok(UsLegalStatus::PermanentResident) => {
                             required_dis
                                 .extend([IDK::Nationality.into(), IDK::Citizenships.into()].into_iter());
                         }

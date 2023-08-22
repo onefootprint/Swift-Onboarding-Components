@@ -126,7 +126,6 @@ pub enum UsLegalStatus {
     Citizen,
     PermanentResident,
     Visa,
-    Other,
 }
 
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
