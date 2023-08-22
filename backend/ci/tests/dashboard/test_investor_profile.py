@@ -56,7 +56,7 @@ def test_decrypt(sandbox_tenant, sb_user_with_investor_profile, fields_to_decryp
         sandbox_tenant.sk.key,
     )
     for field in fields_to_decrypt:
-        assert body[field] == IP_DATA.get(field)
+        assert body[field] == sb_user_with_investor_profile.client.decrypted_data[field]
 
     access_event = latest_access_event_for(
         sb_user_with_investor_profile.fp_id, sandbox_tenant

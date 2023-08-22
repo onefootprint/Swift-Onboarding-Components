@@ -44,7 +44,7 @@ def primary_bo(kyb_sandbox_ob_config, twilio):
 def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     # Extract the link sent to the secondary BO's phone number and verify it contains references to
     # the business and the BO that invited them
-    bos = json.loads(primary_bo.client.data["business.kyced_beneficial_owners"])
+    bos = primary_bo.client.data["business.kyced_beneficial_owners"]
     business_name = primary_bo.client.data["business.name"]
     (sms_body, token) = extract_bo_session_sms(
         twilio, bos[1]["phone_number"], business_name
@@ -99,7 +99,9 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     # But not for a different user
     phone_number = primary_bo.client.data["id.phone_number"]
     sandbox_id_h = SandboxId(primary_bo.client.sandbox_id)
-    identify_user(dict(phone_number=phone_number), kyb_sandbox_ob_config.key, sandbox_id_h)
+    identify_user(
+        dict(phone_number=phone_number), kyb_sandbox_ob_config.key, sandbox_id_h
+    )
     challenge_data = challenge_user(
         phone_number, "sms", kyb_sandbox_ob_config.key, sandbox_id_h
     )
@@ -149,7 +151,7 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
         "process",
     ]
 
-    bos = json.loads(primary_bo.client.data["business.kyced_beneficial_owners"])
+    bos = primary_bo.client.data["business.kyced_beneficial_owners"]
     business_name = primary_bo.client.data["business.name"]
     (sms_body, token) = extract_bo_session_sms(
         twilio, bos[1]["phone_number"], business_name

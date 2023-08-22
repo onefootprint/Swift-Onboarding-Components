@@ -88,28 +88,24 @@ BUSINESS_DATA = {
     "business.zip": "94117",
     "business.country": "US",
     "business.tin": "121231234",
-    "business.beneficial_owners": json.dumps(
-        [
-            {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
-            {"first_name": "Franklin", "last_name": "Frog", "ownership_stake": 30},
-        ]
-    ),
-    "business.kyced_beneficial_owners": json.dumps(
-        [
-            {
-                "first_name": "Piip",
-                "last_name": "Penguin",
-                "ownership_stake": 50,
-            },
-            {
-                "first_name": "Franklin",
-                "last_name": "Frog",
-                "email": "franklin@onefootprint.com",
-                "phone_number": LIVE_PHONE_NUMBER,
-                "ownership_stake": 30,
-            },
-        ]
-    ),
+    "business.beneficial_owners": [
+        {"first_name": "Piip", "last_name": "Penguin", "ownership_stake": 50},
+        {"first_name": "Franklin", "last_name": "Frog", "ownership_stake": 30},
+    ],
+    "business.kyced_beneficial_owners": [
+        {
+            "first_name": "Piip",
+            "last_name": "Penguin",
+            "ownership_stake": 50,
+        },
+        {
+            "first_name": "Franklin",
+            "last_name": "Frog",
+            "email": "franklin@onefootprint.com",
+            "phone_number": LIVE_PHONE_NUMBER,
+            "ownership_stake": 30,
+        },
+    ],
 }
 
 IP_DATA = {
@@ -118,12 +114,15 @@ IP_DATA = {
     "investor_profile.employer": "Hayes Valley Hospital",
     "investor_profile.annual_income": "gt25k_le50k",
     "investor_profile.net_worth": "gt1m_le5m",
-    "investor_profile.investment_goals": '["growth", "preserve_capital"]',
+    "investor_profile.investment_goals": ["growth", "preserve_capital"],
     "investor_profile.risk_tolerance": "conservative",
-    "investor_profile.declarations": '["affiliated_with_us_broker", "family_of_political_figure"]',
+    "investor_profile.declarations": [
+        "affiliated_with_us_broker",
+        "family_of_political_figure",
+    ],
     "investor_profile.brokerage_firm_employer": "Robinhood",
-    "investor_profile.senior_executive_symbols": '["AAPL", "HOOOD", "SPY"]',
-    "investor_profile.family_member_names": '["Hayes Valley", "Piip Penguin"]',
+    "investor_profile.senior_executive_symbols": ["AAPL", "HOOOD", "SPY"],
+    "investor_profile.family_member_names": ["Hayes Valley", "Piip Penguin"],
     "investor_profile.political_organization": "Enclave Party",
 }
 

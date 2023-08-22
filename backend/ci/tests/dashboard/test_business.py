@@ -89,18 +89,13 @@ def test_decrypt(sandbox_tenant, primary_bo, fields_to_decrypt):
         reason="Doing a business hecking decrypt",
     )
 
-    expected_data = primary_bo.client.data
-    expected_data["business.phone_number"] = expected_data[
-        "business.phone_number"
-    ].replace(" ", "")
-
     body = post(
         f"entities/{primary_bo.fp_bid}/vault/decrypt",
         data,
         *sandbox_tenant.db_auths,
     )
     for field in fields_to_decrypt:
-        assert body[field] == expected_data.get(field)
+        assert body[field] == primary_bo.client.decrypted_data.get(field)
 
     # Check the access event - but never expect business.name since it's stored in plaintext, or
     # other attributes that don't exist
@@ -109,5 +104,4 @@ def test_decrypt(sandbox_tenant, primary_bo, fields_to_decrypt):
     expected_access_event_fields = (
         set(fields_to_decrypt) - {"business.name"}
     ) & populated_keys
-    print(access_event["targets"])
     assert set(access_event["targets"]) == expected_access_event_fields

@@ -129,7 +129,7 @@ def test_alpaca_cip(
     assert alpaca_response["identity"]["given_name"] == d["id.first_name"]
     assert alpaca_response["identity"]["family_name"] == d["id.last_name"]
     assert alpaca_response["identity"]["date_of_birth"] == d["id.dob"]
-    declarations = json.loads(d["investor_profile.declarations"])
+    declarations = d["investor_profile.declarations"]
     assert alpaca_response["disclosures"] == {
         "is_control_person": "senior_executive" in declarations,
         "is_affiliated_exchange_or_finra": "affiliated_with_us_broker" in declarations,

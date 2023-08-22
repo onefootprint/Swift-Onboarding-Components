@@ -36,10 +36,10 @@ def incomplete_client(investor_profile_ob_config, twilio):
         ("investor_profile.net_worth", "0", "Matching variant not found"),
         (
             "investor_profile.investment_goals",
-            '["hi", "grow_long_term_wealth"]',
+            ["hi", "grow_long_term_wealth"],
             "Matching variant not found",
         ),
-        ("investor_profile.investment_goals", "[]", "Invalid length"),
+        ("investor_profile.investment_goals", [], "Invalid length"),
         (
             "investor_profile.risk_tolerance",
             "really high",
@@ -47,7 +47,7 @@ def incomplete_client(investor_profile_ob_config, twilio):
         ),
         (
             "investor_profile.declarations",
-            '["hi", "grow_long_term_wealth"]',
+            ["hi", "grow_long_term_wealth"],
             "Matching variant not found",
         ),
     ],
@@ -93,7 +93,7 @@ def test_document_requirement(incomplete_client):
     assert not req["missing_document"]
 
     # When we add a specific declaration, we should now have a missing requirement
-    data = {**IP_DATA, "investor_profile.declarations": '["affiliated_with_us_broker"]'}
+    data = {**IP_DATA, "investor_profile.declarations": ["affiliated_with_us_broker"]}
     patch("hosted/user/vault", data, auth_token)
     requirements = incomplete_client.get_status()["requirements"]
     req = next(r for r in requirements if r["kind"] == "collect_investor_profile")
