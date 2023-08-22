@@ -45,8 +45,6 @@ const getComponentsUrl = (isLocal: boolean) => {
 };
 
 const getApiUrl = (isLocal: boolean) => {
-  return 'https://api.dev.onefootprint.com';
-
   if (isE2E) {
     return 'https://api.dev.onefootprint.com';
   }
