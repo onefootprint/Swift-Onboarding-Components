@@ -1,24 +1,35 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
-  InvestorProfileData,
   InvestorProfileDeclaration,
   InvestorProfileDI,
 } from '@onefootprint/types';
-import { Checkbox } from '@onefootprint/ui';
+import { Checkbox, TextInput } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import CustomForm from '../../../../components/custom-form';
 import { DeclarationData } from '../../../../utils/state-machine/types';
 import UploadComplianceLetter from '../upload-compliance-letter';
+import filterNonTruthy from './utils/filter-non-truthy';
+import trimAndSplit from './utils/trim-and-split';
+import validateCompanySymbols from './utils/validate-company-symbols';
 
 export type DeclarationsFormProps = {
-  defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.declarations>;
+  defaultValues?: Partial<DeclarationData>;
   isLoading?: boolean;
   onSubmit: (data: DeclarationData, files?: File[]) => void;
 };
 
-type FormData = Record<InvestorProfileDeclaration, boolean>;
+type FormData = Record<InvestorProfileDeclaration, boolean> & {
+  seniorExecutiveSymbols?: string;
+};
+
+const declarationKeys = [
+  InvestorProfileDeclaration.affiliatedWithUsBroker,
+  InvestorProfileDeclaration.seniorExecutive,
+  InvestorProfileDeclaration.seniorPoliticalFigure,
+  InvestorProfileDeclaration.familyOfPoliticalFigure,
+];
 
 const DeclarationsForm = ({
   defaultValues,
@@ -29,24 +40,29 @@ const DeclarationsForm = ({
   const defaultEntries = (
     defaultValues?.[InvestorProfileDI.declarations] ?? []
   ).map(goal => [goal, true]);
-  const { handleSubmit, register, watch } = useForm<FormData>({
-    defaultValues: Object.fromEntries(defaultEntries),
+  const {
+    handleSubmit,
+    register,
+    watch,
+    formState: { errors },
+    setValue,
+  } = useForm<FormData>({
+    defaultValues: {
+      ...Object.fromEntries(defaultEntries),
+      seniorExecutiveSymbols:
+        defaultValues?.[InvestorProfileDI.seniorExecutiveSymbols],
+    },
   });
   const affiliatedWithUsBroker = watch(
     InvestorProfileDeclaration.affiliatedWithUsBroker,
   );
-  const checkboxes = watch([
-    InvestorProfileDeclaration.affiliatedWithUsBroker,
-    InvestorProfileDeclaration.seniorExecutive,
-    InvestorProfileDeclaration.seniorPoliticalFigure,
-    InvestorProfileDeclaration.familyOfPoliticalFigure,
-  ]);
+  const checkboxes = watch(declarationKeys);
   const seniorExecutive = watch(InvestorProfileDeclaration.seniorExecutive);
   const shouldRequireUpload = affiliatedWithUsBroker || seniorExecutive;
+  const showCompanySymbols = seniorExecutive;
   const [shouldShowUploadError, setShouldShowUploadError] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const hasSelectedAnyOption = Object.values(checkboxes).some(value => value);
-
   const handleUploadChange = (newFiles: File[]) => {
     if (newFiles.length > 0) {
       setShouldShowUploadError(false);
@@ -59,18 +75,22 @@ const DeclarationsForm = ({
       setShouldShowUploadError(true);
       return;
     }
-
-    const filteredData = Object.entries(data)
-      .filter(([, value]) => !!value)
-      .map(([key]) => key as InvestorProfileDeclaration);
-    const declarations = {
-      [InvestorProfileDI.declarations]: filteredData,
+    const declarations = Object.fromEntries(
+      declarationKeys.map(key => [key, data[key]]),
+    );
+    const payload: DeclarationData = {
+      [InvestorProfileDI.declarations]: filterNonTruthy(
+        declarations,
+      ) as InvestorProfileDeclaration[],
+      [InvestorProfileDI.seniorExecutiveSymbols]: trimAndSplit(
+        data.seniorExecutiveSymbols,
+      ),
     };
 
     if (files.length) {
-      onSubmit(declarations, files);
+      onSubmit(payload, files);
     } else {
-      onSubmit(declarations);
+      onSubmit(payload);
     }
   };
 
@@ -93,8 +113,31 @@ const DeclarationsForm = ({
       />
       <Checkbox
         label={t(`options.${InvestorProfileDeclaration.seniorExecutive}`)}
-        {...register(InvestorProfileDeclaration.seniorExecutive)}
+        {...register(InvestorProfileDeclaration.seniorExecutive, {
+          onChange: () => {
+            if (!seniorExecutive) {
+              setValue('seniorExecutiveSymbols', '');
+            }
+          },
+        })}
       />
+      {showCompanySymbols && (
+        <TextInput
+          autoFocus
+          hasError={!!errors.seniorExecutiveSymbols}
+          hint={
+            errors.seniorExecutiveSymbols
+              ? t('company-symbols.error')
+              : t('company-symbols.hint')
+          }
+          label={t('company-symbols.label')}
+          placeholder={t('company-symbols.placeholder')}
+          {...register('seniorExecutiveSymbols', {
+            required: true,
+            validate: validateCompanySymbols,
+          })}
+        />
+      )}
       <Checkbox
         label={t(`options.${InvestorProfileDeclaration.seniorPoliticalFigure}`)}
         {...register(InvestorProfileDeclaration.seniorPoliticalFigure)}

@@ -27,7 +27,8 @@ export type RiskToleranceData = Required<
 
 export type DeclarationData = Required<
   Pick<InvestorProfileData, InvestorProfileDI.declarations>
->;
+> &
+  Partial<Pick<InvestorProfileData, InvestorProfileDI.seniorExecutiveSymbols>>;
 
 export type MachineContext = {
   // Plugin context

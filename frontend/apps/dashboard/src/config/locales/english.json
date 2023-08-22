@@ -65,6 +65,7 @@
       "investment_goals": "Investment goals",
       "risk_tolerance": "Risk tolerance",
       "declarations": "Declaration(s)",
+      "senior_executive_symbols": "Company symbols",
       "compliance_letter": "Finra compliance letter"
     },
     "document": {
@@ -1326,6 +1327,9 @@
               "diversification": "Diversification",
               "other": "Other"
             }
+          },
+          "seniorExecutiveSymbols": {
+            "title": "Company symbols"
           },
           "risk-tolerance": {
             "title": "How would you describe your risk tolerance?",

@@ -8,7 +8,9 @@ import {
 import React from 'react';
 import { FieldOrPlaceholder } from 'src/components';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
-import { createCapitalStringList } from 'src/utils/create-string-list';
+import createStringList, {
+  createCapitalStringList,
+} from 'src/utils/create-string-list';
 
 import { WithEntityProps } from '@/entity/components/with-entity';
 
@@ -130,6 +132,20 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               return <FieldOrPlaceholder data={value} />;
             }}
           />
+          {isVaultDataEmpty(
+            data?.[InvestorProfileDI.seniorExecutiveSymbols],
+          ) ? null : (
+            <Field
+              di={InvestorProfileDI.seniorExecutiveSymbols}
+              entity={entity}
+              renderValue={value => {
+                if (Array.isArray(value)) {
+                  return <FieldOrPlaceholder data={createStringList(value)} />;
+                }
+                return <FieldOrPlaceholder data={value} />;
+              }}
+            />
+          )}
           {isVaultDataEmpty(data?.[DocumentDI.finraComplianceLetter]) ? null : (
             <Field di={DocumentDI.finraComplianceLetter} entity={entity} />
           )}

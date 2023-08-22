@@ -82,6 +82,7 @@ const UploadFiles = ({ onChange }: UploadFilesProps) => {
         // multiple
         type="file"
         ref={inputRef}
+        data-testid="file-upload-input"
         onChange={handleChange}
       />
       {files.length > 0 && (

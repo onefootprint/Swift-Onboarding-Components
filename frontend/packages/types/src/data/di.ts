@@ -24,6 +24,7 @@ export enum InvestorProfileDI {
   investmentGoals = 'investor_profile.investment_goals',
   riskTolerance = 'investor_profile.risk_tolerance',
   declarations = 'investor_profile.declarations',
+  seniorExecutiveSymbols = 'investor_profile.senior_executive_symbols',
 }
 
 export enum IdDI {
