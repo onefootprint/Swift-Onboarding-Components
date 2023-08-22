@@ -221,14 +221,20 @@
       "title": {
         "driversLicense": "Driver's license · Front side",
         "idCard": "ID card · Front side",
-        "passport": "Passport · Photo page"
+        "passport": "Passport · Photo page",
+        "visa": "Visa",
+        "residenceDocument": "Residence card · Front side",
+        "workPermit": "Work permit · Front side"
       }
     },
     "back-photo-capture": {
       "title": {
         "driversLicense": "Driver's license · Back side",
         "idCard": "ID card · Back side",
-        "passport": "Passport · Photo page"
+        "passport": "Passport · Photo page",
+        "visa": "Visa",
+        "residenceDocument": "Residence card · Back side",
+        "workPermit": "Work permit · Back side"
       }
     },
     "selfie-photo-prompt": {

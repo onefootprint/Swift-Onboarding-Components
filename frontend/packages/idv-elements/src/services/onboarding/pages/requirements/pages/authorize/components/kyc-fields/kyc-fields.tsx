@@ -3,16 +3,19 @@ import {
   IcoBuilding24,
   IcoCake24,
   IcoCar24,
+  IcoClipboard24,
   IcoDollar24,
   IcoEmail24,
   IcoFileText24,
   IcoFlag24,
+  IcoHome24,
   IcoIdCard24,
   Icon,
   IcoPassport24,
   IcoPhone24,
   IcoSelfie24,
   IcoUserCircle24,
+  IcoWriting24,
 } from '@onefootprint/icons';
 import {
   CollectedDocumentDataOption,
@@ -43,6 +46,9 @@ const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
   [SupportedIdDocTypes.idCard]: IcoIdCard24,
   [SupportedIdDocTypes.driversLicense]: IcoCar24,
   [SupportedIdDocTypes.passport]: IcoPassport24,
+  [SupportedIdDocTypes.workPermit]: IcoClipboard24,
+  [SupportedIdDocTypes.residenceDocument]: IcoHome24,
+  [SupportedIdDocTypes.visa]: IcoWriting24,
 };
 
 type KycFieldsProps = {
@@ -73,6 +79,11 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [SupportedIdDocTypes.idCard]: t('data-labels.id-card'),
     [SupportedIdDocTypes.passport]: t('data-labels.passport'),
     [SupportedIdDocTypes.driversLicense]: t('data-labels.driversLicense'),
+    [SupportedIdDocTypes.residenceDocument]: t(
+      'data-labels.residence-document',
+    ),
+    [SupportedIdDocTypes.workPermit]: t('data-labels.work-permit'),
+    [SupportedIdDocTypes.visa]: t('data-labels.visa'),
   };
 
   const fields: FieldProps[] = [];
