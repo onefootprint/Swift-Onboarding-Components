@@ -6,6 +6,8 @@ use newtypes::{DataLifetimeId, PiiString, S3Url, SealedVaultBytes, VaultId};
 
 use crate::{models::data_lifetime::DataLifetime, DbError, DbResult};
 
+const LIFETIME_ID_CHUNK_SIZE: usize = 25_000;
+
 /// Defines common functionality required for pieces of data that belong to a user vault and
 /// have an associated DataLifetime.
 pub trait HasLifetime {
@@ -24,12 +26,19 @@ pub trait HasLifetime {
     where
         Self: Sized,
     {
-        let lifetime_ids: Vec<_> = lifetimes.iter().map(|l| l.id.clone()).collect();
         let lifetime_id_to_uv_id: HashMap<DataLifetimeId, VaultId> =
             HashMap::from_iter(lifetimes.iter().map(|l| (l.id.clone(), l.vault_id.clone())));
 
-        // Use the existing util to fetch all the rows for these lifetimes
-        let results = Self::get_for(conn, &lifetime_ids)?;
+        // Use the existing util to fetch all the rows for these lifetimes.
+        // Batch by chunks of 25k lifetime_ids at a time
+        let lifetime_ids: Vec<_> = lifetimes.iter().map(|l| l.id.clone()).sorted().collect();
+        let results = lifetime_ids
+            .into_iter()
+            .chunks(LIFETIME_ID_CHUNK_SIZE)
+            .into_iter()
+            .map(|l_ids| Self::get_for(conn, &l_ids.into_iter().collect_vec()))
+            .collect::<DbResult<Vec<_>>>()?;
+        let results = results.into_iter().flatten().collect_vec();
 
         // Organize the results by the uv_id to which each row belongs
         let uv_ids = results
@@ -41,11 +50,7 @@ pub trait HasLifetime {
                     .ok_or(DbError::RelatedObjectNotFound)
             })
             .collect::<DbResult<Vec<_>>>()?;
-        let results = uv_ids
-            .into_iter()
-            .zip(results.into_iter())
-            .sorted_by_key(|(uv_id, _)| uv_id.clone())
-            .into_group_map();
+        let results = uv_ids.into_iter().zip(results.into_iter()).into_group_map();
         Ok(results)
     }
 

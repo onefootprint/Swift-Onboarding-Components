@@ -60,12 +60,9 @@ impl<Type> VaultWrapper<Type> {
         // We then build a HashMap of UserVaultId -> Data object in order to build our final
         // VaultWrapper for each User
         let vds = VaultData::bulk_get(conn, &active_lifetime_list)?;
+        let document_datas = DocumentData::bulk_get(conn, &active_lifetime_list)?;
         let scoped_vault_ids = users.iter().map(|(sv, _)| &sv.id).collect();
         let workflows_map = Workflow::bulk_get_for_users(conn, scoped_vault_ids)?;
-        let document_datas = DocumentData::bulk_get_by_lifetime_ids(
-            conn,
-            active_lifetime_list.iter().map(|lt| &lt.id).collect(),
-        )?;
 
         // Map over our UserVaults, assembling the VaultWrappers from the data we fetched above
         let results = users

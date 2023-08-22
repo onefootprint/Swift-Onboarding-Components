@@ -6,10 +6,8 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use crate::VaultedData;
 use chrono::{DateTime, Utc};
-use db_schema::schema::data_lifetime;
 use db_schema::schema::document_data;
 use diesel::prelude::*;
-use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSeqno;
@@ -90,28 +88,6 @@ impl DocumentData {
             .get_results::<DocumentData>(conn)?
             .into_iter()
             .map(|d| (d.id.clone(), d))
-            .collect();
-
-        Ok(results)
-    }
-
-    #[tracing::instrument("DocumentData::bulk_get_by_lifetime_ids", skip_all)]
-    pub fn bulk_get_by_lifetime_ids(
-        conn: &mut PgConn,
-        ids: Vec<&DataLifetimeId>,
-    ) -> DbResult<HashMap<VaultId, Vec<DocumentData>>> {
-        let results: Vec<_> = document_data::table
-            .inner_join(data_lifetime::table)
-            .filter(data_lifetime::id.eq_any(ids))
-            .select((data_lifetime::vault_id, document_data::all_columns))
-            .get_results::<(VaultId, DocumentData)>(conn)?;
-
-        // group by vault id
-        let results = results
-            .into_iter()
-            .group_by(|(v_id, _)| v_id.clone())
-            .into_iter()
-            .map(|(v_id, g)| (v_id, g.into_iter().map(|(_, d)| d).collect()))
             .collect();
 
         Ok(results)
