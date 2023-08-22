@@ -213,85 +213,107 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 
 For listing, decrypting, and updating -- all the APIs above are identical for standalone user vaults.
 
-## Validation rules for vault data
+## Vault fields
 
-Footprint's vaulting aims to be flexible while providing base-level validation logic for structured vault data such as Identity or PCI data. Below we outline the validation rules enforced by vaults.
+Footprint's vaulting aims to be flexible while providing base-level validation logic for structured vault data such as Identity or PCI data. Below we outline the allowed data identifiers and any validation rules enforced.
+
+Note that not all fields may be populated in the vault.
 
 ### Identity fields
 
-| Data Identifier    | Rules                                                                           |
-| ------------------ | ------------------------------------------------------------------------------- |
-| `id.phone_number`  | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number  |
-| `id.email`         | [Email address](https://datatracker.ietf.org/doc/html/rfc3696)                  |
-| `id.first_name`    | Any valid UTF-8 String <1KB                                                     |
-| `id.last_name`     | Any valid UTF-8 String <1KB                                                     |
-| `id.ssn9`          | `9` digit string (note hyphens will be ignored and stripped out)                |
-| `id.ssn4`          | `4` digit string                                                                |
-| `id.dob`           | Date of birth formatted as `%Y-%m-%d`                                           |
-| `id.address_line1` | Any valid UTF-8 String <1KB                                                     |
-| `id.address_line2` | Any valid UTF-8 String <1KB                                                     |
-| `id.city`          | Any valid UTF-8 String <1KB                                                     |
-| `id.state`         | Any valid UTF-8 String <1KB                                                     |
-| `id.zip`           | Postal code `^([A-Za-z0-9\- ]*)$`                                               |
-| `id.country`       | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes) |
+| Data Identifier           | Description                                              | Format                                                                                 |
+| ------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `id.phone_number`         | Primary phone number                                     | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number         |
+| `id.email`                | Primary email address                                    | [Email address](https://datatracker.ietf.org/doc/html/rfc3696)                         |
+| `id.first_name`           | First name                                               | Any valid UTF-8 String <1KB                                                            |
+| `id.last_name`            | Last name                                                | Any valid UTF-8 String <1KB                                                            |
+| `id.ssn9`                 | Full SSN                                                 | 9-digit string (hyphens will be ignored and stripped out)                              |
+| `id.ssn4`                 | Last four of the SSN                                     | 4-digit string                                                                         |
+| `id.dob`                  | Date of birth                                            | Formatted as `%Y-%m-%d`                                                                |
+| `id.address_line1`        | First line of the user's street address                  | Any valid UTF-8 String <1KB                                                            |
+| `id.address_line2`        | Second line of the user's street address                 | Any valid UTF-8 String <1KB                                                            |
+| `id.city`                 | City of the user's street address                        | Any valid UTF-8 String <1KB                                                            |
+| `id.state`                | State of the user's street address                       | Any valid UTF-8 String <1KB                                                            |
+| `id.zip`                  | Postal code for the user's street address                | Postal code `^([A-Za-z0-9\- ]*)$`                                                      |
+| `id.country`              | Country for the user's street address                    | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)        |
+| `id.us_legal_status`      | The user's legal status in the US                        | `citizen`, `permanent_resident`, or `visa`                                             |
+| `id.nationality`          | The user's nationality                                   | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)        |
+| `id.citizenships`         | A list of countries for which the user holds citizenship | A list of valid [ISO3166-alpha-2 Country Codes](https://datahub.io/core/country-codes) |
+| `id.visa_kind`            | The type of US visa held by the user                     | One of `e1`, `e2`, `e3`, `f1`, `g4`, `h1b`, `l1`, `o1`, `tn1`, or `other`              |
+| `id.visa_expiration_date` | The expiration date of the user's visa                   | Formatted as `%Y-%m-%d`                                                                |
 
 ### Business fields
 
-| Data Identifier                    | Rules                                                                                                                                                                         |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `business.name`                    | Any valid UTF-8 String <1KB                                                                                                                                                   |
-| `business.dba`                     | Doing business as alias. Any valid UTF-8 String <1KB                                                                                                                          |
-| `business.website`                 | Business website.                                                                                                                                                             |
-| `business.phone_number`            | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number                                                                                                |
-| `business.tin`                     | Taxpayer identification number. Must include 9 digits, can include hyphens (-).                                                                                               |
-| `business.address_line1`           | Registered business address. Any valid UTF-8 String <1KB                                                                                                                      |
-| `business.address_line2`           | Registered business address. Any valid UTF-8 String <1KB                                                                                                                      |
-| `business.city`                    | Registered business address. Any valid UTF-8 String <1KB                                                                                                                      |
-| `business.state`                   | Registered business address. Any valid UTF-8 String <1KB                                                                                                                      |
-| `business.zip`                     | Registered business address. Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                |
-| `business.country`                 | Registered business address. Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                  |
-| `business.beneficial_owners`       | An array of business owners with `first_name` (string), `last_name` (string) and `ownership_stake` (numeric and > 0) fields.                                                  |
-| `business.kyced_beneficial_owners` | An array of business owners that should be KYC'ed. Business owner entries include `first_name` (string), `last_name` (string) and `ownership_stake` (numeric and > 0) fields. |
-| `business.corporation_type`        | One of `corporation`, `llc`, `partnership`, `sole_proprietorship`, `non_profit`, `unknown`, `trust`, `agent`                                                                  |
+| Data Identifier                    | Description                                                                              | Format                                                                                                                                                                                                                   |
+| ---------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --- |
+| `business.name`                    | Name of the business                                                                     | Any valid UTF-8 String <1KB                                                                                                                                                                                              |
+| `business.dba`                     | Doing-business-as alias                                                                  | Any valid UTF-8 String <1KB                                                                                                                                                                                              |
+| `business.website`                 | Website of the business                                                                  | A valid absolute URL.                                                                                                                                                                                                    |     |
+| `business.phone_number`            | Phone number                                                                             | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number                                                                                                                                           |
+| `business.tin`                     | Taxpayer identification number                                                           | 9-digit string (hyphens will be ignored and stripped out)                                                                                                                                                                |
+| `business.address_line1`           | First line of the business's street address                                              | Any valid UTF-8 String <1KB                                                                                                                                                                                              |
+| `business.address_line2`           | Second line of the business's street address                                             | Any valid UTF-8 String <1KB                                                                                                                                                                                              |
+| `business.city`                    | City of the business's street address                                                    | Any valid UTF-8 String <1KB                                                                                                                                                                                              |
+| `business.state`                   | State of the business's street address                                                   | Any valid UTF-8 String <1KB                                                                                                                                                                                              |
+| `business.zip`                     | Postal code for the business's street address                                            | Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                                                                                        |
+| `business.country`                 | Country for the business's street address                                                | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                                                                                          |
+| `business.beneficial_owners`       | Information about owners of the business. Available when not KYC-ing every businss owner | An array of objects with `first_name` (string), `last_name` (string), and `ownership_stake` (numeric > 0) fields                                                                                                         |
+| `business.kyced_beneficial_owners` | Information about owners of the business. Available when KYC-ing every businss owner     | An array of objects with `first_name` (string), `last_name` (string), `email` (string), `phone_number` (string), and `ownership_stake` (numeric > 0) fields. Email and phone will be absent for the first business owner |
+| `business.corporation_type`        | The type of corporation                                                                  | One of `corporation`, `llc`, `partnership`, `sole_proprietorship`, `non_profit`, `unknown`, `trust`, `agent`                                                                                                             |
 
 ### Investor profile fields
 
-| Data Identifier                             | Rules                                                                                                                               |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `investor_profile.employment_status`        | One of `employed`, `unemployed`, `student`, `retired`                                                                               |
-| `investor_profile.employer`                 | Any valid UTF-8 String <1KB                                                                                                         |
-| `investor_profile.occupation`               | Any valid UTF-8 String <1KB                                                                                                         |
-| `investor_profile.brokerage_firm_employer`  | Any valid UTF-8 String <1KB                                                                                                         |
-| `investor_profile.annual_income`            | One of `le25k`, `gt25k_le50k`, `gt50k_le100k`, `gt100k_le200k`, `gt200k_le300k`, `gt300k_le500k`, `gt500k_le1200k`, `gt1200k`       |
-| `investor_profile.net_worth`                | One of `le50k`, `gt50k_le100k`, `gt100k_le200k`, `gt200k_le500k`, `gt500k_le1m`, `gt1m_le5m`, `gt5m`                                |
-| `investor_profile.investment_goals`         | A JSON-serialized array of `growth`, `income`, `preserve_capital`, `speculation`, `diversification`, `other`                        |
-| `investor_profile.risk_tolerance`           | One of `conservative`, `moderate`, `aggressive`                                                                                     |
-| `investor_profile.declarations`             | A JSON-serialized array of `affiliated_with_us_broker`, `senior_executive`, `senior_political_figure`, `family_of_political_figure` |
-| `investor_profile.brokerage_firm_employer`  | Any valid UTF-8 String <1KB                                                                                                         |
-| `investor_profile.senior_executive_symbols` | A JSON-serialized array of symbols, each 3-5 ASCII alphabetic characters                                                            |
-| `investor_profile.family_member_names`      | A JSON-serialized array of names, each UTF-8 Strings <1KB                                                                           |
-| `investor_profile.political_organization`   | Any valid UTF-8 String <1KB                                                                                                         |
+| Data Identifier                             | Description                                                                                                                                          | Format                                                                                                                 |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `investor_profile.employment_status`        | Information on the user's employment status                                                                                                          | One of `employed`, `unemployed`, `student`, `retired`                                                                  |
+| `investor_profile.employer`                 | The name of the user's employer, if any                                                                                                              | Any valid UTF-8 String <1KB                                                                                            |
+| `investor_profile.occupation`               | The name of the user's occupation, if any                                                                                                            | Any valid UTF-8 String <1KB                                                                                            |
+| `investor_profile.annual_income`            | Information on the user's annual income                                                                                                              | One of `le25k`, `gt25k_le50k,`, `gt50k_le100k`, `gt100k_le200k`, `gt200k_le300k`, `gt300k_le500k`, or `gt500k_le1200k` |
+| `investor_profile.net_worth`                | Information on the user's net worth income                                                                                                           | One of `le50k`, `gt50k_le100k`, `gt100k_le200k`, `gt200k_le500k`, `gt500k_le1m`, `gt1m_le5m`, or `gt5m`                |
+| `investor_profile.investment_goals`         | Information on the user's investment goals.                                                                                                          | List with at least one of `growth`, `income`, `preserve_capital`, `speculation`, `diversification`, or `other`         |
+| `investor_profile.risk_tolerance`           | The user's stated risk tolerance                                                                                                                     | One of `conservative`, `moderate`, `aggressive`                                                                        |
+| `investor_profile.declarations`             | Self-proclaimed declarations                                                                                                                         | An array of `affiliated_with_us_broker`, `senior_executive`, or `senior_political_figure`. May be empty if none apply  |
+| `investor_profile.brokerage_firm_employer`  | If the user selected `affiliated_with_us_broker` for `investor_profile.declarations`, the name of the brokerage                                      | Any valid UTF-8 String <1KB                                                                                            |
+| `document.finra_compliance_letter`          | If the user selected `affiliated_with_us_broker` for `investor_profile.declarations`, the uploaded FINRA compliance document                         | Required if `investor_profile.declarations` includes `affiliated_with_us_broker` or `senior_executive`.                |
+| `investor_profile.senior_executive_symbols` | If the user selected `senior_executive` for `investor_profile.declarations`, the list of associated symbols for which the user is a senior executive | An array of symbols, each 3-5 ASCII alphabetic characters                                                              |
+| `investor_profile.family_member_names`      | If the user selected `senior_political_figure` for `investor_profile.declarations`, the names of the user's immediate family members                 | An array of names, each UTF-8 Strings <1KB                                                                             |
+| `investor_profile.political_organization`   | If the user selected `senior_political_figure` for `investor_profile.declarations`, the name of the political organization                           | Any valid UTF-8 String <1KB                                                                                            |
 
 ### Document fields
 
-| Data Identifier                    | Rules                                                                                                   |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `document.finra_compliance_letter` | Required if `investor_profile.declarations` includes `affiliated_with_us_broker` or `senior_executive`. |
+If a document is uploaded during onboarding, Footprint will attempt to extracted the following fields from respective documents. These extracted fields can be accessed through the document's type, which is one of `id_card`, `drivers_license`, `passport`, `permit`, `visa`, or `residence_document`. For example, `document.drivers_license.document_number` represents the driver's license document number.
+
+| Data Identifier              | Description                                    | Format                                                                          |
+| ---------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------- |
+| `document.*.full_name`       | The extracted name                             | Any UTF-8 String <200B                                                          |
+| `document.*.dob`             | The extracted date of birth                    | Formatted as `%Y-%m-%d`                                                         |
+| `document.*.gender`          | The extracted gender                           | Any UTF-8 String <200B                                                          |
+| `document.*.full_address`    | The extracted full address                     | Any UTF-8 String <200B                                                          |
+| `document.*.document_number` | The extracted document number                  | Any UTF-8 String <200B                                                          |
+| `document.*.issued_at`       | The date on which the document was issued      | Formatted as `%Y-%m-%d`                                                         |
+| `document.*.expires_at`      | The date at which the document expires         | Formatted as `%Y-%m-%d`                                                         |
+| `document.*.issuing_state`   | The name of the state that issued the document | Any UTF-8 String <200B                                                          |
+| `document.*.issuing_country` | The the country that issued the document       | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes) |
+| `document.*.nationality`     | The nationality extracted from the document    | Any UTF-8 String <200B                                                          |
 
 ### Card fields
 
-| Data Identifier              | Rules                                                                                                                                                                                        |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `card.*.name`                | Any UTF-8 String <200B                                                                                                                                                                       |
-| `card.*.number`              | Valid credit or debit card number (length and Luhn check). Supports: Visa, Mastercard, Amex, MIR, Diners Club, Discover, UnionPay, JCB, Visa Electron, Maestro, Forbrugsforeningen, Dankort. |
-| `card.*.cvc`                 | Valid `3` or `4` digit string card security code relative to the number if provided (Amex is 4 digits, others are 3)                                                                         |
-| `card.*.expiration`          | Any valid expiration date `MM/YYYY`,`MM/YY`, `MM-YY`, or `MM-YYYY`. Note: always stored as`MM/YYYY`.                                                                                         |
-| `card.*.number_last4`        | `4` digit string                                                                                                                                                                             |
-| `card.*.billing_address.zip` | Same as `id.zip`                                                                                                                                                                             |
-| `card.*.issuer`              | Automatically populated when a recognized number is supplied. See `card.*.number` for supported issuers.                                                                                     |
+Each individual card is assigned an alias by your application. Each card alias must match `^([A-Za-z0-9\-_]+)$`.
+
+| Data Identifier              | Description                                                      | Format                                                                                                                                                                                       |
+| ---------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `card.*.name`                | The name of the cardholder                                       | Any UTF-8 String <200B                                                                                                                                                                       |
+| `card.*.number`              | The full card number                                             | Valid credit or debit card number (length and Luhn check). Supports: Visa, Mastercard, Amex, MIR, Diners Club, Discover, UnionPay, JCB, Visa Electron, Maestro, Forbrugsforeningen, Dankort. |
+| `card.*.cvc`                 | The verification code for the credit card                        | Valid 3- or 4-digit numeric code                                                                                                                                                             |
+| `card.*.expiration`          | The date at which the card expires                               | `MM/YYYY`. Accepts any of `MM/YYYY`, `MM/YY`, `MM-YY`, or `MM-YYYY`                                                                                                                          |
+| `card.*.billing_address.zip` | The billing ZIP code for the card                                | Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                                                            |
+| `card.*.number_last4`        | The last four digits of the card number. Automatically populated | 4-digit string. Cannot be specified, can only be read                                                                                                                                        |
+| `card.*.issuer`              | The issuer of the card. Automatically populated                  | One of `visa`, `master_card`, `amex`, `discover`, `mir`, `diners_club`, `union_pay`, `jcb`, `visa_electron`, `maestro`, `forbrugsforeningen`, `dankort`, or `unknown`                        |
 
 ### Custom fields
 
-| Data Identifier | Rules                                                                                                                      |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `custom.*`      | Any UTF-8 String. Note that custom field name represented by `*` can be any UTF-8 string matching `^([A-Za-z0-9\-_\.]+)$`. |
+Each piece of custom data is assigned an alias by your application. Each custom data alias must match `^([A-Za-z0-9\-_\.]+)$`.
+
+| Data Identifier | Description                              | Format                                                                                                                     |
+| --------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `custom.*`      | Any piece of data you'd like to provide. | Any UTF-8 String. Note that custom field name represented by `*` can be any UTF-8 string matching `^([A-Za-z0-9\-_\.]+)$`. |

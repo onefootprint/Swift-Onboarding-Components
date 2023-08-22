@@ -91,7 +91,7 @@ Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vanil
 
 ### Setup and authentication
 
-Go to the Footprint developer dashboard and generate a new Secret API Key. This will look something like `sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv`. Add this to the credential manager of your server-side app. To learn more about server-side API authentication, read the short guide on [API Authentication](/integrate/api-auth)
+Go to the Footprint developer dashboard and generate a new Secret API Key. This will look something like `sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv`. Add this to the credential manager of your server-side app. To learn more about server-side API authentication, read the short guide on [API Authentication](/integrate/api-auth).
 
 ### Validate the onboarding token (from Step 5 above)
 
@@ -122,21 +122,27 @@ Footprint will give you some information from this onboarding session. We’ll a
 
 ### Check the onboarding decision status
 
-Using the `status` and `required_manual_review` fields to decide whether or not to onboard this user to your product.
+Using the `status` and `requires_manual_review` fields to decide whether or not to onboard this user to your product.
 
-| Status | Review | What does this mean?                                                                        |
-| ------ | ------ | ------------------------------------------------------------------------------------------- |
-| `pass` | False  | Verification checks succeeded and this user can be onboarded.                               |
-| `pass` | True   | Verification checks succeeded, but Footprint suggests manually reviewing identified risks.  |
-| `fail` | False  | Verification failed. Do not onboard this user.                                              |
-| `fail` | True   | Verification failed, but Footprint suggests manually checking possible acceptance criteria. |
+| Status    | What does this mean?                                                                                                                                                                                                                              |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pass`    | Verification checks succeeded and this user can be onboarded.                                                                                                                                                                                     |
+| `fail`    | Verification failed. Do not onboard this user.                                                                                                                                                                                                    |
+| `pending` | Verifying this user's identity is taking longer than expected. This happens in rare cases where asynchronous actions are required to make a decision. A final decision will be delivered via [webhooks](/integrate/webhooks) to your application. |
 
-### Optionally, decrypt identity fields from the user’s vault:
+| Review | What does this mean?                                                                              |
+| ------ | ------------------------------------------------------------------------------------------------- |
+| False  | We have made a decision automatically that does not require any manual review.                    |
+| True   | Footprint suggests manually reviewing identified risks and manually checking acceptance criteria. |
+
+### After onboarding
+
+Once a user has onboarded onto Footprint, you can interact with the user via API using their `fp_id`. The most common action is to decrypt a user's information. For example:
 
 ```bash
 curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/decrypt \
    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
-   -d '{"fields": ["id.dob", "id.last_name", "id.ssn4"], "reason": "getting started test"}'
+   -d '{"fields": ["id.dob", "id.last_name", "id.ssn4"], "reason": "getting started"}'
 ```
 
 ```json
@@ -146,3 +152,5 @@ curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TL
   "id.ssn4": "1212"
 }
 ```
+
+You can learn more about the fields available for decryption [here](/vault/apis/#vault-fields).
