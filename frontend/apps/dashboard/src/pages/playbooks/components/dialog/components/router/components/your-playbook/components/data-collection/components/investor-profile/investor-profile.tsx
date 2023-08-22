@@ -22,23 +22,23 @@ const InvestorProfile = () => {
         <Typography variant="label-3">{t('title')}</Typography>
         <input
           aria-hidden="true"
-          checked={added}
           aria-checked={added}
           role="switch"
           type="hidden"
           {...register(CollectedInvestorProfileDataOption.investorProfile)}
         />
-        {added ? (
+        {added && (
           <LinkButton
             iconComponent={IcoTrash16}
             iconPosition="left"
-            variant="destructive"
             onClick={handleClick}
             size="tiny"
+            variant="destructive"
           >
             {t('toggle.remove')}
           </LinkButton>
-        ) : (
+        )}
+        {!added && (
           <LinkButton
             iconComponent={IcoPlusSmall16}
             iconPosition="left"
@@ -49,7 +49,29 @@ const InvestorProfile = () => {
           </LinkButton>
         )}
       </Header>
-      <Typography variant="body-3">{t('subtitle')}</Typography>
+      {!added && <Typography variant="body-3">{t('subtitle')}</Typography>}
+      {added && (
+        <InvestorProfileQuestionContainer>
+          <Typography variant="body-3" as="li">
+            {t('questions.employment-status')}
+          </Typography>
+          <Typography variant="body-3" as="li">
+            {t('questions.annual-income')}
+          </Typography>
+          <Typography variant="body-3" as="li">
+            {t('questions.net-worth')}
+          </Typography>
+          <Typography variant="body-3" as="li">
+            {t('questions.investment-goals')}
+          </Typography>
+          <Typography variant="body-3" as="li">
+            {t('questions.risk-tolerance')}
+          </Typography>
+          <Typography variant="body-3" as="li">
+            {t('questions.immediate-family')}
+          </Typography>
+        </InvestorProfileQuestionContainer>
+      )}
     </Container>
   );
 };
@@ -62,6 +84,15 @@ const Container = styled.div`
     border: ${theme.borderColor.tertiary} ${theme.borderWidth[1]} solid;
     border-radius: ${theme.borderRadius.default};
     padding: ${theme.spacing[5]} ${theme.spacing[6]};
+  `};
+`;
+
+const InvestorProfileQuestionContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[3]};
+    margin-left: ${theme.spacing[2]};
   `};
 `;
 
