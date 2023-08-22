@@ -14,7 +14,7 @@ const BusinessScopes = () => {
     <Container>
       <Checkbox
         label={t('all-business-info')}
-        {...register(`authorized-allKybData`)}
+        {...register(`allBusinessData`)}
       />
       <Divider />
       <Typography variant="label-3">{t('beneficial-owner')}</Typography>
