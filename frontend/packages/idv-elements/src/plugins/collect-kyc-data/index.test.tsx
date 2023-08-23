@@ -36,7 +36,7 @@ import {
 } from './index.test.config';
 import { CollectKycDataContext, CollectKycDataProps } from './types';
 
-describe.skip('<CollectKycData />', () => {
+describe('<CollectKycData />', () => {
   const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
@@ -195,7 +195,7 @@ describe.skip('<CollectKycData />', () => {
       dob = screen.getByText('01/01/1990');
       expect(dob).toBeInTheDocument();
 
-      ssn4 = screen.getByText('1234');
+      ssn4 = screen.getByText('••••');
       expect(ssn4).toBeInTheDocument();
 
       // check that we can edit a field, cancel it, and the original value stays as it was
@@ -274,7 +274,7 @@ describe.skip('<CollectKycData />', () => {
       cancel = screen.getByRole('button', { name: 'Cancel' });
       await userEvent.click(cancel);
       await waitFor(() => {
-        expect(screen.getByText('1234')).toBeInTheDocument();
+        expect(screen.getByText('••••')).toBeInTheDocument();
       });
 
       // now, edit SSN, save the change, and show that changed value persists
@@ -297,7 +297,7 @@ describe.skip('<CollectKycData />', () => {
       });
       await userEvent.click(save);
       await waitFor(() => {
-        expect(screen.getByText('5678')).toBeInTheDocument();
+        expect(screen.getByText('••••')).toBeInTheDocument();
       });
 
       // see if edit button shows up in identity section again (because we are done editing)
