@@ -17,6 +17,10 @@ enum IdDocImageError {
   selfieGlare = 'selfie_glare',
   selfieHasLenses = 'selfie_has_lenses',
   selfieHasFaceMask = 'selfie_has_face_mask',
+  selfieBlurry = 'selfie_blurry',
+  selfieImageSizeUnsupported = 'selfie_image_size_unsupported',
+  selfieImageOrientationIncorrect = 'selfie_image_orientation_incorrect',
+  selfieBadImageCompression = 'selfie_bad_image_compression',
   unknownError = 'unknown_error',
 }
 

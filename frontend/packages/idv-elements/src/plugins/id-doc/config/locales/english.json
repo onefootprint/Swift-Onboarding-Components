@@ -103,10 +103,14 @@
         "selfie_glare": "Your selfie had image glare. Please adjust the lighting and try again.",
         "selfie_has_lenses": "We detected glasses in your selfie. Please remove your glasses and try again.",
         "selfie_has_face_mask": "We detected a face mask in your selfie. Please remove all face coverings and try again.",
-        "unknown_error": "An error occurred. Please try again.",
         "unknown_upload_error": "The file upload failed. Please try again.",
         "multiple_files_error": "We detected more than one files. Please upload a single image file.",
-        "file_type_not_allowed": "The uploaded file type is not supported. Please upload image files only."
+        "file_type_not_allowed": "The uploaded file type is not supported. Please upload image files only.",
+        "selfie_blurry": "Your selfie was too blurry. Please try again.",
+        "selfie_image_size_unsupported": "Your selfie image was too small. Please try again with a higher resolution picture.",
+        "selfie_image_orientation_incorrect": "Your selfie image has the wrong orientation. Please ensure the picture submitted is in portrait format and try again.",
+        "selfie_bad_image_compression": "Your selfie image has the incorrect image compression. Please try again.",
+        "unknown_error": "An error occurred. Please try again."
       }
     },
     "success": {
