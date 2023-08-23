@@ -85,7 +85,6 @@ const Nav = styled.nav`
         background: none;
         border: none;
         box-shadow: none;
-        cursor: pointer;
         text-align: left;
       }
     }
@@ -110,10 +109,11 @@ const Item = styled.li`
       button {
         ${createFontStyles('body-3')};
         color: ${theme.color.primary};
+        cursor: pointer;
       }
 
       &:hover button {
-        opacity: 0.5;
+        opacity: 0.7;
       }
     }
 
@@ -121,6 +121,7 @@ const Item = styled.li`
       button {
         ${createFontStyles('label-3')};
         color: ${theme.color.accent};
+        cursor: pointer;
       }
 
       &:hover button {
