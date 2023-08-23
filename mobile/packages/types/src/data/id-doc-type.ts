@@ -8,6 +8,9 @@ export enum SupportedIdDocTypes {
   idCard = 'id_card',
   driversLicense = 'drivers_license',
   passport = 'passport',
+  visa = 'visa',
+  workPermit = 'permit',
+  residenceDocument = 'residence_document',
 }
 
 export enum IdDocRegionality {
