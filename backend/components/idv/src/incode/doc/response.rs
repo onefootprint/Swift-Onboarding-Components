@@ -357,6 +357,12 @@ pub struct FetchOCRResponse {
     pub error: Option<Error>,
 }
 
+pub struct IncodeOcrFixtureResponseFields {
+    pub first_name: Option<PiiString>,
+    pub last_name: Option<PiiString>,
+    pub dob: Option<PiiString>,
+}
+
 impl FetchOCRResponse {
     fn format_date(date: Option<&String>) -> Result<ScrubbedPiiString, IncodeError> {
         let expiration_timestamp = date
@@ -407,15 +413,24 @@ impl FetchOCRResponse {
         Ok((today - dob).num_days() / 365)
     }
 
-    pub fn fixture_response(
-        first_name: Option<PiiString>,
-        last_name: Option<PiiString>,
-        dob: Option<i64>,
-    ) -> serde_json::Value {
-        let first_name = first_name.unwrap_or(PiiString::from("Piip"));
-        let last_name = last_name.unwrap_or(PiiString::from("Penguin"));
+    pub fn fixture_response<T: Into<IncodeOcrFixtureResponseFields>>(data: Option<T>) -> serde_json::Value {
+        let data: Option<IncodeOcrFixtureResponseFields> = data.map(|d| d.into());
+        let first_name = data
+            .as_ref()
+            .and_then(|d| d.first_name.clone())
+            .unwrap_or(PiiString::from("Piip"));
+        let last_name = data
+            .as_ref()
+            .and_then(|d| d.last_name.clone())
+            .unwrap_or(PiiString::from("Penguin"));
         let full_name = format!("{} {}", first_name.leak(), last_name.leak());
-        let dob = dob.unwrap_or(529873860000);
+        let dob = data
+            .as_ref()
+            .and_then(|d| d.dob.as_ref())
+            .and_then(|dob| NaiveDate::parse_from_str(dob.leak(), DATE_FORMAT).ok())
+            .and_then(|d| d.and_hms_milli_opt(0, 0, 0, 0))
+            .map(|d| d.timestamp_millis())
+            .unwrap_or(529873860000);
 
         serde_json::json!(
             {"additionalTimestamps":null,

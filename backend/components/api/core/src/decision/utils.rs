@@ -12,7 +12,6 @@ use db::{
     },
     PgConn, TxnPgConn,
 };
-use idv::incode::doc::response::FetchOCRResponse;
 use newtypes::{
     DecisionIntentId, DecisionStatus, IdentityDocumentFixtureResult, IdentityDocumentId, OnboardingStatus,
     RiskSignalGroupKind, ScopedVaultId, TenantId, VaultKind, VendorAPI, WorkflowFixtureResult, WorkflowId,
@@ -21,7 +20,7 @@ use newtypes::{
 use super::{
     features::incode_docv::IncodeOcrComparisonDataFields,
     sandbox,
-    vendor::{self, incode::states::parse_dob},
+    vendor::{self},
 };
 use crate::{
     errors::{onboarding::OnboardingError, ApiError, ApiErrorKind, ApiResult},
@@ -200,21 +199,4 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
         false,
     )?;
     Ok(())
-}
-
-pub fn fixture_ocr_response_for_incode(
-    comparison_data: Option<IncodeOcrComparisonDataFields>,
-) -> ApiResult<FetchOCRResponse> {
-    let raw = if let Some(data) = comparison_data {
-        idv::incode::doc::response::FetchOCRResponse::fixture_response(
-            data.first_name,
-            data.last_name,
-            data.dob.and_then(|t| parse_dob(t).transpose()).transpose()?,
-        )
-    } else {
-        idv::incode::doc::response::FetchOCRResponse::fixture_response(None, None, None)
-    };
-
-    let parsed = serde_json::from_value(raw)?;
-    Ok(parsed)
 }

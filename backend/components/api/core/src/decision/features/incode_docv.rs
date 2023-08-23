@@ -1,4 +1,4 @@
-use idv::incode::doc::response::{FetchScoresResponse, FetchOCRResponse};
+use idv::incode::doc::response::{FetchScoresResponse, FetchOCRResponse, IncodeOcrFixtureResponseFields};
 use newtypes::{
     incode::{IncodeRCH, IncodeStatus, IncodeTest},
     FootprintReasonCode, VendorAPI, PiiString, VerificationResultId, DataIdentifier, IdentityDataKind,
@@ -12,6 +12,13 @@ pub struct IncodeOcrComparisonDataFields {
     pub first_name: Option<PiiString>,
     pub last_name: Option<PiiString>,
     pub dob: Option<PiiString>,
+}
+
+impl From<IncodeOcrComparisonDataFields> for IncodeOcrFixtureResponseFields {
+    fn from(value: IncodeOcrComparisonDataFields) -> Self {
+        let IncodeOcrComparisonDataFields { first_name, last_name, dob } = value;
+        Self { first_name, last_name, dob }
+    }
 }
 
 impl IncodeOcrComparisonDataFields {

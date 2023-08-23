@@ -145,7 +145,9 @@ pub async fn post(
             } else {
                 if missing_sides.is_empty() {
                     // Create fixture data once all of the sides are uploaded
-                    let ocr = decision::utils::fixture_ocr_response_for_incode(ocr_fixture.clone())?;
+                    let ocr =
+                        idv::incode::doc::response::FetchOCRResponse::fixture_response(ocr_fixture.clone());
+                    let ocr = serde_json::from_value(ocr)?;
 
                     // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals
                     let fake_score_response =

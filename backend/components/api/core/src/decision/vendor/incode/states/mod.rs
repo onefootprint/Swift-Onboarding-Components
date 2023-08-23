@@ -1,4 +1,4 @@
-use chrono::{NaiveDate, Utc};
+use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::verification_request::VerificationRequest;
 
@@ -40,19 +40,20 @@ pub use process_face::*;
 
 use super::state::IncodeStateTransition;
 use super::IncodeContext;
+use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
-use crate::errors::{ApiErrorKind, ApiResult, AssertionError};
-use crate::utils::vault_wrapper::{TenantVw, VaultWrapper};
+use crate::errors::{ApiResult, AssertionError};
+use crate::utils::vault_wrapper::{Person, TenantVw, VaultWrapper};
 use crate::{ApiError, State};
 use db::models::verification_result::{NewVerificationResult, VerificationResult};
 use db::DbPool;
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DataIdentifier, DecisionIntentKind, IdDocKind, IdentityDataKind, IncodeFailureReason,
-    IncodeVerificationSessionId, IncodeVerificationSessionKind, PiiJsonValue, PiiString, ScopedVaultId,
-    ScrubbedPiiJsonValue, ScrubbedPiiString, VendorAPI, WorkflowId, DATE_FORMAT,
+    DecisionIntentKind, IdDocKind, IncodeFailureReason, IncodeVerificationSessionId,
+    IncodeVerificationSessionKind, PiiJsonValue, ScopedVaultId, ScrubbedPiiJsonValue, ScrubbedPiiString,
+    VendorAPI, WorkflowId,
 };
 
 #[derive(Clone)]
@@ -154,33 +155,18 @@ pub async fn save_incode_fixtures(
     let suid = scoped_vault_id.clone();
     let suid2 = scoped_vault_id.clone();
     let wf_id = wf_id.clone();
-    let (decision_intent, uvw): (DecisionIntent, TenantVw) = state
+    let (decision_intent, uvw) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let vw = VaultWrapper::build_for_tenant(conn, &suid)?;
+            let vw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &suid)?;
             let decision_intent =
                 DecisionIntent::get_or_create_for_workflow(conn, &suid, &wf_id, DecisionIntentKind::DocScan)?;
 
             Ok((decision_intent, vw))
         })
         .await?;
-
-    // get first name and dob
-    let mut vd = uvw
-        .decrypt_unchecked(
-            &state.enclave_client,
-            &[
-                DataIdentifier::Id(IdentityDataKind::FirstName),
-                DataIdentifier::Id(IdentityDataKind::LastName),
-                DataIdentifier::Id(IdentityDataKind::Dob),
-            ],
-        )
-        .await?;
+    let ocr_data = IncodeOcrComparisonDataFields::compose(&state.enclave_client, &uvw).await?;
     let uv_public_key = uvw.vault.public_key.clone();
-    let first_name = vd.rm_di(IdentityDataKind::FirstName)?;
-    let last_name = vd.rm_di(IdentityDataKind::LastName)?;
-    let dob = vd.rm_di(IdentityDataKind::Dob)?;
-    let date_of_birth_timestamp = parse_dob(dob)?;
 
     state
         .db_pool
@@ -193,11 +179,8 @@ pub async fn save_incode_fixtures(
             )?;
 
             // Save OCR
-            let raw_ocr_response = idv::incode::doc::response::FetchOCRResponse::fixture_response(
-                Some(first_name),
-                Some(last_name),
-                date_of_birth_timestamp,
-            );
+            let raw_ocr_response =
+                idv::incode::doc::response::FetchOCRResponse::fixture_response(Some(ocr_data));
             let e_ocr_response = vendor::verification_result::encrypt_verification_result_response(
                 &raw_ocr_response.clone().into(),
                 &uv_public_key,
@@ -288,15 +271,6 @@ fn parse_type_of_id(
         return Ok(Err(IncodeFailureReason::CountryCodeMismatch));
     }
     Ok(Ok(id_doc_kind))
-}
-
-pub fn parse_dob(dob: PiiString) -> Result<Option<i64>, ApiError> {
-    let parsed = NaiveDate::parse_from_str(dob.leak(), DATE_FORMAT)
-        .map_err(|_| ApiErrorKind::AssertionError("invalid date in fixture".into()))?
-        .and_hms_milli_opt(0, 0, 0, 0)
-        .map(|d| d.timestamp_millis());
-
-    Ok(parsed)
 }
 
 pub struct AddSideResponseHelper {

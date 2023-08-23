@@ -106,11 +106,7 @@ impl DecryptUncheckedResult {
         self.rm(di, vec![])
     }
 
-    pub fn rm<D: Into<DataIdentifier>>(
-        &mut self,
-        di: D,
-        transforms: Vec<DataTransform>,
-    ) -> ApiResult<PiiString> {
+    fn rm<D: Into<DataIdentifier>>(&mut self, di: D, transforms: Vec<DataTransform>) -> ApiResult<PiiString> {
         let di = di.into();
         self.results
             .remove(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))
@@ -122,11 +118,7 @@ impl DecryptUncheckedResult {
         self.get(di, vec![])
     }
 
-    pub fn get<D: Into<DataIdentifier>>(
-        &self,
-        di: D,
-        transforms: Vec<DataTransform>,
-    ) -> ApiResult<PiiString> {
+    fn get<D: Into<DataIdentifier>>(&self, di: D, transforms: Vec<DataTransform>) -> ApiResult<PiiString> {
         let di = di.into();
         self.results
             .get(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))
