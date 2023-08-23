@@ -15,8 +15,8 @@ const CheckRequirements = ({
   onSuccess,
 }: CheckRequirementsProps) => {
   useGetOnboardingStatus(authToken, {
-    onSuccess: ({ requirements }) => {
-      const remainingRequirements = getRemainingRequirements(requirements);
+    onSuccess: ({ allRequirements }) => {
+      const remainingRequirements = getRemainingRequirements(allRequirements);
       onSuccess(remainingRequirements);
     },
   });

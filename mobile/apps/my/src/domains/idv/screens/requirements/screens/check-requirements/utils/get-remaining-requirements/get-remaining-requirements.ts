@@ -10,13 +10,15 @@ const getRemainingRequirements = (requirements: OnboardingRequirement[]) => {
     liveness: null,
     idDoc: null,
   };
-  requirements.forEach(req => {
-    if (req.kind === OnboardingRequirementKind.liveness) {
-      remainingRequirements.liveness = req;
-    } else if (req.kind === OnboardingRequirementKind.idDoc) {
-      remainingRequirements.idDoc = req;
-    }
-  });
+  requirements
+    .filter(req => !req.isMet)
+    .forEach(req => {
+      if (req.kind === OnboardingRequirementKind.liveness) {
+        remainingRequirements.liveness = req;
+      } else if (req.kind === OnboardingRequirementKind.idDoc) {
+        remainingRequirements.idDoc = req;
+      }
+    });
   return remainingRequirements;
 };
 

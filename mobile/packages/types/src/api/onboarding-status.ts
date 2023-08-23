@@ -16,22 +16,26 @@ export enum OnboardingRequirementKind {
 
 export type CollectKybDataRequirement = {
   kind: OnboardingRequirementKind.collectKybData;
+  isMet: boolean;
   missingAttributes: CollectedKybDataOption[];
 };
 
 export type CollectKycDataRequirement = {
   kind: OnboardingRequirementKind.collectKycData;
+  isMet: boolean;
   missingAttributes: CollectedKycDataOption[];
   populatedAttributes: CollectedKycDataOption[];
 };
 
 export type CollectInvestorProfileRequirement = {
   kind: OnboardingRequirementKind.investorProfile;
+  isMet: boolean;
   missingAttributes: CollectedInvestorProfileDataOption[];
 };
 
 export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
+  isMet: boolean;
   shouldCollectSelfie: boolean;
   shouldCollectConsent: boolean;
   onlyUsSupported: boolean;
@@ -40,10 +44,12 @@ export type IdDocRequirement = {
 
 export type LivenessRequirement = {
   kind: OnboardingRequirementKind.liveness;
+  isMet: boolean;
 };
 
 export type AuthorizeRequirement = {
   kind: OnboardingRequirementKind.authorize;
+  isMet: boolean;
   fieldsToAuthorize: AuthorizeFields;
 };
 
@@ -65,6 +71,5 @@ export type AuthorizeFields = {
 };
 
 export type OnboardingStatusResponse = {
-  requirements: OnboardingRequirement[];
-  metRequirements: OnboardingRequirement[];
+  allRequirements: OnboardingRequirement[];
 };
