@@ -517,4 +517,66 @@ describe('processPlaybook', () => {
       'document.passport,drivers_license.none.require_selfie',
     );
   });
+
+  it('should process case where doc flow is first correctly', () => {
+    const { isDocFirstFlow } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          idDoc: true,
+          idDocKind: [
+            SupportedIdDocTypes.passport,
+            SupportedIdDocTypes.driversLicense,
+          ],
+          idDocFirst: true,
+          selfie: true,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+    expect(isDocFirstFlow).toBe(true);
+  });
+
+  it('should process default case where doc flow is not specified correctly', () => {
+    const { isDocFirstFlow } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          idDoc: true,
+          idDocKind: [
+            SupportedIdDocTypes.passport,
+            SupportedIdDocTypes.driversLicense,
+          ],
+          selfie: true,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+    expect(isDocFirstFlow).toBe(false);
+  });
+
+  it('should process case where doc flow is not first correctly', () => {
+    const { isDocFirstFlow } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          idDoc: true,
+          idDocKind: [
+            SupportedIdDocTypes.passport,
+            SupportedIdDocTypes.driversLicense,
+          ],
+          selfie: true,
+          idDocFirst: false,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+    expect(isDocFirstFlow).toBe(false);
+  });
 });

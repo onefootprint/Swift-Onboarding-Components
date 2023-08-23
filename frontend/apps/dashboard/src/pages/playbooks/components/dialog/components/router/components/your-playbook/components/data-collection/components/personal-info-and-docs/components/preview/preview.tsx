@@ -1,9 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { LinkButton, Tooltip, Typography } from '@onefootprint/ui';
+import { Checkbox, LinkButton, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import useSession from 'src/hooks/use-session';
 
 import {
   Kind,
@@ -23,10 +24,18 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
     'pages.playbooks.dialog.your-playbook.form.personal-info-and-docs',
   );
   const { formValues } = useFormValues();
-  const { getValues } = useFormContext();
+  const { getValues, watch, register } = useFormContext();
+  const {
+    data: { user },
+  } = useSession();
   const personalInfoAndDocs: PersonalInformationAndDocs = getValues(
     'personalInformationAndDocs',
   );
+  const showIdDocFirstFlowOption =
+    user &&
+    user.isFirmEmployee &&
+    watch('personalInformationAndDocs.idDoc') &&
+    watch('personalInformationAndDocs.idDocKind')?.length > 0;
 
   return (
     <Container>
@@ -55,24 +64,42 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
         </LinkButton>
       </Header>
       <CollectedInformationContainer>
-        {formValues.map(field => (
-          <CollectedInformation key={field}>
-            <Typography
-              variant="body-3"
-              color="tertiary"
-              sx={{ whiteSpace: 'nowrap', textAlign: 'right' }}
-            >
-              {t(`preview.${field}`)}
-            </Typography>
-            <ValueContainer>
-              <DisplayValue
-                field={field as keyof PersonalInformationAndDocs}
-                personalInfoAndDocs={personalInfoAndDocs}
-              />
-            </ValueContainer>
-          </CollectedInformation>
-        ))}
+        {formValues.map(
+          field =>
+            field !== 'idDocFirst' && (
+              <CollectedInformation key={field}>
+                <Typography
+                  variant="body-3"
+                  color="tertiary"
+                  sx={{ whiteSpace: 'nowrap', textAlign: 'right' }}
+                >
+                  {t(`preview.${field}`)}
+                </Typography>
+                <ValueContainer>
+                  <DisplayValue
+                    field={field as keyof PersonalInformationAndDocs}
+                    personalInfoAndDocs={personalInfoAndDocs}
+                  />
+                </ValueContainer>
+              </CollectedInformation>
+            ),
+        )}
       </CollectedInformationContainer>
+      {showIdDocFirstFlowOption && (
+        <Subsection>
+          <Checkbox
+            label={t('id-doc-first.checkbox')}
+            {...register('personalInformationAndDocs.idDocFirst')}
+          />
+          <Typography
+            color="tertiary"
+            sx={{ paddingLeft: 7, marginLeft: 2 }}
+            variant="body-3"
+          >
+            {t('id-doc-first.warning')}
+          </Typography>
+        </Subsection>
+      )}
     </Container>
   );
 };
@@ -124,6 +151,14 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[6]};
+  `}
+`;
+
+const Subsection = styled.div`
+  ${({ theme }) => css`
+    border-top: ${theme.borderWidth[1]} ${theme.borderColor.tertiary} dashed;
+    padding-top: ${theme.spacing[5]};
+    gap: ${theme.spacing[2]};
   `}
 `;
 

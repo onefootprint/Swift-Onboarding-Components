@@ -55,17 +55,19 @@ const Router = ({ onClose }: RouterProps) => {
     if (!kind || !playbook || !authorizedScopes || !name) {
       return;
     }
-    const { mustCollectData, canAccessData, optionalData } = processPlaybook({
-      kind,
-      playbook,
-      authorizedScopes,
-    });
+    const { mustCollectData, canAccessData, optionalData, isDocFirstFlow } =
+      processPlaybook({
+        kind,
+        playbook,
+        authorizedScopes,
+      });
     mutation.mutate(
       {
         name,
         mustCollectData,
         canAccessData,
         optionalData,
+        isDocFirstFlow,
       },
       {
         onSuccess: () => {

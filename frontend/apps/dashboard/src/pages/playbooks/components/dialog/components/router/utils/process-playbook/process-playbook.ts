@@ -63,7 +63,7 @@ const processPlaybook = ({
   }
 
   // id doc handling
-  const { idDoc, idDocKind, selfie } = personalInformationAndDocs;
+  const { idDoc, idDocKind, selfie, idDocFirst } = personalInformationAndDocs;
   let docString = '';
   if (idDoc && idDocKind?.length > 0) {
     const docKinds = idDocKind.join(',');
@@ -71,6 +71,9 @@ const processPlaybook = ({
     docString = `document.${docKinds}.none.${selfieParam}`;
     mustCollectData.push(docString);
   }
+
+  const isDocFirstFlow =
+    (idDocFirst && idDoc && idDocKind?.length > 0) ?? false;
 
   // investor profile handling
   if (
@@ -127,7 +130,12 @@ const processPlaybook = ({
     }
   }
 
-  return { mustCollectData, canAccessData, optionalData };
+  return {
+    mustCollectData,
+    canAccessData,
+    optionalData,
+    isDocFirstFlow,
+  };
 };
 
 export default processPlaybook;

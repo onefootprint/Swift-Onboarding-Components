@@ -4,6 +4,7 @@ import {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import React from 'react';
+import { asAdminUser, asAdminUserFirmEmployee } from 'src/config/tests';
 
 import { Kind } from '@/playbooks/utils/machine/types';
 
@@ -64,5 +65,71 @@ describe('<Preview />', () => {
         "To successfully verify a business we also need to verify its beneficial owner's identity.",
       ).length,
     ).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should show doc first flow option if firm employee and ID doc kind exists', async () => {
+    asAdminUserFirmEmployee();
+    renderForm({
+      kind: Kind.KYC,
+      startingValues: {
+        idDoc: true,
+        idDocKind: [SupportedIdDocTypes.driversLicense],
+      },
+    });
+    expect(
+      screen.getByRole('checkbox', {
+        name: 'Use document scan to autofill basic identity data',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('should not show doc first flow option if firm employee but no ID doc kind shown', async () => {
+    asAdminUserFirmEmployee();
+    renderForm({
+      kind: Kind.KYC,
+      startingValues: {
+        idDoc: true,
+        idDocKind: [],
+      },
+    });
+    expect(
+      screen.queryByRole('checkbox', {
+        name: 'Use document scan to autofill basic identity data',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole(
+        'Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan.',
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  it('should not show doc first flow option if non-firm employee', async () => {
+    asAdminUser();
+    renderForm({
+      kind: Kind.KYC,
+      startingValues: {
+        idDoc: true,
+        idDocKind: [
+          SupportedIdDocTypes.driversLicense,
+          SupportedIdDocTypes.idCard,
+        ],
+      },
+    });
+    expect(
+      screen.queryByRole('checkbox', {
+        name: 'Use document scan to autofill basic identity data',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole(
+        'Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan.',
+      ),
+    ).not.toBeInTheDocument();
   });
 });

@@ -43,6 +43,7 @@ export type PersonalInformationAndDocs = {
   ssnKind?: CollectedKycDataOption;
   idDoc: boolean;
   idDocKind: SupportedIdDocTypes[];
+  idDocFirst?: boolean;
   selfie?: boolean;
   ssnOptional?: boolean;
 };

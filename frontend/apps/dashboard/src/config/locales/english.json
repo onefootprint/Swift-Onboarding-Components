@@ -1156,6 +1156,10 @@
                 "checkbox": "Request a selfie",
                 "warning": "You can optionally request users to take a selfie to validate the ID document requested."
               },
+              "id-doc-first": {
+                "checkbox": "Use document scan to autofill basic identity data",
+                "warning": "Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan."
+              },
               "nationality": {
                 "title": "Nationality, Citizenship, and Residence status",
                 "toggle": "Request users to provide their nationality, citizenship and residence status"
