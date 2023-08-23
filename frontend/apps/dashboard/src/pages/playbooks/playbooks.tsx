@@ -39,7 +39,11 @@ const Playbooks = () => {
           fallbackText={t('cta-not-allowed')}
           scopeKind={RoleScopeKind.onboardingConfiguration}
         >
-          <Button size="small" onClick={onCreatePlaybook}>
+          <Button
+            size="small"
+            sx={{ whiteSpace: 'nowrap' }}
+            onClick={onCreatePlaybook}
+          >
             {t('create-button')}
           </Button>
         </PermissionGate>
@@ -73,6 +77,7 @@ const Title = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[2]};
+    max-width: 650px;
   `};
 `;
 

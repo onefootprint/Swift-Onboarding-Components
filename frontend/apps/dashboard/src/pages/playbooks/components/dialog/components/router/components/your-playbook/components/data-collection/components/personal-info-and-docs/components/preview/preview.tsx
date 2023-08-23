@@ -1,6 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import {
+  CollectedDocumentDataOption,
+  CollectedKycDataOption,
+} from '@onefootprint/types';
 import { Checkbox, LinkButton, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -11,7 +15,7 @@ import {
   PersonalInformationAndDocs,
 } from '@/playbooks/utils/machine/types';
 
-import DisplayValue from './components/display-value';
+import CollectedInformation from './components/collected-information';
 import useFormValues from './hooks/use-form-values';
 
 type PreviewProps = {
@@ -36,6 +40,33 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
     user.isFirmEmployee &&
     watch('personalInformationAndDocs.idDoc') &&
     watch('personalInformationAndDocs.idDocKind')?.length > 0;
+
+  const basicInformationFields: string[] = [
+    CollectedKycDataOption.email,
+    CollectedKycDataOption.phoneNumber,
+    CollectedKycDataOption.name,
+    CollectedKycDataOption.dob,
+    CollectedKycDataOption.fullAddress,
+  ];
+  const usResidentFields = [
+    CollectedKycDataOption.ssn9,
+    CollectedKycDataOption.ssn4,
+    CollectedDocumentDataOption.document,
+    'selfie',
+    'idDoc',
+    'idDocKind',
+    'ssnKind',
+    'ssn',
+    CollectedKycDataOption.nationality,
+    // tk legal status
+  ];
+
+  const basicInformationFormValues = formValues.filter(field =>
+    basicInformationFields.includes(field as keyof PersonalInformationAndDocs),
+  );
+  const usResidentFormValues = formValues.filter(field =>
+    usResidentFields.includes(field as keyof PersonalInformationAndDocs),
+  );
 
   return (
     <Container>
@@ -63,28 +94,20 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
           {t('preview.edit')}
         </LinkButton>
       </Header>
-      <CollectedInformationContainer>
-        {formValues.map(
-          field =>
-            field !== 'idDocFirst' && (
-              <CollectedInformation key={field}>
-                <Typography
-                  variant="body-3"
-                  color="tertiary"
-                  sx={{ whiteSpace: 'nowrap', textAlign: 'right' }}
-                >
-                  {t(`preview.${field}`)}
-                </Typography>
-                <ValueContainer>
-                  <DisplayValue
-                    field={field as keyof PersonalInformationAndDocs}
-                    personalInfoAndDocs={personalInfoAndDocs}
-                  />
-                </ValueContainer>
-              </CollectedInformation>
-            ),
-        )}
-      </CollectedInformationContainer>
+
+      <FormElementsContainer>
+        <CollectedInformation
+          fields={basicInformationFormValues}
+          personalInfoAndDocs={personalInfoAndDocs}
+          title={t('basic-information')}
+        />
+        <CollectedInformation
+          fields={usResidentFormValues}
+          personalInfoAndDocs={personalInfoAndDocs}
+          title={t('us-residents')}
+        />
+      </FormElementsContainer>
+
       {showIdDocFirstFlowOption && (
         <Subsection>
           <Checkbox
@@ -93,7 +116,7 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
           />
           <Typography
             color="tertiary"
-            sx={{ paddingLeft: 7, marginLeft: 2 }}
+            sx={{ paddingLeft: 7, marginLeft: 2, width: '100%' }}
             variant="body-3"
           >
             {t('id-doc-first.warning')}
@@ -110,17 +133,6 @@ const Header = styled.div`
   justify-content: space-between;
 `;
 
-const CollectedInformation = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-    gap: ${theme.spacing[10]};
-    height: ${theme.spacing[7]};
-  `}
-`;
-
 const TitleContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
@@ -130,27 +142,19 @@ const TitleContainer = styled.div`
   `}
 `;
 
-const ValueContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  white-space: pre-wrap;
-`;
-
-const CollectedInformationContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: ${theme.spacing[2]};
-  `}
-`;
-
 const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[6]};
+  `}
+`;
+
+const FormElementsContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[8]};
   `}
 `;
 

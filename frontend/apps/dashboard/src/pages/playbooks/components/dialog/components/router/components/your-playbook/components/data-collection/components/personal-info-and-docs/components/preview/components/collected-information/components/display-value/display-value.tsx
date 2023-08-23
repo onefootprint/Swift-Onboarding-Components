@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { CollectedKycDataOption } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 
@@ -19,11 +18,6 @@ const DisplayValue = ({ field, personalInfoAndDocs }: DisplayValueProps) => {
 
   const value = personalInfoAndDocs[field];
 
-  if (field === CollectedKycDataOption.fullAddress) {
-    return (
-      <Typography variant="body-3">{t(`preview.address-display`)}</Typography>
-    );
-  }
   if (field === 'ssnKind') {
     return <Typography variant="body-3">{t(`preview.${value}`)}</Typography>;
   }

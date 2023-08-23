@@ -16,7 +16,7 @@ describe('<AuthorizedScopes />', () => {
     expect(
       screen.getByRole('checkbox', { name: 'All business information' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Beneficial owner')).toBeInTheDocument();
+    expect(screen.getByText('Beneficial owners')).toBeInTheDocument();
   });
 
   it('should not show BusinessScopes when KYC', () => {
@@ -24,6 +24,6 @@ describe('<AuthorizedScopes />', () => {
     expect(
       screen.queryByRole('checkbox', { name: 'All business information' }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByText('Beneficial owner')).not.toBeInTheDocument();
+    expect(screen.queryByText('Beneficial owners')).not.toBeInTheDocument();
   });
 });

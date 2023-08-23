@@ -17,7 +17,7 @@ const BusinessScopes = () => {
         {...register(`allBusinessData`)}
       />
       <Divider />
-      <Typography variant="label-3">{t('beneficial-owner')}</Typography>
+      <Typography variant="label-2">{t('beneficial-owners')}</Typography>
     </Container>
   );
 };

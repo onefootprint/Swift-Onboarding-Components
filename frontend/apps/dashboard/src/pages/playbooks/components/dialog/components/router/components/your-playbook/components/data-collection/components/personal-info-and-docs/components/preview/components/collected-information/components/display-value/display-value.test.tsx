@@ -33,16 +33,24 @@ const renderDisplayValue = ({
 };
 
 describe('<DisplayValue />', () => {
-  it('should render details for address', () => {
+  it('should render details for shown address normally', () => {
     renderDisplayValue({
       field: CollectedKycDataOption.fullAddress,
       personalInfoAndDocs: {
         [CollectedKycDataOption.fullAddress]: true,
       },
     });
-    expect(
-      screen.getByText('Address line, Zip code, City, State'),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('check-icon')).toBeInTheDocument();
+  });
+
+  it('should render details for non-shown address normally', () => {
+    renderDisplayValue({
+      field: CollectedKycDataOption.fullAddress,
+      personalInfoAndDocs: {
+        [CollectedKycDataOption.fullAddress]: false,
+      },
+    });
+    expect(screen.getByTestId('close-icon')).toBeInTheDocument();
   });
 
   it("should render 'Full' for full SSN", () => {

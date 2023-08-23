@@ -1044,7 +1044,7 @@
       "page-title": "Footprint | Playbooks",
       "header": {
         "title": "Playbooks",
-        "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
+        "subtitle": "Playbooks help companies onboard users to match your needs. Prescriptive yet custom to give you our guidance while recognizing this is not a one-size fits all solution."
       },
       "table": {
         "aria-label": "Playbooks",
@@ -1163,12 +1163,10 @@
         },
         "your-playbook": {
           "title": "Your Playbook recommendation",
-          "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+          "subtitle": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
           "back": "Back",
           "next": "Next",
           "data-collection": {
-            "title": "Data collection",
-            "subtitle": "We recommend the following configuration:",
             "investor-profile": {
               "title": "Investor profile questions",
               "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
@@ -1193,7 +1191,9 @@
               "back": "Back",
               "create-playbook": "Create Playbook",
               "all-business-info": "All business information",
-              "beneficial-owner": "Beneficial owner"
+              "beneficial-owners": "Beneficial owners",
+              "basic-information": "Basic information",
+              "us-residents": "U.S. residents"
             }
           },
           "form": {
@@ -1209,9 +1209,11 @@
                 "kyc": "Edit personal information & docs",
                 "kyb": "Edit KYC of a beneficial owner"
               },
+              "us-residents": "U.S. residents",
               "basic-information": "Basic information",
               "phone": {
-                "toggle": "Request users to provide their phone number"
+                "toggle": "Request users to provide their phone number",
+                "title": "Phone number"
               },
               "ssn": {
                 "title": "SSN",
@@ -1232,11 +1234,11 @@
                 "warning": "Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan."
               },
               "nationality": {
-                "title": "Nationality, Citizenship, and Residence status",
-                "toggle": "Request users to provide their nationality, citizenship and residence status"
+                "title": "Legal status",
+                "toggle": "Request users to provide their legal status in the U.S."
               },
               "id-doc": {
-                "title": "ID document scan (U.S. residents)",
+                "title": "ID document scan",
                 "toggle": "Request users to scan an ID document",
                 "drivers_license": "Driver's license",
                 "id_card": "Identity card",

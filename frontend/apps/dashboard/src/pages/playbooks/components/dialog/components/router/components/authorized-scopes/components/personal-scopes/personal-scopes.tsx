@@ -1,10 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
 import {
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
-import { Box, Checkbox } from '@onefootprint/ui';
+import { Box, Checkbox, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -17,7 +18,7 @@ type PersonalScopesProps = {
 
 const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
   const { register } = useFormContext();
-  const { allT } = useTranslation(
+  const { allT, t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.data-collection.authorized-scopes',
   );
 
@@ -30,68 +31,107 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
     kind === Kind.KYC;
 
   return (
-    <>
-      <Checkbox
-        disabled
-        checked
-        label={allT('cdo.email')}
-        {...register(CollectedKycDataOption.email)}
-      />
-      <Checkbox
-        disabled
-        checked
-        label={allT('cdo.phone_number')}
-        {...register(CollectedKycDataOption.phoneNumber)}
-      />
-      <Checkbox
-        label={allT('cdo.name')}
-        {...register(CollectedKycDataOption.name)}
-      />
-      <Checkbox
-        label={allT('cdo.dob')}
-        {...register(CollectedKycDataOption.dob)}
-      />
-      <Checkbox
-        label={allT('cdo.full_address')}
-        {...register(CollectedKycDataOption.fullAddress)}
-      />
-      {ssn &&
-        (ssnKind === CollectedKycDataOption.ssn4 ? (
+    <Sections>
+      <ScopeSection>
+        <Typography variant="label-3">{t('basic-information')}</Typography>
+        <OptionsContainer>
           <Checkbox
-            label={allT('cdo.ssn4')}
-            {...register(CollectedKycDataOption.ssn4)}
+            disabled
+            checked
+            label={allT('cdo.email')}
+            {...register(CollectedKycDataOption.email)}
           />
-        ) : (
           <Checkbox
-            label={allT('cdo.ssn9')}
-            {...register(CollectedKycDataOption.ssn9)}
+            disabled
+            checked
+            label={allT('cdo.phone_number')}
+            {...register(CollectedKycDataOption.phoneNumber)}
           />
-        ))}
+          <Checkbox
+            label={allT('cdo.name')}
+            {...register(CollectedKycDataOption.name)}
+          />
+          <Checkbox
+            label={allT('cdo.dob')}
+            {...register(CollectedKycDataOption.dob)}
+          />
+          <Checkbox
+            label={allT('cdo.full_address')}
+            {...register(CollectedKycDataOption.fullAddress)}
+          />
+        </OptionsContainer>
+      </ScopeSection>
 
-      {nationality && (
-        <Checkbox
-          label={allT('cdo.nationality')}
-          {...register(CollectedKycDataOption.nationality)}
-        />
-      )}
-      {idDoc && (
-        <Box>
-          <Checkbox
-            label={
-              selfie ? allT('cdo.document_and_selfie') : allT('cdo.document')
-            }
-            {...register(CollectedDocumentDataOption.document)}
-          />
-        </Box>
-      )}
-      {isCollectingInvestorProfile && (
-        <Checkbox
-          label={allT('cdo.investor_profile')}
-          {...register(CollectedInvestorProfileDataOption.investorProfile)}
-        />
-      )}
-    </>
+      <ScopeSection>
+        <Typography variant="label-3">{t('us-residents')}</Typography>
+        <OptionsContainer>
+          {ssn &&
+            (ssnKind === CollectedKycDataOption.ssn4 ? (
+              <Checkbox
+                label={allT('cdo.ssn4')}
+                {...register(CollectedKycDataOption.ssn4)}
+              />
+            ) : (
+              <Checkbox
+                label={allT('cdo.ssn9')}
+                {...register(CollectedKycDataOption.ssn9)}
+              />
+            ))}
+          {nationality && (
+            <Checkbox
+              label={allT('cdo.nationality')}
+              {...register(CollectedKycDataOption.nationality)}
+            />
+          )}
+          {idDoc && (
+            <Box>
+              <Checkbox
+                label={
+                  selfie
+                    ? allT('cdo.document_and_selfie')
+                    : allT('cdo.document')
+                }
+                {...register(CollectedDocumentDataOption.document)}
+              />
+            </Box>
+          )}
+          {isCollectingInvestorProfile && (
+            <Checkbox
+              label={allT('cdo.investor_profile')}
+              {...register(CollectedInvestorProfileDataOption.investorProfile)}
+            />
+          )}
+        </OptionsContainer>
+      </ScopeSection>
+    </Sections>
   );
 };
+
+const OptionsContainer = styled.div`
+  ${({ theme }) => css`
+    display: grid;
+    gap: ${theme.spacing[3]};
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+  `}
+`;
+
+const Sections = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[9]};
+    width: 100%;
+  `}
+`;
+
+const ScopeSection = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: ${theme.spacing[7]};
+  `}
+`;
 
 export default PersonalScopes;

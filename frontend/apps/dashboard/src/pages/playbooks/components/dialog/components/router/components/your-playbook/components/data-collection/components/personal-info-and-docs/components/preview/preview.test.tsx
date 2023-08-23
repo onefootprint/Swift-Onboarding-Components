@@ -24,6 +24,17 @@ describe('<Preview />', () => {
     expect(screen.getAllByText('SSN').length).toBe(1);
   });
 
+  it('should show labels for all options', () => {
+    renderForm({});
+    expect(screen.getByText('Email')).toBeInTheDocument();
+    expect(screen.getByText('Phone number')).toBeInTheDocument();
+    expect(screen.getByText('Date of birth')).toBeInTheDocument();
+    expect(screen.getByText('Address')).toBeInTheDocument();
+    expect(screen.getByText('Nationality')).toBeInTheDocument();
+    expect(screen.getByText('SSN')).toBeInTheDocument();
+    expect(screen.getByText('ID document scan')).toBeInTheDocument();
+  });
+
   it('should show SSN only once when we are showing', () => {
     renderForm({
       startingValues: { ssn: true, ssnKind: CollectedKycDataOption.ssn9 },

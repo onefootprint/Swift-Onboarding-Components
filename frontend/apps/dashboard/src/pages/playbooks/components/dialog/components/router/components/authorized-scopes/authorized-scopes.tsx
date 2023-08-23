@@ -47,9 +47,7 @@ const AuthorizedScopes = ({
       <FormProvider {...formMethods}>
         <Form onSubmit={handleSubmit(onSubmit)}>
           {kind === Kind.KYB && <BusinessScopes />}
-          <OptionsContainer>
-            <PersonalScopes playbook={playbook} kind={kind} />
-          </OptionsContainer>
+          <PersonalScopes playbook={playbook} kind={kind} />
           <ButtonContainer>
             <Button size="compact" variant="secondary" onClick={onBack}>
               {t('back')}
@@ -69,14 +67,6 @@ const Form = styled.form`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[7]};
-  `}
-`;
-
-const OptionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[3]};
-    grid-template-columns: repeat(2, 1fr);
   `}
 `;
 

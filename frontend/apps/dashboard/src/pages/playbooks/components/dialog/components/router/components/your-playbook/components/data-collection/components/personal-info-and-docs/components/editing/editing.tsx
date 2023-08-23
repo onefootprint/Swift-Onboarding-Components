@@ -64,8 +64,11 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
     <EditingContainer>
       {showNoPhoneFlow && (
         <Section>
-          <Typography variant="label-1">{t('basic-information')}</Typography>
           {title}
+          <Typography sx={{ paddingBottom: 2 }} variant="label-1">
+            {t('basic-information')}
+          </Typography>
+          <Typography variant="label-3">{t('phone.title')}</Typography>
           <Controller
             control={control}
             name={`personalInformationAndDocs.${CollectedKycDataOption.phoneNumber}`}
@@ -87,6 +90,9 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
       )}
       <Section>
         {!showNoPhoneFlow && title}
+        <Typography sx={{ paddingBottom: 3 }} variant="label-1">
+          {t('us-residents')}
+        </Typography>
         <Typography variant="label-3">{t('ssn.title')}</Typography>
         <Controller
           control={control}
