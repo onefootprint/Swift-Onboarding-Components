@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { RiskSignal } from '@onefootprint/types';
-import { Box, Tooltip } from '@onefootprint/ui';
+import { Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { createCapitalStringList } from 'src/utils/create-string-list';
 
@@ -26,21 +27,33 @@ const Row = ({ riskSignal }: RowProps) => {
       </td>
       <td>{createCapitalStringList(scopesList)}</td>
       <td>
-        {shouldShowTooltip ? (
-          <Tooltip text={riskSignal.description}>
-            <Box sx={{ display: 'inline-flex', gap: 2, alignItems: 'center' }}>
-              {riskSignal.note}
+        <RowData>
+          <Note>{riskSignal.note}</Note>
+          {shouldShowTooltip && (
+            <Tooltip text={riskSignal.description} alignment="start">
               <IcoInfo16 />
-            </Box>
-          </Tooltip>
-        ) : (
-          <Box sx={{ display: 'inline-flex', gap: 2, alignItems: 'center' }}>
-            {riskSignal.note}
-          </Box>
-        )}
+            </Tooltip>
+          )}
+        </RowData>
       </td>
     </>
   );
 };
+
+const RowData = styled.div`
+  ${({ theme }) => css`
+    gap: ${theme.spacing[2]};
+    display: flex;
+    align-items: center;
+  `}
+`;
+
+const Note = styled.div`
+  display: block
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
 
 export default Row;

@@ -74,6 +74,7 @@ const TooltipContainer = styled(TooltipPrimitive.Content)`
     z-index: ${theme.zIndex.tooltip};
     will-change: opacity;
     text-transform: initial;
+    text-wrap: wrap;
 
     &[data-state='open'],
     &[data-state='delayed-open'],
