@@ -93,6 +93,21 @@
         "permanent-resident": "I have a Green Card/I'm a permanent resident",
         "visa": "I have a Visa",
         "other": "Other"
+      },
+      "form": {
+        "country-of-birth": {
+          "label": "Country of birth",
+          "placeholder": "Select",
+          "error": "Country of birth cannot be empty"
+        },
+        "citizenship": {
+          "label": "Citizenship",
+          "placeholder": "Select",
+          "empty-error": "Citizenship cannot be empty",
+          "us-citizen-error": "If you are a US citizen, please select the \"I'm a citizen\" option above",
+          "delete-aria": "Remove citizenship",
+          "add-text": "Add Citizenship"
+        }
       }
     },
     "ssn": {
