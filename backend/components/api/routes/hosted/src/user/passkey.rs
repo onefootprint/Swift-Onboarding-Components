@@ -249,7 +249,7 @@ pub async fn complete_post(
 fn is_android(client_data_json: &[u8]) -> ApiResult<bool> {
     Ok(serde_json::from_slice::<serde_json::Value>(client_data_json)?
         .as_object()
-        .map(|map| map.get("androidPackageName").is_some())
+        .map(|map| matches!(map.get("androidPackageName"), Some(serde_json::Value::String(val)) if val.as_str() == "com.onefootprint.my"))
         .unwrap_or(false))
 }
 
