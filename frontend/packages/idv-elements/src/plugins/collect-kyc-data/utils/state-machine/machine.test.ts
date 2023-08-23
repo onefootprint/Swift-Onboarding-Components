@@ -1,9 +1,9 @@
 import {
   CollectedKycDataOption,
   IdDI,
-  OnboardingConfig,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -12,21 +12,18 @@ import createCollectKycDataMachine from './machine';
 import { MachineContext } from './types';
 
 describe('Collect KYC Data Machine Tests', () => {
-  const TestOnboardingConfig: OnboardingConfig = {
-    createdAt: 'date',
-    id: 'id',
+  const TestOnboardingConfig: PublicOnboardingConfig = {
     isLive: true,
-    key: 'key',
     logoUrl: 'url',
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: [CollectedKycDataOption.name],
-    canAccessData: [CollectedKycDataOption.name],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    requiresIdDoc: false,
+    key: 'key',
+    isKyb: false,
   };
 
   const createMachine = (

@@ -2,8 +2,8 @@ import {
   AuthorizeRequirement,
   CollectedKycDataOption,
   CollectKycDataRequirement,
-  OnboardingConfig,
   OnboardingRequirementKind,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 import computeRequirementsToShow from './compute-requirements-to-show';
@@ -38,7 +38,7 @@ describe('computeRequirementsToShow', () => {
         },
       ],
       // Not used
-      obConfiguration: {} as OnboardingConfig,
+      obConfiguration: {} as PublicOnboardingConfig,
     };
     it('should return KYC requirement when not yet shown', () => {
       const alreadyDisplayedRequirements = {
@@ -109,7 +109,7 @@ describe('computeRequirementsToShow', () => {
     const requirementsResponse = {
       allRequirements: [{ ...collectKycDataRequirement, isMet: true }],
       // Not used
-      obConfiguration: {} as OnboardingConfig,
+      obConfiguration: {} as PublicOnboardingConfig,
     };
     it('should not return KYC requirement on initial fetch', () => {
       const alreadyDisplayedRequirements = {

@@ -13,7 +13,7 @@ type EmailProps = {
 
 const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, config } = state.context;
+  const { authToken } = state.context;
 
   const handleSubmit = (submittedEmail: string) => {
     send({
@@ -31,7 +31,6 @@ const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
       onComplete={handleSubmit}
       onCancel={onCancel}
       ctaLabel={ctaLabel}
-      config={config}
       hideHeader={hideHeader}
     />
   );

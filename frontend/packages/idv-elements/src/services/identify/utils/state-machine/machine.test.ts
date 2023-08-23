@@ -1,11 +1,10 @@
 import {
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
-  CollectedKycDataOption,
   IdDocOutcomes,
   IdentifyBootstrapData,
-  OnboardingConfig,
   OnboardingConfigStatus,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -13,21 +12,18 @@ import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import createIdentifyMachine from './machine';
 
 describe('Identify Machine Tests', () => {
-  const getOnboardingConfig = (isLive = true): OnboardingConfig => ({
+  const getOnboardingConfig = (isLive = true): PublicOnboardingConfig => ({
     isLive,
-    createdAt: 'date',
-    id: 'id',
-    key: 'key',
     logoUrl: 'url',
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: [CollectedKycDataOption.name],
-    canAccessData: [CollectedKycDataOption.name],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    requiresIdDoc: false,
+    key: 'key',
+    isKyb: false,
   });
 
   const getDevice = (): DeviceInfo => ({

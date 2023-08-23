@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import {
   GetOnboardingConfigRequest,
-  GetOnboardingConfigResponse,
+  GetPublicOnboardingConfigResponse,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
@@ -9,7 +9,7 @@ import { AUTH_HEADER } from '../../../config/constants';
 
 const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
   const { obConfigAuth, authToken } = payload;
-  const response = await request<GetOnboardingConfigResponse>({
+  const response = await request<GetPublicOnboardingConfigResponse>({
     method: 'GET',
     url: '/org/onboarding_config',
     headers: obConfigAuth ?? {
@@ -23,7 +23,7 @@ const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
 const useGetOnboardingConfig = (
   payload: GetOnboardingConfigRequest,
   options: {
-    onSuccess?: (response: GetOnboardingConfigResponse) => void;
+    onSuccess?: (response: GetPublicOnboardingConfigResponse) => void;
     onError?: (error: RequestError) => void;
   } = {},
 ) => {

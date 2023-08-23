@@ -1,8 +1,7 @@
 import { renderHook } from '@onefootprint/test-utils';
 import {
-  CollectedKycDataOption,
-  OnboardingConfig,
   OnboardingConfigStatus,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { BifrostMachine } from 'src/utils/state-machine';
 
@@ -10,21 +9,18 @@ import { BifrostMachineProvider } from '../../components/bifrost-machine-provide
 import useSandboxMode from './use-sandbox-mode';
 
 describe('useSandboxMode', () => {
-  const getOnboardingConfig = (isLive: boolean): OnboardingConfig => ({
+  const getOnboardingConfig = (isLive: boolean): PublicOnboardingConfig => ({
     isLive,
-    createdAt: 'date',
-    id: 'id',
     key: 'key',
     logoUrl: 'url',
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: [CollectedKycDataOption.name],
-    canAccessData: [CollectedKycDataOption.name],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    requiresIdDoc: false,
+    isKyb: false,
   });
 
   describe('when it is using a live key', () => {

@@ -2,13 +2,13 @@ import {
   CollectKycDataRequirement,
   IdDI,
   IdDIData,
-  OnboardingConfig,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 import { BasePluginProps } from '../base-plugin';
 
 export type CollectKycDataContext = {
-  config: OnboardingConfig;
+  config: PublicOnboardingConfig;
   userFound: boolean;
   requirement: CollectKycDataRequirement;
   bootstrapData?: IdDIData; // For tenant-provided initial data or email/phone from identify flows

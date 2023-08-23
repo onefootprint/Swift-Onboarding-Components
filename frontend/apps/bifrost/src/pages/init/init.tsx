@@ -5,9 +5,8 @@ import {
 } from '@onefootprint/idv-elements';
 import {
   CLIENT_PUBLIC_KEY_HEADER,
-  CollectedDataOptionLabels,
   IdvBootstrapData,
-  OnboardingConfig,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
@@ -27,22 +26,14 @@ const Init = () => {
   useGetOnboardingConfig(
     { obConfigAuth },
     {
-      onSuccess: (config: OnboardingConfig) => {
+      onSuccess: (config: PublicOnboardingConfig) => {
         observeCollector.setAppContext({
           config,
         });
         send({
           type: 'initContextUpdated',
           payload: {
-            config: {
-              ...config,
-              mustCollectData: config.mustCollectData.map(
-                (attr: string) => CollectedDataOptionLabels[attr],
-              ),
-              canAccessData: config.canAccessData.map(
-                (attr: string) => CollectedDataOptionLabels[attr],
-              ),
-            },
+            config: { ...config },
           },
         });
       },

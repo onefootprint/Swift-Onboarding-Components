@@ -11,9 +11,9 @@ import {
 import {
   CollectedKycDataOption,
   IdDI,
-  OnboardingConfig,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
@@ -82,25 +82,19 @@ describe.skip('<CollectKycData />', () => {
       </React.StrictMode>,
     );
 
-  const getOnboardingConfig = (
-    mustCollectData?: CollectedKycDataOption[],
-    canAccessData?: CollectedKycDataOption[],
-  ): OnboardingConfig => ({
+  const onboardingConfig: PublicOnboardingConfig = {
     isLive: true,
-    createdAt: 'date',
-    id: 'id',
-    key: 'key',
     logoUrl: 'url',
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: mustCollectData ?? [],
-    canAccessData: canAccessData ?? [],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
-  });
+    requiresIdDoc: false,
+    key: 'key',
+    isKyb: false,
+  };
 
   const getContext = (
     attributes?: CollectedKycDataOption[],
@@ -118,7 +112,7 @@ describe.skip('<CollectKycData />', () => {
         [IdDI.email]: 'piip@onefootprint.com',
       },
       userFound: true,
-      config: getOnboardingConfig(attributes, attributes),
+      config: onboardingConfig,
     },
     device: {
       type: 'mobile',

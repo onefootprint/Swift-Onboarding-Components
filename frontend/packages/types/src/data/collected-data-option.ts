@@ -54,31 +54,6 @@ export const documentCdoFor = (
   return null;
 };
 
-// Labels sent from the backend for each attribute
-export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
-  name: CollectedKycDataOption.name,
-  dob: CollectedKycDataOption.dob,
-  email: CollectedKycDataOption.email,
-  ssn9: CollectedKycDataOption.ssn9,
-  ssn4: CollectedKycDataOption.ssn4,
-  full_address: CollectedKycDataOption.fullAddress,
-  partial_address: CollectedKycDataOption.partialAddress,
-  phone_number: CollectedKycDataOption.phoneNumber,
-  nationality: CollectedKycDataOption.nationality,
-  usLegalStatus: CollectedKycDataOption.usLegalStatus,
-  document: CollectedDocumentDataOption.document,
-  document_and_selfie: CollectedDocumentDataOption.documentAndSelfie,
-  business_name: CollectedKybDataOption.name,
-  business_tin: CollectedKybDataOption.tin,
-  business_address: CollectedKybDataOption.address,
-  business_phone_number: CollectedKybDataOption.phoneNumber,
-  business_website: CollectedKybDataOption.website,
-  business_beneficial_owners: CollectedKybDataOption.beneficialOwners,
-  business_kyced_beneficial_owners:
-    CollectedKybDataOption.kycedBeneficialOwners,
-  investor_profile: CollectedInvestorProfileDataOption.investorProfile,
-};
-
 export const CollectedKybDataOptionToRequiredAttributes: Record<
   CollectedKybDataOption,
   BusinessDI[]

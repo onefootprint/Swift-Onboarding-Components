@@ -1,5 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { IdDI, OnboardingConfig } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -15,7 +15,6 @@ type EmailCollectProps = {
   onComplete: (email: string) => void;
   onCancel?: () => void;
   hideHeader?: boolean;
-  config?: OnboardingConfig;
   ctaLabel?: string;
 };
 

@@ -1,8 +1,7 @@
 import {
-  CollectedKycDataOption,
   IdDI,
-  OnboardingConfig,
   OnboardingConfigStatus,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -10,21 +9,18 @@ import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import createOnboardingMachine, { OnboardingMachineArgs } from './machine';
 
 describe('Onboarding Machine Tests', () => {
-  const testOnboardingConfig: OnboardingConfig = {
-    createdAt: 'date',
-    id: 'id',
+  const testOnboardingConfig: PublicOnboardingConfig = {
     isLive: true,
-    key: 'key',
     logoUrl: 'url',
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: [CollectedKycDataOption.name],
-    canAccessData: [CollectedKycDataOption.name],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    requiresIdDoc: false,
+    key: 'key',
+    isKyb: false,
   };
 
   const defaultBootstrapData = {

@@ -1,8 +1,8 @@
 import {
   IdDocOutcomes,
   IdvBootstrapData,
-  OnboardingConfig,
   OnboardingRequirement,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
@@ -10,7 +10,7 @@ import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
 export type MachineContext = {
   onboardingContext: {
     userFound: boolean;
-    config: OnboardingConfig;
+    config: PublicOnboardingConfig;
     device: DeviceInfo;
     authToken: string;
     isTransfer?: boolean;

@@ -1,4 +1,4 @@
-import { IdDocOutcomes, OnboardingConfig } from '@onefootprint/types';
+import { IdDocOutcomes, PublicOnboardingConfig } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
@@ -7,7 +7,7 @@ export type MachineContext = {
   authToken: string;
   scopedAuthToken: string;
   tab?: Window;
-  config?: OnboardingConfig;
+  config?: PublicOnboardingConfig;
   idDocOutcome?: IdDocOutcomes;
 };
 
@@ -18,7 +18,7 @@ export type MachineEvents =
         device: DeviceInfo;
         authToken: string;
         idDocOutcome?: IdDocOutcomes;
-        config: OnboardingConfig;
+        config: PublicOnboardingConfig;
       };
     }
   | {

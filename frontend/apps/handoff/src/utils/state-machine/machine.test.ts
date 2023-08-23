@@ -1,8 +1,7 @@
 import {
-  CollectedKycDataOption,
   D2PStatus,
-  OnboardingConfig,
   OnboardingConfigStatus,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -11,21 +10,18 @@ import { createHandoffMachine } from './machine';
 describe('handoff state machine', () => {
   const createMachine = () => createHandoffMachine();
 
-  const TestOnboardingConfig: OnboardingConfig = {
-    createdAt: 'date',
-    id: 'id',
+  const TestOnboardingConfig: PublicOnboardingConfig = {
     isLive: true,
-    key: 'key',
     logoUrl: 'url',
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: [CollectedKycDataOption.name],
-    canAccessData: [CollectedKycDataOption.name],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    requiresIdDoc: false,
+    key: 'key',
+    isKyb: false,
   };
 
   it('stays in init until all required info is collected', () => {

@@ -9,13 +9,12 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import {
-  CollectedDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
   IdDI,
-  OnboardingConfig,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
@@ -69,59 +68,49 @@ describe.skip('<CollectKybData />', () => {
     });
   });
 
-  const getOnboardingConfig = (
-    mustCollectData?: CollectedDataOption[],
-    canAccessData?: CollectedDataOption[],
-  ): OnboardingConfig => ({
+  const onboardingConfig: PublicOnboardingConfig = {
     isLive: true,
-    createdAt: 'date',
-    id: 'id',
-    key: 'key',
     logoUrl: 'url',
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: mustCollectData ?? [],
-    canAccessData: canAccessData ?? [],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
-  });
+    requiresIdDoc: false,
+    key: 'key',
+    isKyb: false,
+  };
 
   const getContext = (
     kycAttributes: CollectedKycDataOption[],
     kybAttributes: CollectedKybDataOption[],
-  ): PluginContext<CollectKybDataContext> => {
-    const allAttributes = [...kycAttributes, ...kybAttributes];
-
-    return {
-      authToken: 'token',
-      customData: {
-        config: getOnboardingConfig(allAttributes, allAttributes),
-        kybRequirement: {
-          kind: OnboardingRequirementKind.collectKybData,
-          isMet: false,
-          missingAttributes: kybAttributes,
-        },
-        kycRequirement: {
-          kind: OnboardingRequirementKind.collectKycData,
-          isMet: false,
-          missingAttributes: kycAttributes,
-          populatedAttributes: [],
-          optionalAttributes: [],
-        },
-        kycBootstrapData: {
-          [IdDI.email]: 'piip@onefootprint.com',
-        },
-        userFound: true,
+  ): PluginContext<CollectKybDataContext> => ({
+    authToken: 'token',
+    customData: {
+      config: onboardingConfig,
+      kybRequirement: {
+        kind: OnboardingRequirementKind.collectKybData,
+        isMet: false,
+        missingAttributes: kybAttributes,
       },
-      device: {
-        type: 'mobile',
-        hasSupportForWebauthn: true,
+      kycRequirement: {
+        kind: OnboardingRequirementKind.collectKycData,
+        isMet: false,
+        missingAttributes: kycAttributes,
+        populatedAttributes: [],
+        optionalAttributes: [],
       },
-    };
-  };
+      kycBootstrapData: {
+        [IdDI.email]: 'piip@onefootprint.com',
+      },
+      userFound: true,
+    },
+    device: {
+      type: 'mobile',
+      hasSupportForWebauthn: true,
+    },
+  });
 
   const renderPlugin = ({ context, onDone }: CollectKybDataProps) =>
     render(

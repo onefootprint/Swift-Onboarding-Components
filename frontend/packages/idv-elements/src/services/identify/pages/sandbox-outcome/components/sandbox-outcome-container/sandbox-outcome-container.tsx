@@ -2,8 +2,8 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   IdDocOutcomes,
-  OnboardingConfig,
   OverallOutcomes,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
@@ -12,7 +12,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
 import getRandomID from '../../utils/get-random-id';
-import requiresIdDoc from '../../utils/requires-id-doc';
 import IdDocOutcome from '../id-doc-outcome';
 import OverallOutcome from '../overall-outcome';
 import TestIdInput from '../test-id-input';
@@ -27,10 +26,10 @@ export const SandboxOutcomeContainer = ({
   config,
 }: {
   onSubmit: (formData: FormDataType) => void;
-  config?: OnboardingConfig;
+  config?: PublicOnboardingConfig;
 }) => {
   const { t } = useTranslation('pages.sandbox-outcome');
-  const shouldShowIdDocOutcome = requiresIdDoc(config);
+  const shouldShowIdDocOutcome = config?.requiresIdDoc;
   const formMethods = useForm<FormDataType>({
     defaultValues: {
       outcomes: {

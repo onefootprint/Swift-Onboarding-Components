@@ -1,22 +1,13 @@
 import { useGetOnboardingConfig } from '@onefootprint/idv-elements';
-import {
-  CollectedDataOption,
-  CollectedKybDataOption,
-} from '@onefootprint/types';
 
 import useIdvMachine from '../../../hooks/use-idv-machine';
-
-const isKybCdo = (data: CollectedDataOption) =>
-  Object.values(CollectedKybDataOption).includes(
-    data as CollectedKybDataOption,
-  );
 
 const useIsKyb = () => {
   const [state] = useIdvMachine();
   const { obConfigAuth, authToken } = state.context;
   const result = useGetOnboardingConfig({ obConfigAuth, authToken });
   const config = result.data;
-  const isKyb = config?.canAccessData?.some(cdo => isKybCdo(cdo));
+  const isKyb = config?.isKyb;
 
   return { isLoading: result.isLoading, isKyb };
 };

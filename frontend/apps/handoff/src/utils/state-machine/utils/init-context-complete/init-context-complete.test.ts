@@ -1,28 +1,24 @@
 import {
-  CollectedKycDataOption,
-  OnboardingConfig,
   OnboardingConfigStatus,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 import { MachineContext, MachineEvents } from '../../types';
 import initContextComplete from './init-context-complete';
 
 describe('initContextComplete', () => {
-  const TestOnboardingConfig: OnboardingConfig = {
-    createdAt: 'date',
-    id: 'id',
+  const TestOnboardingConfig: PublicOnboardingConfig = {
     isLive: true,
-    key: 'key',
     logoUrl: 'url',
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: [CollectedKycDataOption.name],
-    canAccessData: [CollectedKycDataOption.name],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    requiresIdDoc: false,
+    key: 'key',
+    isKyb: false,
   };
 
   describe('when init context info is complete', () => {

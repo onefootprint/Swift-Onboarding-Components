@@ -4,9 +4,9 @@ import {
   CollectKycDataRequirement,
   IdDI,
   IdDocRequirement,
-  OnboardingConfig,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
+  PublicOnboardingConfig,
   RegisterPasskeyRequirement,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
@@ -50,21 +50,18 @@ describe('Onboarding Requirements Machine Tests', () => {
   const createMachine = (args: OnboardingRequirementsMachineArgs) =>
     createOnboardingRequirementsMachine(args);
 
-  const TestOnboardingConfig: OnboardingConfig = {
-    createdAt: 'date',
-    id: 'id',
+  const TestOnboardingConfig: PublicOnboardingConfig = {
     isLive: true,
-    key: 'key',
     logoUrl: 'url',
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: [CollectedKycDataOption.name],
-    canAccessData: [CollectedKycDataOption.name],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    requiresIdDoc: false,
+    key: 'key',
+    isKyb: false,
   };
 
   describe('with an existing user', () => {

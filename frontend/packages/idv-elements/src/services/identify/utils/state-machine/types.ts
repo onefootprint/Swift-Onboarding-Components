@@ -4,7 +4,7 @@ import {
   Identifier,
   IdentifyBootstrapData,
   ObConfigAuth,
-  OnboardingConfig,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
@@ -12,7 +12,7 @@ import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 export type MachineContext = {
   bootstrapData: IdentifyBootstrapData;
   obConfigAuth: ObConfigAuth;
-  config?: OnboardingConfig;
+  config?: PublicOnboardingConfig;
   device?: DeviceInfo;
   identify: MachineIdentifyContext;
   challenge: MachineChallengeContext;
@@ -41,7 +41,7 @@ export type MachineEvents =
   | {
       type: 'initContextUpdated';
       payload: {
-        config?: OnboardingConfig;
+        config?: PublicOnboardingConfig;
         device?: DeviceInfo;
       };
     }

@@ -1,18 +1,15 @@
 import {
-  CollectedKycDataOption,
   IdDI,
   IdvBootstrapData,
-  OnboardingConfig,
   OnboardingConfigStatus,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import { createBifrostMachine } from './machine';
 
 describe('Bifrost Machine Tests', () => {
-  const testOnboardingConfig: OnboardingConfig = {
-    createdAt: 'date',
-    id: 'id',
+  const testOnboardingConfig: PublicOnboardingConfig = {
     isLive: true,
     key: 'key',
     logoUrl: 'url',
@@ -20,11 +17,10 @@ describe('Bifrost Machine Tests', () => {
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: [CollectedKycDataOption.name],
-    canAccessData: [CollectedKycDataOption.name],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    requiresIdDoc: false,
+    isKyb: false,
   };
 
   const testBootstrapData: IdvBootstrapData = {

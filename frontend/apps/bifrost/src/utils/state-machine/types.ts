@@ -1,8 +1,8 @@
-import { IdvBootstrapData, OnboardingConfig } from '@onefootprint/types';
+import { IdvBootstrapData, PublicOnboardingConfig } from '@onefootprint/types';
 
 export type MachineContext = {
   authToken?: string;
-  config?: OnboardingConfig;
+  config?: PublicOnboardingConfig;
   validationToken?: string;
   bootstrapData?: IdvBootstrapData;
   showCompletionPage?: boolean;
@@ -13,7 +13,7 @@ export type MachineEvents =
   | {
       type: 'initContextUpdated';
       payload: {
-        config?: OnboardingConfig;
+        config?: PublicOnboardingConfig;
         bootstrapData?: IdvBootstrapData;
         showCompletionPage?: boolean;
         showLogo?: boolean;

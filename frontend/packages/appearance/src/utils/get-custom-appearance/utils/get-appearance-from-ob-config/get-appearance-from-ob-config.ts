@@ -1,11 +1,11 @@
 import { FootprintAppearance } from '@onefootprint/footprint-js';
-import { GetOnboardingConfigResponse } from '@onefootprint/types';
+import { GetPublicOnboardingConfigResponse } from '@onefootprint/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const getOnboardingConfig = async (
   onboardingConfigKey: string,
-): Promise<GetOnboardingConfigResponse> => {
+): Promise<GetPublicOnboardingConfigResponse> => {
   const response = await fetch(`${API_BASE_URL}/org/onboarding_config`, {
     method: 'GET',
     headers: {

@@ -25,16 +25,15 @@ export const withUserVault = () =>
   });
 
 export const onboardingConfigFixture = {
-  id: 'ob_config_id_18RIzpIPRAL3pYlnO4Cgeb',
   key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
   name: 'Acme Bank',
   org_name: 'Acme Bank',
   logo_url: null,
-  must_collect_data: ['name', 'dob'],
-  can_access_data: ['dob'],
   is_live: true,
-  created_at: '2022-07-20T01:52:36.984290Z',
   status: 'enabled',
+  is_no_phone_flow: false,
+  requires_id_doc: false,
+  is_kyb: false,
 };
 
 export const withOnboardingConfig = (data = onboardingConfigFixture) =>

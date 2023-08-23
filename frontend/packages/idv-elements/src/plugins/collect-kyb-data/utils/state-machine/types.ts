@@ -4,7 +4,7 @@ import {
   CollectKybDataRequirement,
   CollectKycDataRequirement,
   KycBootstrapData,
-  OnboardingConfig,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
@@ -40,7 +40,7 @@ export type MachineContext = {
   kycBootstrapData?: KycBootstrapData;
   device?: DeviceInfo;
   authToken?: string;
-  config?: OnboardingConfig;
+  config?: PublicOnboardingConfig;
   userFound?: boolean;
   // Machine generated
   data: BusinessDIData;

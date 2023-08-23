@@ -1,4 +1,4 @@
-import { IdDocOutcomes, OnboardingConfig } from '@onefootprint/types';
+import { IdDocOutcomes, PublicOnboardingConfig } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import { TransferRequirements } from '../../types';
@@ -9,7 +9,7 @@ export type MachineContext = {
   scopedAuthToken?: string;
   device?: DeviceInfo;
   missingRequirements: TransferRequirements;
-  config?: OnboardingConfig;
+  config?: PublicOnboardingConfig;
   idDocOutcome?: IdDocOutcomes;
 };
 
@@ -19,7 +19,7 @@ export type MachineEvents =
       payload: {
         authToken: string;
         device: DeviceInfo;
-        config: OnboardingConfig;
+        config: PublicOnboardingConfig;
         missingRequirements: TransferRequirements;
         idDocOutcome?: IdDocOutcomes;
       };

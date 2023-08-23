@@ -1,11 +1,15 @@
-import { IdDIData, IdDocOutcomes, OnboardingConfig } from '@onefootprint/types';
+import {
+  IdDIData,
+  IdDocOutcomes,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type MachineContext = {
   authToken: string;
   bootstrapData: IdDIData; // TODO: generalize this more in the next iteration
-  config?: OnboardingConfig;
+  config?: PublicOnboardingConfig;
   device?: DeviceInfo;
   userFound?: boolean;
   isTransfer?: boolean;
@@ -19,7 +23,7 @@ export type MachineEvents =
   | {
       type: 'initContextUpdated';
       payload: {
-        config?: OnboardingConfig;
+        config?: PublicOnboardingConfig;
         device?: DeviceInfo;
       };
     }

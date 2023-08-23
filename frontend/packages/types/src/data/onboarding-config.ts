@@ -7,6 +7,23 @@ export enum OnboardingConfigStatus {
   disabled = 'disabled',
 }
 
+export type PublicOnboardingConfig = {
+  name: string;
+  key: string;
+  orgName: string;
+  logoUrl: string | null;
+  privacyPolicyUrl: string | null;
+  isLive: boolean;
+  status: OnboardingConfigStatus;
+
+  appearance?: FootprintAppearance;
+
+  isAppClipEnabled: boolean;
+  isNoPhoneFlow: boolean;
+  requiresIdDoc: boolean;
+  isKyb: boolean;
+};
+
 export type OnboardingConfig = {
   id: string;
   name: string;

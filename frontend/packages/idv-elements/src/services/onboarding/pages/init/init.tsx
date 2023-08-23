@@ -2,7 +2,6 @@ import { useObserveCollector } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { CollectedDataOptionLabels } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -47,12 +46,6 @@ const Init = () => {
               ...payload,
               config: {
                 ...onboardingConfig,
-                mustCollectData: onboardingConfig.mustCollectData.map(
-                  (attr: string) => CollectedDataOptionLabels[attr],
-                ),
-                canAccessData: onboardingConfig.canAccessData.map(
-                  (attr: string) => CollectedDataOptionLabels[attr],
-                ),
               },
             },
           });

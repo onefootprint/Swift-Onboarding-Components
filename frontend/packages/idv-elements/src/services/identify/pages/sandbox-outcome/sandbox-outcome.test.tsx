@@ -5,12 +5,10 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import {
-  CollectedDocumentDataOption,
-  CollectedKycDataOption,
   IdDocOutcomes,
-  OnboardingConfig,
   OnboardingConfigStatus,
   OverallOutcomes,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
@@ -21,21 +19,18 @@ import SandboxOutcomeContainer, {
   FormDataType,
 } from './components/sandbox-outcome-container';
 
-const getOnboardingConfig = (isLive = true): OnboardingConfig => ({
+const getOnboardingConfig = (isLive = true): PublicOnboardingConfig => ({
   isLive,
-  createdAt: 'date',
-  id: 'id',
-  key: 'key',
   logoUrl: 'url',
   privacyPolicyUrl: 'url',
   name: 'tenant',
   orgName: 'tenantOrg',
   status: OnboardingConfigStatus.enabled,
-  mustCollectData: [CollectedDocumentDataOption.document],
-  canAccessData: [CollectedKycDataOption.name],
-  optionalData: [],
   isAppClipEnabled: false,
   isNoPhoneFlow: false,
+  requiresIdDoc: true,
+  key: 'key',
+  isKyb: false,
 });
 
 let submittedFormData: FormDataType = {

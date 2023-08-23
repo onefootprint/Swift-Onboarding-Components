@@ -1,6 +1,6 @@
 import {
   CollectKycDataRequirement,
-  OnboardingConfig,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
@@ -10,7 +10,7 @@ export type MachineContext = {
   // Plugin context
   authToken: string;
   device: DeviceInfo;
-  config: OnboardingConfig;
+  config: PublicOnboardingConfig;
   userFound: boolean;
   requirement: CollectKycDataRequirement;
   // Machine-generated

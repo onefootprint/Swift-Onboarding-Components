@@ -5,7 +5,7 @@ import {
   CollectedKycDataOption,
 } from '../data/collected-data-option';
 import { SupportedIdDocTypes } from '../data/id-doc-type';
-import { OnboardingConfig } from '../data/onboarding-config';
+import { PublicOnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {
   registerPasskey = 'liveness', // TODO: eventually we need to synchronously rename `liveness` or create a duplicate
@@ -83,7 +83,7 @@ export type AuthorizeFields = {
 export type OnboardingStatusResponse = {
   allRequirements: OnboardingRequirement[];
   // This is only used to initialize handoff, and the requirements are discarded.
-  obConfiguration: OnboardingConfig;
+  obConfiguration: PublicOnboardingConfig;
 };
 
 export type RequirementForKind<K> =

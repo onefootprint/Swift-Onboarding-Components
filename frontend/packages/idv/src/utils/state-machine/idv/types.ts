@@ -3,7 +3,7 @@ import {
   IdDocOutcomes,
   IdvBootstrapData,
   ObConfigAuth,
-  OnboardingConfig,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 export type MachineContext = {
@@ -25,7 +25,7 @@ export type MachineEvents =
   | {
       type: 'initContextUpdated';
       payload: {
-        config?: OnboardingConfig;
+        config?: PublicOnboardingConfig;
         device?: DeviceInfo;
       };
     }

@@ -1,7 +1,7 @@
 import {
   IdDocOutcomes,
   IdDocRequirement,
-  OnboardingConfig,
+  PublicOnboardingConfig,
   RegisterPasskeyRequirement,
 } from '@onefootprint/types';
 
@@ -13,7 +13,7 @@ export type TransferRequirements = {
 };
 
 export type TransferCustomData = {
-  config: OnboardingConfig;
+  config: PublicOnboardingConfig;
   missingRequirements: TransferRequirements;
   idDocOutcome?: IdDocOutcomes;
 };

@@ -1,9 +1,9 @@
-import { OnboardingConfig } from '../data';
+import { PublicOnboardingConfig } from '../data';
 
 export type OnboardingRequest = {
   authToken: string;
 };
 
 export type OnboardingResponse = {
-  onboardingConfig: OnboardingConfig;
+  onboardingConfig: PublicOnboardingConfig;
 };

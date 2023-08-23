@@ -2,13 +2,13 @@ import {
   CollectKybDataRequirement,
   CollectKycDataRequirement,
   KycBootstrapData,
-  OnboardingConfig,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 import { BasePluginProps } from '../base-plugin';
 
 export type CollectKybDataContext = {
-  config: OnboardingConfig;
+  config: PublicOnboardingConfig;
   kybRequirement: CollectKybDataRequirement;
   kycRequirement?: CollectKycDataRequirement;
   kycBootstrapData?: KycBootstrapData;

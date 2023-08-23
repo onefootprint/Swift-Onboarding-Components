@@ -4,7 +4,6 @@ import {
   CollectedKycDataOption,
 } from '../data/collected-data-option';
 import { SupportedIdDocTypes } from '../data/id-doc-type';
-import { OnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {
   liveness = 'liveness',
@@ -68,6 +67,4 @@ export type AuthorizeFields = {
 export type OnboardingStatusResponse = {
   requirements: OnboardingRequirement[];
   metRequirements: OnboardingRequirement[];
-  // This is only used to initialize handoff, and the requirements are discarded.
-  obConfiguration: OnboardingConfig;
 };

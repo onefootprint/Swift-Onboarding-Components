@@ -1,19 +1,16 @@
 import {
   BusinessBoKycData,
   CLIENT_PUBLIC_KEY_HEADER,
-  CollectedKycDataOption,
   KYB_BO_SESSION_AUTHORIZATION_HEADER,
-  OnboardingConfig,
   OnboardingConfigStatus,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 import { MachineContext, MachineEvents } from '../../types';
 import isContextReady from './is-context-ready';
 
 describe('isContextReady', () => {
-  const testOnboardingConfig: OnboardingConfig = {
-    createdAt: 'date',
-    id: 'id',
+  const testOnboardingConfig: PublicOnboardingConfig = {
     isLive: true,
     key: 'key',
     logoUrl: 'url',
@@ -21,11 +18,10 @@ describe('isContextReady', () => {
     name: 'tenant',
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
-    mustCollectData: [CollectedKycDataOption.name],
-    canAccessData: [CollectedKycDataOption.name],
-    optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    requiresIdDoc: false,
+    isKyb: false,
   };
 
   const testBusinessBoKycData: BusinessBoKycData = {

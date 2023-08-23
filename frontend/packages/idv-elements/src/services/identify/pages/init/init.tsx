@@ -1,8 +1,5 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
-import {
-  CollectedDataOptionLabels,
-  OnboardingConfig,
-} from '@onefootprint/types';
+import { PublicOnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 
 import InitShimmer from '../../../../components/init-shimmer';
@@ -32,25 +29,14 @@ const Init = () => {
   useGetOnboardingConfig(
     { obConfigAuth },
     {
-      onSuccess: (config: OnboardingConfig) => {
+      onSuccess: (config: PublicOnboardingConfig) => {
         observeCollector.setAppContext({
           config,
         });
         send({
           type: 'initContextUpdated',
           payload: {
-            config: {
-              ...config,
-              mustCollectData: config.mustCollectData.map((attr: string) => {
-                if (attr.includes('document'))
-                  // Since we added new cdos in the format document.<something>.<something>.<something>; need to cleanup later
-                  return CollectedDataOptionLabels.document;
-                return CollectedDataOptionLabels[attr];
-              }),
-              canAccessData: config.canAccessData.map(
-                (attr: string) => CollectedDataOptionLabels[attr],
-              ),
-            },
+            config: { ...config },
           },
         });
       },

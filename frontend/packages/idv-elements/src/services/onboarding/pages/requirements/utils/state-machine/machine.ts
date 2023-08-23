@@ -1,7 +1,7 @@
 import {
   IdDocOutcomes,
   IdvBootstrapData,
-  OnboardingConfig,
+  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
@@ -12,7 +12,7 @@ import { MachineContext, MachineEvents } from './types';
 export type OnboardingRequirementsMachineArgs = {
   userFound: boolean;
   device: DeviceInfo;
-  config: OnboardingConfig;
+  config: PublicOnboardingConfig;
   authToken: string;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
