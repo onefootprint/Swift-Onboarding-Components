@@ -3,12 +3,12 @@ import {
   IcoBuilding24,
   IcoCake24,
   IcoCar24,
-  IcoCheckCircle24,
   IcoClipboard24,
   IcoDollar24,
   IcoEmail24,
   IcoFileText24,
   IcoFlag24,
+  IcoGlobe24,
   IcoHome24,
   IcoIdCard24,
   Icon,
@@ -41,7 +41,7 @@ const IconByCollectedKycDataOption: Record<CollectedKycDataOption, Icon> = {
   [CollectedKycDataOption.fullAddress]: IcoBuilding24,
   [CollectedKycDataOption.partialAddress]: IcoBuilding24,
   [CollectedKycDataOption.nationality]: IcoFlag24,
-  [CollectedKycDataOption.usLegalStatus]: IcoCheckCircle24, // placeholder, will add IcoGlobe
+  [CollectedKycDataOption.usLegalStatus]: IcoGlobe24,
 };
 
 const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
