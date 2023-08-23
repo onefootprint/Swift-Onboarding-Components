@@ -63,7 +63,7 @@ const CountrySelect = ({
         onClick={onClick}
         testID={triggerTestID}
       >
-        {selectedOption && (
+        {selectedOption?.value && (
           <StyledFlag code={selectedOption.value} disabled={disabled} />
         )}
         <LabelContainer>{selectedOption?.label || placeholder}</LabelContainer>
