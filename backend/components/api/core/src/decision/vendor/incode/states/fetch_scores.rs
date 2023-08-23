@@ -99,9 +99,9 @@ impl IncodeStateTransition for FetchScores {
                 )
                 .await?;
             let vault_data = IncodeOcrComparisonDataFields {
-                first_name: vd.get_di(IdentityDataKind::FirstName)?,
-                last_name: vd.get_di(IdentityDataKind::LastName)?,
-                dob: vd.get_di(IdentityDataKind::Dob)?,
+                first_name: vd.get_di(IdentityDataKind::FirstName).ok(),
+                last_name: vd.get_di(IdentityDataKind::LastName).ok(),
+                dob: vd.get_di(IdentityDataKind::Dob).ok(),
             };
             Some(vault_data)
         } else {

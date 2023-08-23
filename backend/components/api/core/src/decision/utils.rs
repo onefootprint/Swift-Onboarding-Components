@@ -115,18 +115,11 @@ pub async fn should_initiate_requests_for_document(
                     ],
                 )
                 .await?;
-            match (
-                vd.get_di(IdentityDataKind::FirstName).ok(),
-                vd.get_di(IdentityDataKind::LastName).ok(),
-                vd.get_di(IdentityDataKind::Dob).ok(),
-            ) {
-                (Some(first_name), Some(last_name), Some(dob)) => Some(IncodeOcrComparisonDataFields {
-                    first_name,
-                    last_name,
-                    dob,
-                }),
-                _ => None,
-            }
+            Some(IncodeOcrComparisonDataFields {
+                first_name: vd.get_di(IdentityDataKind::FirstName).ok(),
+                last_name: vd.get_di(IdentityDataKind::LastName).ok(),
+                dob: vd.get_di(IdentityDataKind::Dob).ok(),
+            })
         } else {
             None
         };
@@ -229,9 +222,9 @@ pub fn fixture_ocr_response_for_incode(
 ) -> ApiResult<FetchOCRResponse> {
     let raw = if let Some(data) = comparison_data {
         idv::incode::doc::response::FetchOCRResponse::fixture_response(
-            Some(data.first_name),
-            Some(data.last_name),
-            parse_dob(data.dob)?,
+            data.first_name,
+            data.last_name,
+            data.dob.and_then(|t| parse_dob(t).transpose()).transpose()?,
         )
     } else {
         idv::incode::doc::response::FetchOCRResponse::fixture_response(None, None, None)
