@@ -1,10 +1,10 @@
 use idv::incode::doc::response::{FetchScoresResponse, FetchOCRResponse};
 use newtypes::{
     incode::{IncodeRCH, IncodeStatus, IncodeTest},
-    FootprintReasonCode, VendorAPI, PiiString, VerificationResultId,
+    FootprintReasonCode, VendorAPI, PiiString, VerificationResultId, DataIdentifier, IdentityDataKind,
 };
 
-use crate::decision::onboarding::FeatureSet;
+use crate::{decision::onboarding::FeatureSet, enclave_client::EnclaveClient, utils::vault_wrapper::{VaultWrapper, Person, DecryptUncheckedResult}, errors::ApiResult};
 
 
 #[derive(Default, Clone)]
@@ -12,6 +12,28 @@ pub struct IncodeOcrComparisonDataFields {
     pub first_name: Option<PiiString>,
     pub last_name: Option<PiiString>,
     pub dob: Option<PiiString>,
+}
+
+impl IncodeOcrComparisonDataFields {
+    pub async fn compose(enclave_client: &EnclaveClient, vw: &VaultWrapper<Person>) -> ApiResult<Self> {
+        let fields = &[
+            DataIdentifier::Id(IdentityDataKind::FirstName),
+            DataIdentifier::Id(IdentityDataKind::LastName),
+            DataIdentifier::Id(IdentityDataKind::Dob),
+            // TODO: address
+        ];
+        let vd = vw.decrypt_unchecked(enclave_client, fields).await?;
+        let result = Self::from_decrypted_values(&vd);
+        Ok(result)
+    }
+
+    pub fn from_decrypted_values(vd: &DecryptUncheckedResult) -> Self {
+        IncodeOcrComparisonDataFields {
+            first_name: vd.get_di(IdentityDataKind::FirstName).ok(),
+            last_name: vd.get_di(IdentityDataKind::LastName).ok(),
+            dob: vd.get_di(IdentityDataKind::Dob).ok(),
+        }
+    }
 }
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision

@@ -493,11 +493,7 @@ fn document_and_photo(
 
     // Construct all of the breakdown fields
     // TODO: load these once FRC<>VRes migration is done
-    let incode_vault_data = IncodeOcrComparisonDataFields {
-        first_name: decrypted_data.get_di(FirstName).ok(),
-        last_name: decrypted_data.get_di(LastName).ok(),
-        dob: decrypted_data.get_di(Dob).ok(),
-    };
+    let incode_vault_data = IncodeOcrComparisonDataFields::from_decrypted_values(decrypted_data);
     let frcs = features::incode_docv::footprint_reason_codes(
         ocr_response.clone(),
         score_response,

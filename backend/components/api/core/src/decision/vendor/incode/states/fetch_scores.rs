@@ -5,14 +5,14 @@ use super::{
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{TenantVw, VaultWrapper};
+use crate::utils::vault_wrapper::{Person, TenantVw, VaultWrapper};
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::models::ob_configuration::ObConfiguration;
 use db::{DbPool, TxnPgConn};
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use idv::incode::doc::{IncodeFetchOCRRequest, IncodeFetchScoresRequest};
-use newtypes::{DataIdentifier, DocumentSide, IdentityDataKind, VendorAPI, VerificationResultId};
+use newtypes::{DocumentSide, VendorAPI, VerificationResultId};
 use strum::IntoEnumIterator;
 
 pub struct FetchScores {
@@ -84,25 +84,10 @@ impl IncodeStateTransition for FetchScores {
         // OCR data risk signals
         let vault_data = if !obc.is_doc_first {
             let sv_id = ctx.sv_id.clone();
-            let uvw: TenantVw = db_pool
+            let uvw: TenantVw<Person> = db_pool
                 .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
                 .await??;
-            let vd = uvw
-                .decrypt_unchecked(
-                    &ctx.enclave_client,
-                    &[
-                        DataIdentifier::Id(IdentityDataKind::FirstName),
-                        DataIdentifier::Id(IdentityDataKind::LastName),
-                        DataIdentifier::Id(IdentityDataKind::Dob),
-                        // TODO: address
-                    ],
-                )
-                .await?;
-            let vault_data = IncodeOcrComparisonDataFields {
-                first_name: vd.get_di(IdentityDataKind::FirstName).ok(),
-                last_name: vd.get_di(IdentityDataKind::LastName).ok(),
-                dob: vd.get_di(IdentityDataKind::Dob).ok(),
-            };
+            let vault_data = IncodeOcrComparisonDataFields::compose(&ctx.enclave_client, &uvw).await?;
             Some(vault_data)
         } else {
             None

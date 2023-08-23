@@ -14,9 +14,8 @@ use db::{
 };
 use idv::incode::doc::response::FetchOCRResponse;
 use newtypes::{
-    DataIdentifier, DecisionIntentId, DecisionStatus, IdentityDataKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, OnboardingStatus, RiskSignalGroupKind, ScopedVaultId, TenantId, VaultKind, VendorAPI,
-    WorkflowFixtureResult, WorkflowId,
+    DecisionIntentId, DecisionStatus, IdentityDocumentFixtureResult, IdentityDocumentId, OnboardingStatus,
+    RiskSignalGroupKind, ScopedVaultId, TenantId, VaultKind, VendorAPI, WorkflowFixtureResult, WorkflowId,
 };
 
 use super::{
@@ -104,22 +103,8 @@ pub async fn should_initiate_requests_for_document(
             .map(|d| !matches!(d, IdentityDocumentFixtureResult::Real))
             .unwrap_or(false)
         {
-            let vd = uvw
-                .decrypt_unchecked(
-                    &state.enclave_client,
-                    &[
-                        DataIdentifier::Id(IdentityDataKind::FirstName),
-                        DataIdentifier::Id(IdentityDataKind::LastName),
-                        DataIdentifier::Id(IdentityDataKind::Dob),
-                        // TODO: address
-                    ],
-                )
-                .await?;
-            Some(IncodeOcrComparisonDataFields {
-                first_name: vd.get_di(IdentityDataKind::FirstName).ok(),
-                last_name: vd.get_di(IdentityDataKind::LastName).ok(),
-                dob: vd.get_di(IdentityDataKind::Dob).ok(),
-            })
+            let vault_data = IncodeOcrComparisonDataFields::compose(&state.enclave_client, uvw).await?;
+            Some(vault_data)
         } else {
             None
         };
