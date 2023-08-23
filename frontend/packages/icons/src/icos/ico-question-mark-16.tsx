@@ -11,8 +11,8 @@ const IcoQuestionMark16 = ({
   const theme = useTheme();
   return (
     <svg
-      width={17}
-      height={17}
+      width={16}
+      height={16}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
@@ -21,16 +21,16 @@ const IcoQuestionMark16 = ({
     >
       <g clipPath="url(#prefix__a)">
         <path
-          d="M6.622 5.553a2.015 2.015 0 0 1 2.932-.78 2.017 2.017 0 0 1 .291 3.113c-.448.442-.993.92-1.257 1.48m-.158 2.687v.008m0 2.681a6.5 6.5 0 1 1 0-12.998 6.5 6.5 0 0 1 0 12.998Z"
+          d="M6.193 5.31a2.015 2.015 0 0 1 2.93-.778 2.017 2.017 0 0 1 .293 3.112c-.449.442-.994.919-1.257 1.48M8 11.81v.01m0 2.68A6.5 6.5 0 1 1 8 1.502 6.5 6.5 0 0 1 8 14.5Z"
           stroke={theme.color[color]}
-          strokeWidth={1.5}
+          strokeWidth={1.4}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </g>
       <defs>
         <clipPath id="prefix__a">
-          <path fill="#fff" transform="translate(.43 .242)" d="M0 0h16v16H0z" />
+          <path fill="#fff" d="M0 0h16v16H0z" />
         </clipPath>
       </defs>
     </svg>
