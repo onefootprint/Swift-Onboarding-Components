@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 5.3.0
+
+### Minor Changes
+
+- 5c53277f6: Container customization
+
 ## 5.1.2
 
 ### Patch Changes

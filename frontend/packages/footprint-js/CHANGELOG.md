@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.2.0
+
+### Minor Changes
+
+- 5c53277f6: Container customization
+
 ## 3.1.2
 
 ### Patch Changes
