@@ -42,7 +42,6 @@
     "heic2any": "^0.0.3",
     "i18next": "^22.5.0",
     "isemail": "^3.2.0",
-    "jest-canvas-mock": "^2.5.0",
     "lodash": "^4.17.21",
     "lottie-react": "^2.4.0",
     "opencv-react-ts": "^0.0.11",
@@ -60,6 +59,7 @@
     "xstate": "^4.37.1"
   },
   "devDependencies": {
+    "jest-canvas-mock": "^2.5.0",
     "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
     "@rive-app/react-canvas": "^3.0.35",

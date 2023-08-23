@@ -38,6 +38,7 @@
     "xstate": "^4.37.1"
   },
   "devDependencies": {
+    "jest-canvas-mock": "^2.5.0",
     "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
     "@rive-app/react-canvas": "^3.0.35",
@@ -61,6 +62,9 @@
     ],
     "moduleNameMapper": {
       "@/identify/(.*)": "<rootDir>/src/pages/identify/$1"
-    }
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/utils/tests/setupTests.js"
+    ]
   }
 }

@@ -48,7 +48,7 @@ import {
 } from './idv.test.config';
 import { IdvProps } from './types';
 
-describe.skip('<Idv />', () => {
+describe('<Idv />', () => {
   const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
@@ -118,73 +118,73 @@ describe.skip('<Idv />', () => {
     });
 
     describe('When onboarding to same config', () => {
-      it('can one-click when given an auth token', async () => {
-        withRequirements([], []);
-
-        const onComplete = jest.fn();
-        const onClose = jest.fn();
-
-        renderIdv({
-          authToken: 'token',
-          showCompletionPage: true,
-          onComplete,
-          onClose,
+      describe('When there are empty requirements', () => {
+        beforeEach(() => {
+          withRequirements([], []);
         });
 
-        await checkComplete();
-        await waitFor(() => {
-          expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+        it.skip('skips completion page', async () => {
+          const onComplete = jest.fn();
+          const onClose = jest.fn();
+
+          renderIdv({
+            onComplete,
+            onClose,
+          });
+
+          await identifyUserByPhone();
+
+          await waitFor(() => {
+            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+          });
+
+          await waitFor(() => {
+            expect(onComplete).toBeCalledWith(validationToken);
+          });
         });
 
-        const linkButton = screen.getByText('Return to site');
-        expect(linkButton).toBeInTheDocument();
-        await userEvent.click(linkButton);
-        expect(onClose).toBeCalled();
+        it('can one-click when given an auth token', async () => {
+          const onComplete = jest.fn();
+          const onClose = jest.fn();
+
+          renderIdv({
+            authToken: 'token',
+            showCompletionPage: true,
+            onComplete,
+            onClose,
+          });
+
+          await checkComplete();
+          await waitFor(() => {
+            expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+          });
+
+          const linkButton = screen.getByText('Return to site');
+          expect(linkButton).toBeInTheDocument();
+          await userEvent.click(linkButton);
+          expect(onClose).toBeCalled();
+        });
+
+        it.skip('can onboard directly after identify if already authorized', async () => {
+          const onComplete = jest.fn();
+          const onClose = jest.fn();
+
+          renderIdv({
+            showCompletionPage: true,
+            onComplete,
+            onClose,
+          });
+
+          await identifyUserByPhone();
+
+          await checkComplete();
+          await waitFor(() => {
+            expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+          });
+        });
       });
 
-      it('can onboard directly after identify if already authorized', async () => {
-        const onComplete = jest.fn();
-        const onClose = jest.fn();
-
-        withRequirements([], []);
-
-        renderIdv({
-          showCompletionPage: true,
-          onComplete,
-          onClose,
-        });
-
-        await identifyUserByPhone();
-
-        await checkComplete();
-        await waitFor(() => {
-          expect(onComplete).toBeCalledWith(validationToken, closeDelay);
-        });
-      });
-
-      it('skips completion page', async () => {
-        const onComplete = jest.fn();
-        const onClose = jest.fn();
-
-        withRequirements([], []);
-
-        renderIdv({
-          onComplete,
-          onClose,
-        });
-
-        await identifyUserByPhone();
-
-        await waitFor(() => {
-          expect(screen.getByRole('progressbar')).toBeInTheDocument();
-        });
-
-        await waitFor(() => {
-          expect(onComplete).toBeCalledWith(validationToken);
-        });
-      });
-
-      it('prompts user to confirm previous data when there are met requirements if redoing kyc', async () => {
+      it.skip('prompts user to confirm previous data when there are met requirements if redoing kyc', async () => {
         withUserToken();
         withIdentify(true);
         withRequirements(
@@ -278,7 +278,7 @@ describe.skip('<Idv />', () => {
         });
       });
 
-      it('can onboard after identify, confirm and authorize', async () => {
+      it.skip('can onboard after identify, confirm and authorize', async () => {
         withRequirements(
           [TestAuthorizeRequirement],
           [
@@ -346,7 +346,7 @@ describe.skip('<Idv />', () => {
         });
       });
 
-      it('skips completion page', async () => {
+      it.skip('skips completion page', async () => {
         withRequirements([TestAuthorizeRequirement], []);
 
         const onComplete = jest.fn();
@@ -376,7 +376,7 @@ describe.skip('<Idv />', () => {
         });
       });
 
-      it('can onboard after filling remaining missing attributes', async () => {
+      it.skip('can onboard after filling remaining missing attributes', async () => {
         withRequirements(
           [
             {
@@ -490,7 +490,7 @@ describe.skip('<Idv />', () => {
         withOnboardingConfig(sandboxConfig);
       });
 
-      it('starts flow on sandbox outcome page', async () => {
+      it.skip('starts flow on sandbox outcome page', async () => {
         renderIdv({
           showCompletionPage: true,
         });

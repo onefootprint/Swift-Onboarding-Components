@@ -243,6 +243,7 @@ export const identifyUserByPhone = async () => {
 
   withIdentify(true);
   withLoginChallenge(ChallengeKind.sms);
+
   await fillIdentifyPhone();
 
   await waitFor(() => {
