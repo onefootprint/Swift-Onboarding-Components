@@ -7,6 +7,9 @@ export type CountryRecord = {
   passport: boolean;
   idCard: boolean;
   driversLicense: boolean;
+  visa: boolean;
+  workPermit: boolean;
+  residenceDocument: boolean;
 };
 
 export const COUNTRIES: CountryRecord[] = [
@@ -17,6 +20,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: true,
     driversLicense: true,
+    visa: true,
+    workPermit: true,
+    residenceDocument: true,
   },
   {
     label: 'Afghanistan',
@@ -25,6 +31,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Albania',
@@ -33,6 +42,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Algeria',
@@ -41,6 +53,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Andorra',
@@ -49,6 +64,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Angola',
@@ -57,6 +75,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Antigua and Barbuda',
@@ -65,6 +86,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Argentina',
@@ -73,6 +97,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Armenia',
@@ -81,6 +108,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Australia',
@@ -89,6 +119,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Austria',
@@ -97,6 +130,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Azerbaijan',
@@ -105,6 +141,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Bahamas',
@@ -113,6 +152,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Bahrain',
@@ -121,6 +163,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Bangladesh',
@@ -129,6 +174,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Barbados',
@@ -137,6 +185,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Belarus',
@@ -145,6 +196,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Belgium',
@@ -153,6 +207,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Belize',
@@ -161,6 +218,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Benin',
@@ -169,6 +229,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Bermuda',
@@ -177,6 +240,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Bolivia',
@@ -185,6 +251,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Bosnia and Herzegovina',
@@ -193,6 +262,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Botswana',
@@ -201,6 +273,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Brazil',
@@ -209,6 +284,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Brunei Darussalam',
@@ -217,6 +295,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Bulgaria',
@@ -225,6 +306,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Burkina Faso',
@@ -233,6 +317,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Burundi',
@@ -241,6 +328,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Cambodia',
@@ -249,6 +339,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Cameroon',
@@ -257,6 +350,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Canada',
@@ -265,6 +361,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Cape Verde',
@@ -273,6 +372,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Cayman Islands',
@@ -281,6 +383,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Chad',
@@ -289,6 +394,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Chile',
@@ -297,6 +405,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'China',
@@ -305,6 +416,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Colombia',
@@ -313,6 +427,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Congo (Democratic Republic)',
@@ -321,6 +438,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Congo (Republic of)',
@@ -329,6 +449,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Costa Rica',
@@ -337,6 +460,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Côte d’Ivoire',
@@ -345,6 +471,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Croatia',
@@ -353,6 +482,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Cuba',
@@ -361,6 +493,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Cyprus',
@@ -369,6 +504,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Czech Republic',
@@ -377,6 +515,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Denmark',
@@ -385,6 +526,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Djibouti',
@@ -393,6 +537,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Dominica',
@@ -401,6 +548,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Dominican Republic',
@@ -409,6 +559,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Ecuador',
@@ -417,6 +570,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Egypt',
@@ -425,6 +581,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'El Salvador',
@@ -433,6 +592,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Guinea',
@@ -441,6 +603,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Eritrea',
@@ -449,6 +614,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Estonia',
@@ -457,6 +625,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Eswatini (Swaziland)',
@@ -465,6 +636,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Ethiopia',
@@ -473,6 +647,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Fiji',
@@ -481,6 +658,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Finland',
@@ -489,6 +669,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'France',
@@ -497,6 +680,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Gabon',
@@ -505,6 +691,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Gambia',
@@ -513,6 +702,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Georgia',
@@ -521,6 +713,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Germany',
@@ -529,6 +724,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Ghana',
@@ -537,6 +735,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Greece',
@@ -545,6 +746,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Grenada',
@@ -553,6 +757,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Guatemala',
@@ -561,6 +768,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Guinea',
@@ -569,6 +779,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Guinea-Bissau',
@@ -577,6 +790,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Guyana',
@@ -585,6 +801,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Haiti',
@@ -593,6 +812,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Holy See (Vatican City State)',
@@ -601,6 +823,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Honduras',
@@ -609,6 +834,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Hong Kong',
@@ -617,6 +845,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Hungary',
@@ -625,6 +856,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Iceland',
@@ -633,6 +867,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'India',
@@ -641,6 +878,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Indonesia',
@@ -649,6 +889,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Iran',
@@ -657,6 +900,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Iraq',
@@ -665,6 +911,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Ireland',
@@ -673,6 +922,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Israel',
@@ -681,6 +933,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Italy',
@@ -689,6 +944,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Jamaica',
@@ -697,6 +955,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Japan',
@@ -705,6 +966,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Jordan',
@@ -713,6 +977,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Kazakhstan',
@@ -721,6 +988,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Kenya',
@@ -729,6 +999,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Kosovo',
@@ -737,6 +1010,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Kuwait',
@@ -745,6 +1021,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Kyrgyzstan',
@@ -753,6 +1032,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Laos',
@@ -761,6 +1043,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Latvia',
@@ -769,6 +1054,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Lebanon',
@@ -777,6 +1065,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Lesotho',
@@ -785,6 +1076,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Liberia',
@@ -793,6 +1087,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Libya',
@@ -801,6 +1098,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Liechtenstein',
@@ -809,6 +1109,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Lithuania',
@@ -817,6 +1120,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Luxembourg',
@@ -825,6 +1131,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Macao',
@@ -833,6 +1142,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Macedonia ',
@@ -841,6 +1153,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Madagascar',
@@ -849,6 +1164,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Malawi',
@@ -857,6 +1175,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Malaysia',
@@ -865,6 +1186,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Maldives',
@@ -873,6 +1197,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Mali',
@@ -881,6 +1208,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Malta',
@@ -889,6 +1219,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Marshall Islands',
@@ -897,6 +1230,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Mauritius',
@@ -905,6 +1241,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Mexico',
@@ -913,6 +1252,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Micronesia (Federal States of)',
@@ -921,6 +1263,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Moldova',
@@ -929,6 +1274,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Monaco',
@@ -937,6 +1285,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Mongolia',
@@ -945,6 +1296,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Montenegro',
@@ -953,6 +1307,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Montserrat',
@@ -961,6 +1318,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Morocco',
@@ -969,6 +1329,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Mozambique',
@@ -977,6 +1340,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Myanmar',
@@ -985,6 +1351,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Namibia',
@@ -993,6 +1362,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Nepal',
@@ -1001,6 +1373,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Netherlands',
@@ -1009,6 +1384,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Netherlands Antilles',
@@ -1017,6 +1395,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'New Zealand',
@@ -1025,6 +1406,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Nicaragua',
@@ -1033,6 +1417,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Niger',
@@ -1041,6 +1428,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Nigeria',
@@ -1049,6 +1439,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'North Korea',
@@ -1057,6 +1450,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Northern Mariana Islands',
@@ -1065,6 +1461,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Norway',
@@ -1073,6 +1472,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Oman',
@@ -1081,6 +1483,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Pakistan',
@@ -1089,6 +1494,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Palau',
@@ -1097,6 +1505,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Palestine (State of)',
@@ -1105,6 +1516,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Panama',
@@ -1113,6 +1527,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Papua New Guinea',
@@ -1121,6 +1538,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Paraguay',
@@ -1129,6 +1549,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Peru',
@@ -1137,6 +1560,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Philippines',
@@ -1145,6 +1571,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Poland',
@@ -1153,6 +1582,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Portugal',
@@ -1161,6 +1593,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Puerto Rico',
@@ -1169,6 +1604,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Qatar',
@@ -1177,6 +1615,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Romania',
@@ -1185,6 +1626,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Russian Federation',
@@ -1193,6 +1637,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Rwanda',
@@ -1201,6 +1648,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Saint Kitts and Nevis',
@@ -1209,6 +1659,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Saint Lucia',
@@ -1217,6 +1670,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Saint Vincent and the Grenadines',
@@ -1225,6 +1681,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Samoa',
@@ -1233,6 +1692,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'San Marino',
@@ -1241,6 +1703,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Sao Tome and Principe',
@@ -1249,6 +1714,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Saudi Arabia',
@@ -1257,6 +1725,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Senegal',
@@ -1265,6 +1736,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Serbia',
@@ -1273,6 +1747,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Seychelles',
@@ -1281,6 +1758,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Sierra Leone',
@@ -1289,6 +1769,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Singapore',
@@ -1297,6 +1780,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Sint Maarten',
@@ -1305,6 +1791,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Slovakia',
@@ -1313,6 +1802,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Slovenia',
@@ -1321,6 +1813,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Solomon Islands',
@@ -1329,6 +1824,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Somalia',
@@ -1337,6 +1835,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'South Africa',
@@ -1345,6 +1846,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'South Korea',
@@ -1353,6 +1857,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'South Sudan',
@@ -1361,6 +1868,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Spain',
@@ -1369,6 +1879,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Sri Lanka',
@@ -1377,6 +1890,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Sudan',
@@ -1385,6 +1901,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Suriname',
@@ -1393,6 +1912,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Sweden',
@@ -1401,6 +1923,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Switzerland',
@@ -1409,6 +1934,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Syria',
@@ -1417,6 +1945,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Taiwan',
@@ -1425,6 +1956,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Tajikistan',
@@ -1433,6 +1967,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Tanzania',
@@ -1441,6 +1978,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Thailand',
@@ -1449,6 +1989,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Togo',
@@ -1457,6 +2000,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Tonga',
@@ -1465,6 +2011,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Trinidad and Tobago',
@@ -1473,6 +2022,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Tunisia',
@@ -1481,6 +2033,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Turkey',
@@ -1489,6 +2044,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Turkmenistan',
@@ -1497,6 +2055,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Tuvalu',
@@ -1505,6 +2066,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Uganda',
@@ -1513,6 +2077,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Ukraine',
@@ -1521,6 +2088,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'United Arab Emirates',
@@ -1529,6 +2099,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'United Kingdom',
@@ -1537,6 +2110,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Uruguay',
@@ -1545,6 +2121,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Uzbekistan',
@@ -1553,6 +2132,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Vanuatu',
@@ -1561,6 +2143,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: false,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Venezuela',
@@ -1569,6 +2154,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Vietnam',
@@ -1577,6 +2165,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Yemen',
@@ -1585,6 +2176,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Zambia',
@@ -1593,6 +2187,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
   {
     label: 'Zimbabwe',
@@ -1601,6 +2198,9 @@ export const COUNTRIES: CountryRecord[] = [
     passport: true,
     idCard: false,
     driversLicense: false,
+    visa: false,
+    workPermit: false,
+    residenceDocument: false,
   },
 ];
 
