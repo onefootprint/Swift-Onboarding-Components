@@ -46,6 +46,25 @@ impl RiskSignalGroup {
         Ok(res)
     }
 
+    #[tracing::instrument("RiskSignalGroup::get_or_create", skip(conn))]
+    pub fn get_or_create(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+        kind: RiskSignalGroupKind,
+    ) -> DbResult<Self> {
+        let existing = Self::latest_by_kind(conn, scoped_vault_id, kind);
+        match existing {
+            Ok(e) => Ok(e),
+            Err(e) => {
+                if e.is_not_found() {
+                    Self::create(conn, scoped_vault_id, kind)
+                } else {
+                    Err(e)
+                }
+            }
+        }
+    }
+
     #[tracing::instrument("RiskSignalGroup::latest_by_kind", skip(conn))]
     pub fn latest_by_kind(
         conn: &mut PgConn,

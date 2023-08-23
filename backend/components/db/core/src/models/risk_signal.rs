@@ -51,21 +51,33 @@ pub struct NewRiskSignal {
 
 pub struct IncludeHidden(pub bool);
 
+pub type NewRiskSignalInfo = (FootprintReasonCode, VendorAPI, VerificationResultId);
+
 impl RiskSignal {
     #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
     pub fn bulk_create(
         conn: &mut TxnPgConn,
         scoped_vault_id: &ScopedVaultId,
-        signals: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
+        signals: Vec<NewRiskSignalInfo>,
         risk_group_kind: RiskSignalGroupKind,
         hidden: bool,
     ) -> DbResult<Vec<Self>> {
         let rsg = RiskSignalGroup::create(conn.conn(), scoped_vault_id, risk_group_kind)?;
-
         let duplicates = Self::generate_duplicate_frc_by_reason_code_and_vendor_api(signals.clone());
         if !duplicates.is_empty() {
             tracing::error!(reason_codes=format!("{:?}", duplicates), scoped_vault_id =%scoped_vault_id, "duplicate reason codes produced");
         }
+        Self::bulk_add(conn, signals, hidden, rsg.id)
+    }
+
+    #[tracing::instrument("RiskSignal::bulk_add", skip_all)]
+    /// Add the provided risk signals to an existing RiskSignalGroup
+    pub fn bulk_add(
+        conn: &mut TxnPgConn,
+        signals: Vec<NewRiskSignalInfo>,
+        hidden: bool,
+        rsg_id: RiskSignalGroupId,
+    ) -> DbResult<Vec<Self>> {
         let new_risk_signals: Vec<NewRiskSignal> = signals
             .into_iter()
             .unique()
@@ -76,7 +88,7 @@ impl RiskSignal {
                 verification_result_id: vres_id,
                 hidden,
                 vendor_api,
-                risk_signal_group_id: rsg.id.clone(),
+                risk_signal_group_id: rsg_id.clone(),
             })
             .collect();
 

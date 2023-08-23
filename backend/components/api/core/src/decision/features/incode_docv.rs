@@ -132,8 +132,9 @@ fn merge<'a>(a: Option<&'a PiiString>, b: Option<&'a PiiString>) -> Option<(&'a 
     a.and_then(|a| b.map(|b| (a, b)))
 }
 
-pub fn reason_codes_from_ocr_response( ocr: FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Result<Vec<FootprintReasonCode>, idv::Error>  {
-        let first_name_ocr = ocr.name.as_ref().and_then(|n| n.first_name.clone().map(|f| f.into())).ok_or(idv::Error::from(idv::incode::error::Error::OcrError("missing first name".into())))?;
+pub fn reason_codes_from_ocr_response(ocr: FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Result<Vec<FootprintReasonCode>, idv::Error>  {
+        let first_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.first_name.clone().map(|f| f.into()));
+        let given_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.given_name.clone().map(|f| f.into()));
         let paternal_last_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.paternal_last_name.clone().map(|s| s.into()));
         let maternal_last_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.maternal_last_name.clone().map(|s| s.into()));
         // TODO: 
@@ -141,7 +142,14 @@ pub fn reason_codes_from_ocr_response( ocr: FetchOCRResponse, vault_data: Incode
         let dob_ocr: PiiString = ocr.dob()?.into();
 
         // matches, eventually should do levinstein or something else to determine "partial" matches
-        let first_name_matches = vault_data.first_name.as_ref().map(|r| pii_strings_match(&first_name_ocr, r));
+        let first_name_matches = merge(first_name_ocr.as_ref(), vault_data.first_name.as_ref()).map(|(a, b)| pii_strings_match(a, b));
+        let given_name_matches = merge(given_name_ocr.as_ref(), vault_data.first_name.as_ref()).map(|(a, b)| pii_strings_match(a, b));
+
+        let first_name_matches = match (first_name_matches, given_name_matches) {
+            (Some(x), Some(y)) => Some(x || y),
+            (None, Some(x)) | (Some(x), None) => Some(x),
+            (None, None) => None,
+        };
         // incode doesn't give us a single last name field, except from the MRZ. But we don't always get the MRZ if the barcode was too blurry to 
         // be decoded. ¯\_(ツ)_/¯
         let pat_ln_matches = merge(paternal_last_name_ocr.as_ref(), vault_data.last_name.as_ref()).map(|(a, b)| pii_strings_match(a, b));
@@ -153,7 +161,6 @@ pub fn reason_codes_from_ocr_response( ocr: FetchOCRResponse, vault_data: Incode
         };
         
         let name_matches = first_name_matches.and_then(|x| last_name_matches.map(|y| x && y));
-        println!("name {:?}, first_name {:?}, last_name {:?}", name_matches, first_name_matches, last_name_matches);
 
         let dob_matches = vault_data.dob.map(|dob| pii_strings_match(&dob_ocr, &dob));
         // TODO: address w/ CDOs are a little harder here. also incode OCR includes a bunch of \n and random crap so will do this in followup

@@ -4,6 +4,7 @@ use db::{
         decision_intent::DecisionIntent,
         document_request::DocumentRequest,
         ob_configuration::ObConfiguration,
+        risk_signal::NewRiskSignalInfo,
         scoped_vault::ScopedVault,
         vault::Vault,
         workflow::{Workflow, WorkflowUpdate},
@@ -18,7 +19,10 @@ use newtypes::{
 use crate::{
     decision::{
         self, engine,
-        features::risk_signals::RiskSignalsForDecision,
+        features::{
+            incode_docv::{self, IncodeOcrComparisonDataFields},
+            risk_signals::RiskSignalsForDecision,
+        },
         onboarding::{
             rules::KycRuleExecutionConfig, Decision, DecisionResult, OnboardingRulesDecision,
             OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
@@ -28,7 +32,7 @@ use crate::{
             tenant_vendor_control::TenantVendorControl,
             vendor_api::{
                 vendor_api_response::build_vendor_response_map_from_vendor_results,
-                vendor_api_struct::{ExperianPreciseID, IdologyExpectID},
+                vendor_api_struct::{ExperianPreciseID, IdologyExpectID, IncodeFetchOCR},
             },
             vendor_result::VendorResult,
         },
@@ -312,4 +316,45 @@ pub async fn write_authorized_fingerprints(state: &State, wf_id: &WorkflowId) ->
         })
         .await??;
     vw.create_authorized_fingerprints(state, obc).await
+}
+
+pub async fn generate_ocr_reason_codes(
+    state: &State,
+    wf_id: &WorkflowId,
+    sv_id: &ScopedVaultId,
+    vendor_results: &[VendorResult],
+) -> ApiResult<Option<Vec<NewRiskSignalInfo>>> {
+    let wf_id = wf_id.clone();
+    let (obc, _) = state
+        .db_pool
+        .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
+        .await??;
+
+    if !obc.is_doc_first {
+        return Ok(None);
+    }
+
+    // If this is a doc-first OBC, generate OCR mismatch risk signals
+    let (vendor_map, vendor_result_id_map) = build_vendor_response_map_from_vendor_results(vendor_results)?;
+    let Some(fetch_ocr) = vendor_map.get(&IncodeFetchOCR) else {
+        return Ok(None);
+    };
+    let Some(vres) = vendor_result_id_map.get(&IncodeFetchOCR) else{
+        return Ok(None);
+    };
+
+    let sv_id = sv_id.clone();
+    let vw = state
+        .db_pool
+        .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
+        .await??;
+    let ocr_comparison_data = IncodeOcrComparisonDataFields::compose(&state.enclave_client, &vw).await?;
+
+    let ocr_reason_codes =
+        incode_docv::reason_codes_from_ocr_response(fetch_ocr.clone(), ocr_comparison_data)?
+            .into_iter()
+            .map(|r| (r, VendorAPI::IncodeFetchOCR, vres.verification_result_id.clone()))
+            .collect();
+
+    Ok(Some(ocr_reason_codes))
 }

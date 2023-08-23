@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use db::models::{
     decision_intent::DecisionIntent,
     document_request::{DocumentRequest, NewDocumentRequestArgs},
-    risk_signal::RiskSignal,
+    risk_signal::{NewRiskSignalInfo, RiskSignal},
     risk_signal_group::RiskSignalGroup,
     vault::Vault,
     verification_result::VerificationResult,
@@ -142,7 +142,11 @@ impl AlpacaKycVendorCalls {
 
 #[async_trait]
 impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
-    type AsyncRes = (Vec<VendorResult>, Arc<dyn FeatureFlagClient>);
+    type AsyncRes = (
+        Option<Vec<NewRiskSignalInfo>>,
+        Vec<VendorResult>,
+        Arc<dyn FeatureFlagClient>,
+    );
 
     #[tracing::instrument(
         "OnAction<MakeVendorCalls, AlpacaKycState>::execute_async_idempotent_actions",
@@ -153,8 +157,14 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
+        let vendor_results =
+            common::make_outstanding_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
+        let ocr_reason_codes =
+            common::generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id, &vendor_results).await?;
+
         Ok((
-            common::make_outstanding_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?,
+            ocr_reason_codes,
+            vendor_results,
             state.feature_flag_client.clone(),
         ))
     }
@@ -166,8 +176,16 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<AlpacaKycState> {
-        let (vendor_results, ff_client) = async_res;
+        let (ocr_reason_codes, vendor_results, ff_client) = async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
+
+        // Save OCR risk signals for doc-first OBC if necessary
+        if let Some(ocr_reason_codes) = ocr_reason_codes {
+            // We save under the same RSG created during the incode state machine if it ran so we
+            // don't invalidate the old RSG
+            let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Doc)?;
+            RiskSignal::bulk_add(conn, ocr_reason_codes, false, rsg.id)?;
+        }
 
         let fixture_decision =
             decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
