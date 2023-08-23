@@ -74,15 +74,55 @@ describe('<DeclarationsForm />', () => {
     });
   });
 
+  describe('when the user is a a political', () => {
+    it('should trigger onSubmit with family members and political organization', async () => {
+      const onSubmit = jest.fn();
+      renderForm({ onSubmit });
+
+      const seniorPoliticalFigure = screen.getByLabelText(
+        "I'm a senior political figure",
+      );
+      await userEvent.click(seniorPoliticalFigure);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Names of immediate family members'),
+        ).toBeInTheDocument();
+      });
+      const familyMembers = screen.getByLabelText(
+        'Names of immediate family members',
+      );
+      await userEvent.type(familyMembers, 'Jane Doe, John Doe');
+
+      const politicalOrganization = screen.getByLabelText(
+        'Political organization',
+      );
+      await userEvent.type(politicalOrganization, 'The White House');
+
+      const submitButton = screen.getByRole('button', { name: 'Continue' });
+      userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledWith({
+          [InvestorProfileDI.declarations]: ['senior_political_figure'],
+          [InvestorProfileDI.familyMemberNames]: ['Jane Doe', 'John Doe'],
+          [InvestorProfileDI.politicalOrganization]: 'The White House',
+          [InvestorProfileDI.seniorExecutiveSymbols]: undefined,
+        });
+      });
+    });
+  });
+
   describe('when it has defaultValues', () => {
     it('renders default values correctly', async () => {
       renderForm({
         defaultValues: {
           [InvestorProfileDI.declarations]: [
-            InvestorProfileDeclaration.familyOfPoliticalFigure,
             InvestorProfileDeclaration.seniorExecutive,
+            InvestorProfileDeclaration.seniorPoliticalFigure,
           ],
           [InvestorProfileDI.seniorExecutiveSymbols]: ['AAPL', 'GOOG'],
+          [InvestorProfileDI.familyMemberNames]: ['Jane Doe'],
         },
       });
 
@@ -96,18 +136,18 @@ describe('<DeclarationsForm />', () => {
       ) as HTMLInputElement;
       expect(seniorExec.checked).toBe(true);
 
+      const seniorPoliticalFigure = screen.getByLabelText(
+        "I'm a senior political figure",
+      ) as HTMLInputElement;
+      expect(seniorPoliticalFigure.checked).toBe(true);
+
       const companySymbols = screen.getByLabelText('Company symbols');
       expect(companySymbols).toHaveValue('AAPL,GOOG');
 
-      const politicalFig = screen.getByLabelText(
-        "I'm a senior political figure",
-      ) as HTMLInputElement;
-      expect(politicalFig.checked).toBe(false);
-
-      const politicalFam = screen.getByLabelText(
-        "I'm a family member or relative of a senior political figure",
-      ) as HTMLInputElement;
-      expect(politicalFam.checked).toBe(true);
+      const familyMembers = screen.getByLabelText(
+        'Names of immediate family members',
+      );
+      expect(familyMembers).toHaveValue('Jane Doe');
     });
   });
 

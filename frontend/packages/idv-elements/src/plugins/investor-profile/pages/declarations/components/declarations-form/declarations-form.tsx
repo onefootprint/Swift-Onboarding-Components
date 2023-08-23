@@ -13,6 +13,7 @@ import UploadComplianceLetter from '../upload-compliance-letter';
 import filterNonTruthy from './utils/filter-non-truthy';
 import trimAndSplit from './utils/trim-and-split';
 import validateCompanySymbols from './utils/validate-company-symbols';
+import validateFamilyMemberNames from './utils/validate-family-member-names';
 
 export type DeclarationsFormProps = {
   defaultValues?: Partial<DeclarationData>;
@@ -22,13 +23,14 @@ export type DeclarationsFormProps = {
 
 type FormData = Record<InvestorProfileDeclaration, boolean> & {
   seniorExecutiveSymbols?: string;
+  familyMemberNames?: string;
+  politicalOrganization?: string;
 };
 
 const declarationKeys = [
   InvestorProfileDeclaration.affiliatedWithUsBroker,
   InvestorProfileDeclaration.seniorExecutive,
   InvestorProfileDeclaration.seniorPoliticalFigure,
-  InvestorProfileDeclaration.familyOfPoliticalFigure,
 ];
 
 const DeclarationsForm = ({
@@ -45,21 +47,30 @@ const DeclarationsForm = ({
     register,
     watch,
     formState: { errors },
-    setValue,
+    resetField,
   } = useForm<FormData>({
     defaultValues: {
       ...Object.fromEntries(defaultEntries),
       seniorExecutiveSymbols:
         defaultValues?.[InvestorProfileDI.seniorExecutiveSymbols],
+      familyMemberNames: defaultValues?.[InvestorProfileDI.familyMemberNames],
+      politicalOrganization:
+        defaultValues?.[InvestorProfileDI.politicalOrganization],
     },
   });
+
+  const checkboxes = watch(declarationKeys);
+  const seniorExecutive = watch(InvestorProfileDeclaration.seniorExecutive);
+  const politicalFigure = watch(
+    InvestorProfileDeclaration.seniorPoliticalFigure,
+  );
   const affiliatedWithUsBroker = watch(
     InvestorProfileDeclaration.affiliatedWithUsBroker,
   );
-  const checkboxes = watch(declarationKeys);
-  const seniorExecutive = watch(InvestorProfileDeclaration.seniorExecutive);
   const shouldRequireUpload = affiliatedWithUsBroker || seniorExecutive;
   const showCompanySymbols = seniorExecutive;
+  const showFamilyMembers = politicalFigure;
+  const showPoliticalOrganization = politicalFigure;
   const [shouldShowUploadError, setShouldShowUploadError] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const hasSelectedAnyOption = Object.values(checkboxes).some(value => value);
@@ -85,6 +96,10 @@ const DeclarationsForm = ({
       [InvestorProfileDI.seniorExecutiveSymbols]: trimAndSplit(
         data.seniorExecutiveSymbols,
       ),
+      [InvestorProfileDI.familyMemberNames]: trimAndSplit(
+        data.familyMemberNames,
+      ),
+      [InvestorProfileDI.politicalOrganization]: data.politicalOrganization,
     };
 
     if (files.length) {
@@ -114,9 +129,9 @@ const DeclarationsForm = ({
       <Checkbox
         label={t(`options.${InvestorProfileDeclaration.seniorExecutive}`)}
         {...register(InvestorProfileDeclaration.seniorExecutive, {
-          onChange: () => {
-            if (!seniorExecutive) {
-              setValue('seniorExecutiveSymbols', '');
+          onChange: event => {
+            if (!event.target.checked) {
+              resetField('seniorExecutiveSymbols');
             }
           },
         })}
@@ -140,14 +155,45 @@ const DeclarationsForm = ({
       )}
       <Checkbox
         label={t(`options.${InvestorProfileDeclaration.seniorPoliticalFigure}`)}
-        {...register(InvestorProfileDeclaration.seniorPoliticalFigure)}
+        {...register(InvestorProfileDeclaration.seniorPoliticalFigure, {
+          onChange: event => {
+            if (!event.target.checked) {
+              resetField('familyMemberNames');
+              resetField('politicalOrganization');
+            }
+          },
+        })}
       />
-      <Checkbox
-        label={t(
-          `options.${InvestorProfileDeclaration.familyOfPoliticalFigure}`,
-        )}
-        {...register(InvestorProfileDeclaration.familyOfPoliticalFigure)}
-      />
+      {showFamilyMembers && (
+        <TextInput
+          autoFocus
+          hasError={!!errors.familyMemberNames}
+          hint={
+            errors.familyMemberNames
+              ? t('family-members.error')
+              : t('family-members.hint')
+          }
+          label={t('family-members.label')}
+          placeholder={t('family-members.placeholder')}
+          {...register('familyMemberNames', {
+            required: true,
+            validate: validateFamilyMemberNames,
+          })}
+        />
+      )}
+      {showPoliticalOrganization && (
+        <TextInput
+          hasError={!!errors.politicalOrganization}
+          hint={
+            errors.politicalOrganization && t('political-organization.error')
+          }
+          label={t('political-organization.label')}
+          placeholder={t('political-organization.placeholder')}
+          {...register('politicalOrganization', {
+            required: true,
+          })}
+        />
+      )}
       {shouldRequireUpload && (
         <UploadComplianceLetter
           hasError={shouldShowUploadError}

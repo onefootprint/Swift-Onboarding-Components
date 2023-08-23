@@ -38,6 +38,4 @@ export enum InvestorProfileDeclaration {
   affiliatedWithUsBroker = 'affiliated_with_us_broker',
   seniorExecutive = 'senior_executive',
   seniorPoliticalFigure = 'senior_political_figure',
-  familyOfPoliticalFigure = 'family_of_political_figure',
-  none = 'none',
 }

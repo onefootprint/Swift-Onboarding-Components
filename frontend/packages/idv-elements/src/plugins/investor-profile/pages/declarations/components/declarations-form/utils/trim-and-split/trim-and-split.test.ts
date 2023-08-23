@@ -13,11 +13,10 @@ describe('trimAndSplit', () => {
     expect(trimAndSplit(' abc ')).toEqual(['abc']);
   });
 
-  it('should return an array with trimmed and split values', () => {
-    expect(trimAndSplit(' a, b, c ')).toEqual(['a', 'b', 'c']);
-  });
-
   it('should return an array with split values', () => {
-    expect(trimAndSplit('a,b,c')).toEqual(['a', 'b', 'c']);
+    expect(trimAndSplit('Jane Doe, John Doe')).toEqual([
+      'Jane Doe',
+      'John Doe',
+    ]);
   });
 });

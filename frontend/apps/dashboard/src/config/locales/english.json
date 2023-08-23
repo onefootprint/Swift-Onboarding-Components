@@ -66,6 +66,8 @@
       "risk_tolerance": "Risk tolerance",
       "declarations": "Declaration(s)",
       "senior_executive_symbols": "Company symbols",
+      "family_member_names": "Family member names",
+      "political_organization": "Political organization",
       "compliance_letter": "Finra compliance letter"
     },
     "document": {
@@ -1350,9 +1352,6 @@
               "other": "Other"
             }
           },
-          "seniorExecutiveSymbols": {
-            "title": "Company symbols"
-          },
           "risk-tolerance": {
             "title": "How would you describe your risk tolerance?",
             "options": {
@@ -1366,9 +1365,7 @@
             "options": {
               "affiliated_with_us_broker": "Affiliated or work with the US registered broker-dealer or FINRA",
               "senior_executive": "Senior executive at or a 10% or greater shareholder of a publicly traded company",
-              "senior_political_figure": "I'm a senior political figure",
-              "family_of_political_figure": "I'm a family member or relative of a senior political figure",
-              "none": "None"
+              "senior_political_figure": "I'm a senior political figure"
             }
           },
           "compliance_letter": {

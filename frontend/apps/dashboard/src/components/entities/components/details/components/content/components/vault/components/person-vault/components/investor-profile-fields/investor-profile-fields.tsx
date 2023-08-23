@@ -146,6 +146,28 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               }}
             />
           )}
+          {isVaultDataEmpty(
+            data?.[InvestorProfileDI.familyMemberNames],
+          ) ? null : (
+            <Field
+              di={InvestorProfileDI.familyMemberNames}
+              entity={entity}
+              renderValue={value => {
+                if (Array.isArray(value)) {
+                  return <FieldOrPlaceholder data={createStringList(value)} />;
+                }
+                return <FieldOrPlaceholder data={value} />;
+              }}
+            />
+          )}
+          {isVaultDataEmpty(
+            data?.[InvestorProfileDI.politicalOrganization],
+          ) ? null : (
+            <Field
+              di={InvestorProfileDI.politicalOrganization}
+              entity={entity}
+            />
+          )}
           {isVaultDataEmpty(data?.[DocumentDI.finraComplianceLetter]) ? null : (
             <Field di={DocumentDI.finraComplianceLetter} entity={entity} />
           )}

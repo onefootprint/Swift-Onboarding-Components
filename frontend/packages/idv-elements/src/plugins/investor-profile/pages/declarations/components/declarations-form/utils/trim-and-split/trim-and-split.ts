@@ -2,7 +2,7 @@ const trimAndSplit = (value?: string) => {
   if (!value) {
     return undefined;
   }
-  return value.replaceAll(' ', '').split(',');
+  return value.split(',').map(item => item.trim());
 };
 
 export default trimAndSplit;

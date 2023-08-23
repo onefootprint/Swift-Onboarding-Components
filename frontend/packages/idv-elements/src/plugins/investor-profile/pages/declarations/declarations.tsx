@@ -82,6 +82,10 @@ const Declarations = () => {
             data?.[InvestorProfileDI.declarations],
           [InvestorProfileDI.seniorExecutiveSymbols]:
             data?.[InvestorProfileDI.seniorExecutiveSymbols],
+          [InvestorProfileDI.familyMemberNames]:
+            data?.[InvestorProfileDI.familyMemberNames],
+          [InvestorProfileDI.politicalOrganization]:
+            data?.[InvestorProfileDI.politicalOrganization],
         }}
       />
     </>

@@ -93,8 +93,7 @@
       "options": {
         "affiliated_with_us_broker": "Affiliated or work with the US registered broker-dealer or FINRA",
         "senior_executive": "Senior executive at or a 10% or greater shareholder of a publicly traded company",
-        "senior_political_figure": "I'm a senior political figure",
-        "family_of_political_figure": "I'm a family member or relative of a senior political figure"
+        "senior_political_figure": "I'm a senior political figure"
       },
       "cta-none": "None of these apply to me",
       "company-symbols": {
@@ -102,6 +101,17 @@
         "placeholder": "ABNB, META, GOOG",
         "hint": "Use commas to separate the company symbols",
         "error": "Company symbols is required and should be separated with commas"
+      },
+      "family-members": {
+        "label": "Names of immediate family members",
+        "placeholder": "Josh Smith, Brooke Newman",
+        "hint": "This includes former spouses. Use commas to separate the names",
+        "error": "Family members is required and should be separated with commas"
+      },
+      "political-organization": {
+        "label": "Political organization",
+        "placeholder": "Political organization",
+        "error": "Political organization is required"
       },
       "doc-upload": {
         "label": "Upload a compliance letter (PDF)",
