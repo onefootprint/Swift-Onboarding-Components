@@ -1,27 +1,30 @@
+import * as CSS from 'csstype';
+
 type Overlay = {
-  bg: string;
+  bg: CSS.Property.Background;
 };
 
 type Loading = {
-  bg: string;
-  borderRadius: string;
-  color: string;
-  padding: string;
+  bg: CSS.Property.Background;
+  borderRadius: CSS.Property.BoxShadow;
+  color: CSS.Property.Color;
+  padding: CSS.Property.Padding;
 };
 
 type FpButton = {
-  height: string;
-  borderRadius: string;
+  height: CSS.Property.Height;
+  borderRadius: CSS.Property.BorderRadius;
 };
 
-type Dialog = {
-  bg: string;
-  elevation: string;
-  borderRadius: string;
+type Container = {
+  bg: CSS.Property.Background;
+  border: CSS.Property.Border;
+  elevation: CSS.Property.BoxShadow;
+  borderRadius: CSS.Property.BorderRadius;
 };
 
 export type Bifrost = {
-  dialog: Dialog;
+  container: Container;
   fpButton: FpButton;
   loading: Loading;
   overlay: Overlay;

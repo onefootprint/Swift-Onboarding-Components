@@ -1,6 +1,7 @@
 import { borderRadius } from '../../../primitives/borders';
 import { spacing } from '../../../primitives/spacing';
 import {
+  borderColor,
   elevation,
   overlay,
   surfaceColor,
@@ -25,10 +26,11 @@ const bifrost: Bifrost = {
     color: textColor.primary,
     padding: spacing[5],
   },
-  dialog: {
+  container: {
     bg: surfaceColor[3],
-    elevation: elevation[3],
+    border: `1px solid ${borderColor.tertiary}`,
     borderRadius: borderRadius.default,
+    elevation: elevation[3],
   },
 };
 

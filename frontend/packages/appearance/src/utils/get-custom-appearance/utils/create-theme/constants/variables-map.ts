@@ -1,4 +1,5 @@
 import buttonVariables from './button-variables';
+import containerVariables from './container-variables';
 import dropdownVariables from './dropdown-variables';
 import fontFamilyVariables from './font-family-variables';
 import hintVariables from './hint-variables';
@@ -16,7 +17,7 @@ const variablesMap = new Map<string, { var: string; assignDefault?: string[] }>(
         var: 'borderRadius.default',
         assignDefault: [
           'buttonBorderRadius',
-          'dialogBorderRadius',
+          'containerBorderRadius',
           'inputBorderRadius',
           'dropdownBorderRadius',
           'radioSelectBorderRadius',
@@ -71,6 +72,7 @@ const variablesMap = new Map<string, { var: string; assignDefault?: string[] }>(
       },
     ],
     ...fontFamilyVariables,
+    ...containerVariables,
     ...buttonVariables,
     ...dropdownVariables,
     ...hintVariables,

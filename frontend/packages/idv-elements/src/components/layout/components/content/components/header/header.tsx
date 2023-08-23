@@ -41,7 +41,6 @@ const Header = ({ hideDesktopSandboxBanner, isSandbox }: HeaderProps) => {
 
 const Container = styled.div`
   ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.primary};
     position: sticky;
     top: 0;
     z-index: ${theme.zIndex.sticky};

@@ -68,12 +68,30 @@ In the Footprint SDK, visual token inheritance operates on a hierarchical system
 
 | Higher-level Token | Lower-level Tokens Influenced                                                                                                                                                |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `borderRadius`     | `buttonBorderRadius`, `dialogBorderRadius`, `inputBorderRadius`, `dropdownBorderRadius`, `radioSelectBorderRadius`                                                           |
+| `borderRadius`     | `buttonBorderRadius`, `containerBorderRadius`, `inputBorderRadius`, `dropdownBorderRadius`, `radioSelectBorderRadius`                                                        |
 | `colorError`       | `borderColorError`, `hintErrorColor`, `linkButtonDestructiveColor`                                                                                                           |
 | `colorAccent`      | `linkColor`, `linkButtonColor`, `linkButtonHoverColor`, `linkButtonActiveColor`, `radioSelectColor`, `radioSelectSelectedBorderColor`, `radioSelectComponentsIconSelectedBg` |
 | `borderColorError` | `inputErrorBorderColor`                                                                                                                                                      |
 
 You can define these tokens to easily propagate design choices across multiple lower-level tokens. However, should you need to customize a specific token, setting it individually will override the higher-level default. This allows you to maintain broad stylistic consistency across your interface while still providing granular control over specific components.
+
+### Container
+
+Wraps the entire Footprint component.
+
+<img
+  src="/customization/component-container.png"
+  width={720}
+  height={250}
+  alt="Container"
+/>
+
+| Variable                | Description                              |
+| ----------------------- | ---------------------------------------- |
+| `containerBg`           | Sets the container body background color |
+| `containerElevation`    | Determines the container's shadow        |
+| `containerBorder`       | Defines the container's border           |
+| `containerBorderRadius` | Defines the container's border radius    |
 
 ### Link
 
@@ -89,23 +107,6 @@ Links function like standard anchor tags. A common example is the `Terms of Serv
 | Variable    | Description            |
 | ----------- | ---------------------- |
 | `linkColor` | Defines the link color |
-
-### Dialog
-
-The dialog is a crucial component that wraps our flow.
-
-<img
-  src="/customization/component-dialog.png"
-  width={720}
-  height={250}
-  alt="Dialog"
-/>
-
-| Variable             | Description                           |
-| -------------------- | ------------------------------------- |
-| `dialogBg`           | Sets the dialog body background color |
-| `dialogBoxShadow`    | Determines the dialog's shadow        |
-| `dialogBorderRadius` | Defines the dialog's border radius    |
 
 ### Label
 

@@ -38,9 +38,9 @@ const FullHeightContainer = forwardRef<
 
 const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
   ${({ theme, height }) => css`
-    border: 1px solid ${theme.borderColor.tertiary};
-    box-shadow: ${theme.elevation[1]};
-    background: ${theme.components.bifrost.dialog.bg};
+    background: ${theme.components.bifrost.container.bg};
+    border: ${theme.components.bifrost.container.border};
+    box-shadow: ${theme.components.bifrost.container.elevation};
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -75,7 +75,7 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
     hasBorderRadius &&
     css`
       ${media.greaterThan('md')`
-        border-radius: ${theme.components.bifrost.dialog.borderRadius};
+        border-radius: ${theme.components.bifrost.container.borderRadius};
       `}
     `}
 `;

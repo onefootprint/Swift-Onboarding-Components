@@ -9,13 +9,14 @@ export type AppearanceVariables = Partial<{
   colorAccent: CSS.Property.Color;
   borderColorError: CSS.Property.BorderColor;
 
+  // container
+  containerBg: CSS.Property.Background;
+  containerElevation: CSS.Property.BoxShadow;
+  containerBorder: CSS.Property.Border;
+  containerBorderRadius: CSS.Property.BorderRadius;
+
   // link
   linkColor: CSS.Property.Color;
-
-  // dialog
-  dialogBg: CSS.Property.Background;
-  dialogBoxShadow: CSS.Property.BoxShadow;
-  dialogBorderRadius: CSS.Property.BorderRadius;
 
   // typography
   fontFamily: CSS.Property.FontFamily;
