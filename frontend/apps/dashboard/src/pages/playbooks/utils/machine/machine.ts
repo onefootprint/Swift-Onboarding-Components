@@ -12,25 +12,25 @@ export const createPlaybookMachine = () =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'nameYourPlaybook',
+      initial: 'whoToOnboard',
       context: {},
       states: {
-        nameYourPlaybook: {
-          on: {
-            nameYourPlaybookSubmitted: {
-              target: 'whoToOnboard',
-              actions: ['assignNameYourPlaybook'],
-            },
-          },
-        },
         whoToOnboard: {
           on: {
             whoToOnboardSubmitted: {
-              target: 'yourPlaybook',
+              target: 'nameYourPlaybook',
               actions: ['assignWhoToOnboard'],
             },
-            nameYourPlaybookSelected: {
-              target: 'nameYourPlaybook',
+          },
+        },
+        nameYourPlaybook: {
+          on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+            },
+            nameYourPlaybookSubmitted: {
+              target: 'yourPlaybook',
+              actions: ['assignNameYourPlaybook'],
             },
           },
         },

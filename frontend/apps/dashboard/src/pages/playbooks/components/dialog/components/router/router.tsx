@@ -36,8 +36,8 @@ const Router = ({ onClose }: RouterProps) => {
   const mutation = useCreatePlaybook();
 
   const options = [
-    { value: 'nameYourPlaybook', label: t('name-your-playbook') },
     { value: 'whoToOnboard', label: t('who-to-onboard') },
+    { value: 'nameYourPlaybook', label: t('name-your-playbook') },
     { value: 'yourPlaybook', label: t('your-playbook') },
     { value: 'authorizedScopes', label: t('authorized-scopes') },
   ];
@@ -105,25 +105,25 @@ const Router = ({ onClose }: RouterProps) => {
             }
           }}
           value={stepperValue}
-          aria-label={t('stepper.ariaLabel')}
+          aria-label={t('stepper.aria-label')}
         />
       </StepperContainer>
       <Content>
-        {state.matches('nameYourPlaybook') && (
-          <NameYourPlaybook
-            defaultValues={{ name: state.context.name ?? defaultNameValue }}
-            onBack={onClose}
-            onSubmit={({ name }) => {
-              send('nameYourPlaybookSubmitted', { payload: { name } });
-            }}
-          />
-        )}
         {state.matches('whoToOnboard') && (
           <WhoToOnboard
-            onBack={() => send('nameYourPlaybookSelected')}
+            onBack={onClose}
             defaultKind={state.context.kind}
             onSubmit={({ kind }) => {
               send('whoToOnboardSubmitted', { payload: { kind } });
+            }}
+          />
+        )}
+        {state.matches('nameYourPlaybook') && (
+          <NameYourPlaybook
+            defaultValues={{ name: state.context.name ?? defaultNameValue }}
+            onBack={() => send('whoToOnboardSelected')}
+            onSubmit={({ name }) => {
+              send('nameYourPlaybookSubmitted', { payload: { name } });
             }}
           />
         )}
