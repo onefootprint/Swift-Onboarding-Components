@@ -87,6 +87,14 @@
         "subtitle": "We're legally required to collect this information."
       }
     },
+    "legal-status": {
+      "statuses": {
+        "citizen": "I'm a citizen",
+        "permanent-resident": "I have a Green Card/I'm a permanent resident",
+        "visa": "I have a Visa",
+        "other": "Other"
+      }
+    },
     "ssn": {
       "full": {
         "title": "What's your Social Security Number?",
