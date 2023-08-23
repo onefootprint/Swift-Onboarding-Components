@@ -1046,6 +1046,34 @@
         "title": "Playbooks",
         "subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
       },
+      "table": {
+        "aria-label": "Playbooks",
+        "header": {
+          "name": "Playbook name",
+          "type": "Type",
+          "key": "Publishable key",
+          "status": "Status",
+          "created": "Created at"
+        },
+        "filters": {
+          "status": {
+            "label": "Status",
+            "enabled": "Enabled",
+            "disabled": "Disabled"
+          }
+        },
+        "empty-state": "You haven't created any playbooks.",
+        "row": {
+          "type": {
+            "kyc": "KYC",
+            "kyb": "KYB"
+          },
+          "status": {
+            "enabled": "Enabled",
+            "disabled": "Disabled"
+          }
+        }
+      },
       "create-button": "Create Playbook",
       "empty-description": "You haven't created any Playbooks just yet.",
       "cta-not-allowed": "You're not allowed to create Playbooks",

@@ -1,16 +1,24 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Button, Typography } from '@onefootprint/ui';
+import { Button, Pagination, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
 import Dialog from './components/dialog';
+import Table from './components/table';
+import usePlaybooks from './utils/use-playbooks';
 
 const Playbooks = () => {
   const { t } = useTranslation('pages.playbooks');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const {
+    data: response,
+    errorMessage,
+    isLoading,
+    pagination,
+  } = usePlaybooks();
 
   const onCreatePlaybook = () => {
     setDialogOpen(true);
@@ -35,6 +43,23 @@ const Playbooks = () => {
           </Button>
         </PermissionGate>
       </HeaderContainer>
+
+      <Table
+        data={response?.data}
+        errorMessage={errorMessage}
+        isLoading={isLoading}
+      />
+      {response && response.meta.count > 0 && (
+        <Pagination
+          hasNextPage={pagination.hasNextPage}
+          hasPrevPage={pagination.hasPrevPage}
+          onNextPage={pagination.loadNextPage}
+          onPrevPage={pagination.loadPrevPage}
+          pageIndex={pagination.pageIndex}
+          pageSize={pagination.pageSize}
+          totalNumResults={response.meta.count}
+        />
+      )}
       <Typography variant="body-2">{t('empty-description')}</Typography>
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </Container>
