@@ -200,3 +200,4 @@ define_newtype_id!(
     String,
     "Identifier for a tenant's client configuration"
 );
+define_newtype_id!(ZipCode, String, "ZipCode in the db");

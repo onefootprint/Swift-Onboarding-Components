@@ -914,6 +914,19 @@ table! {
     }
 }
 
+table! {
+    use diesel::sql_types::*;
+
+    zip_code (code) {
+        code -> Text,
+        city -> Text,
+        state -> Nullable<Text>,
+        state_code -> Nullable<Text>,
+        latitude -> Float8,
+        longitude -> Float8,
+    }
+}
+
 joinable!(access_event -> insight_event (insight_event_id));
 joinable!(access_event -> scoped_vault (scoped_vault_id));
 joinable!(access_event -> tenant (tenant_id));
@@ -1046,4 +1059,5 @@ allow_tables_to_appear_in_same_query!(
     webauthn_credential,
     workflow,
     workflow_event,
+    zip_code,
 );
