@@ -1,6 +1,5 @@
 import pytest
-from tests.utils import HttpError
-from tests.bifrost_client import BifrostClient
+from tests.bifrost_client import BifrostClient, RepeatRequirement
 from tests.utils import create_ob_config
 
 
@@ -97,9 +96,7 @@ def test_invalid_us_legal_status(legal_status_obc, twilio, data):
     try:
         bifrost.run()
         assert False, "Should have failed running bifrost"
-    except HttpError as e:
+    except RepeatRequirement as e:
         print(f"Handling error:\n{e}")
-        assert e.path == "hosted/onboarding/authorize"
-        assert (
-            e.json()["error"]["message"] == "Unmet onboarding requirements: CollectData"
-        )
+        assert e.requirement["kind"] == "collect_data"
+        assert e.requirement["missing_attributes"] == ["us_legal_status"]

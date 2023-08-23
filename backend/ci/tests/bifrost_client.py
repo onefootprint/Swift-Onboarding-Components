@@ -174,20 +174,28 @@ class BifrostClient:
         If `kind` is provided, will only handle the requested requirement
         """
         self.handled_requirements = []
+        last_handled_requirement = None
         while True:
             body = self.get_status()
-            requirements = body["requirements"]
-            requirements_to_handle = (
-                requirements
-                if not kind
-                else [i for i in requirements if i["kind"] == kind]
-            )
-            if len(requirements_to_handle) == 0:
+            requirements = [r for r in body["all_requirements"] if not r["is_met"]]
+            try:
+                next_requirement = (
+                    next(r for r in requirements)
+                    if not kind
+                    else next(r for r in requirements if r["kind"] == kind)
+                )
+            except StopIteration:
                 break
-            self.handled_requirements.extend(requirements_to_handle)
+
+            # If the requirement hasn't changed at all since the last iteration, break to prevent
+            # infinite loop
+            if next_requirement == last_handled_requirement:
+                raise RepeatRequirement(next_requirement)
+
+            self.handled_requirements.append(next_requirement)
             self.already_met_requirements = body["met_requirements"]
-            for req in requirements_to_handle:
-                self.handle_requirement(req)
+            self.handle_requirement(next_requirement)
+            last_handled_requirement = next_requirement
 
     def handle_requirement(self, requirement):
         """
@@ -339,3 +347,9 @@ class User(NamedTuple):
     fp_bid: Optional[str]
     tenant: Tenant
     client: BifrostClient
+
+
+class RepeatRequirement(Exception):
+    def __init__(self, requirement):
+        self.requirement = requirement
+        super().__init__()
