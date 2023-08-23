@@ -1,6 +1,7 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
+import { asAdminUser, asAdminUserFirmEmployee } from 'src/config/tests';
 
 import { Kind } from '@/playbooks/utils/machine/types';
 
@@ -134,5 +135,27 @@ describe('<Editing />', () => {
     expect(
       screen.getByText('Edit KYC of a beneficial owner'),
     ).toBeInTheDocument();
+  });
+
+  it('should show no phone flow option if firm employee', async () => {
+    asAdminUserFirmEmployee();
+    renderEditing({ kind: Kind.KYC });
+    expect(
+      screen.getByRole('switch', {
+        name: 'Request users to provide their phone number',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Basic information')).toBeInTheDocument();
+  });
+
+  it('should hide phone option flow option if non-firm employee', async () => {
+    asAdminUser();
+    renderEditing({ kind: Kind.KYC });
+    expect(
+      screen.queryByRole('switch', {
+        name: 'Request users to provide their phone number',
+      }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Basic information')).not.toBeInTheDocument();
   });
 });

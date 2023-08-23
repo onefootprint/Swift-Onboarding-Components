@@ -33,7 +33,6 @@ describe('processPlaybook', () => {
     });
 
     expect(mustCollectData).toContain(CollectedKycDataOption.email);
-    expect(mustCollectData).toContain(CollectedKycDataOption.phoneNumber);
     expect(mustCollectData).toContain(CollectedKycDataOption.name);
     expect(mustCollectData).toContain(CollectedKycDataOption.dob);
     expect(mustCollectData).toContain(CollectedKycDataOption.fullAddress);
@@ -578,5 +577,62 @@ describe('processPlaybook', () => {
       authorizedScopes: defaultAuthorizedScopesValues,
     });
     expect(isDocFirstFlow).toBe(false);
+  });
+
+  it('in default case, should not be phone first flow flow', () => {
+    const { isNoPhoneFlow, mustCollectData } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+    expect(isNoPhoneFlow).toBe(false);
+    expect(mustCollectData).toContain(CollectedKycDataOption.phoneNumber);
+  });
+
+  it('should register as no phone flow if phone is toggled off', () => {
+    const { isNoPhoneFlow, mustCollectData } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          [CollectedKycDataOption.phoneNumber]: false,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+    expect(isNoPhoneFlow).toBe(true);
+    expect(mustCollectData).not.toContain(CollectedKycDataOption.phoneNumber);
+  });
+
+  it('should not register as no phone flow if phone is toggled on', () => {
+    const { isNoPhoneFlow, mustCollectData } = processPlaybook({
+      playbook: {
+        ...defaultPlaybookValuesKYC,
+        personalInformationAndDocs: {
+          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+          [CollectedKycDataOption.phoneNumber]: true,
+        },
+      },
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+    expect(isNoPhoneFlow).toBe(false);
+    expect(mustCollectData).toContain(CollectedKycDataOption.phoneNumber);
+  });
+
+  it('should include phone number and not submit isNoPhoneFlow for default case', () => {
+    const { isNoPhoneFlow, mustCollectData } = processPlaybook({
+      playbook: defaultPlaybookValuesKYC,
+      kind: Kind.KYC,
+      authorizedScopes: defaultAuthorizedScopesValues,
+    });
+    expect(isNoPhoneFlow).toBe(false);
+    expect(mustCollectData).toContain(CollectedKycDataOption.phoneNumber);
   });
 });

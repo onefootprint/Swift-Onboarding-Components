@@ -28,7 +28,6 @@ const getRequiredKybCollectFields = () => [
 
 const getRequiredKycCollectFields = () => [
   CollectedKycDataOption.email,
-  CollectedKycDataOption.phoneNumber,
   CollectedKycDataOption.name,
   CollectedKycDataOption.dob,
   CollectedKycDataOption.fullAddress,
@@ -61,6 +60,13 @@ const processPlaybook = ({
   ) {
     optionalData.push(personalInformationAndDocs.ssnKind);
   }
+
+  // no phone flows handling
+  if (personalInformationAndDocs[CollectedKycDataOption.phoneNumber]) {
+    mustCollectData.push(CollectedKycDataOption.phoneNumber);
+  }
+  const isNoPhoneFlow =
+    !personalInformationAndDocs[CollectedKycDataOption.phoneNumber];
 
   // id doc handling
   const { idDoc, idDocKind, selfie, idDocFirst } = personalInformationAndDocs;
@@ -135,6 +141,7 @@ const processPlaybook = ({
     canAccessData,
     optionalData,
     isDocFirstFlow,
+    isNoPhoneFlow,
   };
 };
 

@@ -7,6 +7,7 @@ import {
 import { Button, Checkbox, Radio, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import useSession from 'src/hooks/use-session';
 
 import {
   type PersonalInformationAndDocs,
@@ -23,10 +24,14 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.form.personal-info-and-docs',
   );
+  const {
+    data: { user },
+  } = useSession();
   const [unselectedIDDoc, setUnselectedIDDoc] = useState(false);
   const ssnOpen = watch('personalInformationAndDocs.ssn');
   const idDocOpen = watch('personalInformationAndDocs.idDoc');
   const idDocKind = watch('personalInformationAndDocs.idDocKind');
+  const showNoPhoneFlow = user && user?.isFirmEmployee;
 
   // need to store this so we don't re-fetch on add'l renders
   const [initialValues] = useState<PersonalInformationAndDocs>({
@@ -48,14 +53,40 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
     stopEditing();
   };
 
+  const title =
+    kind === Kind.KYB ? (
+      <Typography variant="label-3">{t('editing.kyb')}</Typography>
+    ) : (
+      <Typography variant="label-3">{t('editing.kyc')}</Typography>
+    );
+
   return (
     <EditingContainer>
+      {showNoPhoneFlow && (
+        <Section>
+          <Typography variant="label-1">{t('basic-information')}</Typography>
+          {title}
+          <Controller
+            control={control}
+            name={`personalInformationAndDocs.${CollectedKycDataOption.phoneNumber}`}
+            render={({ field }) => (
+              <ToggleContainer>
+                <Toggle
+                  onBlur={field.onBlur}
+                  onChange={nextValue => {
+                    field.onChange(nextValue);
+                  }}
+                  checked={field.value}
+                  label={t('phone.toggle')}
+                  labelPlacement="right"
+                />
+              </ToggleContainer>
+            )}
+          />
+        </Section>
+      )}
       <Section>
-        {kind === Kind.KYB ? (
-          <Typography variant="label-3">{t('editing.kyb')}</Typography>
-        ) : (
-          <Typography variant="label-3">{t('editing.kyc')}</Typography>
-        )}
+        {!showNoPhoneFlow && title}
         <Typography variant="label-3">{t('ssn.title')}</Typography>
         <Controller
           control={control}

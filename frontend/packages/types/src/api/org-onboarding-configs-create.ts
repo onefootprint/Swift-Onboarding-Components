@@ -9,6 +9,7 @@ export type OrgOnboardingConfigCreateRequest = {
   canAccessData: CollectedDataOption[];
   optionalData: CollectedDataOption[];
   isDocFirstFlow?: boolean;
+  isNoPhoneFlow?: boolean;
 };
 
 export type OrgOnboardingConfigCreateResponse = string;

@@ -1142,6 +1142,10 @@
                 "kyc": "Edit personal information & docs",
                 "kyb": "Edit KYC of a beneficial owner"
               },
+              "basic-information": "Basic information",
+              "phone": {
+                "toggle": "Request users to provide their phone number"
+              },
               "ssn": {
                 "title": "SSN",
                 "toggle": "Request users to provide their SSN",

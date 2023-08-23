@@ -3,8 +3,8 @@ import { useFormContext } from 'react-hook-form';
 import { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
 
 const useFormValues = () => {
-  const { getValues } = useFormContext();
-  const personalInfoAndDocs: PersonalInformationAndDocs = getValues(
+  const { watch } = useFormContext();
+  const personalInfoAndDocs: PersonalInformationAndDocs = watch(
     'personalInformationAndDocs',
   );
 
