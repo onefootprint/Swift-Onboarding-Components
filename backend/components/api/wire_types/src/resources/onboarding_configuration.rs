@@ -28,6 +28,9 @@ pub struct OnboardingConfiguration {
     #[serde(skip_serializing_if = "Option::is_none")]
     /// allow list of origins permitted to host the embedded flow
     pub allowed_origins: Option<Vec<String>>,
+
+    pub requires_id_doc: bool,
+    pub is_kyb: bool,
 }
 
 export_schema!(OnboardingConfiguration);

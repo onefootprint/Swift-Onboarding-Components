@@ -5,6 +5,7 @@ use db::models::{
     tenant_client_config::TenantClientConfig,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
+use newtypes::DataIdentifierDiscriminant;
 
 use crate::utils::db2api::DbToApi;
 
@@ -41,6 +42,12 @@ impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
         let appearance = appearance.map(|a| a.data);
         let is_app_clip_enabled = ff_client.flag(BoolFlag::IsAppClipEnabled(&tenant_id));
         let is_instant_app_enabled = ff_client.flag(BoolFlag::IsInstantAppEnabled(&tenant_id));
+        let is_kyb = must_collect_data
+            .iter()
+            .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Business);
+        let requires_id_doc = must_collect_data
+            .iter()
+            .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Document);
         Self {
             id,
             key,
@@ -60,6 +67,8 @@ impl DbToApi<ObConfigInfo> for api_wire_types::OnboardingConfiguration {
             tenant_id,
             is_no_phone_flow,
             allowed_origins: tenant_client_config.map(|c| c.allowed_origins),
+            requires_id_doc,
+            is_kyb,
         }
     }
 }
