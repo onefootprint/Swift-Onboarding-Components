@@ -12,7 +12,7 @@ import useSession, { AuthHeaders } from 'src/hooks/use-session';
 
 import useFilters from '../use-filters';
 
-const QUERY_KEY = 'onboarding_configs';
+export const QUERY_KEY = 'onboarding_configs';
 
 const getPlaybooks = async (
   authHeaders: AuthHeaders,

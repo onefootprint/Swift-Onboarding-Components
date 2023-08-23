@@ -6,6 +6,7 @@ import Head from 'next/head';
 import React, { useState } from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
+import Details from './components/details';
 import Dialog from './components/dialog';
 import Table from './components/table';
 import usePlaybooks from './utils/use-playbooks';
@@ -61,6 +62,7 @@ const Playbooks = () => {
         />
       )}
       <Typography variant="body-2">{t('empty-description')}</Typography>
+      <Details />
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </Container>
   );
