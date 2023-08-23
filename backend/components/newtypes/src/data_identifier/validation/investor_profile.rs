@@ -121,7 +121,7 @@ enum InvestmentGoal {
     Income,
     PreserveCapital,
     Speculation,
-    Divserification,
+    Diversification,
     Other,
 
     // Can't remove these yet since some old vaults have these
