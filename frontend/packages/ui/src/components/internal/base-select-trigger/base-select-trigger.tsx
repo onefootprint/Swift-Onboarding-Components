@@ -112,6 +112,7 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
       &:disabled {
         background: ${input.state.disabled.bg};
         border-color: ${input.state.disabled.border};
+        color: ${input.state.disabled.color};
       }
     `;
   }}

@@ -54,6 +54,7 @@ const input: Input = {
     disabled: {
       bg: backgroundColor.secondary,
       border: borderColor.primary,
+      color: textColor.quaternary,
     },
   },
   size: {

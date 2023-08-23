@@ -47,6 +47,7 @@ export type Input = {
     disabled: {
       bg: CSS.Property.Background;
       border: CSS.Property.BorderColor;
+      color: CSS.Property.Color;
     };
   };
   size: {

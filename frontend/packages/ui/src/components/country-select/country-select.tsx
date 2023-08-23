@@ -63,7 +63,9 @@ const CountrySelect = ({
         onClick={onClick}
         testID={triggerTestID}
       >
-        {selectedOption && <StyledFlag code={selectedOption.value} />}
+        {selectedOption && (
+          <StyledFlag code={selectedOption.value} disabled={disabled} />
+        )}
         <LabelContainer>{selectedOption?.label || placeholder}</LabelContainer>
       </BaseSelectTrigger>
     )}
@@ -76,10 +78,15 @@ const LabelContainer = styled.div`
   white-space: nowrap;
 `;
 
-const StyledFlag = styled(Flag)`
-  ${({ theme }) => css`
+const StyledFlag = styled(Flag)<{ disabled?: boolean }>`
+  ${({ theme, disabled }) => css`
     margin-right: ${theme.spacing[4]};
     min-width: 20px;
+
+    ${disabled &&
+    css`
+      opacity: 0.4;
+    `};
   `}
 `;
 

@@ -95,6 +95,7 @@ const Field = styled(Cleave)<FieldInternalProps>`
       &:disabled {
         background: ${input.state.disabled.bg};
         border-color: ${input.state.disabled.border};
+        color: ${input.state.disabled.color};
       }
     `;
   }}
