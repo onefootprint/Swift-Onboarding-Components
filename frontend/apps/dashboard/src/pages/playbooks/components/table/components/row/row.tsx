@@ -7,6 +7,7 @@ import { Badge, CodeInline, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import useOrgSession from 'src/hooks/use-org-session';
 
+import Actions from './components/actions';
 import isKybPlaybook from './utils/is-kyb-playbook';
 
 export type RowProps = {
@@ -57,7 +58,7 @@ const Row = ({ playbook }: RowProps) => {
       </td>
       <td>{formatDateWithTime(new Date(createdAt))}</td>
       <td>
-        {/* actions TK <Actions onboardingConfig={onboardingConfig} /> */}
+        <Actions playbook={playbook} />
       </td>
     </>
   );

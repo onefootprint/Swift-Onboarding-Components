@@ -1062,6 +1062,45 @@
             "disabled": "Disabled"
           }
         },
+        "actions": {
+          "aria-label": "Open actions for Playbook {{name}}",
+          "not-allowed": "You're not allowed to manage Playbooks",
+          "status": {
+            "label": "Status",
+            "enable": "Enable",
+            "disable": {
+              "cta": "Disable",
+              "confirmation": {
+                "title": "Disable Playbook?",
+                "description": "Are you sure you want to disable this Playbook?"
+              }
+            }
+          },
+          "edit-name": {
+            "cta": "Edit name",
+            "title": "Edit Playbook name",
+            "form": {
+              "name": {
+                "label": "Playbook name",
+                "placeholder": "User ID verification",
+                "errors": {
+                  "required": "Please enter a name for the Playbook."
+                }
+              },
+              "save": "Save",
+              "cancel": "Cancel"
+            },
+            "feedback": {
+              "success": {
+                "title": "Success",
+                "description": "Playbook name changed!"
+              }
+            }
+          },
+          "get-link": {
+            "cta": "Get shareable link"
+          }
+        },
         "empty-state": "You haven't created any playbooks.",
         "row": {
           "type": {
