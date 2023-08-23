@@ -3,20 +3,20 @@ import {
   IcoBuilding24,
   IcoCake24,
   IcoCar24,
-  IcoClipboard24,
   IcoDollar24,
   IcoEmail24,
   IcoFileText24,
   IcoFlag24,
   IcoGlobe24,
-  IcoHome24,
+  IcoGreenCard24,
   IcoIdCard24,
   Icon,
   IcoPassport24,
   IcoPhone24,
   IcoSelfie24,
   IcoUserCircle24,
-  IcoWriting24,
+  IcoVisaPassport24,
+  IcoWork24,
 } from '@onefootprint/icons';
 import {
   CollectedDocumentDataOption,
@@ -48,9 +48,9 @@ const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
   [SupportedIdDocTypes.idCard]: IcoIdCard24,
   [SupportedIdDocTypes.driversLicense]: IcoCar24,
   [SupportedIdDocTypes.passport]: IcoPassport24,
-  [SupportedIdDocTypes.workPermit]: IcoClipboard24,
-  [SupportedIdDocTypes.residenceDocument]: IcoHome24,
-  [SupportedIdDocTypes.visa]: IcoWriting24,
+  [SupportedIdDocTypes.workPermit]: IcoWork24,
+  [SupportedIdDocTypes.residenceDocument]: IcoGreenCard24,
+  [SupportedIdDocTypes.visa]: IcoVisaPassport24,
 };
 
 type KycFieldsProps = {

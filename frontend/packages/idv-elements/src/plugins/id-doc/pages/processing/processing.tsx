@@ -115,7 +115,7 @@ const Processing = () => {
 
   return (
     <IdDocAnimation
-      loadingComponent={<Loading imageType={currSide} docType={type} />}
+      loadingComponent={<Loading imageType={currSide} />}
       successComponent={
         <Success
           imageType={currSide}
@@ -128,7 +128,6 @@ const Processing = () => {
       nextSideComponent={
         nextSide && (
           <NextSide
-            docType={type}
             nextSideImageType={nextSide}
             onComplete={onNextSideComplete}
           />

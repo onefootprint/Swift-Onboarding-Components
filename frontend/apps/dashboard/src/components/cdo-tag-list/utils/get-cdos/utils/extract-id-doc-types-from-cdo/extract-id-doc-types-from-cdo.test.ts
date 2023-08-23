@@ -14,6 +14,9 @@ describe('extractIdDocTypesFromCdo', () => {
       SupportedIdDocTypes.idCard,
       SupportedIdDocTypes.driversLicense,
       SupportedIdDocTypes.passport,
+      SupportedIdDocTypes.visa,
+      SupportedIdDocTypes.residenceDocument,
+      SupportedIdDocTypes.workPermit,
     ]);
     expect(
       extractIdDocTypesFromCdo(CollectedDocumentDataOption.documentAndSelfie),
@@ -21,6 +24,9 @@ describe('extractIdDocTypesFromCdo', () => {
       SupportedIdDocTypes.idCard,
       SupportedIdDocTypes.driversLicense,
       SupportedIdDocTypes.passport,
+      SupportedIdDocTypes.visa,
+      SupportedIdDocTypes.residenceDocument,
+      SupportedIdDocTypes.workPermit,
     ]);
     expect(extractIdDocTypesFromCdo(CollectedKycDataOption.dob)).toEqual([]);
     expect(extractIdDocTypesFromCdo('document.id_card.none.none')).toEqual([

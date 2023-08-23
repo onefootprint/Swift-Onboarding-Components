@@ -13,6 +13,7 @@ import React from 'react';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { imageIcons } from '../../constants/image-types';
+import getImageSideLabel from '../../utils/get-image-side-label';
 import FeedbackIcon from '../feedback-icon';
 
 type ErrorProps = {
@@ -32,10 +33,7 @@ const Error = ({
 }: ErrorProps) => {
   const { t } = useTranslation('components.error');
 
-  const side =
-    docType === SupportedIdDocTypes.passport && IdDocImageTypes.front
-      ? 'photo page'
-      : `${imageType} side`;
+  const side = getImageSideLabel(imageType, docType);
 
   const imageErrorsSet: Set<IdDocImageProcessingError | IdDocImageUploadError> =
     new Set([

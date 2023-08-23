@@ -44,6 +44,9 @@ const tagOrder: (CollectedDataOption | SupportedIdDocTypes | 'selfie')[] = [
   SupportedIdDocTypes.driversLicense,
   SupportedIdDocTypes.passport,
   SupportedIdDocTypes.idCard,
+  SupportedIdDocTypes.visa,
+  SupportedIdDocTypes.workPermit,
+  SupportedIdDocTypes.residenceDocument,
   'selfie',
 ];
 

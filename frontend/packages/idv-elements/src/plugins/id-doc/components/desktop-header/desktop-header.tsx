@@ -9,6 +9,7 @@ import React from 'react';
 import { HeaderTitle } from '../../../../components';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
+import getImageSideLabel from '../../utils/get-image-side-label';
 
 type DesktopHeaderProps = {
   type?: SupportedIdDocTypes;
@@ -19,10 +20,7 @@ type DesktopHeaderProps = {
 const DesktopHeader = ({ type, imageType, country }: DesktopHeaderProps) => {
   const { t } = useTranslation('components.desktop-header');
 
-  const side =
-    type === SupportedIdDocTypes.passport && IdDocImageTypes.front
-      ? 'photo page'
-      : `${imageType} side`;
+  const side = getImageSideLabel(imageType, type);
 
   const typeLabel = type ? IdDocTypeToLabel[type] : '';
   const countryName = getCountryFromCode(country)?.label;

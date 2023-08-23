@@ -10,6 +10,9 @@ const getDataLabel = (
     .replace(`document.${SupportedIdDocTypes.driversLicense}.`, '')
     .replace(`document.${SupportedIdDocTypes.passport}.`, '')
     .replace(`document.${SupportedIdDocTypes.idCard}.`, '')
+    .replace(`document.${SupportedIdDocTypes.visa}.`, '')
+    .replace(`document.${SupportedIdDocTypes.workPermit}.`, '')
+    .replace(`document.${SupportedIdDocTypes.residenceDocument}.`, '')
     .replace(`:${activeDocumentVersion}`, '');
 
 export default getDataLabel;

@@ -13,6 +13,10 @@ const mainDIs: Partial<Record<DocumentDI, SupportedIdDocTypes>> = {
   [DocumentDI.latestIdCardFront]: SupportedIdDocTypes.idCard,
   [DocumentDI.latestDriversLicenseFront]: SupportedIdDocTypes.driversLicense,
   [DocumentDI.latestPassport]: SupportedIdDocTypes.passport,
+  [DocumentDI.latestVisa]: SupportedIdDocTypes.visa,
+  [DocumentDI.latestWorkPermitFront]: SupportedIdDocTypes.workPermit,
+  [DocumentDI.latestResidenceDocumentFront]:
+    SupportedIdDocTypes.residenceDocument,
 };
 
 const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
@@ -27,6 +31,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.idCardIssuingState,
     DocumentDI.idCardIssuingCountry,
     DocumentDI.idCardRefNumber,
+    DocumentDI.idCardNationality,
   ],
   [SupportedIdDocTypes.driversLicense]: [
     DocumentDI.driversLicenseFullName,
@@ -39,6 +44,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.driversLicenseIssuingState,
     DocumentDI.driversLicenseIssuingCountry,
     DocumentDI.driversLicenseRefNumber,
+    DocumentDI.driversLicenseNationality,
   ],
   [SupportedIdDocTypes.passport]: [
     DocumentDI.passportFullName,
@@ -51,6 +57,46 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.passportIssuingState,
     DocumentDI.passportIssuingCountry,
     DocumentDI.passportRefNumber,
+    DocumentDI.passportNationality,
+  ],
+  [SupportedIdDocTypes.visa]: [
+    DocumentDI.visaFullName,
+    DocumentDI.visaDOB,
+    DocumentDI.visaGender,
+    DocumentDI.visaFullAddress,
+    DocumentDI.visaDocumentNumber,
+    DocumentDI.visaIssuedAt,
+    DocumentDI.visaExpiresAt,
+    DocumentDI.visaIssuingState,
+    DocumentDI.visaIssuingCountry,
+    DocumentDI.visaRefNumber,
+    DocumentDI.visaNationality,
+  ],
+  [SupportedIdDocTypes.workPermit]: [
+    DocumentDI.workPermitFullName,
+    DocumentDI.workPermitDOB,
+    DocumentDI.workPermitGender,
+    DocumentDI.workPermitFullAddress,
+    DocumentDI.workPermitDocumentNumber,
+    DocumentDI.workPermitIssuedAt,
+    DocumentDI.workPermitExpiresAt,
+    DocumentDI.workPermitIssuingState,
+    DocumentDI.workPermitIssuingCountry,
+    DocumentDI.workPermitRefNumber,
+    DocumentDI.workPermitNationality,
+  ],
+  [SupportedIdDocTypes.residenceDocument]: [
+    DocumentDI.residenceDocumentFullName,
+    DocumentDI.residenceDocumentDOB,
+    DocumentDI.residenceDocumentGender,
+    DocumentDI.residenceDocumentFullAddress,
+    DocumentDI.residenceDocumentDocumentNumber,
+    DocumentDI.residenceDocumentIssuedAt,
+    DocumentDI.residenceDocumentExpiresAt,
+    DocumentDI.residenceDocumentIssuingState,
+    DocumentDI.residenceDocumentIssuingCountry,
+    DocumentDI.residenceDocumentRefNumber,
+    DocumentDI.residenceDocumentNationality,
   ],
 };
 

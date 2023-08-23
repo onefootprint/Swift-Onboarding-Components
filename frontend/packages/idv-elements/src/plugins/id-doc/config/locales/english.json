@@ -77,7 +77,6 @@
     "loading": {
       "processing-front": "Processing image...",
       "processing-back": "Processing image...",
-      "processing-one-side": "Processing image...",
       "processing-selfie": "Processing your selfie..."
     },
     "error": {
@@ -114,10 +113,7 @@
       }
     },
     "success": {
-      "front-upload": "Front side image uploaded",
-      "back-upload": "Back side image uploaded",
-      "one-side-upload": "Image uploaded",
-      "selfie-upload": "Selfie uploaded"
+      "title": "Successfully uploaded {{side}} image"
     },
     "id-doc-photo-upload-buttons": {
       "take-photo": {
@@ -131,8 +127,7 @@
     "next-side": {
       "front": "Now the front side",
       "back": "Now the back side",
-      "selfie": "Now we need a selfie",
-      "one-side": "Now the photo page of your passport"
+      "selfie": "Now we need a selfie"
     },
     "camera": {
       "take": "Take photo",
@@ -215,6 +210,18 @@
           "driversLicense": {
             "title": "Driver's license",
             "description": "Front & Back"
+          },
+          "visa": {
+            "title": "Visa",
+            "description": "Photo page"
+          },
+          "workPermit": {
+            "title": "Work permit / EAD card",
+            "description": "Front & Back"
+          },
+          "residenceDocument": {
+            "title": "Residence card / Green card",
+            "description": "Front & Back"
           }
         },
         "not-supported": "Sorry, we don't support IDs for your country yet.",
@@ -226,9 +233,9 @@
         "driversLicense": "Driver's license · Front side",
         "idCard": "ID card · Front side",
         "passport": "Passport · Photo page",
-        "visa": "Visa",
-        "residenceDocument": "Residence card · Front side",
-        "workPermit": "Work permit · Front side"
+        "visa": "Visa · Photo page",
+        "workPermit": "EAD card · Front side",
+        "residenceDocument": "Green card · Front side"
       }
     },
     "back-photo-capture": {
@@ -236,9 +243,9 @@
         "driversLicense": "Driver's license · Back side",
         "idCard": "ID card · Back side",
         "passport": "Passport · Photo page",
-        "visa": "Visa",
-        "residenceDocument": "Residence card · Back side",
-        "workPermit": "Work permit · Back side"
+        "visa": "Visa · Photo page",
+        "workPermit": "EAD card · Back side",
+        "residenceDocument": "Green card · Back side"
       }
     },
     "selfie-photo-prompt": {

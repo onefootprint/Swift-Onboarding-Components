@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
+import { IdDocImageTypes } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 
@@ -9,22 +9,11 @@ import FeedbackIcon from '../feedback-icon';
 
 export type LoadingProps = {
   imageType: IdDocImageTypes;
-  docType: SupportedIdDocTypes;
   backgroundColor?: 'primary' | 'secondary';
 };
 
-const Loading = ({
-  imageType,
-  docType,
-  backgroundColor = 'primary',
-}: LoadingProps) => {
+const Loading = ({ imageType, backgroundColor = 'primary' }: LoadingProps) => {
   const { t } = useTranslation('components.loading');
-
-  const side =
-    imageType ===
-    (docType === SupportedIdDocTypes.passport && IdDocImageTypes.front)
-      ? 'one-side'
-      : imageType;
 
   return (
     <Container>
@@ -37,7 +26,7 @@ const Loading = ({
         }}
       />
       <Typography variant="label-1" sx={{ marginTop: 5, textAlign: 'center' }}>
-        {t(`processing-${side}`)}
+        {t(`processing-${imageType}`)}
       </Typography>
     </Container>
   );

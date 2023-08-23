@@ -9,6 +9,9 @@ describe('getInitialCountry', () => {
       passport: true,
       idCard: true,
       driversLicense: true,
+      visa: true,
+      workPermit: true,
+      residenceDocument: true,
     });
   });
 
@@ -20,6 +23,9 @@ describe('getInitialCountry', () => {
       passport: true,
       idCard: false,
       driversLicense: false,
+      visa: false,
+      workPermit: false,
+      residenceDocument: false,
     });
   });
 });

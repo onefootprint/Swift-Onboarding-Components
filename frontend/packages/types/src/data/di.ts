@@ -66,6 +66,8 @@ export enum DocumentDI {
   passportIssuingState = 'document.passport.issuing_state',
   passportIssuingCountry = 'document.passport.issuing_country',
   passportRefNumber = 'document.passport.ref_number',
+  passportNationality = 'document.passport.nationality',
+
   latestDriversLicenseFront = 'document.drivers_license.front.latest_upload',
   latestDriversLicenseBack = 'document.drivers_license.back.latest_upload',
   latestDriversLicenseSelfie = 'document.drivers_license.selfie.latest_upload',
@@ -79,6 +81,8 @@ export enum DocumentDI {
   driversLicenseIssuingState = 'document.drivers_license.issuing_state',
   driversLicenseIssuingCountry = 'document.drivers_license.issuing_country',
   driversLicenseRefNumber = 'document.drivers_license.ref_number',
+  driversLicenseNationality = 'document.drivers_license.nationality',
+
   latestIdCardFront = 'document.id_card.front.latest_upload',
   latestIdCardBack = 'document.id_card.back.latest_upload',
   latestIdCardSelfie = 'document.id_card.selfie.latest_upload',
@@ -92,6 +96,51 @@ export enum DocumentDI {
   idCardIssuingState = 'document.id_card.issuing_state',
   idCardIssuingCountry = 'document.id_card.issuing_country',
   idCardRefNumber = 'document.id_card.ref_number',
+  idCardNationality = 'document.id_card.nationality',
+
+  latestVisa = 'document.visa.front.latest_upload',
+  latestVisaSelfie = 'document.visa.selfie.latest_upload',
+  visaFullName = 'document.visa.full_name',
+  visaDOB = 'document.visa.dob',
+  visaGender = 'document.visa.gender',
+  visaFullAddress = 'document.visa.full_address',
+  visaDocumentNumber = 'document.visa.document_number',
+  visaIssuedAt = 'document.visa.issued_at',
+  visaExpiresAt = 'document.visa.expires_at',
+  visaIssuingState = 'document.visa.issuing_state',
+  visaIssuingCountry = 'document.visa.issuing_country',
+  visaRefNumber = 'document.visa.ref_number',
+  visaNationality = 'document.visa.nationality',
+
+  latestResidenceDocumentFront = 'document.residence_document.front.latest_upload',
+  latestResidenceDocumentBack = 'document.residence_document.back.latest_upload',
+  latestResidenceDocumentSelfie = 'document.residence_document.selfie.latest_upload',
+  residenceDocumentFullName = 'document.residence_document.full_name',
+  residenceDocumentDOB = 'document.residence_document.dob',
+  residenceDocumentGender = 'document.residence_document.gender',
+  residenceDocumentFullAddress = 'document.residence_document.full_address',
+  residenceDocumentDocumentNumber = 'document.residence_document.document_number',
+  residenceDocumentIssuedAt = 'document.residence_document.issued_at',
+  residenceDocumentExpiresAt = 'document.residence_document.expires_at',
+  residenceDocumentIssuingState = 'document.residence_document.issuing_state',
+  residenceDocumentIssuingCountry = 'document.residence_document.issuing_country',
+  residenceDocumentRefNumber = 'document.residence_document.ref_number',
+  residenceDocumentNationality = 'document.residence_document.nationality',
+
+  latestWorkPermitFront = 'document.permit.front.latest_upload',
+  latestWorkPermitBack = 'document.permit.back.latest_upload',
+  latestWorkPermitSelfie = 'document.permit.selfie.latest_upload',
+  workPermitFullName = 'document.permit.full_name',
+  workPermitDOB = 'document.permit.dob',
+  workPermitGender = 'document.permit.gender',
+  workPermitFullAddress = 'document.permit.full_address',
+  workPermitDocumentNumber = 'document.permit.document_number',
+  workPermitIssuedAt = 'document.permit.issued_at',
+  workPermitExpiresAt = 'document.permit.expires_at',
+  workPermitIssuingState = 'document.permit.issuing_state',
+  workPermitIssuingCountry = 'document.permit.issuing_country',
+  workPermitRefNumber = 'document.permit.ref_number',
+  workPermitNationality = 'document.permit.nationality',
 }
 
 export type VersionedDocumentDI<Version extends string = string> =
@@ -107,6 +156,7 @@ export type VersionedDocumentDI<Version extends string = string> =
   | `${DocumentDI.passportIssuingState}:${Version}`
   | `${DocumentDI.passportIssuingCountry}:${Version}`
   | `${DocumentDI.passportRefNumber}:${Version}`
+  | `${DocumentDI.passportNationality}:${Version}`
   | `${DocumentDI.latestDriversLicenseFront}:${Version}`
   | `${DocumentDI.latestDriversLicenseBack}:${Version}`
   | `${DocumentDI.latestDriversLicenseSelfie}:${Version}`
@@ -120,6 +170,7 @@ export type VersionedDocumentDI<Version extends string = string> =
   | `${DocumentDI.driversLicenseIssuingState}:${Version}`
   | `${DocumentDI.driversLicenseIssuingCountry}:${Version}`
   | `${DocumentDI.driversLicenseRefNumber}:${Version}`
+  | `${DocumentDI.driversLicenseNationality}:${Version}`
   | `${DocumentDI.latestIdCardFront}:${Version}`
   | `${DocumentDI.latestIdCardBack}:${Version}`
   | `${DocumentDI.latestIdCardSelfie}:${Version}`
@@ -132,7 +183,41 @@ export type VersionedDocumentDI<Version extends string = string> =
   | `${DocumentDI.idCardExpiresAt}:${Version}`
   | `${DocumentDI.idCardIssuingState}:${Version}`
   | `${DocumentDI.idCardIssuingCountry}:${Version}`
-  | `${DocumentDI.idCardRefNumber}:${Version}`;
+  | `${DocumentDI.idCardRefNumber}:${Version}`
+  | `${DocumentDI.idCardNationality}:${Version}`
+  | `${DocumentDI.visaFullName}:${Version}`
+  | `${DocumentDI.visaDOB}:${Version}`
+  | `${DocumentDI.visaGender}:${Version}`
+  | `${DocumentDI.visaFullAddress}:${Version}`
+  | `${DocumentDI.visaDocumentNumber}:${Version}`
+  | `${DocumentDI.visaIssuedAt}:${Version}`
+  | `${DocumentDI.visaExpiresAt}:${Version}`
+  | `${DocumentDI.visaIssuingState}:${Version}`
+  | `${DocumentDI.visaIssuingCountry}:${Version}`
+  | `${DocumentDI.visaRefNumber}:${Version}`
+  | `${DocumentDI.visaNationality}:${Version}`
+  | `${DocumentDI.residenceDocumentFullName}:${Version}`
+  | `${DocumentDI.residenceDocumentDOB}:${Version}`
+  | `${DocumentDI.residenceDocumentGender}:${Version}`
+  | `${DocumentDI.residenceDocumentFullAddress}:${Version}`
+  | `${DocumentDI.residenceDocumentDocumentNumber}:${Version}`
+  | `${DocumentDI.residenceDocumentIssuedAt}:${Version}`
+  | `${DocumentDI.residenceDocumentExpiresAt}:${Version}`
+  | `${DocumentDI.residenceDocumentIssuingState}:${Version}`
+  | `${DocumentDI.residenceDocumentIssuingCountry}:${Version}`
+  | `${DocumentDI.residenceDocumentRefNumber}:${Version}`
+  | `${DocumentDI.residenceDocumentNationality}:${Version}`
+  | `${DocumentDI.workPermitFullName}:${Version}`
+  | `${DocumentDI.workPermitDOB}:${Version}`
+  | `${DocumentDI.workPermitGender}:${Version}`
+  | `${DocumentDI.workPermitFullAddress}:${Version}`
+  | `${DocumentDI.workPermitDocumentNumber}:${Version}`
+  | `${DocumentDI.workPermitIssuedAt}:${Version}`
+  | `${DocumentDI.workPermitExpiresAt}:${Version}`
+  | `${DocumentDI.workPermitIssuingState}:${Version}`
+  | `${DocumentDI.workPermitIssuingCountry}:${Version}`
+  | `${DocumentDI.workPermitRefNumber}:${Version}`
+  | `${DocumentDI.workPermitNationality}:${Version}`;
 
 export enum CardDIField {
   name = 'name',

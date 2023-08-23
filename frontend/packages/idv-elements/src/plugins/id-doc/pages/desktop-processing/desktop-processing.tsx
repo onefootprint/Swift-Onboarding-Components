@@ -116,11 +116,7 @@ const DeskTopProcessing = () => {
       <FeedbackContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         <IdDocAnimation
           loadingComponent={
-            <Loading
-              imageType={currSide}
-              docType={type}
-              backgroundColor="secondary"
-            />
+            <Loading imageType={currSide} backgroundColor="secondary" />
           }
           successComponent={
             <Success

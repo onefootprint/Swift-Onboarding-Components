@@ -36,7 +36,10 @@
     "id_card": "ID card",
     "driver_license": "Driver's license",
     "drivers_license": "Driver's license",
-    "passport": "Passport"
+    "passport": "Passport",
+    "visa": "Visa",
+    "permit": "Work permit / EAD card",
+    "residence_document": "Residence card / Green card"
   },
   "di": {
     "id": {
@@ -94,7 +97,8 @@
         "gender": "Passport gender",
         "full_name": "Passport full name",
         "document_number": "Passport document number",
-        "ref_number": "Passport reference number"
+        "ref_number": "Passport reference number",
+        "nationality": "Passport nationality"
       },
       "id_card": {
         "front": {
@@ -123,7 +127,8 @@
         "gender": "ID card gender",
         "full_name": "ID card full name",
         "document_number": "ID card document number",
-        "ref_number": "ID card reference number"
+        "ref_number": "ID card reference number",
+        "nationality": "ID card nationality"
       },
       "drivers_license": {
         "front": {
@@ -152,7 +157,93 @@
         "gender": "Driver's license gender",
         "full_name": "Driver's license full name",
         "document_number": "Driver's license document number",
-        "ref_number": "Driver's license reference number"
+        "ref_number": "Driver's license reference number",
+        "nationality": "Driver's license nationality"
+      },
+      "visa": {
+        "front": {
+          "image": "Visa",
+          "latest_upload": "Visa",
+          "mime_type": "Visa MIME type"
+        },
+        "selfie": {
+          "image": "Selfie",
+          "latest_upload": "Selfie",
+          "mime_type": "Selfie MIME type"
+        },
+        "number": "Visa number",
+        "expiration": "Visa expiration",
+        "dob": "Visa DOB",
+        "issuing_state": "Visa issuing state",
+        "issuing_country": "Visa issuing country",
+        "expires_at": "Visa expires at",
+        "issued_at": "Visa issued at",
+        "full_address": "Visa full address",
+        "gender": "Visa gender",
+        "full_name": "Visa full name",
+        "document_number": "Visa document number",
+        "ref_number": "Visa reference number",
+        "nationality": "Visa nationality"
+      },
+      "residence_document": {
+        "front": {
+          "image": "Residence card / green card",
+          "latest_upload": "Residence card / green card",
+          "mime_type": "Residence card / green card MIME type"
+        },
+        "back": {
+          "image": "Residence card / green card back",
+          "latest_upload": "Residence card / green card back",
+          "mime_type": "Residence card / green card back MIME type"
+        },
+        "selfie": {
+          "image": "Selfie",
+          "latest_upload": "Selfie",
+          "mime_type": "Selfie MIME type"
+        },
+        "number": "Residence card / green card number",
+        "expiration": "Residence card / green card expiration",
+        "dob": "Residence card / green card DOB",
+        "issuing_state": "Residence card / green card issuing state",
+        "issuing_country": "Residence card / green card issuing country",
+        "expires_at": "Residence card / green card expires at",
+        "issued_at": "Residence card / green card issued at",
+        "full_address": "Residence card / green card full address",
+        "gender": "Residence card / green card gender",
+        "full_name": "Residence card / green card full name",
+        "document_number": "Residence card / green card document number",
+        "ref_number": "Residence card / green card reference number",
+        "nationality": "Residence card / green card nationality"
+      },
+      "permit": {
+        "front": {
+          "image": "Work permit / EAD card",
+          "latest_upload": "Work permit / EAD card",
+          "mime_type": "Work permit / EAD card MIME type"
+        },
+        "back": {
+          "image": "Work permit / EAD card back",
+          "latest_upload": "Work permit / EAD card back",
+          "mime_type": "Work permit / EAD card back MIME type"
+        },
+        "selfie": {
+          "image": "Selfie",
+          "latest_upload": "Selfie",
+          "mime_type": "Selfie MIME type"
+        },
+        "number": "Work permit / EAD card number",
+        "expiration": "Work permit / EAD card expiration",
+        "dob": "Work permit / EAD card DOB",
+        "issuing_state": "Work permit / EAD card issuing state",
+        "issuing_country": "Work permit / EAD card issuing country",
+        "expires_at": "Work permit / EAD card expires at",
+        "issued_at": "Work permit / EAD card issued at",
+        "full_address": "Work permit / EAD card full address",
+        "gender": "Work permit / EAD card gender",
+        "full_name": "Work permit / EAD card full name",
+        "document_number": "Work permit / EAD card document number",
+        "ref_number": "Work permit / EAD card reference number",
+        "nationality": "Work permit / EAD card nationality"
       }
     },
     "business": {
@@ -210,6 +301,9 @@
     "passport": "Passport",
     "drivers_license": "Driver's license",
     "driver_license": "Driver's license",
+    "visa": "Visa",
+    "permit": "Work permit / EAD card",
+    "residence_document": "Residence card / Green card",
     "business_name": "Business name",
     "business_tin": "Taxpayer Identification Number (TIN)",
     "business_address": "Registered business address",
@@ -613,6 +707,9 @@
             "drivers_license.title": "Driver's license and selfie",
             "id_card.title": "ID card and selfie",
             "passport.title": "Passport and selfie",
+            "residence_document.title": "Residence card / Green card and selfie",
+            "permit.title": "Work permit / EAD card and selfie",
+            "visa.title": "Visa and selfie",
             "session-selector": {
               "title": "Session",
               "session": "Session"
@@ -656,7 +753,10 @@
               "document-types": {
                 "id_card": "ID",
                 "drivers_license": "driver's license",
-                "passport": "passport"
+                "passport": "passport",
+                "residence_document": "Residence card / Green card",
+                "permit": "Work permit / EAD card",
+                "visa": "Visa"
               }
             }
           }

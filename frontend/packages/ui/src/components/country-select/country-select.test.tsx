@@ -81,6 +81,9 @@ describe('<CountrySelect />', () => {
         passport: true,
         value: 'US',
         value3: 'USA',
+        visa: true,
+        workPermit: true,
+        residenceDocument: true,
       });
     });
   });

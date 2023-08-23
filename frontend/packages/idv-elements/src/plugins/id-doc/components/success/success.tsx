@@ -7,6 +7,7 @@ import React, { useEffect } from 'react';
 
 import { imageIcons } from '../../constants/image-types';
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
+import getImageSideLabel from '../../utils/get-image-side-label';
 import FeedbackIcon from '../feedback-icon';
 
 type SuccessProps = {
@@ -31,11 +32,7 @@ const Success = ({
     }
   }, [onComplete]);
 
-  const side =
-    imageType ===
-    (docType === SupportedIdDocTypes.passport && IdDocImageTypes.front)
-      ? 'one-side'
-      : imageType;
+  const side = getImageSideLabel(imageType, docType);
 
   return (
     <Container>
@@ -48,7 +45,9 @@ const Success = ({
         }}
       />
       <Typography variant="label-1" sx={{ textAlign: 'center', marginTop: 5 }}>
-        {t(`${side}-upload`)}
+        {t('title', {
+          side,
+        })}
       </Typography>
     </Container>
   );

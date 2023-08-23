@@ -4,12 +4,7 @@ import {
   DEFAULT_COUNTRY,
 } from '@onefootprint/global-constants';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import {
-  IcoCar24,
-  IcoIdCard24,
-  IcoIdGeneric40,
-  IcoPassport24,
-} from '@onefootprint/icons';
+import { IcoIdGeneric40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
@@ -28,6 +23,7 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useIdDocMachine } from '../../components/machine-provider';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
+import useOptionsByDocType from './hooks/use-options-by-doc-type';
 import useSubmitDocType from './hooks/use-submit-doc-type';
 import SupportedDocTypesByCountry from './supported-doc-types-by-country.constants';
 import detectWebcam from './utils/detect-webcam';
@@ -116,37 +112,11 @@ const IdDocCountryAndType = () => {
     );
   };
 
-  const optionByDocType: {
-    [key in SupportedIdDocTypes]?: RadioSelectOptionFields;
-  } = {};
-  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.passport)) {
-    optionByDocType[SupportedIdDocTypes.passport] = {
-      title: t('form.type.passport.title'),
-      description: t('form.type.passport.description'),
-      IconComponent: IcoPassport24,
-      value: SupportedIdDocTypes.passport,
-    };
-  }
-  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.driversLicense)) {
-    optionByDocType[SupportedIdDocTypes.driversLicense] = {
-      title: t('form.type.driversLicense.title'),
-      description: t('form.type.driversLicense.description'),
-      IconComponent: IcoCar24,
-      value: SupportedIdDocTypes.driversLicense,
-    };
-  }
-  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.idCard)) {
-    optionByDocType[SupportedIdDocTypes.idCard] = {
-      title: t('form.type.idCard.title'),
-      description: t('form.type.idCard.description'),
-      IconComponent: IcoIdCard24,
-      value: SupportedIdDocTypes.idCard,
-    };
-  }
+  const optionsByDocType = useOptionsByDocType(supportedDocumentTypes);
 
   // We only show the doc types supported by both the country and onboarding config
   const options: RadioSelectOptionFields[] = types
-    .map(type => optionByDocType[type])
+    .map(type => optionsByDocType[type])
     .filter((option): option is RadioSelectOptionFields => !!option);
 
   return (
@@ -167,7 +137,7 @@ const IdDocCountryAndType = () => {
         <Divider />
         {options.length > 0 ? (
           <RadioSelect
-            value={optionByDocType[docType]?.value}
+            value={optionsByDocType[docType]?.value}
             options={options}
             onChange={handleDocTypeChange}
           />

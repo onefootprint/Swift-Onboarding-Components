@@ -18,6 +18,7 @@ import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { imageIcons } from '../../constants/image-types';
+import getImageSideLabel from '../../utils/get-image-side-label';
 import FadeInContainer from '../fade-in-container';
 import { useIdDocMachine } from '../machine-provider';
 import ConsentMobile from './components/consent-mobile';
@@ -42,10 +43,7 @@ const IdDocPhotoPrompt = ({
   const ImageIcon = imageIcons[imageType];
   const { shouldCollectConsent: consentRequired } = state.context.requirement;
   const [consentVisible, setConsentVisible] = useState(false);
-  const side =
-    type === SupportedIdDocTypes.passport && IdDocImageTypes.front
-      ? 'photo page'
-      : `${imageType} side`;
+  const side = getImageSideLabel(imageType, type);
 
   const handleClose = () => {
     setConsentVisible(false);
@@ -81,8 +79,7 @@ const IdDocPhotoPrompt = ({
             items={[
               {
                 title: t('guidelines.position-document.title', {
-                  document:
-                    type === SupportedIdDocTypes.passport ? 'passport' : 'ID',
+                  document: IdDocTypeToLabel[type],
                 }),
                 description: t('guidelines.position-document.description', {
                   side,

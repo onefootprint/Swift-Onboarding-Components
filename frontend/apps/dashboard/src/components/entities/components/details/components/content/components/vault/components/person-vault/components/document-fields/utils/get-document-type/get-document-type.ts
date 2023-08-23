@@ -12,6 +12,15 @@ const getDocumentType = (di: DocumentDI) => {
   if (di.includes(SupportedIdDocTypes.passport)) {
     return SupportedIdDocTypes.passport;
   }
+  if (di.includes(SupportedIdDocTypes.visa)) {
+    return SupportedIdDocTypes.visa;
+  }
+  if (di.includes(SupportedIdDocTypes.residenceDocument)) {
+    return SupportedIdDocTypes.residenceDocument;
+  }
+  if (di.includes(SupportedIdDocTypes.workPermit)) {
+    return SupportedIdDocTypes.workPermit;
+  }
   return undefined;
 };
 
