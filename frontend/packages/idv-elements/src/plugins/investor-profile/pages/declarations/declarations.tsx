@@ -80,6 +80,8 @@ const Declarations = () => {
         defaultValues={{
           [InvestorProfileDI.declarations]:
             data?.[InvestorProfileDI.declarations],
+          [InvestorProfileDI.brokerageFirmEmployer]:
+            data?.[InvestorProfileDI.brokerageFirmEmployer],
           [InvestorProfileDI.seniorExecutiveSymbols]:
             data?.[InvestorProfileDI.seniorExecutiveSymbols],
           [InvestorProfileDI.familyMemberNames]:

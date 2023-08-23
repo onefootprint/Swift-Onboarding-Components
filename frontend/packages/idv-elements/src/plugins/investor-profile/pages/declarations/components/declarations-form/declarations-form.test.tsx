@@ -28,6 +28,52 @@ describe('<DeclarationsForm />', () => {
     );
   };
 
+  describe('when the user is affiliated or work with a broke dealer', () => {
+    it('should trigger onSubmit with company symbols and the file uploaded', async () => {
+      const onSubmit = jest.fn();
+      renderForm({ onSubmit });
+
+      const broker = screen.getByLabelText(
+        'Affiliated or work with the US registered broker-dealer or FINRA',
+      );
+      await userEvent.click(broker);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Firm name')).toBeInTheDocument();
+      });
+      const firmName = screen.getByLabelText('Firm name');
+      await userEvent.type(firmName, 'Lorem Dolor');
+
+      const button = screen.getByRole('button', {
+        name: 'Choose file to upload',
+      });
+      userEvent.click(button);
+
+      const fileInput = screen.getByTestId(
+        'file-upload-input',
+      ) as HTMLInputElement;
+      const file = new File(['hello'], 'example.pdf', {
+        type: 'application/pdf',
+      });
+      await userEvent.upload(fileInput, file);
+
+      const submitButton = screen.getByRole('button', { name: 'Continue' });
+      userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledWith(
+          {
+            [InvestorProfileDI.declarations]: [
+              InvestorProfileDeclaration.affiliatedWithUsBroker,
+            ],
+            [InvestorProfileDI.brokerageFirmEmployer]: 'Lorem Dolor',
+          },
+          expect.anything(),
+        );
+      });
+    });
+  });
+
   describe('when the user is a senior executive', () => {
     it('should trigger onSubmit with company symbols and the file uploaded', async () => {
       const onSubmit = jest.fn();

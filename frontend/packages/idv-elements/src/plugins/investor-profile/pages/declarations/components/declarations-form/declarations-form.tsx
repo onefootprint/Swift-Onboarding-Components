@@ -25,6 +25,7 @@ type FormData = Record<InvestorProfileDeclaration, boolean> & {
   seniorExecutiveSymbols?: string;
   familyMemberNames?: string;
   politicalOrganization?: string;
+  brokerageFirmEmployer?: string;
 };
 
 const declarationKeys = [
@@ -51,6 +52,8 @@ const DeclarationsForm = ({
   } = useForm<FormData>({
     defaultValues: {
       ...Object.fromEntries(defaultEntries),
+      brokerageFirmEmployer:
+        defaultValues?.[InvestorProfileDI.brokerageFirmEmployer],
       seniorExecutiveSymbols:
         defaultValues?.[InvestorProfileDI.seniorExecutiveSymbols],
       familyMemberNames: defaultValues?.[InvestorProfileDI.familyMemberNames],
@@ -67,6 +70,7 @@ const DeclarationsForm = ({
   const affiliatedWithUsBroker = watch(
     InvestorProfileDeclaration.affiliatedWithUsBroker,
   );
+  const showFirmEmployer = affiliatedWithUsBroker;
   const shouldRequireUpload = affiliatedWithUsBroker || seniorExecutive;
   const showCompanySymbols = seniorExecutive;
   const showFamilyMembers = politicalFigure;
@@ -100,6 +104,7 @@ const DeclarationsForm = ({
         data.familyMemberNames,
       ),
       [InvestorProfileDI.politicalOrganization]: data.politicalOrganization,
+      [InvestorProfileDI.brokerageFirmEmployer]: data.brokerageFirmEmployer,
     };
 
     if (files.length) {
@@ -124,8 +129,28 @@ const DeclarationsForm = ({
         label={t(
           `options.${InvestorProfileDeclaration.affiliatedWithUsBroker}`,
         )}
-        {...register(InvestorProfileDeclaration.affiliatedWithUsBroker)}
+        {...register(InvestorProfileDeclaration.affiliatedWithUsBroker, {
+          onChange: event => {
+            if (!event.target.checked) {
+              resetField('brokerageFirmEmployer');
+            }
+          },
+        })}
       />
+      {showFirmEmployer && (
+        <TextInput
+          autoFocus
+          hasError={!!errors.brokerageFirmEmployer}
+          hint={
+            errors.brokerageFirmEmployer && t('brokerage-firm-employer.error')
+          }
+          label={t('brokerage-firm-employer.label')}
+          placeholder={t('brokerage-firm-employer.placeholder')}
+          {...register('brokerageFirmEmployer', {
+            required: true,
+          })}
+        />
+      )}
       <Checkbox
         label={t(`options.${InvestorProfileDeclaration.seniorExecutive}`)}
         {...register(InvestorProfileDeclaration.seniorExecutive, {

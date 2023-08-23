@@ -34,6 +34,7 @@ export type DeclarationData = Required<
       | InvestorProfileDI.seniorExecutiveSymbols
       | InvestorProfileDI.familyMemberNames
       | InvestorProfileDI.politicalOrganization
+      | InvestorProfileDI.brokerageFirmEmployer
     >
   >;
 

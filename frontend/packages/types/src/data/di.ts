@@ -27,6 +27,7 @@ export enum InvestorProfileDI {
   seniorExecutiveSymbols = 'investor_profile.senior_executive_symbols',
   familyMemberNames = 'investor_profile.family_member_names',
   politicalOrganization = 'investor_profile.political_organization',
+  brokerageFirmEmployer = 'investor_profile.brokerage_firm_employer',
 }
 
 export enum IdDI {

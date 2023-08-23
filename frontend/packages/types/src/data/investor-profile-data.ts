@@ -19,4 +19,5 @@ export type InvestorProfileData = Partial<{
   [InvestorProfileDI.seniorExecutiveSymbols]: string[];
   [InvestorProfileDI.familyMemberNames]: string[];
   [InvestorProfileDI.politicalOrganization]: string;
+  [InvestorProfileDI.brokerageFirmEmployer]: string;
 }>;

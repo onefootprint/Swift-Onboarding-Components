@@ -96,6 +96,11 @@
         "senior_political_figure": "I'm a senior political figure"
       },
       "cta-none": "None of these apply to me",
+      "brokerage-firm-employer": {
+        "label": "Firm name",
+        "placeholder": "Firm name",
+        "error": "Firm name is required"
+      },
       "company-symbols": {
         "label": "Company symbols",
         "placeholder": "ABNB, META, GOOG",

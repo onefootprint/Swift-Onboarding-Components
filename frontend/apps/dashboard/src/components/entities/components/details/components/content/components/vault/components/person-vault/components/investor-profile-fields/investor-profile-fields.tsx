@@ -133,6 +133,14 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
             }}
           />
           {isVaultDataEmpty(
+            data?.[InvestorProfileDI.brokerageFirmEmployer],
+          ) ? null : (
+            <Field
+              di={InvestorProfileDI.brokerageFirmEmployer}
+              entity={entity}
+            />
+          )}
+          {isVaultDataEmpty(
             data?.[InvestorProfileDI.seniorExecutiveSymbols],
           ) ? null : (
             <Field

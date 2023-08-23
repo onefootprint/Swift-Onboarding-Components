@@ -59,13 +59,13 @@
     "investor_profile": {
       "employment_status": "Employment status",
       "occupation": "Occupation",
-      "brokerage_firm_employer": "Employed by brokerage firm?",
       "annual_income": "Annual income",
       "net_worth": "Net worth",
       "investment_goals": "Investment goals",
       "risk_tolerance": "Risk tolerance",
       "declarations": "Declaration(s)",
       "senior_executive_symbols": "Company symbols",
+      "brokerage_firm_employer": "Firm name",
       "family_member_names": "Family member names",
       "political_organization": "Political organization",
       "compliance_letter": "Finra compliance letter"
