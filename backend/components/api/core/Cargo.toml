@@ -99,6 +99,8 @@ alpaca = { path = "../../integrations/alpaca" }
 
 http = "0.2.8"
 
+geoutils = "0.5.1"
+
 [dev-dependencies]
 test-case = { workspace = true }
 enclave = { path = "../../enclave/enclave" }

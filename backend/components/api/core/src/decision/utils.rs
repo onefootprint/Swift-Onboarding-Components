@@ -3,12 +3,14 @@ use std::sync::Arc;
 use db::{
     models::{
         decision_intent::DecisionIntent,
+        insight_event::InsightEvent,
         risk_signal::RiskSignal,
         scoped_vault::ScopedVault,
         vault::Vault,
         verification_request::VerificationRequest,
         verification_result::VerificationResult,
         workflow::{Workflow, WorkflowUpdate},
+        zip_code::ZipCode,
     },
     PgConn, TxnPgConn,
 };
@@ -31,6 +33,7 @@ use feature_flag::{BoolFlag, FeatureFlagClient};
 
 pub type CreateManualReview = bool;
 pub type FixtureDecision = (DecisionStatus, CreateManualReview);
+use geoutils::{Distance, Location};
 
 #[tracing::instrument(skip_all)]
 /// Determines whether production IDV requests should be made.
@@ -199,4 +202,22 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
         false,
     )?;
     Ok(())
+}
+
+pub fn is_in_radius_from_ip_to_zip(
+    zip_code: &ZipCode,
+    insight_event: &InsightEvent,
+    radius_in_meters: i32,
+) -> Option<bool> {
+    let Some((ie_lat, ie_long)) = insight_event
+        .latitude
+        .and_then(|lat| insight_event.longitude.map(|long| (lat, long))) else {
+            return None
+        };
+    let zip_code_location = Location::new(zip_code.latitude, zip_code.longitude);
+    let insight_event_location = Location::new(ie_lat, ie_long);
+
+    insight_event_location
+        .is_in_circle(&zip_code_location, Distance::from_meters(radius_in_meters))
+        .ok()
 }
