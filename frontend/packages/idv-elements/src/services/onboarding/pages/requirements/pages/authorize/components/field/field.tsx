@@ -1,6 +1,6 @@
 import { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Typography } from '@onefootprint/ui';
+import { createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 
 export type FieldProps = {
@@ -13,13 +13,21 @@ const Field = ({ label, IconComponent }: FieldProps) => (
     <IconContainer>
       <IconComponent />
     </IconContainer>
-    <Typography variant="label-3">{label}</Typography>
+    <LabelContainer>{label}</LabelContainer>
   </Category>
 );
 
 const IconContainer = styled.span`
   ${({ theme }) => css`
     margin-right: ${theme.spacing[2]};
+  `}
+`;
+
+const LabelContainer = styled.span`
+  ${createFontStyles('body-4')};
+
+  ${media.greaterThan('md')`
+    ${createFontStyles('label-3')};
   `}
 `;
 
