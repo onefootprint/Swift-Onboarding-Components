@@ -1,33 +1,42 @@
 import {
+  AuthorizeRequirement,
   CollectedKycDataOption,
+  CollectKycDataRequirement,
   OnboardingConfig,
-  OnboardingRequirement,
   OnboardingRequirementKind,
-  SupportedIdDocTypes,
 } from '@onefootprint/types';
 
 import computeRequirementsToShow from './compute-requirements-to-show';
 
+const collectKycDataRequirement: CollectKycDataRequirement = {
+  kind: OnboardingRequirementKind.collectKycData,
+  isMet: true,
+  missingAttributes: [],
+  optionalAttributes: [],
+  populatedAttributes: [CollectedKycDataOption.name],
+};
+const authorizeRequirement: AuthorizeRequirement = {
+  kind: OnboardingRequirementKind.authorize,
+  isMet: false,
+  fieldsToAuthorize: {
+    collectedData: [],
+    documentTypes: [],
+  },
+};
+
 describe('computeRequirementsToShow', () => {
   describe('with met KYC requirement, unmet authorize', () => {
     const requirementsResponse = {
-      requirements: [
+      allRequirements: [
         {
-          kind: OnboardingRequirementKind.authorize,
-          fieldsToAuthorize: {
-            collectedData: [] as CollectedKycDataOption[],
-            documentTypes: [] as SupportedIdDocTypes[],
-          },
+          ...collectKycDataRequirement,
+          isMet: true,
         },
-      ] as OnboardingRequirement[],
-      metRequirements: [
         {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [],
-          optionalAttributes: [],
-          populatedAttributes: [CollectedKycDataOption.name],
+          ...authorizeRequirement,
+          isMet: false,
         },
-      ] as OnboardingRequirement[],
+      ],
       // Not used
       obConfiguration: {} as OnboardingConfig,
     };
@@ -41,7 +50,11 @@ describe('computeRequirementsToShow', () => {
         alreadyDisplayedRequirements,
         requirementsResponse,
       );
-      expect(remainingRequirements.kyc).toBeTruthy();
+      expect(
+        remainingRequirements.some(
+          r => r.kind === OnboardingRequirementKind.collectKycData,
+        ),
+      ).toBeTruthy();
     });
     it('should return KYC requirement when not yet shown havent started collecting data', () => {
       const alreadyDisplayedRequirements = {
@@ -53,7 +66,11 @@ describe('computeRequirementsToShow', () => {
         alreadyDisplayedRequirements,
         requirementsResponse,
       );
-      expect(remainingRequirements.kyc).toBeTruthy();
+      expect(
+        remainingRequirements.some(
+          r => r.kind === OnboardingRequirementKind.collectKycData,
+        ),
+      ).toBeTruthy();
     });
     it('should not return KYC requirement when in transfer', () => {
       const alreadyDisplayedRequirements = {
@@ -65,7 +82,11 @@ describe('computeRequirementsToShow', () => {
         alreadyDisplayedRequirements,
         requirementsResponse,
       );
-      expect(remainingRequirements.kyc).toBeFalsy();
+      expect(
+        remainingRequirements.some(
+          r => r.kind === OnboardingRequirementKind.collectKycData,
+        ),
+      ).toBeFalsy();
     });
     it('should not return KYC requirement when already shown', () => {
       const alreadyDisplayedRequirements = {
@@ -77,20 +98,16 @@ describe('computeRequirementsToShow', () => {
         alreadyDisplayedRequirements,
         requirementsResponse,
       );
-      expect(remainingRequirements.kyc).toBeFalsy();
+      expect(
+        remainingRequirements.some(
+          r => r.kind === OnboardingRequirementKind.collectKycData,
+        ),
+      ).toBeFalsy();
     });
   });
   describe('with met KYC requirement, no authorize', () => {
     const requirementsResponse = {
-      requirements: [],
-      metRequirements: [
-        {
-          kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [],
-          populatedAttributes: [CollectedKycDataOption.name],
-          optionalAttributes: [],
-        },
-      ] as OnboardingRequirement[],
+      allRequirements: [{ ...collectKycDataRequirement, isMet: true }],
       // Not used
       obConfiguration: {} as OnboardingConfig,
     };
@@ -104,7 +121,11 @@ describe('computeRequirementsToShow', () => {
         alreadyDisplayedRequirements,
         requirementsResponse,
       );
-      expect(remainingRequirements.kyc).toBeFalsy();
+      expect(
+        remainingRequirements.some(
+          r => r.kind === OnboardingRequirementKind.collectKycData,
+        ),
+      ).toBeFalsy();
     });
   });
 });

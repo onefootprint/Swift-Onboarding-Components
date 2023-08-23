@@ -29,6 +29,7 @@ const getInitialContext = ({
   userFound: true,
   requirement: requirement ?? {
     kind: OnboardingRequirementKind.collectKycData,
+    isMet: false,
     missingAttributes: [],
     populatedAttributes: [CollectedKycDataOption.ssn4],
     optionalAttributes: [],

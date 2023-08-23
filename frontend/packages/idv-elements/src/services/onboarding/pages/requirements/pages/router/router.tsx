@@ -1,4 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
+import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import DeviceSignals from '../../../../../../components/device-signals';
@@ -33,8 +34,21 @@ const Router = ({ onDone }: RouterProps) => {
       idDocOutcome,
     },
     collectedKycData,
-    requirements: { kyb, kyc, liveness, idDoc },
+    requirements,
   } = state.context;
+  const kyb = getRequirement(
+    requirements,
+    OnboardingRequirementKind.collectKybData,
+  );
+  const kyc = getRequirement(
+    requirements,
+    OnboardingRequirementKind.collectKycData,
+  );
+  const liveness = getRequirement(
+    requirements,
+    OnboardingRequirementKind.registerPasskey,
+  );
+  const idDoc = getRequirement(requirements, OnboardingRequirementKind.idDoc);
   const isDone = state.matches('success');
   useLogStateMachine('onboarding-requirements', state);
   const kycBootstrapData = getKycBootstrapData(bootstrapData);

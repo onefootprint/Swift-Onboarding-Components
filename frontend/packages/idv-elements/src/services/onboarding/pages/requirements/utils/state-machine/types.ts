@@ -1,28 +1,11 @@
 import {
-  AuthorizeRequirement,
-  CollectInvestorProfileRequirement,
-  CollectKybDataRequirement,
-  CollectKycDataRequirement,
   IdDocOutcomes,
-  IdDocRequirement,
   IdvBootstrapData,
   OnboardingConfig,
-  ProcessRequirement,
-  RegisterPasskeyRequirement,
+  OnboardingRequirement,
 } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
-
-export type Requirements = {
-  kyb?: CollectKybDataRequirement;
-  kyc?: CollectKycDataRequirement;
-  isKycMet?: boolean;
-  investorProfile?: CollectInvestorProfileRequirement;
-  liveness?: RegisterPasskeyRequirement;
-  idDoc?: IdDocRequirement;
-  authorize?: AuthorizeRequirement;
-  process?: ProcessRequirement;
-};
 
 export type MachineContext = {
   onboardingContext: {
@@ -44,7 +27,7 @@ export type MachineContext = {
   // Record whether transfer plugin already ran. If the user chose to continue on desktop,
   // don't render transfer again
   didRunTransfer?: boolean;
-  requirements: Requirements;
+  requirements: OnboardingRequirement[];
 };
 
 export type MachineEvents =
@@ -53,5 +36,5 @@ export type MachineEvents =
     }
   | {
       type: 'onboardingRequirementsReceived';
-      payload: Requirements;
+      payload: OnboardingRequirement[];
     };

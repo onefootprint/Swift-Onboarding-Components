@@ -7,7 +7,7 @@ import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
 import { RequirementTargets, requiresAdditionalInfo } from './machine.utils';
-import { MachineContext, MachineEvents, Requirements } from './types';
+import { MachineContext, MachineEvents } from './types';
 
 export type OnboardingRequirementsMachineArgs = {
   userFound: boolean;
@@ -18,8 +18,6 @@ export type OnboardingRequirementsMachineArgs = {
   isTransfer?: boolean;
   idDocOutcome?: IdDocOutcomes;
 };
-
-const defaultRequirements: Requirements = {};
 
 const createOnboardingRequirementsMachine = ({
   userFound,
@@ -50,7 +48,7 @@ const createOnboardingRequirementsMachine = ({
           isTransfer,
           idDocOutcome,
         },
-        requirements: { ...defaultRequirements },
+        requirements: [],
         startedDataCollection: false,
       },
       states: {
@@ -155,7 +153,7 @@ const createOnboardingRequirementsMachine = ({
       actions: {
         assignRequirements: assign((context, event) => ({
           ...context,
-          requirements: { ...event.payload },
+          requirements: [...event.payload],
         })),
         markDidRunTransfer: assign(context => ({
           ...context,

@@ -5,6 +5,8 @@ import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
+  getRequirement,
+  OnboardingRequirementKind,
 } from '@onefootprint/types';
 import { Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
@@ -32,8 +34,12 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   const [state] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { authToken, config },
-    requirements: { authorize: requirement },
+    requirements,
   } = state.context;
+  const requirement = getRequirement(
+    requirements,
+    OnboardingRequirementKind.authorize,
+  );
   const onboardingAuthorizeMutation = useOnboardingAuthorize();
   const toast = useToast();
 

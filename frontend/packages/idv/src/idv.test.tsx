@@ -192,6 +192,7 @@ describe.skip('<Idv />', () => {
           [
             {
               kind: OnboardingRequirementKind.collectKycData,
+              isMet: false,
               missingAttributes: [],
               optionalAttributes: [],
               populatedAttributes: [
@@ -235,6 +236,7 @@ describe.skip('<Idv />', () => {
           [
             {
               kind: OnboardingRequirementKind.collectKycData,
+              isMet: true,
               missingAttributes: [],
               optionalAttributes: [],
               populatedAttributes: [
@@ -282,6 +284,7 @@ describe.skip('<Idv />', () => {
           [
             {
               kind: OnboardingRequirementKind.collectKycData,
+              isMet: true,
               missingAttributes: [],
               optionalAttributes: [],
               populatedAttributes: [
@@ -324,6 +327,7 @@ describe.skip('<Idv />', () => {
           [
             {
               kind: OnboardingRequirementKind.collectKycData,
+              isMet: true,
               missingAttributes: [],
               optionalAttributes: [],
               populatedAttributes: [
@@ -377,6 +381,7 @@ describe.skip('<Idv />', () => {
           [
             {
               kind: OnboardingRequirementKind.collectKycData,
+              isMet: true,
               missingAttributes: [CollectedKycDataOption.name],
               optionalAttributes: [],
               populatedAttributes: [
@@ -434,6 +439,7 @@ describe.skip('<Idv />', () => {
           [
             {
               kind: OnboardingRequirementKind.collectKycData,
+              isMet: true,
               missingAttributes: [],
               optionalAttributes: [],
               populatedAttributes: [
@@ -455,6 +461,7 @@ describe.skip('<Idv />', () => {
           [
             {
               kind: OnboardingRequirementKind.collectKycData,
+              isMet: true,
               missingAttributes: [],
               optionalAttributes: [],
               populatedAttributes: [
@@ -508,6 +515,7 @@ describe.skip('<Idv />', () => {
           [
             {
               kind: OnboardingRequirementKind.collectKycData,
+              isMet: false,
               missingAttributes: [
                 CollectedKycDataOption.name,
                 CollectedKycDataOption.dob,
@@ -564,6 +572,7 @@ describe.skip('<Idv />', () => {
           [
             {
               kind: OnboardingRequirementKind.collectKycData,
+              isMet: false,
               missingAttributes: [
                 CollectedKycDataOption.dob,
                 CollectedKycDataOption.ssn9,
@@ -667,6 +676,7 @@ describe.skip('<Idv />', () => {
         [
           {
             kind: OnboardingRequirementKind.idDoc,
+            isMet: false,
             shouldCollectConsent: false,
             shouldCollectSelfie: false,
             onlyUsSupported: false,
@@ -698,6 +708,7 @@ describe.skip('<Idv />', () => {
         [
           {
             kind: OnboardingRequirementKind.registerPasskey,
+            isMet: false,
           },
         ],
         [],
@@ -718,6 +729,7 @@ describe.skip('<Idv />', () => {
         [
           {
             kind: OnboardingRequirementKind.idDoc,
+            isMet: false,
             shouldCollectConsent: false,
             shouldCollectSelfie: false,
             onlyUsSupported: false,

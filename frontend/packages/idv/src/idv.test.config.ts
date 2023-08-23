@@ -16,6 +16,7 @@ import {
 
 export const TestAuthorizeRequirement: OnboardingRequirement = {
   kind: OnboardingRequirementKind.authorize,
+  isMet: false,
   fieldsToAuthorize: {
     collectedData: [
       CollectedKycDataOption.name,
@@ -77,6 +78,7 @@ export const withOnboardingValidate = (validationToken?: string) =>
 const RequirementsFixture: OnboardingRequirement[] = [
   {
     kind: OnboardingRequirementKind.collectKycData,
+    isMet: false,
     missingAttributes: [
       CollectedKycDataOption.name,
       CollectedKycDataOption.dob,

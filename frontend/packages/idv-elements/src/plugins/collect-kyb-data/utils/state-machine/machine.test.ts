@@ -46,10 +46,12 @@ describe('Collect KYB Data Machine Tests', () => {
       config: { ...TestOnboardingConfig },
       kybRequirement: {
         kind: OnboardingRequirementKind.collectKybData,
+        isMet: false,
         missingAttributes: missingKybAttributes,
       },
       kycRequirement: {
         kind: OnboardingRequirementKind.collectKycData,
+        isMet: false,
         missingAttributes: missingKycAttributes,
         populatedAttributes: [],
         optionalAttributes: [],

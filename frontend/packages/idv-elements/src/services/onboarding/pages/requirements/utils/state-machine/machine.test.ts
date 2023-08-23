@@ -15,15 +15,23 @@ import createOnboardingRequirementsMachine, {
   OnboardingRequirementsMachineArgs,
 } from './machine';
 
-const livenessRequirement = {} as RegisterPasskeyRequirement;
+const livenessRequirement: RegisterPasskeyRequirement = {
+  kind: OnboardingRequirementKind.registerPasskey,
+  isMet: false,
+};
 
-const idDocRequirement = {
+const idDocRequirement: IdDocRequirement = {
+  kind: OnboardingRequirementKind.idDoc,
+  isMet: false,
   shouldCollectSelfie: true,
   shouldCollectConsent: true,
-} as IdDocRequirement;
+  onlyUsSupported: false,
+  supportedDocumentTypes: [],
+};
 
 const kycRequirement: CollectKycDataRequirement = {
   kind: OnboardingRequirementKind.collectKycData,
+  isMet: false,
   missingAttributes: [CollectedKycDataOption.name],
   populatedAttributes: [],
   optionalAttributes: [],
@@ -31,6 +39,7 @@ const kycRequirement: CollectKycDataRequirement = {
 
 const authorizeRequirement: AuthorizeRequirement = {
   kind: OnboardingRequirementKind.authorize,
+  isMet: false,
   fieldsToAuthorize: {
     collectedData: [CollectedKycDataOption.name],
     documentTypes: [],
@@ -80,7 +89,7 @@ describe('Onboarding Requirements Machine Tests', () => {
       expect(state.value).toBe('checkRequirements');
       const { requirements, startedDataCollection, onboardingContext } =
         state.context;
-      expect(requirements).toEqual({});
+      expect(requirements).toEqual([]);
       expect(startedDataCollection).toBe(false);
       expect(onboardingContext).toEqual({
         device: {
@@ -97,7 +106,7 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {},
+        payload: [],
       });
       expect(state.value).toBe('success');
     });
@@ -121,18 +130,14 @@ describe('Onboarding Requirements Machine Tests', () => {
       expect(state.context.startedDataCollection).toBe(false);
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {
-          liveness: livenessRequirement,
-          kyc: kycRequirement,
-          authorize: authorizeRequirement,
-        },
+        payload: [kycRequirement, livenessRequirement, authorizeRequirement],
       });
 
-      expect(state.context.requirements).toEqual({
-        liveness: livenessRequirement,
-        kyc: kycRequirement,
-        authorize: authorizeRequirement,
-      });
+      expect(state.context.requirements).toEqual([
+        kycRequirement,
+        livenessRequirement,
+        authorizeRequirement,
+      ]);
       expect(state.context.startedDataCollection).toBe(true);
       expect(state.value).toBe('additionalInfoRequired');
 
@@ -149,15 +154,12 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {
-          liveness: livenessRequirement,
-          authorize: authorizeRequirement,
-        },
+        payload: [livenessRequirement, authorizeRequirement],
       });
-      expect(state.context.requirements).toEqual({
-        liveness: livenessRequirement,
-        authorize: authorizeRequirement,
-      });
+      expect(state.context.requirements).toEqual([
+        livenessRequirement,
+        authorizeRequirement,
+      ]);
 
       expect(state.value).toBe('transfer');
 
@@ -168,15 +170,11 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {
-          authorize: authorizeRequirement,
-        },
+        payload: [authorizeRequirement],
       });
 
       expect(state.value).toBe('authorize');
-      expect(state.context.requirements).toEqual({
-        authorize: authorizeRequirement,
-      });
+      expect(state.context.requirements).toEqual([authorizeRequirement]);
 
       state = machine.send({
         type: 'requirementCompleted',
@@ -185,7 +183,7 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {},
+        payload: [],
       });
       expect(state.value).toBe('success');
     });
@@ -209,17 +207,13 @@ describe('Onboarding Requirements Machine Tests', () => {
       let { state } = machine;
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {
-          liveness: livenessRequirement,
-          kyc: kycRequirement,
-          authorize: authorizeRequirement,
-        },
+        payload: [kycRequirement, livenessRequirement, authorizeRequirement],
       });
-      expect(state.context.requirements).toEqual({
-        liveness: livenessRequirement,
-        kyc: kycRequirement,
-        authorize: authorizeRequirement,
-      });
+      expect(state.context.requirements).toEqual([
+        kycRequirement,
+        livenessRequirement,
+        authorizeRequirement,
+      ]);
 
       expect(state.value).toBe('kycData');
 
@@ -230,17 +224,13 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {
-          liveness: livenessRequirement,
-          idDoc: idDocRequirement,
-          authorize: authorizeRequirement,
-        },
+        payload: [livenessRequirement, idDocRequirement, authorizeRequirement],
       });
-      expect(state.context.requirements).toEqual({
-        liveness: livenessRequirement,
-        idDoc: idDocRequirement,
-        authorize: authorizeRequirement,
-      });
+      expect(state.context.requirements).toEqual([
+        livenessRequirement,
+        idDocRequirement,
+        authorizeRequirement,
+      ]);
 
       expect(state.value).toBe('transfer');
 
@@ -251,15 +241,11 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {
-          authorize: authorizeRequirement,
-        },
+        payload: [authorizeRequirement],
       });
 
       expect(state.value).toBe('authorize');
-      expect(state.context.requirements).toEqual({
-        authorize: authorizeRequirement,
-      });
+      expect(state.context.requirements).toEqual([authorizeRequirement]);
 
       state = machine.send({
         type: 'requirementCompleted',
@@ -268,7 +254,7 @@ describe('Onboarding Requirements Machine Tests', () => {
 
       state = machine.send({
         type: 'onboardingRequirementsReceived',
-        payload: {},
+        payload: [],
       });
       expect(state.value).toBe('success');
     });

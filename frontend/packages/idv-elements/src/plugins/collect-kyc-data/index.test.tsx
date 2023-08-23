@@ -109,6 +109,7 @@ describe.skip('<CollectKycData />', () => {
     customData: {
       requirement: {
         kind: OnboardingRequirementKind.collectKycData,
+        isMet: false,
         missingAttributes: attributes ?? [],
         populatedAttributes: [],
         optionalAttributes: [],

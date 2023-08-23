@@ -19,11 +19,13 @@ export enum OnboardingRequirementKind {
 
 export type CollectKybDataRequirement = {
   kind: OnboardingRequirementKind.collectKybData;
+  isMet: boolean;
   missingAttributes: CollectedKybDataOption[];
 };
 
 export type CollectKycDataRequirement = {
   kind: OnboardingRequirementKind.collectKycData;
+  isMet: boolean;
   missingAttributes: CollectedKycDataOption[];
   populatedAttributes: CollectedKycDataOption[];
   optionalAttributes: CollectedKycDataOption[];
@@ -31,11 +33,13 @@ export type CollectKycDataRequirement = {
 
 export type CollectInvestorProfileRequirement = {
   kind: OnboardingRequirementKind.investorProfile;
+  isMet: boolean;
   missingAttributes: CollectedInvestorProfileDataOption[];
 };
 
 export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
+  isMet: boolean;
   shouldCollectSelfie: boolean;
   shouldCollectConsent: boolean;
   onlyUsSupported: boolean;
@@ -44,15 +48,18 @@ export type IdDocRequirement = {
 
 export type RegisterPasskeyRequirement = {
   kind: OnboardingRequirementKind.registerPasskey;
+  isMet: boolean;
 };
 
 export type AuthorizeRequirement = {
   kind: OnboardingRequirementKind.authorize;
+  isMet: boolean;
   fieldsToAuthorize: AuthorizeFields;
 };
 
 export type ProcessRequirement = {
   kind: OnboardingRequirementKind.process;
+  isMet: boolean;
 };
 
 export type OnboardingRequirement =
@@ -74,8 +81,32 @@ export type AuthorizeFields = {
 };
 
 export type OnboardingStatusResponse = {
-  requirements: OnboardingRequirement[];
-  metRequirements: OnboardingRequirement[];
+  allRequirements: OnboardingRequirement[];
   // This is only used to initialize handoff, and the requirements are discarded.
   obConfiguration: OnboardingConfig;
+};
+
+export type RequirementForKind<K> =
+  K extends OnboardingRequirementKind.registerPasskey
+    ? RegisterPasskeyRequirement
+    : K extends OnboardingRequirementKind.idDoc
+    ? IdDocRequirement
+    : K extends OnboardingRequirementKind.collectKycData
+    ? CollectKycDataRequirement
+    : K extends OnboardingRequirementKind.collectKybData
+    ? CollectKybDataRequirement
+    : K extends OnboardingRequirementKind.investorProfile
+    ? CollectInvestorProfileRequirement
+    : K extends OnboardingRequirementKind.authorize
+    ? AuthorizeRequirement
+    : K extends OnboardingRequirementKind.process
+    ? ProcessRequirement
+    : never;
+
+export const getRequirement = <K extends OnboardingRequirementKind>(
+  reqs: OnboardingRequirement[],
+  kind: K,
+) => {
+  const found = reqs.find(req => req.kind === kind);
+  return found as RequirementForKind<K> | undefined;
 };

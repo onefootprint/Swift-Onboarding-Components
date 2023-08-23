@@ -39,6 +39,7 @@ describe('Collect KYC Data Machine Tests', () => {
       authToken: 'authToken',
       requirement: {
         kind: OnboardingRequirementKind.collectKycData,
+        isMet: false,
         missingAttributes,
         populatedAttributes: [],
         optionalAttributes: [],

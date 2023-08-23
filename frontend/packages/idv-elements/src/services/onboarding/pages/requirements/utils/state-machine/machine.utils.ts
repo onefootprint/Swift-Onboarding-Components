@@ -1,3 +1,5 @@
+import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
+
 import { MachineContext } from './types';
 
 type MachineTarget = {
@@ -45,14 +47,33 @@ export const RequirementTargets: MachineTarget[] = [
 export const requiresAdditionalInfo = (context: MachineContext) => {
   const {
     onboardingContext: { userFound, isTransfer },
-    requirements: { kyc, isKycMet, idDoc, liveness, investorProfile, kyb },
+    requirements,
     startedDataCollection,
   } = context;
+  // If there's an unmet requirement after logging into an existing user, show a screen saying
+  // we need to collect additional info
+  const kyc = getRequirement(
+    requirements,
+    OnboardingRequirementKind.collectKycData,
+  );
+  const kyb = getRequirement(
+    requirements,
+    OnboardingRequirementKind.collectKybData,
+  );
+  const idDoc = getRequirement(requirements, OnboardingRequirementKind.idDoc);
+  const liveness = getRequirement(
+    requirements,
+    OnboardingRequirementKind.registerPasskey,
+  );
+  const investorProfile = getRequirement(
+    requirements,
+    OnboardingRequirementKind.investorProfile,
+  );
   return (
     !startedDataCollection &&
     userFound &&
     !isTransfer &&
-    ((!!kyc && !isKycMet) ||
+    ((!!kyc && !kyc.isMet) ||
       !!idDoc ||
       !!liveness ||
       !!investorProfile ||
@@ -61,43 +82,42 @@ export const requiresAdditionalInfo = (context: MachineContext) => {
 };
 
 const shouldRunCollectKybData = (context: MachineContext) =>
-  !!context.requirements.kyb;
+  context.requirements[0]?.kind === OnboardingRequirementKind.collectKybData;
 
 const shouldRunCollectKycData = (context: MachineContext) =>
-  !!context.requirements.kyc;
+  context.requirements[0]?.kind === OnboardingRequirementKind.collectKycData;
 
 const shouldRunCollectInvestorProfile = (context: MachineContext) =>
-  !!context.requirements.investorProfile;
+  context.requirements[0]?.kind === OnboardingRequirementKind.investorProfile;
 
 const shouldRunLiveness = (context: MachineContext) =>
-  !!context.requirements.liveness;
+  context.requirements[0]?.kind === OnboardingRequirementKind.registerPasskey;
 
-const shouldRunIdDoc = (context: MachineContext) => {
-  const {
-    requirements: { idDoc },
-  } = context;
-  return !!idDoc;
-};
+const shouldRunIdDoc = (context: MachineContext) =>
+  context.requirements[0]?.kind === OnboardingRequirementKind.idDoc;
 
 const shouldShowAuthorize = (context: MachineContext) => {
   const {
-    requirements: { authorize },
     onboardingContext: { isTransfer },
   } = context;
-  return !isTransfer && !!authorize;
+  return (
+    !isTransfer &&
+    context.requirements[0]?.kind === OnboardingRequirementKind.authorize
+  );
 };
 
 const shouldShowProcess = (context: MachineContext) => {
   const {
-    requirements: { process },
     onboardingContext: { isTransfer },
   } = context;
-  return !isTransfer && !!process;
+  return (
+    !isTransfer &&
+    context.requirements[0]?.kind === OnboardingRequirementKind.process
+  );
 };
 
 const shouldRunTransfer = (context: MachineContext) => {
   const {
-    requirements: { idDoc, liveness },
     onboardingContext: {
       device: { type },
       isTransfer,
@@ -107,11 +127,16 @@ const shouldRunTransfer = (context: MachineContext) => {
   if (didRunTransfer) {
     return false;
   }
+  const nextReqIsLiveness =
+    context.requirements[0]?.kind === OnboardingRequirementKind.registerPasskey;
+  const nextReqIsIdDoc =
+    context.requirements[0]?.kind === OnboardingRequirementKind.idDoc;
+
   if (isTransfer) {
     return false;
   }
   if (type === 'mobile') {
-    return !!liveness;
+    return nextReqIsLiveness;
   }
-  return !!idDoc || !!liveness;
+  return nextReqIsIdDoc || nextReqIsLiveness;
 };

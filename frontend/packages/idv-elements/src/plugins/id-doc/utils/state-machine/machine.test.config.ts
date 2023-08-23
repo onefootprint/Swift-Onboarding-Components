@@ -10,6 +10,7 @@ import { MachineContext } from './types';
 
 export const requirement: IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc,
+  isMet: false,
   shouldCollectSelfie: true,
   shouldCollectConsent: true,
   onlyUsSupported: false,

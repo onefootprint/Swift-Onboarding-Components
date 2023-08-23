@@ -75,6 +75,7 @@ describe.skip('<IdDoc />', () => {
     customData: {
       requirement: {
         kind: OnboardingRequirementKind.idDoc,
+        isMet: false,
         shouldCollectSelfie: shouldCollectSelfie ?? false,
         shouldCollectConsent: shouldCollectConsent ?? false,
         onlyUsSupported: onlyUsSupported || false,

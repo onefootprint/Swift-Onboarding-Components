@@ -16,6 +16,7 @@ const getRequirement = ({
   optionalAttributes = [],
 }: GetRequirementArgs = {}): CollectKycDataRequirement => ({
   kind: OnboardingRequirementKind.collectKycData,
+  isMet: false,
   missingAttributes,
   populatedAttributes,
   optionalAttributes,

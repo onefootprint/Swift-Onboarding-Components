@@ -101,10 +101,12 @@ describe.skip('<CollectKybData />', () => {
         config: getOnboardingConfig(allAttributes, allAttributes),
         kybRequirement: {
           kind: OnboardingRequirementKind.collectKybData,
+          isMet: false,
           missingAttributes: kybAttributes,
         },
         kycRequirement: {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: kycAttributes,
           populatedAttributes: [],
           optionalAttributes: [],

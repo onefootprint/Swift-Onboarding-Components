@@ -12,6 +12,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -25,6 +26,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -38,6 +40,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -51,6 +54,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -66,6 +70,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [CollectedKycDataOption.partialAddress],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -79,6 +84,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [CollectedKycDataOption.ssn4],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -92,6 +98,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [],
           populatedAttributes: [],
           optionalAttributes: [CollectedKycDataOption.ssn9],
@@ -105,6 +112,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [CollectedKycDataOption.partialAddress],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -120,6 +128,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
@@ -136,6 +145,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
@@ -152,6 +162,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [
             CollectedKycDataOption.dob,
             CollectedKycDataOption.fullAddress,
@@ -168,6 +179,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [
             CollectedKycDataOption.dob,
             CollectedKycDataOption.fullAddress,
@@ -184,6 +196,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [
             CollectedKycDataOption.dob,
             CollectedKycDataOption.fullAddress,
@@ -200,6 +213,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [CollectedKycDataOption.dob],
           populatedAttributes: [],
           optionalAttributes: [CollectedKycDataOption.ssn4],
@@ -215,6 +229,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
@@ -240,6 +255,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
@@ -265,6 +281,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
@@ -290,6 +307,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
       getCurrentStepFromMissingAttributes(
         {
           kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
             CollectedKycDataOption.fullAddress,
