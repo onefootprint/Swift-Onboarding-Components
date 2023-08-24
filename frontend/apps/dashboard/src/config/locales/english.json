@@ -1165,6 +1165,19 @@
         "details": {
           "title": "Playbook details",
           "content": {
+            "data-collection": {
+              "basic-information": "Basic information",
+              "email": "Email",
+              "phone_number": "Phone number",
+              "name": "First & Last name",
+              "dob": "Date of birth",
+              "full_address": "Address",
+              "nationality": "Legal status in the U.S.",
+              "ssn": "SSN",
+              "id-doc": "ID document scan",
+              "selfie": "Selfie",
+              "us-residents": "U.S. residents"
+            },
             "basics": {
               "title": "Playbook basics",
               "edit-name": {
@@ -1182,7 +1195,9 @@
                 "kyb": "KYB"
               },
               "name": "Playbook name",
-              "publishable-key": "Publishable key"
+              "publishable-key": "Publishable key",
+              "data-collection": "Data collection",
+              "authorized-scopes": "Authorized scopes"
             }
           }
         },

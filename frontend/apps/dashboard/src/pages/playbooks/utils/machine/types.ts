@@ -144,3 +144,24 @@ export type MachineEvents =
         playbook: PlaybookFormData;
       };
     };
+
+export const basicInformationFields: string[] = [
+  CollectedKycDataOption.email,
+  CollectedKycDataOption.phoneNumber,
+  CollectedKycDataOption.name,
+  CollectedKycDataOption.dob,
+  CollectedKycDataOption.fullAddress,
+];
+
+export const usResidentFields = [
+  CollectedKycDataOption.ssn9,
+  CollectedKycDataOption.ssn4,
+  CollectedDocumentDataOption.document,
+  'selfie',
+  'idDoc',
+  'idDocKind',
+  'ssnKind',
+  'ssn',
+  CollectedKycDataOption.nationality,
+  // tk legal status
+];

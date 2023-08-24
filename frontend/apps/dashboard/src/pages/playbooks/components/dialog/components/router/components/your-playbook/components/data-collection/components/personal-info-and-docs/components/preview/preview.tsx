@@ -1,18 +1,16 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import {
-  CollectedDocumentDataOption,
-  CollectedKycDataOption,
-} from '@onefootprint/types';
 import { Checkbox, LinkButton, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 
 import {
+  basicInformationFields,
   Kind,
   PersonalInformationAndDocs,
+  usResidentFields,
 } from '@/playbooks/utils/machine/types';
 
 import CollectedInformation from './components/collected-information';
@@ -40,26 +38,6 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
     user.isFirmEmployee &&
     watch('personalInformationAndDocs.idDoc') &&
     watch('personalInformationAndDocs.idDocKind')?.length > 0;
-
-  const basicInformationFields: string[] = [
-    CollectedKycDataOption.email,
-    CollectedKycDataOption.phoneNumber,
-    CollectedKycDataOption.name,
-    CollectedKycDataOption.dob,
-    CollectedKycDataOption.fullAddress,
-  ];
-  const usResidentFields = [
-    CollectedKycDataOption.ssn9,
-    CollectedKycDataOption.ssn4,
-    CollectedDocumentDataOption.document,
-    'selfie',
-    'idDoc',
-    'idDocKind',
-    'ssnKind',
-    'ssn',
-    CollectedKycDataOption.nationality,
-    // tk legal status
-  ];
 
   const basicInformationFormValues = formValues.filter(field =>
     basicInformationFields.includes(field as keyof PersonalInformationAndDocs),

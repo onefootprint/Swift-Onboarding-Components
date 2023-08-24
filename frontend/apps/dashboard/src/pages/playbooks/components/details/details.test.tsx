@@ -34,7 +34,7 @@ describe('<Details />', () => {
     renderDetails();
 
     await waitFor(() => {
-      const content = screen.getByTestId('playbooks-details-content');
+      const content = screen.getByText('Playbook basics');
       expect(content).toBeInTheDocument();
     });
   };
