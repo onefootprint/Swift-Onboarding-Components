@@ -4,7 +4,10 @@ import { OnboardingConfig } from '@onefootprint/types';
 import { Tab, Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import { basicInformationFields } from '@/playbooks/utils/machine/types';
+import {
+  basicInformationFields,
+  usResidentFields,
+} from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
 
@@ -22,6 +25,11 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
   const { mustCollectData } = playbook;
   const basicInformationValues = mustCollectData.filter(field =>
     basicInformationFields.includes(field as keyof OnboardingConfig),
+  );
+  const usResidentValues = mustCollectData.filter(
+    field =>
+      usResidentFields.includes(field as keyof OnboardingConfig) ||
+      field.match('document'),
   );
 
   const handleChange = (value: string) => {
@@ -44,10 +52,16 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
       </Tabs>
 
       {segment === 'data' && (
-        <DataCollection
-          fields={basicInformationValues}
-          title={t('data-collection.basic-information')}
-        />
+        <>
+          <DataCollection
+            fields={basicInformationValues}
+            title={t('data-collection.basic-information')}
+          />
+          <DataCollection
+            fields={usResidentValues}
+            title={t('data-collection.us-residents')}
+          />
+        </>
       )}
     </Container>
   );

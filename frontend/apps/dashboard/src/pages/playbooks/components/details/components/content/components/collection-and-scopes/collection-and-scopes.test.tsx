@@ -20,4 +20,18 @@ describe('<CollectionAndScopes />', () => {
       screen.getByRole('tab', { name: 'Authorized scopes' }),
     ).toBeInTheDocument();
   });
+
+  it('should render document if document string included in mustCollectData', () => {
+    renderCollectionAndScopes({
+      playbook: {
+        ...playbookFixture,
+        mustCollectData: [
+          'document.passport,drivers_license,id_card.none.require_selfie',
+        ],
+      },
+    });
+    expect(screen.getByText('ID document scan')).toBeInTheDocument();
+    expect(screen.getByText('Identity card and')).toBeInTheDocument();
+    expect(screen.getByText('2 more')).toBeInTheDocument();
+  });
 });

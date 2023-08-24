@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
-import { Tooltip, Typography } from '@onefootprint/ui';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
+import IdDocDisplay from '@/playbooks/components/id-doc-display';
 import { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
 
 type DisplayValueProps = {
@@ -23,34 +23,7 @@ const DisplayValue = ({ field, personalInfoAndDocs }: DisplayValueProps) => {
     return <Typography variant="body-3">{t(`preview.${value}`)}</Typography>;
   }
   if (field === 'idDocKind') {
-    const remainingIdDocTypes = idDocKind.slice(2);
-    const remainingDocString = remainingIdDocTypes
-      .map(k => t(`preview.${k as string}`))
-      .join(', ');
-    if (idDocKind.length > 3) {
-      return (
-        <DocPreviewContainer>
-          <Typography variant="body-3">
-            {`${t(`preview.${idDocKind[0]}`)}, ${t(
-              `preview.${idDocKind[1]}`,
-            )}, ${t('preview.and')}`}
-          </Typography>
-          <Tooltip
-            text={remainingDocString}
-            alignment="center"
-            position="bottom"
-          >
-            <Typography variant="body-3" sx={{ textDecoration: 'underline' }}>
-              {`${remainingIdDocTypes.length} ${t('preview.more')}`}
-            </Typography>
-          </Tooltip>
-        </DocPreviewContainer>
-      );
-    }
-    const possibleIdDocs = idDocKind
-      .map(k => t(`preview.${k as string}`))
-      .join(', ');
-    return <Typography variant="body-3">{possibleIdDocs}</Typography>;
+    return <IdDocDisplay idDocKind={idDocKind} />;
   }
   if (field === 'selfie' && (!idDoc || !idDocKind.length)) {
     return <IcoCloseSmall24 testID="close-icon" />;
@@ -66,12 +39,3 @@ const DisplayValue = ({ field, personalInfoAndDocs }: DisplayValueProps) => {
 };
 
 export default DisplayValue;
-
-const DocPreviewContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    gap: ${theme.spacing[2]};
-    flex-wrap: nowrap;
-  `}
-`;

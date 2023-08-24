@@ -15,6 +15,13 @@ const DataCollection = ({ fields, title }: DataCollectionProps) => {
     'pages.playbooks.table.details.content.data-collection',
   );
 
+  const getLabel = (field: string) => {
+    if (field.includes('document')) {
+      return t('document');
+    }
+    return t(field);
+  };
+
   return (
     <Container>
       <Typography variant="label-3">{title}</Typography>
@@ -26,7 +33,7 @@ const DataCollection = ({ fields, title }: DataCollectionProps) => {
               color="tertiary"
               sx={{ whiteSpace: 'nowrap', textAlign: 'right' }}
             >
-              {t(field)}
+              {getLabel(field)}
             </Typography>
             <ValueContainer>
               <DisplayValue field={field} attributes={fields} />
