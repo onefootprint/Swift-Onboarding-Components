@@ -20,8 +20,6 @@ use tracing::instrument;
 pub struct ScopedVaultListQueryParams<TSearch = (PiiString, Vec<Fingerprint>)> {
     pub tenant_id: TenantId,
     pub is_live: bool,
-    /// When true, only returns the scoped users that either are (1) authorized or (2) non-portable
-    pub only_billable: bool,
     pub statuses: Vec<OnboardingStatusFilter>,
     pub search: Option<TSearch>,
     pub fp_id: Option<FpId>,
@@ -37,7 +35,6 @@ impl ScopedVaultListQueryParams {
         let Self {
             tenant_id,
             is_live,
-            only_billable,
             statuses,
             search,
             fp_id,
@@ -58,7 +55,6 @@ impl ScopedVaultListQueryParams {
         let result = ScopedVaultListQueryParams {
             tenant_id,
             is_live,
-            only_billable,
             statuses,
             search: matching_vaults,
             fp_id,
@@ -76,113 +72,99 @@ impl ScopedVaultListQueryParams {
 /// Requires the `conn` only to execute one subquery because diesel doesn't like it. Returns a box
 /// query that must still be executed
 macro_rules! list_query {
-    ($params: ident) => {
-        {
-            // Filter out onboardings that haven't been explicitly authorized by the user - these should
-            // not be visible in the dashboard since the tenant doesn't have permissions to view anything
-            // about the user
-            use db_schema::schema::{manual_review, scoped_vault, vault, watchlist_check, workflow};
-            let mut query = scoped_vault::table
-                .inner_join(vault::table)
-                .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
-                .filter(scoped_vault::is_live.eq($params.is_live))
-                .into_boxed();
-            if $params.only_billable {
-                let scoped_vault_ids =
-                    workflow::table
-                    .filter(not(workflow::authorized_at.is_null()))
-                    .select(workflow::scoped_vault_id);
-                query = query
-                    // Don't bill for business vaults
-                    .filter(vault::kind.eq(VaultKind::Person))
-                    // Only allow billing authorized scoped users for portable vaults OR non-portable vaults
-                    // owned by the tenant
-                    .filter(scoped_vault::id.eq_any(scoped_vault_ids).or(vault::is_portable.eq(false)));
+    ($params: ident) => {{
+        // Filter out onboardings that haven't been explicitly authorized by the user - these should
+        // not be visible in the dashboard since the tenant doesn't have permissions to view anything
+        // about the user
+        use db_schema::schema::{manual_review, scoped_vault, vault, watchlist_check, workflow};
+        let mut query = scoped_vault::table
+            .inner_join(vault::table)
+            .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
+            .filter(scoped_vault::is_live.eq($params.is_live))
+            .into_boxed();
+
+        // Filter on whether user is in manual review
+        if let Some(requires_manual_review) = $params.requires_manual_review {
+            let matching_ids = manual_review::table
+                .filter(manual_review::completed_at.is_null())
+                .inner_join(workflow::table)
+                .select(workflow::scoped_vault_id)
+                .distinct();
+            if requires_manual_review {
+                query = query.filter(scoped_vault::id.eq_any(matching_ids))
+            } else {
+                query = query.filter(diesel::dsl::not(scoped_vault::id.eq_any(matching_ids)))
             }
-
-            // Filter on whether user is in manual review
-            if let Some(requires_manual_review) = $params.requires_manual_review {
-                let matching_ids = manual_review::table
-                    .filter(manual_review::completed_at.is_null())
-                    .inner_join(workflow::table)
-                    .select(workflow::scoped_vault_id)
-                    .distinct();
-                if requires_manual_review {
-                    query = query.filter(scoped_vault::id.eq_any(matching_ids))
-                } else {
-                    query = query.filter(diesel::dsl::not(scoped_vault::id.eq_any(matching_ids)))
-                }
-            }
-
-            // Filter on whether user has a watchlist hit
-            if let Some(watchlist_hit) = $params.watchlist_hit.as_ref() {
-                let matching_ids = watchlist_check::table
-                    .filter(watchlist_check::status.eq(WatchlistCheckStatusKind::Fail))
-                    .filter(watchlist_check::deactivated_at.is_null())
-                    .filter(not(watchlist_check::completed_at.is_null()))
-                    .select(watchlist_check::scoped_vault_id)
-                    .distinct();
-                if *watchlist_hit {
-                    query = query.filter(scoped_vault::id.eq_any(matching_ids))
-                } else {
-                    query = query.filter(diesel::dsl::not(scoped_vault::id.eq_any(matching_ids)))
-                }
-            }
-
-            // Filter on onboarding status: pass/fail/incomplete/vault only
-            if !$params.statuses.is_empty() {
-                // Filter on non-portable users
-                let q_none_status = if $params.statuses.contains(&OnboardingStatusFilter::None) {
-                    Some(scoped_vault::status.is_null())
-                } else {
-                    None
-                };
-
-                let onboarding_status: Vec<_> = $params
-                    .statuses
-                    .iter()
-                    .flat_map(OnboardingStatus::try_from)
-                    .collect();
-
-                let q_onboarding_status = if !onboarding_status.is_empty() {
-                    Some(scoped_vault::status.eq_any(onboarding_status))
-                } else {
-                    None
-                };
-
-                // This is tricky... If any filtering status is provided, we only want to return results
-                // that match the filters. But, the filters are determined through a handful of different
-                // queries.
-                match (q_none_status, q_onboarding_status) {
-                    (Some(q1), Some(q2)) => query = query.filter(q1.or(q2)),
-                    (Some(q1), None) => query = query.filter(q1),
-                    (None, Some(q1)) => query = query.filter(q1),
-                    (None, None) => {}
-                }
-            }
-
-            if let Some(fp_id) = $params.fp_id.as_ref() {
-                query = query.filter(scoped_vault::fp_id.eq(fp_id))
-            }
-
-            if let Some(timestamp_lte) = $params.timestamp_lte {
-                query = query.filter(scoped_vault::start_timestamp.le(timestamp_lte))
-            }
-
-            if let Some(timestamp_gte) = $params.timestamp_gte {
-                query = query.filter(scoped_vault::start_timestamp.ge(timestamp_gte))
-            }
-
-            if let Some(kind) = $params.kind.as_ref() {
-                query = query.filter(vault::kind.eq(kind))
-            }
-
-            if let Some(vault_ids) = $params.search.as_ref() {
-                query = query.filter(vault::id.eq_any(vault_ids))
-            }
-            query
         }
-    };
+
+        // Filter on whether user has a watchlist hit
+        if let Some(watchlist_hit) = $params.watchlist_hit.as_ref() {
+            let matching_ids = watchlist_check::table
+                .filter(watchlist_check::status.eq(WatchlistCheckStatusKind::Fail))
+                .filter(watchlist_check::deactivated_at.is_null())
+                .filter(not(watchlist_check::completed_at.is_null()))
+                .select(watchlist_check::scoped_vault_id)
+                .distinct();
+            if *watchlist_hit {
+                query = query.filter(scoped_vault::id.eq_any(matching_ids))
+            } else {
+                query = query.filter(diesel::dsl::not(scoped_vault::id.eq_any(matching_ids)))
+            }
+        }
+
+        // Filter on onboarding status: pass/fail/incomplete/vault only
+        if !$params.statuses.is_empty() {
+            // Filter on non-portable users
+            let q_none_status = if $params.statuses.contains(&OnboardingStatusFilter::None) {
+                Some(scoped_vault::status.is_null())
+            } else {
+                None
+            };
+
+            let onboarding_status: Vec<_> = $params
+                .statuses
+                .iter()
+                .flat_map(OnboardingStatus::try_from)
+                .collect();
+
+            let q_onboarding_status = if !onboarding_status.is_empty() {
+                Some(scoped_vault::status.eq_any(onboarding_status))
+            } else {
+                None
+            };
+
+            // This is tricky... If any filtering status is provided, we only want to return results
+            // that match the filters. But, the filters are determined through a handful of different
+            // queries.
+            match (q_none_status, q_onboarding_status) {
+                (Some(q1), Some(q2)) => query = query.filter(q1.or(q2)),
+                (Some(q1), None) => query = query.filter(q1),
+                (None, Some(q1)) => query = query.filter(q1),
+                (None, None) => {}
+            }
+        }
+
+        if let Some(fp_id) = $params.fp_id.as_ref() {
+            query = query.filter(scoped_vault::fp_id.eq(fp_id))
+        }
+
+        if let Some(timestamp_lte) = $params.timestamp_lte {
+            query = query.filter(scoped_vault::start_timestamp.le(timestamp_lte))
+        }
+
+        if let Some(timestamp_gte) = $params.timestamp_gte {
+            query = query.filter(scoped_vault::start_timestamp.ge(timestamp_gte))
+        }
+
+        if let Some(kind) = $params.kind.as_ref() {
+            query = query.filter(vault::kind.eq(kind))
+        }
+
+        if let Some(vault_ids) = $params.search.as_ref() {
+            query = query.filter(vault::id.eq_any(vault_ids))
+        }
+        query
+    }};
 }
 
 fn vaults_matching_search(
@@ -279,14 +261,6 @@ fn list(
         .select((schema::scoped_vault::all_columns, schema::vault::all_columns))
         .get_results(conn)?;
     Ok(results)
-}
-
-#[instrument(skip_all)]
-pub fn count_authorized_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> DbResult<i64> {
-    let params = &params.map_search(conn)?;
-    let query = list_query!(params);
-    let count = query.count().get_result(conn)?;
-    Ok(count)
 }
 
 /// lists all scoped_vaults across all configurations

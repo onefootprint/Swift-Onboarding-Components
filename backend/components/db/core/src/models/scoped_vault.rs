@@ -13,13 +13,13 @@ use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::scoped_vault;
-use diesel::dsl::not;
+use diesel::dsl::{count_distinct, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
     DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus, ScopedVaultId, TenantId,
-    VaultCreatedInfo, VaultId, WorkflowId,
+    VaultCreatedInfo, VaultId, VaultKind, WorkflowId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -317,5 +317,33 @@ impl ScopedVault {
             .order_by(workflow::created_at.desc())
             .get_results(conn)?;
         Ok(results)
+    }
+
+    /// Count the number of scoped vaults that are billable for PII storage
+    #[tracing::instrument("ScopedVault::count_billable", skip_all)]
+    pub fn count_billable(conn: &mut PgConn, t_id: &TenantId, end_date: DateTime<Utc>) -> DbResult<i64> {
+        use db_schema::schema::{vault, workflow};
+
+        let sv_with_authed_wf = workflow::table
+            // NOTE: We'll miss a handful of vaults that were created but not authorized before end_date.
+            // And, this calculation won't be stable if we re-run it for a historical period. But
+            // it will only change by very small amounts
+            .filter(not(workflow::authorized_at.is_null()))
+            .select(workflow::scoped_vault_id);
+
+        let count = scoped_vault::table
+            .inner_join(vault::table)
+            .filter(scoped_vault::tenant_id.eq(t_id))
+            .filter(scoped_vault::is_live.eq(true))
+            // Don't bill for business vaults. TODO should we?
+            .filter(vault::kind.eq(VaultKind::Person))
+            // Only allow billing authorized scoped users for portable vaults OR non-portable vaults
+            // owned by the tenant
+            .filter(scoped_vault::id.eq_any(sv_with_authed_wf).or(vault::is_portable.eq(false)))
+            // Only bill for vaults that existed by the end of the bililng period
+            .filter(scoped_vault::start_timestamp.lt(end_date))
+            .select(count_distinct(scoped_vault::id))
+            .get_result(conn)?;
+        Ok(count)
     }
 }

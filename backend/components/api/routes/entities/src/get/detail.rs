@@ -35,7 +35,6 @@ pub async fn get(
     let query_params = ScopedVaultListQueryParams {
         tenant_id: tenant.id.clone(),
         is_live: auth.is_live()?,
-        only_billable: false,
         requires_manual_review: None,
         watchlist_hit: None,
         statuses: vec![],
