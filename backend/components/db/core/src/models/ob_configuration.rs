@@ -11,6 +11,7 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::AppearanceId;
+use newtypes::DocumentCdoInfo;
 use newtypes::WorkflowId;
 use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
@@ -263,6 +264,15 @@ impl ObConfiguration {
 }
 
 impl ObConfiguration {
+    pub fn document_cdo(&self) -> Option<&DocumentCdoInfo> {
+        self.must_collect_data
+            .iter()
+            .filter_map(|cdo| match cdo {
+                CDO::Document(doc_info) => Some(doc_info),
+                _ => None,
+            })
+            .next()
+    }
     pub fn can_access_document(&self) -> bool {
         self.can_access_data
             .iter()

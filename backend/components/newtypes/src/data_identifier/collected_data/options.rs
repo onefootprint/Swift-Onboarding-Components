@@ -331,7 +331,7 @@ impl CollectedDataOption {
     pub fn permission(self) -> TenantScope {
         match self {
             Self::Document(doc_info) => {
-                if doc_info.2 == Selfie::RequireSelfie {
+                if doc_info.selfie() == Selfie::RequireSelfie {
                     TenantScope::DecryptDocumentAndSelfie
                 } else {
                     TenantScope::DecryptDocument

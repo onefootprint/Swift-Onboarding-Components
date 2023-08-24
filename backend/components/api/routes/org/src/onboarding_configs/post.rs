@@ -367,9 +367,14 @@ mod test {
         req.validate().is_ok()
     }
 
-    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![] => true)]
-    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], vec![] => false)]
-    fn test_is_doc_first(must_collect_data: Vec<CDO>, can_access_data: Vec<CDO>) -> bool {
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![], false => true)]
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![], true => false)]
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], vec![], false => false)]
+    fn test_is_doc_first(
+        must_collect_data: Vec<CDO>,
+        can_access_data: Vec<CDO>,
+        allow_international: bool,
+    ) -> bool {
         let req = CreateOnboardingConfigurationRequest {
             name: "Flerp".to_owned(),
             must_collect_data,
@@ -378,7 +383,7 @@ mod test {
             cip_kind: None,
             is_no_phone_flow: Some(false),
             is_doc_first_flow: true,
-            allow_international_residents: false,
+            allow_international_residents: allow_international,
             international_country_restrictions: None,
         };
         req.validate().is_ok()

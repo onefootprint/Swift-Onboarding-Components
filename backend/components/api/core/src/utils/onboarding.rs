@@ -11,9 +11,8 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    CollectedDataOption, CountryRestriction, DocTypeRestriction, EncryptedVaultPrivateKey,
-    Iso3166TwoDigitCountryCode, ScopedVaultId, Selfie, VaultId, VaultKind, VaultPublicKey,
-    WorkflowFixtureResult,
+    CollectedDataOption, CountryRestriction, EncryptedVaultPrivateKey, Iso3166TwoDigitCountryCode,
+    ScopedVaultId, Selfie, VaultId, VaultKind, VaultPublicKey, WorkflowFixtureResult,
 };
 
 use crate::errors::ApiResult;
@@ -56,21 +55,17 @@ pub fn get_or_start_onboarding(
         {
             // Create a `DocumentRequest` if specified in the ob config.
             // To prevent duplicate document requests, only create a doc request if the onboarding is new
-            let doc_type_restriction = if let DocTypeRestriction::Restrict(types) = doc_info.0.clone() {
-                Some(types)
-            } else {
-                None
-            };
+            let doc_type_restriction = doc_info.restricted_id_doc_kinds();
 
             let args = NewDocumentRequestArgs {
                 scoped_vault_id: wf.scoped_vault_id.clone(),
                 ref_id: None,
                 workflow_id: wf.id.clone(),
-                should_collect_selfie: doc_info.2 == Selfie::RequireSelfie,
+                should_collect_selfie: doc_info.selfie() == Selfie::RequireSelfie,
+                // TODO: Drop these columns on doc request
                 global_doc_types_accepted: doc_type_restriction,
-                country_restrictions: vec![
-                    (doc_info.1 == CountryRestriction::UsOnly).then_some(Iso3166TwoDigitCountryCode::US)
-                ]
+                country_restrictions: vec![(doc_info.country_restriction() == CountryRestriction::UsOnly)
+                    .then_some(Iso3166TwoDigitCountryCode::US)]
                 .into_iter()
                 .flatten()
                 .collect(),

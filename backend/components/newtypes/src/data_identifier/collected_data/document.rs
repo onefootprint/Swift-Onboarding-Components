@@ -54,9 +54,32 @@ pub enum Selfie {
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub struct DocumentCdoInfo(pub DocTypeRestriction, pub CountryRestriction, pub Selfie);
 
+impl DocumentCdoInfo {
+    pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
+        match self.doc_type_restriction() {
+            DocTypeRestriction::Restrict(types) => Some(types),
+            DocTypeRestriction::None => None,
+        }
+    }
+
+    pub fn doc_type_restriction(&self) -> DocTypeRestriction {
+        self.0.clone()
+    }
+    pub fn country_restriction(&self) -> CountryRestriction {
+        self.1.clone()
+    }
+    pub fn selfie(&self) -> Selfie {
+        self.2.clone()
+    }
+}
+
 impl std::fmt::Display for DocumentCdoInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match (&self.0, &self.1, &self.2) {
+        match (
+            &self.doc_type_restriction(),
+            &self.country_restriction(),
+            &self.selfie(),
+        ) {
             // Support legacy serializations
             (DocTypeRestriction::None, CountryRestriction::None, Selfie::None) => write!(f, "document"),
             (DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie) => {
@@ -80,15 +103,16 @@ impl FromStr for DocumentCdoInfo {
                 CountryRestriction::None,
                 Selfie::RequireSelfie,
             ),
+
             s => {
                 // Complex parse
                 let parts = s.split('.').collect_vec();
-                let doc_restriction =
+                let doc_type_restriction =
                     DocTypeRestriction::from_str(parts.get(1).ok_or(ParseError::VariantNotFound)?)?;
                 let country_restriction =
                     CountryRestriction::from_str(parts.get(2).ok_or(ParseError::VariantNotFound)?)?;
                 let selfie = Selfie::from_str(parts.get(3).ok_or(ParseError::VariantNotFound)?)?;
-                Self(doc_restriction, country_restriction, selfie)
+                Self(doc_type_restriction, country_restriction, selfie)
             }
         };
         Ok(res)
