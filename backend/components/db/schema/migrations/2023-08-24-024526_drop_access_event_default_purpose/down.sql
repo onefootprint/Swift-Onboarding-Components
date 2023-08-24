@@ -1,0 +1,1 @@
+ALTER TABLE access_event ALTER COLUMN purpose SET DEFAULT 'unknown';
