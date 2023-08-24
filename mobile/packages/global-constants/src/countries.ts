@@ -158,7 +158,7 @@ export const COUNTRIES: CountryRecord[] = [
   },
   {
     label: 'Bahrain',
-    value: 'BS',
+    value: 'BH',
     value3: 'BHR',
     passport: true,
     idCard: false,
