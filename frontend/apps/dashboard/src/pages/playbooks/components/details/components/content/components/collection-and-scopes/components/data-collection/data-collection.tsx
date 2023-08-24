@@ -32,7 +32,9 @@ const DataCollection = ({
 
   return (
     <Container>
-      <Typography variant="label-3">{title}</Typography>
+      <Typography variant="label-3" color="secondary">
+        {title}
+      </Typography>
       <ValuesContainer>
         {displayFields.map(field => (
           <ItemContainer key={field}>

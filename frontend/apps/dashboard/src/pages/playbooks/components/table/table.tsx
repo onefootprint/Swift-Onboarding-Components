@@ -32,7 +32,7 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
     <UITable<OnboardingConfig>
       aria-label={t('table.aria-label')}
       columns={columns}
-      emptyStateText={errorMessage || t('table.empty-state')}
+      emptyStateText={errorMessage || t('empty-description')}
       getAriaLabelForRow={onboardingConfig => onboardingConfig.name}
       getKeyForRow={onboardingConfig => onboardingConfig.id}
       isLoading={isLoading}

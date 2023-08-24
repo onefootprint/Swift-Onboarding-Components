@@ -43,8 +43,12 @@ const AuthorizedScopes = ({
   return (
     <Container>
       <Header>
-        <Typography variant="label-1">{t('title')}</Typography>
-        <Typography variant="body-3">{t('subtitle')}</Typography>
+        <Typography variant="label-1" color="secondary">
+          {t('title')}
+        </Typography>
+        <Typography variant="body-2" color="secondary">
+          {t('subtitle')}
+        </Typography>
       </Header>
       <FormProvider {...formMethods}>
         <Form onSubmit={handleSubmit(onSubmit)}>

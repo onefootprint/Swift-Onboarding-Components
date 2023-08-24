@@ -30,8 +30,12 @@ const YourPlaybook = ({
   return (
     <Container>
       <Header>
-        <Typography variant="label-1">{t('title')}</Typography>
-        <Typography variant="body-2">{t('subtitle')}</Typography>
+        <Typography variant="label-1" color="secondary">
+          {t('title')}
+        </Typography>
+        <Typography variant="body-2" color="secondary">
+          {t('subtitle')}
+        </Typography>
       </Header>
       <FormProvider {...formMethods}>
         <Form id="your-playbook-form" onSubmit={handleSubmit(onSubmit)}>

@@ -24,6 +24,10 @@ export type NameFormData = {
 
 export const defaultNameValue = '';
 
+export const defaultNameFormData: NameFormData = {
+  name: defaultNameValue,
+};
+
 export type AuthorizedScopesFormData = {
   [CollectedKycDataOption.name]: boolean;
   [CollectedKycDataOption.email]: boolean;
@@ -161,13 +165,13 @@ export const usResidentFormFields = [
   CollectedKycDataOption.ssn9,
   CollectedKycDataOption.ssn4,
   CollectedDocumentDataOption.document,
-  'selfie',
   'idDoc',
   'idDocKind',
-  'ssnKind',
-  'ssn',
+  'selfie',
   // note: internal nationality corresponds to "Legal status in the US"
   CollectedKycDataOption.nationality,
+  'ssnKind',
+  'ssn',
 ];
 
 // used to display

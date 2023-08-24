@@ -1310,7 +1310,8 @@
           "form": {
             "name": {
               "label": "Playbook name",
-              "placeholder": "User ID verification"
+              "placeholder-kyc": "User ID verification",
+              "placeholder-kyb": "Business verification"
             }
           }
         },

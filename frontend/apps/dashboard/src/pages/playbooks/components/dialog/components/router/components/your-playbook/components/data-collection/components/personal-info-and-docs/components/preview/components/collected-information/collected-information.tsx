@@ -23,7 +23,9 @@ const CollectedInformation = ({
 
   return (
     <Container>
-      <Typography variant="label-3">{title}</Typography>
+      <Typography variant="label-3" color="secondary">
+        {title}
+      </Typography>
       <ValuesContainer>
         {fields.map(field => (
           <ItemContainer key={field}>

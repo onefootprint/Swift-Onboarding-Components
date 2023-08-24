@@ -4,15 +4,17 @@ import { Button, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { NameFormData } from '@/playbooks/utils/machine/types';
+import { Kind, NameFormData } from '@/playbooks/utils/machine/types';
 
 type NameYourPlaybookProps = {
+  kind?: Kind;
   onSubmit: (data: NameFormData) => void;
   onBack: () => void;
   defaultValues: NameFormData;
 };
 
 const NameYourPlaybook = ({
+  kind = Kind.KYC,
   onSubmit,
   onBack,
   defaultValues,
@@ -28,14 +30,22 @@ const NameYourPlaybook = ({
       <FormProvider {...formMethods}>
         <Form id="your-playbook-form" onSubmit={handleSubmit(onSubmit)}>
           <Header>
-            <Typography variant="label-1">{t('title')}</Typography>
-            <Typography variant="body-2">{t('subtitle')}</Typography>
+            <Typography variant="label-1" color="secondary">
+              {t('title')}
+            </Typography>
+            <Typography variant="body-2" color="secondary">
+              {t('subtitle')}
+            </Typography>
           </Header>
           <TextInput
             autoFocus
             {...register('name')}
             label={t('form.name.label')}
-            placeholder={t('form.name.placeholder')}
+            placeholder={
+              kind === Kind.KYC
+                ? t('form.name.placeholder-kyc')
+                : t('form.name.placeholder-kyb')
+            }
           />
           <ButtonContainer>
             <Button size="compact" variant="secondary" onClick={onBack}>

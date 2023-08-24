@@ -126,6 +126,7 @@ const Router = ({ onClose }: RouterProps) => {
         )}
         {state.matches('nameYourPlaybook') && (
           <NameYourPlaybook
+            kind={state.context.kind}
             defaultValues={{ name: state.context.name ?? defaultNameValue }}
             onBack={() => send('whoToOnboardSelected')}
             onSubmit={({ name }) => {
@@ -167,6 +168,10 @@ const StepperContainer = styled.div`
     white-space: nowrap;
     margin-left: ${theme.spacing[10]};
     position: fixed;
+    margin-top: ${theme.spacing[9]};
+    @media (max-width: 1200px) {
+      display: none;
+    }
   `}
 `;
 

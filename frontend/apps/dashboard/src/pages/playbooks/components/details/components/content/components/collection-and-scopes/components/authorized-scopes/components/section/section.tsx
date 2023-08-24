@@ -27,20 +27,20 @@ const Section = ({ canAccessData, title, displayScopes }: SectionProps) => {
   const idDocKinds = Object.values(SupportedIdDocTypes).filter(v =>
     documentString?.includes(v),
   );
-
+  if (displayScopes.includes('document')) {
+    dataToDisplay.push(...idDocKinds);
+  }
   if (displayScopes.includes('selfie')) {
     if (documentString?.includes('require_selfie')) {
       dataToDisplay.push('selfie');
     }
   }
 
-  if (displayScopes.includes('document')) {
-    dataToDisplay.push(...idDocKinds);
-  }
-
   return (
     <Container>
-      <Typography variant="label-3">{title}</Typography>
+      <Typography variant="label-3" color="secondary">
+        {title}
+      </Typography>
       <TagContainer>
         {dataToDisplay.map(field => (
           <Tag key={field}>{t(field)}</Tag>

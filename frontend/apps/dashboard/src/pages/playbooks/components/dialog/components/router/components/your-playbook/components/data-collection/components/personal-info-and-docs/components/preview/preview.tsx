@@ -42,9 +42,16 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
   const basicInformationFormValues = formValues.filter(field =>
     basicInformationFields.includes(field as keyof PersonalInformationAndDocs),
   );
-  const usResidentFormValues = formValues.filter(field =>
-    usResidentFormFields.includes(field as keyof PersonalInformationAndDocs),
-  );
+
+  const usResidentFormValues = formValues
+    .filter(field =>
+      usResidentFormFields.includes(field as keyof PersonalInformationAndDocs),
+    )
+    // preserve order so ID doc and selfie are together
+    .sort(
+      (a, b) =>
+        usResidentFormFields.indexOf(a) - usResidentFormFields.indexOf(b),
+    );
 
   return (
     <Container>

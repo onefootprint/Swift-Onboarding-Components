@@ -49,23 +49,24 @@ const Playbooks = () => {
         </PermissionGate>
       </HeaderContainer>
 
-      <Table
-        data={response?.data}
-        errorMessage={errorMessage}
-        isLoading={isLoading}
-      />
-      {response && response.meta.count > 0 && (
-        <Pagination
-          hasNextPage={pagination.hasNextPage}
-          hasPrevPage={pagination.hasPrevPage}
-          onNextPage={pagination.loadNextPage}
-          onPrevPage={pagination.loadPrevPage}
-          pageIndex={pagination.pageIndex}
-          pageSize={pagination.pageSize}
-          totalNumResults={response.meta.count}
+      <TableContainer>
+        <Table
+          data={response?.data}
+          errorMessage={errorMessage}
+          isLoading={isLoading}
         />
-      )}
-      <Typography variant="body-2">{t('empty-description')}</Typography>
+        {response && response.meta.count > 0 && (
+          <Pagination
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            onNextPage={pagination.loadNextPage}
+            onPrevPage={pagination.loadPrevPage}
+            pageIndex={pagination.pageIndex}
+            pageSize={pagination.pageSize}
+            totalNumResults={response.meta.count}
+          />
+        )}
+      </TableContainer>
       <Details />
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </Container>
@@ -86,6 +87,14 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[8]};
+  `};
+`;
+
+const TableContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
   `};
 `;
 
