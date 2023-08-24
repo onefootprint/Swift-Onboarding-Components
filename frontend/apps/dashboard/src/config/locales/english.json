@@ -1818,6 +1818,10 @@
           "kyc-collect-form": {
             "title": "Documentation",
             "description": "Select types of documents to request.",
+            "phone": {
+              "title": "Phone number",
+              "request": "Request users to provide their phone number"
+            },
             "ssn": {
               "title": "SSN",
               "request": "Request users to provide their SSN",

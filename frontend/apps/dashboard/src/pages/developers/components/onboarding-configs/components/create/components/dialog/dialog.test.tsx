@@ -6,7 +6,11 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import React from 'react';
-import { asAdminUser } from 'src/config/tests';
+import {
+  asAdminUser,
+  asAdminUserFirmEmployee,
+  asAdminUserInOrg,
+} from 'src/config/tests';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import Dialog, { DialogProps } from './dialog';
@@ -45,6 +49,7 @@ import {
   PASSPORT_LABEL,
   PASSPORT_OPTION,
   PHONE_LABEL,
+  PHONE_OPTION,
   selectType,
   SELFIE_LABEL,
   SELFIE_OPTION,
@@ -202,6 +207,63 @@ describe('<Dialog />', () => {
   });
 
   describe('When collecting KYC data', () => {
+    beforeEach(() => {
+      asAdminUser();
+    });
+
+    describe('When user is a firm employee', () => {
+      beforeEach(() => {
+        asAdminUserFirmEmployee();
+      });
+
+      it('can toggle phone off', async () => {
+        renderDialog();
+
+        await selectType();
+        await fillName();
+
+        expect(
+          screen.getByTestId(getFormIdForState('kycCollect')),
+        ).toBeInTheDocument();
+
+        await toggleCollectOption(PHONE_OPTION, PHONE_LABEL, false);
+
+        await checkCollectedDataExists([
+          EMAIL_LABEL,
+          NAME_LABEL,
+          DOB_LABEL,
+          ADDRESS_LABEL,
+          SSN_FULL_LABEL,
+        ]);
+      });
+    });
+
+    describe('when user is a findigs employee', () => {
+      beforeEach(() => {
+        asAdminUserInOrg('Findigs.com');
+      });
+
+      it('can toggle phone off as firm employee', async () => {
+        renderDialog();
+
+        await selectType();
+        await fillName();
+
+        expect(
+          screen.getByTestId(getFormIdForState('kycCollect')),
+        ).toBeInTheDocument();
+        await toggleCollectOption(PHONE_OPTION, PHONE_LABEL, false);
+
+        await checkCollectedDataExists([
+          EMAIL_LABEL,
+          NAME_LABEL,
+          DOB_LABEL,
+          ADDRESS_LABEL,
+          SSN_FULL_LABEL,
+        ]);
+      });
+    });
+
     it('should show collected data options', async () => {
       renderDialog();
 
@@ -211,6 +273,10 @@ describe('<Dialog />', () => {
       expect(
         screen.getByTestId(getFormIdForState('kycCollect')),
       ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('switch', { name: PHONE_OPTION }),
+      ).not.toBeInTheDocument();
 
       await checkCollectedDataExists([
         EMAIL_LABEL,

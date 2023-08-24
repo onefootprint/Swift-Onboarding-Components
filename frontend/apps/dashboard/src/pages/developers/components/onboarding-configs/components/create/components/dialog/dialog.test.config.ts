@@ -51,6 +51,7 @@ export const SELFIE_LABEL = 'Selfie';
 export const ID_DOCUMENT_AND_SELFIE_LABEL = 'ID Document & Selfie';
 export const INVESTOR_PROFILE_LABEL = 'Investor profile';
 
+export const PHONE_OPTION = 'Request users to provide their phone number';
 export const NATIONALITY_OPTION = 'Request users to specify their nationality';
 export const ID_CARD_OPTION = 'ID card';
 export const PASSPORT_OPTION = 'Passport';
@@ -71,6 +72,7 @@ export const BUSINESS_BO_FULL_KYC_OPTION = 'Fully KYC all beneficial owners';
 
 const getOption = (label: string) =>
   (screen.queryByRole('radio', { name: label }) ||
+    screen.queryByRole('switch', { name: label }) ||
     screen.queryByRole('checkbox', { name: label })) as HTMLInputElement | null;
 
 export const toggleCollectOption = async (

@@ -18,6 +18,7 @@ export type KycCollectData = {
   idDoc: IdDocData;
   optionalSSN: boolean;
   requireSSN: boolean;
+  requirePhone: boolean;
   ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
 };
 

@@ -18,10 +18,10 @@ const getDefaultKycAccess = (context: MachineContext) => {
     >
   > = {
     [CollectedKycDataOption.email]: true,
-    [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.name]: true,
     [CollectedKycDataOption.dob]: true,
     [CollectedKycDataOption.fullAddress]: true,
+    [CollectedKycDataOption.phoneNumber]: !!kycCollect?.requirePhone,
     [CollectedKycDataOption.ssn4]:
       kycCollect?.ssnKind === CollectedKycDataOption.ssn4,
     [CollectedKycDataOption.ssn9]:

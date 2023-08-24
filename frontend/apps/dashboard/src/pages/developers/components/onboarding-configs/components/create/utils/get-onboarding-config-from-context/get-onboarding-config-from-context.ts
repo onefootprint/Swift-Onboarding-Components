@@ -23,13 +23,21 @@ const getMustCollectDocumentCdo = (idDocData: IdDocData) => {
   return `document.${typeString}.${country}.${selfie}`;
 };
 
-export const getRequiredKycCollectFields = () => [
-  CollectedKycDataOption.email,
-  CollectedKycDataOption.phoneNumber,
-  CollectedKycDataOption.name,
-  CollectedKycDataOption.dob,
-  CollectedKycDataOption.fullAddress,
-];
+export const getRequiredKycCollectFields = (requirePhone?: boolean) => {
+  const fields = [CollectedKycDataOption.email];
+
+  if (requirePhone) {
+    fields.push(CollectedKycDataOption.phoneNumber);
+  }
+
+  fields.push(
+    CollectedKycDataOption.name,
+    CollectedKycDataOption.dob,
+    CollectedKycDataOption.fullAddress,
+  );
+
+  return fields;
+};
 
 export const getConditionallyRequiredKycFields = (
   kycCollect?: KycCollectData,
@@ -133,7 +141,7 @@ const getKycOnboardingConfigFromContext = (context: MachineContext) => {
 
   const optionalData = getOptionalKycCollectFields(kycCollect);
   const mustCollectData = [
-    ...getRequiredKycCollectFields(),
+    ...getRequiredKycCollectFields(context.kycCollect?.requirePhone),
     ...getConditionallyRequiredKycFields(kycCollect),
   ];
   if (
@@ -173,7 +181,7 @@ const getKybOnboardingConfigFromContext = (context: MachineContext) => {
 
   const mustCollectData = [
     ...mustCollectKybData,
-    ...getRequiredKycCollectFields(),
+    ...getRequiredKycCollectFields(context.kycCollect?.requirePhone),
     ...getConditionallyRequiredKycFields(kycCollect),
   ];
 
@@ -185,7 +193,7 @@ const getKybOnboardingConfigFromContext = (context: MachineContext) => {
   return { mustCollectData, canAccessData, optionalData };
 };
 
-const getOnboardingConfigFromContext = (
+const getOnboardingConfigDataFromContext = (
   context: MachineContext,
 ): Pick<
   OrgOnboardingConfigCreateRequest,
@@ -199,6 +207,21 @@ const getOnboardingConfigFromContext = (
     return getKycOnboardingConfigFromContext(context);
   }
   return { mustCollectData: [], canAccessData: [], optionalData: [] };
+};
+
+const getOnboardingConfigFromContext = (
+  context: MachineContext,
+): Pick<
+  OrgOnboardingConfigCreateRequest,
+  'mustCollectData' | 'canAccessData' | 'optionalData' | 'isNoPhoneFlow'
+> => {
+  const data = getOnboardingConfigDataFromContext(context);
+  const isNoPhoneFlow = !context.kycCollect?.requirePhone;
+
+  return {
+    ...data,
+    isNoPhoneFlow,
+  };
 };
 
 export default getOnboardingConfigFromContext;

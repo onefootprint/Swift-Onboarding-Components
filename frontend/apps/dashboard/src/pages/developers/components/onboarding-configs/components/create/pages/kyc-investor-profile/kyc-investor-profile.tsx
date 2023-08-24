@@ -33,7 +33,7 @@ const KycInvestorProfile = () => {
   const { handleSubmit, register, watch } = methods;
   const shouldCollect = watch('shouldCollect');
   const collectedData = [
-    ...getRequiredKycCollectFields(),
+    ...getRequiredKycCollectFields(kycCollect?.requirePhone),
     ...getConditionallyRequiredKycFields(kycCollect),
     ...getOptionalKycCollectFields(kycCollect),
   ];

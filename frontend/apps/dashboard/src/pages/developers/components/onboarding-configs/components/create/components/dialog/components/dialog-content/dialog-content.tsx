@@ -72,7 +72,7 @@ const DialogContent = ({ onClose }: DialogContentProps) => {
   };
 
   const handleCreate = () => {
-    const { mustCollectData, canAccessData, optionalData } =
+    const { mustCollectData, canAccessData, optionalData, isNoPhoneFlow } =
       getOnboardingConfigFromContext(state.context);
     mutation.mutate(
       {
@@ -80,6 +80,7 @@ const DialogContent = ({ onClose }: DialogContentProps) => {
         mustCollectData,
         canAccessData,
         optionalData,
+        isNoPhoneFlow,
       },
       {
         onSuccess: () => {

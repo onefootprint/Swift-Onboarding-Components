@@ -7,12 +7,14 @@ import {
 import { getRequiredKycCollectFields } from '../../../utils/get-onboarding-config-from-context';
 
 const getSummary = ({
+  requirePhone,
   requireSSN,
   ssnKind,
   nationality,
   idDocType,
   selfieRequired,
 }: {
+  requirePhone: boolean;
   requireSSN: boolean;
   ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
   nationality: CollectedKycDataOption.nationality;
@@ -20,7 +22,7 @@ const getSummary = ({
   selfieRequired: boolean;
 }) => {
   const collectedData: (CollectedDataOption | string)[] =
-    getRequiredKycCollectFields();
+    getRequiredKycCollectFields(requirePhone);
   if (requireSSN) {
     collectedData.push(
       ssnKind === CollectedKycDataOption.ssn4

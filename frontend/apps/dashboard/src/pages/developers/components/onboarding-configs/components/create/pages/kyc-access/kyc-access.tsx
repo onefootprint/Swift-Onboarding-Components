@@ -55,10 +55,12 @@ const KycAccess = () => {
           label={allT('cdo.email')}
           {...register(CollectedKycDataOption.email)}
         />
-        <Checkbox
-          label={allT('cdo.phone_number')}
-          {...register(CollectedKycDataOption.phoneNumber)}
-        />
+        {kycCollect?.requirePhone && (
+          <Checkbox
+            label={allT('cdo.phone_number')}
+            {...register(CollectedKycDataOption.phoneNumber)}
+          />
+        )}
         <Checkbox
           label={allT('cdo.name')}
           {...register(CollectedKycDataOption.name)}

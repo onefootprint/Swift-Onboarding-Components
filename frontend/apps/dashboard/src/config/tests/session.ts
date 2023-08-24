@@ -112,6 +112,21 @@ export const asAdminUserInLive = () => {
   });
 };
 
+export const asAdminUserInOrg = (orgName: string) => {
+  useStore.setState({
+    data: {
+      auth: '1',
+      user: baseUser,
+      org: {
+        ...baseOrg,
+        name: orgName,
+        isLive: true,
+      },
+      meta: baseMeta,
+    },
+  });
+};
+
 export const asUserWithScope = (scopeKinds: BasicRoleScopeKind[]) => {
   useStore.setState({
     data: {

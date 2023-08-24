@@ -15,6 +15,7 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import useSession from 'src/hooks/use-session';
 
 import getFormIdForState from '../../utils/get-form-id-for-state';
 import CollectedDataSummary from '../collected-data-summary';
@@ -23,6 +24,7 @@ import { useOnboardingConfigMachine } from '../machine-provider';
 import getSummary from './utils/get-summary';
 
 type FormData = {
+  requirePhone: boolean;
   requireSSN: boolean;
   optionalSSN: boolean;
   ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
@@ -40,8 +42,12 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create.kyc-collect-form',
   );
+  const {
+    data: { user, org },
+  } = useSession();
   const [state, send] = useOnboardingConfigMachine();
   const { kycCollect } = state.context;
+  const defaultRequestPhone = kycCollect?.requirePhone ?? true;
   const defaultRequestSSN = kycCollect?.requireSSN ?? true;
   const defaultOptionalSSN = kycCollect?.optionalSSN ?? false;
   const defaultSSNKind = kycCollect?.ssnKind ?? CollectedKycDataOption.ssn9;
@@ -51,6 +57,7 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
   const defaultSelfieRequired = kycCollect?.idDoc?.selfieRequired ?? false;
   const methods = useForm<FormData>({
     defaultValues: {
+      requirePhone: defaultRequestPhone,
       requireSSN: defaultRequestSSN,
       optionalSSN: defaultOptionalSSN,
       ssnKind: defaultSSNKind,
@@ -62,6 +69,7 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
   });
   const { register, handleSubmit, watch, control, setValue } = methods;
   const collectedData = getSummary({
+    requirePhone: watch('requirePhone'),
     requireSSN: watch('requireSSN'),
     ssnKind: watch('ssnKind'),
     nationality: watch('nationality'),
@@ -82,6 +90,7 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
     send({
       type: 'kycCollectSubmitted',
       payload: {
+        requirePhone: formData.requirePhone,
         ssnKind: skipSSN ? undefined : formData.ssnKind,
         [CollectedKycDataOption.nationality]:
           formData[CollectedKycDataOption.nationality],
@@ -96,6 +105,9 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
     });
   };
 
+  const shouldShowPhoneToggle =
+    user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs');
+
   return (
     <FormProvider {...methods}>
       <Form
@@ -105,6 +117,32 @@ const KycCollectForm = ({ title }: KycCollectFormProps) => {
       >
         <CollectedDataSummary collectedData={collectedData} />
         {title}
+        {shouldShowPhoneToggle && (
+          <>
+            <Section>
+              <Typography variant="label-3">{t('phone.title')}</Typography>
+              <Box sx={{ display: 'flex' }}>
+                <Controller
+                  control={control}
+                  name="requirePhone"
+                  defaultValue={defaultRequestPhone}
+                  render={({ field }) => (
+                    <Toggle
+                      checked={field.value}
+                      label={t('phone.request')}
+                      labelPlacement="right"
+                      onChange={e => {
+                        const { checked } = e.target;
+                        field.onChange(checked);
+                      }}
+                    />
+                  )}
+                />
+              </Box>
+            </Section>
+            <Divider variant="secondary" />
+          </>
+        )}
         <Section>
           <Typography variant="label-3">{t('ssn.title')}</Typography>
           <Box sx={{ display: 'flex' }}>
