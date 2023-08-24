@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
+  IcoBook16,
   IcoCode16,
   IcoFileText16,
   IcoSettings16,
@@ -14,6 +15,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useOrgSession from 'src/hooks/use-org-session';
+import useSession from 'src/hooks/use-session';
 
 import AssumeBanner from './components/assume-banner';
 import ManualReviewNavigator from './components/manual-review-navigator';
@@ -28,6 +30,9 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   const { t } = useTranslation('components.private-layout.nav');
   const router = useRouter();
   const { data } = useOrgSession();
+  const {
+    data: { user },
+  } = useSession();
 
   const routes = [
     { href: '/users', Icon: IcoUsers16, text: t('users') },
@@ -36,6 +41,20 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
     { href: '/developers', Icon: IcoCode16, text: t('developers') },
     { href: '/settings', Icon: IcoSettings16, text: t('settings') },
   ];
+  let displayRoutes = routes.slice();
+
+  if (user?.isFirmEmployee) {
+    displayRoutes = routes
+      .slice(0, 2)
+      .concat([
+        {
+          href: '/playbooks',
+          Icon: IcoBook16,
+          text: t('playbooks'),
+        },
+      ])
+      .concat(routes.slice(2, 5));
+  }
 
   return (
     <DefaultLayoutContainer
@@ -65,7 +84,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
             }}
           >
             <Tabs variant="pill">
-              {routes.map(({ href, Icon, text }) => (
+              {displayRoutes.map(({ href, Icon, text }) => (
                 <Tab
                   key={href}
                   as={Link}
