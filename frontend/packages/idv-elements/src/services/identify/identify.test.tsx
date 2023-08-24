@@ -364,57 +364,118 @@ describe('<Identify />', () => {
     describe('when there is an existing user vault', () => {
       beforeEach(() => {
         withOnboardingConfig(noPhoneOnboardingConfigFixture);
-        withIdentify(true, [ChallengeKind.email]);
-        withLoginChallenge(ChallengeKind.email);
         withIdentifyVerify();
       });
 
-      it('shows email challenge page', async () => {
-        const onDone = jest.fn();
-        renderIdentify({}, onDone);
-
-        await expectShimmer();
-        await fillIdentifyEmail();
-        await fillChallengePin();
-        await waitFor(() => {
-          expect(screen.getByText('Success!')).toBeInTheDocument();
+      describe('when only email challenge is available', () => {
+        beforeEach(() => {
+          withIdentify(true, [ChallengeKind.email]);
+          withLoginChallenge(ChallengeKind.email);
         });
-        await waitFor(() => {
-          expect(onDone).toHaveBeenCalled();
+
+        it('shows email challenge page', async () => {
+          const onDone = jest.fn();
+          renderIdentify({}, onDone);
+
+          await expectShimmer();
+          await fillIdentifyEmail();
+          await fillChallengePin();
+          await waitFor(() => {
+            expect(screen.getByText('Success!')).toBeInTheDocument();
+          });
+          await waitFor(() => {
+            expect(onDone).toHaveBeenCalled();
+          });
+        });
+
+        it('can bootstrap', async () => {
+          const onDone = jest.fn();
+          const email = 'piip@onefootprint.com';
+          renderIdentify({ email }, onDone);
+
+          await expectShimmer();
+          await bootstrapExistingUser();
+          await waitFor(() => {
+            expect(onDone).toHaveBeenCalled();
+          });
+        });
+
+        it('can resend email challenge', async () => {
+          const onDone = jest.fn();
+          renderIdentify({}, onDone);
+
+          await expectShimmer();
+          await fillIdentifyEmail();
+
+          // Wait until the login challenge request succeeds
+          await waitFor(() => {
+            expect(screen.getByRole('presentation')).toHaveAttribute(
+              'data-pending',
+              'false',
+            );
+          });
+          await userEvent.click(screen.getByText('Resend code'));
+          await waitFor(() => {
+            expect(
+              screen.getByText('We sent you a new code.'),
+            ).toBeInTheDocument();
+          });
         });
       });
 
-      it('can bootstrap', async () => {
-        const onDone = jest.fn();
-        const email = 'piip@onefootprint.com';
-        renderIdentify({ email }, onDone);
-
-        await expectShimmer();
-        await bootstrapExistingUser();
-        await waitFor(() => {
-          expect(onDone).toHaveBeenCalled();
+      describe('when other challenges are available', () => {
+        beforeEach(() => {
+          withIdentify(true, [ChallengeKind.sms]);
+          withLoginChallenge(ChallengeKind.sms);
         });
-      });
 
-      it('can resend email challenge', async () => {
-        const onDone = jest.fn();
-        renderIdentify({}, onDone);
+        it('shows sms challenge page', async () => {
+          const onDone = jest.fn();
+          renderIdentify({}, onDone);
 
-        await expectShimmer();
-        await fillIdentifyEmail();
-
-        // Wait until the login challenge request succeeds
-        await waitFor(() => {
-          expect(screen.getByRole('presentation')).toHaveAttribute(
-            'data-pending',
-            'false',
-          );
+          await expectShimmer();
+          await fillIdentifyEmail();
+          await fillChallengePin();
+          await waitFor(() => {
+            expect(screen.getByText('Success!')).toBeInTheDocument();
+          });
+          await waitFor(() => {
+            expect(onDone).toHaveBeenCalled();
+          });
         });
-        await userEvent.click(screen.getByText('Resend code'));
-        await waitFor(() => {
-          expect(
-            screen.getByText('We sent you a new code.'),
-          ).toBeInTheDocument();
+
+        it('can bootstrap', async () => {
+          const onDone = jest.fn();
+          const email = 'piip@onefootprint.com';
+          renderIdentify({ email }, onDone);
+
+          await expectShimmer();
+          await bootstrapExistingUser();
+          await waitFor(() => {
+            expect(onDone).toHaveBeenCalled();
+          });
+        });
+
+        it('can resend sms challenge', async () => {
+          const onDone = jest.fn();
+          renderIdentify({}, onDone);
+
+          await expectShimmer();
+          await fillIdentifyEmail();
+
+          // Wait until the login challenge request succeeds
+          await waitFor(() => {
+            expect(screen.getByRole('presentation')).toHaveAttribute(
+              'data-pending',
+              'false',
+            );
+          });
+          await userEvent.click(screen.getByText('Resend code'));
+          await waitFor(() => {
+            expect(
+              screen.getByText('We sent you a new code.'),
+            ).toBeInTheDocument();
+          });
         });
       });
     });
@@ -422,7 +483,7 @@ describe('<Identify />', () => {
     describe('when the user vault is new', () => {
       beforeEach(() => {
         withOnboardingConfig(noPhoneOnboardingConfigFixture);
-        withIdentify(false);
+        withIdentify(false, []);
         withSignupChallenge(ChallengeKind.email);
         withIdentifyVerify();
       });

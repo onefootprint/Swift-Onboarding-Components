@@ -5,6 +5,7 @@ import { getCanChallengeBiometrics } from '../biometrics';
 import { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldBootstrap from './utils/should-bootstrap';
+import shouldChallengeEmail from './utils/should-challenge-email';
 import shouldSelectSandboxOutcome from './utils/should-select-sandbox-outcome';
 
 export type IdentifyMachineArgs = {
@@ -127,7 +128,11 @@ const createIdentifyMachine = ({
                 actions: ['assignIdentifySuccessResult'],
                 description:
                   'Initiate a signup challenge for the email in no-phone flows',
-                cond: context => !!context.config?.isNoPhoneFlow,
+                cond: (context, event) =>
+                  shouldChallengeEmail(
+                    !!context.config?.isNoPhoneFlow,
+                    event.payload.availableChallengeKinds,
+                  ),
               },
               {
                 target: 'biometricChallenge',
@@ -157,7 +162,11 @@ const createIdentifyMachine = ({
                 actions: ['assignIdentifySuccessResult'],
                 description:
                   'Do not collect phone number and just initiate email OTP',
-                cond: context => !!context.config?.isNoPhoneFlow,
+                cond: (context, event) =>
+                  shouldChallengeEmail(
+                    !!context.config?.isNoPhoneFlow,
+                    event.payload.availableChallengeKinds,
+                  ),
               },
               {
                 target: 'phoneIdentification',
