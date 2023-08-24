@@ -10,7 +10,7 @@ import {
   basicInformationFields,
   Kind,
   PersonalInformationAndDocs,
-  usResidentFields,
+  useResidentFormFields,
 } from '@/playbooks/utils/machine/types';
 
 import CollectedInformation from './components/collected-information';
@@ -43,7 +43,7 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
     basicInformationFields.includes(field as keyof PersonalInformationAndDocs),
   );
   const usResidentFormValues = formValues.filter(field =>
-    usResidentFields.includes(field as keyof PersonalInformationAndDocs),
+    useResidentFormFields.includes(field as keyof PersonalInformationAndDocs),
   );
 
   return (

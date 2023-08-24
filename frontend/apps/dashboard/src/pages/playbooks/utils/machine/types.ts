@@ -153,7 +153,8 @@ export const basicInformationFields: string[] = [
   CollectedKycDataOption.fullAddress,
 ];
 
-export const usResidentFields = [
+// used within Playbook forms before submitting
+export const useResidentFormFields = [
   CollectedKycDataOption.ssn9,
   CollectedKycDataOption.ssn4,
   CollectedDocumentDataOption.document,
@@ -162,6 +163,14 @@ export const usResidentFields = [
   'idDocKind',
   'ssnKind',
   'ssn',
+  // note: internal nationality corresponds to "Legal status in the US"
   CollectedKycDataOption.nationality,
-  // tk legal status
+];
+
+// used to display
+export const usResidentDisplayFields = [
+  CollectedDocumentDataOption.document,
+  'selfie',
+  CollectedKycDataOption.nationality,
+  'ssn',
 ];

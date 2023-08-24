@@ -34,4 +34,24 @@ describe('<CollectionAndScopes />', () => {
     expect(screen.getByText('Identity card and')).toBeInTheDocument();
     expect(screen.getByText('2 more')).toBeInTheDocument();
   });
+
+  it('should render selfie even if no document or selfie option', () => {
+    renderCollectionAndScopes({
+      playbook: {
+        ...playbookFixture,
+        mustCollectData: [],
+      },
+    });
+    expect(screen.getByText('Selfie')).toBeInTheDocument();
+  });
+
+  it('should render SSN even if none included in mustCollectData', () => {
+    renderCollectionAndScopes({
+      playbook: {
+        ...playbookFixture,
+        mustCollectData: [],
+      },
+    });
+    expect(screen.getByText('SSN')).toBeInTheDocument();
+  });
 });

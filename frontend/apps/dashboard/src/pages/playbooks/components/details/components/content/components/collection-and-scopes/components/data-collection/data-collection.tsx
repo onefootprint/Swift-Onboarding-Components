@@ -6,11 +6,16 @@ import React from 'react';
 import DisplayValue from './components/display-value';
 
 export type DataCollectionProps = {
-  fields: string[];
+  displayFields: string[];
+  mustCollectData: string[];
   title: string;
 };
 
-const DataCollection = ({ fields, title }: DataCollectionProps) => {
+const DataCollection = ({
+  displayFields,
+  title,
+  mustCollectData,
+}: DataCollectionProps) => {
   const { t } = useTranslation(
     'pages.playbooks.table.details.content.data-collection',
   );
@@ -19,6 +24,9 @@ const DataCollection = ({ fields, title }: DataCollectionProps) => {
     if (field.includes('document')) {
       return t('document');
     }
+    if (field.includes('ssn')) {
+      return t('ssn');
+    }
     return t(field);
   };
 
@@ -26,7 +34,7 @@ const DataCollection = ({ fields, title }: DataCollectionProps) => {
     <Container>
       <Typography variant="label-3">{title}</Typography>
       <ValuesContainer>
-        {fields.map(field => (
+        {displayFields.map(field => (
           <ItemContainer key={field}>
             <Typography
               variant="body-3"
@@ -36,7 +44,7 @@ const DataCollection = ({ fields, title }: DataCollectionProps) => {
               {getLabel(field)}
             </Typography>
             <ValueContainer>
-              <DisplayValue field={field} attributes={fields} />
+              <DisplayValue field={field} mustCollectData={mustCollectData} />
             </ValueContainer>
           </ItemContainer>
         ))}

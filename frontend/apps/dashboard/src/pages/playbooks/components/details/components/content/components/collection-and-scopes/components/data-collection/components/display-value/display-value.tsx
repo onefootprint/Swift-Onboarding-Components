@@ -1,22 +1,51 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
-import { SupportedIdDocTypes } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  SupportedIdDocTypes,
+} from '@onefootprint/types';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import IdDocDisplay from 'src/pages/playbooks/components/id-doc-display';
 
 export type DisplayValueProps = {
   field: string;
-  attributes: string[];
+  mustCollectData: string[];
 };
 
-const DisplayValue = ({ field, attributes }: DisplayValueProps) => {
-  if (field.match('document')) {
+const DisplayValue = ({ field, mustCollectData }: DisplayValueProps) => {
+  const { t } = useTranslation(
+    'pages.playbooks.table.details.content.data-collection',
+  );
+
+  if (field === 'document') {
+    const documentString = mustCollectData.find(a => a.match('document'));
     const idDocKinds = Object.values(SupportedIdDocTypes).filter(k =>
-      field.includes(k),
+      documentString?.includes(k),
     );
-    return <IdDocDisplay idDocKind={idDocKinds} threshold={2} />;
+    if (idDocKinds.length > 0) {
+      return <IdDocDisplay idDocKind={idDocKinds} threshold={2} />;
+    }
+    return <IcoCloseSmall24 testID="close-icon" />;
+  }
+  if (field.match('selfie')) {
+    const documentString = mustCollectData.find(a => a.match('document'));
+    if (documentString?.includes('require_selfie')) {
+      return <IcoCheck24 testID="check-icon" />;
+    }
+    return <IcoCloseSmall24 testID="close-icon" />;
+  }
+  if (field === 'ssn') {
+    if (mustCollectData.includes(CollectedKycDataOption.ssn9)) {
+      return <Typography variant="body-3">{t('full')}</Typography>;
+    }
+    if (mustCollectData.includes(CollectedKycDataOption.ssn4)) {
+      return <Typography variant="body-3">{t('last4')}</Typography>;
+    }
+    return <IcoCloseSmall24 testID="close-icon" />;
   }
 
-  if (attributes.includes(field)) {
+  if (mustCollectData.includes(field)) {
     return <IcoCheck24 testID="check-icon" />;
   }
   return <IcoCloseSmall24 testID="close-icon" />;

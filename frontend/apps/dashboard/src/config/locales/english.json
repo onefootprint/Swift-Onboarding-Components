@@ -1174,6 +1174,8 @@
               "full_address": "Address",
               "nationality": "Legal status in the U.S.",
               "ssn": "SSN",
+              "full": "Full",
+              "last4": "Last 4 digits",
               "document": "ID document scan",
               "selfie": "Selfie",
               "us-residents": "U.S. residents"

@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 
 import {
   basicInformationFields,
-  usResidentFields,
+  usResidentDisplayFields,
 } from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
@@ -23,14 +23,6 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
   ];
   const [segment, setSegment] = useState(options[0].value);
   const { mustCollectData } = playbook;
-  const basicInformationValues = mustCollectData.filter(field =>
-    basicInformationFields.includes(field as keyof OnboardingConfig),
-  );
-  const usResidentValues = mustCollectData.filter(
-    field =>
-      usResidentFields.includes(field as keyof OnboardingConfig) ||
-      field.match('document'),
-  );
 
   const handleChange = (value: string) => {
     setSegment(value);
@@ -54,11 +46,13 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
       {segment === 'data' && (
         <>
           <DataCollection
-            fields={basicInformationValues}
+            displayFields={basicInformationFields}
+            mustCollectData={mustCollectData}
             title={t('data-collection.basic-information')}
           />
           <DataCollection
-            fields={usResidentValues}
+            displayFields={usResidentDisplayFields}
+            mustCollectData={mustCollectData}
             title={t('data-collection.us-residents')}
           />
         </>
