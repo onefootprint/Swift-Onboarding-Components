@@ -1293,7 +1293,8 @@
               "all-business-info": "All business information",
               "beneficial-owners": "Beneficial owners",
               "basic-information": "Basic information",
-              "us-residents": "U.S. residents"
+              "us-residents": "U.S. residents",
+              "nationality": "Legal status in the U.S."
             }
           },
           "form": {
@@ -1357,7 +1358,7 @@
                 "phone_number": "Phone number",
                 "name": "First & last name",
                 "dob": "Date of birth",
-                "nationality": "Nationality",
+                "nationality": "Legal status in the U.S.",
                 "full_address": "Address",
                 "idDoc": "ID document scan",
                 "idDocKind": "ID document scan",

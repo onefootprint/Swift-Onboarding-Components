@@ -30,7 +30,7 @@ describe('<Preview />', () => {
     expect(screen.getByText('Phone number')).toBeInTheDocument();
     expect(screen.getByText('Date of birth')).toBeInTheDocument();
     expect(screen.getByText('Address')).toBeInTheDocument();
-    expect(screen.getByText('Nationality')).toBeInTheDocument();
+    expect(screen.getByText('Legal status in the U.S.')).toBeInTheDocument();
     expect(screen.getByText('SSN')).toBeInTheDocument();
     expect(screen.getByText('ID document scan')).toBeInTheDocument();
   });

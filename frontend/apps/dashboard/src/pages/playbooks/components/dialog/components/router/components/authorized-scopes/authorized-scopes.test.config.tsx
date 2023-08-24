@@ -13,10 +13,12 @@ import AuthorizedScopes from './authorized-scopes';
 
 export type AuthorizedScopesWithContextProps = {
   kind: Kind;
+  submissionLoading?: boolean;
 };
 
 const AuthorizedScopesWithContext = ({
   kind,
+  submissionLoading = false,
 }: AuthorizedScopesWithContextProps) => {
   const formMethods = useForm<AuthorizedScopesFormData>({
     defaultValues: defaultAuthorizedScopesValues,
@@ -31,6 +33,7 @@ const AuthorizedScopesWithContext = ({
         playbook={playbook}
         onBack={() => {}}
         onSubmit={() => {}}
+        submissionLoading={submissionLoading}
       />
     </FormProvider>
   );

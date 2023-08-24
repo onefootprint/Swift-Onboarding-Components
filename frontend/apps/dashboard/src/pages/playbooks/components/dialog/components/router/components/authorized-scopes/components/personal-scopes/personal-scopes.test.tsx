@@ -78,13 +78,17 @@ describe('<PersonalScopes />', () => {
 
   it('should not show nationality if not collecting', () => {
     renderPersonalScopes({ startingPersonalValues: { nationality: false } });
-    const nationality = screen.queryByRole('checkbox', { name: 'Nationality' });
+    const nationality = screen.queryByRole('checkbox', {
+      name: 'Legal status in the U.S.',
+    });
     expect(nationality).not.toBeInTheDocument();
   });
 
   it('should show nationality if collecting', () => {
     renderPersonalScopes({ startingPersonalValues: { nationality: true } });
-    const nationality = screen.getByRole('checkbox', { name: 'Nationality' });
+    const nationality = screen.getByRole('checkbox', {
+      name: 'Legal status in the U.S.',
+    });
     expect(nationality).toBeInTheDocument();
   });
 

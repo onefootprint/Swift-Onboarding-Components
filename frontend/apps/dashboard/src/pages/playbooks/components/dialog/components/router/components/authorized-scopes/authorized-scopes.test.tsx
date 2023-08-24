@@ -7,8 +7,16 @@ import AuthorizedScopesWithContext, {
   AuthorizedScopesWithContextProps,
 } from './authorized-scopes.test.config';
 
-const renderAuthorizedScopes = ({ kind }: AuthorizedScopesWithContextProps) => {
-  customRender(<AuthorizedScopesWithContext kind={kind} />);
+const renderAuthorizedScopes = ({
+  kind,
+  submissionLoading,
+}: AuthorizedScopesWithContextProps) => {
+  customRender(
+    <AuthorizedScopesWithContext
+      kind={kind}
+      submissionLoading={submissionLoading}
+    />,
+  );
 };
 describe('<AuthorizedScopes />', () => {
   it('should show BusinessScopes when KYB', () => {
@@ -25,5 +33,20 @@ describe('<AuthorizedScopes />', () => {
       screen.queryByRole('checkbox', { name: 'All business information' }),
     ).not.toBeInTheDocument();
     expect(screen.queryByText('Beneficial owners')).not.toBeInTheDocument();
+  });
+
+  it('shows regular "create playbook" button when not loading', () => {
+    renderAuthorizedScopes({ kind: Kind.KYC, submissionLoading: false });
+    expect(
+      screen.getByRole('button', { name: 'Create Playbook' }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows loading state if mutation is loading', () => {
+    renderAuthorizedScopes({ kind: Kind.KYC, submissionLoading: true });
+    const createButton = screen.getByRole('progressbar', {
+      name: 'Loading...',
+    });
+    expect(createButton).toBeInTheDocument();
   });
 });

@@ -70,6 +70,7 @@ const Header = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[2]};
+    padding-top: ${theme.spacing[5]};
   `};
 `;
 

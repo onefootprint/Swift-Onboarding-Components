@@ -75,7 +75,7 @@ export const defaultPlaybookValuesKYC: PlaybookFormData = {
     email: true,
     [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.dob]: true,
-    [CollectedKycDataOption.nationality]: true,
+    [CollectedKycDataOption.nationality]: false,
     [CollectedKycDataOption.fullAddress]: true,
     ssn: true,
     idDoc: false,

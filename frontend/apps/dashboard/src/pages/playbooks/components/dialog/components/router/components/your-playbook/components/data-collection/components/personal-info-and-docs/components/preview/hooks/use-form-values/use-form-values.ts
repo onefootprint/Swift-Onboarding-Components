@@ -22,10 +22,7 @@ const useFormValues = () => {
     if (field === 'ssnOptional') {
       return false;
     }
-    if (
-      !personalInfoAndDocs.idDoc &&
-      (field === 'idDocKind' || field === 'selfie')
-    ) {
+    if (!personalInfoAndDocs.idDoc && field === 'idDocKind') {
       return false;
     }
     if (

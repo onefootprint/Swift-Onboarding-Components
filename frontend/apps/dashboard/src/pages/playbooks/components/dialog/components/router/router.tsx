@@ -148,6 +148,7 @@ const Router = ({ onClose }: RouterProps) => {
                 authorizedScopes: data,
               });
             }}
+            submissionLoading={mutation.isLoading}
           />
         )}
       </Content>
@@ -159,6 +160,7 @@ const StepperContainer = styled.div`
   ${({ theme }) => css`
     white-space: nowrap;
     margin-left: ${theme.spacing[10]};
+    position: fixed;
   `}
 `;
 

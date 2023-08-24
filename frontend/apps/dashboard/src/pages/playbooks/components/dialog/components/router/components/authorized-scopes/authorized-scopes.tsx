@@ -19,6 +19,7 @@ type AuthorizedScopesProps = {
   playbook: PlaybookFormData;
   kind?: Kind;
   onSubmit: (data: AuthorizedScopesFormData) => void;
+  submissionLoading: boolean;
 };
 
 const AuthorizedScopes = ({
@@ -26,6 +27,7 @@ const AuthorizedScopes = ({
   playbook,
   kind = Kind.KYC,
   onSubmit,
+  submissionLoading,
 }: AuthorizedScopesProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.data-collection.authorized-scopes',
@@ -41,7 +43,7 @@ const AuthorizedScopes = ({
   return (
     <Container>
       <Header>
-        <Typography variant="label-2">{t('title')}</Typography>
+        <Typography variant="label-1">{t('title')}</Typography>
         <Typography variant="body-3">{t('subtitle')}</Typography>
       </Header>
       <FormProvider {...formMethods}>
@@ -52,7 +54,7 @@ const AuthorizedScopes = ({
             <Button size="compact" variant="secondary" onClick={onBack}>
               {t('back')}
             </Button>
-            <Button size="compact" type="submit">
+            <Button loading={submissionLoading} size="compact" type="submit">
               {t('create-playbook')}
             </Button>
           </ButtonContainer>

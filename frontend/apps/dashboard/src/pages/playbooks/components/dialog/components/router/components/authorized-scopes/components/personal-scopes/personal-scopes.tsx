@@ -79,7 +79,7 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
             ))}
           {nationality && (
             <Checkbox
-              label={allT('cdo.nationality')}
+              label={t('nationality')}
               {...register(CollectedKycDataOption.nationality)}
             />
           )}

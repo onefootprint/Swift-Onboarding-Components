@@ -217,4 +217,37 @@ describe('<DisplayValue />', () => {
     });
     expect(screen.getByTestId('check-icon')).toBeInTheDocument();
   });
+
+  it('should render close icon for selfie if id doc is false', () => {
+    renderDisplayValue({
+      field: 'selfie',
+      personalInfoAndDocs: {
+        idDoc: false,
+      },
+    });
+    expect(screen.getByTestId('close-icon')).toBeInTheDocument();
+  });
+
+  it('should render close icon for selfie if id doc is true but id doc kind is empty', () => {
+    renderDisplayValue({
+      field: 'selfie',
+      personalInfoAndDocs: {
+        idDoc: true,
+        idDocKind: [],
+      },
+    });
+    expect(screen.getByTestId('close-icon')).toBeInTheDocument();
+  });
+
+  it('should render check icon for selfie if id doc is true, id doc kind is non-empty, and selfie is true', () => {
+    renderDisplayValue({
+      field: 'selfie',
+      personalInfoAndDocs: {
+        idDoc: true,
+        idDocKind: [SupportedIdDocTypes.driversLicense],
+        selfie: true,
+      },
+    });
+    expect(screen.getByTestId('check-icon')).toBeInTheDocument();
+  });
 });

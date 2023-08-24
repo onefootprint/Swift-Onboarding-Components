@@ -17,12 +17,12 @@ const DisplayValue = ({ field, personalInfoAndDocs }: DisplayValueProps) => {
   );
 
   const value = personalInfoAndDocs[field];
+  const { idDocKind, idDoc } = personalInfoAndDocs;
 
   if (field === 'ssnKind') {
     return <Typography variant="body-3">{t(`preview.${value}`)}</Typography>;
   }
   if (field === 'idDocKind') {
-    const { idDocKind } = personalInfoAndDocs;
     const remainingIdDocTypes = idDocKind.slice(2);
     const remainingDocString = remainingIdDocTypes
       .map(k => t(`preview.${k as string}`))
@@ -51,6 +51,9 @@ const DisplayValue = ({ field, personalInfoAndDocs }: DisplayValueProps) => {
       .map(k => t(`preview.${k as string}`))
       .join(', ');
     return <Typography variant="body-3">{possibleIdDocs}</Typography>;
+  }
+  if (field === 'selfie' && (!idDoc || !idDocKind.length)) {
+    return <IcoCloseSmall24 testID="close-icon" />;
   }
   if (typeof value === 'boolean') {
     if (value) {
