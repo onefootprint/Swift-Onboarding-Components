@@ -47,7 +47,7 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
       </Tabs>
 
       {segment === 'data' && (
-        <SectionsContainer>
+        <>
           <DataCollection
             displayFields={basicInformationFields}
             mustCollectData={mustCollectData}
@@ -58,7 +58,7 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
             mustCollectData={mustCollectData}
             title={t('data-collection.us-residents')}
           />
-        </SectionsContainer>
+        </>
       )}
       {segment === 'authorized-scopes' && (
         <AuthorizedScopes canAccessData={canAccessData} />
@@ -72,14 +72,6 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[8]};
-  `}
-`;
-
-const SectionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
   `}
 `;
 
