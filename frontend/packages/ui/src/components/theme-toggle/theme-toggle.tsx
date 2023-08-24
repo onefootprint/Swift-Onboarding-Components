@@ -1,3 +1,4 @@
+import { primitives } from '@onefootprint/design-tokens';
 import { IcoMoon16, IcoSun16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { motion } from 'framer-motion';
@@ -128,8 +129,8 @@ const Button = styled(motion.button)<{
 }>`
   ${({ theme, checked }) => css`
     cursor: pointer;
-    background: ${theme.backgroundColor.secondary};
-    border-color: ${theme.backgroundColor.secondary};
+    background: ${theme.backgroundColor.senary};
+    border-color: ${theme.backgroundColor.senary};
     border-radius: ${theme.borderRadius.full};
     border-style: solid;
     border-width: ${theme.borderWidth[1]};
@@ -142,8 +143,8 @@ const Button = styled(motion.button)<{
 
     @media (hover: hover) {
       &:hover {
-        background-color: ${theme.backgroundColor.senary};
-        border-color: ${theme.backgroundColor.senary};
+        background-color: ${checked ? primitives.Gray600 : primitives.Gray200};
+        border-color: ${checked ? primitives.Gray600 : primitives.Gray200};
       }
     }
   `}
