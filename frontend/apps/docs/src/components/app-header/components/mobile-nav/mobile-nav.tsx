@@ -1,23 +1,25 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoClose24, IcoMenu24, LogoFpCompact } from '@onefootprint/icons';
+import {
+  IcoClose24,
+  IcoMenu24,
+  ThemedLogoFpCompact,
+} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, createFontStyles, LinkButton, media } from '@onefootprint/ui';
+import { Box, createFontStyles, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import type { PageNavigation } from 'src/types/page';
 import { useLockedBody } from 'usehooks-ts';
 
-import type { LinkItem } from '../../app-header.types';
 import PageNav from './components/page-nav';
 
 type MobileNavProps = {
   navigation?: PageNavigation;
-  links: LinkItem[];
 };
 
-const MobileNav = ({ navigation, links }: MobileNavProps) => {
+const MobileNav = ({ navigation }: MobileNavProps) => {
   const { t } = useTranslation('components.header');
   const [isExpanded, setIsExpanded] = useState(false);
   const [animateNavMenu] = useAutoAnimate<HTMLDivElement>();
@@ -51,7 +53,7 @@ const MobileNav = ({ navigation, links }: MobileNavProps) => {
           )}
           <MainLinks>
             <LogoLink href={FRONTPAGE_BASE_URL} aria-label={t('nav.home')}>
-              <LogoFpCompact />
+              <ThemedLogoFpCompact color="primary" />
             </LogoLink>
             <Divider />
             <DocumentationLink href="/">
@@ -59,18 +61,6 @@ const MobileNav = ({ navigation, links }: MobileNavProps) => {
             </DocumentationLink>
           </MainLinks>
         </NavTriggerContainer>
-        {links.length &&
-          links.map(({ href, text, Icon }) => (
-            <LinkButton
-              href={href}
-              iconComponent={Icon}
-              key={text}
-              size="compact"
-              target="_blank"
-            >
-              {text}
-            </LinkButton>
-          ))}
       </Header>
       <Box ref={animateNavMenu}>
         {isExpanded && navigation && (

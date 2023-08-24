@@ -2,8 +2,7 @@ import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoHelp24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Button, media, Typography } from '@onefootprint/ui';
-import Image from 'next/image';
+import { Button, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import ContactDialog from 'src/components/contact-dialog';
@@ -44,12 +43,6 @@ const Banner = () => {
           {t('contact-us')}
         </Button>
       </Buttons>
-      <PiiIllustration
-        src="/introduction/pii-resting.png"
-        alt={t('pii-alt')}
-        width={621}
-        height={231}
-      />
       <ContactDialog
         url={GET_FORM_URL}
         open={showDialog}
@@ -62,7 +55,7 @@ const Banner = () => {
 const Container = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[7]};
-    background-color: #edf3fc;
+    background-color: ${theme.backgroundColor.secondary};
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[7]};
@@ -96,19 +89,6 @@ const Buttons = styled.div`
     a {
       text-decoration: none;
     }
-  `}
-`;
-
-const PiiIllustration = styled(Image)`
-  display: none;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  height: 81px;
-  width: 237px;
-
-  ${media.greaterThan('md')`
-    display: block;
   `}
 `;
 

@@ -1,6 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import Image from 'next/image';
+import { useTheme } from 'next-themes';
 import React from 'react';
 
 export type OptionProps = {
@@ -10,14 +11,21 @@ export type OptionProps = {
   selected: boolean;
 };
 
-const Option = ({ name, image, selected, onClick }: OptionProps) => (
-  <OptionContainer data-selected={selected} onClick={onClick}>
-    <Image src={image} width={120} height={97} alt={name} />
-    <Typography color="secondary" variant="body-3">
-      {name}
-    </Typography>
-  </OptionContainer>
-);
+const Option = ({ name, image, selected, onClick }: OptionProps) => {
+  const { theme } = useTheme();
+  const parts = image.split('/');
+  const filename = parts.pop();
+  const themedPath = `${parts.join('/')}/${theme}/${filename}`;
+
+  return (
+    <OptionContainer data-selected={selected} onClick={onClick}>
+      <Image src={themedPath} width={120} height={97} alt={name} />
+      <Typography color="secondary" variant="body-3">
+        {name}
+      </Typography>
+    </OptionContainer>
+  );
+};
 
 const OptionContainer = styled.button`
   ${({ theme }) => css`

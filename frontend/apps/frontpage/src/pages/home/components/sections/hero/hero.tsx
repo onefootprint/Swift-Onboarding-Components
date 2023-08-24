@@ -11,6 +11,7 @@ import {
 } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
+/* eslint-disable import/no-extraneous-dependencies */
 import ContactDialog from 'src/components/contact-dialog';
 import LinkingButton from 'src/components/linking-button';
 

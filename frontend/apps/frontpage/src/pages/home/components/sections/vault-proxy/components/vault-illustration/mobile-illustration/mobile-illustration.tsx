@@ -3,8 +3,8 @@ import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 
+import VerticalBeam from '../../../../../vertical-beam';
 import Knob from '../components/knob';
-import VerticalBeam from '../components/vertical-beam';
 
 const values = {
   cc: {

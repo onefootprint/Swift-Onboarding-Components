@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import HorizontalBeam from 'src/pages/home/components/horizontal-beam/horizontal-beam';
 
-import VerticalBeam from '../../../vault-proxy/components/vault-illustration/components/vertical-beam';
+import VerticalBeam from '../../../../vertical-beam';
 
 type BackgroundProps = {
   className?: string;

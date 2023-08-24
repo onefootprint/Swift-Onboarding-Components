@@ -18,10 +18,6 @@
       "nav": {
         "home": "Go to the home page",
         "documentation": "Documentation",
-        "docs": {
-          "mobile": "API",
-          "desktop": "API Reference"
-        },
         "nav-toggle": {
           "open": "Open navigation",
           "close": "Close navigation"
@@ -75,18 +71,24 @@
         "submit-error": "Oops, something went wrong. Please try again."
       }
     },
-    "need-help": {
-      "label": "Need help?",
-      "dialog": {
-        "title": "Need help?",
-        "description": "We're more than happy to help! Please let us know what you need help with and we'll get back to you as soon as possible."
-      }
-    },
-    "send-feedback": {
-      "label": "Send feedback",
-      "dialog": {
-        "title": "Send feedback",
-        "description": "We'd love to hear your thoughts on our docs!"
+    "side-navigation": {
+      "need-help": {
+        "label": "Need help?",
+        "dialog": {
+          "title": "Need help?",
+          "description": "We're more than happy to help! Please let us know what you need help with and we'll get back to you as soon as possible."
+        }
+      },
+      "send-feedback": {
+        "label": "Send feedback",
+        "dialog": {
+          "title": "Send feedback",
+          "description": "We'd love to hear your thoughts on our docs!"
+        }
+      },
+      "api-reference": {
+        "label": "API Reference",
+        "theme": "Theme"
       }
     }
   },

@@ -9,9 +9,10 @@ type SectionCardProps = {
   title: string;
   subtitle: string;
   icon?: Icon;
-  imageSrc: string;
+  imageSrc?: string;
   gridArea?: string;
   href: string;
+  children?: React.ReactNode;
 };
 
 const SectionCard = ({
@@ -20,6 +21,7 @@ const SectionCard = ({
   icon: Icon,
   imageSrc,
   gridArea,
+  children,
   href,
 }: SectionCardProps) => {
   const renderedIcon = Icon && <Icon />;
@@ -27,7 +29,10 @@ const SectionCard = ({
   return (
     <Container href={href} gridArea={gridArea}>
       <IllustrationContainer>
-        <Image src={imageSrc} alt={title} height={194} width={350} />
+        {children ||
+          (imageSrc && (
+            <Image src={imageSrc} alt={title} height={194} width={350} />
+          ))}
       </IllustrationContainer>
       <TextContainer>
         <TitleContainer>
@@ -49,11 +54,6 @@ const Container = styled(Link)<{ gridArea?: string }>`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     grid-area: ${gridArea};
     text-decoration: none;
-    transition: all 0.2s ease-in-out;
-
-    img {
-      transition: all 0.3s ease-in-out;
-    }
 
     @media (hover: hover) {
       &:hover {

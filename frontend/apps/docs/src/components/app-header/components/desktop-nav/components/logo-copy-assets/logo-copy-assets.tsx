@@ -1,6 +1,6 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoDownload16, LogoFpCompact } from '@onefootprint/icons';
+import { IcoDownload16, ThemedLogoFpDefault } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Dropdown, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
@@ -64,7 +64,7 @@ const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
           onClick={handleButtonClick}
           onContextMenu={handleButtonContextMenu}
         >
-          <LogoFpCompact />
+          <ThemedLogoFpDefault color="primary" />
         </Trigger>
       </Dropdown.Trigger>
       <Dropdown.Content

@@ -5,6 +5,7 @@ import { Button, Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import React, { useState } from 'react';
+/* eslint-disable import/no-extraneous-dependencies */
 import ContactDialog from 'src/components/contact-dialog';
 
 import Illustration from './components/illustration/illustration';

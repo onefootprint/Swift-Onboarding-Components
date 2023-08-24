@@ -1,5 +1,6 @@
-import styled from '@onefootprint/styled';
+import styled, { css } from '@onefootprint/styled';
 import Image from 'next/image';
+import { useTheme } from 'next-themes';
 import React from 'react';
 
 type ImgProps = {
@@ -10,20 +11,32 @@ type ImgProps = {
   width: number;
 };
 
-const img = ({ alt, src, title, width, height }: ImgProps) => (
-  <StyledImage
-    alt={alt}
-    src={src}
-    title={title}
-    width={width}
-    height={height}
-  />
-);
+const img = ({ alt, src, title, width, height }: ImgProps) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { theme } = useTheme();
+  const parts = src.split('/');
+  const filename = parts.pop();
+  const themedPath = `${parts.join('/')}/${theme}/${filename}`;
+
+  return (
+    <StyledImage
+      alt={alt}
+      src={themedPath}
+      title={title}
+      width={width}
+      key={themedPath}
+      height={height}
+    />
+  );
+};
 
 const StyledImage = styled(Image)`
-  object-fit: contain;
-  max-width: 100%;
-  height: auto;
+  ${({ theme }) => css`
+    object-fit: contain;
+    max-width: 100%;
+    height: auto;
+    background-color: ${theme.backgroundColor.secondary};
+  `}
 `;
 
 export default img;

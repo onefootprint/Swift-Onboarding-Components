@@ -5,40 +5,40 @@ const codeHighlight: CodeHighlight = {
     display: 'block',
     overflowX: 'auto',
     padding: '0.5em',
-    color: '#383a42',
+    color: '#ffffff',
     background: '#fafafa',
   },
   'hljs-comment': {
-    color: '#a0a1a7',
+    color: '#8b949e',
     fontStyle: 'italic',
   },
   'hljs-quote': {
-    color: '#a0a1a7',
+    color: '#8b949e',
     fontStyle: 'italic',
   },
   'hljs-doctag': {
-    color: '#a626a4',
+    color: '#d2a8ff',
   },
   'hljs-keyword': {
-    color: '#a626a4',
+    color: '#d2a8ff',
   },
   'hljs-formula': {
-    color: '#a626a4',
+    color: '#d2a8ff',
   },
   'hljs-section': {
-    color: '#e45649',
+    color: '#ff7b72',
   },
   'hljs-name': {
-    color: '#e45649',
+    color: '#ff7b72',
   },
   'hljs-selector-tag': {
-    color: '#e45649',
+    color: '#ff7b72',
   },
   'hljs-deletion': {
-    color: '#e45649',
+    color: '#ff7b72',
   },
   'hljs-subst': {
-    color: '#e45649',
+    color: '#ff7b72',
   },
   'hljs-literal': {
     color: '#0184bb',
@@ -65,47 +65,47 @@ const codeHighlight: CodeHighlight = {
     color: '#c18401',
   },
   'hljs-attr': {
-    color: '#986801',
+    color: '#ffa657',
   },
   'hljs-variable': {
-    color: '#986801',
+    color: '#ffa657',
   },
   'hljs-template-variable': {
-    color: '#986801',
+    color: '#ffa657',
   },
   'hljs-type': {
-    color: '#986801',
+    color: '#ffa657',
   },
   'hljs-selector-class': {
-    color: '#986801',
+    color: '#ffa657',
   },
   'hljs-selector-attr': {
-    color: '#986801',
+    color: '#ffa657',
   },
   'hljs-selector-pseudo': {
-    color: '#986801',
+    color: '#ffa657',
   },
   'hljs-number': {
-    color: '#986801',
+    color: '#ffa657',
   },
   'hljs-symbol': {
-    color: '#4078f2',
+    color: '#79c0ff',
   },
   'hljs-bullet': {
-    color: '#4078f2',
+    color: '#79c0ff',
   },
   'hljs-link': {
-    color: '#4078f2',
+    color: '#79c0ff',
     textDecoration: 'underline',
   },
   'hljs-meta': {
-    color: '#4078f2',
+    color: '#79c0ff',
   },
   'hljs-selector-id': {
-    color: '#4078f2',
+    color: '#79c0ff',
   },
   'hljs-title': {
-    color: '#4078f2',
+    color: '#79c0ff',
   },
   'hljs-emphasis': {
     fontStyle: 'italic',

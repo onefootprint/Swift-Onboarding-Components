@@ -1,18 +1,10 @@
-// import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import {
-  Box,
-  createFontStyles,
-  media,
-  // Toggle,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import SupportList from 'src/components/support-list';
 import type { PageNavigation } from 'src/types/page';
-// import { useDarkMode } from 'usehooks-ts';
 
 type PageNavProps = {
   navigation: PageNavigation;
@@ -20,10 +12,6 @@ type PageNavProps = {
 
 const PageNav = ({ navigation }: PageNavProps) => {
   const router = useRouter();
-
-  // TODO: https://linear.app/footprint/issue/FP-1890/bring-dark-theme-back-again
-  // const { t } = useTranslation('components.product-navigation');
-  // const { isDarkMode, toggle } = useDarkMode();
 
   return (
     <PageNavContainer>
@@ -47,20 +35,20 @@ const PageNav = ({ navigation }: PageNavProps) => {
           </Box>
         ))}
       </NavContainer>
-      <Box>
+      <BottomLinks>
         <SupportList />
-        {/* <ThemeControl>
-          <Toggle
-            label={t('dark-mode')}
-            checked={isDarkMode}
-            onChange={toggle}
-            sx={{ justifyContent: 'space-between' }}
-          />
-        </ThemeControl> */}
-      </Box>
+      </BottomLinks>
     </PageNavContainer>
   );
 };
+
+const BottomLinks = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+  `}
+`;
 
 const PageNavContainer = styled.aside`
   ${({ theme }) => css`
@@ -113,7 +101,7 @@ const StyledLink = styled(Link)`
 
       @media (hover: hover) {
         &:hover {
-          background: ${theme.backgroundColor.secondary};
+          background-color: ${theme.backgroundColor.secondary};
         }
       }
     }
@@ -124,14 +112,5 @@ const StyledLink = styled(Link)`
     }
   `}
 `;
-
-// const ThemeControl = styled.div`
-//   ${({ theme }) => css`
-//     background: ${theme.backgroundColor.secondary};
-//     border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-//     margin: 0 calc(${theme.spacing[5]} * -1);
-//     padding: ${theme.spacing[4]} ${theme.spacing[7]};
-//   `}
-// `;
 
 export default PageNav;

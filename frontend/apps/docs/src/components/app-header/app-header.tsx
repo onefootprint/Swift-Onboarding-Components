@@ -1,5 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { IcoArrowUpRight16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import type { PageNavigation } from 'src/types/page';
@@ -11,32 +9,12 @@ type AppHeaderProps = {
   navigation?: PageNavigation;
 };
 
-const AppHeader = ({ navigation }: AppHeaderProps) => {
-  const { t } = useTranslation('components.header');
-
-  const desktopLinks = [
-    {
-      href: 'https://api-docs.onefootprint.com/docs/footprint-public-docs',
-      Icon: IcoArrowUpRight16,
-      text: t('nav.docs.desktop'),
-    },
-  ];
-
-  const mobileLinks = [
-    {
-      href: 'https://api-docs.onefootprint.com/docs/footprint-public-docs',
-      Icon: IcoArrowUpRight16,
-      text: t('nav.docs.mobile'),
-    },
-  ];
-
-  return (
-    <Header>
-      <DesktopNav links={desktopLinks} />
-      <MobileNav links={mobileLinks} navigation={navigation} />
-    </Header>
-  );
-};
+const AppHeader = ({ navigation }: AppHeaderProps) => (
+  <Header>
+    <DesktopNav />
+    <MobileNav navigation={navigation} />
+  </Header>
+);
 
 const Header = styled.header`
   ${({ theme }) => css`

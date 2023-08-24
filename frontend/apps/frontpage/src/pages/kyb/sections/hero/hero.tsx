@@ -4,6 +4,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Button, Container, createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
+/* eslint-disable import/no-extraneous-dependencies */
 import ContactDialog from 'src/components/contact-dialog';
 
 const GET_FORM_URL =

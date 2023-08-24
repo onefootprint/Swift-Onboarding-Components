@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { Box, CodeBlock, Typography } from '@onefootprint/ui';
+import { CodeBlock, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import Iframe from './components/iframe';
@@ -11,7 +11,7 @@ const CustomizationPreview = () => {
   const [selectedTheme, setTheme] = useState<Theme>(defaultTheme);
 
   return (
-    <Box>
+    <Container>
       <IframeContainer>
         {themes.map(theme => (
           <Iframe
@@ -41,9 +41,19 @@ const CustomizationPreview = () => {
         </SelectContainer>
         <CodeBlock language="javascript">{selectedTheme.code}</CodeBlock>
       </Content>
-    </Box>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    border-radius: ${theme.borderRadius.default};
+    overflow: hidden;
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+  `};
+`;
 
 const IframeContainer = styled.div`
   ${({ theme }) => css`
@@ -51,7 +61,7 @@ const IframeContainer = styled.div`
     height: 620px;
     border-top-left-radius: ${theme.borderRadius.default};
     border-top-right-radius: ${theme.borderRadius.default};
-    background: rgba(14, 20, 56, 0.2);
+    background-color: ${theme.backgroundColor.secondary};
     overflow: auto;
     max-width: 100%;
     position: relative;
@@ -60,9 +70,7 @@ const IframeContainer = styled.div`
 
 const Content = styled.div`
   ${({ theme }) => css`
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-bottom-left-radius: ${theme.borderRadius.default};
-    border-bottom-right-radius: ${theme.borderRadius.default};
+    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     padding: ${theme.spacing[7]};
   `}
 `;

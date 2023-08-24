@@ -1,18 +1,20 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles, LinkButton, media } from '@onefootprint/ui';
+import { createFontStyles, media, ThemeToggle } from '@onefootprint/ui';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 import React from 'react';
 
-import type { LinkItem } from '../../app-header.types';
 import LogoCopyAssets from './components/logo-copy-assets';
 
-type DesktopNavProps = {
-  links: LinkItem[];
-};
-
-const DesktopNav = ({ links }: DesktopNavProps) => {
+const DesktopNav = () => {
   const { t } = useTranslation('components.header');
+  const { theme, setTheme } = useTheme();
+
+  const handleToggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+  };
 
   return (
     <Container>
@@ -24,20 +26,8 @@ const DesktopNav = ({ links }: DesktopNavProps) => {
             {t('nav.documentation')}
           </DocumentationLink>
         </MainLinks>
-        <>
-          {links.map(({ href, Icon, text }) => (
-            <LinkButton
-              href={href}
-              iconComponent={Icon}
-              size="compact"
-              target="_blank"
-              key={text}
-            >
-              {text}
-            </LinkButton>
-          ))}
-        </>
       </Nav>
+      <ThemeToggle onChange={handleToggleTheme} checked={theme === 'dark'} />
     </Container>
   );
 };

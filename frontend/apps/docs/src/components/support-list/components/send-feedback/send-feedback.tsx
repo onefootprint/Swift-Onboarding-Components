@@ -9,7 +9,7 @@ const GET_FORM_URL =
   'https://getform.io/f/037045de-1c04-421c-a274-429812dacb45';
 
 const SendFeedback = () => {
-  const { t } = useTranslation('components.send-feedback');
+  const { t } = useTranslation('components.side-navigation.send-feedback');
   const [showDialog, setShowDialog] = useState(false);
 
   const handleClickTrigger = () => {

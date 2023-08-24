@@ -4,6 +4,7 @@ import styled, { css } from '@onefootprint/styled';
 import { media, Tab, Tabs, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 import React, { useState } from 'react';
 
 import { defaultOption, options } from './examples.constants';
@@ -11,6 +12,8 @@ import { defaultOption, options } from './examples.constants';
 const Examples = () => {
   const [tab, setTab] = useState(defaultOption);
   const [animatedList] = useAutoAnimate<HTMLDivElement>();
+  const { theme } = useTheme();
+
   return (
     <>
       <Tabs variant="underlined">
@@ -25,35 +28,42 @@ const Examples = () => {
         ))}
       </Tabs>
       <List ref={animatedList}>
-        {tab.links.map(({ name, img, href }) => (
-          <Item
-            href={href}
-            key={name}
-            rel="noreferrer noopener"
-            target="_blank"
-          >
-            <IconOpen color="accent" />
-            <ImageContainer>
-              <Image
-                alt={name}
-                height={img.height}
-                src={img.src}
-                width={img.width}
-              />
-            </ImageContainer>
-            <Typography
-              color="secondary"
-              variant="body-3"
-              sx={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
+        {tab.links.map(({ name, img, href }) => {
+          const parts = img.src.split('/');
+          const filename = parts.pop();
+          const themedPath = `${parts.join('/')}/${theme}/${filename}`;
+
+          console.log(themedPath);
+          return (
+            <Item
+              href={href}
+              key={name}
+              rel="noreferrer noopener"
+              target="_blank"
             >
-              {name}
-            </Typography>
-          </Item>
-        ))}
+              <IconOpen color="accent" />
+              <ImageContainer>
+                <Image
+                  alt={name}
+                  height={img.height}
+                  src={themedPath}
+                  width={img.width}
+                />
+              </ImageContainer>
+              <Typography
+                color="secondary"
+                variant="body-3"
+                sx={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {name}
+              </Typography>
+            </Item>
+          );
+        })}
       </List>
     </>
   );

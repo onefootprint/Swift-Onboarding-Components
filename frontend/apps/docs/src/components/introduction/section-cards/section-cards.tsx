@@ -8,55 +8,87 @@ import {
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
-import React from 'react';
+import React, { useRef } from 'react';
+import { useHover } from 'usehooks-ts';
 
+import KybIllustration from './illustrations/kyb-illustration';
+import KycIllustration from './illustrations/kyc-illustration';
+import OtherComponentsIllustration from './illustrations/other-components-illustration';
+import VaultProxyIllustration from './illustrations/vault-proxy-illustration';
+import VaultingIllustration from './illustrations/vaulting-illustration';
 import SectionCard from './section-card/section-card';
 
 const SectionCards = () => {
   const { t } = useTranslation('pages.home.quickstart');
+  const kybHover = useRef(null);
+  const kycHover = useRef(null);
+  const vaultingHover = useRef(null);
+  const vaultProxyHover = useRef(null);
+  const otherComponentsHover = useRef(null);
+
+  const isKybHover = useHover(kybHover);
+  const isKycHover = useHover(kycHover);
+  const isVaultingHover = useHover(vaultingHover);
+  const isVaultProxyHover = useHover(vaultProxyHover);
+  const isOtherComponentsHover = useHover(otherComponentsHover);
 
   return (
     <Grid>
-      <SectionCard
-        title={t('kyc.title')}
-        subtitle={t('kyc.description')}
-        href="/kyc/getting-started"
-        icon={IcoIdCard24}
-        imageSrc="/introduction/kyc.png"
-        gridArea="kyc"
-      />
-      <SectionCard
-        title={t('kyb.title')}
-        subtitle={t('kyb.description')}
-        href="/kyb/getting-started"
-        icon={IcoStore24}
-        imageSrc="/introduction/kyb.png"
-        gridArea="kyb"
-      />
-      <SectionCard
-        title={t('vaulting.title')}
-        subtitle={t('vaulting.description')}
-        href="/vault/apis"
-        icon={IcoDatabase24}
-        imageSrc="/introduction/vaulting.png"
-        gridArea="vaulting"
-      />
-      <SectionCard
-        title={t('vault-proxy.title')}
-        subtitle={t('vault-proxy.description')}
-        href="/vault/proxy"
-        icon={IcoLayer0124}
-        imageSrc="/introduction/vault-proxy.png"
-        gridArea="vault-proxy"
-      />
-      <SectionCard
-        title={t('embedded-components.title')}
-        subtitle={t('embedded-components.description')}
-        href="/embedded-components/getting-started"
-        icon={IcoGridMasonry24}
-        imageSrc="/introduction/embedded-components.png"
-        gridArea="components"
-      />
+      <div ref={kycHover}>
+        <SectionCard
+          title={t('kyc.title')}
+          subtitle={t('kyc.description')}
+          href="/kyc/getting-started"
+          icon={IcoIdCard24}
+          gridArea="kyc"
+        >
+          <KycIllustration isHovered={isKycHover} />
+        </SectionCard>
+      </div>
+      <div ref={kybHover}>
+        <SectionCard
+          title={t('kyb.title')}
+          subtitle={t('kyb.description')}
+          href="/kyb/getting-started"
+          icon={IcoStore24}
+          gridArea="kyb"
+        >
+          <KybIllustration isHovered={isKybHover} />
+        </SectionCard>
+      </div>
+      <div ref={vaultingHover}>
+        <SectionCard
+          title={t('vaulting.title')}
+          subtitle={t('vaulting.description')}
+          href="/vault/apis"
+          icon={IcoDatabase24}
+          gridArea="vaulting"
+        >
+          <VaultingIllustration isHovered={isVaultingHover} />
+        </SectionCard>
+      </div>
+      <div ref={vaultProxyHover}>
+        <SectionCard
+          title={t('vault-proxy.title')}
+          subtitle={t('vault-proxy.description')}
+          href="/vault/proxy"
+          icon={IcoLayer0124}
+          gridArea="vault-proxy"
+        >
+          <VaultProxyIllustration isHovered={isVaultProxyHover} />
+        </SectionCard>
+      </div>
+      <div ref={otherComponentsHover}>
+        <SectionCard
+          title={t('embedded-components.title')}
+          subtitle={t('embedded-components.description')}
+          href="/embedded-components/getting-started"
+          icon={IcoGridMasonry24}
+          gridArea="components"
+        >
+          <OtherComponentsIllustration isHovered={isOtherComponentsHover} />
+        </SectionCard>
+      </div>
     </Grid>
   );
 };

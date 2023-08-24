@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { Box, createFontStyles, Typography } from '@onefootprint/ui';
+import { Box, createFontStyles, Divider, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -37,6 +37,7 @@ const PageNav = ({ navigation, onNavItemClick }: PageNavProps) => {
           </Box>
         ))}
       </NavContainer>
+      <Divider />
       <SupportList />
     </PageNavContainer>
   );
