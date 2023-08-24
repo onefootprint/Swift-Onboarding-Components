@@ -77,6 +77,11 @@ def test_data_vaulting(tenant, key, value):
             "Invalid checksum. Please verify that the number is correct",
         ),
         (
+            "document.drivers_license.document_number",
+            "12345",
+            "Cannot vault this piece of data.",
+        ),
+        (
             "card.flerp.expiration_month",
             "12",
             "Cannot specify this piece of data. It will automatically be derived.",
