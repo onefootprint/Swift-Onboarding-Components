@@ -12,7 +12,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
 use db::models::workflow::Workflow;
-use feature_flag::BoolFlag;
 use newtypes::{StripeCustomerId, TenantId, VaultKind};
 
 #[derive(Debug, serde::Deserialize)]
@@ -58,7 +57,7 @@ async fn post_all(
         tenant_rb.firm_employee_user()?;
     }
 
-    let tenants = state.db_pool.db_query(Tenant::list_live).await??;
+    let tenants = state.db_pool.db_query(Tenant::list_billable).await??;
 
     // Subtract 8 hours so we always generate the invoice for last month
     let billing_date = (Utc::now() - Duration::hours(8)).date_naive();
@@ -100,9 +99,6 @@ pub async fn get_or_create_customer_id(state: &State, tenant: &Tenant) -> ApiRes
 
 #[tracing::instrument(skip_all)]
 async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: NaiveDate) -> ApiResult<()> {
-    if !state.feature_flag_client.flag(BoolFlag::ShouldBill(&tenant.id)) {
-        return Ok(());
-    }
     let i = billing::interval::get_billing_interval(billing_date)?;
     let t_id = tenant.id.clone();
     // Count the number of billable uses of each product for this tenant

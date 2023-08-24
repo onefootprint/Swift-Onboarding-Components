@@ -7,8 +7,6 @@ pub enum BoolFlag<'a> {
     IsRiskOps(&'a OrgMemberEmail),
     #[strum(to_string = "IsDemoTenant")]
     IsDemoTenant(&'a TenantId),
-    #[strum(to_string = "EnableBilling")]
-    ShouldBill(&'a TenantId),
     #[strum(to_string = "TenantCanViewSocureRiskSignal")]
     CanViewSocureRiskSignals(&'a TenantId),
     #[strum(to_string = "EnableIdologyIdvCallsInNonProdEnvironment")]
@@ -60,7 +58,6 @@ impl<'a> BoolFlag<'a> {
         match self {
             Self::IsRiskOps(k) => Some(k.to_string()),
             Self::IsDemoTenant(k) => Some(k.to_string()),
-            Self::ShouldBill(k) => Some(k.to_string()),
             Self::CanViewSocureRiskSignals(k) => Some(k.to_string()),
             Self::EnableScanOnboardingInNonProd(k) => Some(k.to_string()),
             Self::EnableIdologyInNonProd(k) => Some(k.to_string()),
@@ -88,7 +85,6 @@ impl<'a> BoolFlag<'a> {
         match self {
             Self::IsRiskOps(_) => false,
             Self::IsDemoTenant(_) => false,
-            Self::ShouldBill(_) => false,
             Self::CanViewSocureRiskSignals(_) => false,
             Self::EnableScanOnboardingInNonProd(_) => false,
             Self::EnableIdologyInNonProd(_) => false,
