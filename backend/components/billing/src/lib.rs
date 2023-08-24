@@ -228,10 +228,18 @@ pub struct BillingInfo {
 
 #[derive(Debug)]
 pub struct BillingCounts {
+    /// Total number user vaults with billable PII - either an authorized workflow OR created via API
     pub pii: i64,
+    /// Number of KYC verifications ran this month
     pub kyc: i64,
+    /// Number of KYB verifications ran this month
     pub kyb: i64,
+    /// Number of watchlist checks ran this month
     pub watchlist_checks: i64,
+    /// Number of vaults with decrypts this month
+    pub hot_vaults: i64,
+    /// Number of vaults with proxy decrypts this month
+    pub hot_proxy_vaults: i64,
 }
 
 pub type LineItem = (PriceId, i64);
@@ -244,8 +252,10 @@ impl BillingCounts {
             kyc,
             kyb,
             watchlist_checks,
+            hot_vaults,
+            hot_proxy_vaults,
         } = self;
-        pii + kyc + kyb + watchlist_checks == 0
+        pii + kyc + kyb + watchlist_checks + hot_vaults + hot_proxy_vaults == 0
     }
 
     fn line_items(&self, prices: BillingProfile) -> Vec<LineItem> {
@@ -255,15 +265,20 @@ impl BillingCounts {
             kyc,
             kyb,
             watchlist_checks,
+            hot_vaults,
+            hot_proxy_vaults,
         } = self;
 
         vec![
-            (prices.pii, pii),
-            (prices.kyc, kyc),
-            (prices.kyb, kyb),
-            (prices.watchlist, watchlist_checks),
+            (Some(prices.pii), pii),
+            (Some(prices.kyc), kyc),
+            (Some(prices.kyb), kyb),
+            (Some(prices.watchlist), watchlist_checks),
+            (prices.hot_vaults, hot_vaults),
+            (prices.hot_proxy_vaults, hot_proxy_vaults),
         ]
         .into_iter()
+        .filter_map(|(price, count)| price.map(|p| (p, count)))
         .filter(|(_, count)| count > &0)
         .collect()
     }

@@ -7,6 +7,7 @@ use crate::State;
 use actix_web::{post, web};
 use billing::{BillingCounts, BillingInfo};
 use chrono::{Duration, NaiveDate, Utc};
+use db::models::access_event::AccessEvent;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
 use db::models::workflow::Workflow;
@@ -116,15 +117,20 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
     let counts = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
+            // TODO need this to be users created before the end date
             let pii = count_authorized_for_tenant(conn, params)?;
             let kyc = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
             let kyb = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
             let watchlist_checks = WatchlistCheck::get_billable_count(conn, &t_id, i.start, i.end)?;
+            let hot_vaults = AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end)?;
+            let hot_proxy_vaults = 0;
             let counts = BillingCounts {
                 pii,
                 kyc,
                 kyb,
                 watchlist_checks,
+                hot_vaults,
+                hot_proxy_vaults,
             };
             Ok(counts)
         })

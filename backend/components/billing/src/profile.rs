@@ -1,5 +1,3 @@
-
-
 use feature_flag::{JsonFlag, LaunchDarklyFeatureFlagClient};
 use newtypes::TenantId;
 
@@ -12,6 +10,11 @@ pub(crate) struct BillingProfile {
     pub(crate) pii: stripe::PriceId,
     pub(crate) kyb: stripe::PriceId,
     pub(crate) watchlist: stripe::PriceId,
+
+    // Not all tenants have billing for hot vaults
+    pub(crate) hot_vaults: Option<stripe::PriceId>,
+    pub(crate) hot_proxy_vaults: Option<stripe::PriceId>,
+    // TODO documentary verifications
 }
 
 impl BillingProfile {

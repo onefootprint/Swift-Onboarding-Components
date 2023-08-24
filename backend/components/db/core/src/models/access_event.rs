@@ -2,8 +2,11 @@ use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::access_event;
+use diesel::dsl::count_distinct;
+use diesel::prelude::*;
 use diesel::{Insertable, Queryable, RunQueryDsl};
 use itertools::Itertools;
+use newtypes::VaultKind;
 use newtypes::{
     AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedVaultId, TenantId,
 };
@@ -88,5 +91,29 @@ impl AccessEvent {
             .execute(conn)?;
 
         Ok(())
+    }
+
+    #[tracing::instrument("AccessEvent::count_hot_vaults", skip_all)]
+    pub fn count_hot_vaults(
+        conn: &mut PgConn,
+        t_id: &TenantId,
+        start_date: DateTime<Utc>,
+        end_date: DateTime<Utc>,
+    ) -> DbResult<i64> {
+        // TODO do we want to bill for hot business vaults? Probably just want to consider the user hot,
+        // but that's hard
+        use db_schema::schema::{scoped_vault, vault};
+        let count = access_event::table
+            .inner_join(scoped_vault::table.inner_join(vault::table))
+            // Cookie-cutter filters for all billable events
+            .filter(scoped_vault::is_live.eq(true))
+            .filter(scoped_vault::tenant_id.eq(t_id))
+            .filter(vault::kind.eq(VaultKind::Person))
+            // Filter for access events made during this billing period
+            .filter(access_event::timestamp.ge(start_date))
+            .filter(access_event::timestamp.lt(end_date))
+            .select(count_distinct(scoped_vault::id))
+            .get_result(conn)?;
+        Ok(count)
     }
 }
