@@ -61,18 +61,20 @@ const Drawer = ({
               event.stopPropagation();
             }}
           >
-            <Header>
-              <CloseContainer>
-                <IconButton aria-label={closeAriaLabel} onClick={onClose}>
-                  <CloseIconComponent />
-                </IconButton>
-              </CloseContainer>
-              <Typography variant="label-2" as="h2">
-                {title}
-              </Typography>
-            </Header>
-            {headerComponent}
-            <Body>{children}</Body>
+            <DrawerSurface>
+              <Header>
+                <CloseContainer>
+                  <IconButton aria-label={closeAriaLabel} onClick={onClose}>
+                    <CloseIconComponent />
+                  </IconButton>
+                </CloseContainer>
+                <Typography variant="label-2" as="h2">
+                  {title}
+                </Typography>
+              </Header>
+              {headerComponent}
+              <Body>{children}</Body>
+            </DrawerSurface>
           </DrawerContainer>
         </span>
       </FocusTrap>
@@ -80,15 +82,24 @@ const Drawer = ({
   );
 };
 
-const DrawerContainer = styled.div`
+const DrawerSurface = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.surfaceColor[3]};
-    box-shadow: ${theme.elevation[3]};
+    border-radius: ${theme.borderRadius.default};
+    height: 100%;
+    overflow: hidden;
+    box-shadow: ${theme.elevation[2]};
+  `}
+`;
+
+const DrawerContainer = styled.div`
+  ${({ theme }) => css`
     height: 100vh;
+    width: calc(500px + 2 * ${theme.spacing[3]});
     position: fixed;
     right: 0;
     top: 0;
-    width: 500px;
+    padding: ${theme.spacing[3]};
     transition: transform 0.2s ease-in-out;
     z-index: ${theme.zIndex.drawer};
 
