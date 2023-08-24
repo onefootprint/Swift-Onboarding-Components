@@ -154,7 +154,7 @@ export const basicInformationFields: string[] = [
 ];
 
 // used within Playbook forms before submitting
-export const useResidentFormFields = [
+export const usResidentFormFields = [
   CollectedKycDataOption.ssn9,
   CollectedKycDataOption.ssn4,
   CollectedDocumentDataOption.document,
@@ -173,4 +173,12 @@ export const usResidentDisplayFields = [
   'selfie',
   CollectedKycDataOption.nationality,
   'ssn',
+];
+
+export const usResidentDisplayScopes = [
+  'selfie',
+  'document',
+  CollectedKycDataOption.nationality,
+  CollectedKycDataOption.ssn9,
+  CollectedKycDataOption.ssn4,
 ];

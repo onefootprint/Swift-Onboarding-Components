@@ -9,6 +9,7 @@ import {
   usResidentDisplayFields,
 } from '@/playbooks/utils/machine/types';
 
+import AuthorizedScopes from './components/authorized-scopes';
 import DataCollection from './components/data-collection';
 
 export type CollectionAndScopesProps = {
@@ -22,7 +23,7 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
     { value: 'authorized-scopes', label: t('basics.authorized-scopes') },
   ];
   const [segment, setSegment] = useState(options[0].value);
-  const { mustCollectData } = playbook;
+  const { mustCollectData, canAccessData } = playbook;
 
   const handleChange = (value: string) => {
     setSegment(value);
@@ -56,6 +57,9 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
             title={t('data-collection.us-residents')}
           />
         </>
+      )}
+      {segment === 'authorized-scopes' && (
+        <AuthorizedScopes canAccessData={canAccessData} />
       )}
     </Container>
   );

@@ -1178,6 +1178,18 @@
               "last4": "Last 4 digits",
               "document": "ID document scan",
               "selfie": "Selfie",
+              "us-residents": "U.S. residents",
+              "ssn9": "SSN (Full)",
+              "ssn4": "SSN (Last 4 digits)",
+              "drivers_license": "Driver's license",
+              "id_card": "Identity card",
+              "passport": "Passport (photo page)",
+              "visa": "Visa",
+              "residence_document": "Residence card",
+              "permit": "Work permit"
+            },
+            "authorized-scopes": {
+              "basic-information": "Basic information",
               "us-residents": "U.S. residents"
             },
             "basics": {
