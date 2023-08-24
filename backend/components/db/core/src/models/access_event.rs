@@ -106,6 +106,7 @@ impl AccessEvent {
         t_id: &TenantId,
         start_date: DateTime<Utc>,
         end_date: DateTime<Utc>,
+        purposes: Vec<AccessEventPurpose>,
     ) -> DbResult<i64> {
         // TODO do we want to bill for hot business vaults? Probably just want to consider the user hot,
         // but that's hard
@@ -119,6 +120,7 @@ impl AccessEvent {
             // Filter for access events made during this billing period
             .filter(access_event::timestamp.ge(start_date))
             .filter(access_event::timestamp.lt(end_date))
+            .filter(access_event::purpose.eq_any(purposes))
             .select(count_distinct(scoped_vault::id))
             .get_result(conn)?;
         Ok(count)

@@ -12,7 +12,8 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
 use db::models::workflow::Workflow;
-use newtypes::{StripeCustomerId, TenantId, VaultKind};
+use newtypes::{AccessEventPurpose, StripeCustomerId, TenantId, VaultKind};
+use strum::IntoEnumIterator;
 
 #[derive(Debug, serde::Deserialize)]
 struct CreateInvoiceRequest {
@@ -109,8 +110,11 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
             let kyc = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
             let kyb = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
             let watchlist_checks = WatchlistCheck::get_billable_count(conn, &t_id, i.start, i.end)?;
-            let hot_vaults = AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end)?;
-            let hot_proxy_vaults = 0;
+            let hot_purposes = AccessEventPurpose::iter().collect(); // Any access is billable
+            let hot_vaults = AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, hot_purposes)?;
+            let hot_proxy_purposes = vec![AccessEventPurpose::VaultProxy];
+            let hot_proxy_vaults =
+                AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, hot_proxy_purposes)?;
             let counts = BillingCounts {
                 pii,
                 kyc,
