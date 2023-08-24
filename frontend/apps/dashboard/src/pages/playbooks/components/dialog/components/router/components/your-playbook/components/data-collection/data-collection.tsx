@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { InlineAlert } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import { Kind } from '@/playbooks/utils/machine/types';
 
@@ -17,6 +18,11 @@ const DataCollection = ({ kind }: DataCollectionProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.data-collection',
   );
+  const { setValue } = useFormContext();
+
+  useEffect(() => {
+    setValue('kind', kind);
+  }, [kind, setValue]);
 
   return (
     <Container>

@@ -6,7 +6,13 @@ import {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 
+export enum Kind {
+  KYB = 'kyb',
+  KYC = 'kyc',
+}
+
 export type PlaybookFormData = {
+  kind: Kind;
   personalInformationAndDocs: PersonalInformationAndDocs;
   businessInformation?: BusinessInformation;
   [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
@@ -71,6 +77,7 @@ export const defaultBusinessInformation = {
 };
 
 export const defaultPlaybookValuesKYC: PlaybookFormData = {
+  kind: Kind.KYC,
   personalInformationAndDocs: {
     email: true,
     [CollectedKycDataOption.phoneNumber]: true,
@@ -88,6 +95,7 @@ export const defaultPlaybookValuesKYC: PlaybookFormData = {
 
 export const defaultPlaybookValuesKYB: PlaybookFormData = {
   ...defaultPlaybookValuesKYC,
+  kind: Kind.KYB,
   businessInformation: defaultBusinessInformation,
 };
 
@@ -104,11 +112,6 @@ export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
   [CollectedInvestorProfileDataOption.investorProfile]: true,
   allBusinessData: true,
 };
-
-export enum Kind {
-  KYB = 'kyb',
-  KYC = 'kyc',
-}
 
 export type MachineContext = {
   kind?: Kind;

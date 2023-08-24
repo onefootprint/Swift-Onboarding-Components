@@ -41,10 +41,16 @@ const Router = ({ onClose }: RouterProps) => {
     { value: 'yourPlaybook', label: t('your-playbook') },
     { value: 'authorizedScopes', label: t('authorized-scopes') },
   ];
-  const defaultPlaybookValues =
+  const playbookDefaultValues =
     state.context.kind === Kind.KYB
       ? defaultPlaybookValuesKYB
       : defaultPlaybookValuesKYC;
+
+  const playbookValuesToPrefill =
+    state.context?.playbook?.kind === state.context.kind &&
+    state.context.playbook
+      ? state.context.playbook
+      : playbookDefaultValues;
 
   const step = getStep({ value: state.value as string });
   const stepperValue = options[step];
@@ -129,7 +135,7 @@ const Router = ({ onClose }: RouterProps) => {
         )}
         {state.matches('yourPlaybook') && state.context.kind && (
           <YourPlaybook
-            defaultValues={state.context.playbook ?? defaultPlaybookValues}
+            defaultValues={playbookValuesToPrefill}
             kind={state.context.kind}
             onSubmit={data => {
               send('playbookSubmitted', { payload: { playbook: data } });
@@ -140,7 +146,7 @@ const Router = ({ onClose }: RouterProps) => {
         {state.matches('authorizedScopes') && (
           <AuthorizedScopes
             kind={state.context.kind}
-            playbook={state.context.playbook ?? defaultPlaybookValues}
+            playbook={state.context.playbook ?? playbookValuesToPrefill}
             onBack={() => send('yourPlaybookSelected')}
             onSubmit={data => {
               // avoid state machine call — we don't store authorized scopes in context

@@ -186,4 +186,28 @@ describe('<Router />', () => {
     ).toBeInTheDocument();
     expect(closeFn).toHaveBeenCalled();
   });
+
+  it('should allow user to create a KYC playbook, navigate back, and create a KYB playbookw ithout error', async () => {
+    renderRouter({ onClose: jest.fn() });
+    // KYC
+    await selectWhoToOnboard();
+    expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
+    const back = screen.getByRole('button', {
+      name: 'Back',
+    });
+    await userEvent.click(back);
+    expect(
+      screen.getByText('Who would you like to onboard?'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('This helps us better recommend which data to collect.'),
+    ).toBeInTheDocument();
+    const KYB = screen.getByText(
+      'Onboard businesses and their beneficial owners',
+    );
+    await userEvent.click(KYB);
+    const continueButton = screen.getByRole('button', { name: 'Continue' });
+    await userEvent.click(continueButton);
+    expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
+  });
 });
