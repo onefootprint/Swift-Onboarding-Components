@@ -35,6 +35,7 @@
     "base64url": "^3.0.1",
     "browser-image-compression": "^2.0.0",
     "constate": "^3.3.2",
+    "date-fns": "^2.30.0",
     "face-api.js": "^0.22.2",
     "focus-trap-react": "^10.2.1",
     "framer-motion": "^10.12.4",

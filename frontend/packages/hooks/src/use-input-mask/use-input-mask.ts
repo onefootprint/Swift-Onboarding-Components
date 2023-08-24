@@ -6,6 +6,12 @@ const masks = {
       delimiter: '/',
       datePattern: ['m', 'd', 'Y'],
     },
+    visaExpiration: {
+      date: true,
+      numericOnly: true,
+      delimiter: '/',
+      datePattern: ['m', 'd', 'Y'],
+    },
     ssn: {
       numericOnly: true,
       delimiters: ['-', '-'],

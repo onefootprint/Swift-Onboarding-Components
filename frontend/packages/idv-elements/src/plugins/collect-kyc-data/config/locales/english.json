@@ -107,6 +107,28 @@
           "us-citizen-error": "If you are a US citizen, please select the \"I'm a citizen\" option above",
           "delete-aria": "Remove citizenship",
           "add-text": "Add Citizenship"
+        },
+        "visa-type": {
+          "label": "Visa type",
+          "placeholder": "Select",
+          "error": "Visa type cannot be empty",
+          "mapping": {
+            "e1": "E1",
+            "e2": "E2",
+            "e3": "E3",
+            "f1": "F1",
+            "g4": "G4",
+            "h1b": "H1B",
+            "l1": "L1",
+            "o1": "O1",
+            "tn1": "TN1",
+            "other": "OTHER"
+          }
+        },
+        "visa-expiration": {
+          "label": "Visa expiration date",
+          "placeholder": "MM/DD/YYYY",
+          "error": "Visa expiration date cannot be empty or expired"
         }
       }
     },

@@ -56,3 +56,4 @@ export * from './timeline';
 export * from './vault';
 export { default as Vendor } from './vendor';
 export { default as VerificationStatus } from './verification-status';
+export { default as VisaKind } from './visa-kind';
