@@ -307,13 +307,14 @@ fn get_requirement_inner(
             if let Some(dr) = dr {
                 let user_consent = UserConsent::get_for_workflow(conn, &args.workflow.id)?;
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
+                let doc_cdo = ob_config.document_cdo();
                 // Show a CollectDocument requirement if there's no id_document or the existing
                 // id_document is still Pending
                 let should_render = id_doc.is_empty()
                     || id_doc
                         .into_iter()
                         .any(|d| d.status == IdentityDocumentStatus::Pending);
-                let only_us_dr = dr.only_us();
+                let only_us_dr = doc_cdo.as_ref().map(|d| d.only_us()).unwrap_or(false);
                 should_render.then_some(OnboardingRequirement::CollectDocument {
                     document_request_id: dr.id,
                     should_collect_selfie: dr.should_collect_selfie,
@@ -321,7 +322,9 @@ fn get_requirement_inner(
                     // TODO remove only_us_dl feature flag when all of flexcar is migrated.
                     // For now, regardless of what's on the DR for flexcar, restrict to US
                     only_us_supported: only_us_dr || only_us_dl,
-                    supported_document_types: if let Some(doc_types) = dr.global_doc_types_accepted {
+                    supported_document_types: if let Some(doc_types) =
+                        doc_cdo.and_then(|cdo| cdo.restricted_id_doc_kinds())
+                    {
                         doc_types
                     } else if only_us_dl {
                         vec![IdDocKind::DriversLicense]

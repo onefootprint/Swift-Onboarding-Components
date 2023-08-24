@@ -71,6 +71,10 @@ impl DocumentCdoInfo {
     pub fn selfie(&self) -> Selfie {
         self.2.clone()
     }
+
+    pub fn only_us(&self) -> bool {
+        self.1 == CountryRestriction::UsOnly
+    }
 }
 
 impl std::fmt::Display for DocumentCdoInfo {

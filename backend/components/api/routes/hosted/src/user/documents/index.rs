@@ -8,6 +8,7 @@ use api_core::types::JsonApiResponse;
 use api_wire_types::{CreateIdentityDocumentRequest, CreateIdentityDocumentResponse};
 use db::models::document_request::DocumentRequest as DbDocumentRequest;
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
+use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use feature_flag::BoolFlag;
 use newtypes::output::Csv;
@@ -44,11 +45,15 @@ pub async fn post(
             // If there's no doc requests, nothing to do here
             let doc_request =
                 DbDocumentRequest::get(conn, &wf_id)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
+
+            let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
+            let doc_cdo = obc.document_cdo();
+            
             // Validate that the type of document uploaded matches what's required by the doc request
-            if doc_request.only_us() && country_code != "US" {
+            if doc_cdo.as_ref().map(|d| d.only_us()).unwrap_or(false) && country_code != "US" {
                 return Err(OnboardingError::UnsupportedNonUSDocumentCountry.into());
             }
-            if let Some(doc_types) = doc_request.global_doc_types_accepted.clone() {
+            if let Some(doc_types) = doc_cdo.and_then(|cdo| cdo.restricted_id_doc_kinds()) {
                 if !doc_types.contains(&document_type) {
                     return Err(OnboardingError::UnsupportedDocumentType(Csv::from(doc_types)).into());
                 }
