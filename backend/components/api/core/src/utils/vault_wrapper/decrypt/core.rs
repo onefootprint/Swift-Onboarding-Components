@@ -13,14 +13,23 @@ use newtypes::{DataIdentifier, DocumentKind, EncryptedVaultPrivateKey, PiiBytes,
 use std::collections::HashMap;
 
 impl<Type> VaultWrapper<Type> {
-    /// Like `fn_decrypt_unchecked` but with no transform
+    /// Util to transform decrypt a list of DataIdentifiers WITHOUT checking permissions or making an access
+    /// event.
+    ///
+    /// Returns a hashmap of identifiers to their decrypted PiiString.
+    /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
+    /// doesn't exist in the UVW.
     pub async fn decrypt_unchecked(
         &self,
         enclave_client: &EnclaveClient,
         ops: &[DataIdentifier],
     ) -> ApiResult<DecryptUncheckedResult> {
         let ops: Vec<_> = ops.iter().map(|di| di.clone().into()).collect();
-        self.fn_decrypt_unchecked(enclave_client, ops).await
+        let results = self
+            .fn_decrypt_unchecked_raw(enclave_client, ops)
+            .await?
+            .map_to_piistrings()?;
+        Ok(results)
     }
 
     /// Get the VaultedData for the provided id, if exists. This also includes strange logic to
@@ -35,25 +44,6 @@ impl<Type> VaultWrapper<Type> {
             return Some(VaultedData::NonPrivate(&document.mime_type));
         }
         self.get(di).map(|v| v.data())
-    }
-
-    /// Util to transform decrypt a list of DataIdentifiers WITHOUT checking permissions or making an access
-    /// event.
-    ///
-    /// Returns a hashmap of identifiers to their decrypted PiiString.
-    /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
-    /// doesn't exist in the UVW.
-    #[tracing::instrument("VaultWrapper::fn_decrypt_unchecked", skip_all)]
-    pub async fn fn_decrypt_unchecked(
-        &self,
-        enclave_client: &EnclaveClient,
-        ops: Vec<EnclaveDecryptOperation>,
-    ) -> ApiResult<DecryptUncheckedResult> {
-        let results = self
-            .fn_decrypt_unchecked_raw(enclave_client, ops)
-            .await?
-            .map_to_piistrings()?;
-        Ok(results)
     }
 
     /// Decrypts the requested DIs and applies the corresponding transforms WITHOUT checking

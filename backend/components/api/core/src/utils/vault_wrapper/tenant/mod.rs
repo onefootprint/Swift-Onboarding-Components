@@ -2,13 +2,11 @@ mod accessors;
 mod build;
 mod bulk_decrypt;
 mod decrypt;
-mod decrypt_request;
 mod delete;
 
 use db::models::{scoped_vault::ScopedVault, workflow::WorkflowAndConfig};
 
 pub use bulk_decrypt::*;
-pub use decrypt_request::DecryptRequest;
 
 use super::{Any, VaultWrapper};
 

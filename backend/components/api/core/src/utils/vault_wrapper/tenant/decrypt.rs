@@ -1,14 +1,16 @@
-use super::{DecryptRequest, TenantVw};
+use super::TenantVw;
 use crate::auth::AuthError;
 use crate::utils::vault_wrapper::decrypt::{EnclaveDecryptOperation, Pii};
 use crate::{errors::ApiResult, State};
+use db::models::access_event::NewAccessEvent;
+use db::models::insight_event::CreateInsightEvent;
 use itertools::Itertools;
-use newtypes::{DataIdentifier, PiiString};
+use newtypes::{AccessEventKind, DataIdentifier, DbActor};
 use std::collections::HashMap;
 
 impl<Type> TenantVw<Type> {
     // Before decrypting, asserts that the requested fields are decryptable by this VW
-    pub fn check_ob_config_access(&self, ids: Vec<&DataIdentifier>) -> ApiResult<()> {
+    pub(super) fn check_ob_config_access(&self, ids: Vec<&DataIdentifier>) -> ApiResult<()> {
         let cannot_access = ids
             .into_iter()
             .filter(|x| self.has_field((*x).clone()))
@@ -22,40 +24,34 @@ impl<Type> TenantVw<Type> {
         Ok(())
     }
 
-    /// Util to transform decrypt a list of T where T represents a DataIdentifier. Returns a hashmap of T to
-    /// the decrypted PiiString.
-    /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
-    /// doesn't have any associated data on the UVW.
-    #[tracing::instrument("TenantVw::fn_decrypt", skip_all)]
-    pub async fn fn_decrypt(
-        &self,
-        state: &State,
-        req: DecryptRequest,
-    ) -> ApiResult<HashMap<EnclaveDecryptOperation, PiiString>> {
-        let dis = req.targets.iter().map(|op| &op.identifier).collect();
-        self.check_ob_config_access(dis)?;
-        let results = self
-            .fn_decrypt_unchecked(&state.enclave_client, req.targets.clone())
-            .await?;
-        req.create_access_event(state, &self.scoped_vault, results.decrypted_dis)
-            .await?;
-        Ok(results.results)
-    }
-
     /// like `fn_decrypt` but raw bytes or string result
     #[tracing::instrument("TenantVw::fn_decrypt", skip_all)]
     pub async fn fn_decrypt_raw(
         &self,
         state: &State,
-        req: DecryptRequest,
+        reason: String,
+        principal: DbActor,
+        insight: CreateInsightEvent,
+        targets: Vec<EnclaveDecryptOperation>,
     ) -> ApiResult<HashMap<EnclaveDecryptOperation, Pii>> {
-        let dis = req.targets.iter().map(|op| &op.identifier).collect();
+        let dis = targets.iter().map(|op| &op.identifier).collect();
         self.check_ob_config_access(dis)?;
         let results = self
-            .fn_decrypt_unchecked_raw(&state.enclave_client, req.targets.clone())
+            .fn_decrypt_unchecked_raw(&state.enclave_client, targets)
             .await?;
-        req.create_access_event(state, &self.scoped_vault, results.decrypted_dis)
-            .await?;
+
+        let event = NewAccessEvent {
+            scoped_vault_id: self.scoped_vault.id.clone(),
+            tenant_id: self.scoped_vault.tenant_id.clone(),
+            is_live: self.scoped_vault.is_live,
+            reason: Some(reason),
+            principal,
+            insight,
+            kind: AccessEventKind::Decrypt,
+            // TODO: also store the transforms!
+            targets: results.decrypted_dis.into_iter().map(|t| t.identifier).collect(),
+        };
+        state.db_pool.db_query(|conn| event.create(conn)).await??;
         Ok(results.results)
     }
 }

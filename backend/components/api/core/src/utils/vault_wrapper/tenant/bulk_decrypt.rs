@@ -19,16 +19,16 @@ use super::TenantVw;
 
 /// Represents a request to decrypt targets for a specific VaultWrapper instance. Use the key to
 /// uniquely identify the VW
-pub struct BulkDecryptReq<T = Any> {
-    pub vw: TenantVw<T>,
+pub struct BulkDecryptReq<'a, T = Any> {
+    pub vw: &'a TenantVw<T>,
     pub targets: Vec<EnclaveDecryptOperation>,
 }
 
 const MAX_ACCESS_EVENTS: usize = 5000;
 
-pub async fn bulk_decrypt<TKey, T>(
+pub async fn bulk_decrypt<'a, TKey, T>(
     state: &State,
-    requests: HashMap<TKey, BulkDecryptReq<T>>,
+    requests: HashMap<TKey, BulkDecryptReq<'a, T>>,
     insight: CreateInsightEvent,
     reason: String,
     principal: DbActor,
@@ -99,6 +99,7 @@ where
                         scoped_vault_id: sv.id,
                         tenant_id: sv.tenant_id,
                         is_live: sv.is_live,
+                        // TODO: also store the transforms!
                         targets,
                         insight_event_id: insight.id.clone(),
                         reason: Some(reason.clone()),

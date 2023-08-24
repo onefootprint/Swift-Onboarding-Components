@@ -156,7 +156,7 @@ pub(super) async fn post_inner(
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
 
-    let mut vws: HashMap<Option<DataLifetimeSeqno>, TenantVw> = state
+    let vws: HashMap<Option<DataLifetimeSeqno>, TenantVw> = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
@@ -173,7 +173,7 @@ pub(super) async fn post_inner(
         .clone()
         .into_iter()
         .map(|(v, targets)| -> ApiResult<_> {
-            let vw = vws.remove(&v).ok_or(AssertionError("No VW found for version"))?;
+            let vw = vws.get(&v).ok_or(AssertionError("No VW found for version"))?;
             Ok((v, BulkDecryptReq { vw, targets }))
         })
         .collect::<ApiResult<_>>()?;

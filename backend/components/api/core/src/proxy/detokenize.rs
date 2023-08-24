@@ -40,7 +40,7 @@ pub async fn detokenize(
     let fp_ids = tokens.keys().cloned().collect_vec();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let mut vws: HashMap<FpId, TenantVw> = state
+    let vws: HashMap<FpId, TenantVw> = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let svs = ScopedVault::bulk_get(conn, fp_ids, &tenant_id, is_live)?;
@@ -56,7 +56,7 @@ pub async fn detokenize(
         .into_iter()
         .map(|(fp_id, targets)| -> ApiResult<_> {
             let vw = vws
-                .remove(&fp_id)
+                .get(&fp_id)
                 .ok_or(TenantError::VaultDoesntExist(fp_id.clone()))?;
             let targets = targets
                 .into_iter()
