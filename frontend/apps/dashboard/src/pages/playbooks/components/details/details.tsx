@@ -9,7 +9,7 @@ import Error from './components/error';
 import Loading from './components/loading';
 
 const Details = () => {
-  const { t } = useTranslation();
+  const { t, allT } = useTranslation('pages.playbooks.table.details');
   const { query, clear } = useFilters();
   const isOpen = !!query.onboarding_config_id;
   const { data, isLoading, errorMessage } = usePlaybook(
@@ -18,9 +18,11 @@ const Details = () => {
 
   const getDrawerTitle = () => {
     if (data) {
-      return data.name;
+      return t('title');
     }
-    return isLoading ? t('notifications.loading') : t('notifications.error');
+    return isLoading
+      ? allT('notifications.loading')
+      : allT('notifications.error');
   };
 
   return (

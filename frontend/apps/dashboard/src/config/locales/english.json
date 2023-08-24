@@ -1162,6 +1162,30 @@
             "disabled": "Disabled"
           }
         },
+        "details": {
+          "title": "Playbook details",
+          "content": {
+            "basics": {
+              "title": "Playbook basics",
+              "edit-name": {
+                "title": "Playbook basics",
+                "edit": "Edit name",
+                "form": {
+                  "label": "Playbook name",
+                  "cancel": "Cancel",
+                  "save": "Save"
+                }
+              },
+              "type": {
+                "label": "Type",
+                "kyc": "KYC",
+                "kyb": "KYB"
+              },
+              "name": "Playbook name",
+              "publishable-key": "Publishable key"
+            }
+          }
+        },
         "actions": {
           "aria-label": "Open actions for Playbook {{name}}",
           "not-allowed": "You're not allowed to manage Playbooks",
