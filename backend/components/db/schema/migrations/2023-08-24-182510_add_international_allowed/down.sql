@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration DROP COLUMN allow_international_residents, DROP COLUMN international_country_restrictions;

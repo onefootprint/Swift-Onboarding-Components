@@ -29,6 +29,9 @@ pub struct CreateOnboardingConfigurationRequest {
     is_no_phone_flow: Option<bool>,
     #[serde(default)]
     is_doc_first_flow: bool,
+    #[serde(default)]
+    allow_international_residents: bool,
+    international_country_restrictions: Option<Vec<String>>,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -240,6 +243,8 @@ pub async fn post(
         cip_kind,
         is_no_phone_flow,
         is_doc_first_flow,
+        allow_international_residents,
+        international_country_restrictions,
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -261,6 +266,8 @@ pub async fn post(
                 cip_kind,
                 is_no_phone_flow.unwrap_or(false),
                 is_doc_first_flow,
+                allow_international_residents,
+                international_country_restrictions,
             )
         })
         .await??;
@@ -322,6 +329,8 @@ mod test {
             cip_kind: None,
             is_no_phone_flow: Some(false),
             is_doc_first_flow: false,
+            allow_international_residents: false,
+            international_country_restrictions: None,
         };
         req.validate_inner().is_ok()
     }
@@ -343,6 +352,8 @@ mod test {
             cip_kind: None,
             is_no_phone_flow: Some(true),
             is_doc_first_flow: false,
+            allow_international_residents: false,
+            international_country_restrictions: None,
         };
         req.validate().is_ok()
     }
@@ -358,6 +369,8 @@ mod test {
             cip_kind: None,
             is_no_phone_flow: Some(false),
             is_doc_first_flow: true,
+            allow_international_residents: false,
+            international_country_restrictions: None,
         };
         req.validate().is_ok()
     }

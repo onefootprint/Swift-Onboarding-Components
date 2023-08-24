@@ -383,6 +383,8 @@ table! {
         optional_data -> Array<Text>,
         is_no_phone_flow -> Bool,
         is_doc_first -> Bool,
+        allow_international_residents -> Bool,
+        international_country_restrictions -> Nullable<Array<Text>>,
     }
 }
 

@@ -35,8 +35,11 @@ pub struct ObConfiguration {
     pub appearance_id: Option<AppearanceId>,
     pub cip_kind: Option<CipKind>,
     pub optional_data: Vec<CDO>,
+    // DO NOT REORDER THESE FIELDS
     pub is_no_phone_flow: bool,
     pub is_doc_first: bool,
+    pub allow_international_residents: bool,
+    pub international_country_restrictions: Option<Vec<String>>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
@@ -54,6 +57,8 @@ struct NewObConfiguration {
     optional_data: Vec<CDO>,
     is_no_phone_flow: bool,
     is_doc_first: bool,
+    allow_international_residents: bool,
+    international_country_restrictions: Option<Vec<String>>,
 }
 
 #[derive(Debug)]
@@ -207,6 +212,8 @@ impl ObConfiguration {
         cip_kind: Option<CipKind>,
         is_no_phone_flow: bool,
         is_doc_first: bool,
+        allow_international_residents: bool,
+        international_country_restrictions: Option<Vec<String>>,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -221,6 +228,8 @@ impl ObConfiguration {
             optional_data,
             is_no_phone_flow,
             is_doc_first,
+            allow_international_residents,
+            international_country_restrictions,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
