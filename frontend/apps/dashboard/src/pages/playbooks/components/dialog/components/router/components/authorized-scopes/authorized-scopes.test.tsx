@@ -49,4 +49,12 @@ describe('<AuthorizedScopes />', () => {
     });
     expect(createButton).toBeInTheDocument();
   });
+
+  it('should disable back button if mutation is loading', () => {
+    renderAuthorizedScopes({ kind: Kind.KYC, submissionLoading: true });
+    const backButton = screen.getByRole('button', {
+      name: 'Back',
+    });
+    expect(backButton).toBeDisabled();
+  });
 });

@@ -7,7 +7,7 @@ import React from 'react';
 import PlaybookMachine from '@/playbooks/utils/machine';
 import {
   AuthorizedScopesFormData,
-  defaultNameValue,
+  defaultNameFormData,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
   Kind,
@@ -52,13 +52,19 @@ const Router = ({ onClose }: RouterProps) => {
       ? state.context.playbook
       : playbookDefaultValues;
 
+  const nameValueToPrefill =
+    state.context?.nameForm?.kind === state.context.kind &&
+    state.context.nameForm
+      ? state.context.nameForm
+      : defaultNameFormData;
+
   const step = getStep({ value: state.value as string });
   const stepperValue = options[step];
 
   // we can't break this out into a separate util b/c of hook dependencies
   const createPlaybook = ({ authorizedScopes }: HandleCreateProps) => {
-    const { kind, playbook, name } = state.context;
-    if (!kind || !playbook || !authorizedScopes || !name) {
+    const { kind, playbook, nameForm } = state.context;
+    if (!kind || !playbook || !authorizedScopes || !nameForm) {
       return;
     }
     const {
@@ -67,10 +73,12 @@ const Router = ({ onClose }: RouterProps) => {
       optionalData,
       isDocFirstFlow,
       isNoPhoneFlow,
+      name,
     } = processPlaybook({
       kind,
       playbook,
       authorizedScopes,
+      nameForm,
     });
     mutation.mutate(
       {
@@ -117,7 +125,6 @@ const Router = ({ onClose }: RouterProps) => {
       <Content>
         {state.matches('whoToOnboard') && (
           <WhoToOnboard
-            onBack={onClose}
             defaultKind={state.context.kind}
             onSubmit={({ kind }) => {
               send('whoToOnboardSubmitted', { payload: { kind } });
@@ -127,10 +134,12 @@ const Router = ({ onClose }: RouterProps) => {
         {state.matches('nameYourPlaybook') && (
           <NameYourPlaybook
             kind={state.context.kind}
-            defaultValues={{ name: state.context.name ?? defaultNameValue }}
+            defaultValues={nameValueToPrefill}
             onBack={() => send('whoToOnboardSelected')}
-            onSubmit={({ name }) => {
-              send('nameYourPlaybookSubmitted', { payload: { name } });
+            onSubmit={data => {
+              send('nameYourPlaybookSubmitted', {
+                payload: { nameForm: data },
+              });
             }}
           />
         )}
@@ -141,7 +150,7 @@ const Router = ({ onClose }: RouterProps) => {
             onSubmit={data => {
               send('playbookSubmitted', { payload: { playbook: data } });
             }}
-            onBack={() => send('whoToOnboardSelected')}
+            onBack={() => send('nameYourPlaybookSelected')}
           />
         )}
         {state.matches('authorizedScopes') && (
@@ -168,7 +177,7 @@ const StepperContainer = styled.div`
     white-space: nowrap;
     margin-left: ${theme.spacing[10]};
     position: fixed;
-    margin-top: ${theme.spacing[9]};
+    margin-top: ${theme.spacing[5]};
     @media (max-width: 1200px) {
       display: none;
     }

@@ -111,7 +111,7 @@ describe('<PersonalScopes />', () => {
   it('should show investor profile if collecting', () => {
     renderPersonalScopes({ investorProfile: true });
     const investorProfile = screen.getByRole('checkbox', {
-      name: 'Investor profile',
+      name: 'Investor profile questions',
     });
     expect(investorProfile).toBeInTheDocument();
   });
@@ -139,5 +139,29 @@ describe('<PersonalScopes />', () => {
       name: 'ID Document & Selfie',
     });
     expect(idDoc).not.toBeInTheDocument();
+  });
+
+  it('should not US residents section if none of the options exist', () => {
+    renderPersonalScopes({
+      startingPersonalValues: {
+        idDoc: false,
+        ssn: false,
+        ssnKind: undefined,
+        nationality: false,
+      },
+    });
+    expect(screen.queryByText('U.S. residents')).not.toBeInTheDocument();
+  });
+
+  it('should render US residents section if at least one of the options exist', () => {
+    renderPersonalScopes({
+      startingPersonalValues: {
+        idDoc: false,
+        ssn: true,
+        ssnKind: CollectedKycDataOption.ssn9,
+        nationality: false,
+      },
+    });
+    expect(screen.getByText('U.S. residents')).toBeInTheDocument();
   });
 });

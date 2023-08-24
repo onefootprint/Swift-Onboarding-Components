@@ -10,6 +10,7 @@ import {
   AuthorizedScopesFormData,
   BusinessInformation,
   Kind,
+  NameFormData,
   PlaybookFormData,
 } from '@/playbooks/utils/machine/types';
 
@@ -17,6 +18,7 @@ type ProcessPlaybookProps = {
   playbook: PlaybookFormData;
   kind: Kind;
   authorizedScopes: AuthorizedScopesFormData;
+  nameForm: NameFormData;
 };
 
 const getRequiredKybCollectFields = () => [
@@ -37,6 +39,7 @@ const processPlaybook = ({
   playbook,
   kind,
   authorizedScopes,
+  nameForm,
 }: ProcessPlaybookProps) => {
   const mustCollectData: CollectedDataOption[] = [];
   const canAccessData: CollectedDataOption[] = [];
@@ -136,12 +139,15 @@ const processPlaybook = ({
     }
   }
 
+  const { name } = nameForm;
+
   return {
     mustCollectData,
     canAccessData,
     optionalData,
     isDocFirstFlow,
     isNoPhoneFlow,
+    name,
   };
 };
 

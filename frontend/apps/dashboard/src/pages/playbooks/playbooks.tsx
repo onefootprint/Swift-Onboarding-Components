@@ -91,11 +91,9 @@ const Container = styled.div`
 `;
 
 const TableContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-  `};
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 `;
 
 const HeaderContainer = styled.div`

@@ -55,7 +55,12 @@ const AuthorizedScopes = ({
           {kind === Kind.KYB && <BusinessScopes />}
           <PersonalScopes playbook={playbook} kind={kind} />
           <ButtonContainer>
-            <Button size="compact" variant="secondary" onClick={onBack}>
+            <Button
+              size="compact"
+              variant="secondary"
+              onClick={onBack}
+              disabled={submissionLoading}
+            >
               {t('back')}
             </Button>
             <Button loading={submissionLoading} size="compact" type="submit">
@@ -81,6 +86,7 @@ const Header = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[2]};
+    padding-top: ${theme.spacing[5]};
   `};
 `;
 

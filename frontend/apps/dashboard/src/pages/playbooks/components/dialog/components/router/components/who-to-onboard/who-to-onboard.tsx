@@ -8,7 +8,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { Kind } from '@/playbooks/utils/machine/types';
 
 export type WhoToOnboardProps = {
-  onBack: () => void;
   onSubmit: (formData: FormData) => void;
   defaultKind?: Kind;
 };
@@ -17,7 +16,7 @@ type FormData = {
   kind: Kind;
 };
 
-const WhoToOnboard = ({ onBack, onSubmit, defaultKind }: WhoToOnboardProps) => {
+const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
   const { t } = useTranslation('pages.playbooks.dialog.who-to-onboard');
   const { handleSubmit, control } = useForm<FormData>({
     defaultValues: { kind: defaultKind },
@@ -64,9 +63,6 @@ const WhoToOnboard = ({ onBack, onSubmit, defaultKind }: WhoToOnboardProps) => {
           )}
         />
         <ButtonContainer>
-          <Button variant="secondary" size="compact" onClick={onBack}>
-            {t('buttons.back')}
-          </Button>
           <Button variant="primary" size="compact" type="submit">
             {t('buttons.continue')}
           </Button>
@@ -98,7 +94,7 @@ const Container = styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-end;
 `;
 
 const Form = styled.form`

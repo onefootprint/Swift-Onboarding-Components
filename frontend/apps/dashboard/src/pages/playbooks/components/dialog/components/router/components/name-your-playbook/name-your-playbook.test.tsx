@@ -1,4 +1,9 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import { Kind } from '@/playbooks/utils/machine/types';
@@ -24,5 +29,14 @@ describe('<NameYourPlaybook />', () => {
     expect(
       screen.getByPlaceholderText('Business verification'),
     ).toBeInTheDocument();
+  });
+
+  it('should show error if no name provided', async () => {
+    renderNameYourPlaybook({ kind: Kind.KYB });
+    const next = screen.getByRole('button', { name: 'Next' });
+    await userEvent.click(next);
+    await waitFor(() => {
+      expect(screen.getByText('Please name your Playbook')).toBeInTheDocument();
+    });
   });
 });

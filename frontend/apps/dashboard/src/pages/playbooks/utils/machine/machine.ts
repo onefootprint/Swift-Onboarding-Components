@@ -67,7 +67,7 @@ export const createPlaybookMachine = () =>
       actions: {
         assignNameYourPlaybook: assign((context, event) => ({
           ...context,
-          name: event.payload.name,
+          nameForm: event.payload.nameForm,
         })),
         assignWhoToOnboard: assign((context, event) => ({
           ...context,

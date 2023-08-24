@@ -19,12 +19,14 @@ export type PlaybookFormData = {
 };
 
 export type NameFormData = {
+  kind: Kind;
   name: string;
 };
 
 export const defaultNameValue = '';
 
 export const defaultNameFormData: NameFormData = {
+  kind: Kind.KYC,
   name: defaultNameValue,
 };
 
@@ -119,7 +121,7 @@ export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
 
 export type MachineContext = {
   kind?: Kind;
-  name?: string;
+  nameForm?: NameFormData;
   playbook?: PlaybookFormData;
 };
 
@@ -127,7 +129,7 @@ export type MachineEvents =
   | {
       type: 'nameYourPlaybookSubmitted';
       payload: {
-        name: string;
+        nameForm: NameFormData;
       };
     }
   | {

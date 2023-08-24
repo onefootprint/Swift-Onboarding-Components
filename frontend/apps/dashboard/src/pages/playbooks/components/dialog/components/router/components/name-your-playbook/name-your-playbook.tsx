@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button, TextInput, Typography } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { Kind, NameFormData } from '@/playbooks/utils/machine/types';
@@ -23,7 +23,15 @@ const NameYourPlaybook = ({
   const formMethods = useForm<NameFormData>({
     defaultValues,
   });
-  const { handleSubmit, register } = formMethods;
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    formState: { errors },
+  } = formMethods;
+  useEffect(() => {
+    setValue('kind', kind);
+  }, [setValue, kind]);
 
   return (
     <Container>
@@ -37,16 +45,26 @@ const NameYourPlaybook = ({
               {t('subtitle')}
             </Typography>
           </Header>
-          <TextInput
-            autoFocus
-            {...register('name')}
-            label={t('form.name.label')}
-            placeholder={
-              kind === Kind.KYC
-                ? t('form.name.placeholder-kyc')
-                : t('form.name.placeholder-kyb')
-            }
-          />
+          <NameContainer>
+            <TextInput
+              autoFocus
+              {...register('name', {
+                required: { value: true, message: t('form.errors.required') },
+              })}
+              label={t('form.name.label')}
+              hasError={!!errors.name}
+              placeholder={
+                kind === Kind.KYC
+                  ? t('form.name.placeholder-kyc')
+                  : t('form.name.placeholder-kyb')
+              }
+            />
+            {errors.name && (
+              <Typography variant="body-3" color="error">
+                {t('form.errors.required')}
+              </Typography>
+            )}
+          </NameContainer>
           <ButtonContainer>
             <Button size="compact" variant="secondary" onClick={onBack}>
               {t('back')}
@@ -85,6 +103,14 @@ const Header = styled.div`
     flex-direction: column;
     gap: ${theme.spacing[2]};
     padding-top: ${theme.spacing[5]};
+  `};
+`;
+
+const NameContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[2]};
   `};
 `;
 

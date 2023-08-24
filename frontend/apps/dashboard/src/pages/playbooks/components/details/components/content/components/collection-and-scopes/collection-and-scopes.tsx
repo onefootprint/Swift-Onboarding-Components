@@ -32,20 +32,22 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
   return (
     <Container>
       <Tabs variant="underlined">
-        {options.map(({ value, label }) => (
-          <Tab
-            as="button"
-            key={value}
-            onClick={() => handleChange(value)}
-            selected={segment === value}
-          >
-            {label}
-          </Tab>
-        ))}
+        <TabContainer>
+          {options.map(({ value, label }) => (
+            <Tab
+              as="button"
+              key={value}
+              onClick={() => handleChange(value)}
+              selected={segment === value}
+            >
+              {label}
+            </Tab>
+          ))}
+        </TabContainer>
       </Tabs>
 
       {segment === 'data' && (
-        <>
+        <SectionsContainer>
           <DataCollection
             displayFields={basicInformationFields}
             mustCollectData={mustCollectData}
@@ -56,7 +58,7 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
             mustCollectData={mustCollectData}
             title={t('data-collection.us-residents')}
           />
-        </>
+        </SectionsContainer>
       )}
       {segment === 'authorized-scopes' && (
         <AuthorizedScopes canAccessData={canAccessData} />
@@ -69,7 +71,23 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
+    gap: ${theme.spacing[8]};
+  `}
+`;
+
+const SectionsContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
     gap: ${theme.spacing[5]};
+  `}
+`;
+
+const TabContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    gap: ${theme.spacing[8]};
   `}
 `;
 

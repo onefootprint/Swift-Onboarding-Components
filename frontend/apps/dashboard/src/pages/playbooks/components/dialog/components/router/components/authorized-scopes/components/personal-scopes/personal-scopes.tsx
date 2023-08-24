@@ -62,47 +62,55 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
         </OptionsContainer>
       </ScopeSection>
 
-      <ScopeSection>
-        <Typography variant="label-3">{t('us-residents')}</Typography>
-        <OptionsContainer>
-          {ssn &&
-            (ssnKind === CollectedKycDataOption.ssn4 ? (
+      {(ssn || nationality || idDoc) && (
+        <ScopeSection>
+          <Typography variant="label-3">{t('us-residents')}</Typography>
+          <OptionsContainer>
+            {ssn &&
+              (ssnKind === CollectedKycDataOption.ssn4 ? (
+                <Checkbox
+                  label={allT('cdo.ssn4')}
+                  {...register(CollectedKycDataOption.ssn4)}
+                />
+              ) : (
+                <Checkbox
+                  label={allT('cdo.ssn9')}
+                  {...register(CollectedKycDataOption.ssn9)}
+                />
+              ))}
+            {nationality && (
               <Checkbox
-                label={allT('cdo.ssn4')}
-                {...register(CollectedKycDataOption.ssn4)}
+                label={t('nationality')}
+                {...register(CollectedKycDataOption.nationality)}
               />
-            ) : (
-              <Checkbox
-                label={allT('cdo.ssn9')}
-                {...register(CollectedKycDataOption.ssn9)}
-              />
-            ))}
-          {nationality && (
+            )}
+            {idDoc && (
+              <Box>
+                <Checkbox
+                  label={
+                    selfie
+                      ? allT('cdo.document_and_selfie')
+                      : allT('cdo.document')
+                  }
+                  {...register(CollectedDocumentDataOption.document)}
+                />
+              </Box>
+            )}
+          </OptionsContainer>
+        </ScopeSection>
+      )}
+
+      {isCollectingInvestorProfile && (
+        <ScopeSection>
+          <Typography variant="label-3">{t('investor-profile')}</Typography>
+          <OptionsContainer>
             <Checkbox
-              label={t('nationality')}
-              {...register(CollectedKycDataOption.nationality)}
-            />
-          )}
-          {idDoc && (
-            <Box>
-              <Checkbox
-                label={
-                  selfie
-                    ? allT('cdo.document_and_selfie')
-                    : allT('cdo.document')
-                }
-                {...register(CollectedDocumentDataOption.document)}
-              />
-            </Box>
-          )}
-          {isCollectingInvestorProfile && (
-            <Checkbox
-              label={allT('cdo.investor_profile')}
+              label={t('investor-profile-questions')}
               {...register(CollectedInvestorProfileDataOption.investorProfile)}
             />
-          )}
-        </OptionsContainer>
-      </ScopeSection>
+          </OptionsContainer>
+        </ScopeSection>
+      )}
     </Sections>
   );
 };

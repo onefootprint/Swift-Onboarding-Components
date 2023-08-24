@@ -1312,6 +1312,9 @@
               "label": "Playbook name",
               "placeholder-kyc": "User ID verification",
               "placeholder-kyb": "Business verification"
+            },
+            "errors": {
+              "required": "Please name your Playbook"
             }
           }
         },
@@ -1348,6 +1351,8 @@
               "beneficial-owners": "Beneficial owners",
               "basic-information": "Basic information",
               "us-residents": "U.S. residents",
+              "investor-profile": "Investor profile",
+              "investor-profile-questions": "Investor profile questions",
               "nationality": "Legal status in the U.S."
             }
           },

@@ -84,7 +84,7 @@ describe('<Router />', () => {
     ).toBeInTheDocument();
   });
 
-  it("should navigate from 'Your Playbook' to 'Who to onboard' screen by way of back button", async () => {
+  it("should navigate from 'Your Playbook' to 'Name your playbook' screen by way of back button", async () => {
     renderRouter({ onClose: jest.fn() });
     await selectWhoToOnboard();
     await enterName();
@@ -97,7 +97,9 @@ describe('<Router />', () => {
     });
     await userEvent.click(backButton);
     expect(
-      screen.getByText('Who would you like to onboard?'),
+      screen.getByText(
+        'This helps you easily identify your Playbook, especially if you have multiple ones.',
+      ),
     ).toBeInTheDocument();
   });
 
@@ -209,5 +211,34 @@ describe('<Router />', () => {
     const continueButton = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(continueButton);
     expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
+  });
+
+  it('should reset name value if user swaps between KYC and KYB', async () => {
+    renderRouter({ onClose: jest.fn() });
+    // KYC
+    await selectWhoToOnboard();
+    expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
+    let nameField = screen.getByRole('textbox');
+    await userEvent.type(nameField, 'Test KYC name');
+    expect(nameField).toHaveValue('Test KYC name');
+    const back = screen.getByRole('button', {
+      name: 'Back',
+    });
+    await userEvent.click(back);
+    expect(
+      screen.getByText('Who would you like to onboard?'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('This helps us better recommend which data to collect.'),
+    ).toBeInTheDocument();
+    const KYB = screen.getByText(
+      'Onboard businesses and their beneficial owners',
+    );
+    await userEvent.click(KYB);
+    const continueButton = screen.getByRole('button', { name: 'Continue' });
+    await userEvent.click(continueButton);
+    expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
+    nameField = screen.getByRole('textbox');
+    expect(nameField).not.toHaveValue('Test KYC name');
   });
 });
