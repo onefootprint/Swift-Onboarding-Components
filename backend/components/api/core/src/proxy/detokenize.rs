@@ -11,6 +11,7 @@ use crate::State;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
+use newtypes::AccessEventPurpose;
 use newtypes::FpId;
 use newtypes::PiiString;
 use newtypes::ProxyToken;
@@ -30,6 +31,7 @@ pub async fn detokenize(
     tokens: Vec<ProxyToken>,
     reason: Option<String>,
     insight: InsightHeaders,
+    purpose: AccessEventPurpose,
 ) -> ApiResult<HashMap<ProxyToken, PiiString>> {
     // split tokens by fp_id
     let tokens = tokens
@@ -74,7 +76,8 @@ pub async fn detokenize(
         .collect::<ApiResult<_>>()?;
     let reason = reason.unwrap_or_else(|| "Vault Proxy Default Reason".to_string());
     let insight = CreateInsightEvent::from(insight);
-    let decrypted_results = bulk_decrypt(state, decrypt_reqs, insight, reason, auth.actor().into()).await?;
+    let actor = auth.actor().into();
+    let decrypted_results = bulk_decrypt(state, decrypt_reqs, insight, reason, actor, purpose).await?;
 
     let out = decrypted_results
         .into_iter()

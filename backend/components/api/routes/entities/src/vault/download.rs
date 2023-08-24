@@ -12,6 +12,7 @@ use api_core::utils::vault_wrapper::{Any, EnclaveDecryptOperation, Pii, TenantVw
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
+use newtypes::AccessEventPurpose;
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[route_alias(get(
@@ -64,8 +65,9 @@ pub async fn get(
         transforms: vec![],
     };
     let insight = CreateInsightEvent::from(insights);
+    let purpose = AccessEventPurpose::Api;
     let result = vw
-        .fn_decrypt_raw(&state, reason, principal, insight, vec![op.clone()])
+        .fn_decrypt_raw(&state, reason, principal, insight, vec![op.clone()], purpose)
         .await?
         .remove(&op)
         .ok_or(TenantError::DataDoesntExist(di.clone()))?;

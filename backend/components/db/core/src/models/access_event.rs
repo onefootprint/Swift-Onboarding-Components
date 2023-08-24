@@ -6,6 +6,7 @@ use diesel::dsl::count_distinct;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable, RunQueryDsl};
 use itertools::Itertools;
+use newtypes::AccessEventPurpose;
 use newtypes::VaultKind;
 use newtypes::{
     AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedVaultId, TenantId,
@@ -23,6 +24,7 @@ pub struct AccessEvent {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub insight_event_id: InsightEventId,
+    /// The human-readable explanation for the access event
     pub reason: Option<String>,
     pub principal: DbActor,
     pub ordering_id: i64,
@@ -32,6 +34,8 @@ pub struct AccessEvent {
     pub tenant_id: TenantId,
     /// Denormalized from scoped_vault for faster querying
     pub is_live: bool,
+    /// The machine-readable reason for the access event
+    pub purpose: AccessEventPurpose,
 }
 
 #[derive(Debug, Clone)]
@@ -44,6 +48,7 @@ pub struct NewAccessEvent {
     pub insight: CreateInsightEvent,
     pub kind: AccessEventKind,
     pub targets: Vec<DataIdentifier>,
+    pub purpose: AccessEventPurpose,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -57,6 +62,7 @@ pub struct NewAccessEventRow {
     pub targets: Vec<DataIdentifier>,
     pub tenant_id: TenantId,
     pub is_live: bool,
+    pub purpose: AccessEventPurpose,
 }
 
 impl NewAccessEvent {
@@ -72,6 +78,7 @@ impl NewAccessEvent {
             targets: self.targets,
             tenant_id: self.tenant_id,
             is_live: self.is_live,
+            purpose: self.purpose,
         };
 
         diesel::insert_into(access_event::table)

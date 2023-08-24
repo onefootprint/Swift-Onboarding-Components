@@ -12,7 +12,7 @@ use strum_macros::{AsRefStr, EnumString};
     PartialEq,
     Ord,
     PartialOrd,
-    Display,
+    Display, // Careful, this is derive_more::Display, not strum
     Hash,
     Clone,
     Copy,

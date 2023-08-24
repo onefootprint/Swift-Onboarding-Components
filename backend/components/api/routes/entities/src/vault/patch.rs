@@ -16,7 +16,7 @@ use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{AccessEventKind, FpId, PiiString, PiiValue, ValidateArgs};
+use newtypes::{AccessEventKind, AccessEventPurpose, FpId, PiiString, PiiValue, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 #[route_alias(
@@ -155,6 +155,7 @@ async fn patch_inner(
                 insight,
                 kind: AccessEventKind::Update,
                 targets,
+                purpose: AccessEventPurpose::Api,
             }
             .create(conn)?;
 

@@ -5,7 +5,7 @@ use db::models::{
     insight_event::CreateInsightEvent,
 };
 use itertools::Itertools;
-use newtypes::{AccessEventKind, DbActor, PiiString};
+use newtypes::{AccessEventKind, AccessEventPurpose, DbActor, PiiString};
 
 use crate::{
     errors::{ApiResult, AssertionError},
@@ -32,6 +32,7 @@ pub async fn bulk_decrypt<'a, TKey, T>(
     insight: CreateInsightEvent,
     reason: String,
     principal: DbActor,
+    purpose: AccessEventPurpose,
 ) -> ApiResult<Vec<(TKey, HashMap<EnclaveDecryptOperation, PiiString>)>>
 where
     TKey: Eq + std::hash::Hash + 'static + Clone,
@@ -105,6 +106,7 @@ where
                         reason: Some(reason.clone()),
                         principal: principal.clone(),
                         kind: AccessEventKind::Decrypt,
+                        purpose,
                     };
                     Ok(access_event)
                 })

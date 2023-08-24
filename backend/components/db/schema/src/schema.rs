@@ -15,6 +15,7 @@ table! {
         targets -> Array<Text>,
         tenant_id -> Text,
         is_live -> Bool,
+        purpose -> Text,
     }
 }
 

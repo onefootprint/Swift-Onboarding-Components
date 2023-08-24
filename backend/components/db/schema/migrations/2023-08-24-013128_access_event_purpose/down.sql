@@ -1,0 +1,1 @@
+ALTER TABLE access_event DROP COLUMN purpose;

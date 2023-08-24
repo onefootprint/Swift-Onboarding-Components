@@ -19,6 +19,7 @@ use db::models::vault::NewVaultArgs;
 use itertools::Itertools;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::AccessEventKind;
+use newtypes::AccessEventPurpose;
 use newtypes::SandboxId;
 use newtypes::ValidateArgs;
 use newtypes::VaultKind;
@@ -95,6 +96,7 @@ pub async fn post(
                     insight,
                     kind: AccessEventKind::Update,
                     targets,
+                    purpose: AccessEventPurpose::Api,
                 }
                 .create(conn)?;
             }

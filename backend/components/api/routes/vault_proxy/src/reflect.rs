@@ -12,6 +12,7 @@ use api_core::api_headers_schema;
 use api_core::auth::CanDecrypt;
 use api_core::utils::body_bytes::BodyBytes;
 use api_core::ApiErrorKind;
+use newtypes::AccessEventPurpose;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web, web::HttpResponse};
 use reqwest::StatusCode;
@@ -65,6 +66,7 @@ pub async fn post(
         parser.matches.keys().cloned().collect(),
         params.access_reason,
         insight.clone(),
+        AccessEventPurpose::Reflect,
     )
     .await?;
 

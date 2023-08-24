@@ -15,7 +15,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::{DataLifetimeSeqno, VersionedDataIdentifier};
+use newtypes::{AccessEventPurpose, DataLifetimeSeqno, VersionedDataIdentifier};
 use newtypes::{FilterFunction, FpId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
@@ -178,7 +178,9 @@ pub(super) async fn post_inner(
         })
         .collect::<ApiResult<_>>()?;
     let insight = CreateInsightEvent::from(insights);
-    let mut decrypted_results = bulk_decrypt(state, decrypt_reqs, insight, reason, auth.actor().into())
+    let actor = auth.actor().into();
+    let purpose = AccessEventPurpose::Api;
+    let mut decrypted_results = bulk_decrypt(state, decrypt_reqs, insight, reason, actor, purpose)
         .await?
         .into_iter()
         .collect::<HashMap<_, _>>();

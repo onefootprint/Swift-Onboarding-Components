@@ -16,7 +16,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use macros::route_alias;
-use newtypes::{AccessEventKind, DataIdentifier, FpId, PiiBytes};
+use newtypes::{AccessEventKind, AccessEventPurpose, DataIdentifier, FpId, PiiBytes};
 use paperclip::actix::{self, api_v2_operation, web, web::Path};
 
 api_headers_schema! {
@@ -161,6 +161,7 @@ async fn post_upload_inner(
                 insight,
                 kind: AccessEventKind::Update,
                 targets: vec![data_identifier],
+                purpose: AccessEventPurpose::Api,
             }
             .create(conn)?;
 

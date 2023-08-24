@@ -17,7 +17,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
 
-use newtypes::{flat_api_object_map_type, AccessEventKind, DataIdentifier, FpId};
+use newtypes::{flat_api_object_map_type, AccessEventKind, AccessEventPurpose, DataIdentifier, FpId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 use serde::Deserialize;
@@ -83,6 +83,7 @@ pub async fn delete(
                 insight: CreateInsightEvent::from(insight),
                 kind: AccessEventKind::Delete,
                 targets: dis.clone(),
+                purpose: AccessEventPurpose::Api,
             }
             .create(conn.conn())?;
 

@@ -18,6 +18,7 @@ use enclave_proxy::DataTransformer;
 use futures::future::try_join_all;
 use itertools::Itertools;
 use newtypes::AccessEventKind;
+use newtypes::AccessEventPurpose;
 use newtypes::DataIdentifier;
 use newtypes::DataRequest;
 use newtypes::DocumentKind;
@@ -159,6 +160,7 @@ pub async fn vault_pii(
                         .cloned()
                         .chain(documents.iter().map(|d| DataIdentifier::Document(d.kind)))
                         .collect(),
+                    purpose: AccessEventPurpose::VaultProxy,
                 }
                 .create(conn)?;
 

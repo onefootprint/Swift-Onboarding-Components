@@ -5,7 +5,7 @@ use crate::{errors::ApiResult, State};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use itertools::Itertools;
-use newtypes::{AccessEventKind, DataIdentifier, DbActor};
+use newtypes::{AccessEventKind, AccessEventPurpose, DataIdentifier, DbActor};
 use std::collections::HashMap;
 
 impl<Type> TenantVw<Type> {
@@ -33,6 +33,7 @@ impl<Type> TenantVw<Type> {
         principal: DbActor,
         insight: CreateInsightEvent,
         targets: Vec<EnclaveDecryptOperation>,
+        purpose: AccessEventPurpose,
     ) -> ApiResult<HashMap<EnclaveDecryptOperation, Pii>> {
         let dis = targets.iter().map(|op| &op.identifier).collect();
         self.check_ob_config_access(dis)?;
@@ -50,6 +51,7 @@ impl<Type> TenantVw<Type> {
             kind: AccessEventKind::Decrypt,
             // TODO: also store the transforms!
             targets: results.decrypted_dis.into_iter().map(|t| t.identifier).collect(),
+            purpose,
         };
         state.db_pool.db_query(|conn| event.create(conn)).await??;
         Ok(results.results)

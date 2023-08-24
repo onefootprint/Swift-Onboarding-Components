@@ -18,6 +18,7 @@ use api_core::auth::tenant::TenantAuth;
 use api_core::proxy::config::JitProxyHeaderParams;
 use api_core::proxy::config::ProxyHeaderParams;
 use api_core::utils::body_bytes::BodyBytes;
+use newtypes::AccessEventPurpose;
 use newtypes::InvokeVaultProxyPermission;
 use newtypes::ProxyConfigId;
 use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
@@ -117,6 +118,7 @@ async fn invoke_vault_proxy(
         parser.matches.keys().cloned().collect(),
         config.access_reason.clone(),
         insight.clone(),
+        AccessEventPurpose::VaultProxy,
     )
     .await?;
 
