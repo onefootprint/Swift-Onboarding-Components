@@ -4,7 +4,6 @@ import {
   DEFAULT_COUNTRY,
 } from '@onefootprint/global-constants';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { IcoIdGeneric40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
@@ -122,7 +121,6 @@ const IdDocCountryAndType = () => {
   return (
     <Container>
       <NavigationHeader />
-      <IcoIdGeneric40 />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <InputsContainer>
         <CountrySelect

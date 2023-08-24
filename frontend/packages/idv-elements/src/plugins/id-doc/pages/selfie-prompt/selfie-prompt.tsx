@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoEmojiHappy24,
-  IcoSelfie40,
   IcoSmartphone24,
   IcoSparkles24,
   IcoSun24,
@@ -28,7 +27,6 @@ const SelfiePrompt = () => {
     <FadeInContainer>
       <PromptContainer>
         <NavigationHeader />
-        <IcoSelfie40 />
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <InfoBox
           items={[

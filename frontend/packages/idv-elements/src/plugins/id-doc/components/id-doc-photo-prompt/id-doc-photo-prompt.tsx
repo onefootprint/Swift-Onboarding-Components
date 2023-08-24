@@ -17,7 +17,6 @@ import React, { useState } from 'react';
 import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
-import { imageIcons } from '../../constants/image-types';
 import getImageSideLabel from '../../utils/get-image-side-label';
 import FadeInContainer from '../fade-in-container';
 import { useIdDocMachine } from '../machine-provider';
@@ -40,7 +39,6 @@ const IdDocPhotoPrompt = ({
 }: IdDocPhotoPromptProps) => {
   const { t } = useTranslation('components.id-doc-photo-prompt');
   const [state, send] = useIdDocMachine();
-  const ImageIcon = imageIcons[imageType];
   const { shouldCollectConsent: consentRequired } = state.context.requirement;
   const [consentVisible, setConsentVisible] = useState(false);
   const side = getImageSideLabel(imageType, type);
@@ -66,7 +64,6 @@ const IdDocPhotoPrompt = ({
   return (
     <FadeInContainer>
       <PromptContainer>
-        <ImageIcon />
         <HeaderTitle
           title={t('title', {
             type: IdDocTypeToLabel[type],
