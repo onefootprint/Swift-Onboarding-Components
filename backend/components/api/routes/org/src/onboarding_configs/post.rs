@@ -98,6 +98,15 @@ impl CreateOnboardingConfigurationRequest {
                 )
                 .into());
             }
+
+            // it would be really difficult to support the doc-first flow (for now)
+            // since we won’t know what document kinds/countries to restrict to until we have the residential address
+            if self.allow_international_residents {
+                return Err(TenantError::ValidationError(
+                    "Cannot have is_doc_first and allow_international_residents".to_owned(),
+                )
+                .into());
+            }
         }
 
         // Make sure there's only one CDO per CD, and create a map of CD -> selected CDO
