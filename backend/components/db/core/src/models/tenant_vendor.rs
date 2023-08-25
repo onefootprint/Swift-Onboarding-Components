@@ -1,4 +1,4 @@
-use crate::{DbResult, PgConn};
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_vendor_control;
 use diesel::ExpressionMethods;
@@ -37,7 +37,7 @@ struct NewTenantVendorControl {
 impl TenantVendorControl {
     #[tracing::instrument("TenantVendorControl::create", skip_all)]
     pub fn create(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         tenant_id: TenantId,
         idology_enabled: bool,
         experian_enabled: bool,
@@ -45,16 +45,20 @@ impl TenantVendorControl {
         middesk_api_key: Option<SealedVaultBytes>,
     ) -> DbResult<Self> {
         let new = NewTenantVendorControl {
-            tenant_id,
+            tenant_id: tenant_id.clone(),
             idology_enabled,
             experian_enabled,
             experian_subscriber_code,
             middesk_api_key,
         };
+        diesel::update(tenant_vendor_control::table)
+            .filter(tenant_vendor_control::tenant_id.eq(&tenant_id))
+            .set(tenant_vendor_control::deactivated_at.eq(Utc::now()))
+            .execute(conn.conn())?;
 
         let tvc = diesel::insert_into(tenant_vendor_control::table)
             .values(new)
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
 
         Ok(tvc)
     }
