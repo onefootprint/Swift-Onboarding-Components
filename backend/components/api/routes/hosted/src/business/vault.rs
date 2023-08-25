@@ -15,7 +15,8 @@ use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{
-    BusinessDataKind as BDK, BusinessOwnerKind, PiiJsonValue, PiiValue, ScopedVaultId, WorkflowGuard,
+    BusinessDataKind as BDK, BusinessOwnerKind, DataLifetimeSource, PiiJsonValue, PiiValue, ScopedVaultId,
+    WorkflowGuard,
 };
 use newtypes::{KycedBusinessOwnerData, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -92,7 +93,7 @@ pub async fn patch(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
-            bvw.patch_data(conn, request)?;
+            bvw.patch_data(conn, request, DataLifetimeSource::Hosted)?;
             Ok(())
         })
         .await?;

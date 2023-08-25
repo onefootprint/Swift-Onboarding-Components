@@ -117,6 +117,7 @@ table! {
         portablized_seqno -> Nullable<Int8>,
         deactivated_seqno -> Nullable<Int8>,
         kind -> Text,
+        source -> Text,
     }
 }
 

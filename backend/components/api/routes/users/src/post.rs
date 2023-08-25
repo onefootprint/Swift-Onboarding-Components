@@ -76,16 +76,17 @@ pub async fn post(
     }
 
     let actor = auth.actor().into();
+    let source = auth.source();
     let scoped_user = state
         .db_pool
-        .db_transaction(|conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let (su, _) =
                 ScopedVault::get_or_create_non_portable(conn, new_user, tenant_id, idempotency_id.0, actor)?;
 
             if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault
                 let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
-                uvw.patch_data(conn, request)?;
+                uvw.patch_data(conn, request, source)?;
                 // Create an access event to show data was added
                 NewAccessEvent {
                     scoped_vault_id: su.id.clone(),

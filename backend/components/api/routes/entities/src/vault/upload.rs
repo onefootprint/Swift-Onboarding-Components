@@ -102,6 +102,7 @@ async fn post_upload_inner(
     let tenant_id: newtypes::TenantId = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let principal = auth.actor().into();
+    let source = auth.source();
 
     // temporarily: block non custom/document objects
     match data_identifier {
@@ -149,6 +150,7 @@ async fn post_upload_inner(
                 file.filename,
                 e_data_key,
                 s3_url,
+                source,
             )?;
 
             // Create an access event to show data was added

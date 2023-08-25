@@ -11,8 +11,8 @@ use db::models::vault::Vault;
 use db::TxnPgConn;
 use newtypes::email::Email;
 use newtypes::{
-    DataIdentifier, DataRequest, Fingerprint, FingerprintRequest, FingerprintScopeKind, PhoneNumber,
-    PiiString, SandboxId,
+    DataIdentifier, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest, FingerprintScopeKind,
+    PhoneNumber, PiiString, SandboxId,
 };
 use newtypes::{IdentityDataKind as IDK, VaultKind};
 use newtypes::{Locked, ValidateArgs};
@@ -109,7 +109,8 @@ impl VaultWrapper<Person> {
             .into_iter()
             .flatten(),
         ));
-        let PatchDataResult { new_ci, seqno } = uvw.patch_data(conn, request)?;
+        let source = DataLifetimeSource::Hosted;
+        let PatchDataResult { new_ci, seqno } = uvw.patch_data(conn, request, source)?;
         // Immediately mark the phone as verified and portablized since it was proven to be owned
         // by the user in order to create this vault
         let (_, ci) = new_ci

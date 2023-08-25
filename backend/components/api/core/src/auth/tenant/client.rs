@@ -10,7 +10,7 @@ use actix_web::web;
 use db::{models::tenant::Tenant, PgConn};
 use futures_util::Future;
 use itertools::Itertools;
-use newtypes::{DataIdentifier, FpId, PiiString, TenantApiKeyId};
+use newtypes::{DataIdentifier, DataLifetimeSource, FpId, PiiString, TenantApiKeyId};
 use paperclip::actix::Apiv2Security;
 use std::{pin::Pin, sync::Arc};
 use tracing_actix_web::RootSpan;
@@ -127,6 +127,10 @@ impl TenantAuth for SessionContext<ClientTenantData> {
     fn scopes(&self) -> Vec<newtypes::TenantScope> {
         // This is false in some cases. Maybe ClientTenantAuth shouldn't implement TenantAuth
         vec![]
+    }
+
+    fn source(&self) -> DataLifetimeSource {
+        DataLifetimeSource::ClientTenant
     }
 }
 

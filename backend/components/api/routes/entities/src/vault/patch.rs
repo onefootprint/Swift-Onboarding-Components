@@ -137,13 +137,14 @@ async fn patch_inner(
     let request = request.clean_and_validate(args)?;
     let request = request.build_tenant_fingerprints(state, &tenant_id).await?;
 
+    let source = auth.source();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_user.id)?;
-            uvw.patch_data(conn, request)?;
+            uvw.patch_data(conn, request, source)?;
 
             // Create an access event to show data was added
             NewAccessEvent {

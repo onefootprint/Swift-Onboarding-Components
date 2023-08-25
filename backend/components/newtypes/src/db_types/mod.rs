@@ -7,6 +7,7 @@ mod company_size;
 mod compliance_status;
 mod contact_info_priority;
 mod d2p_session_status;
+mod data_lifetime_source;
 mod data_priority;
 mod decision_intent_kind;
 mod decision_status;
@@ -46,8 +47,8 @@ mod workos_auth_method;
 pub use self::{
     access_event_kind::*, access_event_purpose::*, actor::*, attestation_type::*, business_owner_kind::*,
     company_size::*, compliance_status::*, contact_info_priority::*, d2p_session_status::*,
-    d2p_session_status::*, data_priority::*, decision_intent_kind::*, decision_status::*,
-    document_scan_device_type::*, document_side::*, fingerprint::*, fingerprint_meta::*,
+    d2p_session_status::*, data_lifetime_source::*, data_priority::*, decision_intent_kind::*,
+    decision_status::*, document_scan_device_type::*, document_side::*, fingerprint::*, fingerprint_meta::*,
     footprint_reason_code::*, identity_document_fixture_result::*, identity_document_status::*, incode::*,
     liveness_source::*, manual_review::*, middesk_request_state::*, ob_config::*, onboarding_status::*,
     org_member_email::*, proxy_ingress_kind::*, requirement_status::*, risk_signal_group::*, sealed_bytes::*,

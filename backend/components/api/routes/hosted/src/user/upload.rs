@@ -7,7 +7,7 @@ use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserObAuthContext;
-use newtypes::{DataIdentifier, DocumentKind, WorkflowGuard};
+use newtypes::{DataIdentifier, DataLifetimeSource, DocumentKind, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 const MAX_DOC_SIZE_BYTES: usize = 5_048_576;
@@ -54,6 +54,7 @@ pub async fn post(
                 file.filename,
                 e_data_key,
                 s3_url,
+                DataLifetimeSource::Hosted,
             )?;
             Ok(doc)
         })

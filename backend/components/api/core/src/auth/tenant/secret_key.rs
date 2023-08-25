@@ -9,7 +9,7 @@ use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::TenantScope;
+use newtypes::{DataLifetimeSource, TenantScope};
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 use tracing_actix_web::RootSpan;
@@ -122,6 +122,10 @@ impl TenantAuth for CheckedSecretTenantAuth {
 
     fn scopes(&self) -> Vec<TenantScope> {
         self.role.scopes.clone()
+    }
+
+    fn source(&self) -> DataLifetimeSource {
+        DataLifetimeSource::Tenant
     }
 }
 

@@ -8,7 +8,7 @@ use api_core::auth::user::{UserAuthGuard, UserObAuthContext};
 use api_core::utils::vault_wrapper::{Any, TenantVw};
 use newtypes::email::Email;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{DataIdentifier, IdentityDataKind as IDK, ValidateArgs, WorkflowGuard};
+use newtypes::{DataIdentifier, DataLifetimeSource, IdentityDataKind as IDK, ValidateArgs, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::str::FromStr;
 
@@ -98,7 +98,7 @@ async fn patch_inner(
 
             // Even though this accepts id.phone_number, it will always error at runtime if we
             // provide id.phone_number since we only allow a vault to have one phone number
-            let new_contact_info = uvw.patch_data(conn, request)?.new_ci;
+            let new_contact_info = uvw.patch_data(conn, request, DataLifetimeSource::Hosted)?.new_ci;
             Ok(new_contact_info)
         })
         .await?;

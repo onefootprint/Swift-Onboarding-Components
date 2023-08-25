@@ -14,7 +14,7 @@ use db::models::vault_data::VaultData;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{BusinessDataKind as BDK, DataLifetimeSeqno, S3Url};
+use newtypes::{BusinessDataKind as BDK, DataLifetimeSeqno, DataLifetimeSource, S3Url};
 use newtypes::{
     CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, Fingerprints,
     IdentityDataKind as IDK, KycedBusinessOwnerData, PiiString, ScopedVaultId, SealedVaultDataKey, VaultId,
@@ -38,6 +38,7 @@ impl<Type> WriteableVw<Type> {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: DataRequest<Fingerprints>,
+        source: DataLifetimeSource,
     ) -> ApiResult<PatchDataResult> {
         request.assert_allowable_identifiers(self.vault.kind)?;
         let keys = request.keys().cloned().collect_vec();
@@ -46,7 +47,7 @@ impl<Type> WriteableVw<Type> {
         let (new_ci, seqno) = if !request.is_empty() {
             // Must do this validation here inside the locked, WriteableUvw
             let request = self.validate_request(request)?;
-            let (vds, seqno) = request.save(conn, self.vault(), self.scoped_vault_id.clone())?;
+            let (vds, seqno) = request.save(conn, self.vault(), self.scoped_vault_id.clone(), source)?;
             let new_ci = Self::create_contact_info_if_needed(conn, vds)?;
             (new_ci, seqno)
         } else {
@@ -136,8 +137,8 @@ mod test {
     use crate::{errors::ApiResult, utils::vault_wrapper::WriteableVw};
     use db::TxnPgConn;
     use newtypes::{
-        DataIdentifier, DataRequest, Fingerprint, FingerprintRequest, FingerprintScopeKind, IdentityDataKind,
-        PiiString, ValidateArgs,
+        DataIdentifier, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
+        FingerprintScopeKind, IdentityDataKind, PiiString, ValidateArgs,
     };
     use std::collections::HashMap;
 
@@ -181,7 +182,8 @@ mod test {
             } else {
                 request.no_fingerprints()
             };
-            let new_ci = self.patch_data(conn, request)?.new_ci;
+            let source = DataLifetimeSource::Unknown;
+            let new_ci = self.patch_data(conn, request, source)?.new_ci;
             Ok(new_ci)
         }
     }
@@ -192,6 +194,7 @@ impl WriteableVw<Person> {
     /// Docs are fun in that it sounds like we need to support having multiple docs of the same kind in general (eg: right now you can upload 2 FINRA docs)
     ///  so the logic around deactivating/portabalizing DL's is a little divergent here
     /// NOTE: do not read from `self` after using this util as `self` will be stale
+    #[allow(clippy::too_many_arguments)]
     pub fn put_document_unsafe(
         &self,
         conn: &mut TxnPgConn,
@@ -200,6 +203,7 @@ impl WriteableVw<Person> {
         filename: String,
         e_data_key: SealedVaultDataKey,
         s3_url: S3Url,
+        source: DataLifetimeSource,
     ) -> ApiResult<(DocumentData, DataLifetimeSeqno)> {
         let vault_id = self.vault.id.clone();
         let su_id = self.scoped_vault_id.clone();
@@ -208,7 +212,7 @@ impl WriteableVw<Person> {
         DataLifetime::bulk_deactivate_speculative(conn, &su_id, vec![kind.clone()], seqno)?;
 
         let doc = DocumentData::create(
-            conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key, seqno,
+            conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key, seqno, source,
         )?;
 
         Ok((doc, seqno))

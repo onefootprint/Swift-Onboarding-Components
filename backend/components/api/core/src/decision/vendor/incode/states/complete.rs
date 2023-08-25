@@ -24,6 +24,7 @@ use idv::incode::doc::response::FetchOCRResponse;
 use idv::incode::doc::response::FetchScoresResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::DocumentKind;
 use newtypes::DocumentSide;
@@ -82,7 +83,9 @@ impl Complete {
                 let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
                 let name = format!("{}.png", kind);
                 let mime_type = "image/png".to_string();
-                let (r, _) = uvw.put_document_unsafe(conn, kind, mime_type, name, u.e_data_key, u.s3_url)?;
+                let source = DataLifetimeSource::Hosted;
+                let (r, _) =
+                    uvw.put_document_unsafe(conn, kind, mime_type, name, u.e_data_key, u.s3_url, source)?;
                 Ok((u.side, r.lifetime_id))
             })
             .collect::<ApiResult<_>>()?;
@@ -154,7 +157,8 @@ impl Complete {
         let data = HashMap::from_iter(data.into_iter().chain(id_data.into_iter()));
         let data = DataRequest::clean_and_validate(data, validate_args)?;
         let data = data.no_fingerprints();
-        let completed_seqno = uvw.patch_data(conn, data)?.seqno;
+        let source = DataLifetimeSource::Ocr;
+        let completed_seqno = uvw.patch_data(conn, data, source)?.seqno;
 
         let (document_score, _) = score_response.document_score().map_err(map_to_api_err)?;
         let (ocr_confidence_score, _) = score_response.id_ocr_confidence().map_err(map_to_api_err)?;

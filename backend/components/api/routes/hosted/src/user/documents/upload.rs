@@ -28,8 +28,8 @@ use db::models::verification_result::VerificationResult;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, DecisionIntentId, DecisionIntentKind, DocumentKind, DocumentSide, IdentityDocumentId,
-    IdentityDocumentStatus, IncodeVerificationSessionState, TenantId, WorkflowId,
+    DataIdentifier, DataLifetimeSource, DecisionIntentId, DecisionIntentKind, DocumentKind, DocumentSide,
+    IdentityDocumentId, IdentityDocumentStatus, IncodeVerificationSessionState, TenantId, WorkflowId,
 };
 use newtypes::{ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
@@ -113,8 +113,10 @@ pub async fn post(
                 return Err(OnboardingError::IdentityDocumentNotPending.into());
             }
             // Vault the images under latest uploads
+
+            let source = DataLifetimeSource::Hosted;
             let (d, seqno) =
-                uvw.put_document_unsafe(conn, di, mime_type, file.filename, e_data_key, s3_url)?;
+                uvw.put_document_unsafe(conn, di, mime_type, file.filename, e_data_key, s3_url, source)?;
             DocumentUpload::create(conn, id_doc.id.clone(), side, d.s3_url, d.e_data_key, seqno)?;
             let existing_sides = id_doc
                 .images(conn, true)?

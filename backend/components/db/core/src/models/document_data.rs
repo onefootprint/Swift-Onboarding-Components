@@ -11,6 +11,7 @@ use diesel::prelude::*;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSeqno;
+use newtypes::DataLifetimeSource;
 use newtypes::DocumentDataId;
 use newtypes::PiiString;
 use newtypes::S3Url;
@@ -60,8 +61,9 @@ impl DocumentData {
         s3_url: S3Url,
         e_data_key: SealedVaultDataKey,
         seqno: DataLifetimeSeqno,
+        source: DataLifetimeSource,
     ) -> DbResult<Self> {
-        let dl = DataLifetime::create(conn, vault_id, scoped_vault_id, kind.clone(), seqno)?;
+        let dl = DataLifetime::create(conn, vault_id, scoped_vault_id, kind.clone(), seqno, source)?;
 
         let new_doc = NewDocumentData {
             lifetime_id: dl.id,

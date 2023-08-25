@@ -7,6 +7,7 @@ use diesel::sql_types::Int8;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
+use newtypes::DataLifetimeSource;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::{DataLifetimeId, VaultId};
@@ -74,6 +75,8 @@ pub struct DataLifetime {
     pub portablized_seqno: Option<DataLifetimeSeqno>,
     pub deactivated_seqno: Option<DataLifetimeSeqno>,
     pub kind: DataIdentifier,
+    /// Inforamation on how the piece of data was added to the vault
+    pub source: DataLifetimeSource,
 }
 
 #[derive(Clone, Insertable)]
@@ -87,6 +90,7 @@ struct NewDataLifetime {
     created_at: DateTime<Utc>,
     created_seqno: DataLifetimeSeqno,
     kind: DataIdentifier,
+    source: DataLifetimeSource,
 }
 
 #[derive(Default, AsChangeset)]
@@ -139,6 +143,7 @@ impl DataLifetime {
         scoped_vault_id: &ScopedVaultId,
         kinds: Vec<DataIdentifier>,
         seqno: DataLifetimeSeqno,
+        source: DataLifetimeSource,
     ) -> DbResult<Vec<Self>> {
         let new_rows: Vec<NewDataLifetime> = kinds
             .into_iter()
@@ -148,6 +153,7 @@ impl DataLifetime {
                 created_at: Utc::now(),
                 created_seqno: seqno,
                 kind: k,
+                source,
             })
             .collect();
         let result = diesel::insert_into(data_lifetime::table)
@@ -164,8 +170,9 @@ impl DataLifetime {
         scoped_vault_id: &ScopedVaultId,
         kind: DataIdentifier,
         seqno: DataLifetimeSeqno,
+        source: DataLifetimeSource,
     ) -> DbResult<Self> {
-        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![kind], seqno)?
+        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![kind], seqno, source)?
             .into_iter()
             .next()
             .ok_or(DbError::ObjectNotFound)?;

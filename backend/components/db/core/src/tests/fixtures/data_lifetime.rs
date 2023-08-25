@@ -1,6 +1,6 @@
 use crate::models::data_lifetime::DataLifetime;
 use crate::tests::prelude::TestPgConn;
-use newtypes::{DataIdentifier, DataLifetimeSeqno, ScopedVaultId, VaultId};
+use newtypes::{DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, ScopedVaultId, VaultId};
 
 /// Util function to create multiple DataLifetimes with the provided info
 pub fn build<T: Into<DataIdentifier>>(
@@ -12,7 +12,8 @@ pub fn build<T: Into<DataIdentifier>>(
     deactivated_seqno: Option<DataLifetimeSeqno>,
     kind: T,
 ) -> DataLifetime {
-    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, su_id, vec![kind.into()], created_seqno)
+    let s = DataLifetimeSource::Unknown;
+    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, su_id, vec![kind.into()], created_seqno, s)
         .unwrap()
         .pop()
         .unwrap();

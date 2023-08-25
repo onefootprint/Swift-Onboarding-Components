@@ -9,6 +9,7 @@ use db_schema::schema::vault_data;
 use diesel::prelude::*;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
+use newtypes::DataLifetimeSource;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::SealedVaultBytes;
@@ -56,6 +57,7 @@ impl VaultData {
         scoped_user_id: &ScopedVaultId,
         data: Vec<NewVaultData>,
         seqno: DataLifetimeSeqno,
+        source: DataLifetimeSource,
     ) -> DbResult<Vec<Self>> {
         // One more sanity check that we don't store plaintext data where not desired
         if let Some(d) = data
@@ -84,6 +86,7 @@ impl VaultData {
             scoped_user_id,
             data.iter().map(|d| d.kind.clone()).collect(),
             seqno,
+            source,
         )?;
         let new_rows: Vec<_> = data
             .into_iter()

@@ -10,6 +10,7 @@ use db::tests::prelude::*;
 use itertools::Itertools;
 use macros::db_test;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
 use newtypes::DocumentKind;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::KvDataKey;
@@ -59,7 +60,8 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    let vds = VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno).unwrap();
+    let source = DataLifetimeSource::Unknown;
+    let vds = VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, source).unwrap();
 
     // Portablize the phone as happens in prod
     let phone_data = vds
@@ -137,7 +139,8 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    VaultData::bulk_create(conn, &bv.id, &sb.id, data, seqno).unwrap();
+    let source = DataLifetimeSource::Unknown;
+    VaultData::bulk_create(conn, &bv.id, &sb.id, data, seqno, source).unwrap();
 
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
     let tests = vec![
@@ -791,6 +794,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
             "filename.png".into(),
             newtypes::SealedVaultDataKey(vec![0x01]),
             S3Url::from("test".to_string()),
+            DataLifetimeSource::Hosted,
         )
         .unwrap();
 

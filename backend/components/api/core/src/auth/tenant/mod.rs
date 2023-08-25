@@ -7,6 +7,7 @@ use db::models::tenant::Tenant;
 use db::models::tenant_user::TenantUser;
 
 mod secret_key;
+use newtypes::DataLifetimeSource;
 use newtypes::WorkosAuthMethod;
 pub use secret_key::*;
 mod tenant_rb;
@@ -73,6 +74,7 @@ pub trait TenantAuth {
     fn is_live(&self) -> Result<bool, ApiError>;
     fn actor(&self) -> AuthActor;
     fn scopes(&self) -> Vec<TenantScope>;
+    fn source(&self) -> DataLifetimeSource;
 }
 
 pub trait GetFirmEmployee {

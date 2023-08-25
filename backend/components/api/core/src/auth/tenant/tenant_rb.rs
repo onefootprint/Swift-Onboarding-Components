@@ -16,7 +16,7 @@ use db::{
     PgConn,
 };
 use feature_flag::FeatureFlagClient;
-use newtypes::{TenantRolebindingId, TenantScope, WorkosAuthMethod};
+use newtypes::{DataLifetimeSource, TenantRolebindingId, TenantScope, WorkosAuthMethod};
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone)]
@@ -151,6 +151,10 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
 
     fn scopes(&self) -> Vec<TenantScope> {
         self.tenant_role.scopes.clone()
+    }
+
+    fn source(&self) -> DataLifetimeSource {
+        DataLifetimeSource::Tenant
     }
 }
 

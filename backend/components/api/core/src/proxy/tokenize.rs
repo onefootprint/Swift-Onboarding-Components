@@ -141,6 +141,7 @@ pub async fn vault_pii(
         )
         .await?;
 
+        let source = auth.source();
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
@@ -167,7 +168,7 @@ pub async fn vault_pii(
                 // put our data
                 if !data.is_empty() {
                     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_vault.id)?;
-                    uvw.patch_data(conn, data)?;
+                    uvw.patch_data(conn, data, source)?;
                 }
 
                 // put our documents
@@ -193,6 +194,7 @@ pub async fn vault_pii(
                                             filename,
                                             e_data_key,
                                             s3_url,
+                                            source,
                                         )
                                     },
                                 )
