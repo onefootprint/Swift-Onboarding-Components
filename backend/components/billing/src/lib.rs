@@ -8,7 +8,8 @@ use std::{collections::HashMap, str::FromStr};
 pub use stripe::Client;
 use stripe::{
     CreateCustomer, CreateInvoice, CreateInvoiceItem, Customer, CustomerId, Invoice, InvoiceItem,
-    InvoiceStatus, ListCustomers, ListInvoiceItems, ListInvoices, PriceId, UpdateInvoiceItem,
+    InvoicePendingInvoiceItemsBehavior, InvoiceStatus, ListCustomers, ListInvoiceItems, ListInvoices,
+    PriceId, UpdateInvoiceItem,
 };
 
 pub type BResult<T> = Result<T, Error>;
@@ -180,6 +181,7 @@ impl BillingClient {
             customer: Some(customer_id.clone()),
             metadata: Some(metadata),
             auto_advance: Some(false), // Don't let stripe automatically send out this invoice
+            pending_invoice_items_behavior: Some(InvoicePendingInvoiceItemsBehavior::Include),
             description: None,
             ..Default::default()
         };

@@ -99,7 +99,18 @@ impl BillingProfile {
 
 /// Lookup existing prices for the specified product. If one exists with the same numeric price,
 /// return it. Otherwise, make a new price
+#[tracing::instrument(skip(client))]
 async fn get_or_create_price(client: &stripe::Client, product_id: &str, price: String) -> BResult<PriceId> {
+    let existing_price = get_price(client, product_id, &price).await?;
+    if let Some(p) = existing_price {
+        return Ok(p.id);
+    }
+    let result = create_price(client, product_id, &price).await?;
+    Ok(result)
+}
+
+#[tracing::instrument(skip(client))]
+async fn get_price(client: &stripe::Client, product_id: &str, price: &str) -> BResult<Option<Price>> {
     let request = ListPrices {
         active: Some(true),
         currency: Some(Currency::USD),
@@ -108,7 +119,7 @@ async fn get_or_create_price(client: &stripe::Client, product_id: &str, price: S
     };
 
     let prices = Price::list(client, &request).await?;
-    let price_decimal = Decimal::from_str(&price)?;
+    let price_decimal = Decimal::from_str(price)?;
     let existing_price = prices.data.into_iter().find(|p| {
         // Can clean this up with is_some_and one day...
         if p.billing_scheme != Some(PriceBillingScheme::PerUnit) || !is_managed(&p.metadata) {
@@ -122,15 +133,17 @@ async fn get_or_create_price(client: &stripe::Client, product_id: &str, price: S
         };
         a == price_decimal
     });
-    if let Some(p) = existing_price {
-        return Ok(p.id);
-    }
+    Ok(existing_price)
+}
+
+#[tracing::instrument(skip(client))]
+async fn create_price(client: &stripe::Client, product_id: &str, price: &str) -> BResult<PriceId> {
     let params = CreatePrice {
         billing_scheme: Some(PriceBillingScheme::PerUnit),
         currency: Currency::USD,
         product: Some(IdOrCreate::Id(product_id)),
         metadata: Some(managed_metadata()),
-        unit_amount_decimal: Some(&price),
+        unit_amount_decimal: Some(price),
         // This doesn't implement Default for some reason...
         active: None,
         currency_options: None,
