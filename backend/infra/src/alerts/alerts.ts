@@ -76,6 +76,11 @@ export const Alerts: Alert[] = [
           op: 'exists',
         },
         {
+          column: 'http.route',
+          op: '!=',
+          value: '/private/invoices',
+        },
+        {
           column: 'duration_ms',
           op: '>=',
           value: 15000,
