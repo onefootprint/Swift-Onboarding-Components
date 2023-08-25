@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::collections::HashMap;
 
 use super::{
     features::risk_signals::{create_risk_signals_from_vendor_results, RiskSignalsForDecision},
@@ -20,7 +20,7 @@ use crate::{
     errors::{ApiError, ApiErrorKind, ApiResult},
     metrics,
     utils::vault_wrapper::VaultWrapper,
-    vendor_clients::VendorClient,
+    State,
 };
 use db::{
     models::{
@@ -33,13 +33,6 @@ use db::{
     DbError, DbPool, TxnPgConn,
 };
 use either::Either;
-use feature_flag::FeatureFlagClient;
-use idv::{
-    experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
-    idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
-    socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest},
-    twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
-};
 
 use itertools::Itertools;
 use newtypes::{
@@ -231,41 +224,13 @@ fn partition_vendor_errors(
 #[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip_all)]
 pub async fn make_vendor_requests(
-    db_pool: &DbPool,
-    wf_id: &WorkflowId,
-    enclave_client: &EnclaveClient,
-    is_production: bool,
+    state: &State,
+    tvc: TenantVendorControl,
     requests: Vec<VerificationRequest>,
-    ff_client: Arc<dyn FeatureFlagClient>,
-    idology_client: VendorClient<
-        IdologyExpectIDRequest,
-        IdologyExpectIDAPIResponse,
-        idv::idology::error::Error,
-    >,
-    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-    experian_client: VendorClient<
-        ExperianCrossCoreRequest,
-        ExperianCrossCoreResponse,
-        idv::experian::error::Error,
-    >,
-    tenant_vendor_control: TenantVendorControl,
+    wf_id: &WorkflowId,
 ) -> ApiResult<VendorResults> {
     // Make requests
-    let results = vendor::make_request::make_vendor_requests(
-        requests,
-        wf_id,
-        db_pool,
-        enclave_client,
-        is_production,
-        ff_client,
-        idology_client,
-        socure_client,
-        twilio_client,
-        experian_client,
-        tenant_vendor_control,
-    )
-    .await?;
+    let results = vendor::make_request::make_vendor_requests(state, tvc, requests, wf_id).await?;
 
     Ok(partition_vendor_errors(results))
 }

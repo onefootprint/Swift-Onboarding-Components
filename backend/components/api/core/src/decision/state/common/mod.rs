@@ -121,20 +121,8 @@ pub async fn make_outstanding_kyc_vendor_calls(
             TenantVendorControl::new(t_id.clone(), &state.db_pool, &state.config, &state.enclave_client)
                 .await?;
         // TODO: we could refactor this to return just the plaintext raw responses and then encrypt and save them in the on_commit txn
-        decision::engine::make_vendor_requests(
-            &state.db_pool,
-            wf_id,
-            &state.enclave_client,
-            state.config.service_config.is_production(),
-            vendor_requests.outstanding_requests,
-            state.feature_flag_client.clone(),
-            state.vendor_clients.idology_expect_id.clone(),
-            state.vendor_clients.socure_id_plus.clone(),
-            state.vendor_clients.twilio_lookup_v2.clone(),
-            state.vendor_clients.experian_cross_core.clone(),
-            tvc,
-        )
-        .await?
+        decision::engine::make_vendor_requests(state, tvc, vendor_requests.outstanding_requests, wf_id)
+            .await?
     };
 
     let has_critical_error = !vendor_results.critical_errors.is_empty();

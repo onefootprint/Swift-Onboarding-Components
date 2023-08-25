@@ -87,9 +87,8 @@ async fn make_vendor_calls(
         .db_query(move |conn| Workflow::get_all(conn, &wf_id))
         .await??;
     let tid = sv.tenant_id.clone();
-    let tenant_vendor_control =
-        TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
-    let tenant_vendor_control2 = tenant_vendor_control.clone();
+    let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
+    let tvc2 = tvc.clone();
 
     let wfid = wf.id.clone();
     let (requests, vw, obc) = state
@@ -103,7 +102,7 @@ async fn make_vendor_calls(
                 &uvw,
                 &sv.id,
                 &decision_intent.id,
-                &tenant_vendor_control2,
+                &tvc2,
             )?;
 
             let (obc, _) = ObConfiguration::get(conn, &wfid)?;
@@ -112,20 +111,7 @@ async fn make_vendor_calls(
         })
         .await?;
 
-    let vendor_results = decision::engine::make_vendor_requests(
-        &state.db_pool,
-        &wf.id,
-        &state.enclave_client,
-        state.config.service_config.is_production(),
-        requests,
-        state.feature_flag_client.clone(),
-        state.vendor_clients.idology_expect_id.clone(),
-        state.vendor_clients.socure_id_plus.clone(),
-        state.vendor_clients.twilio_lookup_v2.clone(),
-        state.vendor_clients.experian_cross_core.clone(),
-        tenant_vendor_control,
-    )
-    .await?;
+    let vendor_results = decision::engine::make_vendor_requests(&state, tvc, requests, &wf.id).await?;
 
     if !vendor_results.critical_errors.is_empty() {
         return Err(ApiErrorKind::VendorRequestsFailed)?;
@@ -267,9 +253,8 @@ async fn shadow_run(
         .db_query(move |conn| Workflow::get_all(conn, &wf_id))
         .await??;
     let tid = sv.tenant_id.clone();
-    let tenant_vendor_control =
-        TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
-    let tenant_vendor_control2 = tenant_vendor_control.clone();
+    let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
+    let tvc2 = tvc.clone();
 
     let wfid = wf.id.clone();
     let (requests, vw, obc) = state
@@ -278,10 +263,8 @@ async fn shadow_run(
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
-            let vendor_apis = vendor::get_vendor_apis_for_verification_requests(
-                uvw.populated().as_slice(),
-                &tenant_vendor_control2,
-            )?;
+            let vendor_apis =
+                vendor::get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), &tvc2)?;
             #[allow(clippy::unwrap_used)]
             let memory_only_requests = vendor_apis
                 .into_iter()
@@ -306,20 +289,7 @@ async fn shadow_run(
         })
         .await?;
 
-    let vendor_results = decision::engine::make_vendor_requests(
-        &state.db_pool,
-        &wf.id,
-        &state.enclave_client,
-        state.config.service_config.is_production(),
-        requests,
-        state.feature_flag_client.clone(),
-        state.vendor_clients.idology_expect_id.clone(),
-        state.vendor_clients.socure_id_plus.clone(),
-        state.vendor_clients.twilio_lookup_v2.clone(),
-        state.vendor_clients.experian_cross_core.clone(),
-        tenant_vendor_control,
-    )
-    .await?;
+    let vendor_results = decision::engine::make_vendor_requests(&state, tvc, requests, &wf.id).await?;
 
     let all_vendor_errors: Vec<&ApiError> = vendor_results.all_errors();
     if !all_vendor_errors.is_empty() {

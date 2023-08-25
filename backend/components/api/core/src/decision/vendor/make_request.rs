@@ -5,12 +5,10 @@ use super::tenant_vendor_control::TenantVendorControl;
 
 use super::vendor_trait::VendorAPIResponse;
 use super::*;
-use crate::enclave_client::EnclaveClient;
 use crate::errors::ApiErrorKind;
 use crate::metrics;
 use crate::vendor_clients::VendorClient;
 use crate::{errors::ApiError, State};
-use db::DbPool;
 use db::{
     models::{
         insight_event::InsightEvent, ob_configuration::ObConfiguration,
@@ -28,70 +26,49 @@ use newtypes::idology::IdologyScanOnboardingCaptureResult;
 use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, VendorAPI, WorkflowId};
 use prometheus::labels;
 
-#[tracing::instrument(skip(
-    ff_client,
-    idology_client,
-    socure_client,
-    twilio_client,
-    experian_client,
-    idv_data,
-    socure_data,
-    tenant_vendor_control
-))]
+#[tracing::instrument(skip(state, tvc, idv_data, socure_data))]
 pub async fn send_idv_request(
-    request: VerificationRequest,
-    tenant_vendor_control: &TenantVendorControl,
+    state: &State,
+    tvc: &TenantVendorControl,
+    vendor_api: VendorAPI,
     idv_data: IdvData,
     socure_data: SocureData,
     ob_configuration_key: ObConfigurationKey,
-    is_production: bool,
-    ff_client: Arc<dyn FeatureFlagClient>,
-    idology_client: VendorClient<
-        IdologyExpectIDRequest,
-        IdologyExpectIDAPIResponse,
-        idv::idology::error::Error,
-    >,
-    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-    experian_client: VendorClient<
-        ExperianCrossCoreRequest,
-        ExperianCrossCoreResponse,
-        idv::experian::error::Error,
-    >,
 ) -> Result<VendorResponse, VendorAPIError> {
+    let is_production = state.config.service_config.is_production();
     // still TODO: traitfy the ff logic shared by these requests
-    match request.vendor_api {
+    match vendor_api {
         VendorAPI::IdologyExpectID => {
-            let request = tenant_vendor_control.build_idology_request(idv_data);
+            let request = tvc.build_idology_request(idv_data);
             send_idology_idv_request(
                 request,
                 is_production,
                 ob_configuration_key,
-                idology_client,
-                ff_client,
+                state.vendor_clients.idology_expect_id.clone(),
+                state.feature_flag_client.clone(),
             )
             .await
         }
-        VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(idv_data, twilio_client.clone()).await,
+        VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(idv_data, state.vendor_clients.twilio_lookup_v2.clone()).await,
         VendorAPI::SocureIDPlus => {
             send_socure_idv_request(
                 idv_data,
                 socure_data,
                 ob_configuration_key,
                 is_production,
-                socure_client,
-                ff_client,
+                state.vendor_clients.socure_id_plus.clone(),
+                state.feature_flag_client.clone(),
             )
             .await
         }
         VendorAPI::ExperianPreciseID => {
-            let request = tenant_vendor_control.build_experian_request(idv_data);
+            let request = tvc.build_experian_request(idv_data);
             send_experian_idv_request(
                 request,
                 is_production,
                 ob_configuration_key,
-                experian_client,
-                ff_client,
+                state.vendor_clients.experian_cross_core.clone(),
+                state.feature_flag_client.clone(),
             )
             .await
         }
@@ -101,7 +78,7 @@ pub async fn send_idv_request(
         }
     }
     .map_err(|e| VendorAPIError {
-        vendor_api: request.vendor_api,
+        vendor_api,
         error: e,
     })
 }
@@ -366,49 +343,28 @@ pub async fn send_scan_onboarding_docv_request(
 
 /// Make our requests to a vendor, building data from the cached VerificationRequest
 #[tracing::instrument(skip_all)]
-pub async fn make_idv_request(
-    request: VerificationRequest,
-    wf_id: &WorkflowId,
-    data: IdvData,
+pub async fn make_idv_request( // TODO: really no need to have this and send_idv_request
+    state: &State,
+    tvc: &TenantVendorControl,
+    vendor_api: VendorAPI,
+    idv_data: IdvData,
     socure_data: SocureData,
     ob_configuration_key: ObConfigurationKey,
-    is_production: bool,
-    ff_client: Arc<dyn FeatureFlagClient>,
-    idology_client: VendorClient<
-        IdologyExpectIDRequest,
-        IdologyExpectIDAPIResponse,
-        idv::idology::error::Error,
-    >,
-    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-    experian_client: VendorClient<
-        ExperianCrossCoreRequest,
-        ExperianCrossCoreResponse,
-        idv::experian::error::Error,
-    >,
-    tenant_vendor_control: &TenantVendorControl,
+    wf_id: &WorkflowId, // TODO: remove, only used in this random log here
 ) -> Result<VendorResponse, VendorAPIError> {
-    let vendor_api = request.vendor_api;
     tracing::info!(
-        msg = "Sending verification request",
-        request_id = request.id.clone().to_string(),
         vendor_api = vendor_api.clone().to_string(),
-        scoped_user_id = %request.scoped_vault_id,
         workflow_id = %wf_id,
+        "Sending verification request"
     );
 
     let vendor_response = send_idv_request(
-        request,
-        tenant_vendor_control,
-        data,
+        state,
+        tvc,
+        vendor_api,
+        idv_data,
         socure_data,
         ob_configuration_key,
-        is_production,
-        ff_client,
-        idology_client,
-        socure_client,
-        twilio_client,
-        experian_client,
     )
     .await?;
 
@@ -423,33 +379,18 @@ pub type VerificationRequestWithVendorError = (VerificationRequest, ApiError);
     vendors = ?requests.iter().map(|r| r.vendor).collect::<Vec<_>>()))
 ]
 pub async fn make_vendor_requests(
+    state: &State,
+    tvc: TenantVendorControl,
     requests: Vec<VerificationRequest>,
-    wf_id: &WorkflowId,
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-    is_production: bool,
-    ff_client: Arc<dyn FeatureFlagClient>,
-    idology_client: VendorClient<
-        IdologyExpectIDRequest,
-        IdologyExpectIDAPIResponse,
-        idv::idology::error::Error,
-    >,
-    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    twilio_client: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-    experian_client: VendorClient<
-        ExperianCrossCoreRequest,
-        ExperianCrossCoreResponse,
-        idv::experian::error::Error,
-    >,
-    tenant_vendor_control: TenantVendorControl,
+    wf_id: &WorkflowId, // TODO: remove?
 ) -> Result<Vec<Result<VerificationRequestWithVendorResponse, VerificationRequestWithVendorError>>, ApiError>
 {
     let requests_with_data =
-        build_request::bulk_build_data_from_requests(db_pool, enclave_client, requests).await?;
+        build_request::bulk_build_data_from_requests(&state.db_pool, &state.enclave_client, requests).await?;
 
     let wfid = wf_id.clone();
 
-    let (socure_device_session_id, ip_address, obc_key) = db_pool
+    let (socure_device_session_id, ip_address, obc_key) = state.db_pool
         .db_query(
             move |conn| -> Result<(Option<String>, Option<PiiString>, ObConfigurationKey), DbError> {
                 let socure_device_session_id =
@@ -473,18 +414,7 @@ pub async fn make_vendor_requests(
         (
             r.clone(),
             make_idv_request(
-                r,
-                wf_id,
-                data,
-                socure_data.clone(),
-                obc_key.clone(),
-                is_production,
-                ff_client.clone(),
-                idology_client.clone(),
-                socure_client.clone(),
-                twilio_client.clone(),
-                experian_client.clone(),
-                &tenant_vendor_control,
+                state, &tvc, r.vendor_api, data, socure_data.clone(), obc_key.clone(), wf_id
             ),
         )
     });
