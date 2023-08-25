@@ -75,6 +75,9 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
             payload: { nextSideToCollect },
           });
         }}
+        onBack={() => {
+          send('backButtonTapped');
+        }}
         onRetryLimitExceeded={() => {
           send('retryLimitExceeded');
         }}

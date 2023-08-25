@@ -1,5 +1,5 @@
 import { getCountryFromCode } from '@onefootprint/global-constants';
-import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
+import { UploadDocumentSide } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
@@ -21,8 +21,8 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
         currentSide: UploadDocumentSide.Front,
         collectingDocumentMeta: {
           countryCode: USCountryCode,
-          type: SupportedIdDocTypes.passport,
-          docId: '',
+          type: undefined,
+          docId: undefined,
         },
         ...initialContext,
       },
@@ -46,14 +46,14 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
         tooManyAttempts: {},
         frontImage: {
           on: {
+            backButtonTapped: {
+              target: 'docSelection',
+            },
             consentCompleted: {
               actions: 'assignConsent',
             },
             retryLimitExceeded: {
               target: 'tooManyAttempts',
-            },
-            backButtonTapped: {
-              target: 'docSelection',
             },
             imageSubmitted: [
               {
@@ -137,6 +137,7 @@ const createIdDocMachine = (initialContext: Partial<MachineContext>) =>
         assignCountryAndType: assign((context, { payload }) => {
           return {
             ...context,
+            currentSide: UploadDocumentSide.Front,
             collectingDocumentMeta: {
               docId: payload.docId,
               countryCode: payload.countryCode,

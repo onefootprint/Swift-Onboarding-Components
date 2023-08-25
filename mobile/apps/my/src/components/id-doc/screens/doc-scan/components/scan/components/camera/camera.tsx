@@ -25,6 +25,7 @@ type CameraProps = {
   subtitle?: string;
   title: string;
   type?: ScanType;
+  onBack?: () => void;
 };
 
 const AUTO_CAPTURE_DELAY = 750;
@@ -39,6 +40,7 @@ const Camera = ({
   subtitle,
   title,
   type = 'back',
+  onBack,
 }: CameraProps) => {
   const [isFlashing, setIsFlashing] = useState(false);
   const camera = useRef<VisionCamera>(null);
@@ -79,11 +81,11 @@ const Camera = ({
       <StatusBar variant={disabled ? 'default' : 'on-camera'} />
       <CameraContainer>
         {subtitle ? (
-          <Header>
+          <Header onBack={onBack}>
             {title} - {subtitle}
           </Header>
         ) : (
-          <Header>{title}</Header>
+          <Header onBack={onBack}>{title}</Header>
         )}
         {device && (
           <StyledCamera

@@ -8,6 +8,7 @@ const ScanContext = createContext<{
   errors: string[];
   isLoading: boolean;
   onSubmit: (image: string) => void;
+  onBack: () => void;
   onResetErrors: () => void;
 }>({
   country: DEFAULT_COUNTRY,
@@ -16,6 +17,7 @@ const ScanContext = createContext<{
   errors: [],
   isLoading: false,
   onSubmit: () => {},
+  onBack: () => {},
   onResetErrors: () => {},
 });
 

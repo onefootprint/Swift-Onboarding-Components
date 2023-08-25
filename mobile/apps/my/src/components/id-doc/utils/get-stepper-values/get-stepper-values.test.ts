@@ -3,7 +3,7 @@ import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
 import getStepperValues from '.';
 
 describe('getStepperValues', () => {
-  describe('passport', () => {
+  describe('Passport', () => {
     it('should return correct values for passport without selfie', () => {
       const { value, max } = getStepperValues({
         type: SupportedIdDocTypes.passport,
@@ -34,7 +34,40 @@ describe('getStepperValues', () => {
       expect(max).toEqual(2);
     });
   });
-  describe('drivers license', () => {
+
+  describe('Visa', () => {
+    it('should return correct values for visa without selfie', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.visa,
+        shouldCollectSelfie: false,
+        currentSide: UploadDocumentSide.Front,
+      });
+      expect(value).toEqual(0);
+      expect(max).toEqual(1);
+    });
+
+    it('should return correct values for visa with selfie on first step', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.visa,
+        shouldCollectSelfie: true,
+        currentSide: UploadDocumentSide.Front,
+      });
+      expect(value).toEqual(0);
+      expect(max).toEqual(2);
+    });
+
+    it('should return correct values for visa with selfie on selfie stage', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.visa,
+        shouldCollectSelfie: true,
+        currentSide: UploadDocumentSide.Selfie,
+      });
+      expect(value).toEqual(1);
+      expect(max).toEqual(2);
+    });
+  });
+
+  describe('Drivers license', () => {
     it('should return correct values for drivers license without selfie on front', () => {
       const { value, max } = getStepperValues({
         type: SupportedIdDocTypes.driversLicense,
@@ -85,6 +118,7 @@ describe('getStepperValues', () => {
       expect(max).toEqual(3);
     });
   });
+
   describe('ID card', () => {
     it('should return correct values for id card without selfie on front', () => {
       const { value, max } = getStepperValues({
@@ -129,6 +163,110 @@ describe('getStepperValues', () => {
     it('should return correct values for id card with selfie on selfie stage', () => {
       const { value, max } = getStepperValues({
         type: SupportedIdDocTypes.idCard,
+        shouldCollectSelfie: true,
+        currentSide: UploadDocumentSide.Selfie,
+      });
+      expect(value).toEqual(2);
+      expect(max).toEqual(3);
+    });
+  });
+
+  describe('Residence permit', () => {
+    it('should return correct values for id card without selfie on front', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.residenceDocument,
+        shouldCollectSelfie: false,
+        currentSide: UploadDocumentSide.Front,
+      });
+      expect(value).toEqual(0);
+      expect(max).toEqual(2);
+    });
+
+    it('should return correct values for id card without selfie on back', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.residenceDocument,
+        shouldCollectSelfie: false,
+        currentSide: UploadDocumentSide.Back,
+      });
+      expect(value).toEqual(1);
+      expect(max).toEqual(2);
+    });
+
+    it('should return correct values for id card with selfie on front', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.residenceDocument,
+        shouldCollectSelfie: true,
+        currentSide: UploadDocumentSide.Front,
+      });
+      expect(value).toEqual(0);
+      expect(max).toEqual(3);
+    });
+
+    it('should return correct values for id card with selfie on back', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.residenceDocument,
+        shouldCollectSelfie: true,
+        currentSide: UploadDocumentSide.Back,
+      });
+      expect(value).toEqual(1);
+      expect(max).toEqual(3);
+    });
+
+    it('should return correct values for id card with selfie on selfie stage', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.residenceDocument,
+        shouldCollectSelfie: true,
+        currentSide: UploadDocumentSide.Selfie,
+      });
+      expect(value).toEqual(2);
+      expect(max).toEqual(3);
+    });
+  });
+
+  describe('Work permit', () => {
+    it('should return correct values for id card without selfie on front', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.workPermit,
+        shouldCollectSelfie: false,
+        currentSide: UploadDocumentSide.Front,
+      });
+      expect(value).toEqual(0);
+      expect(max).toEqual(2);
+    });
+
+    it('should return correct values for id card without selfie on back', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.workPermit,
+        shouldCollectSelfie: false,
+        currentSide: UploadDocumentSide.Back,
+      });
+      expect(value).toEqual(1);
+      expect(max).toEqual(2);
+    });
+
+    it('should return correct values for id card with selfie on front', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.workPermit,
+        shouldCollectSelfie: true,
+        currentSide: UploadDocumentSide.Front,
+      });
+      expect(value).toEqual(0);
+      expect(max).toEqual(3);
+    });
+
+    it('should return correct values for id card with selfie on back', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.workPermit,
+        shouldCollectSelfie: true,
+        currentSide: UploadDocumentSide.Back,
+      });
+      expect(value).toEqual(1);
+      expect(max).toEqual(3);
+    });
+
+    it('should return correct values for id card with selfie on selfie stage', () => {
+      const { value, max } = getStepperValues({
+        type: SupportedIdDocTypes.workPermit,
         shouldCollectSelfie: true,
         currentSide: UploadDocumentSide.Selfie,
       });

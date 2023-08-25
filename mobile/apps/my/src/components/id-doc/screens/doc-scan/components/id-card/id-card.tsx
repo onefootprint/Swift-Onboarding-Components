@@ -7,7 +7,7 @@ import { detectDocument } from 'vision-camera-plugin-document';
 import useTranslation from '@/hooks/use-translation';
 
 import Frame from '../default-frame';
-import DocInstructions from '../doc-instructions';
+import Instructions from '../default-instructions';
 import Scan from '../scan';
 import ScanContext from '../scan-context';
 import { StepperProps } from '../stepper';
@@ -45,7 +45,7 @@ const IdCard = ({ side, stepperValues }: IdCardProps) => {
   );
 
   return (
-    <DocInstructions
+    <Instructions
       title={t(`instructions.${side}`, { country: country.value3 })}
       stepperValues={stepperValues}
     >
@@ -59,7 +59,7 @@ const IdCard = ({ side, stepperValues }: IdCardProps) => {
       >
         <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
       </Scan>
-    </DocInstructions>
+    </Instructions>
   );
 };
 

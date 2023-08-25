@@ -7,12 +7,12 @@ import {
 
 export type MachineContext = {
   requirement?: IdDocRequirement;
+  currentSide?: UploadDocumentSide;
   collectingDocumentMeta?: {
     countryCode: CountryCode;
-    type: SupportedIdDocTypes;
-    docId: string;
+    type?: SupportedIdDocTypes;
+    docId?: string;
   };
-  currentSide?: UploadDocumentSide;
 };
 
 export type MachineEvents =

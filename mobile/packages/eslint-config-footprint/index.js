@@ -6,7 +6,7 @@ module.exports = {
     'plugin:import/typescript',
     'turbo',
     'prettier',
-    '@react-native-community/eslint-config',
+    '@react-native',
   ],
   settings: {
     'import/parsers': {

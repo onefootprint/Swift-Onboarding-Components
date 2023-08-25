@@ -1,14 +1,20 @@
-import { DEBUG_HANDOFF_URL, IS_DEV } from '@/domains/idv/config/constants';
+import {
+  DEBUG_HANDOFF_URL,
+  IS_DEV,
+  REVIEW_AUTH_TOKEN,
+} from '@/domains/idv/config/constants';
 
 import useURL from './use-url';
 
 const useShouldOpenIdv = () => {
   const linkingUrl = useURL();
-  if (DEBUG_HANDOFF_URL && IS_DEV) {
-    return { shouldOpen: true, linkingUrl: DEBUG_HANDOFF_URL };
-  }
+  const debugUrl = IS_DEV ? DEBUG_HANDOFF_URL : undefined;
+  const url = debugUrl || linkingUrl;
+  const isPreview = url?.endsWith(REVIEW_AUTH_TOKEN);
+  const isDemo = url?.includes('demo=true');
   const shouldOpen = linkingUrl?.includes('https://handoff');
-  return { shouldOpen, linkingUrl };
+
+  return { shouldOpen, linkingUrl, isPreview, isDemo };
 };
 
 export default useShouldOpenIdv;

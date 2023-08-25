@@ -12,6 +12,15 @@ export const getAvailableDocTypesByCountry = (country: CountryRecord) => {
   if (country.passport) {
     availableTypes.push(SupportedIdDocTypes.passport);
   }
+  if (country.residenceDocument) {
+    availableTypes.push(SupportedIdDocTypes.residenceDocument);
+  }
+  if (country.workPermit) {
+    availableTypes.push(SupportedIdDocTypes.workPermit);
+  }
+  if (country.visa) {
+    availableTypes.push(SupportedIdDocTypes.visa);
+  }
   return availableTypes;
 };
 

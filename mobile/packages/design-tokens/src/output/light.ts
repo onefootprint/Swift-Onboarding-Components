@@ -383,7 +383,7 @@ export const dropdownBaseBgActive = '#F7F7F7';
 export const dropdownBaseColor = '#000000';
 
 // Radio Select
-export const radioSelectBg = 'none';
+export const radioSelectBg = '#FFF';
 export const radioSelectBorderRadius = '6px';
 export const radioSelectBorderWidth = '1px';
 export const radioSelectBorderColor = '#e2e2e2';

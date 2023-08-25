@@ -26,7 +26,10 @@
   "id-doc": {
     "drivers_license": "driver's license",
     "id_card": "ID Card",
-    "passport": "Passport"
+    "passport": "Passport",
+    "visa": "Visa",
+    "permit": "Work permit / EAD card",
+    "residence_document": "Residence card / Green card"
   },
   "cdo": {
     "name": "Full name",
@@ -84,6 +87,18 @@
           },
           "passport": {
             "title": "Passport",
+            "description": "Photo page"
+          },
+          "residence-document": {
+            "title": "Residence card / Green card",
+            "description": "Front & Back"
+          },
+          "work-permit": {
+            "title": "Work permit / EAD card",
+            "description": "Front & Back"
+          },
+          "visa": {
+            "title": "Visa",
             "description": "Photo page"
           }
         },
@@ -167,6 +182,24 @@
         "title": "Passport",
         "instructions": "Scan the photo page of your passport ({{country}})"
       },
+      "residence-document": {
+        "title": "Residence card",
+        "instructions": {
+          "front": "Scan the front side of your residence card / Green card ({{country}})",
+          "back": "Scan the back side of your residence card / Green card ({{country}})"
+        }
+      },
+      "work-permit": {
+        "title": "EAD card",
+        "instructions": {
+          "front": "Scan the front side of your work permit / EAD card ({{country}})",
+          "back": "Scan the back side of your work permit / EAD card ({{country}})"
+        }
+      },
+      "visa": {
+        "title": "Visa",
+        "instructions": "Scan the photo page of your Visa ({{country}})"
+      },
       "selfie": {
         "title": "Selfie",
         "instructions": "Scan the photo page of your passport",
@@ -194,6 +227,14 @@
     }
   },
   "screens": {
+    "preview": {
+      "banner": "Demo mode",
+      "about": {
+        "title": "Demo mode",
+        "content": "To keep things safe, all this experience has mock data so you can test the flow without compromising your privacy.",
+        "cta": "Continue"
+      }
+    },
     "email-identification": {
       "title": "Hey there! 👋",
       "subtitle": "Enter your email to get started.",
@@ -250,6 +291,11 @@
     "completed": {
       "title": "Success!",
       "subtitle": "You can now continue where you left on desktop"
+    },
+    "completed-preview": {
+      "title": "Success!",
+      "subtitle": "You have successfully completed our demo.",
+      "cta": "Restart demo"
     },
     "error": {
       "title": "Session is not valid",

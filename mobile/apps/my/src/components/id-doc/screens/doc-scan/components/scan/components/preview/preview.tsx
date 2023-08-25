@@ -7,13 +7,15 @@ import {
   Image,
   Typography,
 } from '@onefootprint/ui';
-import React, { useContext } from 'react';
+import React from 'react';
 import { StatusBar } from 'react-native';
 import { PhotoFile } from 'react-native-vision-camera';
 
+import BackButton from '@/components/back-button';
+import Header from '@/components/header';
 import useTranslation from '@/hooks/use-translation';
 
-import ScanContext from '../../../scan-context';
+import { useScanContext } from '../../../scan-context';
 import Stepper, { StepperProps } from '../../../stepper';
 import type { ScanSize } from '../../scan.types';
 import Errors from './components/errors';
@@ -22,25 +24,28 @@ import encodeImagePath from './utils/encode-image-path';
 import sanitizeImagePath from './utils/sanitize-image-path';
 
 type PreviewProps = {
+  onBack?: () => void;
   onReset: () => void;
   photo: PhotoFile;
   size?: ScanSize;
-  title: string;
-  subtitle?: string;
   stepperValues: StepperProps;
+  subtitle?: string;
+  title: string;
 };
 
 const Preview = ({
-  title,
-  subtitle,
+  onBack,
   onReset,
   photo,
   size,
   stepperValues,
+  subtitle,
+  title,
 }: PreviewProps) => {
   const { t } = useTranslation('components.scan.preview');
+  const { value, max } = stepperValues;
   const { isLoading, isError, isSuccess, onSubmit, errors, onResetErrors } =
-    useContext(ScanContext);
+    useScanContext();
   const showActionButtons = !isError && !isSuccess;
   const imageHeight = size === 'default' ? DEFAULT_HEIGHT : LARGE_HEIGHT;
 
@@ -55,18 +60,18 @@ const Preview = ({
     onReset();
   };
 
-  const { value, max } = stepperValues;
-
   return (
     <>
       <StatusBar barStyle="dark-content" />
       <Container>
         <Box flex={1}>
-          {max > 1 && (
-            <Box center paddingTop={5}>
-              <Stepper value={value} max={max} />
-            </Box>
-          )}
+          <Header headerLeft={<BackButton onPress={onBack} />}>
+            {max > 1 && (
+              <Box center>
+                <Stepper value={value} max={max} />
+              </Box>
+            )}
+          </Header>
           <Box marginVertical={5}>
             <Typography variant="heading-3" center>
               {title}

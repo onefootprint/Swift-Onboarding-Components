@@ -17,7 +17,6 @@ export type SelfieProps = {
 
 const Selfie = ({ stepperValues }: SelfieProps) => {
   const { width, height } = Dimensions.get('window');
-
   const { t } = useTranslation('components.scan.selfie');
   const [feedback, setFeedback] = useState('');
   const [objectedDetected, setObjectDetected] = useState(false);

@@ -1,5 +1,6 @@
+import { IcoChevronLeftBig24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Typography } from '@onefootprint/ui';
+import { Box, Pressable, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -7,29 +8,60 @@ const HEADER_HEIGHT = 56;
 
 type HeaderProps = {
   children: React.ReactNode;
+  onBack?: () => void;
 };
 
-const Header = ({ children }: HeaderProps) => {
+const Header = ({ children, onBack }: HeaderProps) => {
   const insets = useSafeAreaInsets();
-  const height = HEADER_HEIGHT + insets.top;
+  const height = HEADER_HEIGHT;
 
   return (
-    <Container height={height}>
-      <Typography variant="label-2" color="quinary">
-        {children}
-      </Typography>
-    </Container>
+    <>
+      <StatusBar height={insets.top} />
+      <Container
+        alignItems="flex-end"
+        flexDirection="row"
+        height={height}
+        justifyContent="space-between"
+        top={insets.top}
+      >
+        <Box flex={1}>
+          <Pressable onPress={onBack}>
+            <IcoChevronLeftBig24 color="quinary" />
+          </Pressable>
+        </Box>
+        <Box>
+          <Typography variant="label-2" color="quinary">
+            {children}
+          </Typography>
+        </Box>
+        <Box flex={1} />
+      </Container>
+    </>
   );
 };
 
-const Container = styled.View<{ height }>`
-  ${({ theme, height }) => css`
+const StatusBar = styled.View<{ height: number }>`
+  ${({ height }) => css`
+    background: rgba(0, 0, 0, 0.35);
+    height: ${height}px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+  `}
+`;
+
+const Container = styled.View<{ height: number; top: number }>`
+  ${({ theme, height, top }) => css`
+    align-items: center;
     align-items: center;
     background: rgba(0, 0, 0, 0.35);
     height: ${height}px;
-    justify-content: flex-end;
-    padding-bottom: ${theme.spacing[4]};
+    padding-horizontal: ${theme.spacing[3]};
     position: absolute;
+    top: ${top}px;
     width: 100%;
     z-index: 1;
   `}

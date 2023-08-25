@@ -14,11 +14,16 @@ const getStepperValues = ({
   let totalSteps = 0;
   let currentStep = 0;
 
-  if (type === SupportedIdDocTypes.passport) {
+  if (
+    type === SupportedIdDocTypes.passport ||
+    type === SupportedIdDocTypes.visa
+  ) {
     totalSteps = 1;
   } else if (
     type === SupportedIdDocTypes.driversLicense ||
-    type === SupportedIdDocTypes.idCard
+    type === SupportedIdDocTypes.idCard ||
+    type === SupportedIdDocTypes.workPermit ||
+    type === SupportedIdDocTypes.residenceDocument
   ) {
     // front and back
     totalSteps = 2;
@@ -26,7 +31,6 @@ const getStepperValues = ({
   if (shouldCollectSelfie) {
     totalSteps += 1;
   }
-
   if (currentSide === UploadDocumentSide.Front) {
     currentStep = 0;
   } else if (currentSide === UploadDocumentSide.Back) {
@@ -35,7 +39,6 @@ const getStepperValues = ({
   if (currentSide === UploadDocumentSide.Selfie) {
     currentStep = totalSteps - 1;
   }
-
   return { value: currentStep, max: totalSteps };
 };
 

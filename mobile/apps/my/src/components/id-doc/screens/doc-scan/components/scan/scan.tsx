@@ -17,6 +17,7 @@ type ScanProps = {
   subtitle?: string;
   type?: ScanType;
   stepperValues: StepperProps;
+  onBack?: () => void;
 };
 
 const Scan = ({
@@ -30,6 +31,7 @@ const Scan = ({
   subtitle,
   type = 'back',
   stepperValues,
+  onBack,
 }: ScanProps) => {
   const [photo, setPhoto] = useState<PhotoFile | null>(null);
   const showPreview = !!photo;
@@ -44,12 +46,13 @@ const Scan = ({
 
   return showPreview ? (
     <Preview
+      onBack={onBack}
       onReset={handleResetPhoto}
       photo={photo}
       size={size}
+      stepperValues={stepperValues}
       subtitle={subtitle}
       title={title}
-      stepperValues={stepperValues}
     />
   ) : (
     <Camera
@@ -57,6 +60,7 @@ const Scan = ({
       feedback={feedback}
       frameProcessor={frameProcessor}
       isObjectDetected={isObjectDetected}
+      onBack={onBack}
       onPhotoTaken={handlePhotoTaken}
       subtitle={subtitle}
       title={title}
