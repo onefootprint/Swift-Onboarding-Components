@@ -144,18 +144,24 @@ pub fn save_vreq_and_vres(
 
     let vreq = VerificationRequest::create(conn, sv_id, di_id, vendor_api)?;
 
-    let vres = match vendor_result {
-        Ok(vr) => save_verification_result(conn, &(vreq.clone(), vr), public_key)?,
-        Err(e) => {
-            let (_, json) = VendorResults::construct_requests_with_responses_for_verification_result(&(
-                vreq.clone(),
-                ApiError::from(e),
-            ));
-            save_error_verification_result(conn, &(vreq.clone(), json), public_key)?
-        }
-    };
+    let vres = save_vres(conn, public_key, &vendor_result, &vreq)?;
 
     Ok((vreq, vres))
+}
+
+pub fn save_vres(
+    conn: &mut PgConn,
+    public_key: &VaultPublicKey,
+    vendor_result: &Result<VendorResponse, VendorAPIError>,
+    vreq: &VerificationRequest,
+) -> ApiResult<VerificationResult> {
+    match vendor_result {
+        Ok(vr) => save_verification_result(conn, &(vreq.clone(), vr.clone()), public_key),
+        Err(e) => {
+            let json = VendorResults::vendor_api_error_to_json(e);
+            save_error_verification_result(conn, &(vreq.clone(), json), public_key)
+        }
+    }
 }
 
 #[cfg(test)]

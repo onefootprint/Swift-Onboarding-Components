@@ -9,6 +9,8 @@ use crate::errors::ApiErrorKind;
 use crate::metrics;
 use crate::vendor_clients::VendorClient;
 use crate::{errors::ApiError, State};
+use db::models::vault::Vault;
+use db::models::verification_result::VerificationResult;
 use db::{
     models::{
         insight_event::InsightEvent, ob_configuration::ObConfiguration,
@@ -25,6 +27,82 @@ use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorR
 use newtypes::idology::IdologyScanOnboardingCaptureResult;
 use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, VendorAPI, WorkflowId};
 use prometheus::labels;
+
+
+
+// For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call, and returns the success or error response
+#[tracing::instrument(skip(state, tvc))]
+pub async fn make_idv_vendor_call_save_vreq_vres(
+    state: &State,
+    tvc: &TenantVendorControl,
+    sv_id: &ScopedVaultId,
+    di_id: &DecisionIntentId,
+    ob_configuration_key: ObConfigurationKey,
+    vendor_api: VendorAPI,
+) -> ApiResult<(VerificationRequest, VerificationResult, Result<VendorResponse, VendorAPIError>)> {
+    let (vreq, vendor_result) = make_idv_vendor_call_save_vreq(
+        state,
+        tvc,
+        sv_id,
+        di_id,
+        ob_configuration_key,
+        vendor_api,
+    ).await?;
+
+    let sv_id = sv_id.clone();
+    let v_req: VerificationRequest = vreq.clone();
+    let (vres, vendor_result) = state.db_pool.db_query(move |conn| -> ApiResult<_>{
+        let uv = Vault::get(conn, &sv_id)?;
+        let vres = verification_result::save_vres(
+            conn,
+            &uv.public_key,
+            &vendor_result,
+            &v_req,
+        )?;
+        Ok((vres, vendor_result))
+    }).await??;
+
+    Ok((vreq, vres, vendor_result))
+}
+
+// For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call, and returns the success or error response
+#[tracing::instrument(skip(state, tvc))]
+pub async fn make_idv_vendor_call_save_vreq(
+    state: &State,
+    tvc: &TenantVendorControl,
+    sv_id: &ScopedVaultId,
+    di_id: &DecisionIntentId,
+    ob_configuration_key: ObConfigurationKey,
+    vendor_api: VendorAPI,
+) -> ApiResult<(VerificationRequest, Result<VendorResponse, VendorAPIError>)> {
+    let sv_id = sv_id.clone();
+    let di_id = di_id.clone();
+    let vreq = state.db_pool.db_query(move |conn| {
+        VerificationRequest::create(
+            conn,
+            &sv_id,
+            &di_id,
+            vendor_api,
+        )
+    }).await??;
+
+    let idv_data = build_request::build_idv_data_from_verification_request(
+        &state.db_pool,
+        &state.enclave_client,
+        vreq.clone(),
+    ).await?;
+
+    let socure_data = SocureData {device_session_id: None, ip_address: None }; // TODO: rm socure from send_idv_request- we aren't using any more and SocureData is annoying
+
+    Ok((vreq, send_idv_request(
+        state,
+        tvc,
+        vendor_api,
+        idv_data,
+        socure_data,
+        ob_configuration_key,
+    ).await))
+}
 
 #[tracing::instrument(skip(state, tvc, idv_data, socure_data))]
 pub async fn send_idv_request(

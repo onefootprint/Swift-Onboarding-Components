@@ -11,7 +11,7 @@ use super::{
         tenant_vendor_control::TenantVendorControl,
         vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
         vendor_result::VendorResult,
-        verification_result,
+        verification_result, VendorAPIError,
     },
     *,
 };
@@ -173,20 +173,23 @@ impl VendorResults {
         v: &VerificationRequestWithVendorError,
     ) -> (VerificationRequest, Option<PiiJsonValue>) {
         match (&v.0, v.1.kind()) {
-            (req, ApiErrorKind::VendorRequestFailed(ve)) => match &ve.error {
-                idv::Error::IDologyError(idv::idology::error::Error::ErrorWithResponse(e)) => {
-                    (req.clone(), Some(e.response.clone()))
-                }
-                idv::Error::ExperianError(idv::experian::error::Error::ErrorWithResponse(e)) => {
-                    (req.clone(), Some(e.response.clone()))
-                }
-                idv::Error::StytchError(idv::stytch::error::Error::ErrorWithResponse(e)) => {
-                    (req.clone(), Some(e.response.clone()))
-                }
-                // TODO: non-ideal to have empty json, should make response optional
-                _ => (req.clone(), None),
-            },
+            (req, ApiErrorKind::VendorRequestFailed(ve)) => (req.clone(), Self::vendor_api_error_to_json(ve)),
             (req, _) => (req.clone(), None),
+        }
+    }
+
+    pub fn vendor_api_error_to_json(vendor_api_error: &VendorAPIError) -> Option<PiiJsonValue> {
+        match &vendor_api_error.error {
+            idv::Error::IDologyError(idv::idology::error::Error::ErrorWithResponse(e)) => {
+                Some(e.response.clone())
+            }
+            idv::Error::ExperianError(idv::experian::error::Error::ErrorWithResponse(e)) => {
+                Some(e.response.clone())
+            }
+            idv::Error::StytchError(idv::stytch::error::Error::ErrorWithResponse(e)) => {
+                Some(e.response.clone())
+            }
+            _ => None,
         }
     }
 }
