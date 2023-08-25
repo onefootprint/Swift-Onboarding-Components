@@ -1,0 +1,1 @@
+ALTER TABLE data_lifetime ALTER COLUMN source DROP DEFAULT;
