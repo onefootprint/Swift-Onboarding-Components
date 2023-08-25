@@ -103,6 +103,11 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
     let counts = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
+            // TODO as we add more of these, probably only want to execute the ones that we're set up
+            // to bill for.
+            // And then some of them we might want to fail if billing isn't set up for them but they use it.
+            // For ex, KYB for almost all tenants should show up as an un-negotiated price
+            // Maybe we have a price for every product that is un-negotiated, and we default to that?
             let pii = ScopedVault::count_billable(conn, &t_id, i.end)?;
             let kyc = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
             let kyb = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;

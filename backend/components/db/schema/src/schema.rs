@@ -49,6 +49,24 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    billing_profile (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        tenant_id -> Text,
+        kyc -> Nullable<Text>,
+        kyb -> Nullable<Text>,
+        pii -> Nullable<Text>,
+        id_docs -> Nullable<Text>,
+        watchlist -> Nullable<Text>,
+        hot_vaults -> Nullable<Text>,
+        hot_proxy_vaults -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     business_owner (id) {
         id -> Text,
         user_vault_id -> Nullable<Text>,
@@ -935,6 +953,7 @@ joinable!(access_event -> scoped_vault (scoped_vault_id));
 joinable!(access_event -> tenant (tenant_id));
 joinable!(annotation -> scoped_vault (scoped_vault_id));
 joinable!(appearance -> tenant (tenant_id));
+joinable!(billing_profile -> tenant (tenant_id));
 joinable!(contact_info -> data_lifetime (lifetime_id));
 joinable!(data_lifetime -> scoped_vault (scoped_vault_id));
 joinable!(data_lifetime -> vault (vault_id));
@@ -1010,6 +1029,7 @@ allow_tables_to_appear_in_same_query!(
     access_event,
     annotation,
     appearance,
+    billing_profile,
     business_owner,
     contact_info,
     custom_migration,
