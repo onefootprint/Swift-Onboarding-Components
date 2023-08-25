@@ -8,7 +8,7 @@ authors = { workspace = true }
 doctest = false
 
 [dependencies]
-async-stripe = { version = "0.18.2", default-features = false, features = ["checkout","billing","runtime-tokio-hyper"] }
+async-stripe = { version = "0.22.2", default-features = false, features = ["checkout","billing","runtime-tokio-hyper"] }
 db = { path = "../db/core" }
 newtypes = { path = "../newtypes" }
 feature_flag = { path = "../feature_flag" }
@@ -18,6 +18,8 @@ tracing = { workspace = true }
 chrono = { workspace = true }
 futures = { workspace = true }
 serde = { workspace = true }
+rust_decimal = { workspace = true }
+
 
 [dev-dependencies]
 test-case = { workspace = true }

@@ -14,6 +14,7 @@ pub struct BillingProfile {
     pub tenant_id: TenantId,
 
     // WARNING: do NOT re-order these columns
+    // All in cents
     pub kyc: Option<String>,
     pub kyb: Option<String>,
     pub pii: Option<String>,

@@ -1,3 +1,4 @@
+use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use db::models::tenant::Tenant;
 use feature_flag::LaunchDarklyFeatureFlagClient;
 use interval::BillingInterval;
@@ -7,7 +8,7 @@ use std::{collections::HashMap, str::FromStr};
 pub use stripe::Client;
 use stripe::{
     CreateCustomer, CreateInvoice, CreateInvoiceItem, Customer, CustomerId, Invoice, InvoiceItem,
-    InvoiceStatusFilter, ListCustomers, ListInvoiceItems, ListInvoices, PriceId, UpdateInvoiceItem,
+    InvoiceStatus, ListCustomers, ListInvoiceItems, ListInvoices, PriceId, UpdateInvoiceItem,
 };
 
 pub type BResult<T> = Result<T, Error>;
@@ -33,6 +34,8 @@ pub enum Error {
     InvoiceMissingItem(usize, usize),
     #[error("{0}")]
     FeatureFlagError(#[from] feature_flag::Error),
+    #[error("{0}")]
+    DecimalError(#[from] rust_decimal::Error),
 }
 
 #[derive(Clone)]
@@ -140,7 +143,7 @@ impl BillingClient {
         let list_invoice = ListInvoices {
             customer: Some(customer_id.clone()),
             limit: Some(10),
-            status: Some(InvoiceStatusFilter::Draft),
+            status: Some(InvoiceStatus::Draft),
             ..Default::default()
         };
         let existing_invoices = Invoice::list(&self.client, &list_invoice).await?;
@@ -154,7 +157,8 @@ impl BillingClient {
         }
 
         // Create the invoice items, unassociated with any invoice, for all the items we'll be charging
-        let prices = BillingProfile::get_for(ff_client, &info.tenant_id)?;
+        let prices =
+            BillingProfile::get_for(&self.client, ff_client, &info.tenant_id, info.billing_profile).await?;
         let items_fut = info
             .counts
             .line_items(prices)
@@ -186,12 +190,12 @@ impl BillingClient {
         // line item we didn't know about
         let data = invoice.lines.data;
         data.iter().try_for_each(|l| -> BResult<_> {
-            let Some(item_id) = l.invoice_item.as_ref() else {
-                    return Err(Error::NonInvoiceLineItem(l.id.to_string()));
-                };
-            let Some(item) = items.get(&stripe::InvoiceItemId::from_str(item_id)?) else {
-                    return Err(Error::UnknownInvoiceItem(l.id.to_string()));
-                };
+            let Some(item_id) = l.invoice_item.as_ref().map(|i| i.id()) else {
+                return Err(Error::NonInvoiceLineItem(l.id.to_string()));
+            };
+            let Some(item) = items.get(&item_id) else {
+                return Err(Error::UnknownInvoiceItem(l.id.to_string()));
+            };
             if item.quantity != l.quantity {
                 return Err(Error::InvalidLineItemQuantity(l.id.to_string()));
             }
@@ -221,6 +225,7 @@ fn is_managed(metadata: &HashMap<String, String>) -> bool {
 #[derive(Debug)]
 pub struct BillingInfo {
     pub tenant_id: TenantId,
+    pub billing_profile: Option<DbBillingProfile>,
     pub customer_id: StripeCustomerId,
     pub interval: BillingInterval,
     pub counts: BillingCounts,

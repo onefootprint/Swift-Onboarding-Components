@@ -8,6 +8,7 @@ use actix_web::{post, web};
 use billing::{BillingCounts, BillingInfo};
 use chrono::{Duration, NaiveDate, Utc};
 use db::models::access_event::AccessEvent;
+use db::models::billing_profile::BillingProfile;
 use db::models::identity_document::IdentityDocument;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::{Tenant, UpdateTenant};
@@ -100,9 +101,10 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
     let i = billing::interval::get_billing_interval(billing_date)?;
     let t_id = tenant.id.clone();
     // Count the number of billable uses of each product for this tenant
-    let counts = state
+    let (billing_profile, counts) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
+            let billing_profile = BillingProfile::get(conn, &t_id)?;
             // TODO as we add more of these, probably only want to execute the ones that we're set up
             // to bill for.
             // And then some of them we might want to fail if billing isn't set up for them but they use it.
@@ -127,7 +129,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
                 hot_vaults,
                 hot_proxy_vaults,
             };
-            Ok(counts)
+            Ok((billing_profile, counts))
         })
         .await??;
 
@@ -135,6 +137,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
     let customer_id = get_or_create_customer_id(state, &tenant).await?;
     let info = BillingInfo {
         tenant_id: tenant.id.clone(),
+        billing_profile,
         interval: i,
         customer_id,
         counts,
