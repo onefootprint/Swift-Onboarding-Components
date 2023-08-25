@@ -13,13 +13,12 @@ use diesel::{Insertable, Queryable};
 use newtypes::AppearanceId;
 use newtypes::DocumentCdoInfo;
 use newtypes::WorkflowId;
-use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant};
+use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant, DbActor};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
-use serde::{Deserialize, Serialize};
 
 pub type IsLive = bool;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Default)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = ob_configuration)]
 pub struct ObConfiguration {
     pub id: ObConfigurationId,
@@ -41,8 +40,10 @@ pub struct ObConfiguration {
     pub is_doc_first: bool,
     pub allow_international_residents: bool,
     pub international_country_restrictions: Option<Vec<String>>,
+    pub author: Option<DbActor>,
 }
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
+
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = ob_configuration)]
 struct NewObConfiguration {
     key: ObConfigurationKey,
@@ -60,6 +61,7 @@ struct NewObConfiguration {
     is_doc_first: bool,
     allow_international_residents: bool,
     international_country_restrictions: Option<Vec<String>>,
+    author: DbActor,
 }
 
 #[derive(Debug)]
@@ -215,6 +217,7 @@ impl ObConfiguration {
         is_doc_first: bool,
         allow_international_residents: bool,
         international_country_restrictions: Option<Vec<String>>,
+        author: DbActor,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -231,6 +234,7 @@ impl ObConfiguration {
             is_doc_first,
             allow_international_residents,
             international_country_restrictions,
+            author,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)

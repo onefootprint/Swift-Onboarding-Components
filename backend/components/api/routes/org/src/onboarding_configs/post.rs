@@ -261,6 +261,7 @@ pub async fn post(
         return Err(TenantError::CannotCreateProdObConfigs.into());
     }
 
+    let actor = auth.actor().into();
     let obc = state
         .db_pool
         .db_query(move |conn| {
@@ -277,6 +278,7 @@ pub async fn post(
                 is_doc_first_flow,
                 allow_international_residents,
                 international_country_restrictions,
+                actor,
             )
         })
         .await??;

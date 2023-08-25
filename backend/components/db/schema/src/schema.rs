@@ -403,6 +403,7 @@ table! {
         is_doc_first -> Bool,
         allow_international_residents -> Bool,
         international_country_restrictions -> Nullable<Array<Text>>,
+        author -> Nullable<Jsonb>,
     }
 }
 

@@ -1,5 +1,5 @@
 use crate::PgConn;
-use newtypes::{CipKind, CollectedDataOption, TenantId};
+use newtypes::{CipKind, CollectedDataOption, DbActor, TenantId};
 
 use crate::models::ob_configuration::ObConfiguration;
 
@@ -17,6 +17,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         false,
         false,
         None,
+        DbActor::Footprint,
     )
     .expect("Could not create ob config")
 }
@@ -47,6 +48,7 @@ pub fn create_with_opts(
         false,
         false,
         None,
+        DbActor::Footprint,
     )
     .expect("Could not create ob config")
 }
