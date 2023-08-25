@@ -82,13 +82,16 @@ export const requiresAdditionalInfo = (context: MachineContext) => {
 };
 
 const shouldRunCollectKybData = (context: MachineContext) =>
-  context.requirements[0]?.kind === OnboardingRequirementKind.collectKybData;
+  context.requirements[0]?.kind === OnboardingRequirementKind.collectKybData &&
+  !context.onboardingContext.isTransfer;
 
 const shouldRunCollectKycData = (context: MachineContext) =>
-  context.requirements[0]?.kind === OnboardingRequirementKind.collectKycData;
+  context.requirements[0]?.kind === OnboardingRequirementKind.collectKycData &&
+  !context.onboardingContext.isTransfer;
 
 const shouldRunCollectInvestorProfile = (context: MachineContext) =>
-  context.requirements[0]?.kind === OnboardingRequirementKind.investorProfile;
+  context.requirements[0]?.kind === OnboardingRequirementKind.investorProfile &&
+  !context.onboardingContext.isTransfer;
 
 const shouldRunLiveness = (context: MachineContext) =>
   context.requirements[0]?.kind === OnboardingRequirementKind.registerPasskey;
