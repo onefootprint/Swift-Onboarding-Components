@@ -41,6 +41,7 @@ struct SendgridPersonalization {
 #[derive(Debug, Clone, serde::Serialize)]
 struct SendgridEmail {
     email: String,
+    name: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -81,6 +82,7 @@ impl SendgridClient {
     const OTP_VERIFY_TEMPLATE_ID: &str = "d-d4707e4a976449e1af1753de5f05289d";
 
     const FROM_EMAIL: &str = "noreply@noreply.onefootprint.com";
+    const FROM_NAME: &str = "Footprint";
 
     pub fn new(api_key: String) -> Self {
         let client = reqwest::Client::new();
@@ -187,11 +189,13 @@ impl SendgridClient {
             personalizations: vec![SendgridPersonalization {
                 to: vec![SendgridEmail {
                     email: to_email.leak_to_string(),
+                    name: None,
                 }],
                 dynamic_template_data: template_data,
             }],
             from: SendgridEmail {
                 email: Self::FROM_EMAIL.to_owned(),
+                name: Some(Self::FROM_NAME.to_owned()),
             },
             template_id: template_id.to_string(),
         };
