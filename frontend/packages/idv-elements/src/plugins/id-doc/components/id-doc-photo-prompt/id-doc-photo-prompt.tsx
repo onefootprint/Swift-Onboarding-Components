@@ -115,12 +115,12 @@ const IdDocPhotoPrompt = ({
 
 const PromptContainer = styled.div`
   ${({ theme }) => css`
-    height: 100%;
     display: flex;
     flex-direction: column;
     row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
+    margin-top: calc(-1 * ${theme.spacing[5]});
   `}
 `;
 

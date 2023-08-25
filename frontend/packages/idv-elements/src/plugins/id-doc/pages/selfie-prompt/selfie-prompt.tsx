@@ -11,7 +11,6 @@ import React from 'react';
 
 import InfoBox from '../../../../components/info-box';
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import FadeInContainer from '../../components/fade-in-container';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
@@ -26,7 +25,6 @@ const SelfiePrompt = () => {
   return (
     <FadeInContainer>
       <PromptContainer>
-        <NavigationHeader />
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <InfoBox
           items={[
@@ -66,6 +64,7 @@ const PromptContainer = styled.div`
     row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
+    margin-top: calc(-1 * ${theme.spacing[5]});
     > button {
       margin-top: -${theme.spacing[4]};
     }
