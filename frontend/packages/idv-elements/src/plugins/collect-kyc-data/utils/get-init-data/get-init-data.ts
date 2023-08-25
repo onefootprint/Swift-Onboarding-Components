@@ -16,10 +16,12 @@ const getInitData = (
   const data: KycData = {};
   if (bootstrapData) {
     Object.entries(bootstrapData).forEach(([key, value]) => {
-      data[key as IdDI] = {
-        value,
-        bootstrap: true,
-      };
+      if (value) {
+        data[key as IdDI] = {
+          value: value as any,
+          bootstrap: true,
+        };
+      }
     });
   }
 

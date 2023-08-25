@@ -6,5 +6,5 @@ export type DecryptUserRequest = {
 };
 
 export type DecryptUserResponse = Partial<
-  Record<DataIdentifier, string | undefined>
+  Record<DataIdentifier, string | string[] | undefined>
 >;

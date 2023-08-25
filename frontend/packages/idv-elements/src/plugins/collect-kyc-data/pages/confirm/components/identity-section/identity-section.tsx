@@ -101,9 +101,9 @@ const IdentitySection = () => {
 
   const handleDecryptSuccess = (payload: DecryptUserResponse) => {
     const decryptedData: KycData = {};
-    Object.entries(payload).forEach(([key, value = '']) => {
+    Object.entries(payload).forEach(([key, value]) => {
       decryptedData[key as IdDI] = {
-        value,
+        value: (value as any) ?? '',
         decrypted: true,
       };
     });

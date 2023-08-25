@@ -19,8 +19,9 @@ const decryptUser = async (
       [AUTH_HEADER]: authToken,
     },
   });
-  if (response.data['id.dob']) {
-    response.data['id.dob'] = formatUtcDate(new Date(response.data['id.dob']));
+  const dobData = response.data['id.dob'] as string | undefined;
+  if (dobData) {
+    response.data['id.dob'] = formatUtcDate(new Date(dobData));
   }
   return response.data;
 };

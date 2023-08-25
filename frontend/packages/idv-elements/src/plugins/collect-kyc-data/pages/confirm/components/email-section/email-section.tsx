@@ -10,7 +10,6 @@ import {
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import { getDisplayValue } from '../../../../utils/data-types';
 import Email from '../../../email';
 
 const EmailSection = () => {
@@ -21,7 +20,7 @@ const EmailSection = () => {
     requirement: { missingAttributes },
   } = state.context;
   const emailEntry = data[IdDI.email];
-  const email = getDisplayValue(emailEntry);
+  const email = emailEntry?.value;
   const [editing, setEditing] = useState(false);
   const receivedEmail = emailEntry?.bootstrap;
   // We don't use allAttributes here -

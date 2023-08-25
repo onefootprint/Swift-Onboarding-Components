@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IdDI, IdDIData } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 
 import useUserData from '../../../hooks/api/hosted/user/vault/use-user-data';
@@ -35,13 +35,17 @@ const useSyncData = () => {
       return;
     }
 
-    const keyValuePairs: [IdDI, string][] = Object.entries(data)
+    const requestData: Partial<Record<IdDI, string | string[]>> = {};
+    Object.keys(data).forEach((di: string) => {
+      const entry = data[di as keyof KycData];
       // Don't sync data that's already set in the vault
-      .filter(([, v]) => !v.scrubbed && !v.decrypted)
-      .map(([key, value]) => [key as IdDI, value.value]);
-    const requestData: IdDIData = Object.fromEntries(keyValuePairs);
+      if (entry && !entry?.scrubbed && !entry?.decrypted) {
+        requestData[di as IdDI] = entry.value;
+      }
+    });
+
     // DOB is accepted by the backend in a different format
-    const dobData = requestData[IdDI.dob];
+    const dobData = requestData[IdDI.dob] as string;
     if (dobData) {
       const [month, day, year] = dobData.split('/');
       requestData[IdDI.dob] = `${year}-${month}-${day}`;

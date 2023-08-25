@@ -10,7 +10,6 @@ import {
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import { getDisplayValue } from '../../../../utils/data-types';
 import getInitialCountry from '../../../../utils/get-initial-country';
 import BasicInformation from '../../../basic-information';
 
@@ -22,7 +21,7 @@ const BasicInfoSection = () => {
 
   const basicInfo = [];
 
-  const firstName = getDisplayValue(data[IdDI.firstName]);
+  const firstName = data[IdDI.firstName]?.value;
   if (firstName) {
     basicInfo.push({
       text: t('basic-info.first-name'),
@@ -30,7 +29,7 @@ const BasicInfoSection = () => {
     });
   }
 
-  const lastName = getDisplayValue(data[IdDI.lastName]);
+  const lastName = data[IdDI.lastName]?.value;
   if (lastName) {
     basicInfo.push({
       text: t('basic-info.last-name'),
@@ -38,7 +37,7 @@ const BasicInfoSection = () => {
     });
   }
 
-  const dob = getDisplayValue(data[IdDI.dob]);
+  const dob = data[IdDI.dob]?.value;
   if (dob) {
     basicInfo.push({
       text: t('basic-info.dob'),

@@ -11,7 +11,6 @@ import {
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import { getDisplayValue } from '../../../../utils/data-types';
 import Address from '../../../residential-address';
 import createAddressLine from './utils/create-address-line';
 
@@ -21,12 +20,12 @@ const AddressSection = () => {
   const { data } = state.context;
 
   const address = [];
-  const addressLine1 = getDisplayValue(data[IdDI.addressLine1]);
-  const addressLine2 = getDisplayValue(data[IdDI.addressLine2]);
-  const city = getDisplayValue(data[IdDI.city]);
-  const stateName = getDisplayValue(data[IdDI.state]);
-  const country = getDisplayValue(data[IdDI.country]);
-  const zip = getDisplayValue(data[IdDI.zip]);
+  const addressLine1 = data[IdDI.addressLine1]?.value;
+  const addressLine2 = data[IdDI.addressLine2]?.value;
+  const city = data[IdDI.city]?.value;
+  const stateName = data[IdDI.state]?.value;
+  const country = data[IdDI.country]?.value;
+  const zip = data[IdDI.zip]?.value;
   const hasFullAddress = addressLine1 && city && stateName && country && zip;
   const hasCountryAndZip = country && zip;
   const [editing, setEditing] = useState(false);
