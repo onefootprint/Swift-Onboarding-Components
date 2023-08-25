@@ -3,14 +3,15 @@ use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{document_request, document_upload, identity_document};
 
-use diesel::dsl::not;
+use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
     DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentScanDeviceType, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, WorkflowId,
+    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, TenantId,
+    WorkflowId,
 };
 
 use super::document_request::DocumentRequest;
@@ -268,5 +269,29 @@ impl IdentityDocument {
         }
         let results = query.get_results(conn)?;
         Ok(results)
+    }
+
+    #[tracing::instrument("IdentityDocument::get_billable_count", skip_all)]
+    pub fn get_billable_count(
+        conn: &mut PgConn,
+        t_id: &TenantId,
+        start_date: DateTime<Utc>,
+        end_date: DateTime<Utc>,
+    ) -> DbResult<i64> {
+        use db_schema::schema::scoped_vault;
+        let count = identity_document::table
+            .inner_join(document_request::table.inner_join(scoped_vault::table))
+            // Basic filters
+            .filter(scoped_vault::is_live.eq(true))
+            .filter(scoped_vault::tenant_id.eq(t_id))
+            // Only completed docs
+            .filter(identity_document::status.eq(IdentityDocumentStatus::Complete))
+            // Filter for id docs that happened during this time
+            // TODO probably not the best timestamp to be using here. Should revisit in the future
+            .filter(identity_document::created_at.ge(start_date))
+            .filter(identity_document::created_at.lt(end_date))
+            .select(count_star())
+            .get_result(conn)?;
+        Ok(count)
     }
 }

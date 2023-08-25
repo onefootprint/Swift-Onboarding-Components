@@ -8,6 +8,7 @@ use actix_web::{post, web};
 use billing::{BillingCounts, BillingInfo};
 use chrono::{Duration, NaiveDate, Utc};
 use db::models::access_event::AccessEvent;
+use db::models::identity_document::IdentityDocument;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
@@ -105,6 +106,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
             let pii = ScopedVault::count_billable(conn, &t_id, i.end)?;
             let kyc = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
             let kyb = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
+            let id_docs = IdentityDocument::get_billable_count(conn, &t_id, i.start, i.end)?;
             let watchlist_checks = WatchlistCheck::get_billable_count(conn, &t_id, i.start, i.end)?;
             let hot_purposes = AccessEventPurpose::iter().collect(); // Any access is billable
             let hot_vaults = AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, hot_purposes)?;
@@ -115,6 +117,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
                 pii,
                 kyc,
                 kyb,
+                id_docs,
                 watchlist_checks,
                 hot_vaults,
                 hot_proxy_vaults,

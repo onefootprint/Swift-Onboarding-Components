@@ -9,12 +9,12 @@ pub(crate) struct BillingProfile {
     pub(crate) kyc: stripe::PriceId,
     pub(crate) pii: stripe::PriceId,
     pub(crate) kyb: stripe::PriceId,
+    pub(crate) id_docs: stripe::PriceId,
     pub(crate) watchlist: stripe::PriceId,
 
     // Not all tenants have billing for hot vaults
     pub(crate) hot_vaults: Option<stripe::PriceId>,
     pub(crate) hot_proxy_vaults: Option<stripe::PriceId>,
-    // TODO documentary verifications
 }
 
 impl BillingProfile {

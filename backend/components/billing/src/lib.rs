@@ -234,6 +234,8 @@ pub struct BillingCounts {
     pub kyc: i64,
     /// Number of KYB verifications ran this month
     pub kyb: i64,
+    /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't finish onboarding
+    pub id_docs: i64,
     /// Number of watchlist checks ran this month
     pub watchlist_checks: i64,
     /// Number of vaults with decrypts this month
@@ -252,10 +254,11 @@ impl BillingCounts {
             kyc,
             kyb,
             watchlist_checks,
+            id_docs,
             hot_vaults,
             hot_proxy_vaults,
         } = self;
-        pii + kyc + kyb + watchlist_checks + hot_vaults + hot_proxy_vaults == 0
+        pii + kyc + kyb + id_docs + watchlist_checks + hot_vaults + hot_proxy_vaults == 0
     }
 
     fn line_items(&self, prices: BillingProfile) -> Vec<LineItem> {
@@ -264,6 +267,7 @@ impl BillingCounts {
             pii,
             kyc,
             kyb,
+            id_docs,
             watchlist_checks,
             hot_vaults,
             hot_proxy_vaults,
@@ -273,6 +277,7 @@ impl BillingCounts {
             (Some(prices.pii), pii),
             (Some(prices.kyc), kyc),
             (Some(prices.kyb), kyb),
+            (Some(prices.id_docs), id_docs),
             (Some(prices.watchlist), watchlist_checks),
             (prices.hot_vaults, hot_vaults),
             (prices.hot_proxy_vaults, hot_proxy_vaults),
