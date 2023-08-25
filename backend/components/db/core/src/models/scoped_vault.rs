@@ -19,7 +19,7 @@ use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
     DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus, ScopedVaultId, TenantId,
-    VaultCreatedInfo, VaultId, VaultKind, WorkflowId,
+    VaultCreatedInfo, VaultId, WorkflowId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -335,8 +335,6 @@ impl ScopedVault {
             .inner_join(vault::table)
             .filter(scoped_vault::tenant_id.eq(t_id))
             .filter(scoped_vault::is_live.eq(true))
-            // Don't bill for business vaults. TODO should we?
-            .filter(vault::kind.eq(VaultKind::Person))
             // Only allow billing authorized scoped users for portable vaults OR non-portable vaults
             // owned by the tenant
             .filter(scoped_vault::id.eq_any(sv_with_authed_wf).or(vault::is_portable.eq(false)))
