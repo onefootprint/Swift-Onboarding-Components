@@ -33,15 +33,15 @@ impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio
 }
 
 impl VendorAPIResponse for TwilioLookupV2APIResponse {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::TwilioLookupV2
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::TwilioLookupV2(self.parsed_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::TwilioLookupV2(self.parsed_response.clone())
     }
 }

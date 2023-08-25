@@ -132,7 +132,7 @@ pub async fn send_twilio_lookupv2_request(
         .make_request(TwilioLookupV2Request { idv_data })
         .await
         .map(|r| {
-            let parsed_response = r.clone().parsed_response();
+            let parsed_response = r.parsed_response();
             let raw_response = r.raw_response();
             // TODO put this into a INto
             VendorResponse {
@@ -191,7 +191,7 @@ pub async fn send_idology_idv_request(
         }
 
         res.map(|r| {
-            let parsed_response = r.clone().parsed_response();
+            let parsed_response = r.parsed_response();
             let raw_response = r.raw_response();
             VendorResponse {
                 // TODO: later delete VendorResponse and just replace with VendorAPIResponse
@@ -246,7 +246,7 @@ pub async fn send_socure_idv_request(
 
         res.map(|r| {
             // TODO: later delete VendorResponse and just replace with VendorAPIResponse
-            let parsed_response = r.clone().parsed_response();
+            let parsed_response = r.parsed_response();
             let raw_response = r.raw_response();
             VendorResponse {
                 response: parsed_response,
@@ -282,7 +282,7 @@ pub async fn send_experian_idv_request(
         let res = experian_api_call.make_request(request).await;
 
         res.map(|r| {
-            let parsed_response = r.clone().parsed_response();
+            let parsed_response = r.parsed_response();
             let raw_response = r.raw_response();
 
             VendorResponse {

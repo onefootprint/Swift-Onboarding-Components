@@ -37,15 +37,15 @@ impl VendorAPICall<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::exp
 }
 
 impl VendorAPIResponse for ExperianCrossCoreResponse {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::ExperianPreciseID
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::ExperianPreciseID(self.parsed_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::ExperianPreciseID(self.parsed_response.clone())
     }
 }

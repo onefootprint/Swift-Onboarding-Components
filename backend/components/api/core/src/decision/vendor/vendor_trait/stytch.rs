@@ -25,15 +25,15 @@ impl VendorAPICall<StytchLookupRequest, StytchLookupResponse, idv::stytch::error
 }
 
 impl VendorAPIResponse for StytchLookupResponse {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::StytchLookup
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::StytchLookup(self.parsed_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::StytchLookup(self.parsed_response.clone())
     }
 }

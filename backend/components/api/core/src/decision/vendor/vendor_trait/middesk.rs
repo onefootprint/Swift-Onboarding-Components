@@ -33,16 +33,16 @@ impl VendorAPICall<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, 
 }
 
 impl VendorAPIResponse for MiddeskCreateBusinessResponse {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::MiddeskCreateBusiness
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::MiddeskCreateBusiness(self.parsed_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::MiddeskCreateBusiness(self.parsed_response.clone())
     }
 }
 
@@ -66,15 +66,15 @@ impl VendorAPICall<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::m
 }
 
 impl VendorAPIResponse for MiddeskGetBusinessResponse {
-    fn vendor_api(self) -> VendorAPI {
+    fn vendor_api(&self) -> VendorAPI {
         VendorAPI::MiddeskGetBusiness
     }
 
-    fn raw_response(self) -> PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> PiiJsonValue {
+        self.raw_response.clone()
     }
 
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::MiddeskGetBusiness(self.parsed_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::MiddeskGetBusiness(self.parsed_response.clone())
     }
 }

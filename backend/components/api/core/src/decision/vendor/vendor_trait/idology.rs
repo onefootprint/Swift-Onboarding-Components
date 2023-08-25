@@ -40,16 +40,16 @@ impl VendorAPICall<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idol
 }
 
 impl VendorAPIResponse for IdologyExpectIDAPIResponse {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IdologyExpectID
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IDologyExpectID(self.parsed_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IDologyExpectID(self.parsed_response.clone())
     }
 }
 
@@ -82,15 +82,15 @@ impl VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::
 }
 
 impl VendorAPIResponse for IdologyPaAPIResponse {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IdologyPa
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IDologyPa(self.parsed_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IDologyPa(self.parsed_response.clone())
     }
 }

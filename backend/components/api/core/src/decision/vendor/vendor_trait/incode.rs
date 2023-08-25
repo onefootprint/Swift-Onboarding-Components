@@ -60,17 +60,17 @@ impl VendorAPICall<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartR
 }
 
 impl VendorAPIResponse for IncodeResponse<OnboardingStartResponse> {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IncodeStartOnboarding
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
     // we don't use incode in this way
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
 
@@ -101,19 +101,19 @@ impl VendorAPICall<IncodeAddFrontRequest, IncodeResponse<AddSideResponse>, Incod
 }
 
 impl VendorAPIResponse for IncodeResponse<AddSideResponse> {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         // this isn't correct, so don't use it :)
         // 2 VendorAPIs use the same result struct
         unimplemented!()
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
     // we don't use incode in this way
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
 
@@ -168,18 +168,18 @@ impl VendorAPICall<IncodeProcessIdRequest, IncodeResponse<ProcessIdResponse>, In
 }
 
 impl VendorAPIResponse for IncodeResponse<ProcessIdResponse> {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         // this isn't correct
         VendorAPI::IncodeProcessId
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
     // we don't use incode in this way
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
 
@@ -208,18 +208,18 @@ impl VendorAPICall<IncodeFetchScoresRequest, IncodeResponse<FetchScoresResponse>
 }
 
 impl VendorAPIResponse for IncodeResponse<FetchScoresResponse> {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         // this isn't correct
         VendorAPI::IncodeFetchScores
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
     // we don't use incode in this way
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
 
@@ -277,18 +277,18 @@ impl VendorAPICall<IncodeAddMLConsentRequest, IncodeResponse<AddConsentResponse>
 }
 
 impl VendorAPIResponse for IncodeResponse<AddConsentResponse> {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         // this isn't correct
         VendorAPI::IncodeAddPrivacyConsent
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
     // we don't use incode in this way
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
 
@@ -317,17 +317,17 @@ impl VendorAPICall<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>, Inco
 }
 
 impl VendorAPIResponse for IncodeResponse<FetchOCRResponse> {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IncodeFetchOCR
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
     // we don't use incode in this way
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
 
@@ -356,17 +356,17 @@ impl VendorAPICall<IncodeAddSelfieRequest, IncodeResponse<AddSelfieResponse>, In
 }
 
 impl VendorAPIResponse for IncodeResponse<AddSelfieResponse> {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IncodeAddSelfie
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
     // we don't use incode in this way
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
 
@@ -408,17 +408,17 @@ impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultRe
 }
 
 impl VendorAPIResponse for IncodeResponse<WatchlistResultResponse> {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IncodeWatchlistCheck
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
     // we don't use incode in this way
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
 
@@ -448,17 +448,17 @@ impl VendorAPICall<IncodeProcessFaceRequest, IncodeResponse<ProcessFaceResponse>
 }
 
 impl VendorAPIResponse for IncodeResponse<ProcessFaceResponse> {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IncodeProcessFace
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
     // we don't use incode in this way
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
 
@@ -494,16 +494,16 @@ impl VendorAPICall<IncodeGetOnboardingStatusRequest, IncodeResponse<GetOnboardin
 }
 
 impl VendorAPIResponse for IncodeResponse<GetOnboardingStatusResponse> {
-    fn vendor_api(self) -> newtypes::VendorAPI {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::IncodeGetOnboardingStatus
     }
 
-    fn raw_response(self) -> newtypes::PiiJsonValue {
-        self.raw_response
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
     }
 
     // we don't use incode in this way
-    fn parsed_response(self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response)
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
