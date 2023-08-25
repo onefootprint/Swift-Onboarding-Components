@@ -114,7 +114,7 @@ async fn get_price(client: &stripe::Client, product_id: &str, price: &str) -> BR
     let request = ListPrices {
         active: Some(true),
         currency: Some(Currency::USD),
-        product: Some(IdOrCreate::Id(HOT_PROXY_VAULTS)),
+        product: Some(IdOrCreate::Id(product_id)),
         ..Default::default()
     };
 
@@ -139,13 +139,13 @@ async fn get_price(client: &stripe::Client, product_id: &str, price: &str) -> BR
 #[tracing::instrument(skip(client))]
 async fn create_price(client: &stripe::Client, product_id: &str, price: &str) -> BResult<PriceId> {
     let params = CreatePrice {
+        active: Some(true),
         billing_scheme: Some(PriceBillingScheme::PerUnit),
         currency: Currency::USD,
         product: Some(IdOrCreate::Id(product_id)),
         metadata: Some(managed_metadata()),
         unit_amount_decimal: Some(price),
         // This doesn't implement Default for some reason...
-        active: None,
         currency_options: None,
         custom_unit_amount: None,
         expand: &[],
