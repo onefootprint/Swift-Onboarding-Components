@@ -26,7 +26,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 pub fn get(
     state: web::Data<State>,
     auth: Either<ObConfigAuth, UserObAuthContext>,
-) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<api_wire_types::PublicOnboardingConfiguration>>, ApiError> {
     let (tenant, ob_config) = match auth {
         Either::Left(ob_pk_auth) => {
             // Support auth that identifies an ob config
@@ -66,7 +66,7 @@ pub fn get(
     let ff_client = state.feature_flag_client.clone();
 
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((
+        api_wire_types::PublicOnboardingConfiguration::from_db((
             ob_config,
             tenant,
             client_config,

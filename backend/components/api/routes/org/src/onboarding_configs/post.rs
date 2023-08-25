@@ -283,9 +283,8 @@ pub async fn post(
         })
         .await??;
 
-    let ff_client = state.feature_flag_client.clone();
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((obc, tenant, None, None, ff_client)),
+        api_wire_types::OnboardingConfiguration::from_db(obc),
     )))
 }
 

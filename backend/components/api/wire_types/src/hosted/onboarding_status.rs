@@ -5,7 +5,7 @@ use newtypes::OnboardingRequirement;
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema, JsonSchema)]
 pub struct OnboardingStatusResponse {
     pub all_requirements: Vec<ApiOnboardingRequirement>,
-    pub ob_configuration: OnboardingConfiguration,
+    pub ob_configuration: PublicOnboardingConfiguration,
     // TODO deprecate
     pub requirements: Vec<ApiOnboardingRequirement>,
     pub met_requirements: Vec<ApiOnboardingRequirement>,

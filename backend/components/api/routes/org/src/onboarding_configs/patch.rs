@@ -43,8 +43,7 @@ async fn patch(
         .db_transaction(move |conn| ObConfiguration::update(conn, &id, &tenant_id, is_live, name, status))
         .await?;
 
-    let ff_client = state.feature_flag_client.clone();
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((result, tenant, None, None, ff_client)),
+        api_wire_types::OnboardingConfiguration::from_db(result),
     )))
 }

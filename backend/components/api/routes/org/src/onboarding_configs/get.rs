@@ -48,19 +48,10 @@ async fn get_list(
         })
         .await??;
 
-    let ff_client = state.feature_flag_client.clone();
     let results = results
         .into_iter()
-        .map(|obc| {
-            api_wire_types::OnboardingConfiguration::from_db((
-                obc,
-                tenant.clone(),
-                None,
-                None,
-                ff_client.clone(),
-            ))
-        })
-        .collect::<Vec<api_wire_types::OnboardingConfiguration>>();
+        .map(api_wire_types::OnboardingConfiguration::from_db)
+        .collect::<Vec<_>>();
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
 }
 
@@ -79,12 +70,11 @@ async fn get_detail(
     let is_live = auth.is_live()?;
     let ob_config_id = ob_config_id.into_inner();
 
-    let (obc, tenant) = state
+    let (obc, _) = state
         .db_pool
         .db_query(move |conn| ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live)))
         .await??;
 
-    let ff_client = state.feature_flag_client.clone();
-    let result = api_wire_types::OnboardingConfiguration::from_db((obc, tenant, None, None, ff_client));
+    let result = api_wire_types::OnboardingConfiguration::from_db(obc);
     ResponseData::ok(result).json()
 }
