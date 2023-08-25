@@ -1,6 +1,10 @@
 use std::slice;
 
-use crate::{enclave_client::EnclaveClient, errors::ApiError};
+use crate::{
+    decision::engine::VendorResults,
+    enclave_client::EnclaveClient,
+    errors::{ApiError, ApiResult},
+};
 use chrono::Utc;
 use db::{
     models::{
@@ -9,13 +13,15 @@ use db::{
     },
     DbError, PgConn,
 };
+use idv::VendorResponse;
 use newtypes::{
-    EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedPiiJsonValue, SealedVaultBytes, VaultPublicKey,
+    DecisionIntentId, EncryptedVaultPrivateKey, PiiJsonValue, ScopedVaultId, ScrubbedPiiJsonValue,
+    SealedVaultBytes, VaultPublicKey,
 };
 
 use super::{
     make_request::VerificationRequestWithVendorResponse,
-    vendor_api::vendor_api_response::scrub_raw_error_vendor_response,
+    vendor_api::vendor_api_response::scrub_raw_error_vendor_response, VendorAPIError,
 };
 
 /// Save a verification result, encrypting the response payload in the process
@@ -122,4 +128,180 @@ pub async fn decrypt_verification_result_response(
         .into_iter()
         .map(|b| PiiJsonValue::try_from(b).map_err(ApiError::from))
         .collect()
+}
+
+pub fn save_vreq_and_vres(
+    conn: &mut PgConn,
+    public_key: &VaultPublicKey,
+    sv_id: &ScopedVaultId,
+    di_id: &DecisionIntentId,
+    vendor_result: Result<VendorResponse, VendorAPIError>,
+) -> ApiResult<(VerificationRequest, VerificationResult)> {
+    let vendor_api = match &vendor_result {
+        Ok(vr) => (&vr.response).into(),
+        Err(e) => e.vendor_api,
+    };
+
+    let vreq = VerificationRequest::create(conn, sv_id, di_id, vendor_api)?;
+
+    let vres = match vendor_result {
+        Ok(vr) => save_verification_result(conn, &(vreq.clone(), vr), public_key)?,
+        Err(e) => {
+            let (_, json) = VendorResults::construct_requests_with_responses_for_verification_result(&(
+                vreq.clone(),
+                ApiError::from(e),
+            ));
+            save_error_verification_result(conn, &(vreq.clone(), json), public_key)?
+        }
+    };
+
+    Ok((vreq, vres))
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::decision::vendor::vendor_trait::VendorAPIResponse;
+    use crate::{
+        decision::{
+            tests::test_helpers::create_kyc_user_and_wf,
+            vendor::vendor_trait::{MockVendorAPICall, VendorAPICall},
+        },
+        State,
+    };
+    use db::models::decision_intent::DecisionIntent;
+    use db::tests::test_db_pool::TestDbPool;
+    use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
+    use idv::stytch::StytchLookupRequest;
+    use idv::stytch::StytchLookupResponse;
+    use macros::test_state;
+    use newtypes::{vendor_credentials::IdologyCredentials, DecisionIntentKind, IdvData};
+    use newtypes::{Vendor, VendorAPI};
+    use serde_json::json;
+
+    async fn test_save_vreq_and_vres<T, U, E>(
+        state: &State,
+        req: T,
+        res: Result<U, E>,
+        vendor_api: VendorAPI,
+        res_json: serde_json::Value,
+    ) where
+        T: Send + Sync + Sized,
+        U: VendorAPIResponse + Send + Sync + 'static,
+        E: Send + Sync + Into<idv::Error> + 'static,
+    {
+        let mut mock_client = MockVendorAPICall::<T, U, E>::new();
+        mock_client
+            .expect_make_request()
+            .times(1)
+            .return_once(move |_| res);
+
+        let res: Result<U, E> = mock_client.make_request(req).await;
+
+        let res = res.map(|r| r.into_vendor_response()).map_err(|e| VendorAPIError {
+            vendor_api,
+            error: e.into(),
+        });
+
+        let (_, wf, uv, su, _) =
+            create_kyc_user_and_wf(&state.db_pool, &state.enclave_client, None, None, true, None).await;
+
+        let is_error = res.is_err();
+        let sv_id = su.id.clone();
+        let wf_id = wf.id.clone();
+        let (vreq, vres) = state
+            .db_pool
+            .db_transaction(move |conn| {
+                let di = DecisionIntent::get_or_create_for_workflow(
+                    conn,
+                    &sv_id,
+                    &wf_id,
+                    DecisionIntentKind::OnboardingKyc,
+                )
+                .unwrap();
+                save_vreq_and_vres(conn, &uv.public_key, &sv_id, &di.id, res)
+            })
+            .await
+            .unwrap();
+
+        assert_eq!(vendor_api, vreq.vendor_api);
+        assert_eq!(Vendor::from(vendor_api), vreq.vendor);
+        assert_eq!(is_error, vres.is_error);
+
+        // assert we can decrypt e_response and it matches the raw json
+        let decrypted_e_response = decrypt_verification_result_response(
+            &state.enclave_client,
+            vec![vres.e_response.unwrap()],
+            &uv.e_private_key,
+        )
+        .await
+        .unwrap()
+        .pop()
+        .unwrap();
+
+        assert_eq!(res_json, decrypted_e_response.into_leak());
+    }
+
+    #[test_state]
+    async fn save_vreq_and_vres_idology_success(state: &mut State) {
+        let res = idv::tests::fixtures::idology::create_response("result.match".to_string(), None);
+        let json = res.raw_response.clone().into_leak();
+
+        let res = Ok::<_, idv::idology::error::Error>(res);
+
+        let req = IdologyExpectIDRequest {
+            idv_data: IdvData { ..Default::default() },
+            credentials: IdologyCredentials { ..Default::default() },
+            tenant_identifier: "yo".to_owned(),
+        };
+
+        test_save_vreq_and_vres(state, req, res, VendorAPI::IdologyExpectID, json).await;
+    }
+
+    #[test_state]
+    async fn save_vreq_and_vres_idology_error(state: &mut State) {
+        // TODO: refactor how we propogate errors + raw json response from vendor calls
+        let json = idv::tests::fixtures::idology::error_response_json();
+        let error =
+            serde_json::from_value::<idv::idology::expectid::response::ExpectIDResponse>(json.clone())
+                .unwrap()
+                .response
+                .validate()
+                .unwrap_err();
+
+        let res = Err::<IdologyExpectIDAPIResponse, _>(idv::idology::error::Error::ErrorWithResponse(
+            Box::new(idv::idology::error::ErrorWithResponse {
+                error,
+                response: PiiJsonValue::new(json.clone()),
+            }),
+        ));
+
+        let req = IdologyExpectIDRequest {
+            idv_data: IdvData { ..Default::default() },
+            credentials: IdologyCredentials { ..Default::default() },
+            tenant_identifier: "yo".to_owned(),
+        };
+
+        test_save_vreq_and_vres(state, req, res, VendorAPI::IdologyExpectID, json).await;
+    }
+
+    #[test_state]
+    async fn save_vreq_and_vres_stytch_error(state: &mut State) {
+        let json = json!({"error_message": "something went mad wrong"});
+        let error: idv::stytch::error::Error =
+            idv::stytch::response::parse_response(json.clone()).unwrap_err();
+
+        let res = Err::<StytchLookupResponse, _>(idv::stytch::error::Error::ErrorWithResponse(Box::new(
+            idv::stytch::error::ErrorWithResponse {
+                error,
+                response: PiiJsonValue::new(json.clone()),
+            },
+        )));
+
+        let req = StytchLookupRequest {
+            telemetry_id: "yo".to_owned(),
+        };
+
+        test_save_vreq_and_vres(state, req, res, VendorAPI::StytchLookup, json).await;
+    }
 }

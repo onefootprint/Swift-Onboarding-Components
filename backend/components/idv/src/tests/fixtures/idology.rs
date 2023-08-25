@@ -57,3 +57,20 @@ pub fn create_response_pa_no_hit() -> pa::IdologyPaAPIResponse {
         parsed_response,
     }
 }
+
+pub fn error_response_json() -> serde_json::Value {
+    serde_json::json!(
+        {
+        "response":
+            {
+                "error": "Your IP address is not registered. Please contact IDology Customer Service at 866-520-1234 or email customerservice@idology.com",
+                "id-scan": null,
+                "results": null,
+                "id-number": null,
+                "qualifiers": null,
+                "restriction": null,
+                "summary-result": null
+            }
+        }
+    )
+}

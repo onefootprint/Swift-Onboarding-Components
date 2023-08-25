@@ -436,7 +436,7 @@ pub async fn make_vendor_requests(
                         log_msg
                     );
 
-                    Err((reqs[idx].clone(), ApiError::from(e)))
+                    Err((reqs[idx].clone(), ApiError::from(e))) // TODO: no need to wrap in ApiError
                 }
             }
         })

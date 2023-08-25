@@ -168,7 +168,8 @@ impl VendorResults {
 }
 
 impl VendorResults {
-    fn construct_requests_with_responses_for_verification_result(
+    // TODO: this and the struct in general doesnt need to operate on ApiError, we could keep VendorAPIError
+    pub fn construct_requests_with_responses_for_verification_result(
         v: &VerificationRequestWithVendorError,
     ) -> (VerificationRequest, Option<PiiJsonValue>) {
         match (&v.0, v.1.kind()) {
@@ -177,6 +178,9 @@ impl VendorResults {
                     (req.clone(), Some(e.response.clone()))
                 }
                 idv::Error::ExperianError(idv::experian::error::Error::ErrorWithResponse(e)) => {
+                    (req.clone(), Some(e.response.clone()))
+                }
+                idv::Error::StytchError(idv::stytch::error::Error::ErrorWithResponse(e)) => {
                     (req.clone(), Some(e.response.clone()))
                 }
                 // TODO: non-ideal to have empty json, should make response optional

@@ -22,7 +22,7 @@ pub struct VerificationResult {
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub e_response: Option<SealedVaultBytes>,
+    pub e_response: Option<SealedVaultBytes>, // TODO: why is this optional
     pub is_error: bool,
 }
 

@@ -1,8 +1,8 @@
 use crate::{DbError, PgConn};
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
+use db_schema::schema::scoped_vault;
 use db_schema::schema::vault::{self, BoxedQuery};
-use db_schema::schema::{scoped_vault};
 use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -10,8 +10,8 @@ use diesel::upsert::on_constraint;
 use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, SandboxId,
-    ScopedVaultId, TenantId, VaultId, VaultKind, VaultPublicKey,
+    EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, SandboxId, ScopedVaultId, TenantId,
+    VaultId, VaultKind, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
