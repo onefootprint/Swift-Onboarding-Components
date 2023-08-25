@@ -2,7 +2,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
-import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import type { ArticleSection } from 'src/types/article';
 
@@ -25,20 +24,22 @@ const Sections = ({ sections }: SectionsProps) => {
   }, [sections]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const elementActiveClass = document.querySelector('.active');
-      const elementID = elementActiveClass
-        ?.getAttribute('data-scroll-id')
-        ?.valueOf();
-      if (elementID && elementID !== activeSection) {
-        setActiveSection(elementID);
-      }
-    };
     document.addEventListener('scroll', handleScroll);
     return () => {
       document.removeEventListener('scroll', handleScroll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSection]);
+
+  const handleScroll = () => {
+    const elementActiveClass = document.querySelector('.active');
+    const elementID = elementActiveClass
+      ?.getAttribute('data-scroll-id')
+      ?.valueOf();
+    if (elementID && elementID !== activeSection) {
+      setActiveSection(elementID);
+    }
+  };
 
   return (
     <Container>
@@ -59,9 +60,6 @@ const Sections = ({ sections }: SectionsProps) => {
               ref={ref}
             >
               <a href={anchor}>{label}</a>
-              {id === activeSection ? (
-                <ActiveMarker layoutId="active-marker" />
-              ) : null}
             </li>
           ))}
         </ul>
@@ -69,17 +67,6 @@ const Sections = ({ sections }: SectionsProps) => {
     </Container>
   );
 };
-
-const ActiveMarker = styled(motion.div)`
-  ${({ theme }) => css`
-    width: ${theme.borderWidth[2]};
-    height: 90%;
-    background-color: ${theme.color.accent};
-    position: absolute;
-    left: calc(-1 * ${theme.spacing[5]});
-    top: 0;
-  `}
-`;
 
 const Container = styled.aside`
   ${({ theme }) => css`
@@ -125,8 +112,15 @@ const Container = styled.aside`
       }
 
       &[data-level='2'] {
-        padding-left: ${theme.spacing[3]};
+        padding-left: ${theme.spacing[2]};
 
+        a {
+          ${createFontStyles('body-4')};
+        }
+      }
+
+      &[data-level='3'] {
+        padding-left: ${theme.spacing[6]};
         a {
           ${createFontStyles('body-4')};
         }
@@ -141,21 +135,18 @@ const Container = styled.aside`
       &.active {
         a {
           color: ${theme.color.primary};
-        }
-      }
 
-      /* this is only for the case of Introduction to Footprint in which there's 1 of each level kind */
-      &[data-level='3'] {
-        padding-left: ${theme.spacing[6]};
-
-        &:nth-child(3):last-of-type {
-          a {
-            ${createFontStyles('body-4')};
+          &::before {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 60%;
+            left: calc(-1 * ${theme.spacing[5]});
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: ${theme.color.accent};
+            border-radius: ${theme.borderRadius.full};
           }
-        }
-
-        a {
-          ${createFontStyles('caption-2')};
         }
       }
     }
