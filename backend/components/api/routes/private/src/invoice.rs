@@ -62,13 +62,9 @@ async fn post_all(
 
     // Subtract 8 hours so we always generate the invoice for last month
     let billing_date = (Utc::now() - Duration::hours(8)).date_naive();
-    let fut_bill_tenant = tenants
-        .into_iter()
-        .map(|t| create_bill_for_tenant(&state, t, billing_date));
-    futures::future::join_all(fut_bill_tenant)
-        .await
-        .into_iter()
-        .collect::<ApiResult<_>>()?;
+    for t in tenants {
+        create_bill_for_tenant(&state, t, billing_date).await?;
+    }
 
     EmptyResponse::ok().json()
 }
