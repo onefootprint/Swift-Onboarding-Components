@@ -274,11 +274,11 @@ impl BillingCounts {
         } = self;
 
         vec![
-            (Some(prices.pii), pii),
-            (Some(prices.kyc), kyc),
-            (Some(prices.kyb), kyb),
-            (Some(prices.id_docs), id_docs),
-            (Some(prices.watchlist), watchlist_checks),
+            (prices.pii, pii),
+            (prices.kyc, kyc),
+            (prices.kyb, kyb),
+            (prices.id_docs, id_docs),
+            (prices.watchlist, watchlist_checks),
             (prices.hot_vaults, hot_vaults),
             (prices.hot_proxy_vaults, hot_proxy_vaults),
         ]
