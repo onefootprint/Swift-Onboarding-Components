@@ -12,6 +12,7 @@ export interface Config {
   sendgrid: Sendgrid;
   sentryUrl: string;
   airplane: Airplane;
+  apple: Apple;
 }
 
 export interface Domains {
@@ -86,4 +87,8 @@ export interface EnclaveResources {
   cid: number;
   minInstances: number;
   maxInstances: number;
+}
+
+export interface Apple {
+  keyId: string;
 }

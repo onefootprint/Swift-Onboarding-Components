@@ -8,6 +8,7 @@ const B64_CONFIG: base64::Config = base64::URL_SAFE_NO_PAD;
 
 pub use base64::DecodeError;
 
+
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Apiv2Schema, JsonSchema)]
 pub struct Base64Data(pub Vec<u8>);
 /// represents a string that has been encoded as base 64

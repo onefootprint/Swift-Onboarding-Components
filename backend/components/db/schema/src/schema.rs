@@ -49,6 +49,32 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    apple_device_attestation (id) {
+        id -> Text,
+        vault_id -> Text,
+        metadata -> Jsonb,
+        receipt -> Bytea,
+        raw_attestation -> Bytea,
+        webauthn_cred_public_key -> Nullable<Bytea>,
+        is_development -> Bool,
+        attested_key_id -> Bytea,
+        attested_public_key -> Bytea,
+        receipt_type -> Text,
+        receipt_risk_metric -> Nullable<Int4>,
+        receipt_expiration -> Timestamptz,
+        receipt_creation -> Timestamptz,
+        receipt_not_before -> Nullable<Timestamptz>,
+        dc_token -> Nullable<Text>,
+        dc_bit0 -> Nullable<Bool>,
+        dc_bit1 -> Nullable<Bool>,
+        dc_last_updated -> Nullable<Text>,
+        created_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     billing_profile (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -955,6 +981,7 @@ joinable!(access_event -> scoped_vault (scoped_vault_id));
 joinable!(access_event -> tenant (tenant_id));
 joinable!(annotation -> scoped_vault (scoped_vault_id));
 joinable!(appearance -> tenant (tenant_id));
+joinable!(apple_device_attestation -> vault (vault_id));
 joinable!(billing_profile -> tenant (tenant_id));
 joinable!(contact_info -> data_lifetime (lifetime_id));
 joinable!(data_lifetime -> scoped_vault (scoped_vault_id));
@@ -1031,6 +1058,7 @@ allow_tables_to_appear_in_same_query!(
     access_event,
     annotation,
     appearance,
+    apple_device_attestation,
     billing_profile,
     business_owner,
     contact_info,

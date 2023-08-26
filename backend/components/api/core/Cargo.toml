@@ -100,6 +100,8 @@ alpaca = { path = "../../integrations/alpaca" }
 http = "0.2.8"
 
 geoutils = "0.5.1"
+app-attest = { path = "../../app_attest" }
+
 
 [dev-dependencies]
 test-case = { workspace = true }
@@ -113,6 +115,7 @@ mockall = { workspace = true }
 opentelemetry_api = { workspace = true }
 
 criterion = { version = "0.5.1", features = ["html_reports"] }
+
 
 [[bench]]
 name = "api_error"

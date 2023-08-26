@@ -155,6 +155,7 @@ export abstract class ServiceContainers {
         secretsStore.experianCrossCoreSubscriberCode.arn,
         secretsStore.stytchProject.arn,
         secretsStore.stytchSecret.arn,
+        secretsStore.appleDeviceCheckPrivateKey.arn,
       ])
       .apply(
         ([
@@ -202,6 +203,7 @@ export abstract class ServiceContainers {
           experianCrossCoreSubscriberCode,
           stytchProject,
           stytchSecret,
+          appleDcPrivateKey,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -372,6 +374,10 @@ export abstract class ServiceContainers {
                 name: 'STYTCH_SECRET',
                 valueFrom: stytchSecret,
               },
+              {
+                name: 'APPLE_DEVICE_CHECK_PRIVATE_KEY',
+                valueFrom: appleDcPrivateKey,
+              },
             ],
             environment: [
               {
@@ -465,6 +471,10 @@ export abstract class ServiceContainers {
               {
                 name: 'ENCLAVE_PROXY_ENDPOINT',
                 value: nitroService.serviceEndpoint,
+              },
+              {
+                name: 'APPLE_DEVICE_CHECK_KEY_ID',
+                value: constants.apple.keyId,
               },
             ],
             // TODO: I've suggested some more tolerant values

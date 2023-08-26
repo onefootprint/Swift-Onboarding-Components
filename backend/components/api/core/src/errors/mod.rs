@@ -177,6 +177,12 @@ pub enum ApiErrorKind {
 
     #[error("Invalid identifier")]
     InvalidIdentifierFound(#[from] strum::ParseError),
+
+    #[error("Invalid Base64")]
+    Base64Error(#[from] crypto::base64::DecodeError),
+
+    #[error("Attestation error")]
+    AttestError(#[from] app_attest::error::AttestationError)
 }
 
 impl From<std::convert::Infallible> for ApiError {
@@ -340,6 +346,8 @@ impl actix_web::ResponseError for ApiError {
             | ApiErrorKind::InvalidHttpMethod(_)
             | ApiErrorKind::InvalidIdentifierFound(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::CipIntegrationError(c) => c.status_code(),
+            ApiErrorKind::Base64Error(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::AttestError(_) => StatusCode::BAD_REQUEST,
         }
     }
 

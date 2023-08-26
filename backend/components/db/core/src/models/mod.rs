@@ -1,6 +1,7 @@
 pub mod access_event;
 pub mod annotation;
 pub mod appearance;
+pub mod apple_device_attest;
 pub mod billing_profile;
 pub mod business_owner;
 pub mod contact_info;

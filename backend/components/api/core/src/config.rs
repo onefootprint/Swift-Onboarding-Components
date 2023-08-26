@@ -120,6 +120,9 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub stytch_config: StytchConfig,
+
+    #[envconfig(nested = true)]
+    pub apple_config: AppleConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
@@ -351,4 +354,12 @@ pub struct StytchConfig {
 
     #[envconfig(from = "STYTCH_SECRET")]
     pub stytch_secret: PiiString,
+}
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct AppleConfig {
+    #[envconfig(from = "APPLE_DEVICE_CHECK_PRIVATE_KEY")]
+    pub apple_device_check_private_key_pem: String,
+    #[envconfig(from = "APPLE_DEVICE_CHECK_KEY_ID")]
+    pub apple_device_check_key_id: String,
 }

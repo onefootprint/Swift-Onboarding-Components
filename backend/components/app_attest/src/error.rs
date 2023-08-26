@@ -58,4 +58,25 @@ pub enum AttestationError {
 
     #[error("missing nonce from attestation")]
     AttestationNonceMissing,
+
+    #[error("challenge is mismatched")]
+    InvalidChallenge,
+
+    #[error("invalid base64")]
+    InvalidBase64(#[from] base64::DecodeError),
+
+    #[error("jwt error")]
+    JwtError(#[from] jwt_simple::Error),
+
+    #[error("reqwest error")]
+    ReqwestError(#[from] reqwest::Error),
+
+    #[error("apple device check error")]
+    DeviceCheckError(#[from] crate::apple::device_check::DeviceCheckError),
+
+    #[error("ASN.1 DER error")]
+    DerError(#[from] der_parser::error::BerError),
+
+    #[error("JSON error: {0}")]
+    JsonError(#[from] serde_json::Error)
 }

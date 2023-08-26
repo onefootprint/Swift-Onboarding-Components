@@ -202,3 +202,8 @@ define_newtype_id!(
     "Identifier for a tenant's client configuration"
 );
 define_newtype_id!(ZipCode, String, "ZipCode in the db");
+define_newtype_id!(
+    AppleDeviceAttestationId,
+    String,
+    "Identifier for an apple device attestation"
+);

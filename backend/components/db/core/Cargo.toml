@@ -14,7 +14,7 @@ testing = []
 crypto = { path = "../../enclave/crypto" }
 newtypes = { path = "../../newtypes" }
 macros = { path = "../../macros" }
-webhooks = {path = "../../webhooks" }
+webhooks = { path = "../../webhooks" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }
@@ -38,7 +38,12 @@ uuid = { workspace = true }
 derive_more = { workspace = true }
 
 # i-implement-a-third-party-backend-and-opt-into-breaking-changes only needed for our InstrumentedPgConnection
-diesel = { workspace = true, features = ["extras", "uuid", "postgres", "i-implement-a-third-party-backend-and-opt-into-breaking-changes" ] }
+diesel = { workspace = true, features = [
+    "extras",
+    "uuid",
+    "postgres",
+    "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
+] }
 diesel-derive-newtype = { workspace = true }
 diesel_migrations = { workspace = true }
 hex = { workspace = true }
@@ -46,6 +51,7 @@ hex = { workspace = true }
 ipnetwork = { version = ">=0.12.2, <0.21.0" }
 
 db_schema = { path = "../schema" }
+diesel_as_jsonb = { workspace = true }
 
 [dev-dependencies]
 actix-rt = "2.7.0"

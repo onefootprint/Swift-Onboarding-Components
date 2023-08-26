@@ -4,7 +4,7 @@ use crate::State;
 use actix_web::web::Json;
 
 use api_core::types::ResponseData;
-use api_core::utils::challenge::{Challenge, ChallengeToken};
+use api_core::utils::challenge::Challenge;
 
 use api_core::ApiErrorKind;
 use api_wire_types::hosted::device_attestation::{
@@ -14,6 +14,11 @@ use api_wire_types::hosted::device_attestation::{
 use chrono::{Duration, Utc};
 
 use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
+
+mod ios;
+
+#[cfg(test)]
+mod tests;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -57,6 +62,7 @@ pub async fn post_challenge(
 }
 
 /// receive the attestation
+#[tracing::instrument(skip(state, user_auth))]
 #[api_v2_operation(
     tags(Hosted),
     description = "Parses and accepts a user's onboarding device attestation"
@@ -67,22 +73,30 @@ pub async fn post_attestation(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let _ = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     let CreateDeviceAttestationRequest {
-        attestation: _,
+        attestation,
         state: sealed_state,
     } = request.into_inner();
 
     // first decode the state
-    let challenge: ChallengeToken = serde_json::from_str(&sealed_state)?;
     let ChallengeState::DeviceAttestationChallenge {
-        attestation_challenge: _,
+        attestation_challenge: challenge,
         device_type,
-    } = Challenge::unseal(&state.challenge_sealing_key, &challenge)?.data;
+    } = Challenge::unseal_string(&state.challenge_sealing_key, sealed_state)?.data;
 
     match device_type {
         // only support ios for now
-        DeviceAttestationType::Ios => {}
+        DeviceAttestationType::Ios => {
+            let new_attestation = ios::attest(&state, auth.user.id.clone(), challenge, attestation).await?;
+
+            let attestation = state
+                .db_pool
+                .db_query(move |conn| new_attestation.create(conn))
+                .await??;
+
+            tracing::info!(attestation_id=%attestation.id, "create apple device attestation");
+        }
         DeviceAttestationType::Android => {
             return Err(ApiErrorKind::AssertionError(
                 "Android device attestation not yet support".into(),

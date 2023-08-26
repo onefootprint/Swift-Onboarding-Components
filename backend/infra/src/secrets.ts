@@ -61,6 +61,7 @@ export interface StaticSecrets {
   experianCrossCoreSubscriberCode: aws.ssm.Parameter;
   stytchProject: aws.ssm.Parameter;
   stytchSecret: aws.ssm.Parameter;
+  appleDeviceCheckPrivateKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -81,6 +82,7 @@ interface SecretConstants {
   middesk: Middesk;
   experian: Experian;
   stytch: Stytch;
+  apple: Apple;
 }
 
 interface ElasticSecrets {
@@ -171,6 +173,10 @@ interface Experian {
 interface Stytch {
   project: string;
   secret: string;
+}
+
+interface Apple {
+  deviceCheckPrivateKey: string;
 }
 
 export async function LoadSecrets(
@@ -424,6 +430,10 @@ export async function LoadSecrets(
     stytchSecret: createSecretParameter(
       `stytchSecret-${stack}`,
       secretConstants.stytch.secret,
+    ),
+    appleDeviceCheckPrivateKey: createSecretParameter(
+      `appleDCPrivateKey-${stack}`,
+      secretConstants.apple.deviceCheckPrivateKey,
     ),
   };
 }

@@ -18,7 +18,7 @@ config:
       assets: i.onefp.net
       base: api.onefootprint.com
       frontendBase: onefootprint.com
-      prefix: ""
+      prefix: ''
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
@@ -138,13 +138,17 @@ config:
         secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
-      integrationTestPhoneNumber: "+13393311410"
-      phoneNumber: "+15105883668"
+      integrationTestPhoneNumber: '+13393311410'
+      phoneNumber: '+15105883668'
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:qBwY9xkQ5AxOOFFR:nJs8FBGP1lGvhsAUJ/ANgv2PKoIWYJovYxCyLtDBWa24r+sDRpLxD7EC3z6ZWcVOlBb2hoYuR4vJobSyQ/3FBe7jPAFqLDJhrL9m6LEsX0NFg6iP/hYMKnPCqVfE+L2YaE5m
+    apple:
+      deviceCheckPrivateKey:
+        secure: v1:FcixnMvgpC0LACRd:t9xtI2M0q1tmxiOBjOvYeCTm4ZNj9HNYNqTcFC6KDX7IRteAqBmOU4UcNzGqRQDnbUlQf0s7EoO6zZ29X4MD32mFB2gNeItsPjGp0/eNkI7MjNv/GLw0mQepGpGvnSykgLIRWgQjlb7NGpmlm2shn2iVoLlM4VtN+ux460nCe+ByBrTTKFpNKX9YiIoSaOfzFC4oyht9TM3e3yeEsjS2pC6udMnX/XIQs2ftFLn5Z6+tsg9VIVhWgBOXvU4s6U4muxsmNysCEf2dZo4toj1tvgobRM5pk8SBYHNogNtk+JhSAhj4ElXGa47HcHl66WB66RNc0H5qgbkuRsiAdOAZmX78O3ox5HgluEMypyibRcWc
+      keyId: 3A9LZR4SKP
   infra:honeycomb:
     apiKey:
       secure: v1:t/fTPilvkE289hWA:DoGjpZ/6qq/jI8FK9T7k+5eUwpQ+raqhPVB36GXR4f/RxGshmqk=
