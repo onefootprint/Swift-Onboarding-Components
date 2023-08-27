@@ -6,7 +6,7 @@ branch := $(shell git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r '
 commit := "$(branch)-$(shell git rev-parse --short HEAD)"
 commit_full := "$(shell git rev-parse HEAD)"
 
-RUST_VERSION := "1.68.0"
+RUST_VERSION := "1.71.1"
 
 # Builds the API crate into a musl binary
 api-release:
@@ -21,7 +21,7 @@ api-debug:
 
 # Builds the builder that will help us build enclave docker images
 build-enclave-builder:
-	@docker build -t ne_builder2 \
+	@docker build -t "ne_builder2_${RUST_VERSION}" \
 			--build-arg USER=$(whoami) \
 			--build-arg USER_ID=$(id -u) \
 			--build-arg GROUP_ID=$(id -g) \
@@ -35,7 +35,7 @@ build-enclave-docker:
 
 	@echo "building enclave"
 
-	@docker run -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/build" --rm -t ne_builder2:latest cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
+	@docker run -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/build" --rm -t "ne_builder2_${RUST_VERSION}:latest" cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
 
 	@cp ./target/x86_64-unknown-linux-musl/release/enclave ./out/enclave
 
