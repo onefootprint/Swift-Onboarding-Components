@@ -11,7 +11,6 @@ import Webhooks from './components/webhooks';
 
 enum TabName {
   apiKeys = 'api_keys',
-  onboardingConfigs = 'onboarding_configs',
   proxyConfigs = 'proxy_configs',
   webhooks = 'webhook',
 }
@@ -21,7 +20,7 @@ const Developers = () => {
 
   const [tab, setTab] = useQueryState<TabName>({
     query: 'tab',
-    defaultValue: TabName.onboardingConfigs,
+    defaultValue: TabName.apiKeys,
   });
   const tabs = [
     { label: t('tabs.api-keys'), value: TabName.apiKeys },
