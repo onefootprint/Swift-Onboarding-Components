@@ -5,9 +5,9 @@ import { Box, Dropdown } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
+import CopyLink, { CopyLinkHandler } from './components/copy-link';
 import EditName, { EditNameHandler } from './components/edit-name';
 import Status, { StatusHandler } from './components/status';
-import getPermanentLink from './utils/get-permanent-link';
 
 type ActionsProps = {
   playbook: OnboardingConfig;
@@ -18,6 +18,7 @@ const Actions = ({ playbook }: ActionsProps) => {
   const { t } = useTranslation('pages.playbooks.table.actions');
   const statusRef = useRef<StatusHandler>(null);
   const editNameRef = useRef<EditNameHandler>(null);
+  const copyLinkRef = useRef<CopyLinkHandler>(null);
 
   const handleToggleStatus = () => {
     statusRef.current?.toggle();
@@ -28,8 +29,7 @@ const Actions = ({ playbook }: ActionsProps) => {
   };
 
   const copyLinkToClipboard = () => {
-    const permanentLink = getPermanentLink(playbook);
-    navigator.clipboard.writeText(permanentLink);
+    copyLinkRef.current?.launch();
   };
 
   return (
@@ -45,6 +45,12 @@ const Actions = ({ playbook }: ActionsProps) => {
         </PermissionGate>
         <Dropdown.Content align="end">
           <Dropdown.Item
+            onSelect={copyLinkToClipboard}
+            onClick={event => event.stopPropagation()}
+          >
+            {t('get-link.cta')}
+          </Dropdown.Item>
+          <Dropdown.Item
             onSelect={launchEditName}
             onClick={event => event.stopPropagation()}
           >
@@ -59,16 +65,11 @@ const Actions = ({ playbook }: ActionsProps) => {
               ? t('status.disable.cta')
               : t('status.enable')}
           </Dropdown.Item>
-          <Dropdown.Item
-            onSelect={copyLinkToClipboard}
-            onClick={event => event.stopPropagation()}
-          >
-            {t('get-link.cta')}
-          </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>
       <Status playbook={playbook} key={status} ref={statusRef} />
       <EditName playbook={playbook} ref={editNameRef} key={name} />
+      <CopyLink playbook={playbook} ref={copyLinkRef} />
     </Box>
   );
 };
