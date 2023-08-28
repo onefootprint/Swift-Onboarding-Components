@@ -23,7 +23,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useOrgSession from 'src/hooks/use-org-session';
-import useSession from 'src/hooks/use-session';
 
 import AssumeBanner from './components/assume-banner';
 import ManualReviewNavigator from './components/manual-review-navigator';
@@ -38,18 +37,15 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   const { t } = useTranslation('components.private-layout.nav');
   const router = useRouter();
   const { data, sandbox } = useOrgSession();
-  const {
-    data: { user },
-  } = useSession();
 
   const routes = [
     { href: '/users', Icon: IcoUsers16, text: t('users') },
     { href: '/businesses', Icon: IcoStore16, text: t('businesses') },
+    { href: '/playbooks', Icon: IcoBook16, text: t('playbooks') },
     { href: '/security-logs', Icon: IcoFileText16, text: t('security-logs') },
     { href: '/developers', Icon: IcoCode16, text: t('developers') },
     { href: '/settings', Icon: IcoSettings16, text: t('settings') },
   ];
-  let displayRoutes = routes.slice();
 
   const userWouldBeRedirected =
     router.pathname.startsWith('/users/[id]') ||
@@ -71,19 +67,6 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
     }
     sandbox.toggle();
   };
-
-  if (user?.isFirmEmployee) {
-    displayRoutes = routes
-      .slice(0, 2)
-      .concat([
-        {
-          href: '/playbooks',
-          Icon: IcoBook16,
-          text: t('playbooks'),
-        },
-      ])
-      .concat(routes.slice(2, 5));
-  }
 
   return (
     <DefaultLayoutContainer
@@ -113,7 +96,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
             }}
           >
             <Tabs variant="pill">
-              {displayRoutes.map(({ href, Icon, text }) => (
+              {routes.map(({ href, Icon, text }) => (
                 <Tab
                   key={href}
                   as={Link}
