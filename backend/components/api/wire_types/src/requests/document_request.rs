@@ -103,6 +103,7 @@ pub enum DocumentImageError {
     SelfieImageSizeUnsupported,
     SelfieImageOrientationIncorrect,
     SelfieBadImageCompression,
+    DriversLicensePermitNotAllowed,
     UnknownCountryCode,
     CountryCodeMismatch,
     UnknownError,
@@ -155,6 +156,7 @@ impl From<IncodeFailureReason> for DocumentImageError {
             IncodeFailureReason::SelfieImageSizeUnsupported => Self::SelfieImageSizeUnsupported,
             IncodeFailureReason::SelfieImageOrientationIncorrect => Self::SelfieImageOrientationIncorrect,
             IncodeFailureReason::SelfieBadImageCompression => Self::SelfieBadImageCompression,
+            IncodeFailureReason::DriversLicensePermitNotAllowed => Self::DriversLicensePermitNotAllowed,
         }
     }
 }

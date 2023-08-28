@@ -6,7 +6,7 @@ use crate::{
 };
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use newtypes::{
-    incode::{IncodeDocumentType, IncodeStatus, IncodeTest},
+    incode::{IncodeDocumentRestriction, IncodeDocumentType, IncodeStatus, IncodeTest},
     IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
     Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiString, DATE_FORMAT,
 };
@@ -21,7 +21,7 @@ pub struct AddSideResponse {
     pub country_code: Option<ScrubbedPiiString>,
     pub glare: Option<i32>,
     pub horizontal_resolution: Option<i32>,
-    pub issue_name: Option<ScrubbedPiiString>,
+    pub issue_name: Option<String>,
     pub issue_year: Option<i32>,
     pub readability: Option<bool>,
     pub session_status: Option<PiiString>,
@@ -32,9 +32,32 @@ pub struct AddSideResponse {
     pub error: Option<Error>,
 }
 
+// https://onefootprint.slack.com/archives/C0514LEFUCS/p1692735019118229
+// Only for US atm
+// No documentation for these enum values
+const DRIVERS_LICENSE_PERMIT_IDENTIFIERS: [&str; 16] = [
+    "DRIVER_LICENSE_UNDER21",
+    "LEARNERS_PERMIT",
+    "LEARNERS_PERMIT_UNDER21",
+    "DRIVERS_LICENSE_UNDER21",
+    "PROVISIONAL_DRIVERS_LICENSE_UNDER21",
+    "ENHANCED_DRIVERS_LICENSE",
+    "PROVISIONAL_DRIVERS_LICENSE",
+    "INTERMEDIATE_DRIVERS_LICENSE_UNDER21",
+    "TEMPORARY_DRIVERS_LICENSE",
+    "JUNIOR_DRIVERS_LICENSE",
+    "ENHANCED_DRIVER_LICENSE",
+    "ENHANCED_DRIVERS_LICENSE_UNDER21",
+    "JUNIOR_OPERATORS_LICENSE_UNDER21",
+    "ENHANCED_LEARNERS_PERMIT_UNDER21",
+    "ENHANCED_PROVISIONAL_DRIVERS_LICENSE_UNDER21",
+    "ENHANCED_DRIVER_LICENSE_UNDER21",
+];
+
 impl AddSideResponse {
     // Unfortunately, in this case we get a 200 + a non-null `fail_reason`
-    pub fn failure_reasons(&self) -> Vec<IncodeFailureReason> {
+    pub fn failure_reasons(&self, restrictions: Vec<IncodeDocumentRestriction>) -> Vec<IncodeFailureReason> {
+        let restrictions_fail_reasons = restrictions.into_iter().map(|r| self.handle_restriction(r));
         let fail_reason = self.fail_reason.as_ref().map(|e| {
             IncodeFailureReason::try_from(e.as_str())
                 .unwrap_or_else(|_| IncodeFailureReason::Other(e.clone()))
@@ -46,8 +69,27 @@ impl AddSideResponse {
             (self.correct_sharpness == Some(false)).then_some(IncodeFailureReason::DocumentSharpness),
         ]
         .into_iter()
+        .chain(restrictions_fail_reasons)
         .flatten()
         .collect()
+    }
+
+    fn handle_restriction(&self, restriction: IncodeDocumentRestriction) -> Option<IncodeFailureReason> {
+        match restriction {
+            IncodeDocumentRestriction::NoDriverLicensePermit => {
+                self.is_drivers_license_permit().and_then(|is_permit| {
+                    is_permit.then_some(IncodeFailureReason::DriversLicensePermitNotAllowed)
+                })
+            }
+        }
+    }
+
+    fn is_drivers_license_permit(&self) -> Option<bool> {
+        self.issue_name.as_ref().map(|issue_name| {
+            DRIVERS_LICENSE_PERMIT_IDENTIFIERS
+                .iter()
+                .any(|i| issue_name.contains(i))
+        })
     }
 }
 
@@ -570,7 +612,7 @@ pub struct OCRAddress {
 #[cfg(test)]
 mod tests {
     use newtypes::{
-        incode::{IncodeStatus, IncodeTest},
+        incode::{IncodeDocumentRestriction, IncodeStatus, IncodeTest},
         IncodeFailureReason,
     };
 
@@ -639,14 +681,21 @@ mod tests {
             "classification": false,
             "typeOfId": "DriversLicense",
             "issueYear": 2016,
-            "issueName": "USA DriversLicense DRIVERS_LICENSE",
+            "issueName": "USA DriversLicense ENHANCED_DRIVERS_LICENSE_UNDER21",
             "sessionStatus": "Alive",
             "failReason": "WRONG_DOCUMENT_SIDE"
         });
 
         let parsed: AddSideResponse = serde_json::from_value(raw_response_with_failure).unwrap();
-        let failure = parsed.failure_reasons().pop().unwrap();
-        assert_eq!(failure, IncodeFailureReason::WrongDocumentSide);
+        // disallow permits
+        let failures = parsed.failure_reasons(vec![IncodeDocumentRestriction::NoDriverLicensePermit]);
+        assert_eq!(
+            failures,
+            vec![
+                IncodeFailureReason::WrongDocumentSide,
+                IncodeFailureReason::DriversLicensePermitNotAllowed
+            ]
+        );
 
         // No failure
         let raw_response = serde_json::json!({
@@ -661,7 +710,7 @@ mod tests {
         });
 
         let parsed: AddSideResponse = serde_json::from_value(raw_response).unwrap();
-        let failure = parsed.failure_reasons();
+        let failure = parsed.failure_reasons(vec![]);
         assert!(failure.is_empty())
     }
 

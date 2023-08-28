@@ -94,6 +94,7 @@ pub enum IncodeFailureReason {
     SelfieBadImageCompression,
     UnknownCountryCode,
     CountryCodeMismatch,
+    DriversLicensePermitNotAllowed,
     DocumentGlare,
     DocumentSharpness,
     Other(String),

@@ -60,7 +60,8 @@ impl IncodeStateTransition for AddFront {
                 Ok(response) => Ok((
                     response.type_of_id.clone(),
                     response.country_code.clone(),
-                    response.failure_reasons(),
+                    // TODO add restrictions from OBC
+                    response.failure_reasons(vec![]),
                     vec![],
                 )),
                 // status is a mix of custom error codes and http status codes

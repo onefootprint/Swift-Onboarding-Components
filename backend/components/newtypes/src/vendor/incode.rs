@@ -301,3 +301,7 @@ impl<'a> TryFrom<&'a IncodeDocumentType> for IdDocKind {
         }
     }
 }
+
+pub enum IncodeDocumentRestriction {
+    NoDriverLicensePermit,
+}
