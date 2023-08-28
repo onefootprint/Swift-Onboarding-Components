@@ -63,15 +63,21 @@ pub fn save_error_verification_results(
     let new_verification_results: Vec<NewVerificationResult> = vendor_responses_with_errors
         .iter()
         .map(|(req, response)| {
-            // TODO: should just make response optional for is_error
-            let r = response.clone().unwrap_or(serde_json::json!("").into());
-            let e_response = encrypt_verification_result_response(&r, user_vault_public_key)?;
+            let (e_response, scrubbed_response) = if let Some(raw_json) = response {
+                let e_response = encrypt_verification_result_response(raw_json, user_vault_public_key)?;
+                let scrubbed_response = scrub_raw_error_vendor_response(&req.vendor_api, raw_json)?;
+                (Some(e_response), scrubbed_response)
+            } else {
+                // response is non-optional on vres. This is a hack
+                let empty_response = ScrubbedPiiJsonValue::from(serde_json::json!({}));
+                (None, empty_response)
+            };
 
             Ok(NewVerificationResult {
                 request_id: req.id.clone(),
-                response: scrub_raw_error_vendor_response(&req.vendor_api, &r)?,
+                response: scrubbed_response,
                 timestamp: now,
-                e_response: Some(e_response),
+                e_response,
                 is_error: true,
             })
         })
