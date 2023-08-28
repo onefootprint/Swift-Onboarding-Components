@@ -83,7 +83,7 @@ const OnboardingInstructions = ({
               Footprint developer dashboard
             </Link>
             {` `}
-            and create a new Onboarding configuration:
+            and create a new Playbook:
           </Typography>
           <Typography variant="body-2">
             2. Grab the Onboarding Publishable Key:{' '}

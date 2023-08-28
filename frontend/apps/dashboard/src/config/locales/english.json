@@ -619,7 +619,7 @@
             "title": "Review your onboarded users",
             "subtitle": "Find them on the 'Users' tab"
           },
-          "cta": "Go to onboarding configurations",
+          "cta": "Go to Playbooks",
           "cancel": "Cancel"
         }
       },
@@ -1660,12 +1660,12 @@
     "developers": {
       "page-title": "Footprint | Developers",
       "dialog-test-onboarding": {
-        "heading": "Test onboarding configuration",
+        "heading": "Test Playbook",
         "title": "One last recommendation:",
-        "subtitle": "Test your onboarding configuration to see how it looks and feels",
+        "subtitle": "Test your Playbook to see how it looks and feels",
         "step-1": {
           "number": "1",
-          "title": "Go through your new onboarding configuration",
+          "title": "Go through your new Playbook",
           "subtitle": "You'll create a new user and see how the onboarding process will look like in your product."
         },
         "step-2": {
@@ -1673,7 +1673,7 @@
           "title": "See onboarded users' details",
           "subtitle": "When users complete onboardings, they will appear on the 'Users' page. You can select a specific user and decrypt their data afterwards."
         },
-        "cta": "Test onboarding configuration",
+        "cta": "Test Playbook",
         "cancel": "Cancel"
       },
       "header": {
@@ -1689,7 +1689,6 @@
       },
       "tabs": {
         "api-keys": "API Keys",
-        "onboarding-configs": "Onboarding configurations",
         "webhooks": "Webhooks",
         "proxy-configs": "Vault proxy configurations"
       },
@@ -1770,224 +1769,6 @@
             }
           },
           "empty-state": "No secret keys"
-        }
-      },
-      "onboarding-configs": {
-        "page-title": "Footprint | Onboarding Configuration",
-        "title": "Onboarding configurations",
-        "subtitle": "Set up requirements for customers onboarding onto your platform.",
-        "cta": "Create onboarding config",
-        "cta-not-allowed": "You're not allowed to create onboarding configurations",
-        "type": {
-          "kyb": "KYB",
-          "kyc": "KYC"
-        },
-        "status": {
-          "enabled": "Enabled",
-          "disabled": "Disabled"
-        },
-        "table": {
-          "aria-label": "Onboarding configurations",
-          "header": {
-            "name": "Configuration name",
-            "type": "Type",
-            "key": "Publishable key",
-            "status": "Status",
-            "created": "Created at"
-          },
-          "filters": {
-            "status": {
-              "label": "Status",
-              "enabled": "Enabled",
-              "disabled": "Disabled"
-            }
-          },
-          "empty-state": "You haven't created any vault onboarding configurations just yet."
-        },
-        "actions": {
-          "aria-label": "Open actions for onboarding config {{name}}",
-          "not-allowed": "You're not allowed to manage onboarding configs",
-          "status": {
-            "label": "Status",
-            "enable": "Enable",
-            "disable": {
-              "cta": "Disable",
-              "confirmation": {
-                "title": "Disable onboarding config?",
-                "description": "Are you sure you want to disable this onboarding configuration?"
-              }
-            }
-          },
-          "edit-name": {
-            "cta": "Edit name",
-            "title": "Edit onboarding configuration name",
-            "form": {
-              "name": {
-                "label": "Onboarding configuration name",
-                "placeholder": "User ID verification",
-                "errors": {
-                  "required": "Please enter a name for the onboarding configuration."
-                }
-              },
-              "save": "Save",
-              "cancel": "Cancel"
-            },
-            "feedback": {
-              "success": {
-                "title": "Success",
-                "description": "Onboarding configuration name changed!"
-              }
-            }
-          },
-          "get-link": {
-            "cta": "Get shareable link"
-          }
-        },
-        "create": {
-          "title": "Create onboarding config",
-          "type-form": {
-            "title": "Types of onboarding configuration",
-            "description": "Select the type of verification flow you want to create:",
-            "kyc": {
-              "title": "KYC",
-              "description": "Know Your Customer (KYC) is the obligation of banks, businesses, and other financial institutions to identify and authenticate a person's identity before doing business with them."
-            },
-            "kyb": {
-              "title": "KYB",
-              "description": "Know Your Business (KYB) is the obligation to verify the identity of any entity that you do business with."
-            }
-          },
-          "name-form": {
-            "name": {
-              "label": "Onboarding configuration name",
-              "placeholder": "User ID verification",
-              "errors": {
-                "required": "Please enter a name for your onboarding configuration."
-              }
-            }
-          },
-          "collected-data-summary": {
-            "will-collect": "Will collect:"
-          },
-          "id-doc-form": {
-            "alert-info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
-            "selfie": {
-              "label": "Request a selfie",
-              "hint": "You can optionally request users to take a selfie to validate the ID document requested."
-            },
-            "regionality": {
-              "title": "Regionality",
-              "subtitle": "Restrict acceptable IDs by country of issuance.",
-              "values": {
-                "international": "International",
-                "us_only": "US only"
-              }
-            }
-          },
-          "kyc-collect-form": {
-            "title": "Documentation",
-            "description": "Select types of documents to request.",
-            "phone": {
-              "title": "Phone number",
-              "request": "Request users to provide their phone number"
-            },
-            "ssn": {
-              "title": "SSN",
-              "request": "Request users to provide their SSN",
-              "ssn9": "Full",
-              "ssn4": "Last 4",
-              "no-ssn": {
-                "label": "Allow users without an SSN to proceed with the verification",
-                "hint": "They will need to be manually reviewed by you."
-              }
-            },
-            "nationality": "Request users to specify their nationality",
-            "id-doc": "Photo ID (optional)"
-          },
-          "kyc-step-up": {
-            "title": "Step-up document request",
-            "description": "When users cannot be identified with their submitted data, automatically requesting additional documentation can improve your onboarding process conversion. This has an additional cost per step-up request."
-          },
-          "kyc-investor-profile": {
-            "title": "Investor profile questions",
-            "description": "These are required for brokerage and investment apps, and are meant to understand users' risk tolerance and investment preferences.",
-            "label": "Ask investor profile questions",
-            "questions": {
-              "employment": "What's your employment status and occupation?",
-              "income": "What's your annual income?",
-              "net-worth": "What's your net worth?",
-              "investment-goals": "What are your investment goals?",
-              "risk-tolerance": "How would you describe your risk tolerance?",
-              "declarations": "Do any of the following apply to you or a member of your immediate family?"
-            }
-          },
-          "kyc-access-form": {
-            "title": "Authorized scopes",
-            "description": "Select the data attributes you need read access to after a user onboarding. During onboarding, the user will \"authorize\" access to the scopes you choose below. If you are not sure what you will need, leave all the default fields selected."
-          },
-          "kyb-collect-form": {
-            "title": "KYB",
-            "description": "You can customize the verification flow by choosing optional fields to collect.",
-            "collected-data": "Collected data",
-            "optional": "Optionally required",
-            "beneficial-owner-warning": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business.",
-            "kyced-beneficial-owners": "Fully KYC all beneficial owners"
-          },
-          "kyb-bo-collect-form": {
-            "title": "KYC of a Beneficial owner",
-            "description": "To successfully verify a business we also need to verify its beneficial owner's identity.",
-            "step-up": "Step-up document request",
-            "step-up-description": "When users cannot be instantly verified with the data they submitted, you can request them to submit extra documentation. This step up improves the conversion rate of your onboarding process and has an extra cost per request."
-          },
-          "kyb-access-form": {
-            "title": "Authorized scopes",
-            "description": "Select the data attributes you need read access to after an onboarding. During onboarding, the user will \"authorize\" access to the scopes you choose below. If you are not sure what you will need, leave all the default fields selected.",
-            "all-business-info": "All business information",
-            "beneficial-owner": "Beneficial owner"
-          },
-          "cta": {
-            "aria-label": "Creating a new onboarding config..."
-          },
-          "feedback": {
-            "success": {
-              "title": "Success",
-              "description": "Onboarding config created successfully."
-            }
-          }
-        },
-        "details": {
-          "name": {
-            "label": "Onboarding configuration name",
-            "placeholder": "User ID verification",
-            "errors": {
-              "required": "Please enter a name for the onboarding configuration."
-            }
-          },
-          "onboarding-details": {
-            "type": {
-              "label": "Type",
-              "kyb": "KYB",
-              "kyc": "KYC"
-            },
-            "key": "Publishable key"
-          },
-          "kyc-data-collection": {
-            "collected-data": "Collected data",
-            "accessed-data": "Access permission scope"
-          },
-          "kyb-data-collection": {
-            "title": "KYB",
-            "collected-data": "Collected data",
-            "accessed-data": "Access permission scope",
-            "all": "All business information",
-            "none": "No business information"
-          },
-          "kyb-bo-data-collection": {
-            "title": "KYC of a Beneficial owner",
-            "collected-data": "Collected data",
-            "accessed-data": "Access permission scope",
-            "none": "No beneficial owner information"
-          }
         }
       },
       "webhooks": {
@@ -2233,7 +2014,7 @@
           "decrypt_fields_one": "Decrypt {{field}}",
           "decrypt_fields_other": "Decrypt {{count}} fields",
           "read": "Read-only",
-          "onboarding_configuration": "Manage onboarding configurations",
+          "onboarding_configuration": "Manage Playbooks",
           "api_keys": "Manage API keys",
           "manage_vault_proxy": "Manage vault proxy configurations",
           "invoke_vault_proxy_options": {
@@ -2274,7 +2055,7 @@
           },
           "hints": {
             "read": "Basic read-only access",
-            "onboarding_configuration": "Create and update onboarding configurations",
+            "playbooks": "Create and update Playbooks",
             "api_keys": "Add, edit, and decrypt secret API keys and their roles",
             "manage_vault_proxy": "Create and update vault proxy configurations",
             "invoke_vault_proxy": "Invoke the specified vault proxies",

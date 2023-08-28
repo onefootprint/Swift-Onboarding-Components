@@ -199,7 +199,7 @@ const Flexcar = () => (
               Footprint developer dashboard
             </Link>
             {` `}
-            and create a new Onboarding configuration:
+            and create a new Playbook:
           </Typography>
           <span>
             <Typography variant="body-2">

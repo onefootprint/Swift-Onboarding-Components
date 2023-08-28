@@ -75,7 +75,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         ) && (
           <Checkbox
             label={t('scopes.onboarding_configuration')}
-            hint={t('scopes.hints.onboarding_configuration')}
+            hint={t('scopes.hints.playbooks')}
             value={RoleScopeKind.onboardingConfiguration}
             {...register('scopeKinds')}
           />
