@@ -1,6 +1,6 @@
 import pytest
 from tests.bifrost_client import BifrostClient
-from tests.utils import create_ob_config, post, get
+from tests.utils import create_ob_config, post, get, get_requirement_from_requirements
 
 
 @pytest.fixture(scope="session")
@@ -67,3 +67,53 @@ def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config, t
 
     # Bifrost client uploads the right kind of doc, so this should work
     bifrost.run()
+
+def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
+    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_requirements(kind="liveness")
+    status = bifrost.get_status()
+    doc_requirement = get_requirement_from_requirements("collect_document", status['requirements'])
+    
+    assert doc_requirement["should_collect_selfie"]
+    # consent
+    consent_data = {"consent_language_text": "I consent"}
+    post("hosted/user/consent", consent_data, bifrost.auth_token)
+
+    data = {
+        "document_type": "drivers_license",
+        "country_code": "US",
+        "skip_selfie": True,
+        "device_type": "desktop"
+    }
+    body = post("hosted/user/documents", data, bifrost.auth_token)
+    doc_id = body["id"]
+
+    # Upload the documents consecutively in separate requests
+    sides = ["front", "back"]
+    for i, side in enumerate(sides):
+        data = dict(
+            image=bifrost.data[f"document.drivers_license.{side}.image"],
+            side=side,
+            mime_type="image/png",
+        )
+        body = post(f"hosted/user/documents/{doc_id}/upload", data, bifrost.auth_token)
+        next_side = sides[i + 1] if i + 1 < len(sides) else None
+        assert body["next_side_to_collect"] == next_side
+        assert not body["errors"]
+    # now check what fields we have to authorize
+    status_after_doc = bifrost.get_status()
+    fields_to_authorize = get_requirement_from_requirements("authorize", status_after_doc['requirements'])["fields_to_authorize"]["collected_data"]
+    
+    # we didn't authorize selfie
+    # TODO: i think this should authorize document but not doc + selfie. will check with frontend
+    assert "document_and_selfie" not in fields_to_authorize
+    
+    # finish bifrost
+    user = bifrost.run()
+    
+    tenant = user.tenant
+    fp_id = user.fp_id
+    body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
+    assert all([d['device_type'] == "desktop" for d in body])
+    

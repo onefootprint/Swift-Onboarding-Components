@@ -129,7 +129,6 @@ def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_
         can_access_data + ["document_and_selfie"],
     )
 
-
 @pytest.fixture(scope="session")
 def kyb_cdos():
     return [

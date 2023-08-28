@@ -111,59 +111,100 @@ def test_config_create(sandbox_tenant, twilio):
     )
     post("hosted/onboarding", None, ob_config_key, auth_token)
 
-
 @pytest.mark.parametrize(
-    "must_collect,optional_data,can_access,expected_error",
+    "config_data,expected_error",
     [
-        (["ssn4", "name", "full_address", "email", "phone_number"], [], [], None),
         (
-            ["ssn4", "ssn9", "name", "full_address", "email", "phone_number"],
-            [],
-            [],
-            "Validation error: Cannot provide both ssn4 and ssn9",
+            dict(
+                must_collect_data=["ssn4", "name", "full_address", "email", "phone_number"], 
+                optional_data=[], 
+                can_access_data=[], 
+                allow_international_residents=False,
+                international_country_restrictions=None,
+            ),    
+            None
         ),
         (
-            ["full_address", "partial_address", "name", "email", "phone_number"],
-            [],
-            [],
-            "Validation error: Cannot provide both full_address and partial_address",
+            dict(
+                must_collect_data=["ssn4", "ssn9", "name", "full_address", "email", "phone_number"], 
+                optional_data=[], 
+                can_access_data=[], 
+                allow_international_residents=False,
+                international_country_restrictions=None,
+            ),    
+           "Validation error: Cannot provide both ssn4 and ssn9",
         ),
         (
-            ["name", "email", "phone_number", "full_address"],
-            [],
-            ["ssn9"],
-            "Validation error: Decryptable Ssn fields must be a subset of collected fields",
+            dict(
+                must_collect_data=["full_address", "partial_address", "name", "email", "phone_number"], 
+                optional_data=[], 
+                can_access_data=[], 
+                allow_international_residents=False,
+                international_country_restrictions=None,
+            ),    
+           "Validation error: Cannot provide both full_address and partial_address",
+        ),
+        (
+            dict(
+                must_collect_data=["name", "email", "phone_number", "full_address"], 
+                optional_data=[], 
+                can_access_data=["ssn9"], 
+                allow_international_residents=False,
+                international_country_restrictions=None,
+            ),    
+           "Validation error: Decryptable Ssn fields must be a subset of collected fields",
         ),  # can_access must be < must_collect
         (
-            ["name", "full_address", "email", "phone_number"],
-            ["ssn9"],
-            ["name", "ssn9"],
-            None,
+            dict(
+                must_collect_data=["name", "full_address", "email", "phone_number"], 
+                optional_data=["ssn9"], 
+                can_access_data=["name", "ssn9"], 
+                allow_international_residents=False,
+                international_country_restrictions=None,
+            ),    
+           None,
         ),  # data in optional_data should be allowed in can_access
+       (
+            dict(
+                must_collect_data=["name", "full_address", "email", "phone_number"], 
+                optional_data=["dob"], 
+                can_access_data=[], 
+                allow_international_residents=False,
+                international_country_restrictions=None,
+            ),    
+           "Validation error: [Dob] cannot be optional",
+        ),  # for now only let ssn4/ssn9 be optional, not any arbitary CDO
         (
-            ["name", "full_address", "email", "phone_number", "ssn9"],
-            ["ssn4"],
-            ["name"],
-            "Validation error: Field Ssn cannot be included in both must_collect_data and optional_data",
-        ),
+            dict(
+                must_collect_data=["name", "full_address", "email", "phone_number", "dob"], 
+                optional_data=[], 
+                can_access_data=[], 
+                allow_international_residents=False,
+                international_country_restrictions=["MX"],
+            ),    
+           "Validation error: Cannot specify international_country_restrictions without allow_international_residents"
+        ),  
         (
-            ["name", "full_address", "email", "phone_number"],
-            ["dob"],
-            [],
-            "Validation error: [Dob] cannot be optional",
-        ),  # for now only let ssn4/ssn9 be optional, not any arbritary CDO
+            dict(
+                must_collect_data=["name", "full_address", "email", "phone_number", "dob"], 
+                optional_data=[], 
+                can_access_data=[], 
+                allow_international_residents=True,
+                international_country_restrictions=["MX"],
+            ),    
+           None
+        ),  
     ],
 )
 def test_config_create_validation(
-    sandbox_tenant, must_collect, optional_data, can_access, expected_error
+    sandbox_tenant, 
+    config_data,
+    expected_error
 ):
+    data = {"name": "Acme Bank Loan"}
+    data.update(config_data)
+    
     # Test validation errors
-    data = dict(
-        name="Acme Bank Loan",
-        must_collect_data=must_collect,
-        optional_data=optional_data,
-        can_access_data=can_access,
-    )
     res = post(
         "org/onboarding_configs",
         data,

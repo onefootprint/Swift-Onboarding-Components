@@ -428,6 +428,8 @@ def create_ob_config(
     optional_data=None,
     is_no_phone_flow=False,
     is_doc_first_flow=False,
+    allow_international_residents=False,
+    international_country_restrictions=None
 ):
     ob_conf_data = {
         "name": name,
@@ -437,6 +439,9 @@ def create_ob_config(
         "cip_kind": cip_kind,
         "is_no_phone_flow": is_no_phone_flow,
         "is_doc_first_flow": is_doc_first_flow,
+        "allow_international_residents": allow_international_residents,
+        "international_country_restrictions": international_country_restrictions
+
     }
     # TODO also make this get or create?
     body = post("org/onboarding_configs", ob_conf_data, *tenant.db_auths)
