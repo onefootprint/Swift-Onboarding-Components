@@ -49,6 +49,10 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
         vendor_api,
     ).await?;
 
+    if let Err(error) = vendor_result.as_ref() {
+        tracing::error!(?error, "Error making vendor call");
+    }
+
     let sv_id = sv_id.clone();
     let v_req: VerificationRequest = vreq.clone();
     let (vres, vendor_result) = state.db_pool.db_query(move |conn| -> ApiResult<_>{

@@ -1,6 +1,11 @@
+use std::collections::HashMap;
+
 use crate::{enclave_client::EnclaveClient, errors::ApiError};
 
-use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
+use db::models::{
+    verification_request::{RequestAndMaybeResult, VerificationRequest},
+    verification_result::VerificationResult,
+};
 use idv::{ParsedResponse, VendorResponse};
 use newtypes::{
     EncryptedVaultPrivateKey, SealedVaultBytes, VendorAPI, VerificationRequestId, VerificationResultId,
@@ -15,10 +20,63 @@ pub struct VendorResult {
     pub verification_request_id: VerificationRequestId,
 }
 
+#[derive(Clone)]
+pub struct HydratedVerificationResult {
+    pub vres: VerificationResult,
+    // None if vres.is_error
+    pub response: Option<VendorResponse>,
+}
+
+pub type RequestAndMaybeHydratedResult = (VerificationRequest, Option<HydratedVerificationResult>);
+
 impl VendorResult {
+    // A convenience method that takes (vreq,vres)'s and decryptes and parses the vres (if present) into VendorResponse. Similar to from_verification_results_for_onboarding, but this method preserve the same (vreq, vres) list passed in instead of implicitly filtering to only non-None vres's
+    #[tracing::instrument(skip_all)]
+    pub async fn hydrate_vendor_results(
+        requests_and_results: Vec<RequestAndMaybeResult>,
+        enclave_client: &EnclaveClient,
+        user_vault_private_key: &EncryptedVaultPrivateKey,
+    ) -> Result<Vec<RequestAndMaybeHydratedResult>, ApiError> {
+        // TODO: our saving/derser of vendor "Errors" is pretty sketch and
+        // from_verification_results_for_onboarding decrypting and deser'ing Vres's that are
+        // is_error = true seems a bit scary to me. Need to overhaul our approach to vendor errors
+
+        let vendor_results = Self::from_verification_results_for_onboarding(
+            requests_and_results.clone(),
+            enclave_client,
+            user_vault_private_key,
+        )
+        .await?;
+
+        let result_map: HashMap<VerificationRequestId, VendorResponse> = vendor_results
+            .into_iter()
+            .map(|vr| (vr.verification_request_id, vr.response))
+            .collect();
+
+        let res: Vec<_> = requests_and_results
+            .into_iter()
+            .map(|(vreq, vres)| {
+                let response = result_map.get(&vreq.id);
+                if let Some(vres) = vres {
+                    (
+                        vreq,
+                        Some(HydratedVerificationResult {
+                            vres,
+                            response: response.cloned(),
+                        }),
+                    )
+                } else {
+                    (vreq, None)
+                }
+            })
+            .collect();
+
+        Ok(res)
+    }
+
     #[tracing::instrument(skip_all)]
     pub async fn from_verification_results_for_onboarding(
-        requests_and_results: Vec<(VerificationRequest, Option<VerificationResult>)>,
+        requests_and_results: Vec<RequestAndMaybeResult>,
         enclave_client: &EnclaveClient,
         user_vault_private_key: &EncryptedVaultPrivateKey,
     ) -> Result<Vec<Self>, ApiError> {

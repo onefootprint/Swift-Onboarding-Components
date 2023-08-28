@@ -13,6 +13,7 @@ use self::tenant_vendor_control::TenantVendorControl;
 pub mod build_request;
 pub mod incode;
 pub mod incode_watchlist;
+pub mod kyc_waterfall;
 pub mod make_request;
 pub mod middesk;
 pub mod tenant_vendor_control;

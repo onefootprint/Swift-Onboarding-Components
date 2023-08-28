@@ -10,3 +10,12 @@ pub fn bulk_create(
 ) -> Vec<VerificationRequest> {
     VerificationRequest::bulk_create(conn, su_id.clone(), vendor_apis, decision_intent_id).unwrap()
 }
+
+pub fn create(
+    conn: &mut PgConn,
+    sv_id: &ScopedVaultId,
+    di_id: &DecisionIntentId,
+    vendor_api: VendorAPI,
+) -> VerificationRequest {
+    VerificationRequest::create(conn, sv_id, di_id, vendor_api).unwrap()
+}

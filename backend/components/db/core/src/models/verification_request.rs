@@ -128,6 +128,25 @@ impl VerificationRequest {
         Ok(req_and_res)
     }
 
+    #[tracing::instrument("VerificationRequest::get_latest_by_vendor_api_for_decision_intent", skip_all)]
+    pub fn get_latest_by_vendor_api_for_decision_intent(
+        conn: &mut PgConn,
+        di_id: &DecisionIntentId,
+    ) -> DbResult<Vec<RequestAndMaybeResult>> {
+        let req_and_res: Vec<RequestAndMaybeResult> = verification_request::table
+            .filter(verification_request::decision_intent_id.eq(di_id))
+            .left_join(verification_result::table)
+            .order((
+                verification_request::vendor_api,
+                verification_request::uvw_snapshot_seqno.desc(),
+                verification_request::timestamp.desc(), // tie breaker if seq_no has a tie
+            ))
+            .distinct_on(verification_request::vendor_api)
+            .get_results(conn)?;
+
+        Ok(req_and_res)
+    }
+
     #[tracing::instrument("VerificationRequest::create_document_verification_request", skip_all)]
     pub fn create_document_verification_request(
         conn: &mut PgConn,
@@ -175,5 +194,107 @@ impl VerificationRequest {
             .get_results(conn)?;
 
         Ok(res)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::decision_intent::DecisionIntent;
+    use crate::test_helpers::assert_have_same_elements;
+    use crate::tests::prelude::*;
+    use macros::db_test_case;
+    use newtypes::DecisionIntentKind;
+    use newtypes::VerificationResultId;
+    use std::str::FromStr;
+
+    enum VresType {
+        None,
+        Error,
+        Success,
+    }
+
+    #[db_test_case(vec![
+        (VendorAPI::IdologyExpectID, vec![VresType::Success])
+    ])]
+    #[db_test_case(vec![
+        (VendorAPI::IdologyExpectID, vec![VresType::Success, VresType::None])
+    ])]
+    #[db_test_case(vec![
+        (VendorAPI::IdologyExpectID, vec![VresType::Error, VresType::Success])
+    ])]
+    #[db_test_case(vec![
+        (VendorAPI::IdologyExpectID, vec![VresType::Error, VresType::Success]),
+        (VendorAPI::ExperianPreciseID, vec![VresType::Success])
+    ])]
+    #[db_test_case(vec![
+        (VendorAPI::IdologyExpectID, vec![VresType::Error, VresType::Success]),
+        (VendorAPI::ExperianPreciseID, vec![VresType::Error, VresType::None, VresType::Success])
+    ])]
+    fn test_get_latest_by_vendor_api_for_decision_intent(
+        conn: &mut TestPgConn,
+        input: Vec<(VendorAPI, Vec<VresType>)>,
+    ) {
+        let sv_id = ScopedVaultId::from_str("sv123").unwrap();
+        let di = DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &sv_id, None).unwrap();
+
+        let mut created: Vec<_> = input
+            .into_iter()
+            .map(|(vendor_api, vres_types)| {
+                (
+                    vendor_api,
+                    save_vreq_vres(conn, &sv_id, &di.id, vendor_api, vres_types),
+                )
+            })
+            .collect();
+
+        // expect last created (vreq, vres) per VendorAPI
+        let expected: Vec<(VerificationRequest, Option<VerificationResult>)> =
+            created.iter_mut().map(|(_, vrr)| vrr.pop().unwrap()).collect();
+
+        let res: Vec<(VerificationRequest, Option<VerificationResult>)> =
+            VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, &di.id).unwrap();
+
+        assert_same(expected, res);
+    }
+
+    fn save_vreq_vres(
+        conn: &mut TestPgConn,
+        sv_id: &ScopedVaultId,
+        di_id: &DecisionIntentId,
+        vendor_api: VendorAPI,
+        vres_types: Vec<VresType>,
+    ) -> Vec<(VerificationRequest, Option<VerificationResult>)> {
+        vres_types
+            .into_iter()
+            .map(|vres_type| {
+                let vreq = tests::fixtures::verification_request::create(conn, sv_id, di_id, vendor_api);
+                let vres = match vres_type {
+                    VresType::Success => Some(tests::fixtures::verification_result::create(
+                        conn, &vreq.id, false,
+                    )),
+                    VresType::Error => {
+                        Some(tests::fixtures::verification_result::create(conn, &vreq.id, true))
+                    }
+                    VresType::None => None,
+                };
+                (vreq, vres)
+            })
+            .collect()
+    }
+
+    fn assert_same(
+        e: Vec<(VerificationRequest, Option<VerificationResult>)>,
+        a: Vec<(VerificationRequest, Option<VerificationResult>)>,
+    ) {
+        assert_have_same_elements(extract_ids(e), extract_ids(a));
+    }
+
+    fn extract_ids(
+        v: Vec<RequestAndMaybeResult>,
+    ) -> Vec<(VerificationRequestId, Option<VerificationResultId>)> {
+        v.iter()
+            .map(|(req, res)| (req.id.clone(), res.as_ref().map(|r| r.id.clone())))
+            .collect()
     }
 }
