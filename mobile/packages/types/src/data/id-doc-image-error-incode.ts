@@ -21,6 +21,7 @@ enum IdDocImageError {
   selfieImageSizeUnsupported = 'selfie_image_size_unsupported',
   selfieImageOrientationIncorrect = 'selfie_image_orientation_incorrect',
   selfieBadImageCompression = 'selfie_bad_image_compression',
+  driversLicensePermitNotAllowed = 'drivers_license_permit_not_allowed',
   unknownError = 'unknown_error',
 }
 
