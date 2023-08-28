@@ -1,5 +1,6 @@
 use crate::DbResult;
 use crate::PgConn;
+use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::document_request;
 use diesel::prelude::*;
@@ -76,6 +77,16 @@ impl DocumentRequest {
             .first(conn)
             .optional()?;
         Ok(result)
+    }
+
+    #[tracing::instrument("DocumentRequest::get_or_create", skip_all)]
+    pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
+        if let Some(existing) = Self::get(conn, &args.workflow_id)? {
+            // TODO FP-5894: this is a bit lacking in specificity could be a doc req that is _not_ a selfie, but should be a selfie based on app logic
+            Ok(existing)
+        } else {
+            Self::create(conn, args)
+        }
     }
 }
 

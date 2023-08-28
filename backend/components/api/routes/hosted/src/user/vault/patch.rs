@@ -6,9 +6,13 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::{UserAuthGuard, UserObAuthContext};
 use api_core::utils::vault_wrapper::{Any, TenantVw};
+use db::models::document_request::{DocumentRequest, NewDocumentRequestArgs};
 use newtypes::email::Email;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{DataIdentifier, DataLifetimeSource, IdentityDataKind as IDK, ValidateArgs, WorkflowGuard};
+use newtypes::{
+    DataIdentifier, DataLifetimeSource, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, ValidateArgs,
+    WorkflowGuard,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::str::FromStr;
 
@@ -81,11 +85,16 @@ async fn patch_inner(
         .clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
     let is_fixture = user_auth.user().is_fixture;
     let tenant_id = user_auth.tenant()?.id.clone();
-    let su_id = user_auth.data.scoped_user.id;
+    let su_id = user_auth.data.scoped_user.id.clone();
+    let sv_id2 = su_id.clone();
     let email = request
         .get(&IDK::Email.into())
         .map(|p| Email::from_str(p.leak()))
         .transpose()?;
+
+    let residential_address = request
+        .get(&IDK::Country.into())
+        .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
 
     let request = request
         .build_global_fingerprints(state.as_ref(), is_fixture)
@@ -110,6 +119,32 @@ async fn patch_inner(
             .find(|(di, _)| di == &DataIdentifier::from(IDK::Email))
         {
             send_email_challenge(&state, &tenant_id, ci.id, &email.email).await?;
+        }
+    }
+
+    let obc = user_auth.ob_config()?;
+
+    if let (Some(address), Some(workflow)) = (residential_address, user_auth.workflow().ok()) {
+        // if we allow international and haven't requested a doc, we need to create a doc req
+        if obc.allow_international_residents && obc.document_cdo().is_none() && !address.is_us() {
+            tracing::info!(scoped_vault_id=%sv_id2, wf_id=%workflow.id, "creating doc request for international onboarding");
+
+            let args = NewDocumentRequestArgs {
+                scoped_vault_id: sv_id2.clone(),
+                ref_id: None,
+                workflow_id: workflow.id.clone(),
+                // international we require selfie for now
+                should_collect_selfie: true,
+                // TODO: Deprecated - None of these are used
+                global_doc_types_accepted: None,
+                country_restrictions: vec![],
+                country_doc_type_restrictions: None,
+            };
+            // TODO: FP-5895 handle 1 click case where address doesn't change (we won't hit this endpoint)
+            state
+                .db_pool
+                .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
+                .await?;
         }
     }
 
