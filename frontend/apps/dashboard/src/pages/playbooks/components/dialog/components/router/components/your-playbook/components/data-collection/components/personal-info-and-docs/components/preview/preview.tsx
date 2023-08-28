@@ -37,7 +37,8 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
     user &&
     user.isFirmEmployee &&
     watch('personalInformationAndDocs.idDoc') &&
-    watch('personalInformationAndDocs.idDocKind')?.length > 0;
+    watch('personalInformationAndDocs.idDocKind')?.length > 0 &&
+    kind === Kind.KYC;
 
   const basicInformationFormValues = formValues.filter(field =>
     basicInformationFields.includes(field as keyof PersonalInformationAndDocs),

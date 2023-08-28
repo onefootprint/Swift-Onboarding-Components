@@ -78,7 +78,7 @@ describe('<Preview />', () => {
     ).toBeGreaterThanOrEqual(1);
   });
 
-  it('should show doc first flow option if firm employee and ID doc kind exists', async () => {
+  it('should show doc first flow option if firm employee and ID doc kind exists and kind is KYC', async () => {
     asAdminUserFirmEmployee();
     renderForm({
       kind: Kind.KYC,
@@ -97,6 +97,27 @@ describe('<Preview />', () => {
         'Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan.',
       ),
     ).toBeInTheDocument();
+  });
+
+  it('should NOT doc first flow option if firm employee and ID doc kind exists BUT kind is KYB', async () => {
+    asAdminUserFirmEmployee();
+    renderForm({
+      kind: Kind.KYB,
+      startingValues: {
+        idDoc: true,
+        idDocKind: [SupportedIdDocTypes.driversLicense],
+      },
+    });
+    expect(
+      screen.queryByRole('checkbox', {
+        name: 'Use document scan to autofill basic identity data',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole(
+        'Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan.',
+      ),
+    ).not.toBeInTheDocument();
   });
 
   it('should not show doc first flow option if firm employee but no ID doc kind shown', async () => {
