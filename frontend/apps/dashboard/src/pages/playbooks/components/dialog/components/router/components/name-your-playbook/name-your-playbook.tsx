@@ -3,8 +3,11 @@ import styled, { css } from '@onefootprint/styled';
 import { Button, TextInput, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import useSession from 'src/hooks/use-session';
 
 import { Kind, NameFormData } from '@/playbooks/utils/machine/types';
+
+import getPlaceholder from './utils/get-placeholder';
 
 type NameYourPlaybookProps = {
   kind?: Kind;
@@ -23,6 +26,9 @@ const NameYourPlaybook = ({
   const formMethods = useForm<NameFormData>({
     defaultValues,
   });
+  const { data } = useSession();
+  const { org } = data;
+
   const {
     handleSubmit,
     register,
@@ -32,6 +38,12 @@ const NameYourPlaybook = ({
   useEffect(() => {
     setValue('kind', kind);
   }, [setValue, kind]);
+
+  const kindString = t(kind);
+  const placeholder = getPlaceholder({
+    tenantName: org?.name || '',
+    kindString,
+  });
 
   return (
     <Container>
@@ -53,11 +65,7 @@ const NameYourPlaybook = ({
               })}
               label={t('form.name.label')}
               hasError={!!errors.name}
-              placeholder={
-                kind === Kind.KYC
-                  ? t('form.name.placeholder-kyc')
-                  : t('form.name.placeholder-kyb')
-              }
+              placeholder={placeholder}
             />
             {errors.name && (
               <Typography variant="body-3" color="error">

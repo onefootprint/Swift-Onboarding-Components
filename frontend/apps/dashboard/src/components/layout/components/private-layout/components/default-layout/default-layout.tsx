@@ -9,7 +9,15 @@ import {
   ThemedLogoFpCompact,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Container, Tab, Tabs, Typography } from '@onefootprint/ui';
+import {
+  Box,
+  Container,
+  Tab,
+  Tabs,
+  Toggle,
+  Tooltip,
+  Typography,
+} from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -29,7 +37,7 @@ type DefaultLayoutProps = {
 const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   const { t } = useTranslation('components.private-layout.nav');
   const router = useRouter();
-  const { data } = useOrgSession();
+  const { data, sandbox } = useOrgSession();
   const {
     data: { user },
   } = useSession();
@@ -42,6 +50,27 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
     { href: '/settings', Icon: IcoSettings16, text: t('settings') },
   ];
   let displayRoutes = routes.slice();
+
+  const userWouldBeRedirected =
+    router.pathname.startsWith('/users/[id]') ||
+    router.pathname.startsWith('/businesses/[id]');
+
+  const tooltipInfoText = sandbox.isSandbox
+    ? t('sandbox-mode.tooltip-info.sandbox')
+    : t('sandbox-mode.tooltip-info.live');
+
+  const toggleSandboxMode = () => {
+    if (router.pathname.startsWith('/users')) {
+      router.push({
+        pathname: '/users',
+      });
+    } else if (router.pathname.startsWith('/businesses')) {
+      router.push({
+        pathname: '/businesses',
+      });
+    }
+    sandbox.toggle();
+  };
 
   if (user?.isFirmEmployee) {
     displayRoutes = routes
@@ -95,8 +124,28 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
                   {text}
                 </Tab>
               ))}
+              <ManualReviewNavigator />
             </Tabs>
-            <ManualReviewNavigator />
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Tooltip
+                disabled={!userWouldBeRedirected && sandbox.canToggle}
+                text={
+                  userWouldBeRedirected
+                    ? tooltipInfoText
+                    : 'sandbox-mode.tooltip-disabled'
+                }
+                alignment="end"
+                position="bottom"
+              >
+                <Toggle
+                  size="compact"
+                  checked={sandbox.isSandbox}
+                  disabled={!sandbox.canToggle}
+                  label={t('sandbox-mode.label')}
+                  onChange={toggleSandboxMode}
+                />
+              </Tooltip>
+            </Box>
           </Container>
         </Nav>
         <Container>{children}</Container>

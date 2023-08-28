@@ -6,7 +6,6 @@ import React from 'react';
 
 import ApiKeys from './components/api-keys';
 import Header from './components/header';
-import OnboardingConfigs from './components/onboarding-configs';
 import ProxyConfigs from './components/proxy-configs';
 import Webhooks from './components/webhooks';
 
@@ -25,7 +24,6 @@ const Developers = () => {
     defaultValue: TabName.onboardingConfigs,
   });
   const tabs = [
-    { label: t('tabs.onboarding-configs'), value: TabName.onboardingConfigs },
     { label: t('tabs.api-keys'), value: TabName.apiKeys },
     { label: t('tabs.proxy-configs'), value: TabName.proxyConfigs },
     { label: t('tabs.webhooks'), value: TabName.webhooks },
@@ -51,7 +49,6 @@ const Developers = () => {
       </Tabs>
       <Content>
         {tab === TabName.apiKeys && <ApiKeys />}
-        {tab === TabName.onboardingConfigs && <OnboardingConfigs />}
         {tab === TabName.proxyConfigs && <ProxyConfigs />}
         {tab === TabName.webhooks && <Webhooks />}
       </Content>

@@ -17,20 +17,6 @@ const renderNameYourPlaybook = ({ kind }: NameYourPlaybookWithContextProps) => {
 };
 
 describe('<NameYourPlaybook />', () => {
-  it('should render "User ID verification" placeholder for KYC', () => {
-    renderNameYourPlaybook({ kind: Kind.KYC });
-    expect(
-      screen.getByPlaceholderText('User ID verification'),
-    ).toBeInTheDocument();
-  });
-
-  it('should render "Business verification" placeholder for KYB', () => {
-    renderNameYourPlaybook({ kind: Kind.KYB });
-    expect(
-      screen.getByPlaceholderText('Business verification'),
-    ).toBeInTheDocument();
-  });
-
   it('should show error if no name provided', async () => {
     renderNameYourPlaybook({ kind: Kind.KYB });
     const next = screen.getByRole('button', { name: 'Next' });

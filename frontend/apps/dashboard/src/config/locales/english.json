@@ -360,7 +360,15 @@
         "developers": "Developers",
         "settings": "Settings",
         "log-out": "Log out",
-        "manual-reviews": "Manual reviews"
+        "manual-reviews": "Manual reviews",
+        "sandbox-mode": {
+          "label": "Sandbox mode",
+          "tooltip-info": {
+            "sandbox": "By turning this off, you’ll see live data and will be redirected to a different page",
+            "live": "By turning this on, you’ll see test data and will be redirected to a different page"
+          },
+          "tooltip-disabled": "To access live data you have to activate your account first. Please contact us to do so."
+        }
       },
       "sandbox-banner": {
         "title": "Sandbox mode.",
@@ -1307,11 +1315,11 @@
           "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones.",
           "back": "Back",
           "next": "Next",
+          "kyc": "KYC",
+          "kyb": "KYB",
           "form": {
             "name": {
-              "label": "Playbook name",
-              "placeholder-kyc": "User ID verification",
-              "placeholder-kyb": "Business verification"
+              "label": "Playbook name"
             },
             "errors": {
               "required": "Please name your Playbook"
