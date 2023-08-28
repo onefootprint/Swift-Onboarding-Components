@@ -68,6 +68,7 @@ impl TenantVendorControl {
         let control: Option<Self> = tenant_vendor_control::table
             .filter(tenant_vendor_control::tenant_id.eq(tenant_id))
             .filter(tenant_vendor_control::deactivated_at.is_null())
+            .order_by(tenant_vendor_control::_created_at.desc())
             .first(conn)
             .optional()?;
         Ok(control)

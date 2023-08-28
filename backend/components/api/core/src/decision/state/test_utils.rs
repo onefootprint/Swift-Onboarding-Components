@@ -23,6 +23,7 @@ use db::models::{
 };
 use db::tests::fixtures;
 use db::TxnPgConn;
+use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::IdologyExpectIDAPIResponse;
 use idv::idology::IdologyExpectIDRequest;
 use idv::incode::response::OnboardingStartResponse;
@@ -226,6 +227,45 @@ pub fn mock_idology(state: &mut State, with_qualifier: WithQualifier) {
             ))
         });
     state.set_idology_expect_id(Arc::new(mock_idology_expect_id));
+}
+
+pub fn mock_idology_error(state: &mut State) {
+    let mut mock_idology_expect_id = MockVendorAPICall::<
+        IdologyExpectIDRequest,
+        IdologyExpectIDAPIResponse,
+        idv::idology::error::Error,
+    >::new();
+    mock_idology_expect_id
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| Err(idv::idology::error::Error::UnknownError("oops".to_owned())));
+    state.set_idology_expect_id(Arc::new(mock_idology_expect_id));
+}
+
+pub fn mock_experian(state: &mut State) {
+    let mut mock_experian = MockVendorAPICall::<
+        ExperianCrossCoreRequest,
+        ExperianCrossCoreResponse,
+        idv::experian::error::Error,
+    >::new();
+    mock_experian
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| Ok(idv::tests::fixtures::experian::create_response()));
+    state.set_experian_cross_core(Arc::new(mock_experian));
+}
+
+pub fn mock_experian_error(state: &mut State) {
+    let mut mock_experian = MockVendorAPICall::<
+        ExperianCrossCoreRequest,
+        ExperianCrossCoreResponse,
+        idv::experian::error::Error,
+    >::new();
+    mock_experian
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| Err(idv::experian::error::Error::UserNamePasswordError));
+    state.set_experian_cross_core(Arc::new(mock_experian));
 }
 
 pub fn mock_twilio(state: &mut State) {

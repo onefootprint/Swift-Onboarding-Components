@@ -20,8 +20,8 @@ pub fn parse_response(response: serde_json::Value) -> Result<CrossCoreAPIRespons
 pub struct CrossCoreAPIResponse {
     pub response_header: ResponseHeader,
     // Experian sends us back all the data we sent to them
-    #[serde(skip_serializing)]
-    pub original_request_data: super::request::BodyPayload,
+    #[serde(skip)] // TODO: why did we have skip_serializing here? wouldn't it cause deser errors?
+    pub original_request_data: Option<super::request::BodyPayload>,
     pub client_response_payload: ClientResponsePayload,
 }
 

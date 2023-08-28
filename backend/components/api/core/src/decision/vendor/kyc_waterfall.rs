@@ -150,7 +150,6 @@ where
     loop {
         tracing::info!(waterfall_vec_len=?waterfall_vec.len(), "[waterfall_loop] loop");
         let vr = waterfall_vec.get(i).cloned();
-
         let Some((vendor_api, req_res)) = vr else {
             // we have exhausted the waterfall of vendors to try
             return Err(ApiErrorKind::VendorRequestsFailed.into());
@@ -238,5 +237,260 @@ fn next_action(req_res: &Option<RequestAndMaybeHydratedResult>, have_attempted_c
         },
         // We have not attempted calling this vendor at all yet (no Vreq exists) so we should make a call
         None => Action::MakeCall,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::decision::state::test_utils;
+    use crate::decision::state::test_utils::UserKind;
+    use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
+    use feature_flag::MockFeatureFlagClient;
+    use idv::ParsedResponse;
+    use macros::test_state_case;
+    use newtypes::DecisionIntentKind;
+    use newtypes::Vendor;
+    use std::sync::Arc;
+
+    struct ExperianEnabled(bool);
+    struct IdologyEnabled(bool);
+
+    enum VR {
+        ShouldntCall,
+        Success,
+        Error,
+    }
+    struct ExperianResponse(VR);
+    struct IdologyResponse(VR);
+
+    enum ExpectedResult {
+        SingularSuccessVendorResult(Vendor),
+        ErrVendorRequestsFailed,
+        ErrNotEnoughInformation,
+    }
+
+    struct Run(ExperianResponse, IdologyResponse, ExpectedResult);
+
+    #[test_state_case(
+        ExperianEnabled(false),
+        IdologyEnabled(false),
+        Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrNotEnoughInformation),
+        Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrNotEnoughInformation)
+        ; "No available vendor"
+    )]
+    #[test_state_case(
+        ExperianEnabled(false),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::Success), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
+        Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
+        ; "Idology only, call succeeds"
+    )]
+    #[test_state_case(
+        ExperianEnabled(false),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed)
+        ; "Idology only, call errors, re-run errors"
+    )]
+    #[test_state_case(
+        ExperianEnabled(false),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Success), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
+        ; "Idology only, call errors, re-rerun succeeds"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(false),
+        Run(ExperianResponse(VR::Success), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
+        ; "Experian only, call succeeds"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(false),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrVendorRequestsFailed),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrVendorRequestsFailed)
+        ; "Experian only, call errors, re-run errors"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(false),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrVendorRequestsFailed) ,
+        Run(ExperianResponse(VR::Success), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
+        ; "Experian only, call errors, re-run succeeds"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::Success), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
+        ; "Both, Experian succeeds"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
+        ; "Both, Experian fails, Idology succeeds"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
+        Run(ExperianResponse(VR::Success), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
+        ; "Both, Experian fails, Idology fails, re-run Experian succeeds"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
+        ; "Both, Experian fails, Idology fails, re-run Experian fails Idology succeeds"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed)
+        ; "Both, Experian fails, Idology fails, re-run Experian fails Idology fails"
+    )]
+    #[tokio::test]
+    async fn test_run_kyc_waterfall(
+        state: &mut State,
+        experian_enabled: ExperianEnabled,
+        idology_enabled: IdologyEnabled,
+        run1: Run,
+        run2: Run,
+    ) {
+        // Setup
+        let (wf, t, _obc, _tu) = test_utils::setup_data(state, UserKind::Live, None, None).await;
+
+        let di =
+            state
+                .db_pool
+                .db_transaction(move |conn| -> ApiResult<_> {
+                    let _tvc: DbTenantVendorControl = DbTenantVendorControl::create(
+                        conn,
+                        t.id,
+                        idology_enabled.0,
+                        experian_enabled.0,
+                        experian_enabled.0.then(|| "abc123".to_owned()),
+                        None,
+                    )
+                    .unwrap();
+
+                    Ok(DecisionIntent::create(
+                        conn,
+                        DecisionIntentKind::OnboardingKyc,
+                        &wf.scoped_vault_id,
+                        None,
+                    )
+                    .unwrap())
+                })
+                .await
+                .unwrap();
+
+        // Mock Run 1
+
+        let Run {
+            0: experian_response,
+            1: idology_response,
+            2: expected_result,
+        } = run1;
+        mock_calls(state, experian_response, idology_response);
+        // Function under test
+        let res = run_kyc_waterfall(state, &di, &wf.id).await;
+        // Assertions
+        assert_expected_result(state, expected_result, res).await;
+
+        // Simulate re-running. Ones that suceeded already should noop. Ones that ended in error should remake vendor calls
+        // Mock Run 2
+        let Run {
+            0: experian_response2,
+            1: idology_response2,
+            2: expected_result2,
+        } = run2;
+        mock_calls(state, experian_response2, idology_response2);
+        // Function under test
+        let res2 = run_kyc_waterfall(state, &di, &wf.id).await;
+        // Assertions
+        assert_expected_result(state, expected_result2, res2).await;
+    }
+
+    fn mock_calls(state: &mut State, experian_response: ExperianResponse, idology_response: IdologyResponse) {
+        // TODO: maybe by default the state's mock_ff_client could respond to any flag and return their default value (since thats something we specify in enum). Oof but then we gotta solve the whole is_production dealiooo
+        let mut mock_ff_client = MockFeatureFlagClient::new();
+        mock_ff_client.expect_flag().return_const(true);
+        match idology_response.0 {
+            VR::ShouldntCall => (),
+            VR::Success => test_utils::mock_idology(state, test_utils::WithQualifier(None)),
+            VR::Error => test_utils::mock_idology_error(state),
+        };
+        match experian_response.0 {
+            VR::ShouldntCall => (),
+            VR::Success => test_utils::mock_experian(state),
+            VR::Error => test_utils::mock_experian_error(state),
+        };
+        state.set_ff_client(Arc::new(mock_ff_client));
+    }
+
+    async fn assert_expected_result(
+        state: &mut State,
+        expected_result: ExpectedResult,
+        res: ApiResult<Vec<VendorResult>>,
+    ) {
+        match expected_result {
+            ExpectedResult::SingularSuccessVendorResult(vendor) => {
+                let mut res = res.unwrap();
+                assert_eq!(1, res.len());
+                assert_vendor_result(state, vendor, res.pop().unwrap()).await;
+            }
+            ExpectedResult::ErrVendorRequestsFailed => {
+                let err = res.err().unwrap();
+                if !matches!(err.kind(), ApiErrorKind::VendorRequestsFailed) {
+                    panic!("{:#?}", err);
+                }
+                // TODO: could also assert that vreq/vres with is_error = true was written
+            }
+            ExpectedResult::ErrNotEnoughInformation => {
+                let err = res.err().unwrap();
+                if let ApiErrorKind::AssertionError(s) = err.kind() {
+                    assert_eq!(
+                        "Not enough information to send to any vendors".to_owned(),
+                        s.to_owned()
+                    );
+                } else {
+                    panic!("{:#?}", err);
+                }
+            }
+        };
+    }
+
+    async fn assert_vendor_result(state: &mut State, expected_vendor: Vendor, vr: VendorResult) {
+        let vreqid = vr.verification_request_id.clone();
+        let vresid = vr.verification_result_id.clone();
+        let (vreq, vres) = state
+            .db_pool
+            .db_query(move |conn| {
+                let vreq = VerificationRequest::get(conn, &vreqid).unwrap();
+                let vres = VerificationResult::get(conn, &vresid).unwrap();
+                (vreq, vres)
+            })
+            .await
+            .unwrap();
+
+        assert_eq!(vreq.vendor, expected_vendor);
+        assert!(!vres.is_error);
+
+        match expected_vendor {
+            Vendor::Idology => assert!(matches!(vr.response.response, ParsedResponse::IDologyExpectID(_))),
+            Vendor::Experian => assert!(matches!(
+                vr.response.response,
+                ParsedResponse::ExperianPreciseID(_)
+            )),
+            _ => panic!(),
+        };
     }
 }
