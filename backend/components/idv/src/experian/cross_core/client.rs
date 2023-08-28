@@ -324,6 +324,7 @@ pub(self) struct CrossCoreAuthTokenCredentials {
 /// These are the credentials used to make requests (with the JWT authorization) to CrossCore
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
+
 pub(self) struct CrossCoreRequestCredentials {
     pid_username: PiiString,
     pid_password: Base64EncodedString,

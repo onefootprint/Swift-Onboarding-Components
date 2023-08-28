@@ -19,6 +19,8 @@ pub type ObConfigInfo = (
 
 impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
     fn from_db((ob_config, tenant, tenant_client_config, appearance, ff_client): ObConfigInfo) -> Self {
+        let supported_countries = ob_config.residential_address_countries();
+
         let ObConfiguration {
             name,
             key,
@@ -26,6 +28,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             is_live,
             is_no_phone_flow,
             must_collect_data,
+            allow_international_residents,
             ..
         } = ob_config;
         let Tenant {
@@ -61,6 +64,8 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             requires_id_doc,
             is_kyb,
             app_clip_experience_id,
+            allow_international_residents,
+            supported_countries,
         }
     }
 }
@@ -78,6 +83,8 @@ impl DbToApi<ObConfiguration> for api_wire_types::OnboardingConfiguration {
             is_live,
             optional_data,
             is_no_phone_flow,
+            allow_international_residents,
+            international_country_restrictions,
             ..
         } = ob_config;
         Self {
@@ -91,6 +98,8 @@ impl DbToApi<ObConfiguration> for api_wire_types::OnboardingConfiguration {
             created_at,
             status,
             is_no_phone_flow,
+            allow_international_residents,
+            international_country_restrictions,
         }
     }
 }

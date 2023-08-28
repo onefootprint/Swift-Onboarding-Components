@@ -14,6 +14,8 @@ pub struct OnboardingConfiguration {
     pub must_collect_data: Vec<CollectedDataOption>,
     pub optional_data: Vec<CollectedDataOption>,
     pub can_access_data: Vec<CollectedDataOption>,
+    pub allow_international_residents: bool,
+    pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub is_no_phone_flow: bool,
 }
 
@@ -39,6 +41,8 @@ pub struct PublicOnboardingConfiguration {
     pub is_no_phone_flow: bool,
     pub requires_id_doc: bool,
     pub is_kyb: bool,
+    pub allow_international_residents: bool,
+    pub supported_countries: Vec<Iso3166TwoDigitCountryCode>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub appearance: Option<serde_json::Value>,

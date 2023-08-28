@@ -10,11 +10,14 @@ use db_schema::schema::{ob_configuration, tenant};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use itertools::Itertools;
 use newtypes::AppearanceId;
 use newtypes::DocumentCdoInfo;
+use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::WorkflowId;
 use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant, DbActor};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
+use strum::IntoEnumIterator;
 
 pub type IsLive = bool;
 
@@ -39,8 +42,27 @@ pub struct ObConfiguration {
     pub is_no_phone_flow: bool,
     pub is_doc_first: bool,
     pub allow_international_residents: bool,
-    pub international_country_restrictions: Option<Vec<String>>,
+    pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: Option<DbActor>,
+}
+
+impl ObConfiguration {
+    pub fn residential_address_countries(&self) -> Vec<Iso3166TwoDigitCountryCode> {
+        let mut supported_countries = match self.international_country_restrictions.as_ref() {
+            Some(supported) => supported.clone(),
+            None => {
+                if self.allow_international_residents {
+                    Iso3166TwoDigitCountryCode::iter().collect()
+                } else {
+                    vec![]
+                }
+            }
+        };
+        // always include US in the supportable countries
+        supported_countries.push(Iso3166TwoDigitCountryCode::US);
+
+        supported_countries.into_iter().unique().collect()
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -60,7 +82,7 @@ struct NewObConfiguration {
     is_no_phone_flow: bool,
     is_doc_first: bool,
     allow_international_residents: bool,
-    international_country_restrictions: Option<Vec<String>>,
+    international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     author: DbActor,
 }
 
@@ -216,7 +238,7 @@ impl ObConfiguration {
         is_no_phone_flow: bool,
         is_doc_first: bool,
         allow_international_residents: bool,
-        international_country_restrictions: Option<Vec<String>>,
+        international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
         author: DbActor,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
@@ -288,5 +310,53 @@ impl ObConfiguration {
         self.must_collect_data
             .iter()
             .any(|cdo| cdo.parent().data_identifier_kind() == di_kind)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use crate::test_helpers::assert_have_same_elements;
+
+    use super::ObConfiguration;
+    use chrono::Utc;
+    use newtypes::{
+        ApiKeyStatus, Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, TenantId,
+    };
+    use strum::IntoEnumIterator;
+    use test_case::test_case;
+
+    #[test_case(true, None, Iso3166TwoDigitCountryCode::iter().collect(); "allow international, any country acceptable")]
+    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX, Iso3166TwoDigitCountryCode::US]; "obc has restrictions, includes US")]
+    #[test_case(false, None, vec![Iso3166TwoDigitCountryCode::US]; "obc doesn't allow international, only US")]
+    fn test_ob_config_international_countries(
+        allow_international: bool,
+        international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
+        expected_countries: Vec<Iso3166TwoDigitCountryCode>,
+    ) {
+        let obc = ObConfiguration {
+            id: ObConfigurationId::from_str("1234").unwrap(),
+            key: ObConfigurationKey::from_str("obk1").unwrap(),
+            name: "obc".into(),
+            tenant_id: TenantId::from_str("t_1234").unwrap(),
+            _created_at: Utc::now(),
+            _updated_at: Utc::now(),
+            is_live: true,
+            status: ApiKeyStatus::Enabled,
+            created_at: Utc::now(),
+            must_collect_data: vec![],
+            can_access_data: vec![],
+            appearance_id: None,
+            cip_kind: None,
+            optional_data: vec![],
+            is_no_phone_flow: false,
+            is_doc_first: false,
+            allow_international_residents: allow_international,
+            international_country_restrictions,
+            author: None,
+        };
+
+        assert_have_same_elements(obc.residential_address_countries(), expected_countries)
     }
 }

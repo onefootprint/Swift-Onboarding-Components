@@ -56,3 +56,4 @@ diesel_as_jsonb = { workspace = true }
 [dev-dependencies]
 actix-rt = "2.7.0"
 macros = { path = "../../macros" }
+test-case = { workspace = true }

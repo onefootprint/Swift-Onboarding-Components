@@ -10,9 +10,9 @@ use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::CollectedData as CD;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::{CipKind, TenantId};
+use newtypes::{CollectedData as CD, Iso3166TwoDigitCountryCode};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::collections::HashMap;
@@ -31,7 +31,7 @@ pub struct CreateOnboardingConfigurationRequest {
     is_doc_first_flow: bool,
     #[serde(default)]
     allow_international_residents: bool,
-    international_country_restrictions: Option<Vec<String>>,
+    international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
 }
 
 impl CreateOnboardingConfigurationRequest {
