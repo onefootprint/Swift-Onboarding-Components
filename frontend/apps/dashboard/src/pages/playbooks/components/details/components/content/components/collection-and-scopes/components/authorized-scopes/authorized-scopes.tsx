@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import { CollectedKycDataOption } from '@onefootprint/types';
 import React from 'react';
 import {
   basicInformationFields,
@@ -17,6 +18,15 @@ const AuthorizedScopes = ({ canAccessData }: AuthorizedScopesProps) => {
     'pages.playbooks.table.details.content.authorized-scopes',
   );
 
+  const ssn =
+    canAccessData.includes(CollectedKycDataOption.ssn9) ||
+    canAccessData.includes(CollectedKycDataOption.ssn4);
+  const nationality = canAccessData.includes(
+    CollectedKycDataOption.nationality,
+  );
+  const idDoc =
+    canAccessData.filter(scope => scope.includes('document'))?.length > 0;
+
   return (
     <Container>
       <Section
@@ -24,11 +34,13 @@ const AuthorizedScopes = ({ canAccessData }: AuthorizedScopesProps) => {
         canAccessData={canAccessData}
         title={t('basic-information')}
       />
-      <Section
-        displayScopes={usResidentDisplayScopes}
-        canAccessData={canAccessData}
-        title={t('us-residents')}
-      />
+      {(ssn || nationality || idDoc) && (
+        <Section
+          displayScopes={usResidentDisplayScopes}
+          canAccessData={canAccessData}
+          title={t('us-residents')}
+        />
+      )}
     </Container>
   );
 };

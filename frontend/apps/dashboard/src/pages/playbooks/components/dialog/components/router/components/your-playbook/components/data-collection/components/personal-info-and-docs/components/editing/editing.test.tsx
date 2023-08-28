@@ -19,9 +19,7 @@ describe('<Editing />', () => {
   it('should show SSN options when toggling', async () => {
     renderEditing({});
     expect(screen.getByRole('radio', { name: 'Full' })).toBeInTheDocument();
-    expect(
-      screen.getByRole('radio', { name: 'Last 4 digits' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Last 4' })).toBeInTheDocument();
     expect(
       screen.getByRole('checkbox', {
         name: 'Allow users without an SSN to proceed with the verification',
@@ -146,6 +144,16 @@ describe('<Editing />', () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText('Basic information')).toBeInTheDocument();
+  });
+
+  it('should not show no phone flow option if firm employee but KYB', async () => {
+    asAdminUserFirmEmployee();
+    renderEditing({ kind: Kind.KYB });
+    expect(
+      screen.queryByRole('switch', {
+        name: 'Request users to provide their phone number',
+      }),
+    ).not.toBeInTheDocument();
   });
 
   it('should hide phone option flow option if non-firm employee', async () => {

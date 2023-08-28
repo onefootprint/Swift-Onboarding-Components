@@ -1175,12 +1175,12 @@
               "nationality": "Legal status in the U.S.",
               "ssn": "SSN",
               "full": "Full",
-              "last4": "Last 4 digits",
+              "last4": "Last 4",
               "document": "ID document scan",
               "selfie": "Selfie",
               "us-residents": "U.S. residents",
               "ssn9": "SSN (Full)",
-              "ssn4": "SSN (Last 4 digits)",
+              "ssn4": "SSN (Last 4)",
               "drivers_license": "Driver's license",
               "id_card": "Identity card",
               "passport": "Passport (photo page)",
@@ -1196,7 +1196,7 @@
               "title": "Playbook basics",
               "edit-name": {
                 "title": "Playbook basics",
-                "edit": "Edit name",
+                "edit": "Edit Playbook name",
                 "form": {
                   "label": "Playbook name",
                   "cancel": "Cancel",
@@ -1379,7 +1379,7 @@
                 "title": "SSN",
                 "toggle": "Request users to provide their SSN",
                 "full": "Full",
-                "last4": "Last 4 digits"
+                "last4": "Last 4"
               },
               "ssn-optional": {
                 "checkbox": "Allow users without an SSN to proceed with the verification",
@@ -1439,8 +1439,9 @@
             },
             "business-information": {
               "editing": {
+                "business-information": "Editing business information",
                 "legal-entity-type": {
-                  "title": "Editing business information",
+                  "title": "Legal entity type",
                   "toggle": "Request users to provide their business legal entity type"
                 },
                 "website": {
@@ -1886,7 +1887,7 @@
               "title": "SSN",
               "request": "Request users to provide their SSN",
               "ssn9": "Full",
-              "ssn4": "Last 4 digits",
+              "ssn4": "Last 4",
               "no-ssn": {
                 "label": "Allow users without an SSN to proceed with the verification",
                 "hint": "They will need to be manually reviewed by you."

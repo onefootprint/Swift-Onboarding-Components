@@ -339,7 +339,6 @@ describe('processPlaybook', () => {
     });
 
     expect(canAccessData).toContain(CollectedKybDataOption.beneficialOwners);
-    expect(canAccessData).toContain('doingBusinessAs');
     expect(canAccessData).toContain(CollectedKybDataOption.name);
     expect(canAccessData).toContain(CollectedKybDataOption.address);
     expect(canAccessData).toContain(CollectedKybDataOption.tin);
@@ -368,7 +367,6 @@ describe('processPlaybook', () => {
     });
 
     expect(canAccessData).toContain(CollectedKybDataOption.beneficialOwners);
-    expect(canAccessData).toContain('doingBusinessAs');
     expect(canAccessData).toContain(CollectedKybDataOption.name);
     expect(canAccessData).toContain(CollectedKybDataOption.address);
     expect(canAccessData).toContain(CollectedKybDataOption.tin);
@@ -399,7 +397,6 @@ describe('processPlaybook', () => {
     expect(canAccessData).not.toContain(
       CollectedKybDataOption.beneficialOwners,
     );
-    expect(canAccessData).not.toContain('doingBusinessAs');
     expect(canAccessData).not.toContain(CollectedKybDataOption.name);
     expect(canAccessData).not.toContain(CollectedKybDataOption.address);
     expect(canAccessData).not.toContain(CollectedKybDataOption.tin);

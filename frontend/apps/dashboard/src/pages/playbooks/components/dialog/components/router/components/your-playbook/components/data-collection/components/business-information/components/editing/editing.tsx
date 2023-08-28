@@ -29,6 +29,7 @@ const Editing = ({ stopEditing }: EditingProps) => {
   return (
     <EditingContainer>
       <Section>
+        <Typography variant="label-2">{t('business-information')}</Typography>
         <Typography variant="label-3">
           {t('legal-entity-type.title')}
         </Typography>

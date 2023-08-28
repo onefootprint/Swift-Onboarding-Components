@@ -25,6 +25,8 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
   const { personalInformationAndDocs } = playbook;
   const { selfie, idDoc, nationality, ssn, ssnKind } =
     personalInformationAndDocs;
+  const phoneNumber =
+    personalInformationAndDocs[CollectedKycDataOption.phoneNumber];
 
   const isCollectingInvestorProfile =
     playbook[CollectedInvestorProfileDataOption.investorProfile] &&
@@ -41,12 +43,14 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
             label={allT('cdo.email')}
             {...register(CollectedKycDataOption.email)}
           />
-          <Checkbox
-            disabled
-            checked
-            label={allT('cdo.phone_number')}
-            {...register(CollectedKycDataOption.phoneNumber)}
-          />
+          {phoneNumber && (
+            <Checkbox
+              disabled
+              checked
+              label={allT('cdo.phone_number')}
+              {...register(CollectedKycDataOption.phoneNumber)}
+            />
+          )}
           <Checkbox
             label={allT('cdo.name')}
             {...register(CollectedKycDataOption.name)}

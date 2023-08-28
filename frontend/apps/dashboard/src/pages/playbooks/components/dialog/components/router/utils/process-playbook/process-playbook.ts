@@ -114,7 +114,6 @@ const processPlaybook = ({
     CollectedKybDataOption.corporationType,
     CollectedKybDataOption.website,
     CollectedKybDataOption.phoneNumber,
-    'doingBusinessAs',
   ];
 
   if (kind === Kind.KYB && businessInformation) {

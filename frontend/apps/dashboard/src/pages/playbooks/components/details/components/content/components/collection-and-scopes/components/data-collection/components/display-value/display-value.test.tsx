@@ -32,7 +32,7 @@ describe('<DisplayValue />', () => {
     expect(screen.getByTestId('close-icon')).toBeInTheDocument();
   });
 
-  it('should show "last 4 digits" if SSN4 is included', () => {
+  it('should show "last 4" if SSN4 is included', () => {
     renderDisplayValues({
       mustCollectData: [
         CollectedKycDataOption.ssn4,
@@ -41,7 +41,7 @@ describe('<DisplayValue />', () => {
       ],
       field: 'ssn',
     });
-    expect(screen.getByText('Last 4 digits')).toBeInTheDocument();
+    expect(screen.getByText('Last 4')).toBeInTheDocument();
   });
 
   it('should show "Full" if SSN9 is included', () => {

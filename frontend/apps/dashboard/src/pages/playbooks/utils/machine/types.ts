@@ -62,7 +62,6 @@ export type PersonalInformationAndDocs = {
 
 export type BusinessInformation = {
   [CollectedKybDataOption.name]: boolean;
-  doingBusinessAs?: boolean;
   [CollectedKybDataOption.beneficialOwners]: boolean;
   [CollectedKybDataOption.address]: boolean;
   [CollectedKybDataOption.tin]: boolean;
@@ -73,7 +72,6 @@ export type BusinessInformation = {
 
 export const defaultBusinessInformation = {
   [CollectedKybDataOption.name]: true,
-  doingBusinessAs: true,
   [CollectedKybDataOption.beneficialOwners]: true,
   [CollectedKybDataOption.address]: true,
   [CollectedKybDataOption.tin]: true,
@@ -111,7 +109,7 @@ export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
   [CollectedKycDataOption.name]: true,
   [CollectedKycDataOption.dob]: true,
   [CollectedKycDataOption.fullAddress]: true,
-  [CollectedKycDataOption.ssn4]: false,
+  [CollectedKycDataOption.ssn4]: true,
   [CollectedKycDataOption.ssn9]: true,
   [CollectedKycDataOption.nationality]: true,
   [CollectedDocumentDataOption.document]: true,

@@ -35,6 +35,17 @@ describe('<PersonalScopes />', () => {
     expect(phone).toBeDisabled();
   });
 
+  it('should not show phone for no phone flows', () => {
+    renderPersonalScopes({
+      startingPersonalValues: {
+        phone_number: false,
+      },
+    });
+    expect(
+      screen.queryByRole('checkbox', { name: 'Phone number' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('should show name, date of birth, and address by default', () => {
     renderPersonalScopes({ startingPersonalValues: { nationality: false } });
     const name = screen.getByRole('checkbox', { name: 'Full name' });
@@ -74,6 +85,28 @@ describe('<PersonalScopes />', () => {
     expect(
       screen.getByRole('checkbox', { name: 'SSN (Last 4)' }),
     ).toBeInTheDocument();
+  });
+
+  it('should show SSN (Last 4) enabled by default', () => {
+    renderPersonalScopes({
+      startingPersonalValues: {
+        ssn: true,
+        ssnKind: CollectedKycDataOption.ssn4,
+      },
+    });
+    expect(
+      screen.getByRole('checkbox', { name: 'SSN (Last 4)' }),
+    ).toBeChecked();
+  });
+
+  it('should show SSN Full enabled by default', () => {
+    renderPersonalScopes({
+      startingPersonalValues: {
+        ssn: true,
+        ssnKind: CollectedKycDataOption.ssn9,
+      },
+    });
+    expect(screen.getByRole('checkbox', { name: 'SSN (Full)' })).toBeChecked();
   });
 
   it('should not show nationality if not collecting', () => {

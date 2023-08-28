@@ -11,7 +11,7 @@ const renderBasics = ({ playbook = playbookFixture }: BasicsProps) => {
 describe('<InfoSection />', () => {
   it('should render edit button and no form when not editing', () => {
     renderBasics({ playbook: playbookFixture });
-    expect(screen.getByText('Edit name')).toBeInTheDocument();
+    expect(screen.getByText('Edit Playbook name')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
@@ -29,7 +29,7 @@ describe('<InfoSection />', () => {
 
   it('should render form with expected values when editing', async () => {
     renderBasics({ playbook: playbookFixture });
-    const edit = screen.getByRole('button', { name: 'Edit name' });
+    const edit = screen.getByRole('button', { name: 'Edit Playbook name' });
     await userEvent.click(edit);
     expect(screen.getByRole('textbox')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe('<InfoSection />', () => {
 
   it('should not render basic information while ediitng', async () => {
     renderBasics({ playbook: playbookFixture });
-    const edit = screen.getByRole('button', { name: 'Edit name' });
+    const edit = screen.getByRole('button', { name: 'Edit Playbook name' });
     await userEvent.click(edit);
     expect(screen.queryByText('Type')).not.toBeInTheDocument();
     expect(screen.queryByText('KYC')).not.toBeInTheDocument();

@@ -77,7 +77,7 @@ describe('<AuthorizedScopes />', () => {
     renderAuthorizedScopes({
       canAccessData: [CollectedKycDataOption.ssn4],
     });
-    expect(screen.getByText('SSN (Last 4 digits)')).toBeInTheDocument();
+    expect(screen.getByText('SSN (Last 4)')).toBeInTheDocument();
   });
 
   it('should render legal status if included', () => {
@@ -85,5 +85,24 @@ describe('<AuthorizedScopes />', () => {
       canAccessData: [CollectedKycDataOption.nationality],
     });
     expect(screen.getByText('Legal status in the U.S.')).toBeInTheDocument();
+  });
+
+  it('should not render US residents section if no SSN, nationality, or ID doc', () => {
+    renderAuthorizedScopes({
+      canAccessData: [
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.dob,
+        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.email,
+      ],
+    });
+    expect(screen.queryByText('U.S. residents')).not.toBeInTheDocument();
+  });
+
+  it('should render US residents section if SSN, nationality, or ID doc', () => {
+    renderAuthorizedScopes({
+      canAccessData: [CollectedKycDataOption.ssn9],
+    });
+    expect(screen.getByText('U.S. residents')).toBeInTheDocument();
   });
 });

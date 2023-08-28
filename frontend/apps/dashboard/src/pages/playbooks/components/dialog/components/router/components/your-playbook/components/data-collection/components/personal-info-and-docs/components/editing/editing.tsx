@@ -31,7 +31,7 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
   const ssnOpen = watch('personalInformationAndDocs.ssn');
   const idDocOpen = watch('personalInformationAndDocs.idDoc');
   const idDocKind = watch('personalInformationAndDocs.idDocKind');
-  const showNoPhoneFlow = user && user?.isFirmEmployee;
+  const showNoPhoneFlow = user && user?.isFirmEmployee && kind === Kind.KYC;
 
   // need to store this so we don't re-fetch on add'l renders
   const [initialValues] = useState<PersonalInformationAndDocs>({
