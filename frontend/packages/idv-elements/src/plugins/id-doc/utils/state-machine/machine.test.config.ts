@@ -1,6 +1,7 @@
 import {
   IdDocImageProcessingError,
   IdDocImageTypes,
+  IdDocImageUploadError,
   IdDocRequirement,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
@@ -21,7 +22,7 @@ export const requirement: IdDocRequirement = {
   ],
 };
 
-export const argsRegular: MachineContext = {
+export const argsRegularMobile: MachineContext = {
   authToken: 'token',
   device: {
     hasSupportForWebauthn: true,
@@ -32,21 +33,16 @@ export const argsRegular: MachineContext = {
   idDoc: {},
 };
 
-export const argsNonMobile: MachineContext = {
-  ...argsRegular,
+export const argsRegularDesktop: MachineContext = {
+  authToken: 'token',
   device: {
     hasSupportForWebauthn: true,
-    type: 'quantum computer',
+    type: 'desktop',
   },
-};
-
-export const argsUsOnlySingleDocType: MachineContext = {
-  ...argsRegular,
-  requirement: {
-    ...requirement,
-    onlyUsSupported: true,
-    supportedDocumentTypes: [SupportedIdDocTypes.driversLicense],
-  },
+  currSide: IdDocImageTypes.front,
+  requirement: { ...requirement },
+  idDoc: {},
 };
 
 export const processingErrors = [IdDocImageProcessingError.documentNotReadable];
+export const uploadErrors = [IdDocImageUploadError.fileTypeNotAllowed];

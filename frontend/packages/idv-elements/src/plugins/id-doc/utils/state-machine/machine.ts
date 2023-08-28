@@ -58,10 +58,6 @@ const createIdDocMachine = (args: MachineContext) =>
             consentReceived: {
               actions: 'assignConsent',
             },
-            receivedImage: {
-              target: 'processingMobile',
-              actions: 'assignImage',
-            },
             startImageCapture: {
               target: 'frontImageCaptureMobile',
               cond: context => !context.requirement.shouldCollectConsent,
@@ -119,10 +115,6 @@ const createIdDocMachine = (args: MachineContext) =>
         },
         backImageMobile: {
           on: {
-            receivedImage: {
-              target: 'processingMobile',
-              actions: 'assignImage',
-            },
             startImageCapture: {
               target: 'backImageCaptureMobile',
             },
