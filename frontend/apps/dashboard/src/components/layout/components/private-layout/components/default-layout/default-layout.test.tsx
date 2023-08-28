@@ -99,6 +99,7 @@ describe('<DefaultLayout />', () => {
         await waitFor(() => {
           expect(pushMockFn).toHaveBeenCalledWith({
             pathname: '/users',
+            query: {},
           });
         });
 
@@ -128,6 +129,40 @@ describe('<DefaultLayout />', () => {
       await waitFor(() => {
         expect(pushMockFn).toHaveBeenCalledWith({
           pathname: '/businesses',
+          query: {},
+        });
+      });
+      await waitFor(() => {
+        expect(screen.getByText(SANDBOX_MODE_TEXT)).toBeInTheDocument();
+      });
+    });
+
+    it('should keep query params when toggling to sandbox', async () => {
+      asAdminUserInLive();
+      const id = 'fp_bid_ub0TUlzLv3dyoJbaxlObCe';
+      const pushMockFn = jest.fn();
+      useRouterSpy({
+        pathname: '/businesses/detail',
+        query: {
+          date_range: ['last-30-days'],
+          status: ['pass', 'fail', 'incomplete', 'none'],
+          id,
+        },
+        push: pushMockFn,
+      });
+      renderDefaultLayout();
+
+      expect(screen.queryByText(SANDBOX_MODE_TEXT)).not.toBeInTheDocument();
+
+      const toggle = screen.getByRole('switch', { name: 'Sandbox mode' });
+      await userEvent.click(toggle);
+      await waitFor(() => {
+        expect(pushMockFn).toHaveBeenCalledWith({
+          pathname: '/businesses',
+          query: {
+            date_range: ['last-30-days'],
+            status: ['pass', 'fail', 'incomplete', 'none'],
+          },
         });
       });
       await waitFor(() => {

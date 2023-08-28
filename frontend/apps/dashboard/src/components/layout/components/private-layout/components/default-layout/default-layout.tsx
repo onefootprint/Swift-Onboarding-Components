@@ -19,6 +19,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
+import { omit } from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -59,10 +60,12 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
     if (router.pathname.startsWith('/users')) {
       router.push({
         pathname: '/users',
+        query: omit(router.query, 'id'),
       });
     } else if (router.pathname.startsWith('/businesses')) {
       router.push({
         pathname: '/businesses',
+        query: omit(router.query, 'id'),
       });
     }
     sandbox.toggle();
@@ -115,7 +118,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
                 text={
                   userWouldBeRedirected
                     ? tooltipInfoText
-                    : 'sandbox-mode.tooltip-disabled'
+                    : t('sandbox-mode.tooltip-disabled')
                 }
                 alignment="end"
                 position="bottom"
