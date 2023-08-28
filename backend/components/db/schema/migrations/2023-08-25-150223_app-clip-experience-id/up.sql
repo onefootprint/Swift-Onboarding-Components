@@ -1,0 +1,1 @@
+ALTER TABLE tenant ADD COLUMN app_clip_experience_id TEXT NOT NULL DEFAULT prefixed_uid('app_exp_');

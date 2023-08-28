@@ -207,3 +207,4 @@ define_newtype_id!(
     String,
     "Identifier for an apple device attestation"
 );
+define_newtype_id!(AppClipExperienceId, String, "Identifier for an app clip experience");

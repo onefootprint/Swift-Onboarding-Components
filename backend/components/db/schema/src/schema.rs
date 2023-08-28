@@ -694,6 +694,7 @@ table! {
         domain -> Nullable<Text>,
         allow_domain_access -> Bool,
         supported_auth_methods -> Nullable<Array<Text>>,
+        app_clip_experience_id -> Text,
     }
 }
 

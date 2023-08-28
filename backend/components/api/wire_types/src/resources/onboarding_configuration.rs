@@ -34,6 +34,8 @@ pub struct PublicOnboardingConfiguration {
 
     pub is_app_clip_enabled: bool,
     pub is_instant_app_enabled: bool,
+    pub app_clip_experience_id: AppClipExperienceId,
+
     pub is_no_phone_flow: bool,
     pub requires_id_doc: bool,
     pub is_kyb: bool,

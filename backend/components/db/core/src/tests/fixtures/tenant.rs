@@ -1,6 +1,6 @@
 use crate::TxnPgConn;
 use chrono::Utc;
-use newtypes::{EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
+use newtypes::{AppClipExperienceId, EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
 
 use crate::models::tenant::{NewTenant, Tenant};
 
@@ -60,5 +60,6 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         domain: None,
         allow_domain_access: false,
         supported_auth_methods: None,
+        app_clip_experience_id: AppClipExperienceId::test_data("test".into()),
     }
 }

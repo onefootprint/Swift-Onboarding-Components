@@ -1,0 +1,1 @@
+ALTER TABLE tenant DROP COLUMN app_clip_experience_id;

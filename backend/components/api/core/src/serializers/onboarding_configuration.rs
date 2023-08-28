@@ -33,6 +33,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             logo_url,
             privacy_policy_url,
             id: tenant_id,
+            app_clip_experience_id,
             ..
         } = tenant;
         let appearance = appearance.map(|a| a.data);
@@ -59,6 +60,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             allowed_origins: tenant_client_config.map(|c| c.allowed_origins),
             requires_id_doc,
             is_kyb,
+            app_clip_experience_id,
         }
     }
 }
