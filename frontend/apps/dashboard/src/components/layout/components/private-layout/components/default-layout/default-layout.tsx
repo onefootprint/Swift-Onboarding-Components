@@ -60,12 +60,12 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
     if (router.pathname.startsWith('/users')) {
       router.push({
         pathname: '/users',
-        query: omit(router.query, 'id'),
+        query: omit(router.query, ['id', 'cursor']),
       });
     } else if (router.pathname.startsWith('/businesses')) {
       router.push({
         pathname: '/businesses',
-        query: omit(router.query, 'id'),
+        query: omit(router.query, ['id', 'cursor']),
       });
     }
     sandbox.toggle();
