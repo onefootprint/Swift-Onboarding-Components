@@ -556,6 +556,12 @@ pub enum Iso3166TwoDigitCountryCode {
     AX,
 }
 
+impl Iso3166TwoDigitCountryCode {
+    pub fn is_us(&self) -> bool {
+        matches!(self, Self::US)
+    }
+}
+
 crate::util::impl_enum_str_diesel!(Iso3166ThreeDigitCountryCode);
 
 impl From<Iso3166ThreeDigitCountryCode> for Iso3166TwoDigitCountryCode {

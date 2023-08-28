@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 
 use crate::utils::vault_wrapper::{Business, Person, VaultWrapper, VwArgs};
 use api_core::{
@@ -18,8 +18,8 @@ use db::{
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
 use newtypes::{
-    AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, LivenessSource, OnboardingRequirement,
-    OnboardingRequirementKind, Selfie, UsLegalStatus,
+    AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, Iso3166TwoDigitCountryCode, LivenessSource,
+    OnboardingRequirement, OnboardingRequirementKind, Selfie, UsLegalStatus,
 };
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind, IdDocKind,
@@ -81,7 +81,11 @@ impl GetRequirementsArgs {
         state: &State,
         uvw: &VaultWrapper<Person>,
     ) -> ApiResult<DecryptUncheckedResult> {
-        let values = vec![IPK::Declarations.into(), IDK::UsLegalStatus.into()];
+        let values = vec![
+            IPK::Declarations.into(),
+            IDK::UsLegalStatus.into(),
+            IDK::Country.into(),
+        ];
         let decrypted_values = uvw.decrypt_unchecked(&state.enclave_client, &values).await?;
         Ok(decrypted_values)
     }
@@ -307,30 +311,33 @@ fn get_requirement_inner(
             if let Some(dr) = dr {
                 let user_consent = UserConsent::get_for_workflow(conn, &args.workflow.id)?;
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
-                let doc_cdo = ob_config.document_cdo();
+                let country = decrypted_values
+                    .get(&IDK::Country.into())
+                    .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
+
                 // Show a CollectDocument requirement if there's no id_document or the existing
                 // id_document is still Pending
                 let should_render = id_doc.is_empty()
                     || id_doc
                         .into_iter()
                         .any(|d| d.status == IdentityDocumentStatus::Pending);
-                let only_us_dr = doc_cdo.as_ref().map(|d| d.only_us()).unwrap_or(false);
+                let supported_countries = get_collect_document_supported_countries(ob_config);
+                // TODO remove only_us_obc once the frontend is reading supported_countries
+                let only_us_obc = supported_countries == vec![Iso3166TwoDigitCountryCode::US];
+
                 should_render.then_some(OnboardingRequirement::CollectDocument {
                     document_request_id: dr.id,
                     should_collect_selfie: dr.should_collect_selfie,
                     should_collect_consent: user_consent.is_none(),
                     // TODO remove only_us_dl feature flag when all of flexcar is migrated.
                     // For now, regardless of what's on the DR for flexcar, restrict to US
-                    only_us_supported: only_us_dr || only_us_dl,
-                    supported_document_types: if let Some(doc_types) =
-                        doc_cdo.and_then(|cdo| cdo.restricted_id_doc_kinds())
-                    {
-                        doc_types
-                    } else if only_us_dl {
+                    only_us_supported: only_us_obc || only_us_dl,
+                    supported_document_types: if only_us_dl {
                         vec![IdDocKind::DriversLicense]
                     } else {
-                        IdDocKind::iter().collect()
+                        get_collect_document_supported_doc_types(country, ob_config)
                     },
+                    supported_countries,
                 })
             } else {
                 None
@@ -390,4 +397,36 @@ fn get_requirement_inner(
         }
     };
     Ok(req)
+}
+
+fn get_collect_document_supported_countries(obc: &ObConfiguration) -> Vec<Iso3166TwoDigitCountryCode> {
+    if obc.document_cdo().as_ref().map(|d| d.only_us()).unwrap_or(false) {
+        return vec![Iso3166TwoDigitCountryCode::US];
+    }
+
+    obc.residential_address_countries()
+}
+fn get_collect_document_supported_doc_types(
+    country: Option<Iso3166TwoDigitCountryCode>,
+    obc: &ObConfiguration,
+) -> Vec<IdDocKind> {
+    match country {
+        Some(residential_country) => {
+            if residential_country.is_us() {
+                default_doc_types(obc)
+            // non-US can only provide passport
+            } else {
+                vec![IdDocKind::Passport]
+            }
+        }
+        None => default_doc_types(obc),
+    }
+}
+
+fn default_doc_types(obc: &ObConfiguration) -> Vec<IdDocKind> {
+    if let Some(restricted_doc_types) = obc.document_cdo().and_then(|cdo| cdo.restricted_id_doc_kinds()) {
+        restricted_doc_types
+    } else {
+        IdDocKind::iter().collect()
+    }
 }

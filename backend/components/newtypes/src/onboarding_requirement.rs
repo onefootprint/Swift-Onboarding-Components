@@ -1,4 +1,4 @@
-use crate::{CollectedDataOption, DocumentRequestId, IdDocKind};
+use crate::{CollectedDataOption, DocumentRequestId, IdDocKind, Iso3166TwoDigitCountryCode};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use strum::EnumDiscriminants;
@@ -37,8 +37,10 @@ pub enum OnboardingRequirement {
         should_collect_selfie: bool,
         should_collect_consent: bool,
         /// When true, should only allow collecting documents from the US
+        /// To be deprecated
         only_us_supported: bool,
         supported_document_types: Vec<IdDocKind>,
+        supported_countries: Vec<Iso3166TwoDigitCountryCode>,
     },
     /// The client needs to display the authorization consent page and confirm the user authorizes access
     Authorize { fields_to_authorize: AuthorizeFields },
@@ -98,6 +100,7 @@ impl OnboardingRequirement {
                 should_collect_selfie: _,
                 only_us_supported: _,
                 supported_document_types: _,
+                supported_countries: _,
             } => false,
             Self::Authorize {
                 fields_to_authorize: _,

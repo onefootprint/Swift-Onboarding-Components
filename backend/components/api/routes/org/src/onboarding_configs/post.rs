@@ -109,6 +109,14 @@ impl CreateOnboardingConfigurationRequest {
             }
         }
 
+        if self.international_country_restrictions.is_some() && !self.allow_international_residents {
+            return Err(TenantError::ValidationError(
+                "Cannot specify international_country_restrictions without allow_international_residents"
+                    .to_owned(),
+            )
+            .into());
+        }
+
         // Make sure there's only one CDO per CD, and create a map of CD -> selected CDO
         let must_collect = group_by_parent(self.must_collect_data.clone())?;
         let optional_data = group_by_parent(optional_data)?;
