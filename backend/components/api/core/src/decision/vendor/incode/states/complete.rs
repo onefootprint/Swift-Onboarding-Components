@@ -123,7 +123,7 @@ impl Complete {
         // But, bifrost will display an empty address screen if ANY address field is missing
         validate_args.allow_dangling_keys = true;
         let id_data: Vec<(DataIdentifier, PiiString)> = if obc.is_doc_first {
-            let r = fetch_ocr_response.clone();
+            let r = &fetch_ocr_response;
             let name = r.name.as_ref();
             let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
             vec![
