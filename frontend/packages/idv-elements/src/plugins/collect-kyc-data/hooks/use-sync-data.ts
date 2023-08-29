@@ -50,6 +50,11 @@ const useSyncData = () => {
       const [month, day, year] = dobData.split('/');
       requestData[IdDI.dob] = `${year}-${month}-${day}`;
     }
+    const visaExpirationData = requestData[IdDI.visaExpirationDate] as string;
+    if (visaExpirationData) {
+      const [month, day, year] = visaExpirationData.split('/');
+      requestData[IdDI.visaExpirationDate] = `${year}-${month}-${day}`;
+    }
 
     userDataMutation.mutate(
       {

@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { UsLegalStatus } from '@onefootprint/types';
 import { Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -17,19 +18,19 @@ const StatusFields = () => {
   return (
     <>
       <Radio
-        value="citizen"
+        value={UsLegalStatus.citizen}
         label={t('citizen')}
         {...register('usLegalStatus', { onChange: handleStatusChange })}
         testID="citizen-radio"
       />
       <Radio
-        value="permanentResident"
+        value={UsLegalStatus.permanentResident}
         label={t('permanent-resident')}
         {...register('usLegalStatus', { onChange: handleStatusChange })}
         testID="permanent-resident-radio"
       />
       <Radio
-        value="visa"
+        value={UsLegalStatus.visa}
         label={t('visa')}
         {...register('usLegalStatus', { onChange: handleStatusChange })}
         testID="visa-radio"

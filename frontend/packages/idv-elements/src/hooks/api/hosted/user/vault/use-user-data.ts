@@ -25,7 +25,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
       .filter(e => !!e[1] && e[0] !== IdDI.phoneNumber && e[0] !== IdDI.email)
       .map(([k, v]) => {
         // The backend expects stringified objects/arrays
-        if (typeof v === 'object') {
+        if (typeof v === 'object' && k !== IdDI.citizenships) {
           return [k, JSON.stringify(v)];
         }
         return [k, v];

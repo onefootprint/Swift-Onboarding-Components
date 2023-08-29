@@ -28,6 +28,7 @@ export interface Typegen0 {
     | 'init'
     | 'residentialAddress'
     | 'router'
-    | 'ssn';
+    | 'ssn'
+    | 'usLegalStatus';
   tags: never;
 }

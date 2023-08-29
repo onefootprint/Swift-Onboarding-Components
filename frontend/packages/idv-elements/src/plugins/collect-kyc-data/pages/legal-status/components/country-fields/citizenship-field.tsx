@@ -50,7 +50,11 @@ const CitizenshipField = ({
     return (
       <Container>
         <CountrySelectWrapper>{citizenshipSelect}</CountrySelectWrapper>
-        <IconWrapper>{deleteButton}</IconWrapper>
+        {hasError ? (
+          <IconWithErrorWrapper>{deleteButton}</IconWithErrorWrapper>
+        ) : (
+          <IconWrapper>{deleteButton}</IconWrapper>
+        )}
       </Container>
     );
   }
@@ -72,6 +76,14 @@ const IconWrapper = styled.div`
   ${({ theme }) => css`
     min-width: ${theme.spacing[7]};
     padding-top: ${theme.spacing[7]};
+    padding-left: ${theme.spacing[4]};
+  `}
+`;
+
+const IconWithErrorWrapper = styled.div`
+  ${({ theme }) => css`
+    min-width: ${theme.spacing[7]};
+    padding-top: ${theme.spacing[1]};
     padding-left: ${theme.spacing[4]};
   `}
 `;

@@ -48,7 +48,7 @@ const BasicInfoSection = () => {
   const countryVal = data[IdDI.nationality]?.value;
   const defaultCountry =
     countryVal && isCountryCode(countryVal) ? countryVal : undefined;
-  const nationality = getInitialCountry(defaultCountry).label;
+  const nationality = getInitialCountry(defaultCountry)?.label;
   // we only want to display nationality / the default country if we collected it
   if (countryVal && nationality) {
     basicInfo.push({

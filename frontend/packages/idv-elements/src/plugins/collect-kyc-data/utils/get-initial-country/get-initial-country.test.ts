@@ -28,4 +28,8 @@ describe('getInitialCountry', () => {
       residenceDocument: false,
     });
   });
+
+  it('should return undefined if no country if it is passed in and ignoreDefaultCountry is true', () => {
+    expect(getInitialCountry(undefined, true)).toBeUndefined();
+  });
 });

@@ -1,5 +1,7 @@
 import { CountryCode } from './countries';
 import { IdDI } from './di';
+import UsLegalStatus from './us-legal-status';
+import VisaKind from './visa-kind';
 
 export type IdDIData = Partial<{ [K in IdDI]: ValueTypeForIdDI<K> }>;
 
@@ -32,11 +34,11 @@ export type ValueTypeForIdDI<K> = K extends IdDI.email
   : K extends IdDI.nationality
   ? CountryCode
   : K extends IdDI.usLegalStatus
-  ? string
+  ? UsLegalStatus
   : K extends IdDI.visaExpirationDate
   ? string
   : K extends IdDI.visaKind
-  ? string
+  ? VisaKind
   : K extends IdDI.citizenships
   ? CountryCode[]
   : never;

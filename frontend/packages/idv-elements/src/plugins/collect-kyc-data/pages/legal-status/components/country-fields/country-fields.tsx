@@ -33,13 +33,18 @@ const CountryFields = () => {
     onChange({ label, value } as CountrySelectOption);
   };
 
-  const getError = (index: number, value: string, error?: FieldError) => {
+  const getErrorMessage = (
+    index: number,
+    value: string,
+    error?: FieldError,
+  ) => {
     if (error) {
-      return t('citizenship.empty-error');
-    }
-    if (usCitizenSelectedIndex === index && value) {
-      // Checks value to clear this error if user selects a different status
-      return t('citizenship.us-citizen-error');
+      if (!value) {
+        return t('citizenship.empty-error');
+      }
+      if (usCitizenSelectedIndex === index) {
+        return t('citizenship.us-citizen-error');
+      }
     }
     return undefined;
   };
@@ -72,10 +77,17 @@ const CountryFields = () => {
           control={control}
           rules={{
             required: true,
-            validate: ({ value }) => !!value,
+            validate: {
+              empty: ({ value }) => !!value,
+              usCitizen: ({ value }) => value !== 'US',
+            },
           }}
           render={({ field, fieldState: { error } }) => {
-            const errorMessage = getError(index, field.value.value, error);
+            const errorMessage = getErrorMessage(
+              index,
+              field.value.value,
+              error,
+            );
 
             return (
               <>
@@ -95,7 +107,7 @@ const CountryFields = () => {
                 />
                 {index === fields.length - 1 && (
                   <LinkButton
-                    disabled={!field.value.value}
+                    disabled={!!error || !field.value.value}
                     iconComponent={IcoPlusSmall16}
                     iconPosition="left"
                     onClick={() => append({ label: '', value: undefined })}

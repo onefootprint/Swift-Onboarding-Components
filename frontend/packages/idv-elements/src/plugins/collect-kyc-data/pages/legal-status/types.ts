@@ -1,11 +1,12 @@
+import { UsLegalStatus, VisaKind } from '@onefootprint/types';
 import { CountrySelectOption } from '@onefootprint/ui';
 
 export type FormData = {
-  usLegalStatus: 'citizen' | 'permanentResident' | 'visa';
+  usLegalStatus: UsLegalStatus;
   nationality?: CountrySelectOption;
   citizenships?: CountrySelectOption[];
   visa?: {
-    kind: { label: string; value: string };
+    kind: { label: string; value: VisaKind };
     expirationDate: string;
   };
 };

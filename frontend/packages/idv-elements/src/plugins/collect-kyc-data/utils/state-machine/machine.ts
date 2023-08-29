@@ -209,14 +209,24 @@ const createCollectKycDataMachine = (
                 actions: ['assignData'],
               },
             ],
-            navigatedToPrevPage: {
-              target: 'basicInformation',
-              cond: context =>
-                isMissingBasicAttribute(
-                  allAttributes(context.requirement),
-                  context.initialData,
-                ),
-            },
+            navigatedToPrevPage: [
+              {
+                target: 'basicInformation',
+                cond: context =>
+                  isMissingBasicAttribute(
+                    allAttributes(context.requirement),
+                    context.initialData,
+                  ),
+              },
+              {
+                target: 'email',
+                cond: context =>
+                  isMissingEmailAttribute(
+                    allAttributes(context.requirement),
+                    context.initialData,
+                  ),
+              },
+            ],
           },
         },
         residentialAddress: {
@@ -239,7 +249,6 @@ const createCollectKycDataMachine = (
             navigatedToPrevPage: [
               {
                 target: 'usLegalStatus',
-                actions: 'assignData',
                 cond: context =>
                   isMissingUSLegalStatusAttribute(
                     allAttributes(context.requirement),
@@ -276,6 +285,14 @@ const createCollectKycDataMachine = (
                 target: 'residentialAddress',
                 cond: context =>
                   isMissingResidentialAttribute(
+                    allAttributes(context.requirement),
+                    context.initialData,
+                  ),
+              },
+              {
+                target: 'usLegalStatus',
+                cond: context =>
+                  isMissingUSLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
                   ),
@@ -325,6 +342,14 @@ const createCollectKycDataMachine = (
                 target: 'residentialAddress',
                 cond: context =>
                   isMissingResidentialAttribute(
+                    allAttributes(context.requirement),
+                    context.initialData,
+                  ),
+              },
+              {
+                target: 'usLegalStatus',
+                cond: context =>
+                  isMissingUSLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
                   ),

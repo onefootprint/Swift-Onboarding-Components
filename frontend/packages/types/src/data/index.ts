@@ -53,6 +53,7 @@ export * from './role';
 export * from './rolebinding';
 export * from './sandbox-outcomes-type';
 export * from './timeline';
+export { default as UsLegalStatus } from './us-legal-status';
 export * from './vault';
 export { default as Vendor } from './vendor';
 export { default as VerificationStatus } from './verification-status';

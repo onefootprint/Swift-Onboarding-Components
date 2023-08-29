@@ -6,6 +6,7 @@ import BasicInformation from '../basic-information';
 import Confirm from '../confirm';
 import Email from '../email';
 import Init from '../init';
+import LegalStatus from '../legal-status';
 import Address from '../residential-address';
 import Ssn from '../ssn';
 
@@ -33,9 +34,9 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('basicInformation')) {
     return <BasicInformation />;
   }
-  // if (state.matches('usLegalStatus')) {
-  //   return <LegalStatus />;
-  // }
+  if (state.matches('usLegalStatus')) {
+    return <LegalStatus />;
+  }
   if (state.matches('residentialAddress')) {
     return <Address />;
   }
