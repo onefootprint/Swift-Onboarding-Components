@@ -1,7 +1,7 @@
 import * as pulumi from '@pulumi/pulumi';
 import { Recipient } from './trigger';
 import { TriggerResource } from './provider';
-import { Alerts } from './alerts';
+import { generateAlerts } from './alerts';
 import { StackEnvironment, StackMetadata } from '../stack_metadata';
 import { GlobalState } from '../main';
 
@@ -22,7 +22,8 @@ export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
   }
   const apiKey = honeycombSecrets.apiKey;
 
-  if (new Set(Alerts.map(a => a.name)).size != Alerts.length) {
+  const alerts = generateAlerts(g);
+  if (new Set(alerts.map(a => a.name)).size != alerts.length) {
     throw 'Alerts must have unique `name`s';
   }
 
@@ -44,9 +45,17 @@ export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
 
   console.log(pagerRecipient);
 
-  for (const alert of Alerts) {
-    const { datasetName, slackThreshold, pageThreshold, name, ...trigger } =
-      alert;
+  for (const alert of alerts) {
+    const {
+      datasetName,
+      slackThreshold,
+      pageThreshold,
+      name,
+      description: partialDescription,
+      runbookUrl,
+      ...trigger
+    } = alert;
+    const description = `${partialDescription || ''}\nRunbook: ${runbookUrl}`;
     const nameHyphen = name.replace(/ /g, '-');
     const commonName = `alert-${stackMeta.shortStackName}-${nameHyphen}`;
     // Create a slack trigger
@@ -61,6 +70,7 @@ export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
           name: `[WARNING] ${name}`,
           recipients: [slackRecipient],
           threshold: slackThreshold,
+          description,
           ...trigger,
         },
       });
@@ -81,6 +91,7 @@ export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
           name: `[CRITICAL] ${name}`,
           recipients,
           threshold: pageThreshold,
+          description,
           ...trigger,
         },
       });

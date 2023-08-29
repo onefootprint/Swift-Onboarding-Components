@@ -6,6 +6,7 @@ import { GlobalState } from '../main';
 export interface Alert {
   name: string;
   description?: string;
+  runbookUrl: string;
   datasetName: string;
   disabled?: boolean;
   query: Query;
@@ -13,11 +14,14 @@ export interface Alert {
   pageThreshold?: Threshold;
 }
 
-export const Alerts: Alert[] = [
+// Note, add alert runbooks at: https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25
+const staticAlerts: Alert[] = [
   {
     name: 'HTTP 5xx Errors',
     description: 'HTTP 5xx as reported by the application server',
     datasetName: 'fpc-api',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#f9974c9bdc4c4b62878cbdf6ef7c55dc',
     query: {
       time_range: 240,
       breakdowns: [
@@ -58,6 +62,8 @@ export const Alerts: Alert[] = [
     name: 'Latent HTTP request',
     description: 'HTTP request took longer than 15s',
     datasetName: 'fpc-api',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#1430bed953954300827cc3a07777a84f',
     query: {
       time_range: 240,
       breakdowns: ['http.method', 'http.route', 'http.status_code'],
@@ -101,6 +107,8 @@ export const Alerts: Alert[] = [
     name: 'ALB Target 5xx Errors',
     description:
       'Elevated 5xx that originated from the loadbalancer target. This will likely fire any time the HTTP 5xx errors alert fires',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#73efd0bc1e48446db7ab38e735b8925e',
     datasetName: 'aws',
     query: {
       time_range: 240,
@@ -131,6 +139,8 @@ export const Alerts: Alert[] = [
     description:
       'Elevated 5xx that originated from the loadbalancer. This specifically does not includes 5xx that originated from the loadbalancer target (the application)',
     datasetName: 'aws',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#b6d06909bf0e4a1689bbaaef62ebd8f0',
     query: {
       time_range: 240,
       breakdowns: ['LoadBalancer'],
@@ -159,6 +169,8 @@ export const Alerts: Alert[] = [
   },
   {
     name: 'ECS Service High CPU',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#06a4512609164a2e8fa42c6e41d13508',
     datasetName: 'aws',
     query: {
       time_range: 240,
@@ -188,6 +200,8 @@ export const Alerts: Alert[] = [
   },
   {
     name: 'ECS Service High Memory Use',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#57b457736a274484b3768d1e7e7b9b92',
     datasetName: 'aws',
     query: {
       time_range: 240,
@@ -217,6 +231,8 @@ export const Alerts: Alert[] = [
   },
   {
     name: 'High RDS CPU',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#ad0c4bebc4c44d3eab953d2e1aa10b55',
     datasetName: 'aws',
     query: {
       time_range: 240,
@@ -250,6 +266,8 @@ export const Alerts: Alert[] = [
   },
   {
     name: 'Unhealthy Host for Loadbalancer Target',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#325f29c560a944a48a6d3cc0caad0ea4',
     datasetName: 'aws',
     query: {
       time_range: 240,
@@ -285,6 +303,8 @@ export const generateAlerts = (g: GlobalState) => {
       name: 'API server scaled up',
       description:
         'The API server has scaled up. Autoscaling on the enclave is not set up yet - please check enclave health and prepare to scale up the enclave if needed.',
+      runbookUrl:
+        'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#bb124f8285ab4d6880c1ff282f22b27b',
       datasetName: 'aws',
       query: {
         time_range: 240,
@@ -315,5 +335,5 @@ export const generateAlerts = (g: GlobalState) => {
       },
     },
   ];
-  return dynamicAlerts.concat(Alerts);
+  return dynamicAlerts.concat(staticAlerts);
 };
