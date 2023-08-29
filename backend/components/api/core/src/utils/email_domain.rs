@@ -22,7 +22,7 @@ pub fn parse_private_email_domain(email_address: &str) -> Option<String> {
         .ok()?
         .to_string();
 
-    if PUBLIC_EMAIL_DOMAINS.contains(host.as_str()) {
+    if PUBLIC_EMAIL_DOMAINS.contains(host.as_str()) || host.to_lowercase().ends_with(".edu") {
         return None;
     }
 
@@ -39,8 +39,9 @@ mod tests {
     #[test_case("josh@donotpay.com" => Some("donotpay.com".to_string()))]
     #[test_case("josh@alx@donotpay.com" => None)]
     #[test_case("alex@gmail.com" => None)]
-    #[test_case("alex@outlook.com" => None)]
+    #[test_case("alex@outLook.com" => None)]
     #[test_case("alex@live.com" => None)]
+    #[test_case("alex@mit.EDU" => None)]
     fn test_good_emails(email: &str) -> Option<String> {
         parse_private_email_domain(email)
     }
