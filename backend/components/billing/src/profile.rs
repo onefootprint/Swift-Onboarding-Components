@@ -10,8 +10,8 @@ use stripe::{CreatePrice, Currency, IdOrCreate, ListPrices, Price, PriceBillingS
 use crate::{is_managed, managed_metadata, BResult};
 
 /// Stores all the price IDs for products we offer. This may differ per environment and occasionally per tenant
-#[derive(serde::Deserialize)]
-pub(crate) struct BillingProfile {
+#[derive(Debug, serde::Deserialize)]
+pub struct BillingProfile {
     pub(crate) kyc: Option<stripe::PriceId>,
     pub(crate) pii: Option<stripe::PriceId>,
     pub(crate) kyb: Option<stripe::PriceId>,
@@ -19,8 +19,8 @@ pub(crate) struct BillingProfile {
     pub(crate) watchlist: Option<stripe::PriceId>,
 
     // Not all tenants have billing for hot vaults
-    pub(crate) hot_vaults: Option<stripe::PriceId>,
-    pub(crate) hot_proxy_vaults: Option<stripe::PriceId>,
+    pub hot_vaults: Option<stripe::PriceId>,
+    pub hot_proxy_vaults: Option<stripe::PriceId>,
 }
 
 // TODO this doesn't have dev products
@@ -138,28 +138,12 @@ async fn get_price(client: &stripe::Client, product_id: &str, price: &str) -> BR
 
 #[tracing::instrument(skip(client))]
 async fn create_price(client: &stripe::Client, product_id: &str, price: &str) -> BResult<PriceId> {
-    let params = CreatePrice {
-        active: Some(true),
-        billing_scheme: Some(PriceBillingScheme::PerUnit),
-        currency: Currency::USD,
-        product: Some(IdOrCreate::Id(product_id)),
-        metadata: Some(managed_metadata()),
-        unit_amount_decimal: Some(price),
-        // This doesn't implement Default for some reason...
-        currency_options: None,
-        custom_unit_amount: None,
-        expand: &[],
-        lookup_key: None,
-        nickname: None,
-        product_data: None,
-        recurring: None,
-        tax_behavior: None,
-        tiers: None,
-        tiers_mode: None,
-        transfer_lookup_key: None,
-        transform_quantity: None,
-        unit_amount: None,
-    };
+    let mut params = CreatePrice::new(Currency::USD);
+    params.active = Some(true);
+    params.billing_scheme = Some(PriceBillingScheme::PerUnit);
+    params.product = Some(IdOrCreate::Id(product_id));
+    params.metadata = Some(managed_metadata());
+    params.unit_amount_decimal = Some(price);
     let price = Price::create(client, params).await?;
     Ok(price.id)
 }

@@ -100,26 +100,40 @@ pub async fn get_or_create_customer_id(state: &State, tenant: &Tenant) -> ApiRes
 async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: NaiveDate) -> ApiResult<()> {
     let i = billing::interval::get_billing_interval(billing_date)?;
     let t_id = tenant.id.clone();
+
+    let billing_profile = state
+        .db_pool
+        .db_query(move |conn| BillingProfile::get(conn, &t_id))
+        .await??;
+    let billing_profile = state
+        .billing_client
+        .get_billing_profile(state.feature_flag_client_raw.clone(), billing_profile, &tenant.id)
+        .await?;
     // Count the number of billable uses of each product for this tenant
+    let t_id = tenant.id.clone();
     let (billing_profile, counts) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let billing_profile = BillingProfile::get(conn, &t_id)?;
-            // TODO as we add more of these, probably only want to execute the ones that we're set up
-            // to bill for.
-            // And then some of them we might want to fail if billing isn't set up for them but they use it.
-            // For ex, KYB for almost all tenants should show up as an un-negotiated price
-            // Maybe we have a price for every product that is un-negotiated, and we default to that?
+            // Fetch counts for most products regardless of whether the tenant is set up with
+            // billing for them. We will error if any of these products have use when they haven't
+            // been contracted
             let pii = ScopedVault::count_billable(conn, &t_id, i.end)?;
             let kyc = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
             let kyb = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
             let id_docs = IdentityDocument::get_billable_count(conn, &t_id, i.start, i.end)?;
             let watchlist_checks = WatchlistCheck::get_billable_count(conn, &t_id, i.start, i.end)?;
-            let hot_purposes = AccessEventPurpose::iter().collect(); // Any access is billable
-            let hot_vaults = AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, hot_purposes)?;
-            let hot_proxy_purposes = vec![AccessEventPurpose::VaultProxy];
-            let hot_proxy_vaults =
-                AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, hot_proxy_purposes)?;
+
+            // Hot vaults are only billed by some tenants, so only fetch them conditionally
+            let p = AccessEventPurpose::iter().collect(); // Any access is billable
+            let hot_vaults = billing_profile
+                .hot_vaults
+                .is_some()
+                .then_some(AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, p)?);
+            let p = vec![AccessEventPurpose::VaultProxy];
+            let hot_proxy_vaults = billing_profile
+                .hot_proxy_vaults
+                .is_some()
+                .then_some(AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, p)?);
             let counts = BillingCounts {
                 pii,
                 kyc,
@@ -144,7 +158,7 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
     };
     state
         .billing_client
-        .generate_draft_invoice(state.feature_flag_client_raw.clone(), info)
+        .generate_draft_invoice(info)
         .await
         .map_err(|e| {
             // Log error since the request only fails with a single tenant's error message

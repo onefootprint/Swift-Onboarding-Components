@@ -92,11 +92,21 @@ impl BillingClient {
     async fn get_or_create_invoice_item(
         &self,
         customer_id: CustomerId,
-        price_id: PriceId,
-        quantity: i64,
+        line_item: LineItem,
     ) -> BResult<Option<InvoiceItem>> {
-        if quantity == 0 {
+        let LineItem {
+            price_id,
+            count,
+            is_uncontracted,
+        } = line_item;
+        if count == 0 {
             return Ok(None);
+        }
+        let description = is_uncontracted
+            .then_some("The price for this product is not contracted for this tenant. Please review.");
+        if is_uncontracted {
+            // These require manual human action, but we don't want to prevent invoice generation
+            tracing::error!(customer_id=%customer_id, price_id=%price_id, "Billing line item is uncontracted");
         }
         // First check if there's already a pending invoice item
         let list_items = ListInvoiceItems {
@@ -113,7 +123,8 @@ impl BillingClient {
         let item = if let Some(item) = existing_item {
             // If the pending invoice item for this price exists, just update it
             let update = UpdateInvoiceItem {
-                quantity: Some(quantity as u64),
+                quantity: Some(count as u64),
+                description,
                 ..Default::default()
             };
             InvoiceItem::update(&self.client, &item.id, update).await?
@@ -121,19 +132,27 @@ impl BillingClient {
             // Otherwise, make a new one
             let mut new_invoice_item = CreateInvoiceItem::new(customer_id);
             new_invoice_item.price = Some(price_id);
-            new_invoice_item.quantity = Some(quantity as u64);
+            new_invoice_item.quantity = Some(count as u64);
             new_invoice_item.metadata = Some(managed_metadata());
+            new_invoice_item.description = description;
             InvoiceItem::create(&self.client, new_invoice_item).await?
         };
         Ok(Some(item))
     }
 
-    #[tracing::instrument(skip(self, ff_client))]
-    pub async fn generate_draft_invoice(
+    #[tracing::instrument(skip_all)]
+    pub async fn get_billing_profile(
         &self,
         ff_client: LaunchDarklyFeatureFlagClient,
-        info: BillingInfo,
-    ) -> BResult<()> {
+        billing_profile: Option<DbBillingProfile>,
+        tenant_id: &TenantId,
+    ) -> BResult<BillingProfile> {
+        let prices = BillingProfile::get_for(&self.client, ff_client, tenant_id, billing_profile).await?;
+        Ok(prices)
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub async fn generate_draft_invoice(&self, info: BillingInfo) -> BResult<()> {
         if info.counts.is_zero() {
             return Ok(());
         }
@@ -158,13 +177,11 @@ impl BillingClient {
         }
 
         // Create the invoice items, unassociated with any invoice, for all the items we'll be charging
-        let prices =
-            BillingProfile::get_for(&self.client, ff_client, &info.tenant_id, info.billing_profile).await?;
         let items_fut = info
             .counts
-            .line_items(prices)
+            .line_items(info.billing_profile)?
             .into_iter()
-            .map(|(price_id, count)| self.get_or_create_invoice_item(customer_id.clone(), price_id, count));
+            .map(|l| self.get_or_create_invoice_item(customer_id.clone(), l));
         let items: HashMap<_, _> = futures::future::join_all(items_fut)
             .await
             .into_iter()
@@ -227,7 +244,7 @@ fn is_managed(metadata: &HashMap<String, String>) -> bool {
 #[derive(Debug)]
 pub struct BillingInfo {
     pub tenant_id: TenantId,
-    pub billing_profile: Option<DbBillingProfile>,
+    pub billing_profile: BillingProfile,
     pub customer_id: StripeCustomerId,
     pub interval: BillingInterval,
     pub counts: BillingCounts,
@@ -246,12 +263,25 @@ pub struct BillingCounts {
     /// Number of watchlist checks ran this month
     pub watchlist_checks: i64,
     /// Number of vaults with decrypts this month
-    pub hot_vaults: i64,
+    pub hot_vaults: Option<i64>,
     /// Number of vaults with proxy decrypts this month
-    pub hot_proxy_vaults: i64,
+    pub hot_proxy_vaults: Option<i64>,
 }
 
-pub type LineItem = (PriceId, i64);
+#[derive(Debug)]
+struct LineItem {
+    price_id: PriceId,
+    count: i64,
+    is_uncontracted: bool,
+}
+
+const PII_UNCONTRACTED_PRICE: &str = "price_1NkF5kGerPBo41PtfIaoIhXN";
+const KYC_UNCONTRACTED_PRICE: &str = "price_1NkF5NGerPBo41PtviDJIY8K";
+const KYB_UNCONTRACTED_PRICE: &str = "price_1NkF4LGerPBo41PtnOXu0Zx2";
+const ID_DOC_UNCONTRACTED_PRICE: &str = "price_1NkF3zGerPBo41PtnyBrvOU1";
+const WATCHLIST_UNCONTRACTED_PRICE: &str = "price_1NkF4sGerPBo41Ptb21nKXbp";
+const HOT_VAULTS_UNCONTRACTED_PRICE: &str = "price_1NkF3eGerPBo41Ptv5wHuJFY";
+const HOT_PROXY_UNCONTRACTED_PRICE: &str = "price_1NkF3HGerPBo41Pt8FI5ii7q";
 
 impl BillingCounts {
     fn is_zero(&self) -> bool {
@@ -265,10 +295,12 @@ impl BillingCounts {
             hot_vaults,
             hot_proxy_vaults,
         } = self;
-        pii + kyc + kyb + id_docs + watchlist_checks + hot_vaults + hot_proxy_vaults == 0
+        pii + kyc + kyb + id_docs + watchlist_checks == 0
+            && !hot_vaults.is_some_and(|c| c != 0)
+            && !hot_proxy_vaults.is_some_and(|c| c != 0)
     }
 
-    fn line_items(&self, prices: BillingProfile) -> Vec<LineItem> {
+    fn line_items(&self, prices: BillingProfile) -> BResult<Vec<LineItem>> {
         // Decompose to fail compiling when new count is added
         let &BillingCounts {
             pii,
@@ -280,18 +312,49 @@ impl BillingCounts {
             hot_proxy_vaults,
         } = self;
 
-        vec![
-            (prices.pii, pii),
-            (prices.kyc, kyc),
-            (prices.kyb, kyb),
-            (prices.id_docs, id_docs),
-            (prices.watchlist, watchlist_checks),
-            (prices.hot_vaults, hot_vaults),
-            (prices.hot_proxy_vaults, hot_proxy_vaults),
+        let results = vec![
+            (prices.pii, PriceId::from_str(PII_UNCONTRACTED_PRICE)?, Some(pii)),
+            (prices.kyc, PriceId::from_str(KYC_UNCONTRACTED_PRICE)?, Some(kyc)),
+            (prices.kyb, PriceId::from_str(KYB_UNCONTRACTED_PRICE)?, Some(kyb)),
+            (
+                prices.id_docs,
+                PriceId::from_str(ID_DOC_UNCONTRACTED_PRICE)?,
+                Some(id_docs),
+            ),
+            (
+                prices.watchlist,
+                PriceId::from_str(WATCHLIST_UNCONTRACTED_PRICE)?,
+                Some(watchlist_checks),
+            ),
+            (
+                prices.hot_vaults,
+                PriceId::from_str(HOT_VAULTS_UNCONTRACTED_PRICE)?,
+                hot_vaults,
+            ),
+            (
+                prices.hot_proxy_vaults,
+                PriceId::from_str(HOT_PROXY_UNCONTRACTED_PRICE)?,
+                hot_proxy_vaults,
+            ),
         ]
         .into_iter()
-        .filter_map(|(price, count)| price.map(|p| (p, count)))
-        .filter(|(_, count)| count > &0)
-        .collect()
+        .filter_map(|(p, u, count)| count.map(|c| (p, u, c)))
+        .filter(|(_, _, count)| count > &0)
+        .map(|(price_id, uncontracted_price_id, count)| {
+            let (price_id, is_uncontracted) = if let Some(price_id) = price_id {
+                (price_id, false)
+            } else {
+                // If there is no price set up for this tenant but they have used the product,
+                // error by adding a line item to the invoice that shows the uncontracted price
+                (uncontracted_price_id, true)
+            };
+            LineItem {
+                price_id,
+                count,
+                is_uncontracted,
+            }
+        })
+        .collect();
+        Ok(results)
     }
 }
