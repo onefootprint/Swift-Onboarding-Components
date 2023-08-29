@@ -1,3 +1,4 @@
+use crate::counts::LineItem;
 use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use db::models::tenant::Tenant;
 use feature_flag::LaunchDarklyFeatureFlagClient;
@@ -9,11 +10,13 @@ pub use stripe::Client;
 use stripe::{
     CreateCustomer, CreateInvoice, CreateInvoiceItem, Customer, CustomerId, Invoice, InvoiceItem,
     InvoicePendingInvoiceItemsBehavior, InvoiceStatus, ListCustomers, ListInvoiceItems, ListInvoices,
-    PriceId, UpdateInvoiceItem,
+    UpdateInvoiceItem,
 };
 
 pub type BResult<T> = Result<T, Error>;
 
+mod counts;
+pub use counts::BillingCounts;
 pub mod interval;
 mod profile;
 
@@ -248,113 +251,4 @@ pub struct BillingInfo {
     pub customer_id: StripeCustomerId,
     pub interval: BillingInterval,
     pub counts: BillingCounts,
-}
-
-#[derive(Debug)]
-pub struct BillingCounts {
-    /// Total number user vaults with billable PII - either an authorized workflow OR created via API
-    pub pii: i64,
-    /// Number of KYC verifications ran this month
-    pub kyc: i64,
-    /// Number of KYB verifications ran this month
-    pub kyb: i64,
-    /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't finish onboarding
-    pub id_docs: i64,
-    /// Number of watchlist checks ran this month
-    pub watchlist_checks: i64,
-    /// Number of vaults with decrypts this month
-    pub hot_vaults: Option<i64>,
-    /// Number of vaults with proxy decrypts this month
-    pub hot_proxy_vaults: Option<i64>,
-}
-
-#[derive(Debug)]
-struct LineItem {
-    price_id: PriceId,
-    count: i64,
-    is_uncontracted: bool,
-}
-
-const PII_UNCONTRACTED_PRICE: &str = "price_1NkF5kGerPBo41PtfIaoIhXN";
-const KYC_UNCONTRACTED_PRICE: &str = "price_1NkF5NGerPBo41PtviDJIY8K";
-const KYB_UNCONTRACTED_PRICE: &str = "price_1NkF4LGerPBo41PtnOXu0Zx2";
-const ID_DOC_UNCONTRACTED_PRICE: &str = "price_1NkF3zGerPBo41PtnyBrvOU1";
-const WATCHLIST_UNCONTRACTED_PRICE: &str = "price_1NkF4sGerPBo41Ptb21nKXbp";
-const HOT_VAULTS_UNCONTRACTED_PRICE: &str = "price_1NkF3eGerPBo41Ptv5wHuJFY";
-const HOT_PROXY_UNCONTRACTED_PRICE: &str = "price_1NkF3HGerPBo41Pt8FI5ii7q";
-
-impl BillingCounts {
-    fn is_zero(&self) -> bool {
-        // Decompose to fail compiling when new count is added
-        let &BillingCounts {
-            pii,
-            kyc,
-            kyb,
-            watchlist_checks,
-            id_docs,
-            hot_vaults,
-            hot_proxy_vaults,
-        } = self;
-        pii + kyc + kyb + id_docs + watchlist_checks == 0
-            && !hot_vaults.is_some_and(|c| c != 0)
-            && !hot_proxy_vaults.is_some_and(|c| c != 0)
-    }
-
-    fn line_items(&self, prices: BillingProfile) -> BResult<Vec<LineItem>> {
-        // Decompose to fail compiling when new count is added
-        let &BillingCounts {
-            pii,
-            kyc,
-            kyb,
-            id_docs,
-            watchlist_checks,
-            hot_vaults,
-            hot_proxy_vaults,
-        } = self;
-
-        let results = vec![
-            (prices.pii, PriceId::from_str(PII_UNCONTRACTED_PRICE)?, Some(pii)),
-            (prices.kyc, PriceId::from_str(KYC_UNCONTRACTED_PRICE)?, Some(kyc)),
-            (prices.kyb, PriceId::from_str(KYB_UNCONTRACTED_PRICE)?, Some(kyb)),
-            (
-                prices.id_docs,
-                PriceId::from_str(ID_DOC_UNCONTRACTED_PRICE)?,
-                Some(id_docs),
-            ),
-            (
-                prices.watchlist,
-                PriceId::from_str(WATCHLIST_UNCONTRACTED_PRICE)?,
-                Some(watchlist_checks),
-            ),
-            (
-                prices.hot_vaults,
-                PriceId::from_str(HOT_VAULTS_UNCONTRACTED_PRICE)?,
-                hot_vaults,
-            ),
-            (
-                prices.hot_proxy_vaults,
-                PriceId::from_str(HOT_PROXY_UNCONTRACTED_PRICE)?,
-                hot_proxy_vaults,
-            ),
-        ]
-        .into_iter()
-        .filter_map(|(p, u, count)| count.map(|c| (p, u, c)))
-        .filter(|(_, _, count)| count > &0)
-        .map(|(price_id, uncontracted_price_id, count)| {
-            let (price_id, is_uncontracted) = if let Some(price_id) = price_id {
-                (price_id, false)
-            } else {
-                // If there is no price set up for this tenant but they have used the product,
-                // error by adding a line item to the invoice that shows the uncontracted price
-                (uncontracted_price_id, true)
-            };
-            LineItem {
-                price_id,
-                count,
-                is_uncontracted,
-            }
-        })
-        .collect();
-        Ok(results)
-    }
 }
