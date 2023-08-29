@@ -45,6 +45,8 @@ pub struct Workflow {
     pub authorized_at: Option<DateTime<Utc>>,
     /// The time at which the first Footprint decision was made, if any
     pub decision_made_at: Option<DateTime<Utc>>,
+    /// The time at which the workflow moves into a terminal state
+    pub completed_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -380,11 +382,23 @@ impl Workflow {
         new_state: WorkflowState,
     ) -> DbResult<Self> {
         let id = id.into_inner();
+        let e = WorkflowEvent::create(conn, id, old_state, new_state)?;
+
+        #[derive(AsChangeset)]
+        #[table_name = "workflow"]
+        struct WorkflowStateUpdate {
+            state: WorkflowState,
+            completed_at: Option<DateTime<Utc>>,
+        }
+
+        let update = WorkflowStateUpdate {
+            state: new_state,
+            completed_at: new_state.is_complete().then_some(e.created_at),
+        };
         let result = diesel::update(workflow::table)
-            .filter(workflow::id.eq(&id))
-            .set(workflow::state.eq(new_state))
+            .filter(workflow::id.eq(&e.workflow_id))
+            .set(update)
             .get_result(conn.conn())?;
-        WorkflowEvent::create(conn, id, old_state, new_state)?;
         Ok(result)
     }
 

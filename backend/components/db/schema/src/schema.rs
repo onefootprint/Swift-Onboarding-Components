@@ -949,6 +949,7 @@ table! {
         insight_event_id -> Nullable<Text>,
         authorized_at -> Nullable<Timestamptz>,
         decision_made_at -> Nullable<Timestamptz>,
+        completed_at -> Nullable<Timestamptz>,
     }
 }
 

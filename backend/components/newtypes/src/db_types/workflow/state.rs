@@ -52,6 +52,17 @@ pub enum WorkflowState {
 impl_enum_string_diesel!(WorkflowKind);
 impl_enum_string_diesel!(WorkflowState);
 
+impl WorkflowState {
+    pub fn is_complete(&self) -> bool {
+        match self {
+            Self::Kyc(s) => matches!(s, KycState::Complete),
+            Self::AlpacaKyc(s) => matches!(s, AlpacaKycState::Complete),
+            Self::Document(s) => matches!(s, DocumentState::Complete),
+            Self::Kyb(s) => matches!(s, KybState::Complete),
+        }
+    }
+}
+
 impl std::fmt::Display for WorkflowState {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let prefix = self.as_ref();
