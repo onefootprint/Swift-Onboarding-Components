@@ -98,6 +98,7 @@ impl BillingClient {
         line_item: LineItem,
     ) -> BResult<Option<InvoiceItem>> {
         let LineItem {
+            product,
             price_id,
             count,
             is_uncontracted,
@@ -105,8 +106,10 @@ impl BillingClient {
         if count == 0 {
             return Ok(None);
         }
-        let description = is_uncontracted
-            .then_some("The price for this product is not contracted for this tenant. Please review.");
+        let description = is_uncontracted.then_some(format!(
+            "{} - The price for this product is not contracted for this tenant. Please review.",
+            product
+        ));
         if is_uncontracted {
             // These require manual human action, but we don't want to prevent invoice generation
             tracing::error!(customer_id=%customer_id, price_id=%price_id, "Billing line item is uncontracted");
@@ -127,7 +130,7 @@ impl BillingClient {
             // If the pending invoice item for this price exists, just update it
             let update = UpdateInvoiceItem {
                 quantity: Some(count as u64),
-                description,
+                description: description.as_deref(),
                 ..Default::default()
             };
             InvoiceItem::update(&self.client, &item.id, update).await?
@@ -137,7 +140,7 @@ impl BillingClient {
             new_invoice_item.price = Some(price_id);
             new_invoice_item.quantity = Some(count as u64);
             new_invoice_item.metadata = Some(managed_metadata());
-            new_invoice_item.description = description;
+            new_invoice_item.description = description.as_deref();
             InvoiceItem::create(&self.client, new_invoice_item).await?
         };
         Ok(Some(item))

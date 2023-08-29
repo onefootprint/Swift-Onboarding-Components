@@ -26,9 +26,10 @@ pub struct BillingCounts {
 
 #[derive(Debug)]
 pub(crate) struct LineItem {
-    pub(crate) price_id: PriceId,
-    pub(crate) count: i64,
-    pub(crate) is_uncontracted: bool,
+    pub product: Product,
+    pub price_id: PriceId,
+    pub count: i64,
+    pub is_uncontracted: bool,
 }
 
 impl BillingCounts {
@@ -85,6 +86,7 @@ impl BillingCounts {
                     (product.uncontracted_price_id()?, true)
                 };
                 Ok(LineItem {
+                    product,
                     price_id,
                     count,
                     is_uncontracted,

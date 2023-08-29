@@ -3,9 +3,9 @@ use std::str::FromStr;
 use stripe::PriceId;
 
 use crate::BResult;
-use strum_macros::EnumIter;
+use strum_macros::{Display, EnumIter};
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, EnumIter)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, EnumIter, Display)]
 pub enum Product {
     /// Total number user vaults with billable PII - either an authorized workflow OR created via API
     Pii,
