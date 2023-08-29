@@ -10,7 +10,7 @@ import React from 'react';
 import CustomDesignSystemProvider from '../components/custom-design-system-provider';
 import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';
-import { FATHOM_TRACKING_CODE } from '../config/constants';
+import { FATHOM_TRACKING_CODE, UNIFY_API_KEY } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 
@@ -79,6 +79,15 @@ const App = ({ Component, pageProps }: AppProps) => (
         })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`,
       }}
     />
+    {UNIFY_API_KEY && (
+      <Script
+        async
+        data-api-key={UNIFY_API_KEY}
+        id="unifytag"
+        src="https://cdn.unifygtm.com/tag/v1/unify-tag-script.js"
+        type="module"
+      />
+    )}
     <QueryClientProvider client={queryClient}>
       <CustomDesignSystemProvider>
         <GlobalStyle />
