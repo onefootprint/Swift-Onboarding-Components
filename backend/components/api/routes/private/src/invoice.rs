@@ -105,15 +105,12 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
         .db_pool
         .db_query(move |conn| BillingProfile::get(conn, &t_id))
         .await??;
-    let billing_profile = state
-        .billing_client
-        .get_billing_profile(state.feature_flag_client_raw.clone(), billing_profile, &tenant.id)
-        .await?;
     // Count the number of billable uses of each product for this tenant
     let t_id = tenant.id.clone();
     let (billing_profile, counts) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
+            let bp = billing_profile.as_ref();
             // Fetch counts for most products regardless of whether the tenant is set up with
             // billing for them. We will error if any of these products have use when they haven't
             // been contracted
@@ -124,25 +121,25 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
             let watchlist_checks = WatchlistCheck::get_billable_count(conn, &t_id, i.start, i.end)?;
 
             // These billing schemes are only used by some tenants, so only count them conditionally
-            let hot_vaults = if billing_profile.hot_vaults.is_some() {
+            let hot_vaults = if bp.is_some_and(|p| p.hot_vaults.is_some()) {
                 let p = AccessEventPurpose::iter().collect(); // Any access is billable
                 Some(AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, p)?)
             } else {
                 None
             };
-            let hot_proxy_vaults = if billing_profile.hot_proxy_vaults.is_some() {
+            let hot_proxy_vaults = if bp.is_some_and(|p| p.hot_proxy_vaults.is_some()) {
                 let p = vec![AccessEventPurpose::VaultProxy];
                 Some(AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, p)?)
             } else {
                 None
             };
-            let vaults_with_non_pci = if billing_profile.vaults_with_non_pci.is_some() {
+            let vaults_with_non_pci = if bp.is_some_and(|p| p.vaults_with_non_pci.is_some()) {
                 let filter = ScopedVaultPiiFilters::NonPci;
                 Some(ScopedVault::count_billable(conn, &t_id, i.end, filter)?)
             } else {
                 None
             };
-            let vaults_with_pci = if billing_profile.vaults_with_non_pci.is_some() {
+            let vaults_with_pci = if bp.is_some_and(|p| p.vaults_with_non_pci.is_some()) {
                 let filter = ScopedVaultPiiFilters::PciOrCustom;
                 Some(ScopedVault::count_billable(conn, &t_id, i.end, filter)?)
             } else {

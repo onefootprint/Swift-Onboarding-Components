@@ -1,7 +1,6 @@
 use crate::counts::LineItem;
 use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use db::models::tenant::Tenant;
-use feature_flag::LaunchDarklyFeatureFlagClient;
 use interval::BillingInterval;
 use newtypes::{PiiString, StripeCustomerId, TenantId};
 use profile::BillingProfile;
@@ -18,6 +17,7 @@ pub type BResult<T> = Result<T, Error>;
 mod counts;
 pub use counts::BillingCounts;
 pub mod interval;
+mod product;
 mod profile;
 
 #[derive(Debug, thiserror::Error)]
@@ -143,17 +143,6 @@ impl BillingClient {
         Ok(Some(item))
     }
 
-    #[tracing::instrument(skip_all)]
-    pub async fn get_billing_profile(
-        &self,
-        ff_client: LaunchDarklyFeatureFlagClient,
-        billing_profile: Option<DbBillingProfile>,
-        tenant_id: &TenantId,
-    ) -> BResult<BillingProfile> {
-        let prices = BillingProfile::get_for(&self.client, ff_client, tenant_id, billing_profile).await?;
-        Ok(prices)
-    }
-
     #[tracing::instrument(skip(self))]
     pub async fn generate_draft_invoice(&self, info: BillingInfo) -> BResult<()> {
         if info.counts.is_zero() {
@@ -180,9 +169,10 @@ impl BillingClient {
         }
 
         // Create the invoice items, unassociated with any invoice, for all the items we'll be charging
+        let prices = BillingProfile::get_for(&self.client, info.billing_profile).await?;
         let items_fut = info
             .counts
-            .line_items(info.billing_profile)?
+            .line_items(prices)?
             .into_iter()
             .map(|l| self.get_or_create_invoice_item(customer_id.clone(), l));
         let items: HashMap<_, _> = futures::future::join_all(items_fut)
@@ -247,7 +237,7 @@ fn is_managed(metadata: &HashMap<String, String>) -> bool {
 #[derive(Debug)]
 pub struct BillingInfo {
     pub tenant_id: TenantId,
-    pub billing_profile: BillingProfile,
+    pub billing_profile: Option<DbBillingProfile>,
     pub customer_id: StripeCustomerId,
     pub interval: BillingInterval,
     pub counts: BillingCounts,

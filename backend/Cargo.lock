@@ -2135,6 +2135,8 @@ dependencies = [
  "newtypes",
  "rust_decimal",
  "serde",
+ "strum",
+ "strum_macros",
  "test-case",
  "thiserror",
  "tokio",
