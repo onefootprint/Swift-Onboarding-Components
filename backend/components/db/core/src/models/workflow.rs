@@ -47,6 +47,8 @@ pub struct Workflow {
     pub decision_made_at: Option<DateTime<Utc>>,
     /// The time at which the workflow moves into a terminal state
     pub completed_at: Option<DateTime<Utc>>,
+    /// The time at which the Wf is deactivated by creating a newer workflow for the scoped vault
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -167,10 +169,18 @@ pub type IsNew = bool;
 
 impl Workflow {
     #[tracing::instrument("Workflow::insert", skip_all)]
-    pub fn insert(conn: &mut PgConn, new_workflow: NewWorkflow) -> DbResult<Self> {
-        let res = diesel::insert_into(workflow::table)
+    pub fn insert(conn: &mut TxnPgConn, new_workflow: NewWorkflow) -> DbResult<Self> {
+        // Deactivate existing workflow, if any. We also set the deactivated_at of the previous
+        // workflow to the created_at of the new workflow, just for convenience
+        diesel::update(workflow::table)
+            .filter(workflow::scoped_vault_id.eq(&new_workflow.scoped_vault_id))
+            .filter(workflow::deactivated_at.is_null())
+            .set(workflow::deactivated_at.eq(new_workflow.created_at))
+            .execute(conn.conn())?;
+
+        let res: Self = diesel::insert_into(workflow::table)
             .values(new_workflow)
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
 
         Ok(res)
     }
@@ -208,10 +218,21 @@ impl Workflow {
             VaultKind::Business => KybConfig {}.into(),
         };
 
-        // Check if a workflow exists for this ob config
+        // Check if an active or completed workflow exists for this ob config
         let wf = workflow::table
             .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
             .filter(workflow::ob_configuration_id.eq(&ob_configuration_id))
+            .filter(
+                // An existing workflow (that we'd inherit) has to be _either_ active OR already
+                // completed.
+                // We want a user to be able to make a new workflow for the same OBC if the last
+                // one was incomplete and deactivated.
+                // But we don't want them to make a new workflow for the same OBC if they already
+                // completed the last one.
+                workflow::deactivated_at
+                    .is_null()
+                    .or(not(workflow::completed_at.is_null())),
+            )
             .first(conn.conn())
             .optional()?;
         if let Some(wf) = wf {
@@ -237,7 +258,7 @@ impl Workflow {
     }
 
     #[tracing::instrument("Workflow::create", skip_all)]
-    pub fn create(conn: &mut PgConn, args: NewWorkflowArgs) -> DbResult<Self> {
+    pub fn create(conn: &mut TxnPgConn, args: NewWorkflowArgs) -> DbResult<Self> {
         let NewWorkflowArgs {
             scoped_vault_id,
             config,

@@ -179,6 +179,11 @@ impl UserObSession {
     pub fn check_workflow_guard(&self, guard: WorkflowGuard) -> ApiResult<()> {
         // TODO we ideally want this to happen inside a locked transaction with the refreshed
         // workflow state, otherwise this could be stale
+        // TODO check deactivated_at. subject to stale reads here, though...
+        // Maybe when fetching workflow from db we only look for active?
+        // The only time we load a deactivated wf is when it's already approved and we're onboarding onto an old wf
+        // maybe we then have our own graceful error that means the session is completed
+        // or, we just check this guard in a locked txn
         let allowed_guards = if let Some(wf) = self.workflow.as_ref() {
             wf.state.allowed_guards()
         } else {

@@ -1,0 +1,1 @@
+ALTER TABLE workflow DROP COLUMN deactivated_at;

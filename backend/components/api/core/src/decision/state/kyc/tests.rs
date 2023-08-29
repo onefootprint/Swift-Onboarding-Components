@@ -39,7 +39,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
 
     state
         .db_pool
-        .db_query(move |conn| {
+        .db_transaction(move |conn| {
             DbWorkflow::insert(
                 conn,
                 NewWorkflow {
@@ -54,7 +54,6 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
                     insight_event_id: None,
                 },
             )
-            .unwrap()
         })
         .await
         .unwrap()
@@ -512,7 +511,7 @@ async fn redo_and_pass(
     let obc_id = prior_wf.ob_configuration_id.clone();
     let wf = state
         .db_pool
-        .db_query(move |conn| {
+        .db_transaction(move |conn| {
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id,
                 config: KycConfig { is_redo: true }.into(),
@@ -520,7 +519,7 @@ async fn redo_and_pass(
                 ob_configuration_id: obc_id,
                 insight_event_id: None,
             };
-            Workflow::create(conn, args).unwrap()
+            Workflow::create(conn, args)
         })
         .await
         .unwrap();

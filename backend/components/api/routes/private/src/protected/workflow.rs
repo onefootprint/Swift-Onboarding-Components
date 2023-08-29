@@ -42,7 +42,7 @@ async fn create_workflow(
 
     let wf = state
         .db_pool
-        .db_query(move |conn| -> Result<Workflow, DbError> {
+        .db_transaction(move |conn| -> Result<Workflow, DbError> {
             Workflow::insert(
                 conn,
                 NewWorkflow {
@@ -58,7 +58,7 @@ async fn create_workflow(
                 },
             )
         })
-        .await??;
+        .await?;
 
     Ok(Json(ResponseData::ok(CreateWorkflowResponse {
         workflow_id: wf.id,

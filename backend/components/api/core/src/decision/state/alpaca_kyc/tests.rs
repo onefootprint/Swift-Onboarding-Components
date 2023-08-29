@@ -721,7 +721,7 @@ async fn redo_and_pass(
     let obc_id = prior_wf.ob_configuration_id.clone();
     let wf = state
         .db_pool
-        .db_query(move |conn| {
+        .db_transaction(move |conn| {
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id,
                 config: AlpacaKycConfig { is_redo: true }.into(),
@@ -729,7 +729,7 @@ async fn redo_and_pass(
                 ob_configuration_id: obc_id,
                 insight_event_id: None,
             };
-            Workflow::create(conn, args).unwrap()
+            Workflow::create(conn, args)
         })
         .await
         .unwrap();
