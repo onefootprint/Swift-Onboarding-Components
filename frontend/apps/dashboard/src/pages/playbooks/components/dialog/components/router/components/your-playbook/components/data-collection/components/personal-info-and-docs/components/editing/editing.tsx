@@ -25,13 +25,15 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
     'pages.playbooks.dialog.your-playbook.form.personal-info-and-docs',
   );
   const {
-    data: { user },
+    data: { user, org },
   } = useSession();
   const [unselectedIDDoc, setUnselectedIDDoc] = useState(false);
   const ssnOpen = watch('personalInformationAndDocs.ssn');
   const idDocOpen = watch('personalInformationAndDocs.idDoc');
   const idDocKind = watch('personalInformationAndDocs.idDocKind');
-  const showNoPhoneFlow = user && user?.isFirmEmployee && kind === Kind.KYC;
+  const showNoPhoneFlow =
+    (user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs')) &&
+    kind === Kind.KYC;
 
   // need to store this so we don't re-fetch on add'l renders
   const [initialValues] = useState<PersonalInformationAndDocs>({
