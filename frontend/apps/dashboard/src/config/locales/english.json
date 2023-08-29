@@ -606,12 +606,12 @@
           "subtitle": "Follow these 3 simple steps to start, but feel free to reach out to us too if you need any help in the process.",
           "step-1": {
             "number": "1",
-            "title": "Create an onboarding config",
-            "subtitle": "You can do this from the 'Developers' tab"
+            "title": "Create a Playbook",
+            "subtitle": "You can do this from the 'Playbooks' tab"
           },
           "step-2": {
             "number": "2",
-            "title": "Integrate this config in your product",
+            "title": "Integrate this Playbook in your product",
             "subtitle": "Find all the details in our documentation"
           },
           "step-3": {

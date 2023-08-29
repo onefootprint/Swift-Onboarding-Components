@@ -3,8 +3,9 @@ import styled, { css } from '@onefootprint/styled';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Pagination, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PermissionGate from 'src/components/permission-gate';
+import WaveAnimation from 'src/components/wave-animation';
 
 import Details from './components/details';
 import Dialog from './components/dialog';
@@ -14,6 +15,7 @@ import usePlaybooks from './utils/use-playbooks';
 const Playbooks = () => {
   const { t } = useTranslation('pages.playbooks');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [hasHadPlaybook, setHasHadPlaybook] = useState(false);
   const {
     data: response,
     errorMessage,
@@ -24,6 +26,12 @@ const Playbooks = () => {
   const onCreatePlaybook = () => {
     setDialogOpen(true);
   };
+
+  useEffect(() => {
+    if (response && response?.data?.length > 0) {
+      setHasHadPlaybook(true);
+    }
+  }, [response]);
 
   return (
     <Container>
@@ -39,13 +47,16 @@ const Playbooks = () => {
           fallbackText={t('cta-not-allowed')}
           scopeKind={RoleScopeKind.onboardingConfiguration}
         >
-          <Button
-            size="small"
-            sx={{ whiteSpace: 'nowrap' }}
-            onClick={onCreatePlaybook}
-          >
-            {t('create-button')}
-          </Button>
+          <Wrapper>
+            <Button
+              size="small"
+              sx={{ whiteSpace: 'nowrap' }}
+              onClick={onCreatePlaybook}
+            >
+              {t('create-button')}
+            </Button>
+            {!hasHadPlaybook && <WaveAnimation width={140} />}
+          </Wrapper>
         </PermissionGate>
       </HeaderContainer>
 
@@ -101,6 +112,10 @@ const HeaderContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+`;
+
+const Wrapper = styled.div`
+  position: relative;
 `;
 
 export default Playbooks;

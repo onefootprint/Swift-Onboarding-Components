@@ -39,7 +39,7 @@ const IntroDialog = () => {
       primaryButton={{
         label: t('dialog.cta'),
         onClick: () => {
-          router.push('/developers');
+          router.push('/playbooks');
         },
       }}
       secondaryButton={{
