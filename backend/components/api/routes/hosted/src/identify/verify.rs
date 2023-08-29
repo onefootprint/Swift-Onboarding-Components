@@ -234,8 +234,7 @@ fn validate_biometric_challenge(
     // if the credential's backup state has changed:
     // update the backup state to learn that a credential is now portable across devices
     if result.backup_state && challenge_state.non_synced_cred_ids.contains(&result.cred_id) {
-        let uv_id = challenge_state.user_vault_id.clone();
-        WebauthnCredential::update_backup_state(conn, &uv_id, &result.cred_id.0)?;
+        WebauthnCredential::update_backup_state(conn, &challenge_state.user_vault_id, &result.cred_id.0)?;
     }
 
     Ok((challenge_state.user_vault_id, VerifyKind::UserInherited))

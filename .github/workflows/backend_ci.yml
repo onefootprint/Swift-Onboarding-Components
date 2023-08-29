@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@1.71.1
+        uses: dtolnay/rust-toolchain@1.70.0
 
       - uses: rui314/setup-mold@7f56dbde35ee02a3fe0287e7ddd310922eb5f553
         with:
@@ -133,7 +133,7 @@ jobs:
         run: make set-dot-env
 
       - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@1.71.1
+        uses: dtolnay/rust-toolchain@1.70.0
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@dd05243424bd5c0e585e4b55eb2d7615cdd32f1f
@@ -267,7 +267,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@1.71.1
+        uses: dtolnay/rust-toolchain@1.70.0
         with:
           components: clippy
 
@@ -275,4 +275,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --manifest-path ./backend/Cargo.toml -- -D warnings
-          toolchain: 1.71.1
+          toolchain: 1.70.0

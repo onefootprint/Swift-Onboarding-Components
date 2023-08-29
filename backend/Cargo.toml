@@ -5,6 +5,7 @@ description = "Footprint's core APIs, verification engine, and enclave service"
 edition = "2021"
 
 [workspace]
+resolver = "2"
 members = [
     "components/api/core",
     "components/api/server",
