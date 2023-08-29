@@ -16,6 +16,6 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'check' | 'completed' | 'idDoc' | 'liveness';
+  matchesStates: 'check' | 'completed' | 'idDoc' | 'passkeys';
   tags: never;
 }

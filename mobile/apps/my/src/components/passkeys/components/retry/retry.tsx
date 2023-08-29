@@ -6,7 +6,7 @@ import useTranslation from '@/hooks/use-translation';
 
 import useRegisterBiometric from '../../hooks/use-register-biometric';
 import Success from '../success';
-import useSkipLiveness from './hooks/use-skip-liveness';
+import useSkipPasskeys from './hooks/use-skip-passkeys';
 
 export type RetryProps = {
   authToken: string;
@@ -15,12 +15,12 @@ export type RetryProps = {
 };
 
 const Retry = ({ authToken, onSkip, onSuccess }: RetryProps) => {
-  const { t } = useTranslation('components.liveness.retry');
+  const { t } = useTranslation('components.passkeys.retry');
   const registerBiometric = useRegisterBiometric();
-  const skipLivenessMutation = useSkipLiveness();
+  const mutation = useSkipPasskeys();
 
   const handleSkip = () => {
-    skipLivenessMutation.mutate(
+    mutation.mutate(
       { authToken },
       {
         onSuccess: onSkip,
@@ -50,12 +50,12 @@ const Retry = ({ authToken, onSkip, onSuccess }: RetryProps) => {
           <Button
             onPress={handleRegister}
             loading={registerBiometric.isLoading}
-            disabled={skipLivenessMutation.isLoading}
+            disabled={mutation.isLoading}
           >
             {t('cta')}
           </Button>
           <Button
-            loading={skipLivenessMutation.isLoading}
+            loading={mutation.isLoading}
             disabled={registerBiometric.isLoading}
             onPress={handleSkip}
             variant="secondary"

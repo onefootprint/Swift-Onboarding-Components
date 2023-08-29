@@ -1,5 +1,5 @@
-export type SkipLivenessRequest = {
+export type SkipPasskeysRequest = {
   authToken: string;
 };
 
-export type SkipLivenessResponse = {};
+export type SkipPasskeysResponse = {};

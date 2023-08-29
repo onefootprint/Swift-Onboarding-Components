@@ -16,7 +16,7 @@ export type RegisterProps = {
 };
 
 const Register = ({ onContinue }: RegisterProps) => {
-  const { t } = useTranslation('components.liveness.register');
+  const { t } = useTranslation('components.passkeys.register');
 
   const handleRegister = async () => {
     const challengeJson = JSON.parse(challenge);

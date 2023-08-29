@@ -2,10 +2,10 @@ import { createMachine } from 'xstate';
 
 import { MachineEvents } from './types';
 
-export const createLivenessMachine = () =>
+export const createPasskeysMachine = () =>
   createMachine({
     predictableActionArguments: true,
-    id: 'liveness',
+    id: 'passkeys',
     schema: {
       events: {} as MachineEvents,
     },
@@ -39,4 +39,4 @@ export const createLivenessMachine = () =>
     },
   });
 
-export default createLivenessMachine;
+export default createPasskeysMachine;

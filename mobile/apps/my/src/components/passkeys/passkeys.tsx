@@ -5,12 +5,12 @@ import Register from './components/register';
 import Retry from './components/retry';
 import createMachine from './utils/state-machine';
 
-export type LivenessProps = {
+export type PasskeysProps = {
   authToken: string;
   onDone?: () => void;
 };
 
-const Liveness = ({ authToken, onDone }: LivenessProps) => {
+const Passkeys = ({ authToken, onDone }: PasskeysProps) => {
   const [state, send] = useMachine(() => createMachine());
 
   return (
@@ -29,4 +29,4 @@ const Liveness = ({ authToken, onDone }: LivenessProps) => {
   );
 };
 
-export default Liveness;
+export default Passkeys;

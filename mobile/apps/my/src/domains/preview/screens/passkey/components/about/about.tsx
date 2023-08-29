@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import useTranslation from '@/hooks/use-translation';
 
 const About = () => {
-  const { t } = useTranslation('components.liveness.register');
+  const { t } = useTranslation('components.passkeys.register');
   const [open, setOpen] = useState(false);
 
   return (

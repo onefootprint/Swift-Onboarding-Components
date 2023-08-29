@@ -5,7 +5,7 @@ import React from 'react';
 import useTranslation from '@/hooks/use-translation';
 
 const Success = () => {
-  const { t } = useTranslation('components.liveness.success');
+  const { t } = useTranslation('components.passkeys.success');
 
   return (
     <Box

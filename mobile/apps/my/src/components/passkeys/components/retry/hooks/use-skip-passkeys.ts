@@ -1,11 +1,11 @@
 import request from '@onefootprint/request';
-import { SkipLivenessRequest, SkipLivenessResponse } from '@onefootprint/types';
+import { SkipPasskeysRequest, SkipPasskeysResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '@/config/constants';
 
-const skipLiveness = async (payload: SkipLivenessRequest) => {
-  const response = await request<SkipLivenessResponse>({
+const skipPasskeys = async (payload: SkipPasskeysRequest) => {
+  const response = await request<SkipPasskeysResponse>({
     method: 'POST',
     url: '/hosted/onboarding/skip_passkey_register',
     data: payload,
@@ -17,6 +17,6 @@ const skipLiveness = async (payload: SkipLivenessRequest) => {
   return response.data;
 };
 
-const useSkipLiveness = () => useMutation(skipLiveness);
+const useSkipPasskeys = () => useMutation(skipPasskeys);
 
-export default useSkipLiveness;
+export default useSkipPasskeys;

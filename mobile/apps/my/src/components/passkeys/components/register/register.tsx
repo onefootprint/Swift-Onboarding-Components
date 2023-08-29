@@ -15,7 +15,7 @@ export type RegisterProps = {
 };
 
 const Register = ({ authToken, onSuccess, onError }: RegisterProps) => {
-  const { t } = useTranslation('components.liveness.register');
+  const { t } = useTranslation('components.passkeys.register');
   const registerBiometric = useRegisterBiometric();
 
   const handlePress = () => {

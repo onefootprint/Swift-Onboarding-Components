@@ -8,7 +8,7 @@ type AboutProps = {
 };
 
 const About = ({ ctaDisabled }: AboutProps) => {
-  const { t } = useTranslation('components.liveness.register');
+  const { t } = useTranslation('components.passkeys.register');
   const [open, setOpen] = useState(false);
 
   return (

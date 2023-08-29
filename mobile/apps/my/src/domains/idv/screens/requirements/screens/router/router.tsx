@@ -2,7 +2,7 @@ import { useMachine } from '@xstate/react';
 import React, { useEffect } from 'react';
 
 import IdDoc from '@/components/id-doc';
-import Liveness from '@/components/liveness';
+import Passkeys from '@/components/passkeys';
 
 import CheckRequirements from '../check-requirements';
 import createMachine from './utils/state-machine';
@@ -36,8 +36,8 @@ const Router = ({ authToken, onDone }: RouterProps) => {
           }}
         />
       )}
-      {state.matches('liveness') && (
-        <Liveness
+      {state.matches('passkeys') && (
+        <Passkeys
           authToken={authToken}
           onDone={() => send({ type: 'requirementCompleted' })}
         />

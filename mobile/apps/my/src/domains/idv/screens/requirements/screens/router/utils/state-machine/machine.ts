@@ -23,7 +23,7 @@ const createRequirementsMachine = () =>
         on: {
           remainingRequirementsReceived: [
             {
-              target: 'liveness',
+              target: 'passkeys',
               cond: (context, { payload }) => {
                 return !!payload.remainingRequirements.liveness;
               },
@@ -52,7 +52,7 @@ const createRequirementsMachine = () =>
           ],
         },
       },
-      liveness: {
+      passkeys: {
         on: {
           requirementCompleted: {
             target: 'check',

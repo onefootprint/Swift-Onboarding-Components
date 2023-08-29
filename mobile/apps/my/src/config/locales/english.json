@@ -50,7 +50,7 @@
     "back-button": {
       "cta": "Go back"
     },
-    "liveness": {
+    "passkeys": {
       "register": {
         "title": "Confirm liveness using your passkey",
         "subtitle": "We use this secure method for making sure your data is only accessed by you. ",
