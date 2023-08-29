@@ -1,3 +1,4 @@
+export * from './attestation';
 export * from './biometric-register';
 export * from './business';
 export * from './business-data';
