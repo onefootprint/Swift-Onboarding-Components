@@ -16,6 +16,12 @@
 		3E461D99554A48A4959DE609 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* LaunchScreen.storyboard */; };
 		466FB29480ED45F29313B597 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D70DCF0218B413A89B9CE9C /* main.m */; };
 		5666E5B62A437AD8005BA1BD /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */; };
+		5673E5A82A9E0EC4009ED260 /* DeviceSignals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5673E5A72A9E0EC4009ED260 /* DeviceSignals.swift */; };
+		5673E5A92A9E0EC4009ED260 /* DeviceSignals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5673E5A72A9E0EC4009ED260 /* DeviceSignals.swift */; };
+		5673E5AB2A9E0EEF009ED260 /* DeviceSignalsBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 5673E5AA2A9E0EEF009ED260 /* DeviceSignalsBridge.m */; };
+		5673E5AC2A9E0EEF009ED260 /* DeviceSignalsBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 5673E5AA2A9E0EEF009ED260 /* DeviceSignalsBridge.m */; };
+		5673E5AE2A9E0F54009ED260 /* Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = 5673E5AD2A9E0F54009ED260 /* Bridging-Header.h */; };
+		5673E5AF2A9E0F54009ED260 /* Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = 5673E5AD2A9E0F54009ED260 /* Bridging-Header.h */; };
 		5B02D5BA96E4428ABC097AB8 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */; };
 		75ABE281253AF18AF6387B17 /* libPods-myClip.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 429C1D27522F17395A052B9C /* libPods-myClip.a */; };
 		78130D6617B542B38CAA1DC3 /* DMSans-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F4DC3E575BC04DCA98CAB985 /* DMSans-Bold.otf */; };
@@ -67,6 +73,9 @@
 		41B99DF686D046AF9888DA0B /* Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		429C1D27522F17395A052B9C /* libPods-myClip.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-myClip.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C1043791F1816C343583023 /* Pods-myClip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-myClip.debug.xcconfig"; path = "Target Support Files/Pods-myClip/Pods-myClip.debug.xcconfig"; sourceTree = "<group>"; };
+		5673E5A72A9E0EC4009ED260 /* DeviceSignals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceSignals.swift; sourceTree = "<group>"; };
+		5673E5AA2A9E0EEF009ED260 /* DeviceSignalsBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceSignalsBridge.m; sourceTree = "<group>"; };
+		5673E5AD2A9E0F54009ED260 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		56F0BB5E2A028BF1000405D0 /* myDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = myDebug.entitlements; path = my/myDebug.entitlements; sourceTree = "<group>"; };
 		56F0BB5F2A0292D0000405D0 /* myClipDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = myClipDebug.entitlements; sourceTree = "<group>"; };
 		5D103F0A28FC4D1EB7286496 /* AppDelegate.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -141,6 +150,16 @@
 			name = DocumentProcessor;
 			sourceTree = "<group>";
 		};
+		5673E5A62A9E0EB8009ED260 /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				5673E5A72A9E0EC4009ED260 /* DeviceSignals.swift */,
+				5673E5AA2A9E0EEF009ED260 /* DeviceSignalsBridge.m */,
+				5673E5AD2A9E0F54009ED260 /* Bridging-Header.h */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -151,6 +170,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				5673E5A62A9E0EB8009ED260 /* Modules */,
 				13B07FAE1A68108700A75B9A /* my */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -217,6 +237,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5673E5AE2A9E0F54009ED260 /* Bridging-Header.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,6 +245,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5673E5AF2A9E0F54009ED260 /* Bridging-Header.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -532,6 +554,8 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				5B02D5BA96E4428ABC097AB8 /* noop-file.swift in Sources */,
+				5673E5AB2A9E0EEF009ED260 /* DeviceSignalsBridge.m in Sources */,
+				5673E5A82A9E0EC4009ED260 /* DeviceSignals.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -542,6 +566,8 @@
 				27CCBF5E8F304ED1BA117BF6 /* AppDelegate.mm in Sources */,
 				466FB29480ED45F29313B597 /* main.m in Sources */,
 				5666E5B62A437AD8005BA1BD /* noop-file.swift in Sources */,
+				5673E5AC2A9E0EEF009ED260 /* DeviceSignalsBridge.m in Sources */,
+				5673E5A92A9E0EC4009ED260 /* DeviceSignals.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -589,7 +615,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "my-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Modules/Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -625,7 +651,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "my-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Modules/Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
