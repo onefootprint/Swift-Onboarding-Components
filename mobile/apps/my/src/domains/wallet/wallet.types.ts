@@ -2,7 +2,6 @@ import { Identifier } from '@onefootprint/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type Navigation = {
-  DeviceSignals: undefined;
   EmailIdentification: undefined;
   Login: {
     canUseBiometric: boolean;

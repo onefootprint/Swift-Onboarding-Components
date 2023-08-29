@@ -34,7 +34,7 @@ struct AttestedDevice: Codable {
 typealias KeyId = String
 
 class Attester {
-  static let ATTESTATION_KEY_ID_STORAGE_KEY = "fp_attest_key"
+  static let ATTESTATION_KEY_ID_STORAGE_KEY = "fp_attest_key_2"
 
   static func initOrCreate() async throws -> Attester {
     let keyId = try await Self.generateOrGetAttestationKey()

@@ -16,7 +16,6 @@ import Sharing from '../sharing';
 import Vault from '../vault';
 import BackButton from './components/back-button';
 import SettingsButton from './components/settings-button';
-import DeviceSignals from './device';
 
 configureReactI18next();
 
@@ -29,10 +28,9 @@ const Router = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={isLoggedIn ? 'MainTabs' : 'DeviceSignals'}
+        initialRouteName={isLoggedIn ? 'MainTabs' : 'EmailIdentification'}
       >
         <Stack.Group screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="DeviceSignals" component={DeviceSignals} />
           <Stack.Screen
             name="EmailIdentification"
             component={EmailIdentification}

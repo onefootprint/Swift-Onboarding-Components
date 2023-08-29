@@ -5,17 +5,15 @@ import React
 @objc(DeviceAttestation)
 class DeviceAttestation: NSObject {
 
-  @objc func attest(_ webauthnPublicKey: NSString, withChallenge challenge: NSString, callback: @escaping RCTResponseSenderBlock) -> Void {
-    NSLog("webauthnPublicKey %@", webauthnPublicKey)
-    NSLog("challenge %@", challenge)
+  @objc func attest(_ webauthnPublicKey: String?, withChallenge challenge: String, callback: @escaping RCTResponseSenderBlock) -> Void {
     Task {
       do {
         let attester = try await Attester.initOrCreate()
         let attestation = try await attester.attestDevice(metadata: DataToAttest(
           model: UIDevice.current.model,
           os: UIDevice.current.systemVersion,
-          webauthnPublicKey: nil, // TODO: pass in the public key from passkey registration
-          footprintAttestationChallenge: "", // TODO: get from server and pass in here
+          webauthnPublicKey: webauthnPublicKey,
+          footprintAttestationChallenge: challenge,
           uploadedDocumentTypes: [],
           deviceCheckToken: attester.deviceToken?.base64EncodedString())
         )
