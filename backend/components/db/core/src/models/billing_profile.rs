@@ -22,6 +22,8 @@ pub struct BillingProfile {
     pub watchlist: Option<String>,
     pub hot_vaults: Option<String>,
     pub hot_proxy_vaults: Option<String>,
+    pub vaults_with_non_pci: Option<String>,
+    pub vaults_with_pci: Option<String>,
 }
 
 impl BillingProfile {

@@ -10,7 +10,7 @@ use chrono::{Duration, NaiveDate, Utc};
 use db::models::access_event::AccessEvent;
 use db::models::billing_profile::BillingProfile;
 use db::models::identity_document::IdentityDocument;
-use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::{ScopedVault, ScopedVaultPiiFilters};
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
 use db::models::workflow::Workflow;
@@ -117,23 +117,38 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
             // Fetch counts for most products regardless of whether the tenant is set up with
             // billing for them. We will error if any of these products have use when they haven't
             // been contracted
-            let pii = ScopedVault::count_billable(conn, &t_id, i.end)?;
+            let pii = ScopedVault::count_billable(conn, &t_id, i.end, ScopedVaultPiiFilters::None)?;
             let kyc = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
             let kyb = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
             let id_docs = IdentityDocument::get_billable_count(conn, &t_id, i.start, i.end)?;
             let watchlist_checks = WatchlistCheck::get_billable_count(conn, &t_id, i.start, i.end)?;
 
-            // Hot vaults are only billed by some tenants, so only fetch them conditionally
-            let p = AccessEventPurpose::iter().collect(); // Any access is billable
-            let hot_vaults = billing_profile
-                .hot_vaults
-                .is_some()
-                .then_some(AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, p)?);
-            let p = vec![AccessEventPurpose::VaultProxy];
-            let hot_proxy_vaults = billing_profile
-                .hot_proxy_vaults
-                .is_some()
-                .then_some(AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, p)?);
+            // These billing schemes are only used by some tenants, so only count them conditionally
+            let hot_vaults = if billing_profile.hot_vaults.is_some() {
+                let p = AccessEventPurpose::iter().collect(); // Any access is billable
+                Some(AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, p)?)
+            } else {
+                None
+            };
+            let hot_proxy_vaults = if billing_profile.hot_proxy_vaults.is_some() {
+                let p = vec![AccessEventPurpose::VaultProxy];
+                Some(AccessEvent::count_hot_vaults(conn, &t_id, i.start, i.end, p)?)
+            } else {
+                None
+            };
+            let vaults_with_non_pci = if billing_profile.vaults_with_non_pci.is_some() {
+                let filter = ScopedVaultPiiFilters::NonPci;
+                Some(ScopedVault::count_billable(conn, &t_id, i.end, filter)?)
+            } else {
+                None
+            };
+            let vaults_with_pci = if billing_profile.vaults_with_non_pci.is_some() {
+                let filter = ScopedVaultPiiFilters::PciOrCustom;
+                Some(ScopedVault::count_billable(conn, &t_id, i.end, filter)?)
+            } else {
+                None
+            };
+
             let counts = BillingCounts {
                 pii,
                 kyc,
@@ -142,6 +157,8 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
                 watchlist_checks,
                 hot_vaults,
                 hot_proxy_vaults,
+                vaults_with_non_pci,
+                vaults_with_pci,
             };
             Ok((billing_profile, counts))
         })

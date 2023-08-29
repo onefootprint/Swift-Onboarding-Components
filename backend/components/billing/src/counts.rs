@@ -19,6 +19,10 @@ pub struct BillingCounts {
     pub hot_vaults: Option<i64>,
     /// Number of vaults with proxy decrypts this month
     pub hot_proxy_vaults: Option<i64>,
+    /// Number of vaults with non-card and non-custom data
+    pub vaults_with_non_pci: Option<i64>,
+    /// Number of vaults with card or custom data
+    pub vaults_with_pci: Option<i64>,
 }
 
 #[derive(Debug)]
@@ -35,6 +39,8 @@ const ID_DOC_UNCONTRACTED_PRICE: &str = "price_1NkF3zGerPBo41PtnyBrvOU1";
 const WATCHLIST_UNCONTRACTED_PRICE: &str = "price_1NkF4sGerPBo41Ptb21nKXbp";
 const HOT_VAULTS_UNCONTRACTED_PRICE: &str = "price_1NkF3eGerPBo41Ptv5wHuJFY";
 const HOT_PROXY_UNCONTRACTED_PRICE: &str = "price_1NkF3HGerPBo41Pt8FI5ii7q";
+const NON_PCI_UNCONTRACTED_PRICE: &str = "price_1NkFbHGerPBo41PtUNBe5Zlx";
+const PCI_UNCONTRACTED_PRICE: &str = "price_1NkFcaGerPBo41Ptx8aKzHeS";
 
 impl BillingCounts {
     pub(crate) fn is_zero(&self) -> bool {
@@ -47,10 +53,18 @@ impl BillingCounts {
             id_docs,
             hot_vaults,
             hot_proxy_vaults,
+            vaults_with_non_pci,
+            vaults_with_pci,
         } = self;
-        pii + kyc + kyb + id_docs + watchlist_checks == 0
-            && !hot_vaults.is_some_and(|c| c != 0)
-            && !hot_proxy_vaults.is_some_and(|c| c != 0)
+        pii + kyc
+            + kyb
+            + id_docs
+            + watchlist_checks
+            + hot_vaults.unwrap_or_default()
+            + hot_proxy_vaults.unwrap_or_default()
+            + vaults_with_non_pci.unwrap_or_default()
+            + vaults_with_pci.unwrap_or_default()
+            == 0
     }
 
     pub(crate) fn line_items(&self, prices: BillingProfile) -> BResult<Vec<LineItem>> {
@@ -63,6 +77,8 @@ impl BillingCounts {
             watchlist_checks,
             hot_vaults,
             hot_proxy_vaults,
+            vaults_with_non_pci,
+            vaults_with_pci,
         } = self;
 
         let results = vec![
@@ -88,6 +104,16 @@ impl BillingCounts {
                 prices.hot_proxy_vaults,
                 PriceId::from_str(HOT_PROXY_UNCONTRACTED_PRICE)?,
                 hot_proxy_vaults,
+            ),
+            (
+                prices.vaults_with_non_pci,
+                PriceId::from_str(NON_PCI_UNCONTRACTED_PRICE)?,
+                vaults_with_non_pci,
+            ),
+            (
+                prices.vaults_with_pci,
+                PriceId::from_str(PCI_UNCONTRACTED_PRICE)?,
+                vaults_with_pci,
             ),
         ]
         .into_iter()

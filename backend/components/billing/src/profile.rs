@@ -18,9 +18,11 @@ pub struct BillingProfile {
     pub(crate) id_docs: Option<stripe::PriceId>,
     pub(crate) watchlist: Option<stripe::PriceId>,
 
-    // Not all tenants have billing for hot vaults
+    // Not all tenants have billing for these
     pub hot_vaults: Option<stripe::PriceId>,
     pub hot_proxy_vaults: Option<stripe::PriceId>,
+    pub vaults_with_non_pci: Option<stripe::PriceId>,
+    pub vaults_with_pci: Option<stripe::PriceId>,
 }
 
 // TODO this doesn't have dev products
@@ -31,6 +33,8 @@ const KYB: &str = "prod_NbtsYZ8CIBKWo2";
 const WATCHLIST_MONITORING: &str = "prod_NbtH04u60RlSWg";
 const KYC: &str = "prod_NPMdLP5c6udoVi";
 const PII: &str = "prod_NPMd4yoHoFrHw7";
+const VAULTS_WITH_NON_PCI: &str = "prod_OXKFlTuCOGcCvW";
+const VAULTS_WITH_PCI: &str = "prod_OXKHHjVIuWL7OV";
 
 impl BillingProfile {
     pub(crate) async fn get_for(
@@ -55,6 +59,8 @@ impl BillingProfile {
             hot_vaults,
             hot_proxy_vaults,
             watchlist,
+            vaults_with_non_pci,
+            vaults_with_pci,
             id: _,
             tenant_id: _,
             _created_at: _,
@@ -72,6 +78,10 @@ impl BillingProfile {
         let id_docs = OptionFuture::from(id_docs.map(|p| get_or_create_price(client, DOCUMENT_SCANS, p)))
             .await
             .transpose()?;
+        let watchlist =
+            OptionFuture::from(watchlist.map(|p| get_or_create_price(client, WATCHLIST_MONITORING, p)))
+                .await
+                .transpose()?;
         let hot_vaults = OptionFuture::from(hot_vaults.map(|p| get_or_create_price(client, HOT_VAULTS, p)))
             .await
             .transpose()?;
@@ -79,10 +89,12 @@ impl BillingProfile {
             OptionFuture::from(hot_proxy_vaults.map(|p| get_or_create_price(client, HOT_PROXY_VAULTS, p)))
                 .await
                 .transpose()?;
-        let watchlist =
-            OptionFuture::from(watchlist.map(|p| get_or_create_price(client, WATCHLIST_MONITORING, p)))
-                .await
-                .transpose()?;
+        let vaults_with_non_pci = OptionFuture::from(vaults_with_non_pci.map(|p| get_or_create_price(client, VAULTS_WITH_NON_PCI, p)))
+            .await
+            .transpose()?;
+        let vaults_with_pci = OptionFuture::from(vaults_with_pci.map(|p| get_or_create_price(client, VAULTS_WITH_PCI, p)))
+            .await
+            .transpose()?;
 
         let profile = BillingProfile {
             kyc,
@@ -92,6 +104,8 @@ impl BillingProfile {
             hot_vaults,
             hot_proxy_vaults,
             watchlist,
+            vaults_with_non_pci,
+            vaults_with_pci,
         };
         Ok(profile)
     }

@@ -87,6 +87,8 @@ table! {
         watchlist -> Nullable<Text>,
         hot_vaults -> Nullable<Text>,
         hot_proxy_vaults -> Nullable<Text>,
+        vaults_with_non_pci -> Nullable<Text>,
+        vaults_with_pci -> Nullable<Text>,
     }
 }
 
