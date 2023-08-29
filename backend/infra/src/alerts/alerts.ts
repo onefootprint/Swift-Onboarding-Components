@@ -308,22 +308,23 @@ export const generateAlerts = (g: GlobalState) => {
       datasetName: 'aws',
       query: {
         time_range: 240,
-        breakdowns: ['TargetGroup'],
+        breakdowns: ['ClusterName', 'ServiceName'],
         calculations: [
           {
             op: 'MAX',
-            column: 'amazonaws.com/AWS/ApplicationELB/HealthyHostCount.max',
+            column: 'amazonaws.com/ECS/ContainerInsights/DesiredTaskCount.max',
           },
         ],
+        // This may get noisy if we end up making multiple ECS clusters/services since the threshold
+        // is only based on the API server task count
         filters: [
           {
-            column: 'TargetGroup',
+            column: 'ClusterName',
             op: 'exists',
           },
           {
-            column: 'TargetGroup',
-            op: 'contains',
-            value: 'fpc-tg',
+            column: 'ServiceName',
+            op: 'exists',
           },
         ],
         filter_combination: 'AND',
