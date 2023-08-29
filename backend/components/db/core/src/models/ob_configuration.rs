@@ -1,4 +1,6 @@
 use super::tenant::Tenant;
+use crate::actor;
+use crate::actor::SaturatedActor;
 use crate::NextPage;
 use crate::OffsetPagination;
 use crate::PgConn;
@@ -141,6 +143,8 @@ pub struct ObConfigurationQuery {
     pub search: Option<String>,
 }
 
+pub type ObConfigInfo = (ObConfiguration, Option<SaturatedActor>);
+
 impl ObConfiguration {
     fn list_query(filters: &ObConfigurationQuery) -> BoxedQuery<Pg> {
         let mut query = ob_configuration::table
@@ -161,7 +165,7 @@ impl ObConfiguration {
         conn: &mut PgConn,
         query: &ObConfigurationQuery,
         pagination: OffsetPagination,
-    ) -> DbResult<(Vec<Self>, NextPage)> {
+    ) -> DbResult<(Vec<ObConfigInfo>, NextPage)> {
         let mut query = Self::list_query(query)
             .order_by(ob_configuration::created_at.desc())
             .limit(pagination.limit());
@@ -170,6 +174,7 @@ impl ObConfiguration {
             query = query.offset(offset)
         }
         let results = query.load::<Self>(conn)?;
+        let results = actor::saturate_actors_nullable(conn, results)?;
         Ok(pagination.results(results))
     }
 

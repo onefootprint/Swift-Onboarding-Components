@@ -1,8 +1,12 @@
 use std::sync::Arc;
 
-use db::models::{
-    appearance::Appearance, ob_configuration::ObConfiguration, tenant::Tenant,
-    tenant_client_config::TenantClientConfig,
+use api_wire_types::Actor;
+use db::{
+    actor::SaturatedActor,
+    models::{
+        appearance::Appearance, ob_configuration::ObConfiguration, tenant::Tenant,
+        tenant_client_config::TenantClientConfig,
+    },
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::DataIdentifierDiscriminant;
@@ -70,8 +74,8 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
     }
 }
 
-impl DbToApi<ObConfiguration> for api_wire_types::OnboardingConfiguration {
-    fn from_db(ob_config: ObConfiguration) -> Self {
+impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::OnboardingConfiguration {
+    fn from_db((ob_config, author): (ObConfiguration, Option<SaturatedActor>)) -> Self {
         let ObConfiguration {
             id,
             key,
@@ -100,6 +104,7 @@ impl DbToApi<ObConfiguration> for api_wire_types::OnboardingConfiguration {
             is_no_phone_flow,
             allow_international_residents,
             international_country_restrictions,
+            author: author.map(Actor::from_db),
         }
     }
 }

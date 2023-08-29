@@ -272,8 +272,8 @@ pub async fn post(
     let actor = auth.actor().into();
     let obc = state
         .db_pool
-        .db_query(move |conn| {
-            ObConfiguration::create(
+        .db_query(move |conn| -> ApiResult<_> {
+            let obc = ObConfiguration::create(
                 conn,
                 name,
                 tenant_id,
@@ -287,7 +287,9 @@ pub async fn post(
                 allow_international_residents,
                 international_country_restrictions,
                 actor,
-            )
+            )?;
+            let obc = db::actor::saturate_actor_nullable(conn, obc)?;
+            Ok(obc)
         })
         .await??;
 

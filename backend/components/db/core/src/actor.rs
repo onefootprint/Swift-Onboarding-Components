@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::PgConn;
+use crate::{models::ob_configuration::ObConfiguration, PgConn};
 use newtypes::{DbActor, TenantApiKeyId, TenantUserId};
 use tracing::instrument;
 
@@ -22,30 +22,36 @@ pub enum SaturatedActor {
 }
 
 pub trait HasActor {
-    fn actor(&self) -> DbActor;
+    fn actor(&self) -> Option<DbActor>;
 }
 
 impl HasActor for Annotation {
-    fn actor(&self) -> DbActor {
-        self.actor.clone()
+    fn actor(&self) -> Option<DbActor> {
+        Some(self.actor.clone())
     }
 }
 
 impl HasActor for OnboardingDecision {
-    fn actor(&self) -> DbActor {
-        self.actor.clone()
+    fn actor(&self) -> Option<DbActor> {
+        Some(self.actor.clone())
+    }
+}
+
+impl HasActor for ObConfiguration {
+    fn actor(&self) -> Option<DbActor> {
+        self.author.clone()
     }
 }
 
 impl HasActor for AccessEvent {
-    fn actor(&self) -> DbActor {
-        self.principal.clone()
+    fn actor(&self) -> Option<DbActor> {
+        Some(self.principal.clone())
     }
 }
 
 impl HasActor for DbActor {
-    fn actor(&self) -> DbActor {
-        self.clone()
+    fn actor(&self) -> Option<DbActor> {
+        Some(self.clone())
     }
 }
 
@@ -54,7 +60,22 @@ pub fn saturate_actors<T>(conn: &mut PgConn, has_actors: Vec<T>) -> DbResult<Vec
 where
     T: HasActor,
 {
-    let actors: Vec<DbActor> = has_actors.iter().map(|ha| ha.actor()).collect();
+    let results = saturate_actors_nullable(conn, has_actors)?
+        .into_iter()
+        .filter_map(|(ha, a)| a.map(|a| (ha, a)))
+        .collect();
+    Ok(results)
+}
+
+#[instrument(skip_all)]
+pub fn saturate_actors_nullable<T>(
+    conn: &mut PgConn,
+    has_actors: Vec<T>,
+) -> DbResult<Vec<(T, Option<SaturatedActor>)>>
+where
+    T: HasActor,
+{
+    let actors: Vec<DbActor> = has_actors.iter().filter_map(|ha| ha.actor()).collect();
 
     let tenant_user_ids = actors.iter().flat_map(|a| match a {
         DbActor::TenantUser { id } => Some(id),
@@ -81,33 +102,46 @@ where
         .map(|t| (t.id.clone(), t))
         .collect();
 
-    let has_actors_with_saturated_actors: Vec<(T, SaturatedActor)> = has_actors
+    let has_actors_with_saturated_actors: Vec<(T, Option<SaturatedActor>)> = has_actors
         .into_iter()
         .map(|ha| {
             let saturated_actor = match ha.actor() {
-                DbActor::TenantUser { id } => SaturatedActor::TenantUser(
+                Some(DbActor::TenantUser { id }) => Some(SaturatedActor::TenantUser(
                     tenant_users_map
                         .get(&id)
                         .ok_or(DbError::RelatedObjectNotFound)?
                         .clone(),
-                ),
-                DbActor::TenantApiKey { id } => SaturatedActor::TenantApiKey(
+                )),
+                Some(DbActor::TenantApiKey { id }) => Some(SaturatedActor::TenantApiKey(
                     tenant_api_keys_map
                         .get(&id)
                         .ok_or(DbError::RelatedObjectNotFound)?
                         .clone(),
-                ),
-                DbActor::Footprint => SaturatedActor::Footprint,
-                DbActor::FirmEmployee { id } => SaturatedActor::FirmEmployee(
+                )),
+                Some(DbActor::Footprint) => Some(SaturatedActor::Footprint),
+                Some(DbActor::FirmEmployee { id }) => Some(SaturatedActor::FirmEmployee(
                     tenant_users_map
                         .get(&id)
                         .ok_or(DbError::RelatedObjectNotFound)?
                         .clone(),
-                ),
+                )),
+                None => None,
             };
             Ok((ha, saturated_actor))
         })
         .collect::<DbResult<Vec<_>>>()?;
 
     Ok(has_actors_with_saturated_actors)
+}
+
+#[instrument(skip_all)]
+pub fn saturate_actor_nullable<T>(conn: &mut PgConn, has_actor: T) -> DbResult<(T, Option<SaturatedActor>)>
+where
+    T: HasActor,
+{
+    let result = saturate_actors_nullable(conn, vec![has_actor])?
+        .into_iter()
+        .next()
+        .ok_or(DbError::ObjectNotFound)?;
+    Ok(result)
 }

@@ -70,9 +70,13 @@ async fn get_detail(
     let is_live = auth.is_live()?;
     let ob_config_id = ob_config_id.into_inner();
 
-    let (obc, _) = state
+    let obc = state
         .db_pool
-        .db_query(move |conn| ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live)))
+        .db_query(move |conn| -> ApiResult<_> {
+            let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
+            let obc = db::actor::saturate_actor_nullable(conn, obc)?;
+            Ok(obc)
+        })
         .await??;
 
     let result = api_wire_types::OnboardingConfiguration::from_db(obc);

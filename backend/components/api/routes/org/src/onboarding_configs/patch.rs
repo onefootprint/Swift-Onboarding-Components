@@ -4,6 +4,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::errors::ApiResult;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::ApiKeyStatus;
 use newtypes::ObConfigurationId;
@@ -40,7 +41,11 @@ async fn patch(
     let tenant_id = tenant.id.clone();
     let result = state
         .db_pool
-        .db_transaction(move |conn| ObConfiguration::update(conn, &id, &tenant_id, is_live, name, status))
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let obc = ObConfiguration::update(conn, &id, &tenant_id, is_live, name, status)?;
+            let obc = db::actor::saturate_actor_nullable(conn, obc)?;
+            Ok(obc)
+        })
         .await?;
 
     Ok(Json(ResponseData::ok(
