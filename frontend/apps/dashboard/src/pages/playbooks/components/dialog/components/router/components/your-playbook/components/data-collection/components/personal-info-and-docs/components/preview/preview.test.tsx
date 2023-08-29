@@ -4,7 +4,11 @@ import {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import React from 'react';
-import { asAdminUser, asAdminUserFirmEmployee } from 'src/config/tests';
+import {
+  asAdminUser,
+  asAdminUserFirmEmployee,
+  asAdminUserInOrg,
+} from 'src/config/tests';
 
 import { Kind } from '@/playbooks/utils/machine/types';
 
@@ -87,16 +91,26 @@ describe('<Preview />', () => {
         idDocKind: [SupportedIdDocTypes.driversLicense],
       },
     });
-    expect(
-      screen.getByRole('checkbox', {
-        name: 'Use document scan to autofill basic identity data',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan.',
-      ),
-    ).toBeInTheDocument();
+
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'Use document scan to autofill basic identity data',
+    });
+    expect(checkbox).toBeInTheDocument();
+  });
+  it('should show doc first flow option if flexcar employee', async () => {
+    asAdminUserInOrg('flexcar');
+    renderForm({
+      kind: Kind.KYC,
+      startingValues: {
+        idDoc: true,
+        idDocKind: [SupportedIdDocTypes.driversLicense],
+      },
+    });
+
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'Use document scan to autofill basic identity data',
+    });
+    expect(checkbox).toBeInTheDocument();
   });
 
   it('should NOT doc first flow option if firm employee and ID doc kind exists BUT kind is KYB', async () => {

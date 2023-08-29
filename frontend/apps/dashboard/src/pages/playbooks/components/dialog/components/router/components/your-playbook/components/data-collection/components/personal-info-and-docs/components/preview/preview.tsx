@@ -25,20 +25,24 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.your-playbook.form.personal-info-and-docs',
   );
+  const {
+    data: { user, org },
+  } = useSession();
   const { formValues } = useFormValues();
   const { getValues, watch, register } = useFormContext();
-  const {
-    data: { user },
-  } = useSession();
   const personalInfoAndDocs: PersonalInformationAndDocs = getValues(
     'personalInformationAndDocs',
   );
+  const hasIdDoc = watch('personalInformationAndDocs.idDocKind').length > 0;
+  const hasUserPermission = user?.isFirmEmployee;
+  // TODO: Move to a feature flag
+  const hasOrgPermissionForIdDocFirst = org?.name
+    .toLowerCase()
+    .includes('flexcar');
   const showIdDocFirstFlowOption =
-    user &&
-    user.isFirmEmployee &&
-    watch('personalInformationAndDocs.idDoc') &&
-    watch('personalInformationAndDocs.idDocKind')?.length > 0 &&
-    kind === Kind.KYC;
+    hasIdDoc &&
+    kind === Kind.KYC &&
+    (hasUserPermission || hasOrgPermissionForIdDocFirst);
 
   const basicInformationFormValues = formValues.filter(field =>
     basicInformationFields.includes(field as keyof PersonalInformationAndDocs),
@@ -80,7 +84,6 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
           {t('preview.edit')}
         </LinkButton>
       </Header>
-
       <FormElementsContainer>
         <CollectedInformation
           fields={basicInformationFormValues}
@@ -93,7 +96,6 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
           title={t('us-residents')}
         />
       </FormElementsContainer>
-
       {showIdDocFirstFlowOption && (
         <Subsection>
           <Checkbox
