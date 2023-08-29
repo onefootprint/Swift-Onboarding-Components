@@ -51,7 +51,7 @@ impl Product {
         let price_id = match self {
             Self::Pii => "price_1NkF5kGerPBo41PtfIaoIhXN",
             Self::Kyc => "price_1NkF5NGerPBo41PtviDJIY8K",
-            Self::Kyb => "price_1NkF4LGerPBo41PtnOXu0Zx2",
+            Self::Kyb => "price_1NkLQ1GerPBo41PtKbvpKKCg",
             Self::IdDocs => "price_1NkF3zGerPBo41PtnyBrvOU1",
             Self::WatchlistChecks => "price_1NkF4sGerPBo41Ptb21nKXbp",
             Self::HotVaults => "price_1NkF3eGerPBo41Ptv5wHuJFY",
