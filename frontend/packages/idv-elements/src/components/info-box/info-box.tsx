@@ -9,7 +9,7 @@ export type InfoBoxProps = {
 };
 
 const InfoBox = ({ items, variant }: InfoBoxProps) => (
-  <Container data-variant={variant}>
+  <Container data-variant={variant} aria-label="infoBox">
     {items.map(({ title, description, Icon }) => (
       <Item title={title} key={title}>
         <IconContainer>

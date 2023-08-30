@@ -49,6 +49,7 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
       onClose={handleClose}
       onComplete={handleConsent}
       isLoading={consentMutation.isLoading}
+      testID="mobile-consent"
     >
       <ImageConsent ref={consentRef} />
     </ConsentBottomSheet>
