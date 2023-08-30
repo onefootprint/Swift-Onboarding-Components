@@ -53,10 +53,16 @@ pub async fn post(
     let sv_id = user_auth
         .scoped_user_id()
         .ok_or(AssertionError("auth missing scoped_user_id"))?;
+    let wf_id = user_auth.workflow_id();
     state
         .db_pool
         .db_transaction(move |conn: &mut db::TxnPgConn<'_>| -> ApiResult<_> {
-            let di = DecisionIntent::create(conn, DecisionIntentKind::DeviceFingerprint, &sv_id, None)?;
+            let di = DecisionIntent::create(
+                conn,
+                DecisionIntentKind::DeviceFingerprint,
+                &sv_id,
+                wf_id.as_ref(),
+            )?;
             let vreq = VerificationRequest::create(conn, &sv_id, &di.id, VendorAPI::StytchLookup)?;
             let uv = Vault::get(conn, &uv_id)?;
 
