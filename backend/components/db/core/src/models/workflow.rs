@@ -406,7 +406,7 @@ impl Workflow {
         let e = WorkflowEvent::create(conn, id, old_state, new_state)?;
 
         #[derive(AsChangeset)]
-        #[table_name = "workflow"]
+        #[diesel(table_name = workflow)]
         struct WorkflowStateUpdate {
             state: WorkflowState,
             completed_at: Option<DateTime<Utc>>,
