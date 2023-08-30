@@ -55,7 +55,7 @@ pub async fn post_challenge(
     .seal(&state.challenge_sealing_key)?;
 
     ResponseData::ok(DeviceAttestationChallengeResponse {
-        state: serde_json::to_string(&sealed_state)?,
+        state: sealed_state.to_string(),
         attestation_challenge,
     })
     .json()
