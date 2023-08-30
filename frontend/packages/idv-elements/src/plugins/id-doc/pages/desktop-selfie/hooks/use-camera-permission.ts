@@ -16,6 +16,7 @@ const useCameraPermission = () => {
       })
       .then(stream => {
         // If there is a stream, we know that permission has been given
+        setPermissionState('allowed');
         stream.getTracks().forEach(track => {
           track.stop();
         });
@@ -32,21 +33,23 @@ const useCameraPermission = () => {
 
   useInterval(
     () => {
-      navigator.permissions
-        .query({ name: 'camera' as any })
-        .then(result => {
-          if (result.state === 'granted') {
+      if (navigator.permissions) {
+        navigator.permissions
+          .query({ name: 'camera' as any })
+          .then(result => {
+            if (result.state === 'granted') {
+              setPermissionState('allowed');
+            } else {
+              setPermissionState('notAllowed');
+            }
+          })
+          .catch(() => {
+            // Technically the permission can still not be allowed;
+            // but the only way we can have an error is if the browser doesn't support this API (e.g. firefox)
+            // In that case we will let camera component handle the rest
             setPermissionState('allowed');
-          } else {
-            setPermissionState('notAllowed');
-          }
-        })
-        .catch(() => {
-          // Technically the permission can still not be allowed;
-          // but the only way we can have an error is if the browser doesn't support this API (e.g. firefox)
-          // In that case we will let camera component handle the rest
-          setPermissionState('allowed');
-        });
+          });
+      }
     },
     permissionState !== 'allowed' ? PERMISSION_CHECK_INTERVAL : null,
   );
