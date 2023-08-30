@@ -167,7 +167,7 @@ async fn make_decision(
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
             let is_sandbox = !scoped_user.is_live;
-            let wf = Workflow::latest(conn, &scoped_user.id)?.ok_or(OnboardingError::NoWorkflow)?;
+            let wf = Workflow::get_active(conn, &scoped_user.id)?.ok_or(OnboardingError::NoWorkflow)?;
 
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 

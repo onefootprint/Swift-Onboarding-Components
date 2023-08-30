@@ -45,7 +45,7 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> DbResult<Option<Workflow>> {
             let sv = ScopedVault::get(conn, (&fpid, &tid, is_live))?;
-            Workflow::latest(conn, &sv.id)
+            Workflow::get_active(conn, &sv.id)
         })
         .await??;
     let wf = wf.ok_or(OnboardingError::NoWorkflow)?;

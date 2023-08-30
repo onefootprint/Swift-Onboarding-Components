@@ -529,12 +529,11 @@ impl Workflow {
         Ok(result)
     }
 
-    // TODO: maybe in future we have a concept of only 1 active workflow at a time and this queries for that instead
-    #[tracing::instrument("Workflow::latest", skip_all)]
-    pub fn latest(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
+    #[tracing::instrument("Workflow::get_active", skip_all)]
+    pub fn get_active(conn: &mut PgConn, scoped_vault_id: &ScopedVaultId) -> DbResult<Option<Self>> {
         let res = workflow::table
             .filter(workflow::scoped_vault_id.eq(scoped_vault_id))
-            .order_by(workflow::created_at.desc())
+            .filter(workflow::deactivated_at.is_null())
             .first(conn)
             .optional()?;
         Ok(res)
