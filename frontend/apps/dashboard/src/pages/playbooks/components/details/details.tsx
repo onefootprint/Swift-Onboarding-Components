@@ -10,7 +10,7 @@ import Loading from './components/loading';
 
 const Details = () => {
   const { t, allT } = useTranslation('pages.playbooks.table.details');
-  const { query, clear } = useFilters();
+  const { query, push } = useFilters();
   const isOpen = !!query.onboarding_config_id;
   const { data, isLoading, errorMessage } = usePlaybook(
     query.onboarding_config_id,
@@ -25,8 +25,15 @@ const Details = () => {
       : allT('notifications.error');
   };
 
+  const handleClose = () => {
+    push({
+      ...query,
+      onboarding_config_id: undefined,
+    });
+  };
+
   return (
-    <Drawer open={isOpen} title={getDrawerTitle()} onClose={clear}>
+    <Drawer open={isOpen} title={getDrawerTitle()} onClose={handleClose}>
       <>
         {data && <Content playbook={data} />}
         {isLoading && <Loading />}

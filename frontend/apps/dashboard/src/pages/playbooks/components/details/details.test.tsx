@@ -2,6 +2,7 @@ import {
   createUseRouterSpy,
   customRender,
   screen,
+  userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
 import React from 'react';
@@ -61,9 +62,48 @@ describe('<Details />', () => {
 
     it('should show the playbook name', async () => {
       await renderDetailsAndWaitData();
+
       expect(
         screen.getAllByText(playbookDetailsFixture.name).length,
       ).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe('when closing the details drawer', () => {
+    beforeEach(() => {
+      withPlaybookDetails(playbookDetailsFixture.id);
+    });
+
+    it('should preserve pagination', async () => {
+      const pushMockFn = jest.fn();
+
+      useRouterSpy({
+        pathname: '/developers',
+        query: {
+          tab: 'onboarding-configs',
+          onboarding_config_id: playbookDetailsFixture.id,
+          onboarding_configs_page: 4,
+        },
+        push: pushMockFn,
+      });
+
+      await renderDetailsAndWaitData();
+
+      const closeButton = screen.getByRole('button', {
+        name: 'Close',
+      });
+      await userEvent.click(closeButton);
+
+      expect(pushMockFn).toHaveBeenCalledWith(
+        {
+          query: {
+            tab: 'onboarding-configs',
+            onboarding_configs_page: 4,
+          },
+        },
+        undefined,
+        { shallow: true },
+      );
     });
   });
 });
