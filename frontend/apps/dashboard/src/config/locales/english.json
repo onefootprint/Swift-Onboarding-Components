@@ -1196,7 +1196,8 @@
               "passport": "Passport (photo page)",
               "visa": "Visa",
               "residence_document": "Residence card",
-              "permit": "Work permit"
+              "permit": "Work permit",
+              "id-doc-first": "Document scan will be used to autofill basic identity data"
             },
             "authorized-scopes": {
               "basic-information": "Basic information",

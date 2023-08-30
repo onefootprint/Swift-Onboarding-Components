@@ -42,4 +42,5 @@ export type OnboardingConfig = {
   optionalData: CollectedDataOption[];
   isAppClipEnabled: boolean;
   isNoPhoneFlow: boolean;
+  isDocFirstFlow: boolean;
 };

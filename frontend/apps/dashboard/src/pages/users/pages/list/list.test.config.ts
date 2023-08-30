@@ -91,6 +91,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     status: OnboardingConfigStatus.enabled,
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    isDocFirstFlow: false,
   },
 ];
 

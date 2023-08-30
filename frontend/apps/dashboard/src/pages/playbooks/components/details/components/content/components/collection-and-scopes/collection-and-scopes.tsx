@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { OnboardingConfig } from '@onefootprint/types';
-import { Tab, Tabs } from '@onefootprint/ui';
+import { InlineAlert, Tab, Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import {
@@ -23,7 +23,7 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
     { value: 'authorized-scopes', label: t('basics.authorized-scopes') },
   ];
   const [segment, setSegment] = useState(options[0].value);
-  const { mustCollectData, canAccessData } = playbook;
+  const { mustCollectData, canAccessData, isDocFirstFlow } = playbook;
 
   const handleChange = (value: string) => {
     setSegment(value);
@@ -58,6 +58,11 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
             mustCollectData={mustCollectData}
             title={t('data-collection.us-residents')}
           />
+          {isDocFirstFlow && (
+            <InlineAlert variant="info">
+              {t('data-collection.id-doc-first')}
+            </InlineAlert>
+          )}
         </>
       )}
       {segment === 'authorized-scopes' && (

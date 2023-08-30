@@ -36,6 +36,21 @@ describe('<CollectionAndScopes />', () => {
     expect(screen.getByText('2 more')).toBeInTheDocument();
   });
 
+  it('should render id doc first inline alert', () => {
+    renderCollectionAndScopes({
+      playbook: {
+        ...playbookFixture,
+        mustCollectData: [],
+        isDocFirstFlow: true,
+      },
+    });
+    expect(
+      screen.getByText(
+        'Document scan will be used to autofill basic identity data',
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('should render selfie even if no document or selfie option', () => {
     renderCollectionAndScopes({
       playbook: {
