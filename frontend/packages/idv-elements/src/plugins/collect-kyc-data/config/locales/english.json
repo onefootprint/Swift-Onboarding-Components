@@ -206,6 +206,21 @@
         "dob": "Date of birth",
         "nationality": "Nationality"
       },
+      "legal-status": {
+        "text": {
+          "title": "Legal status in the U.S.",
+          "status": "Legal status",
+          "nationality": "Country of birth",
+          "citizenship": "Citizenship",
+          "visa-kind": "Visa type",
+          "visa-expiration": "Visa expiration date"
+        },
+        "statuses": {
+          "citizen": "I'm a citizen",
+          "permanent_resident": "I have a Green Card/I'm a permanent resident",
+          "visa": "I have a Visa"
+        }
+      },
       "address": {
         "title": "Address"
       },

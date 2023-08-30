@@ -57,7 +57,7 @@ const VisaFields = () => {
         value={getValues('visa.expirationDate')}
         {...register('visa.expirationDate', {
           required: true,
-          validate: date => !isPast(new Date(date)),
+          validate: date => !!date && !isPast(new Date(date)),
         })}
         testID="visa-expiration-textinput"
       />

@@ -12,6 +12,7 @@ import AddressSection from './components/address-section';
 import BasicInfoSection from './components/basic-info-section';
 import EmailSection from './components/email-section';
 import IdentitySection from './components/identity-section';
+import LegalStatusSection from './components/legal-status-section';
 
 const Confirm = () => {
   const { t } = useTranslation('pages.confirm');
@@ -78,6 +79,7 @@ const Confirm = () => {
     >
       <EmailSection />
       <BasicInfoSection />
+      <LegalStatusSection />
       <AddressSection />
       <IdentitySection />
     </ConfirmCollectedData>

@@ -28,6 +28,7 @@ describe('LegalStatus', () => {
     withIdentifyVerify();
     withLoginChallenge(ChallengeKind.biometric);
     withUserToken([]);
+    withUserVaultValidate();
   });
 
   describe('when the page is initially shown', () => {
@@ -109,7 +110,6 @@ describe('LegalStatus', () => {
       const onComplete = jest.fn();
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
-      withUserVaultValidate();
 
       const continueButton = screen.getByTestId('continue-button');
       expect(continueButton).toBeInTheDocument();
@@ -121,6 +121,18 @@ describe('LegalStatus', () => {
           [IdDI.usLegalStatus]: {
             value: UsLegalStatus.citizen,
           },
+          [IdDI.nationality]: {
+            value: undefined,
+          },
+          [IdDI.citizenships]: {
+            value: undefined,
+          },
+          [IdDI.visaExpirationDate]: {
+            value: undefined,
+          },
+          [IdDI.visaKind]: {
+            value: undefined,
+          },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
       });
@@ -130,7 +142,6 @@ describe('LegalStatus', () => {
       const onComplete = jest.fn();
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
-      withUserVaultValidate();
 
       const visaRadio = screen.getByTestId('visa-radio');
       await userEvent.click(visaRadio);
@@ -159,6 +170,18 @@ describe('LegalStatus', () => {
         const args = {
           [IdDI.usLegalStatus]: {
             value: UsLegalStatus.citizen,
+          },
+          [IdDI.nationality]: {
+            value: undefined,
+          },
+          [IdDI.citizenships]: {
+            value: undefined,
+          },
+          [IdDI.visaExpirationDate]: {
+            value: undefined,
+          },
+          [IdDI.visaKind]: {
+            value: undefined,
           },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
@@ -189,7 +212,6 @@ describe('LegalStatus', () => {
     it('the country fields should both be required', async () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
-      withUserVaultValidate();
 
       const permanentResidentRadio = screen.getByTestId(
         'permanent-resident-radio',
@@ -221,7 +243,6 @@ describe('LegalStatus', () => {
     it('should error if the United States is chosen as a citizenship', async () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
-      withUserVaultValidate();
 
       const permanentResidentRadio = screen.getByTestId(
         'permanent-resident-radio',
@@ -258,7 +279,6 @@ describe('LegalStatus', () => {
       const onComplete = jest.fn();
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
-      withUserVaultValidate();
 
       const permanentResidentRadio = screen.getByTestId(
         'permanent-resident-radio',
@@ -293,6 +313,12 @@ describe('LegalStatus', () => {
           },
           [IdDI.citizenships]: {
             value: ['AL'],
+          },
+          [IdDI.visaExpirationDate]: {
+            value: undefined,
+          },
+          [IdDI.visaKind]: {
+            value: undefined,
           },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
@@ -359,7 +385,6 @@ describe('LegalStatus', () => {
       const onComplete = jest.fn();
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
-      withUserVaultValidate();
 
       const permanentResidentRadio = screen.getByTestId(
         'permanent-resident-radio',
@@ -414,6 +439,12 @@ describe('LegalStatus', () => {
           [IdDI.citizenships]: {
             value: ['AL', 'AD'],
           },
+          [IdDI.visaExpirationDate]: {
+            value: undefined,
+          },
+          [IdDI.visaKind]: {
+            value: undefined,
+          },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
       });
@@ -423,7 +454,6 @@ describe('LegalStatus', () => {
       const onComplete = jest.fn();
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
-      withUserVaultValidate();
 
       const permanentResidentRadio = screen.getByTestId(
         'permanent-resident-radio',
@@ -478,6 +508,12 @@ describe('LegalStatus', () => {
           [IdDI.citizenships]: {
             value: ['AL'],
           },
+          [IdDI.visaExpirationDate]: {
+            value: undefined,
+          },
+          [IdDI.visaKind]: {
+            value: undefined,
+          },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
       });
@@ -505,7 +541,6 @@ describe('LegalStatus', () => {
       const onComplete = jest.fn();
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
-      withUserVaultValidate();
 
       const permanentResidentRadio = screen.getByTestId(
         'permanent-resident-radio',
@@ -614,6 +649,12 @@ describe('LegalStatus', () => {
           [IdDI.citizenships]: {
             value: ['AL', 'AF', 'AD'],
           },
+          [IdDI.visaExpirationDate]: {
+            value: undefined,
+          },
+          [IdDI.visaKind]: {
+            value: undefined,
+          },
         };
         expect(onComplete).toHaveBeenCalledWith(args);
       });
@@ -649,7 +690,6 @@ describe('LegalStatus', () => {
     it('the country and the visa fields should all be required', async () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
-      withUserVaultValidate();
 
       const visaRadio = screen.getByTestId('visa-radio');
       await userEvent.click(visaRadio);
@@ -689,7 +729,6 @@ describe('LegalStatus', () => {
     it('the visa expiration date should not be expired', async () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
-      withUserVaultValidate();
 
       const visaRadio = screen.getByTestId('visa-radio');
       await userEvent.click(visaRadio);
@@ -732,7 +771,6 @@ describe('LegalStatus', () => {
       const onComplete = jest.fn();
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
-      withUserVaultValidate();
 
       const visaRadio = screen.getByTestId('visa-radio');
       await userEvent.click(visaRadio);

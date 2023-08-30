@@ -1,10 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
-import {
-  CountrySelect,
-  CountrySelectOption,
-  LinkButton,
-} from '@onefootprint/ui';
+import { CountrySelect, LinkButton } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import {
   Controller,
@@ -13,6 +9,7 @@ import {
   useFormContext,
 } from 'react-hook-form';
 
+import { CountrySelectOptionOrPlaceholder } from '../../types';
 import CitizenshipField from './citizenship-field';
 
 const CountryFields = () => {
@@ -26,11 +23,11 @@ const CountryFields = () => {
 
   const handleCitizenshipChange = (
     index: number,
-    onChange: (cso: CountrySelectOption) => void,
-    { label, value }: CountrySelectOption,
+    onChange: (cso: CountrySelectOptionOrPlaceholder) => void,
+    { label, value }: CountrySelectOptionOrPlaceholder,
   ) => {
     setUSCitizenSelectedIndex(value === 'US' ? index : -1);
-    onChange({ label, value } as CountrySelectOption);
+    onChange({ label, value } as CountrySelectOptionOrPlaceholder);
   };
 
   const getErrorMessage = (
@@ -55,7 +52,12 @@ const CountryFields = () => {
         data-private
         name="nationality"
         control={control}
-        rules={{ required: true }}
+        rules={{
+          required: true,
+          validate: {
+            empty: ({ value }) => !!value,
+          },
+        }}
         render={({ field, fieldState: { error } }) => (
           <CountrySelect
             label={t('nationality.label')}
@@ -97,7 +99,7 @@ const CountryFields = () => {
                     handleCitizenshipChange(
                       index,
                       field.onChange,
-                      nextValue as CountrySelectOption,
+                      nextValue as CountrySelectOptionOrPlaceholder,
                     )
                   }
                   hasDeleteButton={fields.length > 1}

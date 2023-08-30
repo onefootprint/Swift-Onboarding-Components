@@ -4,16 +4,14 @@ import { Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-const StatusFields = () => {
+type StatusFieldsProps = {
+  handleStatusChange: () => void;
+};
+
+const StatusFields = ({ handleStatusChange }: StatusFieldsProps) => {
   const { t } = useTranslation('pages.legal-status.statuses');
 
-  const { register, resetField } = useFormContext();
-
-  const handleStatusChange = () => {
-    resetField('nationality');
-    resetField('citizenships');
-    resetField('visa');
-  };
+  const { register } = useFormContext();
 
   return (
     <>
