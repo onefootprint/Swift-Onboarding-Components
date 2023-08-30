@@ -10,8 +10,8 @@ use std::collections::HashMap;
 
 use newtypes::{
     DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentScanDeviceType, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, ScopedVaultId, TenantId,
-    WorkflowId,
+    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
+    IncodeVerificationSessionState, ScopedVaultId, TenantId, WorkflowId,
 };
 
 use super::document_request::DocumentRequest;
@@ -278,18 +278,18 @@ impl IdentityDocument {
         start_date: DateTime<Utc>,
         end_date: DateTime<Utc>,
     ) -> DbResult<i64> {
-        use db_schema::schema::scoped_vault;
+        use db_schema::schema::{incode_verification_session, scoped_vault};
         let count = identity_document::table
             .inner_join(document_request::table.inner_join(scoped_vault::table))
+            .inner_join(incode_verification_session::table)
             // Basic filters
             .filter(scoped_vault::is_live.eq(true))
             .filter(scoped_vault::tenant_id.eq(t_id))
             // Only completed docs
-            .filter(identity_document::status.eq(IdentityDocumentStatus::Complete))
+            .filter(incode_verification_session::state.eq(IncodeVerificationSessionState::Complete))
             // Filter for id docs that happened during this time
-            // TODO probably not the best timestamp to be using here. Should revisit in the future
-            .filter(identity_document::created_at.ge(start_date))
-            .filter(identity_document::created_at.lt(end_date))
+            .filter(incode_verification_session::completed_at.ge(start_date))
+            .filter(incode_verification_session::completed_at.lt(end_date))
             .select(count_star())
             .get_result(conn)?;
         Ok(count)
