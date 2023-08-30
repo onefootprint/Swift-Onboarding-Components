@@ -3,24 +3,27 @@ use crate::auth::ob_config::ObConfigAuth;
 use crate::auth::user::UserAuthScope;
 use crate::errors::challenge::ChallengeError;
 use crate::errors::{ApiError, ApiResult};
-use crate::identify::{ChallengeData, ChallengeDataKind, ChallengeState};
+use crate::identify::{ChallengeData, ChallengeState};
 use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::WebauthnConfig;
 use crate::utils::session::AuthSession;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::auth::session::user::UserSession;
+use api_core::auth::session::user::{AuthFactor, UserSession};
 use api_core::auth::session::UpdateSession;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
 use api_core::errors::onboarding::OnboardingError;
+use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::AuthedData;
-use chrono::Duration;
+use chrono::{Duration, Utc};
 use crypto::sha256;
+use db::models::auth_event::NewAuthEvent;
 use db::models::business_owner::BusinessOwner;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -30,8 +33,8 @@ use itertools::Itertools;
 use newtypes::email::Email;
 use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::{
-    DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, Fingerprinter, PhoneNumber, SandboxId,
-    SessionAuthToken, VaultId, VaultPublicKey,
+    AuthEventKind, DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, Fingerprinter, PhoneNumber,
+    SandboxId, ScopedVaultId, SessionAuthToken, VaultId, VaultPublicKey, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use std::str::FromStr;
@@ -70,6 +73,7 @@ pub async fn post(
     ob_pk_auth: Option<ObConfigAuth>,
     // When provided, augments the existing user_auth token with the scopes gained from the challenge
     user_auth: Option<UserAuthContext>,
+    insight_headers: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let VerifyRequest {
@@ -80,7 +84,6 @@ pub async fn post(
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
 
     // Generate fingerprints and keypairs async if needed
-    let challenge_kind = ChallengeDataKind::from(&challenge_state.data);
     let challenge_data = match challenge_state.data {
         ChallengeData::Sms(challenge_state) => {
             let authed_data = AuthedData::Phone(PhoneNumber::parse(challenge_state.phone_number.clone())?);
@@ -96,7 +99,7 @@ pub async fn post(
 
             ChallengeContext::Sms(vault_context)
         }
-        ChallengeData::Biometric(challenge_state) => ChallengeContext::Biometric(challenge_state),
+        ChallengeData::Passkey(challenge_state) => ChallengeContext::Passkey(challenge_state),
         ChallengeData::Email(challenge_state) => {
             let vault_context = make_vault_context(
                 &state,
@@ -116,47 +119,74 @@ pub async fn post(
     let (auth_token, user_kind) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (uv_id, user_kind) = match challenge_data {
-                ChallengeContext::Sms(ctx) | ChallengeContext::Email(ctx) => {
-                    validate(conn, ctx, &challenge_response)?
+            let (uv_id, user_kind, auth_factor, event_kind, passkey_cred_id) = match challenge_data {
+                ChallengeContext::Sms(ctx) => {
+                    let (tok, uk) = validate(conn, ctx, &challenge_response)?;
+                    (tok, uk, AuthFactor::Sms, AuthEventKind::Sms, None)
                 }
-                ChallengeContext::Biometric(context) => {
-                    validate_biometric_challenge(conn, &config, context, &challenge_response)?
+                ChallengeContext::Email(ctx) => {
+                    let (tok, uk) = validate(conn, ctx, &challenge_response)?;
+                    (tok, uk, AuthFactor::Email, AuthEventKind::Email, None)
+                }
+                ChallengeContext::Passkey(context) => {
+                    let (tok, uk, cred) =
+                        validate_biometric_challenge(conn, &config, context, &challenge_response)?;
+                    (
+                        tok,
+                        uk,
+                        AuthFactor::Passkey(cred.clone()),
+                        AuthEventKind::Passkey,
+                        Some(cred),
+                    )
                 }
             };
 
-            // If you authed with Biometric, you also get SensitiveProfile
-            let sensitive_scope = matches!(challenge_kind, ChallengeDataKind::Biometric)
-                .then_some(UserAuthScope::SensitiveProfile);
+            // If you authed with passkey, you also get SensitiveProfile
+            let sensitive_scope =
+                matches!(auth_factor, AuthFactor::Passkey(_)).then_some(UserAuthScope::SensitiveProfile);
 
-            let auth_token = if let Some(user_auth) = user_auth {
+            let (auth_token, scoped_vault_id) = if let Some(user_auth) = user_auth {
                 // If you provided an existing auth token, add the warranted scopes
                 let user_auth = user_auth.check_guard(Any)?;
                 let token = user_auth.auth_token.clone();
-                let data = user_auth
-                    .data
-                    .clone()
-                    .session_with_added_scopes(sensitive_scope.into_iter().collect());
+                let data = user_auth.data.clone().session_with_added_scopes_and_auth(
+                    sensitive_scope.into_iter().collect(),
+                    Some(auth_factor),
+                );
+                let scoped_vault_id = user_auth.scoped_user_id();
                 user_auth.update_session(conn, &session_key, data)?;
-                token
+                (token, scoped_vault_id)
             } else {
                 // Otherwise, create a new token with the scopes for bifrost or my1fp
-                let (new_token_scopes, duration) = if let Some(ob_pk_auth) = ob_pk_auth {
-                    let scopes = onboarding_scopes(conn, ob_pk_auth, &uv_id)?.into_iter();
+                let (new_token_scopes, duration, scoped_vault_id) = if let Some(ob_pk_auth) = ob_pk_auth {
+                    let (sv_id, scopes) = onboarding_scopes(conn, ob_pk_auth, &uv_id)?;
                     let duration = Duration::minutes(30); // Onboarding is pretty short
-                    (scopes, duration)
+                    (scopes.into_iter(), duration, Some(sv_id))
                 } else {
                     let scopes = vec![Some(UserAuthScope::BasicProfile)].into_iter();
                     let duration = Duration::hours(8); // Issue my1fp token for a long time
-                    (scopes, duration)
+                    (scopes, duration, None)
                 };
 
                 // Create the auth token for this user
                 let scopes = new_token_scopes.chain([sensitive_scope]).flatten().collect();
-                let data = UserSession::make(uv_id, scopes);
+                let data = UserSession::make(uv_id.clone(), scopes, vec![auth_factor]);
                 let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-                token
+                (token, scoped_vault_id)
             };
+
+            // record the new auth event
+            let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
+            NewAuthEvent {
+                vault_id: uv_id,
+                scoped_vault_id,
+                insight_event_id: Some(insight.id),
+                kind: event_kind,
+                webauthn_credential_id: passkey_cred_id,
+                created_at: Utc::now(),
+            }
+            .create(conn.conn())?;
+
             Ok((auth_token, user_kind))
         })
         .await?;
@@ -171,7 +201,7 @@ pub async fn post(
 
 pub enum ChallengeContext {
     Sms(VaultContext),
-    Biometric(BiometricChallengeState),
+    Passkey(BiometricChallengeState),
     Email(VaultContext),
 }
 
@@ -180,7 +210,7 @@ fn onboarding_scopes(
     conn: &mut TxnPgConn,
     ob_pk_auth: ObConfigAuth,
     uv_id: &VaultId,
-) -> ApiResult<Vec<Option<UserAuthScope>>> {
+) -> ApiResult<(ScopedVaultId, Vec<Option<UserAuthScope>>)> {
     let obc = ob_pk_auth.ob_config();
     // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
     // created with an ob config
@@ -206,15 +236,18 @@ fn onboarding_scopes(
         None
     };
 
-    Ok(vec![
-        Some(UserAuthScope::SignUp),
-        Some(UserAuthScope::OrgOnboarding {
-            id: su.id,
-            ob_configuration_id: Some(obc.id.clone()),
-        }),
-        // Business owner scope, if any
-        bo_scope,
-    ])
+    Ok((
+        su.id.clone(),
+        vec![
+            Some(UserAuthScope::SignUp),
+            Some(UserAuthScope::OrgOnboarding {
+                id: su.id,
+                ob_configuration_id: Some(obc.id.clone()),
+            }),
+            // Business owner scope, if any
+            bo_scope,
+        ],
+    ))
 }
 
 fn validate_biometric_challenge(
@@ -222,7 +255,7 @@ fn validate_biometric_challenge(
     config: &Config,
     challenge_state: BiometricChallengeState,
     challenge_response: &str,
-) -> ApiResult<(VaultId, VerifyKind)> {
+) -> ApiResult<(VaultId, VerifyKind, WebauthnCredentialId)> {
     // Decode and validate the response to the biometric challenge
     let webauthn = WebauthnConfig::new(config);
     let auth_resp = serde_json::from_str(challenge_response)?;
@@ -231,13 +264,20 @@ fn validate_biometric_challenge(
         .webauthn()
         .authenticate_credential(&auth_resp, &challenge_state.state)?;
 
+    let credential: WebauthnCredential =
+        WebauthnCredential::get_by_credential_id(conn, &challenge_state.user_vault_id, &result.cred_id.0)?;
+
     // if the credential's backup state has changed:
     // update the backup state to learn that a credential is now portable across devices
     if result.backup_state && challenge_state.non_synced_cred_ids.contains(&result.cred_id) {
-        WebauthnCredential::update_backup_state(conn, &challenge_state.user_vault_id, &result.cred_id.0)?;
+        credential.update_backup_state(conn)?;
     }
 
-    Ok((challenge_state.user_vault_id, VerifyKind::UserInherited))
+    Ok((
+        challenge_state.user_vault_id,
+        VerifyKind::UserInherited,
+        credential.id,
+    ))
 }
 
 /// Info extracted when an onboarding config auth is provided that allows creating a new vault

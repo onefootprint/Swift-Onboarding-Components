@@ -102,7 +102,7 @@ pub async fn post(
             ChallengeKind::Biometric => {
                 let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
                 let challenge = initiate_biometric_challenge_for_user(&state, &uvw.vault.id, creds).await?;
-                let challenge_data = ChallengeData::Biometric(challenge.state);
+                let challenge_data = ChallengeData::Passkey(challenge.state);
                 (
                     challenge_data,
                     0,

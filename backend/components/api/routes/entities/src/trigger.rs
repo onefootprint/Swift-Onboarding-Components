@@ -6,6 +6,7 @@ use crate::auth::tenant::TenantSessionAuth;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::auth::session::user::AuthFactor;
 use api_core::auth::session::user::UserSession;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::tenant::TenantError;
@@ -131,7 +132,7 @@ pub async fn post(
                 },
             ];
             let duration = Duration::days(1);
-            let data = UserSession::make(sv.vault_id, scopes);
+            let data = UserSession::make(sv.vault_id, scopes, vec![AuthFactor::Sms]);
             let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((vw, auth_token))
         })

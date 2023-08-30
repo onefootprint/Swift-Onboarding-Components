@@ -4,6 +4,7 @@ use paperclip::actix::web;
 mod annotations;
 mod client_token;
 mod decisions;
+mod auth_events;
 mod documents;
 mod get;
 mod kyc;
@@ -35,5 +36,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(match_signals::get)
         .service(trigger::post)
         .service(kyc::post)
-        .service(risk_signals::get_detail);
+        .service(risk_signals::get_detail)
+        .service(auth_events::get);
 }

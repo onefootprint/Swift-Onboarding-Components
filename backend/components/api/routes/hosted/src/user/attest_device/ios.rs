@@ -8,8 +8,12 @@ use chrono::Utc;
 
 use crypto::base64;
 
-use db::models::apple_device_attest::{AppleDeviceMetadata, NewAppleDeviceAttestation};
+use db::models::{
+    apple_device_attest::{AppleDeviceMetadata, NewAppleDeviceAttestation},
+    webauthn_credential::WebauthnCredential,
+};
 use newtypes::VaultId;
+use webauthn_rs_proto::RegisterPublicKeyCredential;
 
 // TODO: this structure is placeholder
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -20,13 +24,13 @@ struct IosAttestationPayload {
     attestation_data: String,
 }
 
-/// TODO: temporary
-/// there are more fields here...
+/// The object embedding what the device has attested
+/// TODO: more to add here
 #[derive(Debug, Clone, serde::Deserialize)]
 struct AttestedMetadata {
     #[serde(rename = "footprint_attestation_challenge")]
     attested_challenge: String,
-    webauthn_public_key: Option<String>,
+    webauthn_device_response_json: Option<String>,
     model: Option<String>,
     os: Option<String>,
     /// token to use with DC bit get/set
@@ -51,7 +55,13 @@ pub(super) async fn attest(
         "5F264K8AG4",
     )?;
 
-    let new_attestation = attest_inner(vault_id, &verifier, challenge, attestation).await?;
+    let vault_id_copy = vault_id.clone();
+    let creds = state
+        .db_pool
+        .db_query(move |conn| WebauthnCredential::list(conn, &vault_id_copy))
+        .await??;
+
+    let new_attestation = attest_inner(vault_id, &verifier, challenge, attestation, creds).await?;
 
     Ok(new_attestation)
 }
@@ -61,6 +71,7 @@ pub(super) async fn attest_inner(
     verifier: &AppleAppAttestationVerifier,
     challenge: String,
     attestation: String,
+    webauthn_creds: Vec<WebauthnCredential>,
 ) -> ApiResult<NewAppleDeviceAttestation> {
     let payload: IosAttestationPayload = serde_json::from_slice(&base64::decode(attestation)?)?;
     let attestation_data = base64::decode(payload.attestation_data)?;
@@ -79,7 +90,6 @@ pub(super) async fn attest_inner(
         return Err(app_attest::error::AttestationError::InvalidChallenge)?;
     }
 
-    // todo: remove these info logs
     tracing::info!(receipt=?attest_receipt, "verifed attested receipt");
 
     let (server_receipt, receipt) = verifier
@@ -123,6 +133,35 @@ pub(super) async fn attest_inner(
         None
     };
 
+    // Link the attestation to webauthn credential:
+    // if a webauthn key was attested: look for the user's credential and associate
+    // the attestation to that passkey
+    let webauthn_credential_id =
+        if let Some(webauthn_response) = attested_metadata.webauthn_device_response_json {
+            let attested_registered_credential: RegisterPublicKeyCredential =
+                serde_json::from_str(&webauthn_response)?;
+
+            // credential.response.attestation_object
+            webauthn_creds
+                .into_iter()
+                .filter_map(|cred| {
+                    let attestation: crate::user::passkey::SavedAttestationData =
+                        serde_cbor::from_slice(&cred.attestation_data).ok()?;
+
+                    // match by the raw attestation blob
+                    if attestation.raw_attestation_object
+                        == attested_registered_credential.response.attestation_object.0
+                    {
+                        Some(cred.id)
+                    } else {
+                        None
+                    }
+                })
+                .next()
+        } else {
+            None
+        };
+
     Ok(NewAppleDeviceAttestation {
         vault_id,
         metadata: AppleDeviceMetadata {
@@ -131,10 +170,7 @@ pub(super) async fn attest_inner(
         },
         receipt,
         raw_attestation: attestation_data,
-        webauthn_cred_public_key: attested_metadata
-            .webauthn_public_key
-            .map(base64::decode)
-            .transpose()?,
+        webauthn_credential_id,
         is_development: server_receipt.is_sandbox,
         attested_key_id: verified_attest.att_key_id,
         attested_public_key: verified_attest.att_public_key,
@@ -154,5 +190,6 @@ pub(super) async fn attest_inner(
         dc_bit0: bits.as_ref().map(|b| b.bit0),
         dc_bit1: bits.as_ref().map(|b| b.bit1),
         dc_last_updated: bits.map(|b| b.last_update_time),
+        bundle_id: server_receipt.app_id,
     })
 }

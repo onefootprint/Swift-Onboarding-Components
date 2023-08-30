@@ -8,7 +8,10 @@ use paperclip::actix::Apiv2Security;
 use super::{UserAuthGuard, UserAuthScope};
 use crate::{
     auth::{
-        session::{user::UserSession, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
+        session::{
+            user::{AuthFactor, UserSession},
+            AllowSessionUpdate, AuthSessionData, ExtractableAuthSession,
+        },
         user::UserAuth,
         AuthError, IsGuardMet, SessionContext,
     },
@@ -20,6 +23,16 @@ use feature_flag::FeatureFlagClient;
 pub struct UserSessionContext {
     pub user: Vault,
     pub scopes: Vec<UserAuthScope>,
+    /// the auth method that was used
+    pub auth_factors: Vec<AuthFactor>,
+}
+
+impl UserSessionContext {
+    pub fn did_use_passkey(&self) -> bool {
+        self.auth_factors
+            .iter()
+            .any(|factor| matches!(factor, AuthFactor::Passkey(_)))
+    }
 }
 
 impl UserAuth for UserSessionContext {
@@ -33,6 +46,14 @@ impl AllowSessionUpdate for UserSessionContext {}
 
 impl UserSessionContext {
     pub fn session_with_added_scopes(self, new_scopes: Vec<UserAuthScope>) -> AuthSessionData {
+        self.session_with_added_scopes_and_auth(new_scopes, None)
+    }
+
+    pub fn session_with_added_scopes_and_auth(
+        self,
+        new_scopes: Vec<UserAuthScope>,
+        new_auth_factor: Option<AuthFactor>,
+    ) -> AuthSessionData {
         let new_scope_kinds = new_scopes.iter().map(UserAuthGuard::from).collect_vec();
         let new_scopes = self.scopes
             .into_iter()
@@ -41,7 +62,13 @@ impl UserSessionContext {
             // And replace it with the new scope
             .chain(new_scopes.into_iter())
             .collect();
-        UserSession::make(self.user.id, new_scopes)
+
+        let new_factors = if let Some(auth_factor) = new_auth_factor {
+            self.auth_factors.into_iter().chain(vec![auth_factor]).collect()
+        } else {
+            self.auth_factors
+        };
+        UserSession::make(self.user.id, new_scopes, new_factors)
     }
 
     /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboarding` scope on this
@@ -119,6 +146,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                 let data = UserSessionContext {
                     user: vault,
                     scopes: data.scopes,
+                    auth_factors: data.auth_factors,
                 };
                 Ok(ParsedUserSessionContext(data))
             }

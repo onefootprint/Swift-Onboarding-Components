@@ -55,7 +55,6 @@ table! {
         metadata -> Jsonb,
         receipt -> Bytea,
         raw_attestation -> Bytea,
-        webauthn_cred_public_key -> Nullable<Bytea>,
         is_development -> Bool,
         attested_key_id -> Bytea,
         attested_public_key -> Bytea,
@@ -69,6 +68,24 @@ table! {
         dc_bit1 -> Nullable<Bool>,
         dc_last_updated -> Nullable<Text>,
         created_at -> Timestamptz,
+        bundle_id -> Text,
+        webauthn_credential_id -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
+    auth_event (id) {
+        id -> Text,
+        vault_id -> Text,
+        scoped_vault_id -> Nullable<Text>,
+        insight_event_id -> Nullable<Text>,
+        kind -> Text,
+        webauthn_credential_id -> Nullable<Text>,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 
@@ -987,6 +1004,11 @@ joinable!(access_event -> tenant (tenant_id));
 joinable!(annotation -> scoped_vault (scoped_vault_id));
 joinable!(appearance -> tenant (tenant_id));
 joinable!(apple_device_attestation -> vault (vault_id));
+joinable!(apple_device_attestation -> webauthn_credential (webauthn_credential_id));
+joinable!(auth_event -> insight_event (insight_event_id));
+joinable!(auth_event -> scoped_vault (scoped_vault_id));
+joinable!(auth_event -> vault (vault_id));
+joinable!(auth_event -> webauthn_credential (webauthn_credential_id));
 joinable!(billing_profile -> tenant (tenant_id));
 joinable!(contact_info -> data_lifetime (lifetime_id));
 joinable!(data_lifetime -> scoped_vault (scoped_vault_id));
@@ -1064,6 +1086,7 @@ allow_tables_to_appear_in_same_query!(
     annotation,
     appearance,
     apple_device_attestation,
+    auth_event,
     billing_profile,
     business_owner,
     contact_info,

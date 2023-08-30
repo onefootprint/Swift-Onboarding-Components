@@ -74,7 +74,7 @@ pub async fn post(
                 &scoped_user.vault_id,
                 &scoped_user.id,
                 &obc,
-                Some(insight_event),
+                Some(insight_event.clone()),
                 maybe_new_biz_args,
             )?;
 

@@ -21,7 +21,7 @@ api-debug:
 
 # Builds the builder that will help us build enclave docker images
 build-enclave-builder:
-	@docker build -t "ne_builder2_${RUST_VERSION}" \
+	@docker build -t "ne_builder2:${RUST_VERSION}" \
 			--build-arg USER=$(whoami) \
 			--build-arg USER_ID=$(id -u) \
 			--build-arg GROUP_ID=$(id -g) \
@@ -34,8 +34,7 @@ build-enclave-docker:
 	rm -f ./out/enclave
 
 	@echo "building enclave"
-
-	@docker run -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/build" --rm -t "ne_builder2_${RUST_VERSION}:latest" cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
+	@docker run -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/build" --rm -t "ne_builder2:${RUST_VERSION}" cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
 
 	@cp ./target/x86_64-unknown-linux-musl/release/enclave ./out/enclave
 

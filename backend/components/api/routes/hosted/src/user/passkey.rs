@@ -16,7 +16,7 @@ use api_core::{
 
 use chrono::{Duration, Utc};
 
-use db::models::{insight_event::CreateInsightEvent, user_timeline::UserTimeline};
+use db::models::{auth_event::NewAuthEvent, insight_event::CreateInsightEvent, user_timeline::UserTimeline};
 use db::models::{
     liveness_event::NewLivenessEvent,
     vault::Vault,
@@ -24,7 +24,7 @@ use db::models::{
 };
 use macros::route_alias;
 
-use newtypes::{AttestationType, LivenessAttributes, LivenessInfo, LivenessIssuer};
+use newtypes::{AttestationType, AuthEventKind, LivenessAttributes, LivenessInfo, LivenessIssuer};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 
@@ -54,9 +54,6 @@ pub struct WebAuthnInitResponse {
 #[api_v2_operation(description = "Generates a passkey registration challenge.", tags(Hosted))]
 #[post("/hosted/user/passkey/register")]
 pub async fn init_post(
-    // TODO only allow registering webauthn credentials if you have no previous credentials OR if
-    // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
-    // their own webauthn creds
     user_auth: UserAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<WebAuthnInitResponse>>, ApiError> {
@@ -67,7 +64,11 @@ pub async fn init_post(
         .db_pool
         .db_query(move |conn| WebauthnCredential::list(conn, &user_vault_id))
         .await??;
-    if !creds.is_empty() {
+
+    // only allow registering webauthn credentials if you have no previous credentials OR if
+    // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
+    // their own webauthn creds
+    if !creds.is_empty() && !user_auth.did_use_passkey() {
         return Err(ChallengeError::BiometricCredentialAlreadyExists.into());
     }
 
@@ -107,6 +108,15 @@ pub struct WebauthnRegisterRequest {
     challenge_token: ChallengeToken,
 }
 
+/// this is the format of the stored attestation data
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SavedAttestationData {
+    #[serde(rename = "meta")]
+    pub attested_metadata: AttestationMetadata,
+    #[serde(rename = "raw")]
+    pub raw_attestation_object: Vec<u8>,
+}
+
 //TODO: remove alias once frontend updates
 #[route_alias(post(
     "/hosted/user/biometric",
@@ -125,6 +135,7 @@ pub async fn complete_post(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp.or(UserAuthGuard::Handoff))?;
+    let did_use_passkey = user_auth.did_use_passkey();
 
     let challenge_data = Challenge::unseal(&state.challenge_sealing_key, &request.challenge_token)?;
     let reg_state = challenge_data.data;
@@ -146,15 +157,9 @@ pub async fn complete_post(
             .register_credential(&reg, &reg_state, Some(&cas))?
     };
 
-    // this is the format of the stored attestation data
-    #[derive(Debug, Serialize)]
-    struct SavedAttestationMetadata {
-        #[serde(rename = "c")]
-        credential_attestation: AttestationMetadata,
-    }
-
-    let attestation_metadata = SavedAttestationMetadata {
-        credential_attestation: cred.attestation.metadata,
+    let attestation_data_to_save = SavedAttestationData {
+        attested_metadata: cred.attestation.metadata,
+        raw_attestation_object: reg.response.attestation_object.0,
     };
 
     let (attestation_type, liveness_event_attributes) = match cred.attestation_format {
@@ -169,9 +174,7 @@ pub async fn complete_post(
             AttestationType::AndroidKey,
             Some(LivenessAttributes {
                 issuers: vec![LivenessIssuer::Google, LivenessIssuer::Footprint],
-                metadata: Some(serde_json::to_value(
-                    &attestation_metadata.credential_attestation,
-                )?),
+                metadata: Some(serde_json::to_value(&attestation_data_to_save.attested_metadata)?),
                 ..Default::default()
             }),
         ),
@@ -179,9 +182,7 @@ pub async fn complete_post(
             AttestationType::AndroidSafetyNet,
             Some(LivenessAttributes {
                 issuers: vec![LivenessIssuer::Google, LivenessIssuer::Footprint],
-                metadata: Some(serde_json::to_value(
-                    &attestation_metadata.credential_attestation,
-                )?),
+                metadata: Some(serde_json::to_value(&attestation_data_to_save.attested_metadata)?),
                 ..Default::default()
             }),
         ),
@@ -189,19 +190,20 @@ pub async fn complete_post(
         _ => (AttestationType::Unknown, None),
     };
 
-    tracing::info!(attestation=?attestation_metadata, "attestation details");
+    tracing::info!(attestation=?attestation_data_to_save, "attestation details");
 
-    let attestation_data = serde_cbor::to_vec(&attestation_metadata)?;
+    let attestation_data = serde_cbor::to_vec(&attestation_data_to_save)?;
     let public_key = crypto::serde_cbor::to_vec(&cred.cred).map_err(crypto::Error::Cbor)?;
 
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            // Protect against someone adding a webauthn credential while we verify that there's
-            // only one
+            // only allow registering webauthn credentials if you have no previous credentials OR if
+            // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
+            // their own webauthn creds
             Vault::lock(conn, user_auth.user_vault_id())?;
             let creds = WebauthnCredential::list(conn, user_auth.user_vault_id())?;
-            if !creds.is_empty() {
+            if !creds.is_empty() && !did_use_passkey {
                 return Err(ChallengeError::BiometricCredentialAlreadyExists.into());
             }
 
@@ -225,7 +227,7 @@ pub async fn complete_post(
                 }
             }
 
-            let _ = NewWebauthnCredential {
+            let credential = NewWebauthnCredential {
                 vault_id: user_auth.user_vault_id().clone(),
                 credential_id: cred.cred_id.0,
                 public_key,
@@ -233,9 +235,22 @@ pub async fn complete_post(
                 backup_eligible: cred.backup_eligible,
                 backup_state: cred.backup_state,
                 attestation_type,
-                insight_event_id: insight_event.id,
+                insight_event_id: insight_event.id.clone(),
             }
             .save(conn)?;
+
+            // record our registration of a passkey as an auth event
+            // this is done here for (a) consistency with SMS first-time registration/auth
+            // and (b) so we can later link a device attestation to this passkey
+            let _ = NewAuthEvent {
+                vault_id: user_auth.user_vault_id().clone(),
+                scoped_vault_id: user_auth.scoped_user_id(),
+                insight_event_id: Some(insight_event.id),
+                kind: AuthEventKind::Passkey,
+                webauthn_credential_id: Some(credential.id),
+                created_at: Utc::now(),
+            }
+            .create(conn.conn())?;
 
             Ok(())
         })

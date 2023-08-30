@@ -15,6 +15,7 @@ use super::insight_event::InsightEvent;
 pub struct WebauthnCredential {
     pub id: WebauthnCredentialId,
     pub vault_id: VaultId,
+    /// a webauthn "key handle" aka as "credential id": https://www.w3.org/TR/webauthn-2/#credential-id
     pub credential_id: Vec<u8>,
     pub public_key: Vec<u8>,
     pub counter: i32,
@@ -36,20 +37,10 @@ struct UpdateCredentialBackupState {
 }
 
 impl WebauthnCredential {
-    #[tracing::instrument("WebauthnCredential::get_for_user_vault", skip_all)]
-    pub fn get_for_user_vault(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<Vec<Self>> {
-        let creds = schema::webauthn_credential::table
-            .filter(schema::webauthn_credential::vault_id.eq(vault_id))
-            .get_results(conn)?;
-
-        Ok(creds)
-    }
-
     #[tracing::instrument("WebauthnCredential::list", skip_all)]
-    pub fn list(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<Vec<(Self, InsightEvent)>> {
+    pub fn list(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<Vec<Self>> {
         let creds = schema::webauthn_credential::table
             .filter(schema::webauthn_credential::vault_id.eq(vault_id))
-            .inner_join(schema::insight_event::table)
             .get_results(conn)?;
 
         Ok(creds)
@@ -69,13 +60,20 @@ impl WebauthnCredential {
     }
 
     #[tracing::instrument("WebauthnCredential::update_backup_state", skip_all)]
-    pub fn update_backup_state(conn: &mut PgConn, vault_id: &VaultId, cred_id: &[u8]) -> DbResult<()> {
+    pub fn update_backup_state(&self, conn: &mut PgConn) -> DbResult<()> {
         diesel::update(webauthn_credential::table)
-            .filter(webauthn_credential::vault_id.eq(vault_id))
-            .filter(webauthn_credential::credential_id.eq(cred_id))
+            .filter(webauthn_credential::id.eq(self.id.clone()))
             .set(&UpdateCredentialBackupState { backup_state: true })
             .execute(conn)?;
         Ok(())
+    }
+
+    #[tracing::instrument("WebauthnCredential::get_by_credential_id", skip_all)]
+    pub fn get_by_credential_id(conn: &mut PgConn, vault_id: &VaultId, cred_id: &[u8]) -> DbResult<Self> {
+        Ok(webauthn_credential::table
+            .filter(webauthn_credential::vault_id.eq(vault_id))
+            .filter(webauthn_credential::credential_id.eq(cred_id))
+            .get_result(conn)?)
     }
 }
 

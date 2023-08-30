@@ -1,3 +1,5 @@
+use db_schema::schema::apple_device_attestation;
+use db_schema::schema::auth_event;
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::VaultId;
@@ -52,6 +54,15 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
     deleted_rows += diesel::delete(stytch_fingerprint_event::table)
         .filter(stytch_fingerprint_event::vault_id.eq_any(&v_ids))
+        .execute(conn.conn())?;
+
+    // delete auth events and device attestations
+    deleted_rows += diesel::delete(auth_event::table)
+        .filter(auth_event::vault_id.eq_any(&v_ids))
+        .execute(conn.conn())?;
+
+    deleted_rows += diesel::delete(apple_device_attestation::table)
+        .filter(apple_device_attestation::vault_id.eq_any(&v_ids))
         .execute(conn.conn())?;
 
     // DataLifetimes

@@ -1,5 +1,6 @@
 use newtypes::ContactInfoId;
 use newtypes::VaultId;
+use newtypes::WebauthnCredentialId;
 use newtypes::WorkflowId;
 
 use crate::auth::user::UserAuthScope;
@@ -11,14 +12,28 @@ use super::AuthSessionData;
 pub struct UserSession {
     pub user_vault_id: VaultId,
     pub scopes: Vec<UserAuthScope>,
-    // TODO Eventually might want to store auth methods to know if a token is generated from SMS, biometric, or via tenant trigger
+    /// the auth method that was used
+    #[serde(default)]
+    pub auth_factors: Vec<AuthFactor>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub enum AuthFactor {
+    Passkey(WebauthnCredentialId),
+    Email,
+    Sms,
 }
 
 impl UserSession {
-    pub fn make(user_vault_id: VaultId, scopes: Vec<UserAuthScope>) -> AuthSessionData {
+    pub fn make(
+        user_vault_id: VaultId,
+        scopes: Vec<UserAuthScope>,
+        auth_factors: Vec<AuthFactor>,
+    ) -> AuthSessionData {
         AuthSessionData::User(Self {
             user_vault_id,
             scopes,
+            auth_factors,
         })
     }
 }

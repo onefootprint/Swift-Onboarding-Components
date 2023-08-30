@@ -3,6 +3,7 @@ mod actor;
 mod annotation;
 mod authorized_org;
 mod business_owner;
+mod auth_event;
 mod document;
 mod entity;
 mod identity_document;

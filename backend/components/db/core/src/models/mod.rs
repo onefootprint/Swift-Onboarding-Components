@@ -50,3 +50,4 @@ pub mod webauthn_credential;
 pub mod workflow;
 pub mod workflow_event;
 pub mod zip_code;
+pub mod auth_event;

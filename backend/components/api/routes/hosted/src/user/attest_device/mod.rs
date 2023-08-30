@@ -85,21 +85,20 @@ pub async fn post_attestation(
         device_type,
     } = Challenge::unseal_string(&state.challenge_sealing_key, sealed_state)?.data;
 
-    match device_type {
-        // only support ios for now
-        DeviceAttestationType::Ios => {
-            let new_attestation = ios::attest(&state, auth.user.id.clone(), challenge, attestation).await?;
+    let vault_id = auth.user.id.clone();
 
-            let attestation = state
+    let _ = match device_type {
+        DeviceAttestationType::Ios => {
+            let new_attestation = ios::attest(&state, vault_id.clone(), challenge, attestation).await?;
+
+            state
                 .db_pool
                 .db_query(move |conn| new_attestation.create(conn))
-                .await??;
-
-            tracing::info!(attestation_id=%attestation.id, "create apple device attestation");
+                .await?
         }
         DeviceAttestationType::Android => {
             return Err(ApiErrorKind::AssertionError(
-                "Android device attestation not yet support".into(),
+                "Android device attestation not yet supported".into(),
             ))?
         }
     };

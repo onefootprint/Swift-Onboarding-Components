@@ -292,7 +292,7 @@ fn get_requirement_inner(
             if ob_config.is_no_phone_flow {
                 None
             } else {
-                let credentials = WebauthnCredential::get_for_user_vault(conn, &uvw.vault().id)?;
+                let credentials = WebauthnCredential::list(conn, &uvw.vault().id)?;
 
                 // Note: we should probably represent this another way, but for now we can determine if we want to skip passkey reg
                 // by checking for this liveness event on the scoped_vault

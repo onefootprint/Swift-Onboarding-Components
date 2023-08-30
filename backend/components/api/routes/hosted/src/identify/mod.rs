@@ -77,11 +77,10 @@ pub struct ChallengeState {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, EnumDiscriminants)]
-#[strum_discriminants(name(ChallengeDataKind))]
-#[strum_discriminants(vis(pub))]
 pub enum ChallengeData {
     Sms(PhoneChallengeState),
-    Biometric(BiometricChallengeState),
+    #[serde(alias = "Biometric")] // TODO: drop this alias after challenges expire
+    Passkey(BiometricChallengeState),
     Email(EmailChallengeState),
 }
 
@@ -89,7 +88,7 @@ impl ChallengeState {
     pub fn expires_at(&self) -> DateTime<Utc> {
         let ttl = match &self.data {
             ChallengeData::Sms(_) => Duration::minutes(5),
-            ChallengeData::Biometric(_) => Duration::minutes(5),
+            ChallengeData::Passkey(_) => Duration::minutes(5),
             ChallengeData::Email(_) => Duration::minutes(5),
         };
 
@@ -116,7 +115,7 @@ async fn get_user_challenge_context(
         .db_query(move |conn| -> Result<_, ApiError> {
             let uvw = VaultWrapper::build(conn, VwArgs::Vault(&existing_user.id))?;
 
-            let creds = WebauthnCredential::get_for_user_vault(conn, &uvw.vault.id)?;
+            let creds = WebauthnCredential::list(conn, &uvw.vault.id)?;
             Ok((uvw, creds))
         })
         .await??;
