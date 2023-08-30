@@ -36,7 +36,7 @@ const AuthorizedScopes = ({
   // defaultValues populates only the fields that are in the form
   // so we can set everything to true and only the fields we display will submit
   const formMethods = useForm<AuthorizedScopesFormData>({
-    defaultValues: defaultAuthorizedScopesValues,
+    defaultValues: { ...defaultAuthorizedScopesValues },
   });
   const { handleSubmit } = formMethods;
 

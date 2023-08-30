@@ -38,19 +38,9 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
       <ScopeSection>
         <Typography variant="label-3">{t('basic-information')}</Typography>
         <OptionsContainer>
-          <Checkbox
-            disabled
-            checked
-            label={allT('cdo.email')}
-            {...register(CollectedKycDataOption.email)}
-          />
+          <Checkbox disabled checked label={allT('cdo.email')} />
           {phoneNumber && (
-            <Checkbox
-              disabled
-              checked
-              label={allT('cdo.phone_number')}
-              {...register(CollectedKycDataOption.phoneNumber)}
-            />
+            <Checkbox disabled checked label={allT('cdo.phone_number')} />
           )}
           <Checkbox
             label={allT('cdo.name')}

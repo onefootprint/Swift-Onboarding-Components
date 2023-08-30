@@ -1,4 +1,14 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
+import {
+  CollectedDocumentDataOption,
+  CollectedInvestorProfileDataOption,
+  CollectedKycDataOption,
+} from '@onefootprint/types';
 import React from 'react';
 
 import { Kind } from '@/playbooks/utils/machine/types';
@@ -10,11 +20,13 @@ import AuthorizedScopesWithContext, {
 const renderAuthorizedScopes = ({
   kind,
   submissionLoading,
+  onSubmit,
 }: AuthorizedScopesWithContextProps) => {
   customRender(
     <AuthorizedScopesWithContext
       kind={kind}
       submissionLoading={submissionLoading}
+      onSubmit={onSubmit}
     />,
   );
 };
@@ -56,5 +68,34 @@ describe('<AuthorizedScopes />', () => {
       name: 'Back',
     });
     expect(backButton).toBeDisabled();
+  });
+
+  it('always contains email and phone number in access scopes', async () => {
+    const onSubmit = jest.fn();
+    renderAuthorizedScopes({ kind: Kind.KYC, onSubmit });
+
+    const submitButton = screen.getByRole('button', {
+      name: 'Create Playbook',
+    });
+    await userEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        {
+          [CollectedKycDataOption.name]: true,
+          [CollectedKycDataOption.email]: true,
+          [CollectedKycDataOption.phoneNumber]: true,
+          [CollectedKycDataOption.dob]: true,
+          [CollectedKycDataOption.fullAddress]: true,
+          [CollectedKycDataOption.ssn4]: true,
+          [CollectedKycDataOption.ssn9]: true,
+          [CollectedKycDataOption.usLegalStatus]: true,
+          [CollectedDocumentDataOption.document]: true,
+          [CollectedInvestorProfileDataOption.investorProfile]: true,
+          allBusinessData: true,
+        },
+        expect.anything(),
+      );
+    });
   });
 });

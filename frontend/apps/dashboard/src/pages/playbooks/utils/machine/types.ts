@@ -34,7 +34,6 @@ export type AuthorizedScopesFormData = {
   [CollectedKycDataOption.name]: boolean;
   [CollectedKycDataOption.email]: boolean;
   [CollectedKycDataOption.phoneNumber]: boolean;
-  [CollectedKycDataOption.name]: boolean;
   [CollectedKycDataOption.dob]: boolean;
   [CollectedKycDataOption.fullAddress]: boolean;
   [CollectedKycDataOption.ssn4]?: boolean;
