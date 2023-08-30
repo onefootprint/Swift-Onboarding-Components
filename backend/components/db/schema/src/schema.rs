@@ -1023,6 +1023,8 @@ joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
 joinable!(fingerprint_visit_event -> vault (vault_id));
 joinable!(identity_document -> document_request (request_id));
+joinable!(incode_verification_session -> identity_document (identity_document_id));
+joinable!(incode_verification_session_event -> identity_document (identity_document_id));
 joinable!(incode_verification_session_event -> incode_verification_session (incode_verification_session_id));
 joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> scoped_vault (scoped_vault_id));
