@@ -69,4 +69,8 @@ pub enum AuthError {
     NonPersonVault,
     #[error("Your organization administrator has disabled the ability to log in using this auth method. Please retry using another auth method.")]
     UnsupportedAuthMethod,
+    #[error("Workflow state does not allow {0}")]
+    MissingWorkflowGuard(newtypes::WorkflowGuard),
+    #[error("Workflow is deactivated. Cannot perform {0}")]
+    WorkflowDeactivated(newtypes::WorkflowGuard),
 }

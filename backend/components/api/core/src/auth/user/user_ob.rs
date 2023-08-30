@@ -20,7 +20,7 @@ use crate::{
         session::{AuthSessionData, ExtractableAuthSession},
         AuthError, IsGuardMet, SessionContext,
     },
-    errors::{onboarding::OnboardingError, workflow::WorkflowError, ApiResult},
+    errors::{onboarding::OnboardingError, ApiResult},
     ApiError,
 };
 
@@ -179,11 +179,15 @@ impl UserObSession {
     pub fn check_workflow_guard(&self, guard: WorkflowGuard) -> ApiResult<()> {
         // TODO we ideally want this to happen inside a locked transaction with the refreshed
         // workflow state, otherwise this could be stale
-        // TODO check deactivated_at. subject to stale reads here, though...
-        // Maybe when fetching workflow from db we only look for active?
-        // The only time we load a deactivated wf is when it's already approved and we're onboarding onto an old wf
-        // maybe we then have our own graceful error that means the session is completed
-        // or, we just check this guard in a locked txn
+        // TODO to solve ^, maybe we add this check to the write path on the VW. I believe
+        // everything checking this makes a new DataLifetime
+        if self
+            .workflow
+            .as_ref()
+            .is_some_and(|wf| wf.deactivated_at.is_some())
+        {
+            return Err(AuthError::WorkflowDeactivated(guard).into());
+        }
         let allowed_guards = if let Some(wf) = self.workflow.as_ref() {
             wf.state.allowed_guards()
         } else {
@@ -192,7 +196,7 @@ impl UserObSession {
             vec![WorkflowGuard::AddData]
         };
         if !allowed_guards.contains(&guard) {
-            Err(WorkflowError::MissingGuard(guard).into())
+            Err(AuthError::MissingWorkflowGuard(guard).into())
         } else {
             Ok(())
         }

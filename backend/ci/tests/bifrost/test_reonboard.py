@@ -10,7 +10,7 @@ def test_reonboard(sandbox_tenant, twilio, sandbox_user):
         sandbox_tenant.default_ob_config, twilio, phone_number, sandbox_id
     )
     bifrost.run()
-    body = patch("hosted/user/vault", dict(), bifrost.auth_token, status_code=400)
+    body = patch("hosted/user/vault", dict(), bifrost.auth_token, status_code=401)
     assert body["error"]["message"] == "Workflow state does not allow add_data"
     assert len(bifrost.handled_requirements) == 0
 
