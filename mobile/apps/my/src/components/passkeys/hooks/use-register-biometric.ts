@@ -33,9 +33,9 @@ const biometricInit = async (authToken: string) => {
   return data;
 };
 
-const generateDeviceResponse = async (challenge: string) => {
-  const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;
-  const { publicKey } = challengeJson;
+const generateDeviceResponse = async ({
+  publicKey,
+}: BiometricRegisterChallengeJson) => {
   const result = (await Passkey.register({
     challenge: base64url.toBase64(publicKey.challenge as unknown as string),
     rp: {
@@ -82,13 +82,14 @@ const register = async ({ authToken, deviceResponseJson, challengeToken }) => {
 
 const registerBiometric = async (authToken: string) => {
   const { challengeToken, challengeJson } = await biometricInit(authToken);
-  const deviceResponseJson = await generateDeviceResponse(challengeJson);
-  const response = await register({
+  const challenge = JSON.parse(challengeJson) as BiometricRegisterChallengeJson;
+  const deviceResponseJson = await generateDeviceResponse(challenge);
+  await register({
     authToken,
     challengeToken,
     deviceResponseJson,
   });
-  return response;
+  return deviceResponseJson;
 };
 
 const useBiometricInit = () => useMutation(registerBiometric);

@@ -10,7 +10,7 @@ import About from './components/about';
 
 export type RegisterProps = {
   authToken: string;
-  onSuccess?: () => void;
+  onSuccess?: (deviceResponseJson: string) => void;
   onError?: (error: unknown) => void;
 };
 

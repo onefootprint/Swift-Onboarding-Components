@@ -19,7 +19,7 @@ enum DCAttestationError: Error {
 struct DataToAttest: Encodable {
   let model: String
   let os: String
-  let webauthnPublicKey: String?
+  let webauthnDeviceResponseJson: String?
   let footprintAttestationChallenge: String
   let uploadedDocumentTypes: [String]
   let deviceCheckToken: String?

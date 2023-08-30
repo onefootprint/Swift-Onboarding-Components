@@ -2,6 +2,6 @@
 
 @interface RCT_EXTERN_MODULE(DeviceAttestation, NSObject)
 
-RCT_EXTERN_METHOD(attest:(NSString *)webauthnPublicKey withChallenge:(NSString *)challenge callback:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(attest:(NSString *)deviceResponseJson withChallenge:(NSString *)challenge callback:(RCTResponseSenderBlock)callback)
 
 @end

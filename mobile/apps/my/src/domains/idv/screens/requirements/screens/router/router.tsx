@@ -5,6 +5,7 @@ import IdDoc from '@/components/id-doc';
 import Passkeys from '@/components/passkeys';
 
 import CheckRequirements from '../check-requirements';
+import useAttestDevice from './hooks/use-attest-device';
 import createMachine from './utils/state-machine';
 
 type RouterProps = {
@@ -14,12 +15,17 @@ type RouterProps = {
 
 const Router = ({ authToken, onDone }: RouterProps) => {
   const [state, send] = useMachine(() => createMachine());
+  const attestDeviceMutation = useAttestDevice();
 
   useEffect(() => {
     if (state.done) {
       onDone();
     }
   }, [state.done, onDone]);
+
+  const attestDevice = (deviceResponseJson: string | null = null) => {
+    attestDeviceMutation.mutate({ authToken, deviceResponseJson });
+  };
 
   return (
     <>
@@ -39,7 +45,10 @@ const Router = ({ authToken, onDone }: RouterProps) => {
       {state.matches('passkeys') && (
         <Passkeys
           authToken={authToken}
-          onDone={() => send({ type: 'requirementCompleted' })}
+          onDone={deviceResponseJson => {
+            attestDevice(deviceResponseJson);
+            send({ type: 'requirementCompleted' });
+          }}
         />
       )}
       {state.matches('idDoc') && (

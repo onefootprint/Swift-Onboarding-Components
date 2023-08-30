@@ -10,7 +10,7 @@ import useSkipPasskeys from './hooks/use-skip-passkeys';
 
 export type RetryProps = {
   authToken: string;
-  onSuccess?: () => void;
+  onSuccess?: (deviceResponseJson: string) => void;
   onSkip?: () => void;
 };
 

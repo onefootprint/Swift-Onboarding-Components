@@ -12,11 +12,11 @@ import { AUTH_HEADER } from '@/config/constants';
 const { DeviceAttestation } = NativeModules;
 
 const getSignalsAsync = async (
-  webauthnPublicKey: string | null,
+  deviceResponseJson: string | null,
   challenge: string,
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    DeviceAttestation.attest(webauthnPublicKey, challenge, (error, result) => {
+    DeviceAttestation.attest(deviceResponseJson, challenge, (error, result) => {
       if (error) {
         reject(error);
       } else {
@@ -60,10 +60,10 @@ const createDeviceAttestation = async (
 
 const getAttestation = async ({
   authToken,
-  webauthnPublicKey,
+  deviceResponseJson,
 }: {
   authToken: string;
-  webauthnPublicKey: string | null;
+  deviceResponseJson: string | null;
 }) => {
   if (Platform.OS !== 'ios') return null;
   const { attestationChallenge, state } = await getDeviceAttestationChallenge(
@@ -73,12 +73,12 @@ const getAttestation = async ({
     },
   );
   const attestation = await getSignalsAsync(
-    webauthnPublicKey,
+    deviceResponseJson,
     attestationChallenge,
   );
   await createDeviceAttestation(authToken, {
     attestation,
-    state: state.replaceAll('"', ''),
+    state,
   });
 };
 
@@ -86,11 +86,11 @@ const useAttestDevice = () => {
   return useMutation(
     ({
       authToken,
-      webauthnPublicKey,
+      deviceResponseJson,
     }: {
       authToken: string;
-      webauthnPublicKey: string | null;
-    }) => getAttestation({ authToken, webauthnPublicKey }),
+      deviceResponseJson: string | null;
+    }) => getAttestation({ authToken, deviceResponseJson }),
   );
 };
 

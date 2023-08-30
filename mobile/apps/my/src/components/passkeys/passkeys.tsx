@@ -7,7 +7,7 @@ import createMachine from './utils/state-machine';
 
 export type PasskeysProps = {
   authToken: string;
-  onDone?: () => void;
+  onDone?: (deviceResponseJson?: string | null) => void;
 };
 
 const Passkeys = ({ authToken, onDone }: PasskeysProps) => {
