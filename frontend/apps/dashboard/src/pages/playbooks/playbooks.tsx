@@ -43,11 +43,11 @@ const Playbooks = () => {
           <Typography variant="heading-3">{t('header.title')}</Typography>
           <Typography variant="body-2">{t('header.subtitle')}</Typography>
         </Title>
-        <PermissionGate
-          fallbackText={t('cta-not-allowed')}
-          scopeKind={RoleScopeKind.onboardingConfiguration}
-        >
-          <Wrapper>
+        <Wrapper>
+          <PermissionGate
+            fallbackText={t('cta-not-allowed')}
+            scopeKind={RoleScopeKind.onboardingConfiguration}
+          >
             <Button
               size="small"
               sx={{ whiteSpace: 'nowrap' }}
@@ -55,11 +55,10 @@ const Playbooks = () => {
             >
               {t('create-button')}
             </Button>
-            {!hasHadPlaybook && <WaveAnimation width={140} />}
-          </Wrapper>
-        </PermissionGate>
+          </PermissionGate>
+          {!hasHadPlaybook && <WaveAnimation width={140} />}
+        </Wrapper>
       </HeaderContainer>
-
       <TableContainer>
         <Table
           data={response?.data}
