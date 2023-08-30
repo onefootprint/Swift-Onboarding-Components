@@ -84,7 +84,7 @@ describe('LegalStatus', () => {
       const nationalityText = screen.getByText('Hong Kong');
       expect(nationalityText).toBeInTheDocument();
 
-      const visaKindText = screen.getByText('H1B');
+      const visaKindText = screen.getByText('H-1B');
       expect(visaKindText).toBeInTheDocument();
 
       const visaExpirationInput = screen.getByTestId(
@@ -154,7 +154,7 @@ describe('LegalStatus', () => {
       const nationalityTrigger = triggers[0];
       await selectEvents.select(nationalityTrigger, 'United States of America');
       const visaTypeTrigger = triggers[2];
-      await selectEvents.select(visaTypeTrigger, 'L1');
+      await selectEvents.select(visaTypeTrigger, 'L-1');
 
       const citizenRadio = screen.getByTestId('citizen-radio');
       await userEvent.click(citizenRadio);
@@ -204,9 +204,6 @@ describe('LegalStatus', () => {
 
       const citizenshipSelects = screen.getAllByText('Citizenship');
       expect(citizenshipSelects).toHaveLength(1);
-
-      const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
-      expect(addCitizenshipButton).toBeInTheDocument();
     });
 
     it('the country fields should both be required', async () => {
@@ -367,17 +364,10 @@ describe('LegalStatus', () => {
       await userEvent.click(permanentResidentRadio);
 
       await waitFor(() => {
-        const addCitizenshipButton = screen.getByTestId(
+        const addCitizenshipButton = screen.queryByTestId(
           'add-citizenship-button',
         );
-        expect(addCitizenshipButton).toBeInTheDocument();
-      });
-      const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
-      await userEvent.click(addCitizenshipButton);
-
-      await waitFor(() => {
-        const citizenshipSelects = screen.getAllByText('Citizenship');
-        expect(citizenshipSelects).toHaveLength(1);
+        expect(addCitizenshipButton).toBeNull();
       });
     });
 
@@ -554,10 +544,11 @@ describe('LegalStatus', () => {
 
       const nationalityTrigger = countryTriggers[0];
       await selectEvents.select(nationalityTrigger, 'United States of America');
+
+      // Add 3 citizenships (AL, AF, DZ)
       const citizenshipTrigger = countryTriggers[1];
       await selectEvents.select(citizenshipTrigger, 'Albania');
 
-      // Add 3 additional citizenships for a total of 4 (AL, AF, DZ, AD)
       await waitFor(() => {
         const addCitizenshipButton = screen.getByTestId(
           'add-citizenship-button',
@@ -598,33 +589,12 @@ describe('LegalStatus', () => {
       });
       await selectEvents.select(citizenship3Trigger, 'Algeria');
 
-      await waitFor(() => {
-        const addCitizenship3Button = screen.getByTestId(
-          'add-citizenship-button',
-        );
-        expect(addCitizenship3Button).toBeInTheDocument();
-      });
-      const addCitizenship3Button = screen.getByTestId(
-        'add-citizenship-button',
-      );
-      await userEvent.click(addCitizenship3Button);
-      await waitFor(() => {
-        const citizenship4Trigger = screen.getByRole('button', {
-          name: 'Select',
-        });
-        expect(citizenship4Trigger).toBeInTheDocument();
-      });
-      const citizenship4Trigger = screen.getByRole('button', {
-        name: 'Select',
-      });
-      await selectEvents.select(citizenship4Trigger, 'Andorra');
-
-      // Delete 3rd citizenship for a total of 3 remaining (AL, AF, AD)
+      // Delete 3rd citizenship for a total of 2 remaining (AL, AF)
       await waitFor(() => {
         const deleteCitizenshipButtons = screen.queryAllByTestId(
           'citizenship-delete-button',
         );
-        expect(deleteCitizenshipButtons).toHaveLength(4);
+        expect(deleteCitizenshipButtons).toHaveLength(3);
       });
       const deleteCitizenshipButtons = screen.queryAllByTestId(
         'citizenship-delete-button',
@@ -647,7 +617,7 @@ describe('LegalStatus', () => {
             value: 'US',
           },
           [IdDI.citizenships]: {
-            value: ['AL', 'AF', 'AD'],
+            value: ['AL', 'AF'],
           },
           [IdDI.visaExpirationDate]: {
             value: undefined,
@@ -674,9 +644,6 @@ describe('LegalStatus', () => {
 
       const citizenshipSelects = screen.getAllByText('Citizenship');
       expect(citizenshipSelects).toHaveLength(1);
-
-      const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
-      expect(addCitizenshipButton).toBeInTheDocument();
 
       const visaKindSelect = screen.getByTestId('visa-kind-select');
       expect(visaKindSelect).toBeInTheDocument();
@@ -745,7 +712,7 @@ describe('LegalStatus', () => {
       const citizenshipTrigger = triggers[1];
       await selectEvents.select(citizenshipTrigger, 'Afghanistan');
       const visaTrigger = triggers[2];
-      await selectEvents.select(visaTrigger, 'H1B');
+      await selectEvents.select(visaTrigger, 'H-1B');
 
       const visaExpirationTextInput = screen.getByTestId(
         'visa-expiration-textinput',
@@ -786,7 +753,7 @@ describe('LegalStatus', () => {
       await selectEvents.select(citizenshipTrigger, 'Albania');
 
       const visaTypeTrigger = triggers[2];
-      await selectEvents.select(visaTypeTrigger, 'L1');
+      await selectEvents.select(visaTypeTrigger, 'L-1');
       const visaExpirationTextInput = screen.getByTestId(
         'visa-expiration-textinput',
       );

@@ -39,5 +39,6 @@ export type MachineEvents =
   | { type: 'editEmail' }
   | { type: 'editBasicInfo' }
   | { type: 'editAddress' }
+  | { type: 'editUsLegalStatus' }
   | { type: 'editIdentity' }
   | { type: 'returnToSummary' };

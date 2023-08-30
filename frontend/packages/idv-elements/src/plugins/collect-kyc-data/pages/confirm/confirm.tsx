@@ -79,8 +79,8 @@ const Confirm = () => {
     >
       <EmailSection />
       <BasicInfoSection />
-      <LegalStatusSection />
       <AddressSection />
+      <LegalStatusSection />
       <IdentitySection />
     </ConfirmCollectedData>
   );

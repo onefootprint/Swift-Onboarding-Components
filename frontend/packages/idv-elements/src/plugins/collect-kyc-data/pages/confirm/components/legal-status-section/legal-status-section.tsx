@@ -110,7 +110,7 @@ const LegalStatusSection = () => {
 
   return (
     <Section
-      title={t('legal-status.title')}
+      title={t('confirm.legal-status.text.title')}
       actions={actions}
       IconComponent={IcoGlobe24}
       content={getSectionContent()}

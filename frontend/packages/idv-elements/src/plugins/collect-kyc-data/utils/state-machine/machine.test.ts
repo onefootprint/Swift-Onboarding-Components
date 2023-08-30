@@ -4,6 +4,8 @@ import {
   OnboardingConfigStatus,
   OnboardingRequirementKind,
   PublicOnboardingConfig,
+  UsLegalStatus,
+  VisaKind,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -60,6 +62,7 @@ describe('Collect KYC Data Machine Tests', () => {
         [
           CollectedKycDataOption.name,
           CollectedKycDataOption.fullAddress,
+          CollectedKycDataOption.usLegalStatus,
           CollectedKycDataOption.ssn9,
         ],
         { [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true } },
@@ -71,6 +74,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.requirement.missingAttributes).toEqual([
         CollectedKycDataOption.name,
         CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
       expect(context.data[IdDI.email]).toEqual({
@@ -113,7 +117,7 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.zip]: { value: '94107' },
         },
       });
-      expect(state.value).toEqual('ssn');
+      expect(state.value).toEqual('usLegalStatus');
       context = state.context;
       expect(context.data[IdDI.country]).toEqual({ value: 'US' });
       expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
@@ -133,6 +137,39 @@ describe('Collect KYC Data Machine Tests', () => {
       context = state.context;
       expect(context.data[IdDI.country]).toEqual({ value: 'TR' });
       expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
+      expect(state.value).toEqual('usLegalStatus');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.permanentResident },
+          [IdDI.nationality]: { value: 'CA' },
+          [IdDI.citizenships]: { value: ['HK'] },
+        },
+      });
+      expect(state.value).toEqual('ssn');
+      context = state.context;
+      expect(context.data[IdDI.usLegalStatus]).toEqual({
+        value: UsLegalStatus.permanentResident,
+      });
+      expect(context.data[IdDI.nationality]).toEqual({ value: 'CA' });
+      expect(context.data[IdDI.citizenships]).toEqual({ value: ['HK'] });
+
+      // Navigate to prev
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('usLegalStatus');
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.usLegalStatus]).toEqual({
+        value: UsLegalStatus.citizen,
+      });
       expect(state.value).toEqual('ssn');
 
       state = machine.send({
@@ -228,6 +265,7 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.email,
         CollectedKycDataOption.name,
         CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
       machine.send({ type: 'initialized', payload: {} });
@@ -237,6 +275,7 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.email,
         CollectedKycDataOption.name,
         CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
       expect(context.data[IdDI.email]).toBeUndefined();
@@ -305,7 +344,7 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.zip]: { value: '94107' },
         },
       });
-      expect(state.value).toEqual('ssn');
+      expect(state.value).toEqual('usLegalStatus');
       context = state.context;
       expect(context.data[IdDI.country]).toEqual({ value: 'US' });
       expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
@@ -325,6 +364,45 @@ describe('Collect KYC Data Machine Tests', () => {
       context = state.context;
       expect(context.data[IdDI.country]).toEqual({ value: 'TR' });
       expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
+      expect(state.value).toEqual('usLegalStatus');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen },
+        },
+      });
+      expect(state.value).toEqual('ssn');
+      context = state.context;
+      expect(context.data[IdDI.usLegalStatus]).toEqual({
+        value: UsLegalStatus.citizen,
+      });
+
+      // Navigate to prev
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('usLegalStatus');
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.visa },
+          [IdDI.nationality]: { value: 'CA' },
+          [IdDI.citizenships]: { value: ['HK'] },
+          [IdDI.visaKind]: { value: VisaKind.h1b },
+          [IdDI.visaExpirationDate]: { value: '01012054' },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.usLegalStatus]).toEqual({
+        value: UsLegalStatus.visa,
+      });
+      expect(context.data[IdDI.nationality]).toEqual({ value: 'CA' });
+      expect(context.data[IdDI.citizenships]).toEqual({ value: ['HK'] });
+      expect(context.data[IdDI.visaKind]).toEqual({ value: VisaKind.h1b });
+      expect(context.data[IdDI.visaExpirationDate]).toEqual({
+        value: '01012054',
+      });
       expect(state.value).toEqual('ssn');
 
       state = machine.send({
@@ -587,6 +665,7 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.email,
         CollectedKycDataOption.name,
         CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
       machine.send({ type: 'initialized', payload: {} });
@@ -596,6 +675,7 @@ describe('Collect KYC Data Machine Tests', () => {
         CollectedKycDataOption.email,
         CollectedKycDataOption.name,
         CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
       expect(context.data[IdDI.email]).toBeUndefined();
@@ -627,6 +707,13 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen },
+        },
+      });
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
           [IdDI.ssn9]: { value: '101010101' },
         },
       });
@@ -644,6 +731,10 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(state.value).toEqual('confirm');
       state = machine.send({
         type: 'editAddress',
+      });
+      expect(state.value).toEqual('confirm');
+      state = machine.send({
+        type: 'editUsLegalStatus',
       });
       expect(state.value).toEqual('confirm');
       state = machine.send({
@@ -681,6 +772,23 @@ describe('Collect KYC Data Machine Tests', () => {
       });
       expect(state.context.data[IdDI.country]).toEqual({ value: 'TR' });
       expect(state.context.data[IdDI.zip]).toEqual({ value: '00000' });
+      expect(state.value).toBe('confirm');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.permanentResident },
+          [IdDI.nationality]: { value: 'BR' },
+          [IdDI.citizenships]: { value: ['IT', 'VE'] },
+        },
+      });
+      expect(state.context.data[IdDI.usLegalStatus]).toEqual({
+        value: UsLegalStatus.permanentResident,
+      });
+      expect(state.context.data[IdDI.nationality]).toEqual({ value: 'BR' });
+      expect(state.context.data[IdDI.citizenships]).toEqual({
+        value: ['IT', 'VE'],
+      });
       expect(state.value).toBe('confirm');
 
       state = machine.send({

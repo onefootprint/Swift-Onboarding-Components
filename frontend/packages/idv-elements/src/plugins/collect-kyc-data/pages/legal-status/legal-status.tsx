@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, UsLegalStatus } from '@onefootprint/types';
-import { CountrySelectOption } from '@onefootprint/ui';
+import { CountrySelectOption, Divider, media } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -118,7 +118,10 @@ const LegalStatus = ({
         <Form onSubmit={methods.handleSubmit(handleBeforeSubmit)}>
           <StatusFields handleStatusChange={handleStatusChange} />
           {selectedOption && selectedOption !== UsLegalStatus.citizen && (
-            <CountryFields />
+            <>
+              <Divider />
+              <CountryFields />
+            </>
           )}
           {selectedOption === UsLegalStatus.visa && <VisaFields />}
           <EditableFormButtonContainer
@@ -137,7 +140,11 @@ const Form = styled.form`
   ${({ theme }) => css`
     width: 100%;
     display: grid;
-    row-gap: ${theme.spacing[7]};
+    row-gap: ${theme.spacing[5]};
+
+    ${media.lessThan('sm')`
+      row-gap: ${theme.spacing[6]};
+    `}
   `}
 `;
 

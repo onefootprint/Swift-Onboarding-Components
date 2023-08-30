@@ -60,17 +60,17 @@ const createCollectKycDataMachine = (
                 ),
             },
             {
-              target: 'usLegalStatus',
+              target: 'residentialAddress',
               cond: context =>
-                isMissingUSLegalStatusAttribute(
+                isMissingResidentialAttribute(
                   allAttributes(context.requirement),
                   context.data,
                 ),
             },
             {
-              target: 'residentialAddress',
+              target: 'usLegalStatus',
               cond: context =>
-                isMissingResidentialAttribute(
+                isMissingUSLegalStatusAttribute(
                   allAttributes(context.requirement),
                   context.data,
                 ),
@@ -105,19 +105,19 @@ const createCollectKycDataMachine = (
                   ),
               },
               {
-                target: 'usLegalStatus',
-                actions: 'assignData',
+                target: 'residentialAddress',
+                actions: ['assignData'],
                 cond: context =>
-                  isMissingUSLegalStatusAttribute(
+                  isMissingResidentialAttribute(
                     allAttributes(context.requirement),
                     context.data,
                   ),
               },
               {
-                target: 'residentialAddress',
-                actions: ['assignData'],
+                target: 'usLegalStatus',
+                actions: 'assignData',
                 cond: context =>
-                  isMissingResidentialAttribute(
+                  isMissingUSLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.data,
                   ),
@@ -142,19 +142,19 @@ const createCollectKycDataMachine = (
           on: {
             dataSubmitted: [
               {
-                target: 'usLegalStatus',
-                actions: 'assignData',
+                target: 'residentialAddress',
+                actions: ['assignData'],
                 cond: context =>
-                  isMissingUSLegalStatusAttribute(
+                  isMissingResidentialAttribute(
                     allAttributes(context.requirement),
                     context.data,
                   ),
               },
               {
-                target: 'residentialAddress',
-                actions: ['assignData'],
+                target: 'usLegalStatus',
+                actions: 'assignData',
                 cond: context =>
-                  isMissingResidentialAttribute(
+                  isMissingUSLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.data,
                   ),
@@ -183,14 +183,14 @@ const createCollectKycDataMachine = (
             },
           },
         },
-        usLegalStatus: {
+        residentialAddress: {
           on: {
             dataSubmitted: [
               {
-                target: 'residentialAddress',
-                actions: ['assignData'],
+                target: 'usLegalStatus',
+                actions: 'assignData',
                 cond: context =>
-                  isMissingResidentialAttribute(
+                  isMissingUSLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.data,
                   ),
@@ -229,7 +229,7 @@ const createCollectKycDataMachine = (
             ],
           },
         },
-        residentialAddress: {
+        usLegalStatus: {
           on: {
             dataSubmitted: [
               {
@@ -248,9 +248,9 @@ const createCollectKycDataMachine = (
             ],
             navigatedToPrevPage: [
               {
-                target: 'usLegalStatus',
+                target: 'residentialAddress',
                 cond: context =>
-                  isMissingUSLegalStatusAttribute(
+                  isMissingResidentialAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
                   ),
@@ -282,17 +282,17 @@ const createCollectKycDataMachine = (
             },
             navigatedToPrevPage: [
               {
-                target: 'residentialAddress',
+                target: 'usLegalStatus',
                 cond: context =>
-                  isMissingResidentialAttribute(
+                  isMissingUSLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
                   ),
               },
               {
-                target: 'usLegalStatus',
+                target: 'residentialAddress',
                 cond: context =>
-                  isMissingUSLegalStatusAttribute(
+                  isMissingResidentialAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
                   ),
@@ -339,17 +339,17 @@ const createCollectKycDataMachine = (
                   ),
               },
               {
-                target: 'residentialAddress',
+                target: 'usLegalStatus',
                 cond: context =>
-                  isMissingResidentialAttribute(
+                  isMissingUSLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
                   ),
               },
               {
-                target: 'usLegalStatus',
+                target: 'residentialAddress',
                 cond: context =>
-                  isMissingUSLegalStatusAttribute(
+                  isMissingResidentialAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
                   ),

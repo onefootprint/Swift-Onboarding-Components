@@ -1,16 +1,19 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
-import { CountrySelect, LinkButton } from '@onefootprint/ui';
+import { LinkButton } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import {
   Controller,
+  ControllerRenderProps,
   FieldError,
+  FieldValues,
   useFieldArray,
   useFormContext,
 } from 'react-hook-form';
 
 import { CountrySelectOptionOrPlaceholder } from '../../types';
 import CitizenshipField from './citizenship-field';
+import CountryOfBirthField from './country-of-birth-field';
 
 const CountryFields = () => {
   const { t } = useTranslation('pages.legal-status.form');
@@ -46,31 +49,64 @@ const CountryFields = () => {
     return undefined;
   };
 
+  const renderAddButton = (
+    index: number,
+    value: string,
+    error?: FieldError,
+  ) => {
+    // Allow additional citizenships if user has filled out at least 1, with a maximum of 3
+    const isLastCitizenship = index === fields.length - 1;
+    const correctNumCitizenships =
+      (!!value || fields.length > 1) && fields.length < 3;
+    return isLastCitizenship && correctNumCitizenships ? (
+      <LinkButton
+        disabled={!!error || !value}
+        iconComponent={IcoPlusSmall16}
+        iconPosition="left"
+        onClick={() => append({ label: '', value: undefined })}
+        size="compact"
+        testID="add-citizenship-button"
+      >
+        {t('citizenship.add-text')}
+      </LinkButton>
+    ) : null;
+  };
+
+  const renderCitizenshipFields = (
+    index: number,
+    field: ControllerRenderProps<FieldValues, `citizenships.${number}`>,
+    error?: FieldError,
+  ) => {
+    const {
+      value: { value },
+      onChange,
+    } = field;
+    const errorMessage = getErrorMessage(index, value, error);
+
+    return (
+      <>
+        <CitizenshipField
+          field={field}
+          onChange={nextValue =>
+            handleCitizenshipChange(
+              index,
+              onChange,
+              nextValue as CountrySelectOptionOrPlaceholder,
+            )
+          }
+          hasDeleteButton={fields.length > 1}
+          onDelete={() => remove(index)}
+          hasError={!!errorMessage}
+          hint={errorMessage}
+        />
+        {renderAddButton(index, value, error)}
+      </>
+    );
+  };
+
   return (
     <>
-      <Controller
-        data-private
-        name="nationality"
-        control={control}
-        rules={{
-          required: true,
-          validate: {
-            empty: ({ value }) => !!value,
-          },
-        }}
-        render={({ field, fieldState: { error } }) => (
-          <CountrySelect
-            label={t('nationality.label')}
-            onBlur={field.onBlur}
-            placeholder={t('nationality.placeholder')}
-            onChange={({ label, value }) => field.onChange({ label, value })}
-            value={field.value}
-            hasError={!!error}
-            hint={error && t('nationality.error')}
-            testID="nationality-select"
-          />
-        )}
-      />
+      <CountryOfBirthField />
       {fields.map((citizenshipField, index) => (
         <Controller
           key={citizenshipField.id}
@@ -84,44 +120,9 @@ const CountryFields = () => {
               usCitizen: ({ value }) => value !== 'US',
             },
           }}
-          render={({ field, fieldState: { error } }) => {
-            const errorMessage = getErrorMessage(
-              index,
-              field.value.value,
-              error,
-            );
-
-            return (
-              <>
-                <CitizenshipField
-                  field={field}
-                  onChange={nextValue =>
-                    handleCitizenshipChange(
-                      index,
-                      field.onChange,
-                      nextValue as CountrySelectOptionOrPlaceholder,
-                    )
-                  }
-                  hasDeleteButton={fields.length > 1}
-                  onDelete={() => remove(index)}
-                  hasError={!!errorMessage}
-                  hint={errorMessage}
-                />
-                {index === fields.length - 1 && (
-                  <LinkButton
-                    disabled={!!error || !field.value.value}
-                    iconComponent={IcoPlusSmall16}
-                    iconPosition="left"
-                    onClick={() => append({ label: '', value: undefined })}
-                    size="compact"
-                    testID="add-citizenship-button"
-                  >
-                    {t('citizenship.add-text')}
-                  </LinkButton>
-                )}
-              </>
-            );
-          }}
+          render={({ field, fieldState: { error } }) =>
+            renderCitizenshipFields(index, field, error)
+          }
         />
       ))}
     </>
