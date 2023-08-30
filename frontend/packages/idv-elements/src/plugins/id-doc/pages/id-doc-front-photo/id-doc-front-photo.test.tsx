@@ -1,11 +1,7 @@
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import { screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
-import { I18nextProvider } from 'react-i18next';
-import { Layout } from 'src/components';
 
-import { MachineProvider } from '../../components/machine-provider';
-import { MissingPermissionsSheetProvider } from '../../components/missing-permissions-sheet';
-import configureI18next from '../../config/initializers/i18next';
+import renderPage from '../../test-utils/render-page';
 import { MachineContext } from '../../utils/state-machine';
 import IdDocFrontPhoto from '.';
 import {
@@ -20,17 +16,7 @@ import {
 } from './id-doc-front-photo.test.config';
 
 const renderFrontPhotoPrompt = (context: MachineContext) =>
-  customRender(
-    <MachineProvider args={context}>
-      <I18nextProvider i18n={configureI18next()}>
-        <MissingPermissionsSheetProvider>
-          <Layout>
-            <IdDocFrontPhoto />,
-          </Layout>
-        </MissingPermissionsSheetProvider>
-      </I18nextProvider>
-    </MachineProvider>,
-  );
+  renderPage(context, <IdDocFrontPhoto />);
 
 describe('<IdDocFrontPhoto />', () => {
   describe('Contains the expected UI components', () => {
@@ -41,16 +27,19 @@ describe('<IdDocFrontPhoto />', () => {
       );
       expect(title).toBeInTheDocument();
     });
+
     it('Contains the guideline texts', () => {
       renderFrontPhotoPrompt(initialContextDL);
       const infoBox = screen.getByLabelText('infoBox');
       expect(infoBox).toBeInTheDocument();
     });
+
     it('Contains the continue button', () => {
       renderFrontPhotoPrompt(initialContextDL);
       const continueButton = screen.getByText('Continue');
       expect(continueButton).toBeInTheDocument();
     });
+
     it('Shows the consent bottomsheet when continue is clicked', async () => {
       renderFrontPhotoPrompt(initialContextDL);
       const continueButton = screen.getByText('Continue');
@@ -68,6 +57,7 @@ describe('<IdDocFrontPhoto />', () => {
       );
       expect(title).toBeInTheDocument();
     });
+
     it('Passport', () => {
       renderFrontPhotoPrompt(initialContextPassport);
       const title = screen.getByText(
@@ -75,6 +65,7 @@ describe('<IdDocFrontPhoto />', () => {
       );
       expect(title).toBeInTheDocument();
     });
+
     it('Visa', () => {
       renderFrontPhotoPrompt(initialContextVisa);
       const title = screen.getByText(
@@ -82,6 +73,7 @@ describe('<IdDocFrontPhoto />', () => {
       );
       expect(title).toBeInTheDocument();
     });
+
     it('Residence card', () => {
       renderFrontPhotoPrompt(initialContextGreenCard);
       const title = screen.getByText(
@@ -89,6 +81,7 @@ describe('<IdDocFrontPhoto />', () => {
       );
       expect(title).toBeInTheDocument();
     });
+
     it('work permit', () => {
       renderFrontPhotoPrompt(initialContextWorkPermit);
       const title = screen.getByText(
@@ -96,6 +89,7 @@ describe('<IdDocFrontPhoto />', () => {
       );
       expect(title).toBeInTheDocument();
     });
+
     it('ID card', () => {
       renderFrontPhotoPrompt(initialContextIdCard);
       const title = screen.getByText(
@@ -113,6 +107,7 @@ describe('<IdDocFrontPhoto />', () => {
       );
       expect(title).toBeInTheDocument();
     });
+
     it('Bangladesh', () => {
       renderFrontPhotoPrompt(initialContextBD);
       const title = screen.getByText(
