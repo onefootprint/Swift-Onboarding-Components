@@ -23,8 +23,9 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
   );
 
   const { personalInformationAndDocs } = playbook;
-  const { selfie, idDoc, nationality, ssn, ssnKind } =
-    personalInformationAndDocs;
+  const { selfie, idDoc, ssn, ssnKind } = personalInformationAndDocs;
+  const usLegalStatus =
+    personalInformationAndDocs[CollectedKycDataOption.usLegalStatus];
   const phoneNumber =
     personalInformationAndDocs[CollectedKycDataOption.phoneNumber];
 
@@ -66,7 +67,7 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
         </OptionsContainer>
       </ScopeSection>
 
-      {(ssn || nationality || idDoc) && (
+      {(ssn || usLegalStatus || idDoc) && (
         <ScopeSection>
           <Typography variant="label-3">{t('us-residents')}</Typography>
           <OptionsContainer>
@@ -82,10 +83,10 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
                   {...register(CollectedKycDataOption.ssn9)}
                 />
               ))}
-            {nationality && (
+            {usLegalStatus && (
               <Checkbox
-                label={t('nationality')}
-                {...register(CollectedKycDataOption.nationality)}
+                label={allT('cdo.us_legal_status')}
+                {...register(CollectedKycDataOption.usLegalStatus)}
               />
             )}
             {idDoc && (

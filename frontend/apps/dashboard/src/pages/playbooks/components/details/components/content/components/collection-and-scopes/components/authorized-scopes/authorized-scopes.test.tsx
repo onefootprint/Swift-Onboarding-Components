@@ -82,12 +82,12 @@ describe('<AuthorizedScopes />', () => {
 
   it('should render legal status if included', () => {
     renderAuthorizedScopes({
-      canAccessData: [CollectedKycDataOption.nationality],
+      canAccessData: [CollectedKycDataOption.usLegalStatus],
     });
     expect(screen.getByText('Legal status in the U.S.')).toBeInTheDocument();
   });
 
-  it('should not render US residents section if no SSN, nationality, or ID doc', () => {
+  it('should not render US residents section if no SSN, usLegalStatus, or ID doc', () => {
     renderAuthorizedScopes({
       canAccessData: [
         CollectedKycDataOption.name,
@@ -99,7 +99,7 @@ describe('<AuthorizedScopes />', () => {
     expect(screen.queryByText('U.S. residents')).not.toBeInTheDocument();
   });
 
-  it('should render US residents section if SSN, nationality, or ID doc', () => {
+  it('should render US residents section if SSN, usLegalStatus, or ID doc', () => {
     renderAuthorizedScopes({
       canAccessData: [CollectedKycDataOption.ssn9],
     });

@@ -147,10 +147,10 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
         )}
       </Section>
       <Section>
-        <Typography variant="label-3">{t('nationality.title')}</Typography>
+        <Typography variant="label-3">{t('us-legal-status.title')}</Typography>
         <Controller
           control={control}
-          name="personalInformationAndDocs.nationality"
+          name={`personalInformationAndDocs.${CollectedKycDataOption.usLegalStatus}`}
           render={({ field }) => (
             <ToggleContainer>
               <Toggle
@@ -160,7 +160,7 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
                 }}
                 defaultChecked={false}
                 checked={field.value}
-                label={t('nationality.toggle')}
+                label={t('us-legal-status.toggle')}
                 labelPlacement="right"
               />
             </ToggleContainer>

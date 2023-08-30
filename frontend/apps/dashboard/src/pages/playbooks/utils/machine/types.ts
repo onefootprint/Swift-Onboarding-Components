@@ -39,7 +39,7 @@ export type AuthorizedScopesFormData = {
   [CollectedKycDataOption.fullAddress]: boolean;
   [CollectedKycDataOption.ssn4]?: boolean;
   [CollectedKycDataOption.ssn9]?: boolean;
-  [CollectedKycDataOption.nationality]?: boolean;
+  [CollectedKycDataOption.usLegalStatus]?: boolean;
   [CollectedDocumentDataOption.document]?: boolean;
   [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
   allBusinessData?: boolean;
@@ -49,7 +49,7 @@ export type PersonalInformationAndDocs = {
   [CollectedKycDataOption.email]: boolean;
   [CollectedKycDataOption.phoneNumber]: boolean;
   [CollectedKycDataOption.dob]: boolean;
-  [CollectedKycDataOption.nationality]: boolean;
+  [CollectedKycDataOption.usLegalStatus]: boolean;
   [CollectedKycDataOption.fullAddress]: boolean;
   ssn: boolean;
   ssnKind?: CollectedKycDataOption;
@@ -86,7 +86,7 @@ export const defaultPlaybookValuesKYC: PlaybookFormData = {
     email: true,
     [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.dob]: true,
-    [CollectedKycDataOption.nationality]: false,
+    [CollectedKycDataOption.usLegalStatus]: false,
     [CollectedKycDataOption.fullAddress]: true,
     ssn: true,
     idDoc: false,
@@ -111,7 +111,7 @@ export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
   [CollectedKycDataOption.fullAddress]: true,
   [CollectedKycDataOption.ssn4]: true,
   [CollectedKycDataOption.ssn9]: true,
-  [CollectedKycDataOption.nationality]: true,
+  [CollectedKycDataOption.usLegalStatus]: true,
   [CollectedDocumentDataOption.document]: true,
   [CollectedInvestorProfileDataOption.investorProfile]: true,
   allBusinessData: true,
@@ -158,6 +158,7 @@ export const basicInformationFields: string[] = [
   CollectedKycDataOption.name,
   CollectedKycDataOption.dob,
   CollectedKycDataOption.fullAddress,
+  CollectedKycDataOption.nationality,
 ];
 
 // used within Playbook forms before submitting
@@ -168,8 +169,8 @@ export const usResidentFormFields = [
   'idDoc',
   'idDocKind',
   'selfie',
-  // note: internal nationality corresponds to "Legal status in the US"
-  CollectedKycDataOption.nationality,
+  // note: internal usLegalStatus corresponds to "Legal status in the US"
+  CollectedKycDataOption.usLegalStatus,
   'ssnKind',
   'ssn',
 ];
@@ -178,14 +179,14 @@ export const usResidentFormFields = [
 export const usResidentDisplayFields = [
   CollectedDocumentDataOption.document,
   'selfie',
-  CollectedKycDataOption.nationality,
+  CollectedKycDataOption.usLegalStatus,
   'ssn',
 ];
 
 export const usResidentDisplayScopes = [
   'selfie',
   'document',
-  CollectedKycDataOption.nationality,
+  CollectedKycDataOption.usLegalStatus,
   CollectedKycDataOption.ssn9,
   CollectedKycDataOption.ssn4,
 ];

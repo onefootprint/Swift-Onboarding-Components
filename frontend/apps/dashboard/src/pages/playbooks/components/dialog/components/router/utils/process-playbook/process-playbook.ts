@@ -50,6 +50,11 @@ const processPlaybook = ({
   const requiredKycFields = getRequiredKycCollectFields();
   mustCollectData.push(...requiredKycFields);
 
+  // US Legal Status
+  if (personalInformationAndDocs[CollectedKycDataOption.usLegalStatus]) {
+    mustCollectData.push(CollectedKycDataOption.usLegalStatus);
+  }
+
   // SSN handling
   if (
     personalInformationAndDocs.ssn &&

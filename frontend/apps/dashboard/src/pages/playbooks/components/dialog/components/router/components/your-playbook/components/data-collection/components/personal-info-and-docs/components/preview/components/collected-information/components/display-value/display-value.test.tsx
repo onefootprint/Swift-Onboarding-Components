@@ -210,9 +210,9 @@ describe('<DisplayValue />', () => {
 
   it('should render check icon for included property', () => {
     renderDisplayValue({
-      field: CollectedKycDataOption.nationality,
+      field: CollectedKycDataOption.usLegalStatus,
       personalInfoAndDocs: {
-        [CollectedKycDataOption.nationality]: true,
+        [CollectedKycDataOption.usLegalStatus]: true,
       },
     });
     expect(screen.getByTestId('check-icon')).toBeInTheDocument();

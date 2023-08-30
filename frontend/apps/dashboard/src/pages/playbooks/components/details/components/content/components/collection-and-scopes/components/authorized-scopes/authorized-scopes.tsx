@@ -21,8 +21,8 @@ const AuthorizedScopes = ({ canAccessData }: AuthorizedScopesProps) => {
   const ssn =
     canAccessData.includes(CollectedKycDataOption.ssn9) ||
     canAccessData.includes(CollectedKycDataOption.ssn4);
-  const nationality = canAccessData.includes(
-    CollectedKycDataOption.nationality,
+  const usLegalStatus = canAccessData.includes(
+    CollectedKycDataOption.usLegalStatus,
   );
   const idDoc =
     canAccessData.filter(scope => scope.includes('document'))?.length > 0;
@@ -34,7 +34,7 @@ const AuthorizedScopes = ({ canAccessData }: AuthorizedScopesProps) => {
         canAccessData={canAccessData}
         title={t('basic-information')}
       />
-      {(ssn || nationality || idDoc) && (
+      {(ssn || usLegalStatus || idDoc) && (
         <Section
           displayScopes={usResidentDisplayScopes}
           canAccessData={canAccessData}

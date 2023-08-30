@@ -312,7 +312,8 @@
     "business_corporation_type": "Business corporation type",
     "business_beneficial_owners": "Business beneficial owners",
     "business_kyced_beneficial_owners": "Business beneficial owners (Fully-KYCed)",
-    "investor_profile": "Investor profile"
+    "investor_profile": "Investor profile",
+    "us_legal_status": "Legal status in the U.S."
   },
   "vendor": {
     "idology": "Idology",
@@ -1180,7 +1181,8 @@
               "name": "First & Last name",
               "dob": "Date of birth",
               "full_address": "Address",
-              "nationality": "Legal status in the U.S.",
+              "nationality": "Nationality",
+              "us_legal_status": "Legal status in the U.S.",
               "ssn": "SSN",
               "full": "Full",
               "last4": "Last 4",
@@ -1372,8 +1374,7 @@
               "basic-information": "Basic information",
               "us-residents": "U.S. residents",
               "investor-profile": "Investor profile",
-              "investor-profile-questions": "Investor profile questions",
-              "nationality": "Legal status in the U.S."
+              "investor-profile-questions": "Investor profile questions"
             }
           },
           "form": {
@@ -1413,7 +1414,7 @@
                 "checkbox": "Use document scan to autofill basic identity data",
                 "warning": "Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan."
               },
-              "nationality": {
+              "us-legal-status": {
                 "title": "Legal status",
                 "toggle": "Request users to provide their legal status in the U.S."
               },
@@ -1437,7 +1438,7 @@
                 "phone_number": "Phone number",
                 "name": "First & last name",
                 "dob": "Date of birth",
-                "nationality": "Legal status in the U.S.",
+                "us_legal_status": "Legal status in the U.S.",
                 "full_address": "Address",
                 "idDoc": "ID document scan",
                 "idDocKind": "ID document scan",

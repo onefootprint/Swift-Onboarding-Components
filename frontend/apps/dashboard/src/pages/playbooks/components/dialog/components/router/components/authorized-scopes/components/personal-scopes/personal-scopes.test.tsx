@@ -26,7 +26,9 @@ const renderPersonalScopes = ({
 };
 describe('<PersonalScopes />', () => {
   it('should show email and phone as required and disabled because they are always authorized', () => {
-    renderPersonalScopes({ startingPersonalValues: { nationality: false } });
+    renderPersonalScopes({
+      startingPersonalValues: { [CollectedKycDataOption.usLegalStatus]: false },
+    });
     const email = screen.getByRole('checkbox', { name: 'Email' });
     expect(email).toBeInTheDocument();
     expect(email).toBeDisabled();
@@ -47,7 +49,9 @@ describe('<PersonalScopes />', () => {
   });
 
   it('should show name, date of birth, and address by default', () => {
-    renderPersonalScopes({ startingPersonalValues: { nationality: false } });
+    renderPersonalScopes({
+      startingPersonalValues: { [CollectedKycDataOption.usLegalStatus]: false },
+    });
     const name = screen.getByRole('checkbox', { name: 'Full name' });
     expect(name).toBeInTheDocument();
     const dob = screen.getByRole('checkbox', { name: 'Date of birth' });
@@ -109,20 +113,24 @@ describe('<PersonalScopes />', () => {
     expect(screen.getByRole('checkbox', { name: 'SSN (Full)' })).toBeChecked();
   });
 
-  it('should not show nationality if not collecting', () => {
-    renderPersonalScopes({ startingPersonalValues: { nationality: false } });
-    const nationality = screen.queryByRole('checkbox', {
+  it('should not show usLegalStatus if not collecting', () => {
+    renderPersonalScopes({
+      startingPersonalValues: { [CollectedKycDataOption.usLegalStatus]: false },
+    });
+    const usLegalStatus = screen.queryByRole('checkbox', {
       name: 'Legal status in the U.S.',
     });
-    expect(nationality).not.toBeInTheDocument();
+    expect(usLegalStatus).not.toBeInTheDocument();
   });
 
-  it('should show nationality if collecting', () => {
-    renderPersonalScopes({ startingPersonalValues: { nationality: true } });
-    const nationality = screen.getByRole('checkbox', {
+  it('should show usLegalStatus if collecting', () => {
+    renderPersonalScopes({
+      startingPersonalValues: { [CollectedKycDataOption.usLegalStatus]: true },
+    });
+    const usLegalStatus = screen.getByRole('checkbox', {
       name: 'Legal status in the U.S.',
     });
-    expect(nationality).toBeInTheDocument();
+    expect(usLegalStatus).toBeInTheDocument();
   });
 
   it('should not show investor profile if not collecting', () => {
@@ -180,7 +188,7 @@ describe('<PersonalScopes />', () => {
         idDoc: false,
         ssn: false,
         ssnKind: undefined,
-        nationality: false,
+        [CollectedKycDataOption.usLegalStatus]: false,
       },
     });
     expect(screen.queryByText('U.S. residents')).not.toBeInTheDocument();
@@ -192,7 +200,7 @@ describe('<PersonalScopes />', () => {
         idDoc: false,
         ssn: true,
         ssnKind: CollectedKycDataOption.ssn9,
-        nationality: false,
+        [CollectedKycDataOption.usLegalStatus]: false,
       },
     });
     expect(screen.getByText('U.S. residents')).toBeInTheDocument();
