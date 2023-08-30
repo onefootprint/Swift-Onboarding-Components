@@ -89,6 +89,7 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             is_no_phone_flow,
             allow_international_residents,
             international_country_restrictions,
+            is_doc_first,
             ..
         } = ob_config;
         Self {
@@ -102,6 +103,7 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             created_at,
             status,
             is_no_phone_flow,
+            is_doc_first_flow: is_doc_first,
             allow_international_residents,
             international_country_restrictions,
             author: author.map(Actor::from_db),

@@ -17,6 +17,7 @@ pub struct OnboardingConfiguration {
     pub allow_international_residents: bool,
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub is_no_phone_flow: bool,
+    pub is_doc_first_flow: bool,
     pub author: Option<Actor>,
 }
 
