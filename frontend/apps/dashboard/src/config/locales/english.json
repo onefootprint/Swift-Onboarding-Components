@@ -384,11 +384,6 @@
       "text": "By continuing you agree to our <a1>Terms of Service</a1> and <a2>Privacy Policy</a2>."
     },
     "sandbox-banner": {
-      "title": "You're in sandbox mode. To activate your account,",
-      "form": "schedule a call",
-      "contact-us": "contact us",
-      "or": "or",
-      "toggle": "Turn sandbox mode off",
       "contact-us-dialog": {
         "title": "Activate account",
         "description": "We need to book a call with you to activate your account. Please, fill out the form below and we'll get back to you as soon as possible.",
@@ -430,7 +425,12 @@
             "required": "Message is required"
           }
         }
-      }
+      },
+      "contact-us": "contact us",
+      "form": "schedule a call",
+      "or": "or",
+      "title": "You're in sandbox mode. To activate your account,",
+      "toggle": "turn sandbox mode off."
     }
   },
   "pages": {
