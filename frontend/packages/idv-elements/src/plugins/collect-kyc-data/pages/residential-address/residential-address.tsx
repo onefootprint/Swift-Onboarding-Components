@@ -39,7 +39,7 @@ const ResidentialAddress = ({
   hideHeader,
 }: ResidentialAddressProps) => {
   const [state, send] = useCollectKycDataMachine();
-  const { requirement, data } = state.context;
+  const { requirement, data, config } = state.context;
   const { mutation, syncData } = useSyncData();
   const convertFormData = useConvertFormData();
 
@@ -57,10 +57,8 @@ const ResidentialAddress = ({
   const isCityDisabled = data[IdDI.city]?.disabled;
   const isStateDisabled = data[IdDI.state]?.disabled;
   const isZipDisabled = data[IdDI.zip]?.disabled;
-
-  // disabling country field for now as per https://linear.app/footprint/issue/FP-4793/[general-bifrost]-bifrost-has-country-picker-but-only-fields-for-us
-  // const isCountryDisabled = data[IdDI.country]?.disabled;
-  const isCountryDisabled = true;
+  const isCountryDisabled =
+    data[IdDI.country]?.disabled || !config.allowInternationalResidents;
 
   const countryVal = data[IdDI.country]?.value;
   const defaultCountry =
