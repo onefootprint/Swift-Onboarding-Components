@@ -134,7 +134,11 @@
         "visa-expiration": {
           "label": "Visa expiration date",
           "placeholder": "MM/DD/YYYY",
-          "error": "Visa expiration date cannot be empty or expired"
+          "error": {
+            "required": "Visa expiration date cannot be empty",
+            "invalid": "Visa expiration date is invalid",
+            "invalidTimeframe": "Visa expiration date is invalid"
+          }
         }
       }
     },

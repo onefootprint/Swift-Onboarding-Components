@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import { LinkButton } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Controller,
   ControllerRenderProps,
@@ -11,38 +11,23 @@ import {
   useFormContext,
 } from 'react-hook-form';
 
-import { CountrySelectOptionOrPlaceholder } from '../../types';
 import CitizenshipField from './citizenship-field';
 import CountryOfBirthField from './country-of-birth-field';
 
 const CountryFields = () => {
   const { t } = useTranslation('pages.legal-status.form');
-  const [usCitizenSelectedIndex, setUSCitizenSelectedIndex] = useState(-1);
   const { control } = useFormContext();
   const { append, fields, remove } = useFieldArray({
     name: 'citizenships',
     control,
   });
 
-  const handleCitizenshipChange = (
-    index: number,
-    onChange: (cso: CountrySelectOptionOrPlaceholder) => void,
-    { label, value }: CountrySelectOptionOrPlaceholder,
-  ) => {
-    setUSCitizenSelectedIndex(value === 'US' ? index : -1);
-    onChange({ label, value } as CountrySelectOptionOrPlaceholder);
-  };
-
-  const getErrorMessage = (
-    index: number,
-    value: string,
-    error?: FieldError,
-  ) => {
+  const getErrorMessage = (error?: FieldError) => {
     if (error) {
-      if (!value) {
+      if (error.type === 'empty') {
         return t('citizenship.empty-error');
       }
-      if (usCitizenSelectedIndex === index) {
+      if (error.type === 'usCitizen') {
         return t('citizenship.us-citizen-error');
       }
     }
@@ -81,19 +66,13 @@ const CountryFields = () => {
       value: { value },
       onChange,
     } = field;
-    const errorMessage = getErrorMessage(index, value, error);
+    const errorMessage = getErrorMessage(error);
 
     return (
       <>
         <CitizenshipField
           field={field}
-          onChange={nextValue =>
-            handleCitizenshipChange(
-              index,
-              onChange,
-              nextValue as CountrySelectOptionOrPlaceholder,
-            )
-          }
+          onChange={nextValue => onChange(nextValue)}
           hasDeleteButton={fields.length > 1}
           onDelete={() => remove(index)}
           hasError={!!errorMessage}

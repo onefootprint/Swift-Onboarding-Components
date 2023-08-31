@@ -687,13 +687,13 @@ describe('LegalStatus', () => {
 
       await waitFor(() => {
         const visaExpirationError = screen.getByText(
-          'Visa expiration date cannot be empty or expired',
+          'Visa expiration date cannot be empty',
         );
         expect(visaExpirationError).toBeInTheDocument();
       });
     });
 
-    it('the visa expiration date should not be expired', async () => {
+    it('the visa expiration date should not be invalid, too far in the past, or too far in the future', async () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
@@ -717,18 +717,28 @@ describe('LegalStatus', () => {
       const visaExpirationTextInput = screen.getByTestId(
         'visa-expiration-textinput',
       );
-      await userEvent.type(visaExpirationTextInput, '01012000');
 
+      const before1900 = 1899;
+      await userEvent.type(visaExpirationTextInput, `01/01/${before1900}`);
       await waitFor(() => {
         const continueButton = screen.getByTestId('continue-button');
         expect(continueButton).toBeInTheDocument();
       });
       const continueButton = screen.getByTestId('continue-button');
       await userEvent.click(continueButton);
-
       await waitFor(() => {
         const visaExpirationError = screen.getByText(
-          'Visa expiration date cannot be empty or expired',
+          'Visa expiration date is invalid',
+        );
+        expect(visaExpirationError).toBeInTheDocument();
+      });
+
+      const after3000 = 3001;
+      await userEvent.type(visaExpirationTextInput, `01/01/${after3000}`);
+      await userEvent.click(continueButton);
+      await waitFor(() => {
+        const visaExpirationError = screen.getByText(
+          'Visa expiration date is invalid',
         );
         expect(visaExpirationError).toBeInTheDocument();
       });

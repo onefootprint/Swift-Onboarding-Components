@@ -1,7 +1,7 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { VisaKind } from '@onefootprint/types';
 import { Select, TextInput } from '@onefootprint/ui';
-import { isPast } from 'date-fns';
+import { isValid } from 'date-fns';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
@@ -17,7 +17,8 @@ const VisaFields = () => {
   } = useFormContext<FormData>();
   const inputMasks = useInputMask('en-US');
 
-  const hasExpirationError = !!errors.visa?.expirationDate;
+  const errorType = errors.visa?.expirationDate?.type;
+  const errorMessage = errorType ? t(`visa-expiration.error.${errorType}`) : '';
 
   const options = Object.keys(VisaKind)
     .filter(el => Number.isNaN(Number(el)))
@@ -49,15 +50,21 @@ const VisaFields = () => {
       />
       <TextInput
         data-private
-        hasError={hasExpirationError}
-        hint={hasExpirationError ? t('visa-expiration.error') : undefined}
+        hasError={!!errorMessage}
+        hint={errorMessage}
         label={t('visa-expiration.label')}
         mask={inputMasks.visaExpiration}
         placeholder={t('visa-expiration.placeholder')}
         value={getValues('visa.expirationDate')}
         {...register('visa.expirationDate', {
           required: true,
-          validate: date => !!date && !isPast(new Date(date)),
+          validate: {
+            invalid: input => input && isValid(new Date(input)),
+            invalidTimeframe: input =>
+              input &&
+              new Date(input).getFullYear() > 1900 &&
+              new Date(input).getFullYear() < 3000,
+          },
         })}
         testID="visa-expiration-textinput"
       />
