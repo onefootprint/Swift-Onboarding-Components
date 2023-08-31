@@ -1,0 +1,3675 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Footprint API",
+        "version": "6e49f5bf4d3bc9b40ae62de502f2b0476a4532b2"
+    },
+    "servers": [
+        {
+            "url": "//api.onefootprint.com"
+        }
+    ],
+    "paths": {
+        "/businesses/{fp_bid}/vault": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Given a list of fields, checks for their existence in the business vault without decrypting them.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "Comma separated list of fields to check. For example, `id.first_name,id.ssn4,custom.bank_account`",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetVaultResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Businesses",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Deletes data in a business vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeleteRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeleteVaultResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Businesses",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Updates data in a business vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RawDataRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/businesses/{fp_bid}/vault/decrypt": {
+            "post": {
+                "tags": [
+                    "Businesses",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Decrypts the specified list of fields from the provided vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DecryptRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DecryptResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/businesses/{fp_bid}/vault/validate": {
+            "post": {
+                "tags": [
+                    "Businesses",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Checks if provided data is valid before adding it to the vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RawDataRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/businesses/{fp_bid}/vault/{data_identifier}/upload": {
+            "post": {
+                "tags": [
+                    "Businesses",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Updates data in a business vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "data_identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id.first_name",
+                                "id.last_name",
+                                "id.dob",
+                                "id.ssn4",
+                                "id.ssn9",
+                                "id.address_line1",
+                                "id.address_line2",
+                                "id.city",
+                                "id.state",
+                                "id.zip",
+                                "id.country",
+                                "id.email",
+                                "id.phone_number",
+                                "id.us_legal_status",
+                                "id.visa_kind",
+                                "id.visa_expiration_date",
+                                "id.nationality",
+                                "id.citizenships",
+                                "custom.*",
+                                "business.name",
+                                "business.dba",
+                                "business.website",
+                                "business.phone_number",
+                                "business.tin",
+                                "business.address_line1",
+                                "business.address_line2",
+                                "business.city",
+                                "business.state",
+                                "business.zip",
+                                "business.country",
+                                "business.beneficial_owners",
+                                "business.kyced_beneficial_owners",
+                                "business.corporation_type",
+                                "investor_profile.employment_status",
+                                "investor_profile.occupation",
+                                "investor_profile.employer",
+                                "investor_profile.annual_income",
+                                "investor_profile.net_worth",
+                                "investor_profile.investment_goals",
+                                "investor_profile.risk_tolerance",
+                                "investor_profile.declarations",
+                                "investor_profile.brokerage_firm_employer",
+                                "investor_profile.senior_executive_symbols",
+                                "investor_profile.family_member_names",
+                                "investor_profile.political_organization",
+                                "document.id_card.front.image",
+                                "document.id_card.front.mime_type",
+                                "document.id_card.back.image",
+                                "document.id_card.back.mime_type",
+                                "document.id_card.selfie.image",
+                                "document.id_card.selfie.mime_type",
+                                "document.id_card.full_name",
+                                "document.id_card.dob",
+                                "document.id_card.gender",
+                                "document.id_card.full_address",
+                                "document.id_card.document_number",
+                                "document.id_card.expires_at",
+                                "document.id_card.issued_at",
+                                "document.id_card.issuing_state",
+                                "document.id_card.issuing_country",
+                                "document.id_card.ref_number",
+                                "document.id_card.nationality",
+                                "document.drivers_license.front.image",
+                                "document.drivers_license.front.mime_type",
+                                "document.drivers_license.back.image",
+                                "document.drivers_license.back.mime_type",
+                                "document.drivers_license.selfie.image",
+                                "document.drivers_license.selfie.mime_type",
+                                "document.drivers_license.full_name",
+                                "document.drivers_license.dob",
+                                "document.drivers_license.gender",
+                                "document.drivers_license.full_address",
+                                "document.drivers_license.document_number",
+                                "document.drivers_license.expires_at",
+                                "document.drivers_license.issued_at",
+                                "document.drivers_license.issuing_state",
+                                "document.drivers_license.issuing_country",
+                                "document.drivers_license.ref_number",
+                                "document.drivers_license.nationality",
+                                "document.passport.front.image",
+                                "document.passport.front.mime_type",
+                                "document.passport.back.image",
+                                "document.passport.back.mime_type",
+                                "document.passport.selfie.image",
+                                "document.passport.selfie.mime_type",
+                                "document.passport.full_name",
+                                "document.passport.dob",
+                                "document.passport.gender",
+                                "document.passport.full_address",
+                                "document.passport.document_number",
+                                "document.passport.expires_at",
+                                "document.passport.issued_at",
+                                "document.passport.issuing_state",
+                                "document.passport.issuing_country",
+                                "document.passport.ref_number",
+                                "document.passport.nationality",
+                                "document.permit.front.image",
+                                "document.permit.front.mime_type",
+                                "document.permit.back.image",
+                                "document.permit.back.mime_type",
+                                "document.permit.selfie.image",
+                                "document.permit.selfie.mime_type",
+                                "document.permit.full_name",
+                                "document.permit.dob",
+                                "document.permit.gender",
+                                "document.permit.full_address",
+                                "document.permit.document_number",
+                                "document.permit.expires_at",
+                                "document.permit.issued_at",
+                                "document.permit.issuing_state",
+                                "document.permit.issuing_country",
+                                "document.permit.ref_number",
+                                "document.permit.nationality",
+                                "document.visa.front.image",
+                                "document.visa.front.mime_type",
+                                "document.visa.back.image",
+                                "document.visa.back.mime_type",
+                                "document.visa.selfie.image",
+                                "document.visa.selfie.mime_type",
+                                "document.visa.full_name",
+                                "document.visa.dob",
+                                "document.visa.gender",
+                                "document.visa.full_address",
+                                "document.visa.document_number",
+                                "document.visa.expires_at",
+                                "document.visa.issued_at",
+                                "document.visa.issuing_state",
+                                "document.visa.issuing_country",
+                                "document.visa.ref_number",
+                                "document.visa.nationality",
+                                "document.residence_document.front.image",
+                                "document.residence_document.front.mime_type",
+                                "document.residence_document.back.image",
+                                "document.residence_document.back.mime_type",
+                                "document.residence_document.selfie.image",
+                                "document.residence_document.selfie.mime_type",
+                                "document.residence_document.full_name",
+                                "document.residence_document.dob",
+                                "document.residence_document.gender",
+                                "document.residence_document.full_address",
+                                "document.residence_document.document_number",
+                                "document.residence_document.expires_at",
+                                "document.residence_document.issued_at",
+                                "document.residence_document.issuing_state",
+                                "document.residence_document.issuing_country",
+                                "document.residence_document.ref_number",
+                                "document.residence_document.nationality",
+                                "document.finra_compliance_letter",
+                                "card.*.number",
+                                "card.*.expiration",
+                                "card.*.cvc",
+                                "card.*.name",
+                                "card.*.billing_address.zip",
+                                "card.*.billing_address.country",
+                                "card.*.expiration_month",
+                                "card.*.expiration_year",
+                                "card.*.number_last4",
+                                "card.*.issuer"
+                            ]
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "content-type",
+                        "description": "Specify the content type of the object like `application/json` or `image/png`",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/onboarding/session": {
+            "post": {
+                "tags": [
+                    "Onboarding",
+                    "PublicApi"
+                ],
+                "description": "Generates a single-use session token for an onboarding configuration.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateOnboardingSessionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ObConfigSessionToken"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/onboarding/session/validate": {
+            "post": {
+                "tags": [
+                    "Onboarding",
+                    "PublicApi"
+                ],
+                "description": "Validate a short-lived onboarding session token and exchange it for a long-lived fp_id",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ValidateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidateResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Creates a new user vault, optionally initializing with the provided data",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-idempotency-id",
+                        "description": "To safely support retrying requests without accidentally performing the same operation multiple times, provide a client-generated `x-idempotency-id`. Requests made with the same `x-idempotency-id` value will no-op and return the same result. Note, if `x-idempotency-id` is provided, initial data may not be specified in the HTTP body.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {},
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/vault": {
+            "patch": {
+                "tags": [
+                    "Client",
+                    "Vault",
+                    "Users",
+                    "PublicApi"
+                ],
+                "description": "Updates data in a vault given a short-lived, entity-scoped client token.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RawDataRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Client Token": []
+                    }
+                ]
+            }
+        },
+        "/users/vault/decrypt": {
+            "post": {
+                "tags": [
+                    "Client",
+                    "Vault",
+                    "Users",
+                    "PublicApi"
+                ],
+                "description": "Decrypts the specified list of fields given a short-lived, entity-scoped client token",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClientDecryptRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DecryptResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Client Token": []
+                    }
+                ]
+            }
+        },
+        "/users/vault/decrypt/{token}": {
+            "get": {
+                "tags": [
+                    "Client",
+                    "Vault",
+                    "Users",
+                    "PublicApi"
+                ],
+                "description": "Decrypts and downloads the user's data as specified by the provided token.",
+                "responses": {},
+                "security": []
+            }
+        },
+        "/users/vault/validate": {
+            "post": {
+                "tags": [
+                    "Client",
+                    "Vault",
+                    "Users",
+                    "PublicApi"
+                ],
+                "description": "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RawDataRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Client Token": []
+                    }
+                ]
+            }
+        },
+        "/users/vault/{data_identifier}/upload": {
+            "post": {
+                "tags": [
+                    "Client",
+                    "Vault",
+                    "Users",
+                    "PublicApi"
+                ],
+                "description": "Updates data in a vault given a short-lived, entity-scoped client token.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "data_identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id.first_name",
+                                "id.last_name",
+                                "id.dob",
+                                "id.ssn4",
+                                "id.ssn9",
+                                "id.address_line1",
+                                "id.address_line2",
+                                "id.city",
+                                "id.state",
+                                "id.zip",
+                                "id.country",
+                                "id.email",
+                                "id.phone_number",
+                                "id.us_legal_status",
+                                "id.visa_kind",
+                                "id.visa_expiration_date",
+                                "id.nationality",
+                                "id.citizenships",
+                                "custom.*",
+                                "business.name",
+                                "business.dba",
+                                "business.website",
+                                "business.phone_number",
+                                "business.tin",
+                                "business.address_line1",
+                                "business.address_line2",
+                                "business.city",
+                                "business.state",
+                                "business.zip",
+                                "business.country",
+                                "business.beneficial_owners",
+                                "business.kyced_beneficial_owners",
+                                "business.corporation_type",
+                                "investor_profile.employment_status",
+                                "investor_profile.occupation",
+                                "investor_profile.employer",
+                                "investor_profile.annual_income",
+                                "investor_profile.net_worth",
+                                "investor_profile.investment_goals",
+                                "investor_profile.risk_tolerance",
+                                "investor_profile.declarations",
+                                "investor_profile.brokerage_firm_employer",
+                                "investor_profile.senior_executive_symbols",
+                                "investor_profile.family_member_names",
+                                "investor_profile.political_organization",
+                                "document.id_card.front.image",
+                                "document.id_card.front.mime_type",
+                                "document.id_card.back.image",
+                                "document.id_card.back.mime_type",
+                                "document.id_card.selfie.image",
+                                "document.id_card.selfie.mime_type",
+                                "document.id_card.full_name",
+                                "document.id_card.dob",
+                                "document.id_card.gender",
+                                "document.id_card.full_address",
+                                "document.id_card.document_number",
+                                "document.id_card.expires_at",
+                                "document.id_card.issued_at",
+                                "document.id_card.issuing_state",
+                                "document.id_card.issuing_country",
+                                "document.id_card.ref_number",
+                                "document.id_card.nationality",
+                                "document.drivers_license.front.image",
+                                "document.drivers_license.front.mime_type",
+                                "document.drivers_license.back.image",
+                                "document.drivers_license.back.mime_type",
+                                "document.drivers_license.selfie.image",
+                                "document.drivers_license.selfie.mime_type",
+                                "document.drivers_license.full_name",
+                                "document.drivers_license.dob",
+                                "document.drivers_license.gender",
+                                "document.drivers_license.full_address",
+                                "document.drivers_license.document_number",
+                                "document.drivers_license.expires_at",
+                                "document.drivers_license.issued_at",
+                                "document.drivers_license.issuing_state",
+                                "document.drivers_license.issuing_country",
+                                "document.drivers_license.ref_number",
+                                "document.drivers_license.nationality",
+                                "document.passport.front.image",
+                                "document.passport.front.mime_type",
+                                "document.passport.back.image",
+                                "document.passport.back.mime_type",
+                                "document.passport.selfie.image",
+                                "document.passport.selfie.mime_type",
+                                "document.passport.full_name",
+                                "document.passport.dob",
+                                "document.passport.gender",
+                                "document.passport.full_address",
+                                "document.passport.document_number",
+                                "document.passport.expires_at",
+                                "document.passport.issued_at",
+                                "document.passport.issuing_state",
+                                "document.passport.issuing_country",
+                                "document.passport.ref_number",
+                                "document.passport.nationality",
+                                "document.permit.front.image",
+                                "document.permit.front.mime_type",
+                                "document.permit.back.image",
+                                "document.permit.back.mime_type",
+                                "document.permit.selfie.image",
+                                "document.permit.selfie.mime_type",
+                                "document.permit.full_name",
+                                "document.permit.dob",
+                                "document.permit.gender",
+                                "document.permit.full_address",
+                                "document.permit.document_number",
+                                "document.permit.expires_at",
+                                "document.permit.issued_at",
+                                "document.permit.issuing_state",
+                                "document.permit.issuing_country",
+                                "document.permit.ref_number",
+                                "document.permit.nationality",
+                                "document.visa.front.image",
+                                "document.visa.front.mime_type",
+                                "document.visa.back.image",
+                                "document.visa.back.mime_type",
+                                "document.visa.selfie.image",
+                                "document.visa.selfie.mime_type",
+                                "document.visa.full_name",
+                                "document.visa.dob",
+                                "document.visa.gender",
+                                "document.visa.full_address",
+                                "document.visa.document_number",
+                                "document.visa.expires_at",
+                                "document.visa.issued_at",
+                                "document.visa.issuing_state",
+                                "document.visa.issuing_country",
+                                "document.visa.ref_number",
+                                "document.visa.nationality",
+                                "document.residence_document.front.image",
+                                "document.residence_document.front.mime_type",
+                                "document.residence_document.back.image",
+                                "document.residence_document.back.mime_type",
+                                "document.residence_document.selfie.image",
+                                "document.residence_document.selfie.mime_type",
+                                "document.residence_document.full_name",
+                                "document.residence_document.dob",
+                                "document.residence_document.gender",
+                                "document.residence_document.full_address",
+                                "document.residence_document.document_number",
+                                "document.residence_document.expires_at",
+                                "document.residence_document.issued_at",
+                                "document.residence_document.issuing_state",
+                                "document.residence_document.issuing_country",
+                                "document.residence_document.ref_number",
+                                "document.residence_document.nationality",
+                                "document.finra_compliance_letter",
+                                "card.*.number",
+                                "card.*.expiration",
+                                "card.*.cvc",
+                                "card.*.name",
+                                "card.*.billing_address.zip",
+                                "card.*.billing_address.country",
+                                "card.*.expiration_month",
+                                "card.*.expiration_year",
+                                "card.*.number_last4",
+                                "card.*.issuer"
+                            ]
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "content-type",
+                        "description": "Specify the content type of the object like `application/json` or `image/png`",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Client Token": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "PublicApi"
+                ],
+                "description": "View details of a most recent onboarding status of user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/client_token": {
+            "post": {
+                "tags": [
+                    "Client",
+                    "PublicApi"
+                ],
+                "description": "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClientTokenRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClientTokenResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/vault": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Given a list of fields, checks for their existence in the user vault without decrypting them.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "Comma separated list of fields to check. For example, `id.first_name,id.ssn4,custom.bank_account`",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetVaultResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Deletes data in a user vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeleteRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeleteVaultResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Users",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Updates data in a user vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RawDataRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/vault/decrypt": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Decrypts the specified list of fields from the provided vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DecryptRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DecryptResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/vault/validate": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Checks if provided data is valid before adding it to the vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RawDataRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/vault/{data_identifier}/upload": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "description": "Updates data in a user vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "data_identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id.first_name",
+                                "id.last_name",
+                                "id.dob",
+                                "id.ssn4",
+                                "id.ssn9",
+                                "id.address_line1",
+                                "id.address_line2",
+                                "id.city",
+                                "id.state",
+                                "id.zip",
+                                "id.country",
+                                "id.email",
+                                "id.phone_number",
+                                "id.us_legal_status",
+                                "id.visa_kind",
+                                "id.visa_expiration_date",
+                                "id.nationality",
+                                "id.citizenships",
+                                "custom.*",
+                                "business.name",
+                                "business.dba",
+                                "business.website",
+                                "business.phone_number",
+                                "business.tin",
+                                "business.address_line1",
+                                "business.address_line2",
+                                "business.city",
+                                "business.state",
+                                "business.zip",
+                                "business.country",
+                                "business.beneficial_owners",
+                                "business.kyced_beneficial_owners",
+                                "business.corporation_type",
+                                "investor_profile.employment_status",
+                                "investor_profile.occupation",
+                                "investor_profile.employer",
+                                "investor_profile.annual_income",
+                                "investor_profile.net_worth",
+                                "investor_profile.investment_goals",
+                                "investor_profile.risk_tolerance",
+                                "investor_profile.declarations",
+                                "investor_profile.brokerage_firm_employer",
+                                "investor_profile.senior_executive_symbols",
+                                "investor_profile.family_member_names",
+                                "investor_profile.political_organization",
+                                "document.id_card.front.image",
+                                "document.id_card.front.mime_type",
+                                "document.id_card.back.image",
+                                "document.id_card.back.mime_type",
+                                "document.id_card.selfie.image",
+                                "document.id_card.selfie.mime_type",
+                                "document.id_card.full_name",
+                                "document.id_card.dob",
+                                "document.id_card.gender",
+                                "document.id_card.full_address",
+                                "document.id_card.document_number",
+                                "document.id_card.expires_at",
+                                "document.id_card.issued_at",
+                                "document.id_card.issuing_state",
+                                "document.id_card.issuing_country",
+                                "document.id_card.ref_number",
+                                "document.id_card.nationality",
+                                "document.drivers_license.front.image",
+                                "document.drivers_license.front.mime_type",
+                                "document.drivers_license.back.image",
+                                "document.drivers_license.back.mime_type",
+                                "document.drivers_license.selfie.image",
+                                "document.drivers_license.selfie.mime_type",
+                                "document.drivers_license.full_name",
+                                "document.drivers_license.dob",
+                                "document.drivers_license.gender",
+                                "document.drivers_license.full_address",
+                                "document.drivers_license.document_number",
+                                "document.drivers_license.expires_at",
+                                "document.drivers_license.issued_at",
+                                "document.drivers_license.issuing_state",
+                                "document.drivers_license.issuing_country",
+                                "document.drivers_license.ref_number",
+                                "document.drivers_license.nationality",
+                                "document.passport.front.image",
+                                "document.passport.front.mime_type",
+                                "document.passport.back.image",
+                                "document.passport.back.mime_type",
+                                "document.passport.selfie.image",
+                                "document.passport.selfie.mime_type",
+                                "document.passport.full_name",
+                                "document.passport.dob",
+                                "document.passport.gender",
+                                "document.passport.full_address",
+                                "document.passport.document_number",
+                                "document.passport.expires_at",
+                                "document.passport.issued_at",
+                                "document.passport.issuing_state",
+                                "document.passport.issuing_country",
+                                "document.passport.ref_number",
+                                "document.passport.nationality",
+                                "document.permit.front.image",
+                                "document.permit.front.mime_type",
+                                "document.permit.back.image",
+                                "document.permit.back.mime_type",
+                                "document.permit.selfie.image",
+                                "document.permit.selfie.mime_type",
+                                "document.permit.full_name",
+                                "document.permit.dob",
+                                "document.permit.gender",
+                                "document.permit.full_address",
+                                "document.permit.document_number",
+                                "document.permit.expires_at",
+                                "document.permit.issued_at",
+                                "document.permit.issuing_state",
+                                "document.permit.issuing_country",
+                                "document.permit.ref_number",
+                                "document.permit.nationality",
+                                "document.visa.front.image",
+                                "document.visa.front.mime_type",
+                                "document.visa.back.image",
+                                "document.visa.back.mime_type",
+                                "document.visa.selfie.image",
+                                "document.visa.selfie.mime_type",
+                                "document.visa.full_name",
+                                "document.visa.dob",
+                                "document.visa.gender",
+                                "document.visa.full_address",
+                                "document.visa.document_number",
+                                "document.visa.expires_at",
+                                "document.visa.issued_at",
+                                "document.visa.issuing_state",
+                                "document.visa.issuing_country",
+                                "document.visa.ref_number",
+                                "document.visa.nationality",
+                                "document.residence_document.front.image",
+                                "document.residence_document.front.mime_type",
+                                "document.residence_document.back.image",
+                                "document.residence_document.back.mime_type",
+                                "document.residence_document.selfie.image",
+                                "document.residence_document.selfie.mime_type",
+                                "document.residence_document.full_name",
+                                "document.residence_document.dob",
+                                "document.residence_document.gender",
+                                "document.residence_document.full_address",
+                                "document.residence_document.document_number",
+                                "document.residence_document.expires_at",
+                                "document.residence_document.issued_at",
+                                "document.residence_document.issuing_state",
+                                "document.residence_document.issuing_country",
+                                "document.residence_document.ref_number",
+                                "document.residence_document.nationality",
+                                "document.finra_compliance_letter",
+                                "card.*.number",
+                                "card.*.expiration",
+                                "card.*.cvc",
+                                "card.*.name",
+                                "card.*.billing_address.zip",
+                                "card.*.billing_address.country",
+                                "card.*.expiration_month",
+                                "card.*.expiration_year",
+                                "card.*.number_last4",
+                                "card.*.issuer"
+                            ]
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "content-type",
+                        "description": "Specify the content type of the object like `application/json` or `image/png`",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/vault_proxy/jit": {
+            "post": {
+                "tags": [
+                    "VaultProxy",
+                    "PublicApi"
+                ],
+                "description": "Invoke the vault proxy 'just-in-time' (JIT) to securely send and receive data to a target destination",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-target-url",
+                        "description": "Target proxy destination URL Required if \"just-in-time\" OR ignored if using proxy configuration",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-method",
+                        "description": "HTTP Method VERB for the proxy destination request (defaults to POST)",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-path-and-query",
+                        "description": "Egress destination URL path and query string to append",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-ingress-content-type",
+                        "description": "Content-type for the proxy ingress",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-access-reason",
+                        "description": "Access reason for any egress decryption operations during the proxy request",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-id",
+                        "description": "When proxy requests are on behalf of a single footprint vault, you can can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.  Similarly, if specifying proxy configuration ingress rules from a stored configuration the corresponding token must be assigned just-in-time via a headers  i.e: `x-fp-id: fp_id_abc`",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-ingress-rule",
+                        "description": "Configure one more ingress rules  x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-fwd-",
+                        "description": "Prefixes custom headers to forward along egress For example `x-fp-proxy-fwd-MYHEADER: hello world` sends `MYHEADER: hello world` to the destination",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-client-cert",
+                        "description": "Base64 encoded PEM client certificate to use (required if using key)",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-client-key",
+                        "description": "Base64 encoded PEM client key to use (required if using cert)",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-pin-cert",
+                        "description": "Configure one or more base64 encoded PEM server certificates to validate and pin proxy destination TLS connections.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {},
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/vault_proxy/{proxy_id}": {
+            "post": {
+                "tags": [
+                    "VaultProxy",
+                    "PublicApi"
+                ],
+                "description": "Invoke the vault proxy by configuration id to securely send and receive data to a target destination",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "proxy_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-method",
+                        "description": "HTTP Method VERB for the proxy destination request (defaults to POST)",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-path-and-query",
+                        "description": "Egress destination URL path and query string to append",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-ingress-content-type",
+                        "description": "Content-type for the proxy ingress",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-access-reason",
+                        "description": "Access reason for any egress decryption operations during the proxy request",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-id",
+                        "description": "When proxy requests are on behalf of a single footprint vault, you can can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.  Similarly, if specifying proxy configuration ingress rules from a stored configuration the corresponding token must be assigned just-in-time via a headers  i.e: `x-fp-id: fp_id_abc`",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-ingress-rule",
+                        "description": "Configure one more ingress rules  x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-fwd-",
+                        "description": "Prefixes custom headers to forward along egress For example `x-fp-proxy-fwd-MYHEADER: hello world` sends `MYHEADER: hello world` to the destination",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-client-cert",
+                        "description": "Base64 encoded PEM client certificate to use (required if using key)",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-client-key",
+                        "description": "Base64 encoded PEM client key to use (required if using cert)",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-proxy-pin-cert",
+                        "description": "Configure one or more base64 encoded PEM server certificates to validate and pin proxy destination TLS connections.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {},
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "Secret API Key": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Footprint-Secret-Key",
+                "description": "Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server."
+            },
+            "Dashboard Token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Fp-Dashboard-Authorization",
+                "description": "Short-lived token for an authenticated dashboard user."
+            },
+            "Client Token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Fp-Authorization",
+                "description": "Short-lived client token to perform actions for a given user."
+            }
+        },
+        "schemas": {
+            "ValidateRequest": {
+                "description": "Request containing a short-lived validation token that is used to verify auth and the end of\n an onboarding session.",
+                "type": "object",
+                "properties": {
+                    "validation_token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "validation_token"
+                ]
+            },
+            "DecryptRequest": {
+                "type": "object",
+                "properties": {
+                    "fields": {
+                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`",
+                        "type": "array",
+                        "items": {
+                            "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
+                            "type": "string",
+                            "enum": [
+                                "id.first_name",
+                                "id.last_name",
+                                "id.dob",
+                                "id.ssn4",
+                                "id.ssn9",
+                                "id.address_line1",
+                                "id.address_line2",
+                                "id.city",
+                                "id.state",
+                                "id.zip",
+                                "id.country",
+                                "id.email",
+                                "id.phone_number",
+                                "id.us_legal_status",
+                                "id.visa_kind",
+                                "id.visa_expiration_date",
+                                "id.nationality",
+                                "id.citizenships",
+                                "custom.*",
+                                "business.name",
+                                "business.dba",
+                                "business.website",
+                                "business.phone_number",
+                                "business.tin",
+                                "business.address_line1",
+                                "business.address_line2",
+                                "business.city",
+                                "business.state",
+                                "business.zip",
+                                "business.country",
+                                "business.beneficial_owners",
+                                "business.kyced_beneficial_owners",
+                                "business.corporation_type",
+                                "investor_profile.employment_status",
+                                "investor_profile.occupation",
+                                "investor_profile.employer",
+                                "investor_profile.annual_income",
+                                "investor_profile.net_worth",
+                                "investor_profile.investment_goals",
+                                "investor_profile.risk_tolerance",
+                                "investor_profile.declarations",
+                                "investor_profile.brokerage_firm_employer",
+                                "investor_profile.senior_executive_symbols",
+                                "investor_profile.family_member_names",
+                                "investor_profile.political_organization",
+                                "document.id_card.front.image",
+                                "document.id_card.front.mime_type",
+                                "document.id_card.back.image",
+                                "document.id_card.back.mime_type",
+                                "document.id_card.selfie.image",
+                                "document.id_card.selfie.mime_type",
+                                "document.id_card.full_name",
+                                "document.id_card.dob",
+                                "document.id_card.gender",
+                                "document.id_card.full_address",
+                                "document.id_card.document_number",
+                                "document.id_card.expires_at",
+                                "document.id_card.issued_at",
+                                "document.id_card.issuing_state",
+                                "document.id_card.issuing_country",
+                                "document.id_card.ref_number",
+                                "document.id_card.nationality",
+                                "document.drivers_license.front.image",
+                                "document.drivers_license.front.mime_type",
+                                "document.drivers_license.back.image",
+                                "document.drivers_license.back.mime_type",
+                                "document.drivers_license.selfie.image",
+                                "document.drivers_license.selfie.mime_type",
+                                "document.drivers_license.full_name",
+                                "document.drivers_license.dob",
+                                "document.drivers_license.gender",
+                                "document.drivers_license.full_address",
+                                "document.drivers_license.document_number",
+                                "document.drivers_license.expires_at",
+                                "document.drivers_license.issued_at",
+                                "document.drivers_license.issuing_state",
+                                "document.drivers_license.issuing_country",
+                                "document.drivers_license.ref_number",
+                                "document.drivers_license.nationality",
+                                "document.passport.front.image",
+                                "document.passport.front.mime_type",
+                                "document.passport.back.image",
+                                "document.passport.back.mime_type",
+                                "document.passport.selfie.image",
+                                "document.passport.selfie.mime_type",
+                                "document.passport.full_name",
+                                "document.passport.dob",
+                                "document.passport.gender",
+                                "document.passport.full_address",
+                                "document.passport.document_number",
+                                "document.passport.expires_at",
+                                "document.passport.issued_at",
+                                "document.passport.issuing_state",
+                                "document.passport.issuing_country",
+                                "document.passport.ref_number",
+                                "document.passport.nationality",
+                                "document.permit.front.image",
+                                "document.permit.front.mime_type",
+                                "document.permit.back.image",
+                                "document.permit.back.mime_type",
+                                "document.permit.selfie.image",
+                                "document.permit.selfie.mime_type",
+                                "document.permit.full_name",
+                                "document.permit.dob",
+                                "document.permit.gender",
+                                "document.permit.full_address",
+                                "document.permit.document_number",
+                                "document.permit.expires_at",
+                                "document.permit.issued_at",
+                                "document.permit.issuing_state",
+                                "document.permit.issuing_country",
+                                "document.permit.ref_number",
+                                "document.permit.nationality",
+                                "document.visa.front.image",
+                                "document.visa.front.mime_type",
+                                "document.visa.back.image",
+                                "document.visa.back.mime_type",
+                                "document.visa.selfie.image",
+                                "document.visa.selfie.mime_type",
+                                "document.visa.full_name",
+                                "document.visa.dob",
+                                "document.visa.gender",
+                                "document.visa.full_address",
+                                "document.visa.document_number",
+                                "document.visa.expires_at",
+                                "document.visa.issued_at",
+                                "document.visa.issuing_state",
+                                "document.visa.issuing_country",
+                                "document.visa.ref_number",
+                                "document.visa.nationality",
+                                "document.residence_document.front.image",
+                                "document.residence_document.front.mime_type",
+                                "document.residence_document.back.image",
+                                "document.residence_document.back.mime_type",
+                                "document.residence_document.selfie.image",
+                                "document.residence_document.selfie.mime_type",
+                                "document.residence_document.full_name",
+                                "document.residence_document.dob",
+                                "document.residence_document.gender",
+                                "document.residence_document.full_address",
+                                "document.residence_document.document_number",
+                                "document.residence_document.expires_at",
+                                "document.residence_document.issued_at",
+                                "document.residence_document.issuing_state",
+                                "document.residence_document.issuing_country",
+                                "document.residence_document.ref_number",
+                                "document.residence_document.nationality",
+                                "document.finra_compliance_letter",
+                                "card.*.number",
+                                "card.*.expiration",
+                                "card.*.cvc",
+                                "card.*.name",
+                                "card.*.billing_address.zip",
+                                "card.*.billing_address.country",
+                                "card.*.expiration_month",
+                                "card.*.expiration_year",
+                                "card.*.number_last4",
+                                "card.*.issuer"
+                            ]
+                        }
+                    },
+                    "filters": {
+                        "description": "A list of filter functions to apply to each decrypted data\n Omit or leave empty to apply no filters",
+                        "type": "array",
+                        "items": {
+                            "description": "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/vault/proxy#filter-functions",
+                            "type": "object",
+                            "properties": {
+                                "date_format": {
+                                    "type": "object",
+                                    "properties": {
+                                        "from_format": {
+                                            "type": "string"
+                                        },
+                                        "to_format": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "from_format",
+                                        "to_format"
+                                    ]
+                                },
+                                "encrypt": {
+                                    "type": "object",
+                                    "properties": {
+                                        "algorithm": {
+                                            "type": "string",
+                                            "enum": [
+                                                "rsa_pkcs1v15",
+                                                "ecies_p256x963_sha256_aes_gcm"
+                                            ]
+                                        },
+                                        "public_key": {
+                                            "description": "hex encoded, DER-formatted asymmetric public key",
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "required": [
+                                        "algorithm",
+                                        "public_key"
+                                    ]
+                                },
+                                "hmac_sha256": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "description": "hex-encoded signing key",
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "required": [
+                                        "key"
+                                    ]
+                                },
+                                "prefix": {
+                                    "type": "object",
+                                    "properties": {
+                                        "count": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
+                                    "required": [
+                                        "count"
+                                    ]
+                                },
+                                "replace": {
+                                    "type": "object",
+                                    "properties": {
+                                        "from": {
+                                            "type": "string"
+                                        },
+                                        "to": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "from",
+                                        "to"
+                                    ]
+                                },
+                                "suffix": {
+                                    "type": "object",
+                                    "properties": {
+                                        "count": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
+                                    "required": [
+                                        "count"
+                                    ]
+                                },
+                                "to_ascii": {
+                                    "type": "object"
+                                },
+                                "to_lowercase": {
+                                    "type": "object"
+                                },
+                                "to_uppercase": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "reason": {
+                        "description": "Reason for the data decryption. This will be logged",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "fields",
+                    "reason"
+                ]
+            },
+            "ValidateResponse": {
+                "type": "object",
+                "properties": {
+                    "validation_token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "validation_token"
+                ]
+            },
+            "GetVaultResponse": {
+                "example": {
+                    "id.last_name": true,
+                    "id.ssn9": true,
+                    "custom.credit_card": true,
+                    "id.dob": false
+                },
+                "type": "object",
+                "properties": {
+                    "<key>": {
+                        "type": "string",
+                        "enum": [
+                            "id.first_name",
+                            "id.last_name",
+                            "id.dob",
+                            "id.ssn4",
+                            "id.ssn9",
+                            "id.address_line1",
+                            "id.address_line2",
+                            "id.city",
+                            "id.state",
+                            "id.zip",
+                            "id.country",
+                            "id.email",
+                            "id.phone_number",
+                            "id.us_legal_status",
+                            "id.visa_kind",
+                            "id.visa_expiration_date",
+                            "id.nationality",
+                            "id.citizenships",
+                            "custom.*",
+                            "business.name",
+                            "business.dba",
+                            "business.website",
+                            "business.phone_number",
+                            "business.tin",
+                            "business.address_line1",
+                            "business.address_line2",
+                            "business.city",
+                            "business.state",
+                            "business.zip",
+                            "business.country",
+                            "business.beneficial_owners",
+                            "business.kyced_beneficial_owners",
+                            "business.corporation_type",
+                            "investor_profile.employment_status",
+                            "investor_profile.occupation",
+                            "investor_profile.employer",
+                            "investor_profile.annual_income",
+                            "investor_profile.net_worth",
+                            "investor_profile.investment_goals",
+                            "investor_profile.risk_tolerance",
+                            "investor_profile.declarations",
+                            "investor_profile.brokerage_firm_employer",
+                            "investor_profile.senior_executive_symbols",
+                            "investor_profile.family_member_names",
+                            "investor_profile.political_organization",
+                            "document.id_card.front.image",
+                            "document.id_card.front.mime_type",
+                            "document.id_card.back.image",
+                            "document.id_card.back.mime_type",
+                            "document.id_card.selfie.image",
+                            "document.id_card.selfie.mime_type",
+                            "document.id_card.full_name",
+                            "document.id_card.dob",
+                            "document.id_card.gender",
+                            "document.id_card.full_address",
+                            "document.id_card.document_number",
+                            "document.id_card.expires_at",
+                            "document.id_card.issued_at",
+                            "document.id_card.issuing_state",
+                            "document.id_card.issuing_country",
+                            "document.id_card.ref_number",
+                            "document.id_card.nationality",
+                            "document.drivers_license.front.image",
+                            "document.drivers_license.front.mime_type",
+                            "document.drivers_license.back.image",
+                            "document.drivers_license.back.mime_type",
+                            "document.drivers_license.selfie.image",
+                            "document.drivers_license.selfie.mime_type",
+                            "document.drivers_license.full_name",
+                            "document.drivers_license.dob",
+                            "document.drivers_license.gender",
+                            "document.drivers_license.full_address",
+                            "document.drivers_license.document_number",
+                            "document.drivers_license.expires_at",
+                            "document.drivers_license.issued_at",
+                            "document.drivers_license.issuing_state",
+                            "document.drivers_license.issuing_country",
+                            "document.drivers_license.ref_number",
+                            "document.drivers_license.nationality",
+                            "document.passport.front.image",
+                            "document.passport.front.mime_type",
+                            "document.passport.back.image",
+                            "document.passport.back.mime_type",
+                            "document.passport.selfie.image",
+                            "document.passport.selfie.mime_type",
+                            "document.passport.full_name",
+                            "document.passport.dob",
+                            "document.passport.gender",
+                            "document.passport.full_address",
+                            "document.passport.document_number",
+                            "document.passport.expires_at",
+                            "document.passport.issued_at",
+                            "document.passport.issuing_state",
+                            "document.passport.issuing_country",
+                            "document.passport.ref_number",
+                            "document.passport.nationality",
+                            "document.permit.front.image",
+                            "document.permit.front.mime_type",
+                            "document.permit.back.image",
+                            "document.permit.back.mime_type",
+                            "document.permit.selfie.image",
+                            "document.permit.selfie.mime_type",
+                            "document.permit.full_name",
+                            "document.permit.dob",
+                            "document.permit.gender",
+                            "document.permit.full_address",
+                            "document.permit.document_number",
+                            "document.permit.expires_at",
+                            "document.permit.issued_at",
+                            "document.permit.issuing_state",
+                            "document.permit.issuing_country",
+                            "document.permit.ref_number",
+                            "document.permit.nationality",
+                            "document.visa.front.image",
+                            "document.visa.front.mime_type",
+                            "document.visa.back.image",
+                            "document.visa.back.mime_type",
+                            "document.visa.selfie.image",
+                            "document.visa.selfie.mime_type",
+                            "document.visa.full_name",
+                            "document.visa.dob",
+                            "document.visa.gender",
+                            "document.visa.full_address",
+                            "document.visa.document_number",
+                            "document.visa.expires_at",
+                            "document.visa.issued_at",
+                            "document.visa.issuing_state",
+                            "document.visa.issuing_country",
+                            "document.visa.ref_number",
+                            "document.visa.nationality",
+                            "document.residence_document.front.image",
+                            "document.residence_document.front.mime_type",
+                            "document.residence_document.back.image",
+                            "document.residence_document.back.mime_type",
+                            "document.residence_document.selfie.image",
+                            "document.residence_document.selfie.mime_type",
+                            "document.residence_document.full_name",
+                            "document.residence_document.dob",
+                            "document.residence_document.gender",
+                            "document.residence_document.full_address",
+                            "document.residence_document.document_number",
+                            "document.residence_document.expires_at",
+                            "document.residence_document.issued_at",
+                            "document.residence_document.issuing_state",
+                            "document.residence_document.issuing_country",
+                            "document.residence_document.ref_number",
+                            "document.residence_document.nationality",
+                            "document.finra_compliance_letter",
+                            "card.*.number",
+                            "card.*.expiration",
+                            "card.*.cvc",
+                            "card.*.name",
+                            "card.*.billing_address.zip",
+                            "card.*.billing_address.country",
+                            "card.*.expiration_month",
+                            "card.*.expiration_year",
+                            "card.*.number_last4",
+                            "card.*.issuer"
+                        ]
+                    },
+                    "<value>": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "ClientTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "description": "The time at which this token will expire.",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "vault_fields": {
+                        "description": "The list of fields that are allowed to be vaulted by this token",
+                        "type": "array",
+                        "items": {
+                            "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
+                            "type": "string",
+                            "enum": [
+                                "id.first_name",
+                                "id.last_name",
+                                "id.dob",
+                                "id.ssn4",
+                                "id.ssn9",
+                                "id.address_line1",
+                                "id.address_line2",
+                                "id.city",
+                                "id.state",
+                                "id.zip",
+                                "id.country",
+                                "id.email",
+                                "id.phone_number",
+                                "id.us_legal_status",
+                                "id.visa_kind",
+                                "id.visa_expiration_date",
+                                "id.nationality",
+                                "id.citizenships",
+                                "custom.*",
+                                "business.name",
+                                "business.dba",
+                                "business.website",
+                                "business.phone_number",
+                                "business.tin",
+                                "business.address_line1",
+                                "business.address_line2",
+                                "business.city",
+                                "business.state",
+                                "business.zip",
+                                "business.country",
+                                "business.beneficial_owners",
+                                "business.kyced_beneficial_owners",
+                                "business.corporation_type",
+                                "investor_profile.employment_status",
+                                "investor_profile.occupation",
+                                "investor_profile.employer",
+                                "investor_profile.annual_income",
+                                "investor_profile.net_worth",
+                                "investor_profile.investment_goals",
+                                "investor_profile.risk_tolerance",
+                                "investor_profile.declarations",
+                                "investor_profile.brokerage_firm_employer",
+                                "investor_profile.senior_executive_symbols",
+                                "investor_profile.family_member_names",
+                                "investor_profile.political_organization",
+                                "document.id_card.front.image",
+                                "document.id_card.front.mime_type",
+                                "document.id_card.back.image",
+                                "document.id_card.back.mime_type",
+                                "document.id_card.selfie.image",
+                                "document.id_card.selfie.mime_type",
+                                "document.id_card.full_name",
+                                "document.id_card.dob",
+                                "document.id_card.gender",
+                                "document.id_card.full_address",
+                                "document.id_card.document_number",
+                                "document.id_card.expires_at",
+                                "document.id_card.issued_at",
+                                "document.id_card.issuing_state",
+                                "document.id_card.issuing_country",
+                                "document.id_card.ref_number",
+                                "document.id_card.nationality",
+                                "document.drivers_license.front.image",
+                                "document.drivers_license.front.mime_type",
+                                "document.drivers_license.back.image",
+                                "document.drivers_license.back.mime_type",
+                                "document.drivers_license.selfie.image",
+                                "document.drivers_license.selfie.mime_type",
+                                "document.drivers_license.full_name",
+                                "document.drivers_license.dob",
+                                "document.drivers_license.gender",
+                                "document.drivers_license.full_address",
+                                "document.drivers_license.document_number",
+                                "document.drivers_license.expires_at",
+                                "document.drivers_license.issued_at",
+                                "document.drivers_license.issuing_state",
+                                "document.drivers_license.issuing_country",
+                                "document.drivers_license.ref_number",
+                                "document.drivers_license.nationality",
+                                "document.passport.front.image",
+                                "document.passport.front.mime_type",
+                                "document.passport.back.image",
+                                "document.passport.back.mime_type",
+                                "document.passport.selfie.image",
+                                "document.passport.selfie.mime_type",
+                                "document.passport.full_name",
+                                "document.passport.dob",
+                                "document.passport.gender",
+                                "document.passport.full_address",
+                                "document.passport.document_number",
+                                "document.passport.expires_at",
+                                "document.passport.issued_at",
+                                "document.passport.issuing_state",
+                                "document.passport.issuing_country",
+                                "document.passport.ref_number",
+                                "document.passport.nationality",
+                                "document.permit.front.image",
+                                "document.permit.front.mime_type",
+                                "document.permit.back.image",
+                                "document.permit.back.mime_type",
+                                "document.permit.selfie.image",
+                                "document.permit.selfie.mime_type",
+                                "document.permit.full_name",
+                                "document.permit.dob",
+                                "document.permit.gender",
+                                "document.permit.full_address",
+                                "document.permit.document_number",
+                                "document.permit.expires_at",
+                                "document.permit.issued_at",
+                                "document.permit.issuing_state",
+                                "document.permit.issuing_country",
+                                "document.permit.ref_number",
+                                "document.permit.nationality",
+                                "document.visa.front.image",
+                                "document.visa.front.mime_type",
+                                "document.visa.back.image",
+                                "document.visa.back.mime_type",
+                                "document.visa.selfie.image",
+                                "document.visa.selfie.mime_type",
+                                "document.visa.full_name",
+                                "document.visa.dob",
+                                "document.visa.gender",
+                                "document.visa.full_address",
+                                "document.visa.document_number",
+                                "document.visa.expires_at",
+                                "document.visa.issued_at",
+                                "document.visa.issuing_state",
+                                "document.visa.issuing_country",
+                                "document.visa.ref_number",
+                                "document.visa.nationality",
+                                "document.residence_document.front.image",
+                                "document.residence_document.front.mime_type",
+                                "document.residence_document.back.image",
+                                "document.residence_document.back.mime_type",
+                                "document.residence_document.selfie.image",
+                                "document.residence_document.selfie.mime_type",
+                                "document.residence_document.full_name",
+                                "document.residence_document.dob",
+                                "document.residence_document.gender",
+                                "document.residence_document.full_address",
+                                "document.residence_document.document_number",
+                                "document.residence_document.expires_at",
+                                "document.residence_document.issued_at",
+                                "document.residence_document.issuing_state",
+                                "document.residence_document.issuing_country",
+                                "document.residence_document.ref_number",
+                                "document.residence_document.nationality",
+                                "document.finra_compliance_letter",
+                                "card.*.number",
+                                "card.*.expiration",
+                                "card.*.cvc",
+                                "card.*.name",
+                                "card.*.billing_address.zip",
+                                "card.*.billing_address.country",
+                                "card.*.expiration_month",
+                                "card.*.expiration_year",
+                                "card.*.number_last4",
+                                "card.*.issuer"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "vault_fields"
+                ]
+            },
+            "CreateOnboardingSessionRequest": {
+                "type": "object",
+                "properties": {
+                    "onboarding_config_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "onboarding_config_id"
+                ]
+            },
+            "DecryptResponse": {
+                "example": {
+                    "id.last_name": "smith",
+                    "id.ssn9": "121121212",
+                    "custom.credit_card": "1234 1234 1234 1234"
+                },
+                "type": "object",
+                "properties": {
+                    "<key>": {
+                        "type": "string",
+                        "enum": [
+                            "id.first_name",
+                            "id.last_name",
+                            "id.dob",
+                            "id.ssn4",
+                            "id.ssn9",
+                            "id.address_line1",
+                            "id.address_line2",
+                            "id.city",
+                            "id.state",
+                            "id.zip",
+                            "id.country",
+                            "id.email",
+                            "id.phone_number",
+                            "id.us_legal_status",
+                            "id.visa_kind",
+                            "id.visa_expiration_date",
+                            "id.nationality",
+                            "id.citizenships",
+                            "custom.*",
+                            "business.name",
+                            "business.dba",
+                            "business.website",
+                            "business.phone_number",
+                            "business.tin",
+                            "business.address_line1",
+                            "business.address_line2",
+                            "business.city",
+                            "business.state",
+                            "business.zip",
+                            "business.country",
+                            "business.beneficial_owners",
+                            "business.kyced_beneficial_owners",
+                            "business.corporation_type",
+                            "investor_profile.employment_status",
+                            "investor_profile.occupation",
+                            "investor_profile.employer",
+                            "investor_profile.annual_income",
+                            "investor_profile.net_worth",
+                            "investor_profile.investment_goals",
+                            "investor_profile.risk_tolerance",
+                            "investor_profile.declarations",
+                            "investor_profile.brokerage_firm_employer",
+                            "investor_profile.senior_executive_symbols",
+                            "investor_profile.family_member_names",
+                            "investor_profile.political_organization",
+                            "document.id_card.front.image",
+                            "document.id_card.front.mime_type",
+                            "document.id_card.back.image",
+                            "document.id_card.back.mime_type",
+                            "document.id_card.selfie.image",
+                            "document.id_card.selfie.mime_type",
+                            "document.id_card.full_name",
+                            "document.id_card.dob",
+                            "document.id_card.gender",
+                            "document.id_card.full_address",
+                            "document.id_card.document_number",
+                            "document.id_card.expires_at",
+                            "document.id_card.issued_at",
+                            "document.id_card.issuing_state",
+                            "document.id_card.issuing_country",
+                            "document.id_card.ref_number",
+                            "document.id_card.nationality",
+                            "document.drivers_license.front.image",
+                            "document.drivers_license.front.mime_type",
+                            "document.drivers_license.back.image",
+                            "document.drivers_license.back.mime_type",
+                            "document.drivers_license.selfie.image",
+                            "document.drivers_license.selfie.mime_type",
+                            "document.drivers_license.full_name",
+                            "document.drivers_license.dob",
+                            "document.drivers_license.gender",
+                            "document.drivers_license.full_address",
+                            "document.drivers_license.document_number",
+                            "document.drivers_license.expires_at",
+                            "document.drivers_license.issued_at",
+                            "document.drivers_license.issuing_state",
+                            "document.drivers_license.issuing_country",
+                            "document.drivers_license.ref_number",
+                            "document.drivers_license.nationality",
+                            "document.passport.front.image",
+                            "document.passport.front.mime_type",
+                            "document.passport.back.image",
+                            "document.passport.back.mime_type",
+                            "document.passport.selfie.image",
+                            "document.passport.selfie.mime_type",
+                            "document.passport.full_name",
+                            "document.passport.dob",
+                            "document.passport.gender",
+                            "document.passport.full_address",
+                            "document.passport.document_number",
+                            "document.passport.expires_at",
+                            "document.passport.issued_at",
+                            "document.passport.issuing_state",
+                            "document.passport.issuing_country",
+                            "document.passport.ref_number",
+                            "document.passport.nationality",
+                            "document.permit.front.image",
+                            "document.permit.front.mime_type",
+                            "document.permit.back.image",
+                            "document.permit.back.mime_type",
+                            "document.permit.selfie.image",
+                            "document.permit.selfie.mime_type",
+                            "document.permit.full_name",
+                            "document.permit.dob",
+                            "document.permit.gender",
+                            "document.permit.full_address",
+                            "document.permit.document_number",
+                            "document.permit.expires_at",
+                            "document.permit.issued_at",
+                            "document.permit.issuing_state",
+                            "document.permit.issuing_country",
+                            "document.permit.ref_number",
+                            "document.permit.nationality",
+                            "document.visa.front.image",
+                            "document.visa.front.mime_type",
+                            "document.visa.back.image",
+                            "document.visa.back.mime_type",
+                            "document.visa.selfie.image",
+                            "document.visa.selfie.mime_type",
+                            "document.visa.full_name",
+                            "document.visa.dob",
+                            "document.visa.gender",
+                            "document.visa.full_address",
+                            "document.visa.document_number",
+                            "document.visa.expires_at",
+                            "document.visa.issued_at",
+                            "document.visa.issuing_state",
+                            "document.visa.issuing_country",
+                            "document.visa.ref_number",
+                            "document.visa.nationality",
+                            "document.residence_document.front.image",
+                            "document.residence_document.front.mime_type",
+                            "document.residence_document.back.image",
+                            "document.residence_document.back.mime_type",
+                            "document.residence_document.selfie.image",
+                            "document.residence_document.selfie.mime_type",
+                            "document.residence_document.full_name",
+                            "document.residence_document.dob",
+                            "document.residence_document.gender",
+                            "document.residence_document.full_address",
+                            "document.residence_document.document_number",
+                            "document.residence_document.expires_at",
+                            "document.residence_document.issued_at",
+                            "document.residence_document.issuing_state",
+                            "document.residence_document.issuing_country",
+                            "document.residence_document.ref_number",
+                            "document.residence_document.nationality",
+                            "document.finra_compliance_letter",
+                            "card.*.number",
+                            "card.*.expiration",
+                            "card.*.cvc",
+                            "card.*.name",
+                            "card.*.billing_address.zip",
+                            "card.*.billing_address.country",
+                            "card.*.expiration_month",
+                            "card.*.expiration_year",
+                            "card.*.number_last4",
+                            "card.*.issuer"
+                        ]
+                    },
+                    "<value>": {
+                        "type": "string"
+                    }
+                }
+            },
+            "DeleteVaultResponse": {
+                "example": {
+                    "id.last_name": true,
+                    "id.ssn9": true,
+                    "custom.credit_card": true,
+                    "id.dob": false
+                },
+                "type": "object",
+                "properties": {
+                    "<key>": {
+                        "type": "string",
+                        "enum": [
+                            "id.first_name",
+                            "id.last_name",
+                            "id.dob",
+                            "id.ssn4",
+                            "id.ssn9",
+                            "id.address_line1",
+                            "id.address_line2",
+                            "id.city",
+                            "id.state",
+                            "id.zip",
+                            "id.country",
+                            "id.email",
+                            "id.phone_number",
+                            "id.us_legal_status",
+                            "id.visa_kind",
+                            "id.visa_expiration_date",
+                            "id.nationality",
+                            "id.citizenships",
+                            "custom.*",
+                            "business.name",
+                            "business.dba",
+                            "business.website",
+                            "business.phone_number",
+                            "business.tin",
+                            "business.address_line1",
+                            "business.address_line2",
+                            "business.city",
+                            "business.state",
+                            "business.zip",
+                            "business.country",
+                            "business.beneficial_owners",
+                            "business.kyced_beneficial_owners",
+                            "business.corporation_type",
+                            "investor_profile.employment_status",
+                            "investor_profile.occupation",
+                            "investor_profile.employer",
+                            "investor_profile.annual_income",
+                            "investor_profile.net_worth",
+                            "investor_profile.investment_goals",
+                            "investor_profile.risk_tolerance",
+                            "investor_profile.declarations",
+                            "investor_profile.brokerage_firm_employer",
+                            "investor_profile.senior_executive_symbols",
+                            "investor_profile.family_member_names",
+                            "investor_profile.political_organization",
+                            "document.id_card.front.image",
+                            "document.id_card.front.mime_type",
+                            "document.id_card.back.image",
+                            "document.id_card.back.mime_type",
+                            "document.id_card.selfie.image",
+                            "document.id_card.selfie.mime_type",
+                            "document.id_card.full_name",
+                            "document.id_card.dob",
+                            "document.id_card.gender",
+                            "document.id_card.full_address",
+                            "document.id_card.document_number",
+                            "document.id_card.expires_at",
+                            "document.id_card.issued_at",
+                            "document.id_card.issuing_state",
+                            "document.id_card.issuing_country",
+                            "document.id_card.ref_number",
+                            "document.id_card.nationality",
+                            "document.drivers_license.front.image",
+                            "document.drivers_license.front.mime_type",
+                            "document.drivers_license.back.image",
+                            "document.drivers_license.back.mime_type",
+                            "document.drivers_license.selfie.image",
+                            "document.drivers_license.selfie.mime_type",
+                            "document.drivers_license.full_name",
+                            "document.drivers_license.dob",
+                            "document.drivers_license.gender",
+                            "document.drivers_license.full_address",
+                            "document.drivers_license.document_number",
+                            "document.drivers_license.expires_at",
+                            "document.drivers_license.issued_at",
+                            "document.drivers_license.issuing_state",
+                            "document.drivers_license.issuing_country",
+                            "document.drivers_license.ref_number",
+                            "document.drivers_license.nationality",
+                            "document.passport.front.image",
+                            "document.passport.front.mime_type",
+                            "document.passport.back.image",
+                            "document.passport.back.mime_type",
+                            "document.passport.selfie.image",
+                            "document.passport.selfie.mime_type",
+                            "document.passport.full_name",
+                            "document.passport.dob",
+                            "document.passport.gender",
+                            "document.passport.full_address",
+                            "document.passport.document_number",
+                            "document.passport.expires_at",
+                            "document.passport.issued_at",
+                            "document.passport.issuing_state",
+                            "document.passport.issuing_country",
+                            "document.passport.ref_number",
+                            "document.passport.nationality",
+                            "document.permit.front.image",
+                            "document.permit.front.mime_type",
+                            "document.permit.back.image",
+                            "document.permit.back.mime_type",
+                            "document.permit.selfie.image",
+                            "document.permit.selfie.mime_type",
+                            "document.permit.full_name",
+                            "document.permit.dob",
+                            "document.permit.gender",
+                            "document.permit.full_address",
+                            "document.permit.document_number",
+                            "document.permit.expires_at",
+                            "document.permit.issued_at",
+                            "document.permit.issuing_state",
+                            "document.permit.issuing_country",
+                            "document.permit.ref_number",
+                            "document.permit.nationality",
+                            "document.visa.front.image",
+                            "document.visa.front.mime_type",
+                            "document.visa.back.image",
+                            "document.visa.back.mime_type",
+                            "document.visa.selfie.image",
+                            "document.visa.selfie.mime_type",
+                            "document.visa.full_name",
+                            "document.visa.dob",
+                            "document.visa.gender",
+                            "document.visa.full_address",
+                            "document.visa.document_number",
+                            "document.visa.expires_at",
+                            "document.visa.issued_at",
+                            "document.visa.issuing_state",
+                            "document.visa.issuing_country",
+                            "document.visa.ref_number",
+                            "document.visa.nationality",
+                            "document.residence_document.front.image",
+                            "document.residence_document.front.mime_type",
+                            "document.residence_document.back.image",
+                            "document.residence_document.back.mime_type",
+                            "document.residence_document.selfie.image",
+                            "document.residence_document.selfie.mime_type",
+                            "document.residence_document.full_name",
+                            "document.residence_document.dob",
+                            "document.residence_document.gender",
+                            "document.residence_document.full_address",
+                            "document.residence_document.document_number",
+                            "document.residence_document.expires_at",
+                            "document.residence_document.issued_at",
+                            "document.residence_document.issuing_state",
+                            "document.residence_document.issuing_country",
+                            "document.residence_document.ref_number",
+                            "document.residence_document.nationality",
+                            "document.finra_compliance_letter",
+                            "card.*.number",
+                            "card.*.expiration",
+                            "card.*.cvc",
+                            "card.*.name",
+                            "card.*.billing_address.zip",
+                            "card.*.billing_address.country",
+                            "card.*.expiration_month",
+                            "card.*.expiration_year",
+                            "card.*.number_last4",
+                            "card.*.issuer"
+                        ]
+                    },
+                    "<value>": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "ClientTokenRequest": {
+                "type": "object",
+                "properties": {
+                    "decrypt_reason": {
+                        "description": "If the token is allowed to decrypt, provide a default decryption reason",
+                        "type": "string"
+                    },
+                    "fields": {
+                        "description": "List of data identifiers to which this token will have access. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`",
+                        "type": "array",
+                        "items": {
+                            "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
+                            "type": "string",
+                            "enum": [
+                                "id.first_name",
+                                "id.last_name",
+                                "id.dob",
+                                "id.ssn4",
+                                "id.ssn9",
+                                "id.address_line1",
+                                "id.address_line2",
+                                "id.city",
+                                "id.state",
+                                "id.zip",
+                                "id.country",
+                                "id.email",
+                                "id.phone_number",
+                                "id.us_legal_status",
+                                "id.visa_kind",
+                                "id.visa_expiration_date",
+                                "id.nationality",
+                                "id.citizenships",
+                                "custom.*",
+                                "business.name",
+                                "business.dba",
+                                "business.website",
+                                "business.phone_number",
+                                "business.tin",
+                                "business.address_line1",
+                                "business.address_line2",
+                                "business.city",
+                                "business.state",
+                                "business.zip",
+                                "business.country",
+                                "business.beneficial_owners",
+                                "business.kyced_beneficial_owners",
+                                "business.corporation_type",
+                                "investor_profile.employment_status",
+                                "investor_profile.occupation",
+                                "investor_profile.employer",
+                                "investor_profile.annual_income",
+                                "investor_profile.net_worth",
+                                "investor_profile.investment_goals",
+                                "investor_profile.risk_tolerance",
+                                "investor_profile.declarations",
+                                "investor_profile.brokerage_firm_employer",
+                                "investor_profile.senior_executive_symbols",
+                                "investor_profile.family_member_names",
+                                "investor_profile.political_organization",
+                                "document.id_card.front.image",
+                                "document.id_card.front.mime_type",
+                                "document.id_card.back.image",
+                                "document.id_card.back.mime_type",
+                                "document.id_card.selfie.image",
+                                "document.id_card.selfie.mime_type",
+                                "document.id_card.full_name",
+                                "document.id_card.dob",
+                                "document.id_card.gender",
+                                "document.id_card.full_address",
+                                "document.id_card.document_number",
+                                "document.id_card.expires_at",
+                                "document.id_card.issued_at",
+                                "document.id_card.issuing_state",
+                                "document.id_card.issuing_country",
+                                "document.id_card.ref_number",
+                                "document.id_card.nationality",
+                                "document.drivers_license.front.image",
+                                "document.drivers_license.front.mime_type",
+                                "document.drivers_license.back.image",
+                                "document.drivers_license.back.mime_type",
+                                "document.drivers_license.selfie.image",
+                                "document.drivers_license.selfie.mime_type",
+                                "document.drivers_license.full_name",
+                                "document.drivers_license.dob",
+                                "document.drivers_license.gender",
+                                "document.drivers_license.full_address",
+                                "document.drivers_license.document_number",
+                                "document.drivers_license.expires_at",
+                                "document.drivers_license.issued_at",
+                                "document.drivers_license.issuing_state",
+                                "document.drivers_license.issuing_country",
+                                "document.drivers_license.ref_number",
+                                "document.drivers_license.nationality",
+                                "document.passport.front.image",
+                                "document.passport.front.mime_type",
+                                "document.passport.back.image",
+                                "document.passport.back.mime_type",
+                                "document.passport.selfie.image",
+                                "document.passport.selfie.mime_type",
+                                "document.passport.full_name",
+                                "document.passport.dob",
+                                "document.passport.gender",
+                                "document.passport.full_address",
+                                "document.passport.document_number",
+                                "document.passport.expires_at",
+                                "document.passport.issued_at",
+                                "document.passport.issuing_state",
+                                "document.passport.issuing_country",
+                                "document.passport.ref_number",
+                                "document.passport.nationality",
+                                "document.permit.front.image",
+                                "document.permit.front.mime_type",
+                                "document.permit.back.image",
+                                "document.permit.back.mime_type",
+                                "document.permit.selfie.image",
+                                "document.permit.selfie.mime_type",
+                                "document.permit.full_name",
+                                "document.permit.dob",
+                                "document.permit.gender",
+                                "document.permit.full_address",
+                                "document.permit.document_number",
+                                "document.permit.expires_at",
+                                "document.permit.issued_at",
+                                "document.permit.issuing_state",
+                                "document.permit.issuing_country",
+                                "document.permit.ref_number",
+                                "document.permit.nationality",
+                                "document.visa.front.image",
+                                "document.visa.front.mime_type",
+                                "document.visa.back.image",
+                                "document.visa.back.mime_type",
+                                "document.visa.selfie.image",
+                                "document.visa.selfie.mime_type",
+                                "document.visa.full_name",
+                                "document.visa.dob",
+                                "document.visa.gender",
+                                "document.visa.full_address",
+                                "document.visa.document_number",
+                                "document.visa.expires_at",
+                                "document.visa.issued_at",
+                                "document.visa.issuing_state",
+                                "document.visa.issuing_country",
+                                "document.visa.ref_number",
+                                "document.visa.nationality",
+                                "document.residence_document.front.image",
+                                "document.residence_document.front.mime_type",
+                                "document.residence_document.back.image",
+                                "document.residence_document.back.mime_type",
+                                "document.residence_document.selfie.image",
+                                "document.residence_document.selfie.mime_type",
+                                "document.residence_document.full_name",
+                                "document.residence_document.dob",
+                                "document.residence_document.gender",
+                                "document.residence_document.full_address",
+                                "document.residence_document.document_number",
+                                "document.residence_document.expires_at",
+                                "document.residence_document.issued_at",
+                                "document.residence_document.issuing_state",
+                                "document.residence_document.issuing_country",
+                                "document.residence_document.ref_number",
+                                "document.residence_document.nationality",
+                                "document.finra_compliance_letter",
+                                "card.*.number",
+                                "card.*.expiration",
+                                "card.*.cvc",
+                                "card.*.name",
+                                "card.*.billing_address.zip",
+                                "card.*.billing_address.country",
+                                "card.*.expiration_month",
+                                "card.*.expiration_year",
+                                "card.*.number_last4",
+                                "card.*.issuer"
+                            ]
+                        }
+                    },
+                    "scopes": {
+                        "description": "Specify whether this token should be allowed to vault, decrypt, or both",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "vault",
+                                "decrypt",
+                                "decrypt_download"
+                            ]
+                        }
+                    },
+                    "ttl": {
+                        "example": 300,
+                        "description": "Time to live until this token expires, provided in seconds. Defaults to 30 minutes. Must be at least 60 seconds, at most 1 day",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "required": [
+                    "fields",
+                    "scopes"
+                ]
+            },
+            "EmptyResponse": {
+                "type": "object"
+            },
+            "ObConfigSessionToken": {
+                "type": "object",
+                "properties": {
+                    "session_token": {
+                        "description": "a one-time use session token for onboarding a new user",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "session_token"
+                ]
+            },
+            "User": {
+                "description": "Basic information about a user",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "requires_manual_review": {
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pass",
+                            "fail",
+                            "incomplete",
+                            "pending"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "requires_manual_review"
+                ]
+            },
+            "ClientDecryptRequest": {
+                "type": "object",
+                "properties": {
+                    "fields": {
+                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`",
+                        "type": "array",
+                        "items": {
+                            "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
+                            "type": "string",
+                            "enum": [
+                                "id.first_name",
+                                "id.last_name",
+                                "id.dob",
+                                "id.ssn4",
+                                "id.ssn9",
+                                "id.address_line1",
+                                "id.address_line2",
+                                "id.city",
+                                "id.state",
+                                "id.zip",
+                                "id.country",
+                                "id.email",
+                                "id.phone_number",
+                                "id.us_legal_status",
+                                "id.visa_kind",
+                                "id.visa_expiration_date",
+                                "id.nationality",
+                                "id.citizenships",
+                                "custom.*",
+                                "business.name",
+                                "business.dba",
+                                "business.website",
+                                "business.phone_number",
+                                "business.tin",
+                                "business.address_line1",
+                                "business.address_line2",
+                                "business.city",
+                                "business.state",
+                                "business.zip",
+                                "business.country",
+                                "business.beneficial_owners",
+                                "business.kyced_beneficial_owners",
+                                "business.corporation_type",
+                                "investor_profile.employment_status",
+                                "investor_profile.occupation",
+                                "investor_profile.employer",
+                                "investor_profile.annual_income",
+                                "investor_profile.net_worth",
+                                "investor_profile.investment_goals",
+                                "investor_profile.risk_tolerance",
+                                "investor_profile.declarations",
+                                "investor_profile.brokerage_firm_employer",
+                                "investor_profile.senior_executive_symbols",
+                                "investor_profile.family_member_names",
+                                "investor_profile.political_organization",
+                                "document.id_card.front.image",
+                                "document.id_card.front.mime_type",
+                                "document.id_card.back.image",
+                                "document.id_card.back.mime_type",
+                                "document.id_card.selfie.image",
+                                "document.id_card.selfie.mime_type",
+                                "document.id_card.full_name",
+                                "document.id_card.dob",
+                                "document.id_card.gender",
+                                "document.id_card.full_address",
+                                "document.id_card.document_number",
+                                "document.id_card.expires_at",
+                                "document.id_card.issued_at",
+                                "document.id_card.issuing_state",
+                                "document.id_card.issuing_country",
+                                "document.id_card.ref_number",
+                                "document.id_card.nationality",
+                                "document.drivers_license.front.image",
+                                "document.drivers_license.front.mime_type",
+                                "document.drivers_license.back.image",
+                                "document.drivers_license.back.mime_type",
+                                "document.drivers_license.selfie.image",
+                                "document.drivers_license.selfie.mime_type",
+                                "document.drivers_license.full_name",
+                                "document.drivers_license.dob",
+                                "document.drivers_license.gender",
+                                "document.drivers_license.full_address",
+                                "document.drivers_license.document_number",
+                                "document.drivers_license.expires_at",
+                                "document.drivers_license.issued_at",
+                                "document.drivers_license.issuing_state",
+                                "document.drivers_license.issuing_country",
+                                "document.drivers_license.ref_number",
+                                "document.drivers_license.nationality",
+                                "document.passport.front.image",
+                                "document.passport.front.mime_type",
+                                "document.passport.back.image",
+                                "document.passport.back.mime_type",
+                                "document.passport.selfie.image",
+                                "document.passport.selfie.mime_type",
+                                "document.passport.full_name",
+                                "document.passport.dob",
+                                "document.passport.gender",
+                                "document.passport.full_address",
+                                "document.passport.document_number",
+                                "document.passport.expires_at",
+                                "document.passport.issued_at",
+                                "document.passport.issuing_state",
+                                "document.passport.issuing_country",
+                                "document.passport.ref_number",
+                                "document.passport.nationality",
+                                "document.permit.front.image",
+                                "document.permit.front.mime_type",
+                                "document.permit.back.image",
+                                "document.permit.back.mime_type",
+                                "document.permit.selfie.image",
+                                "document.permit.selfie.mime_type",
+                                "document.permit.full_name",
+                                "document.permit.dob",
+                                "document.permit.gender",
+                                "document.permit.full_address",
+                                "document.permit.document_number",
+                                "document.permit.expires_at",
+                                "document.permit.issued_at",
+                                "document.permit.issuing_state",
+                                "document.permit.issuing_country",
+                                "document.permit.ref_number",
+                                "document.permit.nationality",
+                                "document.visa.front.image",
+                                "document.visa.front.mime_type",
+                                "document.visa.back.image",
+                                "document.visa.back.mime_type",
+                                "document.visa.selfie.image",
+                                "document.visa.selfie.mime_type",
+                                "document.visa.full_name",
+                                "document.visa.dob",
+                                "document.visa.gender",
+                                "document.visa.full_address",
+                                "document.visa.document_number",
+                                "document.visa.expires_at",
+                                "document.visa.issued_at",
+                                "document.visa.issuing_state",
+                                "document.visa.issuing_country",
+                                "document.visa.ref_number",
+                                "document.visa.nationality",
+                                "document.residence_document.front.image",
+                                "document.residence_document.front.mime_type",
+                                "document.residence_document.back.image",
+                                "document.residence_document.back.mime_type",
+                                "document.residence_document.selfie.image",
+                                "document.residence_document.selfie.mime_type",
+                                "document.residence_document.full_name",
+                                "document.residence_document.dob",
+                                "document.residence_document.gender",
+                                "document.residence_document.full_address",
+                                "document.residence_document.document_number",
+                                "document.residence_document.expires_at",
+                                "document.residence_document.issued_at",
+                                "document.residence_document.issuing_state",
+                                "document.residence_document.issuing_country",
+                                "document.residence_document.ref_number",
+                                "document.residence_document.nationality",
+                                "document.finra_compliance_letter",
+                                "card.*.number",
+                                "card.*.expiration",
+                                "card.*.cvc",
+                                "card.*.name",
+                                "card.*.billing_address.zip",
+                                "card.*.billing_address.country",
+                                "card.*.expiration_month",
+                                "card.*.expiration_year",
+                                "card.*.number_last4",
+                                "card.*.issuer"
+                            ]
+                        }
+                    },
+                    "filters": {
+                        "description": "A list of filter functions to apply to each decrypted data\n Omit or leave empty to apply no filters",
+                        "type": "array",
+                        "items": {
+                            "description": "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/vault/proxy#filter-functions",
+                            "type": "object",
+                            "properties": {
+                                "date_format": {
+                                    "type": "object",
+                                    "properties": {
+                                        "from_format": {
+                                            "type": "string"
+                                        },
+                                        "to_format": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "from_format",
+                                        "to_format"
+                                    ]
+                                },
+                                "encrypt": {
+                                    "type": "object",
+                                    "properties": {
+                                        "algorithm": {
+                                            "type": "string",
+                                            "enum": [
+                                                "rsa_pkcs1v15",
+                                                "ecies_p256x963_sha256_aes_gcm"
+                                            ]
+                                        },
+                                        "public_key": {
+                                            "description": "hex encoded, DER-formatted asymmetric public key",
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "required": [
+                                        "algorithm",
+                                        "public_key"
+                                    ]
+                                },
+                                "hmac_sha256": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "description": "hex-encoded signing key",
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "required": [
+                                        "key"
+                                    ]
+                                },
+                                "prefix": {
+                                    "type": "object",
+                                    "properties": {
+                                        "count": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
+                                    "required": [
+                                        "count"
+                                    ]
+                                },
+                                "replace": {
+                                    "type": "object",
+                                    "properties": {
+                                        "from": {
+                                            "type": "string"
+                                        },
+                                        "to": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "from",
+                                        "to"
+                                    ]
+                                },
+                                "suffix": {
+                                    "type": "object",
+                                    "properties": {
+                                        "count": {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        }
+                                    },
+                                    "required": [
+                                        "count"
+                                    ]
+                                },
+                                "to_ascii": {
+                                    "type": "object"
+                                },
+                                "to_lowercase": {
+                                    "type": "object"
+                                },
+                                "to_uppercase": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "reason": {
+                        "description": "Reason for the data decryption. This will be logged.\n The reason must be provided either here or in the client token",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "fields"
+                ]
+            },
+            "DeleteRequest": {
+                "type": "object",
+                "properties": {
+                    "fields": {
+                        "description": "List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`",
+                        "type": "array",
+                        "items": {
+                            "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
+                            "type": "string",
+                            "enum": [
+                                "id.first_name",
+                                "id.last_name",
+                                "id.dob",
+                                "id.ssn4",
+                                "id.ssn9",
+                                "id.address_line1",
+                                "id.address_line2",
+                                "id.city",
+                                "id.state",
+                                "id.zip",
+                                "id.country",
+                                "id.email",
+                                "id.phone_number",
+                                "id.us_legal_status",
+                                "id.visa_kind",
+                                "id.visa_expiration_date",
+                                "id.nationality",
+                                "id.citizenships",
+                                "custom.*",
+                                "business.name",
+                                "business.dba",
+                                "business.website",
+                                "business.phone_number",
+                                "business.tin",
+                                "business.address_line1",
+                                "business.address_line2",
+                                "business.city",
+                                "business.state",
+                                "business.zip",
+                                "business.country",
+                                "business.beneficial_owners",
+                                "business.kyced_beneficial_owners",
+                                "business.corporation_type",
+                                "investor_profile.employment_status",
+                                "investor_profile.occupation",
+                                "investor_profile.employer",
+                                "investor_profile.annual_income",
+                                "investor_profile.net_worth",
+                                "investor_profile.investment_goals",
+                                "investor_profile.risk_tolerance",
+                                "investor_profile.declarations",
+                                "investor_profile.brokerage_firm_employer",
+                                "investor_profile.senior_executive_symbols",
+                                "investor_profile.family_member_names",
+                                "investor_profile.political_organization",
+                                "document.id_card.front.image",
+                                "document.id_card.front.mime_type",
+                                "document.id_card.back.image",
+                                "document.id_card.back.mime_type",
+                                "document.id_card.selfie.image",
+                                "document.id_card.selfie.mime_type",
+                                "document.id_card.full_name",
+                                "document.id_card.dob",
+                                "document.id_card.gender",
+                                "document.id_card.full_address",
+                                "document.id_card.document_number",
+                                "document.id_card.expires_at",
+                                "document.id_card.issued_at",
+                                "document.id_card.issuing_state",
+                                "document.id_card.issuing_country",
+                                "document.id_card.ref_number",
+                                "document.id_card.nationality",
+                                "document.drivers_license.front.image",
+                                "document.drivers_license.front.mime_type",
+                                "document.drivers_license.back.image",
+                                "document.drivers_license.back.mime_type",
+                                "document.drivers_license.selfie.image",
+                                "document.drivers_license.selfie.mime_type",
+                                "document.drivers_license.full_name",
+                                "document.drivers_license.dob",
+                                "document.drivers_license.gender",
+                                "document.drivers_license.full_address",
+                                "document.drivers_license.document_number",
+                                "document.drivers_license.expires_at",
+                                "document.drivers_license.issued_at",
+                                "document.drivers_license.issuing_state",
+                                "document.drivers_license.issuing_country",
+                                "document.drivers_license.ref_number",
+                                "document.drivers_license.nationality",
+                                "document.passport.front.image",
+                                "document.passport.front.mime_type",
+                                "document.passport.back.image",
+                                "document.passport.back.mime_type",
+                                "document.passport.selfie.image",
+                                "document.passport.selfie.mime_type",
+                                "document.passport.full_name",
+                                "document.passport.dob",
+                                "document.passport.gender",
+                                "document.passport.full_address",
+                                "document.passport.document_number",
+                                "document.passport.expires_at",
+                                "document.passport.issued_at",
+                                "document.passport.issuing_state",
+                                "document.passport.issuing_country",
+                                "document.passport.ref_number",
+                                "document.passport.nationality",
+                                "document.permit.front.image",
+                                "document.permit.front.mime_type",
+                                "document.permit.back.image",
+                                "document.permit.back.mime_type",
+                                "document.permit.selfie.image",
+                                "document.permit.selfie.mime_type",
+                                "document.permit.full_name",
+                                "document.permit.dob",
+                                "document.permit.gender",
+                                "document.permit.full_address",
+                                "document.permit.document_number",
+                                "document.permit.expires_at",
+                                "document.permit.issued_at",
+                                "document.permit.issuing_state",
+                                "document.permit.issuing_country",
+                                "document.permit.ref_number",
+                                "document.permit.nationality",
+                                "document.visa.front.image",
+                                "document.visa.front.mime_type",
+                                "document.visa.back.image",
+                                "document.visa.back.mime_type",
+                                "document.visa.selfie.image",
+                                "document.visa.selfie.mime_type",
+                                "document.visa.full_name",
+                                "document.visa.dob",
+                                "document.visa.gender",
+                                "document.visa.full_address",
+                                "document.visa.document_number",
+                                "document.visa.expires_at",
+                                "document.visa.issued_at",
+                                "document.visa.issuing_state",
+                                "document.visa.issuing_country",
+                                "document.visa.ref_number",
+                                "document.visa.nationality",
+                                "document.residence_document.front.image",
+                                "document.residence_document.front.mime_type",
+                                "document.residence_document.back.image",
+                                "document.residence_document.back.mime_type",
+                                "document.residence_document.selfie.image",
+                                "document.residence_document.selfie.mime_type",
+                                "document.residence_document.full_name",
+                                "document.residence_document.dob",
+                                "document.residence_document.gender",
+                                "document.residence_document.full_address",
+                                "document.residence_document.document_number",
+                                "document.residence_document.expires_at",
+                                "document.residence_document.issued_at",
+                                "document.residence_document.issuing_state",
+                                "document.residence_document.issuing_country",
+                                "document.residence_document.ref_number",
+                                "document.residence_document.nationality",
+                                "document.finra_compliance_letter",
+                                "card.*.number",
+                                "card.*.expiration",
+                                "card.*.cvc",
+                                "card.*.name",
+                                "card.*.billing_address.zip",
+                                "card.*.billing_address.country",
+                                "card.*.expiration_month",
+                                "card.*.expiration_year",
+                                "card.*.number_last4",
+                                "card.*.issuer"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "fields"
+                ]
+            },
+            "RawDataRequest": {
+                "example": {
+                    "id.first_name": "Peter",
+                    "custom.ach_account_number": "1234567890",
+                    "custom.cc_last_4": "4242"
+                },
+                "type": "object",
+                "properties": {
+                    "<key>": {
+                        "type": "string",
+                        "enum": [
+                            "id.first_name",
+                            "id.last_name",
+                            "id.dob",
+                            "id.ssn4",
+                            "id.ssn9",
+                            "id.address_line1",
+                            "id.address_line2",
+                            "id.city",
+                            "id.state",
+                            "id.zip",
+                            "id.country",
+                            "id.email",
+                            "id.phone_number",
+                            "id.us_legal_status",
+                            "id.visa_kind",
+                            "id.visa_expiration_date",
+                            "id.nationality",
+                            "id.citizenships",
+                            "custom.*",
+                            "business.name",
+                            "business.dba",
+                            "business.website",
+                            "business.phone_number",
+                            "business.tin",
+                            "business.address_line1",
+                            "business.address_line2",
+                            "business.city",
+                            "business.state",
+                            "business.zip",
+                            "business.country",
+                            "business.beneficial_owners",
+                            "business.kyced_beneficial_owners",
+                            "business.corporation_type",
+                            "investor_profile.employment_status",
+                            "investor_profile.occupation",
+                            "investor_profile.employer",
+                            "investor_profile.annual_income",
+                            "investor_profile.net_worth",
+                            "investor_profile.investment_goals",
+                            "investor_profile.risk_tolerance",
+                            "investor_profile.declarations",
+                            "investor_profile.brokerage_firm_employer",
+                            "investor_profile.senior_executive_symbols",
+                            "investor_profile.family_member_names",
+                            "investor_profile.political_organization",
+                            "document.id_card.front.image",
+                            "document.id_card.front.mime_type",
+                            "document.id_card.back.image",
+                            "document.id_card.back.mime_type",
+                            "document.id_card.selfie.image",
+                            "document.id_card.selfie.mime_type",
+                            "document.id_card.full_name",
+                            "document.id_card.dob",
+                            "document.id_card.gender",
+                            "document.id_card.full_address",
+                            "document.id_card.document_number",
+                            "document.id_card.expires_at",
+                            "document.id_card.issued_at",
+                            "document.id_card.issuing_state",
+                            "document.id_card.issuing_country",
+                            "document.id_card.ref_number",
+                            "document.id_card.nationality",
+                            "document.drivers_license.front.image",
+                            "document.drivers_license.front.mime_type",
+                            "document.drivers_license.back.image",
+                            "document.drivers_license.back.mime_type",
+                            "document.drivers_license.selfie.image",
+                            "document.drivers_license.selfie.mime_type",
+                            "document.drivers_license.full_name",
+                            "document.drivers_license.dob",
+                            "document.drivers_license.gender",
+                            "document.drivers_license.full_address",
+                            "document.drivers_license.document_number",
+                            "document.drivers_license.expires_at",
+                            "document.drivers_license.issued_at",
+                            "document.drivers_license.issuing_state",
+                            "document.drivers_license.issuing_country",
+                            "document.drivers_license.ref_number",
+                            "document.drivers_license.nationality",
+                            "document.passport.front.image",
+                            "document.passport.front.mime_type",
+                            "document.passport.back.image",
+                            "document.passport.back.mime_type",
+                            "document.passport.selfie.image",
+                            "document.passport.selfie.mime_type",
+                            "document.passport.full_name",
+                            "document.passport.dob",
+                            "document.passport.gender",
+                            "document.passport.full_address",
+                            "document.passport.document_number",
+                            "document.passport.expires_at",
+                            "document.passport.issued_at",
+                            "document.passport.issuing_state",
+                            "document.passport.issuing_country",
+                            "document.passport.ref_number",
+                            "document.passport.nationality",
+                            "document.permit.front.image",
+                            "document.permit.front.mime_type",
+                            "document.permit.back.image",
+                            "document.permit.back.mime_type",
+                            "document.permit.selfie.image",
+                            "document.permit.selfie.mime_type",
+                            "document.permit.full_name",
+                            "document.permit.dob",
+                            "document.permit.gender",
+                            "document.permit.full_address",
+                            "document.permit.document_number",
+                            "document.permit.expires_at",
+                            "document.permit.issued_at",
+                            "document.permit.issuing_state",
+                            "document.permit.issuing_country",
+                            "document.permit.ref_number",
+                            "document.permit.nationality",
+                            "document.visa.front.image",
+                            "document.visa.front.mime_type",
+                            "document.visa.back.image",
+                            "document.visa.back.mime_type",
+                            "document.visa.selfie.image",
+                            "document.visa.selfie.mime_type",
+                            "document.visa.full_name",
+                            "document.visa.dob",
+                            "document.visa.gender",
+                            "document.visa.full_address",
+                            "document.visa.document_number",
+                            "document.visa.expires_at",
+                            "document.visa.issued_at",
+                            "document.visa.issuing_state",
+                            "document.visa.issuing_country",
+                            "document.visa.ref_number",
+                            "document.visa.nationality",
+                            "document.residence_document.front.image",
+                            "document.residence_document.front.mime_type",
+                            "document.residence_document.back.image",
+                            "document.residence_document.back.mime_type",
+                            "document.residence_document.selfie.image",
+                            "document.residence_document.selfie.mime_type",
+                            "document.residence_document.full_name",
+                            "document.residence_document.dob",
+                            "document.residence_document.gender",
+                            "document.residence_document.full_address",
+                            "document.residence_document.document_number",
+                            "document.residence_document.expires_at",
+                            "document.residence_document.issued_at",
+                            "document.residence_document.issuing_state",
+                            "document.residence_document.issuing_country",
+                            "document.residence_document.ref_number",
+                            "document.residence_document.nationality",
+                            "document.finra_compliance_letter",
+                            "card.*.number",
+                            "card.*.expiration",
+                            "card.*.cvc",
+                            "card.*.name",
+                            "card.*.billing_address.zip",
+                            "card.*.billing_address.country",
+                            "card.*.expiration_month",
+                            "card.*.expiration_year",
+                            "card.*.number_last4",
+                            "card.*.issuer"
+                        ]
+                    },
+                    "<value>": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "PublicApi"
+        },
+        {
+            "name": "Preview"
+        }
+    ]
+}

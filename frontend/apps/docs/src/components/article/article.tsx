@@ -5,11 +5,9 @@ import React from 'react';
 import SEO from 'src/components/seo';
 
 import type { Article } from '../../types/article';
-import type { Page } from '../../types/page';
 import Banner from '../introduction/banner';
 import SectionCards from '../introduction/section-cards';
 import ArticleHeader from './components/article-header';
-import Layout from './components/layout';
 import A from './components/markdown-components/a';
 import Code from './components/markdown-components/code';
 import CustomizationPreview from './components/markdown-components/customization-preview';
@@ -22,7 +20,6 @@ import Img from './components/markdown-components/img';
 import Strong from './components/markdown-components/strong';
 
 type ArticleProps = {
-  page: Page;
   article: Article;
 };
 
@@ -65,20 +62,19 @@ const overrides: MarkdownToJSX.Overrides = {
   },
 };
 
-const ArticlePage = ({ page, article }: ArticleProps) => (
+const ArticlePage = ({ article }: ArticleProps) => (
   <>
     <SEO
       description={article.data.meta.description}
       slug={article.data.slug}
       title={article.data.meta.title}
     />
-    <Layout page={page} article={article}>
-      <ArticleHeader
-        title={article.data.title}
-        subtitle={article.data.readingTime.text}
-      />
-      <Container options={{ overrides }}>{article.content}</Container>
-    </Layout>
+
+    <ArticleHeader
+      title={article.data.title}
+      subtitle={article.data.readingTime.text}
+    />
+    <Container options={{ overrides }}>{article.content}</Container>
   </>
 );
 

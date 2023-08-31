@@ -18,6 +18,7 @@
       "nav": {
         "home": "Go to the home page",
         "documentation": "Documentation",
+        "api-reference": "API",
         "nav-toggle": {
           "open": "Open navigation",
           "close": "Close navigation"
@@ -71,7 +72,10 @@
         "submit-error": "Oops, something went wrong. Please try again."
       }
     },
-    "side-navigation": {
+    "navigation-footer": {
+      "theme": "Theme",
+      "api-reference": "API Reference",
+      "docs": "Documentation",
       "need-help": {
         "label": "Need help?",
         "dialog": {
@@ -85,10 +89,36 @@
           "title": "Send feedback",
           "description": "We'd love to hear your thoughts on our docs!"
         }
-      },
-      "api-reference": {
-        "label": "API Reference",
-        "theme": "Theme"
+      }
+    },
+    "navigation-api-reference": {
+      "navigation": {
+        "business": {
+          "label": "Businesses",
+          "singular": "Business"
+        },
+        "users": {
+          "label": "Users",
+          "singular": "User"
+        },
+        "vault": {
+          "label": "Vault",
+          "singular": "Vault"
+        },
+        "vault-proxy": {
+          "label": "Vault Proxy",
+          "singular": "Vault Proxy"
+        },
+        "entities": {
+          "label": "Entities",
+          "singular": "Entity"
+        },
+        "methods": {
+          "post": "Create",
+          "patch": "Modify",
+          "delete": "Delete",
+          "get": "Get"
+        }
       }
     }
   },

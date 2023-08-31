@@ -107,7 +107,7 @@ const Grid = styled.div`
       'vault-proxy'
       'components';
 
-    ${media.greaterThan('md')`
+    ${media.greaterThan('sm')`
          grid-template-columns: repeat(2, 1fr);
          grid-template-areas:
       'kyc kyb'

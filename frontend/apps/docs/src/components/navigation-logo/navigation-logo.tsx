@@ -1,0 +1,65 @@
+import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
+import { createFontStyles } from '@onefootprint/ui';
+import Link from 'next/link';
+import React from 'react';
+
+import LogoCopyAssets from './components/logo-copy-assets';
+
+const API_REFERENCE_PATH = '/api-reference';
+
+type NavigationLogoProps = {
+  section?: 'api-reference' | 'docs';
+};
+
+const NavigationLogo = ({ section }: NavigationLogoProps) => {
+  const { t } = useTranslation('components.header.nav');
+  return (
+    <MainLinks>
+      <LogoCopyAssets />
+      <Line />
+      <SectionTitle
+        href={section === 'api-reference' ? API_REFERENCE_PATH : '/'}
+      >
+        {section === 'api-reference' ? t('api-reference') : t('documentation')}
+      </SectionTitle>
+    </MainLinks>
+  );
+};
+
+const MainLinks = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing[4]};
+    position: relative;
+    flex: 1;
+    height: 100%;
+  `};
+`;
+
+const SectionTitle = styled(Link)`
+  ${({ theme }) => css`
+    ${createFontStyles('body-3')}
+    color: ${theme.color.tertiary};
+    text-decoration: none;
+    transition: opacity 0.2s ease-in-out;
+
+    @media (hover: hover) {
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  `}
+`;
+
+const Line = styled.div`
+  ${({ theme }) => css`
+    height: 100%;
+    width: 1px;
+    background-color: ${theme.borderColor.tertiary};
+    max-height: 20px;
+  `};
+`;
+
+export default NavigationLogo;

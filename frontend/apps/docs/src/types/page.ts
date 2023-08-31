@@ -13,4 +13,9 @@ export type PageNavigationCategory = {
   items: PageNavigationItem[];
 };
 
+export type APIRefPageNavigation = {
+  name: string;
+  items: PageNavigationItem[];
+};
+
 export type PageNavigation = PageNavigationCategory[];

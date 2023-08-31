@@ -29,9 +29,8 @@ const Item = styled.button`
     cursor: pointer;
     align-items: center;
     display: flex;
-    padding-left: ${theme.spacing[3]};
-    display: flex;
     gap: ${theme.spacing[3]};
+    padding: 0;
 
     @media (hover: hover) {
       &:hover {
