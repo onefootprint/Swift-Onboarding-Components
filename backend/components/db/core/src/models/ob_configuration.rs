@@ -446,6 +446,7 @@ mod tests {
             allow_international_residents: allow_international,
             international_country_restrictions,
             author: None,
+            skip_kyc: false,
         };
 
         assert_have_same_elements(obc.supported_countries_for_doc_type(doc_type), expected_countries)
