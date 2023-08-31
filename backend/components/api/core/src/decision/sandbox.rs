@@ -3,8 +3,9 @@ use std::collections::HashMap;
 use crate::{errors::ApiResult, utils::vault_wrapper::VaultWrapper};
 use db::{
     models::{
-        ob_configuration::ObConfiguration, verification_request::VerificationRequest,
-        verification_result::VerificationResult,
+        decision_intent::DecisionIntent, ob_configuration::ObConfiguration, vault::Vault,
+        verification_request::VerificationRequest, verification_result::VerificationResult,
+        workflow::Workflow,
     },
     DbPool,
 };
@@ -18,11 +19,11 @@ use rand::Rng;
 use strum::IntoEnumIterator;
 
 use super::{
-    engine::VendorResults,
     features,
     onboarding::{Decision, OnboardingRulesDecisionOutput},
     utils::FixtureDecision,
-    vendor, Error,
+    vendor::{self, vendor_result::VendorResult},
+    Error,
 };
 
 // In future, this could take in FixtureDecision and determine the fixture vendor response to use.
@@ -61,20 +62,32 @@ fn fixture_response_for_vendor_api(vendor_api: VendorAPI) -> ApiResult<VendorRes
     }
 }
 
-pub fn get_fixture_vendor_results(vreqs: Vec<VerificationRequest>) -> ApiResult<VendorResults> {
-    let fixture_responses = vreqs
-        .into_iter()
-        .map(|vreq| {
-            let vr = fixture_response_for_vendor_api(vreq.vendor_api)?;
-            Ok((vreq, vr))
-        })
-        .collect::<ApiResult<Vec<_>>>()?;
+pub async fn save_fixture_vendor_result(
+    db_pool: &DbPool,
+    di: &DecisionIntent,
+    wf: &Workflow,
+) -> ApiResult<VendorResult> {
+    let di_id = di.id.clone();
+    let sv_id = wf.scoped_vault_id.clone();
+    db_pool
+        .db_query(move |conn| {
+            let uv = Vault::get(conn, &sv_id)?;
+            let vr = fixture_response_for_vendor_api(VendorAPI::IdologyExpectID)?;
+            let (vreq, vres) = vendor::verification_result::save_vreq_and_vres(
+                conn,
+                &uv.public_key,
+                &sv_id,
+                &di_id,
+                Ok(vr.clone()),
+            )?;
 
-    Ok(VendorResults {
-        successful: fixture_responses,
-        non_critical_errors: vec![],
-        critical_errors: vec![],
-    })
+            Ok(VendorResult {
+                response: vr,
+                verification_result_id: vres.id,
+                verification_request_id: vreq.id,
+            })
+        })
+        .await?
 }
 
 pub fn get_fixture_reason_codes(

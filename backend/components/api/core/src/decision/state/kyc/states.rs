@@ -5,11 +5,11 @@ use db::models::{
     risk_signal::{NewRiskSignalInfo, RiskSignal},
     risk_signal_group::RiskSignalGroup,
     vault::Vault,
-    workflow::Workflow as DbWorkflow,
+    workflow::{Workflow as DbWorkflow, WorkflowUpdate},
 };
 
 use feature_flag::FeatureFlagClient;
-use newtypes::{KycConfig, Locked, RiskSignalGroupKind, VaultKind};
+use newtypes::{KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind, VaultKind};
 
 use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
@@ -28,11 +28,7 @@ use crate::decision::{
     vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
 };
 use crate::{
-    decision::{
-        self,
-        state::OnAction,
-        vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
-    },
+    decision::{self, state::OnAction, vendor::vendor_result::VendorResult},
     errors::ApiResult,
     State,
 };
@@ -59,7 +55,7 @@ impl KycDataCollection {
 
 #[async_trait]
 impl OnAction<Authorize, KycState> for KycDataCollection {
-    type AsyncRes = TenantVendorControl;
+    type AsyncRes = ();
 
     #[tracing::instrument("OnAction<Authorize, KycState>::execute_async_idempotent_actions", skip_all)]
     async fn execute_async_idempotent_actions(
@@ -70,21 +66,12 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
         // Write fingerprints
         common::write_authorized_fingerprints(state, &self.wf_id).await?;
 
-        // Create TVC for use in writing vreqs in `on_commit`
-        let tid = self.t_id.clone();
-        let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
-
-        Ok(tvc)
+        Ok(())
     }
 
     #[tracing::instrument("OnAction<Authorize, KycState>::on_commit", skip_all)]
-    fn on_commit(
-        self,
-        wf: Locked<DbWorkflow>,
-        tvc: TenantVendorControl,
-        conn: &mut db::TxnPgConn,
-    ) -> ApiResult<KycState> {
-        common::setup_kyc_onboarding_vreqs(conn, tvc, &self.sv_id, wf)?;
+    fn on_commit(self, wf: Locked<DbWorkflow>, _: (), conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
+        DbWorkflow::update(wf, conn, WorkflowUpdate::set_status(OnboardingStatus::Pending))?;
 
         Ok(KycState::from(KycVendorCalls {
             wf_id: self.wf_id,
@@ -139,10 +126,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let vendor_results =
-            common::make_outstanding_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
-        let ocr_reason_codes =
-            common::generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id, &vendor_results).await?;
+        let vendor_results = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
+        let ocr_reason_codes = common::generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id).await?;
 
         Ok((
             ocr_reason_codes,
@@ -219,6 +204,8 @@ impl KycDecisioning {
     pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
+        // TODO: we don't really need the onboarding_decision_verification_result_junction anymore and that's the only reason we retrieve vendor results directly here
+        // can probably rm
         let vendor_results = common::assert_kyc_vendor_calls_completed(state, &sv.id).await?;
 
         Ok(KycDecisioning {

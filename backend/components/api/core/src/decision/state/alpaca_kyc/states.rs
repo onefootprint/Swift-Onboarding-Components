@@ -75,7 +75,7 @@ impl AlpacaKycDataCollection {
 
 #[async_trait]
 impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
-    type AsyncRes = TenantVendorControl;
+    type AsyncRes = ();
 
     #[tracing::instrument(
         "OnAction<Authorize, AlpacaKycState>::execute_async_idempotent_actions",
@@ -89,20 +89,12 @@ impl OnAction<Authorize, AlpacaKycState> for AlpacaKycDataCollection {
         // Write fingerprints
         common::write_authorized_fingerprints(state, &self.wf_id).await?;
 
-        let tid = self.t_id.clone();
-        let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
-
-        Ok(tvc)
+        Ok(())
     }
 
     #[tracing::instrument("OnAction<Authorize, AlpacaKycState>::on_commit", skip_all)]
-    fn on_commit(
-        self,
-        wf: Locked<DbWorkflow>,
-        tvc: Self::AsyncRes,
-        conn: &mut db::TxnPgConn,
-    ) -> ApiResult<AlpacaKycState> {
-        common::setup_kyc_onboarding_vreqs(conn, tvc, &self.sv_id, wf)?;
+    fn on_commit(self, wf: Locked<DbWorkflow>, _: (), conn: &mut db::TxnPgConn) -> ApiResult<AlpacaKycState> {
+        DbWorkflow::update(wf, conn, WorkflowUpdate::set_status(OnboardingStatus::Pending))?;
 
         Ok(AlpacaKycState::from(AlpacaKycVendorCalls {
             wf_id: self.wf_id,
@@ -157,10 +149,8 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let vendor_results =
-            common::make_outstanding_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
-        let ocr_reason_codes =
-            common::generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id, &vendor_results).await?;
+        let vendor_results = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
+        let ocr_reason_codes = common::generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id).await?;
 
         Ok((
             ocr_reason_codes,

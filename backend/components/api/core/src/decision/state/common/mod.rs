@@ -1,19 +1,14 @@
 use db::{
     models::{
-        data_lifetime::DataLifetime,
-        decision_intent::DecisionIntent,
-        document_request::DocumentRequest,
-        ob_configuration::ObConfiguration,
-        risk_signal::NewRiskSignalInfo,
-        scoped_vault::ScopedVault,
-        vault::Vault,
-        workflow::{Workflow, WorkflowUpdate},
+        decision_intent::DecisionIntent, document_request::DocumentRequest,
+        ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo, scoped_vault::ScopedVault,
+        vault::Vault, workflow::Workflow,
     },
     DbPool, DbResult, TxnPgConn,
 };
 use newtypes::{
-    DecisionIntentKind, DecisionStatus, FootprintReasonCode, Locked, OnboardingStatus, ReviewReason,
-    ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
+    DecisionIntentKind, DecisionStatus, FootprintReasonCode, ReviewReason, ScopedVaultId, TenantId,
+    VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -29,7 +24,7 @@ use crate::{
         },
         utils::{should_execute_rules_for_document_only, FixtureDecision},
         vendor::{
-            tenant_vendor_control::TenantVendorControl,
+            self,
             vendor_api::{
                 vendor_api_response::build_vendor_response_map_from_vendor_results,
                 vendor_api_struct::{ExperianPreciseID, IdologyExpectID, IncodeFetchOCR},
@@ -37,7 +32,7 @@ use crate::{
             vendor_result::VendorResult,
         },
     },
-    errors::{onboarding::OnboardingError, ApiErrorKind, ApiResult},
+    errors::{onboarding::OnboardingError, ApiResult},
     utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs},
     State,
 };
@@ -60,102 +55,41 @@ pub fn get_vw_and_obc(
 ) -> ApiResult<(VaultWrapper, ObConfiguration)> {
     let (obc, _) = ObConfiguration::get(conn, wf_id)?;
 
-    // TODO: store authorized_seqno and use this here and for the seqno in the Vreq's for the vendor calls
-    let seqno = DataLifetime::get_current_seqno(conn)?;
-    let vw = VaultWrapper::<_>::build(conn, VwArgs::Historical(sv_id, seqno))?;
+    let vw = VaultWrapper::<_>::build(conn, VwArgs::Tenant(sv_id))?;
 
     Ok((vw, obc))
 }
 
-#[tracing::instrument(skip(conn, tvc))]
-pub fn setup_kyc_onboarding_vreqs(
-    conn: &mut TxnPgConn,
-    tvc: TenantVendorControl,
-    sv_id: &ScopedVaultId,
-    wf: Locked<Workflow>,
-) -> ApiResult<()> {
-    let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
-    let wf = Workflow::update(wf, conn, update)?;
-    // TODO: create new DI if is_redo
-    let decision_intent =
-        DecisionIntent::get_or_create_for_workflow(conn, sv_id, &wf.id, DecisionIntentKind::OnboardingKyc)?;
-
-    let uvw = VaultWrapper::build(conn, VwArgs::Tenant(sv_id))?;
-
-    decision::vendor::build_verification_requests_and_checkpoint(
-        conn,
-        &uvw,
-        sv_id,
-        &decision_intent.id,
-        &tvc,
-    )?;
-    Ok(())
-}
-
 #[tracing::instrument(skip(state))]
-pub async fn make_outstanding_kyc_vendor_calls(
+pub async fn run_kyc_vendor_calls(
     state: &State,
     wf_id: &WorkflowId,
     t_id: &TenantId,
 ) -> ApiResult<Vec<VendorResult>> {
     let wfid = wf_id.clone();
-    let (wf, v) = state
+    let (wf, v, di) = state
         .db_pool
-        .db_query(move |conn| Workflow::get_with_vault(conn, &wfid))
-        .await??;
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
+            let di = DecisionIntent::get_or_create_for_workflow(
+                conn,
+                &wf.scoped_vault_id,
+                &wfid,
+                DecisionIntentKind::OnboardingKyc,
+            )?;
+            Ok((wf, v, di))
+        })
+        .await?;
     let ff_client = state.feature_flag_client.clone();
     let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, t_id)?;
 
-    let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
-        &wf.scoped_vault_id,
-        &state.db_pool,
-        &state.enclave_client,
-    )
-    .await?;
-
-    // If we are Sandbox/Demo, we do not make real vendor calls and instead just artificially produce some canned vendor responses
-    let vendor_results = if fixture_decision.is_some() {
-        decision::sandbox::get_fixture_vendor_results(vendor_requests.outstanding_requests)?
+    if fixture_decision.is_some() {
+        Ok(vec![
+            decision::sandbox::save_fixture_vendor_result(&state.db_pool, &di, &wf).await?,
+        ])
     } else {
-        let tvc =
-            TenantVendorControl::new(t_id.clone(), &state.db_pool, &state.config, &state.enclave_client)
-                .await?;
-        // TODO: we could refactor this to return just the plaintext raw responses and then encrypt and save them in the on_commit txn
-        decision::engine::make_vendor_requests(state, tvc, vendor_requests.outstanding_requests, wf_id)
-            .await?
-    };
-
-    let has_critical_error = !vendor_results.critical_errors.is_empty();
-    let error_message = format!("{:?}", vendor_results.all_errors());
-
-    // 🤔 I think if we are doing bulk vendor calls, we want to save every VRes we can, even if there is a critical error that is blocking us from transitioning
-    // to `Decisioning`- so I think we should save the VRes's here and not in the on_commit txn. Alternatively we could have a `VendorError` state,
-    // but that just introduces so many extra states to cover errors
-    // TODO: For failed vres's, we should create new Vreq's for those
-    let err_vres = vendor_results.all_errors_with_parsable_requests();
-    let completed_oustanding_vendor_responses =
-        decision::engine::save_vendor_responses(&state.db_pool, &vendor_results.successful, err_vres, wf_id)
-            .await?;
-
-    if has_critical_error {
-        tracing::error!(
-            errors = error_message,
-            scoped_vault_id = %wf.scoped_vault_id,
-            tenant_id = %t_id,
-            "VendorRequestsFailed"
-        );
-        if !vendor_results.has_sufficient_results_for_kyc() {
-            return Err(ApiErrorKind::VendorRequestsFailed.into());
-        }
+        vendor::kyc_waterfall::run_kyc_waterfall(state, &di, &wf.id).await
     }
-
-    let all_vendor_results: Vec<VendorResult> = vendor_requests
-        .completed_requests
-        .into_iter()
-        .chain(completed_oustanding_vendor_responses.into_iter())
-        .collect();
-
-    Ok(all_vendor_results)
 }
 
 #[tracing::instrument(skip(state))]
@@ -310,7 +244,6 @@ pub async fn generate_ocr_reason_codes(
     state: &State,
     wf_id: &WorkflowId,
     sv_id: &ScopedVaultId,
-    vendor_results: &[VendorResult],
 ) -> ApiResult<Option<Vec<NewRiskSignalInfo>>> {
     let wf_id = wf_id.clone();
     let (obc, _) = state
@@ -321,6 +254,16 @@ pub async fn generate_ocr_reason_codes(
     if !obc.is_doc_first {
         return Ok(None);
     }
+
+    // TODO: instead of retrieving all results from all vendor calls here, we could just retrieve the ones for the DocScan DI or even just directly retrieve IncodeFetchOCR itself
+    // also slightly sketch to query latest by sv_id instead of strictly querying from vres's made within this workflow specifically
+    let vendor_results = &decision::engine::get_latest_verification_requests_and_results(
+        sv_id,
+        &state.db_pool,
+        &state.enclave_client,
+    )
+    .await?
+    .completed_requests;
 
     // If this is a doc-first OBC, generate OCR mismatch risk signals
     let (vendor_map, vendor_result_id_map) = build_vendor_response_map_from_vendor_results(vendor_results)?;
