@@ -95,15 +95,16 @@ const Content = styled(NavigationMenu.Content)<{ isOnDarkSection?: boolean }>`
     position: absolute;
     left: 0;
     top: 100%;
-    min-width: 320px;
+    min-width: 380px;
     margin-top: ${theme.spacing[3]};
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
     box-shadow: ${theme.elevation[2]};
     background-color: ${isOnDarkSection
-      ? primitives.Gray900
+      ? primitives.Gray800
       : theme.backgroundColor.primary};
     padding: ${theme.spacing[3]};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     z-index: 1;
 
     &[data-state='open'] {
