@@ -244,8 +244,8 @@ fn next_action(req_res: &Option<RequestAndMaybeHydratedResult>, have_attempted_c
 mod tests {
     use super::*;
     use crate::decision::state::test_utils;
-    use crate::decision::state::test_utils::UserKind;
     use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
+    use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use feature_flag::MockFeatureFlagClient;
     use idv::ParsedResponse;
     use macros::test_state_case;
@@ -365,7 +365,15 @@ mod tests {
         run2: Run,
     ) {
         // Setup
-        let (wf, t, _obc, _tu) = test_utils::setup_data(state, UserKind::Live, None, None).await;
+        let (wf, t, _obc, _tu) = test_utils::setup_data(
+            state,
+            ObConfigurationOpts {
+                is_live: true,
+                ..Default::default()
+            },
+            None,
+        )
+        .await;
 
         let di =
             state

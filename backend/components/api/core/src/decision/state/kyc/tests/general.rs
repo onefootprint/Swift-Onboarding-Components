@@ -18,6 +18,7 @@ use db::models::workflow::Workflow as DbWorkflow;
 use db::models::workflow::{NewWorkflow, NewWorkflowArgs};
 use db::models::workflow_event::WorkflowEvent;
 use db::test_helpers::assert_have_same_elements;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::test_db_pool::TestDbPool;
 use feature_flag::BoolFlag;
 use feature_flag::MockFeatureFlagClient;
@@ -33,9 +34,16 @@ use newtypes::{KycState, WorkflowFixtureResult, WorkflowId, WorkflowState};
 use std::sync::Arc;
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
-    let (_, _, _, sv, obc) =
-        test_helpers::create_kyc_user_and_wf(&state.db_pool, &state.enclave_client, None, None, true, None)
-            .await;
+    let (_, _, _, sv, obc) = test_helpers::create_kyc_user_and_wf(
+        &state.db_pool,
+        &state.enclave_client,
+        ObConfigurationOpts {
+            is_live: true,
+            ..Default::default()
+        },
+        None,
+    )
+    .await;
 
     state
         .db_pool
@@ -138,7 +146,15 @@ async fn invalid_action(state: &mut State) {
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.fixture_result()).await;
+    let (wf, tenant, obc, _tu) = setup_data(
+        state,
+        ObConfigurationOpts {
+            is_live: user_kind.is_live(),
+            ..Default::default()
+        },
+        user_kind.fixture_result(),
+    )
+    .await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = svid.clone();
@@ -309,7 +325,15 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.fixture_result()).await;
+    let (wf, tenant, obc, _tu) = setup_data(
+        state,
+        ObConfigurationOpts {
+            is_live: user_kind.is_live(),
+            ..Default::default()
+        },
+        user_kind.fixture_result(),
+    )
+    .await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = wf.scoped_vault_id.clone();

@@ -182,6 +182,7 @@ mod test {
         State,
     };
     use db::models::decision_intent::DecisionIntent;
+    use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use db::tests::test_db_pool::TestDbPool;
     use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
     use idv::stytch::StytchLookupRequest;
@@ -215,8 +216,16 @@ mod test {
             error: e.into(),
         });
 
-        let (_, wf, uv, su, _) =
-            create_kyc_user_and_wf(&state.db_pool, &state.enclave_client, None, None, true, None).await;
+        let (_, wf, uv, su, _) = create_kyc_user_and_wf(
+            &state.db_pool,
+            &state.enclave_client,
+            ObConfigurationOpts {
+                is_live: true,
+                ..Default::default()
+            },
+            None,
+        )
+        .await;
 
         let is_error = res.is_err();
         let sv_id = su.id.clone();

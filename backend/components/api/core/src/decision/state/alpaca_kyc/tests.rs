@@ -19,6 +19,7 @@ use db::models::workflow::{NewWorkflowArgs, Workflow};
 
 use db::test_helpers::assert_have_same_elements;
 
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use feature_flag::BoolFlag;
 
 use feature_flag::MockFeatureFlagClient;
@@ -44,8 +45,11 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(
         state,
-        user_kind,
-        Some(CipKind::Alpaca),
+        ObConfigurationOpts {
+            is_live: user_kind.is_live(),
+            cip_kind: Some(CipKind::Alpaca),
+            ..Default::default()
+        },
         user_kind.fixture_result(),
     )
     .await;
@@ -198,8 +202,11 @@ async fn pass_then_watchlist_hit(
     // DATA SETUP
     let (wf, tenant, obc, tu) = setup_data(
         state,
-        user_kind,
-        Some(CipKind::Alpaca),
+        ObConfigurationOpts {
+            is_live: user_kind.is_live(),
+            cip_kind: Some(CipKind::Alpaca),
+            ..Default::default()
+        },
         user_kind.fixture_result(),
     )
     .await;
@@ -395,8 +402,11 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     // DATA SETUP
     let (wf, tenant, obc, tu) = setup_data(
         state,
-        user_kind,
-        Some(CipKind::Alpaca),
+        ObConfigurationOpts {
+            is_live: user_kind.is_live(),
+            cip_kind: Some(CipKind::Alpaca),
+            ..Default::default()
+        },
         user_kind.fixture_result(),
     )
     .await;
@@ -571,8 +581,11 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(
         state,
-        user_kind,
-        Some(CipKind::Alpaca),
+        ObConfigurationOpts {
+            is_live: user_kind.is_live(),
+            cip_kind: Some(CipKind::Alpaca),
+            ..Default::default()
+        },
         user_kind.fixture_result(),
     )
     .await;

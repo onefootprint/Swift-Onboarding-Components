@@ -8,6 +8,7 @@ use db::{
         risk_signal::RiskSignal, user_consent::UserConsent, verification_request::VerificationRequest,
     },
     test_helpers::assert_have_same_elements,
+    tests::fixtures::ob_configuration::ObConfigurationOpts,
     DbError, DbResult,
 };
 use idv::{
@@ -44,25 +45,25 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
     //
     // Set up
     //
-    let must_collect_data = if is_selfie {
+    let obc_opts = if is_selfie {
         let doc_info = DocumentCdoInfo(
             DocTypeRestriction::None,
             CountryRestriction::None,
             Selfie::RequireSelfie,
         );
-        Some(vec![CollectedDataOption::Document(doc_info)])
+        ObConfigurationOpts {
+            must_collect_data: vec![CollectedDataOption::Document(doc_info)],
+            is_live: true,
+            ..Default::default()
+        }
     } else {
-        None
+        ObConfigurationOpts {
+            is_live: true,
+            ..Default::default()
+        }
     };
-    let (tenant, wf, uv, su, _) = create_kyc_user_and_wf(
-        &state.db_pool,
-        &state.enclave_client,
-        must_collect_data,
-        None,
-        true,
-        None,
-    )
-    .await;
+    let (tenant, wf, uv, su, _) =
+        create_kyc_user_and_wf(&state.db_pool, &state.enclave_client, obc_opts, None).await;
     let wf_id = wf.id.clone();
     let wf_id2 = wf.id.clone();
 
@@ -280,25 +281,25 @@ async fn test_fail(state: &State, is_selfie: bool) {
     //
     // Set up
     //
-    let must_collect_data = if is_selfie {
+    let obc_opts = if is_selfie {
         let doc_info = DocumentCdoInfo(
             DocTypeRestriction::None,
             CountryRestriction::None,
             Selfie::RequireSelfie,
         );
-        Some(vec![CollectedDataOption::Document(doc_info)])
+        ObConfigurationOpts {
+            is_live: true,
+            must_collect_data: vec![CollectedDataOption::Document(doc_info)],
+            ..Default::default()
+        }
     } else {
-        None
+        ObConfigurationOpts {
+            is_live: true,
+            ..Default::default()
+        }
     };
-    let (tenant, wf, uv, su, _) = create_kyc_user_and_wf(
-        &state.db_pool,
-        &state.enclave_client,
-        must_collect_data,
-        None,
-        true,
-        None,
-    )
-    .await;
+    let (tenant, wf, uv, su, _) =
+        create_kyc_user_and_wf(&state.db_pool, &state.enclave_client, obc_opts, None).await;
     let wf_id = wf.id.clone();
     let wf_id2 = wf.id.clone();
 

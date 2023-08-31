@@ -1,5 +1,5 @@
 use crate::PgConn;
-use newtypes::{CipKind, CollectedDataOption, DbActor, TenantId};
+use newtypes::{CipKind, CollectedDataOption as CDO, DbActor, Iso3166TwoDigitCountryCode, TenantId};
 
 use crate::models::ob_configuration::ObConfiguration;
 
@@ -8,9 +8,9 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         conn,
         "Flerp config".to_owned(),
         tenant_id.clone(),
-        vec![CollectedDataOption::PhoneNumber],
+        vec![CDO::PhoneNumber],
         vec![],
-        vec![CollectedDataOption::PhoneNumber],
+        vec![CDO::PhoneNumber],
         is_live,
         None,
         false,
@@ -23,34 +23,60 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
     .expect("Could not create ob config")
 }
 
+pub struct ObConfigurationOpts {
+    pub name: String,
+    pub must_collect_data: Vec<CDO>,
+    pub optional_data: Vec<CDO>,
+    pub can_access_data: Vec<CDO>,
+    pub is_live: bool,
+    pub cip_kind: Option<CipKind>,
+    pub is_no_phone_flow: bool,
+    pub is_doc_first: bool,
+    pub allow_international_residents: bool,
+    pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
+    pub author: DbActor,
+    pub skip_kyc: bool,
+}
+
+impl Default for ObConfigurationOpts {
+    fn default() -> Self {
+        Self {
+            name: "Flerp config".to_owned(),
+            must_collect_data: vec![CDO::PhoneNumber],
+            optional_data: vec![],
+            can_access_data: vec![CDO::PhoneNumber],
+            is_live: false,
+            cip_kind: None,
+            is_no_phone_flow: false,
+            is_doc_first: false,
+            allow_international_residents: false,
+            international_country_restrictions: None,
+            author: DbActor::Footprint,
+            skip_kyc: false,
+        }
+    }
+}
+
 pub fn create_with_opts(
     conn: &mut PgConn,
     tenant_id: &TenantId,
-    is_live: bool,
-    must_collect_options: Option<Vec<CollectedDataOption>>,
-    cip_kind: Option<CipKind>,
+    opts: ObConfigurationOpts,
 ) -> ObConfiguration {
-    let must_collect = if let Some(mc) = must_collect_options {
-        mc
-    } else {
-        vec![CollectedDataOption::PhoneNumber]
-    };
-
     ObConfiguration::create(
         conn,
-        "Flerp config".to_owned(),
+        opts.name,
         tenant_id.clone(),
-        must_collect.clone(),
-        Vec::new(),
-        must_collect,
-        is_live,
-        cip_kind,
-        false,
-        false,
-        false,
-        None,
-        DbActor::Footprint,
-        false,
+        opts.must_collect_data,
+        opts.optional_data,
+        opts.can_access_data,
+        opts.is_live,
+        opts.cip_kind,
+        opts.is_no_phone_flow,
+        opts.is_doc_first,
+        opts.allow_international_residents,
+        opts.international_country_restrictions,
+        opts.author,
+        opts.skip_kyc,
     )
     .expect("Could not create ob config")
 }

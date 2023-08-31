@@ -15,6 +15,7 @@ use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
 use db::models::workflow::{NewWorkflowArgs, Workflow};
 use db::test_helpers::assert_have_same_elements;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use feature_flag::BoolFlag;
 use feature_flag::MockFeatureFlagClient;
 use itertools::Itertools;
@@ -32,7 +33,15 @@ use std::sync::Arc;
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: DocumentOutcome) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(state, user_kind, None, user_kind.fixture_result()).await;
+    let (wf, tenant, obc, _tu) = setup_data(
+        state,
+        ObConfigurationOpts {
+            is_live: user_kind.is_live(),
+            ..Default::default()
+        },
+        user_kind.fixture_result(),
+    )
+    .await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = wf.scoped_vault_id.clone();

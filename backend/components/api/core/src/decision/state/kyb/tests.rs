@@ -16,17 +16,18 @@ use api_wire_types::TerminalDecisionStatus;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow as DbWorkflow;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::test_db_pool::TestDbPool;
 use feature_flag::BoolFlag;
 use feature_flag::MockFeatureFlagClient;
 use itertools::Itertools;
 use macros::{test_state, test_state_case};
-use newtypes::KybState;
 use newtypes::OnboardingStatus;
 use newtypes::SignalSeverity;
 use newtypes::VendorAPI;
 use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowState;
+use newtypes::{CollectedDataOption as CDO, KybState};
 use newtypes::{DecisionStatus, FootprintReasonCode};
 use std::sync::Arc;
 
@@ -35,11 +36,21 @@ async fn setup(
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> (DbWorkflow, Tenant, ObConfiguration, DbWorkflow) {
     let is_live = fixture_result.is_none();
+    let cdos = vec![
+        CDO::PhoneNumber,
+        CDO::FullAddress,
+        CDO::BusinessName,
+        CDO::BusinessBeneficialOwners,
+    ];
     let (t, wf, _v, _sv, obc, biz_wf) = test_helpers::create_kyb_user_and_onboarding(
         &state.db_pool,
         &state.enclave_client,
-        None,
-        is_live,
+        ObConfigurationOpts {
+            is_live,
+            must_collect_data: cdos.clone(),
+            can_access_data: cdos,
+            ..Default::default()
+        },
         fixture_result,
     )
     .await;

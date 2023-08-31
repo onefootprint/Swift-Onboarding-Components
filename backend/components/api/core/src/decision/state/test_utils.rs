@@ -22,6 +22,7 @@ use db::models::{
     tenant_vendor::TenantVendorControl, workflow::Workflow,
 };
 use db::tests::fixtures;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::TxnPgConn;
 use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::IdologyExpectIDAPIResponse;
@@ -33,11 +34,11 @@ use idv::incode::IncodeStartOnboardingRequest;
 use idv::middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse};
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
+use newtypes::OnboardingStatus;
 use newtypes::{
-    CipKind, DecisionIntentKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
+    DecisionIntentKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
     WorkflowFixtureResult, WorkflowId,
 };
-use newtypes::{CollectedDataOption as CDO, OnboardingStatus};
 use webhooks::events::WebhookEvent;
 use webhooks::MockWebhookClient;
 
@@ -53,6 +54,14 @@ impl UserKind {
             UserKind::Demo => None,
             UserKind::Sandbox(s) => Some(*s),
             UserKind::Live => None,
+        }
+    }
+
+    pub fn is_live(&self) -> bool {
+        match self {
+            UserKind::Demo => true,
+            UserKind::Sandbox(_) => false,
+            UserKind::Live => true,
         }
     }
 }
@@ -97,21 +106,12 @@ impl DocumentCollectionKind {
 
 pub async fn setup_data(
     state: &State,
-    user_kind: UserKind,
-    cip_kind: Option<CipKind>,
+    obc_opts: ObConfigurationOpts,
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
-    // TODO: create sandbox vs demo vs real, diff sandbox fixues
-    let is_live = matches!(user_kind, UserKind::Live | UserKind::Demo);
-    let (tenant, wf, _, _, obc) = test_helpers::create_kyc_user_and_wf(
-        &state.db_pool,
-        &state.enclave_client,
-        Some(vec![CDO::PhoneNumber, CDO::FullAddress]), // so we can meet min req for kyc vendor calls
-        cip_kind,
-        is_live,
-        fixture_result,
-    )
-    .await;
+    let (tenant, wf, _, _, obc) =
+        test_helpers::create_kyc_user_and_wf(&state.db_pool, &state.enclave_client, obc_opts, fixture_result)
+            .await;
 
     let tid = tenant.id.clone();
     let tu = state
