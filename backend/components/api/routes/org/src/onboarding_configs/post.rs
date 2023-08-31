@@ -273,7 +273,7 @@ pub async fn post(
     // like Coba should always have skip_kyc=true. Probably better than doing this purely via PG or via feature flags
     let skip_kyc = state
         .feature_flag_client
-        .flag(BoolFlag::TenantCanMakeDocFirstObc(&tenant_id));
+        .flag(BoolFlag::IsSkipKycTenant(&tenant_id));
 
     let actor = auth.actor().into();
     let obc = state
