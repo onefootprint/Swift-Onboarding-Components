@@ -47,17 +47,19 @@ pub async fn post(
                 DbDocumentRequest::get(conn, &wf_id)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
 
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
-            let doc_cdo = obc.document_cdo();
             
             // Validate that the type of document uploaded matches what's required by the doc request
-            if doc_cdo.as_ref().map(|d| d.only_us()).unwrap_or(false) && country_code != "US" {
-                return Err(OnboardingError::UnsupportedNonUSDocumentCountry.into());
-            }
-            if let Some(doc_types) = doc_cdo.and_then(|cdo| cdo.restricted_id_doc_kinds()) {
+            if let Some(doc_types) = obc.restricted_id_doc_kinds() {
                 if !doc_types.contains(&document_type) {
                     return Err(OnboardingError::UnsupportedDocumentType(Csv::from(doc_types)).into());
                 }
             }
+
+            let supported_countries_for_doc_type = obc.supported_countries_for_doc_type(document_type);
+            if !supported_countries_for_doc_type.contains(&country_code) {
+                return Err(OnboardingError::UnsupportedDocumentCountryForDocumentType(Csv::from(supported_countries_for_doc_type)).into());
+            }
+
             let vault = Vault::get(conn, &su_id)?;
             // Check we're in sandbox
             if vault.is_live && fixture_result.is_some() {
@@ -82,7 +84,6 @@ pub async fn post(
             } else {
                 false
             };
-            
             
             let args = NewIdentityDocumentArgs {
                 request_id: doc_request.id,

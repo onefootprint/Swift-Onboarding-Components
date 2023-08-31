@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use newtypes::{
     DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentScanDeviceType, IdDocKind,
     IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
-    IncodeVerificationSessionState, ScopedVaultId, TenantId, WorkflowId,
+    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, WorkflowId,
 };
 
 use super::document_request::DocumentRequest;
@@ -61,7 +61,7 @@ impl IdentityDocument {
 pub struct NewIdentityDocumentArgs {
     pub request_id: DocumentRequestId,
     pub document_type: IdDocKind,
-    pub country_code: String,
+    pub country_code: Iso3166TwoDigitCountryCode,
     pub fixture_result: Option<IdentityDocumentFixtureResult>,
     pub skip_selfie: Option<bool>,
     pub device_type: Option<DocumentScanDeviceType>,
@@ -72,7 +72,7 @@ pub struct NewIdentityDocumentArgs {
 struct NewIdentityDocumentRow {
     request_id: DocumentRequestId,
     document_type: IdDocKind,
-    country_code: String,
+    country_code: Iso3166TwoDigitCountryCode,
     created_at: DateTime<Utc>,
     status: IdentityDocumentStatus,
     fixture_result: Option<IdentityDocumentFixtureResult>,

@@ -12,9 +12,9 @@ use db_schema::schema::{ob_configuration, tenant};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use itertools::Itertools;
 use newtypes::AppearanceId;
 use newtypes::DocumentCdoInfo;
+use newtypes::IdDocKind;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::WorkflowId;
 use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant, DbActor};
@@ -49,21 +49,49 @@ pub struct ObConfiguration {
 }
 
 impl ObConfiguration {
-    pub fn residential_address_countries(&self) -> Vec<Iso3166TwoDigitCountryCode> {
-        let mut supported_countries = match self.international_country_restrictions.as_ref() {
+    pub fn supported_countries(&self) -> Vec<Iso3166TwoDigitCountryCode> {
+        match self.international_country_restrictions.as_ref() {
+            // first check if we have restrictions on country.
+            // Note: US is not included by default here.
             Some(supported) => supported.clone(),
             None => {
+                // if we don't, we could allow or disallow international, so check that here
                 if self.allow_international_residents {
                     Iso3166TwoDigitCountryCode::iter().collect()
                 } else {
-                    vec![]
+                    vec![Iso3166TwoDigitCountryCode::US]
                 }
             }
-        };
-        // always include US in the supportable countries
-        supported_countries.push(Iso3166TwoDigitCountryCode::US);
+        }
+    }
 
-        supported_countries.into_iter().unique().collect()
+    // Assumes you've checked if the document type is supported already
+    pub fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
+        match doc_type {
+            IdDocKind::IdCard => vec![Iso3166TwoDigitCountryCode::US],
+            IdDocKind::DriversLicense => vec![Iso3166TwoDigitCountryCode::US],
+            IdDocKind::Passport => {
+                // in this case, tenant has not requested any other countries to be restricted other than
+                // US, so we allow any passport country
+                if self.only_us() && self.international_country_restrictions.is_none() {
+                    Iso3166TwoDigitCountryCode::iter().collect()
+                // tenant has said they have specific countries they want, so we honor that
+                } else {
+                    self.supported_countries()
+                }
+            }
+            IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::US],
+            IdDocKind::Visa => vec![Iso3166TwoDigitCountryCode::US],
+            IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
+        }
+    }
+
+    pub fn only_us(&self) -> bool {
+        self.supported_countries() == vec![Iso3166TwoDigitCountryCode::US]
+    }
+
+    pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
+        self.document_cdo().and_then(|cdo| cdo.restricted_id_doc_kinds())
     }
 }
 
@@ -327,13 +355,13 @@ mod tests {
     use super::ObConfiguration;
     use chrono::Utc;
     use newtypes::{
-        ApiKeyStatus, Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, TenantId,
+        ApiKeyStatus, IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, TenantId,
     };
     use strum::IntoEnumIterator;
     use test_case::test_case;
 
     #[test_case(true, None, Iso3166TwoDigitCountryCode::iter().collect(); "allow international, any country acceptable")]
-    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX, Iso3166TwoDigitCountryCode::US]; "obc has restrictions, includes US")]
+    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX]; "obc has restrictions")]
     #[test_case(false, None, vec![Iso3166TwoDigitCountryCode::US]; "obc doesn't allow international, only US")]
     fn test_ob_config_international_countries(
         allow_international: bool,
@@ -362,6 +390,59 @@ mod tests {
             author: None,
         };
 
-        assert_have_same_elements(obc.residential_address_countries(), expected_countries)
+        assert_have_same_elements(obc.supported_countries(), expected_countries)
+    }
+
+    // allow international, with no restrictions
+    #[test_case(true, None, IdDocKind::IdCard, vec![Iso3166TwoDigitCountryCode::US]; "allow international, id card, only US")]
+    #[test_case(true, None, IdDocKind::DriversLicense, vec![Iso3166TwoDigitCountryCode::US]; "allow international, DL, only US")]
+    #[test_case(true, None, IdDocKind::Visa, vec![Iso3166TwoDigitCountryCode::US]; "allow international, visa, only US")]
+    #[test_case(true, None, IdDocKind::ResidenceDocument, vec![Iso3166TwoDigitCountryCode::US]; "allow international, residence doc, only US")]
+    #[test_case(true, None, IdDocKind::Permit, vec![Iso3166TwoDigitCountryCode::US]; "allow international, permit, only US")]
+    #[test_case(true, None, IdDocKind::Passport, Iso3166TwoDigitCountryCode::iter().collect(); "allow international, no restrictions, passport can be from any country")]
+    // allow international, with restrictions
+    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::IdCard, vec![Iso3166TwoDigitCountryCode::US]; "allow international, restrictions, id card, only US")]
+    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::DriversLicense, vec![Iso3166TwoDigitCountryCode::US]; "allow international, restrictions,  DL, only US")]
+    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::Visa, vec![Iso3166TwoDigitCountryCode::US]; "allow international, restrictions, visa, only US")]
+    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::ResidenceDocument, vec![Iso3166TwoDigitCountryCode::US]; "allow international, restrictions, residence doc, only US")]
+    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::Permit, vec![Iso3166TwoDigitCountryCode::US]; "allow international, restrictions, permit, only US")]
+    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::Passport, vec![Iso3166TwoDigitCountryCode::MX]; "allow international, with restrictions, passport is only from restricted countries")]
+    // no international
+    #[test_case(false, None, IdDocKind::IdCard, vec![Iso3166TwoDigitCountryCode::US]; "no international, id card, only US")]
+    #[test_case(false, None, IdDocKind::DriversLicense, vec![Iso3166TwoDigitCountryCode::US]; "no international, DL, only US")]
+    #[test_case(false, None, IdDocKind::Visa, vec![Iso3166TwoDigitCountryCode::US]; "no international, visa, only US")]
+    #[test_case(false, None, IdDocKind::ResidenceDocument, vec![Iso3166TwoDigitCountryCode::US]; "no international, residence doc, only US")]
+    #[test_case(false, None, IdDocKind::Permit, vec![Iso3166TwoDigitCountryCode::US]; "no international, permit, only US")]
+    #[test_case(false, None, IdDocKind::Passport, Iso3166TwoDigitCountryCode::iter().collect(); "no international, no restrictions, passport can be from any country")]
+
+    fn test_supported_countries_for_doc_type(
+        allow_international: bool,
+        international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
+        doc_type: IdDocKind,
+        expected_countries: Vec<Iso3166TwoDigitCountryCode>,
+    ) {
+        let obc = ObConfiguration {
+            id: ObConfigurationId::from_str("1234").unwrap(),
+            key: ObConfigurationKey::from_str("obk1").unwrap(),
+            name: "obc".into(),
+            tenant_id: TenantId::from_str("t_1234").unwrap(),
+            _created_at: Utc::now(),
+            _updated_at: Utc::now(),
+            is_live: true,
+            status: ApiKeyStatus::Enabled,
+            created_at: Utc::now(),
+            must_collect_data: vec![],
+            can_access_data: vec![],
+            appearance_id: None,
+            cip_kind: None,
+            optional_data: vec![],
+            is_no_phone_flow: false,
+            is_doc_first: false,
+            allow_international_residents: allow_international,
+            international_country_restrictions,
+            author: None,
+        };
+
+        assert_have_same_elements(obc.supported_countries_for_doc_type(doc_type), expected_countries)
     }
 }

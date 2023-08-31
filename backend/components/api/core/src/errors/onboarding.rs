@@ -1,5 +1,5 @@
 use newtypes::{output::Csv, CollectedDataOption};
-use newtypes::{IdDocKind, OnboardingRequirementKind, WorkflowId};
+use newtypes::{IdDocKind, Iso3166TwoDigitCountryCode, OnboardingRequirementKind, WorkflowId};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -44,8 +44,8 @@ pub enum OnboardingError {
     MissingObPkAuth,
     #[error("Not expecting a selfie image to be uploaded")]
     NotExpectingSelfie,
-    #[error("Non-US documents are not supported")]
-    UnsupportedNonUSDocumentCountry,
+    #[error("Unsupported document country. Supported document countries: {0}")]
+    UnsupportedDocumentCountryForDocumentType(Csv<Iso3166TwoDigitCountryCode>),
     #[error("Unsupported document type. Supported document types: {0}")]
     UnsupportedDocumentType(Csv<IdDocKind>),
     #[error("Cannot create a fixture result for a non-sandbox Vault")]

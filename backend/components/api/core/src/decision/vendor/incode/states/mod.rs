@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::verification_request::VerificationRequest;
@@ -52,8 +54,8 @@ use idv::incode::{APIResponseToIncodeError, IncodeResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DecisionIntentKind, IdDocKind, IncodeFailureReason, IncodeVerificationSessionId,
-    IncodeVerificationSessionKind, PiiJsonValue, ScopedVaultId, ScrubbedPiiJsonValue, ScrubbedPiiString,
-    VendorAPI, WorkflowId,
+    IncodeVerificationSessionKind, Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiJsonValue,
+    ScopedVaultId, ScrubbedPiiJsonValue, ScrubbedPiiString, VendorAPI, WorkflowId,
 };
 
 #[derive(Clone)]
@@ -250,24 +252,19 @@ fn parse_type_of_id(
 
     // Validate the country code what the client told us (and what we validated against the
     // doc request)
-    // TODO this is horrible - the country codes we get from the client are two-letter ISO
-    // while incode gives us three-letter ISO.
-    // Until we have fully-fledged enum mappings from the two-letter to three-letter, just hardcode
-    // the check that if the client told us it's US, we have a US document here.
-    // Realistically, the only time we care about a document's country is when the tenant restricts
-    // to only US
-    let expected_country_is_us = ctx
-        .docv_data
-        .country_code
-        .clone()
-        .ok_or(AssertionError("Docv data has no country_code"))?
-        .leak()
-        == "US";
-    let Some(country_code) = country_code else {
+    let expected_country: Iso3166TwoDigitCountryCode = Iso3166TwoDigitCountryCode::from_str(
+        ctx.docv_data
+            .country_code
+            .clone()
+            .ok_or(AssertionError("Docv data has no country_code"))?
+            .leak(),
+    )?;
+
+    let Some(provided_country) = country_code.and_then(|i| Iso3166ThreeDigitCountryCode::from_str(i.leak()).ok()).map(Iso3166TwoDigitCountryCode::from) else {
         return Ok(Err(IncodeFailureReason::UnknownCountryCode));
     };
-    let country_is_us = country_code.leak() == "USA";
-    if country_is_us != expected_country_is_us {
+
+    if expected_country != provided_country {
         return Ok(Err(IncodeFailureReason::CountryCodeMismatch));
     }
     Ok(Ok(id_doc_kind))

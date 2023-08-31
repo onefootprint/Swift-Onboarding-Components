@@ -432,7 +432,7 @@ fn get_collect_document_supported_countries(obc: &ObConfiguration) -> Vec<Iso316
         return vec![Iso3166TwoDigitCountryCode::US];
     }
 
-    obc.residential_address_countries()
+    obc.supported_countries()
 }
 fn get_collect_document_supported_doc_types(
     country: Option<Iso3166TwoDigitCountryCode>,

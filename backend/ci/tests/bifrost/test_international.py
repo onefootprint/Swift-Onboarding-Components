@@ -113,5 +113,5 @@ def test_with_documents_handles_international_address_restricted_documents(
     )
     assert doc_requirement["should_collect_selfie"]
     assert doc_requirement["supported_document_types"] == ["passport"]
-    # we'll accept any country
-    assert doc_requirement["supported_countries"] == ["MX", "NO", "US"]
+    # we'll only accept countries from the restriction list
+    assert doc_requirement['supported_countries'] == ['MX', 'NO']

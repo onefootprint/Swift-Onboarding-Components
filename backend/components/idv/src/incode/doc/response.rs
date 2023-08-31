@@ -704,6 +704,7 @@ mod tests {
             "horizontalResolution": 0,
             "classification": false,
             "typeOfId": "DriversLicense",
+            "countryCode": "USA",
             "issueYear": 2016,
             "issueName": "USA DriversLicense DRIVERS_LICENSE",
             "sessionStatus": "Alive",

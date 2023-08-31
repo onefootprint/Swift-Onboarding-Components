@@ -12,6 +12,17 @@ def restricted_doc_ob_config(sandbox_tenant, must_collect_data, can_access_data)
         can_access_data + ["document.drivers_license.us_only.require_selfie"],
     )
 
+@pytest.fixture(scope="session")
+def restricted_doc_ob_config_only_international(sandbox_tenant, must_collect_data, can_access_data):
+    return create_ob_config(
+        sandbox_tenant,
+        "Restricted doc request config (new)",
+        # technically we don't support DL for anything other than US, so this is just so we can simulate the correct error
+        must_collect_data + ["document.passport.none.require_selfie"],
+        can_access_data + ["document.passport.none.require_selfie"],
+        allow_international_residents=True,
+        international_country_restrictions=["MX"]
+    )
 
 def test_upload_documents(doc_request_sandbox_ob_config, twilio):
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
@@ -39,7 +50,7 @@ def test_upload_documents(doc_request_sandbox_ob_config, twilio):
     assert len([i for i in body if i["kind"] == "drivers_license"]) == 2
 
 
-def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config, twilio):
+def test_upload_documents_with_ob_config_restriction_legacy_version(restricted_doc_ob_config, twilio):
     bifrost = BifrostClient.new(restricted_doc_ob_config, twilio)
 
     # Manually handle the document requirement with some invalid data
@@ -52,7 +63,7 @@ def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config, t
         "country_code": "NO",
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
-    assert body["error"]["message"] == "Non-US documents are not supported"
+    assert body["error"]["message"] == "Unsupported document country. Supported document countries: US"
 
     # Shouldn't be allowed to upload non-drivers-license
     data = {
@@ -67,6 +78,40 @@ def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config, t
 
     # Bifrost client uploads the right kind of doc, so this should work
     bifrost.run()
+
+
+def test_upload_documents_with_ob_config_restriction_only_international(restricted_doc_ob_config_only_international, twilio):
+    bifrost = BifrostClient.new(restricted_doc_ob_config_only_international, twilio)
+
+    # Manually handle the document requirement with some invalid data
+    consent_data = {"consent_language_text": "I consent"}
+    post("hosted/user/consent", consent_data, bifrost.auth_token)
+
+    # Shouldn't be allowed to upload DL
+    data = {
+        "document_type": "drivers_license",
+        "country_code": "MX",
+    }
+    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    # we check doc type first
+    assert body["error"]["message"] == "Unsupported document type. Supported document types: passport"
+
+    # Shouldn't be allowed to upload non-MX document
+    data = {
+        "document_type": "passport",
+        "country_code": "NO",
+    }
+    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    assert body["error"]["message"] == "Unsupported document country. Supported document countries: MX"
+
+    # upload the correct doc
+    data = {
+        "document_type": "passport",
+        "country_code": "MX",
+    }
+
+    # this should succeed
+    post("hosted/user/documents", data, bifrost.auth_token)
 
 def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
