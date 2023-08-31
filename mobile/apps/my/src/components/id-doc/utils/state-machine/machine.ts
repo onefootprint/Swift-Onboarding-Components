@@ -15,7 +15,7 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
       context: {
-        requirement: undefined,
+        requirement,
         currentSide: UploadDocumentSide.Front,
         collectingDocumentMeta: {
           countryCode: getInitialCountry(requirement),
