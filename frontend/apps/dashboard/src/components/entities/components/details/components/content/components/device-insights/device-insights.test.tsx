@@ -11,9 +11,9 @@ import Provider from 'src/components/entities/components/details/hooks/use-entit
 import { entityFixture } from '../../../../details.test.config';
 import DeviceInsights from './device-insights';
 import {
-  withCurrentEntityLivenessData,
-  withCurrentEntityLivenessEmpty,
-  withCurrentEntityLivenessError,
+  withCurrentEntityAuthEventsData,
+  withCurrentEntityAuthEventsEmpty,
+  withCurrentEntityAuthEventsError,
 } from './device-insights.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -41,7 +41,7 @@ describe('<DeviceInsights />', () => {
   };
 
   describe('When liveness request fails', () => {
-    beforeAll(withCurrentEntityLivenessError);
+    beforeAll(withCurrentEntityAuthEventsError);
 
     it('Shows error message when the request fail', async () => {
       renderDeviceInsights(entity);
@@ -54,7 +54,7 @@ describe('<DeviceInsights />', () => {
   });
 
   describe('When liveness request passes, but with empty data', () => {
-    beforeAll(withCurrentEntityLivenessEmpty);
+    beforeAll(withCurrentEntityAuthEventsEmpty);
 
     it('Shows empty device insights if the onboarding is undefined', async () => {
       renderDeviceInsights(entityWithNoInsightEvent);
@@ -76,7 +76,7 @@ describe('<DeviceInsights />', () => {
   });
 
   describe('When liveness request passes with liveness data', () => {
-    beforeAll(withCurrentEntityLivenessData);
+    beforeAll(withCurrentEntityAuthEventsData);
 
     it('Shows non-empty device insights even if the onboarding is not defined', async () => {
       renderDeviceInsights(entityWithNoInsightEvent);

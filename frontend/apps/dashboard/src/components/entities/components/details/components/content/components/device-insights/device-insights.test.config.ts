@@ -25,24 +25,24 @@ export const biometricCred: Liveness = {
 
 export const livenessDataFixture = [biometricCred];
 
-export const withCurrentEntityLivenessData = () =>
+export const withCurrentEntityAuthEventsData = () =>
   mockRequest({
     method: 'get',
-    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/liveness',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/auth_events',
     response: livenessDataFixture,
   });
 
-export const withCurrentEntityLivenessEmpty = () =>
+export const withCurrentEntityAuthEventsEmpty = () =>
   mockRequest({
     method: 'get',
-    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/liveness',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/auth_events',
     response: [],
   });
 
-export const withCurrentEntityLivenessError = () =>
+export const withCurrentEntityAuthEventsError = () =>
   mockRequest({
     method: 'get',
-    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/liveness',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/auth_events',
     statusCode: 400,
     response: {
       error: {

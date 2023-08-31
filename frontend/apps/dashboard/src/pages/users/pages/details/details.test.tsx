@@ -17,10 +17,10 @@ import {
   entityFixture,
   getTextByRow,
   withAnnotations,
+  withAuthEvents,
   withDecrypt,
   withEntity,
   withEntityError,
-  withLiveness,
   withRiskSignals,
   withTimeline,
 } from './details.test.config';
@@ -49,7 +49,7 @@ describe('<Details />', () => {
     });
     withRiskSignals();
     withTimeline();
-    withLiveness();
+    withAuthEvents();
     withAnnotations();
   });
 

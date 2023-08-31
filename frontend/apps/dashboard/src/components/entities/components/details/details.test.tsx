@@ -17,11 +17,11 @@ import {
   entityFixture,
   getTextByRow,
   withAnnotations,
+  withAuthEvents,
   withBusinessOwners,
   withEntity,
   withEntityDecrypt,
   withEntityError,
-  withLiveness,
   withRiskSignals,
   withTimeline,
 } from './details.test.config';
@@ -40,7 +40,7 @@ describe.skip('<Details />', () => {
     withRiskSignals();
     withTimeline();
     withBusinessOwners();
-    withLiveness();
+    withAuthEvents();
     withAnnotations();
   });
 

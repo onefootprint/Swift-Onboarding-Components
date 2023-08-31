@@ -1,8 +1,8 @@
 import useEntityVault from '../../../hooks/use-entity-vault';
 import useEntity from './use-entity';
 import useEntityAnnotations from './use-entity-annotations';
+import useEntityLiveness from './use-entity-auth-events';
 import useEntityId from './use-entity-id';
-import useEntityLiveness from './use-entity-liveness';
 import useEntityRiskSignals from './use-entity-risk-signals';
 import useEntityTimeline from './use-entity-timeline';
 

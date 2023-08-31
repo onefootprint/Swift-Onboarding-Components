@@ -179,10 +179,10 @@ export const withRiskSignals = (entity = entityFixture, response = []) =>
     response,
   });
 
-export const withLiveness = (entity = entityFixture, response = []) =>
+export const withAuthEvents = (entity = entityFixture, response = []) =>
   mockRequest({
     method: 'get',
-    path: `/entities/${entity.id}/liveness`,
+    path: `/entities/${entity.id}/auth_events`,
     response,
   });
 
