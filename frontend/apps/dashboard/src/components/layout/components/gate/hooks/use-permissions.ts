@@ -24,32 +24,34 @@ const usePermissionsByRoute = (options: {
   useEffect(() => {
     const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
     const isPrivateRoute = !isPublicRoute;
-    if (isPublicRoute) {
-      if (isLoggedIn) {
-        publicRoute.onError();
-      } else {
-        publicRoute.onSuccess();
-      }
-    }
-    if (isPrivateRoute) {
-      if (isLoggedIn) {
-        const { requiresOnboarding } = data.meta;
-        if (requiresOnboarding && pathname !== '/onboarding') {
-          privateRoute.onError({ isLoggedIn: true, requiresOnboarding: true });
-        }
-        if (!requiresOnboarding && pathname === '/onboarding') {
-          privateRoute.onError({ isLoggedIn: true, requiresOnboarding: false });
-        }
-        if (requiresOnboarding && pathname === '/onboarding') {
-          privateRoute.onSuccess();
-        }
-        if (!requiresOnboarding && pathname !== '/onboarding') {
-          privateRoute.onSuccess();
-        }
-      } else {
-        privateRoute.onError({ isLoggedIn: false, requiresOnboarding: false });
-      }
-    }
+    privateRoute.onSuccess();
+
+    // if (isPublicRoute) {
+    //   if (isLoggedIn) {
+    //     publicRoute.onError();
+    //   } else {
+    //     publicRoute.onSuccess();
+    //   }
+    // }
+    // if (isPrivateRoute) {
+    //   if (isLoggedIn) {
+    //     const { requiresOnboarding } = data.meta;
+    //     if (requiresOnboarding && pathname !== '/onboarding') {
+    //       privateRoute.onError({ isLoggedIn: true, requiresOnboarding: true });
+    //     }
+    //     if (!requiresOnboarding && pathname === '/onboarding') {
+    //       privateRoute.onError({ isLoggedIn: true, requiresOnboarding: false });
+    //     }
+    //     if (requiresOnboarding && pathname === '/onboarding') {
+    //       privateRoute.onSuccess();
+    //     }
+    //     if (!requiresOnboarding && pathname !== '/onboarding') {
+    //       privateRoute.onSuccess();
+    //     }
+    //   } else {
+    //     privateRoute.onError({ isLoggedIn: false, requiresOnboarding: false });
+    //   }
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, isLoggedIn]);
 };

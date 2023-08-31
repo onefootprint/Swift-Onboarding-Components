@@ -360,8 +360,8 @@
         "playbooks": "Playbooks",
         "developers": "Developers",
         "settings": "Settings",
-        "log-out": "Log out",
         "manual-reviews": "Manual reviews",
+        "log-out": "Log out",
         "sandbox-mode": {
           "label": "Sandbox mode",
           "tooltip-info": {
@@ -502,6 +502,10 @@
     },
     "onboarding": {
       "page-title": "Footprint | Onboarding",
+      "header": {
+        "logged-as": "Logged in as",
+        "logout": "Log out"
+      },
       "welcome": {
         "img-alt": "A Penguin using a cellphone",
         "title": "Welcome to Footprint!",
@@ -596,8 +600,7 @@
             "title_other": "Invitations weren't sent"
           }
         }
-      },
-      "logged-as": "Logged in as"
+      }
     },
     "entities": {
       "intro": {

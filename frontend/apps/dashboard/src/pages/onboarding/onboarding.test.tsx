@@ -49,7 +49,7 @@ describe('<Onboarding />', () => {
       push,
     });
 
-    it.skip('should redirect to the /users page', async () => {
+    it('should redirect to the /users page', async () => {
       renderOnboarding();
 
       // 1st step
