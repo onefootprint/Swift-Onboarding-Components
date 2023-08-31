@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
 
@@ -152,7 +153,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &self.sv_id).await?;
+        let vendor_results = common::get_latest_vendor_results(state, &self.sv_id).await?;
 
         Ok((state.feature_flag_client.clone(), vendor_results))
     }
@@ -166,8 +167,10 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
     ) -> ApiResult<DocumentState> {
         let (ff_client, vendor_results) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
+        let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
-        let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
+        let execute_rules_for_real_document_decision_only =
+            should_execute_rules_for_document_only(&v, &wf, &obc)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
         let decision = if let Some(fixture_decision) = fixture_decision {

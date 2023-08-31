@@ -150,7 +150,8 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
         let vendor_results = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
-        let ocr_reason_codes = common::generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id).await?;
+        let ocr_reason_codes =
+            common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id).await?;
 
         Ok((
             ocr_reason_codes,
@@ -230,7 +231,7 @@ impl AlpacaKycDecisioning {
     pub async fn init(state: &State, workflow: DbWorkflow, config: AlpacaKycConfig) -> ApiResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
-        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &sv.id).await?;
+        let vendor_results = common::get_latest_vendor_results(state, &sv.id).await?;
         let svid = sv.id.clone();
         let risk_signals = state
             .db_pool
@@ -281,14 +282,13 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
             common::get_decision(&self, conn, self.risk_signals.clone(), &wf, &v)?
         };
 
-        // Now, we unhide the risk signals for the vendor that made the decision
         // TODO: what if doc failed by KYC passed? fix this
-        let rsg = RiskSignalGroup::latest_by_kind(conn.conn(), &self.sv_id, RiskSignalGroupKind::Kyc)?;
-        RiskSignal::unhide_risk_signals_for_risk_signal_group(
-            conn,
-            &rsg.id,
-            decision.vendors_for_unhiding_risk_signals(),
-        )?;
+
+        if let Some(chosen_kyc_vendor) = decision.chosen_kyc_vendor() {
+            // Now, we unhide the risk signals for the vendor that made the decision
+            let rsg = RiskSignalGroup::latest_by_kind(conn.conn(), &self.sv_id, RiskSignalGroupKind::Kyc)?;
+            RiskSignal::unhide_risk_signals_for_risk_signal_group(conn, &rsg.id, chosen_kyc_vendor)?;
+        }
 
         match decision.final_kyc_decision()?.decision.decision_status {
             DecisionStatus::Fail => {
@@ -440,7 +440,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             )
         };
 
-        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &self.sv_id).await?;
+        let vendor_results = common::get_latest_vendor_results(state, &self.sv_id).await?;
 
         Ok((watchlist_res, vendor_results))
     }

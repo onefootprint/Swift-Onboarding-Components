@@ -84,7 +84,7 @@ impl<'a> BoolFlag<'a> {
         }
     }
 
-    pub(crate) fn default(&self) -> bool {
+    pub fn default(&self) -> bool {
         match self {
             Self::IsRiskOps(_) => false,
             Self::IsDemoTenant(_) => false,

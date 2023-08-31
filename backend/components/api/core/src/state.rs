@@ -86,7 +86,12 @@ impl State {
 
         let mut s = Self::init_or_die(config).await;
         s.enclave_client.replace_proxy_client(Arc::new(MockEnclave));
-        s.set_ff_client(Arc::new(MockFeatureFlagClient::new()));
+
+        // by default, the ff_client on a test state will just return the default
+        let mut mock_ff_client = MockFeatureFlagClient::new();
+        mock_ff_client.expect_flag().returning(|f| f.default());
+        s.set_ff_client(Arc::new(mock_ff_client));
+
         s.set_webhook_client(Arc::new(MockWebhookClient::new()));
         s.set_vendor_clients(VendorClients::new_with_mocks());
         s

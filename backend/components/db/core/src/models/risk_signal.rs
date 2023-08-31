@@ -204,12 +204,12 @@ impl RiskSignal {
     pub fn unhide_risk_signals_for_risk_signal_group(
         conn: &mut TxnPgConn,
         rsg_id: &RiskSignalGroupId,
-        vendor_apis: Vec<VendorAPI>,
+        vendor_api: VendorAPI,
     ) -> DbResult<usize> {
         let rows_updated = diesel::update(
             risk_signal::table
                 .filter(risk_signal::risk_signal_group_id.eq(rsg_id))
-                .filter(risk_signal::vendor_api.eq_any(vendor_apis)),
+                .filter(risk_signal::vendor_api.eq(vendor_api)),
         )
         .set(risk_signal::hidden.eq(false))
         .execute(conn.conn())?;

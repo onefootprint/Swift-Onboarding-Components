@@ -4,6 +4,7 @@ use db::{
     models::{
         decision_intent::DecisionIntent,
         insight_event::InsightEvent,
+        ob_configuration::ObConfiguration,
         risk_signal::RiskSignal,
         scoped_vault::ScopedVault,
         vault::Vault,
@@ -67,7 +68,14 @@ pub fn get_fixture_data_decision(
     }
 }
 
-pub fn should_execute_rules_for_document_only(vault: &Vault, workflow: &Workflow) -> ApiResult<bool> {
+pub fn should_execute_rules_for_document_only(
+    vault: &Vault,
+    workflow: &Workflow,
+    obc: &ObConfiguration,
+) -> ApiResult<bool> {
+    if obc.skip_kyc {
+        return Ok(true);
+    }
     if !vault.is_live {
         let fixture_result = workflow
             .fixture_result

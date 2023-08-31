@@ -37,7 +37,7 @@ use crate::{
     State,
 };
 
-use super::{traits::HasRuleGroup, StateError};
+use super::traits::HasRuleGroup;
 
 #[tracing::instrument(skip(db_pool))]
 pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> DbResult<ScopedVault> {
@@ -93,24 +93,14 @@ pub async fn run_kyc_vendor_calls(
 }
 
 #[tracing::instrument(skip(state))]
-pub async fn assert_kyc_vendor_calls_completed(
-    state: &State,
-    sv_id: &ScopedVaultId,
-) -> ApiResult<Vec<VendorResult>> {
-    let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
+pub async fn get_latest_vendor_results(state: &State, sv_id: &ScopedVaultId) -> ApiResult<Vec<VendorResult>> {
+    decision::engine::get_latest_verification_requests_and_results(
         sv_id,
         &state.db_pool,
         &state.enclave_client,
     )
-    .await?;
-    if !vendor_requests.outstanding_requests.is_empty() {
-        return Err(StateError::StateInitError(
-            "Decisioning".to_owned(),
-            "outstanding vreqs found".to_owned(),
-        )
-        .into());
-    }
-    Ok(vendor_requests.completed_requests)
+    .await
+    .map(|r| r.completed_requests)
 }
 
 pub type KycDecision = (
@@ -189,8 +179,9 @@ pub fn get_decision(
     wf: &Workflow,
     vault: &Vault,
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
+    let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
     let include_doc = DocumentRequest::get(conn, &wf.id)?.is_some();
-    let document_only = should_execute_rules_for_document_only(vault, wf)?;
+    let document_only = should_execute_rules_for_document_only(vault, wf, &obc)?;
     let config = KycRuleExecutionConfig {
         include_doc,
         document_only,
@@ -240,7 +231,7 @@ pub async fn write_authorized_fingerprints(state: &State, wf_id: &WorkflowId) ->
     vw.create_authorized_fingerprints(state, obc).await
 }
 
-pub async fn generate_ocr_reason_codes(
+pub async fn maybe_generate_ocr_reason_codes(
     state: &State,
     wf_id: &WorkflowId,
     sv_id: &ScopedVaultId,
@@ -257,13 +248,7 @@ pub async fn generate_ocr_reason_codes(
 
     // TODO: instead of retrieving all results from all vendor calls here, we could just retrieve the ones for the DocScan DI or even just directly retrieve IncodeFetchOCR itself
     // also slightly sketch to query latest by sv_id instead of strictly querying from vres's made within this workflow specifically
-    let vendor_results = &decision::engine::get_latest_verification_requests_and_results(
-        sv_id,
-        &state.db_pool,
-        &state.enclave_client,
-    )
-    .await?
-    .completed_requests;
+    let vendor_results = &get_latest_vendor_results(state, sv_id).await?;
 
     // If this is a doc-first OBC, generate OCR mismatch risk signals
     let (vendor_map, vendor_result_id_map) = build_vendor_response_map_from_vendor_results(vendor_results)?;

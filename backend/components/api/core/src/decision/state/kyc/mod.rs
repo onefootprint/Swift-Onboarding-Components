@@ -9,7 +9,7 @@ use super::{
     DoAction, StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
 };
 use crate::{
-    decision::{onboarding::rules::KycRuleGroup, rule::rule_sets, vendor::vendor_result::VendorResult},
+    decision::{onboarding::rules::KycRuleGroup, rule::rule_sets},
     errors::ApiResult,
     State,
 };
@@ -47,7 +47,6 @@ pub struct KycDecisioning {
     #[allow(unused)]
     sv_id: ScopedVaultId,
     t_id: TenantId,
-    vendor_results: Vec<VendorResult>,
 }
 
 impl HasRuleGroup for KycDecisioning {

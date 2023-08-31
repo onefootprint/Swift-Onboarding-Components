@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use db::models::{
+    ob_configuration::ObConfiguration,
     risk_signal::{NewRiskSignalInfo, RiskSignal},
     risk_signal_group::RiskSignalGroup,
     vault::Vault,
@@ -113,7 +114,7 @@ impl KycVendorCalls {
 impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     type AsyncRes = (
         Option<Vec<NewRiskSignalInfo>>,
-        Vec<VendorResult>,
+        Option<Vec<VendorResult>>,
         Arc<dyn FeatureFlagClient>,
     );
 
@@ -126,12 +127,26 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let vendor_results = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
-        let ocr_reason_codes = common::generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id).await?;
+        let wfid = self.wf_id.clone();
+        let obc = state
+            .db_pool
+            .db_query(move |conn| ObConfiguration::get(conn, &wfid))
+            .await??
+            .0;
+
+        // TODO: we should also skip if the UVW is non-US, but then we probably need to assert that doc was collected. Also need to clairfy tenant's understanding of this
+        let kyc_vendor_results = if !obc.skip_kyc {
+            Some(common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?)
+        } else {
+            None
+        };
+
+        let ocr_reason_codes =
+            common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id).await?;
 
         Ok((
             ocr_reason_codes,
-            vendor_results,
+            kyc_vendor_results,
             state.feature_flag_client.clone(),
         ))
     }
@@ -143,7 +158,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KycState> {
-        let (ocr_reason_codes, vendor_results, ff_client) = async_res;
+        let (ocr_reason_codes, kyc_vendor_results, ff_client) = async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
 
         // Save OCR risk signals for doc-first OBC if necessary
@@ -154,13 +169,16 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             RiskSignal::bulk_add(conn, ocr_reason_codes, false, rsg.id)?;
         }
 
-        let fixture_decision =
-            decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
-        let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> =
-            if let Some(fd) = fixture_decision {
+        // Save KYC risk signals, if we made KYC calls
+        if let Some(kyc_vendor_results) = kyc_vendor_results {
+            let fixture_decision =
+                decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
+            let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> = if let Some(fd) =
+                fixture_decision
+            {
                 let reason_codes =
                     decision::sandbox::get_fixture_reason_codes(fd, VaultKind::Person, Some((&vw, &obc)));
-                let vres_id = get_vres_id_for_fixture(&vendor_results)?;
+                let vres_id = get_vres_id_for_fixture(&kyc_vendor_results)?;
 
                 RiskSignalGroupStruct {
                     footprint_reason_codes: reason_codes
@@ -170,18 +188,18 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                     group: risk_signal_group_struct::Kyc,
                 }
             } else {
-                let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+                let vendor_result_maps = build_vendor_response_map_from_vendor_results(&kyc_vendor_results)?;
                 create_risk_signals_from_vendor_results(vendor_result_maps, vw, obc)?
             };
 
-        save_risk_signals(conn, &self.sv_id, &risk_signals, true)?;
+            save_risk_signals(conn, &self.sv_id, &risk_signals, true)?;
+        }
 
         Ok(KycState::from(KycDecisioning {
             wf_id: self.wf_id,
             is_redo: self.is_redo,
             sv_id: self.sv_id,
             t_id: self.t_id,
-            vendor_results,
         }))
     }
 }
@@ -204,23 +222,18 @@ impl KycDecisioning {
     pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
-        // TODO: we don't really need the onboarding_decision_verification_result_junction anymore and that's the only reason we retrieve vendor results directly here
-        // can probably rm
-        let vendor_results = common::assert_kyc_vendor_calls_completed(state, &sv.id).await?;
-
         Ok(KycDecisioning {
             wf_id: workflow.id,
             is_redo: config.is_redo,
             sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
-            vendor_results,
         })
     }
 }
 
 #[async_trait]
 impl OnAction<MakeDecision, KycState> for KycDecisioning {
-    type AsyncRes = Arc<dyn FeatureFlagClient>;
+    type AsyncRes = (Vec<VendorResult>, Arc<dyn FeatureFlagClient>);
 
     #[tracing::instrument(
         "OnAction<MakeDecision, KycState>::execute_async_idempotent_actions",
@@ -231,19 +244,25 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok(state.feature_flag_client.clone())
+        // TODO: we don't really need the onboarding_decision_verification_result_junction anymore and that's the only reason we retrieve vendor results directly here
+        // can probably rm
+        let latest_vendor_results = common::get_latest_vendor_results(state, &self.sv_id).await?;
+        Ok((latest_vendor_results, state.feature_flag_client.clone()))
     }
 
     #[tracing::instrument("OnAction<MakeDecision, KycState>::on_commit", skip_all)]
     fn on_commit(
         self,
         wf: Locked<DbWorkflow>,
-        ff_client: Self::AsyncRes,
+        async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KycState> {
+        let (latest_vendor_results, ff_client) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
+        let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
-        let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
+        let execute_rules_for_real_document_decision_only =
+            should_execute_rules_for_document_only(&v, &wf, &obc)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
         let decision = if let Some(fixture_decision) = fixture_decision {
@@ -256,19 +275,17 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             common::get_decision(&self, conn, risk_signals, &wf, &v)?
         };
 
-        // Now, we unhide the risk signals for the vendor that made the decision
-        let rsg = RiskSignalGroup::latest_by_kind(conn.conn(), &self.sv_id, RiskSignalGroupKind::Kyc)?;
-        RiskSignal::unhide_risk_signals_for_risk_signal_group(
-            conn,
-            &rsg.id,
-            decision.vendors_for_unhiding_risk_signals(),
-        )?;
+        if let Some(chosen_kyc_vendor) = decision.chosen_kyc_vendor() {
+            // Now, we unhide the risk signals for the vendor that made the decision
+            let rsg = RiskSignalGroup::latest_by_kind(conn.conn(), &self.sv_id, RiskSignalGroupKind::Kyc)?;
+            RiskSignal::unhide_risk_signals_for_risk_signal_group(conn, &rsg.id, chosen_kyc_vendor)?;
+        }
 
         common::save_kyc_decision(
             conn,
             &self.sv_id,
             &wf,
-            self.vendor_results
+            latest_vendor_results
                 .iter()
                 .map(|vr| vr.verification_result_id.clone())
                 .collect(),

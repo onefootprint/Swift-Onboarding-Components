@@ -68,7 +68,7 @@ impl WaterfallOnboardingRulesDecisionOutput {
 
     pub fn final_kyc_decision(&self) -> ApiResult<OnboardingRulesDecisionOutput> {
         let mut result = self
-            .kyc_decisions()
+            .kyc_and_doc_decisions()
             .iter()
             .filter_map(|d| match d {
                 DecisionResult::Evaluated(e) => Some(e),
@@ -90,18 +90,15 @@ impl WaterfallOnboardingRulesDecisionOutput {
         }
     }
 
-    fn kyc_decisions(&self) -> Vec<DecisionResult> {
+    fn kyc_and_doc_decisions(&self) -> Vec<DecisionResult> {
         vec![self.kyc_decision.clone(), self.doc_decision.clone()]
     }
 
-    pub fn vendors_for_unhiding_risk_signals(&self) -> Vec<VendorAPI> {
-        self.kyc_decisions()
-            .iter()
-            .filter_map(|d| match d {
-                DecisionResult::Evaluated(e) => Some(e.decision.vendor_api),
-                DecisionResult::NotRequired => None,
-            })
-            .collect()
+    pub fn chosen_kyc_vendor(&self) -> Option<VendorAPI> {
+        match &self.kyc_decision {
+            DecisionResult::Evaluated(e) => Some(e.decision.vendor_api),
+            DecisionResult::NotRequired => None,
+        }
     }
 }
 
