@@ -26,7 +26,6 @@ const tagOrder: (CollectedDataOption | SupportedIdDocTypes | 'selfie')[] = [
   CollectedKycDataOption.name,
   CollectedKycDataOption.email,
   CollectedKycDataOption.fullAddress,
-  CollectedKycDataOption.partialAddress,
   CollectedKycDataOption.dob,
   CollectedKycDataOption.phoneNumber,
   CollectedKycDataOption.ssn4,

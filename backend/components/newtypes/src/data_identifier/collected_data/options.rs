@@ -39,7 +39,6 @@ pub enum CollectedDataOption {
     Ssn4,
     Ssn9,
     FullAddress,
-    PartialAddress,
     Email,
     PhoneNumber,
     Nationality,
@@ -117,7 +116,6 @@ impl TryFrom<CollectedDataOptionKind> for CollectedDataOption {
             CollectedDataOptionKind::Ssn4 => Self::Ssn4,
             CollectedDataOptionKind::Ssn9 => Self::Ssn9,
             CollectedDataOptionKind::FullAddress => Self::FullAddress,
-            CollectedDataOptionKind::PartialAddress => Self::PartialAddress,
             CollectedDataOptionKind::Email => Self::Email,
             CollectedDataOptionKind::PhoneNumber => Self::PhoneNumber,
             CollectedDataOptionKind::BusinessName => Self::BusinessName,
@@ -146,7 +144,7 @@ impl CollectedDataOption {
             Self::Name => CollectedData::Name,
             Self::Dob => CollectedData::Dob,
             Self::Ssn4 | Self::Ssn9 => CollectedData::Ssn,
-            Self::FullAddress | Self::PartialAddress => CollectedData::Address,
+            Self::FullAddress => CollectedData::Address,
             Self::Email => CollectedData::Email,
             Self::PhoneNumber => CollectedData::PhoneNumber,
             Self::Document(_) => CollectedData::Document,
@@ -180,7 +178,6 @@ impl CollectedDataOption {
                 IDK::Zip.into(),
                 IDK::Country.into(),
             ]),
-            Self::PartialAddress => Some(vec![IDK::Zip.into(), IDK::Country.into()]),
             Self::Email => Some(vec![IDK::Email.into()]),
             Self::PhoneNumber => Some(vec![IDK::PhoneNumber.into()]),
             Self::BusinessName => Some(vec![BDK::Name.into(), BDK::Dba.into()]),
@@ -231,7 +228,6 @@ impl CollectedDataOption {
             Self::Dob => vec![IDK::Dob.into()],
             Self::Ssn9 => vec![IDK::Ssn9.into(), IDK::Ssn4.into()],
             Self::Ssn4 => vec![IDK::Ssn4.into()],
-            Self::PartialAddress => vec![IDK::Zip.into(), IDK::Country.into()],
             // We'll optionally add City, State, and Zip to US addresses
             Self::FullAddress => vec![IDK::AddressLine1.into(), IDK::Country.into()],
             Self::Email => vec![IDK::Email.into()],
@@ -315,7 +311,6 @@ impl CollectedDataOption {
     pub fn full_variant(&self) -> Option<Self> {
         match self {
             Self::Ssn4 => Some(Self::Ssn9),
-            Self::PartialAddress => Some(Self::FullAddress),
             Self::BusinessBeneficialOwners => Some(Self::BusinessKycedBeneficialOwners),
             // TODO just until we deprecate
             Self::Nationality => Some(Self::UsLegalStatus),

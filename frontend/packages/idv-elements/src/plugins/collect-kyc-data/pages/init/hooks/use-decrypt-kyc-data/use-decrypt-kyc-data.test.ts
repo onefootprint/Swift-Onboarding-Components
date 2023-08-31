@@ -20,8 +20,6 @@ describe.skip('useDecryptKycData', () => {
       [IdDI.firstName]: 'John',
       [IdDI.lastName]: 'Doe',
       [IdDI.email]: 'john@onefootprint.com',
-      [IdDI.zip]: '12345',
-      [IdDI.country]: 'US',
     });
     const onSuccess = jest.fn();
     const onError = jest.fn();
@@ -30,7 +28,6 @@ describe.skip('useDecryptKycData', () => {
       CollectedKycDataOption.email,
       CollectedKycDataOption.name,
       CollectedKycDataOption.ssn4,
-      CollectedKycDataOption.partialAddress,
     ];
 
     customRenderHook(() =>
@@ -58,16 +55,6 @@ describe.skip('useDecryptKycData', () => {
           decrypted: true,
           scrubbed: false,
         },
-        [IdDI.zip]: {
-          value: '12345',
-          decrypted: true,
-          scrubbed: false,
-        },
-        [IdDI.country]: {
-          value: 'US',
-          decrypted: true,
-          scrubbed: false,
-        },
       });
     });
   });
@@ -78,8 +65,6 @@ describe.skip('useDecryptKycData', () => {
       [IdDI.firstName]: 'John',
       [IdDI.lastName]: 'Doe',
       [IdDI.email]: 'john@onefootprint.com',
-      [IdDI.zip]: '12345',
-      [IdDI.country]: 'US',
       [IdDI.ssn4]: '1234',
     });
     const onSuccess = jest.fn();
@@ -89,7 +74,6 @@ describe.skip('useDecryptKycData', () => {
       CollectedKycDataOption.email,
       CollectedKycDataOption.name,
       CollectedKycDataOption.ssn4,
-      CollectedKycDataOption.partialAddress,
     ];
 
     customRenderHook(() =>
@@ -118,16 +102,6 @@ describe.skip('useDecryptKycData', () => {
           decrypted: true,
           scrubbed: false,
         },
-        [IdDI.zip]: {
-          value: '12345',
-          decrypted: true,
-          scrubbed: false,
-        },
-        [IdDI.country]: {
-          value: 'US',
-          decrypted: true,
-          scrubbed: false,
-        },
       });
     });
   });
@@ -142,7 +116,6 @@ describe.skip('useDecryptKycData', () => {
       CollectedKycDataOption.email,
       CollectedKycDataOption.name,
       CollectedKycDataOption.ssn4,
-      CollectedKycDataOption.partialAddress,
     ];
 
     customRenderHook(() =>
@@ -171,16 +144,6 @@ describe.skip('useDecryptKycData', () => {
           decrypted: false,
           scrubbed: true,
         },
-        [IdDI.zip]: {
-          value: '',
-          decrypted: false,
-          scrubbed: true,
-        },
-        [IdDI.country]: {
-          value: '',
-          decrypted: false,
-          scrubbed: true,
-        },
       });
     });
   });
@@ -194,7 +157,6 @@ describe.skip('useDecryptKycData', () => {
       CollectedKycDataOption.email,
       CollectedKycDataOption.name,
       CollectedKycDataOption.ssn4,
-      CollectedKycDataOption.partialAddress,
     ];
 
     customRenderHook(() =>
@@ -216,7 +178,6 @@ describe.skip('useDecryptKycData', () => {
       CollectedKycDataOption.email,
       CollectedKycDataOption.name,
       CollectedKycDataOption.ssn4,
-      CollectedKycDataOption.partialAddress,
     ];
 
     customRenderHook(() =>

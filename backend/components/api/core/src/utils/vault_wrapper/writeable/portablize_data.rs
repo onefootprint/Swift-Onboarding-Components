@@ -195,11 +195,6 @@ mod test {
         vec![Name], vec![Ssn4] => None
     )]
     #[test_case(
-        vec![PartialAddress], vec![FullAddress],
-        // Deactivate partial address because we already have a full one
-        vec![], vec![PartialAddress] => None
-    )]
-    #[test_case(
         vec![Dob, Ssn9], vec![Ssn9],
         // Allow replacing Ssn9
         vec![Dob, Ssn9], vec![] => None
@@ -208,11 +203,6 @@ mod test {
         vec![Dob, Ssn9], vec![Ssn4],
         // Allow replacing Ssn4 with an Ssn9
         vec![Dob, Ssn9], vec![] => None
-    )]
-    #[test_case(
-        vec![FullAddress], vec![PartialAddress],
-        // Allow replacing existing partial address
-        vec![FullAddress], vec![] => None
     )]
     #[test_case(
         vec![FullAddress], vec![FullAddress],

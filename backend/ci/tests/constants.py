@@ -148,7 +148,6 @@ CDO_TO_DIS = {
         "id.zip",
         "id.country",
     ],
-    "partial_address": ["id.zip", "id.country"],
     "email": ["id.email"],
     "phone_number": ["id.phone_number"],
     "nationality": ["id.nationality"],

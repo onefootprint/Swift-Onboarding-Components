@@ -520,16 +520,7 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
             su_id: &su2.id, // This is the only test that uses su2
             is_allowed: true,
         },
-        // Allowed to add partial address
-        Test {
-            update: vec![
-                (IDK::Zip.into(), PiiString::new("94117".to_owned())),
-                (IDK::Country.into(), PiiString::new("US".to_owned())),
-            ],
-            su_id: &su.id,
-            is_allowed: true,
-        },
-        // Allowed to add full address on top of partial address
+        // Allowed to add full address
         Test {
             update: vec![
                 (IDK::AddressLine1.into(), PiiString::new("Flerp".to_owned())),
@@ -540,15 +531,6 @@ fn test_uvw_update_identity_data_validation(conn: &mut TestPgConn) {
             ],
             su_id: &su.id,
             is_allowed: true,
-        },
-        // Not allowed to add partial address on top of full address
-        Test {
-            update: vec![
-                (IDK::Zip.into(), PiiString::new("94117".to_owned())),
-                (IDK::Country.into(), PiiString::new("US".to_owned())),
-            ],
-            su_id: &su.id,
-            is_allowed: false,
         },
         // Allowed to update all remaining info
         Test {
@@ -674,11 +656,6 @@ fn test_uvw_replace_address_line2(conn: &mut TestPgConn) {
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let updates = vec![
-        // Partial address
-        vec![
-            (IDK::Zip.into(), PiiString::new("94117".to_owned())),
-            (IDK::Country.into(), PiiString::new("US".to_owned())),
-        ],
         // Full address with line2
         vec![
             (IDK::AddressLine1.into(), PiiString::new("Flerp".to_owned())),

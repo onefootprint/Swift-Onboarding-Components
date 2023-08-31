@@ -290,7 +290,6 @@
     "ssn9": "SSN (Full)",
     "ssn4": "SSN (Last 4)",
     "full_address": "Address",
-    "partial_address": "Address (Country & Zip Code)",
     "email": "Email",
     "phone_number": "Phone number",
     "nationality": "Nationality",
@@ -2073,7 +2072,6 @@
             "dob": "Date of birth",
             "documents": "Documents",
             "full_address": "Address",
-            "partial_address": "Partial address (Country & Zip Code)",
             "custom": "Custom attributes",
             "investor_profile": "Broker questions (Investor profile)",
             "card": "Card data"

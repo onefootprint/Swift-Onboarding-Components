@@ -27,7 +27,6 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
     IdDI.zip,
     IdDI.country,
   ],
-  [CollectedKycDataOption.partialAddress]: [IdDI.zip, IdDI.country],
   [CollectedKycDataOption.email]: [IdDI.email],
   [CollectedKycDataOption.phoneNumber]: [IdDI.phoneNumber],
   [CollectedKycDataOption.nationality]: [IdDI.nationality],

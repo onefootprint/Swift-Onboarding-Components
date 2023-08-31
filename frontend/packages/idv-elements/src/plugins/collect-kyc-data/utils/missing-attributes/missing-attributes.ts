@@ -16,10 +16,7 @@ const BASIC_ATTRIBUTES = [
 const US_LEGAL_STATUS_ATTRIBUTES = [CollectedKycDataOption.usLegalStatus];
 
 // The list of CollectedKycDataOption that may be input on the residential screen
-const RESIDENTIAL_ATTRIBUTES = [
-  CollectedKycDataOption.fullAddress,
-  CollectedKycDataOption.partialAddress,
-];
+const RESIDENTIAL_ATTRIBUTES = [CollectedKycDataOption.fullAddress];
 
 // The list of CollectedKycDataOption that may be input on the ssn screen
 const SSN_ATTRIBUTES = [

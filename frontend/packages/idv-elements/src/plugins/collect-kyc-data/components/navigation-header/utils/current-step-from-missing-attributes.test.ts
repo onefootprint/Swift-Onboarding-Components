@@ -71,7 +71,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           isMet: false,
-          missingAttributes: [CollectedKycDataOption.partialAddress],
+          missingAttributes: [CollectedKycDataOption.fullAddress],
           populatedAttributes: [],
           optionalAttributes: [],
         },
@@ -113,7 +113,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           isMet: false,
-          missingAttributes: [CollectedKycDataOption.partialAddress],
+          missingAttributes: [CollectedKycDataOption.fullAddress],
           populatedAttributes: [],
           optionalAttributes: [],
         },

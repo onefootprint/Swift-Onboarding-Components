@@ -11,7 +11,6 @@ export enum RoleScope {
   decryptSsn4 = 'decrypt.ssn4',
   decryptSsn9 = 'decrypt.ssn9',
   decryptFullAddress = 'decrypt.full_address',
-  decryptPartialAddress = 'decrypt.partial_address',
   decryptEmail = 'decrypt.email',
   decryptPhoneNumber = 'decrypt.phone_number',
   decryptDocuments = 'decrypt.document_and_selfie',

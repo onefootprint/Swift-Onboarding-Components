@@ -111,99 +111,111 @@ def test_config_create(sandbox_tenant, twilio):
     )
     post("hosted/onboarding", None, ob_config_key, auth_token)
 
+
 @pytest.mark.parametrize(
     "config_data,expected_error",
     [
         (
             dict(
-                must_collect_data=["ssn4", "name", "full_address", "email", "phone_number"], 
-                optional_data=[], 
-                can_access_data=[], 
+                must_collect_data=[
+                    "ssn4",
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
+                optional_data=[],
+                can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=None,
-            ),    
-            None
+            ),
+            None,
         ),
         (
             dict(
-                must_collect_data=["ssn4", "ssn9", "name", "full_address", "email", "phone_number"], 
-                optional_data=[], 
-                can_access_data=[], 
+                must_collect_data=[
+                    "ssn4",
+                    "ssn9",
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
+                optional_data=[],
+                can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=None,
-            ),    
-           "Validation error: Cannot provide both ssn4 and ssn9",
+            ),
+            "Validation error: Cannot provide both ssn4 and ssn9",
         ),
         (
             dict(
-                must_collect_data=["full_address", "partial_address", "name", "email", "phone_number"], 
-                optional_data=[], 
-                can_access_data=[], 
+                must_collect_data=["name", "email", "phone_number", "full_address"],
+                optional_data=[],
+                can_access_data=["ssn9"],
                 allow_international_residents=False,
                 international_country_restrictions=None,
-            ),    
-           "Validation error: Cannot provide both full_address and partial_address",
-        ),
-        (
-            dict(
-                must_collect_data=["name", "email", "phone_number", "full_address"], 
-                optional_data=[], 
-                can_access_data=["ssn9"], 
-                allow_international_residents=False,
-                international_country_restrictions=None,
-            ),    
-           "Validation error: Decryptable Ssn fields must be a subset of collected fields",
+            ),
+            "Validation error: Decryptable Ssn fields must be a subset of collected fields",
         ),  # can_access must be < must_collect
         (
             dict(
-                must_collect_data=["name", "full_address", "email", "phone_number"], 
-                optional_data=["ssn9"], 
-                can_access_data=["name", "ssn9"], 
+                must_collect_data=["name", "full_address", "email", "phone_number"],
+                optional_data=["ssn9"],
+                can_access_data=["name", "ssn9"],
                 allow_international_residents=False,
                 international_country_restrictions=None,
-            ),    
-           None,
+            ),
+            None,
         ),  # data in optional_data should be allowed in can_access
-       (
+        (
             dict(
-                must_collect_data=["name", "full_address", "email", "phone_number"], 
-                optional_data=["dob"], 
-                can_access_data=[], 
+                must_collect_data=["name", "full_address", "email", "phone_number"],
+                optional_data=["dob"],
+                can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=None,
-            ),    
-           "Validation error: [Dob] cannot be optional",
+            ),
+            "Validation error: [Dob] cannot be optional",
         ),  # for now only let ssn4/ssn9 be optional, not any arbitary CDO
         (
             dict(
-                must_collect_data=["name", "full_address", "email", "phone_number", "dob"], 
-                optional_data=[], 
-                can_access_data=[], 
+                must_collect_data=[
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                    "dob",
+                ],
+                optional_data=[],
+                can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=["MX"],
-            ),    
-           "Validation error: Cannot specify international_country_restrictions without allow_international_residents"
-        ),  
+            ),
+            "Validation error: Cannot specify international_country_restrictions without allow_international_residents",
+        ),
         (
             dict(
-                must_collect_data=["name", "full_address", "email", "phone_number", "dob"], 
-                optional_data=[], 
-                can_access_data=[], 
+                must_collect_data=[
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                    "dob",
+                ],
+                optional_data=[],
+                can_access_data=[],
                 allow_international_residents=True,
                 international_country_restrictions=["MX"],
-            ),    
-           None
-        ),  
+            ),
+            None,
+        ),
     ],
 )
-def test_config_create_validation(
-    sandbox_tenant, 
-    config_data,
-    expected_error
-):
+def test_config_create_validation(sandbox_tenant, config_data, expected_error):
     data = {"name": "Acme Bank Loan"}
     data.update(config_data)
-    
+
     # Test validation errors
     res = post(
         "org/onboarding_configs",

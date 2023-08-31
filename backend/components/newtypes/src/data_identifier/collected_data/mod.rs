@@ -35,16 +35,16 @@ impl CollectedData {
     /// Returns all the variants of this CollectedDataOption, in increasing order of "completeness."
     pub fn options(&self) -> Vec<CollectedDataOption> {
         use CollectedDataOption::*;
+        // NOTE: these CDOs with multiple options MUST be returned in increasing order of
+        // "completeness" - the options that contain fewer fields are first
+        // TODO we're probably outgrowing this
         match self {
             Self::Name => vec![Name],
             Self::Dob => vec![Dob],
             Self::Email => vec![Email],
             Self::PhoneNumber => vec![PhoneNumber],
-            // These are the only two CollectedDatas that map to multiple Options
-            // NOTE: these MUST be returned in increasing order of "completeness" - the options that
-            // contain fewer fields are first
             Self::Ssn => vec![Ssn4, Ssn9],
-            Self::Address => vec![PartialAddress, FullAddress],
+            Self::Address => vec![FullAddress],
             Self::BusinessName => vec![BusinessName],
             Self::BusinessTin => vec![BusinessTin],
             Self::BusinessAddress => vec![BusinessAddress],
