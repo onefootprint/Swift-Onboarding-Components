@@ -269,6 +269,10 @@ pub async fn post(
         return Err(TenantError::CannotCreateProdObConfigs.into());
     }
 
+    // Hard coded for now until we expose in playbooks. TODO: could maybe have "tenant defaults" expressed in our code where we could map tenants to default invariants for them
+    // like Coba should always have skip_kyc=true. Probably better than doing this purely via PG or via feature flags
+    let skip_kyc = false;
+
     let actor = auth.actor().into();
     let obc = state
         .db_pool
@@ -287,6 +291,7 @@ pub async fn post(
                 allow_international_residents,
                 international_country_restrictions,
                 actor,
+                skip_kyc,
             )?;
             let obc = db::actor::saturate_actor_nullable(conn, obc)?;
             Ok(obc)

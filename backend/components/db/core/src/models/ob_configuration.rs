@@ -46,6 +46,7 @@ pub struct ObConfiguration {
     pub allow_international_residents: bool,
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: Option<DbActor>,
+    pub skip_kyc: bool,
 }
 
 impl ObConfiguration {
@@ -114,6 +115,7 @@ struct NewObConfiguration {
     allow_international_residents: bool,
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     author: DbActor,
+    skip_kyc: bool,
 }
 
 #[derive(Debug)]
@@ -273,6 +275,7 @@ impl ObConfiguration {
         allow_international_residents: bool,
         international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
         author: DbActor,
+        skip_kyc: bool,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -290,6 +293,7 @@ impl ObConfiguration {
             allow_international_residents,
             international_country_restrictions,
             author,
+            skip_kyc,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -388,6 +392,7 @@ mod tests {
             allow_international_residents: allow_international,
             international_country_restrictions,
             author: None,
+            skip_kyc: false,
         };
 
         assert_have_same_elements(obc.supported_countries(), expected_countries)

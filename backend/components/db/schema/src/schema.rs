@@ -450,6 +450,7 @@ table! {
         allow_international_residents -> Bool,
         international_country_restrictions -> Nullable<Array<Text>>,
         author -> Nullable<Jsonb>,
+        skip_kyc -> Bool,
     }
 }
 
