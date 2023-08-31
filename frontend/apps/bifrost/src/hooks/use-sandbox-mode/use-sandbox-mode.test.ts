@@ -21,6 +21,7 @@ describe('useSandboxMode', () => {
     isNoPhoneFlow: false,
     requiresIdDoc: false,
     isKyb: false,
+    allowInternationalResidents: false,
   });
 
   describe('when it is using a live key', () => {

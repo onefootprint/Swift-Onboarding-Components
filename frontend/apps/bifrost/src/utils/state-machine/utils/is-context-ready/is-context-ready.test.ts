@@ -19,6 +19,7 @@ describe('isContextReady', () => {
     isNoPhoneFlow: false,
     requiresIdDoc: false,
     isKyb: false,
+    allowInternationalResidents: false,
   };
 
   describe('when init context info is complete', () => {

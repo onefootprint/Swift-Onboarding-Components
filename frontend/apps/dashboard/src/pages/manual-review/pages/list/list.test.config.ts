@@ -91,6 +91,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     optionalData: [],
     isAppClipEnabled: false,
     isNoPhoneFlow: false,
+    allowInternationalResidents: false,
     isDocFirstFlow: false,
   },
 ];

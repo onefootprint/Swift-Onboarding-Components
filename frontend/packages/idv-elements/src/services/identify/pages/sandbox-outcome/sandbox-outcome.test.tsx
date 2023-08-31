@@ -31,6 +31,7 @@ const getOnboardingConfig = (isLive = true): PublicOnboardingConfig => ({
   requiresIdDoc: true,
   key: 'key',
   isKyb: false,
+  allowInternationalResidents: false,
 });
 
 let submittedFormData: FormDataType = {

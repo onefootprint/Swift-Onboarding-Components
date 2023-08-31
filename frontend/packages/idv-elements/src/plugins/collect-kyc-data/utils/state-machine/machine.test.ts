@@ -26,6 +26,7 @@ describe('Collect KYC Data Machine Tests', () => {
     requiresIdDoc: false,
     key: 'key',
     isKyb: false,
+    allowInternationalResidents: false,
   };
 
   const createMachine = (

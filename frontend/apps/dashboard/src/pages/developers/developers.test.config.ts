@@ -33,6 +33,7 @@ export const listOnboardingConfigsFixture = [
     is_live: true,
     created_at: '2022-07-20T01:52:36.984290Z',
     status: 'enabled',
+    allow_international_residents: false,
   },
 ];
 

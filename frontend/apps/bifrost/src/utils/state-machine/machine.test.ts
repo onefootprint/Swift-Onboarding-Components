@@ -21,6 +21,7 @@ describe('Bifrost Machine Tests', () => {
     isNoPhoneFlow: false,
     requiresIdDoc: false,
     isKyb: false,
+    allowInternationalResidents: false,
   };
 
   const testBootstrapData: IdvBootstrapData = {

@@ -1,12 +1,14 @@
 import { FootprintAppearance } from '@onefootprint/footprint-js';
 
 import { CollectedDataOption } from './collected-data-option';
+import { CountryCode } from './countries';
 
 export enum OnboardingConfigStatus {
   enabled = 'enabled',
   disabled = 'disabled',
 }
 
+// Used in the IDV context
 export type PublicOnboardingConfig = {
   name: string;
   key: string;
@@ -22,8 +24,11 @@ export type PublicOnboardingConfig = {
   isNoPhoneFlow: boolean;
   requiresIdDoc: boolean;
   isKyb: boolean;
+  allowInternationalResidents: boolean;
+  internationalCountryRestrictions?: CountryCode[];
 };
 
+// Used in the dashboard context
 export type OnboardingConfig = {
   id: string;
   name: string;
@@ -42,5 +47,7 @@ export type OnboardingConfig = {
   optionalData: CollectedDataOption[];
   isAppClipEnabled: boolean;
   isNoPhoneFlow: boolean;
+  allowInternationalResidents: boolean;
+  internationalCountryRestrictions?: CountryCode[];
   isDocFirstFlow: boolean;
 };

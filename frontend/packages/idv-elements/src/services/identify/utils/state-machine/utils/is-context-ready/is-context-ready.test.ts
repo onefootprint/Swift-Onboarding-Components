@@ -20,6 +20,7 @@ describe('isContextReady', () => {
     requiresIdDoc: false,
     key: 'key',
     isKyb: false,
+    allowInternationalResidents: false,
   };
 
   describe('when init context info is complete', () => {

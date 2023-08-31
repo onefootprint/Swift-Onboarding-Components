@@ -22,6 +22,7 @@ describe('handoff state machine', () => {
     requiresIdDoc: false,
     key: 'key',
     isKyb: false,
+    allowInternationalResidents: false,
   };
 
   it('stays in init until all required info is collected', () => {

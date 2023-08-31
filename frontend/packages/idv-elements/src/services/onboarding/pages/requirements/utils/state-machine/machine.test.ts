@@ -62,6 +62,7 @@ describe('Onboarding Requirements Machine Tests', () => {
     requiresIdDoc: false,
     key: 'key',
     isKyb: false,
+    allowInternationalResidents: false,
   };
 
   describe('with an existing user', () => {

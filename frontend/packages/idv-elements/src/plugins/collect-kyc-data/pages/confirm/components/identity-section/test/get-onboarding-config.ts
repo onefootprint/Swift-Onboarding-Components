@@ -15,6 +15,7 @@ const getOnboardingConfig = (): PublicOnboardingConfig => ({
   requiresIdDoc: false,
   key: 'key',
   isKyb: false,
+  allowInternationalResidents: false,
 });
 
 export default getOnboardingConfig;

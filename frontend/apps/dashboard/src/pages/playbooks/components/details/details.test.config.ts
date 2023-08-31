@@ -24,6 +24,7 @@ export const playbookDetailsFixture: OnboardingConfig = {
   optionalData: [],
   isAppClipEnabled: false,
   isNoPhoneFlow: false,
+  allowInternationalResidents: false,
   isDocFirstFlow: false,
 };
 

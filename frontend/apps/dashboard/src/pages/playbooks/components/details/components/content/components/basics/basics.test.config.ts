@@ -22,6 +22,7 @@ const playbookFixture: OnboardingConfig = {
   optionalData: [],
   canAccessData: [],
   isAppClipEnabled: false,
+  allowInternationalResidents: false,
   isDocFirstFlow: false,
 };
 

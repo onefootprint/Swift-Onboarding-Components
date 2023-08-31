@@ -80,6 +80,7 @@ describe.skip('<CollectKybData />', () => {
     requiresIdDoc: false,
     key: 'key',
     isKyb: false,
+    allowInternationalResidents: false,
   };
 
   const getContext = (

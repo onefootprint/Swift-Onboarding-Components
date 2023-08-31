@@ -55,6 +55,7 @@ export const getOnboardingConfig = (isLive?: boolean, noPhone?: boolean) => ({
   is_no_phone_flow: !!noPhone,
   requires_id_doc: false,
   is_kyb: false,
+  allow_international_residents: false,
 });
 
 export const liveOnboardingConfigFixture = getOnboardingConfig(true);

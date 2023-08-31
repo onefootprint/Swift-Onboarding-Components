@@ -33,6 +33,7 @@ export const onboardingConfigFixture = {
   is_no_phone_flow: false,
   requires_id_doc: false,
   is_kyb: false,
+  allow_international_residents: false,
 };
 
 export const withOnboardingConfig = (data = onboardingConfigFixture) =>
