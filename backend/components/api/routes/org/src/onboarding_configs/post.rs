@@ -271,7 +271,9 @@ pub async fn post(
 
     // Hard coded for now until we expose in playbooks. TODO: could maybe have "tenant defaults" expressed in our code where we could map tenants to default invariants for them
     // like Coba should always have skip_kyc=true. Probably better than doing this purely via PG or via feature flags
-    let skip_kyc = false;
+    let skip_kyc = state
+        .feature_flag_client
+        .flag(BoolFlag::TenantCanMakeDocFirstObc(&tenant_id));
 
     let actor = auth.actor().into();
     let obc = state

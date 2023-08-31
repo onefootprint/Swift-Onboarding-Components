@@ -47,6 +47,8 @@ pub enum BoolFlag<'a> {
     TenantCanMakeNoPhoneObc(&'a TenantId),
     #[strum(to_string = "TenantCanMakeDocFirstObc")]
     TenantCanMakeDocFirstObc(&'a TenantId),
+    #[strum(to_string = "IsSkipKycTenant")]
+    IsSkipKycTenant(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -78,6 +80,7 @@ impl<'a> BoolFlag<'a> {
             Self::OmitEmailVerification(k) => Some(k.to_string()),
             Self::TenantCanMakeNoPhoneObc(k) => Some(k.to_string()),
             Self::TenantCanMakeDocFirstObc(k) => Some(k.to_string()),
+            Self::IsSkipKycTenant(k) => Some(k.to_string()),
         }
     }
 
@@ -105,6 +108,7 @@ impl<'a> BoolFlag<'a> {
             Self::OmitEmailVerification(_) => false,
             Self::TenantCanMakeNoPhoneObc(_) => false,
             Self::TenantCanMakeDocFirstObc(_) => false,
+            Self::IsSkipKycTenant(_) => false,
         }
     }
 }
