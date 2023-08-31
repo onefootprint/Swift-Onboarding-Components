@@ -19,6 +19,11 @@ export type UIStates = {
   neutral: string;
   success: string;
   warning: string;
+  successInverted: string;
+  warningInverted: string;
+  errorInverted: string;
+  infoInverted: string;
+  neutralInverted: string;
 };
 
 export type FontFamilies = {

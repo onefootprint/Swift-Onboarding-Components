@@ -51,6 +51,11 @@ const theme: Theme = {
     success: backgroundColor.success,
     warning: backgroundColor.warning,
     neutral: backgroundColor.neutral,
+    successInverted: backgroundColor.successInverted,
+    warningInverted: backgroundColor.warningInverted,
+    errorInverted: backgroundColor.errorInverted,
+    infoInverted: backgroundColor.infoInverted,
+    neutralInverted: backgroundColor.neutralInverted,
   },
   borderColor: {
     transparent: borderColor.transparent,
@@ -78,6 +83,11 @@ const theme: Theme = {
     success: textColor.success,
     warning: textColor.warning,
     neutral: textColor.neutral,
+    successInverted: textColor.successInverted,
+    warningInverted: textColor.warningInverted,
+    errorInverted: textColor.errorInverted,
+    infoInverted: textColor.infoInverted,
+    neutralInverted: textColor.neutralInverted,
   },
   // TODO: Remove
   // https://linear.app/footprint/issue/FP-1728/bifrost-customization-remove-overlay-from-theme

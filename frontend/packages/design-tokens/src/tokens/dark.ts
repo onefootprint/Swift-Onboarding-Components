@@ -15,6 +15,11 @@ export const backgroundColor = {
   warning: `${c.Yellow900}`,
   neutral: `${c.Gray800}`,
   active: `${c.Gray700}`,
+  infoInverted: `${c.Blue100}`,
+  successInverted: `${c.Green200}`,
+  warningInverted: `${c.Yellow200}`,
+  neutralInverted: `${c.Gray200}`,
+  errorInverted: `${c.Red200}`,
   transparent: 'transparent',
 };
 
@@ -62,6 +67,11 @@ export const textColor = {
   warning: `${c.Yellow100}`,
   warningHover: `${c.Yellow200}`,
   neutral: `${c.Gray50}`,
+  successInverted: `${c.Green700}`,
+  warningInverted: `${c.Yellow800}`,
+  errorInverted: `${c.Red700}`,
+  infoInverted: `${c.Blue700}`,
+  neutralInverted: `${c.Gray800}`,
 };
 
 export const surfaceColor = {
