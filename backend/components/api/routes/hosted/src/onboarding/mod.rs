@@ -75,19 +75,24 @@ impl GetRequirementsArgs {
     }
 }
 
+/// Wrapper type around DecryptUncheckedResult that is guaranteed to have all the IDKs we need for
+/// requirement checking
+#[derive(derive_more::Deref)]
+pub struct DecryptUncheckedResultForReqs(#[deref] DecryptUncheckedResult);
+
 impl GetRequirementsArgs {
     /// Fetch various values from the vault that may conditionally affect requirements
     pub async fn get_decrypted_values(
         state: &State,
         uvw: &VaultWrapper<Person>,
-    ) -> ApiResult<DecryptUncheckedResult> {
+    ) -> ApiResult<DecryptUncheckedResultForReqs> {
         let values = vec![
             IPK::Declarations.into(),
             IDK::UsLegalStatus.into(),
             IDK::Country.into(),
         ];
         let decrypted_values = uvw.decrypt_unchecked(&state.enclave_client, &values).await?;
-        Ok(decrypted_values)
+        Ok(DecryptUncheckedResultForReqs(decrypted_values))
     }
 }
 
@@ -127,11 +132,61 @@ struct RequirementProgress {
     missing_attributes: Vec<CollectedDataOption>,
 }
 
+/// Returns if the provided CDO is met by the data in the VW. Some CDOs have conditional
+/// requirements that are a function of data in the vault - you must pass in the pre-decrypted
+/// values as well
+fn is_cdo_met<Type>(
+    vw: &VaultWrapper<Type>,
+    cdo: &CollectedDataOption,
+    decrypted_values: &DecryptUncheckedResultForReqs,
+) -> bool {
+    let mut required_dis = cdo.required_data_identifiers();
+    // Also check if optional DIs (based on selected values) are met
+    match cdo {
+        CollectedDataOption::UsLegalStatus => {
+            let legal_status = decrypted_values
+                .get(&IDK::UsLegalStatus.into())
+                .and_then(|a| a.parse_into::<UsLegalStatus>().ok());
+            match legal_status {
+                Some(UsLegalStatus::Citizen) => (),
+                Some(UsLegalStatus::PermanentResident) => {
+                    required_dis.extend([IDK::Nationality.into(), IDK::Citizenships.into()].into_iter());
+                }
+                Some(UsLegalStatus::Visa) => {
+                    let addl_dis = [
+                        IDK::Nationality.into(),
+                        IDK::Citizenships.into(),
+                        IDK::VisaKind.into(),
+                        IDK::VisaExpirationDate.into(),
+                    ];
+                    required_dis.extend(addl_dis.into_iter());
+                }
+                None => (),
+            }
+        }
+        CollectedDataOption::FullAddress => {
+            let country = decrypted_values
+                .get(&IDK::Country.into())
+                .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
+            if country == Some(Iso3166TwoDigitCountryCode::US) {
+                // US addresses always require City, State, and Zip
+                let addl_dis = [IDK::City.into(), IDK::State.into(), IDK::Zip.into()];
+                required_dis.extend(addl_dis.into_iter());
+            }
+            // Non-US addresses will have the full address in AddressLine1 and as many other
+            // fields extracted as possible
+        }
+        _ => (),
+    }
+
+    required_dis.into_iter().all(|di| vw.has_field(di))
+}
+
 fn get_progress<Type>(
     vw: &VaultWrapper<Type>,
     ob_config: &ObConfiguration,
     di_kind: DID,
-    decrypted_values: &DecryptUncheckedResult,
+    decrypted_values: &DecryptUncheckedResultForReqs,
 ) -> RequirementProgress {
     let mut populated_attributes = Vec::new();
     let mut missing_attributes = Vec::new();
@@ -143,34 +198,7 @@ fn get_progress<Type>(
         .chain(ob_config.optional_data.iter().map(|cdo| (cdo, false)))
         .filter(|(cdo, _)| cdo.parent().data_identifier_kind() == di_kind)
         .for_each(|(cdo, must_collect)| {
-            let mut required_dis = cdo.required_data_identifiers();
-            // Also check if optional DIs (based on selected values) are met
-            if cdo == &CollectedDataOption::UsLegalStatus {
-                if let Ok(legal_status) = decrypted_values.get_di(IDK::UsLegalStatus) {
-                    match legal_status.parse_into::<UsLegalStatus>() {
-                        Ok(UsLegalStatus::Citizen) => (),
-                        Ok(UsLegalStatus::PermanentResident) => {
-                            required_dis
-                                .extend([IDK::Nationality.into(), IDK::Citizenships.into()].into_iter());
-                        }
-                        Ok(UsLegalStatus::Visa) => {
-                            let addl_dis = [
-                                IDK::Nationality.into(),
-                                IDK::Citizenships.into(),
-                                IDK::VisaKind.into(),
-                                IDK::VisaExpirationDate.into(),
-                            ];
-                            required_dis.extend(addl_dis.into_iter());
-                        }
-                        Err(e) => {
-                            tracing::error!(e=%e, "Couldn't parse UsLegalStatus in requirement fetching")
-                        }
-                    }
-                }
-            }
-
-            let has_all_dis = required_dis.into_iter().all(|di| vw.has_field(di));
-
+            let has_all_dis = is_cdo_met(vw, cdo, decrypted_values);
             if has_all_dis {
                 populated_attributes.push(cdo.clone());
             } else if must_collect {
@@ -189,7 +217,7 @@ pub fn get_requirements_inner(
     conn: &mut PgConn,
     uvw: VaultWrapper<Person>,
     args: GetRequirementsArgs,
-    decrypted_values: DecryptUncheckedResult,
+    decrypted_values: DecryptUncheckedResultForReqs,
     ff_client: Arc<dyn FeatureFlagClient>,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     let only_us_dl = ff_client.flag(BoolFlag::RestrictToUsDriversLicense(&args.ob_config.tenant_id));
@@ -219,7 +247,7 @@ fn get_requirement_inner(
     conn: &mut PgConn,
     uvw: &VaultWrapper<Person>,
     args: &GetRequirementsArgs,
-    decrypted_values: &DecryptUncheckedResult,
+    decrypted_values: &DecryptUncheckedResultForReqs,
     only_us_dl: bool,
 ) -> ApiResult<Option<OnboardingRequirement>> {
     let ob_config = &args.ob_config;

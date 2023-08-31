@@ -231,14 +231,9 @@ impl CollectedDataOption {
             Self::Dob => vec![IDK::Dob.into()],
             Self::Ssn9 => vec![IDK::Ssn9.into(), IDK::Ssn4.into()],
             Self::Ssn4 => vec![IDK::Ssn4.into()],
-            Self::FullAddress => vec![
-                IDK::AddressLine1.into(),
-                IDK::City.into(),
-                IDK::State.into(),
-                IDK::Zip.into(),
-                IDK::Country.into(),
-            ],
             Self::PartialAddress => vec![IDK::Zip.into(), IDK::Country.into()],
+            // We'll optionally add City, State, and Zip to US addresses
+            Self::FullAddress => vec![IDK::AddressLine1.into(), IDK::Country.into()],
             Self::Email => vec![IDK::Email.into()],
             Self::PhoneNumber => vec![IDK::PhoneNumber.into()],
             Self::BusinessName => vec![BDK::Name.into()],

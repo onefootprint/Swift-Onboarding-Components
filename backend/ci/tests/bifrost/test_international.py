@@ -1,5 +1,34 @@
 from tests.bifrost_client import BifrostClient
-from tests.utils import get_requirement_from_requirements, create_ob_config
+from tests.utils import get_requirement_from_requirements, create_ob_config, patch
+
+
+def test_international_address_req(sandbox_tenant, must_collect_data, twilio):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "International config",
+        must_collect_data,
+        must_collect_data,
+        allow_international_residents=True,
+    )
+    bifrost = BifrostClient.new(obc, twilio)
+
+    # Add address line 1 and country, which is sufficient ONLY if the country is non-US
+    data = {"id.address_line1": "730 Hayes St", "id.country": "US"}
+    patch("/hosted/user/vault", data, bifrost.auth_token)
+
+    # We should still be required to collect address
+    status = bifrost.get_status()
+    req = get_requirement_from_requirements("collect_data", status["requirements"])
+    assert "full_address" in req["missing_attributes"]
+
+    # Then add international address
+    data = {"id.address_line1": "730 Hayes St", "id.country": "MX"}
+    patch("/hosted/user/vault", data, bifrost.auth_token)
+
+    # Address CDO shuold be met
+    status = bifrost.get_status()
+    req = get_requirement_from_requirements("collect_data", status["requirements"])
+    assert "full_address" not in req["missing_attributes"]
 
 
 def test_user_without_documents_international(
