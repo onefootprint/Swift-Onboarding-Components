@@ -75,6 +75,9 @@
       "doc-selection": {
         "title": "We need a photo of your ID",
         "subtitle": "Select the option that works best for you",
+        "country-select": {
+          "hint": "Only documents issued by {{country}} are accepted"
+        },
         "options": {
           "dl": {
             "title": "Driver's license",

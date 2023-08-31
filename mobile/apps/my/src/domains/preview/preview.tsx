@@ -48,7 +48,7 @@ const Preview = ({ isDemo }: PreviewProps) => {
             kind: OnboardingRequirementKind.idDoc,
             shouldCollectSelfie: true,
             shouldCollectConsent: false,
-            onlyUsSupported: false,
+            supportedCountries: ['US'],
             supportedDocumentTypes: [
               SupportedIdDocTypes.driversLicense,
               SupportedIdDocTypes.idCard,

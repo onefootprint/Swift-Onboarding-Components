@@ -51,15 +51,19 @@ const DocSelection = ({
 }: DocSelectionProps) => {
   const { t } = useTranslation('components.scan.doc-selection');
   const app = useApp();
-  const { onlyUsSupported, supportedDocumentTypes } = requirement;
+  const { supportedCountries, supportedDocumentTypes } = requirement;
   const [country, setCountry] = useState<CountryRecord>(defaultCountry);
   const docTypeOptions = useDocumentOptions(supportedDocumentTypes, country);
-  const countryOptions = useCountryOptions(onlyUsSupported);
+  const countryOptions = useCountryOptions(supportedCountries);
   const [docType, setDocType] = useState<SupportedIdDocTypes>(
     defaultType || docTypeOptions[0].value,
   );
   const docTypeMutation = useSubmitDocType();
   const isEndOfScroll = useSharedValue(false);
+  const onlyOneCountrySupported = supportedCountries.length === 1;
+  const countrySelectHint =
+    onlyOneCountrySupported &&
+    t('country-select.hint', { country: country.label });
 
   const handleScroll = (event: NativeScrollEvent, isEnd: boolean) => {
     isEndOfScroll.value = isEnd;
@@ -102,7 +106,8 @@ const DocSelection = ({
         <Box justifyContent="space-between" flex={1}>
           <Box>
             <CountrySelect
-              disabled={!!onlyUsSupported}
+              disabled={onlyOneCountrySupported}
+              hint={countrySelectHint}
               onChange={handleCountryChange}
               options={countryOptions}
               value={country}

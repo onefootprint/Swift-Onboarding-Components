@@ -34,7 +34,7 @@ const HintContainer = styled.Text<{ hasError: boolean; size: HintSize }>`
       font: ${size === 'compact'
         ? hint.size.compact.typography
         : hint.size.default.typography};
-      color: ${hasError ? hint.states.error.color : hint.states.error.color};
+      color: ${hasError ? hint.states.error.color : hint.states.default.color};
     `;
   }}
 `;

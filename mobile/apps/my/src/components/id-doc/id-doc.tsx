@@ -19,7 +19,7 @@ export type IdDocProps = {
 };
 
 const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
-  const [state, send] = useMachine(() => createMachine({ requirement }));
+  const [state, send] = useMachine(() => createMachine(requirement));
   const { currentSide, collectingDocumentMeta } = state.context;
   const country = getCountryFromCode(
     collectingDocumentMeta?.countryCode ?? DEFAULT_COUNTRY.value,

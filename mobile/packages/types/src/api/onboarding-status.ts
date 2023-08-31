@@ -1,3 +1,4 @@
+import { CountryCode } from '../data';
 import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
@@ -38,8 +39,8 @@ export type IdDocRequirement = {
   isMet: boolean;
   shouldCollectSelfie: boolean;
   shouldCollectConsent: boolean;
-  onlyUsSupported: boolean;
   supportedDocumentTypes: SupportedIdDocTypes[];
+  supportedCountries: CountryCode[];
 };
 
 export type LivenessRequirement = {

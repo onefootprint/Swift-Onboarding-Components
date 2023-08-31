@@ -37,7 +37,6 @@ const App = ({ linkingUrl, onLoad }: AppProps) => {
   }
   if (authToken && handoffMetaQuery.isFetched) {
     const theme = createTheme(themes.light, handoffMetaQuery.data?.styleParams);
-
     return (
       <AppContext.Provider value={appContextValue}>
         <DesignSystemProvider theme={theme}>
