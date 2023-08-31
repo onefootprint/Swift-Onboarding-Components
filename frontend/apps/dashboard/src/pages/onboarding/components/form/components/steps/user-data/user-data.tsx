@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Button, Grid, Portal, TextInput } from '@onefootprint/ui';
+import { Box, Button, Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useUserSession from 'src/hooks/use-user-session';
@@ -8,7 +8,7 @@ import useUserSession from 'src/hooks/use-user-session';
 import Header from '../header';
 
 export type UserDataProps = {
-  id: string;
+  onBack: () => void;
   onComplete: () => void;
 };
 
@@ -17,7 +17,7 @@ type FormData = {
   lastName: string;
 };
 
-const UserData = ({ id, onComplete }: UserDataProps) => {
+const UserData = ({ onBack, onComplete }: UserDataProps) => {
   const { data, dangerouslyCastedData, mutation } = useUserSession();
   const { t, allT } = useTranslation('pages.onboarding.user-data');
   const {
@@ -32,15 +32,13 @@ const UserData = ({ id, onComplete }: UserDataProps) => {
   });
 
   const handleSubmit = (formData: FormData) => {
-    mutation.mutate(formData, {
-      onSuccess: onComplete,
-    });
+    mutation.mutate(formData, { onSuccess: onComplete });
   };
 
   return (
-    <Container>
+    <Box>
       <Header title={t('title')} subtitle={t('subtitle')} />
-      <Form id={id} onSubmit={handleFormSubmit(handleSubmit)}>
+      <Form onSubmit={handleFormSubmit(handleSubmit)}>
         <TextInput
           disabled
           label={t('form.email.label')}
@@ -87,32 +85,37 @@ const UserData = ({ id, onComplete }: UserDataProps) => {
             />
           </Grid.Column>
         </Grid.Row>
-        <Portal selector="#onboarding-cta-portal">
+        <ButtonContainer>
           <Button
-            form={id}
-            loading={mutation.isLoading}
+            disabled={mutation.isLoading}
+            onClick={onBack}
             size="compact"
-            type="submit"
+            variant="secondary"
           >
+            {allT('back')}
+          </Button>
+          <Button loading={mutation.isLoading} size="compact" type="submit">
             {allT('next')}
           </Button>
-        </Portal>
+        </ButtonContainer>
       </Form>
-    </Container>
+    </Box>
   );
 };
-
-const Container = styled.header`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[8]} ${theme.spacing[7]} ${theme.spacing[7]};
-  `}
-`;
 
 const Form = styled.form`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[7]};
+  `}
+`;
+
+const ButtonContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    margin-top: ${theme.spacing[3]};
   `}
 `;
 

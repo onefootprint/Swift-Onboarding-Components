@@ -17,27 +17,19 @@ import {
 } from './invite.test.config';
 
 describe('<Invite />', () => {
-  const renderInvite = ({
-    id = 'invite-form',
-    onComplete = jest.fn(),
-  }: Partial<InviteProps>) =>
-    customRender(
-      <>
-        <div id="onboarding-cta-portal" />
-        <Invite id={id} onComplete={onComplete} />
-      </>,
-    );
+  const renderInvite = ({ onComplete = jest.fn() }: Partial<InviteProps>) =>
+    customRender(<Invite onComplete={onComplete} onBack={() => {}} />);
 
   const renderInviteAndWaitData = async ({
-    id = 'invite-form',
+    onBack = jest.fn(),
     onComplete = jest.fn(),
   }: Partial<InviteProps>) => {
-    renderInvite({ id, onComplete });
+    renderInvite({ onComplete, onBack });
     await waitFor(() => {
       screen.getByTestId('onboarding-invite-content');
     });
     await waitFor(() => {
-      screen.getByRole('button', { name: 'Complete' });
+      screen.getByRole('button', { name: 'Go to dashboard' });
     });
   };
 
@@ -126,7 +118,9 @@ describe('<Invite />', () => {
           const emailField = screen.getByLabelText('Email address');
           await userEvent.type(emailField, 'jane.doe@acme.com');
 
-          const submitButton = screen.getByRole('button', { name: 'Complete' });
+          const submitButton = screen.getByRole('button', {
+            name: 'Go to dashboard',
+          });
           await userEvent.click(submitButton);
           await waitFor(() => {
             expect(onComplete).toHaveBeenCalled();
@@ -145,7 +139,9 @@ describe('<Invite />', () => {
           const emailField = screen.getByLabelText('Email address');
           await userEvent.type(emailField, 'jane.doe@acme.com');
 
-          const submitButton = screen.getByRole('button', { name: 'Complete' });
+          const submitButton = screen.getByRole('button', {
+            name: 'Go to dashboard',
+          });
           await userEvent.click(submitButton);
 
           const error = await screen.findByText('Something went wrong');

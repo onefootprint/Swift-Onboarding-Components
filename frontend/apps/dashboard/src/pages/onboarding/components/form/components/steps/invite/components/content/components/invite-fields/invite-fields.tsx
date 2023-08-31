@@ -17,6 +17,7 @@ const InviteFields = ({ index, roles }: InviteFieldsProps) => {
     <Grid.Row>
       <Grid.Column col={8}>
         <TextInput
+          autoFocus
           type="email"
           label={shouldShowLabel ? t('form.email.label') : undefined}
           placeholder={t('form.email.placeholder')}

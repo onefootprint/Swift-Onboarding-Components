@@ -180,6 +180,7 @@ const StepperContainer = styled.div`
     @media (max-width: 960px) {
       display: none;
     }
+
     @media (min-width: 960px) {
       margin-left: ${theme.spacing[10]};
       position: fixed;
@@ -189,11 +190,13 @@ const StepperContainer = styled.div`
 
 const Content = styled.div`
   grid-area: content;
+
   @media (max-width: 960px) {
     display: flex;
     justify-content: center;
     align-items: center;
   }
+
   @media (min-width: 960px) and (max-width: 1100px) {
     margin-left: 220px;
     width: 100%;
@@ -201,6 +204,7 @@ const Content = styled.div`
     justify-content: center;
     align-items: center;
   }
+
   @media (min-width: 1100px) {
     display: flex;
     justify-content: center;
@@ -214,11 +218,13 @@ const Container = styled.div`
     flex-direction: row;
     justify-content: center;
   }
+
   @media (min-width: 960px) and (max-width: 1100px) {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
   }
+
   @media (min-width: 1100px) {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

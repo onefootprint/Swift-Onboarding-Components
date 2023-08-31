@@ -20,8 +20,7 @@ const Header = ({ title, subtitle }: HeaderProps) => (
 
 const Container = styled.header`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]};
-    text-align: center;
+    margin-bottom: ${theme.spacing[8]};
   `}
 `;
 

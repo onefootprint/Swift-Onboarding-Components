@@ -1,10 +1,8 @@
-import { primitives } from '@onefootprint/design-tokens';
+import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { motion } from 'framer-motion';
-import { useTheme } from 'next-themes';
+import { media, Stepper, StepperOption } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import ProgressBar from './components/progress-bar';
 import CompanyData from './components/steps/company-data';
 import Invite from './components/steps/invite';
 import UserData from './components/steps/user-data';
@@ -14,101 +12,86 @@ export type FormProps = {
   onComplete: () => void;
 };
 
-const steps = [
-  { id: 'welcome-form', Step: Welcome },
-  { id: 'user-data-form', Step: UserData },
-  { id: 'onboarding-company-data-content', Step: CompanyData },
-  { id: 'invite-form', Step: Invite },
-];
-
 const Form = ({ onComplete }: FormProps) => {
-  const [step, setStep] = useState(0);
-  const stepsCount = steps.length;
-  const maxStep = stepsCount - 1;
-  const { Step, id } = steps[step];
-  const isDarkTheme = useTheme().theme === 'dark';
+  const { t } = useTranslation('pages.onboarding');
+  const options = [
+    { value: 'welcome', label: t('welcome.nav') },
+    { value: 'user', label: t('user-data.nav') },
+    { value: 'company', label: t('company-data.nav') },
+    { value: 'invite', label: t('invite.nav') },
+  ];
+  const [stepIndex, setStepIndex] = useState(0);
+  const step = options[stepIndex];
+  const maxStep = options.length - 1;
+
+  const handleChange = (newOption: StepperOption) => {
+    const newStepIndex = options.findIndex(
+      option => option.value === newOption.value,
+    );
+    setStepIndex(newStepIndex);
+  };
 
   const handleComplete = () => {
-    if (step === maxStep) {
+    if (stepIndex === maxStep) {
       onComplete();
     } else {
-      setStep(prevStep => prevStep + 1);
+      setStepIndex(prevStep => prevStep + 1);
     }
   };
 
-  const handlePrev = () => {
-    if (step > 0) {
-      setStep(prevStep => prevStep - 1);
+  const handleBack = () => {
+    if (stepIndex > 0) {
+      setStepIndex(prevStep => prevStep - 1);
     }
   };
 
   return (
-    <Container
-      data-step={id}
-      layout
-      transition={{
-        layout: { duration: 0.1, ease: 'linear' },
-      }}
-      isDarkTheme={isDarkTheme}
-    >
-      <motion.span key={id} initial={{ scale: 1 }} animate={{ scale: 1 }}>
-        <Step id={id} onComplete={handleComplete} />
-      </motion.span>
-      <Controls>
-        <ProgressBar max={stepsCount} onPrev={handlePrev} value={step} />
-        <ButtonsContainer id="onboarding-cta-portal" />
-      </Controls>
+    <Container>
+      <StepperContainer>
+        <Stepper
+          options={options}
+          onChange={handleChange}
+          value={step}
+          aria-label={t('stepper.aria-label')}
+        />
+      </StepperContainer>
+      <Content>
+        {step.value === 'welcome' && <Welcome onComplete={handleComplete} />}
+        {step.value === 'user' && (
+          <UserData onComplete={handleComplete} onBack={handleBack} />
+        )}
+        {step.value === 'company' && (
+          <CompanyData onComplete={handleComplete} onBack={handleBack} />
+        )}
+        {step.value === 'invite' && (
+          <Invite onComplete={handleComplete} onBack={handleBack} />
+        )}
+      </Content>
     </Container>
   );
 };
 
-const Container = styled(motion.div)<{ isDarkTheme: boolean }>`
-  ${({ theme, isDarkTheme }) => css`
-    background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    box-shadow: ${theme.elevation[1]};
-    margin-bottom: ${theme.spacing[6]};
-    overflow: hidden;
-    position: relative;
-    width: 500px;
-
-    &[data-step='welcome-form'] {
-      background-blend-mode: overlay;
-      background: url('/onboarding/noise.svg'),
-        ${isDarkTheme
-          ? `
-            linear-gradient(
-              180deg,
-              ${primitives.Gray825} 0%,
-              transparent 100%
-            );
-            `
-          : `
-            linear-gradient(
-                180deg,
-                ${primitives.Purple100} 0%,
-                transparent 100%
-              );
-          `};
-    }
-  `}
-`;
-
-const Controls = styled.footer`
+const Container = styled.div`
   ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    padding: ${theme.spacing[5]} ${theme.spacing[7]};
+    margin-top: ${theme.spacing[9]};
+
+    ${media.greaterThan('md')`
+      display: grid;
+      grid-template-areas: 'stepper content .';
+      grid-template-columns: 1fr 440px 1fr;
+      margin-top: ${theme.spacing[10]};
+    `}
   `}
 `;
 
-const ButtonsContainer = styled.footer`
-  ${({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacing[7]};
+const StepperContainer = styled.div`
+  display: none;
+
+  ${media.greaterThan('md')`
+    display: block;
   `}
 `;
+
+const Content = styled.div``;
 
 export default Form;

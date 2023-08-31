@@ -18,7 +18,6 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
   const [allowDomainAccess, setAllowDomainAccess] = useState(
     org.allowDomainAccess,
   );
-
   // If the domain is claimed by another tenant, we disable the ability to enable domain access
   const disableTogle = !!org.isDomainAlreadyClaimed && !allowDomainAccess;
 
@@ -87,6 +86,21 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
   );
 };
 
+const Container = styled.div`
+  ${({ theme }) => css`
+    align-items: flex-start;
+    align-self: stretch;
+    background: ${theme.backgroundColor.primary};
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
+    margin-top: ${theme.spacing[5]};
+    padding: ${theme.spacing[5]};
+  `}
+`;
+
 const EnableSubContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -114,21 +128,6 @@ const HeaderContainer = styled.div`
     flex-direction: column;
     align-items: flex-start;
     gap: ${theme.spacing[4]};
-  `}
-`;
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    padding: ${theme.spacing[5]};
-    margin-top: ${theme.spacing[5]};
-    flex-direction: column;
-    align-items: flex-start;
-    gap: ${theme.spacing[5]};
-    align-self: stretch;
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    background: ${theme.backgroundColor.primary};
   `}
 `;
 

@@ -16,7 +16,6 @@ const AddButton = ({ onClick }: AddButtonProps) => {
       iconPosition="left"
       onClick={onClick}
       size="compact"
-      sx={{ marginTop: 5 }}
     >
       {t('add-more')}
     </LinkButton>

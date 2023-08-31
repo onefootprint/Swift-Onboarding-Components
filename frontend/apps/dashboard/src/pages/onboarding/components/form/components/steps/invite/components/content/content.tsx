@@ -1,8 +1,7 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Organization } from '@onefootprint/types';
-import { Box, Button, Portal, SelectOption } from '@onefootprint/ui';
+import { Box, Button, SelectOption } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import DomainAccess from 'src/components/domain-access';
@@ -15,9 +14,9 @@ import useInviteMembers from './hooks/use-invite-members';
 
 export type ContentProps = {
   defaultRole: SelectOption;
-  org: Organization;
-  id: string;
+  onBack: () => void;
   onComplete: () => void;
+  org: Organization;
   roles: SelectOption[];
 };
 
@@ -25,11 +24,16 @@ type FormData = {
   invitations: { email: string; role: SelectOption }[];
 };
 
-const Content = ({ id, onComplete, org, defaultRole, roles }: ContentProps) => {
+const Content = ({
+  defaultRole,
+  onBack,
+  onComplete,
+  org,
+  roles,
+}: ContentProps) => {
   const { t, allT } = useTranslation('pages.onboarding.invite');
   const inviteMembersMutations = useInviteMembers();
   const updateOrgMutation = useUpdateOrg();
-  const [animate] = useAutoAnimate<HTMLFormElement>();
   const methods = useForm({
     defaultValues: {
       invitations: [{ email: '', role: defaultRole }],
@@ -67,27 +71,36 @@ const Content = ({ id, onComplete, org, defaultRole, roles }: ContentProps) => {
   return (
     <Box testID="onboarding-invite-content">
       <FormProvider {...methods}>
-        <Form id={id} onSubmit={handleSubmit(handleAfterSubmit)} ref={animate}>
+        <Form onSubmit={handleSubmit(handleAfterSubmit)}>
           {fields.map((field, index) => (
             <InviteFields index={index} key={field.id} roles={roles} />
           ))}
+          <AddButton onClick={handleAddMore} />
+          {org.domain && <DomainAccess org={org} />}
+          {shouldShowError && <Error>{t('form.errors.invalid')}</Error>}
+          <ButtonContainer>
+            <Button
+              disabled={
+                inviteMembersMutations.isLoading || updateOrgMutation.isLoading
+              }
+              onClick={onBack}
+              size="compact"
+              variant="secondary"
+            >
+              {allT('back')}
+            </Button>
+            <Button
+              loading={
+                inviteMembersMutations.isLoading || updateOrgMutation.isLoading
+              }
+              size="compact"
+              type="submit"
+            >
+              {t('cta')}
+            </Button>
+          </ButtonContainer>
         </Form>
       </FormProvider>
-      <AddButton onClick={handleAddMore} />
-      {org.domain && <DomainAccess org={org} />}
-      {shouldShowError && <Error>{t('form.errors.invalid')}</Error>}
-      <Portal selector="#onboarding-cta-portal">
-        <Button
-          form={id}
-          loading={
-            inviteMembersMutations.isLoading || updateOrgMutation.isLoading
-          }
-          size="compact"
-          type="submit"
-        >
-          {allT('complete')}
-        </Button>
-      </Portal>
     </Box>
   );
 };
@@ -97,6 +110,14 @@ const Form = styled.form`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};
+  `}
+`;
+
+const ButtonContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    margin-top: ${theme.spacing[5]};
   `}
 `;
 

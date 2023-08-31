@@ -1,15 +1,14 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Button, Portal, Typography } from '@onefootprint/ui';
+import { Button, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 
 export type WelcomeProps = {
-  id: string;
   onComplete: () => void;
 };
 
-const Welcome = ({ id, onComplete }: WelcomeProps) => {
+const Welcome = ({ onComplete }: WelcomeProps) => {
   const { t, allT } = useTranslation('pages.onboarding.welcome');
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -18,47 +17,52 @@ const Welcome = ({ id, onComplete }: WelcomeProps) => {
   };
 
   return (
-    <Container>
-      <form id={id} onSubmit={handleSubmit}>
-        <ImageContainer>
-          <StyledImage
-            alt={t('img-alt')}
-            height={201}
-            priority
-            src="/onboarding/penguin.png"
-            width={150}
-          />
-        </ImageContainer>
+    <Form onSubmit={handleSubmit}>
+      <StyledImage
+        alt={t('img-alt')}
+        height={178}
+        priority
+        src="/onboarding/penguin.png"
+        width={137}
+      />
+      <TitleContainer>
         <Typography variant="heading-3">{t('title')}</Typography>
-        <Typography color="secondary" variant="body-1">
-          {t('subtitle')}
-        </Typography>
-        <Portal selector="#onboarding-cta-portal" removeContent>
-          <Button form={id} size="compact" type="submit">
-            {allT('next')}
-          </Button>
-        </Portal>
-      </form>
-    </Container>
+      </TitleContainer>
+      <Typography color="secondary" variant="body-2">
+        {t('subtitle')}
+      </Typography>
+      <ButtonContainer>
+        <Button size="compact" type="submit" fullWidth>
+          {allT('next')}
+        </Button>
+      </ButtonContainer>
+    </Form>
   );
 };
 
-const Container = styled.div`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[9]} ${theme.spacing[7]};
-    position: relative;
-  `}
-`;
+const Form = styled.form`
+  text-align: center;
 
-const ImageContainer = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: center;
+  ${media.greaterThan('md')`
+    text-align: left;
+  `}
 `;
 
 const StyledImage = styled(Image)`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[9]};
+  `}
+`;
+
+const TitleContainer = styled.div`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.spacing[3]};
+  `}
+`;
+
+const ButtonContainer = styled.div`
+  ${({ theme }) => css`
+    margin-top: ${theme.spacing[7]};
   `}
 `;
 

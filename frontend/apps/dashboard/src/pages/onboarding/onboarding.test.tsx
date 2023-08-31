@@ -97,18 +97,13 @@ describe('<Onboarding />', () => {
       // 4th step
       // Invite members
       await waitFor(() => {
-        screen.getByText('Invite teammates');
         screen.getByTestId('onboarding-invite-content');
-        screen.getByRole('button', { name: 'Complete' });
+        screen.getByRole('button', { name: 'Go to dashboard' });
       });
 
-      const inviteStep = screen.getByText('Invite teammates');
-      expect(inviteStep).toBeInTheDocument();
-
-      const emailField = screen.getByLabelText('Email address');
-      await userEvent.type(emailField, 'jane.doe@acme.com');
-
-      await userEvent.click(screen.getByRole('button', { name: 'Complete' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Go to dashboard' }),
+      );
       await waitFor(() => {
         expect(push).toHaveBeenCalled();
       });

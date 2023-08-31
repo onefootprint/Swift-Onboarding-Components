@@ -1,2 +1,2 @@
-export type { StepperProps } from './stepper';
+export type { StepperOption, StepperProps } from './stepper';
 export { default } from './stepper';

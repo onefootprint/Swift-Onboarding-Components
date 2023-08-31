@@ -16,24 +16,19 @@ import {
   withUpdateOrgError,
 } from './company-data.test.config';
 
-describe.skip('<CompanyData />', () => {
+describe('<CompanyData />', () => {
   const renderCompanyData = ({
-    id = 'company-form',
+    onBack = jest.fn(),
     onComplete = jest.fn(),
   }: Partial<CompanyDataProps>) => {
-    customRender(
-      <>
-        <div id="onboarding-cta-portal" />
-        <CompanyData id={id} onComplete={onComplete} />
-      </>,
-    );
+    customRender(<CompanyData onComplete={onComplete} onBack={onBack} />);
   };
 
   const renderCompanyDataAndWaitData = async ({
-    id = 'company-form',
+    onBack = jest.fn(),
     onComplete = jest.fn(),
   }: Partial<CompanyDataProps>) => {
-    renderCompanyData({ id, onComplete });
+    renderCompanyData({ onComplete, onBack });
     await waitFor(() => {
       screen.getByTestId('onboarding-company-data-content');
       screen.getByRole('button', { name: 'Next' });
@@ -53,19 +48,6 @@ describe.skip('<CompanyData />', () => {
     });
   });
 
-  describe('when the request to fetch the org succeeds', () => {
-    beforeEach(() => {
-      withOrg();
-    });
-
-    it('should show the form with the name pre-filled', async () => {
-      await renderCompanyDataAndWaitData({});
-
-      const nameField = screen.getByLabelText('Company name');
-      expect(nameField).toHaveValue(orgFixture.name);
-    });
-  });
-
   describe('when the request to fetch the org fails', () => {
     beforeEach(() => {
       withOrgError();
@@ -79,93 +61,114 @@ describe.skip('<CompanyData />', () => {
     });
   });
 
-  describe('when submitting the form', () => {
+  describe('when the request to fetch the org succeeds', () => {
     beforeEach(() => {
       withOrg();
     });
 
-    describe('when the company name is empty', () => {
-      it('should an error message', async () => {
-        await renderCompanyDataAndWaitData({});
+    it('should show the form with the name pre-filled', async () => {
+      await renderCompanyDataAndWaitData({});
 
-        const nameField = screen.getByLabelText('Company name');
-        await userEvent.clear(nameField);
-
-        const submitButton = screen.getByRole('button', { name: 'Next' });
-        await userEvent.click(submitButton);
-
-        const error = await screen.findByText('Please enter a name');
-        expect(error).toBeInTheDocument();
-      });
+      const nameField = screen.getByLabelText('Company name');
+      expect(nameField).toHaveValue(orgFixture.name);
     });
 
-    describe('when the website url is empty', () => {
-      it('should an error message', async () => {
-        await renderCompanyDataAndWaitData({});
+    describe('when submitting the form', () => {
+      describe('when the company name is empty', () => {
+        it('should an error message', async () => {
+          await renderCompanyDataAndWaitData({});
 
-        const submitButton = screen.getByRole('button', { name: 'Next' });
-        await userEvent.click(submitButton);
+          const nameField = screen.getByLabelText('Company name');
+          await userEvent.clear(nameField);
 
-        const error = await screen.findByText('Please enter a website');
-        expect(error).toBeInTheDocument();
-      });
-    });
+          const submitButton = screen.getByRole('button', { name: 'Next' });
+          await userEvent.click(submitButton);
 
-    describe('when the request to update the org fails', () => {
-      beforeEach(() => {
-        withUpdateOrgError();
-      });
-
-      it('should show an error message', async () => {
-        await renderCompanyDataAndWaitData({});
-
-        const nameField = screen.getByLabelText('Company name');
-        await userEvent.clear(nameField);
-        await userEvent.type(nameField, 'Acme Corp');
-
-        const websiteField = screen.getByLabelText('Company website');
-        await userEvent.type(websiteField, 'https://acme.com');
-
-        const sizeField = screen.getByRole('button', { name: 'Select' });
-        await selectEvents.select(sizeField, '1-10');
-
-        const submitButton = screen.getByRole('button', { name: 'Next' });
-        await userEvent.click(submitButton);
-
-        const error = await screen.findByText('Something went wrong');
-        expect(error).toBeInTheDocument();
-      });
-    });
-
-    describe('when the request to update the org succeeds', () => {
-      beforeEach(() => {
-        withUpdateOrg({
-          ...orgFixture,
-          name: 'Acme Corp',
-          websiteUrl: 'https://acme.com',
+          const error = await screen.findByText('Please enter a name');
+          expect(error).toBeInTheDocument();
         });
       });
 
-      it('should update the org and trigger onComplete', async () => {
-        const onComplete = jest.fn();
-        await renderCompanyDataAndWaitData({ onComplete });
+      describe('when the website url is empty', () => {
+        it('should an error message', async () => {
+          await renderCompanyDataAndWaitData({});
 
-        const nameField = screen.getByLabelText('Company name');
-        await userEvent.clear(nameField);
-        await userEvent.type(nameField, 'Acme Corp');
+          const submitButton = screen.getByRole('button', { name: 'Next' });
+          await userEvent.click(submitButton);
 
-        const websiteField = screen.getByLabelText('Company website');
-        await userEvent.type(websiteField, 'https://acme.com');
-
-        const sizeField = screen.getByRole('button', { name: 'Select' });
-        await selectEvents.select(sizeField, '1-10');
-
-        const submitButton = screen.getByRole('button', { name: 'Next' });
-        await userEvent.click(submitButton);
-
-        await waitFor(() => {
-          expect(onComplete).toHaveBeenCalled();
+          const error = await screen.findByText('Please enter a website');
+          expect(error).toBeInTheDocument();
         });
+      });
+
+      describe('when the request to update the org fails', () => {
+        beforeEach(() => {
+          withUpdateOrgError();
+        });
+
+        it('should show an error message', async () => {
+          await renderCompanyDataAndWaitData({});
+
+          const nameField = screen.getByLabelText('Company name');
+          await userEvent.clear(nameField);
+          await userEvent.type(nameField, 'Acme Corp');
+
+          const websiteField = screen.getByLabelText('Company website');
+          await userEvent.type(websiteField, 'https://acme.com');
+
+          const sizeField = screen.getByRole('button', { name: 'Select' });
+          await selectEvents.select(sizeField, '1-10');
+
+          const submitButton = screen.getByRole('button', { name: 'Next' });
+          await userEvent.click(submitButton);
+
+          const error = await screen.findByText('Something went wrong');
+          expect(error).toBeInTheDocument();
+        });
+      });
+
+      describe('when the request to update the org succeeds', () => {
+        beforeEach(() => {
+          withUpdateOrg({
+            ...orgFixture,
+            name: 'Acme Corp',
+            websiteUrl: 'https://acme.com',
+          });
+        });
+
+        it('should update the org and trigger onComplete', async () => {
+          const onComplete = jest.fn();
+          await renderCompanyDataAndWaitData({ onComplete });
+
+          const nameField = screen.getByLabelText('Company name');
+          await userEvent.clear(nameField);
+          await userEvent.type(nameField, 'Acme Corp');
+
+          const websiteField = screen.getByLabelText('Company website');
+          await userEvent.type(websiteField, 'https://acme.com');
+
+          const sizeField = screen.getByRole('button', { name: 'Select' });
+          await selectEvents.select(sizeField, '1-10');
+
+          const submitButton = screen.getByRole('button', { name: 'Next' });
+          await userEvent.click(submitButton);
+
+          await waitFor(() => {
+            expect(onComplete).toHaveBeenCalled();
+          });
+        });
+      });
+    });
+
+    describe('when clicking on the back button', () => {
+      it('should call onBack', async () => {
+        const onBack = jest.fn();
+        await renderCompanyDataAndWaitData({ onBack });
+
+        const backButton = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(backButton);
+
+        expect(onBack).toHaveBeenCalled();
       });
     });
   });

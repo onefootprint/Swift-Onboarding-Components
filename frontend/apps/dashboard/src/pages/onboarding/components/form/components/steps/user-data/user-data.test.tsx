@@ -21,15 +21,10 @@ describe('<UserData />', () => {
   });
 
   const renderUserData = ({
-    id = 'company-form',
+    onBack = jest.fn(),
     onComplete = jest.fn(),
   }: Partial<UserDataProps>) => {
-    customRender(
-      <>
-        <div id="onboarding-cta-portal" />
-        <UserData id={id} onComplete={onComplete} />
-      </>,
-    );
+    customRender(<UserData onComplete={onComplete} onBack={onBack} />);
   };
 
   it('should show the email of the user logged', () => {
@@ -105,6 +100,18 @@ describe('<UserData />', () => {
           expect(errorMessage).toBeInTheDocument();
         });
       });
+    });
+  });
+
+  describe('when clicking on the back button', () => {
+    it('should call onBack', async () => {
+      const onBack = jest.fn();
+      renderUserData({ onBack });
+
+      const backButton = screen.getByRole('button', { name: 'Back' });
+      await userEvent.click(backButton);
+
+      expect(onBack).toHaveBeenCalled();
     });
   });
 });

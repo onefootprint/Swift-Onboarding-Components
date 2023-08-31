@@ -28,22 +28,20 @@ const Onboarding = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Header userEmail={session.data.user.email} onLogout={handleLogout} />
-      <Container>
+      <>
+        <Header userEmail={session.data.user.email} onLogout={handleLogout} />
         <Content>
-          <Form onComplete={handleCompleted} />
+          <Container>
+            <Form onComplete={handleCompleted} />
+          </Container>
         </Content>
-      </Container>
+      </>
     </>
   ) : null;
 };
 
 const Content = styled.div`
   --header-height: 60px;
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
-  justify-content: center;
   height: calc(100vh - var(--header-height));
   overflow: hidden;
 `;

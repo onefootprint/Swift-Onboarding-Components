@@ -3,6 +3,7 @@ import { createGlobalStyle, css } from '@onefootprint/styled';
 import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import CustomDesignSystemProvider from '../components/custom-design-system-provider';
@@ -16,9 +17,11 @@ configureSentry();
 configureReactI18next();
 
 const App = ({ Component, pageProps }: AppProps) => {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
+  const isResponsive = router.pathname === '/onboarding';
 
   return (
     <>
@@ -28,7 +31,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       <ObserveCollectorProvider appName="dashboard">
         <ReactQueryProvider>
           <CustomDesignSystemProvider>
-            <GlobalStyle />
+            <GlobalStyle hasMinWidth={!isResponsive} />
             <ErrorBoundary>
               <Layout name={pageProps.layout}>
                 <Component />
@@ -42,8 +45,8 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 };
 
-const GlobalStyle = createGlobalStyle`
-  ${({ theme }) => css`
+const GlobalStyle = createGlobalStyle<{ hasMinWidth: boolean }>`
+  ${({ theme, hasMinWidth }) => css`
     #__next {
       display: flex;
       flex-direction: column;
@@ -51,7 +54,10 @@ const GlobalStyle = createGlobalStyle`
     }
 
     body {
-      min-width: ${theme.grid.container.maxWidth.md}px;
+      ${hasMinWidth &&
+      css`
+        min-width: ${theme.grid.container.maxWidth.md}px;
+      `}
     }
   `}
 `;

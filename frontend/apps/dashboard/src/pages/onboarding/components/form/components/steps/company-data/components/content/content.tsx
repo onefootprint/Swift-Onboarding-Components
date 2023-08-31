@@ -1,13 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Organization, OrganizationSize } from '@onefootprint/types';
-import {
-  Button,
-  Portal,
-  Select,
-  SelectOption,
-  TextInput,
-} from '@onefootprint/ui';
+import { Button, Select, SelectOption, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useUpdateOrg from 'src/hooks/use-update-org';
@@ -21,14 +15,14 @@ export type FormData = {
 };
 
 export type ContentProps = {
-  id: string;
+  onBack: () => void;
   onComplete: () => void;
   organization: Organization;
 };
 
-const Content = ({ id, organization, onComplete }: ContentProps) => {
+const Content = ({ onBack, onComplete, organization }: ContentProps) => {
   const { t, allT } = useTranslation('pages.onboarding.company-data');
-  const updateOrgMutation = useUpdateOrg();
+  const mutation = useUpdateOrg();
   const {
     control,
     register,
@@ -45,7 +39,7 @@ const Content = ({ id, organization, onComplete }: ContentProps) => {
   });
 
   const handleAfterSubmit = (formData: FormData) => {
-    updateOrgMutation.mutate(
+    mutation.mutate(
       {
         name: formData.name,
         websiteUrl: formData.website,
@@ -59,8 +53,9 @@ const Content = ({ id, organization, onComplete }: ContentProps) => {
 
   return (
     <Container data-testid="onboarding-company-data-content">
-      <form id={id} onSubmit={handleFormSubmit(handleAfterSubmit)}>
+      <form onSubmit={handleFormSubmit(handleAfterSubmit)}>
         <TextInput
+          autoFocus
           hasError={!!errors.name}
           hint={errors.name ? t('form.name.errors.required') : undefined}
           label={t('form.name.label')}
@@ -100,16 +95,19 @@ const Content = ({ id, organization, onComplete }: ContentProps) => {
             />
           )}
         />
-        <Portal selector="#onboarding-cta-portal" removeContent>
+        <ButtonContainer>
           <Button
-            form={id}
-            loading={updateOrgMutation.isLoading}
+            disabled={mutation.isLoading}
+            onClick={onBack}
             size="compact"
-            type="submit"
+            variant="secondary"
           >
+            {allT('back')}
+          </Button>
+          <Button loading={mutation.isLoading} size="compact" type="submit">
             {allT('next')}
           </Button>
-        </Portal>
+        </ButtonContainer>
       </form>
     </Container>
   );
@@ -123,6 +121,14 @@ const Container = styled.div`
       gap: ${theme.spacing[7]};
     `}
   }
+`;
+
+const ButtonContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    margin-top: ${theme.spacing[3]};
+  `}
 `;
 
 export default Content;

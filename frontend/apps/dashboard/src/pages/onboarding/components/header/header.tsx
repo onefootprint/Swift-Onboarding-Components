@@ -2,11 +2,11 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoLogOut16, LogoFpCompact } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
-  Box,
   Container,
   createFontStyles,
   Divider,
   LinkButton,
+  media,
 } from '@onefootprint/ui';
 import React from 'react';
 
@@ -23,12 +23,16 @@ const Header = ({ userEmail, onLogout }: HeaderProps) => {
       <Container>
         <Inner>
           <LogoFpCompact />
-          <Box>
+          <PillContainer>
             <Pill>
               {t('logged-as')} <span>{userEmail}</span>
             </Pill>
-          </Box>
-          <LinkButton iconComponent={IcoLogOut16} onClick={onLogout}>
+          </PillContainer>
+          <LinkButton
+            size="compact"
+            iconComponent={IcoLogOut16}
+            onClick={onLogout}
+          >
             {t('logout')}
           </LinkButton>
         </Inner>
@@ -43,7 +47,15 @@ const Inner = styled.div`
     align-items: center;
     display: flex;
     justify-content: space-between;
-    padding: ${theme.spacing[5]}} 0;
+    padding: ${theme.spacing[5]} 0;
+  `}
+`;
+
+const PillContainer = styled.div`
+  display: none;
+
+  ${media.greaterThan('md')`
+    display: block;
   `}
 `;
 
