@@ -25,6 +25,7 @@ def user_with_documents(doc_request_sandbox_ob_config, twilio):
 
     return user
 
+
 # Check which things are available in the vault
 def test_tenant_document_get_decrypt(user_with_documents):
     tenant = user_with_documents.tenant
@@ -180,6 +181,3 @@ def test_decrypt_historical(user_with_documents):
             "document.drivers_license.document_number",
         ]
     )
-
-    
-    
