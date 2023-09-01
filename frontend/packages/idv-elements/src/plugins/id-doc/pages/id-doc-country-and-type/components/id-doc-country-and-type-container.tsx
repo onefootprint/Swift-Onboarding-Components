@@ -178,7 +178,7 @@ const Container = styled.div`
     row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
-    margin-top: calc(-1 * ${theme.spacing[5]});
+    margin-top: calc(-1 * ${theme.spacing[4]});
   `}
 `;
 
