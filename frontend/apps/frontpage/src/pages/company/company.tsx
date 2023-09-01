@@ -66,11 +66,23 @@ const Company = () => {
       twitter: 'https://twitter.com/AlexGrinman',
     },
     {
+      name: 'Amanda Lee',
+      avatarSrc: '/team/member-amanda.png',
+      role: 'Engineering',
+      linkedin: 'https://www.linkedin.com/in/a7e/',
+    },
+    {
       name: 'Belce Dogru',
       avatarSrc: '/team/member-belce.png',
       role: 'Engineering',
       linkedin: 'https://www.linkedin.com/in/belce/',
       twitter: 'https://twitter.com/belce_dogru',
+    },
+    {
+      name: 'Bruno Batista',
+      avatarSrc: '/team/member-bruno.png',
+      role: 'Engineering',
+      linkedin: 'https://www.linkedin.com/in/bruno-batista-b25ab76b/',
     },
     {
       name: 'Claudio Angrigiani',
@@ -106,12 +118,6 @@ const Company = () => {
       role: 'Engineering',
       linkedin: 'https://www.linkedin.com/in/elliott-forde-18454b124/',
       twitter: 'https://twitter.com/elliottvforde',
-    },
-    {
-      name: 'Amanda Lee',
-      avatarSrc: '/team/member-amanda.png',
-      role: 'Engineering',
-      linkedin: 'https://www.linkedin.com/in/a7e/',
     },
     {
       name: 'Keagan Long',
