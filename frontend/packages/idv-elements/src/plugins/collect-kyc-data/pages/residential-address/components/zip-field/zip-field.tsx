@@ -11,6 +11,7 @@ const ZipField = () => {
     register,
     formState: { errors },
     watch,
+    getValues,
   } = useFormContext<FormData>();
   const { t } = useTranslation('pages.residential-address.form.zipCode');
   const country = watch('country');
@@ -28,6 +29,7 @@ const ZipField = () => {
       maxLength={zipcode.maxLength}
       minLength={zipcode.minLength}
       placeholder={t('placeholder')}
+      value={getValues('zip')}
       {...register('zip', {
         required: isDomestic,
         pattern: zipcode.pattern,

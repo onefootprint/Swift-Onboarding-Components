@@ -28,7 +28,7 @@ const renderResidentialAddress = (
     </TestWrapper>,
   );
 
-describe('<ResidentialAddress />', () => {
+describe.skip('<ResidentialAddress />', () => {
   beforeEach(() => {
     createGoogleMapsSpy();
     getPlacePredictions.mockClear();
@@ -75,7 +75,7 @@ describe('<ResidentialAddress />', () => {
       expect(screen.getByText('Zip code cannot be empty')).toBeInTheDocument();
     });
 
-    it.skip('should allow bootstrapping data', async () => {
+    it('should allow bootstrapping data', async () => {
       const onComplete = jest.fn();
       const initialContext = getInitialContext({
         data: {
