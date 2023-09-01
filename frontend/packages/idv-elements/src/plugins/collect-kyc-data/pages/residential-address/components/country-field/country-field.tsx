@@ -16,7 +16,8 @@ const CountryField = ({ onChange }: CountryFieldProps) => {
   const {
     context: { config },
   } = state;
-  const { control } = useFormContext<FormData>();
+  const { control, watch } = useFormContext<FormData>();
+  const country = watch('country');
   const { t } = useTranslation('pages.residential-address.form.country');
   const allowedCountries = new Set(config.supportedCountries);
   const disabled =
@@ -30,6 +31,11 @@ const CountryField = ({ onChange }: CountryFieldProps) => {
       name="country"
       render={({ field }) => (
         <CountrySelect
+          hint={
+            disabled && country
+              ? t('disabled-hint', { countryName: country.label })
+              : undefined
+          }
           options={options}
           label={t('label')}
           disabled={disabled}
