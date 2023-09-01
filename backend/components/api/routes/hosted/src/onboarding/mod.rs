@@ -176,6 +176,17 @@ fn is_cdo_met<Type>(
             // Non-US addresses will have the full address in AddressLine1 and as many other
             // fields extracted as possible
         }
+        // If we international, we don't require ssn
+        CollectedDataOption::Ssn4 | CollectedDataOption::Ssn9 => {
+            let country = decrypted_values
+                .get(&IDK::Country.into())
+                .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
+            if let Some(c) = country {
+                if !c.is_us() {
+                    required_dis = vec![]
+                }
+            }
+        }
         _ => (),
     }
 

@@ -16,19 +16,21 @@ def test_international_address_req(sandbox_tenant, must_collect_data, twilio):
     data = {"id.address_line1": "730 Hayes St", "id.country": "US"}
     patch("/hosted/user/vault", data, bifrost.auth_token)
 
-    # We should still be required to collect address
+    # We should still be required to collect address and ssn9
     status = bifrost.get_status()
     req = get_requirement_from_requirements("collect_data", status["requirements"])
     assert "full_address" in req["missing_attributes"]
+    assert "ssn9" in req["missing_attributes"]
 
     # Then add international address
     data = {"id.address_line1": "730 Hayes St", "id.country": "MX"}
     patch("/hosted/user/vault", data, bifrost.auth_token)
 
-    # Address CDO shuold be met
+    # Address CDO shuold be met, as well as ssn9
     status = bifrost.get_status()
     req = get_requirement_from_requirements("collect_data", status["requirements"])
     assert "full_address" not in req["missing_attributes"]
+    assert "ssn9" not in req["missing_attributes"]
 
 
 def test_user_without_documents_international(
@@ -88,7 +90,6 @@ def test_with_documents_handles_international_address(
     assert doc_requirement["supported_document_types"] == ["passport"]
     # we'll accept any country
     assert len(doc_requirement["supported_countries"]) > 1
-
 
 def test_with_documents_handles_international_address_restricted_documents(
     sandbox_tenant, must_collect_data, can_access_data, twilio
