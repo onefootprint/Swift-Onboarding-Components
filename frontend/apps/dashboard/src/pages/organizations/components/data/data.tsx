@@ -1,4 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import styled from '@onefootprint/styled';
 import { GetAuthRolesOrg } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
@@ -60,18 +61,23 @@ const Data = ({ authToken, organizations }: DataProps) => {
             position="right"
             disabled={organization.isAuthMethodSupported}
           >
-            <button
+            <EllipsisButton
               disabled={!organization.isAuthMethodSupported}
               onClick={handleClick(organization.id)}
               type="button"
             >
               {organization.name}
-            </button>
+            </EllipsisButton>
           </Tooltip>
         ))}
       </ButtonGroup>
     </>
   );
 };
+
+const EllipsisButton = styled.button`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
 
 export default Data;
