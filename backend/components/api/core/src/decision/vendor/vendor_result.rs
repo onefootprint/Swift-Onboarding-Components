@@ -98,28 +98,39 @@ impl VendorResult {
             decrypt_verification_result_response(enclave_client, encrypted_responses, user_vault_private_key)
                 .await?;
 
-        requests_with_responses
+        Ok(requests_with_responses
             .into_iter()
             .zip(decrypted_responses.into_iter())
-            .map(
-                |((request, result, _e), decrypted_response)| -> Result<VendorResult, ApiError> {
-                    let raw_decrypted_response = decrypted_response.into_leak();
-                    let parsed_response =
-                        deserialize_from_vendor_api(raw_decrypted_response.clone(), request.vendor_api)?;
-                    let res = VendorResult {
-                        response: VendorResponse {
-                            response: parsed_response,
-                            // TODO: get rid of this, and just use parsed response for vendor map
-                            // https://linear.app/footprint/issue/FP-5624/just-use-parsed-resonse-and-stop-using-raw-response-on-vendor-result
-                            raw_response: raw_decrypted_response.into(),
-                        },
-                        verification_request_id: request.id,
-                        verification_result_id: result.id,
-                    };
-                    Ok(res)
-                },
-            )
-            .collect()
+            .filter_map(|((request, result, _e), decrypted_response)| {
+                let raw_decrypted_response = decrypted_response.into_leak();
+                let parsed_response =
+                    deserialize_from_vendor_api(raw_decrypted_response.clone(), request.vendor_api);
+
+                match parsed_response {
+                    Ok(parsed_response) => {
+                        Some(VendorResult {
+                            response: VendorResponse {
+                                response: parsed_response,
+                                // TODO: get rid of this, and just use parsed response for vendor map
+                                // https://linear.app/footprint/issue/FP-5624/just-use-parsed-resonse-and-stop-using-raw-response-on-vendor-result
+                                raw_response: raw_decrypted_response.into(),
+                            },
+                            verification_request_id: request.id,
+                            verification_result_id: result.id,
+                        })
+                    }
+                    Err(error) => {
+                        tracing::error!(
+                            ?error,
+                            verification_result_id=%result.id,
+                            vendor_api=%request.vendor_api,
+                            "Error in deserializing vendor response, deserialize_from_vendor_api"
+                        );
+                        None
+                    }
+                }
+            })
+            .collect())
     }
 
     pub fn vendor_api(&self) -> VendorAPI {
