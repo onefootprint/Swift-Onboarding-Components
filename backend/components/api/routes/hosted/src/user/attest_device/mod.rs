@@ -7,6 +7,7 @@ use api_core::errors::ApiResult;
 use api_core::types::ResponseData;
 use api_core::utils::challenge::Challenge;
 
+use api_core::utils::headers::InsightHeaders;
 use api_core::ApiErrorKind;
 use api_wire_types::hosted::device_attestation::{
     CreateDeviceAttestationRequest, DeviceAttestationChallengeResponse, DeviceAttestationType,
@@ -14,6 +15,10 @@ use api_wire_types::hosted::device_attestation::{
 };
 use chrono::{Duration, Utc};
 
+use db::models::insight_event::CreateInsightEvent;
+use db::models::liveness_event::NewLivenessEvent;
+use db::models::user_timeline::UserTimeline;
+use newtypes::{LivenessAttributes, LivenessInfo, LivenessIssuer};
 use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
 
 mod ios;
@@ -74,6 +79,7 @@ pub async fn post_attestation(
     request: Json<CreateDeviceAttestationRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
+    insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     let CreateDeviceAttestationRequest {
@@ -95,7 +101,7 @@ pub async fn post_attestation(
 
     match device_type {
         DeviceAttestationType::Ios => {
-            let new_attestation = ios::attest(&state, vault_id, challenge, attestation).await?;
+            let new_attestation = ios::attest(&state, vault_id.clone(), challenge, attestation).await?;
 
             state
                 .db_pool
@@ -104,6 +110,7 @@ pub async fn post_attestation(
 
                     // if we have a scoped vault (which we should always have in an onboarding)
                     if let Some(scoped_vault_id) = scoped_vault_id {
+                        // generate risk signals
                         risk_signals::ios::create(
                             conn,
                             &attestation,
@@ -112,6 +119,30 @@ pub async fn post_attestation(
                             workflow_id.as_ref(),
                             is_live,
                         )?;
+
+                        // the iOS attestation, in conjuction with a passkey registration, also helps us prove liveness
+                        // so if the device attests it registered a passkey, we can confirm liveness too!
+                        if attestation.webauthn_credential_id.is_some() {
+                            let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
+                            let liveness_event = NewLivenessEvent {
+                                scoped_vault_id: scoped_vault_id.clone(),
+                                liveness_source: newtypes::LivenessSource::AppleDeviceAttestation,
+                                attributes: Some(LivenessAttributes {
+                                    issuers: vec![LivenessIssuer::Footprint, LivenessIssuer::Apple],
+                                    os: attestation.metadata.os.clone(),
+                                    device: attestation.metadata.model.clone(),
+                                    ..Default::default()
+                                }),
+                                insight_event_id: Some(insight_event.id),
+                            }
+                            .insert(conn)?;
+
+                            // create the timeline event for a liveness
+                            let info = LivenessInfo {
+                                id: liveness_event.id,
+                            };
+                            UserTimeline::create(conn, info, vault_id, scoped_vault_id.clone())?;
+                        }
                     }
 
                     Ok(())
