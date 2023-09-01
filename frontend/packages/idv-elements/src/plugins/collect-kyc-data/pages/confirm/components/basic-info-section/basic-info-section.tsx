@@ -1,6 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
-import { IdDI, isCountryCode } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  IdDI,
+  isCountryCode,
+} from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import {
@@ -10,14 +14,16 @@ import {
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
+import allAttributes from '../../../../utils/all-attributes/all-attributes';
 import getInitialCountry from '../../../../utils/get-initial-country';
 import BasicInformation from '../../../basic-information';
 
 const BasicInfoSection = () => {
   const { t, allT } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
-  const { data } = state.context;
+  const { data, requirement } = state.context;
   const [editing, setEditing] = useState(false);
+  const attributes = allAttributes(requirement);
 
   const basicInfo = [];
 
@@ -45,12 +51,15 @@ const BasicInfoSection = () => {
     });
   }
 
+  const requiresUsLegalStatus = attributes.includes(
+    CollectedKycDataOption.usLegalStatus,
+  );
   const countryVal = data[IdDI.nationality]?.value;
   const defaultCountry =
     countryVal && isCountryCode(countryVal) ? countryVal : undefined;
   const nationality = getInitialCountry(defaultCountry)?.label;
-  // we only want to display nationality / the default country if we collected it
-  if (countryVal && nationality) {
+  // we only want to display nationality / the default country if we collected it and if there is no legal status data
+  if (!requiresUsLegalStatus && countryVal && nationality) {
     basicInfo.push({
       text: t('basic-info.nationality'),
       subtext: nationality,
