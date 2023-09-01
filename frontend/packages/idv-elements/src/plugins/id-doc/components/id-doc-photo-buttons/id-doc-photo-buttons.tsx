@@ -83,6 +83,7 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
         type="file"
         accept="image/*,.heic,.heif"
         onChange={handleImage}
+        aria-label="file-input"
       />
     </ButtonsContainer>
   );

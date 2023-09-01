@@ -5,9 +5,10 @@ import { createIdDocMachine, MachineContext } from '../../utils/state-machine';
 
 export type IdDocMachineArgs = {
   args: MachineContext;
+  initState?: string;
 };
-const useLocalIdDocMachine = ({ args }: IdDocMachineArgs) =>
-  useMachine(() => createIdDocMachine(args));
+const useLocalIdDocMachine = ({ args, initState }: IdDocMachineArgs) =>
+  useMachine(() => createIdDocMachine(args, initState));
 
 export const [MachineProvider, useIdDocMachine] =
   constate(useLocalIdDocMachine);

@@ -8,9 +8,13 @@ import { MissingPermissionsSheetProvider } from '../components/missing-permissio
 import configureI18next from '../config/initializers/i18next';
 import { MachineContext } from '../utils/state-machine';
 
-const renderPage = (context: MachineContext, component: ReactNode) =>
+const renderPage = (
+  context: MachineContext,
+  component: ReactNode,
+  initState?: string,
+) =>
   customRender(
-    <MachineProvider args={context}>
+    <MachineProvider args={context} initState={initState}>
       <I18nextProvider i18n={configureI18next()}>
         <MissingPermissionsSheetProvider>
           <Layout>{component}</Layout>

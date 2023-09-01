@@ -3,7 +3,7 @@ import { assign, createMachine } from 'xstate';
 import { NextSideTargetsDesktop, NextSideTargetsMobile } from './machine.utils';
 import { MachineContext, MachineEvents } from './types';
 
-const createIdDocMachine = (args: MachineContext) =>
+const createIdDocMachine = (args: MachineContext, initState?: string) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -13,7 +13,7 @@ const createIdDocMachine = (args: MachineContext) =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'init',
+      initial: initState ?? 'init',
       context: { ...args },
       states: {
         init: {
