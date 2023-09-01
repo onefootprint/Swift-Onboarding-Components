@@ -33,6 +33,7 @@ const TimelineFixture: Timeline = [
       data: {
         source: LivenessSource.skipped,
         attributes: {
+          metadata: null,
           issuers: [LivenessIssuer.google, LivenessIssuer.apple],
           device: 'iPhone 14',
           os: 'iOS',

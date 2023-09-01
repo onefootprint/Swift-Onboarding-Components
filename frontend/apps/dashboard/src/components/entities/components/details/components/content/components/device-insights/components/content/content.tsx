@@ -6,24 +6,26 @@ import FloatingBox from '../floating-box';
 import Map from '../map';
 
 export type ContentProps = {
-  insightEvent?: InsightEvent;
+  deviceInfo: { appClip: boolean; instantApp: boolean; web: boolean };
   hasBiometrics: boolean;
+  insight?: InsightEvent;
 };
 
-const Content = ({ insightEvent, hasBiometrics }: ContentProps) => (
+const Content = ({ insight, hasBiometrics, deviceInfo }: ContentProps) => (
   <MapContainer>
     <Map
-      latitude={insightEvent ? insightEvent.latitude : null}
-      longitude={insightEvent ? insightEvent.longitude : null}
+      latitude={insight ? insight.latitude : null}
+      longitude={insight ? insight.longitude : null}
     />
     <FloatingBox
-      hasInsights={!!insightEvent}
-      city={insightEvent?.city || null}
-      country={insightEvent?.country || null}
+      city={insight?.city || null}
+      country={insight?.country || null}
+      deviceInfo={deviceInfo}
       hasBiometrics={hasBiometrics}
-      ipAddress={insightEvent?.ipAddress || null}
-      region={insightEvent?.region || null}
-      userAgent={insightEvent?.userAgent || null}
+      hasInsights={!!insight}
+      ipAddress={insight?.ipAddress || null}
+      region={insight?.region || null}
+      userAgent={insight?.userAgent || null}
     />
   </MapContainer>
 );

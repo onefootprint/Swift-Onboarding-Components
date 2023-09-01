@@ -1,62 +1,31 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import { EntityKind } from '@onefootprint/types';
 import React from 'react';
 import Provider from 'src/components/entities/components/details/hooks/use-entity-context';
 
 import FloatingBox, { FloatingBoxProps } from './floating-box';
 
-type RenderProps = FloatingBoxProps & { kind: EntityKind };
-
-const propsWithInsights: RenderProps = {
-  kind: EntityKind.person,
-  hasInsights: true,
-  city: 'San Francisco',
-  country: 'United States',
-  hasBiometrics: true,
-  ipAddress: '24.3.171.149',
-  region: 'CA',
-  userAgent:
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-};
-
-const propsWithoutInsights: RenderProps = {
-  kind: EntityKind.person,
-  hasInsights: false,
-  city: null,
-  country: null,
-  hasBiometrics: false,
-  ipAddress: null,
-  region: null,
-  userAgent: null,
-};
-
-const propsWithoutBiometrics: RenderProps = {
-  ...propsWithInsights,
-  hasBiometrics: false,
-};
-
-const propsWithBusinessKind: RenderProps = {
-  ...propsWithInsights,
-  kind: EntityKind.business,
-};
-
-const renderFloatingBox = ({
-  kind,
-  hasInsights,
-  city,
-  country,
-  hasBiometrics,
-  ipAddress,
-  region,
-  userAgent,
-}: RenderProps) =>
+const renderFloatingBox = (
+  kind: EntityKind,
+  {
+    hasInsights,
+    city,
+    country,
+    hasBiometrics,
+    ipAddress,
+    region,
+    userAgent,
+    deviceInfo,
+  }: FloatingBoxProps,
+) =>
   customRender(
     <Provider kind={kind} listPath="">
       <FloatingBox
-        hasInsights={hasInsights}
         city={city}
         country={country}
+        deviceInfo={deviceInfo}
         hasBiometrics={hasBiometrics}
+        hasInsights={hasInsights}
         ipAddress={ipAddress}
         region={region}
         userAgent={userAgent}
@@ -64,17 +33,51 @@ const renderFloatingBox = ({
     </Provider>,
   );
 
+const renderFloatingBoxAsVaultUser = () => {
+  const props: FloatingBoxProps = {
+    deviceInfo: {
+      appClip: false,
+      instantApp: false,
+      web: true,
+    },
+    hasInsights: false,
+    city: null,
+    country: null,
+    hasBiometrics: false,
+    ipAddress: null,
+    region: null,
+    userAgent: null,
+  };
+  return renderFloatingBox(EntityKind.person, props);
+};
+
+const renderFloatingBoxAsUser = (props?: Partial<FloatingBoxProps>) => {
+  const floatingBoxProps: FloatingBoxProps = {
+    deviceInfo: {
+      appClip: false,
+      instantApp: false,
+      web: true,
+    },
+    hasInsights: true,
+    city: 'San Francisco',
+    country: 'United States',
+    hasBiometrics: true,
+    ipAddress: '24.3.171.149',
+    region: 'CA',
+    userAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+    ...props,
+  };
+  return renderFloatingBox(EntityKind.person, floatingBoxProps);
+};
+
 describe('<FloatingBox/>', () => {
-  describe('Vault-only users', () => {
-    it('Shows the right title for vault-only users', () => {
-      renderFloatingBox(propsWithoutInsights);
+  describe('vault only users', () => {
+    it('should show an empty state message', () => {
+      renderFloatingBoxAsVaultUser();
 
       const title = screen.getByText('No device insights available');
       expect(title).toBeInTheDocument();
-    });
-
-    it('Shows the right body text for vault-only users', () => {
-      renderFloatingBox(propsWithoutInsights);
 
       const bodyText = screen.getByText(
         "This user was created via API, so we don't have any device insights available.",
@@ -82,70 +85,133 @@ describe('<FloatingBox/>', () => {
       expect(bodyText).toBeInTheDocument();
     });
 
-    it('Does not show ip, biometrics, region, country for vault-only users', () => {
-      renderFloatingBox(propsWithoutInsights);
+    it('should not show information related with ip, region and country', () => {
+      renderFloatingBoxAsVaultUser();
 
-      const ipAddress = screen.queryAllByText('IP address');
-      const biometrics = screen.queryAllByText('Biometrics');
-      const region = screen.queryAllByText('Region');
-      const country = screen.queryAllByText('Country');
-      expect(ipAddress).toHaveLength(0);
-      expect(biometrics).toHaveLength(0);
-      expect(region).toHaveLength(0);
-      expect(country).toHaveLength(0);
+      const ipAddress = screen.queryByText('IP address');
+      expect(ipAddress).not.toBeInTheDocument();
+
+      const region = screen.queryByText('Region');
+      expect(region).not.toBeInTheDocument();
+
+      const country = screen.queryByText('Country');
+      expect(country).not.toBeInTheDocument();
     });
   });
 
-  describe('Users with device insights data', () => {
-    it('Shows the right title with device info', () => {
-      renderFloatingBox(propsWithInsights);
+  describe('users with device insights', () => {
+    it('should show the user agent', () => {
+      renderFloatingBoxAsUser();
 
       const title = screen.getByText('Apple Macintosh, Mac OS 10.15.7');
       expect(title).toBeInTheDocument();
     });
 
-    it('Shows the correct ip info', () => {
-      renderFloatingBox(propsWithInsights);
+    it('should show the ip', () => {
+      renderFloatingBoxAsUser();
 
-      const ipTitle = screen.getByText('IP address');
       const ipAddress = screen.getByText('24.3.171.149');
-      expect(ipTitle).toBeInTheDocument();
       expect(ipAddress).toBeInTheDocument();
     });
 
-    it('Shows the correct region info', () => {
-      renderFloatingBox(propsWithInsights);
+    it('should show the region', () => {
+      renderFloatingBoxAsUser();
 
-      const regionTitle = screen.getByText('Region');
       const region = screen.getByText('San Francisco, CA');
-      expect(regionTitle).toBeInTheDocument();
       expect(region).toBeInTheDocument();
     });
 
-    it('Shows the correct country info', () => {
-      renderFloatingBox(propsWithInsights);
+    it('should show the country', () => {
+      renderFloatingBoxAsUser();
 
-      const countryTitle = screen.getByText('Country');
       const country = screen.getByText('United States');
-      expect(countryTitle).toBeInTheDocument();
       expect(country).toBeInTheDocument();
     });
 
-    it('Does not show biometrics when hasBiometrics flag is not set or entity kind is business', () => {
-      renderFloatingBox(propsWithBusinessKind);
-      expect(screen.queryAllByText('Biometrics')).toHaveLength(0);
+    describe('when the user did not do biometrics check', () => {
+      it('should show it is not verified', () => {
+        renderFloatingBoxAsUser({ hasBiometrics: false });
+        expect(screen.getByText('Biometrics')).toBeInTheDocument();
+        expect(screen.getByText('Not verified')).toBeInTheDocument();
+      });
     });
 
-    it('Show verified biometrics correctly whe entity kind is person', () => {
-      renderFloatingBox(propsWithoutBiometrics);
-      expect(screen.getByText('Biometrics')).toBeInTheDocument();
-      expect(screen.getByText('Not verified')).toBeInTheDocument();
+    describe('when the user did biometrics check', () => {
+      it('should show it is verified', () => {
+        renderFloatingBoxAsUser({ hasBiometrics: true });
+        expect(screen.getByText('Biometrics')).toBeInTheDocument();
+        expect(screen.getByText('Verified')).toBeInTheDocument();
+      });
     });
 
-    it('Show unverified biometrics correctly whe entity kind is person', () => {
-      renderFloatingBox(propsWithInsights);
-      expect(screen.getByText('Biometrics')).toBeInTheDocument();
-      expect(screen.getByText('Verified')).toBeInTheDocument();
+    describe('when the user is using an instant app', () => {
+      it('should show the instant app label', () => {
+        renderFloatingBoxAsUser({
+          deviceInfo: {
+            appClip: false,
+            instantApp: true,
+            web: false,
+          },
+        });
+
+        const title = screen.getByText('Instant App', { exact: false });
+        expect(title).toBeInTheDocument();
+      });
+
+      describe("when clicking on the button 'What is this'", () => {
+        it('should show the modal', async () => {
+          renderFloatingBoxAsUser({
+            deviceInfo: {
+              appClip: false,
+              instantApp: true,
+              web: false,
+            },
+          });
+
+          const button = screen.getByText("What's this?");
+          await userEvent.click(button);
+
+          const modal = screen.getByRole('dialog', {
+            name: "What's an Instant App?",
+          });
+          expect(modal).toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when the user is using an app clip', () => {
+      it('should show the app clip label', () => {
+        renderFloatingBoxAsUser({
+          deviceInfo: {
+            appClip: true,
+            instantApp: false,
+            web: false,
+          },
+        });
+
+        const title = screen.getByText('App Clip', { exact: false });
+        expect(title).toBeInTheDocument();
+      });
+
+      describe("when clicking on the button 'What is this'", () => {
+        it('should show the modal', async () => {
+          renderFloatingBoxAsUser({
+            deviceInfo: {
+              appClip: true,
+              instantApp: false,
+              web: false,
+            },
+          });
+
+          const button = screen.getByText("What's this?");
+          await userEvent.click(button);
+
+          const modal = screen.getByRole('dialog', {
+            name: "What's an App Clip?",
+          });
+          expect(modal).toBeInTheDocument();
+        });
+      });
     });
   });
 });

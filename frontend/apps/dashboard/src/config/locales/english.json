@@ -1109,6 +1109,30 @@
         "country": "Country",
         "verified": "Verified",
         "not_verified": "Not verified",
+        "instant-app": {
+          "label": "Instant App · ",
+          "yes": "Yes",
+          "about": "What's this?",
+          "dialog": {
+            "title": "What's an Instant App?",
+            "content": "Instant Apps deliver a native experience without the need for a full app download, harnessing superior device signal detection for precise identity checks. Unlike web platforms, they offer a swifter and more intuitive ID document flow, ensuring efficient selfie and doc uploads, all while maintaining a consistent and reliable user experience.",
+            "demo": "Here’s a demo so you can try it yourself:",
+            "instructions": "Use your camera app or QR code reader on your phone.",
+            "disclaimer": "This is just a preview and no real data will be collected."
+          }
+        },
+        "app-clip": {
+          "label": "App Clip · ",
+          "yes": "Yes",
+          "about": "What's this?",
+          "dialog": {
+            "title": "What's an App Clip?",
+            "content": "App Clip deliver a native experience without the need for a full app download, harnessing superior device signal detection for precise identity checks. Unlike web platforms, they offer a swifter and more intuitive ID document flow, ensuring efficient selfie and doc uploads, all while maintaining a consistent and reliable user experience.",
+            "demo": "Here’s a demo so you can try it yourself:",
+            "instructions": "Use your camera app or QR code reader on your phone.",
+            "disclaimer": "This is just a preview and no real data will be collected."
+          }
+        },
         "vault-only": {
           "title": "No device insights available",
           "message": "This user was created via API, so we don't have any device insights available."

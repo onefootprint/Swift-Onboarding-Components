@@ -1,7 +1,12 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { InsightEvent, Liveness, LivenessSource } from '@onefootprint/types';
+import {
+  InsightEvent,
+  Liveness,
+  LivenessKind,
+  LivenessSource,
+} from '@onefootprint/types';
 
-export const insightEvent: InsightEvent = {
+export const insight: InsightEvent = {
   city: 'San Francisco',
   country: 'United States',
   ipAddress: '24.3.171.149',
@@ -19,8 +24,10 @@ export const insightEvent: InsightEvent = {
 
 export const biometricCred: Liveness = {
   attributes: null,
-  insightEvent,
+  insight,
   source: LivenessSource.webauthnAttestation,
+  linkedAttestations: [],
+  kind: LivenessKind.sms,
 };
 
 export const livenessDataFixture = [biometricCred];

@@ -18,6 +18,7 @@ import {
   IdDI,
   InvestorProfileDI,
   Liveness,
+  LivenessKind,
   LivenessSource,
   Timeline,
   TimelineEventKind,
@@ -110,9 +111,11 @@ export const entityFixture: Entity = {
 
 export const livenessFixture: Liveness[] = [
   {
+    kind: LivenessKind.sms,
+    linkedAttestations: [],
     source: LivenessSource.skipped,
     attributes: null,
-    insightEvent: {
+    insight: {
       timestamp: '2023-03-29T23:08:33.147280Z',
       ipAddress: '73.222.157.30',
       city: 'San Francisco',

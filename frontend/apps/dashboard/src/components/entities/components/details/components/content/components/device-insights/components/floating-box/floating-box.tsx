@@ -1,5 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoCheckCircle16, IcoClose16, IcoForbid40 } from '@onefootprint/icons';
+import {
+  IcoAppclip16,
+  IcoBolt16,
+  IcoCheckCircle16,
+  IcoClose16,
+  IcoForbid40,
+} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { EntityKind } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
@@ -8,24 +14,27 @@ import { displayForUserAgent, icoForUserAgent } from 'src/utils/user-agent';
 
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
+import AboutAppClipAndInstantApp from './components/about-app-clip-and-instant-app';
 import getRegion from './utils/get-region';
 
 export type FloatingBoxProps = {
-  hasInsights: boolean;
   city: string | null;
   country: string | null;
   hasBiometrics: boolean;
+  hasInsights: boolean;
   ipAddress: string | null;
+  deviceInfo: { appClip: boolean; instantApp: boolean; web: boolean };
   region: string | null;
   userAgent: string | null;
 };
 
 const FloatingBox = ({
-  hasInsights,
   city,
   country,
   hasBiometrics,
+  hasInsights,
   ipAddress,
+  deviceInfo,
   region,
   userAgent,
 }: FloatingBoxProps) => {
@@ -36,7 +45,15 @@ const FloatingBox = ({
 
   return (
     <Container data-has_insights={hasInsights}>
-      {hasInsights ? icoForUserAgent(userAgentText) : <IcoForbid40 />}
+      {hasInsights ? (
+        icoForUserAgent(
+          userAgentText,
+          deviceInfo.instantApp,
+          deviceInfo.appClip,
+        )
+      ) : (
+        <IcoForbid40 />
+      )}
       <Typography
         variant={hasInsights ? 'label-2' : 'label-1'}
         sx={{
@@ -46,7 +63,11 @@ const FloatingBox = ({
         isPrivate
       >
         {hasInsights
-          ? displayForUserAgent(userAgentText)
+          ? displayForUserAgent(
+              userAgentText,
+              deviceInfo.instantApp,
+              deviceInfo.appClip,
+            )
           : t('vault-only.title')}
       </Typography>
       {hasInsights ? (
@@ -62,28 +83,90 @@ const FloatingBox = ({
             </Row>
           )}
           {context.kind === EntityKind.person ? (
-            <Row role="row" aria-label={t('biometrics')}>
-              <Typography variant="body-3" color="tertiary">
-                {t('biometrics')}
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
-                {hasBiometrics ? (
-                  <>
-                    <IcoCheckCircle16 color="success" />
-                    <Typography variant="body-3" color="success">
-                      {t('verified')}
+            <>
+              <Row role="row" aria-label={t('biometrics')}>
+                <Typography variant="body-3" color="tertiary">
+                  {t('biometrics')}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                  {hasBiometrics ? (
+                    <>
+                      <IcoCheckCircle16 color="success" />
+                      <Typography variant="body-3" color="success">
+                        {t('verified')}
+                      </Typography>
+                    </>
+                  ) : (
+                    <>
+                      <IcoClose16 color="error" />
+                      <Typography variant="body-3" color="error">
+                        {t('not_verified')}
+                      </Typography>
+                    </>
+                  )}
+                </Box>
+              </Row>
+              {deviceInfo.instantApp && (
+                <Row role="row" aria-label={t('instant-app.label')}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 2,
+                    }}
+                  >
+                    <Typography variant="body-3" color="tertiary">
+                      {t('instant-app.label')}
                     </Typography>
-                  </>
-                ) : (
-                  <>
-                    <IcoClose16 color="error" />
-                    <Typography variant="body-3" color="error">
-                      {t('not_verified')}
+                    <AboutAppClipAndInstantApp kind="instant-app" />
+                  </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 3,
+                    }}
+                  >
+                    <IcoBolt16 />
+                    <Typography variant="body-3" isPrivate>
+                      {t('instant-app.yes')}
                     </Typography>
-                  </>
-                )}
-              </Box>
-            </Row>
+                  </Box>
+                </Row>
+              )}
+              {deviceInfo.appClip && (
+                <Row role="row" aria-label={t('app-clip.label')}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 2,
+                    }}
+                  >
+                    <Typography variant="body-3" color="tertiary">
+                      {t('app-clip.label')}
+                    </Typography>
+                    <AboutAppClipAndInstantApp kind="app-clip" />
+                  </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 3,
+                    }}
+                  >
+                    <IcoAppclip16 />
+                    <Typography variant="body-3" isPrivate>
+                      {t('app-clip.yes')}
+                    </Typography>
+                  </Box>
+                </Row>
+              )}
+            </>
           ) : null}
           {fullRegion && (
             <Row role="row" aria-label={t('region')}>

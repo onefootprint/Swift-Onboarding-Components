@@ -12,15 +12,20 @@ import UAParser from 'ua-parser-js';
 const isBot = (userAgent: UAParser.IResult) =>
   userAgent.ua?.toLowerCase().includes('python');
 
-export const icoForUserAgent = (userAgentStr: string) => {
+export const icoForUserAgent = (
+  userAgentStr: string,
+  isInstantApp?: boolean,
+  isAppClip?: boolean,
+) => {
   const userAgent = UAParser(userAgentStr || '');
   if (
     userAgent.os.name?.toLowerCase() === 'ios' ||
-    userAgent.device.vendor?.toLowerCase() === 'apple'
+    userAgent.device.vendor?.toLowerCase() === 'apple' ||
+    isAppClip
   ) {
     return <IcoApple24 />;
   }
-  if (userAgent.os.name?.toLowerCase() === 'android') {
+  if (userAgent.os.name?.toLowerCase() === 'android' || isInstantApp) {
     return <IcoAndroid24 />;
   }
   if (userAgent.device.type?.toLowerCase() === 'mobile') {
@@ -40,7 +45,11 @@ export const icoForUserAgent = (userAgentStr: string) => {
   return <IcoUser24 />;
 };
 
-export const displayForUserAgent = (userAgentStr: string) => {
+export const displayForUserAgent = (
+  userAgentStr: string,
+  isInstantApp?: boolean,
+  isAppClip?: boolean,
+) => {
   const userAgent = UAParser(userAgentStr || '');
   if (isBot(userAgent)) {
     return 'A robot';
@@ -51,6 +60,12 @@ export const displayForUserAgent = (userAgentStr: string) => {
   const os = `${userAgent.os.name || ''} ${userAgent.os.version || ''}`.trim();
   if (device && os) {
     return `${device}, ${os}`;
+  }
+  if (isInstantApp) {
+    return 'Android device';
+  }
+  if (isAppClip) {
+    return 'Apple device';
   }
   return device || os || '-';
 };

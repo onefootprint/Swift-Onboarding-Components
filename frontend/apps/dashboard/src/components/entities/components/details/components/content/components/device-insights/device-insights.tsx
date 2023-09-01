@@ -15,14 +15,21 @@ const DeviceInsights = ({ entity }: ContentProps) => {
   const { error, data, isSuccess } = useCurrentEntityAuthEvents();
   const onboardingInsightEvent = entity.insightEvent;
   const biometricCred = data?.[0];
+  const attestation = biometricCred?.linkedAttestations.at(0);
+  const deviceInfo = {
+    appClip: attestation?.deviceType === 'ios',
+    instantApp: attestation?.deviceType === 'android',
+    web: !attestation,
+  };
 
   return (
     <Section title={t('title')}>
       {error && <Error error={error} />}
       {isSuccess && (
         <Content
-          insightEvent={biometricCred?.insightEvent || onboardingInsightEvent}
+          deviceInfo={deviceInfo}
           hasBiometrics={!!biometricCred}
+          insight={biometricCred?.insight || onboardingInsightEvent}
         />
       )}
     </Section>
