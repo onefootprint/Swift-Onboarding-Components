@@ -250,6 +250,51 @@ def test_no_phone_obc(sandbox_tenant):
     assert res["can_access_data"] == collect_data
 
 
+@pytest.mark.parametrize(
+    "collect_data,allow_international_residents,expected_error",
+    [
+        (["name", "full_address", "phone_number", "email"], True, None),
+        (
+            [
+                "name",
+                "full_address",
+                "phone_number",
+                "email",
+                "document.drivers_license.us_only.require_selfie",
+            ],
+            False,
+            None,
+        ),
+        (
+            ["name", "full_address", "phone_number", "email"],
+            False,
+            "Validation error: Cannot specify skip_kyc if allow_international_residents=false and no Document is collected in must_collect_data",
+        ),
+    ],  # don't allow skip_kyc=true if US only and doc isn't being collected
+)
+def test_skip_kyc(
+    sandbox_tenant, collect_data, allow_international_residents, expected_error
+):
+    data = dict(
+        name="skip kyc",
+        must_collect_data=collect_data,
+        can_access_data=collect_data,
+        allow_international_residents=allow_international_residents,
+        skip_kyc=True,
+    )
+    res = post(
+        "org/onboarding_configs",
+        data,
+        *sandbox_tenant.db_auths,
+        status_code=200 if expected_error is None else 400,
+    )
+
+    if expected_error:
+        assert res["error"]["message"] == expected_error
+    else:
+        assert res["skip_kyc"] == True
+
+
 def test_config_update(sandbox_tenant, ob_configuration):
     # Test failing to update
     new_name = "Updated ob config name"

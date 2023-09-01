@@ -32,6 +32,8 @@ pub struct CreateOnboardingConfigurationRequest {
     #[serde(default)]
     allow_international_residents: bool,
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
+    #[serde(default)]
+    skip_kyc: bool,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -86,12 +88,12 @@ impl CreateOnboardingConfigurationRequest {
                 .into());
             }
         }
+        let doc_cdo = self
+            .must_collect_data
+            .iter()
+            .find(|cdo| matches!(cdo, CDO::Document(_)));
+
         if self.is_doc_first_flow {
-            let doc_cdo = self
-                .must_collect_data
-                .iter()
-                .chain(self.optional_data.iter().flatten())
-                .find(|cdo| matches!(cdo, CDO::Document(_)));
             if doc_cdo.is_none() {
                 return Err(TenantError::ValidationError(
                     "Must collect document if is_doc_first is true".to_owned(),
@@ -112,6 +114,14 @@ impl CreateOnboardingConfigurationRequest {
         if self.international_country_restrictions.is_some() && !self.allow_international_residents {
             return Err(TenantError::ValidationError(
                 "Cannot specify international_country_restrictions without allow_international_residents"
+                    .to_owned(),
+            )
+            .into());
+        }
+
+        if self.skip_kyc && !self.allow_international_residents && doc_cdo.is_none() {
+            return Err(TenantError::ValidationError(
+                "Cannot specify skip_kyc if allow_international_residents=false and no Document is collected in must_collect_data"
                     .to_owned(),
             )
             .into());
@@ -262,6 +272,7 @@ pub async fn post(
         is_doc_first_flow,
         allow_international_residents,
         international_country_restrictions,
+        skip_kyc,
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -271,9 +282,10 @@ pub async fn post(
 
     // Hard coded for now until we expose in playbooks. TODO: could maybe have "tenant defaults" expressed in our code where we could map tenants to default invariants for them
     // like Coba should always have skip_kyc=true. Probably better than doing this purely via PG or via feature flags
-    let skip_kyc = state
-        .feature_flag_client
-        .flag(BoolFlag::IsSkipKycTenant(&tenant_id));
+    let skip_kyc = skip_kyc
+        || state
+            .feature_flag_client
+            .flag(BoolFlag::IsSkipKycTenant(&tenant_id));
 
     let actor = auth.actor().into();
     let obc = state
@@ -356,6 +368,7 @@ mod test {
             is_doc_first_flow: false,
             allow_international_residents: false,
             international_country_restrictions: None,
+            skip_kyc: false,
         };
         req.validate_inner().is_ok()
     }
@@ -379,6 +392,7 @@ mod test {
             is_doc_first_flow: false,
             allow_international_residents: false,
             international_country_restrictions: None,
+            skip_kyc: false,
         };
         req.validate().is_ok()
     }
@@ -401,6 +415,26 @@ mod test {
             is_doc_first_flow: true,
             allow_international_residents: allow_international,
             international_country_restrictions: None,
+            skip_kyc: false,
+        };
+        req.validate().is_ok()
+    }
+
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], true => true)]
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], false => true)]
+    #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], false => false)]
+    fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool {
+        let req = CreateOnboardingConfigurationRequest {
+            name: "Flerp".to_owned(),
+            must_collect_data: must_collect_data.clone(),
+            optional_data: None,
+            can_access_data: must_collect_data,
+            cip_kind: None,
+            is_no_phone_flow: Some(false),
+            is_doc_first_flow: false,
+            allow_international_residents: allow_international,
+            international_country_restrictions: None,
+            skip_kyc: true,
         };
         req.validate().is_ok()
     }

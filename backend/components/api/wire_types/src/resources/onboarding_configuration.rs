@@ -19,6 +19,7 @@ pub struct OnboardingConfiguration {
     pub is_no_phone_flow: bool,
     pub is_doc_first_flow: bool,
     pub author: Option<Actor>,
+    pub skip_kyc: bool,
 }
 
 export_schema!(OnboardingConfiguration);
