@@ -35,9 +35,9 @@ const renderDisplayValue = ({
 describe('<DisplayValue />', () => {
   it('should render details for shown address normally', () => {
     renderDisplayValue({
-      field: CollectedKycDataOption.fullAddress,
+      field: CollectedKycDataOption.address,
       personalInfoAndDocs: {
-        [CollectedKycDataOption.fullAddress]: true,
+        [CollectedKycDataOption.address]: true,
       },
     });
     expect(screen.getByTestId('check-icon')).toBeInTheDocument();
@@ -45,9 +45,9 @@ describe('<DisplayValue />', () => {
 
   it('should render details for non-shown address normally', () => {
     renderDisplayValue({
-      field: CollectedKycDataOption.fullAddress,
+      field: CollectedKycDataOption.address,
       personalInfoAndDocs: {
-        [CollectedKycDataOption.fullAddress]: false,
+        [CollectedKycDataOption.address]: false,
       },
     });
     expect(screen.getByTestId('close-icon')).toBeInTheDocument();

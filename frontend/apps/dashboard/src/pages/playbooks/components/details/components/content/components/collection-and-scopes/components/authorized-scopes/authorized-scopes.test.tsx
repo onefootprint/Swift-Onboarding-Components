@@ -39,7 +39,7 @@ describe('<AuthorizedScopes />', () => {
 
   it('should show full address if included', () => {
     renderAuthorizedScopes({
-      canAccessData: [CollectedKycDataOption.fullAddress],
+      canAccessData: [CollectedKycDataOption.address],
     });
     expect(screen.getByText('Address')).toBeInTheDocument();
   });
@@ -92,7 +92,7 @@ describe('<AuthorizedScopes />', () => {
       canAccessData: [
         CollectedKycDataOption.name,
         CollectedKycDataOption.dob,
-        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.address,
         CollectedKycDataOption.email,
       ],
     });

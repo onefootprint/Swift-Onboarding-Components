@@ -86,14 +86,8 @@
           "error": "Zip code cannot be empty"
         }
       },
-      "full": {
-        "title": "What's your residential address?",
-        "subtitle": "We're legally required to collect this information."
-      },
-      "partial": {
-        "title": "What's your country zip code?",
-        "subtitle": "We're legally required to collect this information."
-      }
+      "title": "What's your residential address?",
+      "subtitle": "We're legally required to collect this information."
     },
     "legal-status": {
       "title": "What's your legal status in the U.S.?",

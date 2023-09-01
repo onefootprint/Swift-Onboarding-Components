@@ -26,24 +26,13 @@ const AddressSection = () => {
   const stateName = data[IdDI.state]?.value;
   const country = data[IdDI.country]?.value;
   const zip = data[IdDI.zip]?.value;
-  const hasFullAddress = addressLine1 && city && stateName && country && zip;
-  const hasCountryAndZip = country && zip;
   const [editing, setEditing] = useState(false);
 
-  if (hasFullAddress) {
-    address.push({
-      text: createAddressLine([addressLine1, addressLine2]),
-      subtext: createAddressLine([city, stateName, zip, country]),
-      textColor: 'primary' as Color,
-    });
-  } else if (hasCountryAndZip) {
-    address.push({
-      text: createAddressLine([zip, country]),
-      textColor: 'primary' as Color,
-    });
-  } else {
-    return null;
-  }
+  address.push({
+    text: createAddressLine([addressLine1, addressLine2]),
+    subtext: createAddressLine([city, stateName, zip, country]),
+    textColor: 'primary' as Color,
+  });
 
   const addressItem = address.map(
     ({ text, subtext, textColor }: SectionItemProps) => (

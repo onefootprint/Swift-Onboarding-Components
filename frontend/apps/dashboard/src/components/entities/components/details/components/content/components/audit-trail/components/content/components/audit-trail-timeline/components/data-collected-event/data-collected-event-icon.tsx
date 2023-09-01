@@ -33,7 +33,7 @@ const iconForAttribute: Record<
   [CollectedKycDataOption.ssn4]: IcoUserCircle16,
   [CollectedKycDataOption.ssn9]: IcoUserCircle16,
   [CollectedKycDataOption.dob]: IcoUserCircle16,
-  [CollectedKycDataOption.fullAddress]: IcoBuilding16,
+  [CollectedKycDataOption.address]: IcoBuilding16,
   [CollectedKycDataOption.nationality]: IcoFlag16,
   [CollectedKycDataOption.usLegalStatus]: IcoGlobe16,
   [CollectedKybDataOption.name]: IcoStore16,

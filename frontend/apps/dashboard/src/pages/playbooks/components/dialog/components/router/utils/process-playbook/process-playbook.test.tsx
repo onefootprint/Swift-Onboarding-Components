@@ -26,7 +26,7 @@ describe('processPlaybook', () => {
           [CollectedKycDataOption.email]: false,
           [CollectedKycDataOption.phoneNumber]: false,
           [CollectedKycDataOption.dob]: false,
-          [CollectedKycDataOption.fullAddress]: false,
+          [CollectedKycDataOption.address]: false,
         },
       },
       kind: Kind.KYC,
@@ -37,7 +37,7 @@ describe('processPlaybook', () => {
     expect(mustCollectData).toContain(CollectedKycDataOption.email);
     expect(mustCollectData).toContain(CollectedKycDataOption.name);
     expect(mustCollectData).toContain(CollectedKycDataOption.dob);
-    expect(mustCollectData).toContain(CollectedKycDataOption.fullAddress);
+    expect(mustCollectData).toContain(CollectedKycDataOption.address);
   });
 
   it('should return required KYB fields in mustCollectData regardless of playbook values', () => {
@@ -286,7 +286,7 @@ describe('processPlaybook', () => {
     expect(canAccessData).toContain(CollectedKycDataOption.phoneNumber);
     expect(canAccessData).toContain(CollectedKycDataOption.name);
     expect(canAccessData).toContain(CollectedKycDataOption.dob);
-    expect(canAccessData).toContain(CollectedKycDataOption.fullAddress);
+    expect(canAccessData).toContain(CollectedKycDataOption.address);
     expect(canAccessData).not.toContain(CollectedKycDataOption.ssn4);
     expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
     // tk document case
@@ -318,7 +318,7 @@ describe('processPlaybook', () => {
     expect(canAccessData).not.toContain(CollectedKycDataOption.phoneNumber);
     expect(canAccessData).not.toContain(CollectedKycDataOption.name);
     expect(canAccessData).not.toContain(CollectedKycDataOption.dob);
-    expect(canAccessData).toContain(CollectedKycDataOption.fullAddress);
+    expect(canAccessData).toContain(CollectedKycDataOption.address);
     expect(canAccessData).not.toContain(CollectedKycDataOption.ssn4);
     expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
     // tk document case

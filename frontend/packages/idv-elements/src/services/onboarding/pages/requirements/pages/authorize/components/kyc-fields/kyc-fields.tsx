@@ -38,7 +38,7 @@ const IconByCollectedKycDataOption: Record<CollectedKycDataOption, Icon> = {
   [CollectedKycDataOption.ssn4]: IcoFileText24,
   [CollectedKycDataOption.ssn9]: IcoFileText24,
   [CollectedKycDataOption.dob]: IcoCake24,
-  [CollectedKycDataOption.fullAddress]: IcoBuilding24,
+  [CollectedKycDataOption.address]: IcoBuilding24,
   [CollectedKycDataOption.nationality]: IcoFlag24,
   [CollectedKycDataOption.usLegalStatus]: IcoGlobe24,
 };
@@ -72,7 +72,7 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [CollectedKycDataOption.ssn4]: t('data-labels.ssn4'),
     [CollectedKycDataOption.ssn9]: t('data-labels.ssn9'),
     [CollectedKycDataOption.dob]: t('data-labels.dob'),
-    [CollectedKycDataOption.fullAddress]: t('data-labels.address-full'),
+    [CollectedKycDataOption.address]: t('data-labels.address-full'),
     [CollectedKycDataOption.nationality]: t('data-labels.nationality'),
     [CollectedKycDataOption.usLegalStatus]: t('data-labels.us-legal-status'),
   };

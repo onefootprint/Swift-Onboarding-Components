@@ -70,7 +70,7 @@ describe('Collect KYB Data Machine Tests', () => {
         CollectedKybDataOption.address,
         CollectedKybDataOption.beneficialOwners,
       ],
-      [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+      [CollectedKycDataOption.name, CollectedKycDataOption.address],
     );
     let { state } = machine;
 

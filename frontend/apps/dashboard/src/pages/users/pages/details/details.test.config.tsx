@@ -157,7 +157,7 @@ export const timelineFixture: Timeline = [
       data: {
         attributes: [
           CollectedKycDataOption.dob,
-          CollectedKycDataOption.fullAddress,
+          CollectedKycDataOption.address,
           CollectedKycDataOption.ssn9,
           CollectedKycDataOption.name,
         ],

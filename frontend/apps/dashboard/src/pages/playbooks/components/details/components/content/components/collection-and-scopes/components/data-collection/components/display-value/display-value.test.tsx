@@ -27,7 +27,7 @@ describe('<DisplayValue />', () => {
         CollectedKycDataOption.name,
         CollectedKycDataOption.email,
       ],
-      field: CollectedKycDataOption.fullAddress,
+      field: CollectedKycDataOption.address,
     });
     expect(screen.getByTestId('close-icon')).toBeInTheDocument();
   });

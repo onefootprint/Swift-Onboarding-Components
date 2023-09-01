@@ -62,7 +62,7 @@ describe('Collect KYC Data Machine Tests', () => {
       const machine = createMachine(
         [
           CollectedKycDataOption.name,
-          CollectedKycDataOption.fullAddress,
+          CollectedKycDataOption.address,
           CollectedKycDataOption.usLegalStatus,
           CollectedKycDataOption.ssn9,
         ],
@@ -74,7 +74,7 @@ describe('Collect KYC Data Machine Tests', () => {
       let { context } = state;
       expect(context.requirement.missingAttributes).toEqual([
         CollectedKycDataOption.name,
-        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.address,
         CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
@@ -265,7 +265,7 @@ describe('Collect KYC Data Machine Tests', () => {
       const machine = createMachine([
         CollectedKycDataOption.email,
         CollectedKycDataOption.name,
-        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.address,
         CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
@@ -275,7 +275,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.requirement.missingAttributes).toEqual([
         CollectedKycDataOption.email,
         CollectedKycDataOption.name,
-        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.address,
         CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
@@ -543,7 +543,7 @@ describe('Collect KYC Data Machine Tests', () => {
         [
           CollectedKycDataOption.name,
           CollectedKycDataOption.dob,
-          CollectedKycDataOption.fullAddress,
+          CollectedKycDataOption.address,
           CollectedKycDataOption.ssn9,
         ],
         {
@@ -586,7 +586,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.requirement.missingAttributes).toEqual([
         CollectedKycDataOption.name,
         CollectedKycDataOption.dob,
-        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.address,
         CollectedKycDataOption.ssn9,
       ]);
 
@@ -604,7 +604,7 @@ describe('Collect KYC Data Machine Tests', () => {
         [
           CollectedKycDataOption.name,
           CollectedKycDataOption.dob,
-          CollectedKycDataOption.fullAddress,
+          CollectedKycDataOption.address,
           CollectedKycDataOption.ssn9,
         ],
         {
@@ -629,7 +629,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.requirement.missingAttributes).toEqual([
         CollectedKycDataOption.name,
         CollectedKycDataOption.dob,
-        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.address,
         CollectedKycDataOption.ssn9,
       ]);
 
@@ -665,7 +665,7 @@ describe('Collect KYC Data Machine Tests', () => {
       const machine = createMachine([
         CollectedKycDataOption.email,
         CollectedKycDataOption.name,
-        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.address,
         CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);
@@ -675,7 +675,7 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(context.requirement.missingAttributes).toEqual([
         CollectedKycDataOption.email,
         CollectedKycDataOption.name,
-        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.address,
         CollectedKycDataOption.usLegalStatus,
         CollectedKycDataOption.ssn9,
       ]);

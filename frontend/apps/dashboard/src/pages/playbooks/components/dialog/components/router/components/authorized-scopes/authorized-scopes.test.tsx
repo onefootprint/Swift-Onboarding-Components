@@ -86,7 +86,7 @@ describe('<AuthorizedScopes />', () => {
           [CollectedKycDataOption.email]: true,
           [CollectedKycDataOption.phoneNumber]: true,
           [CollectedKycDataOption.dob]: true,
-          [CollectedKycDataOption.fullAddress]: true,
+          [CollectedKycDataOption.address]: true,
           [CollectedKycDataOption.ssn4]: true,
           [CollectedKycDataOption.ssn9]: true,
           [CollectedKycDataOption.usLegalStatus]: true,

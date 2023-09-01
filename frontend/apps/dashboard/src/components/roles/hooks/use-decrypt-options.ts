@@ -80,7 +80,7 @@ export const DecryptOptionToRoleScope: Record<DecryptOption, RoleScope> = {
   },
   [DecryptOption.fullAddress]: {
     kind: RoleScopeKind.decrypt,
-    data: CollectedKycDataOption.fullAddress,
+    data: CollectedKycDataOption.address,
   },
   [DecryptOption.custom]: {
     kind: RoleScopeKind.decryptCustom,

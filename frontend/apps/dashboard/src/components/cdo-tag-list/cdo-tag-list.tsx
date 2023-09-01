@@ -25,7 +25,7 @@ type CdoTagListProps = {
 const tagOrder: (CollectedDataOption | SupportedIdDocTypes | 'selfie')[] = [
   CollectedKycDataOption.name,
   CollectedKycDataOption.email,
-  CollectedKycDataOption.fullAddress,
+  CollectedKycDataOption.address,
   CollectedKycDataOption.dob,
   CollectedKycDataOption.phoneNumber,
   CollectedKycDataOption.ssn4,

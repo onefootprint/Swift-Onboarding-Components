@@ -16,7 +16,7 @@ describe('MissingAttributesUtils', () => {
     it('should return false if the user has all the basic attributes but they are disabled', () => {
       expect(
         isMissingBasicAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce', disabled: true },
             [IdDI.lastName]: { value: 'Dogru', disabled: true },
@@ -36,7 +36,7 @@ describe('MissingAttributesUtils', () => {
     it('should return true if only some of the data values are disabled', () => {
       expect(
         isMissingBasicAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce', disabled: true },
             [IdDI.city]: { value: 'Enclave', disabled: true },
@@ -46,7 +46,7 @@ describe('MissingAttributesUtils', () => {
 
       expect(
         isMissingBasicAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce', disabled: true },
             [IdDI.lastName]: { value: 'Dogru' },
@@ -72,7 +72,7 @@ describe('MissingAttributesUtils', () => {
     it('should return true if only some of the data values are bootstrapped', () => {
       expect(
         isMissingBasicAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce', bootstrap: true },
             [IdDI.city]: { value: 'Enclave', bootstrap: true },
@@ -82,7 +82,7 @@ describe('MissingAttributesUtils', () => {
 
       expect(
         isMissingBasicAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce', bootstrap: true },
             [IdDI.lastName]: { value: 'Dogru' },
@@ -108,7 +108,7 @@ describe('MissingAttributesUtils', () => {
     it('should return true if only some of the data values are decrypted', () => {
       expect(
         isMissingBasicAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce', decrypted: true },
             [IdDI.city]: { value: 'Enclave', decrypted: true },
@@ -118,7 +118,7 @@ describe('MissingAttributesUtils', () => {
 
       expect(
         isMissingBasicAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce', decrypted: true },
             [IdDI.lastName]: { value: 'Dogru' },
@@ -142,17 +142,17 @@ describe('MissingAttributesUtils', () => {
     });
 
     it('should return false if the user has the missing basic attributes', () => {
+      expect(isMissingBasicAttribute([CollectedKycDataOption.address])).toEqual(
+        false,
+      );
       expect(
-        isMissingBasicAttribute([CollectedKycDataOption.fullAddress]),
-      ).toEqual(false);
-      expect(
-        isMissingBasicAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingBasicAttribute([CollectedKycDataOption.address], {
           [IdDI.city]: { value: 'Enclave' },
         }),
       ).toEqual(false);
       expect(
         isMissingBasicAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce' },
             [IdDI.lastName]: { value: 'Dogru' },
@@ -164,13 +164,13 @@ describe('MissingAttributesUtils', () => {
     it('should return true if the user is missing any of the basic attributes', () => {
       expect(
         isMissingResidentialAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {},
         ),
       ).toEqual(true);
       expect(
         isMissingResidentialAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce' },
           },
@@ -178,7 +178,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(true);
       expect(
         isMissingBasicAttribute(
-          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {},
         ),
       ).toEqual(true);
@@ -192,7 +192,7 @@ describe('MissingAttributesUtils', () => {
 
     it('should return false if the user has all the residential attributes but they are disabled', () => {
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
           [IdDI.city]: { value: 'Enclave', disabled: true },
           [IdDI.state]: { value: 'NY', disabled: true },
@@ -204,7 +204,7 @@ describe('MissingAttributesUtils', () => {
 
     it('should return true if only some of the data values are disabled', () => {
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
           [IdDI.city]: { value: 'Enclave', disabled: true },
           [IdDI.country]: { value: 'US' },
@@ -212,7 +212,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(true);
 
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
           [IdDI.city]: { value: 'Enclave', disabled: true },
           [IdDI.state]: { value: 'NY', disabled: true },
@@ -222,7 +222,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(false);
 
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '123 Main St', disabled: true },
           [IdDI.city]: { value: 'Enclave', disabled: true },
           [IdDI.state]: { value: 'NY' },
@@ -234,7 +234,7 @@ describe('MissingAttributesUtils', () => {
 
     it('should return true if only some of the data values are bootstrapped', () => {
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
           [IdDI.city]: { value: 'Enclave', bootstrap: true },
           [IdDI.country]: { value: 'US' },
@@ -242,7 +242,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(true);
 
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
           [IdDI.city]: { value: 'Enclave', bootstrap: true },
           [IdDI.state]: { value: 'NY', bootstrap: true },
@@ -252,7 +252,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(false);
 
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
           [IdDI.city]: { value: 'Enclave', bootstrap: true },
           [IdDI.state]: { value: 'NY' },
@@ -264,7 +264,7 @@ describe('MissingAttributesUtils', () => {
 
     it('should return true if only some of the data values are decrypted', () => {
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '123 Main St', decrypted: true },
           [IdDI.city]: { value: 'Enclave', decrypted: true },
           [IdDI.country]: { value: 'US' },
@@ -272,7 +272,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(true);
 
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '123 Main St', decrypted: true },
           [IdDI.city]: { value: 'Enclave', decrypted: true },
           [IdDI.state]: { value: 'NY', decrypted: true },
@@ -282,7 +282,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(false);
 
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '123 Main St', decrypted: true },
           [IdDI.city]: { value: 'Enclave', decrypted: true },
           [IdDI.state]: { value: 'NY' },
@@ -304,7 +304,7 @@ describe('MissingAttributesUtils', () => {
         ),
       ).toEqual(false);
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.addressLine1]: { value: '94117' },
           [IdDI.city]: { value: 'Enclave' },
           [IdDI.state]: { value: 'NY' },
@@ -316,22 +316,22 @@ describe('MissingAttributesUtils', () => {
 
     it('should return true if the user is missing any of the residential attributes', () => {
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {}),
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {}),
       ).toEqual(true);
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.zip]: { value: '94107' },
           [IdDI.country]: { value: 'US' },
         }),
       ).toEqual(true);
       expect(
-        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.address], {
           [IdDI.zip]: { value: '94117' },
         }),
       ).toEqual(true);
       expect(
         isMissingResidentialAttribute(
-          [CollectedKycDataOption.dob, CollectedKycDataOption.fullAddress],
+          [CollectedKycDataOption.dob, CollectedKycDataOption.address],
           {
             [IdDI.zip]: { value: '94117' },
           },
@@ -475,7 +475,7 @@ describe('MissingAttributesUtils', () => {
           [
             CollectedKycDataOption.name,
             CollectedKycDataOption.ssn4,
-            CollectedKycDataOption.fullAddress,
+            CollectedKycDataOption.address,
           ],
           {
             [IdDI.firstName]: { value: 'Belce', disabled: true },
@@ -500,7 +500,7 @@ describe('MissingAttributesUtils', () => {
 
       expect(
         hasMissingAttributes(
-          [CollectedKycDataOption.fullAddress, CollectedKycDataOption.ssn9],
+          [CollectedKycDataOption.address, CollectedKycDataOption.ssn9],
           {
             [IdDI.addressLine1]: { value: '730 Hayes St', decrypted: true },
             [IdDI.city]: { value: 'San Francisco', decrypted: true },
@@ -514,7 +514,7 @@ describe('MissingAttributesUtils', () => {
 
       expect(
         hasMissingAttributes(
-          [CollectedKycDataOption.fullAddress, CollectedKycDataOption.ssn9],
+          [CollectedKycDataOption.address, CollectedKycDataOption.ssn9],
           {
             [IdDI.zip]: { value: '94117', decrypted: true },
             [IdDI.ssn9]: { value: '000000000', bootstrap: true },

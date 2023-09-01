@@ -52,7 +52,7 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
           />
           <Checkbox
             label={allT('cdo.full_address')}
-            {...register(CollectedKycDataOption.fullAddress)}
+            {...register(CollectedKycDataOption.address)}
           />
         </OptionsContainer>
       </ScopeSection>

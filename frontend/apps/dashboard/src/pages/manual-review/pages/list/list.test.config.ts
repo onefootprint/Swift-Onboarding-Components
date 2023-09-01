@@ -72,7 +72,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     mustCollectData: [
       CollectedKycDataOption.name,
       CollectedKycDataOption.email,
-      CollectedKycDataOption.fullAddress,
+      CollectedKycDataOption.address,
       CollectedKycDataOption.phoneNumber,
       CollectedKycDataOption.dob,
       CollectedKycDataOption.ssn9,
@@ -80,7 +80,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     canAccessData: [
       CollectedKycDataOption.name,
       CollectedKycDataOption.email,
-      CollectedKycDataOption.fullAddress,
+      CollectedKycDataOption.address,
       CollectedKycDataOption.phoneNumber,
       CollectedKycDataOption.dob,
       CollectedKycDataOption.ssn9,

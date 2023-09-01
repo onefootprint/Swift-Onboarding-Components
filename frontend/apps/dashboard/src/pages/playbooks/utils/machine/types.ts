@@ -35,7 +35,7 @@ export type AuthorizedScopesFormData = {
   [CollectedKycDataOption.email]: boolean;
   [CollectedKycDataOption.phoneNumber]: boolean;
   [CollectedKycDataOption.dob]: boolean;
-  [CollectedKycDataOption.fullAddress]: boolean;
+  [CollectedKycDataOption.address]: boolean;
   [CollectedKycDataOption.ssn4]?: boolean;
   [CollectedKycDataOption.ssn9]?: boolean;
   [CollectedKycDataOption.usLegalStatus]?: boolean;
@@ -49,7 +49,7 @@ export type PersonalInformationAndDocs = {
   [CollectedKycDataOption.phoneNumber]: boolean;
   [CollectedKycDataOption.dob]: boolean;
   [CollectedKycDataOption.usLegalStatus]: boolean;
-  [CollectedKycDataOption.fullAddress]: boolean;
+  [CollectedKycDataOption.address]: boolean;
   ssn: boolean;
   ssnKind?: CollectedKycDataOption;
   idDoc: boolean;
@@ -86,7 +86,7 @@ export const defaultPlaybookValuesKYC: PlaybookFormData = {
     [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.dob]: true,
     [CollectedKycDataOption.usLegalStatus]: false,
-    [CollectedKycDataOption.fullAddress]: true,
+    [CollectedKycDataOption.address]: true,
     ssn: true,
     idDoc: false,
     ssnKind: CollectedKycDataOption.ssn9,
@@ -107,7 +107,7 @@ export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
   [CollectedKycDataOption.phoneNumber]: true,
   [CollectedKycDataOption.name]: true,
   [CollectedKycDataOption.dob]: true,
-  [CollectedKycDataOption.fullAddress]: true,
+  [CollectedKycDataOption.address]: true,
   [CollectedKycDataOption.ssn4]: true,
   [CollectedKycDataOption.ssn9]: true,
   [CollectedKycDataOption.usLegalStatus]: true,
@@ -156,7 +156,7 @@ export const basicInformationFields: string[] = [
   CollectedKycDataOption.phoneNumber,
   CollectedKycDataOption.name,
   CollectedKycDataOption.dob,
-  CollectedKycDataOption.fullAddress,
+  CollectedKycDataOption.address,
   CollectedKycDataOption.nationality,
 ];
 

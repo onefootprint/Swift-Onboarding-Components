@@ -32,7 +32,7 @@ const getRequiredKycCollectFields = () => [
   CollectedKycDataOption.email,
   CollectedKycDataOption.name,
   CollectedKycDataOption.dob,
-  CollectedKycDataOption.fullAddress,
+  CollectedKycDataOption.address,
 ];
 
 const processPlaybook = ({

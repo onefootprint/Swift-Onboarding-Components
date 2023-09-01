@@ -175,7 +175,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.dataCollected,
             data: {
-              attributes: [CollectedKycDataOption.fullAddress],
+              attributes: [CollectedKycDataOption.address],
             },
           },
           isFromOtherOrg: true,
@@ -191,7 +191,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
               attributes: [
                 CollectedKycDataOption.dob,
                 CollectedKycDataOption.email,
-                CollectedKycDataOption.fullAddress,
+                CollectedKycDataOption.address,
               ],
             },
           },
@@ -242,7 +242,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.dataCollected,
             data: {
-              attributes: [CollectedKycDataOption.fullAddress],
+              attributes: [CollectedKycDataOption.address],
             },
           },
           isFromOtherOrg: true,
@@ -283,7 +283,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.dataCollected,
             data: {
-              attributes: [CollectedKycDataOption.fullAddress],
+              attributes: [CollectedKycDataOption.address],
             },
           },
           isFromOtherOrg: true,
@@ -389,7 +389,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.dataCollected,
             data: {
-              attributes: [CollectedKycDataOption.fullAddress],
+              attributes: [CollectedKycDataOption.address],
             },
           },
           isFromOtherOrg: false,
@@ -440,7 +440,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.dataCollected,
             data: {
-              attributes: [CollectedKycDataOption.fullAddress],
+              attributes: [CollectedKycDataOption.address],
             },
           },
           isFromOtherOrg: false,
@@ -487,7 +487,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.dataCollected,
             data: {
-              attributes: [CollectedKycDataOption.fullAddress],
+              attributes: [CollectedKycDataOption.address],
             },
           },
           isFromOtherOrg: true,
@@ -517,7 +517,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             data: {
               attributes: [
                 CollectedKycDataOption.email,
-                CollectedKycDataOption.fullAddress,
+                CollectedKycDataOption.address,
               ],
             },
           },

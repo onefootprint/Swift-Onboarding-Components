@@ -71,7 +71,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           isMet: false,
-          missingAttributes: [CollectedKycDataOption.fullAddress],
+          missingAttributes: [CollectedKycDataOption.address],
           populatedAttributes: [],
           optionalAttributes: [],
         },
@@ -113,7 +113,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
         {
           kind: OnboardingRequirementKind.collectKycData,
           isMet: false,
-          missingAttributes: [CollectedKycDataOption.fullAddress],
+          missingAttributes: [CollectedKycDataOption.address],
           populatedAttributes: [],
           optionalAttributes: [],
         },
@@ -131,7 +131,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
           isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
-            CollectedKycDataOption.fullAddress,
+            CollectedKycDataOption.address,
           ],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -148,7 +148,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
           isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
-            CollectedKycDataOption.fullAddress,
+            CollectedKycDataOption.address,
           ],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -165,7 +165,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
           isMet: false,
           missingAttributes: [
             CollectedKycDataOption.dob,
-            CollectedKycDataOption.fullAddress,
+            CollectedKycDataOption.address,
           ],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -182,7 +182,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
           isMet: false,
           missingAttributes: [
             CollectedKycDataOption.dob,
-            CollectedKycDataOption.fullAddress,
+            CollectedKycDataOption.address,
           ],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -199,7 +199,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
           isMet: false,
           missingAttributes: [
             CollectedKycDataOption.dob,
-            CollectedKycDataOption.fullAddress,
+            CollectedKycDataOption.address,
           ],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -232,7 +232,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
           isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
-            CollectedKycDataOption.fullAddress,
+            CollectedKycDataOption.address,
           ],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -258,7 +258,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
           isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
-            CollectedKycDataOption.fullAddress,
+            CollectedKycDataOption.address,
           ],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -284,7 +284,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
           isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
-            CollectedKycDataOption.fullAddress,
+            CollectedKycDataOption.address,
           ],
           populatedAttributes: [],
           optionalAttributes: [],
@@ -310,7 +310,7 @@ describe('getCurrentStepFromMissingAttributes', () => {
           isMet: false,
           missingAttributes: [
             CollectedKycDataOption.name,
-            CollectedKycDataOption.fullAddress,
+            CollectedKycDataOption.address,
           ],
           populatedAttributes: [],
           optionalAttributes: [CollectedKycDataOption.ssn4],

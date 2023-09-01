@@ -27,7 +27,7 @@ export enum CollectedKycDataOption {
   dob = 'dob',
   ssn4 = 'ssn4',
   ssn9 = 'ssn9',
-  fullAddress = 'full_address',
+  address = 'full_address',
   email = 'email',
   phoneNumber = 'phone_number',
   nationality = 'nationality',
@@ -83,7 +83,7 @@ export const CollectedKycDataOptionToRequiredAttributes: Record<
   [CollectedKycDataOption.dob]: [IdDI.dob],
   [CollectedKycDataOption.ssn4]: [IdDI.ssn4],
   [CollectedKycDataOption.ssn9]: [IdDI.ssn9],
-  [CollectedKycDataOption.fullAddress]: [
+  [CollectedKycDataOption.address]: [
     IdDI.addressLine1,
     IdDI.city,
     IdDI.state,

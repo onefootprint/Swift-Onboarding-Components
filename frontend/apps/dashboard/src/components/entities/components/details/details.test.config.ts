@@ -114,7 +114,7 @@ export const timelineFixture: Timeline = [
               CollectedKybDataOption.tin,
               CollectedKybDataOption.beneficialOwners,
               CollectedKycDataOption.name,
-              CollectedKycDataOption.fullAddress,
+              CollectedKycDataOption.address,
               CollectedKycDataOption.phoneNumber,
               CollectedKycDataOption.dob,
               CollectedKycDataOption.ssn4,
