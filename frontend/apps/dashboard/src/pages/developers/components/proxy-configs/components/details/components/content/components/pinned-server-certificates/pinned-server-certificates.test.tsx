@@ -27,7 +27,7 @@ describe('<PinnedServerCertificates />', () => {
       proxyConfig: configWithNoPinnedServerCertificate,
     });
     expect(
-      screen.getByText("There's no pinned server certificates"),
+      screen.getByText('There are no pinned server certificates'),
     ).toBeInTheDocument();
   });
 });

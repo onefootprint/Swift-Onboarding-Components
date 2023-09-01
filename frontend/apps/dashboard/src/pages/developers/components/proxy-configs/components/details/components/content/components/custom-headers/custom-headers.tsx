@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import type { ProxyConfigDetails } from '@onefootprint/types';
-import { Badge, CodeInline } from '@onefootprint/ui';
+import { Badge, CodeInline, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import { Field } from 'src/components';
 
-type CustomHeadersProps = {
+export type CustomHeadersProps = {
   proxyConfig: ProxyConfigDetails;
 };
 
@@ -34,7 +34,9 @@ const CustomHeaders = ({ proxyConfig }: CustomHeadersProps) => {
         </Fragment>
       ))}
     </>
-  ) : null;
+  ) : (
+    <Typography variant="body-3">{t('empty')}</Typography>
+  );
 };
 
 export default CustomHeaders;

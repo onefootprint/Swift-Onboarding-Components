@@ -1,1 +1,1 @@
-export { default } from './custom-headers';
+export { type CustomHeadersProps, default } from './custom-headers';
