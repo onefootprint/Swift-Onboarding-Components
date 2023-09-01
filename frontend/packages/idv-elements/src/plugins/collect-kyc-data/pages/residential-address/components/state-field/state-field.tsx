@@ -20,10 +20,11 @@ const StateField = () => {
   } = useFormContext<FormData>();
   const country = watch('country');
   const isDomestic = country.value === 'US';
+
   const shouldCollect =
     COUNTRIES_WITH_STATES.includes(country.value) ||
     COUNTRIES_WITH_PROVINCES.includes(country.value);
-  if (shouldCollect) {
+  if (!shouldCollect) {
     return null;
   }
 

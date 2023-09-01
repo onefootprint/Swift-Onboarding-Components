@@ -1,4 +1,5 @@
 import {
+  customRender,
   screen,
   selectEvents,
   userEvent,
@@ -11,7 +12,11 @@ import {
   UsLegalStatus,
   VisaKind,
 } from '@onefootprint/types';
+import React from 'react';
 
+import { KycData } from '../../utils';
+import { MachineContext } from '../../utils/state-machine';
+import TestWrapper from '../../utils/test-wrapper';
 import {
   withIdentify,
   withIdentifyVerify,
@@ -19,8 +24,19 @@ import {
   withUserToken,
   withUserVaultValidate,
 } from './index.test.config';
+import LegalStatus from './legal-status';
 import getInitialContext from './utils/test/get-initial-context';
-import { renderLegalStatus } from './utils/test/render-legal-status';
+
+const renderLegalStatus = (
+  initialContext: MachineContext,
+  onComplete?: (args: KycData) => void,
+) => {
+  customRender(
+    <TestWrapper initialContext={initialContext} initState="confirm">
+      <LegalStatus onComplete={onComplete} />
+    </TestWrapper>,
+  );
+};
 
 describe('LegalStatus', () => {
   beforeEach(() => {

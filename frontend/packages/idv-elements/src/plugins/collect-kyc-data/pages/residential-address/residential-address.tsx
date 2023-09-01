@@ -10,6 +10,7 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
+import { KycData } from '../../utils';
 import getInitialCountry from '../../utils/get-initial-country';
 import AddressLines from './components/address-lines';
 import CityField from './components/city-field';
@@ -22,7 +23,7 @@ import getInitialState from './utils/get-initial-state';
 
 type ResidentialAddressProps = {
   ctaLabel?: string;
-  onComplete?: () => void;
+  onComplete?: (args: KycData) => void;
   onCancel?: () => void;
   hideHeader?: boolean;
 };
@@ -74,7 +75,7 @@ const ResidentialAddress = ({
           type: 'dataSubmitted',
           payload: convertedData,
         });
-        onComplete?.();
+        onComplete?.(convertedData);
       },
     });
   };

@@ -17,11 +17,17 @@ const WithTranslation = ({ children }: WrapperProps) => (
   <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
 );
 
-const TestWrapper = (
-  initialContext: MachineContext,
-  initState: string,
-  children: ReactNode,
-) => (
+type TestWrapperProps = {
+  initialContext: MachineContext;
+  initState: string;
+  children: ReactNode;
+};
+
+const TestWrapper = ({
+  initialContext,
+  initState,
+  children,
+}: TestWrapperProps) => (
   <WithTranslation>
     <ToastProvider>
       <Layout>

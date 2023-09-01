@@ -18,8 +18,9 @@ const CountryField = ({ onChange }: CountryFieldProps) => {
   } = state;
   const { control } = useFormContext<FormData>();
   const { t } = useTranslation('pages.residential-address.form.country');
-  const disabled = !config.allowInternationalResidents;
   const allowedCountries = new Set(config.supportedCountries);
+  const disabled =
+    !config.allowInternationalResidents || allowedCountries.size < 2;
   const options = COUNTRIES.filter(entry => allowedCountries.has(entry.value));
 
   return (
