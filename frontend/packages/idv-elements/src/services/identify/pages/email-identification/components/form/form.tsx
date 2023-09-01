@@ -34,7 +34,7 @@ const Form = ({ defaultEmail, isLoading, onSubmit }: FormProps) => {
           label={t('email.label')}
           placeholder={t('email.placeholder')}
           type="email"
-          defaultValue={getValues('email')}
+          value={getValues('email')}
           {...register('email', {
             required: {
               value: true,

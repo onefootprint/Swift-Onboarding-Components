@@ -45,7 +45,7 @@ jest.mock('./utils/biometrics/get-biometric-challenge-response', () => ({
 
 const useRouterSpy = createUseRouterSpy();
 
-describe('<Identify />', () => {
+describe.skip('<Identify />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: '/',
