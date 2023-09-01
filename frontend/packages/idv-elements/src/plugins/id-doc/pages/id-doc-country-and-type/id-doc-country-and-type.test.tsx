@@ -156,7 +156,9 @@ describe('<IdDocCountryAndType/>', () => {
   describe('Other tests', () => {
     it('Country selector is disabled for only US', async () => {
       renderFrontCountryAndDoc(initialContextOnlyUS);
-      const onlyUSWarning = screen.getByText('We only support US documents');
+      const onlyUSWarning = screen.getByText(
+        'Only documents issued by United States of America are accepted',
+      );
       expect(onlyUSWarning).toBeInTheDocument();
 
       const trigger = screen.getByRole('button', {

@@ -1,3 +1,4 @@
+import { CountryCode } from '../data';
 import {
   CollectedDataOption,
   CollectedInvestorProfileDataOption,
@@ -44,6 +45,7 @@ export type IdDocRequirement = {
   shouldCollectConsent: boolean;
   onlyUsSupported: boolean;
   supportedDocumentTypes: SupportedIdDocTypes[];
+  supportedCountries: CountryCode[];
 };
 
 export type RegisterPasskeyRequirement = {

@@ -20,6 +20,7 @@ export const requirement: IdDocRequirement = {
     SupportedIdDocTypes.idCard,
     SupportedIdDocTypes.passport,
   ],
+  supportedCountries: ['US', 'CA'],
 };
 
 export const argsRegularMobile: MachineContext = {

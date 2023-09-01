@@ -27,6 +27,7 @@ export const initialContextDL: MachineContext = {
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
     ],
+    supportedCountries: ['US', 'CA'],
   },
   idDoc: {
     country: 'US',

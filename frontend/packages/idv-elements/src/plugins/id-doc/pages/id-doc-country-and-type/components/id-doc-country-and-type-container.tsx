@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/global-constants';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { SubmitDocTypeResponse } from '@onefootprint/types';
+import { CountryCode, SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import {
   Button,
@@ -35,6 +35,19 @@ type IdDocCountryAndTypeContainerProps = {
   ) => void;
 };
 
+const getDefaultCountry = (
+  supportedCountries: Set<CountryCode>,
+  supportedCountryRecords: CountryRecord[],
+) => {
+  let defaultCountry;
+  if (supportedCountries.has('US')) {
+    defaultCountry = getCountryFromCode('US');
+  }
+
+  if (!defaultCountry) [defaultCountry] = supportedCountryRecords;
+  return defaultCountry;
+};
+
 const IdDocCountryAndTypeContainer = ({
   onSubmitDocTypeSuccess,
 }: IdDocCountryAndTypeContainerProps) => {
@@ -46,15 +59,25 @@ const IdDocCountryAndTypeContainer = ({
     authToken,
     sandboxOutcome,
     device,
+    requirement,
   } = state.context;
-  const { type: deviceType } = device;
   const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
+  const supportedCountries = new Set(requirement.supportedCountries);
+  const supportedCountryRecords = COUNTRIES.filter(country =>
+    supportedCountries.has(country.value),
+  );
+  const defaultSupportedCountry = getDefaultCountry(
+    supportedCountries,
+    supportedCountryRecords,
+  );
+  const { type: deviceType } = device;
+
   const requestErrorToast = useRequestErrorToast();
   const [country, setCountry] = useState<CountryRecord>(
-    getCountryFromCode(defaultCountry) ?? DEFAULT_COUNTRY,
+    getCountryFromCode(defaultCountry) ?? defaultSupportedCountry,
   );
 
-  const { onlyUsSupported, supportedDocumentTypes } = state.context.requirement;
+  const { supportedDocumentTypes } = state.context.requirement;
   const types: SupportedIdDocTypes[] = SupportedDocTypesByCountry[
     country.value
   ].filter(type => supportedDocumentTypes.includes(type));
@@ -64,10 +87,6 @@ const IdDocCountryAndTypeContainer = ({
   const [docType, setDocType] = useState<SupportedIdDocTypes>(
     defaultType ?? firstTypeFromOptions,
   );
-
-  const countryOptions = onlyUsSupported
-    ? [getCountryFromCode('US') as CountryRecord]
-    : COUNTRIES;
 
   const handleCountryChange = (option: CountrySelectOption) => {
     const nextCountry = getCountryFromCode(option.value);
@@ -122,12 +141,18 @@ const IdDocCountryAndTypeContainer = ({
       <InputsContainer>
         <CountrySelect
           data-private
-          disabled={onlyUsSupported}
+          disabled={supportedCountryRecords.length <= 1}
           label={t('form.country')}
           onChange={handleCountryChange}
-          options={countryOptions}
+          options={supportedCountryRecords}
           value={country}
-          hint={onlyUsSupported ? t('form.only-us') : undefined}
+          hint={
+            supportedCountryRecords.length === 1
+              ? t('form.hint.label', {
+                  country: country.label,
+                })
+              : undefined
+          }
           testID="country-selector"
         />
         <Divider />

@@ -28,11 +28,8 @@ const App = ({ context, onDone }: IdDocProps) => {
     currSide: IdDocImageTypes.front,
     requirement: customData.requirement,
     idDoc: {
-      country: customData.requirement.onlyUsSupported ? 'US' : undefined,
-      type:
-        customData.requirement.supportedDocumentTypes.length === 1
-          ? customData.requirement.supportedDocumentTypes[0]
-          : undefined,
+      country: undefined,
+      type: undefined,
     },
     sandboxOutcome,
   };

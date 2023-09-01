@@ -27,6 +27,7 @@ const idDocRequirement: IdDocRequirement = {
   shouldCollectConsent: true,
   onlyUsSupported: false,
   supportedDocumentTypes: [],
+  supportedCountries: ['US', 'CA'],
 };
 
 const kycRequirement: CollectKycDataRequirement = {

@@ -28,6 +28,7 @@ export const initialContextAllDocTypes: MachineContext = {
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
     ],
+    supportedCountries: ['US', 'CA'],
   },
   idDoc: {
     country: undefined,
@@ -53,6 +54,7 @@ export const initialContextSomeDocTypes: MachineContext = {
       SupportedIdDocTypes.idCard,
       SupportedIdDocTypes.passport,
     ],
+    supportedCountries: ['US', 'CA'],
   },
   idDoc: {
     country: undefined,
@@ -78,6 +80,7 @@ export const initialContextOnlyUS: MachineContext = {
       SupportedIdDocTypes.idCard,
       SupportedIdDocTypes.passport,
     ],
+    supportedCountries: ['US'],
   },
   idDoc: {
     country: 'US',
@@ -103,6 +106,7 @@ export const initialContextBD: MachineContext = {
       SupportedIdDocTypes.idCard,
       SupportedIdDocTypes.passport,
     ],
+    supportedCountries: ['US'],
   },
   idDoc: {
     country: 'BD',
@@ -128,6 +132,7 @@ export const initialContextNoSupportedDoc: MachineContext = {
       SupportedIdDocTypes.idCard,
       SupportedIdDocTypes.passport,
     ],
+    supportedCountries: ['US'],
   },
   idDoc: {
     country: 'SG',
