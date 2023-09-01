@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Drawer } from '@onefootprint/ui';
 import React from 'react';
 import { Error } from 'src/components';
+import { createCapitalStringList } from 'src/utils/create-string-list';
 
 import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';
 
@@ -17,7 +18,9 @@ const Details = () => {
 
   const getDrawerTitle = () => {
     if (data) {
-      return data.note;
+      return data.scopes.length
+        ? createCapitalStringList(data.scopes)
+        : data.note;
     }
     return isLoading ? t('notifications.loading') : t('notifications.error');
   };
