@@ -29,6 +29,7 @@ const contextWithErrors: MachineContext = {
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
     ],
+    supportedCountries: ['US', 'CA'],
   },
   errors: [
     IdDocImageProcessingError.countryCodeMismatch,

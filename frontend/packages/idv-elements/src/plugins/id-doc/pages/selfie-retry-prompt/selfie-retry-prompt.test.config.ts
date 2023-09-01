@@ -28,6 +28,7 @@ const contextWithSelfieErrors: MachineContext = {
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
     ],
+    supportedCountries: ['US', 'CA'],
   },
   errors: [IdDocImageProcessingError.selfieGlare],
   idDoc: {

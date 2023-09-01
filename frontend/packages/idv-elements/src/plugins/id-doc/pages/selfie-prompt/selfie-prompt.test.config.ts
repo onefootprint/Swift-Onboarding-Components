@@ -27,6 +27,7 @@ const selfiePromptStateContext: MachineContext = {
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
     ],
+    supportedCountries: ['US', 'CA'],
   },
   idDoc: {
     country: 'US',
