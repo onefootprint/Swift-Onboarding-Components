@@ -35,6 +35,7 @@ pub enum WrappedVendorAPI {
     IncodeGetOnboardingStatus,
     IncodeProcessFace,
     StytchLookup,
+    FootprintDeviceAttestation,
 }
 impl From<VendorAPI> for WrappedVendorAPI {
     fn from(value: VendorAPI) -> Self {
@@ -64,6 +65,7 @@ impl From<VendorAPI> for WrappedVendorAPI {
             VendorAPI::IncodeGetOnboardingStatus => Self::IncodeGetOnboardingStatus,
             VendorAPI::IncodeProcessFace => Self::IncodeProcessFace,
             VendorAPI::StytchLookup => Self::StytchLookup,
+            VendorAPI::FootprintDeviceAttestation => Self::FootprintDeviceAttestation,
         }
     }
 }
@@ -96,6 +98,7 @@ impl From<WrappedVendorAPI> for VendorAPI {
             WrappedVendorAPI::IncodeGetOnboardingStatus => VendorAPI::IncodeGetOnboardingStatus,
             WrappedVendorAPI::IncodeProcessFace => VendorAPI::IncodeProcessFace,
             WrappedVendorAPI::StytchLookup => VendorAPI::StytchLookup,
+            WrappedVendorAPI::FootprintDeviceAttestation => VendorAPI::FootprintDeviceAttestation,
         }
     }
 }

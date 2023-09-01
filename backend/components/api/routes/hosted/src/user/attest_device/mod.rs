@@ -3,6 +3,7 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
 use actix_web::web::Json;
 
+use api_core::errors::ApiResult;
 use api_core::types::ResponseData;
 use api_core::utils::challenge::Challenge;
 
@@ -16,6 +17,7 @@ use chrono::{Duration, Utc};
 use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
 
 mod ios;
+mod risk_signals;
 
 #[cfg(test)]
 mod tests;
@@ -86,14 +88,34 @@ pub async fn post_attestation(
     } = Challenge::unseal_string(&state.challenge_sealing_key, sealed_state)?.data;
 
     let vault_id = auth.user.id.clone();
+    let scoped_vault_id = auth.scoped_user_id();
+    let workflow_id = auth.workflow_id();
+    let vault_public_key = auth.user.public_key.clone();
+    let is_live = auth.user.is_live;
 
-    let _ = match device_type {
+    match device_type {
         DeviceAttestationType::Ios => {
-            let new_attestation = ios::attest(&state, vault_id.clone(), challenge, attestation).await?;
+            let new_attestation = ios::attest(&state, vault_id, challenge, attestation).await?;
 
             state
                 .db_pool
-                .db_query(move |conn| new_attestation.create(conn))
+                .db_transaction(move |conn| -> ApiResult<()> {
+                    let attestation = new_attestation.create(conn.conn())?;
+
+                    // if we have a scoped vault (which we should always have in an onboarding)
+                    if let Some(scoped_vault_id) = scoped_vault_id {
+                        risk_signals::ios::create(
+                            conn,
+                            &attestation,
+                            &vault_public_key,
+                            &scoped_vault_id,
+                            workflow_id.as_ref(),
+                            is_live,
+                        )?;
+                    }
+
+                    Ok(())
+                })
                 .await?
         }
         DeviceAttestationType::Android => {

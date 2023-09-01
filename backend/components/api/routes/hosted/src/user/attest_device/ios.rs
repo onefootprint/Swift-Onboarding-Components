@@ -2,9 +2,7 @@ use crate::State;
 
 use api_core::errors::ApiResult;
 
-use app_attest::apple::device_check::DeviceCheckBits;
 use app_attest::apple::AppleAppAttestationVerifier;
-use chrono::Utc;
 
 use crypto::base64;
 
@@ -15,7 +13,6 @@ use db::models::{
 use newtypes::VaultId;
 use webauthn_rs_proto::RegisterPublicKeyCredential;
 
-// TODO: this structure is placeholder
 #[derive(Debug, Clone, serde::Deserialize)]
 struct IosAttestationPayload {
     /// base64 encoded metadata json
@@ -100,35 +97,9 @@ pub(super) async fn attest_inner(
 
     let bits = if let Some(device_check_token) = attested_metadata.device_check_token.clone() {
         // fetch the device bits
-        let bits = verifier
-            .query_device_bits(device_check_token.clone(), verified_attest.is_development)
-            .await?;
-
-        let (bit1, bit0) = (bits.as_ref().map(|b| b.bit1), bits.map(|b| b.bit0));
-
-        // update the bits as a counter
-        let (bit1, bit0) = match (bit1, bit0) {
-            // 00 -> 01
-            (Some(false), Some(false)) => (false, true),
-            // 01 -> 10
-            (Some(false), Some(true)) => (true, false),
-            // 10 -> 11
-            (Some(true), Some(false)) => (true, true),
-            // 11 -> 11
-            (Some(true), Some(true)) => (true, true),
-            // unset -> 00
-            _ => (false, false),
-        };
-
         verifier
-            .update_device_bits(device_check_token, verified_attest.is_development, bit0, bit1)
-            .await?;
-
-        Some(DeviceCheckBits {
-            bit0,
-            bit1,
-            last_update_time: Utc::now().format("%Y-%m").to_string(),
-        })
+            .query_device_bits(device_check_token.clone(), verified_attest.is_development)
+            .await?
     } else {
         None
     };

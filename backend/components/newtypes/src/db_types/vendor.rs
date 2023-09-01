@@ -91,6 +91,7 @@ pub enum VendorAPI {
     IncodeGetOnboardingStatus,
     IncodeProcessFace,
     StytchLookup,
+    FootprintDeviceAttestation,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -122,6 +123,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IncodeGetOnboardingStatus => Self::Incode,
             VendorAPI::IncodeProcessFace => Self::Incode,
             VendorAPI::StytchLookup => Self::Stytch,
+            VendorAPI::FootprintDeviceAttestation => Self::Footprint,
         }
     }
 }
@@ -159,7 +161,8 @@ impl VendorAPI {
             | VendorAPI::IncodeGetOnboardingStatus
             | VendorAPI::IncodeProcessFace
             | VendorAPI::SocureIDPlus
-            | VendorAPI::StytchLookup => false,
+            | VendorAPI::StytchLookup
+            | VendorAPI::FootprintDeviceAttestation => false,
         }
     }
 
@@ -189,7 +192,8 @@ impl VendorAPI {
             | VendorAPI::TwilioLookupV2
             | VendorAPI::SocureIDPlus
             | VendorAPI::ExperianPreciseID
-            | VendorAPI::StytchLookup => false,
+            | VendorAPI::StytchLookup
+            | VendorAPI::FootprintDeviceAttestation => false,
         }
     }
 }

@@ -33,6 +33,7 @@ pub enum DecisionIntentKind {
     OnboardingKyb,
     DeviceFingerprint,
     DocScan,
+    DeviceAttestation,
 }
 
 crate::util::impl_enum_str_diesel!(DecisionIntentKind);

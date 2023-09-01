@@ -410,15 +410,15 @@ footprint_reason_code_enum! {
         #[note = "Last name partially matches", severity = SignalSeverity::Low,  description = "The located last name partially matches the input last name."]
         NameLastPartiallyMatches,
 
- #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
- #[note = "Name matches", severity = SignalSeverity::Info,  description = "The located name matches the input name."]
- NameMatches,
- #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
- #[note = "Name does not matches", severity = SignalSeverity::High,  description = "The located name does not match the input name."]
- NameDoesNotMatch,
- #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
- #[note = "Name partially matches", severity = SignalSeverity::Low,  description = "The located name partially matches the input name."]
- NamePartiallyMatches,
+        #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[note = "Name matches", severity = SignalSeverity::Info,  description = "The located name matches the input name."]
+        NameMatches,
+        #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+        #[note = "Name does not matches", severity = SignalSeverity::High,  description = "The located name does not match the input name."]
+        NameDoesNotMatch,
+        #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+        #[note = "Name partially matches", severity = SignalSeverity::Low,  description = "The located name partially matches the input name."]
+        NamePartiallyMatches,
 
  // ~~~~~~~~~~~~ IP Address ~~~~~~~~~~~~
         // TODO: we aren't currently sending ip_address to Idology so these are unused. We possibly want to just remove these and just use Stytch
@@ -1153,8 +1153,30 @@ footprint_reason_code_enum! {
 
         #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
         #[note = "Browser automation", severity = SignalSeverity::Medium,  description = "User's device was using browser automation which is often a sign of abuse."]
-        BrowserAutomation
+        BrowserAutomation,
 
+        //
+        // ~~~~~~~~~ Native Device ~~~~~~~~~~~
+        //
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Attested Apple device", severity = SignalSeverity::Info,  description = "User's Apple device is attested, authentic, and non-jailbroken."]
+        AttestedDeviceApple,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Attested Device Unique", severity = SignalSeverity::Info,  description = "User's attested device indicates no duplicate associated identities."]
+        AttestedDeviceNoFraudDuplicateRisk,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Attested Device Low Duplicate Risk", severity = SignalSeverity::Low,  description = "User's attested device indicates low duplicate identity risk."]
+        AttestedDeviceFraudDuplicateRiskLow,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Attested Device Medium Duplicate Risk", severity = SignalSeverity::Medium,  description = "User's attested device indicates medium duplicate identity risk. Device may be associated with more than one identity."]
+        AttestedDeviceFraudDuplicateRiskMedium,
+
+        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[note = "Attested Device High Duplicate Risk", severity = SignalSeverity::High,  description = "User's attested device indicates high duplicate identity risk. Device may be associated with multiple identities."]
+        AttestedDeviceFraudDuplicateRiskHigh
     }
 }
 crate::util::impl_enum_str_diesel!(FootprintReasonCode);

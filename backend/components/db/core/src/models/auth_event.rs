@@ -63,12 +63,13 @@ impl NewAuthEvent {
 
 pub struct LoadedAuthEvent {
     pub event: AuthEvent,
-    pub insight: Option<InsightEvent>,
-    pub attested_devices: Vec<LinkedDeviceAttestation>,
+    pub insight: Option<InsightEvent>,    
+    pub attested_devices: Option<LinkedDeviceAttestation>,
 }
 
-pub enum LinkedDeviceAttestation {
-    Ios(AppleDeviceAttestation),
+pub struct LinkedDeviceAttestation {
+    pub unique_vaults_associated_by_attestation: i64,
+    pub ios_devices: Vec<AppleDeviceAttestation>
     // TODO: Android
 }
 
@@ -100,7 +101,7 @@ impl AuthEvent {
 
         // This is a bit hacky, but we may have >1 attestation per passkey cred
         // so we collect them together.
-        let ios_attestations:Vec<_> = AppleDeviceAttestation::list_for_scoped_user(conn, fp_id, tenant_id, is_live)?;
+        let (ios_attestations, unique_vault_associations) = AppleDeviceAttestation::list_for_scoped_user(conn, fp_id, tenant_id, is_live)?;
 
         let results = results
             .into_iter()
@@ -109,7 +110,7 @@ impl AuthEvent {
                     (AuthEventKind::Sms | AuthEventKind::Email, None) => {
                         Some(LoadedAuthEvent {
                             insight,
-                            attested_devices: vec![],                            
+                            attested_devices: None, 
                             event,
                         })
                     }
@@ -117,8 +118,14 @@ impl AuthEvent {
 
                         Some(LoadedAuthEvent {
                             insight,
-                            // TODO support android
-                            attested_devices: ios_attestations.iter().filter(|att| att.webauthn_credential_id.as_ref() == Some(cred_id)).map(|att| LinkedDeviceAttestation::Ios(att.clone())).collect(),
+                            attested_devices: Some(LinkedDeviceAttestation { 
+                                unique_vaults_associated_by_attestation: unique_vault_associations, 
+                                ios_devices: ios_attestations
+                                    .iter()
+                                    .filter(|att| att.webauthn_credential_id.as_ref() == Some(cred_id))
+                                    .cloned()
+                                    .collect() 
+                            }),
                             event
                         })
                     },

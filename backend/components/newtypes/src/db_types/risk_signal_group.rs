@@ -34,6 +34,7 @@ pub enum RiskSignalGroupKind {
     AdverseMedia,
     Doc,
     WebDevice,
+    NativeDevice,
 }
 
 impl_enum_str_diesel!(RiskSignalGroupKind);

@@ -114,6 +114,7 @@ pub fn scrub_raw_error_vendor_response(
         VendorAPI::IncodeGetOnboardingStatus => scrub_response::<IncodeGetOnboardingStatus>(raw_response),
         VendorAPI::IncodeProcessFace => scrub_response::<IncodeProcessFace>(raw_response),
         VendorAPI::StytchLookup => scrub_response::<StytchLookup>(raw_response),
+        VendorAPI::FootprintDeviceAttestation => scrub_response::<FootprintDeviceAttestation>(raw_response),
     }
 }
 
@@ -170,6 +171,9 @@ fn build_parsed_vendor_response_map_entry(
         }
         VendorAPI::IncodeProcessFace => insert_map_entry(map, IncodeProcessFace, raw_response)?,
         VendorAPI::StytchLookup => insert_map_entry(map, StytchLookup, raw_response)?,
+        VendorAPI::FootprintDeviceAttestation => {
+            insert_map_entry(map, FootprintDeviceAttestation, raw_response)?
+        }
     };
 
     Ok(())
@@ -208,6 +212,7 @@ fn build_verification_identifier_map_entry(
         VendorAPI::IncodeGetOnboardingStatus => map.insert(IncodeGetOnboardingStatus, request_and_result),
         VendorAPI::IncodeProcessFace => map.insert(IncodeProcessFace, request_and_result),
         VendorAPI::StytchLookup => map.insert(StytchLookup, request_and_result),
+        VendorAPI::FootprintDeviceAttestation => map.insert(FootprintDeviceAttestation, request_and_result),
     };
 }
 
@@ -362,6 +367,9 @@ impl TypedMapKey<VendorAPIResponseMarker> for IncodeProcessFace {
 impl TypedMapKey<VendorAPIResponseMarker> for StytchLookup {
     type Value = stytch::response::Response;
 }
+impl TypedMapKey<VendorAPIResponseMarker> for FootprintDeviceAttestation {
+    type Value = serde_json::Value;
+}
 
 /// Verification Request and Result map, used in conjunction with the above map for reason codes
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyExpectID {
@@ -437,6 +445,9 @@ impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeProcessFace {
     type Value = VerificationRequestAndResult;
 }
 impl TypedMapKey<VendorAPIResponseIdsMarker> for StytchLookup {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for FootprintDeviceAttestation {
     type Value = VerificationRequestAndResult;
 }
 

@@ -67,6 +67,7 @@ pub enum ParsedResponse {
     IncodeGetOnboardingStatus(GetOnboardingStatusResponse),
     IncodeProcessFace(ProcessFaceResponse),
     StytchLookup(stytch::response::LookupResponse),
+    FootprintAppleDevicePayload { associated_vault_count: i64 },
 }
 
 impl ParsedResponse {
@@ -286,6 +287,7 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::IncodeGetOnboardingStatus(_) => VendorAPI::IncodeGetOnboardingStatus,
             ParsedResponse::IncodeProcessFace(_) => VendorAPI::IncodeProcessFace,
             ParsedResponse::StytchLookup(_) => VendorAPI::StytchLookup,
+            ParsedResponse::FootprintAppleDevicePayload { .. } => VendorAPI::FootprintDeviceAttestation,
         }
     }
 }

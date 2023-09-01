@@ -1,4 +1,5 @@
 pub mod experian;
+pub mod fp_ios_attestation;
 pub mod helpers;
 pub mod idology_expectid;
 pub mod idology_scan_onboarding;

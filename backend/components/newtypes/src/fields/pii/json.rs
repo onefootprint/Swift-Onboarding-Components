@@ -74,7 +74,7 @@ impl TryFrom<PiiBytes> for PiiJsonValue {
     }
 }
 
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct ScrubbedPiiJsonValue(serde_json::Value);
 impl ScrubbedPiiJsonValue {
     pub fn scrub<T: serde::Serialize>(s: T) -> Result<Self, serde_json::Error> {

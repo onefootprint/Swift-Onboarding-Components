@@ -7,6 +7,7 @@ use db_schema::schema::vault;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use diesel_as_jsonb::AsJsonb;
+use itertools::Itertools;
 use newtypes::AppleAttestationReceiptType;
 use newtypes::AppleDeviceAttestationId;
 use newtypes::FpId;
@@ -92,6 +93,8 @@ impl NewAppleDeviceAttestation {
     }
 }
 
+pub type UniqueVaultsAssociatedByAttestation = i64;
+
 impl AppleDeviceAttestation {
     #[tracing::instrument("AppleDeviceAttestation::list_for_scoped_user", skip_all)]
     pub fn list_for_scoped_user(
@@ -99,14 +102,41 @@ impl AppleDeviceAttestation {
         fp_id: &FpId,
         tenant_id: &TenantId,
         is_live: bool,
-    ) -> DbResult<Vec<Self>> {
-        Ok(apple_device_attestation::table
+    ) -> DbResult<(Vec<Self>, UniqueVaultsAssociatedByAttestation)> {
+        let attestations: Vec<Self> = apple_device_attestation::table
             .inner_join(vault::table)
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(vault::id)))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::is_live.eq(is_live))
             .select(apple_device_attestation::all_columns)
-            .load(conn)?)
+            .load(conn)?;
+
+        let public_keys: Vec<&[u8]> = attestations
+            .iter()
+            .map(|a| a.attested_public_key.as_ref())
+            .collect_vec();
+
+        let unique_vaults = apple_device_attestation::table
+            .filter(apple_device_attestation::attested_public_key.eq_any(&public_keys))
+            .inner_join(vault::table)
+            .filter(vault::is_live.eq(is_live))
+            .select(apple_device_attestation::vault_id)
+            .distinct()
+            .count()
+            .get_result(conn)?;
+
+        Ok((attestations, unique_vaults))
+    }
+
+    pub fn count_associated_vaults(&self, conn: &mut PgConn, is_live: bool) -> DbResult<i64> {
+        Ok(apple_device_attestation::table
+            .filter(apple_device_attestation::attested_public_key.eq(&self.attested_public_key))
+            .inner_join(vault::table)
+            .filter(vault::is_live.eq(is_live))
+            .select(apple_device_attestation::vault_id)
+            .distinct()
+            .count()
+            .get_result(conn)?)
     }
 }
