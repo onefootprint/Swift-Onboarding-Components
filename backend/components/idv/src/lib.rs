@@ -25,6 +25,7 @@ use socure::response::SocureIDPlusResponse;
 
 pub mod experian;
 pub mod fingerprintjs;
+pub mod footprint;
 pub mod footprint_http_client;
 pub mod idology;
 pub mod incode;
@@ -67,7 +68,7 @@ pub enum ParsedResponse {
     IncodeGetOnboardingStatus(GetOnboardingStatusResponse),
     IncodeProcessFace(ProcessFaceResponse),
     StytchLookup(stytch::response::LookupResponse),
-    FootprintAppleDevicePayload { associated_vault_count: i64 },
+    FootprintDeviceAttestation(footprint::FootprintDeviceAttestationData),
 }
 
 impl ParsedResponse {
@@ -287,7 +288,7 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::IncodeGetOnboardingStatus(_) => VendorAPI::IncodeGetOnboardingStatus,
             ParsedResponse::IncodeProcessFace(_) => VendorAPI::IncodeProcessFace,
             ParsedResponse::StytchLookup(_) => VendorAPI::StytchLookup,
-            ParsedResponse::FootprintAppleDevicePayload { .. } => VendorAPI::FootprintDeviceAttestation,
+            ParsedResponse::FootprintDeviceAttestation(_) => VendorAPI::FootprintDeviceAttestation,
         }
     }
 }

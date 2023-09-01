@@ -7,6 +7,7 @@ use api_core::errors::ApiResult;
 use api_core::types::ResponseData;
 use api_core::utils::challenge::Challenge;
 
+use api_core::decision::vendor;
 use api_core::utils::headers::InsightHeaders;
 use api_core::ApiErrorKind;
 use api_wire_types::hosted::device_attestation::{
@@ -14,7 +15,6 @@ use api_wire_types::hosted::device_attestation::{
     GetDeviceAttestationChallengeRequest,
 };
 use chrono::{Duration, Utc};
-
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::user_timeline::UserTimeline;
@@ -22,7 +22,6 @@ use newtypes::{LivenessAttributes, LivenessInfo, LivenessIssuer};
 use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
 
 mod ios;
-mod risk_signals;
 
 #[cfg(test)]
 mod tests;
@@ -111,7 +110,7 @@ pub async fn post_attestation(
                     // if we have a scoped vault (which we should always have in an onboarding)
                     if let Some(scoped_vault_id) = scoped_vault_id {
                         // generate risk signals
-                        risk_signals::ios::create(
+                        vendor::apple_device_attestation::save_vendor_result_and_risk_signals(
                             conn,
                             &attestation,
                             &vault_public_key,

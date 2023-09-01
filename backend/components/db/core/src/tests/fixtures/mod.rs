@@ -1,3 +1,4 @@
+pub mod apple_device_attestation;
 pub mod data_lifetime;
 pub mod fingerprint;
 pub mod identity_document;

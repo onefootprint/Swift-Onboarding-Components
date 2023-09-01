@@ -181,9 +181,9 @@ fn deserialize_from_vendor_api(
         }
         VendorAPI::IncodeProcessFace => ParsedResponse::from_incode_process_face(raw_response)?,
         VendorAPI::StytchLookup => ParsedResponse::from_stytch(raw_response)?,
-        VendorAPI::FootprintDeviceAttestation => ParsedResponse::FootprintAppleDevicePayload {
-            associated_vault_count: serde_json::from_value(raw_response)?,
-        },
+        VendorAPI::FootprintDeviceAttestation => {
+            ParsedResponse::FootprintDeviceAttestation(serde_json::from_value(raw_response)?)
+        }
     };
 
     Ok(res)

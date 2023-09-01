@@ -10,6 +10,7 @@ use newtypes::{DecisionIntentId, IdentityDataKind, ScopedVaultId, VendorAPI};
 
 use self::tenant_vendor_control::TenantVendorControl;
 
+pub mod apple_device_attestation;
 pub mod build_request;
 pub mod incode;
 pub mod incode_watchlist;
