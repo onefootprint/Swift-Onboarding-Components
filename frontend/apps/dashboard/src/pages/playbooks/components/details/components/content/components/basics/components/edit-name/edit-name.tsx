@@ -57,17 +57,18 @@ const EditName = ({ playbook, open, setOpen }: EditNameProps) => {
         </Typography>
         <TextInput
           autoFocus
-          placeholder=""
           hasError={!!errors.name}
           hint={errors?.name?.message}
+          placeholder=""
+          size="compact"
           {...register('name')}
         />
       </InputContainer>
       <ButtonContainer>
-        <Button variant="secondary" size="compact" onClick={toggleOpen}>
+        <Button variant="secondary" size="small" onClick={toggleOpen}>
           {t('form.cancel')}
         </Button>
-        <Button variant="primary" size="compact" type="submit">
+        <Button variant="primary" size="small" type="submit">
           {t('form.save')}
         </Button>
       </ButtonContainer>
