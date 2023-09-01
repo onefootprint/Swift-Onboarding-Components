@@ -1,42 +1,25 @@
-import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import styled, { css } from '@onefootprint/styled';
-import {
-  CountryCode,
-  DataIdentifier,
-  Entity,
-  IdDI,
-  isCountryCode,
-} from '@onefootprint/types';
+import { DataIdentifier, Entity, IdDI } from '@onefootprint/types';
 import { Flag, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { EncryptedCell } from 'src/components';
 
 import Field from '../../../../../field';
+import checkCountryCode from '../utils/check-country-code';
+import getInitialCountry from '../utils/get-initial-country';
 
 export type NationalityType = {
   di: DataIdentifier;
   entity: Entity;
 };
 
-const checkCountryCode = (value: any): value is CountryCode => {
-  if (!value) return false;
-  return isCountryCode(value);
-};
-
-const getInitialCountry = (initialCountryCode?: CountryCode) => {
-  if (initialCountryCode) {
-    const possibleCountry = COUNTRIES.find(
-      country => country.value === initialCountryCode,
-    );
-    return possibleCountry || DEFAULT_COUNTRY;
-  }
-  return DEFAULT_COUNTRY;
-};
-
 const Nationality = ({ di, entity }: NationalityType) => {
-  if (!entity.attributes.includes(IdDI.nationality)) {
+  // Do not display Nationality if there is a legal status
+  const hasLegalStatusCountry = entity.attributes.includes(IdDI.usLegalStatus);
+  if (!entity.attributes.includes(IdDI.nationality) && !hasLegalStatusCountry) {
     return null;
   }
+
   return (
     <Field
       di={di}

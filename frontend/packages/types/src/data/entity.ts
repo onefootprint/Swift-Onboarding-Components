@@ -1,3 +1,5 @@
+import CdoToAllDisMap from './cdo-to-di-map';
+import { CollectedKycDataOption } from './collected-data-option';
 import { DataIdentifier, DocumentDI, InvestorProfileDI } from './di';
 import { EntityCard } from './entity-cards';
 import { InsightEvent } from './insight-event';
@@ -38,6 +40,11 @@ export type Entity<TStatus = EntityStatus> = {
   requiresManualReview: boolean;
   insightEvent?: InsightEvent;
 };
+
+export const hasEntityUsLegalStatus = (entity: Entity) =>
+  entity.attributes.some(attr =>
+    CdoToAllDisMap[CollectedKycDataOption.usLegalStatus].includes(attr),
+  );
 
 export const hasEntityInvestorProfile = (entity: Entity) => {
   const values = Object.values(InvestorProfileDI);

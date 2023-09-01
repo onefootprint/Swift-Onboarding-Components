@@ -57,7 +57,12 @@
       "city": "City",
       "state": "State",
       "zip": "Zip code",
-      "country": "Country"
+      "country": "Country",
+      "us_legal_status": "Legal status",
+      "country_of_birth": "Country of birth",
+      "citizenships": "Citizenship",
+      "visa_kind": "Visa type",
+      "visa_expiration_date": "Visa expiration date"
     },
     "investor_profile": {
       "employment_status": "Employment status",
@@ -1563,6 +1568,28 @@
         "address": {
           "title": "Address data"
         },
+        "us-legal-status": {
+          "title": "Legal status in the U.S.",
+          "status": {
+            "options": {
+              "citizen": "Citizen",
+              "permanent_resident": "Green Card/permanent resident",
+              "visa": "Visa"
+            }
+          },
+          "visa-kind": {
+            "e1": "E-1",
+            "e2": "E-2",
+            "e3": "E-3",
+            "f1": "F-1",
+            "g4": "G-4",
+            "h1b": "H-1B",
+            "l1": "L-1",
+            "o1": "O-1",
+            "tn1": "TN-1",
+            "other": "Other"
+          }
+        },
         "documents": {
           "title": "ID documents & Selfie"
         },
@@ -1664,6 +1691,9 @@
             },
             "address": {
               "title": "Address data"
+            },
+            "legal-status": {
+              "title": "Legal status data"
             }
           },
           "business": {

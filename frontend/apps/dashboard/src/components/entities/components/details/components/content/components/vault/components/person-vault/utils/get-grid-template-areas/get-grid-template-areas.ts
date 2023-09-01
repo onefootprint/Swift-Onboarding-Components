@@ -4,11 +4,15 @@ import {
   hasEntityCustomData,
   hasEntityDocuments,
   hasEntityInvestorProfile,
+  hasEntityUsLegalStatus,
 } from '@onefootprint/types';
 
 const getGridTemplateAreas = (entity: Entity): number => {
   // basic, address, and identity always exist
   let gridTemplateAreas = 3;
+  if (hasEntityUsLegalStatus(entity)) {
+    gridTemplateAreas += 1;
+  }
   if (hasEntityCards(entity)) {
     gridTemplateAreas += 1;
   }

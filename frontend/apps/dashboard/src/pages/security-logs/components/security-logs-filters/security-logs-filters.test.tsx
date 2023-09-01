@@ -40,6 +40,7 @@ describe('<SecurityLogsFilters />', () => {
     expect(screen.getByText('SSN (Last 4)')).toBeInTheDocument();
     expect(screen.getByText('Address data')).toBeInTheDocument();
     expect(screen.getByText('Address line 1')).toBeInTheDocument();
+    expect(screen.getByText('Legal status')).toBeInTheDocument();
 
     const businessData = screen.getByRole('button', {
       name: 'Business data',

@@ -84,6 +84,31 @@ const SecurityLogsFilters = () => {
                 },
               ],
             },
+            {
+              label: t('attributes.id.legal-status.title'),
+              options: [
+                {
+                  label: allT(`di.${IdDI.usLegalStatus}`),
+                  value: IdDI.usLegalStatus,
+                },
+                {
+                  label: allT('di.id.country_of_birth'),
+                  value: IdDI.nationality,
+                },
+                {
+                  label: allT(`di.${IdDI.citizenships}`),
+                  value: IdDI.citizenships,
+                },
+                {
+                  label: allT(`di.${IdDI.visaKind}`),
+                  value: IdDI.visaKind,
+                },
+                {
+                  label: allT(`di.${IdDI.visaExpirationDate}`),
+                  value: IdDI.visaExpirationDate,
+                },
+              ],
+            },
           ],
           selectedOptions: filters.values.dataAttributesPersonal ?? [],
         },

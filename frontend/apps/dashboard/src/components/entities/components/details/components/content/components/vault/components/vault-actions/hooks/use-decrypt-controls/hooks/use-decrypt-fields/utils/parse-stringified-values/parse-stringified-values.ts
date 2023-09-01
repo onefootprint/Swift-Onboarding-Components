@@ -30,6 +30,9 @@ const parseStringifiedValues = (
         output[key as DataIdentifier] = value;
       }
     }
+    if (Array.isArray(value)) {
+      output[key as DataIdentifier] = value;
+    }
   });
 
   return output;

@@ -5,6 +5,7 @@ import {
   hasEntityCustomData,
   hasEntityDocuments,
   hasEntityInvestorProfile,
+  hasEntityUsLegalStatus,
 } from '@onefootprint/types';
 import React from 'react';
 
@@ -22,15 +23,17 @@ type PersonVaultProps = {
 };
 
 const PersonVault = ({ entity }: PersonVaultProps) => {
+  const hasUsLegalStatus = hasEntityUsLegalStatus(entity);
   const {
     basic,
     address,
+    usLegalStatus,
     identity,
     investorProfile,
     documents,
     cards,
     custom,
-  } = useFieldsets();
+  } = useFieldsets(hasUsLegalStatus);
   const hasCards = hasEntityCards(entity);
   const hasDocuments = hasEntityDocuments(entity);
   const hasInvestorProfile = hasEntityInvestorProfile(entity);
@@ -102,6 +105,15 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
       {displayFirstSectionAsGrid && gridFirstSection}
       <Container>
         {!displayFirstSectionAsGrid && basicAddressIdentity}
+        {hasUsLegalStatus ? (
+          <GridItem>
+            <Fieldset
+              fields={usLegalStatus.fields}
+              iconComponent={usLegalStatus.iconComponent}
+              title={usLegalStatus.title}
+            />
+          </GridItem>
+        ) : null}
         {hasDocuments ? (
           <GridItem>
             <Fieldset
