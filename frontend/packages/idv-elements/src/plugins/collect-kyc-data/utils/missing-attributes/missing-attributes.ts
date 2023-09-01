@@ -74,7 +74,7 @@ export const isMissingBasicAttribute = (
   collectedData?: KycData,
 ) => isMissing(BASIC_ATTRIBUTES, mustCollect, collectedData);
 
-export const isMissingUSLegalStatusAttribute = (
+export const isMissingUsLegalStatusAttribute = (
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
 ) => isMissing(US_LEGAL_STATUS_ATTRIBUTES, mustCollect, collectedData);

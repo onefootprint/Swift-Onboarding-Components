@@ -8,10 +8,11 @@ import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-mac
 import { FormData } from '../../types';
 
 type CountryFieldProps = {
+  disabled?: boolean;
   onChange: () => void;
 };
 
-const CountryField = ({ onChange }: CountryFieldProps) => {
+const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
   const [state] = useCollectKycDataMachine();
   const {
     context: { config },
@@ -20,8 +21,9 @@ const CountryField = ({ onChange }: CountryFieldProps) => {
   const country = watch('country');
   const { t } = useTranslation('pages.residential-address.form.country');
   const allowedCountries = new Set(config.supportedCountries);
-  const disabled =
+  const hasSingleOption =
     !config.allowInternationalResidents || allowedCountries.size < 2;
+  const shouldDisable = disabled || hasSingleOption;
   const options = COUNTRIES.filter(entry => allowedCountries.has(entry.value));
 
   return (
@@ -32,13 +34,13 @@ const CountryField = ({ onChange }: CountryFieldProps) => {
       render={({ field }) => (
         <CountrySelect
           hint={
-            disabled && country
+            shouldDisable && country
               ? t('disabled-hint', { countryName: country.label })
               : undefined
           }
           options={options}
           label={t('label')}
-          disabled={disabled}
+          disabled={shouldDisable}
           onBlur={field.onBlur}
           onChange={nextValue => {
             field.onChange(nextValue);

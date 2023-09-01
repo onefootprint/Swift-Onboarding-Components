@@ -11,6 +11,7 @@ import {
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
+import isInDomesticFlow from '../../../../utils/state-machine/utils';
 import LegalStatus from '../../../legal-status';
 import getCountrySelectOption from '../../../legal-status/utils/get-country-select-option';
 
@@ -19,6 +20,7 @@ const LegalStatusSection = () => {
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
   const [editing, setEditing] = useState(false);
+  const isDomestic = isInDomesticFlow(data);
 
   const legalStatus = [];
 
@@ -72,7 +74,7 @@ const LegalStatusSection = () => {
     });
   }
 
-  if (!legalStatus.length) {
+  if (!isDomestic || !legalStatus.length) {
     return null;
   }
 

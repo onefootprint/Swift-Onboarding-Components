@@ -114,6 +114,9 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
+          [IdDI.addressLine1]: { value: 'Address line 1' },
+          [IdDI.city]: { value: 'City' },
+          [IdDI.state]: { value: 'CA' },
           [IdDI.country]: { value: 'US' },
           [IdDI.zip]: { value: '94107' },
         },
@@ -121,6 +124,11 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(state.value).toEqual('usLegalStatus');
       context = state.context;
       expect(context.data[IdDI.country]).toEqual({ value: 'US' });
+      expect(context.data[IdDI.addressLine1]).toEqual({
+        value: 'Address line 1',
+      });
+      expect(context.data[IdDI.city]).toEqual({ value: 'City' });
+      expect(context.data[IdDI.state]).toEqual({ value: 'CA' });
       expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
 
       // Navigate to prev
@@ -131,13 +139,21 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
-          [IdDI.country]: { value: 'TR' },
-          [IdDI.zip]: { value: '94107' },
+          [IdDI.addressLine1]: { value: 'Address!' },
+          [IdDI.city]: { value: 'Ankara' },
+          [IdDI.country]: { value: 'US' },
+          [IdDI.state]: { value: 'Eskisehir' },
+          [IdDI.zip]: { value: '12345' },
         },
       });
       context = state.context;
-      expect(context.data[IdDI.country]).toEqual({ value: 'TR' });
-      expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
+      expect(context.data[IdDI.country]).toEqual({ value: 'US' });
+      expect(context.data[IdDI.addressLine1]).toEqual({
+        value: 'Address!',
+      });
+      expect(context.data[IdDI.city]).toEqual({ value: 'Ankara' });
+      expect(context.data[IdDI.state]).toEqual({ value: 'Eskisehir' });
+      expect(context.data[IdDI.zip]).toEqual({ value: '12345' });
       expect(state.value).toEqual('usLegalStatus');
 
       state = machine.send({
@@ -249,6 +265,60 @@ describe('Collect KYC Data Machine Tests', () => {
       context = state.context;
       expect(state.value).toEqual('completed');
     });
+
+    it('Skips SSN and US Legal Status pages if address is not in US', () => {
+      const machine = createMachine(
+        [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.address,
+          CollectedKycDataOption.usLegalStatus,
+          CollectedKycDataOption.ssn9,
+        ],
+        { [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true } },
+        'sandboxTest',
+      );
+
+      let state = machine.send([
+        { type: 'initialized', payload: {} },
+        {
+          type: 'dataSubmitted',
+          payload: {
+            [IdDI.firstName]: { value: 'Otto' },
+            [IdDI.lastName]: { value: 'Footprint' },
+          },
+        },
+        {
+          type: 'dataSubmitted',
+          payload: {
+            [IdDI.addressLine1]: { value: 'Address line 1' },
+            [IdDI.city]: { value: 'City' },
+            [IdDI.state]: { value: 'CA' },
+            [IdDI.country]: { value: 'MX' },
+            [IdDI.zip]: { value: '94107' },
+          },
+        },
+      ]);
+
+      expect(state.value).toEqual('confirm');
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('residentialAddress');
+
+      state = machine.send([
+        {
+          type: 'dataSubmitted',
+          payload: {
+            [IdDI.addressLine1]: { value: 'Address line 1' },
+            [IdDI.city]: { value: 'City' },
+            [IdDI.state]: { value: 'CA' },
+            [IdDI.country]: { value: 'US' },
+            [IdDI.zip]: { value: '94107' },
+          },
+        },
+      ]);
+      expect(state.value).toEqual('usLegalStatus');
+    });
   });
 
   describe('When user has onboarded to tenant with current configuration', () => {
@@ -358,13 +428,13 @@ describe('Collect KYC Data Machine Tests', () => {
       state = machine.send({
         type: 'dataSubmitted',
         payload: {
-          [IdDI.country]: { value: 'TR' },
-          [IdDI.zip]: { value: '94107' },
+          [IdDI.country]: { value: 'US' },
+          [IdDI.zip]: { value: '12321' },
         },
       });
       context = state.context;
-      expect(context.data[IdDI.country]).toEqual({ value: 'TR' });
-      expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
+      expect(context.data[IdDI.country]).toEqual({ value: 'US' });
+      expect(context.data[IdDI.zip]).toEqual({ value: '12321' });
       expect(state.value).toEqual('usLegalStatus');
 
       state = machine.send({

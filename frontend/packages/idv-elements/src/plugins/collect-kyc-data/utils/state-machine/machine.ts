@@ -8,10 +8,11 @@ import {
   isMissingEmailAttribute,
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
-  isMissingUSLegalStatusAttribute,
+  isMissingUsLegalStatusAttribute,
   shouldConfirm,
 } from '../missing-attributes';
 import { MachineContext, MachineEvents } from './types';
+import isInDomesticFlow from './utils';
 
 const createCollectKycDataMachine = (
   initialContext: MachineContext,
@@ -70,7 +71,8 @@ const createCollectKycDataMachine = (
             {
               target: 'usLegalStatus',
               cond: context =>
-                isMissingUSLegalStatusAttribute(
+                isInDomesticFlow(context.data) &&
+                isMissingUsLegalStatusAttribute(
                   allAttributes(context.requirement),
                   context.data,
                 ),
@@ -78,6 +80,7 @@ const createCollectKycDataMachine = (
             {
               target: 'ssn',
               cond: context =>
+                isInDomesticFlow(context.data) &&
                 isMissingSsnAttribute(
                   allAttributes(context.requirement),
                   context.data,
@@ -117,7 +120,8 @@ const createCollectKycDataMachine = (
                 target: 'usLegalStatus',
                 actions: 'assignData',
                 cond: context =>
-                  isMissingUSLegalStatusAttribute(
+                  isInDomesticFlow(context.data) &&
+                  isMissingUsLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.data,
                   ),
@@ -126,6 +130,7 @@ const createCollectKycDataMachine = (
                 target: 'ssn',
                 actions: ['assignData'],
                 cond: context =>
+                  isInDomesticFlow(context.data) &&
                   isMissingSsnAttribute(
                     allAttributes(context.requirement),
                     context.data,
@@ -154,7 +159,8 @@ const createCollectKycDataMachine = (
                 target: 'usLegalStatus',
                 actions: 'assignData',
                 cond: context =>
-                  isMissingUSLegalStatusAttribute(
+                  isInDomesticFlow(context.data) &&
+                  isMissingUsLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.data,
                   ),
@@ -163,6 +169,7 @@ const createCollectKycDataMachine = (
                 target: 'ssn',
                 actions: ['assignData'],
                 cond: context =>
+                  isInDomesticFlow(context.data) &&
                   isMissingSsnAttribute(
                     allAttributes(context.requirement),
                     context.data,
@@ -189,8 +196,9 @@ const createCollectKycDataMachine = (
               {
                 target: 'usLegalStatus',
                 actions: 'assignData',
-                cond: context =>
-                  isMissingUSLegalStatusAttribute(
+                cond: (context, event) =>
+                  isInDomesticFlow(mergeData(context.data, event.payload)) &&
+                  isMissingUsLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.data,
                   ),
@@ -198,7 +206,8 @@ const createCollectKycDataMachine = (
               {
                 target: 'ssn',
                 actions: ['assignData'],
-                cond: context =>
+                cond: (context, event) =>
+                  isInDomesticFlow(mergeData(context.data, event.payload)) &&
                   isMissingSsnAttribute(
                     allAttributes(context.requirement),
                     context.data,
@@ -236,6 +245,7 @@ const createCollectKycDataMachine = (
                 target: 'ssn',
                 actions: ['assignData'],
                 cond: context =>
+                  isInDomesticFlow(context.data) &&
                   isMissingSsnAttribute(
                     allAttributes(context.requirement),
                     context.data,
@@ -284,7 +294,7 @@ const createCollectKycDataMachine = (
               {
                 target: 'usLegalStatus',
                 cond: context =>
-                  isMissingUSLegalStatusAttribute(
+                  isMissingUsLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
                   ),
@@ -333,6 +343,7 @@ const createCollectKycDataMachine = (
               {
                 target: 'ssn',
                 cond: context =>
+                  isInDomesticFlow(context.data) &&
                   isMissingSsnAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
@@ -341,7 +352,8 @@ const createCollectKycDataMachine = (
               {
                 target: 'usLegalStatus',
                 cond: context =>
-                  isMissingUSLegalStatusAttribute(
+                  isInDomesticFlow(context.data) &&
+                  isMissingUsLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
                   ),

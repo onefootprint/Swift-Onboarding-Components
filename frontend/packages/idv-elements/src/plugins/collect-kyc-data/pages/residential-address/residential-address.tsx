@@ -26,6 +26,7 @@ type ResidentialAddressProps = {
   onComplete?: (args: KycData) => void;
   onCancel?: () => void;
   hideHeader?: boolean;
+  disableCountry?: boolean;
 };
 
 const ResidentialAddress = ({
@@ -33,6 +34,7 @@ const ResidentialAddress = ({
   onComplete,
   onCancel,
   hideHeader,
+  disableCountry,
 }: ResidentialAddressProps) => {
   const { t } = useTranslation('pages.residential-address');
   const [state, send] = useCollectKycDataMachine();
@@ -97,7 +99,10 @@ const ResidentialAddress = ({
           {!hideHeader && (
             <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
           )}
-          <CountryField onChange={handleCountryChange} />
+          <CountryField
+            disabled={disableCountry}
+            onChange={handleCountryChange}
+          />
           <AddressLines />
           <Grid.Row>
             <Grid.Column col={6}>

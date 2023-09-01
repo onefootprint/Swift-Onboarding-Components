@@ -17,6 +17,7 @@ import {
   getSsnValue,
   ssnFormatter,
 } from '../../../../utils/ssn-utils';
+import isInDomesticFlow from '../../../../utils/state-machine/utils';
 import Ssn from '../../../ssn';
 import useStepUp from './hooks/use-step-up';
 
@@ -35,6 +36,7 @@ const IdentitySection = () => {
   const decryptUserMutation = useDecryptUser();
   const ssnKind = getSsnKind(requirement);
   const ssn = getSsnValue(data, ssnKind);
+  const isDomestic = isInDomesticFlow(data);
 
   const getSsnValueType = () => {
     if (ssn?.value) {
@@ -191,7 +193,11 @@ const IdentitySection = () => {
     }
   }
 
-  return identity.length ? (
+  if (!isDomestic || !identity.length) {
+    return null;
+  }
+
+  return (
     <Section
       title={t('identity.title')}
       actions={actions}
@@ -199,7 +205,7 @@ const IdentitySection = () => {
       content={getSectionContent()}
       testID="identity-section"
     />
-  ) : null;
+  );
 };
 
 export default IdentitySection;

@@ -54,7 +54,12 @@ const AddressSection = () => {
       return addressItem;
     }
     return (
-      <Address onCancel={stopEditing} onComplete={stopEditing} hideHeader />
+      <Address
+        onCancel={stopEditing}
+        onComplete={stopEditing}
+        hideHeader
+        disableCountry
+      />
     );
   };
 
