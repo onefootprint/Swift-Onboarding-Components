@@ -25,7 +25,7 @@ export type PublicOnboardingConfig = {
   requiresIdDoc: boolean;
   isKyb: boolean;
   allowInternationalResidents: boolean;
-  internationalCountryRestrictions?: CountryCode[];
+  supportedCountries?: CountryCode[];
 };
 
 // Used in the dashboard context
@@ -48,6 +48,6 @@ export type OnboardingConfig = {
   isAppClipEnabled: boolean;
   isNoPhoneFlow: boolean;
   allowInternationalResidents: boolean;
-  internationalCountryRestrictions?: CountryCode[];
+  supportedCountries?: CountryCode[];
   isDocFirstFlow: boolean;
 };

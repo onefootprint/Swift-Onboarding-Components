@@ -1,23 +1,33 @@
-import { STATES } from '@onefootprint/global-constants';
+import {
+  COUNTRIES_WITH_PROVINCES,
+  COUNTRIES_WITH_STATES,
+  STATES,
+} from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-type StateFieldProps = {
-  inputKind: 'dropdown' | 'text';
-  disabled?: boolean;
-};
+import { FormData } from '../../types';
 
-const StateField = ({ inputKind, disabled }: StateFieldProps) => {
+const StateField = () => {
+  const { t } = useTranslation('pages.residential-address.form.state');
   const {
     control,
     register,
+    watch,
     formState: { errors },
-  } = useFormContext();
-  const { t } = useTranslation('pages.residential-address.form.state');
+  } = useFormContext<FormData>();
+  const country = watch('country');
+  const isDomestic = country.value === 'US';
+  const shouldCollect =
+    COUNTRIES_WITH_STATES.includes(country.value) ||
+    COUNTRIES_WITH_PROVINCES.includes(country.value);
+  if (shouldCollect) {
+    return null;
+  }
 
-  return inputKind === 'dropdown' ? (
+  return isDomestic ? (
     <Controller
       control={control}
       name="state"
@@ -27,7 +37,6 @@ const StateField = ({ inputKind, disabled }: StateFieldProps) => {
         return (
           <Select
             isPrivate
-            disabled={disabled}
             label={t('label')}
             onBlur={field.onBlur}
             options={STATES}
@@ -45,12 +54,11 @@ const StateField = ({ inputKind, disabled }: StateFieldProps) => {
   ) : (
     <TextInput
       data-private
-      disabled={disabled}
       autoComplete="address-level1"
       hasError={!!errors.state}
       hint={errors.state && t('error')}
-      label={t('label')}
-      placeholder={t('placeholder')}
+      label={t('international-label')}
+      placeholder={t('international-placeholder')}
       {...register('state')}
     />
   );

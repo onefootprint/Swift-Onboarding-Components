@@ -5,7 +5,7 @@ import type { CountryCode } from '@onefootprint/types';
 import { useCombobox } from 'downshift';
 import noop from 'lodash/noop';
 import take from 'lodash/take';
-import React, { forwardRef, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 import usePlacesAutocomplete from 'use-places-autocomplete';
 
@@ -43,6 +43,8 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
     const {
       suggestions: { data },
       setValue,
+      clearCache,
+      clearSuggestions,
     } = usePlacesAutocomplete({
       requestOptions: {
         componentRestrictions: {
@@ -50,6 +52,12 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
         },
       },
     });
+
+    useEffect(() => {
+      clearCache();
+      clearSuggestions();
+    }, [country]);
+
     const options = take(data, MAX_OF_RESULTS);
     const {
       getComboboxProps,

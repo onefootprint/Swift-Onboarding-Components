@@ -1,25 +1,23 @@
 import { STATES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { CountryCode } from '@onefootprint/types';
 import { AddressInput, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import { FormData } from '../../types';
 import getAddressComponent from '../../utils/get-address-components';
 
-type AddressLinesProps = {
-  countryCode: CountryCode;
-  disabled?: boolean;
-};
-
-const AddressLines = ({ countryCode, disabled }: AddressLinesProps) => {
+const AddressLines = () => {
   const {
     register,
     formState: { errors },
     setValue,
     resetField,
-  } = useFormContext();
+    watch,
+  } = useFormContext<FormData>();
+  const country = watch('country');
   const { t } = useTranslation('pages.residential-address.form');
+  const isDomestic = country.value === 'US';
 
   const handleAddressSelect = async (
     prediction?: google.maps.places.AutocompletePrediction | null,
@@ -41,11 +39,17 @@ const AddressLines = ({ countryCode, disabled }: AddressLinesProps) => {
 
     const result = await getAddressComponent(prediction);
     if (result) {
+      if (result.addressLine1) {
+        setValue('addressLine1', result.addressLine1);
+      }
+      if (result.addressLine2) {
+        setValue('addressLine2', result.addressLine2);
+      }
       if (result.city) {
         setValue('city', result.city);
       }
       if (result.state) {
-        if (countryCode === 'US') {
+        if (isDomestic) {
           const possibleState = STATES.find(
             stateOption => stateOption.label === result.state,
           );
@@ -66,11 +70,14 @@ const AddressLines = ({ countryCode, disabled }: AddressLinesProps) => {
     <>
       <AddressInput
         data-private
-        disabled={disabled}
-        country={countryCode}
+        country={country.value}
         hasError={!!errors.addressLine1}
         hint={errors.addressLine1 && t('address-line-1.error')}
-        label={t('address-line-1.label')}
+        label={
+          isDomestic
+            ? t('address-line-1.label')
+            : t('address-line-1.international-label')
+        }
         onSelect={handleAddressSelect}
         placeholder={t('address-line-1.placeholder')}
         {...register('addressLine1', {
@@ -80,10 +87,17 @@ const AddressLines = ({ countryCode, disabled }: AddressLinesProps) => {
       />
       <TextInput
         data-private
-        disabled={disabled}
         autoComplete="address-line2"
-        label={t('address-line-2.label')}
-        placeholder={t('address-line-2.placeholder')}
+        label={
+          isDomestic
+            ? t('address-line-2.label')
+            : t('address-line-2.international-label')
+        }
+        placeholder={
+          isDomestic
+            ? t('address-line-2.placeholder')
+            : t('address-line-2.international-placeholder')
+        }
         {...register('addressLine2')}
       />
     </>

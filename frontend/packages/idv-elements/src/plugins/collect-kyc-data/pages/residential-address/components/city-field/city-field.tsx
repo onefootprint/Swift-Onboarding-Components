@@ -3,22 +3,19 @@ import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-type CityFieldProps = {
-  disabled?: boolean;
-};
+import { FormData } from '../../types';
 
-const CityField = ({ disabled }: CityFieldProps) => {
+const CityField = () => {
   const {
     register,
     formState: { errors },
-  } = useFormContext();
+  } = useFormContext<FormData>();
   const { t } = useTranslation('pages.residential-address.form.city');
 
   return (
     <TextInput
       data-private
       autoComplete="address-level2"
-      disabled={disabled}
       hasError={!!errors.city}
       hint={errors.city && t('error')}
       label={t('label')}

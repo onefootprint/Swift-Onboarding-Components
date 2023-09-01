@@ -5,20 +5,21 @@ import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
+import { FormData } from '../../types';
 
 type CountryFieldProps = {
   onChange: () => void;
-  disabled?: boolean;
 };
 
-const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
+const CountryField = ({ onChange }: CountryFieldProps) => {
   const [state] = useCollectKycDataMachine();
   const {
     context: { config },
   } = state;
-  const { control } = useFormContext();
+  const { control } = useFormContext<FormData>();
   const { t } = useTranslation('pages.residential-address.form.country');
-  const allowedCountries = new Set(config.internationalCountryRestrictions);
+  const disabled = !config.allowInternationalResidents;
+  const allowedCountries = new Set(config.supportedCountries);
   const options = COUNTRIES.filter(entry => allowedCountries.has(entry.value));
 
   return (
@@ -38,7 +39,6 @@ const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
           }}
           placeholder={t('placeholder')}
           value={field.value}
-          hint={t('disabled-hint')}
         />
       )}
     />

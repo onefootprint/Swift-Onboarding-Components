@@ -1,30 +1,27 @@
 import { useTranslation } from '@onefootprint/hooks';
-import type { CountryCode } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import useInputValidations from '../../hooks/use-input-validations';
+import { FormData } from '../../types';
 
-type ZipFieldProps = {
-  countryCode: CountryCode;
-  disabled?: boolean;
-};
-
-const ZipField = ({ countryCode, disabled }: ZipFieldProps) => {
+const ZipField = () => {
   const {
     register,
     formState: { errors },
     getValues,
-  } = useFormContext();
+    watch,
+  } = useFormContext<FormData>();
   const { t } = useTranslation('pages.residential-address.form.zipCode');
-  const { zipcode } = useInputValidations(countryCode);
+  const country = watch('country');
+  const { zipcode } = useInputValidations(country.value);
+  const isDomestic = country.value === 'US';
 
   return (
     <TextInput
       data-private
       autoComplete="postal-code"
-      disabled={disabled}
       hasError={!!errors.zip}
       hint={errors.zip && t('error')}
       label={t('label')}
@@ -34,7 +31,7 @@ const ZipField = ({ countryCode, disabled }: ZipFieldProps) => {
       placeholder={t('placeholder')}
       value={getValues('zip')}
       {...register('zip', {
-        required: true,
+        required: isDomestic,
         pattern: zipcode.pattern,
       })}
     />

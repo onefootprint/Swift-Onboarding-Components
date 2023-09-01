@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedKycDataOption,
+  CountryCode,
   IdDI,
   isCountryCode,
 } from '@onefootprint/types';
@@ -40,6 +41,7 @@ const ResidentialAddress = ({
 }: ResidentialAddressProps) => {
   const [state, send] = useCollectKycDataMachine();
   const { requirement, data, config } = state.context;
+  const countryFromContext = data[IdDI.country]?.value;
   const { mutation, syncData } = useSyncData();
   const convertFormData = useConvertFormData();
 
@@ -52,17 +54,17 @@ const ResidentialAddress = ({
     ? t('full.subtitle')
     : t('partial.subtitle');
 
-  const isAddressLine1Disabled = data[IdDI.addressLine1]?.disabled;
-  const isAddressLine2Disabled = data[IdDI.addressLine2]?.disabled;
-  const isCityDisabled = data[IdDI.city]?.disabled;
-  const isStateDisabled = data[IdDI.state]?.disabled;
-  const isZipDisabled = data[IdDI.zip]?.disabled;
-  const isCountryDisabled =
-    data[IdDI.country]?.disabled || !config.allowInternationalResidents;
+  let defaultCountry: CountryCode | undefined;
+  if (countryFromContext && isCountryCode(countryFromContext)) {
+    defaultCountry = countryFromContext;
+  } else if (
+    config.allowInternationalResidents &&
+    config.supportedCountries &&
+    config.supportedCountries.length > 0
+  ) {
+    [defaultCountry] = config.supportedCountries;
+  }
 
-  const countryVal = data[IdDI.country]?.value;
-  const defaultCountry =
-    countryVal && isCountryCode(countryVal) ? countryVal : undefined;
   const defaultValues = {
     country: getInitialCountry(defaultCountry),
     state: getInitialState(data[IdDI.state]?.value),
@@ -74,8 +76,7 @@ const ResidentialAddress = ({
   const methods = useForm<FormData>({
     defaultValues,
   });
-  const { watch, handleSubmit, setFocus, resetField } = methods;
-  const country = watch('country');
+  const { handleSubmit, setFocus, resetField } = methods;
 
   const onSubmitFormData = (formData: FormData) => {
     const convertedData = convertFormData(formData);
@@ -109,37 +110,22 @@ const ResidentialAddress = ({
           {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
           {requiresFullAddress ? (
             <>
-              <CountryField
-                onChange={handleCountryChange}
-                disabled={isCountryDisabled}
-              />
-              <AddressLines
-                countryCode={country.value}
-                disabled={isAddressLine1Disabled || isAddressLine2Disabled}
-              />
+              <CountryField onChange={handleCountryChange} />
+              <AddressLines />
               <Grid.Row>
                 <Grid.Column col={6}>
-                  <CityField disabled={isCityDisabled} />
+                  <CityField />
                 </Grid.Column>
                 <Grid.Column col={6}>
-                  <ZipField
-                    countryCode={country.value}
-                    disabled={isZipDisabled}
-                  />
+                  <ZipField />
                 </Grid.Column>
               </Grid.Row>
-              <StateField
-                inputKind={country.value === 'US' ? 'dropdown' : 'text'}
-                disabled={isStateDisabled}
-              />
+              <StateField />
             </>
           ) : (
             <>
-              <CountryField
-                onChange={handleCountryChange}
-                disabled={isCountryDisabled}
-              />
-              <ZipField countryCode={country.value} disabled={isZipDisabled} />
+              <CountryField onChange={handleCountryChange} />
+              <ZipField />
             </>
           )}
           <EditableFormButtonContainer
