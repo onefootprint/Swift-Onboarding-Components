@@ -866,7 +866,7 @@
       },
       "retrigger-kyc": {
         "cta": "Open actions",
-        "option": "Request more information...",
+        "option": "Request more information",
         "dialog": {
           "title": "Request more information",
           "send-request": "Send request",
