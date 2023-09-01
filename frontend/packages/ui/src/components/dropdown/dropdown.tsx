@@ -85,7 +85,7 @@ const StyledDropdownContent = styled(RadixDropdown.Content)`
     border: 1px solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[2]};
     min-width: 200px;
-    padding: ${theme.spacing[3]} 0;
+    padding: ${theme.spacing[3]} 0 ${theme.spacing[2]};
     z-index: ${theme.zIndex.dropdown};
   `}
 `;
