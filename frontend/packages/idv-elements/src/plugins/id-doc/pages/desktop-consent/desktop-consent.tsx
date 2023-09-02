@@ -64,7 +64,11 @@ const DesktopConsent = () => {
   return (
     <Container>
       <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
-      <ConsentBody onScroll={handleScroll} height={CONTENT_HEIGHT}>
+      <ConsentBody
+        onScroll={handleScroll}
+        height={CONTENT_HEIGHT}
+        aria-label="consent-body"
+      >
         <ImageConsent ref={consentRef} />
       </ConsentBody>
       <Divider />
@@ -74,6 +78,7 @@ const DesktopConsent = () => {
           onClick={submitConsent}
           loading={consentMutation.isLoading}
           disabled={!fullyScrolled}
+          testID="consent-button"
         >
           {fullyScrolled
             ? t('submit-button.enabled-title')
