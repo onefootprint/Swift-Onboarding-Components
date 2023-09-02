@@ -90,6 +90,7 @@ const DraggableInputField = ({
         type="file"
         accept="image/*,.heic,.heif"
         onChange={handleImageUpload}
+        aria-label="file-input"
       />
     </Container>
   );

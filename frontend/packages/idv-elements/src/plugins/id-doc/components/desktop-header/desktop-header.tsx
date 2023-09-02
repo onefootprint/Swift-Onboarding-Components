@@ -35,7 +35,7 @@ const DesktopHeader = ({ type, imageType, country }: DesktopHeaderProps) => {
 
   let subtitle;
   if (imageType !== IdDocImageTypes.selfie) {
-    t('subtitle', {
+    subtitle = t('subtitle', {
       country: countryName,
     });
   }
