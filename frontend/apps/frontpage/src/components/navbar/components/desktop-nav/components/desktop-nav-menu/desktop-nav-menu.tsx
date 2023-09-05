@@ -101,10 +101,11 @@ const Content = styled(NavigationMenu.Content)<{ isOnDarkSection?: boolean }>`
     overflow: hidden;
     box-shadow: ${theme.elevation[2]};
     background-color: ${isOnDarkSection
-      ? primitives.Gray800
+      ? primitives.Gray875
       : theme.backgroundColor.primary};
     padding: ${theme.spacing[3]};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    border: ${theme.borderWidth[1]} solid
+      ${isOnDarkSection ? primitives.Gray700 : theme.borderColor.tertiary};
     z-index: 1;
 
     &[data-state='open'] {
