@@ -23,16 +23,16 @@ const Seo = ({
     <meta name="twitter:description" content={description} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:url" content={`https://docs.onefootprint.com${slug}`} />
-    <meta property="og:description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content={`https://docs.onefootprint.com${slug}`} />
     <meta
       property="og:image"
       content={`https://docs.onefootprint.com/api/og?title=${encodeURIComponent(
         title,
       )}`}
     />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={`https://docs.onefootprint.com${slug}`} />
   </Head>
 );
 
