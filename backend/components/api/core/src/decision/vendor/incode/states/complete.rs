@@ -101,10 +101,10 @@ impl Complete {
             di(ODK::ExpiresAt, r.expiration_date().ok()),
             di(ODK::IssuedAt, r.issue_date().ok()),
             di(ODK::IssuingCountry, r.issuing_country_two_digit()),
+            di(ODK::IssuingState, r.normalized_issuing_state()),
             di(ODK::Gender, r.gender),
             di(ODK::FullAddress, r.address),
             di(ODK::DocumentNumber, r.document_number),
-            di(ODK::IssuingState, r.issuing_state),
             di(ODK::RefNumber, r.ref_number),
             di(ODK::Nationality, r.nationality_mrz.or(r.nationality)),
             di(

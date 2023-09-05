@@ -11,6 +11,8 @@ use newtypes::{
     Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiString, DATE_FORMAT,
 };
 
+use super::normalize_issuing_state;
+
 /// Response we get back from adding a document image
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -429,6 +431,12 @@ impl FetchOCRResponse {
 
     pub fn issue_date(&self) -> Result<ScrubbedPiiString, IncodeError> {
         Self::format_date(self.issued_at.as_ref())
+    }
+
+    pub fn normalized_issuing_state(&self) -> Option<ScrubbedPiiString> {
+        self.issuing_state
+            .as_ref()
+            .map(|is| ScrubbedPiiString::from(normalize_issuing_state(is.leak_to_string())))
     }
 
     pub fn issuing_country_two_digit(&self) -> Option<ScrubbedPiiString> {
