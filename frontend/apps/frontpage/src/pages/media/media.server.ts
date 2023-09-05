@@ -5,6 +5,17 @@ import type { Article } from './media.types';
 const getStaticProps: GetStaticProps = () => {
   const articles: Article[] = [
     {
+      id: '9',
+      url: 'https://www.businessinsider.com/top-best-fintech-startups-according-to-vc-2023',
+      imageUrl: '/media/business-insider.png',
+      imageAlt: 'Top best fintech startups according to VC',
+      publishedAt: 'Sept 5, 2023',
+      website: 'Business Insider',
+      title: 'Top best fintech startups according to VCs',
+      excerpt:
+        'After several tough quarters in the fintech space, VCs are still bullish on the sector, and Footprint is in the top startups to watch, according to VCs.',
+    },
+    {
       id: '8',
       url: 'https://www.fastcompany.com/90831259/this-gen-z-tech-ceo-wants-to-build-the-apple-pay-of-identity-a-one-stop-shop-for-your-data',
       imageUrl: '/media/fast-co.png',
