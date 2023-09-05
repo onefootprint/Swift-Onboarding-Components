@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoForbid40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedDocumentDataOption,
@@ -9,11 +8,12 @@ import {
   getRequirement,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
-import { Divider, Typography, useToast } from '@onefootprint/ui';
+import { Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
+import Error from '../../../../components/error';
 import {
   isDocCdo,
   isInvestorProfileCdo,
@@ -50,8 +50,8 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   const processMutation = useOnboardingProcess();
   const isLoading =
     onboardingAuthorizeMutation.isLoading || processMutation.isLoading;
-  const isError =
-    onboardingAuthorizeMutation.isError || processMutation.isError;
+  const isError = true;
+  // onboardingAuthorizeMutation.isError || processMutation.isError;
   const toast = useToast();
 
   if (!authorizeRequirement) {
@@ -103,48 +103,26 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     );
   };
 
-  return (
-    <>
+  return isError ? (
+    <Error />
+  ) : (
+    <Container>
       <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
-      <Container>
-        {isError ? (
-          <>
-            <TitleContainer>
-              <IcoForbid40 color="error" />
-              <Typography variant="heading-3">{t('error.title')}</Typography>
-            </TitleContainer>
-            <Typography variant="body-2">{t('error.description')}</Typography>
-          </>
-        ) : (
-          <>
-            <HeaderTitle
-              title={t('title')}
-              subtitle={t('subtitle', { tenantName })}
-            />
-            <KycFields
-              showTitle={hasBothSections}
-              data={kycData}
-              documentTypes={documentTypes}
-            />
-            {hasBothSections && <Divider />}
-            <KybFields showTitle={hasBothSections} data={kybData} />
-            <Button isLoading={isLoading} onClick={handleClick} />
-          </>
-        )}
-      </Container>
-    </>
+      <HeaderTitle
+        title={t('title')}
+        subtitle={t('subtitle', { tenantName })}
+      />
+      <KycFields
+        showTitle={hasBothSections}
+        data={kycData}
+        documentTypes={documentTypes}
+      />
+      {hasBothSections && <Divider />}
+      <KybFields showTitle={hasBothSections} data={kybData} />
+      <Button isLoading={isLoading} onClick={handleClick} />
+    </Container>
   );
 };
-
-const TitleContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    row-gap: ${theme.spacing[2]};
-    justify-content: center;
-  `}
-`;
 
 const Container = styled.div`
   ${({ theme }) => css`

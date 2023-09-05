@@ -1,33 +1,14 @@
 {
-  "components": {},
+  "components": {
+    "error": {
+      "title": "Uh-oh!",
+      "description": "There was an error while completing this request. Please contact the site admin."
+    }
+  },
   "pages": {
-    "init": {
-      "error": {
-        "title": "Uh-oh!",
-        "description": "There was an error while completing this request. Please contact the site admin."
-      }
-    },
     "config-invalid": {
       "title": "Integration incorrectly configured",
       "subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this product."
-    },
-    "validate": {
-      "error": {
-        "title": "Uh-oh!",
-        "description": "There was an error while completing this request. Please try again."
-      }
-    },
-    "check-requirements": {
-      "error": {
-        "title": "Uh-oh!",
-        "description": "There was an error while completing this request. Please try again."
-      }
-    },
-    "process": {
-      "error": {
-        "title": "Uh-oh!",
-        "description": "There was an error while completing this request. Please try again."
-      }
     },
     "additional-info-required": {
       "title": "Additional data is required",
