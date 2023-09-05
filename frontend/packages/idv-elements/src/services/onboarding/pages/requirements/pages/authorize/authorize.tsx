@@ -50,8 +50,8 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   const processMutation = useOnboardingProcess();
   const isLoading =
     onboardingAuthorizeMutation.isLoading || processMutation.isLoading;
-  const isError = true;
-  // onboardingAuthorizeMutation.isError || processMutation.isError;
+  const isError =
+    onboardingAuthorizeMutation.isError || processMutation.isError;
   const toast = useToast();
 
   if (!authorizeRequirement) {
