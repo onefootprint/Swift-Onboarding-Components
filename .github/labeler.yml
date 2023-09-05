@@ -41,6 +41,3 @@ Developer Docs:
 
 Frontpage:
   - frontend/apps/frontpage/**/*
-
-Tooling:
-  - frontend/packages/**/*
