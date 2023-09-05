@@ -31,6 +31,7 @@ const WrittingLayoutContainer = styled.div`
   ${({ theme }) => css`
     margin: 0 auto;
     max-width: 960px;
+    padding: ${theme.spacing[11]} 0 0 0;
 
     ${media.greaterThan('sm')`
       padding: 0 ${theme.spacing[11]};  

@@ -1,6 +1,13 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
-import { Box, Container, LinkButton, Typography } from '@onefootprint/ui';
+import styled, { css } from '@onefootprint/styled';
+import {
+  Box,
+  Container,
+  LinkButton,
+  media,
+  Typography,
+} from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import PostContent from 'src/components/post-content';
@@ -46,7 +53,7 @@ const Post = ({ post }: PostProps) => {
       <article>
         <Container>
           <WritingLayout>
-            <Box sx={{ marginBottom: 8 }}>
+            <BackButton>
               <Link href="/blog" passHref legacyBehavior>
                 <LinkButton
                   iconPosition="left"
@@ -56,7 +63,7 @@ const Post = ({ post }: PostProps) => {
                   {t('go-back')}
                 </LinkButton>
               </Link>
-            </Box>
+            </BackButton>
             <header>
               <Box
                 sx={{
@@ -95,5 +102,15 @@ const Post = ({ post }: PostProps) => {
     </>
   );
 };
+
+const BackButton = styled.div`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.spacing[6]};
+
+    ${media.greaterThan('sm')`
+      margin-bottom: ${theme.spacing[8]};
+    `}
+  `}
+`;
 
 export default Post;

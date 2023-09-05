@@ -1,8 +1,10 @@
 import styled, { css } from '@onefootprint/styled';
-import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
+import { Box, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+
+import Footer from './components/footer';
 
 export type PostPreviewProps = {
   authors: { id: string; avatarImgUrl: string; name: string }[];
@@ -67,26 +69,8 @@ const PostPreview = ({
               {excerpt}
             </Typography>
           </Body>
-          <Footer>
-            <AvatarGroup count={authors.length}>
-              {authors.map(author => (
-                <Avatar
-                  key={author.id}
-                  alt={author.name}
-                  height={20}
-                  src={author.avatarImgUrl}
-                  width={20}
-                />
-              ))}
-            </AvatarGroup>
-            <AuthorsName>
-              {authors.map(author => author.name).join(' & ')}
-            </AuthorsName>
-            <Typography color="tertiary" variant="body-4">
-              | <time>{publishedAt}</time>
-            </Typography>
-          </Footer>
         </Box>
+        <Footer authors={authors} publishedAt={publishedAt} />
       </Content>
     </StyledLink>
   </Container>
@@ -186,39 +170,6 @@ const Body = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[6]};
     min-height: ${theme.spacing[1]};
-  `}
-`;
-
-const Footer = styled.footer`
-  ${({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacing[3]};
-  `}
-`;
-
-const AvatarGroup = styled.div<{ count: number }>`
-  ${({ theme, count }) => css`
-    width: ${count === 2 ? theme.spacing[8] : theme.spacing[5]};
-    position: relative;
-  `}
-`;
-
-const Avatar = styled(Image)`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.full};
-    border: ${theme.borderWidth[2]} solid ${theme.backgroundColor.secondary};
-
-    &:nth-child(2) {
-      position: absolute;
-      left: ${theme.spacing[4]};
-    }
-  `}
-`;
-
-const AuthorsName = styled.div`
-  ${({ theme }) => css`
-    ${createFontStyles('body-4')};
-    color: ${theme.color.tertiary};
   `}
 `;
 
