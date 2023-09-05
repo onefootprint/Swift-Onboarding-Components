@@ -21,6 +21,8 @@ export type PublicOnboardingConfig = {
   appearance?: FootprintAppearance;
 
   isAppClipEnabled: boolean;
+  isInstantAppEnabled: boolean;
+  appClipExperienceId: string;
   isNoPhoneFlow: boolean;
   requiresIdDoc: boolean;
   isKyb: boolean;
@@ -46,6 +48,8 @@ export type OnboardingConfig = {
   canAccessData: CollectedDataOption[];
   optionalData: CollectedDataOption[];
   isAppClipEnabled: boolean;
+  appClipExperienceId: string;
+  isInstantAppEnabled: boolean;
   isNoPhoneFlow: boolean;
   allowInternationalResidents: boolean;
   supportedCountries?: CountryCode[];

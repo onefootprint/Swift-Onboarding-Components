@@ -22,6 +22,8 @@ const playbookFixture: OnboardingConfig = {
   optionalData: [],
   canAccessData: [],
   isAppClipEnabled: false,
+  appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
+  isInstantAppEnabled: false,
   allowInternationalResidents: false,
   isDocFirstFlow: false,
 };

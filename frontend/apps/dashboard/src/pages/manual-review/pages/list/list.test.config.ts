@@ -90,6 +90,8 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     status: OnboardingConfigStatus.enabled,
     optionalData: [],
     isAppClipEnabled: false,
+    isInstantAppEnabled: false,
+    appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
     isNoPhoneFlow: false,
     allowInternationalResidents: false,
     isDocFirstFlow: false,

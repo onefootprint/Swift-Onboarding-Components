@@ -10,6 +10,8 @@ const getOnboardingConfig = (): PublicOnboardingConfig => ({
   isLive: true,
   status: OnboardingConfigStatus.enabled,
   isAppClipEnabled: false,
+  isInstantAppEnabled: false,
+  appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
   isNoPhoneFlow: false,
   privacyPolicyUrl: null,
   requiresIdDoc: false,

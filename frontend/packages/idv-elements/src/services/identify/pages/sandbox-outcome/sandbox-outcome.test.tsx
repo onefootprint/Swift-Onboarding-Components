@@ -27,6 +27,8 @@ const getOnboardingConfig = (isLive = true): PublicOnboardingConfig => ({
   orgName: 'tenantOrg',
   status: OnboardingConfigStatus.enabled,
   isAppClipEnabled: false,
+  isInstantAppEnabled: false,
+  appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
   isNoPhoneFlow: false,
   requiresIdDoc: true,
   key: 'key',

@@ -23,6 +23,8 @@ export const playbookDetailsFixture: OnboardingConfig = {
   status: OnboardingConfigStatus.disabled,
   optionalData: [],
   isAppClipEnabled: false,
+  isInstantAppEnabled: false,
+  appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
   isNoPhoneFlow: false,
   allowInternationalResidents: false,
   isDocFirstFlow: false,

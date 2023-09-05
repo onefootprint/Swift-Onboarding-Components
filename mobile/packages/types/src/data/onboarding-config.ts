@@ -18,4 +18,6 @@ export type OnboardingConfig = {
   mustCollectData: CollectedDataOption[];
   canAccessData: CollectedDataOption[];
   isAppClipEnabled: boolean;
+  isInstantAppEnabled: boolean;
+  appClipExperienceId: string;
 };

@@ -15,6 +15,8 @@ describe('isContextReady', () => {
     orgName: 'tenantOrg',
     status: OnboardingConfigStatus.enabled,
     isAppClipEnabled: false,
+    isInstantAppEnabled: false,
+    appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
     isNoPhoneFlow: false,
     requiresIdDoc: false,
     key: 'key',
