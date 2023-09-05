@@ -21,7 +21,7 @@ const ContentSecurityPolicy = `
   frame-ancestors 'self';
   frame-src 'self' localhost:3000 *.onefootprint.com vercel.live www.youtube.com form.typeform.com; 
   img-src 'self' data: footprint-blog.ghost.io assets.vercel.com vercel.live vercel.com usefathom.com *.usefathom.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net;
-  media-src 'self' https;
+  media-src 'self' https footprint-blog.ghost.io;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' usefathom.com *.usefathom.com vercel.live vitals.vercel-insights.com tagmanager.google.com www.googletagmanager.com platform.twitter.com www.youtube.com static.ads-twitter.com connect.facebook.net www.facebook.com;
   style-src 'self' 'unsafe-inline' tagmanager.google.com fonts.googleapis.com;
   worker-src 'self' blob:;

@@ -43,6 +43,12 @@ const Content = styled.div`
       `}
     }
 
+    video {
+      border-radius: ${theme.borderRadius.default};
+      height: auto;
+      width: 100%;
+    }
+
     code {
       ${createFontStyles('snippet-2', 'code')};
     }
