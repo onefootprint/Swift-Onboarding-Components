@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::{ApiError, ApiResult};
@@ -26,6 +28,7 @@ use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::TxnPgConn;
+use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
     DataIdentifier, DataLifetimeSource, DecisionIntentId, DecisionIntentKind, DocumentKind, DocumentSide,
@@ -198,6 +201,7 @@ pub async fn post(
             is_sandbox,
             should_collect_selfie,
             &wf_id2,
+            state.feature_flag_client.clone(),
         )
         .await?
     } else {
@@ -229,6 +233,7 @@ pub(in crate::user) async fn handle_incode_request(
     is_sandbox: bool,
     should_collect_selfie: bool,
     workflow_id: &WorkflowId,
+    ff_client: Arc<dyn FeatureFlagClient>,
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
 
@@ -242,6 +247,8 @@ pub(in crate::user) async fn handle_incode_request(
         docv_data,
         doc_request_id: doc_request.id,
         enclave_client: state.enclave_client.clone(),
+        tenant_id: tenant_id.clone(),
+        ff_client,
     };
     let machine = IncodeStateMachine::init(
         state,

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::state::{IncodeState, IncodeStateTransition, RunTransition, StepResult};
 use super::states::*;
 use crate::decision::vendor::incode::states::VerificationSession;
@@ -10,6 +12,7 @@ use db::models::identity_document::IdentityDocument;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::vault::Vault;
 use db::DbPool;
+use feature_flag::FeatureFlagClient;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DecisionIntentId, DocVData, DocumentRequestId, IdentityDocumentId, IncodeConfigurationId,
@@ -30,6 +33,8 @@ pub struct IncodeContext {
     pub docv_data: DocVData,
     pub doc_request_id: DocumentRequestId,
     pub enclave_client: EnclaveClient,
+    pub tenant_id: TenantId,
+    pub ff_client: Arc<dyn FeatureFlagClient>,
 }
 
 impl IncodeState {

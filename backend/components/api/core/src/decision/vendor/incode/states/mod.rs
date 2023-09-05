@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use std::sync::Arc;
 
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
@@ -6,8 +7,9 @@ use db::models::verification_request::VerificationRequest;
 
 mod start_onboarding;
 
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::test_fixtures::DocTestOpts;
-use newtypes::incode::IncodeDocumentType;
+use newtypes::incode::{IncodeDocumentRestriction, IncodeDocumentType};
 pub use start_onboarding::*;
 
 mod add_front;
@@ -55,7 +57,7 @@ use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DecisionIntentKind, IdDocKind, IncodeFailureReason, IncodeVerificationSessionId,
     IncodeVerificationSessionKind, Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiJsonValue,
-    ScopedVaultId, ScrubbedPiiJsonValue, ScrubbedPiiString, VendorAPI, WorkflowId,
+    ScopedVaultId, ScrubbedPiiJsonValue, ScrubbedPiiString, TenantId, VendorAPI, WorkflowId,
 };
 
 #[derive(Clone)]
@@ -287,5 +289,22 @@ impl AddSideResponseHelper {
 
     pub fn has_api_error(&self) -> bool {
         !self.failure_reasons_from_api_error.is_empty()
+    }
+
+    pub fn get_restrictions(
+        tenant_id: &TenantId,
+        ff_client: &Arc<dyn FeatureFlagClient>,
+    ) -> Vec<IncodeDocumentRestriction> {
+        let check_glare = !ff_client.flag(BoolFlag::DisableConservativeGlareForDocument(tenant_id));
+        let check_sharpness = !ff_client.flag(BoolFlag::DisableConservativeSharpnessForDocument(tenant_id));
+        let check_dl_permit = ff_client.flag(BoolFlag::DisallowDriverLicensePermits(tenant_id));
+        [
+            check_glare.then_some(IncodeDocumentRestriction::ConservativeGlare),
+            check_sharpness.then_some(IncodeDocumentRestriction::ConservativeSharpness),
+            check_dl_permit.then_some(IncodeDocumentRestriction::NoDriverLicensePermit),
+        ]
+        .into_iter()
+        .flatten()
+        .collect()
     }
 }

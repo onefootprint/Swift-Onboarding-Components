@@ -65,15 +65,11 @@ impl AddSideResponse {
                 .unwrap_or_else(|_| IncodeFailureReason::Other(e.clone()))
         });
 
-        [
-            fail_reason,
-            (self.correct_glare == Some(false)).then_some(IncodeFailureReason::DocumentGlare),
-            (self.correct_sharpness == Some(false)).then_some(IncodeFailureReason::DocumentSharpness),
-        ]
-        .into_iter()
-        .chain(restrictions_fail_reasons)
-        .flatten()
-        .collect()
+        [fail_reason]
+            .into_iter()
+            .chain(restrictions_fail_reasons)
+            .flatten()
+            .collect()
     }
 
     fn handle_restriction(&self, restriction: IncodeDocumentRestriction) -> Option<IncodeFailureReason> {
@@ -82,6 +78,12 @@ impl AddSideResponse {
                 self.is_drivers_license_permit().and_then(|is_permit| {
                     is_permit.then_some(IncodeFailureReason::DriversLicensePermitNotAllowed)
                 })
+            }
+            IncodeDocumentRestriction::ConservativeGlare => {
+                (self.correct_glare == Some(false)).then_some(IncodeFailureReason::DocumentGlare)
+            }
+            IncodeDocumentRestriction::ConservativeSharpness => {
+                (self.correct_sharpness == Some(false)).then_some(IncodeFailureReason::DocumentSharpness)
             }
         }
     }

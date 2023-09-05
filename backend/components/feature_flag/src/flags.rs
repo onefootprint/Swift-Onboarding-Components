@@ -49,6 +49,12 @@ pub enum BoolFlag<'a> {
     TenantCanMakeDocFirstObc(&'a TenantId),
     #[strum(to_string = "IsSkipKycTenant")]
     IsSkipKycTenant(&'a TenantId),
+    #[strum(to_string = "DisableConservativeGlareForDocument")]
+    DisableConservativeGlareForDocument(&'a TenantId),
+    #[strum(to_string = "DisableConservativeSharpnessForDocument")]
+    DisableConservativeSharpnessForDocument(&'a TenantId),
+    #[strum(to_string = "DisallowDriverLicensePermits")]
+    DisallowDriverLicensePermits(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -81,6 +87,9 @@ impl<'a> BoolFlag<'a> {
             Self::TenantCanMakeNoPhoneObc(k) => Some(k.to_string()),
             Self::TenantCanMakeDocFirstObc(k) => Some(k.to_string()),
             Self::IsSkipKycTenant(k) => Some(k.to_string()),
+            Self::DisableConservativeGlareForDocument(k) => Some(k.to_string()),
+            Self::DisableConservativeSharpnessForDocument(k) => Some(k.to_string()),
+            Self::DisallowDriverLicensePermits(k) => Some(k.to_string()),
         }
     }
 
@@ -109,6 +118,9 @@ impl<'a> BoolFlag<'a> {
             Self::TenantCanMakeNoPhoneObc(_) => false,
             Self::TenantCanMakeDocFirstObc(_) => false,
             Self::IsSkipKycTenant(_) => false,
+            Self::DisableConservativeGlareForDocument(_) => false,
+            Self::DisableConservativeSharpnessForDocument(_) => false,
+            Self::DisallowDriverLicensePermits(_) => false,
         }
     }
 }
