@@ -31,6 +31,9 @@ const useGenerateScopedAuthToken = ({
   const styleParams = appearance ? JSON.stringify(appearance) : undefined;
 
   const generateScopedAuthToken = () => {
+    const isMobile = device?.type === 'mobile';
+    const redirectUrl = isMobile ? window.location.href : undefined;
+
     if (
       d2pGenerateMutation.isLoading ||
       d2pGenerateMutation.isSuccess ||
@@ -46,6 +49,7 @@ const useGenerateScopedAuthToken = ({
           sessionId,
           styleParams,
           sandboxIdDocOutcome: idDocOutcome,
+          redirectUrl,
         },
       },
       {
