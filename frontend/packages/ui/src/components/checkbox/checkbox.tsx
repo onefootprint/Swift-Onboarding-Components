@@ -1,5 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
-import React, { forwardRef, ReactNode, useId } from 'react';
+import React, { forwardRef, ReactNode, useId, useRef } from 'react';
+import mergeRefs from 'react-merge-refs';
 
 import { createFontStyles } from '../../utils/mixins';
 import Box from '../box';
@@ -42,8 +43,10 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     }: CheckboxProps,
     ref,
   ) => {
+    const inputRef = useRef<HTMLInputElement>(null);
     const internalId = useId();
     const id = possibleId || internalId;
+
     return (
       <Box>
         <Label
@@ -65,7 +68,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             onBlur={onBlur}
             onChange={onChange}
             readOnly={readOnly}
-            ref={ref}
+            ref={mergeRefs([inputRef, ref])}
             required={required}
             tabIndex={disabled ? undefined : 0}
             type="checkbox"
@@ -74,7 +77,13 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           {label}
         </Label>
         {hint && (
-          <Hint data-has-error={hasError} id={`${id}-hint`}>
+          <Hint
+            data-has-error={hasError}
+            id={`${id}-hint`}
+            onClick={() => {
+              inputRef.current?.click();
+            }}
+          >
             {hint}
           </Hint>
         )}
@@ -173,10 +182,10 @@ const Hint = styled.div`
 
     return css`
       ${createFontStyles('body-3')};
-      text-align: left;
       color: ${hint.states.default.color};
       margin-left: calc(${theme.spacing[8]} - ${theme.spacing[2]});
       margin-top: ${theme.spacing[1]};
+      text-align: left;
 
       &[data-has-error='true'] {
         color: ${hint.states.error.color};

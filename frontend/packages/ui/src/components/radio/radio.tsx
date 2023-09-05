@@ -1,8 +1,8 @@
 import styled, { css } from '@onefootprint/styled';
-import React, { forwardRef, useId } from 'react';
+import React, { forwardRef, useId, useRef } from 'react';
+import mergeRefs from 'react-merge-refs';
 
 import { createFontStyles } from '../../utils/mixins';
-import Hint from '../internal/hint';
 import { createCheckedStyled, createPseudoStyles } from './radio.utils';
 
 export type RadioProps = {
@@ -42,8 +42,10 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
     }: RadioProps,
     ref,
   ) => {
+    const inputRef = useRef<HTMLInputElement>(null);
     const internalId = useId();
     const id = possibleId || internalId;
+
     return (
       <Container>
         <Label
@@ -65,7 +67,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
             onBlur={onBlur}
             onChange={onChange}
             readOnly={readOnly}
-            ref={ref}
+            ref={mergeRefs([inputRef, ref])}
             required={required}
             tabIndex={disabled ? undefined : 0}
             type="radio"
@@ -74,9 +76,15 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
           {label}
         </Label>
         {hint && (
-          <StyledHint hasError={hasError} id={`${id}-hint`} size="compact">
+          <Hint
+            data-has-error={hasError}
+            id={`${id}-hint`}
+            onClick={() => {
+              inputRef.current?.click();
+            }}
+          >
             {hint}
-          </StyledHint>
+          </Hint>
         )}
       </Container>
     );
@@ -163,11 +171,21 @@ const Input = styled.input<Pick<RadioProps, 'hasError'>>`
   `}
 `;
 
-const StyledHint = styled(Hint)`
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[2]};
-    margin-left: calc(${theme.spacing[8]} - ${theme.spacing[1]});
-  `}
-`;
+const Hint = styled.div`
+  ${({ theme }) => {
+    const { hint } = theme.components;
 
+    return css`
+      ${createFontStyles('body-3')};
+      color: ${hint.states.default.color};
+      margin-left: calc(${theme.spacing[8]} - ${theme.spacing[2]});
+      margin-top: ${theme.spacing[1]};
+      text-align: left;
+
+      &[data-has-error='true'] {
+        color: ${hint.states.error.color};
+      }
+    `;
+  }}
+`;
 export default Radio;
