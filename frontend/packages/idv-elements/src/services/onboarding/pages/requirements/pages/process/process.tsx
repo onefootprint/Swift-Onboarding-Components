@@ -6,7 +6,7 @@ import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
-import useOnboardingProcess from './hooks/use-onboarding-process';
+import useOnboardingProcess from '../../hooks/use-onboarding-process';
 
 export type ProcessProps = {
   onDone: () => void;

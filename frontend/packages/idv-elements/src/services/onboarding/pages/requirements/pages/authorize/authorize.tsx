@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoForbid40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedDocumentDataOption,
@@ -8,7 +9,7 @@ import {
   getRequirement,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
-import { Divider, useToast } from '@onefootprint/ui';
+import { Divider, Typography, useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
@@ -20,6 +21,7 @@ import {
   isKycCdo,
 } from '../../../../utils/cdo-utils';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
+import useOnboardingProcess from '../../hooks/use-onboarding-process';
 import Button from './components/button';
 import KybFields from './components/kyb-fields';
 import KycFields from './components/kyc-fields';
@@ -36,18 +38,28 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     onboardingContext: { authToken, config },
     requirements,
   } = state.context;
-  const requirement = getRequirement(
+  const authorizeRequirement = getRequirement(
     requirements,
     OnboardingRequirementKind.authorize,
   );
+  const processRequirement = getRequirement(
+    requirements,
+    OnboardingRequirementKind.process,
+  );
   const onboardingAuthorizeMutation = useOnboardingAuthorize();
+  const processMutation = useOnboardingProcess();
+  const isLoading =
+    onboardingAuthorizeMutation.isLoading || processMutation.isLoading;
+  const isError =
+    onboardingAuthorizeMutation.isError || processMutation.isError;
   const toast = useToast();
 
-  if (!requirement) {
-    return <div />;
+  if (!authorizeRequirement) {
+    return null;
   }
 
-  const { collectedData, documentTypes } = requirement.fieldsToAuthorize;
+  const { collectedData, documentTypes } =
+    authorizeRequirement.fieldsToAuthorize;
   const { orgName: tenantName } = config;
   const kycData = collectedData.filter(
     data => isKycCdo(data) || isDocCdo(data) || isInvestorProfileCdo(data),
@@ -62,11 +74,24 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   ) as CollectedKybDataOption[];
   const hasBothSections = kycData.length > 0 && kybData.length > 0;
 
+  const handleAuthorizeSuccess = () => {
+    if (!processRequirement) {
+      onDone();
+      return;
+    }
+    processMutation.mutate(
+      { authToken },
+      {
+        onSuccess: onDone,
+      },
+    );
+  };
+
   const handleClick = () => {
     onboardingAuthorizeMutation.mutate(
       { authToken },
       {
-        onSuccess: onDone,
+        onSuccess: handleAuthorizeSuccess,
         onError() {
           toast.show({
             title: t('onboarding-complete-error.title'),
@@ -82,25 +107,44 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     <>
       <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
       <Container>
-        <HeaderTitle
-          title={t('title')}
-          subtitle={t('subtitle', { tenantName })}
-        />
-        <KycFields
-          showTitle={hasBothSections}
-          data={kycData}
-          documentTypes={documentTypes}
-        />
-        {hasBothSections && <Divider />}
-        <KybFields showTitle={hasBothSections} data={kybData} />
-        <Button
-          isLoading={onboardingAuthorizeMutation.isLoading}
-          onClick={handleClick}
-        />
+        {isError ? (
+          <>
+            <TitleContainer>
+              <IcoForbid40 color="error" />
+              <Typography variant="heading-3">{t('error.title')}</Typography>
+            </TitleContainer>
+            <Typography variant="body-2">{t('error.description')}</Typography>
+          </>
+        ) : (
+          <>
+            <HeaderTitle
+              title={t('title')}
+              subtitle={t('subtitle', { tenantName })}
+            />
+            <KycFields
+              showTitle={hasBothSections}
+              data={kycData}
+              documentTypes={documentTypes}
+            />
+            {hasBothSections && <Divider />}
+            <KybFields showTitle={hasBothSections} data={kybData} />
+            <Button isLoading={isLoading} onClick={handleClick} />
+          </>
+        )}
       </Container>
     </>
   );
 };
+
+const TitleContainer = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[2]};
+    justify-content: center;
+  `}
+`;
 
 const Container = styled.div`
   ${({ theme }) => css`
