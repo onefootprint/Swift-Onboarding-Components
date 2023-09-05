@@ -1,11 +1,11 @@
 import styled, { css } from '@onefootprint/styled';
-import { Box, media, Typography } from '@onefootprint/ui';
+import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
 export type PostPreviewProps = {
-  author: { avatarImgUrl: string; name: string };
+  authors: { id: string; avatarImgUrl: string; name: string }[];
   publishedAt: string;
   excerpt: string;
   featureImageAlt: string;
@@ -17,7 +17,7 @@ export type PostPreviewProps = {
 };
 
 const PostPreview = ({
-  author,
+  authors,
   publishedAt,
   excerpt,
   featureImageAlt,
@@ -68,14 +68,22 @@ const PostPreview = ({
             </Typography>
           </Body>
           <Footer>
-            <Avatar
-              alt={author.name}
-              height={16}
-              src={author.avatarImgUrl}
-              width={16}
-            />
+            <AvatarGroup count={authors.length}>
+              {authors.map(author => (
+                <Avatar
+                  key={author.id}
+                  alt={author.name}
+                  height={20}
+                  src={author.avatarImgUrl}
+                  width={20}
+                />
+              ))}
+            </AvatarGroup>
+            <AuthorsName>
+              {authors.map(author => author.name).join(' & ')}
+            </AuthorsName>
             <Typography color="tertiary" variant="body-4">
-              {author.name} | <time>{publishedAt}</time>
+              | <time>{publishedAt}</time>
             </Typography>
           </Footer>
         </Box>
@@ -188,9 +196,29 @@ const Footer = styled.footer`
   `}
 `;
 
+const AvatarGroup = styled.div<{ count: number }>`
+  ${({ theme, count }) => css`
+    width: ${count === 2 ? theme.spacing[8] : theme.spacing[5]};
+    position: relative;
+  `}
+`;
+
 const Avatar = styled(Image)`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius.full};
+    border: ${theme.borderWidth[2]} solid ${theme.backgroundColor.secondary};
+
+    &:nth-child(2) {
+      position: absolute;
+      left: ${theme.spacing[4]};
+    }
+  `}
+`;
+
+const AuthorsName = styled.div`
+  ${({ theme }) => css`
+    ${createFontStyles('body-4')};
+    color: ${theme.color.tertiary};
   `}
 `;
 

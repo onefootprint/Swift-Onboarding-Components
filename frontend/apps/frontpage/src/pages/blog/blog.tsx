@@ -37,10 +37,11 @@ const Blog = ({ posts }: BlogProps) => {
           <FeaturedPost>
             <PostPreview
               href={`/blog/${featuredPost.slug}`}
-              author={{
-                avatarImgUrl: featuredPost.primary_author.profile_image,
-                name: featuredPost.primary_author.name,
-              }}
+              authors={featuredPost.authors.map(author => ({
+                id: author.id,
+                avatarImgUrl: author.profile_image,
+                name: author.name,
+              }))}
               primaryTag={featuredPost.primary_tag.name}
               featureImageUrl={featuredPost.feature_image}
               featureImageAlt={
@@ -59,10 +60,11 @@ const Blog = ({ posts }: BlogProps) => {
             {allPosts.map(post => (
               <PostPreview
                 href={`/blog/${post.slug}`}
-                author={{
-                  avatarImgUrl: post.primary_author.profile_image,
-                  name: post.primary_author.name,
-                }}
+                authors={post.authors.map(author => ({
+                  id: author.id,
+                  avatarImgUrl: author.profile_image,
+                  name: author.name,
+                }))}
                 primaryTag={post.primary_tag?.name}
                 featureImageUrl={post.feature_image}
                 featureImageAlt={post.feature_image_alt || post.title}

@@ -68,10 +68,11 @@ const Post = ({ post }: PostProps) => {
               >
                 <PostInfo
                   publishedAt={publishedAt}
-                  author={{
-                    name: post.primary_author.name,
-                    profileImage: post.primary_author.profile_image,
-                  }}
+                  authors={post.authors.map(author => ({
+                    id: author.id,
+                    profileImage: author.profile_image,
+                    name: author.name,
+                  }))}
                   readingTime={post.reading_time}
                   tag={{
                     name: post.primary_tag.name,

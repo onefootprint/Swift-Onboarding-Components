@@ -37,32 +37,34 @@ export type Tag = {
 };
 
 export type Post = {
-  id: string;
-  html: string | undefined;
-  featured: boolean | undefined;
+  authors: Author[];
   created_at: string;
-  published_at: string;
   excerpt: string;
-  reading_time: number;
-  feature_image: string;
   feature_image_alt?: string;
+  feature_image: string;
+  featured: boolean | undefined;
+  html: string | undefined;
+  id: string;
+  primary_author: Author;
+  primary_tag: Tag;
+  published_at: string;
+  reading_time: number;
   slug: string;
+  tags: Tag[];
+  title: string;
   url: string;
   uuid: string;
-  title: string;
-  primary_tag: Tag;
-  primary_author: Author;
-  tags: Tag[];
 };
 
 export type PostDetails = {
+  authors: Author[];
   canonical_url: string;
   created_at: string;
-  published_at: string;
-  excerpt: string;
   custom_excerpt: string;
+  excerpt: string;
   feature_image_alt?: string;
   feature_image: string;
+  featured: boolean;
   html: string;
   meta_description: string;
   meta_title: string;
@@ -71,8 +73,10 @@ export type PostDetails = {
   og_title: string;
   primary_author: Author;
   primary_tag: Tag;
+  published_at: string;
   reading_time: number;
   slug: string;
+  tags: Tag[];
   title: string;
   twitter_description: string;
   twitter_image: string;
@@ -80,6 +84,4 @@ export type PostDetails = {
   updated_at: string;
   url: string;
   uuid: string;
-  tags: Tag[];
-  featured: boolean;
 };
