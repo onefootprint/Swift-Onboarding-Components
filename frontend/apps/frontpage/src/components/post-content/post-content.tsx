@@ -32,11 +32,12 @@ const Content = styled.div`
     }
 
     img {
+      border-radius: ${theme.borderRadius.default};
+      height: auto;
       margin-bottom: ${theme.spacing[9]};
       max-width: 100%;
       object-fit: cover;
       object-position: left;
-      height: auto;
 
       ${media.greaterThan('sm')`
         width: 100%;
