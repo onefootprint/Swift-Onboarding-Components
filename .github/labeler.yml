@@ -41,3 +41,6 @@ Developer Docs:
 
 Frontpage:
   - frontend/apps/frontpage/**/*
+
+DesignSystem:
+  - frontend/packages/ui/*
