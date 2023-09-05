@@ -28,6 +28,17 @@ const AddressSection = () => {
   const zip = data[IdDI.zip]?.value;
   const [editing, setEditing] = useState(false);
 
+  if (
+    !addressLine1 &&
+    !addressLine2 &&
+    !city &&
+    !stateName &&
+    !country &&
+    !zip
+  ) {
+    return null;
+  }
+
   address.push({
     text: createAddressLine([addressLine1, addressLine2]),
     subtext: createAddressLine([city, stateName, zip, country]),
