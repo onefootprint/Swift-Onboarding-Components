@@ -112,6 +112,7 @@ impl Complete {
                 // prefer MRZ decoded name to OCR, since OCR has a higher rate of whoopsies
                 r.name.and_then(|n| n.machine_readable_full_name.or(n.full_name)),
             ),
+            di(ODK::Curp, r.curp),
         ]
         .into_iter()
         .flatten()

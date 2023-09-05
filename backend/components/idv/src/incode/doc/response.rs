@@ -394,6 +394,12 @@ pub struct FetchOCRResponse {
     pub dl_class_details: Option<serde_json::Value>,
     pub ocr_data_confidence: Option<serde_json::Value>,
     pub restrictions: Option<ScrubbedPiiString>,
+    // MX specific
+    pub curp: Option<ScrubbedPiiString>,
+    pub cic: Option<ScrubbedPiiString>,
+    pub mrz1: Option<ScrubbedPiiString>,
+    pub mrz2: Option<ScrubbedPiiString>,
+    pub birth_place: Option<ScrubbedPiiString>,
 
     #[serde(flatten)]
     pub error: Option<Error>,
