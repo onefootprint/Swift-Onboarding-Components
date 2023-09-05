@@ -1,10 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Box, media } from '@onefootprint/ui';
+import { Box } from '@onefootprint/ui';
 import { AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import React, { useState } from 'react';
 
+import IllustrationContainer from '../../components/illustration-section-title/container';
+import Rectangle from '../../components/illustration-section-title/rectangle/rectangle';
 import SectionSubtitle from '../../components/section-subtitle';
 import SectionTitle from '../../components/section-title';
 import DesktopImageGrid from './components/desktop-image-grid';
@@ -18,14 +19,13 @@ const AllData = () => {
   return (
     <Container>
       <TitleContainer>
-        <AllDataImage>
-          <Image
-            src="/vaulting/all-data/all-data-section.png"
-            width={720}
-            height={358}
-            alt=""
-          />
-        </AllDataImage>
+        <IllustrationContainer>
+          <Rectangle top={24} left={24} width={117} height={24} />
+          <Rectangle top={80} left={24} width={90} height={24} />
+          <Rectangle top={125} left={24} width={90} height={24} />
+          <Rectangle top={80} left={280} width={50} height={24} />
+          <Rectangle top={125} left={280} width={50} height={24} />
+        </IllustrationContainer>
         <Title>
           <SectionTitle variant="display-1">{t('title')}</SectionTitle>
           <AnimatePresence>
@@ -69,43 +69,6 @@ const Container = styled.div`
   `}
 `;
 
-const AllDataImage = styled.div`
-  ${({ theme }) => css`
-    position: relative;
-    height: 174px;
-    width: 90%;
-    mask: radial-gradient(
-      60% 100% at 50% 0%,
-      black 0%,
-      black 55%,
-      transparent 95%
-    );
-    mask-mode: alpha;
-
-    img {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      left: 50%;
-      top: 0;
-      transform: translateX(-50%);
-      object-fit: contain;
-      border-radius: ${theme.borderRadius.default};
-    }
-
-    ${media.greaterThan('md')`
-      height: 174px;
-      width: 360px;
-      mask: radial-gradient(
-        70% 100% at 50% 0%,
-        black 0%,
-        black 55%,
-        transparent 100%
-    );
-    `}
-  `}
-`;
-
 const TitleContainer = styled.div`
   ${({ theme }) => css`
     position: relative;
@@ -136,6 +99,7 @@ const TitleContainer = styled.div`
 const Title = styled.div`
   ${({ theme }) => css`
     margin-top: calc(-1 * ${theme.spacing[8]});
+    z-index: 2;
   `};
 `;
 

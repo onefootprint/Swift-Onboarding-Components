@@ -11,12 +11,12 @@ import {
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
-import Image from 'next/image';
 import React from 'react';
 
 import FeatureCard from '../../components/feature-card';
 import SectionSubtitle from '../../components/section-subtitle';
 import SectionTitle from '../../components/section-title';
+import TitleIllustration from './components/title-illustration';
 
 const featureCards = [
   {
@@ -58,14 +58,7 @@ const AllFeatures = () => {
   return (
     <StyledContainer>
       <Title>
-        <AllFeaturesImage>
-          <Image
-            src="/vaulting/all-features/all-features-section.png"
-            width={444}
-            height={247}
-            alt=""
-          />
-        </AllFeaturesImage>
+        <TitleIllustration />
         <TitleContainer>
           <SectionTitle variant="display-1" maxWidth={460} multiline>
             {t('title')}
@@ -132,36 +125,13 @@ const Grid = styled.div`
     `}
 `;
 
-const AllFeaturesImage = styled.div`
-  position: relative;
-  height: 185px;
-  width: 100%;
-  overflow: hidden;
-  mask-mode: alpha;
-  mask: radial-gradient(
-    50% 80% at 50% 0%,
-    black 0%,
-    black 75%,
-    transparent 100%
-  );
-
-  ${media.greaterThan('md')`
-    height: 185px;
-    mask: radial-gradient(
-      70% 80% at 50% 0%,
-      black 0%,
-      black 75%,
-      transparent 100%
-    );
-  `}
-`;
-
 const TitleContainer = styled.div`
   ${({ theme }) => css`
     margin-top: calc(-1 * ${theme.spacing[10]});
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[3]};
+    z-index: 2;
   `}
 `;
 

@@ -4,6 +4,8 @@ import { Container, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 
+import IllustrationContainer from '../../components/illustration-section-title/container';
+import Rectangle from '../../components/illustration-section-title/rectangle/rectangle';
 import SectionSubtitle from '../../components/section-subtitle';
 import SectionTitle from '../../components/section-title';
 
@@ -12,14 +14,15 @@ const AuditTrail = () => {
   return (
     <StyledContainer>
       <Title>
-        <AuditTrailImage>
-          <Image
-            src="/vaulting/audit-trail/audit-trail-section.png"
-            width={360}
-            height={178}
-            alt=""
-          />
-        </AuditTrailImage>
+        <IllustrationContainer>
+          <Rectangle top={32} left={32} width={80} height={12} />
+          <Rectangle top={26} left={124} width={24} height={24} />
+          <Rectangle top={32} left={164} width={160} height={12} />
+          <Rectangle top={56} left={134} width={4} height={24} />
+          <Rectangle top={92} left={32} width={80} height={12} />
+          <Rectangle top={86} left={124} width={24} height={24} />
+          <Rectangle top={92} left={164} width={160} height={12} />
+        </IllustrationContainer>
         <TitleContainer>
           <SectionTitle variant="display-1">{t('title')}</SectionTitle>
           <SectionSubtitle maxWidth={500}>{t('subtitle')}</SectionSubtitle>
@@ -75,19 +78,6 @@ const DesktopTimeline = styled(Image)`
   ${media.greaterThan('md')`
       display: block;
     `}
-`;
-
-const AuditTrailImage = styled.div`
-  position: relative;
-  height: 174px;
-  width: 360px;
-  mask: radial-gradient(
-    80% 85% at 50% 0%,
-    black 0%,
-    black 75%,
-    transparent 100%
-  );
-  mask-mode: alpha;
 `;
 
 const TitleContainer = styled.div`
