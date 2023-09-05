@@ -61,7 +61,7 @@
       },
       "drag-drop-text": {
         "line-1": "or drag and drop",
-        "line-2": "Supported formats: PNG, JPG (max size 25MB)"
+        "line-2": "Only images allowed (JPG, PNG, etc)"
       },
       "continue": "Continue",
       "choose-different-file": "Choose a different file"
@@ -208,11 +208,11 @@
           },
           "idCard": {
             "title": "Identity card",
-            "description": "Front & Back"
+            "description": "Front & back"
           },
           "driversLicense": {
             "title": "Driver's license",
-            "description": "Front & Back"
+            "description": "Front & back"
           },
           "visa": {
             "title": "Visa",
@@ -220,11 +220,11 @@
           },
           "workPermit": {
             "title": "Work permit / EAD card",
-            "description": "Front & Back"
+            "description": "Front & back"
           },
           "residenceDocument": {
             "title": "Residence card / Green card",
-            "description": "Front & Back"
+            "description": "Front & back"
           }
         },
         "not-supported": "Sorry, we don't support IDs for your country yet.",
