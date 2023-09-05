@@ -151,8 +151,8 @@
             "description": "Your SSN is encrypted & stored in a secure environment."
           },
           "privacy": {
-            "title": "Even Footprint can't see your data",
-            "description": "Your SSN will only be accessed in Footprint if required by law, and you will be made aware each time."
+            "title": "Even we can’t see your data",
+            "description": "Your SSN will only be accessed if required by law."
           },
           "credit-score": {
             "title": "Your credit score won't change",

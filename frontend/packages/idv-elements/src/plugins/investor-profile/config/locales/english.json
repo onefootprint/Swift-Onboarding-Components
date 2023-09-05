@@ -28,7 +28,7 @@
       },
       "occupation": {
         "label": "Occupation",
-        "placeholder": "Select your occupation",
+        "placeholder": "Software Engineer",
         "error": "Occupation is required"
       },
       "employer": {
