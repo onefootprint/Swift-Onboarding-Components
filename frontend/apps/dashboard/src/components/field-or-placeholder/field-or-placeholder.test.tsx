@@ -6,9 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import FieldOrPlaceholder, {
-  FieldOrPlaceholderProps,
-} from './field-or-placeholder';
+import type { FieldOrPlaceholderProps } from './field-or-placeholder';
+import FieldOrPlaceholder from './field-or-placeholder';
 
 const fileSaverSpy = createFileSaverSpy();
 

@@ -1,7 +1,12 @@
-import request, { RequestError } from '@onefootprint/request';
-import { GetLivenessRequest, GetLivenessResponse } from '@onefootprint/types';
+import type { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
+import type {
+  GetLivenessRequest,
+  GetLivenessResponse,
+} from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 const getAuthEvents = async (
   { id }: GetLivenessRequest,

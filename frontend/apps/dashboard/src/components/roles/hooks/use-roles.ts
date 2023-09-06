@@ -1,9 +1,7 @@
 import { useIntl } from '@onefootprint/hooks';
-import request, {
-  getErrorMessage,
-  PaginatedRequestResponse,
-} from '@onefootprint/request';
-import {
+import type { PaginatedRequestResponse } from '@onefootprint/request';
+import request, { getErrorMessage } from '@onefootprint/request';
+import type {
   GetRolesRequest,
   GetRolesResponse,
   Role,
@@ -11,7 +9,8 @@ import {
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import usePagination from 'src/hooks/use-pagination';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 import useRolesFilters from './use-roles-filters';
 

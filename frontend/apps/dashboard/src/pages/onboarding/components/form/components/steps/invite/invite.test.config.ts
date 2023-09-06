@@ -1,10 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import {
-  Organization,
-  Role,
-  RoleKind,
-  RoleScopeKind,
-} from '@onefootprint/types';
+import type { Organization, Role } from '@onefootprint/types';
+import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 
 export const RolesFixture: Role[] = [
   {

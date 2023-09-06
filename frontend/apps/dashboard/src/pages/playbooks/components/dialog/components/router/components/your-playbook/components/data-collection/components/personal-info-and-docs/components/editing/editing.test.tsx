@@ -9,9 +9,8 @@ import {
 
 import { Kind } from '@/playbooks/utils/machine/types';
 
-import EditingWithContext, {
-  EditingWithContextProps,
-} from './editing.test.config';
+import type { EditingWithContextProps } from './editing.test.config';
+import EditingWithContext from './editing.test.config';
 
 const renderEditing = ({ kind, startingValues }: EditingWithContextProps) => {
   customRender(

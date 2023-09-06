@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import getDateRange from 'src/utils/get-date-range';
 
-import { SecurityLogsFilterValues } from '../use-security-logs-filters.types';
+import type { SecurityLogsFilterValues } from '../use-security-logs-filters.types';
 
 const useRequestParams = ({
   dateRange,

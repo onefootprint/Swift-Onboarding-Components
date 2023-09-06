@@ -4,11 +4,11 @@ import styled, { css } from '@onefootprint/styled';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 
-import { WithEntityProps } from '@/entity/components/with-entity';
+import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import useField from '../../hooks/use-field';
 import useForm from '../../hooks/use-form';
-import { DiField } from '../../vault.types';
+import type { DiField } from '../../vault.types';
 import Field from '../field';
 import { useDecryptControls } from '../vault-actions';
 

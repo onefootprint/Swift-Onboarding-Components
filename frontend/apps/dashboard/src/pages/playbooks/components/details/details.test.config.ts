@@ -1,7 +1,7 @@
 import { mockRequest } from '@onefootprint/test-utils';
+import type { OnboardingConfig } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
-  OnboardingConfig,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 

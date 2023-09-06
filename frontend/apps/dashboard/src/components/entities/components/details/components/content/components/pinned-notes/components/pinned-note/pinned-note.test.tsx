@@ -5,7 +5,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import PinnedNote, { PinnedNoteProps } from './pinned-note';
+import type { PinnedNoteProps } from './pinned-note';
+import PinnedNote from './pinned-note';
 
 const useRouterSpy = createUseRouterSpy();
 

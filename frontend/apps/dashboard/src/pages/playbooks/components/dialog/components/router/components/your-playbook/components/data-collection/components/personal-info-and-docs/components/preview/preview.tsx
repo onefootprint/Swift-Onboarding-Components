@@ -6,10 +6,10 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 
+import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
 import {
   basicInformationFields,
   Kind,
-  PersonalInformationAndDocs,
   usResidentFormFields,
 } from '@/playbooks/utils/machine/types';
 

@@ -1,4 +1,4 @@
-import { UIState } from '@onefootprint/design-tokens';
+import type { UIState } from '@onefootprint/design-tokens';
 import { EntityStatus } from '@onefootprint/types';
 
 const statusToVariant: Record<EntityStatus, UIState> = {

@@ -1,9 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import {
-  RiskSignal,
-  RiskSignalAttribute,
-  RiskSignalSeverity,
-} from '@onefootprint/types';
+import type { RiskSignal } from '@onefootprint/types';
+import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
 
 export const entityIdFixture = 'fp_id_yCZehsWNeywHnk5JqL20u';
 

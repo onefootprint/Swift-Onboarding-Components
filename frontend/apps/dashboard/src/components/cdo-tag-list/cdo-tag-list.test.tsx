@@ -1,6 +1,6 @@
 import { customRender, screen } from '@onefootprint/test-utils';
+import type { CollectedDataOption } from '@onefootprint/types';
 import {
-  CollectedDataOption,
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,

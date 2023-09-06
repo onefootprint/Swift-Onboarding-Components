@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CreateRoleRequest, RoleKind } from '@onefootprint/types';
+import type { CreateRoleRequest, RoleKind } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
 

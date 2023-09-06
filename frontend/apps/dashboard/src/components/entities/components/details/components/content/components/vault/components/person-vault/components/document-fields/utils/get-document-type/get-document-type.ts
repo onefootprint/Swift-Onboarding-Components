@@ -1,4 +1,5 @@
-import { DocumentDI, SupportedIdDocTypes } from '@onefootprint/types';
+import type { DocumentDI } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 
 // Given a primary DI (i.e. document.drivers_license.front.latest_upload)
 // return the DocumentType (i.e. drivers_license)

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
-import {
+import type {
   CreateMembersRequest,
   CreateMembersResponse,
 } from '@onefootprint/types';
@@ -10,7 +10,8 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 const inviteMemberRequest = async (
   authHeaders: AuthHeaders,

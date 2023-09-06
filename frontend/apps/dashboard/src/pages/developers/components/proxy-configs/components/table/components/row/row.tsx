@@ -1,5 +1,5 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
-import { ProxyConfig } from '@onefootprint/types';
+import type { ProxyConfig } from '@onefootprint/types';
 import { Badge, CodeInline } from '@onefootprint/ui';
 import React from 'react';
 

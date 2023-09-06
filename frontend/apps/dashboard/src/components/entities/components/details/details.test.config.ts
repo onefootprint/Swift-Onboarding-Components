@@ -6,20 +6,22 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
+import type {
+  BusinessOwner,
+  DataIdentifier,
+  Entity,
+  Timeline,
+  VaultValue,
+} from '@onefootprint/types';
 import {
   ActorKind,
   BusinessDI,
-  BusinessOwner,
   CollectedKybDataOption,
   CollectedKycDataOption,
-  DataIdentifier,
   DecisionStatus,
-  Entity,
   EntityKind,
   EntityStatus,
-  Timeline,
   TimelineEventKind,
-  VaultValue,
 } from '@onefootprint/types';
 
 export const entityFixture: Entity = {

@@ -1,4 +1,4 @@
-import { DataIdentifier, EntityVault } from '@onefootprint/types';
+import type { DataIdentifier, EntityVault } from '@onefootprint/types';
 
 const order: Record<string, number> = {
   issuer: 1,

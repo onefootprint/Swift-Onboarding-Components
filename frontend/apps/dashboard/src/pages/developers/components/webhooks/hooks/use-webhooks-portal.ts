@@ -1,6 +1,8 @@
-import request, { RequestError } from '@onefootprint/request';
+import type { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 export type GetWebhooksPortalRequest = {
   authHeaders: AuthHeaders;

@@ -7,9 +7,8 @@ import React from 'react';
 
 import { Kind } from '@/playbooks/utils/machine/types';
 
-import PersonalScopesWithContext, {
-  PersonalScopesWithContextProps,
-} from './personal-scopes.test.config';
+import type { PersonalScopesWithContextProps } from './personal-scopes.test.config';
+import PersonalScopesWithContext from './personal-scopes.test.config';
 
 const renderPersonalScopes = ({
   startingPersonalValues,

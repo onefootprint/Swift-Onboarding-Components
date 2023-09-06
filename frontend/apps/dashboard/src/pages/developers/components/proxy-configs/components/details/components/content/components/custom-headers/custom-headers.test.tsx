@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import CustomHeaders, { CustomHeadersProps } from '.';
+import type { CustomHeadersProps } from '.';
+import CustomHeaders from '.';
 import {
   configWithHeaders,
   configWithoutHeaders,

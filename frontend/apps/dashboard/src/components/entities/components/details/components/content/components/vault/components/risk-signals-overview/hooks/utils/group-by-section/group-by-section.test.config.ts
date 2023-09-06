@@ -1,9 +1,6 @@
 import { faker } from '@faker-js/faker';
-import {
-  RiskSignal,
-  RiskSignalAttribute,
-  RiskSignalSeverity,
-} from '@onefootprint/types';
+import type { RiskSignal, RiskSignalAttribute } from '@onefootprint/types';
+import { RiskSignalSeverity } from '@onefootprint/types';
 
 const createRiskSignal = (scopes: RiskSignalAttribute[]): RiskSignal => ({
   id: faker.datatype.uuid(),

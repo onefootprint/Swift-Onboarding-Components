@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Role, RoleKind } from '@onefootprint/types';
+import type { Role } from '@onefootprint/types';
+import { RoleKind } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
 

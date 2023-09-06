@@ -1,11 +1,8 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import {
-  defaultNameFormData,
-  Kind,
-  NameFormData,
-} from '@/playbooks/utils/machine/types';
+import type { Kind, NameFormData } from '@/playbooks/utils/machine/types';
+import { defaultNameFormData } from '@/playbooks/utils/machine/types';
 
 import NameYourPlaybook from './name-your-playbook';
 

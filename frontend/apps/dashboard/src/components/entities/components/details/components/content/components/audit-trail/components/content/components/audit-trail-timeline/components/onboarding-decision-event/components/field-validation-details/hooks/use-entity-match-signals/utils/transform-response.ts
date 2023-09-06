@@ -1,4 +1,7 @@
-import { GetEntityMatchSignalsResponse, MatchLevel } from '@onefootprint/types';
+import type {
+  GetEntityMatchSignalsResponse,
+  MatchLevel,
+} from '@onefootprint/types';
 
 export type SignalShortInfoType = {
   matchLevel: MatchLevel;

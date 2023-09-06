@@ -1,4 +1,4 @@
-import { Color } from '@onefootprint/design-tokens';
+import type { Color } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCheck16,
@@ -7,10 +7,8 @@ import {
   IcoWarning16,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import {
-  WatchlistCheckEventData,
-  WatchlistCheckStatus,
-} from '@onefootprint/types';
+import type { WatchlistCheckEventData } from '@onefootprint/types';
+import { WatchlistCheckStatus } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 

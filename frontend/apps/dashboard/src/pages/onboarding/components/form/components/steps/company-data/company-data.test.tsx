@@ -7,7 +7,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import CompanyData, { CompanyDataProps } from './company-data';
+import type { CompanyDataProps } from './company-data';
+import CompanyData from './company-data';
 import {
   orgFixture,
   withOrg,

@@ -8,13 +8,8 @@ import {
   IcoGlobe24,
   IcoUsers24,
 } from '@onefootprint/icons';
-import {
-  DataIdentifier,
-  DocumentDI,
-  Entity,
-  IdDI,
-  InvestorProfileDI,
-} from '@onefootprint/types';
+import type { DataIdentifier, Entity } from '@onefootprint/types';
+import { DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import type { Fieldset } from '../../../../vault.types';

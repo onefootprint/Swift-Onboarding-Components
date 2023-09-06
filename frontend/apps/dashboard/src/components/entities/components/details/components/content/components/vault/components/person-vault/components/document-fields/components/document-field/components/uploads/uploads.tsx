@@ -1,13 +1,13 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { IcoIdFront16, IcoInfo16, IcoUpload24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import {
+import type {
   DataIdentifier,
   Document,
   DocumentUpload,
   EntityVault,
-  IdDocImageTypes,
 } from '@onefootprint/types';
+import { IdDocImageTypes } from '@onefootprint/types';
 import { createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
 

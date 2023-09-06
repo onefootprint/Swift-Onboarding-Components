@@ -1,4 +1,4 @@
-import { EntityCard } from '@onefootprint/types';
+import type { EntityCard } from '@onefootprint/types';
 
 const defaultCard: EntityCard = {
   alias: 'Hayes',

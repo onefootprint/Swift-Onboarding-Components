@@ -4,7 +4,7 @@ import React from 'react';
 import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
-import { WithEntityProps } from '@/entity/components/with-entity';
+import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import Field from '../../../field';
 import DocumentField from './components/document-field';

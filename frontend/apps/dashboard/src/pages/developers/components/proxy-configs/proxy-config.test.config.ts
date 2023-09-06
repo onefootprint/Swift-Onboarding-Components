@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { ProxyConfig, ProxyConfigDetails } from '@onefootprint/types';
+import type { ProxyConfig, ProxyConfigDetails } from '@onefootprint/types';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 beforeEach(() => {

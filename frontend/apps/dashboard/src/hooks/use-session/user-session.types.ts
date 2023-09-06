@@ -1,6 +1,6 @@
-import { Organization, RoleScope } from '@onefootprint/types';
+import type { Organization, RoleScope } from '@onefootprint/types';
 
-import {
+import type {
   DASHBOARD_AUTHORIZATION_HEADER,
   DASHBOARD_IS_LIVE_HEADER,
 } from '../../config/constants';

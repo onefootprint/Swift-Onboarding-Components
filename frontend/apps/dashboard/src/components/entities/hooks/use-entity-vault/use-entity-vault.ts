@@ -1,5 +1,6 @@
-import { Entity, EntityVault } from '@onefootprint/types';
-import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { Entity, EntityVault } from '@onefootprint/types';
+import type { QueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 // This is a custom hook that returns the vault for an entity.
 // The vault is stored in the query cache, so can persist and access from anywhere (e.g list page)

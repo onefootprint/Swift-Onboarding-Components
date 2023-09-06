@@ -1,7 +1,7 @@
-import { Timeline } from '@onefootprint/types';
+import type { Timeline } from '@onefootprint/types';
 import React from 'react';
 
-import { WithEntityProps } from '@/entity/components/with-entity';
+import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import AuditTrailTimeline from './components/audit-trail-timeline';
 

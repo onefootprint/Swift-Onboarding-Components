@@ -1,4 +1,5 @@
-import { DocumentDI, EntityVault } from '@onefootprint/types';
+import type { EntityVault } from '@onefootprint/types';
+import { DocumentDI } from '@onefootprint/types';
 
 const entityVaultWithJustIDCardDIs: EntityVault = {
   [`${DocumentDI.latestIdCardFront}:567`]: 'test ID URL',

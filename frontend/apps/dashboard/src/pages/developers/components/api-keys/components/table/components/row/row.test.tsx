@@ -8,7 +8,8 @@ import {
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
-import Row, { RowProps } from './row';
+import type { RowProps } from './row';
+import Row from './row';
 import {
   ApiKeyFixture,
   RolesFixture,

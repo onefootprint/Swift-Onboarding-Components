@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import { Error } from 'src/components';
 
-import { WithEntityProps } from '@/entity/components/with-entity';
+import type { WithEntityProps } from '@/entity/components/with-entity';
 import useCurrentEntityAuthEvents from '@/entity/hooks/use-current-entity-auth-events';
 
 import Section from '../section';

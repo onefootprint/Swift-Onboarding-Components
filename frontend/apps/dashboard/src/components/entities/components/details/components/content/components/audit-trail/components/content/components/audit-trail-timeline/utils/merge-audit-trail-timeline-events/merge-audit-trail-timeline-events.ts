@@ -1,11 +1,11 @@
-import {
+import type {
   CollectedDataEventData,
   CombinedWatchlistChecksEvent,
   TimelineEvent,
-  TimelineEventKind,
   WatchlistCheckEvent,
 } from '@onefootprint/types';
-import { TimelineItemTimeData } from 'src/components/timeline';
+import { TimelineEventKind } from '@onefootprint/types';
+import type { TimelineItemTimeData } from 'src/components/timeline';
 
 export type AuditTrailTimelineEvent = Omit<TimelineEvent, 'timestamp'> & {
   time: TimelineItemTimeData;

@@ -1,10 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import {
-  BusinessDI,
-  Entity,
-  EntityKind,
-  EntityStatus,
-} from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
+import { BusinessDI, EntityKind, EntityStatus } from '@onefootprint/types';
 
 export const entityFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',

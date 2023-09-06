@@ -5,7 +5,7 @@ import { Button, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { BusinessInformation } from '@/playbooks/utils/machine/types';
+import type { BusinessInformation } from '@/playbooks/utils/machine/types';
 
 type EditingProps = {
   stopEditing: () => void;

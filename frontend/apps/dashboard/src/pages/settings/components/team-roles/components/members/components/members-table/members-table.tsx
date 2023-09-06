@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Member } from '@onefootprint/types';
+import type { Member } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
 

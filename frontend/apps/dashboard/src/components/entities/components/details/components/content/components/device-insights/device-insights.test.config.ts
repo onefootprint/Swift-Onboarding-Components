@@ -1,10 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import {
-  InsightEvent,
-  Liveness,
-  LivenessKind,
-  LivenessSource,
-} from '@onefootprint/types';
+import type { InsightEvent, Liveness } from '@onefootprint/types';
+import { LivenessKind, LivenessSource } from '@onefootprint/types';
 
 export const insight: InsightEvent = {
   city: 'San Francisco',

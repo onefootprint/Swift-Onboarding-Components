@@ -6,7 +6,8 @@ import type {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import useSession, { AuthHeaders } from '../use-session';
+import type { AuthHeaders } from '../use-session';
+import useSession from '../use-session';
 
 const updateUser = async (
   authHeaders: AuthHeaders,

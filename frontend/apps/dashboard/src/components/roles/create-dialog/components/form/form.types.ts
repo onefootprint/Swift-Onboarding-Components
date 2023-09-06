@@ -1,5 +1,5 @@
-import { BasicRoleScopeKind } from '@onefootprint/types';
-import { DecryptOption, VaultProxyOption } from 'src/components/roles';
+import type { BasicRoleScopeKind } from '@onefootprint/types';
+import type { DecryptOption, VaultProxyOption } from 'src/components/roles';
 
 export type VaultProxySelectOption = {
   label: string;

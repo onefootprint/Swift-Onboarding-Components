@@ -1,6 +1,6 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Document } from '@onefootprint/types';
+import type { Document } from '@onefootprint/types';
 import { Select, Typography } from '@onefootprint/ui';
 import React from 'react';
 

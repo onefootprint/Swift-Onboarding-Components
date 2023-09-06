@@ -1,4 +1,4 @@
-import { InsightEvent } from '@onefootprint/types';
+import type { InsightEvent } from '@onefootprint/types';
 
 const getRegionForInsightEvent = (event: InsightEvent) =>
   event.city && event.region

@@ -1,9 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  ActorKind,
-  DecisionStatus,
-  OnboardingDecisionEventData,
-} from '@onefootprint/types';
+import type { OnboardingDecisionEventData } from '@onefootprint/types';
+import { ActorKind, DecisionStatus } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 

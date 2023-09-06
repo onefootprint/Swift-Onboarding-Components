@@ -1,5 +1,5 @@
 import { customRender, screen } from '@onefootprint/test-utils';
-import { Entity } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
 import React from 'react';
 
 import Row from './row';

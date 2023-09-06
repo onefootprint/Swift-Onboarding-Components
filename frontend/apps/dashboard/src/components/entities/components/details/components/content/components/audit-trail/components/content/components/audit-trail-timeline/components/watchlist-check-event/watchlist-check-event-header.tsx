@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { PreviousWatchlistChecksEventData } from '@onefootprint/types';
+import type { PreviousWatchlistChecksEventData } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 

@@ -1,7 +1,6 @@
+import type { DataIdentifier, Entity } from '@onefootprint/types';
 import {
-  DataIdentifier,
   DocumentDI,
-  Entity,
   EntityKind,
   EntityStatus,
   IdDI,

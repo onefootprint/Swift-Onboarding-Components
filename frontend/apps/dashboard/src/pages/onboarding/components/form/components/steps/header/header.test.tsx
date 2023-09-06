@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Header, { HeaderProps } from './header';
+import type { HeaderProps } from './header';
+import Header from './header';
 
 describe('<Header />', () => {
   const renderTitle = ({

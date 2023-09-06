@@ -8,9 +8,8 @@ import {
 import { ReviewStatus } from '@onefootprint/types';
 import React from 'react';
 
-import ManualReviewDialog, {
-  ManualReviewDialogProps,
-} from './manual-review-dialog';
+import type { ManualReviewDialogProps } from './manual-review-dialog';
+import ManualReviewDialog from './manual-review-dialog';
 
 const useRouterSpy = createUseRouterSpy();
 

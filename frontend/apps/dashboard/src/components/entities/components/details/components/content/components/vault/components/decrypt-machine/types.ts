@@ -1,4 +1,4 @@
-import { DataIdentifier } from '@onefootprint/types';
+import type { DataIdentifier } from '@onefootprint/types';
 
 import type { FormData } from '../../vault.types';
 

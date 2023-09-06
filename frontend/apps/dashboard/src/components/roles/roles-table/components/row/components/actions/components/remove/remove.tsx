@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { Role } from '@onefootprint/types';
+import type { Role } from '@onefootprint/types';
 import { createFontStyles, useToast } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans } from 'react-i18next';

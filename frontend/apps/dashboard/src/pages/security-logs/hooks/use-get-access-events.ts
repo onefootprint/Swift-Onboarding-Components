@@ -1,10 +1,12 @@
-import request, { PaginatedRequestResponse } from '@onefootprint/request';
-import {
+import type { PaginatedRequestResponse } from '@onefootprint/request';
+import request from '@onefootprint/request';
+import type {
   GetAccessEventsRequest,
   GetAccessEventsResponse,
 } from '@onefootprint/types';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 import useSecurityLogsFilters from './use-security-logs-filters';
 

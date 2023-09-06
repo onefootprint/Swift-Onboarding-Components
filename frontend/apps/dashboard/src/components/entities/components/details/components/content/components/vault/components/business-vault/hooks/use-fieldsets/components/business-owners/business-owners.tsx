@@ -1,4 +1,4 @@
-import { Entity } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
 import React from 'react';
 import { Error } from 'src/components';
 

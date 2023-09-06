@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import { OrgAuthLoginResponse } from '@onefootprint/types';
+import type { OrgAuthLoginResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/router';

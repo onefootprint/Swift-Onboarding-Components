@@ -8,7 +8,8 @@ import {
 import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
 import React from 'react';
 
-import Content, { ContentProps } from './content';
+import type { ContentProps } from './content';
+import Content from './content';
 
 const useRouterSpy = createUseRouterSpy();
 

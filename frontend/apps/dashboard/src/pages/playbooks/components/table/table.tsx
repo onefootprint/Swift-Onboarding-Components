@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
 import React from 'react';
 

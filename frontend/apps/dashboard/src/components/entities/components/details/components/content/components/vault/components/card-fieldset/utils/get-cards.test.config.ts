@@ -1,4 +1,5 @@
-import { Entity, EntityKind, EntityStatus } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
+import { EntityKind, EntityStatus } from '@onefootprint/types';
 
 const entityFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',

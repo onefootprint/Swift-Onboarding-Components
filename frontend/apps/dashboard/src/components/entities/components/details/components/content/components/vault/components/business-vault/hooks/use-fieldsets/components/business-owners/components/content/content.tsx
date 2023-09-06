@@ -1,9 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import type { BusinessOwner, Entity } from '@onefootprint/types';
 import {
   BusinessDI,
-  BusinessOwner,
-  Entity,
   isVaultDataEmpty,
   isVaultDataEncrypted,
 } from '@onefootprint/types';

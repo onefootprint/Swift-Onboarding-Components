@@ -1,7 +1,8 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import { DecryptRequest, DecryptResponse } from '@onefootprint/types';
+import type { DecryptRequest, DecryptResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 const decrypt = async (
   { entityId, fields, reason }: DecryptRequest,

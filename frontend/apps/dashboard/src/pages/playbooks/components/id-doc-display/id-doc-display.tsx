@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { SupportedIdDocTypes } from '@onefootprint/types';
+import type { SupportedIdDocTypes } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 

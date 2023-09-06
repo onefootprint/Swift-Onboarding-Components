@@ -1,4 +1,4 @@
-import { EntityKind } from '@onefootprint/types';
+import type { EntityKind } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 import { Error } from 'src/components';

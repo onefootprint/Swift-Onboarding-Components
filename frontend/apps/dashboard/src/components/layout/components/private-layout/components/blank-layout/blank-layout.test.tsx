@@ -6,7 +6,8 @@ import {
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
-import BlankLayout, { BlankLayoutProps } from './blank-layout';
+import type { BlankLayoutProps } from './blank-layout';
+import BlankLayout from './blank-layout';
 
 const useRouterSpy = createUseRouterSpy();
 

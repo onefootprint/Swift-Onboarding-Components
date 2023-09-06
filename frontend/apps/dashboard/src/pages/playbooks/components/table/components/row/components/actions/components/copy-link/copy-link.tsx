@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
 import { Box, Button, Dialog, TextInput, Typography } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 

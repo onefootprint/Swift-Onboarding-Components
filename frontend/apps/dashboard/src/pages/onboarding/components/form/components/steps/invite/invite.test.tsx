@@ -6,7 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Invite, { InviteProps } from './invite';
+import type { InviteProps } from './invite';
+import Invite from './invite';
 import {
   withInviteMember,
   withInviteMemberError,

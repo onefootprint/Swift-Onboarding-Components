@@ -5,8 +5,8 @@ import { useMachine } from '@xstate/react';
 import React from 'react';
 
 import PlaybookMachine from '@/playbooks/utils/machine';
+import type { AuthorizedScopesFormData } from '@/playbooks/utils/machine/types';
 import {
-  AuthorizedScopesFormData,
   defaultNameFormData,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,

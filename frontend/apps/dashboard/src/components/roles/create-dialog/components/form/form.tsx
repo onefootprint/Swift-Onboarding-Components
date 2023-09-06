@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
+import type {
   CreateRoleRequest,
   RoleKind,
   RoleScope,
-  RoleScopeKind,
   UpdateRoleRequest,
 } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';

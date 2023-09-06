@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { Actor as TActor, ActorKind } from '@onefootprint/types';
+import type { Actor as TActor } from '@onefootprint/types';
+import { ActorKind } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 

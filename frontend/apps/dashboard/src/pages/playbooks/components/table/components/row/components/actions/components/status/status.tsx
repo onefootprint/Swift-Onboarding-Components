@@ -1,6 +1,7 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { OnboardingConfig, OnboardingConfigStatus } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfigStatus } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans } from 'react-i18next';

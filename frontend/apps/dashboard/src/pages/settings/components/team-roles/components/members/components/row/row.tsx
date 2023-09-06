@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { Member, RoleScopeKind } from '@onefootprint/types';
+import type { Member } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Badge, Typography } from '@onefootprint/ui';
 import React from 'react';
 import usePermissions from 'src/hooks/use-permissions';

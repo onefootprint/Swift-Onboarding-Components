@@ -3,7 +3,7 @@ import { EntityStatus } from '@onefootprint/types';
 import { InlineAlert, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 
-import { WithEntityProps } from '@/entity/components/with-entity';
+import type { WithEntityProps } from '@/entity/components/with-entity';
 import { AUDIT_TRAILS_ID } from '@/entity/constants';
 
 type BannerProps = WithEntityProps;

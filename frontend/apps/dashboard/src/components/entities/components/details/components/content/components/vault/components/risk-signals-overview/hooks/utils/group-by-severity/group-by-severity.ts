@@ -1,4 +1,5 @@
-import { RiskSignal, RiskSignalSeverity } from '@onefootprint/types';
+import type { RiskSignal } from '@onefootprint/types';
+import { RiskSignalSeverity } from '@onefootprint/types';
 
 const groupBySeverity = (risksSignals: RiskSignal[]) => {
   const severities: {

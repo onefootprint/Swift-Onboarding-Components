@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { OrgAuthMagicLinkRequest } from '@onefootprint/types';
+import type { OrgAuthMagicLinkRequest } from '@onefootprint/types';
 import { Box, Button, TextInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';

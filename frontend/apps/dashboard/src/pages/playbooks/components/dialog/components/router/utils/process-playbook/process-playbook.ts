@@ -1,18 +1,18 @@
+import type { CollectedDataOption } from '@onefootprint/types';
 import {
-  CollectedDataOption,
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
 
-import {
+import type {
   AuthorizedScopesFormData,
   BusinessInformation,
-  Kind,
   NameFormData,
   PlaybookFormData,
 } from '@/playbooks/utils/machine/types';
+import { Kind } from '@/playbooks/utils/machine/types';
 
 type ProcessPlaybookProps = {
   playbook: PlaybookFormData;

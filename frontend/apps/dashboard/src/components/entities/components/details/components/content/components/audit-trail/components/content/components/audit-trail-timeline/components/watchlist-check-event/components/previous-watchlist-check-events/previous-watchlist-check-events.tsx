@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { PreviousWatchlistChecksEventData } from '@onefootprint/types';
+import type { PreviousWatchlistChecksEventData } from '@onefootprint/types';
 import { Box, Drawer, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 

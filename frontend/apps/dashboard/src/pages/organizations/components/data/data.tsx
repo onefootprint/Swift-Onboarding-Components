@@ -1,6 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { GetAuthRolesOrg } from '@onefootprint/types';
+import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';

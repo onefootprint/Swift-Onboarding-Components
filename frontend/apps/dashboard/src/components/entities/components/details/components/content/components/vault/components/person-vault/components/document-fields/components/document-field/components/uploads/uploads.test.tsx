@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Uploads, { UploadsProps } from './uploads';
+import type { UploadsProps } from './uploads';
+import Uploads from './uploads';
 import {
   entityVaultWithIdCard,
   failedIdCardDocument,

@@ -1,10 +1,9 @@
-import request, {
-  getErrorMessage,
-  PaginatedRequestResponse,
-} from '@onefootprint/request';
-import { GetRolesResponse, RoleKind } from '@onefootprint/types';
+import type { PaginatedRequestResponse } from '@onefootprint/request';
+import request, { getErrorMessage } from '@onefootprint/request';
+import type { GetRolesResponse, RoleKind } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 const getRolesRequest = async (authHeaders: AuthHeaders, kind: RoleKind) => {
   const { data: response } = await request<

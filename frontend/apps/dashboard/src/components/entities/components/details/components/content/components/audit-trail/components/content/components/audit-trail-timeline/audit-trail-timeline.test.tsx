@@ -1,5 +1,5 @@
 import { customRender, screen, within } from '@onefootprint/test-utils';
-import { TimelineEvent } from '@onefootprint/types';
+import type { TimelineEvent } from '@onefootprint/types';
 import React from 'react';
 import { entityFixture } from 'src/components/entities/components/details/details.test.config';
 

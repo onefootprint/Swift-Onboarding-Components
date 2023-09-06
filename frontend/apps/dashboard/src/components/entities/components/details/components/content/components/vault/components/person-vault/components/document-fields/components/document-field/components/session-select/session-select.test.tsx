@@ -6,7 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import SessionSelect, { SessionSelectProps } from './session-select';
+import type { SessionSelectProps } from './session-select';
+import SessionSelect from './session-select';
 import {
   driversLicenseDoc1,
   driversLicenseDoc2,

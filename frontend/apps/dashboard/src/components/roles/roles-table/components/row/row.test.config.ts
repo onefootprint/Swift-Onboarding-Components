@@ -1,4 +1,5 @@
-import { Role, RoleKind, RoleScopeKind } from '@onefootprint/types';
+import type { Role } from '@onefootprint/types';
+import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 
 const roleFixture: Role = {
   id: 'Role_aExxJ5gSBpvqIJ2VcHH6J',

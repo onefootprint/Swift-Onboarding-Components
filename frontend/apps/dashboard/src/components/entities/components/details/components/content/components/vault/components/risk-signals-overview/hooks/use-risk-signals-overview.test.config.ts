@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { mockRequest } from '@onefootprint/test-utils';
-import {
+import type {
   RiskSignal,
   RiskSignalAttribute,
   RiskSignalSeverity,

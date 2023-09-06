@@ -1,8 +1,9 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import { UpdateOrgRequest, UpdateOrgResponse } from '@onefootprint/types';
+import type { UpdateOrgRequest, UpdateOrgResponse } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 const updateOrgRequest = async (
   authHeaders: AuthHeaders,

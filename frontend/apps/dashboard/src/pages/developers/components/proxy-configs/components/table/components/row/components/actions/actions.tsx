@@ -1,12 +1,15 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { ProxyConfig, RoleScopeKind } from '@onefootprint/types';
+import type { ProxyConfig } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
-import Remove, { RemoveHandler } from './components/remove';
-import Status, { StatusHandler } from './components/status';
+import type { RemoveHandler } from './components/remove';
+import Remove from './components/remove';
+import type { StatusHandler } from './components/status';
+import Status from './components/status';
 
 export type ActionsProps = {
   proxyConfig: ProxyConfig;

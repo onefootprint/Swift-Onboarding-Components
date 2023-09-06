@@ -1,8 +1,5 @@
-import {
-  DecryptResponse,
-  EntityVault,
-  isVaultDataText,
-} from '@onefootprint/types';
+import type { DecryptResponse, EntityVault } from '@onefootprint/types';
+import { isVaultDataText } from '@onefootprint/types';
 import unary from 'lodash/fp/unary';
 
 export const isTextResponse = (

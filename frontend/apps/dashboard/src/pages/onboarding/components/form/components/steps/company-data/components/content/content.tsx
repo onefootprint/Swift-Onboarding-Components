@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Organization, OrganizationSize } from '@onefootprint/types';
-import { Button, Select, SelectOption, TextInput } from '@onefootprint/ui';
+import type { Organization, OrganizationSize } from '@onefootprint/types';
+import type { SelectOption } from '@onefootprint/ui';
+import { Button, Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useUpdateOrg from 'src/hooks/use-update-org';

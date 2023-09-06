@@ -1,4 +1,8 @@
-import { DataIdentifier, EntityVault, VaultValue } from '@onefootprint/types';
+import type {
+  DataIdentifier,
+  EntityVault,
+  VaultValue,
+} from '@onefootprint/types';
 import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
 import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
 

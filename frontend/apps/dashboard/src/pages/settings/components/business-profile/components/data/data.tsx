@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { Organization } from '@onefootprint/types';
+import type { Organization } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 

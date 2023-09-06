@@ -7,7 +7,8 @@ import {
 import { EntityStatus } from '@onefootprint/types';
 import React from 'react';
 
-import StatusBadge, { StatusBadgeProps } from './status-badge';
+import type { StatusBadgeProps } from './status-badge';
+import StatusBadge from './status-badge';
 
 const renderStatusBadge = ({
   status,

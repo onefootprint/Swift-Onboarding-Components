@@ -4,11 +4,13 @@ import { Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import {
+import type {
   AuthorizedScopesFormData,
+  PlaybookFormData,
+} from '@/playbooks/utils/machine/types';
+import {
   defaultAuthorizedScopesValues,
   Kind,
-  PlaybookFormData,
 } from '@/playbooks/utils/machine/types';
 
 import BusinessScopes from './components/business-scopes';

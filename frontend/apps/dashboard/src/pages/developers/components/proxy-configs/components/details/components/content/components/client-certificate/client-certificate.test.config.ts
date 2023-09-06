@@ -1,4 +1,4 @@
-import { ProxyConfigDetails } from '@onefootprint/types';
+import type { ProxyConfigDetails } from '@onefootprint/types';
 
 export const configWithNoClientCertificate: ProxyConfigDetails = {
   id: '1',

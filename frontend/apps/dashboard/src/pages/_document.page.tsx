@@ -1,12 +1,7 @@
 import { ServerStyleSheet } from '@onefootprint/styled';
 import { LoadFonts } from '@onefootprint/ui';
-import Document, {
-  DocumentContext,
-  Head,
-  Html,
-  Main,
-  NextScript,
-} from 'next/document';
+import type { DocumentContext } from 'next/document';
+import Document, { Head, Html, Main, NextScript } from 'next/document';
 import React from 'react';
 
 import { COMMIT_SHA, DEPLOYMENT_URL } from '../config/constants';

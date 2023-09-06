@@ -6,10 +6,8 @@ import {
   IcoPassport16,
   IcoWriting16,
 } from '@onefootprint/icons';
-import {
-  IdDocUploadedEventData,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import type { IdDocUploadedEventData } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
 // modern doc type here

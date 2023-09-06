@@ -12,9 +12,8 @@ import {
 
 import { Kind } from '@/playbooks/utils/machine/types';
 
-import PreviewWithContext, {
-  PreviewWithContextProps,
-} from './preview.test.config';
+import type { PreviewWithContextProps } from './preview.test.config';
+import PreviewWithContext from './preview.test.config';
 
 const renderForm = ({ startingValues, kind }: PreviewWithContextProps) => {
   customRender(

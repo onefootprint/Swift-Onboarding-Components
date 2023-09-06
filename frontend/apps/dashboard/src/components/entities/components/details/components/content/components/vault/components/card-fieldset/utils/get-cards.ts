@@ -1,4 +1,4 @@
-import { Entity, EntityCard } from '@onefootprint/types';
+import type { Entity, EntityCard } from '@onefootprint/types';
 import merge from 'lodash/merge';
 import set from 'lodash/set';
 

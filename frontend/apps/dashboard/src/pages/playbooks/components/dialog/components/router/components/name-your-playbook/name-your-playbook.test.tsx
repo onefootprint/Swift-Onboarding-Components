@@ -8,9 +8,8 @@ import React from 'react';
 
 import { Kind } from '@/playbooks/utils/machine/types';
 
-import NameYourPlaybookWithContext, {
-  NameYourPlaybookWithContextProps,
-} from './name-your-playbook.test.config';
+import type { NameYourPlaybookWithContextProps } from './name-your-playbook.test.config';
+import NameYourPlaybookWithContext from './name-your-playbook.test.config';
 
 const renderNameYourPlaybook = ({ kind }: NameYourPlaybookWithContextProps) => {
   customRender(<NameYourPlaybookWithContext kind={kind} />);

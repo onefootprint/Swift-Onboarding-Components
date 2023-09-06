@@ -1,4 +1,5 @@
-import { RiskSignal, RiskSignalAttribute } from '@onefootprint/types';
+import type { RiskSignal } from '@onefootprint/types';
+import { RiskSignalAttribute } from '@onefootprint/types';
 
 const groupBySection = (risksSignals: RiskSignal[]) => {
   const sections: {

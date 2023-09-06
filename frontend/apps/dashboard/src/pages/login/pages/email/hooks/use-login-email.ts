@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import {
+import type {
   OrgAuthMagicLinkRequest,
   OrgAuthMagicLinkResponse,
 } from '@onefootprint/types';

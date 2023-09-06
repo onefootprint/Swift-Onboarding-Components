@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { ProxyConfig } from '@onefootprint/types';
+import type { ProxyConfig } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans } from 'react-i18next';

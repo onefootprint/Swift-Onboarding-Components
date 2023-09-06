@@ -1,4 +1,4 @@
-import { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 

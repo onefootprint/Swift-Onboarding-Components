@@ -2,7 +2,8 @@ import { customRender, screen } from '@onefootprint/test-utils';
 import { CollectedKycDataOption } from '@onefootprint/types';
 import React from 'react';
 
-import AuthorizedScopes, { AuthorizedScopesProps } from './authorized-scopes';
+import type { AuthorizedScopesProps } from './authorized-scopes';
+import AuthorizedScopes from './authorized-scopes';
 
 const renderAuthorizedScopes = ({ canAccessData }: AuthorizedScopesProps) => {
   customRender(<AuthorizedScopes canAccessData={canAccessData} />);

@@ -1,7 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
 
-import { Kind } from '@/playbooks/utils/machine/types';
+import type { Kind } from '@/playbooks/utils/machine/types';
 
 import Editing from './components/editing';
 import Preview from './components/preview';

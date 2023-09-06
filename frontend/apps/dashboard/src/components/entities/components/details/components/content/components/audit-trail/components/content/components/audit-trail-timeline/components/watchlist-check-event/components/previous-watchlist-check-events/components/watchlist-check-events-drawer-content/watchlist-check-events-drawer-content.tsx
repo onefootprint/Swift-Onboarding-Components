@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import {
+import type {
   PreviousWatchlistChecksEventData,
   WatchlistCheckEventData,
 } from '@onefootprint/types';

@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { OrgAuthLoginResponse } from '@onefootprint/types';
+import type { OrgAuthLoginResponse } from '@onefootprint/types';
 import { Box, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';

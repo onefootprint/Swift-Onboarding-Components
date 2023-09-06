@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { RoleScope } from '@onefootprint/types';
+import type { RoleScope } from '@onefootprint/types';
 import React from 'react';
 import DecryptOptions from 'src/components/roles/roles-table/components/row/components/decrypt-options';
 import VaultProxyOptions from 'src/components/roles/roles-table/components/row/components/vault-proxy-options';

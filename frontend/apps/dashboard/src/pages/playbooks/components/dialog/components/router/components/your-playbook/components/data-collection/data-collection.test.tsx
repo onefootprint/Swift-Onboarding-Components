@@ -7,9 +7,8 @@ import {
   Kind,
 } from '@/playbooks/utils/machine/types';
 
-import DataCollectionWithContext, {
-  DataCollectionWithContextProps,
-} from './data-collection.test.config';
+import type { DataCollectionWithContextProps } from './data-collection.test.config';
+import DataCollectionWithContext from './data-collection.test.config';
 
 const renderDataCollection = ({
   startingValues,

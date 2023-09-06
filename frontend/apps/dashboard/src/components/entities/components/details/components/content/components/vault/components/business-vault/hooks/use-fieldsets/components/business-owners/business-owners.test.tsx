@@ -6,7 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import BusinessOwners, { BusinessOwnersProps } from './business-owners';
+import type { BusinessOwnersProps } from './business-owners';
+import BusinessOwners from './business-owners';
 import {
   entityFixture,
   withBusinessOwnersError,

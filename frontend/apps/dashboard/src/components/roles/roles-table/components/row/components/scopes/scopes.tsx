@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { RoleScope } from '@onefootprint/types';
+import type { RoleScope } from '@onefootprint/types';
 import { Tag } from '@onefootprint/ui';
 import React from 'react';
 import groupScopes from 'src/components/roles/utils/group-scopes';

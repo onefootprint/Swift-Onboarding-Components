@@ -1,7 +1,8 @@
 import request from '@onefootprint/request';
-import { Document } from '@onefootprint/types';
+import type { Document } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 type GetDocumentsRequest = {
   entityId: string;

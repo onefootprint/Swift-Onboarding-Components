@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoSpeedometer24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Document } from '@onefootprint/types';
+import type { Document } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 

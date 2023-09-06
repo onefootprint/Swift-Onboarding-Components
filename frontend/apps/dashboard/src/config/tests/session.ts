@@ -1,5 +1,7 @@
-import { BasicRoleScopeKind, RoleScopeKind } from '@onefootprint/types';
-import { UserSession, useStore } from 'src/hooks/use-session';
+import type { BasicRoleScopeKind } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
+import type { UserSession } from 'src/hooks/use-session';
+import { useStore } from 'src/hooks/use-session';
 
 const originalState = useStore.getState();
 

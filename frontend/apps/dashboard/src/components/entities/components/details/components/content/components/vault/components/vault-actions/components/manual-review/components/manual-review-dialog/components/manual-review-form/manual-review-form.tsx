@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { ReviewStatus } from '@onefootprint/types';
+import type { ReviewStatus } from '@onefootprint/types';
 import { Divider, TextArea, Toggle, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';

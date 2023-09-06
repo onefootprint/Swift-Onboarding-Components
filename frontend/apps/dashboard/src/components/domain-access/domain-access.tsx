@@ -1,7 +1,8 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoLock24, IcoLockOpen24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Organization, RoleScopeKind } from '@onefootprint/types';
+import type { Organization } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Divider, Toggle, Tooltip, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import PermissionGate from 'src/components/permission-gate';

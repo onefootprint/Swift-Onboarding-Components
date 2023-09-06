@@ -3,7 +3,8 @@ import React from 'react';
 
 import { Kind } from '@/playbooks/utils/machine/types';
 
-import WhoToOnboard, { WhoToOnboardProps } from './who-to-onboard';
+import type { WhoToOnboardProps } from './who-to-onboard';
+import WhoToOnboard from './who-to-onboard';
 
 const renderWhoToOnboard = ({ onSubmit }: WhoToOnboardProps) =>
   customRender(<WhoToOnboard onSubmit={onSubmit} />);

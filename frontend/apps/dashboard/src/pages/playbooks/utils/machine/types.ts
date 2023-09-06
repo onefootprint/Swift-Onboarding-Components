@@ -1,9 +1,9 @@
+import type { SupportedIdDocTypes } from '@onefootprint/types';
 import {
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
-  SupportedIdDocTypes,
 } from '@onefootprint/types';
 
 export enum Kind {

@@ -1,4 +1,4 @@
-import { Document } from '@onefootprint/types';
+import type { Document } from '@onefootprint/types';
 
 const getDocumentVersion = (document: Document, documents: Document[]) => {
   if (document?.completedVersion) {

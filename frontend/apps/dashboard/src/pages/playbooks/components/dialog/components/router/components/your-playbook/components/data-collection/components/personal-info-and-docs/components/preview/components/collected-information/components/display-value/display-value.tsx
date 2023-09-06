@@ -4,7 +4,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import IdDocDisplay from '@/playbooks/components/id-doc-display';
-import { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
+import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
 
 type DisplayValueProps = {
   field: keyof PersonalInformationAndDocs;

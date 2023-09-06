@@ -7,7 +7,8 @@ import {
 import React from 'react';
 import { asAdminUser, asUser, resetUser } from 'src/config/tests';
 
-import UserData, { UserDataProps } from './user-data';
+import type { UserDataProps } from './user-data';
+import UserData from './user-data';
 import { withUpdateUser, withUpdateUserError } from './user-data.test.config';
 
 describe('<UserData />', () => {

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { AccessEvent } from '@onefootprint/types';
+import type { AccessEvent } from '@onefootprint/types';
 import { SearchInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect } from 'react';

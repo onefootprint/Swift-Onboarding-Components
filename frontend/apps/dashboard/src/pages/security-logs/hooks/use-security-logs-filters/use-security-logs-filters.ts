@@ -2,7 +2,7 @@ import useFilters from 'src/hooks/use-filters';
 
 import useFilterValues from './hooks/use-filter-values';
 import useRequestParams from './hooks/use-request-params';
-import { SecurityLogsQueryString } from './use-security-logs-filters.types';
+import type { SecurityLogsQueryString } from './use-security-logs-filters.types';
 
 const defaultQueryString = {
   data_attributes_business: undefined,

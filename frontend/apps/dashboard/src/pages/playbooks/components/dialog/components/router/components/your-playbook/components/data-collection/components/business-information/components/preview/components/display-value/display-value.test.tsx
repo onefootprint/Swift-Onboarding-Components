@@ -2,10 +2,8 @@ import { customRender, screen } from '@onefootprint/test-utils';
 import { CollectedKybDataOption } from '@onefootprint/types';
 import React from 'react';
 
-import {
-  BusinessInformation,
-  defaultBusinessInformation,
-} from '@/playbooks/utils/machine/types';
+import type { BusinessInformation } from '@/playbooks/utils/machine/types';
+import { defaultBusinessInformation } from '@/playbooks/utils/machine/types';
 
 import DisplayValue from './display-value';
 

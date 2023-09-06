@@ -1,4 +1,4 @@
-import { ApiKey } from '@onefootprint/types';
+import type { ApiKey } from '@onefootprint/types';
 import { useQueryClient } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 

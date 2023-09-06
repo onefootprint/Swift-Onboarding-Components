@@ -1,5 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
 import { Dialog, TextInput, useToast } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useForm } from 'react-hook-form';

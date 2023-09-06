@@ -1,11 +1,8 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import {
-  RoleKind,
-  RoleScopeKind,
-  supportedRoleKinds,
-} from '@onefootprint/types';
+import type { RoleKind } from '@onefootprint/types';
+import { RoleScopeKind, supportedRoleKinds } from '@onefootprint/types';
 import {
   Box,
   Checkbox,

@@ -4,7 +4,8 @@ import {
   screen,
   waitFor,
 } from '@onefootprint/test-utils';
-import { Entity, EntityKind } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
+import { EntityKind } from '@onefootprint/types';
 import React from 'react';
 import Provider from 'src/components/entities/components/details/hooks/use-entity-context';
 

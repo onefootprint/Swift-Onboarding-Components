@@ -1,4 +1,5 @@
-import { SXStyleProps, Typography } from '@onefootprint/ui';
+import type { SXStyleProps } from '@onefootprint/ui';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
 export type FieldProps = {

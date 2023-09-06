@@ -1,10 +1,8 @@
+import type { DataIdentifier, Document, VaultValue } from '@onefootprint/types';
 import {
-  DataIdentifier,
-  Document,
   DocumentDI,
   isVaultDataEmpty,
   SupportedIdDocTypes,
-  VaultValue,
 } from '@onefootprint/types';
 
 import { filterDocumentsByKind } from '../../../../../../../person-vault/components/document-fields/utils';

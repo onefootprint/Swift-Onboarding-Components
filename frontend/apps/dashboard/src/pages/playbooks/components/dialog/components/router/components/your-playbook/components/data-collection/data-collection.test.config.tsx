@@ -1,10 +1,10 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import type { PlaybookFormData } from '@/playbooks/utils/machine/types';
 import {
   defaultPlaybookValuesKYC,
   Kind,
-  PlaybookFormData,
 } from '@/playbooks/utils/machine/types';
 
 import DataCollection from './data-collection';

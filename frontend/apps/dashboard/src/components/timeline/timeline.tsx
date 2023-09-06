@@ -3,9 +3,8 @@ import styled, { css } from '@onefootprint/styled';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 
-import TimelineItemTime, {
-  TimelineItemTimeData,
-} from './components/timeline-item-time';
+import type { TimelineItemTimeData } from './components/timeline-item-time';
+import TimelineItemTime from './components/timeline-item-time';
 
 export type TimelineItem = {
   time?: TimelineItemTimeData;

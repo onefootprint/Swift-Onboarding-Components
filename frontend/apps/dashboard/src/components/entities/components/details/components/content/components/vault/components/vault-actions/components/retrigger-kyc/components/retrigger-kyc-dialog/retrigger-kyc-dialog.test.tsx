@@ -7,9 +7,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import RetriggerKYCDialog, {
-  RetriggerKYCDialogProps,
-} from './retrigger-kyc-dialog';
+import type { RetriggerKYCDialogProps } from './retrigger-kyc-dialog';
+import RetriggerKYCDialog from './retrigger-kyc-dialog';
 
 const defaultOptions = {
   open: true,

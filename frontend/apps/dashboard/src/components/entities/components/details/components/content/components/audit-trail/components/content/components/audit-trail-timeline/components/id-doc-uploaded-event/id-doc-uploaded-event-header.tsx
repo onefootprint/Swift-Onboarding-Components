@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { IdDocUploadedEventData } from '@onefootprint/types';
+import type { IdDocUploadedEventData } from '@onefootprint/types';
 import { Tag, Typography } from '@onefootprint/ui';
 import React from 'react';
 

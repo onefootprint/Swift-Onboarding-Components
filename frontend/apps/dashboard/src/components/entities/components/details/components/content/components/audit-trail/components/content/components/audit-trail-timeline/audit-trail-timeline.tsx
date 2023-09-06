@@ -6,25 +6,25 @@ import {
   IcoWarning16,
   IcoWriting16,
 } from '@onefootprint/icons';
-import {
+import type {
   Annotation,
   CollectedDataEventData,
   CombinedWatchlistChecksEvent,
   Entity,
-  EntityStatus,
   IdDocUploadedEventData,
   LivenessEventData,
   OnboardingDecisionEventData,
   PreviousWatchlistChecksEventData,
   Timeline as EntityTimeline,
-  TimelineEventKind,
   VaultCreatedEventData,
   WatchlistCheckEventData,
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
+import { EntityStatus, TimelineEventKind } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import Timeline, { TimelineItem } from 'src/components/timeline';
+import type { TimelineItem } from 'src/components/timeline';
+import Timeline from 'src/components/timeline';
 
 import {
   AbandonedEventBody,
@@ -55,9 +55,8 @@ import {
   WatchlistCheckEventHeader,
   WatchlistCheckEventIcon,
 } from './components/watchlist-check-event';
-import mergeAuditTrailTimelineEvents, {
-  AuditTrailTimelineEvent,
-} from './utils/merge-audit-trail-timeline-events';
+import type { AuditTrailTimelineEvent } from './utils/merge-audit-trail-timeline-events';
+import mergeAuditTrailTimelineEvents from './utils/merge-audit-trail-timeline-events';
 
 export type AuditTrailTimelineProps = {
   timeline: EntityTimeline;

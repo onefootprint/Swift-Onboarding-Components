@@ -1,11 +1,9 @@
 import { STATES } from '@onefootprint/global-constants';
+import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
 import {
-  DataIdentifier,
-  Entity,
   IdDI,
   isVaultDataDecrypted,
   isVaultDataText,
-  VaultValue,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';

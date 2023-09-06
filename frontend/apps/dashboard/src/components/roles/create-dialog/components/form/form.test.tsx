@@ -3,7 +3,8 @@ import { RoleKind } from '@onefootprint/types';
 import React from 'react';
 import { withProxyConfigs } from 'src/pages/developers/components/proxy-configs/proxy-config.test.config';
 
-import Form, { FormProps } from './form';
+import type { FormProps } from './form';
+import Form from './form';
 
 describe('<Form />', () => {
   beforeEach(() => {

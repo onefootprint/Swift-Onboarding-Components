@@ -1,5 +1,5 @@
 import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import { CountryCode } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
 
 const getInitialCountry = (initialCountryCode?: CountryCode) => {
   if (initialCountryCode) {

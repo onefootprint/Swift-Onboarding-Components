@@ -1,5 +1,5 @@
 import styled from '@onefootprint/styled';
-import { AccessEvent } from '@onefootprint/types';
+import type { AccessEvent } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 

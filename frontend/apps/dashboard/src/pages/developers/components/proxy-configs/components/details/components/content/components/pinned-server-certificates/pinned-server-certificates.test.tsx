@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import PinnedServerCertificates, { PinnedServerCertificatesProps } from '.';
+import type { PinnedServerCertificatesProps } from '.';
+import PinnedServerCertificates from '.';
 import {
   configWithNoPinnedServerCertificate,
   configWithPinnedServerCertificate,

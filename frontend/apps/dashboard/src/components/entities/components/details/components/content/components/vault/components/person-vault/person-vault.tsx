@@ -1,6 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
+import type { Entity } from '@onefootprint/types';
 import {
-  Entity,
   hasEntityCards,
   hasEntityCustomData,
   hasEntityDocuments,

@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { VaultValue } from '@onefootprint/types';
 import {
   isVaultDataDocument,
   isVaultDataEmpty,
   isVaultDataEncrypted,
   isVaultDataText,
-  VaultValue,
 } from '@onefootprint/types';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';

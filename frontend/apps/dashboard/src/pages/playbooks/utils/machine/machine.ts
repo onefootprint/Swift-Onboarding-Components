@@ -1,6 +1,7 @@
 import { assign, createMachine } from 'xstate';
 
-import { MachineContext, MachineEvents } from './types';
+import type { Typegen0 } from './machine.typegen';
+import type { MachineContext, MachineEvents } from './types';
 
 export const createPlaybookMachine = () =>
   createMachine(
@@ -11,7 +12,7 @@ export const createPlaybookMachine = () =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as import('./machine.typegen').Typegen0,
+      tsTypes: {} as Typegen0,
       initial: 'whoToOnboard',
       context: {},
       states: {

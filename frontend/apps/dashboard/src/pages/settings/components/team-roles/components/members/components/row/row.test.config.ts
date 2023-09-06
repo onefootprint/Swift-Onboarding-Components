@@ -1,5 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Member, Role, RoleKind, RoleScopeKind } from '@onefootprint/types';
+import type { Member, Role } from '@onefootprint/types';
+import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 import { asUser, resetUser } from 'src/config/tests';
 
 export const withCurrentUserDifferentFromMember = () => {

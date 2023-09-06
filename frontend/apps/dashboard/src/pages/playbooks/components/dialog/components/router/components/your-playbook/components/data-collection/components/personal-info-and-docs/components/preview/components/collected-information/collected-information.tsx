@@ -3,7 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
+import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
 
 import DisplayValue from './components/display-value';
 

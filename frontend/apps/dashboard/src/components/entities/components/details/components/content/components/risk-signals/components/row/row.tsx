@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { RiskSignal } from '@onefootprint/types';
+import type { RiskSignal } from '@onefootprint/types';
 import { Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { createCapitalStringList } from 'src/utils/create-string-list';

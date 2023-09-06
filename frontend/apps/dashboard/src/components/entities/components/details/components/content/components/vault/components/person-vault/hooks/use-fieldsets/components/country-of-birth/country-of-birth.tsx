@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { DataIdentifier, Entity, IdDI } from '@onefootprint/types';
+import type { DataIdentifier, Entity } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { EncryptedCell } from 'src/components';

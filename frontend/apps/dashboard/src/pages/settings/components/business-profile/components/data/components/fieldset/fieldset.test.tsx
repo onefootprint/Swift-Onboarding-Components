@@ -2,7 +2,8 @@ import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
-import Fieldset, { FieldsetProps } from './fieldset';
+import type { FieldsetProps } from './fieldset';
+import Fieldset from './fieldset';
 
 describe('<Fieldset />', () => {
   beforeEach(() => {

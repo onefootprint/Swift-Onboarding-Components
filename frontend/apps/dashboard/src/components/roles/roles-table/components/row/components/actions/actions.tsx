@@ -1,12 +1,15 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { Role, RoleScopeKind } from '@onefootprint/types';
+import type { Role } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
-import Edit, { EditHandler } from './components/edit';
-import Remove, { RemoveHandler } from './components/remove';
+import type { EditHandler } from './components/edit';
+import Edit from './components/edit';
+import type { RemoveHandler } from './components/remove';
+import Remove from './components/remove';
 
 export type ActionsProps = {
   role: Role;

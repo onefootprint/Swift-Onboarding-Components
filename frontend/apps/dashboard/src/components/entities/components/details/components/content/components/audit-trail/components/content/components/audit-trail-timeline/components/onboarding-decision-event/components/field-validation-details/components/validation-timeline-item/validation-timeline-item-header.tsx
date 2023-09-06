@@ -1,4 +1,4 @@
-import { Color } from '@onefootprint/design-tokens';
+import type { Color } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { MatchLevel } from '@onefootprint/types/src/data/match-signal';

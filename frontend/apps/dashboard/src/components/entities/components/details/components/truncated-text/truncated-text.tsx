@@ -1,12 +1,11 @@
-import { FontVariant } from '@onefootprint/design-tokens';
+import type { FontVariant } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  LinkButton,
+import type {
   LinkButtonSize,
   LinkButtonVariant,
   SXStyleProps,
-  Typography,
 } from '@onefootprint/ui';
+import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import useTruncatedtext, { ShownTextState } from './hooks/use-truncated-text';

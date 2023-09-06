@@ -2,7 +2,8 @@ import { customRender, screen } from '@onefootprint/test-utils';
 import { CollectedKycDataOption } from '@onefootprint/types';
 import React from 'react';
 
-import DisplayValue, { DisplayValueProps } from './display-value';
+import type { DisplayValueProps } from './display-value';
+import DisplayValue from './display-value';
 
 const renderDisplayValues = ({ mustCollectData, field }: DisplayValueProps) =>
   customRender(

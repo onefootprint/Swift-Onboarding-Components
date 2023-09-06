@@ -1,4 +1,4 @@
-import { DecryptResponse, EntityVault } from '@onefootprint/types';
+import type { DecryptResponse, EntityVault } from '@onefootprint/types';
 
 import parseDocuments from '../parse-documents';
 import parseStringifiedValues from '../parse-stringified-values';

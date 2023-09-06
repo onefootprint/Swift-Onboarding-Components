@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
-import { CreateProxyConfigRequest } from '@onefootprint/types';
+import type { CreateProxyConfigRequest } from '@onefootprint/types';
 import { Dialog as FPDialog, useConfirmationDialog } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 

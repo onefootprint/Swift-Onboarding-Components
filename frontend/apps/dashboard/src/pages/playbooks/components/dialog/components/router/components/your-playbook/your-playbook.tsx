@@ -4,7 +4,7 @@ import { Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import { Kind, PlaybookFormData } from '@/playbooks/utils/machine/types';
+import type { Kind, PlaybookFormData } from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
 

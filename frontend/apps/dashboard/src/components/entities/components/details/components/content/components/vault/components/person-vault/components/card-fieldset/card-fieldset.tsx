@@ -1,17 +1,17 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { type Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { EntityCard, VaultValue } from '@onefootprint/types';
+import type { EntityCard, VaultValue } from '@onefootprint/types';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 
-import { WithEntityProps } from '@/entity/components/with-entity';
+import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import getDis from '../../../../../../../../../../utils/get-dis';
 import useField from '../../../../hooks/use-field';
 import useForm from '../../../../hooks/use-form';
-import { DiField } from '../../../../vault.types';
+import type { DiField } from '../../../../vault.types';
 import getCards from '../../../card-fieldset/utils/get-cards';
 import Field from '../../../field';
 import { useDecryptControls } from '../../../vault-actions';

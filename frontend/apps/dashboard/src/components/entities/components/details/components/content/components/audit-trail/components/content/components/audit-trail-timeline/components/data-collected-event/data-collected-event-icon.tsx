@@ -1,16 +1,16 @@
+import type { Icon } from '@onefootprint/icons';
 import {
   IcoBuilding16,
   IcoDollar16,
   IcoEmail16,
   IcoFlag16,
   IcoGlobe16,
-  Icon,
   IcoPhone16,
   IcoStore16,
   IcoUserCircle16,
 } from '@onefootprint/icons';
+import type { CollectedDataEventData } from '@onefootprint/types';
 import {
-  CollectedDataEventData,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,

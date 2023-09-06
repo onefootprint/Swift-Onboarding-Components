@@ -1,10 +1,7 @@
-import {
-  Document,
-  IdDocStatus,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import type { Document, SupportedIdDocTypes } from '@onefootprint/types';
+import { IdDocStatus } from '@onefootprint/types';
 
-import { DocumentStatus } from '../../components/document-status-badge';
+import type { DocumentStatus } from '../../components/document-status-badge';
 import filterDocumentsByKind from '../filter-documents-by-kind';
 
 type GetDocumentStatusProps = {

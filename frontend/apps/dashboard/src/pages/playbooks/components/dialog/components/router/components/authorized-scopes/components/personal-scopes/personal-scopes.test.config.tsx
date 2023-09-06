@@ -2,12 +2,14 @@ import { CollectedInvestorProfileDataOption } from '@onefootprint/types';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import {
+import type {
   AuthorizedScopesFormData,
+  PersonalInformationAndDocs,
+} from '@/playbooks/utils/machine/types';
+import {
   defaultAuthorizedScopesValues,
   defaultPlaybookValuesKYC,
   Kind,
-  PersonalInformationAndDocs,
 } from '@/playbooks/utils/machine/types';
 
 import PersonalScopes from './personal-scopes';

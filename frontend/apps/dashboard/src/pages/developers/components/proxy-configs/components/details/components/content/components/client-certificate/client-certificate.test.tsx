@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import ClientCertificate, { ClientCertificateProps } from '.';
+import type { ClientCertificateProps } from '.';
+import ClientCertificate from '.';
 import {
   configWithClientCertificate,
   configWithNoClientCertificate,

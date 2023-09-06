@@ -1,4 +1,5 @@
-import { DocumentDI, SupportedIdDocTypes } from '@onefootprint/types';
+import type { DocumentDI } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 
 // All of our data labels are based on DI suffixes (i.e. dob, full_name, etc).
 // This function genericizes them so we can use one translation for drivers license, passport, and ID card.

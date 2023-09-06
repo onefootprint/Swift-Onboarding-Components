@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Organization, RoleScopeKind } from '@onefootprint/types';
+import type { Organization } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Avatar, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';

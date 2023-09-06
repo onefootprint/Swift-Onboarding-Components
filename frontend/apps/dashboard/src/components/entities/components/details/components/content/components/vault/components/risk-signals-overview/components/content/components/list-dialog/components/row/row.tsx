@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronRight24, IcoInfo16 } from '@onefootprint/icons';
-import { RiskSignal, RiskSignalSeverity } from '@onefootprint/types';
+import type { RiskSignal } from '@onefootprint/types';
+import { RiskSignalSeverity } from '@onefootprint/types';
 import { Badge, Box, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 

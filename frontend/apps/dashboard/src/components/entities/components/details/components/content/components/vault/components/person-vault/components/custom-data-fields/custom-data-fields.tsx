@@ -6,11 +6,11 @@ import React from 'react';
 import { getCustomDIs } from 'src/components/entities/utils/get-dis';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
-import { WithEntityProps } from '@/entity/components/with-entity';
+import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import useField from '../../../../hooks/use-field';
 import useForm from '../../../../hooks/use-form';
-import { DiField } from '../../../../vault.types';
+import type { DiField } from '../../../../vault.types';
 import Field from '../../../field';
 import { useDecryptControls } from '../../../vault-actions';
 

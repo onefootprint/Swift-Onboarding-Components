@@ -1,9 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  InvokeVaultProxyRoleScope,
-  RoleScope,
-  RoleScopeKind,
-} from '@onefootprint/types';
+import type { InvokeVaultProxyRoleScope, RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 
 import useProxyConfigs from './use-proxy-configs';
 

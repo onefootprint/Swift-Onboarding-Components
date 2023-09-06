@@ -1,4 +1,4 @@
-import { DataIdentifier } from '@onefootprint/types';
+import type { DataIdentifier } from '@onefootprint/types';
 import get from 'lodash/get';
 import { useFormContext, useWatch } from 'react-hook-form';
 

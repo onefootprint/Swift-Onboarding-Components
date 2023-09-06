@@ -1,12 +1,10 @@
 import styled, { css } from '@onefootprint/styled';
-import { RoleScope } from '@onefootprint/types';
+import type { RoleScope } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 
-import DropdownSelector, {
-  DropdownSelectorProps,
-  Option,
-} from '../dropdown-selector';
+import type { DropdownSelectorProps, Option } from '../dropdown-selector';
+import DropdownSelector from '../dropdown-selector';
 import ScopesList from '../team-roles/components/members/components/row/components/edit-role/components/scopes';
 
 export const RoleDropdownSelector = ({

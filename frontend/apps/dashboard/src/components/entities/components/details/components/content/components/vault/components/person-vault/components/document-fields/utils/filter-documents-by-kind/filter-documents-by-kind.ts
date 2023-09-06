@@ -1,4 +1,4 @@
-import { Document, SupportedIdDocTypes } from '@onefootprint/types';
+import type { Document, SupportedIdDocTypes } from '@onefootprint/types';
 
 const filterDocumentsByKind = (
   documents?: Document[],

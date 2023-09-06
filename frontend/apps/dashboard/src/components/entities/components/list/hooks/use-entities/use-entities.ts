@@ -1,16 +1,15 @@
-import request, {
-  getErrorMessage,
-  PaginatedRequestResponse,
-} from '@onefootprint/request';
-import {
-  augmentEntityWithOnboardingInfo,
+import type { PaginatedRequestResponse } from '@onefootprint/request';
+import request, { getErrorMessage } from '@onefootprint/request';
+import type {
   EntityKind,
   GetEntitiesRequest,
   GetEntitiesResponse,
 } from '@onefootprint/types';
+import { augmentEntityWithOnboardingInfo } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useCursorPagination } from 'src/hooks/use-pagination';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 import useFilters from '../../../../hooks/use-filters';
 

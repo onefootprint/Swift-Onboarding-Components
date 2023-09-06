@@ -1,12 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import {
+import type {
   DocumentDI,
   EntityVault,
-  isVaultDataText,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
+import { isVaultDataText } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 

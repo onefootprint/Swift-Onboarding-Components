@@ -1,4 +1,4 @@
-import { Entity } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
 import React from 'react';
 import { useEntitiesContext } from 'src/components/entities/components/list/hooks/use-entities-context';

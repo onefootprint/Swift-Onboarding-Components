@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { ApiKey, RoleKind } from '@onefootprint/types';
+import type { ApiKey } from '@onefootprint/types';
+import { RoleKind } from '@onefootprint/types';
 import React, { useState } from 'react';
 import useRoles from 'src/hooks/use-roles';
 import RoleDropdownSelector from 'src/pages/settings/components/role-dropdown-selector';

@@ -1,12 +1,13 @@
 import { useIntl } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import {
+import type {
   Annotation,
   GetPinnedAnnotationsRequest,
   GetPinnedAnnotationsResponse,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 const getPinnedAnnotations = async (
   { entityId }: GetPinnedAnnotationsRequest,

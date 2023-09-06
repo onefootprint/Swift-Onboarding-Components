@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { LivenessEventData } from '@onefootprint/types';
+import type { LivenessEventData } from '@onefootprint/types';
 import React from 'react';
 import createStringList from 'src/utils/create-string-list';
 

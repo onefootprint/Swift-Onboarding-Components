@@ -1,10 +1,8 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import {
-  defaultPlaybookValuesKYB,
-  PlaybookFormData,
-} from '@/playbooks/utils/machine/types';
+import type { PlaybookFormData } from '@/playbooks/utils/machine/types';
+import { defaultPlaybookValuesKYB } from '@/playbooks/utils/machine/types';
 
 import Editing from './editing';
 

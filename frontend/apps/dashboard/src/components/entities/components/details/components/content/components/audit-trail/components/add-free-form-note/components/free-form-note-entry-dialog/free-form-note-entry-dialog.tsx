@@ -2,9 +2,8 @@ import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
 
-import ManualNoteEntryForm, {
-  ManualNoteFormData,
-} from '@/entities/components/details/components/content/components/manual-note-entry-form';
+import type { ManualNoteFormData } from '@/entities/components/details/components/content/components/manual-note-entry-form';
+import ManualNoteEntryForm from '@/entities/components/details/components/content/components/manual-note-entry-form';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
 import useSubmitFreeFormNote from '../hooks/use-submit-free-form-note';

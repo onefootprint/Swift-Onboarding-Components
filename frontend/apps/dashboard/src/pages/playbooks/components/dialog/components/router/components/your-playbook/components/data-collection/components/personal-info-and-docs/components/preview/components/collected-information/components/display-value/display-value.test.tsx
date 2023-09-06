@@ -5,10 +5,8 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 
-import {
-  defaultPlaybookValuesKYC,
-  PersonalInformationAndDocs,
-} from '@/playbooks/utils/machine/types';
+import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
+import { defaultPlaybookValuesKYC } from '@/playbooks/utils/machine/types';
 
 import DisplayValue from './display-value';
 

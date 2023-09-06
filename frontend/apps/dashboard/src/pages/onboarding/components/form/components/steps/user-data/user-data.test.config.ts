@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { UserUpdateResponse } from '@onefootprint/types';
+import type { UserUpdateResponse } from '@onefootprint/types';
 
 export const userFixture: UserUpdateResponse = {
   email: 'jane.doe@acme.com',

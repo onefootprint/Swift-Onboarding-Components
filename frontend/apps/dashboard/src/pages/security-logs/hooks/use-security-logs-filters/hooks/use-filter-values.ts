@@ -2,7 +2,7 @@ import { IdDI } from '@onefootprint/types';
 import { useMemo } from 'react';
 import { queryToArray } from 'src/hooks/use-filters';
 
-import {
+import type {
   SecurityLogsFilterValues,
   SecurityLogsQueryString,
 } from '../use-security-logs-filters.types';

@@ -1,11 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  DataIdentifier,
-  Entity,
-  IdDI,
-  isVaultDataDecrypted,
-  VaultValue,
-} from '@onefootprint/types';
+import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
+import { IdDI, isVaultDataDecrypted } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { EncryptedCell } from 'src/components';

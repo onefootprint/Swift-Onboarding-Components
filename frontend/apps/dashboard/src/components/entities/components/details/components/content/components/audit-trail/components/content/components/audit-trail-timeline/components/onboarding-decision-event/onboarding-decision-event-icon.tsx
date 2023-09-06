@@ -1,8 +1,6 @@
 import { IcoClose16, IcoFootprint16 } from '@onefootprint/icons';
-import {
-  DecisionStatus,
-  OnboardingDecisionEventData,
-} from '@onefootprint/types';
+import type { OnboardingDecisionEventData } from '@onefootprint/types';
+import { DecisionStatus } from '@onefootprint/types';
 import React from 'react';
 
 type OnboardingDecisionEventIconProps = {

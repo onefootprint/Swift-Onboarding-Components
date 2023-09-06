@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { InsightEvent } from '@onefootprint/types';
+import type { InsightEvent } from '@onefootprint/types';
 import React from 'react';
 
 import FloatingBox from '../floating-box';

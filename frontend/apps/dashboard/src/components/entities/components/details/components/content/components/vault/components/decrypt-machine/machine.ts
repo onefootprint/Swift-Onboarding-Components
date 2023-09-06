@@ -1,14 +1,7 @@
 import { createMachine } from 'xstate';
 
-import {
-  Action,
-  Context,
-  Event,
-  Guard,
-  MachineEvents,
-  MachineStates,
-  State,
-} from './types';
+import type { Context, MachineEvents, MachineStates } from './types';
+import { Action, Event, Guard, State } from './types';
 import getDiFields from './utils/get-di-fields';
 
 export const createDecryptStateMachine = () =>

@@ -3,11 +3,12 @@ import type {
   GetEntityRiskSignalsRequest,
   GetEntityRiskSignalsResponse,
 } from '@onefootprint/types';
-import { RiskSignal } from '@onefootprint/types/src/data/risk-signal';
+import type { RiskSignal } from '@onefootprint/types/src/data/risk-signal';
 import { useQuery } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
-import { RiskSignalsSummary } from '../risk-signals-overview.types';
+import type { RiskSignalsSummary } from '../risk-signals-overview.types';
 import groupBySection from './utils/group-by-section';
 import groupBySeverity from './utils/group-by-severity';
 

@@ -1,4 +1,5 @@
-import { Role, RoleKind } from '@onefootprint/types';
+import type { Role } from '@onefootprint/types';
+import { RoleKind } from '@onefootprint/types';
 import React from 'react';
 
 import Actions from './components/actions';

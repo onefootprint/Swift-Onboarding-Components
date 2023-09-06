@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { RiskSignal } from '@onefootprint/types';
-import { Box, Dialog, Table, TableRow, Typography } from '@onefootprint/ui';
+import type { RiskSignal } from '@onefootprint/types';
+import type { TableRow } from '@onefootprint/ui';
+import { Box, Dialog, Table, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import Row from './components/row';

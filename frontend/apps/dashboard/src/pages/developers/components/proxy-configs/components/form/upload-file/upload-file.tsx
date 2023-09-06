@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Icon, IcoTrash16 } from '@onefootprint/icons';
+import type { Icon } from '@onefootprint/icons';
+import { IcoTrash16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import {
   Box,

@@ -1,12 +1,13 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import {
+import type {
   ApiKey,
   OrgApiKeyRevealRequest,
   OrgApiKeyRevealResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 import useUpdateApiKeyCache from './use-update-api-key-cache';
 

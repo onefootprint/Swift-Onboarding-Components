@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Entity } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 

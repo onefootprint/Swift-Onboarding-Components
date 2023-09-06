@@ -7,7 +7,8 @@ import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import { useStore } from '../../hooks/use-session';
-import Layout, { LayoutProps } from './layout';
+import type { LayoutProps } from './layout';
+import Layout from './layout';
 import { withEntities } from './layout.test.config';
 
 const originalState = useStore.getState();

@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { media, Stepper, StepperOption } from '@onefootprint/ui';
+import type { StepperOption } from '@onefootprint/ui';
+import { media, Stepper } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import CompanyData from './components/steps/company-data';

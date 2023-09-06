@@ -1,4 +1,5 @@
-import { CollectedKybDataOption, OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
+import { CollectedKybDataOption } from '@onefootprint/types';
 
 export const isKybCdo = (data: string) =>
   Object.values(CollectedKybDataOption).includes(

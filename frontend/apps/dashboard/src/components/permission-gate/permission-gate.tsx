@@ -1,4 +1,4 @@
-import { RoleScopeKind } from '@onefootprint/types';
+import type { RoleScopeKind } from '@onefootprint/types';
 import { Box, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import usePermissions from 'src/hooks/use-permissions';

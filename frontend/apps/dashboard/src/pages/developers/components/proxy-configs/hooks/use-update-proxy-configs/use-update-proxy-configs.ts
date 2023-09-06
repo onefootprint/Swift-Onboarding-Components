@@ -1,9 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
-import { UpdateProxyConfigRequest } from '@onefootprint/types';
+import type { UpdateProxyConfigRequest } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 const updateProxyConfig = async (
   authHeaders: AuthHeaders,

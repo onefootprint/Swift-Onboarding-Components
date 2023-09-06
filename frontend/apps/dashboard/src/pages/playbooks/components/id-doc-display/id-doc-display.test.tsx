@@ -2,7 +2,8 @@ import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
-import IdDocDisplay, { IdDocDisplayProps } from './id-doc-display';
+import type { IdDocDisplayProps } from './id-doc-display';
+import IdDocDisplay from './id-doc-display';
 
 const renderIdDocDisplay = ({ idDocKind, threshold }: IdDocDisplayProps) =>
   customRender(<IdDocDisplay idDocKind={idDocKind} threshold={threshold} />);

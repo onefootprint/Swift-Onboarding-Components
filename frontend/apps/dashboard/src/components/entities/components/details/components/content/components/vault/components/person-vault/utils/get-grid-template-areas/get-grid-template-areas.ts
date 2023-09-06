@@ -1,5 +1,5 @@
+import type { Entity } from '@onefootprint/types';
 import {
-  Entity,
   hasEntityCards,
   hasEntityCustomData,
   hasEntityDocuments,

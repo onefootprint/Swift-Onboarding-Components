@@ -1,7 +1,6 @@
+import type { Document, EntityVault } from '@onefootprint/types';
 import {
-  Document,
   DocumentDI,
-  EntityVault,
   IdDocImageTypes,
   IdDocStatus,
   SupportedIdDocTypes,

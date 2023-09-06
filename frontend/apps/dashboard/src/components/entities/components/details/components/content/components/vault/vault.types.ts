@@ -1,5 +1,5 @@
-import { Icon } from '@onefootprint/icons';
-import {
+import type { Icon } from '@onefootprint/icons';
+import type {
   DataIdentifier,
   Entity,
   VaultEmptyData,

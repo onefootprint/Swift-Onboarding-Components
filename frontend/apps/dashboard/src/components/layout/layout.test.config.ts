@@ -1,5 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Entity, EntityKind, EntityStatus } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
+import { EntityKind, EntityStatus } from '@onefootprint/types';
 
 export const entitiesFixture: Entity[] = [
   {

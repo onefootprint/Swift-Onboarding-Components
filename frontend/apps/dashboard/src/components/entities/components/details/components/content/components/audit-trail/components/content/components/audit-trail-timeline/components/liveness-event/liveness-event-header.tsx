@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { LivenessEventData, LivenessSource } from '@onefootprint/types';
+import type { LivenessEventData } from '@onefootprint/types';
+import { LivenessSource } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 

@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Data, { DataProps } from './data';
+import type { DataProps } from './data';
+import Data from './data';
 
 describe('<Data />', () => {
   const defaultRoles = [

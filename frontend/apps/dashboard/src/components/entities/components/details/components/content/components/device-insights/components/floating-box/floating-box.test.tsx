@@ -3,7 +3,8 @@ import { EntityKind } from '@onefootprint/types';
 import React from 'react';
 import Provider from 'src/components/entities/components/details/hooks/use-entity-context';
 
-import FloatingBox, { FloatingBoxProps } from './floating-box';
+import type { FloatingBoxProps } from './floating-box';
+import FloatingBox from './floating-box';
 
 const renderFloatingBox = (
   kind: EntityKind,

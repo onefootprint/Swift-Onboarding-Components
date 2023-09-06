@@ -1,11 +1,11 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import {
+import type {
   BusinessInformation,
-  defaultPlaybookValuesKYB,
   PlaybookFormData,
 } from '@/playbooks/utils/machine/types';
+import { defaultPlaybookValuesKYB } from '@/playbooks/utils/machine/types';
 
 import BusinessInformationComponent from '.';
 

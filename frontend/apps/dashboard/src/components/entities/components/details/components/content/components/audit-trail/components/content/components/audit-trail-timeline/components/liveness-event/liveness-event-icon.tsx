@@ -1,5 +1,6 @@
 import { IcoClose16, IcoFaceid16, IcoLock16 } from '@onefootprint/icons';
-import { LivenessEventData, LivenessSource } from '@onefootprint/types';
+import type { LivenessEventData } from '@onefootprint/types';
+import { LivenessSource } from '@onefootprint/types';
 import React from 'react';
 
 type LivenessEventIconProps = {

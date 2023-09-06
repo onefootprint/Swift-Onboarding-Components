@@ -1,13 +1,17 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { OnboardingConfig, RoleScopeKind } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
-import CopyLink, { CopyLinkHandler } from './components/copy-link';
-import EditName, { EditNameHandler } from './components/edit-name';
-import Status, { StatusHandler } from './components/status';
+import type { CopyLinkHandler } from './components/copy-link';
+import CopyLink from './components/copy-link';
+import type { EditNameHandler } from './components/edit-name';
+import EditName from './components/edit-name';
+import type { StatusHandler } from './components/status';
+import Status from './components/status';
 
 type ActionsProps = {
   playbook: OnboardingConfig;

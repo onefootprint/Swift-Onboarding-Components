@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 import React from 'react';
 
-import { GetWebhooksPortalResponse } from '../../hooks/use-webhooks-portal';
+import type { GetWebhooksPortalResponse } from '../../hooks/use-webhooks-portal';
 
 const AppPortal = dynamic(
   {

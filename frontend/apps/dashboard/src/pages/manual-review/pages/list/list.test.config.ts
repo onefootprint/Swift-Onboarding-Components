@@ -1,11 +1,10 @@
 import { mockRequest } from '@onefootprint/test-utils';
+import type { Entity, GetOnboardingConfigsResponse } from '@onefootprint/types';
 import {
   BusinessDI,
   CollectedKycDataOption,
-  Entity,
   EntityKind,
   EntityStatus,
-  GetOnboardingConfigsResponse,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 

@@ -8,7 +8,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Row, { RowProps } from './row';
+import type { RowProps } from './row';
+import Row from './row';
 import {
   memberFixture,
   roleToSelectOnEdit,

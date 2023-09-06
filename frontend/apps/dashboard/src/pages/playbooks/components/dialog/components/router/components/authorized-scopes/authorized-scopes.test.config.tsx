@@ -1,8 +1,8 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import type { AuthorizedScopesFormData } from '@/playbooks/utils/machine/types';
 import {
-  AuthorizedScopesFormData,
   defaultAuthorizedScopesValues,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,

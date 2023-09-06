@@ -1,6 +1,6 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import {
+import type {
   Document,
   EntityVault,
   SupportedIdDocTypes,

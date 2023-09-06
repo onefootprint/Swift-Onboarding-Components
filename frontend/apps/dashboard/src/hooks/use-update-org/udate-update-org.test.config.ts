@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { Organization } from '@onefootprint/types';
+import type { Organization } from '@onefootprint/types';
 
 export const organizationFixture: Organization = {
   id: 'org_9L42CAdpXhDeSmi1DI8Qks',

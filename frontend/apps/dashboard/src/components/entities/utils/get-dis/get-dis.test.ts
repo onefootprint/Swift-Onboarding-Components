@@ -1,4 +1,4 @@
-import { DataIdentifier } from '@onefootprint/types';
+import type { DataIdentifier } from '@onefootprint/types';
 
 import getDis, { getDI } from './get-dis';
 

@@ -6,23 +6,25 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
+import type {
+  DataIdentifier,
+  Entity,
+  Liveness,
+  Timeline,
+  VaultValue,
+} from '@onefootprint/types';
 import {
   ActorKind,
   CollectedKycDataOption,
-  DataIdentifier,
   DecisionStatus,
   DocumentDI,
-  Entity,
   EntityKind,
   EntityStatus,
   IdDI,
   InvestorProfileDI,
-  Liveness,
   LivenessKind,
   LivenessSource,
-  Timeline,
   TimelineEventKind,
-  VaultValue,
   Vendor,
   WatchlistCheckStatus,
 } from '@onefootprint/types';

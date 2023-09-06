@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import { OrgMemberResponse } from '@onefootprint/types';
+import type { OrgMemberResponse } from '@onefootprint/types';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -8,15 +8,15 @@ import {
   DASHBOARD_AUTHORIZATION_HEADER,
   DASHBOARD_IS_LIVE_HEADER,
 } from '../../config/constants';
-import {
+import type {
   AuthHeaders,
-  defaultSession,
   MetaSession,
   OrgSession,
   Session,
   UserSession,
   UserSessionState,
 } from './user-session.types';
+import { defaultSession } from './user-session.types';
 
 const getUser = async (auth: string) => {
   const response = await request<OrgMemberResponse>({

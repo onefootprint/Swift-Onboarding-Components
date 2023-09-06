@@ -1,10 +1,10 @@
+import type { Timeline } from '@onefootprint/types';
 import {
   ActorKind,
   CollectedKycDataOption,
   DecisionStatus,
   LivenessIssuer,
   LivenessSource,
-  Timeline,
   TimelineEventKind,
   TriggerKind,
   Vendor,

@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Grid, Select, SelectOption, TextInput } from '@onefootprint/ui';
+import type { SelectOption } from '@onefootprint/ui';
+import { Grid, Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 

@@ -4,7 +4,8 @@ import type {
   GetEntityRiskSignalsResponse,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 import useRiskSignalsFilters from './use-risk-signals-filters';
 

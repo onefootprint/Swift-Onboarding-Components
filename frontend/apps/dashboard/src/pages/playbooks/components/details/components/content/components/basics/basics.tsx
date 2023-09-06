@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoPencil16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
 import { CodeInline, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import isKybPlaybook from 'src/pages/playbooks/components/table/components/row/utils/is-kyb-playbook';

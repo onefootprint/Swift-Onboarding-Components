@@ -1,7 +1,9 @@
-import request, { PaginatedRequestResponse } from '@onefootprint/request';
-import { GetOnboardingConfigsResponse } from '@onefootprint/types';
+import type { PaginatedRequestResponse } from '@onefootprint/request';
+import request from '@onefootprint/request';
+import type { GetOnboardingConfigsResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 const getOnboardingConfigs = async (authHeaders: AuthHeaders) => {
   const { data: response } = await request<

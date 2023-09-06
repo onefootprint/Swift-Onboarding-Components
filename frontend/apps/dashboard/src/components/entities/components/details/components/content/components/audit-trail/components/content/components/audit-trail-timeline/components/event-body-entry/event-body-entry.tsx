@@ -1,5 +1,6 @@
-import { Color } from '@onefootprint/design-tokens';
-import { IcoCheck16, Icon } from '@onefootprint/icons';
+import type { Color } from '@onefootprint/design-tokens';
+import type { Icon } from '@onefootprint/icons';
+import { IcoCheck16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';

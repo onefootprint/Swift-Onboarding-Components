@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { RoleScope } from '@onefootprint/types';
 import {
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
-  RoleScope,
   RoleScopeKind,
 } from '@onefootprint/types';
 

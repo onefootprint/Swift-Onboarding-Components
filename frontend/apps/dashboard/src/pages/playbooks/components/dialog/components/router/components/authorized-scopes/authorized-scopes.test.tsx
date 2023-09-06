@@ -13,9 +13,8 @@ import React from 'react';
 
 import { Kind } from '@/playbooks/utils/machine/types';
 
-import AuthorizedScopesWithContext, {
-  AuthorizedScopesWithContextProps,
-} from './authorized-scopes.test.config';
+import type { AuthorizedScopesWithContextProps } from './authorized-scopes.test.config';
+import AuthorizedScopesWithContext from './authorized-scopes.test.config';
 
 const renderAuthorizedScopes = ({
   kind,

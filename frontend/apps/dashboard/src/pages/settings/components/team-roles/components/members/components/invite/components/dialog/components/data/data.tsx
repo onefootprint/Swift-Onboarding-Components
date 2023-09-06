@@ -1,7 +1,8 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Box, SelectOption } from '@onefootprint/ui';
+import type { SelectOption } from '@onefootprint/ui';
+import { Box } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 

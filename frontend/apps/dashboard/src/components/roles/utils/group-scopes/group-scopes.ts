@@ -1,13 +1,10 @@
-import { BasicRoleScope, RoleScope, RoleScopeKind } from '@onefootprint/types';
+import type { BasicRoleScope, RoleScope } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 
-import {
-  DecryptOption,
-  decryptOptionFromScope,
-} from '../../hooks/use-decrypt-options';
-import {
-  VaultProxyOption,
-  vaultProxyOptionFromScope,
-} from '../../hooks/use-vault-proxy-options';
+import type { DecryptOption } from '../../hooks/use-decrypt-options';
+import { decryptOptionFromScope } from '../../hooks/use-decrypt-options';
+import type { VaultProxyOption } from '../../hooks/use-vault-proxy-options';
+import { vaultProxyOptionFromScope } from '../../hooks/use-vault-proxy-options';
 
 /// Separate scopes into "decrypt" scopes that are displayed in the decrypt dropdown and
 /// "non-decrypt" scopes that have their own checkboxes

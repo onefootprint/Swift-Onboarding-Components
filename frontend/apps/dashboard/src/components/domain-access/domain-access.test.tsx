@@ -6,7 +6,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { Organization } from '@onefootprint/types';
+import type { Organization } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, asUserWithScope, resetUser } from 'src/config/tests';
 

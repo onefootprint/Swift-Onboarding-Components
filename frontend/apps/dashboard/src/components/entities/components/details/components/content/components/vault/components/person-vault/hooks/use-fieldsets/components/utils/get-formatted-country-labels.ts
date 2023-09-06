@@ -1,4 +1,5 @@
-import { CountryCode, isCountryCode } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
+import { isCountryCode } from '@onefootprint/types';
 
 import getInitialCountry from './get-initial-country';
 

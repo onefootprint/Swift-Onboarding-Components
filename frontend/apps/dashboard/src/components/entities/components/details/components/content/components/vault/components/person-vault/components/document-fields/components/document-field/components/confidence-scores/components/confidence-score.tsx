@@ -1,4 +1,4 @@
-import { UIStates } from '@onefootprint/design-tokens';
+import type { UIStates } from '@onefootprint/design-tokens';
 import styled from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';

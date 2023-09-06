@@ -2,7 +2,7 @@ import identity from 'lodash/identity';
 import omitBy from 'lodash/omitBy';
 import pickBy from 'lodash/pickBy';
 import { useRouter } from 'next/router';
-import { ParsedUrlQuery } from 'querystring';
+import type { ParsedUrlQuery } from 'querystring';
 
 const useFilters = <T>(defaultQueryParams: ParsedUrlQuery) => {
   const router = useRouter();

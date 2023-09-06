@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
-import { Member, RoleScopeKind } from '@onefootprint/types';
+import type { Member } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import {
   Box,
   createFontStyles,

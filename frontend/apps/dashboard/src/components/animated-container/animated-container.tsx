@@ -1,5 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { Box, SXStyleProps } from '@onefootprint/ui';
+import type { SXStyleProps } from '@onefootprint/ui';
+import { Box } from '@onefootprint/ui';
 import React from 'react';
 
 type AnimatedContainerProps = {

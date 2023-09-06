@@ -1,4 +1,4 @@
-import { UpdateProxyConfigRequest } from '@onefootprint/types';
+import type { UpdateProxyConfigRequest } from '@onefootprint/types';
 
 import type { FormData } from '@/proxy-configs/proxy-configs.types';
 

@@ -5,7 +5,8 @@ import React, { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 
-import { Kind, NameFormData } from '@/playbooks/utils/machine/types';
+import type { NameFormData } from '@/playbooks/utils/machine/types';
+import { Kind } from '@/playbooks/utils/machine/types';
 
 import getPlaceholder from './utils/get-placeholder';
 

@@ -1,4 +1,5 @@
-import { EntityStatus, ReviewStatus } from '@onefootprint/types';
+import type { ReviewStatus } from '@onefootprint/types';
+import { EntityStatus } from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import useCurrentEntity from '@/entity/hooks/use-current-entity';

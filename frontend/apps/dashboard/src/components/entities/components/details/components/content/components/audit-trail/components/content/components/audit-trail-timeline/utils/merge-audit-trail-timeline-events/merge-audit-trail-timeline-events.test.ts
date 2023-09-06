@@ -1,10 +1,9 @@
+import type { TimelineEvent, WatchlistCheckEvent } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
   IdDocStatus,
   SupportedIdDocTypes,
-  TimelineEvent,
   TimelineEventKind,
-  WatchlistCheckEvent,
   WatchlistCheckReasonCode,
   WatchlistCheckStatus,
 } from '@onefootprint/types';

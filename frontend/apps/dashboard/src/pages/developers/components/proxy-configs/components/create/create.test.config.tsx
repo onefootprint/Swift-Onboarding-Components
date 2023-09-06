@@ -4,7 +4,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { ProxyConfigDetails } from '@onefootprint/types';
+import type { ProxyConfigDetails } from '@onefootprint/types';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 beforeEach(() => {

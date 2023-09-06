@@ -4,7 +4,7 @@ import { CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import StatusBadge from 'src/components/status-badge';
 
-import { WithEntityProps } from '@/entity/components/with-entity';
+import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 

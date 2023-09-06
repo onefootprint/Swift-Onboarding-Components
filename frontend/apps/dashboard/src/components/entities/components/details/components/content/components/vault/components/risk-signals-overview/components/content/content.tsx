@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { RiskSignal } from '@onefootprint/types';
+import type { RiskSignal } from '@onefootprint/types';
 import { LinkButton } from '@onefootprint/ui';
 import React from 'react';
 

@@ -1,10 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
-import {
-  VaultProxyOption,
-  VaultProxyOptionKind,
-} from '../../../../../hooks/use-vault-proxy-options';
+import type { VaultProxyOption } from '../../../../../hooks/use-vault-proxy-options';
+import { VaultProxyOptionKind } from '../../../../../hooks/use-vault-proxy-options';
 
 export type VaultProxyOptionProps<T extends React.ElementType> = {
   options: VaultProxyOption[];

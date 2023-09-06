@@ -1,11 +1,10 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import {
+import type {
   Organization,
   Role,
-  RoleKind,
-  RoleScopeKind,
   UserUpdateResponse,
 } from '@onefootprint/types';
+import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 
 export const userFixture: UserUpdateResponse = {
   email: 'jane.doe@acme.com',

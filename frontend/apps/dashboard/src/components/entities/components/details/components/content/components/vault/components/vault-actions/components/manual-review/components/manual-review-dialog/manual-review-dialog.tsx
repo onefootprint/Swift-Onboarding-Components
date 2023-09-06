@@ -1,11 +1,10 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { ReviewStatus } from '@onefootprint/types';
+import type { ReviewStatus } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
 
-import ManualNoteEntryForm, {
-  ManualNoteFormData,
-} from '@/entities/components/details/components/content/components/manual-note-entry-form';
+import type { ManualNoteFormData } from '@/entities/components/details/components/content/components/manual-note-entry-form';
+import ManualNoteEntryForm from '@/entities/components/details/components/content/components/manual-note-entry-form';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
 import useSubmitReview from './hooks/use-submit-review';

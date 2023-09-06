@@ -1,4 +1,5 @@
-import { Entity, EntityKind } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
+import { EntityKind } from '@onefootprint/types';
 import { Pagination, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';

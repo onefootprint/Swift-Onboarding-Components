@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import {
+import type {
   OrgAssumeRoleRequest,
   OrgAssumeRoleResponse,
 } from '@onefootprint/types/src/api/org-assume-role';

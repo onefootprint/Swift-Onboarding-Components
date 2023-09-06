@@ -12,7 +12,7 @@ import createStringList, {
   createCapitalStringList,
 } from 'src/utils/create-string-list';
 
-import { WithEntityProps } from '@/entity/components/with-entity';
+import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import Field from '../../../field';
 import FieldSection from './components/field-section';

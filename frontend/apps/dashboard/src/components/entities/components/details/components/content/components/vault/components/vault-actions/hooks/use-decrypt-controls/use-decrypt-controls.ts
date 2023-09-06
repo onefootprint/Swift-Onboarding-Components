@@ -1,5 +1,9 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { DataIdentifier, EntityVault, VaultValue } from '@onefootprint/types';
+import type {
+  DataIdentifier,
+  EntityVault,
+  VaultValue,
+} from '@onefootprint/types';
 
 import type { FormData } from '../../../../vault.types';
 import { Event, State, useDecryptMachine } from '../../../decrypt-machine';

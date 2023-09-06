@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { RiskSignal } from '@onefootprint/types';
-import { Table, TableRow } from '@onefootprint/ui';
+import type { TableRow } from '@onefootprint/ui';
+import { Table } from '@onefootprint/ui';
 import React from 'react';
 
 import useCurrentEntityRiskSignals from '@/entity/hooks/use-current-entity-risk-signals';

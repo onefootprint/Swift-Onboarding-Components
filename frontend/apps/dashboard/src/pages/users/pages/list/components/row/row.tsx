@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Entity, IdDI } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FieldOrPlaceholder, StatusBadge } from 'src/components';

@@ -6,9 +6,8 @@ import React from 'react';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
 import useRetriggerKYC from '../hooks/use-retrigger-kyc';
-import RetriggerKYCForm, {
-  RetriggerKYCFormData,
-} from './components/retrigger-kyc-form';
+import type { RetriggerKYCFormData } from './components/retrigger-kyc-form';
+import RetriggerKYCForm from './components/retrigger-kyc-form';
 
 export type RetriggerKYCDialogProps = {
   open: boolean;

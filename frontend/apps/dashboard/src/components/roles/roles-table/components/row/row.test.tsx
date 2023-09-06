@@ -13,7 +13,8 @@ import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 import { withProxyConfigs } from 'src/pages/developers/components/proxy-configs/proxy-config.test.config';
 
-import Row, { RowProps } from './row';
+import type { RowProps } from './row';
+import Row from './row';
 import roleFixture from './row.test.config';
 
 describe('<Row />', () => {

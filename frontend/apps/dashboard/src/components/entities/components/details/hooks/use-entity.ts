@@ -1,12 +1,10 @@
 import request from '@onefootprint/request';
-import {
-  augmentEntityWithOnboardingInfo,
-  GetEntityRequest,
-  GetEntityResponse,
-} from '@onefootprint/types';
+import type { GetEntityRequest, GetEntityResponse } from '@onefootprint/types';
+import { augmentEntityWithOnboardingInfo } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 const getEntity = async (
   authHeaders: AuthHeaders,

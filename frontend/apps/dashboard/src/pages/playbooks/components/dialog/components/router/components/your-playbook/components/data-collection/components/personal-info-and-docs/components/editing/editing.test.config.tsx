@@ -1,11 +1,13 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import type {
+  PersonalInformationAndDocs,
+  PlaybookFormData,
+} from '@/playbooks/utils/machine/types';
 import {
   defaultPlaybookValuesKYC,
   Kind,
-  PersonalInformationAndDocs,
-  PlaybookFormData,
 } from '@/playbooks/utils/machine/types';
 
 import Editing from './editing';

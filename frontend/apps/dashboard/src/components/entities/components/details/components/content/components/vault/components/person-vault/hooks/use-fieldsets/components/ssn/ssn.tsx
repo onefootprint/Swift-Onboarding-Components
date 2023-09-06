@@ -1,6 +1,5 @@
+import type { DataIdentifier, Entity } from '@onefootprint/types';
 import {
-  DataIdentifier,
-  Entity,
   IdDI,
   isVaultDataDecrypted,
   isVaultDataText,

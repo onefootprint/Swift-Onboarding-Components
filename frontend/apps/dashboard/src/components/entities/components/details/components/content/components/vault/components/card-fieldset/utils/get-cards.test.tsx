@@ -1,4 +1,4 @@
-import { Entity } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
 
 import getCardFromEntity from './get-cards';
 import entityFixture from './get-cards.test.config';

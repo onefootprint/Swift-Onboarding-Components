@@ -8,7 +8,8 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import { Role, RoleKind, RoleScopeKind } from '@onefootprint/types';
+import type { Role } from '@onefootprint/types';
+import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 

@@ -1,5 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
-import { DataIdentifier, Entity, IdDI } from '@onefootprint/types';
+import type { DataIdentifier, Entity } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { Flag, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { EncryptedCell } from 'src/components';

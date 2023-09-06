@@ -1,8 +1,9 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import { Organization } from '@onefootprint/types';
+import type { Organization } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import type { AuthHeaders } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 
 export type PostAssumeRequest = {
   tenantId: string;

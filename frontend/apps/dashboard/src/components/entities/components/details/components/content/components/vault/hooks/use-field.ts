@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { DataIdentifier, Entity } from '@onefootprint/types';
 import {
-  DataIdentifier,
-  Entity,
   isVaultDataDecrypted,
   isVaultDataEncrypted,
 } from '@onefootprint/types';

@@ -1,4 +1,4 @@
-import { ProxyConfigDetails } from '@onefootprint/types';
+import type { ProxyConfigDetails } from '@onefootprint/types';
 
 export const configWithNoPinnedServerCertificate: ProxyConfigDetails = {
   id: '1',

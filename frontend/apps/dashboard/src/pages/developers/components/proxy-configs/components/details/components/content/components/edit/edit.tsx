@@ -1,6 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { ProxyConfigDetails } from '@onefootprint/types';
+import type { ProxyConfigDetails } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React, { useId, useState } from 'react';
 import { Fieldset } from 'src/components';

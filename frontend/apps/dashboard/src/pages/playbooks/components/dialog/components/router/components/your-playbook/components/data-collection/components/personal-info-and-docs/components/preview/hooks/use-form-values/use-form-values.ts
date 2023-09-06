@@ -1,6 +1,6 @@
 import { useFormContext } from 'react-hook-form';
 
-import { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
+import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
 
 const useFormValues = () => {
   const { watch } = useFormContext();

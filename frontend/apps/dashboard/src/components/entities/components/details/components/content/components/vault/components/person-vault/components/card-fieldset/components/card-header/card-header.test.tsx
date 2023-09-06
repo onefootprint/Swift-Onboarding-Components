@@ -6,7 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import { CardHeader, CardHeaderProps } from './card-header';
+import type { CardHeaderProps } from './card-header';
+import { CardHeader } from './card-header';
 import defaultCard from './card-header.config';
 
 const renderCardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) =>
