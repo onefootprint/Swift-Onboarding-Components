@@ -6,7 +6,7 @@ import React from 'react';
 
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import { useCreateHandoffUrl } from '../../../../../hooks/ui';
+import { useCreateHandoffUrl } from '../../../../../hooks';
 import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-token';
 
@@ -15,8 +15,10 @@ const NewTabRequest = () => {
   const [state, send] = useMobileMachine();
   const { authToken, device, config, scopedAuthToken, idDocOutcome } =
     state.context;
-  const url = useCreateHandoffUrl(scopedAuthToken, config?.isAppClipEnabled);
-
+  const url = useCreateHandoffUrl({
+    authToken: scopedAuthToken,
+    onboardingConfig: config,
+  });
   const { mutation } = useGenerateScopedAuthToken({
     authToken,
     device,

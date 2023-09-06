@@ -13,8 +13,11 @@ import React from 'react';
 
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import { useD2PSms, useGetD2PStatus } from '../../../../../hooks';
-import { useCreateHandoffUrl } from '../../../../../hooks/ui';
+import {
+  useCreateHandoffUrl,
+  useD2PSms,
+  useGetD2PStatus,
+} from '../../../../../hooks';
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
 import useTranslationSourceForRequirements from '../../../hooks/desktop/use-translation-source-for-requirements';
@@ -32,7 +35,10 @@ const QRRegister = () => {
     idDocOutcome,
     missingRequirements: { idDoc },
   } = state.context;
-  const url = useCreateHandoffUrl(scopedAuthToken, config?.isAppClipEnabled);
+  const url = useCreateHandoffUrl({
+    authToken: scopedAuthToken,
+    onboardingConfig: config,
+  });
 
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
     authToken,
