@@ -88,7 +88,7 @@ const createCollectKycDataMachine = (
             },
             {
               target: 'confirm',
-              cond: context => shouldConfirm(context.data),
+              cond: context => shouldConfirm(context.data, context.requirement),
             },
             {
               target: 'completed',

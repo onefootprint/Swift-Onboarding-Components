@@ -1,7 +1,10 @@
 import {
   CollectedKycDataOption,
   CollectedKycDataOptionToRequiredAttributes,
+  CollectKycDataRequirement,
+  IdDI,
 } from '@onefootprint/types';
+import { pickBy } from 'lodash';
 
 import { KycData } from '../data-types';
 
@@ -99,11 +102,34 @@ export const hasMissingAttributes = (
     ),
   );
 
-export const shouldConfirm = (collectedData?: KycData) => {
+export const shouldConfirm = (
+  collectedData: KycData,
+  requirement: CollectKycDataRequirement,
+) => {
   // Show confirm if any data is collected at all
   if (!collectedData || Object.keys(collectedData).length === 0) {
     return false;
   }
-  const hasData = Object.values(collectedData).some(data => data.value);
-  return hasData;
+
+  const missingAttributesSet = new Set(requirement.missingAttributes);
+  const needsToVaultEmail = missingAttributesSet.has(
+    CollectedKycDataOption.email,
+  );
+  const needsToVaultPhone = missingAttributesSet.has(
+    CollectedKycDataOption.phoneNumber,
+  );
+
+  // We only send email/phone if it just got collected and we need to send to backend
+  // If that's not the case, filter out email/phone fields since we don't show them in the confirm page
+  const dataToConfirm = pickBy(collectedData, (value, key) => {
+    if (!needsToVaultEmail && key === IdDI.email) {
+      return false;
+    }
+    if (!needsToVaultPhone && key === IdDI.phoneNumber) {
+      return false;
+    }
+    return !!value.value;
+  });
+
+  return Object.keys(dataToConfirm).length > 0;
 };

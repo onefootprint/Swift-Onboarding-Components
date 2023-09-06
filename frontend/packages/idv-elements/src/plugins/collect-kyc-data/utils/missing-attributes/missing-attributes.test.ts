@@ -1,10 +1,15 @@
-import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  IdDI,
+  OnboardingRequirementKind,
+} from '@onefootprint/types';
 
 import {
   hasMissingAttributes,
   isMissingBasicAttribute,
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
+  shouldConfirm,
 } from './missing-attributes';
 
 describe('MissingAttributesUtils', () => {
@@ -521,6 +526,131 @@ describe('MissingAttributesUtils', () => {
           },
         ),
       ).toEqual(true);
+    });
+  });
+
+  describe('when running shouldConfirm', () => {
+    it('shows confirm if necessary', () => {
+      // Collecting afresh
+      expect(
+        shouldConfirm(
+          {
+            [IdDI.email]: {
+              value: 'piip@onefootprint.com',
+            },
+            [IdDI.firstName]: {
+              value: 'Piip',
+            },
+            [IdDI.lastName]: {
+              value: 'Foot',
+              decrypted: true,
+            },
+          },
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            missingAttributes: [CollectedKycDataOption.name],
+            populatedAttributes: [CollectedKycDataOption.email],
+            optionalAttributes: [],
+            isMet: false,
+          },
+        ),
+      ).toEqual(true);
+
+      // Redo kyc case
+      expect(
+        shouldConfirm(
+          {
+            [IdDI.email]: {
+              value: 'piip@onefootprint.com',
+            },
+            [IdDI.firstName]: {
+              value: 'Piip',
+            },
+            [IdDI.lastName]: {
+              value: 'Foot',
+            },
+            [IdDI.ssn4]: {
+              value: '1234',
+            },
+          },
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            missingAttributes: [],
+            populatedAttributes: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.ssn4,
+            ],
+            optionalAttributes: [],
+            isMet: true,
+          },
+        ),
+      ).toEqual(true);
+    });
+
+    it('skips confirm', () => {
+      // Legacy ob config with just email req
+      expect(
+        shouldConfirm(
+          {
+            [IdDI.email]: {
+              value: 'piip@onefootprint.com',
+            },
+          },
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            missingAttributes: [],
+            populatedAttributes: [CollectedKycDataOption.email],
+            optionalAttributes: [],
+            isMet: true,
+          },
+        ),
+      ).toEqual(false);
+
+      expect(
+        shouldConfirm(
+          {
+            [IdDI.email]: {
+              value: 'piip@onefootprint.com',
+            },
+            [IdDI.phoneNumber]: {
+              value: '+1232443243',
+            },
+          },
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            missingAttributes: [],
+            populatedAttributes: [
+              CollectedKycDataOption.email,
+              CollectedKycDataOption.phoneNumber,
+            ],
+            optionalAttributes: [],
+            isMet: true,
+          },
+        ),
+      ).toEqual(false);
+
+      // Empty values
+      expect(
+        shouldConfirm(
+          {
+            [IdDI.firstName]: {
+              value: undefined,
+              scrubbed: true,
+            },
+            [IdDI.lastName]: {
+              value: undefined,
+              scrubbed: true,
+            },
+          },
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            missingAttributes: [CollectedKycDataOption.name],
+            populatedAttributes: [],
+            optionalAttributes: [],
+            isMet: false,
+          },
+        ),
+      ).toEqual(false);
     });
   });
 });
