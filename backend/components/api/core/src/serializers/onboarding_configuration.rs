@@ -23,7 +23,7 @@ pub type ObConfigInfo = (
 
 impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
     fn from_db((ob_config, tenant, tenant_client_config, appearance, ff_client): ObConfigInfo) -> Self {
-        let supported_countries = ob_config.supported_countries();
+        let supported_countries = ob_config.supported_countries_for_residential_address();
 
         let ObConfiguration {
             name,

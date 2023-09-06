@@ -443,7 +443,7 @@ fn get_collect_document_supported_countries(obc: &ObConfiguration) -> Vec<Iso316
         return vec![Iso3166TwoDigitCountryCode::US];
     }
 
-    obc.supported_countries()
+    obc.supported_countries_for_residential_address()
 }
 fn get_collect_document_supported_doc_types(
     country: Option<Iso3166TwoDigitCountryCode>,

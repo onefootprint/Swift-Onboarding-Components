@@ -101,17 +101,8 @@ def test_upload_documents_with_ob_config_restriction_only_international(restrict
         "document_type": "passport",
         "country_code": "NO",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
-    assert body["error"]["message"] == "Unsupported document country. Supported document countries: MX"
+    body = post("hosted/user/documents", data, bifrost.auth_token)
 
-    # upload the correct doc
-    data = {
-        "document_type": "passport",
-        "country_code": "MX",
-    }
-
-    # this should succeed
-    post("hosted/user/documents", data, bifrost.auth_token)
 
 def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)

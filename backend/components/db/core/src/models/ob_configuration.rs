@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::tenant::Tenant;
 use crate::actor;
 use crate::actor::SaturatedActor;
@@ -49,8 +51,73 @@ pub struct ObConfiguration {
     pub skip_kyc: bool,
 }
 
+#[derive(derive_more::Deref)]
+pub struct SupportedDocumentAndCountryMapping(pub HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>);
+impl SupportedDocumentAndCountryMapping {
+    pub fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
+        self.0
+            .iter()
+            .filter_map(|(country, doc_types)| doc_types.contains(&doc_type).then_some(country))
+            .cloned()
+            .collect()
+    }
+}
+
 impl ObConfiguration {
-    pub fn supported_countries(&self) -> Vec<Iso3166TwoDigitCountryCode> {
+    // returns a map of country -> supported document types
+    pub fn supported_country_mapping_for_document(
+        &self,
+        residential_country: Option<Iso3166TwoDigitCountryCode>,
+    ) -> SupportedDocumentAndCountryMapping {
+        let id_doc_kinds = if let Some(kinds) = self.restricted_id_doc_kinds() {
+            kinds
+        } else {
+            IdDocKind::iter().collect()
+        };
+
+        // For each id doc kind configured, compute which countries we support
+        let countries_and_doc_types: Vec<(Iso3166TwoDigitCountryCode, IdDocKind)> = id_doc_kinds
+            .into_iter()
+            .flat_map(|doc_type| {
+                let out: Vec<(Iso3166TwoDigitCountryCode, IdDocKind)> = self
+                    .supported_countries_for_doc_type(doc_type)
+                    .into_iter()
+                    .map(|c| (c, doc_type))
+                    .collect();
+
+                out
+            })
+            .collect();
+
+        let map: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>> = countries_and_doc_types
+            .into_iter()
+            .fold(HashMap::new(), |mut acc: HashMap<_, _>, (country, doc_type)| {
+                let is_passport = doc_type == IdDocKind::Passport;
+                // Don't allow non-passport if we are displaying possible document types for an international residential address
+                //   - This is the case _even if the person has a US document type that would have been supported had they been living in the US_
+                //
+                // For example:
+                //  * OBC has DL, passport, id card configured
+                //      * DL + id card are only possible for US (currently)
+                //  * OBC has residential country restrictions: US, MX
+                //  * I am living in Mexico, and submitted my MX address
+                //    ==> i have to provide a passport from any country (which includes US, where i'm from). even though i have an acceptable form of ID were I to be living in the US
+                //
+                //
+                // That is to say, international country restrictions do not affect the countries you can submit a passport for, this just controls
+                // residential address - there are integration tests testing this part
+                if !is_passport && residential_country.map(|c| !c.is_us()).unwrap_or(false) {
+                    acc
+                } else {
+                    acc.entry(country).or_default().push(doc_type);
+                    acc
+                }
+            });
+
+        SupportedDocumentAndCountryMapping(map)
+    }
+
+    pub fn supported_countries_for_residential_address(&self) -> Vec<Iso3166TwoDigitCountryCode> {
         match self.international_country_restrictions.as_ref() {
             // first check if we have restrictions on country.
             // Note: US is not included by default here.
@@ -67,20 +134,12 @@ impl ObConfiguration {
     }
 
     // Assumes you've checked if the document type is supported already
+    // This is currently hard coded on the frontend, but eventually we'll allow more document types per country
     pub fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
         match doc_type {
             IdDocKind::IdCard => vec![Iso3166TwoDigitCountryCode::US],
             IdDocKind::DriversLicense => vec![Iso3166TwoDigitCountryCode::US],
-            IdDocKind::Passport => {
-                // in this case, tenant has not requested any other countries to be restricted other than
-                // US, so we allow any passport country
-                if self.only_us() && self.international_country_restrictions.is_none() {
-                    Iso3166TwoDigitCountryCode::iter().collect()
-                // tenant has said they have specific countries they want, so we honor that
-                } else {
-                    self.supported_countries()
-                }
-            }
+            IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
             IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::US],
             IdDocKind::Visa => vec![Iso3166TwoDigitCountryCode::US],
             IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
@@ -88,7 +147,7 @@ impl ObConfiguration {
     }
 
     pub fn only_us(&self) -> bool {
-        self.supported_countries() == vec![Iso3166TwoDigitCountryCode::US]
+        self.supported_countries_for_residential_address() == vec![Iso3166TwoDigitCountryCode::US]
     }
 
     pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
@@ -359,7 +418,8 @@ mod tests {
     use super::ObConfiguration;
     use chrono::Utc;
     use newtypes::{
-        ApiKeyStatus, IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, TenantId,
+        ApiKeyStatus, CollectedDataOption, DocumentCdoInfo, IdDocKind, Iso3166TwoDigitCountryCode,
+        ObConfigurationId, ObConfigurationKey, TenantId,
     };
     use strum::IntoEnumIterator;
     use test_case::test_case;
@@ -395,38 +455,18 @@ mod tests {
             skip_kyc: false,
         };
 
-        assert_have_same_elements(obc.supported_countries(), expected_countries)
+        assert_have_same_elements(
+            obc.supported_countries_for_residential_address(),
+            expected_countries,
+        )
     }
 
-    // allow international, with no restrictions
-    #[test_case(true, None, IdDocKind::IdCard, vec![Iso3166TwoDigitCountryCode::US]; "allow international, id card, only US")]
-    #[test_case(true, None, IdDocKind::DriversLicense, vec![Iso3166TwoDigitCountryCode::US]; "allow international, DL, only US")]
-    #[test_case(true, None, IdDocKind::Visa, vec![Iso3166TwoDigitCountryCode::US]; "allow international, visa, only US")]
-    #[test_case(true, None, IdDocKind::ResidenceDocument, vec![Iso3166TwoDigitCountryCode::US]; "allow international, residence doc, only US")]
-    #[test_case(true, None, IdDocKind::Permit, vec![Iso3166TwoDigitCountryCode::US]; "allow international, permit, only US")]
-    #[test_case(true, None, IdDocKind::Passport, Iso3166TwoDigitCountryCode::iter().collect(); "allow international, no restrictions, passport can be from any country")]
-    // allow international, with restrictions
-    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::IdCard, vec![Iso3166TwoDigitCountryCode::US]; "allow international, restrictions, id card, only US")]
-    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::DriversLicense, vec![Iso3166TwoDigitCountryCode::US]; "allow international, restrictions,  DL, only US")]
-    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::Visa, vec![Iso3166TwoDigitCountryCode::US]; "allow international, restrictions, visa, only US")]
-    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::ResidenceDocument, vec![Iso3166TwoDigitCountryCode::US]; "allow international, restrictions, residence doc, only US")]
-    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::Permit, vec![Iso3166TwoDigitCountryCode::US]; "allow international, restrictions, permit, only US")]
-    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), IdDocKind::Passport, vec![Iso3166TwoDigitCountryCode::MX]; "allow international, with restrictions, passport is only from restricted countries")]
-    // no international
-    #[test_case(false, None, IdDocKind::IdCard, vec![Iso3166TwoDigitCountryCode::US]; "no international, id card, only US")]
-    #[test_case(false, None, IdDocKind::DriversLicense, vec![Iso3166TwoDigitCountryCode::US]; "no international, DL, only US")]
-    #[test_case(false, None, IdDocKind::Visa, vec![Iso3166TwoDigitCountryCode::US]; "no international, visa, only US")]
-    #[test_case(false, None, IdDocKind::ResidenceDocument, vec![Iso3166TwoDigitCountryCode::US]; "no international, residence doc, only US")]
-    #[test_case(false, None, IdDocKind::Permit, vec![Iso3166TwoDigitCountryCode::US]; "no international, permit, only US")]
-    #[test_case(false, None, IdDocKind::Passport, Iso3166TwoDigitCountryCode::iter().collect(); "no international, no restrictions, passport can be from any country")]
-
-    fn test_supported_countries_for_doc_type(
+    fn obc_with_doc_cdo(
         allow_international: bool,
         international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
-        doc_type: IdDocKind,
-        expected_countries: Vec<Iso3166TwoDigitCountryCode>,
-    ) {
-        let obc = ObConfiguration {
+        doc_cdo: &str,
+    ) -> ObConfiguration {
+        ObConfiguration {
             id: ObConfigurationId::from_str("1234").unwrap(),
             key: ObConfigurationKey::from_str("obk1").unwrap(),
             name: "obc".into(),
@@ -436,7 +476,9 @@ mod tests {
             is_live: true,
             status: ApiKeyStatus::Enabled,
             created_at: Utc::now(),
-            must_collect_data: vec![],
+            must_collect_data: vec![CollectedDataOption::Document(
+                DocumentCdoInfo::from_str(doc_cdo).unwrap(),
+            )],
             can_access_data: vec![],
             appearance_id: None,
             cip_kind: None,
@@ -447,8 +489,106 @@ mod tests {
             international_country_restrictions,
             author: None,
             skip_kyc: false,
-        };
+        }
+    }
 
-        assert_have_same_elements(obc.supported_countries_for_doc_type(doc_type), expected_countries)
+    #[test_case(None)]
+    #[test_case(Some(Iso3166TwoDigitCountryCode::US))]
+    fn test_supported_country_mapping_us_only(residential_country: Option<Iso3166TwoDigitCountryCode>) {
+        // We don't allow international
+        //
+        // We expect by default to return US with the indicated doc types
+        //  every other country with just passport
+        let obc = obc_with_doc_cdo(
+            false,
+            None,
+            "document.drivers_license,passport,id_card.none.require_selfie",
+        );
+
+        let mapping = obc.supported_country_mapping_for_document(residential_country);
+
+        // US has the 3 documents indicated
+        assert_eq!(
+            mapping.get(&Iso3166TwoDigitCountryCode::US).cloned().unwrap(),
+            vec![IdDocKind::DriversLicense, IdDocKind::Passport, IdDocKind::IdCard]
+        );
+        // we also allow a passport from any country
+        Iso3166TwoDigitCountryCode::iter()
+            .filter(|c| !c.is_us())
+            .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
+    }
+
+    #[test_case(None, None)]
+    #[test_case(Some(Iso3166TwoDigitCountryCode::US), None)]
+    #[test_case(Some(Iso3166TwoDigitCountryCode::MX), None)]
+    #[test_case(Some(Iso3166TwoDigitCountryCode::NO), None)]
+    #[test_case(None, Some(vec![
+        Iso3166TwoDigitCountryCode::US,
+        Iso3166TwoDigitCountryCode::MX,
+        Iso3166TwoDigitCountryCode::NO,
+    ]))]
+    #[test_case(Some(Iso3166TwoDigitCountryCode::US), Some(vec![
+        Iso3166TwoDigitCountryCode::US,
+        Iso3166TwoDigitCountryCode::MX,
+        Iso3166TwoDigitCountryCode::NO,
+    ]))]
+    #[test_case(Some(Iso3166TwoDigitCountryCode::MX), Some(vec![
+        Iso3166TwoDigitCountryCode::US,
+        Iso3166TwoDigitCountryCode::MX,
+        Iso3166TwoDigitCountryCode::NO,
+    ]))]
+    #[test_case(Some(Iso3166TwoDigitCountryCode::NO), Some(vec![
+        Iso3166TwoDigitCountryCode::US,
+        Iso3166TwoDigitCountryCode::MX,
+        Iso3166TwoDigitCountryCode::NO,
+    ]))]
+    fn test_supported_country_mapping_allow_international(
+        residential_country: Option<Iso3166TwoDigitCountryCode>,
+        international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
+    ) {
+        // In this test we allow international, and therefore need to handle residential addresses that are non-US.
+        // - in the case we get an international residential address, we only accept passport.
+        // - in the case we get a US residential address, we allow DL + passport
+        //
+        // Note: international country restrictions do not affect the countries you can submit a passport for, this just controls
+        // residential address - there are integration tests testing this part
+        let obc = obc_with_doc_cdo(
+            true,
+            international_country_restrictions,
+            "document.drivers_license,passport.none.require_selfie",
+        );
+
+        let mapping = obc.supported_country_mapping_for_document(residential_country);
+
+        match residential_country.map(|c| c.is_us()) {
+            // country provided
+            Some(is_us) => {
+                // residential country is the us, we get DL + ppt
+                if is_us {
+                    assert_eq!(
+                        mapping.get(&Iso3166TwoDigitCountryCode::US).cloned().unwrap(),
+                        vec![IdDocKind::DriversLicense, IdDocKind::Passport]
+                    );
+                } else {
+                    // country is !US, we only can submit US passports
+                    assert_eq!(
+                        mapping.get(&Iso3166TwoDigitCountryCode::US).cloned().unwrap(),
+                        vec![IdDocKind::Passport]
+                    );
+                }
+            }
+            // default case where no country yet, US supports all doc types it can
+            None => {
+                assert_eq!(
+                    mapping.get(&Iso3166TwoDigitCountryCode::US).cloned().unwrap(),
+                    vec![IdDocKind::DriversLicense, IdDocKind::Passport]
+                );
+            }
+        }
+
+        // in all cases, non-US can just upload passport
+        Iso3166TwoDigitCountryCode::iter()
+            .filter(|c| !c.is_us())
+            .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
     }
 }
