@@ -46,7 +46,7 @@ describe('useCreateHandoffUrl', () => {
     });
   });
 
-  describe('when appclip is not enabled', () => {
+  describe('when appclip and instant app are not enabled', () => {
     it('should return URL with authToken as hash and random seed', () => {
       const { result } = customRenderHook(() =>
         useCreateHandoffUrl({
@@ -65,7 +65,7 @@ describe('useCreateHandoffUrl', () => {
   });
 
   describe('when appclip is enabled', () => {
-    it('should return the URL with "appclip" and the advanced clip experience', () => {
+    it('should return the URL with "appclip" and the app clip experience', () => {
       const { result } = customRenderHook(() =>
         useCreateHandoffUrl({
           authToken: 'tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN',
@@ -80,6 +80,45 @@ describe('useCreateHandoffUrl', () => {
       const parsedUrl = new URL(url as string);
       expect(parsedUrl.pathname).toBe(
         '/appclip/app_exp_9KlTyouGLSNKMgJmpUdBAF',
+      );
+    });
+  });
+
+  describe('when instant-app is enabled', () => {
+    it('should return the URL with "instant-app" path', () => {
+      const { result } = customRenderHook(() =>
+        useCreateHandoffUrl({
+          authToken: 'tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN',
+          onboardingConfig: {
+            ...onboardingConfig,
+            isInstantAppEnabled: true,
+          },
+        }),
+      );
+
+      const url = result.current;
+      const parsedUrl = new URL(url as string);
+      expect(parsedUrl.pathname).toBe('/instant-app');
+    });
+  });
+
+  describe('when both appclip and instant-app are enabled', () => {
+    it('should return the URL with a custom path representing both', () => {
+      const { result } = customRenderHook(() =>
+        useCreateHandoffUrl({
+          authToken: 'tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN',
+          onboardingConfig: {
+            ...onboardingConfig,
+            isAppClipEnabled: true,
+            isInstantAppEnabled: true,
+          },
+        }),
+      );
+
+      const url = result.current;
+      const parsedUrl = new URL(url as string);
+      expect(parsedUrl.pathname).toBe(
+        '/appclip-instant/app_exp_9KlTyouGLSNKMgJmpUdBAF',
       );
     });
   });

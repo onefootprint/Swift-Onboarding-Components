@@ -16,9 +16,15 @@ const useCreateHandoffUrl = ({
       return undefined;
     }
 
+    const { isAppClipEnabled, isInstantAppEnabled, appClipExperienceId } =
+      onboardingConfig;
     const newUrl = new URL(baseUrl);
-    if (onboardingConfig.isAppClipEnabled) {
-      newUrl.pathname = `appclip/${onboardingConfig.appClipExperienceId}`;
+    if (isAppClipEnabled && isInstantAppEnabled) {
+      newUrl.pathname = `appclip-instant/${appClipExperienceId}`;
+    } else if (isAppClipEnabled) {
+      newUrl.pathname = `appclip/${appClipExperienceId}`;
+    } else if (isInstantAppEnabled) {
+      newUrl.pathname = `instant-app`;
     }
 
     const params = new URLSearchParams();
