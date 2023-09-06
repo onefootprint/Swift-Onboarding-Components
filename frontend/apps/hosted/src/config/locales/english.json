@@ -1,6 +1,12 @@
 {
   "global": {
-    "errors": {}
+    "errors": {
+      "uncaught-error": {
+        "title": "Oops! An error occurred.",
+        "description": "We're sorry. Please restart the flow.",
+        "cta": "Restart"
+      }
+    }
   },
   "components": {
     "layout": {
@@ -50,11 +56,6 @@
     "expired": {
       "title": "Session expired",
       "subtitle": "For security reasons, this session has timed out the flow or refresh the page.",
-      "cta": "Restart"
-    },
-    "error": {
-      "title": "Oops! An error occurred.",
-      "description": "We're sorry. Please refresh this tab to restart.",
       "cta": "Restart"
     }
   }

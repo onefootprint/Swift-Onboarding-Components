@@ -1,13 +1,13 @@
 {
   "global": {
-    "errors": {}
+    "errors": {
+      "uncaught-error": {
+        "title": "Oops! An error occurred.",
+        "description": "We're sorry. Please restart the flow.",
+        "cta": "Restart"
+      }
+    }
   },
   "components": {},
-  "pages": {
-    "error": {
-      "title": "Oops! An error occurred.",
-      "description": "We're sorry. Please restart the flow.",
-      "cta": "Restart"
-    }
-  }
+  "pages": {}
 }

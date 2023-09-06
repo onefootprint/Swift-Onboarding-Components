@@ -1,4 +1,13 @@
 {
+  "global": {
+    "errors": {
+      "uncaught-error": {
+        "title": "Oops! An error occurred.",
+        "description": "We're sorry. Please restart the flow.",
+        "cta": "Restart"
+      }
+    }
+  },
   "components": {},
   "pages": {
     "complete": {

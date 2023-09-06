@@ -1,6 +1,12 @@
 {
   "global": {
-    "errors": {}
+    "errors": {
+      "uncaught-error": {
+        "title": "Oops! An error occurred.",
+        "description": "We're sorry. Please restart the flow.",
+        "cta": "Restart"
+      }
+    }
   },
   "pages": {
     "complete": {
@@ -24,11 +30,6 @@
         "mobile": "Please return to the previous page.",
         "desktop": "Please go back to your computer."
       }
-    },
-    "error": {
-      "title": "Oops! An error occurred.",
-      "description": "We're sorry. Please refresh this tab to restart.",
-      "cta": "Restart"
     }
   }
 }
