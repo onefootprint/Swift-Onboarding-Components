@@ -1,7 +1,6 @@
-import { flags } from '@onefootprint/icons';
 import type { CountryCode } from '@onefootprint/types';
 import capitalize from 'lodash/capitalize';
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 
 export type FlagProps = {
   className?: string;
@@ -9,10 +8,23 @@ export type FlagProps = {
   testID?: string;
 };
 
-const Flag = ({ code, testID, className }: FlagProps) => {
-  const capitalizedKey = capitalize(code) as Capitalize<Lowercase<CountryCode>>;
-  const FlagComponent = flags[`Flag${capitalizedKey}`];
-  return <FlagComponent testID={testID} className={className} />;
-};
+const FakeFlag = (_: FlagProps) => null; // eslint-disable-line @typescript-eslint/no-unused-vars
 
-export default Flag;
+const LazyFlag = lazy(() =>
+  import('@onefootprint/flags').then(module => ({
+    default: function InnerFlag({ code, testID, className }: FlagProps) {
+      const key = capitalize(code) as Capitalize<Lowercase<CountryCode>>;
+      const CountryFlag = module.flags[`Flag${key}`];
+
+      return <CountryFlag testID={testID} className={className} />;
+    },
+  })),
+);
+
+const Flag = ({ code, testID, className }: FlagProps): JSX.Element => (
+  <Suspense fallback={null}>
+    <LazyFlag code={code} testID={testID} className={className} />
+  </Suspense>
+);
+
+export default process.env.NODE_ENV === 'test' ? FakeFlag : Flag;

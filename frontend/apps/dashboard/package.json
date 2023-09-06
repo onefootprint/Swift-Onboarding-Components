@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
-    "@next/bundle-analyzer": "^12.3.4",
+    "@next/bundle-analyzer": "^13.4.19",
     "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
     "@types/file-saver": "^2.0.5",

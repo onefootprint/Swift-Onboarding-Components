@@ -1,5 +1,5 @@
 {
-  "name": "@onefootprint/icons",
+  "name": "@onefootprint/flags",
   "private": true,
   "version": "0.0.0",
   "main": "./src/index.ts",
@@ -13,14 +13,13 @@
     "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
     "format:fix": "prettier --write \"./**/*.{ts,tsx,md}\"",
     "typecheck": "yarn tsc --noEmit",
-    "generate:icos": "node ./src/scripts/icos/generate.js",
-    "generate": "yarn generate:icos",
+    "generate:flags": "node ./src/scripts/flags/generate.js",
+    "generate": "yarn generate:flags",
     "postgenerate": "yarn lint:fix && yarn format:fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
-    "@onefootprint/design-tokens": "*",
     "@onefootprint/styled": "*",
     "@svgr/core": "^6.2.1",
     "@svgr/plugin-jsx": "^6.2.1",

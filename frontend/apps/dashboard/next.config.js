@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const IS_DEV = process.env.NODE_ENV === 'development';
+const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
 
 const DevContentSecurityPolicy = `
   child-src onefootprint.com;
@@ -71,7 +72,7 @@ const securityHeaders = [
   },
 ];
 
-module.exports = {
+const nextConfig = {
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   reactStrictMode: false,
   compiler: {
@@ -106,3 +107,7 @@ module.exports = {
     ];
   },
 };
+
+module.exports = IS_ANALYZE_ACTIVE
+  ? require('@next/bundle-analyzer')({ enabled: true })(nextConfig)
+  : nextConfig;
