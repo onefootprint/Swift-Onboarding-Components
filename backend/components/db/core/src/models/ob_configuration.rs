@@ -134,8 +134,7 @@ impl ObConfiguration {
     }
 
     // Assumes you've checked if the document type is supported already
-    // This is currently hard coded on the frontend, but eventually we'll allow more document types per country
-    pub fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
+    fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
         match doc_type {
             IdDocKind::IdCard => vec![Iso3166TwoDigitCountryCode::US],
             IdDocKind::DriversLicense => vec![Iso3166TwoDigitCountryCode::US],

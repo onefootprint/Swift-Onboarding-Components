@@ -18,8 +18,8 @@ def restricted_doc_ob_config_only_international(sandbox_tenant, must_collect_dat
         sandbox_tenant,
         "Restricted doc request config (new)",
         # technically we don't support DL for anything other than US, so this is just so we can simulate the correct error
-        must_collect_data + ["document.passport.none.require_selfie"],
-        can_access_data + ["document.passport.none.require_selfie"],
+        must_collect_data + ["document.drivers_license,passport.none.require_selfie"],
+        can_access_data + ["document.drivers_license,passport.none.require_selfie"],
         allow_international_residents=True,
         international_country_restrictions=["MX"]
     )
@@ -80,8 +80,15 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(restricted_d
     bifrost.run()
 
 
-def test_upload_documents_with_ob_config_restriction_only_international(restricted_doc_ob_config_only_international, twilio):
+def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config_only_international, twilio):
     bifrost = BifrostClient.new(restricted_doc_ob_config_only_international, twilio)
+    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_requirements(kind="liveness")
+    # make sure we've collected country
+    met_requirements = get_requirement_from_requirements(
+        "collect_data", bifrost.get_status()["met_requirements"]
+    )
+    assert 'full_address' in met_requirements["populated_attributes"]
 
     # Manually handle the document requirement with some invalid data
     consent_data = {"consent_language_text": "I consent"}
@@ -93,15 +100,22 @@ def test_upload_documents_with_ob_config_restriction_only_international(restrict
         "country_code": "MX",
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
-    # we check doc type first
     assert body["error"]["message"] == "Unsupported document type. Supported document types: passport"
 
-    # Shouldn't be allowed to upload non-MX document
+    # Can upload a non-US passport
     data = {
         "document_type": "passport",
         "country_code": "NO",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token)
+    post("hosted/user/documents", data, bifrost.auth_token)
+
+    # Can upload a US DL
+    data = {
+        "document_type": "drivers_license",
+        "country_code": "US",
+    }
+    post("hosted/user/documents", data, bifrost.auth_token)
+
 
 
 def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):

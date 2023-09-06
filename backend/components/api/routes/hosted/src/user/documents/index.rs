@@ -5,6 +5,7 @@ use crate::types::response::ResponseData;
 use crate::State;
 use api_core::auth::user::UserObAuthContext;
 use api_core::types::JsonApiResponse;
+use api_core::utils::vault_wrapper::{VaultWrapper, Person, VwArgs};
 use api_wire_types::{CreateIdentityDocumentRequest, CreateIdentityDocumentResponse};
 use db::models::document_request::DocumentRequest as DbDocumentRequest;
 use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
@@ -12,8 +13,9 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use feature_flag::BoolFlag;
 use newtypes::output::Csv;
-use newtypes::WorkflowGuard;
+use newtypes::{WorkflowGuard, Iso3166TwoDigitCountryCode};
 use paperclip::actix::{self, api_v2_operation, web};
+use newtypes::IdentityDataKind as IDK;
 
 #[api_v2_operation(
     description = "Create a new identity document for this user's outstanding document request",
@@ -36,9 +38,20 @@ pub async fn post(
     } = request.into_inner();
 
     let su_id = user_auth.scoped_user.id.clone();
+    let su_id2 = su_id.clone();
     let tenant_id = user_auth.tenant()?.id.clone();
     let wf_id = user_auth.workflow()?.id.clone();
     let ff_client = state.feature_flag_client.clone();
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let uvw: VaultWrapper<_> = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su_id2))?;
+            Ok(uvw)
+        })
+        .await??;
+    let decrypted_values = uvw.decrypt_unchecked(&state.enclave_client, &[IDK::Country.into()]).await?;
+    let residential_country = decrypted_values.get(&IDK::Country.into()).and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
+
     let id_doc = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -48,18 +61,17 @@ pub async fn post(
 
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
             
-            // Validate that the type of document uploaded matches what's required by the doc request
-            if let Some(doc_types) = obc.restricted_id_doc_kinds() {
-                if !doc_types.contains(&document_type) {
-                    return Err(OnboardingError::UnsupportedDocumentType(Csv::from(doc_types)).into());
-                }
+            let document_to_country_mapping = obc.supported_country_mapping_for_document(residential_country);
+            let Some(allowed_doc_types) = document_to_country_mapping.get(&country_code) else {
+                // this country is not in our available countries
+                return Err(OnboardingError::UnsupportedDocumentCountryForDocumentType(Csv::from(document_to_country_mapping.keys().cloned().collect::<Vec<_>>())).into())
+            };
+            
+            // Validate that we support this doc type for the given country
+            if !allowed_doc_types.contains(&document_type) {
+                return Err(OnboardingError::UnsupportedDocumentType(Csv::from(allowed_doc_types.clone())).into());
             }
-
-            let supported_countries_for_doc_type = obc.supported_countries_for_doc_type(document_type);
-            if !supported_countries_for_doc_type.contains(&country_code) {
-                return Err(OnboardingError::UnsupportedDocumentCountryForDocumentType(Csv::from(supported_countries_for_doc_type)).into());
-            }
-
+            
             let vault = Vault::get(conn, &su_id)?;
             // Check we're in sandbox
             if vault.is_live && fixture_result.is_some() {
