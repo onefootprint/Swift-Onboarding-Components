@@ -111,12 +111,21 @@ impl CreateOnboardingConfigurationRequest {
             }
         }
 
-        if self.international_country_restrictions.is_some() && !self.allow_international_residents {
-            return Err(TenantError::ValidationError(
-                "Cannot specify international_country_restrictions without allow_international_residents"
-                    .to_owned(),
-            )
-            .into());
+        if let Some(country_restrictions) = self.international_country_restrictions.as_ref() {
+            if !self.allow_international_residents {
+                return Err(TenantError::ValidationError(
+                    "Cannot specify international_country_restrictions without allow_international_residents"
+                        .to_owned(),
+                )
+                .into());
+            }
+
+            if country_restrictions.is_empty() {
+                return Err(TenantError::ValidationError(
+                    "Must specify 1 or more countries in international_country_restrictions".to_owned(),
+                )
+                .into());
+            }
         }
 
         if self.skip_kyc && !self.allow_international_residents && doc_cdo.is_none() {

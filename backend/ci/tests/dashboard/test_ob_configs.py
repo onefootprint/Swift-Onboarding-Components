@@ -194,6 +194,22 @@ def test_config_create(sandbox_tenant, twilio):
             ),
             "Validation error: Cannot specify international_country_restrictions without allow_international_residents",
         ),
+           (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                    "dob",
+                ],
+                optional_data=[],
+                can_access_data=[],
+                allow_international_residents=True,
+                international_country_restrictions=[],
+            ),
+            "Validation error: Must specify 1 or more countries in international_country_restrictions",
+        ),
         (
             dict(
                 must_collect_data=[
