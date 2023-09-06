@@ -26,7 +26,6 @@ use newtypes::{
     IdentityDataKind as IDK, InvestorProfileKind as IPK, ScopedVaultId,
 };
 use paperclip::actix::web;
-use strum::IntoEnumIterator;
 
 mod authorize;
 mod config;
@@ -363,6 +362,8 @@ fn get_requirement_inner(
                 let supported_countries = get_collect_document_supported_countries(ob_config);
                 // TODO remove only_us_obc once the frontend is reading supported_countries
                 let only_us_obc = supported_countries == vec![Iso3166TwoDigitCountryCode::US];
+                let supported_country_and_doc_types =
+                    ob_config.supported_country_mapping_for_document(country);
 
                 should_render.then_some(OnboardingRequirement::CollectDocument {
                     document_request_id: dr.id,
@@ -377,6 +378,7 @@ fn get_requirement_inner(
                         get_collect_document_supported_doc_types(country, ob_config)
                     },
                     supported_countries,
+                    supported_country_and_doc_types: supported_country_and_doc_types.0,
                 })
             } else {
                 None
@@ -439,33 +441,20 @@ fn get_requirement_inner(
 }
 
 fn get_collect_document_supported_countries(obc: &ObConfiguration) -> Vec<Iso3166TwoDigitCountryCode> {
-    if obc.document_cdo().as_ref().map(|d| d.only_us()).unwrap_or(false) {
-        return vec![Iso3166TwoDigitCountryCode::US];
-    }
-
-    obc.supported_countries_for_residential_address()
+    obc.supported_country_mapping_for_document(None)
+        .keys()
+        .cloned()
+        .collect()
 }
+
 fn get_collect_document_supported_doc_types(
     country: Option<Iso3166TwoDigitCountryCode>,
     obc: &ObConfiguration,
 ) -> Vec<IdDocKind> {
-    match country {
-        Some(residential_country) => {
-            if residential_country.is_us() {
-                default_doc_types(obc)
-            // non-US can only provide passport
-            } else {
-                vec![IdDocKind::Passport]
-            }
-        }
-        None => default_doc_types(obc),
-    }
-}
-
-fn default_doc_types(obc: &ObConfiguration) -> Vec<IdDocKind> {
-    if let Some(restricted_doc_types) = obc.document_cdo().and_then(|cdo| cdo.restricted_id_doc_kinds()) {
-        restricted_doc_types
-    } else {
-        IdDocKind::iter().collect()
-    }
+    obc.supported_country_mapping_for_document(country)
+        .iter()
+        .flat_map(|(_, id_doc_kinds)| id_doc_kinds)
+        .cloned()
+        .unique()
+        .collect()
 }

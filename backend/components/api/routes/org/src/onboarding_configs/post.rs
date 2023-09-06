@@ -253,6 +253,7 @@ impl CreateOnboardingConfigurationRequest {
             )
             .into());
         }
+
         Ok(())
     }
 }

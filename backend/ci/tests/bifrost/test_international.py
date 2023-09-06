@@ -64,6 +64,17 @@ def test_user_without_documents_international(
     assert doc_requirement_after["supported_document_types"] == ["passport"]
     # we'll allow any country
     assert len(doc_requirement_after["supported_countries"]) > 1
+    country_doc_mapping = doc_requirement_after["supported_country_and_doc_types"]
+    n_countries = 0
+    for country, doc_types in country_doc_mapping.items():
+        # all non-US have only passport
+        if country != 'US':
+            assert doc_types == ["passport"]
+        
+        n_countries += 1
+    
+    # we have all iso3166 countries allowed
+    assert n_countries == 249
 
 
 def test_with_documents_handles_international_address(
@@ -91,6 +102,18 @@ def test_with_documents_handles_international_address(
     # we'll accept any country
     assert len(doc_requirement["supported_countries"]) > 1
 
+    country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
+    n_countries = 0
+    for country, doc_types in country_doc_mapping.items():
+        # all non-US have only passport
+        if country != 'US':
+            assert doc_types == ["passport"]
+        
+        n_countries += 1
+    
+    # we have all iso3166 countries allowed
+    assert n_countries == 249
+
 def test_with_documents_handles_international_address_restricted_documents(
     sandbox_tenant, must_collect_data, can_access_data, twilio
 ):
@@ -114,5 +137,63 @@ def test_with_documents_handles_international_address_restricted_documents(
     )
     assert doc_requirement["should_collect_selfie"]
     assert doc_requirement["supported_document_types"] == ["passport"]
-    # we'll only accept countries from the restriction list
-    assert doc_requirement['supported_countries'] == ['MX', 'NO']
+    assert len(doc_requirement['supported_countries']) == 249
+
+    country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
+    assert country_doc_mapping["MX"] == ["passport"]
+    assert country_doc_mapping["NO"] == ["passport"]
+    # we have all countries allowed for passport
+    assert len(country_doc_mapping.keys()) == 249
+    for doc in country_doc_mapping.values():
+        assert doc == ["passport"]
+
+
+def test_with_documents_handles_international_address_restricted_documents_with_dl(
+    sandbox_tenant, must_collect_data, can_access_data, twilio
+):
+    
+    # in this test we expect to see the following behavior:
+    # 
+    # user can onboard from US, MX, or NO
+    # user can supply DL or passport, but DL ONLY if they are residing in the US
+    # if user is not in the US, they can only give passport
+    obc = create_ob_config(
+        sandbox_tenant,
+        "International config weird case",
+        must_collect_data + ["document.drivers_license,passport.none.require_selfie"],
+        can_access_data,
+        allow_international_residents=True,
+        international_country_restrictions=["US", "MX", "NO"],
+    )
+    bifrost = BifrostClient.new(obc, twilio)
+    status_before_address = bifrost.get_status()
+    doc_requirement_before_address = get_requirement_from_requirements(
+        "collect_document", status_before_address["requirements"]
+    )
+    assert doc_requirement_before_address["supported_document_types"] == ["passport", "drivers_license"]
+    country_doc_mapping_before_address = doc_requirement_before_address["supported_country_and_doc_types"]
+    assert country_doc_mapping_before_address["US"] == ["drivers_license", "passport"]
+
+    # collect MX address
+    bifrost.data["id.country"] = "MX"
+    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_requirements(kind="liveness")
+
+    status = bifrost.get_status()
+
+    # Now we should only see passport available for us
+    doc_requirement = get_requirement_from_requirements(
+        "collect_document", status["requirements"]
+    )
+    assert doc_requirement["should_collect_selfie"]
+    assert doc_requirement["supported_document_types"] == ["passport"]
+    assert len(doc_requirement['supported_countries']) == 249
+
+    country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
+    assert country_doc_mapping["MX"] == ["passport"]
+    assert country_doc_mapping["NO"] == ["passport"]
+    assert country_doc_mapping["US"] == ["passport"]
+    # we have all countries allowed for passport
+    assert len(country_doc_mapping.keys()) == 249
+    for doc in country_doc_mapping.values():
+        assert doc == ["passport"]

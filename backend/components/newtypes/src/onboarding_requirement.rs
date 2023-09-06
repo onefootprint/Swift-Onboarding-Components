@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{CollectedDataOption, DocumentRequestId, IdDocKind, Iso3166TwoDigitCountryCode};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -41,6 +43,7 @@ pub enum OnboardingRequirement {
         only_us_supported: bool,
         supported_document_types: Vec<IdDocKind>,
         supported_countries: Vec<Iso3166TwoDigitCountryCode>,
+        supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
     },
     /// The client needs to display the authorization consent page and confirm the user authorizes access
     Authorize { fields_to_authorize: AuthorizeFields },
@@ -101,6 +104,7 @@ impl OnboardingRequirement {
                 only_us_supported: _,
                 supported_document_types: _,
                 supported_countries: _,
+                supported_country_and_doc_types: _,
             } => false,
             Self::Authorize {
                 fields_to_authorize: _,
