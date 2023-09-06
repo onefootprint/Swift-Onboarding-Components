@@ -17,7 +17,7 @@ import {
   getSsnValue,
   ssnFormatter,
 } from '../../../../utils/ssn-utils';
-import isInDomesticFlow from '../../../../utils/state-machine/utils';
+import isInDomesticFlow from '../../../../utils/state-machine/utils/is-in-domestic-flow';
 import Ssn from '../../../ssn';
 import useStepUp from './hooks/use-step-up';
 

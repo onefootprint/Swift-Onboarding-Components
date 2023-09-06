@@ -1,8 +1,18 @@
 {
   "components": {
     "sync-data-error": {
-      "title": "An error occurred",
-      "description": "An error occurred while saving data. Please fix the inputs and try again."
+      "empty-auth-token": {
+        "title": "Your session is invalid",
+        "description": "Please refresh this page to try onboarding again."
+      },
+      "request-data": {
+        "title": "There are missing fields",
+        "description": "Please return to previous steps to ensure all data is filled out"
+      },
+      "invalid-inputs": {
+        "title": "An error occurred",
+        "description": "An error occurred while saving data. Please fix the inputs and try again."
+      }
     }
   },
   "pages": {

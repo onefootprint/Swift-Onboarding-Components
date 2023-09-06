@@ -11,7 +11,7 @@ import {
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import isInDomesticFlow from '../../../../utils/state-machine/utils';
+import isInDomesticFlow from '../../../../utils/state-machine/utils/is-in-domestic-flow';
 import LegalStatus from '../../../legal-status';
 import getCountrySelectOption from '../../../legal-status/utils/get-country-select-option';
 

@@ -1,8 +1,6 @@
 import { assign, createMachine } from 'xstate';
 
 import allAttributes from '../all-attributes';
-import mergeData from '../merge-data/merge-data';
-import mergeInitialData from '../merge-initial-data';
 import {
   isMissingBasicAttribute,
   isMissingEmailAttribute,
@@ -12,7 +10,9 @@ import {
   shouldConfirm,
 } from '../missing-attributes';
 import { MachineContext, MachineEvents } from './types';
-import isInDomesticFlow from './utils';
+import isInDomesticFlow from './utils/is-in-domestic-flow';
+import mergeUpdatedData from './utils/merge-data';
+import mergeInitialData from './utils/merge-initial-data';
 
 const createCollectKycDataMachine = (
   initialContext: MachineContext,
@@ -197,7 +197,9 @@ const createCollectKycDataMachine = (
                 target: 'usLegalStatus',
                 actions: 'assignData',
                 cond: (context, event) =>
-                  isInDomesticFlow(mergeData(context.data, event.payload)) &&
+                  isInDomesticFlow(
+                    mergeUpdatedData(context.data, event.payload),
+                  ) &&
                   isMissingUsLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.data,
@@ -207,7 +209,9 @@ const createCollectKycDataMachine = (
                 target: 'ssn',
                 actions: ['assignData'],
                 cond: (context, event) =>
-                  isInDomesticFlow(mergeData(context.data, event.payload)) &&
+                  isInDomesticFlow(
+                    mergeUpdatedData(context.data, event.payload),
+                  ) &&
                   isMissingSsnAttribute(
                     allAttributes(context.requirement),
                     context.data,
@@ -396,7 +400,7 @@ const createCollectKycDataMachine = (
     {
       actions: {
         assignData: assign((context, event) => {
-          context.data = mergeData(context.data, event.payload);
+          context.data = mergeUpdatedData(context.data, event.payload);
           return context;
         }),
         assignAuthToken: assign((context, event) => ({

@@ -1,8 +1,8 @@
 import { IdDI } from '@onefootprint/types';
 
-import { KycData } from '../data-types';
+import { KycData } from '../../../data-types';
 
-const mergeData = (data: KycData, newData: KycData): KycData => {
+const mergeUpdatedData = (data: KycData, newData: KycData): KycData => {
   // Only allow the update if data has changed.
   // The existing entry has metadata telling us if it came from the existing vault -
   // we only want to overwrite it if the value has changed.
@@ -18,4 +18,4 @@ const mergeData = (data: KycData, newData: KycData): KycData => {
   };
 };
 
-export default mergeData;
+export default mergeUpdatedData;
