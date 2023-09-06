@@ -1,4 +1,4 @@
-import styled, { createGlobalStyle, css } from '@onefootprint/styled';
+import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
 
@@ -9,31 +9,19 @@ export type WrittingLayoutProps = {
 };
 
 const WrittingLayout = ({ children }: WrittingLayoutProps) => (
-  <>
-    <GlobalStyle />
-    <WrittingLayoutContainer>
-      {children}
-      <SubscribeToNewsletter />
-    </WrittingLayoutContainer>
-  </>
+  <WrittingLayoutContainer>
+    {children}
+    <SubscribeToNewsletter />
+  </WrittingLayoutContainer>
 );
-
-const GlobalStyle = createGlobalStyle`
-  ${({ theme }) => css`
-    :root {
-      --desktop-spacing: ${theme.spacing[5]};
-      --mobile-spacing: ${theme.spacing[0]};
-    }
-  `}
-`;
 
 const WrittingLayoutContainer = styled.div`
   ${({ theme }) => css`
-    margin: 0 auto;
+    margin: calc(-1 * ${theme.spacing[6]}) auto 0 auto;
     max-width: 960px;
-    padding: ${theme.spacing[11]} 0 0 0;
 
     ${media.greaterThan('sm')`
+      margin: 0 auto;
       padding: 0 ${theme.spacing[11]};  
     `}
 

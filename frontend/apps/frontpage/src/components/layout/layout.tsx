@@ -19,21 +19,11 @@ const Layout = ({ children }: LayoutProps) => (
 
 const Content = styled.section`
   position: relative;
-  --desktop-padding-top: calc(
-    var(--desktop-header-height) + var(--desktop-spacing)
-  );
-  --mobile-padding-top: calc(
-    var(--mobile-header-height) + var(--mobile-spacing)
-  );
+  padding-top: calc(var(--mobile-header-height) + var(--mobile-spacing));
 
-  > *:first-child {
-    padding-top: var(--mobile-padding-top);
-
-    ${media.greaterThan('lg')`
-        padding-top: var(--desktop-padding-top);
-        
-    `}
-  }
+  ${media.greaterThan('lg')`
+    padding-top: calc(var(--desktop-header-height) + var(--desktop-spacing));
+  `}
 `;
 
 export default Layout;

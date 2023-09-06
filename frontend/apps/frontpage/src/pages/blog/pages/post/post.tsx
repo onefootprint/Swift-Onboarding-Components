@@ -53,17 +53,15 @@ const Post = ({ post }: PostProps) => {
       <article>
         <Container>
           <WritingLayout>
-            <BackButton>
-              <Link href="/blog" passHref legacyBehavior>
-                <LinkButton
-                  iconPosition="left"
-                  iconComponent={IcoChevronLeftBig24}
-                  href="/blog"
-                >
-                  {t('go-back')}
-                </LinkButton>
-              </Link>
-            </BackButton>
+            <BackButtonLink href="/blog" passHref>
+              <LinkButton
+                iconPosition="left"
+                iconComponent={IcoChevronLeftBig24}
+                href="/blog"
+              >
+                {t('go-back')}
+              </LinkButton>
+            </BackButtonLink>
             <header>
               <Box
                 sx={{
@@ -103,8 +101,10 @@ const Post = ({ post }: PostProps) => {
   );
 };
 
-const BackButton = styled.div`
+const BackButtonLink = styled(Link)`
   ${({ theme }) => css`
+    display: flex;
+    text-decoration: none;
     margin-bottom: ${theme.spacing[6]};
 
     ${media.greaterThan('sm')`
