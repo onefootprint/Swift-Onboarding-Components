@@ -73,10 +73,11 @@ pub async fn post(
                 return Err(TenantError::CannotTriggerKycForNonPortable.into());
             }
 
+            let last_alpaca_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::AlpacaKyc)?;
+            let last_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::Kyc)?;
+
             let wf = match trigger {
                 TriggerInfo::RedoKyc => {
-                    let last_alpaca_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::AlpacaKyc)?;
-                    let last_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::Kyc)?;
                     let (config, last_wf) = match (last_alpaca_kyc_wf, last_kyc_wf) {
                         (Some(wf), _) => (AlpacaKycConfig { is_redo: true }.into(), wf),
                         (None, Some(wf)) => (KycConfig { is_redo: true }.into(), wf),
@@ -93,11 +94,14 @@ pub async fn post(
                     Workflow::create(conn, args)?
                 }
                 TriggerInfo::IdDocument { collect_selfie } => {
+                    let last_wf = last_alpaca_kyc_wf
+                        .or(last_kyc_wf)
+                        .ok_or(TenantError::CannotRedoKyc)?;
                     let args = NewWorkflowArgs {
                         scoped_vault_id: sv.id.clone(),
                         config: DocumentConfig {}.into(),
                         fixture_result: None,
-                        ob_configuration_id: None,
+                        ob_configuration_id: last_wf.ob_configuration_id,
                         insight_event_id: None,
                     };
                     let wf = Workflow::create(conn, args)?;
