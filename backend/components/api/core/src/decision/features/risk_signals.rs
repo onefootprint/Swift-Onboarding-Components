@@ -126,17 +126,21 @@ where
     Ok(())
 }
 
-pub fn user_input_based_risk_signals(vw: &VaultWrapper, obc: &ObConfiguration) -> Vec<FootprintReasonCode> {
-    let mut frcs = Vec::<FootprintReasonCode>::new();
-
+pub fn ssn_optional_and_missing<T>(vw: &VaultWrapper<T>, obc: &ObConfiguration) -> bool {
     let cd = CollectedData::Ssn;
     let cdos = cd.options();
-    let ssn_optional_and_missing = cdos.iter().any(|cdo| {
+    cdos.iter().any(|cdo| {
         !cdo.required_data_identifiers()
             .into_iter()
             .all(|di| vw.has_field(di))
             && obc.optional_data.contains(cdo)
-    });
+    })
+}
+
+pub fn user_input_based_risk_signals(vw: &VaultWrapper, obc: &ObConfiguration) -> Vec<FootprintReasonCode> {
+    let mut frcs = Vec::<FootprintReasonCode>::new();
+
+    let ssn_optional_and_missing = ssn_optional_and_missing(vw, obc);
     if ssn_optional_and_missing {
         frcs.push(FootprintReasonCode::SsnNotProvided);
     }

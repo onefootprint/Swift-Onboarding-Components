@@ -72,6 +72,10 @@ impl DocumentCdoInfo {
         self.2.clone()
     }
 
+    pub fn requires_selfie(&self) -> bool {
+        self.selfie() == Selfie::RequireSelfie
+    }
+
     pub fn only_us(&self) -> bool {
         self.1 == CountryRestriction::UsOnly
     }

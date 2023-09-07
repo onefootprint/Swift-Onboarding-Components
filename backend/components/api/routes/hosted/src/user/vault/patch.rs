@@ -5,13 +5,15 @@ use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::{UserAuthGuard, UserObAuthContext};
-use api_core::utils::vault_wrapper::{Any, TenantVw};
+use api_core::decision::features::risk_signals::ssn_optional_and_missing;
+use api_core::utils::vault_wrapper::{Any, Person, TenantVw, VwArgs};
 use db::models::document_request::{DocumentRequest, NewDocumentRequestArgs};
+use db::models::ob_configuration::ObConfiguration;
 use newtypes::email::Email;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, ValidateArgs,
-    WorkflowGuard,
+    DataIdentifier, DataLifetimeSource, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, ScopedVaultId,
+    ValidateArgs, WorkflowGuard, WorkflowId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::str::FromStr;
@@ -129,29 +131,74 @@ async fn patch_inner(
 
     let obc = user_auth.ob_config()?;
 
-    if let (Some(address), Some(workflow)) = (residential_address, user_auth.workflow().ok()) {
-        // if we allow international and haven't requested a doc, we need to create a doc req
-        if obc.allow_international_residents && obc.document_cdo().is_none() && !address.is_us() {
-            tracing::info!(scoped_vault_id=%sv_id2, wf_id=%workflow.id, "creating doc request for international onboarding");
+    if let Ok(workflow) = user_auth.workflow() {
+        if let Some(address) = residential_address {
+            // if we allow international and haven't requested a doc, we need to create a doc req
+            if obc.allow_international_residents && obc.document_cdo().is_none() && !address.is_us() {
+                tracing::info!(scoped_vault_id=%sv_id2, wf_id=%workflow.id, "creating doc request for international onboarding");
 
-            let args = NewDocumentRequestArgs {
-                scoped_vault_id: sv_id2.clone(),
-                ref_id: None,
-                workflow_id: workflow.id.clone(),
-                // international we require selfie for now
-                should_collect_selfie: true,
-                // TODO: Deprecated - None of these are used
-                global_doc_types_accepted: None,
-                country_restrictions: vec![],
-                country_doc_type_restrictions: None,
-            };
-            // TODO: FP-5895 handle 1 click case where address doesn't change (we won't hit this endpoint)
-            state
-                .db_pool
-                .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
-                .await?;
+                let args = default_stepup_doc_args(&sv_id2, true, &workflow.id);
+                // TODO: FP-5895 handle 1 click case where address doesn't change (we won't hit this endpoint)
+                state
+                    .db_pool
+                    .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
+                    .await?;
+            } else if address.is_us() {
+                handle_ssn_skipped(&state, obc.clone(), sv_id2.clone(), workflow.id.clone()).await?
+            }
         }
+
+        
     }
 
     EmptyResponse::ok().json()
+}
+
+// Handle the case where ssn is skipped, we by default request a document if not already requested
+async fn handle_ssn_skipped(
+    state: &State,
+    obc: ObConfiguration,
+    sv_id: ScopedVaultId,
+    workflow_id: WorkflowId,
+) -> ApiResult<()> {
+    // bail early if not needed
+    let Some(doc_info) = obc.document_cdo_for_optional_ssn() else {
+        return Ok(())
+    };
+
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let vw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv_id))?;
+            let ssn_optional_and_missing = ssn_optional_and_missing(&vw, &obc);
+
+            if ssn_optional_and_missing {
+                let doc_req_args = default_stepup_doc_args(&sv_id, doc_info.requires_selfie(), &workflow_id);
+                
+                tracing::info!(scoped_vault_id=%sv_id, wf_id=%workflow_id, "creating doc request for ssn skipped");
+                DocumentRequest::get_or_create(conn, doc_req_args)?;
+            }
+
+            Ok(())
+        })
+        .await?;
+
+    Ok(())
+}
+
+fn default_stepup_doc_args(
+    sv_id: &ScopedVaultId,
+    should_collect_selfie: bool,
+    workflow_id: &WorkflowId,
+) -> NewDocumentRequestArgs {
+    NewDocumentRequestArgs {
+        scoped_vault_id: sv_id.clone(),
+        ref_id: None,
+        workflow_id: workflow_id.clone(),
+        should_collect_selfie,
+        // TODO: Deprecated - None of these are used
+        global_doc_types_accepted: None,
+        country_restrictions: vec![],
+        country_doc_type_restrictions: None,
+    }
 }

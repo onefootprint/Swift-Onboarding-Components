@@ -7,10 +7,14 @@ from tests.utils import create_ob_config
 
 
 @pytest.mark.parametrize(
-    "submit_ssn",
-    [True, False],
+    "submit_ssn,step_up_to_doc",
+    [
+        (True, False), 
+        (False, False),
+        (False, True)
+    ],
 )
-def test_requirements(sandbox_tenant, twilio, submit_ssn):
+def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
     must_collect_data = ["full_address", "name", "email", "phone_number"]
     optional_data = ["ssn9"]
     can_access_data = must_collect_data + optional_data
@@ -20,6 +24,7 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn):
         must_collect_data,
         can_access_data,
         optional_data=optional_data,
+        doc_scan_for_optional_ssn= "document.passport,drivers_license,visa.none.none" if step_up_to_doc else None
     )
     bifrost = BifrostClient.new(obc, twilio, override_ob_config_auth=None)
 
@@ -52,8 +57,17 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn):
     collect_data_req = get_requirement_from_requirements(
         "collect_data", bifrost.get_status()["requirements"]
     )
+    collect_doc_req = get_requirement_from_requirements(
+        "collect_document", bifrost.get_status()["requirements"]
+    )
     # requirements should be empty
     assert collect_data_req is None
+    
+    if step_up_to_doc:# no doc requirement either
+        assert set(collect_doc_req['supported_country_and_doc_types']['US']) == set(["passport", "drivers_license", "visa"])
+    else:
+        assert collect_doc_req is None
+    
 
     # get met_requirements and assert ssn in populated_attributes
     met_requirements = get_requirement_from_requirements(
@@ -69,6 +83,7 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn):
     authorize_requirement = get_requirement_from_requirements(
         "authorize", bifrost.get_status()["requirements"]
     )
+   
     assert set(authorize_requirement["fields_to_authorize"]["collected_data"]) == set(
         expected_populated_attributes
     )

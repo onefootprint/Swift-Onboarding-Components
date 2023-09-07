@@ -70,7 +70,11 @@ impl ObConfiguration {
         &self,
         residential_country: Option<Iso3166TwoDigitCountryCode>,
     ) -> SupportedDocumentAndCountryMapping {
-        let id_doc_kinds = if let Some(kinds) = self.restricted_id_doc_kinds() {
+        let id_doc_kinds = if let Some(kinds) = self
+            .restricted_id_doc_kinds()
+            .or(self.optional_ssn_restricted_id_doc_kinds())
+        // we'll only ever have 1 of these, we prevent OBCs from being created with doc AND optional SSN doc stepup
+        {
             kinds
         } else {
             IdDocKind::iter().collect()
@@ -404,9 +408,9 @@ impl ObConfiguration {
             .next()
     }
 
-    pub fn document_cdo_for_optional_ssn(&self) -> Option<&DocumentCdoInfo> {
+    pub fn document_cdo_for_optional_ssn(&self) -> Option<DocumentCdoInfo> {
         self.doc_scan_for_optional_ssn.as_ref().and_then(|cdo| match cdo {
-            CDO::Document(doc_info) => Some(doc_info),
+            CDO::Document(doc_info) => Some(doc_info.clone()),
             _ => None,
         })
     }
