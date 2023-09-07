@@ -1,5 +1,6 @@
 import type { Theme } from '@onefootprint/design-tokens';
 import { FootprintAppearance } from '@onefootprint/footprint-js';
+import { HostedUrlType } from '@onefootprint/types';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 
@@ -26,10 +27,24 @@ const LoadAppearanceInBrowser = ({
     return url.hash.substring(1);
   };
 
+  const getKybBoAuthToken = () => {
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+    const type = params.get('type');
+    if (type) {
+      return undefined;
+    }
+    if (type === HostedUrlType.beneficialOwner) {
+      return url.hash.substring(1);
+    }
+    return undefined;
+  };
+
   const getAppearance = async () => {
     const response = await getCustomAppearance({
       ...options,
       authToken: getAuthToken(),
+      kybBoAuthToken: getKybBoAuthToken(),
     });
     setTheme(response.theme);
     setAppearance(response.appearance);

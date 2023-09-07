@@ -14,11 +14,12 @@ export type Strategy = 'queryParameters' | 'obConfig' | 'styleParams';
 
 type AppearanceOptions = {
   variant?: string;
-  authToken?: string;
   defaultTheme?: Theme;
-  obConfig?: string;
   params?: Record<string, string>;
   strategy: Strategy[];
+  authToken?: string;
+  kybBoAuthToken?: string;
+  obConfig?: string;
 };
 
 type AppearanceResponse = {
@@ -31,11 +32,12 @@ type AppearanceResponse = {
 
 const getCustomAppearance = async ({
   variant = 'modal',
-  authToken,
   defaultTheme = themes.light,
-  obConfig,
   params,
   strategy,
+  authToken,
+  obConfig,
+  kybBoAuthToken,
 }: AppearanceOptions): Promise<AppearanceResponse> => {
   if (strategy.includes('queryParameters')) {
     const variables = params?.variables || params?.tokens;
@@ -66,8 +68,13 @@ const getCustomAppearance = async ({
       }
     }
   }
+
   if (strategy.includes('obConfig')) {
-    const appearance = await getAppearanceFromObConfig(obConfig || authToken);
+    const appearance = await getAppearanceFromObConfig({
+      obConfig,
+      authToken,
+      kybBoAuthToken,
+    });
     if (appearance) {
       return {
         appearance,

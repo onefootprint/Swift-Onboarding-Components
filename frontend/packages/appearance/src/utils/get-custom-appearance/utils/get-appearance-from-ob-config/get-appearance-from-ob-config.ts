@@ -3,14 +3,37 @@ import { GetPublicOnboardingConfigResponse } from '@onefootprint/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+const CLIENT_PUBLIC_KEY_HEADER = 'X-Onboarding-Config-Key';
+const KYB_BO_SESSION_AUTHORIZATION_HEADER = 'X-Kyb-Bo-Token';
+const AUTH_HEADER = 'x-fp-authorization';
+
+type OnboardingConfigRequestType = {
+  authToken?: string;
+  kybBoAuthToken?: string;
+  obConfig?: string;
+};
+
+const getAuthHeaders = (payload: OnboardingConfigRequestType) => {
+  const headers: Record<string, string> = {};
+  const { authToken, kybBoAuthToken, obConfig } = payload;
+  if (obConfig) {
+    headers[CLIENT_PUBLIC_KEY_HEADER] = obConfig;
+  } else if (kybBoAuthToken) {
+    headers[KYB_BO_SESSION_AUTHORIZATION_HEADER] = kybBoAuthToken;
+  } else if (authToken) {
+    headers[AUTH_HEADER] = authToken;
+  }
+  return headers;
+};
+
 const getOnboardingConfig = async (
-  onboardingConfigKey: string,
+  authHeaders: Record<string, string>,
 ): Promise<GetPublicOnboardingConfigResponse> => {
   const response = await fetch(`${API_BASE_URL}/org/onboarding_config`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'X-Onboarding-Config-Key': onboardingConfigKey,
+      ...authHeaders,
     },
   });
   if (!response.ok) {
@@ -21,14 +44,15 @@ const getOnboardingConfig = async (
 };
 
 const getAppearanceFromObConfig = async (
-  obConfigKey?: string,
+  payload: OnboardingConfigRequestType,
 ): Promise<FootprintAppearance | null> => {
-  if (!obConfigKey) {
+  const authHeaders = getAuthHeaders(payload);
+  if (!Object.values(authHeaders).length) {
     return null;
   }
 
   try {
-    const tenant = await getOnboardingConfig(obConfigKey);
+    const tenant = await getOnboardingConfig(authHeaders);
     return tenant.appearance || null;
   } catch (_) {
     return null;
