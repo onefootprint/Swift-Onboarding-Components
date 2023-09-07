@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { BusinessDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
@@ -40,7 +41,11 @@ const BusinessAddress = ({
       onComplete?.();
     };
 
-    const handleError = () => {
+    const handleError = (error: unknown) => {
+      console.error(
+        'Speculatively vaulting data failed in kyb business-address page:',
+        getErrorMessage(error),
+      );
       toast.show({
         title: allT('pages.sync-data-error.title'),
         description: allT('pages.sync-data-error.description'),

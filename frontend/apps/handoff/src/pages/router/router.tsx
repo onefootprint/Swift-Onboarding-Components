@@ -38,7 +38,11 @@ const Router = ({ variant }: RouterProps) => {
           },
         });
       },
-      onError: () => {
+      onError: error => {
+        console.warn(
+          'Fetching d2p status failed with error, likely indicating expired session:',
+          error,
+        );
         send({
           type: 'statusReceived',
           payload: {

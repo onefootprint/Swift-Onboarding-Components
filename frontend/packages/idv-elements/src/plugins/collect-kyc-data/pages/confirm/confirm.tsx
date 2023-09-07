@@ -1,4 +1,5 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
@@ -16,7 +17,7 @@ import LegalStatusSection from './components/legal-status-section';
 
 const Confirm = () => {
   const { t } = useTranslation('pages.confirm');
-
+  const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useCollectKycDataMachine();
   const { authToken, data, requirement, initialData } = state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();
@@ -40,6 +41,13 @@ const Confirm = () => {
           type: 'confirmed',
         });
       },
+      onError: (error: unknown) => {
+        console.error(
+          'Vaulting data on kyc confirm page failed',
+          getErrorMessage(error),
+        );
+        showRequestErrorToast(error);
+      },
     });
   };
 
@@ -60,6 +68,13 @@ const Confirm = () => {
       email: data[IdDI.email]?.value,
       speculative: false,
       onSuccess: handleSyncData,
+      onError: (error: unknown) => {
+        console.error(
+          'Speculatively sycing email data on kyc confirm page failed.',
+          getErrorMessage(error),
+        );
+        showRequestErrorToast(error);
+      },
     });
   };
 

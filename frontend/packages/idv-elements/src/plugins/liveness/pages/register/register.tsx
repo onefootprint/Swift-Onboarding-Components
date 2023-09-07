@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
 
@@ -29,7 +30,11 @@ const Register = () => {
             send({ type: 'succeeded' });
           }, SUCCESS_TRANSITION_DELAY_MS);
         },
-        onError() {
+        onError(error: unknown) {
+          console.error(
+            'Failed to register passkeys for user',
+            getErrorMessage(error),
+          );
           send({ type: 'failed' });
         },
       },

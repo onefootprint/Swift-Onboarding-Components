@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
@@ -27,7 +28,13 @@ const InvestmentGoals = () => {
           },
         });
       },
-      onError: showToast,
+      onError: (error: unknown) => {
+        console.error(
+          'Encountered error while speculatively syncing data on investor profile investment goals page',
+          getErrorMessage(error),
+        );
+        showToast();
+      },
     });
   };
 

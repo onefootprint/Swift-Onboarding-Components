@@ -4,6 +4,7 @@ import {
   FootprintPrivateEvent,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
+import { getErrorMessage } from '@onefootprint/request';
 import { CardDIField } from '@onefootprint/types';
 import type { GetServerSideProps } from 'next';
 import React, { useRef } from 'react';
@@ -101,11 +102,11 @@ const Form = () => {
         onSuccess: () => {
           footprintProvider.send(FootprintPublicEvent.completed);
         },
-        onError: (error: unknown) => {
+        onError: error => {
           // eslint-disable-next-line no-console
           console.error(
-            'Encountered error while saving user data to vault: ',
-            error,
+            'Encountered error while saving user data to vault in secure form: ',
+            getErrorMessage(error),
           );
         },
       },

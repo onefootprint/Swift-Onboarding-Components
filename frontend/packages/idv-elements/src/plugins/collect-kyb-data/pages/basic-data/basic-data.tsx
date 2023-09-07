@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import {
   BusinessDI,
   CollectedKybDataOption,
@@ -45,7 +46,11 @@ const BasicData = ({
       onComplete?.();
     };
 
-    const handleError = () => {
+    const handleError = (error: unknown) => {
+      console.error(
+        'Speculatively vaulting data failed in kyb basic-data page:',
+        getErrorMessage(error),
+      );
       toast.show({
         title: allT('pages.sync-data-error.title'),
         description: allT('pages.sync-data-error.description'),

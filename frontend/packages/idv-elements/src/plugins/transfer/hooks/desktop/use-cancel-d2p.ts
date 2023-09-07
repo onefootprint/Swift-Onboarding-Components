@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import { D2PStatusUpdate } from '@onefootprint/types';
 
 import { useUpdateD2PStatus } from '../../../../hooks';
@@ -17,6 +18,12 @@ const useCancelD2P = () => {
       {
         onSuccess() {
           send({ type: 'qrCodeCanceled' });
+        },
+        onError: (error: unknown) => {
+          console.error(
+            'Failed to cancel D2P session from desktop bifrost',
+            getErrorMessage(error),
+          );
         },
       },
     );

@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import { D2PStatus, GetD2PResponse } from '@onefootprint/types';
 
 import { useGetD2PStatus } from '../../../../hooks';
@@ -27,7 +28,11 @@ const useNewTabStatusUpdate = () => {
     }
   };
 
-  const handleError = () => {
+  const handleError = (error: unknown) => {
+    console.warn(
+      'Encountered error while polling for status on transfer plugin on mobile, likely indicating expired session.',
+      getErrorMessage(error),
+    );
     tab?.close();
     send({
       type: 'statusPollingErrored',

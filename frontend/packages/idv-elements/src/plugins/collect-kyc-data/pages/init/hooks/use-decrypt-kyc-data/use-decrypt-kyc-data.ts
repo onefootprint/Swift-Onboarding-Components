@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import {
   CdoToAllDisMap,
   CollectedKycDataOption,
@@ -92,7 +93,15 @@ const useDecryptKycData = ({
       { fields, authToken },
       {
         onSuccess: handleDecryptedData,
-        onError,
+        onError: (error: unknown) => {
+          console.error(
+            `useDecryptKycData failed to decrypt user data (${fields.join(
+              ', ',
+            )}) for KYC`,
+            getErrorMessage(error),
+          );
+          onError(error);
+        },
       },
     );
   };
@@ -101,7 +110,13 @@ const useDecryptKycData = ({
     { authToken },
     {
       onSuccess: handleTokenSuccess,
-      onError,
+      onError: (error: unknown) => {
+        console.error(
+          'useDecryptKycData failed to fetch user token info',
+          getErrorMessage(error),
+        );
+        onError(error);
+      },
     },
   );
 };

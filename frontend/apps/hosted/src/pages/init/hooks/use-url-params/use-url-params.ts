@@ -32,18 +32,24 @@ const useParseUrl = (options: UseParseUrlParamOptions = {}) => {
       typeof type !== 'string' ||
       !Object.values(HostedUrlType).includes(type as HostedUrlType)
     ) {
+      console.error('Hosted app URL does not include type:', router.asPath);
       onError?.();
       return;
     }
 
     const parts = router.asPath.split('#');
     if (parts.length < 2) {
+      console.error(
+        'Hosted app URL path does not contain token:',
+        router.asPath,
+      );
       onError?.();
       return;
     }
 
     const token = decodeURI(parts[1]);
     if (!token) {
+      console.error('Hosted app URL does not contain token', router.asPath);
       onError?.();
       return;
     }

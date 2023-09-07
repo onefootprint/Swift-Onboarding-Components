@@ -61,9 +61,9 @@ const QRRegister = () => {
     authToken: scopedAuthToken ?? '',
     options: {
       onSuccess: handleSuccess,
-      onError: () => {
+      onError: error => {
         generateScopedAuthToken();
-        handleError();
+        handleError(error);
       },
     },
   });

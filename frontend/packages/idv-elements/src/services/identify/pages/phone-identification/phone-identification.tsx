@@ -1,4 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
@@ -58,7 +59,10 @@ const PhoneIdentification = () => {
           });
         },
         onError: error => {
-          console.error(error);
+          console.error(
+            'Error while identify user on phone-identification page',
+            getErrorMessage(error),
+          );
           showRequestErrorToast(error);
         },
       },

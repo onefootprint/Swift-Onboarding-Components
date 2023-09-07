@@ -6,6 +6,7 @@ import {
   useParseHandoffUrl,
   useUpdateD2PStatus,
 } from '@onefootprint/idv-elements';
+import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { D2PStatusUpdate, GetD2PResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
@@ -30,6 +31,7 @@ const Init = () => {
           onError() {
             // If the handoff was already completed, we will get an error about
             // trying to transition the status backwards
+            console.warn('Updating the d2p status to in progress failed');
             send({
               type: 'd2pAlreadyCompleted',
             });
@@ -44,6 +46,9 @@ const Init = () => {
           },
         },
       );
+    },
+    onError: () => {
+      console.error('Parsing handoff URL failed on init page');
     },
   });
 
@@ -70,6 +75,12 @@ const Init = () => {
           },
         });
       },
+      onError: (error: unknown) => {
+        console.error(
+          'Fetching d2p status failed on handoff init page:',
+          getErrorMessage(error),
+        );
+      },
     },
   });
 
@@ -81,6 +92,12 @@ const Init = () => {
           onboardingConfig: obConfiguration,
         },
       });
+    },
+    onError: (error: unknown) => {
+      console.error(
+        'Fetching onboarding status failed on handoff init page:',
+        getErrorMessage(error),
+      );
     },
   });
 

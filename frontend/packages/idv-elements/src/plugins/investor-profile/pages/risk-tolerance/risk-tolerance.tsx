@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import {
   InvestorProfileDI,
   InvestorProfileRiskTolerance,
@@ -30,7 +31,13 @@ const RiskTolerance = () => {
           },
         });
       },
-      onError: showToast,
+      onError: (error: unknown) => {
+        console.error(
+          'Encountered error while speculatively syncing data on investor profile risk tolerance page',
+          getErrorMessage(error),
+        );
+        showToast();
+      },
     });
   };
 

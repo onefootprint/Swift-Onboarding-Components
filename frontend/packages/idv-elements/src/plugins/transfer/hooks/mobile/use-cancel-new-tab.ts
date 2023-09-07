@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import { D2PStatusUpdate } from '@onefootprint/types';
 
 import { useUpdateD2PStatus } from '../../../../hooks';
@@ -18,6 +19,12 @@ const useCancelNewTab = () => {
       {
         onSuccess() {
           send({ type: 'newTabRegisterCanceled' });
+        },
+        onError: (error: unknown) => {
+          console.error(
+            'Failed to cancel D2P session from mobile bifrost',
+            getErrorMessage(error),
+          );
         },
       },
     );

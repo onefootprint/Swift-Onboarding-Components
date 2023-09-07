@@ -1,4 +1,5 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
+import { getErrorMessage } from '@onefootprint/request';
 import { PublicOnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 
@@ -40,7 +41,11 @@ const Init = () => {
           },
         });
       },
-      onError: () => {
+      onError: error => {
+        console.error(
+          'Fetching onboarding config in identify service failed with error:',
+          getErrorMessage(error),
+        );
         send({
           type: 'configRequestFailed',
         });

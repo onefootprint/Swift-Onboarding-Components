@@ -1,4 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import {
   ChallengeData,
   ChallengeKind,
@@ -69,7 +70,10 @@ const PinVerification = ({
       { data: { email }, authToken },
       {
         onError: (error: unknown) => {
-          console.error('Failed email verification request: ', error);
+          console.error(
+            'Failed email verification request:',
+            getErrorMessage(error),
+          );
         },
         onSettled: () => {
           complete(authToken);
@@ -115,14 +119,12 @@ const PinVerification = ({
       },
       {
         onSuccess: handlePinValidationSucceeded,
-        onError: handleRequestError,
+        onError: (error: unknown) => {
+          console.error('Failed to verify pin:', getErrorMessage(error));
+          showRequestErrorToast(error);
+        },
       },
     );
-  };
-
-  const handleRequestError = (error: unknown) => {
-    showRequestErrorToast(error);
-    console.error(error);
   };
 
   const handleRequestChallengeSuccess = (payload: LoginChallengeResponse) => {
@@ -151,7 +153,13 @@ const PinVerification = ({
       },
       {
         onSuccess: handleRequestChallengeSuccess,
-        onError: handleRequestError,
+        onError: (error: unknown) => {
+          console.error(
+            'Failed to initiate signup challenge:',
+            getErrorMessage(error),
+          );
+          showRequestErrorToast(error);
+        },
       },
     );
   };
@@ -168,7 +176,13 @@ const PinVerification = ({
       },
       {
         onSuccess: handleRequestChallengeSuccess,
-        onError: handleRequestError,
+        onError: (error: unknown) => {
+          console.error(
+            'Failed to initiate login challenge:',
+            getErrorMessage(error),
+          );
+          showRequestErrorToast(error);
+        },
       },
     );
   };

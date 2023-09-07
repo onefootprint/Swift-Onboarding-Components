@@ -64,14 +64,19 @@ const getRequestData = (
         return;
       }
 
+      const danglingDis: string[] = [];
       requiredDis.forEach(di => {
         const value = data[di]?.value;
         if (typeof value === 'undefined') {
-          throw new Error('Request data incomplete');
+          danglingDis.push(di);
         } else if (!requestData[di]) {
           requestData[di] = value;
         }
       });
+
+      if (danglingDis.length > 0) {
+        throw new Error(`Dangling DIs: ${danglingDis.join(', ')}`);
+      }
     },
   );
 

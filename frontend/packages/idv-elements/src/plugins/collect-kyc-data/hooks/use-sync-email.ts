@@ -1,4 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 
 import { useUserEmail } from '../../../hooks';
 
@@ -42,7 +43,7 @@ const useSyncEmail = () => {
           showRequestErrorToast(error);
           console.error(
             'Failed email verification request from collect-kyc-data: ',
-            error,
+            getErrorMessage(error),
           );
           onError?.(error);
         },

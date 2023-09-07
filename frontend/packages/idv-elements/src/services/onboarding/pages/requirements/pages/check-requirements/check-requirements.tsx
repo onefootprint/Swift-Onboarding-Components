@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { OnboardingStatusResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
@@ -30,7 +31,11 @@ const CheckRequirements = () => {
     });
   };
 
-  const handleError = () => {
+  const handleError = (err: unknown) => {
+    console.error(
+      'Error while checking requirements from onboarding status',
+      getErrorMessage(err),
+    );
     setError(true);
   };
 

@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
@@ -29,6 +30,12 @@ const Retry = () => {
         onSuccess: () => {
           send({ type: 'skipped' });
         },
+        onError: (error: unknown) => {
+          console.error(
+            'Failed to skip liveness after retrying registering passkeys',
+            getErrorMessage(error),
+          );
+        },
       },
     );
   };
@@ -45,7 +52,11 @@ const Retry = () => {
             send({ type: 'succeeded' });
           }, SUCCESS_TRANSITION_DELAY_MS);
         },
-        onError() {
+        onError(error: unknown) {
+          console.error(
+            'Failed to register passkeys for user while retrying',
+            getErrorMessage(error),
+          );
           send({ type: 'failed' });
         },
       },

@@ -1,5 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
+import { getErrorMessage } from '@onefootprint/request';
 import { DecryptUserResponse, IdDI } from '@onefootprint/types';
 import React, { useEffect, useState } from 'react';
 
@@ -136,7 +137,13 @@ const IdentitySection = () => {
       },
       {
         onSuccess: handleDecryptSuccess,
-        onError: showRequestErrorToast,
+        onError: (error: unknown) => {
+          console.error(
+            'Decrypting SSN after step up failed in kyc confirm page',
+            getErrorMessage(error),
+          );
+          showRequestErrorToast(error);
+        },
       },
     );
   };
@@ -150,7 +157,13 @@ const IdentitySection = () => {
     authToken,
     device,
     onSuccess: handleStepUpSuccess,
-    onError: showRequestErrorToast,
+    onError: (error: unknown) => {
+      console.error(
+        'useStepUp hook in kyc confirm page failed',
+        getErrorMessage(error),
+      );
+      showRequestErrorToast(error);
+    },
   });
 
   const shouldTriggerStepUp = ssn?.scrubbed && needsStepUp && canStepUp;

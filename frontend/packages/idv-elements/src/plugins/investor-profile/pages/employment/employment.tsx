@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDollar40, IcoUser40 } from '@onefootprint/icons';
+import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { InvestorProfileDI } from '@onefootprint/types';
 import React, { useState } from 'react';
@@ -38,7 +39,13 @@ const Employment = () => {
           },
         });
       },
-      onError: showToast,
+      onError: (error: unknown) => {
+        console.error(
+          'Encountered error while speculatively syncing data on investor-profile employment page',
+          getErrorMessage(error),
+        );
+        showToast();
+      },
     });
   };
 

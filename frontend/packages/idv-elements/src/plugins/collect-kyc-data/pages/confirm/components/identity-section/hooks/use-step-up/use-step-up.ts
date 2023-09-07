@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import { ChallengeKind, UserTokenScope } from '@onefootprint/types';
 import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -30,7 +31,13 @@ const useStepUp = ({
   const userTokenQuery = useUserToken(
     { authToken },
     {
-      onError,
+      onError: (error: unknown) => {
+        console.error(
+          'Failed to get user token info for step up',
+          getErrorMessage(error),
+        );
+        onError?.(error);
+      },
     },
   );
   const identifyMutation = useIdentify();
@@ -44,7 +51,18 @@ const useStepUp = ({
     identifyVerifyMutation.isLoading;
 
   useEffectOnce(() => {
-    identifyMutation.mutate({ authToken }, { onError });
+    identifyMutation.mutate(
+      { authToken },
+      {
+        onError: (error: unknown) => {
+          console.error(
+            'Failed to identify user for step up',
+            getErrorMessage(error),
+          );
+          onError?.(error);
+        },
+      },
+    );
   });
 
   const needsStepUp = !userTokenQuery.data?.scopes.includes(
@@ -68,7 +86,11 @@ const useStepUp = ({
     payload: LoginChallengeResponse,
   ) => {
     if (!payload?.challengeData) {
-      onError?.(new Error('Missing challenge data in response.'));
+      onError?.(
+        new Error(
+          `Missing challenge data in response. Challenge kind received: ${payload.challengeData.challengeKind}`,
+        ),
+      );
       return;
     }
     const { biometricChallengeJson, challengeToken, challengeKind } =
@@ -76,7 +98,7 @@ const useStepUp = ({
 
     if (challengeKind !== ChallengeKind.biometric) {
       onError?.(
-        'Received sms challenge after requesting login biometric challenge',
+        `Received ${challengeKind} challenge after requesting login biometric challenge`,
       );
       return;
     }
@@ -116,7 +138,7 @@ const useStepUp = ({
         onError: (error: unknown) => {
           console.error(
             'Encountered error while verifying login challenge for step up: ',
-            error,
+            getErrorMessage(error),
           );
           onError?.(error);
         },
@@ -134,7 +156,11 @@ const useStepUp = ({
     }
 
     if (!canStepUp) {
-      onError?.(new Error('Cannot execute step up on current device.'));
+      onError?.(
+        new Error(
+          `Cannot execute step up on current device. ${device.type} device kind, has support for webauthn: ${device.hasSupportForWebauthn}`,
+        ),
+      );
       return;
     }
 
@@ -147,7 +173,7 @@ const useStepUp = ({
         onError: (error: unknown) => {
           console.error(
             'Encountered error while requesting login challenge for step up: ',
-            error,
+            getErrorMessage(error),
           );
           onError?.(error);
         },

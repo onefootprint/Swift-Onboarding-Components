@@ -1,4 +1,5 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
+import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
@@ -48,7 +49,11 @@ const Init = () => {
             },
           });
         },
-        onError: () => {
+        onError: (error: unknown) => {
+          console.error(
+            'Error while initiating onboarding in onboarding init page',
+            getErrorMessage(error),
+          );
           send({
             type: 'configRequestFailed',
           });

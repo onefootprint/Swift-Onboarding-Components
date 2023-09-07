@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
@@ -24,6 +25,12 @@ const Unavailable = () => {
           send({
             type: 'completed',
           });
+        },
+        onError: (error: unknown) => {
+          console.error(
+            'Error while skipping liveness in liveness unavailable page.',
+            getErrorMessage(error),
+          );
         },
       },
     );

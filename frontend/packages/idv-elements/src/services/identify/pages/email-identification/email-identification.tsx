@@ -1,4 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
@@ -53,7 +54,10 @@ const EmailIdentification = () => {
           });
         },
         onError: error => {
-          console.error(error);
+          console.error(
+            'Error while identifying user on email-identification page',
+            getErrorMessage(error),
+          );
           showRequestErrorToast(error);
         },
       },

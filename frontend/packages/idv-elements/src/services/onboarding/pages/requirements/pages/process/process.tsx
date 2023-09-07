@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
@@ -27,6 +28,12 @@ const Process = ({ onDone }: ProcessProps) => {
       { authToken },
       {
         onSuccess: onDone,
+        onError: (error: unknown) => {
+          console.error(
+            'Error while processing onboarding on authorize page',
+            getErrorMessage(error),
+          );
+        },
       },
     );
   });

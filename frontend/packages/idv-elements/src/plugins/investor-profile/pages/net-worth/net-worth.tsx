@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import {
   InvestorProfileDI,
   InvestorProfileNetWorth,
@@ -30,7 +31,13 @@ const NetWorth = () => {
           },
         });
       },
-      onError: showToast,
+      onError: (error: unknown) => {
+        console.error(
+          'Encountered error while speculatively syncing data on investor profile net worth page',
+          getErrorMessage(error),
+        );
+        showToast();
+      },
     });
   };
 

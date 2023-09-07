@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import { DocumentDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
@@ -49,11 +50,23 @@ const Declarations = () => {
             onSuccess: () => {
               sendDeclarationData(declarationData);
             },
-            onError: showToast,
+            onError: (error: unknown) => {
+              console.error(
+                'Encountered error while uploading declarations files',
+                getErrorMessage(error),
+              );
+              showToast();
+            },
           },
         );
       },
-      onError: showToast,
+      onError: (error: unknown) => {
+        console.error(
+          'Encountered error while vaulting data on investor profile declarations page',
+          getErrorMessage(error),
+        );
+        showToast();
+      },
     });
   };
 
@@ -67,7 +80,13 @@ const Declarations = () => {
         // Since this is the last data collection step, go ahead and submit all of this data to backend non-speculatively
         commitData(declarationData, files);
       },
-      onError: showToast,
+      onError: (error: unknown) => {
+        console.error(
+          'Encountered error while speculatively saving data on investor profile declarations page',
+          getErrorMessage(error),
+        );
+        showToast();
+      },
     });
   };
 

@@ -3,6 +3,7 @@ import {
   InitShimmer,
   useGetOnboardingConfig,
 } from '@onefootprint/idv-elements';
+import { getErrorMessage } from '@onefootprint/request';
 import {
   CLIENT_PUBLIC_KEY_HEADER,
   IdvBootstrapData,
@@ -37,7 +38,11 @@ const Init = () => {
           },
         });
       },
-      onError: () => {
+      onError: error => {
+        console.error(
+          'Fetching onboarding config in bifrost init failed with error:',
+          getErrorMessage(error),
+        );
         send({
           type: 'configRequestFailed',
         });

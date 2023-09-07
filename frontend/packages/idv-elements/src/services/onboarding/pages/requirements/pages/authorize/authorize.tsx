@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedDocumentDataOption,
@@ -83,6 +84,12 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
       { authToken },
       {
         onSuccess: onDone,
+        onError: (error: unknown) => {
+          console.error(
+            'Error while processing onboarding on authorize page',
+            getErrorMessage(error),
+          );
+        },
       },
     );
   };
@@ -92,7 +99,11 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
       { authToken },
       {
         onSuccess: handleAuthorizeSuccess,
-        onError() {
+        onError: (error: unknown) => {
+          console.error(
+            'Error while authorizing onboarding on authorize page',
+            getErrorMessage(error),
+          );
           toast.show({
             title: t('onboarding-complete-error.title'),
             description: t('onboarding-complete-error.description'),

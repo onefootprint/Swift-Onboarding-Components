@@ -1,4 +1,5 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { IdDI } from '@onefootprint/types';
 import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
@@ -32,7 +33,6 @@ const EmailCollect = ({
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
   const { t } = useTranslation('pages.email');
-  const showRequestErrorToast = useRequestErrorToast();
   const { mutation, syncEmail } = useSyncEmail();
   const {
     register,
@@ -56,8 +56,10 @@ const EmailCollect = ({
         onComplete(email);
       },
       onError: (error: unknown) => {
-        showRequestErrorToast(error);
-        console.error(error);
+        console.error(
+          'Error while speculatively syncing email on kyc email-collect page',
+          getErrorMessage(error),
+        );
       },
     });
   };

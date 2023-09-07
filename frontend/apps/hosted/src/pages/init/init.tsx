@@ -1,5 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { useGetOnboardingConfig } from '@onefootprint/idv-elements';
+import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
 import { LoadingIndicator, media } from '@onefootprint/ui';
@@ -46,7 +47,11 @@ const Init = () => {
           },
         });
       },
-      onError: (error: unknown) => {
+      onError: error => {
+        console.error(
+          'Hosted app init page fetching business details failed:',
+          getErrorMessage(error),
+        );
         showRequestError(error);
         send({
           type: 'invalidUrlReceived',
@@ -67,7 +72,11 @@ const Init = () => {
           },
         });
       },
-      onError: (error: unknown) => {
+      onError: error => {
+        console.error(
+          'Hosted app init page fetching onboarding config failed:',
+          getErrorMessage(error),
+        );
         showRequestError(error);
         send({
           type: 'invalidUrlReceived',

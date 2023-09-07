@@ -1,5 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoFaceid24 } from '@onefootprint/icons';
+import { getErrorMessage } from '@onefootprint/request';
 import { ChallengeKind, LoginChallengeResponse } from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -25,7 +26,7 @@ const Biometric = () => {
   const isWaiting = isRunningWebauthn || identifyVerifyMutation.isLoading;
   const { isLoading } = loginChallengeMutation;
 
-  const handleComplete = async () => {
+  const handleComplete = () => {
     if (!successfulIdentifier) {
       console.error(
         'No successful identifier found while initiating login biometric challenge',
@@ -33,22 +34,24 @@ const Biometric = () => {
       return;
     }
 
-    loginChallengeMutation
-      .mutateAsync(
-        {
-          identifier: successfulIdentifier,
-          preferredChallengeKind: ChallengeKind.biometric,
-          obConfigAuth,
-          sandboxId,
+    loginChallengeMutation.mutate(
+      {
+        identifier: successfulIdentifier,
+        preferredChallengeKind: ChallengeKind.biometric,
+        obConfigAuth,
+        sandboxId,
+      },
+      {
+        onSuccess: handleRequestChallengeSuccess,
+        onError: (error: unknown) => {
+          console.error(
+            'Error while requesting login biometric challenge',
+            getErrorMessage(error),
+          );
+          showRequestErrorToast(error);
         },
-        {
-          onSuccess: handleRequestChallengeSuccess,
-          onError: handleRequestError,
-        },
-      )
-      .catch((error: unknown) => {
-        handleRequestError(error);
-      });
+      },
+    );
   };
 
   const handleRequestChallengeSuccess = async (
@@ -98,7 +101,11 @@ const Biometric = () => {
             },
           });
         },
-        onError: () => {
+        onError: (error: unknown) => {
+          console.error(
+            'Error while verifying biometric challenge',
+            getErrorMessage(error),
+          );
           setIsRetry(true);
         },
         onSettled: () => {
@@ -106,11 +113,6 @@ const Biometric = () => {
         },
       },
     );
-  };
-
-  const handleRequestError = (error: unknown) => {
-    showRequestErrorToast(error);
-    console.error(error);
   };
 
   if (isWaiting) {

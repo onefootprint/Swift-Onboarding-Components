@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
@@ -9,7 +10,7 @@ import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 
 const SkipLiveness = () => {
   const [state, send] = useMobileMachine();
-  const { authToken } = state.context;
+  const { authToken, device } = state.context;
   const skipLivenessMutation = useSkipLiveness();
 
   useEffectOnce(() => {
@@ -20,6 +21,14 @@ const SkipLiveness = () => {
           send({
             type: 'livenessSkipped',
           });
+        },
+        onError: (error: unknown) => {
+          console.error(
+            `Error while skipping liveness on transfer plugin running on mobile. Webauthn availability: ${
+              device.hasSupportForWebauthn ? 'available' : 'none'
+            }`,
+            getErrorMessage(error),
+          );
         },
       },
     );

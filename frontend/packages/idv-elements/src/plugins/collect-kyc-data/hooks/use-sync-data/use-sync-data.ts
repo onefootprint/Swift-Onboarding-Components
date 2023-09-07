@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
 
 import useUserData from '../../../../hooks/api/hosted/user/vault/use-user-data';
@@ -10,6 +11,7 @@ type SyncDataArgs = {
   data: KycData;
   speculative?: boolean;
   onSuccess?: () => void;
+  onError?: (error?: unknown) => void;
 };
 
 const useSyncData = () => {
@@ -23,6 +25,7 @@ const useSyncData = () => {
     data: rawData,
     speculative,
     onSuccess,
+    onError,
   }: SyncDataArgs) => {
     if (!authToken) {
       console.error('Found empty auth token while syncing kyc data fields.');
@@ -45,22 +48,32 @@ const useSyncData = () => {
         {
           onSuccess,
           onError: err => {
-            console.error(err);
+            console.error(
+              `Kyc useSyncData encountered error while syncing data${
+                speculative ? ' speculatively' : ''
+              }`,
+              getErrorMessage(err),
+            );
             toast.show({
               title: t('invalid-inputs.title'),
               description: t('invalid-inputs.description'),
               variant: 'error',
             });
+            onError?.(err);
           },
         },
       );
     } catch (e) {
-      console.error(e);
+      console.error(
+        'Unable to generate a valid request data obj because of incomplete/dangling DIs.',
+        e,
+      );
       toast.show({
         title: t('request-data.title'),
         description: t('request-data.description'),
         variant: 'error',
       });
+      onError?.();
     }
   };
 

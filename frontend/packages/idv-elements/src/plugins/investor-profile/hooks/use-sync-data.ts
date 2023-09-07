@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import { InvestorProfileData, UserDataResponse } from '@onefootprint/types';
 
 import { useUserData } from '../../../hooks';
@@ -36,7 +37,15 @@ const useSyncData = () => {
       },
       {
         onSuccess,
-        onError,
+        onError: (error: unknown) => {
+          console.error(
+            `Investor profile useSyncData encountered error while syncing data${
+              speculative ? ' speculatively' : ''
+            }`,
+            getErrorMessage(error),
+          );
+          onError?.(error);
+        },
       },
     );
   };

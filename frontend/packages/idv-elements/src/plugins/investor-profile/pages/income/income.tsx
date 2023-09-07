@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@onefootprint/request';
 import {
   InvestorProfileAnnualIncome,
   InvestorProfileDI,
@@ -30,7 +31,13 @@ const Income = () => {
           },
         });
       },
-      onError: showToast,
+      onError: (error: unknown) => {
+        console.error(
+          'Encountered error while speculatively syncing data on investor profile income page',
+          getErrorMessage(error),
+        );
+        showToast();
+      },
     });
   };
 

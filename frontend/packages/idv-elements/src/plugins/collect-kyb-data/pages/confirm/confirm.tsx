@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -28,12 +29,15 @@ const Confirm = () => {
         });
       },
       onError: (error: unknown) => {
+        console.error(
+          'Vaulting data failed in kyb confirm page:',
+          getErrorMessage(error),
+        );
         toast.show({
           title: allT('pages.sync-data-error.title'),
           description: allT('pages.sync-data-error.description'),
           variant: 'error',
         });
-        console.error(error);
       },
     });
   };
