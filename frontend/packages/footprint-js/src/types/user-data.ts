@@ -29,4 +29,8 @@ export type FootprintUserData = Partial<{
   'id.ssn9': string;
   'id.ssn4': string;
   'id.nationality': string; // 2 letter country code
+  'id.usLegalStatus': string;
+  'id.citizenships': string[]; // array of 2 letter country codes
+  'id.visaKind': string;
+  'id.visaExpirationDate': string;
 }>;

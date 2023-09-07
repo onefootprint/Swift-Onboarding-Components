@@ -3,6 +3,7 @@ import {
   CollectedKycDataOptionToRequiredAttributes,
   CollectKycDataRequirement,
   IdDI,
+  UsLegalStatus,
 } from '@onefootprint/types';
 import { pickBy } from 'lodash';
 
@@ -15,7 +16,7 @@ const BASIC_ATTRIBUTES = [
   CollectedKycDataOption.nationality,
 ];
 
-// The list of CollectedKycDataOption that may be input on the basic info screen
+// The list of CollectedKycDataOption that may be input on the us legal status screen
 const US_LEGAL_STATUS_ATTRIBUTES = [CollectedKycDataOption.usLegalStatus];
 
 // The list of CollectedKycDataOption that may be input on the residential screen
@@ -46,6 +47,23 @@ export const isMissing = (
   // No data collected so far
   if (!collectedData || Object.keys(collectedData).length === 0) {
     return true;
+  }
+
+  // Adjust required attributes depending on us legal status
+  if (
+    options === US_LEGAL_STATUS_ATTRIBUTES &&
+    IdDI.usLegalStatus in collectedData
+  ) {
+    const usLegalStatus = collectedData[IdDI.usLegalStatus]?.value;
+    if (
+      usLegalStatus === UsLegalStatus.permanentResident ||
+      usLegalStatus === UsLegalStatus.visa
+    ) {
+      attributes.push(IdDI.nationality, IdDI.citizenships);
+    }
+    if (usLegalStatus === UsLegalStatus.visa) {
+      attributes.push(IdDI.visaKind, IdDI.visaExpirationDate);
+    }
   }
 
   // Filter out entries with disabled/bootstrapped/decrypted values

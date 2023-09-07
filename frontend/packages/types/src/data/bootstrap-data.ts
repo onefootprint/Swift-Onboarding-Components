@@ -1,5 +1,7 @@
 import { CountryCode } from './countries';
 import { IdDI } from './di';
+import UsLegalStatus from './us-legal-status';
+import VisaKind from './visa-kind';
 
 // TODO: expand in the future with KybBootstrapData and InvestorProfileBootstrapData
 export type IdvBootstrapData = KycBootstrapData;
@@ -22,6 +24,11 @@ export type KycBootstrapData = Partial<{
   [IdDI.state]: string;
   [IdDI.country]: CountryCode;
   [IdDI.zip]: string;
+  [IdDI.usLegalStatus]: UsLegalStatus;
+  [IdDI.nationality]: CountryCode;
+  [IdDI.citizenships]: CountryCode[];
+  [IdDI.visaKind]: VisaKind;
+  [IdDI.visaExpirationDate]: string;
 }>;
 
 export type IdentifyBootstrapData = {

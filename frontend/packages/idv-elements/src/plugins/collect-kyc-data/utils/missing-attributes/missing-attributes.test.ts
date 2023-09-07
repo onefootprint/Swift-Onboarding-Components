@@ -2,6 +2,8 @@ import {
   CollectedKycDataOption,
   IdDI,
   OnboardingRequirementKind,
+  UsLegalStatus,
+  VisaKind,
 } from '@onefootprint/types';
 
 import {
@@ -9,6 +11,7 @@ import {
   isMissingBasicAttribute,
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
+  isMissingUsLegalStatusAttribute,
   shouldConfirm,
 } from './missing-attributes';
 
@@ -339,6 +342,200 @@ describe('MissingAttributesUtils', () => {
           [CollectedKycDataOption.dob, CollectedKycDataOption.address],
           {
             [IdDI.zip]: { value: '94117' },
+          },
+        ),
+      ).toEqual(true);
+    });
+  });
+
+  describe('isMissingUsLegalStatusAttribute', () => {
+    it('should return false if missing attributes array is empty', () => {
+      expect(isMissingUsLegalStatusAttribute([], {})).toEqual(false);
+    });
+
+    it('should return true if only some of the data values are bootstrapped', () => {
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: {
+              value: UsLegalStatus.visa,
+              bootstrap: true,
+            },
+            [IdDI.visaKind]: { value: VisaKind.e1, bootstrap: true },
+            [IdDI.visaExpirationDate]: { value: '01012030' },
+          },
+        ),
+      ).toEqual(true);
+
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: {
+              value: UsLegalStatus.visa,
+              bootstrap: true,
+            },
+            [IdDI.nationality]: { value: 'IT', bootstrap: true },
+            [IdDI.citizenships]: { value: ['BR'], bootstrap: true },
+            [IdDI.visaKind]: { value: VisaKind.e1, bootstrap: true },
+            [IdDI.visaExpirationDate]: { value: '01012030', bootstrap: true },
+          },
+        ),
+      ).toEqual(false);
+
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: {
+              value: UsLegalStatus.citizen,
+              bootstrap: true,
+            },
+          },
+        ),
+      ).toEqual(false);
+
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: {
+              value: UsLegalStatus.permanentResident,
+              bootstrap: true,
+            },
+          },
+        ),
+      ).toEqual(true);
+
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: {
+              value: UsLegalStatus.permanentResident,
+              bootstrap: true,
+            },
+            [IdDI.citizenships]: { value: ['BR'], bootstrap: true },
+          },
+        ),
+      ).toEqual(true);
+    });
+
+    it('should return true if only some of the data values are decrypted', () => {
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: {
+              value: UsLegalStatus.citizen,
+              decrypted: true,
+            },
+          },
+        ),
+      ).toEqual(false);
+
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: {
+              value: UsLegalStatus.visa,
+              decrypted: true,
+            },
+            [IdDI.nationality]: { value: 'IT', decrypted: true },
+            [IdDI.citizenships]: { value: ['BR'], decrypted: true },
+            [IdDI.visaKind]: { value: VisaKind.e1, decrypted: true },
+          },
+        ),
+      ).toEqual(true);
+
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: {
+              value: UsLegalStatus.permanentResident,
+              decrypted: true,
+            },
+            [IdDI.nationality]: { value: 'IT', decrypted: true },
+          },
+        ),
+      ).toEqual(true);
+    });
+
+    it('should return false if the user has the missing residential attributes', () => {
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.dob,
+            CollectedKycDataOption.ssn4,
+          ],
+          {},
+        ),
+      ).toEqual(false);
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen },
+          },
+        ),
+      ).toEqual(false);
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: { value: UsLegalStatus.permanentResident },
+            [IdDI.nationality]: { value: 'IT' },
+            [IdDI.citizenships]: { value: ['BR'] },
+          },
+        ),
+      ).toEqual(false);
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.usLegalStatus]: { value: UsLegalStatus.visa },
+            [IdDI.nationality]: { value: 'IT' },
+            [IdDI.citizenships]: { value: ['BR'] },
+            [IdDI.visaKind]: { value: VisaKind.e1 },
+            [IdDI.visaExpirationDate]: { value: '01012030' },
+          },
+        ),
+      ).toEqual(false);
+    });
+
+    it('should return true if the user is missing any of the us legal status attributes', () => {
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {},
+        ),
+      ).toEqual(true);
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.nationality]: { value: 'CN' },
+            [IdDI.citizenships]: { value: ['HK'] },
+          },
+        ),
+      ).toEqual(true);
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.visaKind]: { value: VisaKind.other },
+          },
+        ),
+      ).toEqual(true);
+      expect(
+        isMissingUsLegalStatusAttribute(
+          [CollectedKycDataOption.dob, CollectedKycDataOption.usLegalStatus],
+          {
+            [IdDI.visaExpirationDate]: { value: '01012030' },
           },
         ),
       ).toEqual(true);
