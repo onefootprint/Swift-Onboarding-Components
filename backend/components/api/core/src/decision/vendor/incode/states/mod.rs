@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
+use db::models::document_upload::DocumentUpload;
 use db::models::verification_request::VerificationRequest;
 
 mod start_onboarding;
@@ -293,10 +294,13 @@ impl AddSideResponseHelper {
 
     pub fn get_restrictions(
         tenant_id: &TenantId,
-        ff_client: &Arc<dyn FeatureFlagClient>,
+        ff_client: Arc<dyn FeatureFlagClient>,
+        n_attempts: i64,
     ) -> Vec<IncodeDocumentRestriction> {
-        let check_glare = !ff_client.flag(BoolFlag::DisableConservativeGlareForDocument(tenant_id));
-        let check_sharpness = !ff_client.flag(BoolFlag::DisableConservativeSharpnessForDocument(tenant_id));
+        let check_glare = !ff_client.flag(BoolFlag::DisableConservativeGlareForDocument(tenant_id))
+            && n_attempts < DocumentUpload::MAX_ATTEMPTS_PER_SIDE - 1;
+        let check_sharpness = !ff_client.flag(BoolFlag::DisableConservativeSharpnessForDocument(tenant_id))
+            && n_attempts < DocumentUpload::MAX_ATTEMPTS_PER_SIDE - 1;
         let check_dl_permit = ff_client.flag(BoolFlag::DisallowDriverLicensePermits(tenant_id));
         [
             check_glare.then_some(IncodeDocumentRestriction::ConservativeGlare),
@@ -306,5 +310,55 @@ impl AddSideResponseHelper {
         .into_iter()
         .flatten()
         .collect()
+    }
+}
+
+#[cfg(test)]
+
+mod tests {
+    use std::{str::FromStr, sync::Arc};
+
+    use feature_flag::{BoolFlag, MockFeatureFlagClient};
+    use newtypes::{incode::IncodeDocumentRestriction, TenantId};
+    use test_case::test_case;
+
+    use super::AddSideResponseHelper;
+    #[test_case(false, false, false, 0 => vec![IncodeDocumentRestriction::ConservativeGlare, IncodeDocumentRestriction::ConservativeSharpness])]
+    #[test_case(true, true, true, 0 => vec![IncodeDocumentRestriction::NoDriverLicensePermit])]
+    #[test_case(false, false, true, 4 => vec![IncodeDocumentRestriction::NoDriverLicensePermit])]
+    #[test_case(true, true, true, 4 => vec![IncodeDocumentRestriction::NoDriverLicensePermit])]
+    #[test_case(false, false, false, 3 => vec![IncodeDocumentRestriction::ConservativeGlare, IncodeDocumentRestriction::ConservativeSharpness])]
+    fn test_add_side_get_restrictions(
+        disable_check_glare: bool,
+        disable_check_sharpness: bool,
+        disallow_drivers_license_permits: bool,
+        n_attempts: i64,
+    ) -> Vec<IncodeDocumentRestriction> {
+        let mut mock_ff_client = MockFeatureFlagClient::new();
+        // ¯\_(ツ)_/¯
+        let t1 = TenantId::from_str("t_1234").unwrap();
+        let t2 = t1.clone();
+        let t3 = t1.clone();
+        let t4 = t1.clone();
+
+        mock_ff_client
+            .expect_flag()
+            .times(1)
+            .withf(move |f| *f == BoolFlag::DisableConservativeGlareForDocument(&t2))
+            .return_once(move |_| disable_check_glare);
+
+        mock_ff_client
+            .expect_flag()
+            .times(1)
+            .withf(move |f| *f == BoolFlag::DisableConservativeSharpnessForDocument(&t3))
+            .return_once(move |_| disable_check_sharpness);
+
+        mock_ff_client
+            .expect_flag()
+            .times(1)
+            .withf(move |f| *f == BoolFlag::DisallowDriverLicensePermits(&t4))
+            .return_once(move |_| disallow_drivers_license_permits);
+        let ff_client = Arc::new(mock_ff_client);
+        AddSideResponseHelper::get_restrictions(&t1, ff_client, n_attempts)
     }
 }

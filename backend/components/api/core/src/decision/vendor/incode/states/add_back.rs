@@ -56,7 +56,8 @@ impl IncodeStateTransition for AddBack {
                     // TODO: add restrictions from OBC
                     response.failure_reasons(AddSideResponseHelper::get_restrictions(
                         &ctx.tenant_id,
-                        &ctx.ff_client,
+                        ctx.ff_client.clone(),
+                        ctx.n_attempts,
                     )),
                     vec![],
                 )),

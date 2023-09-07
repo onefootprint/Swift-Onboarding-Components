@@ -302,6 +302,7 @@ impl<'a> TryFrom<&'a IncodeDocumentType> for IdDocKind {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IncodeDocumentRestriction {
     NoDriverLicensePermit,
     ConservativeGlare,

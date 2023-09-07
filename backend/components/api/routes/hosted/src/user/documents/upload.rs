@@ -249,6 +249,7 @@ pub(in crate::user) async fn handle_incode_request(
         enclave_client: state.enclave_client.clone(),
         tenant_id: tenant_id.clone(),
         ff_client,
+        n_attempts: 0,
     };
     let machine = IncodeStateMachine::init(
         state,
