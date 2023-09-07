@@ -194,7 +194,7 @@ def test_config_create(sandbox_tenant, twilio):
             ),
             "Validation error: Cannot specify international_country_restrictions without allow_international_residents",
         ),
-           (
+        (
             dict(
                 must_collect_data=[
                     "name",
@@ -225,6 +225,52 @@ def test_config_create(sandbox_tenant, twilio):
                 international_country_restrictions=["MX"],
             ),
             None,
+        ),
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                    "dob",
+                    "document.passport.none.none"
+                ],
+                optional_data=['ssn9'],
+                can_access_data=[],
+                doc_scan_for_optional_ssn="document.passport.none.none"
+            ),
+            "Validation error: Cannot specify doc_scan_for_optional_ssn if already collecting a document",
+        ),
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                    "dob",
+                ],
+                optional_data=[],
+                can_access_data=[],
+                doc_scan_for_optional_ssn="document.passport.none.none"
+            ),
+            "Validation error: Cannot specify doc_scan_for_optional_ssn if Ssn4 or Ssn9 is not optional",
+        ),
+         (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                    "dob",
+                ],
+                optional_data=['ssn9'],
+                can_access_data=[],
+                doc_scan_for_optional_ssn="full_address"
+            ),
+            "Validation error: doc_scan_for_optional_ssn must be a Document collected data option",
         ),
     ],
 )
