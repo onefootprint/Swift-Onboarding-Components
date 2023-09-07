@@ -253,6 +253,7 @@ pub enum WrappedRiskSignalGroupKind {
     Doc,
     Device,
     NativeDevice,
+    Aml,
 }
 use risk_signal_group_struct::*;
 
@@ -266,6 +267,7 @@ impl From<RiskSignalGroupKind> for WrappedRiskSignalGroupKind {
             RiskSignalGroupKind::Doc => Self::Doc,
             RiskSignalGroupKind::WebDevice => Self::Device,
             RiskSignalGroupKind::NativeDevice => Self::NativeDevice,
+            RiskSignalGroupKind::Aml => Self::Aml,
         }
     }
 }
@@ -280,6 +282,7 @@ impl From<WrappedRiskSignalGroupKind> for RiskSignalGroupKind {
             WrappedRiskSignalGroupKind::Doc => Self::Doc,
             WrappedRiskSignalGroupKind::Device => Self::WebDevice,
             WrappedRiskSignalGroupKind::NativeDevice => Self::NativeDevice,
+            WrappedRiskSignalGroupKind::Aml => Self::Aml,
         }
     }
 }

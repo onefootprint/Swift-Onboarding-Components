@@ -17,7 +17,7 @@ use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     AlpacaKycConfig, DecisionIntentKind, DecisionStatus, FootprintReasonCode, Iso3166TwoDigitCountryCode,
-    Locked, OnboardingStatus, ReviewReason, RiskSignalGroupKind, VendorAPI, VerificationResultId,
+    Locked, OnboardingStatus, ReviewReason, RiskSignalGroupKind, VendorAPI,
 };
 
 use crate::{
@@ -487,22 +487,12 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             },
         };
 
-        let (adverse_media_reason_codes, watchlist_reason_codes) =
-            partition_adverse_media_watchlist_reason_codes(wc_reason_codes.clone());
-
         // write reason codes from Incode watchlist/am
         RiskSignal::bulk_create(
             conn,
             &self.sv_id,
-            adverse_media_reason_codes,
-            RiskSignalGroupKind::AdverseMedia,
-            false,
-        )?;
-        RiskSignal::bulk_create(
-            conn,
-            &self.sv_id,
-            watchlist_reason_codes,
-            RiskSignalGroupKind::Watchlist,
+            wc_reason_codes.clone(),
+            RiskSignalGroupKind::Aml,
             false,
         )?;
 
@@ -752,24 +742,10 @@ fn get_review_reasons(wc_reason_codes: &[FootprintReasonCode], collected_doc: bo
     reasons
 }
 
-#[allow(clippy::type_complexity)]
-fn partition_adverse_media_watchlist_reason_codes(
-    reason_codes: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
-) -> (
-    Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
-    Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
-) {
-    reason_codes
-        .into_iter()
-        .partition(|(frc, _, _)| frc.is_adverse_media())
-}
-
 #[cfg(test)]
 #[allow(clippy::type_complexity)]
 mod tests {
     use super::*;
-    use newtypes::VerificationResultId;
-    use std::str::FromStr;
     use test_case::test_case;
 
     #[test_case(vec![(FootprintReasonCode::WatchlistHitOfac)], false => vec![ReviewReason::WatchlistHit])]
@@ -784,25 +760,5 @@ mod tests {
         collected_doc: bool,
     ) -> Vec<ReviewReason> {
         get_review_reasons(&wc_reason_codes, collected_doc)
-    }
-
-    fn drc(frc: FootprintReasonCode) -> (FootprintReasonCode, VendorAPI, VerificationResultId) {
-        (
-            frc,
-            VendorAPI::IncodeWatchlistCheck,
-            VerificationResultId::from_str("123").unwrap(),
-        )
-    }
-
-    #[test_case(vec![drc(FootprintReasonCode::WatchlistHitOfac)] => (vec![], vec![drc(FootprintReasonCode::WatchlistHitOfac)]))]
-    #[test_case(vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn)] => (vec![], vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn)]))]
-    #[test_case(vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn), drc(FootprintReasonCode::AdverseMediaHit)] => (vec![drc(FootprintReasonCode::AdverseMediaHit)], vec![drc(FootprintReasonCode::WatchlistHitOfac), drc(FootprintReasonCode::WatchlistHitNonSdn)]))]
-    fn test_partition_adverse_media_watchlist_reason_codes(
-        wc_reason_codes: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
-    ) -> (
-        Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
-        Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
-    ) {
-        partition_adverse_media_watchlist_reason_codes(wc_reason_codes)
     }
 }
