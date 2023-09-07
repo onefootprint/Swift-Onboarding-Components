@@ -73,4 +73,58 @@ impl SignalScope {
             SignalScope::BusinessDba => false,
         }
     }
+
+    pub fn is_for_kyc(&self) -> bool {
+        match self {
+            SignalScope::Name
+            | SignalScope::Dob
+            | SignalScope::Ssn
+            | SignalScope::Address
+            | SignalScope::StreetAddress
+            | SignalScope::City
+            | SignalScope::State
+            | SignalScope::Zip
+            | SignalScope::Country
+            | SignalScope::Email
+            | SignalScope::PhoneNumber => true,
+            SignalScope::IpAddress
+            | SignalScope::Device
+            | SignalScope::Document
+            | SignalScope::Selfie
+            | SignalScope::BusinessAddress
+            | SignalScope::BusinessName
+            | SignalScope::BusinessPhoneNumber
+            | SignalScope::BusinessWebsite
+            | SignalScope::BusinessTin
+            | SignalScope::BeneficialOwners
+            | SignalScope::BusinessDba => false,
+        }
+    }
+
+    pub fn is_for_kyb(&self) -> bool {
+        match self {
+            SignalScope::Name
+            | SignalScope::Dob
+            | SignalScope::Ssn
+            | SignalScope::Address
+            | SignalScope::StreetAddress
+            | SignalScope::City
+            | SignalScope::State
+            | SignalScope::Zip
+            | SignalScope::Country
+            | SignalScope::Email
+            | SignalScope::IpAddress
+            | SignalScope::Device
+            | SignalScope::Document
+            | SignalScope::Selfie
+            | SignalScope::PhoneNumber => false,
+            SignalScope::BusinessAddress
+            | SignalScope::BusinessName
+            | SignalScope::BusinessPhoneNumber
+            | SignalScope::BusinessWebsite
+            | SignalScope::BusinessTin
+            | SignalScope::BeneficialOwners
+            | SignalScope::BusinessDba => true,
+        }
+    }
 }

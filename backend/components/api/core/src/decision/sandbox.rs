@@ -199,8 +199,8 @@ fn build_reason_code_map(vault_kind: VaultKind) -> HashMap<SignalSeverity, Vec<F
     FootprintReasonCode::iter()
         .filter_map(|rs| {
             if rs.scopes().iter().all(|s| match vault_kind {
-                VaultKind::Person => s.is_for_person(),
-                VaultKind::Business => !s.is_for_person(),
+                VaultKind::Person => s.is_for_person() && s.is_for_kyc(),
+                VaultKind::Business => !s.is_for_person() && s.is_for_kyb(),
             }) {
                 Some((rs.severity(), rs))
             } else {
@@ -269,19 +269,21 @@ pub async fn save_fixture_incode_watchlist_result(
 
 #[cfg(test)]
 mod tests {
-    use newtypes::{SignalSeverity, VaultKind};
+    use newtypes::{SignalScope, SignalSeverity, VaultKind};
     use test_case::test_case;
 
     use super::{build_reason_code_map, choose_random_reason_codes};
 
-    #[test_case(1, SignalSeverity::High => 1)]
-    #[test_case(3, SignalSeverity::Info => 3)]
-    #[test_case(2, SignalSeverity::Medium => 2)]
+    #[test_case(3, SignalSeverity::High => 3)]
+    #[test_case(10, SignalSeverity::Info => 10)]
+    #[test_case(20, SignalSeverity::Medium => 20)]
     fn test_choose_random_reason_codes(n: usize, severity: SignalSeverity) -> usize {
         let rc = build_reason_code_map(VaultKind::Person);
         let result = choose_random_reason_codes(rc, severity.clone(), n);
 
-        assert!(result.iter().all(|r| r.severity() == severity));
+        assert!(result.iter().all(|r| r.severity() == severity
+            // relying on test flaking for a failure kinda is lame, but its not a big enough deal to completely refactor to isolate this for testing
+            && ![SignalScope::Document, SignalScope::Device].contains(&r.scope().unwrap())));
 
         result.len()
     }
