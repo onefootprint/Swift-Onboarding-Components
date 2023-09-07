@@ -1,5 +1,4 @@
 use crate::auth::tenant::AuthActor;
-use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
 use api_wire_types::CreateAnnotationRequest;
 use api_wire_types::DecisionRequest;
@@ -25,10 +24,10 @@ pub fn save_review_decision(
 
     let sv = ScopedVault::get(conn, &wf.id)?;
 
-    if wf.authorized_at.is_none() {
-        // Can't make a decision on an onboarding that doesn't already have one
-        return Err(TenantError::CannotMakeDecision.into());
-    }
+    // if wf.authorized_at.is_none() {
+    //     // Can't make a decision on an onboarding that doesn't already have one
+    //     return Err(TenantError::CannotMakeDecision.into());
+    // }
 
     // If a manual review will be cleared or we will create a new decision, the operation
     // is not a no-op and we should create an annotation in the DB
