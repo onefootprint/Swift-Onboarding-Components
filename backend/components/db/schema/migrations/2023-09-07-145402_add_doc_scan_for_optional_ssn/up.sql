@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ADD COLUMN doc_scan_for_optional_ssn TEXT;

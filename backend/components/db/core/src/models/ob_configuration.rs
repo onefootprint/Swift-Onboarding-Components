@@ -49,6 +49,7 @@ pub struct ObConfiguration {
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: Option<DbActor>,
     pub skip_kyc: bool,
+    pub doc_scan_for_optional_ssn: Option<CDO>,
 }
 
 #[derive(derive_more::Deref)]
@@ -152,6 +153,11 @@ impl ObConfiguration {
     pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
         self.document_cdo().and_then(|cdo| cdo.restricted_id_doc_kinds())
     }
+
+    pub fn optional_ssn_restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
+        self.document_cdo_for_optional_ssn()
+            .and_then(|cdo| cdo.restricted_id_doc_kinds())
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -174,6 +180,7 @@ struct NewObConfiguration {
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     author: DbActor,
     skip_kyc: bool,
+    doc_scan_for_optional_ssn: Option<CDO>,
 }
 
 #[derive(Debug)]
@@ -334,6 +341,7 @@ impl ObConfiguration {
         international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
         author: DbActor,
         skip_kyc: bool,
+        doc_scan_for_optional_ssn: Option<CDO>,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -352,6 +360,7 @@ impl ObConfiguration {
             international_country_restrictions,
             author,
             skip_kyc,
+            doc_scan_for_optional_ssn,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -394,6 +403,14 @@ impl ObConfiguration {
             })
             .next()
     }
+
+    pub fn document_cdo_for_optional_ssn(&self) -> Option<&DocumentCdoInfo> {
+        self.doc_scan_for_optional_ssn.as_ref().and_then(|cdo| match cdo {
+            CDO::Document(doc_info) => Some(doc_info),
+            _ => None,
+        })
+    }
+
     pub fn can_access_document(&self) -> bool {
         self.can_access_data
             .iter()
@@ -452,6 +469,7 @@ mod tests {
             international_country_restrictions,
             author: None,
             skip_kyc: false,
+            doc_scan_for_optional_ssn: None,
         };
 
         assert_have_same_elements(
@@ -488,6 +506,7 @@ mod tests {
             international_country_restrictions,
             author: None,
             skip_kyc: false,
+            doc_scan_for_optional_ssn: None,
         }
     }
 
@@ -589,5 +608,37 @@ mod tests {
         Iso3166TwoDigitCountryCode::iter()
             .filter(|c| !c.is_us())
             .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
+    }
+
+    #[test_case(Some("document.passport.none.none") => Some(vec![IdDocKind::Passport]))]
+    #[test_case(Some("document.passport,drivers_license.none.none") => Some(vec![IdDocKind::Passport, IdDocKind::DriversLicense]))]
+    #[test_case(None => None)]
+    #[test_case(Some("full_address") => None)] // obc will fail when getting created anyways
+    fn test_doc_scan_for_optional_ssn(cdo: Option<&str>) -> Option<Vec<IdDocKind>> {
+        let obc = ObConfiguration {
+            id: ObConfigurationId::from_str("1234").unwrap(),
+            key: ObConfigurationKey::from_str("obk1").unwrap(),
+            name: "obc".into(),
+            tenant_id: TenantId::from_str("t_1234").unwrap(),
+            _created_at: Utc::now(),
+            _updated_at: Utc::now(),
+            is_live: true,
+            status: ApiKeyStatus::Enabled,
+            created_at: Utc::now(),
+            must_collect_data: vec![],
+            can_access_data: vec![],
+            appearance_id: None,
+            cip_kind: None,
+            optional_data: vec![],
+            is_no_phone_flow: false,
+            is_doc_first: false,
+            allow_international_residents: false,
+            international_country_restrictions: None,
+            author: None,
+            skip_kyc: false,
+            doc_scan_for_optional_ssn: cdo.map(|c| (CollectedDataOption::from_str(c).unwrap())),
+        };
+
+        obc.optional_ssn_restricted_id_doc_kinds()
     }
 }

@@ -451,6 +451,7 @@ table! {
         international_country_restrictions -> Nullable<Array<Text>>,
         author -> Nullable<Jsonb>,
         skip_kyc -> Bool,
+        doc_scan_for_optional_ssn -> Nullable<Text>,
     }
 }
 

@@ -34,6 +34,8 @@ pub struct CreateOnboardingConfigurationRequest {
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     #[serde(default)]
     skip_kyc: bool,
+    #[serde(default)]
+    doc_scan_for_optional_ssn: Option<CDO>,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -283,6 +285,7 @@ pub async fn post(
         allow_international_residents,
         international_country_restrictions,
         skip_kyc,
+        doc_scan_for_optional_ssn,
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -316,6 +319,7 @@ pub async fn post(
                 international_country_restrictions,
                 actor,
                 skip_kyc,
+                doc_scan_for_optional_ssn,
             )?;
             let obc = db::actor::saturate_actor_nullable(conn, obc)?;
             Ok(obc)
@@ -379,6 +383,7 @@ mod test {
             allow_international_residents: false,
             international_country_restrictions: None,
             skip_kyc: false,
+            doc_scan_for_optional_ssn: None,
         };
         req.validate_inner().is_ok()
     }
@@ -403,6 +408,7 @@ mod test {
             allow_international_residents: false,
             international_country_restrictions: None,
             skip_kyc: false,
+            doc_scan_for_optional_ssn: None,
         };
         req.validate().is_ok()
     }
@@ -426,6 +432,7 @@ mod test {
             allow_international_residents: allow_international,
             international_country_restrictions: None,
             skip_kyc: false,
+            doc_scan_for_optional_ssn: None,
         };
         req.validate().is_ok()
     }
@@ -445,6 +452,7 @@ mod test {
             allow_international_residents: allow_international,
             international_country_restrictions: None,
             skip_kyc: true,
+            doc_scan_for_optional_ssn: None,
         };
         req.validate().is_ok()
     }

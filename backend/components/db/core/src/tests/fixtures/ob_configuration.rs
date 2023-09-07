@@ -19,6 +19,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         None,
         DbActor::Footprint,
         false,
+        None,
     )
     .expect("Could not create ob config")
 }
@@ -36,6 +37,7 @@ pub struct ObConfigurationOpts {
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: DbActor,
     pub skip_kyc: bool,
+    pub doc_scan_for_optional_ssn: Option<CDO>,
 }
 
 impl Default for ObConfigurationOpts {
@@ -53,6 +55,7 @@ impl Default for ObConfigurationOpts {
             international_country_restrictions: None,
             author: DbActor::Footprint,
             skip_kyc: false,
+            doc_scan_for_optional_ssn: None,
         }
     }
 }
@@ -77,6 +80,7 @@ pub fn create_with_opts(
         opts.international_country_restrictions,
         opts.author,
         opts.skip_kyc,
+        opts.doc_scan_for_optional_ssn,
     )
     .expect("Could not create ob config")
 }
