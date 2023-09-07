@@ -37,12 +37,12 @@ describe('<Stepper />', () => {
     expect(completedOption).toHaveAttribute('data-completed', 'true');
   });
 
-  it('should display disabled options', () => {
+  it('should display next options', () => {
     renderStepper({
       value: { label: 'Step 2', value: 'step2' },
     });
-    const disabledOption = screen.getByText('Step 3').closest('li');
-    expect(disabledOption).toHaveAttribute('data-disabled', 'true');
+    const nextOption = screen.getByText('Step 3').closest('li');
+    expect(nextOption).toHaveAttribute('data-next', 'true');
   });
 
   it('should trigger the onChange callback with correct value when an option is clicked', async () => {

@@ -1,4 +1,4 @@
-import { IcoCheckCircle16 } from '@onefootprint/icons';
+import { IcoCheckSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { Fragment } from 'react';
 
@@ -7,6 +7,10 @@ import { createFontStyles } from '../../utils';
 export type StepperOption = {
   label: string;
   value: string;
+  options?: {
+    label: string;
+    value: string;
+  }[];
 };
 
 export type StepperProps = {
@@ -35,26 +39,34 @@ const Stepper = ({
       <ul>
         {options.map((option, index) => {
           const isCompleted = valueIndex > index;
-          const isDisabled = valueIndex < index;
+          const isNext = valueIndex < index;
           const isSelected = selectedOption.value === option.value;
           const isLast = index === options.length - 1;
+          const position = index + 1;
+          const subOptions = option.options || [];
+          const showSubOptions = isSelected && subOptions.length > 0;
 
           return (
             <Fragment key={option.value}>
               <Item
                 data-completed={isCompleted}
-                data-disabled={isDisabled}
+                data-next={isNext}
                 data-selected={isSelected}
+                data-sub={showSubOptions}
               >
                 <IconContainer>
-                  {isCompleted && <IcoCheckCircle16 />}
-                  {isDisabled && <DotDisabled />}
-                  {isSelected && <DotSelected />}
+                  {isCompleted && (
+                    <DotCompleted>
+                      <IcoCheckSmall16 color="quinary" />
+                    </DotCompleted>
+                  )}
+                  {isNext && <DotNext>{position}</DotNext>}
+                  {isSelected && <DotSelected>{position}</DotSelected>}
                 </IconContainer>
                 <button
                   type="button"
                   onClick={handleClick(option)}
-                  disabled={isDisabled}
+                  disabled={isNext}
                 >
                   {option.label}
                 </button>
@@ -62,9 +74,36 @@ const Stepper = ({
               {isLast ? null : (
                 <Connector
                   data-completed={isCompleted}
-                  data-disabled={isDisabled}
+                  data-next={isNext}
                   data-selected={isSelected}
                 />
+              )}
+              {showSubOptions && (
+                <>
+                  <ul>
+                    {subOptions.map(suboption => (
+                      <SubItem key={suboption.value}>
+                        <IconContainer>
+                          <SmallDot />
+                        </IconContainer>
+                        <button
+                          type="button"
+                          onClick={handleClick(option)}
+                          disabled={isNext}
+                        >
+                          {suboption.label}
+                        </button>
+                      </SubItem>
+                    ))}
+                  </ul>
+                  {isLast ? null : (
+                    <Connector
+                      data-completed={isCompleted}
+                      data-next={isNext}
+                      data-selected={isSelected}
+                    />
+                  )}
+                </>
               )}
             </Fragment>
           );
@@ -84,7 +123,6 @@ const Nav = styled.nav`
       button {
         background: none;
         border: none;
-        box-shadow: none;
         text-align: left;
       }
     }
@@ -96,12 +134,12 @@ const Item = styled.li`
     align-items: center;
     display: inline-grid;
     gap: ${theme.spacing[5]};
-    grid-template-columns: ${theme.spacing[5]} auto;
+    grid-template-columns: ${theme.spacing[6]} auto;
 
-    &[data-disabled='true'] {
+    &[data-next='true'] {
       button {
         ${createFontStyles('body-3')};
-        color: ${theme.color.tertiary};
+        color: ${theme.color.primary};
       }
     }
 
@@ -128,6 +166,13 @@ const Item = styled.li`
         opacity: 0.75;
       }
     }
+
+    &[data-sub='true'] {
+      button {
+        ${createFontStyles('body-3')};
+        color: ${theme.color.primary};
+      }
+    }
   `};
 `;
 
@@ -138,40 +183,74 @@ const IconContainer = styled.div`
   width: 100%;
 `;
 
-const DotDisabled = styled.div`
+const Dot = styled.div`
   ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.tertiary};
+    ${createFontStyles('caption-3')};
+    align-items: center;
+    color: white;
+    display: flex;
+    height: ${theme.spacing[6]};
+    justify-content: center;
+    width: ${theme.spacing[6]};
     border-radius: ${theme.borderRadius.full};
-    height: ${theme.spacing[3]};
-    opacity: 0.45;
-    width: ${theme.spacing[3]};
   `};
 `;
 
-const DotSelected = styled.div`
+const DotNext = styled(Dot)`
+  ${({ theme }) => css`
+    background-color: ${theme.backgroundColor.tertiary};
+  `};
+`;
+
+const DotSelected = styled(Dot)`
+  ${({ theme }) => css`
+    background-color: ${theme.backgroundColor.accent};
+  `};
+`;
+
+const DotCompleted = styled(Dot)`
+  ${({ theme }) => css`
+    background-color: ${theme.backgroundColor.successInverted};
+  `};
+`;
+
+const SubItem = styled.li`
+  ${({ theme }) => css`
+    align-items: center;
+    display: inline-grid;
+    gap: ${theme.spacing[8]};
+    grid-template-columns: ${theme.spacing[6]} auto;
+    height: calc(${theme.spacing[5]} + 1px);
+    margin-top: calc(${theme.spacing[3]} * -1);
+
+    button {
+      color: ${theme.color.accent};
+      ${createFontStyles('label-3')};
+  `};
+`;
+
+const SmallDot = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.accent};
     border-radius: ${theme.borderRadius.full};
-    box-shadow: 0px 0px 0px ${theme.borderRadius.compact} rgba(74, 36, 219, 0.2);
-    height: ${theme.spacing[3]};
-    width: ${theme.spacing[3]};
+    height: 6px;
+    width: 6px;
   `};
 `;
 
 const Connector = styled.div`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius.full};
-    height: 12px;
-    margin-left: calc(${theme.spacing[3]} - 1px);
-    width: 2px;
+    height: ${theme.spacing[4]};
+    margin-left: calc(${theme.spacing[4]} - ${theme.spacing[1]} - 1px);
+    width: ${theme.borderWidth[2]};
 
-    &[data-disabled='true'] {
+    &[data-next='true'] {
       background-color: ${theme.backgroundColor.tertiary};
-      opacity: 0.45;
     }
 
     &[data-completed='true'] {
-      background-color: ${theme.backgroundColor.tertiary};
+      background-color: ${theme.backgroundColor.successInverted};
     }
 
     &[data-selected='true'] {

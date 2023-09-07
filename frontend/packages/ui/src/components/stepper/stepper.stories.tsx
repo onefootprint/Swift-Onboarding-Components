@@ -1,6 +1,9 @@
 import { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
+import Box from '../box';
+import Button from '../button';
+import Divider from '../divider';
 import Stepper, { StepperProps } from './stepper';
 
 export default {
@@ -28,22 +31,74 @@ export default {
 
 const Template: Story<StepperProps> = ({
   'aria-label': ariaLabel,
-  options,
-  value,
+  options: defaultOptions,
   onChange,
 }: StepperProps) => {
-  const [val, setVal] = useState(value);
+  const [options, setOptions] = useState(defaultOptions);
+  const [index, setIndex] = useState(0);
+  const value = options[index];
 
   return (
-    <Stepper
-      aria-label={ariaLabel}
-      options={options}
-      value={val}
-      onChange={newValue => {
-        setVal(newValue);
-        onChange?.(newValue);
-      }}
-    />
+    <Box>
+      <Stepper
+        aria-label={ariaLabel}
+        options={options}
+        value={value}
+        onChange={newValue => {
+          const nextIndex = options.findIndex(
+            option => option.value === newValue.value,
+          );
+          setIndex(nextIndex);
+          onChange?.(newValue);
+        }}
+      />
+      <Box sx={{ marginTop: 6 }}>
+        <Divider />
+      </Box>
+      <Box sx={{ display: 'flex', gap: 2, marginTop: 7 }}>
+        <Button
+          size="small"
+          onClick={() => {
+            const nextIndex = index - 1;
+            if (nextIndex < 0) return;
+            const [first] = options;
+            if (nextIndex === 1 && first.options) {
+              setOptions(defaultOptions);
+              return;
+            }
+            setIndex(nextIndex);
+            onChange?.(options[nextIndex]);
+          }}
+        >
+          Back
+        </Button>
+        <Button
+          size="small"
+          onClick={() => {
+            const nextIndex = index + 1;
+            if (nextIndex >= options.length) return;
+            const [first] = options;
+
+            if (nextIndex === 1 && !first.options) {
+              setOptions([
+                {
+                  label: 'Who to onboard',
+                  value: 'who-to-onboard',
+                  options: [{ label: 'Residency', value: 'residency' }],
+                },
+                { label: 'Your Playbook', value: 'your-playbook' },
+                { label: 'Name your Playbook', value: 'name-your-playbook' },
+              ]);
+              return;
+            }
+            setIndex(nextIndex);
+            onChange?.(options[nextIndex]);
+          }}
+        >
+          Next
+        </Button>
+      </Box>
+    </Box>
   );
 };
 
@@ -55,6 +110,6 @@ Base.args = {
     { label: 'Your Playbook', value: 'your-playbook' },
     { label: 'Name your Playbook', value: 'name-your-playbook' },
   ],
-  value: { label: 'Your Playbook', value: 'your-playbook' },
+  value: undefined,
   onChange: console.log,
 };
