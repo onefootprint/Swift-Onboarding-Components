@@ -266,7 +266,7 @@ fn parse_type_of_id(
         return Ok(Err(IncodeFailureReason::UnknownCountryCode));
     };
 
-    if expected_country != provided_country {
+    if expected_country != provided_country && id_doc_kind != IdDocKind::Passport {
         return Ok(Err(IncodeFailureReason::CountryCodeMismatch));
     }
     Ok(Ok(id_doc_kind))
