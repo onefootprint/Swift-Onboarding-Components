@@ -35,11 +35,17 @@ const DocumentField = ({
   );
   const documentStatus = getDocumentStatus({ documents, documentType });
 
-  const currentDocument = documents.find(
+  let currentDocument = documents.find(
     document =>
-      document?.completedVersion?.toString() === activeDocumentVersion ||
-      documents[Number(activeDocumentVersion.replace('incomplete_', ''))],
+      document?.completedVersion?.toString() === activeDocumentVersion,
   );
+
+  if (!currentDocument) {
+    const docIndex = +activeDocumentVersion.replace('incomplete_', ''); // If the status/version of the document is "null", we use the format "incomplete_<array index>" as active version
+    if (!Number.isNaN(docIndex) && documents.length > docIndex) {
+      currentDocument = documents[docIndex];
+    }
+  }
 
   return documentType ? (
     <Container>
