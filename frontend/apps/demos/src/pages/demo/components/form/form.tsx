@@ -210,6 +210,10 @@ const InputsContainer = styled.div`
     row-gap: ${theme.spacing[5]};
     text-align: initial;
     margin-bottom: ${theme.spacing[7]};
+
+    > * {
+      width: 100%;
+    }
   `}
 `;
 
