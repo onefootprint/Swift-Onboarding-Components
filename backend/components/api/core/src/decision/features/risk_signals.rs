@@ -252,8 +252,6 @@ where
 pub enum WrappedRiskSignalGroupKind {
     Kyc,
     Kyb,
-    Watchlist,
-    AdverseMedia,
     Doc,
     Device,
     NativeDevice,
@@ -266,8 +264,6 @@ impl From<RiskSignalGroupKind> for WrappedRiskSignalGroupKind {
         match value {
             RiskSignalGroupKind::Kyc => Self::Kyc,
             RiskSignalGroupKind::Kyb => Self::Kyb,
-            RiskSignalGroupKind::Watchlist => Self::Watchlist,
-            RiskSignalGroupKind::AdverseMedia => Self::AdverseMedia,
             RiskSignalGroupKind::Doc => Self::Doc,
             RiskSignalGroupKind::WebDevice => Self::Device,
             RiskSignalGroupKind::NativeDevice => Self::NativeDevice,
@@ -281,8 +277,6 @@ impl From<WrappedRiskSignalGroupKind> for RiskSignalGroupKind {
         match value {
             WrappedRiskSignalGroupKind::Kyc => Self::Kyc,
             WrappedRiskSignalGroupKind::Kyb => Self::Kyb,
-            WrappedRiskSignalGroupKind::Watchlist => Self::Watchlist,
-            WrappedRiskSignalGroupKind::AdverseMedia => Self::AdverseMedia,
             WrappedRiskSignalGroupKind::Doc => Self::Doc,
             WrappedRiskSignalGroupKind::Device => Self::WebDevice,
             WrappedRiskSignalGroupKind::NativeDevice => Self::NativeDevice,

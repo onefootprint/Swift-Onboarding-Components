@@ -30,12 +30,10 @@ use strum_macros::EnumString;
 pub enum RiskSignalGroupKind {
     Kyc,
     Kyb,
-    Watchlist,    // TODO: unused and will be rm'd after DB is migrated appropriately
-    AdverseMedia, // TODO: unused and will be rm'd after DB is migrated appropriately
     Doc,
     WebDevice,
     NativeDevice,
-    Aml, // TODO: This will replace Watchlist + AdverseMedia
+    Aml,
 }
 
 impl_enum_str_diesel!(RiskSignalGroupKind);
