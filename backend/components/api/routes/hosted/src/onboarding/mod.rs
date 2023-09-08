@@ -139,6 +139,10 @@ fn is_cdo_met<Type>(
     cdo: &CollectedDataOption,
     decrypted_values: &DecryptUncheckedResultForReqs,
 ) -> bool {
+    if should_skip_us_only_cdos(cdo, decrypted_values) {
+        return true;
+    }
+
     let mut required_dis = cdo.required_data_identifiers();
     // Also check if optional DIs (based on selected values) are met
     match cdo {
@@ -175,21 +179,27 @@ fn is_cdo_met<Type>(
             // Non-US addresses will have the full address in AddressLine1 and as many other
             // fields extracted as possible
         }
-        // If we international, we don't require ssn
-        CollectedDataOption::Ssn4 | CollectedDataOption::Ssn9 => {
-            let country = decrypted_values
-                .get(&IDK::Country.into())
-                .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
-            if let Some(c) = country {
-                if !c.is_us() {
-                    required_dis = vec![]
-                }
-            }
-        }
         _ => (),
     }
 
     required_dis.into_iter().all(|di| vw.has_field(di))
+}
+
+// these are CDOs only applicable to US
+pub(crate) fn should_skip_us_only_cdos(
+    cdo: &CollectedDataOption,
+    decrypted_values: &DecryptUncheckedResultForReqs,
+) -> bool {
+    match cdo {
+        CollectedDataOption::Ssn4 | CollectedDataOption::Ssn9 | CollectedDataOption::UsLegalStatus => {
+            let country = decrypted_values
+                .get(&IDK::Country.into())
+                .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
+            // skip if !us
+            country.map(|c| !c.is_us()).unwrap_or(false)
+        }
+        _ => false,
+    }
 }
 
 fn get_progress<Type>(
@@ -416,6 +426,7 @@ fn get_requirement_inner(
                             CollectedDataOption::Document(DocumentCdoInfo(_, _, Selfie::RequireSelfie))
                         ) && skipped_selfie)
                     })
+                    .filter(|cdo| !should_skip_us_only_cdos(cdo, decrypted_values))
                     .cloned()
                     .collect();
 

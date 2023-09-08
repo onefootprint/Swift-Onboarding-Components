@@ -31,6 +31,8 @@ def test_international_address_req(sandbox_tenant, must_collect_data, twilio):
     req = get_requirement_from_requirements("collect_data", status["requirements"])
     assert "full_address" not in req["missing_attributes"]
     assert "ssn9" not in req["missing_attributes"]
+    fields_to_authorize = get_requirement_from_requirements("authorize", status['requirements'])["fields_to_authorize"]["collected_data"]
+    assert 'ssn9' not in fields_to_authorize
 
 
 def test_user_without_documents_international(
@@ -197,3 +199,51 @@ def test_with_documents_handles_international_address_restricted_documents_with_
     assert len(country_doc_mapping.keys()) == 249
     for doc in country_doc_mapping.values():
         assert doc == ["passport"]
+
+
+def test_us_legal_status(sandbox_tenant, twilio):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "KYC with legal status",
+        must_collect_data=[
+            "full_address",
+            "name",
+            "phone_number",
+            "email",
+            "us_legal_status",
+        ],
+        can_access_data=[
+            "full_address",
+            "name",
+            "phone_number",
+            "email",
+            "us_legal_status",
+        ],
+        optional_data=[],
+        allow_international_residents=True
+    )
+    bifrost = BifrostClient.new(obc, twilio)
+
+    status_before_address = bifrost.get_status()
+    collect_data_requirement_before_address = get_requirement_from_requirements(
+        "collect_data", status_before_address["requirements"]
+    )
+    
+    assert 'us_legal_status' in collect_data_requirement_before_address["missing_attributes"]
+    
+    # collect MX address
+    bifrost.data["id.country"] = "MX"
+    # remove legal status
+    bifrost.data.pop("id.us_legal_status")
+    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_requirements(kind="liveness")
+
+    status_after_address = bifrost.get_status()
+    collect_data_requirement_after_address = get_requirement_from_requirements(
+        "collect_data", status_after_address["requirements"]
+    )
+
+    assert collect_data_requirement_after_address is None
+
+    fields_to_authorize = get_requirement_from_requirements("authorize", status_after_address['requirements'])["fields_to_authorize"]["collected_data"]
+    assert 'us_legal_status' not in fields_to_authorize
