@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.3.0
+
+### Minor Changes
+
+- 57d333e1b: Add documentation for bootstrapping legal status data
+
 ## 3.2.0
 
 ### Minor Changes
