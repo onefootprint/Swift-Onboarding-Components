@@ -21,9 +21,7 @@ const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
   const country = watch('country');
   const { t } = useTranslation('pages.residential-address.form.country');
   const allowedCountries = new Set(config.supportedCountries);
-  const hasSingleOption =
-    !config.allowInternationalResidents || allowedCountries.size < 2;
-  const shouldDisable = disabled || hasSingleOption;
+  const shouldDisable = disabled || allowedCountries.size === 1;
   const options = COUNTRIES.filter(entry => allowedCountries.has(entry.value));
 
   return (

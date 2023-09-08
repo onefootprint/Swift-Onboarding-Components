@@ -1,5 +1,7 @@
 const ALL_COUNTRY_CODES = [
   'US',
+  'AS',
+  'GU',
   'AF',
   'AX',
   'AL',
@@ -257,6 +259,8 @@ export const isCountryCode = (value: string): value is CountryCode =>
 
 export type CountryCode3 =
   | 'USA'
+  | 'GUM'
+  | 'ASM'
   | 'AFG'
   | 'ALA'
   | 'ALB'
