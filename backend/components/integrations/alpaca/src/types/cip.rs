@@ -270,7 +270,7 @@ pub mod fixtures {
     use super::*;
 
     fn fp_id_test() -> FpId {
-        FpId::from("fp_id_alpaca_test_1".to_string())
+        FpId::from("fp_id_test_xyz1234".to_string())
     }
 
     impl CipRequest {

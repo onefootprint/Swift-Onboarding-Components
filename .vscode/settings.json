@@ -101,24 +101,33 @@
     "**/.git/subtree-cache/**": true,
     "**/node_modules/*/**": true
   },
-  "rust-analyzer.files.excludeDirs": ["**/target/**"],
+  "rust-analyzer.files.excludeDirs": [
+    "**/target/**"
+  ],
   "rust-analyzer.rustfmt.overrideCommand": null,
   "search.exclude": {
     "**/target/": true,
     "**/.jest-cache/**": true
   },
-  "eslint.workingDirectories": ["./frontend"],
-  "eslint.validate": ["javascript", "typescript", "typescriptreact"],
+  "eslint.workingDirectories": [
+    "./frontend"
+  ],
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "typescriptreact"
+  ],
   "command-runner.terminal.name": "RunCommand",
   "command-runner.terminal.autoClear": true,
   "command-runner.terminal.autoFocus": true,
   "command-runner.commands": {
     "clippy fix": "cd backend && cargo clippy --fix --workspace --allow-dirty"
   },
-  "python.testing.pytestArgs": ["backend"],
+  "python.testing.pytestArgs": [
+    "backend"
+  ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "rust-analyzer.cargo.features": [],
-  "cargo.automaticCheck": false,
   "rust-analyzer.check.command": "clippy"
 }

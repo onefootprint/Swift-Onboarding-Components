@@ -1,0 +1,93 @@
+use api_core::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    types::{JsonApiResponse, ResponseData},
+    State,
+};
+use api_wire_types::{ApexCheckedKycData, ApexCipReportRequest, ApexCipSummaryResults, ApexSelfReportedData};
+
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use strum::IntoEnumIterator;
+
+#[api_v2_operation(
+    description = "Export CIP information for APEX as a JSON object",
+    tags(Integrations, Apex, Preview)
+)]
+#[actix::post("/integrations/apex/cip_report")]
+pub async fn post(
+    state: web::Data<State>,
+    auth: SecretTenantAuthContext,
+    request: Json<ApexCipReportRequest>,
+) -> JsonApiResponse<ApexCipSummaryResults> {
+    let request = request.into_inner();
+    let auth = auth.check_guard(TenantGuard::CipIntegration)?;
+    let is_live = auth.is_live()?;
+    let tenant_id = auth.tenant().id.clone();
+
+    // build the cip request based on the alpaca format
+    let (cip, uvw) = crate::alpaca::cip::create_cip_request(
+        &state,
+        request.default_approver,
+        request.fp_user_id.clone(),
+        tenant_id.clone(),
+        is_live,
+    )
+    .await?;
+
+    use newtypes::DataIdentifier::Id;
+    use newtypes::DataIdentifier::InvestorProfile as Ip;
+    use newtypes::IdentityDataKind::*;
+    use newtypes::InvestorProfileKind as IPK;
+    use IPK::*;
+
+    // decrypt a few additional attributes for our apex cip report
+    let attrs = [Id(Ssn9), Id(UsLegalStatus), Id(VisaKind), Id(Citizenships)]
+        .into_iter()
+        .chain(IPK::iter().map(Ip))
+        .collect::<Vec<_>>();
+
+    let mut vd = uvw
+        .decrypt_unchecked(&state.enclave_client, &attrs)
+        .await?
+        .results_by_data_identifier();
+
+    let self_reported = ApexSelfReportedData {
+        citizenships: vd.remove(&Id(Citizenships)),
+        visa_kind: vd.remove(&Id(VisaKind)),
+        us_legal_status: vd.remove(&Id(UsLegalStatus)),
+        annual_income: vd.remove(&Ip(AnnualIncome)),
+        occupation: vd.remove(&Ip(Employer)),
+        employment_status: vd.remove(&Ip(EmploymentStatus)),
+        investment_objectives: vd.remove(&Ip(InvestmentGoals)),
+        net_worth: vd.remove(&Ip(NetWorth)),
+        is_employed_at_brokerage_firm: vd.remove(&Ip(BrokerageFirmEmployer)),
+        declarations: vd.remove(&Ip(Declarations)),
+    };
+
+    let summary = ApexCipSummaryResults {
+        user_id: cip.kyc.id,
+        checked_data: ApexCheckedKycData {
+            tax_id: vd.remove(&Id(Ssn9)),
+            customer_name: cip.kyc.applicant_name,
+            address: cip.kyc.address,
+            date_of_birth: cip.kyc.date_of_birth.clone(),
+        },
+        self_reported,
+        kyc_completed_at: cip.kyc.kyc_completed_at,
+        check_initiated_at: cip.kyc.check_initiated_at,
+        check_completed_at: cip.kyc.check_completed_at,
+        approved_reason: cip.kyc.approved_reason,
+        approved_at: cip.kyc.approved_at,
+        approved_by: cip.kyc.approved_by,
+        ip_address: cip.kyc.ip_address,
+
+        result: cip.identity.result.into(),
+        matched_address: cip.identity.matched_address.into(),
+        matched_addresses: cip.identity.matched_addresses,
+        date_of_birth: cip.identity.date_of_birth.into(),
+        date_of_birth_breakdown: cip.identity.date_of_birth_breakdown,
+        tax_id: cip.identity.tax_id.into(),
+        tax_id_breakdown: cip.identity.tax_id_breakdown,
+    };
+
+    ResponseData::ok(summary).json()
+}

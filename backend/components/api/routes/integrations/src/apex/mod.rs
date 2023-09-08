@@ -1,8 +1,7 @@
-mod account;
-pub(crate) mod cip;
+mod cip_report;
 
 use paperclip::actix::web::{self};
 
 pub fn routes(config: &mut web::ServiceConfig) {
-    config.service(cip::post).service(account::post);
+    config.service(cip_report::post);
 }

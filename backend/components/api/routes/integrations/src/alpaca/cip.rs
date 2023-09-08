@@ -63,7 +63,7 @@ pub async fn post(
         .map_err(CipError::from)?;
 
     // build the cip request
-    let cip_request: CipRequest = create_cip_request(
+    let (cip_request, _) = create_cip_request(
         &state,
         request.default_approver,
         request.fp_user_id,
@@ -90,13 +90,13 @@ pub async fn post(
 }
 
 /// create a CIP request from the decision results
-async fn create_cip_request(
+pub(crate) async fn create_cip_request(
     state: &State,
     default_approver: PiiString,
     fp_id: FpId,
     tenant_id: TenantId,
     is_live: bool,
-) -> ApiResult<CipRequest> {
+) -> ApiResult<(CipRequest, TenantVw)> {
     let (uvw, wf, decision, scoped_vault, actor, mr, risk_signals, insight, vres, collected_document) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -228,7 +228,7 @@ async fn create_cip_request(
         photo,
     };
 
-    Ok(cip)
+    Ok((cip, uvw))
 }
 
 /// helper for building the kyc data
