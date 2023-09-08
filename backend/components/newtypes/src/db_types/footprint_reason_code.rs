@@ -607,10 +607,6 @@ footprint_reason_code_enum! {
         SsnIssueDateCannotBeVerified,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
-        #[note = "SSN located for this consumer has been reported as deceased", severity = SignalSeverity::High,  description = "The Social Security Administration (SSA) has reported that death benefits are being paid on the best on-file SSN"]
-        SsnLocatedIsDeceased,
-
-        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
         #[note = "The issue date for the SSN located for this consumer cannot be verified", severity = SignalSeverity::Medium,  description = "The issue date of the best on-file SSN cannot be verified by the Social Security Administration (SSA)"]
         SsnLocatedIssueDateCannotBeVerified,
 
@@ -863,10 +859,6 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
         #[note = "DOB month match", severity = SignalSeverity::Info,  description = "Month of birth input matches the month of birth located."]
         DobMobMatches,
-
-        #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = None]
-        #[note = "SSN located is deceased", severity = SignalSeverity::High,  description = "The best on-file SSN for this consumer at a bureau recorded As Deceased"]
-        LocatedSsnIsDeceased,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
         #[note = "SSN matches", severity = SignalSeverity::Info,  description = "SSN located matches SSN input."]
