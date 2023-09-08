@@ -43,6 +43,7 @@ pub struct PublicOnboardingConfiguration {
 
     pub is_no_phone_flow: bool,
     pub requires_id_doc: bool,
+    pub can_make_real_doc_scan_calls_in_sandbox: bool,
     pub is_kyb: bool,
     pub allow_international_residents: bool,
     pub supported_countries: Vec<Iso3166TwoDigitCountryCode>,

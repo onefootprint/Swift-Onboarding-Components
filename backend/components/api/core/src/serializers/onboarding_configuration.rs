@@ -46,6 +46,9 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
         let appearance = appearance.map(|a| a.data);
         let is_app_clip_enabled = ff_client.flag(BoolFlag::IsAppClipEnabled(&tenant_id));
         let is_instant_app_enabled = ff_client.flag(BoolFlag::IsInstantAppEnabled(&tenant_id));
+        let can_make_real_doc_scan_calls_in_sandbox = (!ob_config.is_live)
+            .then(|| ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id)))
+            .unwrap_or(false);
         let is_kyb = must_collect_data
             .iter()
             .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Business);
@@ -64,6 +67,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             is_app_clip_enabled,
             is_instant_app_enabled,
             is_no_phone_flow,
+            can_make_real_doc_scan_calls_in_sandbox,
             allowed_origins: tenant_client_config.map(|c| c.allowed_origins),
             requires_id_doc,
             is_kyb,
