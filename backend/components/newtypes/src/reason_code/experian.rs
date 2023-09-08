@@ -130,7 +130,7 @@ vendor_reason_code_enum! {
         CurrentAddressReportByTradeOpenedRecently,
         // The SSA has reported that death benefits GLB are being paid on the best on-file SSN.
         #[ser = "25", description = "Best On-File SSN Recorded As Deceased"]
-        #[footprint_reason_code = Some(FootprintReasonCode::SsnLocatedIsDeceased)]
+        #[footprint_reason_code = Some(FootprintReasonCode::SubjectDeceased)]
         BestLocatedSSNDeceased,
         // The issues date of the best on-file SSN GLB cannot be verified by the SSA.
         #[ser = "26", description = "Best On-File SSN Issue Date Cannot Be Verified"]
