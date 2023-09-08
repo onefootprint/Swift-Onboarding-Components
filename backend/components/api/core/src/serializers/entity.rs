@@ -67,8 +67,14 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             status,
             ..
         } = sv;
-        // TODO should we determine requires_manual_review in another way?
-        let requires_manual_review = wfs.iter().any(|(_, _, mr)| mr.is_some());
+
+        // If the latest Workflow has an uncompleted review
+        let requires_manual_review = wfs
+            .iter()
+            .max_by_key(|(wf, _, _)| wf.created_at)
+            .map(|(_, _, mr)| mr.is_some())
+            .unwrap_or(false);
+
         let insight_event = wfs
             .into_iter()
             .filter_map(|wf| wf.1.map(|ie| (wf.0, ie)))
