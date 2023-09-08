@@ -244,7 +244,7 @@
     "home": {
       "html-title": "Footprint - One tool to unify onboarding, identity verification, and data security",
       "hero": {
-        "title": "Onboarding that solves identity verification, security, and fraud",
+        "title": "Onboarding that solves identity, security, fraud, and auth",
         "subtitle": "Embedding KYC, KYB, and PII + Card Vaulting with 5 lines of code, we empower companies to own their onboarding experience and customer data with one-click.",
         "desktop-img-alt": "desktop mockup",
         "mobile-img-alt": "mobile mockup",
