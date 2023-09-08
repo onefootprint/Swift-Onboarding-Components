@@ -44,6 +44,7 @@ const useProcessImage = () => {
       handleError(ImageProcessingStepError.other, error);
     }
     if (!file) {
+      console.error('Image files undefined after image compression');
       return undefined;
     }
 

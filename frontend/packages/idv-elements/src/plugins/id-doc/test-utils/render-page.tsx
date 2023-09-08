@@ -1,4 +1,4 @@
-import { customRender } from '@onefootprint/test-utils';
+import { render, Wrapper } from '@onefootprint/test-utils';
 import React, { ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { Layout } from 'src/components';
@@ -13,14 +13,16 @@ const renderPage = (
   component: ReactNode,
   initState?: string,
 ) =>
-  customRender(
-    <MachineProvider args={context} initState={initState}>
-      <I18nextProvider i18n={configureI18next()}>
-        <MissingPermissionsSheetProvider>
-          <Layout>{component}</Layout>
-        </MissingPermissionsSheetProvider>
-      </I18nextProvider>
-    </MachineProvider>,
+  render(
+    <Wrapper>
+      <MachineProvider args={context} initState={initState}>
+        <I18nextProvider i18n={configureI18next()}>
+          <MissingPermissionsSheetProvider>
+            <Layout>{component}</Layout>
+          </MissingPermissionsSheetProvider>
+        </I18nextProvider>
+      </MachineProvider>
+    </Wrapper>,
   );
 
 export default renderPage;

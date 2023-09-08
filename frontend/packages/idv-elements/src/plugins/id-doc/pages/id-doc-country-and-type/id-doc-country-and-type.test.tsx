@@ -154,6 +154,9 @@ describe('<IdDocCountryAndType/>', () => {
   });
 
   describe('Other tests', () => {
+    beforeEach(() => {
+      jest.spyOn(console, 'error').mockImplementation(() => null);
+    });
     it('Country selector is disabled for only US', async () => {
       renderFrontCountryAndDoc(initialContextOnlyUS);
       const onlyUSWarning = screen.getByText(

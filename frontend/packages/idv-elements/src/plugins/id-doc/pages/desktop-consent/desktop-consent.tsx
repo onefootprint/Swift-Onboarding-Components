@@ -1,4 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { Button, Divider } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
@@ -25,6 +26,12 @@ const DesktopConsent = () => {
   const submitConsent = () => {
     const consentLanguageText = consentRef.current?.getConsentText();
     if (!authToken || consentMutation.isLoading || !consentLanguageText) {
+      if (!authToken)
+        console.error("Could not submit consent - auth token doesn't exist");
+      if (!consentLanguageText)
+        console.error(
+          'Could not submit consent - consent language is empty or undefined',
+        );
       return;
     }
 
@@ -36,7 +43,12 @@ const DesktopConsent = () => {
             type: 'consentReceived',
           });
         },
-        onError: requestErrorToast,
+        onError: err => {
+          console.error(
+            `Could not submit consent language. Error: ${getErrorMessage(err)}`,
+          );
+          requestErrorToast(err);
+        },
       },
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps

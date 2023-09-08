@@ -105,11 +105,13 @@ const Camera = ({
 
   const handleClick = () => {
     if (!canvasRef.current || !videoRef.current) {
+      console.error('Video ref or canvas not initialized for camera capture');
       return;
     }
 
     const context = canvasRef.current.getContext('2d');
     if (!context) {
+      console.error('Canvas context is undefined for camera capture');
       return;
     }
 
@@ -144,10 +146,12 @@ const Camera = ({
 
   const clearCanvas = () => {
     if (!canvasRef.current) {
+      console.warn('Canvas could not be cleared. Ref undefined');
       return;
     }
     const context = canvasRef.current.getContext('2d');
     if (!context) {
+      console.warn('Canvas could not be cleared. Context undefined');
       return;
     }
     context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);

@@ -4,7 +4,6 @@ import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import React from 'react';
 
 import { useIdDocMachine } from '../../components/machine-provider';
-import { getCountryFromCode } from '../../utils/get-country-from-code';
 import IdDocCountryAndTypeContainer from './components/id-doc-country-and-type-container';
 
 const IdDocCountryAndType = () => {
@@ -19,8 +18,7 @@ const IdDocCountryAndType = () => {
       type: 'receivedCountryAndType',
       payload: {
         type: docType,
-        country:
-          getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value,
+        country: country.value ?? DEFAULT_COUNTRY.value,
         id,
       },
     });

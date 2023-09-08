@@ -32,11 +32,15 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
     const { files } = event.target;
     if (!files?.length) {
       onProcessingDone();
+      console.error('Image upload failed. No image files detected');
       return;
     }
 
     const processingResult = await processImageFile(files[0]);
     if (!processingResult) {
+      console.error(
+        'Image upload failed. Uploaded image could not be processed',
+      );
       onProcessingDone();
       return;
     }
@@ -48,6 +52,9 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
     );
     if (!imageString) {
       onProcessingDone();
+      console.error(
+        'Image upload failed. Uploaded image could not be stringified',
+      );
       return;
     }
 

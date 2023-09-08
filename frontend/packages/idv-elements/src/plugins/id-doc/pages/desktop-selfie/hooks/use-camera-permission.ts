@@ -28,6 +28,10 @@ const useCameraPermission = () => {
           error.name === 'PermissionDeniedError'
         )
           setPermissionState('notAllowed');
+
+        console.error(
+          `Error while retrieving camera permission. Error: ${error.name}`,
+        );
       });
   });
 

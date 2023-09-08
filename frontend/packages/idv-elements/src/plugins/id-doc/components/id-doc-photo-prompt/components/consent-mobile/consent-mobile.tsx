@@ -1,4 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import React, { useRef } from 'react';
 
 import useConsent from '../../../../hooks/use-consent';
@@ -26,9 +27,12 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
   const handleConsent = () => {
     const consentLanguageText = consentRef.current?.getConsentText();
     if (!authToken || !consentLanguageText) {
-      console.error(
-        "Couldn't post consent - auth token or consent text missing",
-      );
+      if (!authToken)
+        console.error("Could not submit consent - auth token doesn't exist");
+      if (!consentLanguageText)
+        console.error(
+          'Could not submit consent - consent language is empty or undefined',
+        );
       return;
     }
 
@@ -38,7 +42,12 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
       { consentLanguageText, authToken },
       {
         onSuccess: onConsent,
-        onError: requestErrorToast,
+        onError: err => {
+          console.error(
+            `Could not submit consent language. Error: ${getErrorMessage(err)}`,
+          );
+          requestErrorToast(err);
+        },
       },
     );
   };

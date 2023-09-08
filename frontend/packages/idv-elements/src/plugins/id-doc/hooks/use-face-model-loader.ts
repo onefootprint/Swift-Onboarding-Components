@@ -19,9 +19,13 @@ const useFaceModelLoader = ({ selfieRequired }: FaceModelLoaderType) => {
         Promise.all([
           nets.tinyFaceDetector.loadFromUri(MODEL_URL),
           nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-        ]).then(() => {
-          setModelsLoaded(true);
-        });
+        ])
+          .then(() => {
+            setModelsLoaded(true);
+          })
+          .catch(err => {
+            console.error(`Error loading the face models: ${err}`);
+          });
       }
     };
     loadModels();

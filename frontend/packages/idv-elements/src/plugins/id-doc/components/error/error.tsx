@@ -43,6 +43,11 @@ const Error = ({
 
   const cleanedErrors = errors.filter(error => imageErrorsSet.has(error)) ?? [];
   if (cleanedErrors.length === 0) {
+    console.error(
+      `Detected unknown image processing (or upload) errors that doesn't exist on the list of defined image errors. Errors: ${errors
+        .map(err => `${err}`)
+        .join(', ')}`,
+    );
     cleanedErrors.push(IdDocImageProcessingError.unknownError);
   }
 

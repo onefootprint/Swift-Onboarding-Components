@@ -14,6 +14,7 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
         const stream = await navigator.mediaDevices.getUserMedia(cameraOptions);
         setMediaStream(stream);
       } catch (err) {
+        console.error(`Could not initialize media stream. Error: ${err}`);
         onCameraError(err);
         onError?.();
       }

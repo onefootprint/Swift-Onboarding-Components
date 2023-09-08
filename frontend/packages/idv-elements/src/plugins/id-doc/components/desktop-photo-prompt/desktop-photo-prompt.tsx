@@ -56,6 +56,9 @@ const DesktopPhotoPrompt = ({
     if (!processingResult) {
       onProcessingDone();
       handleUploadError([IdDocImageUploadError.unknownUploadError]);
+      console.error(
+        'Image upload failed on desktop mode. Uploaded image could not be processed',
+      );
       return;
     }
 
@@ -67,6 +70,9 @@ const DesktopPhotoPrompt = ({
     if (!imageString) {
       onProcessingDone();
       handleUploadError([IdDocImageUploadError.unknownUploadError]);
+      console.error(
+        'Image upload failed on desktop. Uploaded image could not be stringified',
+      );
       return;
     }
 

@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { IdDocImageTypes, SubmitDocResponse } from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
@@ -39,6 +40,7 @@ const DeskTopProcessing = () => {
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
+      console.error('Image upload retry limit exceeded');
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === state.context.currSide) {
       send({
@@ -67,6 +69,15 @@ const DeskTopProcessing = () => {
   useEffectOnce(() => {
     if (!image || !authToken || !type || !country || !currSide || !id) {
       setIsMissingRequirements(true);
+      console.error(
+        `Mobile web flow - id-doc image could not be processed due to missing requirements. Requirements - image: ${
+          image ? 'OK' : 'undefined'
+        }, auth token: ${authToken ? 'OK' : 'undefined'}, doc type: ${
+          type ? 'OK' : 'undefined'
+        }, country: ${country ? 'OK' : 'undefined'}, current side: ${
+          currSide ? 'OK' : 'undefined'
+        }, id: ${id ? 'OK' : 'undefined'}`,
+      );
       return;
     }
 
@@ -82,7 +93,14 @@ const DeskTopProcessing = () => {
       },
       {
         onSuccess: handleSubmitDocSuccess,
-        onError: handleSubmitDocError,
+        onError: err => {
+          console.error(
+            `Id-doc image submit failed. image: ${image}, side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
+              err,
+            )}`,
+          );
+          handleSubmitDocError();
+        },
       },
     );
   });

@@ -4,6 +4,7 @@ import {
   DEFAULT_COUNTRY,
 } from '@onefootprint/global-constants';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { CountryCode, SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
@@ -122,7 +123,14 @@ const IdDocCountryAndTypeContainer = ({
       },
       {
         onSuccess: data => onSubmitDocTypeSuccess(data, country, docType),
-        onError: requestErrorToast,
+        onError: err => {
+          console.error(
+            `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error: ${getErrorMessage(
+              err,
+            )}`,
+          );
+          requestErrorToast(err);
+        },
       },
     );
   };
