@@ -1,5 +1,5 @@
 import { getSessionId } from '@onefootprint/dev-tools';
-import { IS_BROWSER, IS_PROD } from '@onefootprint/global-constants';
+import { IS_BROWSER, IS_DEV } from '@onefootprint/global-constants';
 import { checkDeviceInfo, DeviceInfo } from '@onefootprint/idv-elements';
 import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
@@ -12,7 +12,7 @@ const BASE_URL_DOMAIN = 'onefootprint.com';
 const LOG_ROCKET_ORG_ID = 'lrswdg/footprint-bifrost-prod';
 
 export const configureLogRocket = () => {
-  if (IS_PROD && IS_BROWSER) {
+  if (IS_DEV && IS_BROWSER) {
     LogRocket.init(LOG_ROCKET_ORG_ID, {
       release: COMMIT_SHA,
       rootHostname: BASE_URL_DOMAIN,
@@ -67,7 +67,7 @@ export const configureSentry = () => {
       release: COMMIT_SHA,
       environment: VERCEL_ENV,
       beforeSend(rawEvent) {
-        if (!IS_PROD) {
+        if (!IS_DEV) {
           return rawEvent;
         }
         const event = { ...rawEvent };
