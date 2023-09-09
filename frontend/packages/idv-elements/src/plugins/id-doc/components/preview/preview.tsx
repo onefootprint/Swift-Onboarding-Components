@@ -29,6 +29,7 @@ const Preview = ({
     <Container>
       <PreviewContainer data-device-kind={deviceKind}>
         <ImagePreview
+          data-private
           src={imageSrc}
           data-camera-kind={cameraKind}
           data-device-kind={deviceKind}

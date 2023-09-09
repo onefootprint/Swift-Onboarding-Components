@@ -10,6 +10,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { D2PStatusUpdate, GetD2PResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
+import * as LogRocket from 'logrocket';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
@@ -66,6 +67,7 @@ const Init = () => {
           opener,
           bifrostSessionId,
         });
+        LogRocket.identify(bifrostSessionId);
 
         send({
           type: 'initContextUpdated',

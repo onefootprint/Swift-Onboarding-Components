@@ -11,7 +11,7 @@ export type DeviceInfo = {
 // device, just to avoid to make a lot of ifs
 const DEFAULT_DEVICE_TYPE = 'unknown';
 
-async function checkDeviceInfo() {
+export const checkDeviceInfo = async () => {
   const uaParser = new UAParser();
   const device = uaParser.getDevice();
   let hasSupportForWebauthn = false;
@@ -24,7 +24,7 @@ async function checkDeviceInfo() {
     type: device.type || DEFAULT_DEVICE_TYPE,
   };
   return info;
-}
+};
 
 const useDeviceInfo = (onComplete: (deviceInfo: DeviceInfo) => void) => {
   useEffectOnce(() => {

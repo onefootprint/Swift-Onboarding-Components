@@ -8,11 +8,15 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 import MachineProvider from '../components/machine-provider';
+import {
+  configureLogRocket,
+  configureSentry,
+} from '../config/initializers/logger';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
-import configureSentry from '../config/initializers/sentry';
 
 configureSentry();
+configureLogRocket();
 configureReactI18next();
 
 const App = ({ Component, pageProps }: AppProps) => {

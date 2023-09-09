@@ -2,6 +2,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { OnboardingStatusResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
+import * as LogRocket from 'logrocket';
 import React, { useState } from 'react';
 
 import Error from '../../../../components/error';
@@ -19,6 +20,8 @@ const CheckRequirements = () => {
   const [error, setError] = useState(false);
 
   const handleSuccess = (response: OnboardingStatusResponse) => {
+    LogRocket.log('checkRequirements', response);
+
     const payload = computeRequirementsToShow(
       !!isTransfer,
       startedDataCollection,

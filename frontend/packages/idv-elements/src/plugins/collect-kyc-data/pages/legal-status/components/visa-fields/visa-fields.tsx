@@ -36,6 +36,7 @@ const VisaFields = () => {
         rules={{ required: true }}
         render={({ field, fieldState: { error } }) => (
           <Select
+            data-private
             label={t('visa-kind.label')}
             onBlur={field.onBlur}
             options={options}
