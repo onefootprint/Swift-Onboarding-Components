@@ -10,38 +10,42 @@ import OutcomeSelect from '../../../outcome-select';
 type SimulatedOutcomesProps = {
   onSelect: () => void;
   isSelected: boolean;
+  allowRealOutcome?: boolean;
 };
 
 const SimulatedOutcomes = ({
   onSelect,
   isSelected,
+  allowRealOutcome,
 }: SimulatedOutcomesProps) => {
   const { t } = useTranslation('pages.sandbox-outcome.id-doc-outcome');
   const { control } = useFormContext();
 
   return (
     <Container>
-      <Controller
-        control={control}
-        name="outcomes.idDocOutcome"
-        render={({ field }) => (
-          <Radio
-            label={t('simulated-outcome.title')}
-            value="simulated"
-            onChange={() => {
-              onSelect();
-              field.onChange(IdDocOutcomes.success);
-            }}
-            checked={isSelected}
-          />
-        )}
-      />
+      {allowRealOutcome && (
+        <Controller
+          control={control}
+          name="outcomes.idDocOutcome"
+          render={({ field }) => (
+            <Radio
+              label={t('simulated-outcome.title')}
+              value="simulated"
+              onChange={() => {
+                onSelect();
+                field.onChange(IdDocOutcomes.success);
+              }}
+              checked={isSelected}
+            />
+          )}
+        />
+      )}
 
       <Controller
         control={control}
         name="outcomes.idDocOutcome"
         render={({ field }) => (
-          <Box sx={{ marginLeft: 7, paddingLeft: 2 }}>
+          <Box sx={{ marginLeft: allowRealOutcome ? 7 : 0, paddingLeft: 2 }}>
             <OutcomeSelect
               options={[
                 {

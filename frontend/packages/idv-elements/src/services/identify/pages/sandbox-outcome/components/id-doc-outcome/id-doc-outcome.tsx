@@ -6,7 +6,11 @@ import React, { useState } from 'react';
 import RealOutcome from './components/real-outcome';
 import SimulatedOutcomes from './components/simulated-outcomes/simulated-outcomes';
 
-const IdDocOutcome = () => {
+type IdDocOutcomeProps = {
+  allowRealOutcome?: boolean;
+};
+
+const IdDocOutcome = ({ allowRealOutcome }: IdDocOutcomeProps) => {
   const { t } = useTranslation('pages.sandbox-outcome.id-doc-outcome');
   const [isSimulated, setIsSimulated] = useState(true);
 
@@ -21,8 +25,11 @@ const IdDocOutcome = () => {
         <SimulatedOutcomes
           onSelect={outcomeTypeChange}
           isSelected={isSimulated}
+          allowRealOutcome={allowRealOutcome}
         />
-        <RealOutcome onSelect={outcomeTypeChange} isSelected={!isSimulated} />
+        {allowRealOutcome && (
+          <RealOutcome onSelect={outcomeTypeChange} isSelected={!isSimulated} />
+        )}
       </OutcomesContainer>
     </Container>
   );

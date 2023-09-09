@@ -19,8 +19,11 @@ import SandboxOutcomeContainer, {
   FormDataType,
 } from './components/sandbox-outcome-container';
 
-const getOnboardingConfig = (isLive = true): PublicOnboardingConfig => ({
-  isLive,
+const getOnboardingConfig = (
+  requiresIdDoc = true,
+  canMakeRealDocScanCallsInSandbox = true,
+): PublicOnboardingConfig => ({
+  isLive: false,
   logoUrl: 'url',
   privacyPolicyUrl: 'url',
   name: 'tenant',
@@ -30,10 +33,11 @@ const getOnboardingConfig = (isLive = true): PublicOnboardingConfig => ({
   isInstantAppEnabled: false,
   appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
   isNoPhoneFlow: false,
-  requiresIdDoc: true,
+  requiresIdDoc,
   key: 'key',
   isKyb: false,
   allowInternationalResidents: false,
+  canMakeRealDocScanCallsInSandbox,
 });
 
 let submittedFormData: FormDataType = {
@@ -52,26 +56,37 @@ const mockHandleFormSubmit = jest
 
 const SandboxOutcomeWrapper = ({
   requiresIdDoc,
+  allowRealDocOutcome,
 }: {
   requiresIdDoc: boolean;
+  allowRealDocOutcome?: boolean;
 }) => (
   <SandboxOutcomeContainer
-    config={requiresIdDoc ? getOnboardingConfig() : undefined}
+    config={getOnboardingConfig(requiresIdDoc, allowRealDocOutcome)}
     onSubmit={mockHandleFormSubmit}
   />
 );
 
-const renderSandbox = ({ requiresIdDoc }: { requiresIdDoc: boolean }) => {
+const renderSandbox = ({
+  requiresIdDoc,
+  allowRealDocOutcome = true,
+}: {
+  requiresIdDoc: boolean;
+  allowRealDocOutcome?: boolean;
+}) => {
   customRender(
     <I18nextProvider i18n={configureI18next()}>
       <Layout onClose={() => {}}>
-        <SandboxOutcomeWrapper requiresIdDoc={requiresIdDoc} />
+        <SandboxOutcomeWrapper
+          requiresIdDoc={requiresIdDoc}
+          allowRealDocOutcome={allowRealDocOutcome}
+        />
       </Layout>
     </I18nextProvider>,
   );
 };
 
-describe.skip('<SandboxOutcome/>', () => {
+describe('<SandboxOutcome/>', () => {
   describe('contains all the initial elements', () => {
     it('with id doc case:', () => {
       renderSandbox({ requiresIdDoc: true });
@@ -173,6 +188,20 @@ describe.skip('<SandboxOutcome/>', () => {
 
       const continueButton = screen.getByText('Continue');
       expect(continueButton).toBeInTheDocument();
+    });
+
+    it('without id doc real outcome case:', () => {
+      renderSandbox({ requiresIdDoc: true, allowRealDocOutcome: false });
+      const simulateOutcomeRadioOption =
+        screen.queryAllByLabelText('Simulated outcome');
+      expect(simulateOutcomeRadioOption).toHaveLength(0);
+      const sandboxSimulatedOutcomes = screen.getByTestId(
+        'simulatedOutcomeOptions',
+      );
+      expect(sandboxSimulatedOutcomes).toBeInTheDocument();
+
+      const realOutcomeOption = screen.queryAllByLabelText('Real outcome');
+      expect(realOutcomeOption).toHaveLength(0);
     });
   });
 

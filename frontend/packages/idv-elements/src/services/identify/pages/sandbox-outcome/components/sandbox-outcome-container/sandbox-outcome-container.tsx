@@ -53,7 +53,11 @@ export const SandboxOutcomeContainer = ({
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <FormProvider {...formMethods}>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          {shouldShowIdDocOutcome && <IdDocOutcome />}
+          {shouldShowIdDocOutcome && (
+            <IdDocOutcome
+              allowRealOutcome={config?.canMakeRealDocScanCallsInSandbox}
+            />
+          )}
           <OverallOutcome />
           <TestIdInput />
           <Button fullWidth type="submit" disabled={!!errors?.testID}>

@@ -28,6 +28,7 @@ export type PublicOnboardingConfig = {
   isKyb: boolean;
   allowInternationalResidents: boolean;
   supportedCountries?: CountryCode[];
+  canMakeRealDocScanCallsInSandbox?: boolean;
 };
 
 // Used in the dashboard context
