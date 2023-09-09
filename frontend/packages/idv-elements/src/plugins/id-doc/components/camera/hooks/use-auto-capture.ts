@@ -10,17 +10,21 @@ import { params, ParamsType } from '../utils/graphics-utils/params';
 import useFaceDetection, { FaceStatus } from './use-face-detection';
 import useSize from './use-size';
 
-// We send a new capture from video every 200 milliseconds
-const CHECK_INTERVAL = 200;
+// We send a new capture from video every 200 milliseconds for selfie capture
+const SELFIE_CHECK_INTERVAL = 200;
 
-// We will check if 2 consecutive tries were successful before considering it a complete success
-const REQUIRED_CONSECUTIVE_SUCCESS = 2;
+// We will check if 2 tries were successful before considering it a complete success
+const REQUIRED_SUCCESSES = 2;
 
 // We allow 40 pixels offset outside the card outline (20 pixels each side) along the width
 const WIDTH_ERROR_OFFSET = 40;
 
 // We allow 30 pixels offset outside the card outline (10 pixels each side) along the height
 const HEIGHT_ERROR_OFFSET = 30;
+
+// We pass through the graphics params set in batches of this size.
+// This is to make sure that the autocapture algorithm doesn't block the event queue for too long while passing through all params in one go
+const DOC_DETECTION_PARAMS_BATCH_SIZE = 1;
 
 export type AutocaptureKind = 'document' | 'face';
 
@@ -50,7 +54,7 @@ const useAutoCapture = ({
   shouldDetect,
 }: AutoCaptureProps) => {
   const successCount = useRef(0);
-  const rearrangedParams = useRef(params);
+  const rearrangedParams = useRef({ params, currentIndex: 0 });
   const pastStatus = useRef<FaceStatus | CardCaptureStatus | undefined>(
     FaceStatus.detecting,
   );
@@ -69,7 +73,7 @@ const useAutoCapture = ({
       const selectedParam = newParams[selectedParamIndex];
       newParams.splice(selectedParamIndex, 1);
       newParams.unshift(selectedParam);
-      return newParams;
+      return { params: newParams, currentIndex: 0 };
     };
 
     const detectAndCapture = async () => {
@@ -139,22 +143,32 @@ const useAutoCapture = ({
         // We get the card capture status and the index of the param that successfully detected the card
         const { status: cardCaptureStatus, paramIndex } = getCardCaptureStatus(
           canvasRef.current,
-          rearrangedParams.current,
+          rearrangedParams.current.params,
           cv,
           loaded,
+          rearrangedParams.current.currentIndex,
+          DOC_DETECTION_PARAMS_BATCH_SIZE,
         );
 
         if (cardCaptureStatus === CardCaptureStatus.OK) {
           successCount.current += 1;
           rearrangedParams.current = rearrangeParams(
             paramIndex,
-            rearrangedParams.current,
+            rearrangedParams.current.params,
           );
           if (!shouldShowInstructions) onStatusChange(CardCaptureStatus.OK);
-        } else if (pastStatus.current === cardCaptureStatus) {
-          if (!shouldShowInstructions) onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
+        } else {
+          const currIndex = rearrangedParams.current.currentIndex;
+          const totalParams = rearrangedParams.current.params.length;
+          let newIndex = currIndex + DOC_DETECTION_PARAMS_BATCH_SIZE;
+          if (newIndex >= totalParams) newIndex = 0;
+          rearrangedParams.current.currentIndex = newIndex;
+          if (pastStatus.current === cardCaptureStatus) {
+            if (!shouldShowInstructions) onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
+          }
         }
-        pastStatus.current = cardCaptureStatus;
+        if (rearrangedParams.current.currentIndex === 0)
+          pastStatus.current = cardCaptureStatus; // We only update the past status if it did one complete pass through the params or succeeded in detection
       } else if (autocaptureKind === 'face') {
         const faceStatus = await getFaceStatus(
           videoRef.current,
@@ -172,14 +186,17 @@ const useAutoCapture = ({
       }
     };
 
-    const id = setInterval(async () => {
-      detectAndCapture();
-      if (successCount.current >= REQUIRED_CONSECUTIVE_SUCCESS) {
-        onCapture();
-        clearInterval(id);
-        setIsCaptured(true);
-      }
-    }, CHECK_INTERVAL);
+    const id = setInterval(
+      async () => {
+        detectAndCapture();
+        if (successCount.current >= REQUIRED_SUCCESSES) {
+          onCapture();
+          clearInterval(id);
+          setIsCaptured(true);
+        }
+      },
+      autocaptureKind === 'face' ? SELFIE_CHECK_INTERVAL : undefined, // Since we are checking params in small batches, we don't want to delay more than what it requires to performs the detection. So, we use undefined delay for doc capture
+    );
     return () => clearInterval(id);
   }, [
     autocaptureKind,

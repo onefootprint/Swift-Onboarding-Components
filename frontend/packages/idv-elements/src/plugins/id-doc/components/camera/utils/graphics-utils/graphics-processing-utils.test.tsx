@@ -31,6 +31,8 @@ describe('Testing the image detection outputs', () => {
         jimpSrc.bitmap.width,
         jimpSrc.bitmap.height,
         params,
+        0,
+        20,
       );
       expect(cardCaptureStatus.status === CardCaptureStatus.OK).toEqual(
         capturable,

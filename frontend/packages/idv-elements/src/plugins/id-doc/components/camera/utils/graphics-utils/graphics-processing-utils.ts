@@ -237,8 +237,14 @@ export const detectCardStatus = (
   imgWidth: number,
   imgHeight: number,
   params: ParamsType[],
+  startParamIndex: number,
+  batchSize: number,
 ) => {
-  for (let i = 0; i < params.length; i += 1) {
+  for (
+    let i = startParamIndex;
+    i < Math.min(params.length, startParamIndex + batchSize);
+    i += 1
+  ) {
     const { kSize, fThresh, sThresh, aperSize } = params[i];
     const medianBlurredImage = getMedianBlur(cv, src, kSize, false); // should not clean the src since we need it for every iteration of the loop
     const edges = getEdges(
@@ -290,10 +296,20 @@ export const getCardCaptureStatus = (
   params: ParamsType[],
   cv: OpenCVType,
   loaded: boolean,
+  startParamIndex: number,
+  batchSize: number,
 ) => {
   if (!loaded) return { status: CardCaptureStatus.detecting, paramIndex: -1 }; // If (until) opencv is not initialized, we don't do anything and rely of manual capture fallback
   if (imgSrc.width === 0 || imgSrc.height === 0)
     return { status: CardCaptureStatus.detecting, paramIndex: -1 };
   const src = cv.imread(imgSrc);
-  return detectCardStatus(cv, src, imgSrc.width, imgSrc.height, params);
+  return detectCardStatus(
+    cv,
+    src,
+    imgSrc.width,
+    imgSrc.height,
+    params,
+    startParamIndex,
+    batchSize,
+  );
 };
