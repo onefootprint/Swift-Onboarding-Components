@@ -65,6 +65,21 @@ export const configureSentry = () => {
       dsn: SENTRY_DSN,
       release: COMMIT_SHA,
       environment: VERCEL_ENV,
+      beforeSend(rawEvent) {
+        if (!IS_DEV) {
+          return rawEvent;
+        }
+        const event = { ...rawEvent };
+        const logRocketSession = LogRocket.sessionURL;
+        if (logRocketSession !== null) {
+          if (!event.extra) {
+            event.extra = {};
+          }
+          event.extra.LogRocket = logRocketSession;
+          return event;
+        }
+        return event;
+      },
     });
   }
 };
