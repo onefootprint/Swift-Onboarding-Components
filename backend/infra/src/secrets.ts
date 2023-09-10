@@ -62,6 +62,7 @@ export interface StaticSecrets {
   stytchProject: aws.ssm.Parameter;
   stytchSecret: aws.ssm.Parameter;
   appleDeviceCheckPrivateKey: aws.ssm.Parameter;
+  googlePlayIntegrityDecryptionKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -83,6 +84,7 @@ interface SecretConstants {
   experian: Experian;
   stytch: Stytch;
   apple: Apple;
+  google: Google;
 }
 
 interface ElasticSecrets {
@@ -177,6 +179,9 @@ interface Stytch {
 
 interface Apple {
   deviceCheckPrivateKey: string;
+}
+interface Google {
+  playIntegrityDecryptionKey: string;
 }
 
 export async function LoadSecrets(
@@ -434,6 +439,10 @@ export async function LoadSecrets(
     appleDeviceCheckPrivateKey: createSecretParameter(
       `appleDCPrivateKey-${stack}`,
       secretConstants.apple.deviceCheckPrivateKey,
+    ),
+    googlePlayIntegrityDecryptionKey: createSecretParameter(
+      `googleIntegrityDecryptionKey-${stack}`,
+      secretConstants.google.playIntegrityDecryptionKey,
     ),
   };
 }

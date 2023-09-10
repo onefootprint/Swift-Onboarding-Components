@@ -9,7 +9,6 @@ use api_core::utils::challenge::Challenge;
 
 use api_core::decision::vendor;
 use api_core::utils::headers::InsightHeaders;
-use api_core::ApiErrorKind;
 use api_wire_types::hosted::device_attestation::{
     CreateDeviceAttestationRequest, DeviceAttestationChallengeResponse, DeviceAttestationType,
     GetDeviceAttestationChallengeRequest,
@@ -21,10 +20,11 @@ use db::models::user_timeline::UserTimeline;
 use newtypes::{LivenessAttributes, LivenessInfo, LivenessIssuer};
 use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
 
+mod android;
 mod ios;
-
 #[cfg(test)]
 mod tests;
+mod util;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -146,12 +146,12 @@ pub async fn post_attestation(
 
                     Ok(())
                 })
-                .await?
+                .await?;
         }
         DeviceAttestationType::Android => {
-            return Err(ApiErrorKind::AssertionError(
-                "Android device attestation not yet supported".into(),
-            ))?
+            let new_attestation = android::attest(&state, vault_id.clone(), challenge, attestation).await?;
+            // placeholder for now...next we'll save this data
+            tracing::info!(attestation=?new_attestation, "created android attestation");
         }
     };
 

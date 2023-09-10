@@ -156,6 +156,7 @@ export abstract class ServiceContainers {
         secretsStore.stytchProject.arn,
         secretsStore.stytchSecret.arn,
         secretsStore.appleDeviceCheckPrivateKey.arn,
+        secretsStore.googlePlayIntegrityDecryptionKey.arn,
       ])
       .apply(
         ([
@@ -204,6 +205,7 @@ export abstract class ServiceContainers {
           stytchProject,
           stytchSecret,
           appleDcPrivateKey,
+          googleIntegrityDecryptionKey,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -378,6 +380,10 @@ export abstract class ServiceContainers {
                 name: 'APPLE_DEVICE_CHECK_PRIVATE_KEY',
                 valueFrom: appleDcPrivateKey,
               },
+              {
+                name: 'GOOGLE_PLAY_INTEGRITY_DECRYPTION_KEY',
+                valueFrom: googleIntegrityDecryptionKey,
+              },
             ],
             environment: [
               {
@@ -475,6 +481,10 @@ export abstract class ServiceContainers {
               {
                 name: 'APPLE_DEVICE_CHECK_KEY_ID',
                 value: constants.apple.keyId,
+              },
+              {
+                name: 'GOOGLE_PLAY_INTEGRITY_VERIFICATION_KEY',
+                value: constants.google.playIntegrityVerificationKey,
               },
             ],
             // TODO: I've suggested some more tolerant values

@@ -11,7 +11,6 @@ use db::models::{
     webauthn_credential::WebauthnCredential,
 };
 use newtypes::VaultId;
-use webauthn_rs_proto::RegisterPublicKeyCredential;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 struct IosAttestationPayload {
@@ -36,6 +35,7 @@ struct AttestedMetadata {
 }
 
 /// Main entry point for attesting an iOS device
+#[tracing::instrument(skip_all)]
 pub(super) async fn attest(
     state: &State,
     vault_id: VaultId,
@@ -63,6 +63,7 @@ pub(super) async fn attest(
     Ok(new_attestation)
 }
 
+#[tracing::instrument(skip_all)]
 pub(super) async fn attest_inner(
     vault_id: VaultId,
     verifier: &AppleAppAttestationVerifier,
@@ -104,44 +105,18 @@ pub(super) async fn attest_inner(
         None
     };
 
-    // Link the attestation to webauthn credential:
-    // if a webauthn key was attested: look for the user's credential and associate
-    // the attestation to that passkey
-    let webauthn_credential_id =
-        if let Some(webauthn_response) = attested_metadata.webauthn_device_response_json {
-            let attested_registered_credential: RegisterPublicKeyCredential =
-                serde_json::from_str(&webauthn_response)?;
-
-            // credential.response.attestation_object
-            webauthn_creds
-                .into_iter()
-                .filter_map(|cred| {
-                    let attestation: crate::user::passkey::SavedAttestationData =
-                        serde_cbor::from_slice(&cred.attestation_data).ok()?;
-
-                    // match by the raw attestation blob
-                    if attestation.raw_attestation_object
-                        == attested_registered_credential.response.attestation_object.0
-                    {
-                        Some(cred.id)
-                    } else {
-                        None
-                    }
-                })
-                .next()
-        } else {
-            None
-        };
-
     Ok(NewAppleDeviceAttestation {
         vault_id,
+        webauthn_credential_id: super::util::link_webauthn_credential(
+            webauthn_creds,
+            attested_metadata.webauthn_device_response_json,
+        )?,
         metadata: AppleDeviceMetadata {
             model: attested_metadata.model,
             os: attested_metadata.os,
         },
         receipt,
         raw_attestation: attestation_data,
-        webauthn_credential_id,
         is_development: server_receipt.is_sandbox,
         attested_key_id: verified_attest.att_key_id,
         attested_public_key: verified_attest.att_public_key,

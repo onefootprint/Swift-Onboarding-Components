@@ -13,6 +13,7 @@ export interface Config {
   sentryUrl: string;
   airplane: Airplane;
   apple: Apple;
+  google: Google;
 }
 
 export interface Domains {
@@ -91,4 +92,8 @@ export interface EnclaveResources {
 
 export interface Apple {
   keyId: string;
+}
+
+export interface Google {
+  playIntegrityVerificationKey: string;
 }

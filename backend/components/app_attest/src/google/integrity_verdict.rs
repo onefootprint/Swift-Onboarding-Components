@@ -43,10 +43,11 @@ pub enum AppRecognitionVerdict {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeviceIntegrity {
+    #[serde(default)]
     pub device_recognition_verdict: Vec<DeviceRecognitionVerdict>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Hash, PartialEq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 
 pub enum DeviceRecognitionVerdict {

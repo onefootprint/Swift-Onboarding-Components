@@ -123,6 +123,9 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub apple_config: AppleConfig,
+
+    #[envconfig(nested = true)]
+    pub google_config: GooglePlayConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
@@ -362,4 +365,12 @@ pub struct AppleConfig {
     pub apple_device_check_private_key_pem: String,
     #[envconfig(from = "APPLE_DEVICE_CHECK_KEY_ID")]
     pub apple_device_check_key_id: String,
+}
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct GooglePlayConfig {
+    #[envconfig(from = "GOOGLE_PLAY_INTEGRITY_VERIFICATION_KEY")]
+    pub play_integrity_verificiation_key: String,
+    #[envconfig(from = "GOOGLE_PLAY_INTEGRITY_DECRYPTION_KEY")]
+    pub play_integrity_decryptiong_key: String,
 }

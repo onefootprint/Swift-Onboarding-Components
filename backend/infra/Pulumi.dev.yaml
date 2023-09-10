@@ -7,6 +7,10 @@ config:
       apiToken:
         secure: v1:87RDKonGk+sxikjQ:HDZ9lz9jGhBb1oQmYdyHvGX2BVGq6kkpGZ0MK5eLMgiAT9TnrZ/jUd/ZeoP5Jac3T9sW+rdDEaU=
       teamId: tea20220706zs7g4auu0i6
+    apple:
+      deviceCheckPrivateKey:
+        secure: v1:s7NbeVTk3C4I0YwL:m1UVvIk/x6tFafyU5lvrRhMwbjENM11OImtnaNyx0epPsxyKb/bsTjoAljd3FSdFVhu6LbZZAAgkcZja41iBlE3w1r4paxOswHRi+CjokBjevEFDCiM4DS+CqqP28BLu2sCRKAAjMeohlynPxnYln06TITB1E/voo46A/zvdIw6C6MN4N4Ur562wveFtwqhLYlcIxthrTKiZ69p18yOA6Z6Tq04x1Y2FWGAEMNa9lgbMbw8c8GDIbUS7LDPpixENLTVl4YFf0USGtcNFEyxVRKHdQl8cyhB8OaxNumAAlNYiUFFxvgMjeaqZQQbQBnSveiLCujX0qkdLYuR0ICxx5ELIhR7GxTRUIGKMtHdqWAFN
+      keyId: 3A9LZR4SKP
     containers:
       apiVersion: latest
       enclaveVersion: latest
@@ -56,6 +60,10 @@ config:
     fingerprint:
       fingerprintSdkKey:
         secure: v1:ShqC3sYp5bwUGSIi:1Wcf0WjDOj6NSh2ZBOWffhqskNZVxExTOGkaDd/JDH5WdIvR
+    google:
+      playIntegrityDecryptionKey:
+        secure: v1:Csjb7lPxnUdwMSpM:SZeFVWTVNAg8JUW1d/HgIeFKuYUkQBnzETvLRyTKdVbZBdR1tPZiUg7IF32aD0m4RpzANkKnQHyTPEFa
+      playIntegrityVerificationKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaqWPAmaBoLl5/UiQj+ZHHVtGjcIOnrJFQvLe1ef2Q2Sf3vrkNejer4HnZGkG2YWaq+HyMVBtFYk5qaoshVTdbw==
     grafana:
       prometheusPushAuth:
         secure: v1:VdwOY1dTgkXEMk4W:i3PexS68jj8BwxdeHPPugmMQdl6ygvRTfBXb3K60uQwpJnuMy3N1HEERTa3t0tM2PBSJZbhCobPfOq2LtQG7ALfSKn32zpU75nujiT5KViRm7ZJWNHmaJ0kl15WZj/gRr/tvLsupnW8U/E3hAfkQoqN/IknVqW3qjeQdlL3oP88QHce1PBbAQM+oepcJlLFNrrVgaHdEqwsZJn/4
@@ -147,10 +155,6 @@ config:
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
-    apple:
-      deviceCheckPrivateKey:
-        secure: v1:s7NbeVTk3C4I0YwL:m1UVvIk/x6tFafyU5lvrRhMwbjENM11OImtnaNyx0epPsxyKb/bsTjoAljd3FSdFVhu6LbZZAAgkcZja41iBlE3w1r4paxOswHRi+CjokBjevEFDCiM4DS+CqqP28BLu2sCRKAAjMeohlynPxnYln06TITB1E/voo46A/zvdIw6C6MN4N4Ur562wveFtwqhLYlcIxthrTKiZ69p18yOA6Z6Tq04x1Y2FWGAEMNa9lgbMbw8c8GDIbUS7LDPpixENLTVl4YFf0USGtcNFEyxVRKHdQl8cyhB8OaxNumAAlNYiUFFxvgMjeaqZQQbQBnSveiLCujX0qkdLYuR0ICxx5ELIhR7GxTRUIGKMtHdqWAFN
-      keyId: 3A9LZR4SKP
   infra:honeycomb:
     apiKey:
       secure: v1:OvsQ2EQpwZgDtXX2:gnCIfaNIoMI6yGAeDyc0qBFzp9f3WgptY1RBtOtR9mZBEAsf2bo=

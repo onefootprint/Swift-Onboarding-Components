@@ -164,24 +164,16 @@ $ pulumi down
 
 We use pulumi secrets to help us manage sensitive information we need to run our application. For instance, we have various AWS credentials stored in pulumi secrets, that are then added to our application environment for use.
 
-To add a secret to pulumi, do the following:
+There are two steps to adding a secret
+
+- Make sure you've configured to the right AWS environment profiles (see above, configure one for dev and one for prod-secrets)
+- Run the script below.
+
+To add a secret to pulumi, run the following command which will guide you through.
 
 ```sh
-$ cd infra/
-$ pulumi --stack dev config set --secret --path <SECRET_NAME> <SECRET_VALUE>
-$ pulumi --stack prod config set --secret --path <SECRET_NAME> <SECRET_VALUE>
-```
-
-For example
-
-```sh
-$ AWS_PROFILE=dev pulumi --stack dev config set --secret --path constants.grafana.apiKey 'mySecretValue'
-```
-
-You can similarly read existing secret values with
-
-```
-$ AWS_PROFILE=dev pulumi --stack dev config get --path constants.grafana.apiKey
+# in /backend/infra
+$ ./add_secret.sh
 ```
 
 - To add the secret to the container environment, first edit secrets.ts to add your new secret to StaticSecrets. Then, go to container.ts in the /infra/service directory and add your new secret following the existing structure to the containerDef.

@@ -78,7 +78,13 @@ pub enum PlayIntegrityTokenError {
     MissingCertSha256,
 
     #[error("The integrity verdict was unevaluated")]
-    Unevaluated(Box<IntegrityVerdict>),
+    Unevaluated(Box<IntegrityVerdictWithRawResponse>),
+}
+
+#[derive(Debug, Clone)]
+pub struct IntegrityVerdictWithRawResponse {
+    pub verdict: IntegrityVerdict,
+    pub raw_claims: serde_json::Value,
 }
 
 impl GoogleAppAttestationVerifier {
@@ -86,7 +92,11 @@ impl GoogleAppAttestationVerifier {
         Self { config }
     }
 
-    pub fn verify_token(&self, token: String, expected_nonce: Vec<u8>) -> Result<IntegrityVerdict> {
+    pub fn verify_token(
+        &self,
+        token: String,
+        expected_nonce: Vec<u8>,
+    ) -> Result<IntegrityVerdictWithRawResponse> {
         let decryption_key = base64::decode(self.config.token_decryption_key_base64.as_bytes())?;
         let verification_key = base64::decode(self.config.token_verification_key_base64.as_bytes())?;
 
@@ -97,7 +107,8 @@ impl GoogleAppAttestationVerifier {
         let (payload, _header) = jwt::decode_with_verifier(payload, &verifier)?;
         tracing::info!("got google token claims: {:?}", payload.claims_set());
 
-        let verdict: IntegrityVerdict = serde_json::from_value(serde_json::Value::Object(payload.into()))?;
+        let value = serde_json::Value::Object(payload.into());
+        let verdict: IntegrityVerdict = serde_json::from_value(value.clone())?;
 
         // check package name
         if !self
@@ -131,7 +142,12 @@ impl GoogleAppAttestationVerifier {
             verdict.app_integrity.app_recognition_verdict,
             AppRecognitionVerdict::Unevaluated | AppRecognitionVerdict::Unknown
         ) {
-            return Err(PlayIntegrityTokenError::Unevaluated(Box::new(verdict)))?;
+            return Err(PlayIntegrityTokenError::Unevaluated(Box::new(
+                IntegrityVerdictWithRawResponse {
+                    verdict,
+                    raw_claims: value,
+                },
+            )))?;
         }
 
         // check cert hashes
@@ -146,7 +162,10 @@ impl GoogleAppAttestationVerifier {
             return Err(PlayIntegrityTokenError::UnexpectedPackageName)?;
         }
 
-        Ok(verdict)
+        Ok(IntegrityVerdictWithRawResponse {
+            verdict,
+            raw_claims: value,
+        })
     }
 }
 
@@ -178,7 +197,10 @@ mod tests {
         let md = base64::decode(vectors::METADATA).unwrap();
         let nonce = openssl::sha::sha256(&md).to_vec();
 
-        let verdict = v
+        let IntegrityVerdictWithRawResponse {
+            verdict,
+            raw_claims: _,
+        } = v
             .verify_token(vectors::TOKEN.into(), nonce)
             .expect("verify failed");
 
