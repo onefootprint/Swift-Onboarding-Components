@@ -269,6 +269,32 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    google_device_attestation (id) {
+        id -> Text,
+        vault_id -> Text,
+        metadata -> Jsonb,
+        created_at -> Timestamptz,
+        raw_token -> Text,
+        raw_claims -> Jsonb,
+        package_name -> Text,
+        app_version -> Nullable<Text>,
+        webauthn_credential_id -> Nullable<Text>,
+        widevine_id -> Nullable<Text>,
+        widevine_security_level -> Nullable<Text>,
+        android_id -> Nullable<Text>,
+        is_trustworthy_device -> Bool,
+        is_evaluated_device -> Bool,
+        license_verdict -> Text,
+        recognition_verdict -> Text,
+        integrity_level -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     identity_document (id) {
         id -> Text,
         request_id -> Text,
@@ -1024,6 +1050,8 @@ joinable!(document_upload -> identity_document (document_id));
 joinable!(fingerprint -> data_lifetime (lifetime_id));
 joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
 joinable!(fingerprint_visit_event -> vault (vault_id));
+joinable!(google_device_attestation -> vault (vault_id));
+joinable!(google_device_attestation -> webauthn_credential (webauthn_credential_id));
 joinable!(identity_document -> document_request (request_id));
 joinable!(incode_verification_session -> identity_document (identity_document_id));
 joinable!(incode_verification_session_event -> identity_document (identity_document_id));
@@ -1102,6 +1130,7 @@ allow_tables_to_appear_in_same_query!(
     document_upload,
     fingerprint,
     fingerprint_visit_event,
+    google_device_attestation,
     identity_document,
     identity_document_backup,
     incode_verification_session,

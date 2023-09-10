@@ -8,8 +8,11 @@ use app_attest::{
 };
 use chrono::Utc;
 use crypto::base64;
-use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::{VaultId, WebauthnCredentialId};
+use db::models::{
+    google_device_attest::{GoogleDeviceMetadata, NewGoogleDeviceAttestation},
+    webauthn_credential::WebauthnCredential,
+};
+use newtypes::{AndroidAppLicense, AndroidAppRecognition, AndroidDeviceIntegrityLevel, VaultId};
 
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -45,7 +48,7 @@ pub(super) async fn attest(
     vault_id: VaultId,
     challenge: String,
     attestation: String,
-) -> ApiResult<NewAndroidDeviceAttestation> {
+) -> ApiResult<NewGoogleDeviceAttestation> {
     let verifier = GoogleAppAttestationVerifier::new(app_attest::google::Config {
         allowed_apk_package_names: vec!["com.onefootprint.my".into()],
         allowed_apk_cert_sha256_values: vec!["iaC6-3GYhfKZE9MD30e246TYy2bIXtXJYziWKIhmSUE".into()],
@@ -76,7 +79,7 @@ pub(super) async fn attest_inner(
     challenge: String,
     attestation: String,
     webauthn_creds: Vec<WebauthnCredential>,
-) -> ApiResult<NewAndroidDeviceAttestation> {
+) -> ApiResult<NewGoogleDeviceAttestation> {
     let payload: AndroidAttestationPayload = serde_json::from_slice(&base64::decode(attestation)?)?;
 
     let client_data = base64::decode(payload.metadata_json_data)?;
@@ -116,9 +119,9 @@ pub(super) async fn attest_inner(
             )
         });
 
-    Ok(NewAndroidDeviceAttestation {
+    Ok(NewGoogleDeviceAttestation {
         vault_id,
-        metadata: AndroidDeviceMetadata {
+        metadata: GoogleDeviceMetadata {
             model: attested_metadata.model,
             os: attested_metadata.os,
         },
@@ -158,62 +161,4 @@ pub(super) async fn attest_inner(
             AndroidDeviceIntegrityLevel::Unknown
         },
     })
-}
-
-#[derive(Debug, Clone)]
-pub struct AndroidDeviceMetadata {
-    pub model: Option<String>,
-    pub os: Option<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct NewAndroidDeviceAttestation {
-    pub vault_id: VaultId,
-    pub metadata: AndroidDeviceMetadata,
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    pub raw_token: String,
-    pub raw_claims: serde_json::Value,
-
-    pub package_name: String,
-    pub app_version: Option<String>,
-
-    pub webauthn_credential_id: Option<WebauthnCredentialId>,
-
-    // ids and metadata for matching devices
-    pub widevine_id: Option<String>,
-    pub widevine_security_level: Option<String>,
-    pub android_id: Option<String>,
-
-    // summary of verdicts
-    pub is_trustworthy_device: bool,
-    pub is_evaluated_device: bool,
-
-    // detail verdicts
-    pub license_verdict: AndroidAppLicense,
-    pub recognition_verdict: AndroidAppRecognition,
-    pub integrity_level: AndroidDeviceIntegrityLevel,
-}
-
-#[derive(Debug, Clone)]
-pub enum AndroidAppRecognition {
-    Recognized,
-    Unrecognized,
-    Unevaluated,
-    Unknown,
-}
-
-#[derive(Debug, Clone)]
-pub enum AndroidAppLicense {
-    Unknown,
-    Unevaluated,
-    Unlicensed,
-    Licensed,
-}
-
-#[derive(Debug, Clone)]
-pub enum AndroidDeviceIntegrityLevel {
-    Unknown,
-    Basic,
-    Sufficient,
-    Strong,
 }

@@ -213,3 +213,8 @@ define_newtype_id!(
     "Identifier for an app clip experience"
 );
 define_newtype_id!(AuthEventId, String, "Identifier for a device event");
+define_newtype_id!(
+    GoogleDeviceAttestationId,
+    String,
+    "Identifier for a google device attestation"
+);

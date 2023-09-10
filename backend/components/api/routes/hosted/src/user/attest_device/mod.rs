@@ -150,8 +150,44 @@ pub async fn post_attestation(
         }
         DeviceAttestationType::Android => {
             let new_attestation = android::attest(&state, vault_id.clone(), challenge, attestation).await?;
-            // placeholder for now...next we'll save this data
-            tracing::info!(attestation=?new_attestation, "created android attestation");
+
+            state
+                .db_pool
+                .db_transaction(move |conn| -> ApiResult<()> {
+                    let attestation = new_attestation.create(conn.conn())?;
+
+                    // if we have a scoped vault (which we should always have in an onboarding)
+                    if let Some(scoped_vault_id) = scoped_vault_id {
+                        // TODO: generate risk signals
+
+                        // the iOS attestation, in conjuction with a passkey registration, also helps us prove liveness
+                        // so if the device attests it registered a passkey, we can confirm liveness too!
+                        if attestation.webauthn_credential_id.is_some() {
+                            let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
+                            let liveness_event = NewLivenessEvent {
+                                scoped_vault_id: scoped_vault_id.clone(),
+                                liveness_source: newtypes::LivenessSource::GoogleDeviceAttestation,
+                                attributes: Some(LivenessAttributes {
+                                    issuers: vec![LivenessIssuer::Footprint, LivenessIssuer::Google],
+                                    os: attestation.metadata.os.clone(),
+                                    device: attestation.metadata.model.clone(),
+                                    ..Default::default()
+                                }),
+                                insight_event_id: Some(insight_event.id),
+                            }
+                            .insert(conn)?;
+
+                            // create the timeline event for a liveness
+                            let info = LivenessInfo {
+                                id: liveness_event.id,
+                            };
+                            UserTimeline::create(conn, info, vault_id, scoped_vault_id.clone())?;
+                        }
+                    }
+
+                    Ok(())
+                })
+                .await?;
         }
     };
 

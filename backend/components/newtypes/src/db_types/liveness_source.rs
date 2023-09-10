@@ -29,7 +29,8 @@ pub enum LivenessSource {
     Skipped,
     WebauthnAttestation,
     PrivacyPass,
-    AppleDeviceAttestation
+    AppleDeviceAttestation,
+    GoogleDeviceAttestation,
 }
 
 impl Default for LivenessSource {
