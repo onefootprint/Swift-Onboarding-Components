@@ -10,8 +10,8 @@ use newtypes::{DecisionIntentId, IdentityDataKind, ScopedVaultId, VendorAPI};
 
 use self::tenant_vendor_control::TenantVendorControl;
 
-pub mod apple_device_attestation;
 pub mod build_request;
+pub mod fp_device_attestation;
 pub mod incode;
 pub mod incode_watchlist;
 pub mod kyc_waterfall;
@@ -22,6 +22,7 @@ pub mod vendor_api;
 pub mod vendor_result;
 pub mod vendor_trait;
 pub mod verification_result;
+
 /// Build verification requests from the VaultWrapper and save.
 /// We save so that if something happens, we can always replay the requests
 #[tracing::instrument(skip(conn, uvw))]

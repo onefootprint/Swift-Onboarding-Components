@@ -22,25 +22,26 @@ impl DbToApi<LoadedAuthEvent> for api_wire_types::AuthEvent {
                 .into_iter()
                 .map(|ios| AttestedDeviceData {
                     // this is placeholder -- maybe we shouldn't reveal this here?
-                    fraud_risk: crate::decision::features::fp_ios_attestation::generate_reason_codes(
-                        &ios,
-                        unique_vaults,
-                    )
-                    .into_iter()
-                    .filter_map(|r| match r {
-                        FootprintReasonCode::AttestedDeviceNoFraudDuplicateRisk
-                        | FootprintReasonCode::AttestedDeviceFraudDuplicateRiskLow => {
-                            Some(DeviceFraudRiskLevel::Low)
-                        }
-                        FootprintReasonCode::AttestedDeviceFraudDuplicateRiskMedium => {
-                            Some(DeviceFraudRiskLevel::Medium)
-                        }
-                        FootprintReasonCode::AttestedDeviceFraudDuplicateRiskHigh => {
-                            Some(DeviceFraudRiskLevel::High)
-                        }
-                        _ => None,
-                    })
-                    .next(),
+                    fraud_risk:
+                        crate::decision::features::fp_device_attestation::generate_apple_reason_codes(
+                            &ios,
+                            unique_vaults,
+                        )
+                        .into_iter()
+                        .filter_map(|r| match r {
+                            FootprintReasonCode::AttestedDeviceNoFraudDuplicateRisk
+                            | FootprintReasonCode::AttestedDeviceFraudDuplicateRiskLow => {
+                                Some(DeviceFraudRiskLevel::Low)
+                            }
+                            FootprintReasonCode::AttestedDeviceFraudDuplicateRiskMedium => {
+                                Some(DeviceFraudRiskLevel::Medium)
+                            }
+                            FootprintReasonCode::AttestedDeviceFraudDuplicateRiskHigh => {
+                                Some(DeviceFraudRiskLevel::High)
+                            }
+                            _ => None,
+                        })
+                        .next(),
                     app_bundle_id: ios.bundle_id,
                     model: ios.metadata.model,
                     os: ios.metadata.os,

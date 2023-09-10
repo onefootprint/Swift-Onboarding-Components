@@ -3,6 +3,7 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
 use actix_web::web::Json;
 
+use api_core::decision::vendor::fp_device_attestation::AttestationResult;
 use api_core::errors::ApiResult;
 use api_core::types::ResponseData;
 use api_core::utils::challenge::Challenge;
@@ -110,9 +111,9 @@ pub async fn post_attestation(
                     // if we have a scoped vault (which we should always have in an onboarding)
                     if let Some(scoped_vault_id) = scoped_vault_id {
                         // generate risk signals
-                        vendor::apple_device_attestation::save_vendor_result_and_risk_signals(
+                        vendor::fp_device_attestation::save_vendor_result_and_risk_signals(
                             conn,
-                            &attestation,
+                            &AttestationResult::Apple(&attestation),
                             &vault_public_key,
                             &scoped_vault_id,
                             workflow_id.as_ref(),
@@ -158,7 +159,15 @@ pub async fn post_attestation(
 
                     // if we have a scoped vault (which we should always have in an onboarding)
                     if let Some(scoped_vault_id) = scoped_vault_id {
-                        // TODO: generate risk signals
+                        // generate risk signals
+                        vendor::fp_device_attestation::save_vendor_result_and_risk_signals(
+                            conn,
+                            &AttestationResult::Google(&attestation),
+                            &vault_public_key,
+                            &scoped_vault_id,
+                            workflow_id.as_ref(),
+                            is_live,
+                        )?;
 
                         // the iOS attestation, in conjuction with a passkey registration, also helps us prove liveness
                         // so if the device attests it registered a passkey, we can confirm liveness too!

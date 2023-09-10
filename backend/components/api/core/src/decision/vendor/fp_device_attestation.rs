@@ -2,6 +2,7 @@
 use crate::decision;
 use crate::decision::vendor;
 use crate::errors::ApiResult;
+use db::models::google_device_attest::GoogleDeviceAttestation;
 use db::models::risk_signal::RiskSignal;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
@@ -15,23 +16,40 @@ use newtypes::PiiJsonValue;
 use newtypes::RiskSignalGroupKind;
 use newtypes::{DecisionIntentKind, ScopedVaultId, VaultPublicKey, VendorAPI, WorkflowId};
 
+pub enum AttestationResult<'a> {
+    Apple(&'a AppleDeviceAttestation),
+    Google(&'a GoogleDeviceAttestation),
+}
+
 pub fn save_vendor_result_and_risk_signals(
     conn: &mut TxnPgConn,
-    res: &AppleDeviceAttestation,
+    res: &AttestationResult,
     public_key: &VaultPublicKey,
     sv_id: &ScopedVaultId,
     wf_id: Option<&WorkflowId>,
     is_live: bool,
 ) -> ApiResult<(VerificationRequest, VerificationResult, Vec<RiskSignal>)> {
     // count the associated vaults derived by this attestation
-    let associated_vault_count = res.count_associated_vaults(conn, is_live)?;
+    let associated_vault_count = match res {
+        AttestationResult::Apple(res) => res.count_associated_vaults(conn, is_live)?,
+        AttestationResult::Google(res) => res.count_associated_vaults(conn, is_live)?,
+    };
 
     let di = DecisionIntent::create(conn, DecisionIntentKind::DeviceAttestation, sv_id, wf_id)?;
 
     // Our synthetic "vendor" response payload
     let vres_data = FootprintDeviceAttestationData {
         associated_vault_count: Some(associated_vault_count),
-        apple_device_attestation: Some(serde_json::to_value(res)?),
+        apple_device_attestation: if let AttestationResult::Apple(res) = res {
+            Some(serde_json::to_value(res)?)
+        } else {
+            None
+        },
+        google_device_attestation: if let AttestationResult::Google(res) = res {
+            Some(serde_json::to_value(res)?)
+        } else {
+            None
+        },
     };
     let (vreq, vres) = vendor::verification_result::save_vreq_and_vres(
         conn,
@@ -44,8 +62,21 @@ pub fn save_vendor_result_and_risk_signals(
         }),
     )?;
 
-    let reason_codes =
-        decision::features::fp_ios_attestation::generate_reason_codes(res, associated_vault_count);
+    let reason_codes = match res {
+        AttestationResult::Apple(res) => {
+            decision::features::fp_device_attestation::generate_apple_reason_codes(
+                res,
+                associated_vault_count,
+            )
+        }
+        AttestationResult::Google(res) => {
+            decision::features::fp_device_attestation::generate_google_reason_codes(
+                res,
+                associated_vault_count,
+            )
+        }
+    };
+
     let rs = RiskSignal::bulk_create(
         conn,
         sv_id,
@@ -82,9 +113,15 @@ mod tests {
 
                 let attest = fixtures::apple_device_attestation::create(conn, &uv.id);
 
-                let (vreq, vres, _rs) =
-                    save_vendor_result_and_risk_signals(conn, &attest, &uv.public_key, &sv.id, None, false)
-                        .unwrap();
+                let (vreq, vres, _rs) = save_vendor_result_and_risk_signals(
+                    conn,
+                    &AttestationResult::Apple(&attest),
+                    &uv.public_key,
+                    &sv.id,
+                    None,
+                    false,
+                )
+                .unwrap();
 
                 Ok((vreq, vres, uv.e_private_key.clone()))
             })

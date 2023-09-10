@@ -8,4 +8,5 @@ use serde::{Deserialize, Serialize};
 pub struct FootprintDeviceAttestationData {
     pub associated_vault_count: Option<i64>,
     pub apple_device_attestation: Option<serde_json::Value>,
+    pub google_device_attestation: Option<serde_json::Value>,
 }
