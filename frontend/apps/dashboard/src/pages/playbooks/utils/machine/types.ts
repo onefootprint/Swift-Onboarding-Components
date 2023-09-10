@@ -1,4 +1,4 @@
-import type { SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import {
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
@@ -28,6 +28,24 @@ export const defaultNameValue = '';
 export const defaultNameFormData: NameFormData = {
   kind: Kind.KYC,
   name: defaultNameValue,
+};
+
+export enum CountryRestriction {
+  all = 'all',
+  restrict = 'restrict',
+}
+
+export type ResidencyFormData = {
+  unitedStates: boolean;
+  otherCountries: boolean;
+  restrictCountries?: CountryRestriction;
+  countryList: CountryCode[];
+};
+
+export const defaultResidencyFormData = {
+  unitedStates: true,
+  otherCountries: false,
+  restrictCountries: CountryRestriction.all,
 };
 
 export type AuthorizedScopesFormData = {

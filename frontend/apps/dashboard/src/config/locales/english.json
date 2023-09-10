@@ -1364,6 +1364,22 @@
             "continue": "Continue"
           }
         },
+        "residency": {
+          "title": "Residency",
+          "subtitle": "Select the countries from which your users may onboard.",
+          "us": "United States",
+          "other-countries": "Other countries",
+          "all-countries": {
+            "label": "All countries",
+            "hint": "Except for embargoed or sancionted countries"
+          },
+          "restrict": "Restrict onboarding to specific countries",
+          "initial": "Initial",
+          "buttons": {
+            "back": "Back",
+            "continue": "Continue"
+          }
+        },
         "name-your-playbook": {
           "title": "Name your playbook",
           "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones.",
