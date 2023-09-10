@@ -1,5 +1,7 @@
 use thiserror::Error;
 
+pub type Result<T> = std::result::Result<T, AttestationError>;
+
 #[derive(Debug, Error)]
 pub enum AttestationError {
     #[error("CBOR encoding invalid: '{0}'")]
@@ -78,5 +80,11 @@ pub enum AttestationError {
     DerError(#[from] der_parser::error::BerError),
 
     #[error("JSON error: {0}")]
-    JsonError(#[from] serde_json::Error)
+    JsonError(#[from] serde_json::Error),
+
+    #[error("JOSE crypto error")]
+    JoseError(#[from] josekit::JoseError),
+
+    #[error("Play integrity token error")]
+    PlayIntegrityToken(#[from] crate::google::PlayIntegrityTokenError),
 }
