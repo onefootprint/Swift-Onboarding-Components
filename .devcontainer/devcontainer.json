@@ -43,7 +43,8 @@
 				"ms-python.black-formatter",
 				"ms-azuretools.vscode-docker",
 				"vadimcn.vscode-lldb",
-				"rust-lang.rust-analyzer"
+				"rust-lang.rust-analyzer",
+				"github.vscode-github-actions"
 			]
 		}
 	}
