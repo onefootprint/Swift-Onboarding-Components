@@ -1,6 +1,6 @@
-import { IdDI } from '@onefootprint/types';
+import type { IdDI } from '@onefootprint/types';
 
-import { KycData } from '../../../data-types';
+import type { KycData } from '../../../data-types';
 
 const mergeInitialData = (
   initData: KycData,

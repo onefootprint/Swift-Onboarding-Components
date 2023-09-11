@@ -3,10 +3,11 @@ import {
   IcoPlusSmall24,
   icos,
 } from '@onefootprint/icons';
-import { ComponentMeta, Story } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
 
-import LinkButton, { LinkButtonProps } from './link-button';
+import type { LinkButtonProps } from './link-button';
+import LinkButton from './link-button';
 import { sizes, variants } from './link-button.constants';
 
 export default {

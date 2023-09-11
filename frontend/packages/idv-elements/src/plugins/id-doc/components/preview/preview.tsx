@@ -3,8 +3,8 @@ import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 
-import { DeviceKind } from '../camera/camera';
-import { CameraKind } from '../camera/utils/get-camera-options';
+import type { DeviceKind } from '../camera/camera';
+import type { CameraKind } from '../camera/utils/get-camera-options';
 
 type PreviewProps = {
   imageSrc: string;

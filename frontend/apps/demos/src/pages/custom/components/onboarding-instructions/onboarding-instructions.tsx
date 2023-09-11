@@ -1,4 +1,4 @@
-import { FootprintAppearance } from '@onefootprint/footprint-js';
+import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import styled from '@onefootprint/styled';
 import { CodeBlock, CodeInline, Typography } from '@onefootprint/ui';

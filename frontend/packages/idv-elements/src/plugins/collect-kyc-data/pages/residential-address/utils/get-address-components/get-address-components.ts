@@ -2,7 +2,7 @@ import {
   COUNTRIES_WITH_PROVINCES,
   COUNTRIES_WITH_STATES,
 } from '@onefootprint/global-constants';
-import { CountryCode } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
 import { uniq } from 'lodash';
 import { getDetails } from 'use-places-autocomplete';
 

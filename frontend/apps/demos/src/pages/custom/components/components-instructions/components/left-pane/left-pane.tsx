@@ -1,4 +1,4 @@
-import { FootprintAppearance } from '@onefootprint/footprint-js';
+import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
 import {
   Button,

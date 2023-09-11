@@ -1,7 +1,7 @@
-import { FootprintAppearance } from '@onefootprint/footprint-js';
+import type { FootprintAppearance } from '@onefootprint/footprint-js';
 
-import { CollectedDataOption } from './collected-data-option';
-import { CountryCode } from './countries';
+import type { CollectedDataOption } from './collected-data-option';
+import type { CountryCode } from './countries';
 
 export enum OnboardingConfigStatus {
   enabled = 'enabled',

@@ -1,20 +1,19 @@
-import {
-  COUNTRIES,
-  CountryRecord,
-  DEFAULT_COUNTRY,
-} from '@onefootprint/global-constants';
+import type { CountryRecord } from '@onefootprint/global-constants';
+import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
-import { CountryCode, SubmitDocTypeResponse } from '@onefootprint/types';
+import type { CountryCode, SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
+import type {
+  CountrySelectOption,
+  RadioSelectOptionFields,
+} from '@onefootprint/ui';
 import {
   Button,
   CountrySelect,
-  CountrySelectOption,
   Divider,
   RadioSelect,
-  RadioSelectOptionFields,
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';

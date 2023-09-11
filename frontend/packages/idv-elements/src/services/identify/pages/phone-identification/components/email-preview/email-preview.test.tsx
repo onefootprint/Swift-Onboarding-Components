@@ -2,7 +2,8 @@ import { screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
 import { renderIdentify } from '../../../../config/tests/render';
-import EmailPreview, { EmailPreviewProps } from './email-preview';
+import type { EmailPreviewProps } from './email-preview';
+import EmailPreview from './email-preview';
 
 describe.skip('<EmailPreview />', () => {
   const renderPreview = ({

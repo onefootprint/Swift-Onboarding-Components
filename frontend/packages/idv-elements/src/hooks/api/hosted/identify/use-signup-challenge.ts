@@ -1,9 +1,9 @@
 import request from '@onefootprint/request';
-import {
-  SANDBOX_ID_HEADER,
+import type {
   SignupChallengeRequest,
   SignupChallengeResponse,
 } from '@onefootprint/types';
+import { SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import getRetryDisabledUntil from './utils/get-retry-disabled-until';

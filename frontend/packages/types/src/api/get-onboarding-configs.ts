@@ -1,4 +1,4 @@
-import { OnboardingConfig, OnboardingConfigStatus } from '../data';
+import type { OnboardingConfig, OnboardingConfigStatus } from '../data';
 
 export type GetOnboardingConfigsRequest = {
   status?: OnboardingConfigStatus;

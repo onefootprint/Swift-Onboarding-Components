@@ -1,4 +1,4 @@
-import { ChallengeData, Identifier } from '@onefootprint/types';
+import type { ChallengeData, Identifier } from '@onefootprint/types';
 
 export type GetScrubbedPhoneNumberArgs = {
   successfulIdentifier?: Identifier;

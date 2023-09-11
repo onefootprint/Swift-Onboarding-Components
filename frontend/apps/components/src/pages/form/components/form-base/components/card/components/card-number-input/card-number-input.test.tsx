@@ -2,7 +2,8 @@ import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import { renderComponents } from '../../../../../../../../config/tests';
-import CardNumberInput, { CardNumberInputProps } from './card-number-input';
+import type { CardNumberInputProps } from './card-number-input';
+import CardNumberInput from './card-number-input';
 import InteractiveCardNumberInput from './card-number-input.test.config';
 
 const renderCardNumberInput = ({

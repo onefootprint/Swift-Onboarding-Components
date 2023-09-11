@@ -1,7 +1,8 @@
-import { IdDIData, IdDocOutcomes } from '@onefootprint/types';
+import type { IdDIData, IdDocOutcomes } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { MachineContext, MachineEvents } from './types';
+import type { Typegen0 } from './machine.typegen';
+import type { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 
 export type OnboardingMachineArgs = {
@@ -31,7 +32,7 @@ const createOnboardingMachine = ({
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as import('./machine.typegen').Typegen0,
+      tsTypes: {} as Typegen0,
       initial: 'init',
       context: {
         authToken,

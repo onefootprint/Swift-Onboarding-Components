@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import Toggle, { ToggleProps } from './toggle';
+import type { ToggleProps } from './toggle';
+import Toggle from './toggle';
 
 export default {
   component: Toggle,

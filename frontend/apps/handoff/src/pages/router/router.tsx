@@ -1,8 +1,9 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
-import { FootprintVariant } from '@onefootprint/footprint-js';
+import type { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
 import { AppErrorBoundary, useGetD2PStatus } from '@onefootprint/idv-elements';
-import { CLIENT_PUBLIC_KEY_HEADER, GetD2PResponse } from '@onefootprint/types';
+import type { GetD2PResponse } from '@onefootprint/types';
+import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import React from 'react';
 import Layout from 'src/components/layout';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';

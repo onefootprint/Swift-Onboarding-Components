@@ -1,11 +1,7 @@
 import { ComponentCallbacksByEvent } from '../constants/callbacks';
 import RefsByComponent from '../constants/refs';
-import {
-  ComponentKind,
-  Props,
-  Variant,
-  VerifyProps,
-} from '../types/components';
+import type { Props, Variant, VerifyProps } from '../types/components';
+import { ComponentKind } from '../types/components';
 import { PublicEvent } from '../types/events';
 
 const VariantsByKind: Record<ComponentKind, Variant[]> = {

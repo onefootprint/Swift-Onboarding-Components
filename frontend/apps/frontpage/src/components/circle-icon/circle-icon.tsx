@@ -1,7 +1,7 @@
 import type { BackgroundColor, Color } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Property } from 'csstype';
+import type { Property } from 'csstype';
 import React from 'react';
 
 type CircleIconProps = {

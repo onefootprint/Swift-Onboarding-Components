@@ -2,7 +2,8 @@ import themes from '@onefootprint/design-tokens';
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Box, { BoxProps } from './box';
+import type { BoxProps } from './box';
+import Box from './box';
 
 describe('<Box />', () => {
   const renderBox = ({

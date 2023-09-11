@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import CardCvc, { CardCvcProps } from './card-cvc';
+import type { CardCvcProps } from './card-cvc';
+import CardCvc from './card-cvc';
 
 export default {
   component: CardCvc,

@@ -1,1 +1,1 @@
-export { type RadioSelectProps, default as RadioSelect } from './radio-select';
+export { RadioSelectProps, default as RadioSelect } from './radio-select';

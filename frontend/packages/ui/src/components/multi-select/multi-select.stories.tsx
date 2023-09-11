@@ -1,7 +1,8 @@
-import { ComponentMeta, Story } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
 
-import MultiSelect, { MultiSelectProps } from './multi-select';
+import type { MultiSelectProps } from './multi-select';
+import MultiSelect from './multi-select';
 
 export const defaultOptions = [
   {

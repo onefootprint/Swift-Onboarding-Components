@@ -14,7 +14,7 @@ import React, { useEffect, useState } from 'react';
 
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
-import { NavEntry } from './types';
+import type { NavEntry } from './types';
 
 const Navbar = () => {
   const { t } = useTranslation('components.navbar');

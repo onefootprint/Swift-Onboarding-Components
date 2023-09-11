@@ -1,5 +1,5 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { CountryCode, CountryCode3 } from '@onefootprint/types';
+import type { CountryCode, CountryCode3 } from '@onefootprint/types';
 
 export const getCountryFromCode = (countryCode?: CountryCode) => {
   const match = COUNTRIES.find(country => country.value === countryCode);

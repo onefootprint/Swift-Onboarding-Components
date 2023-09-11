@@ -4,13 +4,14 @@ import type { CountryCode } from '@onefootprint/types';
 import React from 'react';
 
 import Flag from '../flag';
-import BaseSelect, {
+import type {
   BaseSelectOption,
   BaseSelectProps,
 } from '../internal/base-select';
+import BaseSelect from '../internal/base-select';
 import BaseSelectTrigger from '../internal/base-select-trigger';
 import Option from './components/option';
-import { CountrySelectOption } from './country-select.types';
+import type { CountrySelectOption } from './country-select.types';
 
 export type CountrySelectProps = Omit<
   BaseSelectProps<CountrySelectOption>,

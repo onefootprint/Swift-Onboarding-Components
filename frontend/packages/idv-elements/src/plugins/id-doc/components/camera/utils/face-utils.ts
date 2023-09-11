@@ -1,4 +1,4 @@
-import { FaceLandmarks68, Point } from 'face-api.js';
+import type { FaceLandmarks68, Point } from 'face-api.js';
 
 const MAX_HEAD_ROLL = 10;
 const MAX_HEAD_PITCH = 10;

@@ -1,4 +1,4 @@
-import { BusinessDI, DocumentDI, IdDI, InvestorProfileDI } from './di';
+import type { BusinessDI, DocumentDI, IdDI, InvestorProfileDI } from './di';
 
 export type VaultEncryptedData = null;
 

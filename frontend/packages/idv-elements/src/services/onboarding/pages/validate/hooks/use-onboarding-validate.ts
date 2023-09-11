@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import {
+import type {
   OnboardingValidateRequest,
   OnboardingValidateResponse,
 } from '@onefootprint/types/src/api/onboarding-validate';

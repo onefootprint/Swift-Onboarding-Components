@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import styled, { css } from '@onefootprint/styled';
-import { Property } from 'csstype';
-import * as CSS from 'csstype';
+import type * as CSS from 'csstype';
 import React from 'react';
 
 import { createFontStyles } from '../../utils';
-import LoadingIndicator, { LoadingIndicatorProps } from '../loading-indicator';
+import type { LoadingIndicatorProps } from '../loading-indicator';
+import LoadingIndicator from '../loading-indicator';
 import type { AvatarSize } from './avatar.types';
 
 export type AvatarProps = {
@@ -40,7 +40,7 @@ const Avatar = ({
   );
 };
 
-const sizes: Record<AvatarSize, Property.Width | Property.Height> = {
+const sizes: Record<AvatarSize, CSS.Property.Width | CSS.Property.Height> = {
   compact: '24px',
   default: '32px',
   large: '40px',

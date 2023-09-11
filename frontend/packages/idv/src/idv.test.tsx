@@ -46,7 +46,7 @@ import {
   withUserVault,
   withUserVaultValidate,
 } from './idv.test.config';
-import { IdvProps } from './types';
+import type { IdvProps } from './types';
 
 describe('<Idv />', () => {
   const useRouterSpy = createUseRouterSpy();

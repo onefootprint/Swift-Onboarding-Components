@@ -1,12 +1,14 @@
 import { useOpenCv } from 'opencv-react-ts';
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import type { MutableRefObject } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import getSourceDimensions from '../utils/get-source-dimensions';
 import {
   CardCaptureStatus,
   getCardCaptureStatus,
 } from '../utils/graphics-utils/graphics-processing-utils';
-import { params, ParamsType } from '../utils/graphics-utils/params';
+import type { ParamsType } from '../utils/graphics-utils/params';
+import { params } from '../utils/graphics-utils/params';
 import useFaceDetection, { FaceStatus } from './use-face-detection';
 import useSize from './use-size';
 

@@ -1,5 +1,6 @@
 import { assign, createMachine } from 'xstate';
 
+import type { Typegen0 } from './machine.typegen';
 import { MachineContext, MachineEvents } from './types';
 
 const createRequirementsMachine = () =>
@@ -16,7 +17,7 @@ const createRequirementsMachine = () =>
         idDoc: null,
       },
     },
-    tsTypes: {} as import('./machine.typegen').Typegen0,
+    tsTypes: {} as Typegen0,
     initial: 'check',
     states: {
       check: {

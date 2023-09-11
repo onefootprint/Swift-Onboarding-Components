@@ -1,7 +1,5 @@
-import {
-  FootprintFormType,
-  FootprintVariant,
-} from '@onefootprint/footprint-js';
+import type { FootprintVariant } from '@onefootprint/footprint-js';
+import { FootprintFormType } from '@onefootprint/footprint-js';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
@@ -10,14 +8,13 @@ import { Divider, useConfirmationDialog } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import Address, {
-  AddressData,
-  PartialAddress,
-  PartialAddressData,
-} from './components/address';
-import Card, { CardData } from './components/card';
+import type { AddressData, PartialAddressData } from './components/address';
+import Address, { PartialAddress } from './components/address';
+import type { CardData } from './components/card';
+import Card from './components/card';
 import FormDialog from './components/form-dialog';
-import Name, { NameData } from './components/name';
+import type { NameData } from './components/name';
+import Name from './components/name';
 import Title from './components/title';
 
 export type FormData =

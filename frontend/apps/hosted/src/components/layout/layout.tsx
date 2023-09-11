@@ -1,4 +1,4 @@
-import { FootprintVariant } from '@onefootprint/footprint-js';
+import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { Layout as AppLayout } from '@onefootprint/idv-elements';
 import styled from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';

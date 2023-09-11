@@ -1,9 +1,9 @@
+import type { IdDIData } from '@onefootprint/types';
 import {
   BeneficialOwnerDataAttribute,
   BusinessDI,
   CollectedKybDataOption,
   IdDI,
-  IdDIData,
 } from '@onefootprint/types';
 import React from 'react';
 

@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { Modifier } from 'react-popper';
+import type { Modifier } from 'react-popper';
 
 const modifiers: Modifier<string, Record<string, unknown>>[] = [
   {

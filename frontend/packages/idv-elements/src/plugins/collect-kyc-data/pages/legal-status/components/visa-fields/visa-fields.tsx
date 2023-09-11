@@ -5,7 +5,7 @@ import { isValid } from 'date-fns';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { FormData } from '../../types';
+import type { FormData } from '../../types';
 
 const VisaFields = () => {
   const { t } = useTranslation('pages.legal-status.form');

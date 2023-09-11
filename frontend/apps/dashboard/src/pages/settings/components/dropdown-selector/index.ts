@@ -1,5 +1,2 @@
-export {
-  type DropdownSelectorProps,
-  type Option,
-  default,
-} from './dropdown-selector';
+export type { DropdownSelectorProps, Option } from './dropdown-selector';
+export { default } from './dropdown-selector';

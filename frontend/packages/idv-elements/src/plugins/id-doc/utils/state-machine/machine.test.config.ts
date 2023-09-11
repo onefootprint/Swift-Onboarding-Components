@@ -1,13 +1,13 @@
+import type { IdDocRequirement } from '@onefootprint/types';
 import {
   IdDocImageProcessingError,
   IdDocImageTypes,
   IdDocImageUploadError,
-  IdDocRequirement,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 
-import { MachineContext } from './types';
+import type { MachineContext } from './types';
 
 export const requirement: IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc,

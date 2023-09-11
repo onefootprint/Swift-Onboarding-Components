@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { InvestorProfileData } from '@onefootprint/types';
 import {
-  InvestorProfileData,
   InvestorProfileDI,
   InvestorProfileInvestmentGoal,
 } from '@onefootprint/types';
@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import CustomForm from '../../../../components/custom-form';
-import { InvestmentGoalsData } from '../../../../utils/state-machine/types';
+import type { InvestmentGoalsData } from '../../../../utils/state-machine/types';
 
 export type InvestmentGoalsFormProps = {
   defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.investmentGoals>;

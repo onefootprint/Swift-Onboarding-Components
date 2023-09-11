@@ -1,7 +1,10 @@
-import { IdDocOutcomes, PublicOnboardingConfig } from '@onefootprint/types';
+import type {
+  IdDocOutcomes,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
-import { TransferRequirements } from '../../types';
+import type { TransferRequirements } from '../../types';
 
 export type MachineContext = {
   // Plugin context

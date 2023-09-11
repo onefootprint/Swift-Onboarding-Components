@@ -11,7 +11,8 @@ import {
   waitFor,
 } from '@/investor-profile/config/tests';
 
-import IncomeForm, { IncomeFormProps } from './income-form';
+import type { IncomeFormProps } from './income-form';
+import IncomeForm from './income-form';
 
 describe('<IncomeForm />', () => {
   const renderForm = ({

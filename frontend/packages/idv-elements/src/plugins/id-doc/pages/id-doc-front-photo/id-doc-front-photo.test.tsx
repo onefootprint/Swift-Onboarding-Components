@@ -2,7 +2,7 @@ import { screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
 import renderPage from '../../test-utils/render-page';
-import { MachineContext } from '../../utils/state-machine';
+import type { MachineContext } from '../../utils/state-machine';
 import IdDocFrontPhoto from '.';
 import {
   initialContextBD,

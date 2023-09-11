@@ -11,7 +11,8 @@ import {
   waitFor,
 } from '@/investor-profile/config/tests';
 
-import DeclarationsForm, { DeclarationsFormProps } from './declarations-form';
+import type { DeclarationsFormProps } from './declarations-form';
+import DeclarationsForm from './declarations-form';
 
 describe('<DeclarationsForm />', () => {
   const renderForm = ({

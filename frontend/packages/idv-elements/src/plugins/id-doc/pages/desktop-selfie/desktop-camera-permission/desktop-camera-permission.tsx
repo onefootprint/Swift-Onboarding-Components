@@ -5,7 +5,7 @@ import React from 'react';
 
 import { HeaderTitle, NavigationHeader } from '../../../../../components';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../../constants/desktop-interaction-box.constants';
-import { CameraPermissionState } from '../hooks/use-camera-permission';
+import type { CameraPermissionState } from '../hooks/use-camera-permission';
 
 type DesktopCameraPermissionProps = {
   permissionState: Exclude<CameraPermissionState, 'allowed'>;

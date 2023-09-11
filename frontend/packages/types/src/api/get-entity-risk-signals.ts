@@ -1,4 +1,4 @@
-import { RiskSignal } from '../data';
+import type { RiskSignal } from '../data';
 
 export type GetEntityRiskSignalsRequest = {
   id: string;

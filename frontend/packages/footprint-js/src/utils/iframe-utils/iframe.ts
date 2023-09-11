@@ -1,6 +1,7 @@
 import Postmate from '@onefootprint/postmate';
 
-import { ComponentKind, FormRef, Props } from '../../types/components';
+import type { FormRef, Props } from '../../types/components';
+import { ComponentKind } from '../../types/components';
 import { PrivateEvent } from '../../types/events';
 import {
   createInlineContainer,
@@ -17,7 +18,7 @@ import {
   getSanitizedProps,
 } from '../prop-utils';
 import getURL from '../util-utils';
-import { Iframe } from './types';
+import type { Iframe } from './types';
 
 const initIframe = (rawProps: Props): Iframe => {
   let child: Postmate.ParentAPI | null = null;

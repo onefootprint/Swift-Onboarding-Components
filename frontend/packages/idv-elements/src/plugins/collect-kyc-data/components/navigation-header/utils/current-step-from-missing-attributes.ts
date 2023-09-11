@@ -1,7 +1,7 @@
-import { CollectKycDataRequirement } from '@onefootprint/types';
-import { StateValue } from 'xstate';
+import type { CollectKycDataRequirement } from '@onefootprint/types';
+import type { StateValue } from 'xstate';
 
-import { KycData } from '../../../utils/data-types';
+import type { KycData } from '../../../utils/data-types';
 import {
   hasMissingAttributes,
   isMissingBasicAttribute,

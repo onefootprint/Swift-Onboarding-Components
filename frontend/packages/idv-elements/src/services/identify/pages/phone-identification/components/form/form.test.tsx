@@ -2,7 +2,8 @@ import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import { renderIdentify } from '../../../../config/tests/render';
-import Form, { FormProps } from './form';
+import type { FormProps } from './form';
+import Form from './form';
 
 describe.skip('<Form />', () => {
   const renderForm = ({

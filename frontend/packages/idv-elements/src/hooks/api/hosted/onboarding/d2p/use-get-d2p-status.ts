@@ -1,5 +1,6 @@
-import request, { RequestError } from '@onefootprint/request';
-import { GetD2PRequest, GetD2PResponse } from '@onefootprint/types';
+import type { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
+import type { GetD2PRequest, GetD2PResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../../config/constants';

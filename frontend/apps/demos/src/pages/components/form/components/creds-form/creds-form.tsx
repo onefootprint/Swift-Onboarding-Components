@@ -2,9 +2,8 @@ import styled, { css } from '@onefootprint/styled';
 import { Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import useClientToken, {
-  ClientTokenResponse,
-} from 'src/hooks/use-client-token';
+import type { ClientTokenResponse } from 'src/hooks/use-client-token';
+import useClientToken from 'src/hooks/use-client-token';
 
 type FormData = {
   userId: string;

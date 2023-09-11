@@ -3,7 +3,7 @@ import { media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 
-import { CompanyPhoto } from '../company-photos.types';
+import type { CompanyPhoto } from '../company-photos.types';
 
 type CompanyPhotosDesktopProps = {
   photos: CompanyPhoto[];

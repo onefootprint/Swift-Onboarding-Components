@@ -1,4 +1,4 @@
-import { CollectedDataOption } from './collected-data-option';
+import type { CollectedDataOption } from './collected-data-option';
 
 export enum RoleScopeKind {
   read = 'read',

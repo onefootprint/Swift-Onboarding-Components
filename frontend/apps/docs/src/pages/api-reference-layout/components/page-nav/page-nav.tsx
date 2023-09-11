@@ -9,7 +9,7 @@ import NavigationLink from 'src/components/navigation-link';
 import NavigationLogo from 'src/components/navigation-logo';
 import NavigationSectionTitle from 'src/components/navigation-section-title';
 
-import { Navigation } from './types';
+import type { Navigation } from './types';
 
 type PageNavProps = {
   navigation: Navigation;

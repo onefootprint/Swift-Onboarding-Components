@@ -1,5 +1,6 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import { IdDI, UserDataRequest, UserDataResponse } from '@onefootprint/types';
+import type { UserDataRequest, UserDataResponse } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import {

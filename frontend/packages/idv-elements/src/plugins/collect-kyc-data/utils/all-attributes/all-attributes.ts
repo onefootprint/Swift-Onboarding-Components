@@ -1,4 +1,4 @@
-import { CollectKycDataRequirement } from '@onefootprint/types';
+import type { CollectKycDataRequirement } from '@onefootprint/types';
 
 /// Return the list of CDOs that need to be collected to satisfy this requirement, whether already
 /// collected or not.

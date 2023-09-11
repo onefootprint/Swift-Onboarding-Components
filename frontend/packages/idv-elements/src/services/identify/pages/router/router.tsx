@@ -1,5 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
-import { IdDocOutcomes } from '@onefootprint/types';
+import type { IdDocOutcomes } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';

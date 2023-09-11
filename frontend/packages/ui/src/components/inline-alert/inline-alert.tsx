@@ -1,7 +1,8 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import useSX from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';
 import Box from '../box';
 import type { InlineAlertVariant } from './inline-alert.types';

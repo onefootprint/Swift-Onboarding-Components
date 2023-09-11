@@ -1,6 +1,6 @@
-import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
+import type { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 
-import {
+import type {
   CompletePayload,
   FootprintClient,
   LegacyFootprintInternalEvent,

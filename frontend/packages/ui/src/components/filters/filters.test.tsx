@@ -9,7 +9,8 @@ import {
 import MockDate from 'mockdate';
 import React from 'react';
 
-import Filters, { FiltersProps } from './filters';
+import type { FiltersProps } from './filters';
+import Filters from './filters';
 
 const testDate = new Date('2023-01-04');
 

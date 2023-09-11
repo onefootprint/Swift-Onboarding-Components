@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from '@vercel/og';
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 import React from 'react';
 
 export const config = {

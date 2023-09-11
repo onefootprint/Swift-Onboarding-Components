@@ -2,7 +2,8 @@ import { IcoAndroid16, IcoApple16 } from '@onefootprint/icons';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import RadioSelect, { RadioSelectProps } from './radio-select';
+import type { RadioSelectProps } from './radio-select';
+import RadioSelect from './radio-select';
 
 describe('<RadioSelect />', () => {
   const renderRadioSelect = ({

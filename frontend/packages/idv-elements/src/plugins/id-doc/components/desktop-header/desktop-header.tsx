@@ -1,9 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  CountryCode,
-  IdDocImageTypes,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import { IdDocImageTypes } from '@onefootprint/types';
 import React from 'react';
 
 import { HeaderTitle } from '../../../../components';

@@ -1,5 +1,5 @@
 import type { CountryCode } from '@onefootprint/types';
-import { CleaveOptions } from 'cleave.js/options';
+import type { CleaveOptions } from 'cleave.js/options';
 
 export const preferences: Partial<
   Record<

@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { ChallengeData, ChallengeKind } from '@onefootprint/types';
+import type { ChallengeData } from '@onefootprint/types';
+import { ChallengeKind } from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';

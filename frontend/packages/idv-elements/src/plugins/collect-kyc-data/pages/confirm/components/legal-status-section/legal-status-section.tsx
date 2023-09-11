@@ -1,13 +1,15 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoGlobe24 } from '@onefootprint/icons';
 import { IdDI } from '@onefootprint/types';
-import { CountrySelectOption } from '@onefootprint/ui';
+import type { CountrySelectOption } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import {
-  type SectionItemProps,
-  Section,
+import type {
   SectionAction,
+  SectionItemProps,
+} from '../../../../../../components/confirm-collected-data';
+import {
+  Section,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';

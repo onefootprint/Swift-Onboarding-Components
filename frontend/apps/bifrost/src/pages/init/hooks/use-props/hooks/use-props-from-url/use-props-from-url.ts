@@ -1,8 +1,8 @@
-import { IdvBootstrapData } from '@onefootprint/types';
+import type { IdvBootstrapData } from '@onefootprint/types';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-import { BifrostProps } from '../../types';
+import type { BifrostProps } from '../../types';
 import arePropsValid from '../../utils/are-props-valid';
 import getParsedProps from '../../utils/get-parsed-props';
 import parseLegacyUserData from '../../utils/parse-legacy-user-data';

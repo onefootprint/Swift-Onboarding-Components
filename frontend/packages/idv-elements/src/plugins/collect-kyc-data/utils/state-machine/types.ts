@@ -1,10 +1,10 @@
-import {
+import type {
   CollectKycDataRequirement,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
-import { KycData } from '../data-types';
+import type { KycData } from '../data-types';
 
 export type MachineContext = {
   // Plugin context

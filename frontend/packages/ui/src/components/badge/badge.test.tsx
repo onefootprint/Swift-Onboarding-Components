@@ -1,8 +1,10 @@
-import themes, { UIState } from '@onefootprint/design-tokens';
+import type { UIState } from '@onefootprint/design-tokens';
+import themes from '@onefootprint/design-tokens';
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Badge, { BadgeProps } from './badge';
+import type { BadgeProps } from './badge';
+import Badge from './badge';
 
 describe('<Badge />', () => {
   const renderBadge = ({

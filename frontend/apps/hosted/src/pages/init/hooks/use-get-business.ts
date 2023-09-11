@@ -1,9 +1,6 @@
 import request from '@onefootprint/request';
-import {
-  BusinessRequest,
-  BusinessResponse,
-  KYB_BO_SESSION_AUTHORIZATION_HEADER,
-} from '@onefootprint/types';
+import type { BusinessRequest, BusinessResponse } from '@onefootprint/types';
+import { KYB_BO_SESSION_AUTHORIZATION_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 const getBusinessRequest = async ({ obConfigAuth }: BusinessRequest) => {

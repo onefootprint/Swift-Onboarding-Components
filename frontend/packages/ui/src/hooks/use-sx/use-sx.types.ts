@@ -1,4 +1,4 @@
-import {
+import type {
   BackgroundColor,
   BorderColor,
   BorderRadius,
@@ -7,7 +7,7 @@ import {
   Elevation,
   Spacing,
 } from '@onefootprint/design-tokens';
-import * as CSS from 'csstype';
+import type * as CSS from 'csstype';
 
 export type CustomStyleProps = {
   backgroundColor?: BackgroundColor;

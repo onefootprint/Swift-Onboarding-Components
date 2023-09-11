@@ -1,4 +1,4 @@
-import { Icon } from '@onefootprint/icons';
+import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { useRef } from 'react';
 import { useHover } from 'usehooks-ts';

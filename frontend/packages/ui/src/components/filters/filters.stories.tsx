@@ -1,4 +1,4 @@
-import { ComponentMeta, Story } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import Filter from './filters';

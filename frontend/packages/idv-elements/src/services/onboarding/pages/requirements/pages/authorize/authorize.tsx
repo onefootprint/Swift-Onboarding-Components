@@ -1,14 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
-import {
+import type {
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
-  getRequirement,
-  OnboardingRequirementKind,
 } from '@onefootprint/types';
+import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
 import { Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
 

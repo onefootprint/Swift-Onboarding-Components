@@ -1,7 +1,8 @@
 import { assign, createMachine } from 'xstate';
 
+import type { Typegen0 } from './machine.typegen';
 import { NextSideTargetsDesktop, NextSideTargetsMobile } from './machine.utils';
-import { MachineContext, MachineEvents } from './types';
+import type { MachineContext, MachineEvents } from './types';
 
 const createIdDocMachine = (args: MachineContext, initState?: string) =>
   createMachine(
@@ -12,7 +13,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as import('./machine.typegen').Typegen0,
+      tsTypes: {} as Typegen0,
       initial: initState ?? 'init',
       context: { ...args },
       states: {

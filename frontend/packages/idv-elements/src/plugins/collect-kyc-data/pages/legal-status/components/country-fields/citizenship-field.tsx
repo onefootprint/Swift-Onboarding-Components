@@ -3,7 +3,7 @@ import { IcoTrash24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { CountrySelect, IconButton } from '@onefootprint/ui';
 import React from 'react';
-import { ControllerRenderProps, FieldValues } from 'react-hook-form';
+import type { ControllerRenderProps, FieldValues } from 'react-hook-form';
 
 type CitizenshipFieldProps = {
   field: ControllerRenderProps<FieldValues, `citizenships.${number}`>;

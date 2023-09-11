@@ -11,7 +11,8 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 import useSupportForm from '../../hooks/use-support-form';
-import { FormField, SupportFormData } from '../../support-list.types';
+import type { SupportFormData } from '../../support-list.types';
+import { FormField } from '../../support-list.types';
 
 type SupportDialogProps = {
   url: string;

@@ -3,7 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 
-import { FormDialogButton } from '../../types';
+import type { FormDialogButton } from '../../types';
 import SecuredByFootprint from './components/secured-by-footprint';
 
 type FooterProps = {

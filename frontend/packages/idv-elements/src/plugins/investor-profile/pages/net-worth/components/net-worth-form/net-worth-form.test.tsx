@@ -11,7 +11,8 @@ import {
   waitFor,
 } from '@/investor-profile/config/tests';
 
-import NetWorthForm, { NetWorthFormProps } from './net-worth-form';
+import type { NetWorthFormProps } from './net-worth-form';
+import NetWorthForm from './net-worth-form';
 
 describe('<NetWorthForm />', () => {
   const renderForm = ({

@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import { D2PSmsRequest, D2PSmsResponse } from '@onefootprint/types';
+import type { D2PSmsRequest, D2PSmsResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../../config/constants';

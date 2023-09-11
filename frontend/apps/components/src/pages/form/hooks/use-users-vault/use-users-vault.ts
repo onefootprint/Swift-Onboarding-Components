@@ -1,5 +1,8 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import { UsersVaultRequest, UsersVaultResponse } from '@onefootprint/types';
+import type {
+  UsersVaultRequest,
+  UsersVaultResponse,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../config/constants';

@@ -10,8 +10,8 @@ import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import { FaceModelProvider } from './hooks/use-face-model-loader';
 import Router from './pages/router';
-import { IdDocProps } from './types';
-import { MachineContext } from './utils/state-machine';
+import type { IdDocProps } from './types';
+import type { MachineContext } from './utils/state-machine';
 
 const App = ({ context, onDone }: IdDocProps) => {
   const { authToken, device, customData } = context;

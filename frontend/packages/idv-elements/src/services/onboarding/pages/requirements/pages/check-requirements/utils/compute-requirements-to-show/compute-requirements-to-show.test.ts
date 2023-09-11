@@ -1,9 +1,11 @@
-import {
+import type {
   AuthorizeRequirement,
-  CollectedKycDataOption,
   CollectKycDataRequirement,
-  OnboardingRequirementKind,
   PublicOnboardingConfig,
+} from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  OnboardingRequirementKind,
 } from '@onefootprint/types';
 
 import computeRequirementsToShow from './compute-requirements-to-show';

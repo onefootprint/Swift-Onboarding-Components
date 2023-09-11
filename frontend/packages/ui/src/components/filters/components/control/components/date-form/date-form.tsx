@@ -5,7 +5,8 @@ import { Controller, useForm } from 'react-hook-form';
 
 import DateRangeInput from '../../../../../date-range-input';
 import Radio from '../../../../../radio';
-import { FilterDate, FilterDateRange } from '../../../../filters.types';
+import type { FilterDate } from '../../../../filters.types';
+import { FilterDateRange } from '../../../../filters.types';
 import useDateOptions from '../../hooks/use-date-options';
 import getFormDefaultValue from './utils/get-form-default-values';
 

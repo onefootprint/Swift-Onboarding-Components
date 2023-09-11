@@ -1,5 +1,6 @@
-import request, { RequestError } from '@onefootprint/request';
-import {
+import type { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
+import type {
   GetOnboardingConfigRequest,
   GetPublicOnboardingConfigResponse,
 } from '@onefootprint/types';

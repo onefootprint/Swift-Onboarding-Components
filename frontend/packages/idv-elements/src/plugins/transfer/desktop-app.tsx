@@ -7,7 +7,7 @@ import { useDesktopMachine } from './components/desktop-machine-provider';
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import Router from './pages/desktop/router';
-import { TransferProps } from './types';
+import type { TransferProps } from './types';
 
 const i18n = configureI18next();
 

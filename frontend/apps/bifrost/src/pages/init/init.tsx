@@ -4,17 +4,17 @@ import {
   useGetOnboardingConfig,
 } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
-import {
-  CLIENT_PUBLIC_KEY_HEADER,
+import type {
   IdvBootstrapData,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
+import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
 import useTenantPublicKey from '../../hooks/use-tenant-public-key';
 import useProps from './hooks/use-props';
-import { BifrostProps } from './hooks/use-props/types';
+import type { BifrostProps } from './hooks/use-props/types';
 
 const Init = () => {
   const tenantPk = useTenantPublicKey();

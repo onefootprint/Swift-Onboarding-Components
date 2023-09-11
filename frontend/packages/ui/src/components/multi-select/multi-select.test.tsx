@@ -6,7 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import MultiSelect, { MultiSelectProps } from './multi-select';
+import type { MultiSelectProps } from './multi-select';
+import MultiSelect from './multi-select';
 
 const defaultOptions = [
   { value: 'full_name', label: 'Full name' },

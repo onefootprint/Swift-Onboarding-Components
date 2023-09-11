@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { MissingPermissionsSheetProps } from '../missing-permissions-sheet';
+import type { MissingPermissionsSheetProps } from '../missing-permissions-sheet';
 
 const useLocalSheet = () => {
   const [sheet, setSheet] = useState<

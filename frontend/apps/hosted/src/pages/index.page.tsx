@@ -1,4 +1,4 @@
-import { FootprintVariant } from '@onefootprint/footprint-js';
+import type { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
 import { AppErrorBoundary } from '@onefootprint/idv-elements';
 import { IdDI } from '@onefootprint/types';

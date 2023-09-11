@@ -1,5 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
-import React, { forwardRef, TextareaHTMLAttributes, useId } from 'react';
+import type { TextareaHTMLAttributes } from 'react';
+import React, { forwardRef, useId } from 'react';
 
 import { createTypography } from '../../utils';
 import Box from '../box';

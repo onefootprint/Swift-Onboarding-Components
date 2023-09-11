@@ -4,12 +4,14 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import {
-  ChallengeKind,
-  CollectedKycDataOption,
+import type {
   D2PStatus,
   DataIdentifier,
   OnboardingRequirement,
+} from '@onefootprint/types';
+import {
+  ChallengeKind,
+  CollectedKycDataOption,
   OnboardingRequirementKind,
   UserTokenScope,
 } from '@onefootprint/types';

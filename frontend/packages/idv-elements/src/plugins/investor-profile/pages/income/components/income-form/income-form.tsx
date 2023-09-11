@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { InvestorProfileData } from '@onefootprint/types';
 import {
   InvestorProfileAnnualIncome,
-  InvestorProfileData,
   InvestorProfileDI,
 } from '@onefootprint/types';
 import { Radio } from '@onefootprint/ui';
@@ -9,7 +9,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 import FormWithOptions from '../../../../components/custom-form';
-import { IncomeData } from '../../../../utils/state-machine/types';
+import type { IncomeData } from '../../../../utils/state-machine/types';
 
 export type IncomeFormProps = {
   defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.annualIncome>;

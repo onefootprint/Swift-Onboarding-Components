@@ -5,8 +5,9 @@ import { I18nextProvider } from 'react-i18next';
 import OnboardingMachineProvider from './components/machine-provider';
 import configureI18next from './config/initializers/react-i18next';
 import queryClient from './config/initializers/react-query';
-import Router, { DonePayload } from './pages/router';
-import { OnboardingMachineArgs } from './utils/state-machine';
+import type { DonePayload } from './pages/router';
+import Router from './pages/router';
+import type { OnboardingMachineArgs } from './utils/state-machine';
 
 type OnboardingProps = Partial<OnboardingMachineArgs> & {
   onDone: (payload: DonePayload) => void;

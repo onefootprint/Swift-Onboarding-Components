@@ -6,7 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Label, { LabelProps } from './label';
+import type { LabelProps } from './label';
+import Label from './label';
 
 describe('<Label />', () => {
   const renderLabel = ({

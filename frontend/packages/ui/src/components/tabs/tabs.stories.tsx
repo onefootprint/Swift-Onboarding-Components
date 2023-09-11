@@ -1,8 +1,9 @@
 import { IcoCode16, IcoFileText16, IcoSettings16 } from '@onefootprint/icons';
-import { ComponentMeta, Story } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
 
-import { Tab, Tabs, TabsProps } from '.';
+import type { TabsProps } from '.';
+import { Tab, Tabs } from '.';
 
 export default {
   title: 'Components/Tabs',

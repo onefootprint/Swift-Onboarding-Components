@@ -1,4 +1,4 @@
-import { IdDocImageProcessingError, IdDocImageTypes } from '../data';
+import type { IdDocImageProcessingError, IdDocImageTypes } from '../data';
 
 export type SubmitDocRequest = {
   authToken: string;

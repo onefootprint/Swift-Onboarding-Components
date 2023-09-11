@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Tag, { TagProps } from './tag';
+import type { TagProps } from './tag';
+import Tag from './tag';
 
 describe('<Tag />', () => {
   const renderBadge = ({ children = 'Foo' }: Partial<TagProps>) =>

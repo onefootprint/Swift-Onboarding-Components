@@ -76,10 +76,11 @@
     "@types/react-highlight-words": "^0.16.4",
     "@types/react-syntax-highlighter": "^15.5.4",
     "@types/react-window": "^1.8.5",
+    "@types/styled-components": "^5.1.26",
     "csstype": "^3.1.0",
     "eslint-config-footprint": "*",
-    "react-dom": "18.2.0",
     "react": "18.2.0",
+    "react-dom": "18.2.0",
     "tsconfig": "*",
     "typescript": "4.9.5",
     "webpack": "*"

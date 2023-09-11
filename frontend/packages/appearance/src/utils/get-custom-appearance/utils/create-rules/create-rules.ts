@@ -1,4 +1,4 @@
-import { FootprintAppearanceRules } from '@onefootprint/footprint-js';
+import type { FootprintAppearanceRules } from '@onefootprint/footprint-js';
 
 import footprintClassNamesMap from './constants/footprint-class-names-map';
 import rulesWhitelist from './constants/rules-whitelist';

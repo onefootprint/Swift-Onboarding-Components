@@ -1,4 +1,4 @@
-import { DocumentDI } from '../data/di';
+import type { DocumentDI } from '../data/di';
 
 export type UploadFileRequest = {
   authToken: string;

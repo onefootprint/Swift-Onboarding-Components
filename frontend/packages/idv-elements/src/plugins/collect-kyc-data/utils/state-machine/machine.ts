@@ -9,7 +9,8 @@ import {
   isMissingUsLegalStatusAttribute,
   shouldConfirm,
 } from '../missing-attributes';
-import { MachineContext, MachineEvents } from './types';
+import type { Typegen0 } from './machine.typegen';
+import type { MachineContext, MachineEvents } from './types';
 import isInDomesticFlow from './utils/is-in-domestic-flow';
 import mergeUpdatedData from './utils/merge-data';
 import mergeInitialData from './utils/merge-initial-data';
@@ -26,7 +27,7 @@ const createCollectKycDataMachine = (
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as import('./machine.typegen').Typegen0,
+      tsTypes: {} as Typegen0,
       initial: initState ?? 'init',
       context: { ...initialContext },
       states: {

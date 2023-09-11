@@ -1,7 +1,8 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import { createIdDocMachine, MachineContext } from '../../utils/state-machine';
+import type { MachineContext } from '../../utils/state-machine';
+import { createIdDocMachine } from '../../utils/state-machine';
 
 export type IdDocMachineArgs = {
   args: MachineContext;

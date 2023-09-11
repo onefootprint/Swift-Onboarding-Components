@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import {
+import type {
   StytchTelemetryRequest,
   StytchTelemetryResponse,
 } from '@onefootprint/types';

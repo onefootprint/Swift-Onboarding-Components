@@ -6,10 +6,10 @@ import { MachineProvider } from './components/machine-provider';
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
-import { CollectKycDataProps } from './types';
+import type { CollectKycDataProps } from './types';
 import allAttributes from './utils/all-attributes';
 import getInitData from './utils/get-init-data';
-import { MachineContext } from './utils/state-machine';
+import type { MachineContext } from './utils/state-machine';
 
 const i18n = configureI18next();
 

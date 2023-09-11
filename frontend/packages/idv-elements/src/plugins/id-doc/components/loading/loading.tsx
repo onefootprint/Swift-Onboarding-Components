@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { IdDocImageTypes } from '@onefootprint/types';
+import type { IdDocImageTypes } from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 

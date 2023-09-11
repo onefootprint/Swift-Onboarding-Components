@@ -1,6 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import {
+import type {
   ChallengeData,
   ChallengeKind,
   Identifier,

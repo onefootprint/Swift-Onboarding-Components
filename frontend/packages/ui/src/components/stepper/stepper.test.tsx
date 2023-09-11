@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Stepper, { StepperOption, StepperProps } from './stepper';
+import type { StepperOption, StepperProps } from './stepper';
+import Stepper from './stepper';
 
 const renderStepper = (props: Partial<StepperProps> = {}) => {
   const defaultOptions: StepperOption[] = [

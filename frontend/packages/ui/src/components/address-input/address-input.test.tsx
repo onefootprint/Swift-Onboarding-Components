@@ -8,7 +8,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import AddressInput, { AddressInputProps } from './address-input';
+import type { AddressInputProps } from './address-input';
+import AddressInput from './address-input';
 
 describe('AddressInput', () => {
   beforeEach(() => {

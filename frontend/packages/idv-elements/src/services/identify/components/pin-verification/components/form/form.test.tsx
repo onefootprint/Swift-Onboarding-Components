@@ -2,7 +2,8 @@ import { MockDate, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import { renderIdentify } from '../../../../config/tests/render';
-import Form, { FormProps } from './form';
+import type { FormProps } from './form';
+import Form from './form';
 
 const testDate = new Date('2023-01-19T14:10:20.503Z');
 const futureDate = new Date('2043-01-19T14:10:20.503Z');

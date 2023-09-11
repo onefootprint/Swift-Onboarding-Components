@@ -1,4 +1,4 @@
-import { D2PMeta, D2PStatus } from '../data';
+import type { D2PMeta, D2PStatus } from '../data';
 
 export type GetD2PRequest = {
   scopedAuthToken: string;

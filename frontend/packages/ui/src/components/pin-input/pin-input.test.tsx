@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import PinInput, { PinInputProps } from './pin-input';
+import type { PinInputProps } from './pin-input';
+import PinInput from './pin-input';
 
 describe('<PinInput />', () => {
   const renderPinInput = ({

@@ -1,9 +1,8 @@
-import {
-  IdDI,
+import type {
   IdvBootstrapData,
-  OnboardingConfigStatus,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
+import { IdDI, OnboardingConfigStatus } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import { createBifrostMachine } from './machine';

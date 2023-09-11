@@ -1,10 +1,12 @@
+import type {
+  IdentifyBootstrapData,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 import {
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
   IdDocOutcomes,
-  IdentifyBootstrapData,
   OnboardingConfigStatus,
-  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 

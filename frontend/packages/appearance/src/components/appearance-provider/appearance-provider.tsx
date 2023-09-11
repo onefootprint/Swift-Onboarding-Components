@@ -1,5 +1,5 @@
-import { Theme } from '@onefootprint/design-tokens';
-import { FootprintAppearance } from '@onefootprint/footprint-js';
+import type { Theme } from '@onefootprint/design-tokens';
+import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import React from 'react';
 

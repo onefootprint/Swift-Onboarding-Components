@@ -1,1 +1,2 @@
-export { type AuthorizedScopesProps, default } from './authorized-scopes';
+export type { AuthorizedScopesProps } from './authorized-scopes';
+export { default } from './authorized-scopes';

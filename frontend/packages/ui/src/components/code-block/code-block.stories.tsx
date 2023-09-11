@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import CodeBlock, { CodeBlockProps } from './code-block';
+import type { CodeBlockProps } from './code-block';
+import CodeBlock from './code-block';
 
 export default {
   component: CodeBlock,

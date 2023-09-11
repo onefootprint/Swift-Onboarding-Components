@@ -1,4 +1,4 @@
-import { Annotation } from '../data';
+import type { Annotation } from '../data';
 
 export type GetPinnedAnnotationsRequest = {
   entityId: string;

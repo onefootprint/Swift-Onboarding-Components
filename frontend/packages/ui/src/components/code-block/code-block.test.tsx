@@ -8,7 +8,8 @@ import {
 import React from 'react';
 
 import ToastProvider from '../toast/toast-provider';
-import CodeBlock, { CodeBlockProps } from './code-block';
+import type { CodeBlockProps } from './code-block';
+import CodeBlock from './code-block';
 
 const content = `<div id="footprint-button"/>`;
 

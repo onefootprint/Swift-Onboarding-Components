@@ -7,10 +7,12 @@ import {
 } from '@onefootprint/types';
 import React, { useState } from 'react';
 
-import {
-  type SectionItemProps,
-  Section,
+import type {
   SectionAction,
+  SectionItemProps,
+} from '../../../../../../components/confirm-collected-data';
+import {
+  Section,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';

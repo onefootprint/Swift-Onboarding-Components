@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import Avatar, { AvatarProps } from './avatar';
+import type { AvatarProps } from './avatar';
+import Avatar from './avatar';
 
 export default {
   component: Avatar,

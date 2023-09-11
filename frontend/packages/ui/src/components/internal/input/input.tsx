@@ -1,11 +1,14 @@
-import { FontVariant } from '@onefootprint/design-tokens';
+import type { FontVariant } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
-import { CleaveOptions } from 'cleave.js/options';
-import React, { forwardRef, InputHTMLAttributes, useId } from 'react';
+import type { CleaveOptions } from 'cleave.js/options';
+import type { InputHTMLAttributes } from 'react';
+import React, { forwardRef, useId } from 'react';
 
-import useSx, { SXStyleProps, SXStyles } from '../../../hooks/use-sx';
+import type { SXStyleProps, SXStyles } from '../../../hooks/use-sx';
+import useSx from '../../../hooks/use-sx';
 import Label from '../../label';
-import Field, { FieldProps } from '../field';
+import type { FieldProps } from '../field';
+import Field from '../field';
 import Hint from '../hint';
 
 export type InternalInputProps = {

@@ -1,1 +1,2 @@
-export { type BasicsProps, default } from './basics';
+export type { BasicsProps } from './basics';
+export { default } from './basics';

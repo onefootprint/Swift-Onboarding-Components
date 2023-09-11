@@ -1,6 +1,7 @@
 import { D2PStatus } from '@onefootprint/types';
 import { createMachine } from 'xstate';
 
+import type { Typegen0 } from './machine.typegen';
 import { MachineContext, MachineEvents } from './types';
 
 const createHandoffMachine = (authToken: string) =>
@@ -11,7 +12,7 @@ const createHandoffMachine = (authToken: string) =>
       context: {} as MachineContext,
       events: {} as MachineEvents,
     },
-    tsTypes: {} as import('./machine.typegen').Typegen0,
+    tsTypes: {} as Typegen0,
     initial: 'init',
     context: {
       authToken,

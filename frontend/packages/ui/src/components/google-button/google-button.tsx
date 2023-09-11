@@ -2,7 +2,8 @@ import { IcoGoogle24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import Button, { ButtonProps } from '../button';
+import type { ButtonProps } from '../button';
+import Button from '../button';
 
 type OverrideButtonProps = {
   children?: string;

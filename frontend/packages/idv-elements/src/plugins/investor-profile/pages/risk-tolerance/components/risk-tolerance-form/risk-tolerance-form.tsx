@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import type { InvestorProfileData } from '@onefootprint/types';
 import {
-  InvestorProfileData,
   InvestorProfileDI,
   InvestorProfileRiskTolerance,
 } from '@onefootprint/types';
@@ -10,7 +10,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 import CustomForm from '../../../../components/custom-form';
-import { RiskToleranceData } from '../../../../utils/state-machine/types';
+import type { RiskToleranceData } from '../../../../utils/state-machine/types';
 
 export type RiskToleranceFormProps = {
   defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.riskTolerance>;

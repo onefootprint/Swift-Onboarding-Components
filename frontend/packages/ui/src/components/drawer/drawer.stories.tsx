@@ -1,10 +1,11 @@
 import { IcoClose24, icos } from '@onefootprint/icons';
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import Button from '../button';
 import Typography from '../typography';
-import Drawer, { DrawerProps } from './drawer';
+import type { DrawerProps } from './drawer';
+import Drawer from './drawer';
 
 export default {
   component: Drawer,

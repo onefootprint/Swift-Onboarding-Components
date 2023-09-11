@@ -1,5 +1,6 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import { IdDI, UserEmailRequest, UserEmailResponse } from '@onefootprint/types';
+import type { UserEmailRequest, UserEmailResponse } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../config/constants';

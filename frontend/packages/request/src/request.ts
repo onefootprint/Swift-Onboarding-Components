@@ -1,6 +1,7 @@
 import { getSessionId } from '@onefootprint/dev-tools';
 import { DataIdentifierKeys } from '@onefootprint/types';
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import type { AxiosError, AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
 const LOGOUT_ERRORS = ['Session expired or does not exist', 'Session invalid'];

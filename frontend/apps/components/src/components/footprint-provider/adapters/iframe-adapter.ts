@@ -1,7 +1,7 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
 
-import { FootprintClient } from '../types';
+import type { FootprintClient } from '../types';
 import EventEmitter from '../utils/event-emitter/event-emmiter';
 
 class IframeAdapter implements FootprintClient {

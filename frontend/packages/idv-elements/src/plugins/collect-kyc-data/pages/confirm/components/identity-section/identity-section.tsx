@@ -1,18 +1,21 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
-import { DecryptUserResponse, IdDI } from '@onefootprint/types';
+import type { DecryptUserResponse } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import React, { useEffect, useState } from 'react';
 
-import {
-  type SectionItemProps,
-  Section,
+import type {
   SectionAction,
+  SectionItemProps,
+} from '../../../../../../components/confirm-collected-data';
+import {
+  Section,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useDecryptUser from '../../../../hooks/use-decrypt-user';
-import { KycData } from '../../../../utils/data-types';
+import type { KycData } from '../../../../utils/data-types';
 import {
   getSsnKind,
   getSsnValue,

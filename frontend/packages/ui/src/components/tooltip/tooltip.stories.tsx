@@ -1,6 +1,6 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
 import Tooltip from './tooltip';

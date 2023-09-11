@@ -1,4 +1,4 @@
-import { Props } from '../../types/components';
+import type { Props } from '../../types/components';
 
 export type Iframe = {
   props: Props;

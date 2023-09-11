@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
-import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
+import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 

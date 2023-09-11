@@ -1,11 +1,12 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import InputAddon from '../input-addon';
 import InputGroup from '../input-group';
 import FormLabel from '../label';
 import TextInput from '../text-input';
-import FormControl, { FormControlProps } from './form-control';
+import type { FormControlProps } from './form-control';
+import FormControl from './form-control';
 
 export default {
   component: FormControl,

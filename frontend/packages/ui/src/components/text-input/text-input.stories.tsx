@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import TextInput, { TextInputProps } from './text-input';
+import type { TextInputProps } from './text-input';
+import TextInput from './text-input';
 
 export default {
   component: TextInput,

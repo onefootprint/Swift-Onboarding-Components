@@ -8,7 +8,7 @@ import {
   IcoWork24,
 } from '@onefootprint/icons';
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import { RadioSelectOptionFields } from '@onefootprint/ui';
+import type { RadioSelectOptionFields } from '@onefootprint/ui';
 
 const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
   const { t } = useTranslation('pages.country-and-type-selection');

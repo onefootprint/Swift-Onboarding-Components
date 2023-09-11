@@ -1,5 +1,5 @@
+import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import footprint, {
-  FootprintAppearance,
   FootprintComponentKind,
   FootprintFormType,
 } from '@onefootprint/footprint-js';

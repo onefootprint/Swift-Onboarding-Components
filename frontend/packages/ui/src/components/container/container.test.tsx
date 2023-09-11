@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Container, { ContainerProps } from './container';
+import type { ContainerProps } from './container';
+import Container from './container';
 
 describe('<Container />', () => {
   const renderContainer = ({

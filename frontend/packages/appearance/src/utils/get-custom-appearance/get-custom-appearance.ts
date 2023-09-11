@@ -1,4 +1,5 @@
-import themes, { Theme } from '@onefootprint/design-tokens';
+import type { Theme } from '@onefootprint/design-tokens';
+import themes from '@onefootprint/design-tokens';
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
 
 import createRules from './utils/create-rules';

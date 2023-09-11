@@ -1,5 +1,8 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { InvestorProfileData, UserDataResponse } from '@onefootprint/types';
+import type {
+  InvestorProfileData,
+  UserDataResponse,
+} from '@onefootprint/types';
 
 import { useUserData } from '../../../hooks';
 

@@ -7,7 +7,7 @@ import InvestorProfileNavigationHeader from '../../components/investor-profile-n
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncErrorToast from '../../hooks/use-sync-error-toast';
-import { DeclarationData } from '../../utils/state-machine/types';
+import type { DeclarationData } from '../../utils/state-machine/types';
 import DeclarationsForm from './components/declarations-form';
 
 const Declarations = () => {

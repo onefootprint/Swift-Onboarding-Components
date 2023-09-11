@@ -1,8 +1,9 @@
 import { IcoClose24 } from '@onefootprint/icons';
-import { ComponentMeta, Story } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
 
-import IconButton, { IconButtonProps } from './icon-button';
+import type { IconButtonProps } from './icon-button';
+import IconButton from './icon-button';
 
 export default {
   component: IconButton,

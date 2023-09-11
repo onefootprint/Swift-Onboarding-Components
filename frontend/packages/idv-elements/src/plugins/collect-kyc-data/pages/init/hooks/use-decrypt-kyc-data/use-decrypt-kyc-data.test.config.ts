@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { DataIdentifier, UserTokenScope } from '@onefootprint/types';
+import type { DataIdentifier, UserTokenScope } from '@onefootprint/types';
 
 export const withDecrypt = (
   data: Partial<Record<DataIdentifier, string | undefined>>,

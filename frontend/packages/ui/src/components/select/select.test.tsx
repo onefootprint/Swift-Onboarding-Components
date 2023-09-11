@@ -7,7 +7,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Select, { SelectProps } from './select';
+import type { SelectProps } from './select';
+import Select from './select';
 
 const defaultOptions = [
   { value: 'option 1', label: 'option 1' },

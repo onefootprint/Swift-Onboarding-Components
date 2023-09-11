@@ -1,4 +1,4 @@
-import { DataIdentifier } from '../data/di';
+import type { DataIdentifier } from '../data/di';
 
 export type EntitiesVaultDecryptRequest = {
   authToken: string;

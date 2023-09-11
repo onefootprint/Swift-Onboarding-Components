@@ -3,7 +3,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
 
 import useUserData from '../../../../hooks/api/hosted/user/vault/use-user-data';
-import { KycData } from '../../utils/data-types';
+import type { KycData } from '../../utils/data-types';
 import useCollectKycDataMachine from '../use-collect-kyc-data-machine';
 import getRequestData from './utils/get-request-data';
 

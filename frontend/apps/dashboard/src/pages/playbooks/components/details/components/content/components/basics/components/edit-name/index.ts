@@ -1,1 +1,2 @@
-export { type EditNameProps, default } from './edit-name';
+export type { EditNameProps } from './edit-name';
+export { default } from './edit-name';

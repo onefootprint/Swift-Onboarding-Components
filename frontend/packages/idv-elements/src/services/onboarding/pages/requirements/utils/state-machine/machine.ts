@@ -1,4 +1,4 @@
-import {
+import type {
   IdDocOutcomes,
   IdvBootstrapData,
   PublicOnboardingConfig,
@@ -6,8 +6,9 @@ import {
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
+import type { Typegen0 } from './machine.typegen';
 import { RequirementTargets, requiresAdditionalInfo } from './machine.utils';
-import { MachineContext, MachineEvents } from './types';
+import type { MachineContext, MachineEvents } from './types';
 
 export type OnboardingRequirementsMachineArgs = {
   userFound: boolean;
@@ -36,7 +37,7 @@ const createOnboardingRequirementsMachine = ({
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as import('./machine.typegen').Typegen0,
+      tsTypes: {} as Typegen0,
       initial: 'checkRequirements',
       context: {
         onboardingContext: {

@@ -8,12 +8,12 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
   IdDI,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
-  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
@@ -25,7 +25,7 @@ import React from 'react';
 import FootprintProvider from 'src/components/footprint-provider';
 import { Layout } from 'src/components/layout';
 
-import { PluginContext } from '../base-plugin';
+import type { PluginContext } from '../base-plugin';
 import CollectKycData from './index';
 import {
   withIdentify,
@@ -34,7 +34,7 @@ import {
   withUserVault,
   withUserVaultValidate,
 } from './index.test.config';
-import { CollectKycDataContext, CollectKycDataProps } from './types';
+import type { CollectKycDataContext, CollectKycDataProps } from './types';
 
 describe('<CollectKycData />', () => {
   const useRouterSpy = createUseRouterSpy();

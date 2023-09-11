@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
-import { CountryCode, IdDI, isCountryCode } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
+import { IdDI, isCountryCode } from '@onefootprint/types';
 import { Grid } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -11,7 +12,7 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import { KycData } from '../../utils';
+import type { KycData } from '../../utils';
 import getInitialCountry from '../../utils/get-initial-country';
 import AddressLines from './components/address-lines';
 import CityField from './components/city-field';
@@ -19,7 +20,7 @@ import CountryField from './components/country-field';
 import StateField from './components/state-field';
 import ZipField from './components/zip-field';
 import useConvertFormData from './hooks/use-convert-form-data';
-import { FormData } from './types';
+import type { FormData } from './types';
 import getInitialState from './utils/get-initial-state';
 
 type ResidentialAddressProps = {

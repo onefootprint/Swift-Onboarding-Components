@@ -1,10 +1,7 @@
-import {
-  CollectedKycDataOption,
-  CollectKycDataRequirement,
-  IdDI,
-} from '@onefootprint/types';
+import type { CollectKycDataRequirement } from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 
-import { KycData } from '../data-types';
+import type { KycData } from '../data-types';
 
 export const getSsnKind = (requirement: CollectKycDataRequirement) => {
   const { missingAttributes, optionalAttributes, populatedAttributes } =

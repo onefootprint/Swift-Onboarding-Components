@@ -1,4 +1,4 @@
-import { FootprintVariant } from '@onefootprint/footprint-js';
+import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';

@@ -1,6 +1,9 @@
 import { useIntl } from '@onefootprint/hooks';
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import { DecryptUserRequest, DecryptUserResponse } from '@onefootprint/types';
+import type {
+  DecryptUserRequest,
+  DecryptUserResponse,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../config/constants';

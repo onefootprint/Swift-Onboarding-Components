@@ -9,7 +9,7 @@ import InvestorProfileNavigationHeader from '../../components/investor-profile-n
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncErrorToast from '../../hooks/use-sync-error-toast';
-import { RiskToleranceData } from '../../utils/state-machine/types';
+import type { RiskToleranceData } from '../../utils/state-machine/types';
 import RiskToleranceForm from './components/risk-tolerance-form';
 
 const RiskTolerance = () => {

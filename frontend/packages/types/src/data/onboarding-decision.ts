@@ -1,7 +1,7 @@
-import { Actor } from './actor';
-import { CollectedDataOption } from './collected-data-option';
-import DecisionStatus from './decision-status';
-import Vendor from './vendor';
+import type { Actor } from './actor';
+import type { CollectedDataOption } from './collected-data-option';
+import type DecisionStatus from './decision-status';
+import type Vendor from './vendor';
 
 export type OnboardingDecision = {
   id: string;

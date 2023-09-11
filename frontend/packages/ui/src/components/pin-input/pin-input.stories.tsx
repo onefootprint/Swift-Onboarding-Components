@@ -1,11 +1,12 @@
-import { ComponentMeta, Story } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import Box from '../box';
 import LinkButton from '../link-button';
 import LoadingIndicator from '../loading-indicator';
 import Typography from '../typography';
-import PinInput, { PinInputProps } from './pin-input';
+import type { PinInputProps } from './pin-input';
+import PinInput from './pin-input';
 
 export default {
   title: 'Components/PinInput',

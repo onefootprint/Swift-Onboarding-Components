@@ -1,7 +1,7 @@
 import type { CountryCode } from '@onefootprint/types';
 
 import type { BaseSelectOption } from '../internal/base-select/base-select.types';
-import { InputProps as BaseInputProps } from '../internal/input';
+import type { InputProps as BaseInputProps } from '../internal/input';
 
 export type InputProps = Omit<BaseInputProps, 'mask' | 'placeholder'>;
 

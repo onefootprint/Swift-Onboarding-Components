@@ -1,11 +1,11 @@
+import type { CollectKycDataRequirement } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
-  CollectKycDataRequirement,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
-import { DeviceInfo } from 'src/hooks';
-import { KycData } from 'src/plugins/collect-kyc-data/utils';
-import { MachineContext } from 'src/plugins/collect-kyc-data/utils/state-machine';
+import type { DeviceInfo } from 'src/hooks';
+import type { KycData } from 'src/plugins/collect-kyc-data/utils';
+import type { MachineContext } from 'src/plugins/collect-kyc-data/utils/state-machine';
 
 import getOnboardingConfig from './get-onboarding-config';
 

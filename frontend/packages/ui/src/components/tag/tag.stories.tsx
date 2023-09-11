@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import Tag, { TagProps } from './tag';
+import type { TagProps } from './tag';
+import Tag from './tag';
 
 export default {
   component: Tag,

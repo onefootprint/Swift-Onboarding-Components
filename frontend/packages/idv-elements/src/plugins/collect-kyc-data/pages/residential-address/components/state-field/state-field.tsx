@@ -8,7 +8,7 @@ import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { FormData } from '../../types';
+import type { FormData } from '../../types';
 
 const StateField = () => {
   const { t } = useTranslation('pages.residential-address.form.state');

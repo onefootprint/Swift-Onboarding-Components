@@ -1,3 +1,4 @@
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import {
   BeneficialOwnerDataAttribute,
   BusinessDI,
@@ -5,13 +6,12 @@ import {
   CollectedKycDataOption,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
-  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import createCollectKybDataMachine from './machine';
-import { MachineContext } from './types';
+import type { MachineContext } from './types';
 
 describe('Collect KYB Data Machine Tests', () => {
   const TestOnboardingConfig: PublicOnboardingConfig = {

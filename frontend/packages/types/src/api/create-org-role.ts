@@ -1,4 +1,4 @@
-import { Role, RoleKind, RoleScope } from '../data';
+import type { Role, RoleKind, RoleScope } from '../data';
 
 export type CreateRoleRequest = {
   name: string;

@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import Shimmer, { ShimmerProps } from './shimmer';
+import type { ShimmerProps } from './shimmer';
+import Shimmer from './shimmer';
 
 export default {
   component: Shimmer,

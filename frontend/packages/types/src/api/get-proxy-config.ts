@@ -1,4 +1,4 @@
-import { ProxyConfigDetails } from '../data';
+import type { ProxyConfigDetails } from '../data';
 
 export type GetProxyConfigRequest = undefined;
 

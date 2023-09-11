@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import RenderBase, { RenderBaseProps } from './render-base';
+import type { RenderBaseProps } from './render-base';
+import RenderBase from './render-base';
 
 const CARD_VALUE = '4242424242424242';
 const CARD_FORMATTED = '4242 4242 4242 4242';

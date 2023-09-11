@@ -1,5 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 
 const SupportedDocTypesByCountry: Record<CountryCode, SupportedIdDocTypes[]> =
   Object.fromEntries(

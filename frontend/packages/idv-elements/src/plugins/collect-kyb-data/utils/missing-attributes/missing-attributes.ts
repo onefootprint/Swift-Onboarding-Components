@@ -1,5 +1,5 @@
+import type { BusinessDIData } from '@onefootprint/types';
 import {
-  BusinessDIData,
   CollectedKybDataOption,
   CollectedKybDataOptionToRequiredAttributes,
 } from '@onefootprint/types';

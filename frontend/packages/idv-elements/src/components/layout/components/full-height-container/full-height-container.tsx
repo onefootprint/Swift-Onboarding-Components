@@ -1,7 +1,8 @@
-import { FootprintVariant } from '@onefootprint/footprint-js';
+import type { FootprintVariant } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
-import React, { forwardRef, HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
+import React, { forwardRef } from 'react';
 
 import use100vh from './hooks/use-100vh';
 

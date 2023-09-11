@@ -4,7 +4,8 @@ import React, { forwardRef, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
 import { useUpdateEffect } from 'usehooks-ts';
 
-import BaseSelect, { BaseSelectOption } from '../internal/base-select';
+import type { BaseSelectOption } from '../internal/base-select';
+import BaseSelect from '../internal/base-select';
 import Input from './components/input';
 import Option from './components/option';
 import type { PhoneInputProps, PhoneSelectOption } from './phone-input.types';

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
+import type { BeneficialOwner } from '@onefootprint/types';
 import {
-  BeneficialOwner,
   BeneficialOwnerDataAttribute,
   BusinessDI,
   CollectedKybDataOption,

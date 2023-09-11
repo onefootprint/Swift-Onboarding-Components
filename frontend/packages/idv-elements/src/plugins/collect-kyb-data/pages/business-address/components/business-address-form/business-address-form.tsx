@@ -1,19 +1,15 @@
 import { STATES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { BusinessDI, CountryCode } from '@onefootprint/types';
-import {
-  AddressInput,
-  CountrySelectOption,
-  Grid,
-  SelectOption,
-  TextInput,
-} from '@onefootprint/ui';
+import type { CountryCode } from '@onefootprint/types';
+import { BusinessDI } from '@onefootprint/types';
+import type { CountrySelectOption, SelectOption } from '@onefootprint/ui';
+import { AddressInput, Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
-import { BusinessAddressData } from '../../../../utils/state-machine/types';
+import type { BusinessAddressData } from '../../../../utils/state-machine/types';
 import getAddressComponent from '../../utils/get-address-components';
 import getInitialCountry from '../../utils/get-initial-country';
 import getInitialState from '../../utils/get-initial-state';

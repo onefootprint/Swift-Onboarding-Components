@@ -1,5 +1,6 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { D2PStatus, GetD2PResponse } from '@onefootprint/types';
+import type { GetD2PResponse } from '@onefootprint/types';
+import { D2PStatus } from '@onefootprint/types';
 
 import { useGetD2PStatus } from '../../../../hooks';
 import useMobileMachine from './use-mobile-machine';

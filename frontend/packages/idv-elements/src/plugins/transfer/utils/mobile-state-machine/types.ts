@@ -1,4 +1,7 @@
-import { IdDocOutcomes, PublicOnboardingConfig } from '@onefootprint/types';
+import type {
+  IdDocOutcomes,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 

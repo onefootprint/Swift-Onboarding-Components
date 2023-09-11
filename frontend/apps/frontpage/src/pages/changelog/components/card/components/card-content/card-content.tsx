@@ -4,7 +4,7 @@ import { CopyButton, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-import { PostDetails } from 'src/utils/ghost/types';
+import type { PostDetails } from 'src/utils/ghost/types';
 
 import HtmlContent from '../../../html-content';
 import Author from '../author';

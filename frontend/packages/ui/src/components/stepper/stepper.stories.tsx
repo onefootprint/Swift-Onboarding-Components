@@ -1,10 +1,11 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import Box from '../box';
 import Button from '../button';
 import Divider from '../divider';
-import Stepper, { StepperProps } from './stepper';
+import type { StepperProps } from './stepper';
+import Stepper from './stepper';
 
 export default {
   component: Stepper,

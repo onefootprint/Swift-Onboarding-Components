@@ -1,8 +1,9 @@
 import themes from '@onefootprint/design-tokens';
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import Typography, { TypographyProps } from './typography';
+import type { TypographyProps } from './typography';
+import Typography from './typography';
 import variantMapping from './typography.constants';
 
 export default {

@@ -1,7 +1,8 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
 import React from 'react';
 
-import Pill, { PillProps } from '../pill';
+import type { PillProps } from '../pill';
+import Pill from '../pill';
 
 const ClearPill = ({ children, onClick }: PillProps) => (
   <Pill onClick={onClick} type="button">

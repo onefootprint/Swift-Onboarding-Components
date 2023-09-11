@@ -4,7 +4,7 @@ import { AddressInput, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { FormData } from '../../types';
+import type { FormData } from '../../types';
 import getAddressComponent from '../../utils/get-address-components';
 
 const AddressLines = () => {

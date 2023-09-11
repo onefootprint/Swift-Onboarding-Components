@@ -2,7 +2,8 @@ import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import { renderComponents } from '../../../../../../../../config/tests';
-import CardExpDateInput, { CardExpDateInputProps } from './card-exp-date-input';
+import type { CardExpDateInputProps } from './card-exp-date-input';
+import CardExpDateInput from './card-exp-date-input';
 
 describe('CardExpDateInput', () => {
   const renderCardExpDateInput = ({

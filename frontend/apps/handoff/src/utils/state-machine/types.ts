@@ -1,4 +1,4 @@
-import {
+import type {
   D2PStatus,
   IdDocOutcomes,
   PublicOnboardingConfig,

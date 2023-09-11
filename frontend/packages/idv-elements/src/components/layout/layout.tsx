@@ -1,11 +1,11 @@
-import { FootprintVariant } from '@onefootprint/footprint-js';
+import type { FootprintVariant } from '@onefootprint/footprint-js';
 import React from 'react';
 
 import Content from './components/content';
 import FullHeightContainer from './components/full-height-container';
 import LayoutOptionsProvider from './components/layout-options-provider';
 import { LAYOUT_CONTAINER_ID } from './constants';
-import { Options } from './types';
+import type { Options } from './types';
 
 export const BIFROST_CONTAINER_ID = 'bifrost-container-id';
 

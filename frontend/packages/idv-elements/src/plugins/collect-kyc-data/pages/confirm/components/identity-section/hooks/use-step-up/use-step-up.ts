@@ -6,12 +6,10 @@ import { useEffectOnce } from 'usehooks-ts';
 import { useUserToken } from '../../../../../../../../hooks/api';
 import type { DeviceInfo } from '../../../../../../../../hooks/ui/use-device-info';
 import useIdentify from './hooks/use-identify';
-import useIdentifyVerify, {
-  IdentifyVerifyResponse,
-} from './hooks/use-identify-verify';
-import useLoginChallenge, {
-  LoginChallengeResponse,
-} from './hooks/use-login-challenge';
+import type { IdentifyVerifyResponse } from './hooks/use-identify-verify';
+import useIdentifyVerify from './hooks/use-identify-verify';
+import type { LoginChallengeResponse } from './hooks/use-login-challenge';
+import useLoginChallenge from './hooks/use-login-challenge';
 import getBiometricChallengeResponse from './utils/get-biometric-challenge-response';
 
 type UseStepUpArgs = {

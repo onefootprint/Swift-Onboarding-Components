@@ -1,6 +1,6 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import { useTranslation } from '@onefootprint/hooks';
-import { DataIdentifier } from '@onefootprint/types';
+import type { DataIdentifier } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import type { GetServerSideProps } from 'next';
 import React, { useState } from 'react';
@@ -11,7 +11,7 @@ import Invalid from './components/invalid';
 import Loading from './components/loading';
 import RenderBase from './components/render-base';
 import useEntitiesVaultDecrypt from './hooks/use-entities-vault-decrypt';
-import { FootprintRenderDataProps } from './types';
+import type { FootprintRenderDataProps } from './types';
 import arePropsValid from './utils/are-props-valid';
 import getMaskForId from './utils/get-mask-for-id';
 

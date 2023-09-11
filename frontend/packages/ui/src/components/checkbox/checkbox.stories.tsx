@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useEffect, useState } from 'react';
 
-import Checkbox, { CheckboxProps } from './checkbox';
+import type { CheckboxProps } from './checkbox';
+import Checkbox from './checkbox';
 
 export default {
   component: Checkbox,

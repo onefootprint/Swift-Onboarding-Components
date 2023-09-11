@@ -4,7 +4,7 @@ import {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 
-import { MachineContext } from '../../utils/state-machine';
+import type { MachineContext } from '../../utils/state-machine';
 
 export const initialContextDL: MachineContext = {
   authToken: 'token',

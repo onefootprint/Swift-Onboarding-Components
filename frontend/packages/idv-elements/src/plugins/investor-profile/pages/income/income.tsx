@@ -9,7 +9,7 @@ import InvestorProfileNavigationHeader from '../../components/investor-profile-n
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncErrorToast from '../../hooks/use-sync-error-toast';
-import { IncomeData } from '../../utils/state-machine/types';
+import type { IncomeData } from '../../utils/state-machine/types';
 import IncomeForm from './components/income-form';
 
 const Income = () => {

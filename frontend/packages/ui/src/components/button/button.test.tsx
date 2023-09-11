@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Button, { ButtonProps } from './button';
+import type { ButtonProps } from './button';
+import Button from './button';
 
 describe('<Button />', () => {
   const renderButton = ({

@@ -1,8 +1,8 @@
+import type { ObConfigAuth } from '@onefootprint/types';
 import {
   CLIENT_PUBLIC_KEY_HEADER,
   HostedUrlType,
   KYB_BO_SESSION_AUTHORIZATION_HEADER,
-  ObConfigAuth,
 } from '@onefootprint/types';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';

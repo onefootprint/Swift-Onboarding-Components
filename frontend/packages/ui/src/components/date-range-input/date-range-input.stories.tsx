@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import DateRangeInput, { DateRangeInputProps } from './date-range-input';
+import type { DateRangeInputProps } from './date-range-input';
+import DateRangeInput from './date-range-input';
 
 export default {
   component: DateRangeInput,

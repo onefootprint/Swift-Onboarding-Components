@@ -1,4 +1,5 @@
-import { IdDI, IdvBootstrapData, KycBootstrapData } from '@onefootprint/types';
+import type { IdvBootstrapData, KycBootstrapData } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { pickBy } from 'lodash';
 
 const getKycBootstrapData = (data?: IdvBootstrapData): KycBootstrapData => {

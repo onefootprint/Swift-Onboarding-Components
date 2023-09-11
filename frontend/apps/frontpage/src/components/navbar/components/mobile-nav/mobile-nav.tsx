@@ -14,7 +14,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import LinkButton from 'src/components/linking-button';
 import { useLockedBody } from 'usehooks-ts';
 
-import { isNavLink, isNavMenu, NavEntry } from '../../types';
+import type { NavEntry } from '../../types';
+import { isNavLink, isNavMenu } from '../../types';
 import MobileNavLink from './components/mobile-nav-link';
 import MobileNavMenu from './components/mobile-nav-menu';
 

@@ -1,8 +1,8 @@
 import styled, { css, useTheme } from '@onefootprint/styled';
 import FocusTrap from 'focus-trap-react';
+import type { Ref } from 'react';
 import React, {
   forwardRef,
-  Ref,
   useImperativeHandle,
   useRef,
   useState,
@@ -15,7 +15,8 @@ import {
   createFontStyles,
   createOverlayBackground,
 } from '../../../../utils/mixins';
-import DatePicker, { DatePickerProps } from '../../../internal/date-picker';
+import type { DatePickerProps } from '../../../internal/date-picker';
+import DatePicker from '../../../internal/date-picker';
 
 export type ButtonPickerProps = {
   disabledDays?: DatePickerProps['disabled'];

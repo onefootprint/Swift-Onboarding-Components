@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { Icon } from '@onefootprint/icons';
 import {
   IcoBuilding24,
   IcoFileText24,
-  Icon,
   IcoPhone24,
   IcoUserCircle24,
 } from '@onefootprint/icons';
@@ -10,7 +10,7 @@ import { CollectedKybDataOption } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import { FieldProps } from '../field';
+import type { FieldProps } from '../field';
 import FieldsList from '../fields-list';
 
 const IconByCollectedKybDataOption: Record<CollectedKybDataOption, Icon> = {

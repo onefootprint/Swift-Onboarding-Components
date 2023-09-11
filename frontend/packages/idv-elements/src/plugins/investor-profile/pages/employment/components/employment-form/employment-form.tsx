@@ -1,11 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { InvestorProfileDI } from '@onefootprint/types';
-import { Select, SelectOption, TextInput } from '@onefootprint/ui';
+import type { SelectOption } from '@onefootprint/ui';
+import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import CustomForm from '../../../../components/custom-form';
-import { EmploymentData } from '../../../../utils/state-machine/types';
+import type { EmploymentData } from '../../../../utils/state-machine/types';
 
 export type EmploymentFormProps = {
   defaultValues?: Partial<EmploymentData>;

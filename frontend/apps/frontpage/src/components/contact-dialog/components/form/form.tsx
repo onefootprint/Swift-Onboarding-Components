@@ -4,7 +4,8 @@ import { TextArea, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-import { ContactDialogData, FormField } from '../../contact-dialog.types';
+import type { ContactDialogData } from '../../contact-dialog.types';
+import { FormField } from '../../contact-dialog.types';
 
 type FormProps = {
   onSubmit: (data: ContactDialogData) => void;

@@ -1,4 +1,4 @@
-import { ApiKey } from '../data';
+import type { ApiKey } from '../data';
 
 export type OrgCreateApiKeyRequest = {
   name: string;

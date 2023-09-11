@@ -1,5 +1,8 @@
 import request from '@onefootprint/request';
-import { UploadFileRequest, UploadFileResponse } from '@onefootprint/types';
+import type {
+  UploadFileRequest,
+  UploadFileResponse,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../config/constants';

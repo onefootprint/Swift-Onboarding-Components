@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { NextToast, ToastProps } from '../toast.types';
+import type { NextToast, ToastProps } from '../toast.types';
 
 const HIDE_TIMEOUT = 8000;
 const LEAVING_ANIMATION_DURATION = 200;

@@ -2,7 +2,8 @@ import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import SegmentedControl, { SegmentedControlProps } from './segmented-control';
+import type { SegmentedControlProps } from './segmented-control';
+import SegmentedControl from './segmented-control';
 
 describe('<SegmentedControl />', () => {
   const renderSegmentedControl = ({

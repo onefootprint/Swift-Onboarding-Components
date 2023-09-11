@@ -4,7 +4,7 @@ import { DesktopMachineProvider } from './components/desktop-machine-provider';
 import { MobileMachineProvider } from './components/mobile-machine-provider';
 import DesktopApp from './desktop-app';
 import MobileApp from './mobile-app';
-import { TransferProps } from './types';
+import type { TransferProps } from './types';
 
 const AppWithMachine = ({ context, onDone }: TransferProps) => {
   const { device } = context;

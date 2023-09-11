@@ -6,7 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Table, { TableProps } from './table';
+import type { TableProps } from './table';
+import Table from './table';
 
 describe('<Table />', () => {
   const renderTable = ({

@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import { UserTokenRequest, UserTokenResponse } from '@onefootprint/types';
+import type { UserTokenRequest, UserTokenResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../config/constants';

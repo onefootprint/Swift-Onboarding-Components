@@ -2,9 +2,8 @@ import styled, { css } from '@onefootprint/styled';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as React from 'react';
 
-import SegmentedControlOption, {
-  SegmentedControlOptionFields,
-} from './components/segmented-control-option';
+import type { SegmentedControlOptionFields } from './components/segmented-control-option';
+import SegmentedControlOption from './components/segmented-control-option';
 
 export type SegmentedControlProps = {
   'aria-label': string;

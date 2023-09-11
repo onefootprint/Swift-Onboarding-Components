@@ -11,7 +11,7 @@ import {
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { getInitialPosts, PostType } from 'src/utils/ghost';
-import { PostDetails } from 'src/utils/ghost/types';
+import type { PostDetails } from 'src/utils/ghost/types';
 
 import SEO from '../../components/seo';
 import Card from './components/card';

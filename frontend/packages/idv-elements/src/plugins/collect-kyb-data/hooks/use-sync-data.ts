@@ -1,4 +1,4 @@
-import { BusinessDataResponse, BusinessDIData } from '@onefootprint/types';
+import type { BusinessDataResponse, BusinessDIData } from '@onefootprint/types';
 
 import { useBusinessData } from '../../../hooks';
 

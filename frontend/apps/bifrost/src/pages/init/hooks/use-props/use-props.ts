@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import usePropsFromParent from './hooks/use-props-from-parent';
 import usePropsFromUrl from './hooks/use-props-from-url';
-import { BifrostProps } from './types';
+import type { BifrostProps } from './types';
 
 /*
 On web:

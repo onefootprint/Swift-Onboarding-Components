@@ -1,4 +1,4 @@
-import { MachineContext, MachineEvents } from '../../types';
+import type { MachineContext, MachineEvents } from '../../types';
 
 const isContextReady = (
   context: MachineContext,

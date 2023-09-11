@@ -23,7 +23,7 @@ import {
   withUserVault,
   withUserVaultValidate,
 } from './index.test.config';
-import { InvestorProfileProps } from './investor-profile.types';
+import type { InvestorProfileProps } from './investor-profile.types';
 
 describe.skip('<InvestorProfile />', () => {
   const useRouterSpy = createUseRouterSpy();

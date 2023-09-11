@@ -3,15 +3,15 @@ import { IcoChevronDown16, IcoCloseSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import noop from 'lodash/noop';
 import React from 'react';
-import {
+import type {
   ClearIndicatorProps,
-  components,
   DropdownIndicatorProps,
   GroupBase,
   IndicatorSeparatorProps,
   MultiValueRemoveProps,
   OptionProps,
 } from 'react-select';
+import { components } from 'react-select';
 
 import { createFontStyles } from '../../../utils/mixins';
 import Checkbox from '../../checkbox';

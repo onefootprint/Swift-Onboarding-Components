@@ -1,10 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import {
-  IdDocOutcomes,
-  OverallOutcomes,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { IdDocOutcomes, OverallOutcomes } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';

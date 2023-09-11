@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 
-import Input, { InputProps } from '../internal/input';
+import type { InputProps } from '../internal/input';
+import Input from '../internal/input';
 import ClearButton from './components/clear-button';
 import SearchIcon from './components/search-icon';
 

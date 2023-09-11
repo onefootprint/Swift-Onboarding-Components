@@ -1,10 +1,12 @@
 import styled, { useTheme } from '@onefootprint/styled';
 import React, { useCallback, useId, useState } from 'react';
 import { usePopper } from 'react-popper';
-import ReactSelect, { OptionProps } from 'react-select';
+import type { OptionProps } from 'react-select';
+import ReactSelect from 'react-select';
 
 import { createTypography } from '../../../utils/mixins';
-import Label, { LabelTooltipProps } from '../../label';
+import type { LabelTooltipProps } from '../../label';
+import Label from '../../label';
 import Hint from '../hint';
 import type { BaseSelectOption } from './base-select.types';
 import modifiers from './base-select.utils';

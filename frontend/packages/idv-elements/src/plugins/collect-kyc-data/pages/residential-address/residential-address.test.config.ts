@@ -1,13 +1,15 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import {
-  CollectedKycDataOption,
+import type {
   CollectKycDataRequirement,
   CountryCode,
+} from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
-import { KycData } from 'src/plugins/collect-kyc-data/utils';
-import { MachineContext } from 'src/plugins/collect-kyc-data/utils/state-machine';
+import type { KycData } from 'src/plugins/collect-kyc-data/utils';
+import type { MachineContext } from 'src/plugins/collect-kyc-data/utils/state-machine';
 
 type GetInitialContextArgs = {
   data?: KycData;

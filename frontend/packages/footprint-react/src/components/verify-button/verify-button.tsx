@@ -1,7 +1,5 @@
-import footprint, {
-  FootprintComponentKind,
-  FootprintVerifyProps,
-} from '@onefootprint/footprint-js';
+import type { FootprintVerifyProps } from '@onefootprint/footprint-js';
+import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import React from 'react';
 
 export type VerifyButtonProps = Omit<

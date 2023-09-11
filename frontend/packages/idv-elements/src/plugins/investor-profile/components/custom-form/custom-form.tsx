@@ -1,6 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
-import React, { FormHTMLAttributes } from 'react';
+import type { FormHTMLAttributes } from 'react';
+import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import ContinueButton from './components/continue-button';

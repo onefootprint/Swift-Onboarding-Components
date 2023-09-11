@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Basics, { type BasicsProps } from './basics';
+import type { BasicsProps } from './basics';
+import Basics from './basics';
 import playbookFixture from './basics.test.config';
 
 const renderBasics = ({ playbook = playbookFixture }: BasicsProps) => {

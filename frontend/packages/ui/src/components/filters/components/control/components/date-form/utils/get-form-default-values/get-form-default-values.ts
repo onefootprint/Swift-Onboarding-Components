@@ -1,7 +1,5 @@
-import {
-  FilterDateRange,
-  FilterSelectedOption,
-} from '../../../../../../filters.types';
+import type { FilterSelectedOption } from '../../../../../../filters.types';
+import { FilterDateRange } from '../../../../../../filters.types';
 
 type Response = {
   period: string;

@@ -1,11 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import {
   IdDocImageProcessingError,
-  IdDocImageTypes,
   IdDocImageUploadError,
-  SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';

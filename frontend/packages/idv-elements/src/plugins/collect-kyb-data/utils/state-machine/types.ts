@@ -1,4 +1,4 @@
-import {
+import type {
   BusinessDI,
   BusinessDIData,
   CollectKybDataRequirement,

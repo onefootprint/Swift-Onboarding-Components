@@ -6,7 +6,7 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
-import { BasicData } from '../../../../utils/state-machine/types';
+import type { BasicData } from '../../../../utils/state-machine/types';
 
 type FormData = {
   name: string;

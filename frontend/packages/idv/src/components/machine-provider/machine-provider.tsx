@@ -1,9 +1,8 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import createIdvMachine, {
-  IdvMachineArgs,
-} from '../../utils/state-machine/idv/machine';
+import type { IdvMachineArgs } from '../../utils/state-machine/idv/machine';
+import createIdvMachine from '../../utils/state-machine/idv/machine';
 
 type IdvMachineProviderArgs = {
   args: IdvMachineArgs;

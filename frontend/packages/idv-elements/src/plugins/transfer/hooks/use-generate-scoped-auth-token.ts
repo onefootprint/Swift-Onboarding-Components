@@ -1,7 +1,7 @@
 import { useAppearance } from '@onefootprint/appearance';
 import { getSessionId } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
-import {
+import type {
   D2PGenerateResponse,
   IdDocOutcomes,
   PublicOnboardingConfig,

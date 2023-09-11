@@ -1,7 +1,8 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import Field, { FieldProps } from '../field';
+import type { FieldProps } from '../field';
+import Field from '../field';
 
 type FieldsListProps = {
   fields: FieldProps[];

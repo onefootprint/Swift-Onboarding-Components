@@ -1,7 +1,7 @@
-import { CountryCode } from './countries';
-import { IdDI } from './di';
-import UsLegalStatus from './us-legal-status';
-import VisaKind from './visa-kind';
+import type { CountryCode } from './countries';
+import type { IdDI } from './di';
+import type UsLegalStatus from './us-legal-status';
+import type VisaKind from './visa-kind';
 
 // TODO: expand in the future with KybBootstrapData and InvestorProfileBootstrapData
 export type IdvBootstrapData = KycBootstrapData;

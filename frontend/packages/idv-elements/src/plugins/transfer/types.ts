@@ -1,11 +1,11 @@
-import {
+import type {
   IdDocOutcomes,
   IdDocRequirement,
   PublicOnboardingConfig,
   RegisterPasskeyRequirement,
 } from '@onefootprint/types';
 
-import { BasePluginProps } from '../base-plugin';
+import type { BasePluginProps } from '../base-plugin';
 
 export type TransferRequirements = {
   liveness?: RegisterPasskeyRequirement;

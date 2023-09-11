@@ -1,5 +1,5 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import {
+import type {
   EntitiesVaultDecryptRequest,
   EntitiesVaultDecryptResponse,
 } from '@onefootprint/types';

@@ -1,4 +1,7 @@
-import { InvestorProfileData, InvestorProfileDI } from '@onefootprint/types';
+import type {
+  InvestorProfileData,
+  InvestorProfileDI,
+} from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 

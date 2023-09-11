@@ -1,9 +1,8 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import OutcomeSelectOption, {
-  OutcomeOptionFields,
-} from './components/outcome-select-option';
+import type { OutcomeOptionFields } from './components/outcome-select-option';
+import OutcomeSelectOption from './components/outcome-select-option';
 
 export type OutcomeSelectProps = {
   options: OutcomeOptionFields[];

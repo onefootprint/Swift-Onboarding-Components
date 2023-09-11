@@ -3,7 +3,7 @@ import { media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 
-import { CompanyPhoto } from '../company-photos.types';
+import type { CompanyPhoto } from '../company-photos.types';
 import Pager from './components/pager';
 import useCarouselIndex from './hooks/use-carousel-index';
 

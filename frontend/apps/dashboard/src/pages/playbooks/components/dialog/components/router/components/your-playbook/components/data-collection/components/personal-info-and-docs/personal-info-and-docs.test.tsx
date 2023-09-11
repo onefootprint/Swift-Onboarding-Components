@@ -2,9 +2,8 @@ import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
-import PersonalInfoAndDocsWithContext, {
-  type PersonalInfoAndDocsWithContextProps,
-} from './personal-info-and-docs.test.config';
+import type { PersonalInfoAndDocsWithContextProps } from './personal-info-and-docs.test.config';
+import PersonalInfoAndDocsWithContext from './personal-info-and-docs.test.config';
 
 const renderPersonalInfoAndDocs = ({
   startingValues,

@@ -1,4 +1,5 @@
-import { createRef, MutableRefObject, useEffect, useState } from 'react';
+import type { MutableRefObject } from 'react';
+import { createRef, useEffect, useState } from 'react';
 
 const usePinInputRefs = (pinInputCount: number) => {
   const [refs, setRefs] = useState<MutableRefObject<HTMLInputElement>[]>([]);

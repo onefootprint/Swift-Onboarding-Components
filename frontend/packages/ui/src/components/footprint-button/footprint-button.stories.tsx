@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import FootprintButton, { FootprintButtonProps } from './footprint-button';
+import type { FootprintButtonProps } from './footprint-button';
+import FootprintButton from './footprint-button';
 
 export default {
   component: FootprintButton,

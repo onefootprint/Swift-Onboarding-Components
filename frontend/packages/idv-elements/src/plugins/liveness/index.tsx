@@ -9,7 +9,7 @@ import MachineProvider, {
 import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
-import { LivenessProps } from './types';
+import type { LivenessProps } from './types';
 
 const i18n = configureI18next();
 

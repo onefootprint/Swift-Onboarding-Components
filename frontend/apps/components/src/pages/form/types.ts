@@ -1,4 +1,4 @@
-import { FootprintFormProps } from '@onefootprint/footprint-js';
+import type { FootprintFormProps } from '@onefootprint/footprint-js';
 
 export type FootprintFormDataProps = Omit<
   FootprintFormProps,

@@ -1,6 +1,6 @@
-import { Props } from '../../types/components';
+import type { Props } from '../../types/components';
 import { getSanitizedProps } from '../prop-utils';
-import { Iframe } from './types';
+import type { Iframe } from './types';
 
 type Iframes = Record<string, IframeEntry>;
 type IframeEntry = {

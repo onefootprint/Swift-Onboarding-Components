@@ -1,11 +1,12 @@
 import CdoToAllDisMap from './cdo-to-di-map';
 import { CollectedKycDataOption } from './collected-data-option';
-import { DataIdentifier, DocumentDI, InvestorProfileDI } from './di';
-import { EntityCard } from './entity-cards';
-import { InsightEvent } from './insight-event';
-import OnboardingStatus from './onboarding-status';
-import { WatchlistCheckEventData } from './timeline';
-import { VaultValue } from './vault';
+import type { DataIdentifier } from './di';
+import { DocumentDI, InvestorProfileDI } from './di';
+import type { EntityCard } from './entity-cards';
+import type { InsightEvent } from './insight-event';
+import type OnboardingStatus from './onboarding-status';
+import type { WatchlistCheckEventData } from './timeline';
+import type { VaultValue } from './vault';
 
 export type EntityVault = Partial<Record<DataIdentifier, VaultValue>> & {
   cards?: EntityCard[];

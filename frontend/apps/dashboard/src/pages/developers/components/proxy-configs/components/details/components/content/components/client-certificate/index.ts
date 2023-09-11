@@ -1,1 +1,2 @@
-export { type ClientCertificateProps, default } from './client-certificate';
+export type { ClientCertificateProps } from './client-certificate';
+export { default } from './client-certificate';

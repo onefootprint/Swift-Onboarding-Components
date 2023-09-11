@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import BreadcrumbItem, { BreadcrumbItemProps } from './breadcrumb-item';
+import type { BreadcrumbItemProps } from './breadcrumb-item';
+import BreadcrumbItem from './breadcrumb-item';
 
 describe('<BreadcrumbItem />', () => {
   const renderBreadcrumbItem = ({

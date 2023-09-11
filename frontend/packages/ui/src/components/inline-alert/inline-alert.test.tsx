@@ -3,7 +3,8 @@ import themes from '@onefootprint/design-tokens';
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import InlineAlert, { InlineAlertProps } from './inline-alert';
+import type { InlineAlertProps } from './inline-alert';
+import InlineAlert from './inline-alert';
 
 describe('<InlineAlert />', () => {
   const renderInlineAlert = ({

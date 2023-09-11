@@ -9,7 +9,7 @@ import {
 } from './components/machine-provider';
 import configureI18next from './config/initializers/react-i18next';
 import queryClient from './config/initializers/react-query';
-import { InvestorProfileProps } from './investor-profile.types';
+import type { InvestorProfileProps } from './investor-profile.types';
 import Router from './pages/router';
 
 const i18n = configureI18next();

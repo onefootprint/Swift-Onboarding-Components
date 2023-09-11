@@ -11,9 +11,8 @@ import {
   waitFor,
 } from '@/investor-profile/config/tests';
 
-import RiskToleranceForm, {
-  RiskToleranceFormProps,
-} from './risk-tolerance-form';
+import type { RiskToleranceFormProps } from './risk-tolerance-form';
+import RiskToleranceForm from './risk-tolerance-form';
 
 describe('<RiskToleranceForm />', () => {
   const renderForm = ({

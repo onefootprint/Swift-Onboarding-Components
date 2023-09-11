@@ -1,9 +1,10 @@
 import { IcoFootprint24 } from '@onefootprint/icons';
 import React from 'react';
 
-import Button, { ButtonProps } from '../button';
+import type { ButtonProps } from '../button';
+import Button from '../button';
 import Typography from '../typography';
-import { FootprintButtonSize } from './footprint-button.types';
+import type { FootprintButtonSize } from './footprint-button.types';
 import footprintButtonFontVariantBySize from './footprint-button.utils';
 
 export type FootprintButtonProps = Omit<

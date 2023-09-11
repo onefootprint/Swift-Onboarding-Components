@@ -6,7 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Dialog, { DialogProps } from './dialog';
+import type { DialogProps } from './dialog';
+import Dialog from './dialog';
 
 describe('<Dialog />', () => {
   const renderDialog = ({

@@ -1,4 +1,4 @@
-import { BorderRadiuses } from '../themes/types';
+import type { BorderRadiuses } from '../themes/types';
 
 export const borderRadius: BorderRadiuses = {
   none: '0px',

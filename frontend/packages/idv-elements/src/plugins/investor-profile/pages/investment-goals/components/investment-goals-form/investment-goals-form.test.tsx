@@ -11,9 +11,8 @@ import {
   waitFor,
 } from '@/investor-profile/config/tests/render';
 
-import InvestmentGoalsForm, {
-  InvestmentGoalsFormProps,
-} from './investment-goals-form';
+import type { InvestmentGoalsFormProps } from './investment-goals-form';
+import InvestmentGoalsForm from './investment-goals-form';
 
 describe('<InvestmentGoalsForm />', () => {
   const renderForm = ({

@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IdDocImageTypes } from '@onefootprint/types';
+import type { IdDocImageTypes } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTimeout } from 'usehooks-ts';

@@ -1,1 +1,2 @@
-export { type SessionSelectProps, default } from './session-select';
+export type { SessionSelectProps } from './session-select';
+export { default } from './session-select';

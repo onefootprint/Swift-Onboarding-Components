@@ -1,9 +1,5 @@
-import {
-  IcoIdBack40,
-  IcoIdFront40,
-  Icon,
-  IcoSelfie40,
-} from '@onefootprint/icons';
+import type { Icon } from '@onefootprint/icons';
+import { IcoIdBack40, IcoIdFront40, IcoSelfie40 } from '@onefootprint/icons';
 import { IdDocImageTypes } from '@onefootprint/types';
 
 export type ImageIconsType = {

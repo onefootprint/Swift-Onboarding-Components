@@ -7,7 +7,8 @@ import {
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
-import Form, { FormProps } from './form';
+import type { FormProps } from './form';
+import Form from './form';
 
 describe('<Form />', () => {
   const renderForm = ({

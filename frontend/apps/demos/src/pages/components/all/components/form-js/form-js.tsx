@@ -1,7 +1,7 @@
+import type { FootprintVariant } from '@onefootprint/footprint-js';
 import footprint, {
   FootprintComponentKind,
   FootprintFormType,
-  FootprintVariant,
 } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';

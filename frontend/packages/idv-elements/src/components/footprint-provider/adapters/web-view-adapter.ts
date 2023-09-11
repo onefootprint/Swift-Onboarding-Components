@@ -1,4 +1,4 @@
-import { CompletePayload, FootprintClient } from '../types';
+import type { CompletePayload, FootprintClient } from '../types';
 
 class WebView implements FootprintClient {
   get redirectUrl() {

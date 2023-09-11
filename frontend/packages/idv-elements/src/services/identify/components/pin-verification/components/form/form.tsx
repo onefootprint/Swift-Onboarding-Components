@@ -3,7 +3,8 @@ import styled, { css } from '@onefootprint/styled';
 import { PinInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import ResendButton, { ResendButtonProps } from './components/resend-button';
+import type { ResendButtonProps } from './components/resend-button';
+import ResendButton from './components/resend-button';
 import Success from './components/success';
 import Verifying from './components/verifying';
 

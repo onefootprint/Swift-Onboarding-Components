@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Drawer, { DrawerProps } from './drawer';
+import type { DrawerProps } from './drawer';
+import Drawer from './drawer';
 
 describe('<Drawer />', () => {
   const renderDrawer = ({

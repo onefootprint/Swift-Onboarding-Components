@@ -1,4 +1,2 @@
-export {
-  type LoadingIndicatorProps,
-  default as LoadingIndicator,
-} from './loading-indicator';
+export type { LoadingIndicatorProps } from './loading-indicator';
+export { default as LoadingIndicator } from './loading-indicator';

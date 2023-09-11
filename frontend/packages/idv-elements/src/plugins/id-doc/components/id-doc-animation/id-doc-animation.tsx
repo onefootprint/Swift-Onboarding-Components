@@ -1,6 +1,7 @@
 import styled from '@onefootprint/styled';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { ReactNode, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 

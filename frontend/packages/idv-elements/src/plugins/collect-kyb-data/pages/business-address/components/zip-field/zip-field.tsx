@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CountryCode } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';

@@ -2,8 +2,8 @@ import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import allAttributes from '../../../../utils/all-attributes/all-attributes';
-import { KycData } from '../../../../utils/data-types';
-import { FormData } from '../../types';
+import type { KycData } from '../../../../utils/data-types';
+import type { FormData } from '../../types';
 
 const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();

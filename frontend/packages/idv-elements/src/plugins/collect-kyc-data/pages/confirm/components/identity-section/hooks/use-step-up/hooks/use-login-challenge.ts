@@ -1,5 +1,6 @@
 import request from '@onefootprint/request';
-import { ChallengeData, ChallengeKind } from '@onefootprint/types';
+import type { ChallengeData } from '@onefootprint/types';
+import { ChallengeKind } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../../../../../../config/constants';

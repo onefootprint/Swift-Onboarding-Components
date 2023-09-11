@@ -1,17 +1,17 @@
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
   IdDI,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
-  PublicOnboardingConfig,
   UsLegalStatus,
   VisaKind,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
-import { KycData } from '../data-types';
+import type { KycData } from '../data-types';
 import createCollectKycDataMachine from './machine';
-import { MachineContext } from './types';
+import type { MachineContext } from './types';
 
 describe('Collect KYC Data Machine Tests', () => {
   const TestOnboardingConfig: PublicOnboardingConfig = {

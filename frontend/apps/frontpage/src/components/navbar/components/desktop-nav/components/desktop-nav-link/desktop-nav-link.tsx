@@ -4,7 +4,7 @@ import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
 import React from 'react';
 
-import { NavLink } from '../../../../types';
+import type { NavLink } from '../../../../types';
 
 type DesktopNavLinkProps = {
   link: NavLink;

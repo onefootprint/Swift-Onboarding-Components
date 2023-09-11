@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import Banner, { BannerProps } from './banner';
+import type { BannerProps } from './banner';
+import Banner from './banner';
 
 export default {
   component: Banner,

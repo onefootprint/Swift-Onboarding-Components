@@ -2,7 +2,8 @@ import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
 import Tab from './components/tab';
-import Tabs, { TabsProps } from './tabs';
+import type { TabsProps } from './tabs';
+import Tabs from './tabs';
 
 Object.defineProperty(window, 'location', {
   value: {

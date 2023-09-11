@@ -2,7 +2,8 @@ import { IcoArrowRightSmall24 } from '@onefootprint/icons';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import EmptyState, { EmptyStateProps } from './empty-state';
+import type { EmptyStateProps } from './empty-state';
+import EmptyState from './empty-state';
 
 describe.skip('<EmptyState />', () => {
   const renderEmptyState = ({

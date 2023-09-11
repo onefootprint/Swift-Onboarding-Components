@@ -5,9 +5,8 @@ import { Button, Divider } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 
 import { NavigationHeader } from '../../../../components';
-import ImageConsent, {
-  ImageConsentHandler,
-} from '../../components/image-consent';
+import type { ImageConsentHandler } from '../../components/image-consent';
+import ImageConsent from '../../components/image-consent';
 import useConsent from '../../hooks/use-consent';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 

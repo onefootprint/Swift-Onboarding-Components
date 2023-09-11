@@ -1,8 +1,9 @@
-import { IdentifyBootstrapData, ObConfigAuth } from '@onefootprint/types';
+import type { IdentifyBootstrapData, ObConfigAuth } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { getCanChallengeBiometrics } from '../biometrics';
-import { MachineContext, MachineEvents } from './types';
+import type { Typegen0 } from './machine.typegen';
+import type { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldBootstrap from './utils/should-bootstrap';
 import shouldChallengeEmail from './utils/should-challenge-email';
@@ -27,7 +28,7 @@ const createIdentifyMachine = ({
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as import('./machine.typegen').Typegen0,
+      tsTypes: {} as Typegen0,
       initial: 'init',
       context: {
         obConfigAuth,

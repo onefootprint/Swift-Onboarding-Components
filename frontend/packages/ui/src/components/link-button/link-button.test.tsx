@@ -2,7 +2,8 @@ import { IcoArrowRightSmall24 } from '@onefootprint/icons';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import LinkButton, { LinkButtonProps } from './link-button';
+import type { LinkButtonProps } from './link-button';
+import LinkButton from './link-button';
 
 describe('<LinkButton />', () => {
   const renderLinkButton = ({

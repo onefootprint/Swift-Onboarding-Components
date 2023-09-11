@@ -1,4 +1,4 @@
-import { Member } from '../data';
+import type { Member } from '../data';
 
 export type UpdateMemberRequest = {
   roleId: string;

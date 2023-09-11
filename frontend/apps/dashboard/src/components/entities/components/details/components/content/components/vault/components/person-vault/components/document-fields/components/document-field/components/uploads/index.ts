@@ -1,1 +1,2 @@
-export { type UploadsProps, default } from './uploads';
+export type { UploadsProps } from './uploads';
+export { default } from './uploads';

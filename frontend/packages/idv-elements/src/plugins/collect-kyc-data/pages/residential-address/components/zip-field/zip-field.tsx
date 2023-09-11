@@ -4,7 +4,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import useInputValidations from '../../hooks/use-input-validations';
-import { FormData } from '../../types';
+import type { FormData } from '../../types';
 
 const ZipField = () => {
   const {

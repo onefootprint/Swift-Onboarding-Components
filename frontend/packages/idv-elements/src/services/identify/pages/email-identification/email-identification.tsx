@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import { IdentifyResponse } from '@onefootprint/types';
+import type { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';

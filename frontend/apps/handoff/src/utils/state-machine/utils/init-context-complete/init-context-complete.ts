@@ -1,4 +1,4 @@
-import { InitContextUpdatedEvent, MachineContext } from '../../types';
+import type { InitContextUpdatedEvent, MachineContext } from '../../types';
 
 const initContextComplete = (
   context: MachineContext,

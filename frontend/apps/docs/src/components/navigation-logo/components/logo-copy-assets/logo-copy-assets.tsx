@@ -4,7 +4,8 @@ import { IcoDownload16, ThemedLogoFpCompact } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Dropdown, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React, { MouseEvent, useState } from 'react';
+import type { MouseEvent } from 'react';
+import React, { useState } from 'react';
 
 const assetsToCopy = [
   {

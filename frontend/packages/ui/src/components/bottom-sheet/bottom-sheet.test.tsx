@@ -6,7 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import BottomSheet, { BottomSheetProps } from './bottom-sheet';
+import type { BottomSheetProps } from './bottom-sheet';
+import BottomSheet from './bottom-sheet';
 
 describe('<BottomSheet />', () => {
   const renderBottomSheet = ({

@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Avatar, { AvatarProps } from './avatar';
+import type { AvatarProps } from './avatar';
+import Avatar from './avatar';
 
 describe('<Avatar />', () => {
   const renderAvatar = ({

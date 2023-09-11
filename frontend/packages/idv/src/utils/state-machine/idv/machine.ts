@@ -1,12 +1,13 @@
-import {
-  IdDI,
+import type {
   IdDocOutcomes,
   IdvBootstrapData,
   ObConfigAuth,
 } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { MachineContext, MachineEvents } from './types';
+import type { Typegen0 } from './machine.typegen';
+import type { MachineContext, MachineEvents } from './types';
 
 export type IdvMachineArgs = {
   authToken?: string;
@@ -29,7 +30,7 @@ const createIdvMachine = (args: IdvMachineArgs) =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as import('./machine.typegen').Typegen0,
+      tsTypes: {} as Typegen0,
       initial: 'init',
       context: {
         ...args,

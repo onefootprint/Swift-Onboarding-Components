@@ -2,7 +2,8 @@ import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Toggle, { ToggleProps } from './toggle';
+import type { ToggleProps } from './toggle';
+import Toggle from './toggle';
 
 describe('<Toggle />', () => {
   const renderToggle = ({

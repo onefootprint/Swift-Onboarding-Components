@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import { ConsentRequest, ConsentResponse } from '@onefootprint/types';
+import type { ConsentRequest, ConsentResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../config/constants';

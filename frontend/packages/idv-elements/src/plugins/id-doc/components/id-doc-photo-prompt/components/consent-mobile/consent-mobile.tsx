@@ -4,7 +4,8 @@ import React, { useRef } from 'react';
 
 import useConsent from '../../../../hooks/use-consent';
 import useIdDocMachine from '../../../../hooks/use-id-doc-machine';
-import ImageConsent, { ImageConsentHandler } from '../../../image-consent';
+import type { ImageConsentHandler } from '../../../image-consent';
+import ImageConsent from '../../../image-consent';
 import ConsentBottomSheet from './components/consent-bottomsheet/consent-bottomsheet';
 
 type ConsentMobileProps = {

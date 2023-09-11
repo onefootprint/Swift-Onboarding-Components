@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import {
+import type {
   UpdateD2PStatusRequest,
   UpdateD2PStatusResponse,
 } from '@onefootprint/types';

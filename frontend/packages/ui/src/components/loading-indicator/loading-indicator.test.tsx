@@ -2,7 +2,8 @@ import themes from '@onefootprint/design-tokens';
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import LoadingIndicator, { LoadingIndicatorProps } from './loading-indicator';
+import type { LoadingIndicatorProps } from './loading-indicator';
+import LoadingIndicator from './loading-indicator';
 
 describe('<LoadingIndicator />', () => {
   const renderLoadingIndicator = ({

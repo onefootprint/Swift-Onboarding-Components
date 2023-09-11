@@ -15,7 +15,7 @@ import { getSsnKind } from '../../utils/ssn-utils';
 import SSN4 from './components/ssn4';
 import SSN9 from './components/ssn9';
 import useConvertFormData from './hooks/use-convert-form-data';
-import { FormData } from './types';
+import type { FormData } from './types';
 
 type SSNProps = {
   onComplete?: () => void;

@@ -10,7 +10,8 @@ import mergeRefs from 'react-merge-refs';
 import usePlacesAutocomplete from 'use-places-autocomplete';
 
 import Box from '../box';
-import Input, { InputProps } from '../internal/input';
+import type { InputProps } from '../internal/input';
+import Input from '../internal/input';
 import type { AddressPrediction } from './address-input.types';
 import AddressDropdownFooter from './components/address-dropdown-footer';
 import AddressDropdownItem from './components/address-dropdown-item';

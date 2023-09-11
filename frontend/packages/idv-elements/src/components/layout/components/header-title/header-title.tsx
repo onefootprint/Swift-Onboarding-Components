@@ -1,4 +1,5 @@
-import { Box, SXStyleProps, Typography } from '@onefootprint/ui';
+import type { SXStyleProps } from '@onefootprint/ui';
+import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 export const HEADER_TITLE_DEFAULT_ID = 'header-title';

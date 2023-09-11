@@ -1,8 +1,9 @@
-import { ComponentMeta, Story } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import CountrySelect, { CountrySelectProps } from './country-select';
-import { CountrySelectOption } from './country-select.types';
+import type { CountrySelectProps } from './country-select';
+import CountrySelect from './country-select';
+import type { CountrySelectOption } from './country-select.types';
 
 export default {
   title: 'Components/CountrySelect',

@@ -1,12 +1,14 @@
-import {
+import type {
   BusinessBoKycData,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
+import {
   CLIENT_PUBLIC_KEY_HEADER,
   KYB_BO_SESSION_AUTHORIZATION_HEADER,
   OnboardingConfigStatus,
-  PublicOnboardingConfig,
 } from '@onefootprint/types';
 
-import { MachineContext, MachineEvents } from '../../types';
+import type { MachineContext, MachineEvents } from '../../types';
 import isContextReady from './is-context-ready';
 
 describe('isContextReady', () => {

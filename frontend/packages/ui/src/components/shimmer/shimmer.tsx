@@ -1,7 +1,8 @@
 import styled, { css, keyframes } from '@onefootprint/styled';
 import React from 'react';
 
-import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import useSX from '../../hooks/use-sx';
 
 export type ShimmerProps = {
   'aria-hidden'?: boolean;

@@ -4,7 +4,7 @@ import { PhoneInput, PhoneInputRegex } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { FormData } from '../../../../types';
+import type { FormData } from '../../../../types';
 
 type PhoneProps = {
   index: number;

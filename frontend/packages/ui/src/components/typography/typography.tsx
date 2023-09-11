@@ -1,8 +1,9 @@
-import { Color, FontVariant } from '@onefootprint/design-tokens';
+import type { Color, FontVariant } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef } from 'react';
 
-import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import useSX from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';
 import variantMapping from './typography.constants';
 

@@ -1,9 +1,9 @@
 import request from '@onefootprint/request';
-import {
+import type {
   IdentifyVerifyRequest,
   IdentifyVerifyResponse,
-  SANDBOX_ID_HEADER,
 } from '@onefootprint/types';
+import { SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {

@@ -1,19 +1,20 @@
-import {
+import type {
   AuthorizeRequirement,
-  CollectedKycDataOption,
   CollectKycDataRequirement,
-  IdDI,
   IdDocRequirement,
-  OnboardingConfigStatus,
-  OnboardingRequirementKind,
   PublicOnboardingConfig,
   RegisterPasskeyRequirement,
 } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  IdDI,
+  OnboardingConfigStatus,
+  OnboardingRequirementKind,
+} from '@onefootprint/types';
 import { interpret } from 'xstate';
 
-import createOnboardingRequirementsMachine, {
-  OnboardingRequirementsMachineArgs,
-} from './machine';
+import type { OnboardingRequirementsMachineArgs } from './machine';
+import createOnboardingRequirementsMachine from './machine';
 
 const livenessRequirement: RegisterPasskeyRequirement = {
   kind: OnboardingRequirementKind.registerPasskey,

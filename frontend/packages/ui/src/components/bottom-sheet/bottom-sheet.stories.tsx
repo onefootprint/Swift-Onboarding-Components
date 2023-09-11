@@ -1,9 +1,10 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import Button from '../button';
 import Typography from '../typography';
-import BottomSheet, { BottomSheetProps } from './bottom-sheet';
+import type { BottomSheetProps } from './bottom-sheet';
+import BottomSheet from './bottom-sheet';
 
 export default {
   component: BottomSheet,

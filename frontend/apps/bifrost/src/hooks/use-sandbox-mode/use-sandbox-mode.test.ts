@@ -1,8 +1,6 @@
 import { renderHook } from '@onefootprint/test-utils';
-import {
-  OnboardingConfigStatus,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfigStatus } from '@onefootprint/types';
 import { BifrostMachine } from 'src/utils/state-machine';
 
 import { BifrostMachineProvider } from '../../components/bifrost-machine-provider';

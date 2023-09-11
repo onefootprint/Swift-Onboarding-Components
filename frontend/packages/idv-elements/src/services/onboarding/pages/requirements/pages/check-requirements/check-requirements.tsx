@@ -1,6 +1,6 @@
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
-import { OnboardingStatusResponse } from '@onefootprint/types';
+import type { OnboardingStatusResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import * as LogRocket from 'logrocket';
 import React, { useState } from 'react';

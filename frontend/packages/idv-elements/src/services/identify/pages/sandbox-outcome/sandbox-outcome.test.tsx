@@ -4,20 +4,19 @@ import {
   userEvent,
   within,
 } from '@onefootprint/test-utils';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import {
   IdDocOutcomes,
   OnboardingConfigStatus,
   OverallOutcomes,
-  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
 import { Layout } from '../../../../components/layout';
 import configureI18next from '../../config/initializers/react-i18next';
-import SandboxOutcomeContainer, {
-  FormDataType,
-} from './components/sandbox-outcome-container';
+import type { FormDataType } from './components/sandbox-outcome-container';
+import SandboxOutcomeContainer from './components/sandbox-outcome-container';
 
 const getOnboardingConfig = (
   requiresIdDoc = true,

@@ -1,9 +1,10 @@
-import { Color } from '@onefootprint/design-tokens';
-import { Icon } from '@onefootprint/icons';
+import type { Color } from '@onefootprint/design-tokens';
+import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef } from 'react';
 
-import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import useSX from '../../hooks/use-sx';
 import { createTypography } from '../../utils/mixins';
 import Box from '../box';
 import LoadingIndicator from '../loading-indicator';

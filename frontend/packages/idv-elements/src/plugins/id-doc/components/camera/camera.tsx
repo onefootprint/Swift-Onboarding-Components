@@ -9,13 +9,15 @@ import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.const
 import CaptureButton from './components/capture-button';
 import Feedback from './components/feedback';
 import Flash from './components/flash';
-import Overlay, { OutlineKind } from './components/overlay';
+import type { OutlineKind } from './components/overlay';
+import Overlay from './components/overlay';
 import UploadButton from './components/upload-button';
-import useAutoCapture, { AutocaptureKind } from './hooks/use-auto-capture';
+import type { AutocaptureKind } from './hooks/use-auto-capture';
+import useAutoCapture from './hooks/use-auto-capture';
 import useGetImageString from './hooks/use-get-image-string';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
-import { CameraKind } from './utils/get-camera-options';
+import type { CameraKind } from './utils/get-camera-options';
 import getOutlineDimensions from './utils/get-outline-dimensions';
 import getVideoHeight from './utils/get-video-height';
 
@@ -54,7 +56,7 @@ const Camera = ({
     string | undefined
   >();
   const [isImageProcessing, setIsImageProcessing] = useState(false);
-  const [shouldDetect, setShouldDetect] = useState(true); // TODO: Completely remove the use of this hook by moving the image processing to the processing component
+  const [shouldDetect, setShouldDetect] = useState(true); // TOD O: Completely remove the use of this hook by moving the image processing to the processing component
   const [shouldShowInstructions, setShouldShowInstruction] = useState(true);
   const [canCapture, setCanCapture] = useState(true);
   const getImageStringFromVideo = useGetImageString();

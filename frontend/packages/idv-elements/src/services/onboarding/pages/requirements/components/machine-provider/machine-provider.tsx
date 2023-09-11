@@ -1,9 +1,8 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import createOnboardingRequirementsMachine, {
-  OnboardingRequirementsMachineArgs,
-} from '../../utils/state-machine/machine';
+import type { OnboardingRequirementsMachineArgs } from '../../utils/state-machine/machine';
+import createOnboardingRequirementsMachine from '../../utils/state-machine/machine';
 
 const useLocalOnboardingRequirementsMachine = (
   args: OnboardingRequirementsMachineArgs,

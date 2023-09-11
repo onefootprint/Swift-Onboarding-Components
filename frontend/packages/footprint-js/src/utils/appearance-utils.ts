@@ -1,4 +1,4 @@
-import { Appearance } from '../types/appearance';
+import type { Appearance } from '../types/appearance';
 
 const isObject = (obj: any) => typeof obj === 'object' && !!obj;
 

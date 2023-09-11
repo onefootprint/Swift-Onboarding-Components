@@ -20,7 +20,7 @@ import DobField from './components/dob-field';
 import NameFields from './components/name-fields';
 import NationalityField from './components/nationality-field';
 import useConvertFormData from './hooks/use-convert-form-data';
-import { FormData } from './types';
+import type { FormData } from './types';
 
 type BasicInformationProps = {
   hideHeader?: boolean;

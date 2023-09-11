@@ -1,4 +1,4 @@
-import { IdDI, ValueTypeForIdDI } from '@onefootprint/types';
+import type { IdDI, ValueTypeForIdDI } from '@onefootprint/types';
 
 type DataValue<T extends IdDI> = {
   value?: ValueTypeForIdDI<T>;

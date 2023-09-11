@@ -1,6 +1,6 @@
+import type { FootprintUserData } from '@onefootprint/footprint-js';
 import footprint, {
   FootprintComponentKind,
-  FootprintUserData,
   identifyFootprintUser,
 } from '@onefootprint/footprint-js';
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';

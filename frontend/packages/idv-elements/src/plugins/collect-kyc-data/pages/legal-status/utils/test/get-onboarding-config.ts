@@ -1,7 +1,5 @@
-import {
-  OnboardingConfigStatus,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfigStatus } from '@onefootprint/types';
 
 const getOnboardingConfig = (): PublicOnboardingConfig => ({
   isLive: true,

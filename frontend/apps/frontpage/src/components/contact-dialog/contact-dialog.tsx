@@ -3,7 +3,7 @@ import { Box, Dialog, InlineAlert, useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import Form from './components/form';
-import { ContactDialogData } from './contact-dialog.types';
+import type { ContactDialogData } from './contact-dialog.types';
 import useContactForm from './hooks/use-contact-form';
 
 type ContactDialogProps = {

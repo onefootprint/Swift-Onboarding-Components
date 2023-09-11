@@ -1,4 +1,5 @@
-import { getErrorMessage, RequestError } from './request';
+import type { RequestError } from './request';
+import { getErrorMessage } from './request';
 
 describe('@onefootprint/request', () => {
   describe('getErrorMessage', () => {

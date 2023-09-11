@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useTranslation } from '@onefootprint/hooks';
-import { InputProps, InternalInput } from '@onefootprint/ui';
+import type { InputProps } from '@onefootprint/ui';
+import { InternalInput } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
 import React, { forwardRef, useEffect, useState } from 'react';
 

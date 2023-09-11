@@ -3,7 +3,8 @@ import themes from '@onefootprint/design-tokens';
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Badge, { BannerProps } from './banner';
+import type { BannerProps } from './banner';
+import Badge from './banner';
 
 describe('<Badge />', () => {
   const renderBanner = ({

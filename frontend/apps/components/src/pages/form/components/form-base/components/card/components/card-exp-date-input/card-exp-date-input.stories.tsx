@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import CardExpDateInput, { CardExpDateInputProps } from './card-exp-date-input';
+import type { CardExpDateInputProps } from './card-exp-date-input';
+import CardExpDateInput from './card-exp-date-input';
 
 export default {
   component: CardExpDateInput,

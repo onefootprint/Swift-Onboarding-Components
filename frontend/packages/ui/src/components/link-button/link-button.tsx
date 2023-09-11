@@ -1,8 +1,10 @@
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import React, { forwardRef, HTMLAttributeAnchorTarget } from 'react';
+import type { HTMLAttributeAnchorTarget } from 'react';
+import React, { forwardRef } from 'react';
 
-import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import useSX from '../../hooks/use-sx';
 import { createTypography } from '../../utils/mixins';
 import type { LinkButtonSize, LinkButtonVariant } from './link-button.types';
 

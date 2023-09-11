@@ -1,5 +1,5 @@
 import { useOpenCv } from 'opencv-react-ts';
-import { MutableRefObject } from 'react';
+import type { MutableRefObject } from 'react';
 
 import getSourceDimensions from '../utils/get-source-dimensions';
 import { sharpenImage } from '../utils/graphics-utils/graphics-processing-utils';

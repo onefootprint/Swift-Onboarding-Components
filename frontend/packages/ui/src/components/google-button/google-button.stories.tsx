@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import GoogleButton, { GoogleButtonProps } from './google-button';
+import type { GoogleButtonProps } from './google-button';
+import GoogleButton from './google-button';
 
 export default {
   component: GoogleButton,

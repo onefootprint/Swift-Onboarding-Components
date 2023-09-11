@@ -1,9 +1,8 @@
 import React from 'react';
 
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
-import SandboxOutcomeContainer, {
-  FormDataType,
-} from './components/sandbox-outcome-container';
+import type { FormDataType } from './components/sandbox-outcome-container';
+import SandboxOutcomeContainer from './components/sandbox-outcome-container';
 
 const SandboxOutcome = () => {
   const [state, send] = useIdentifyMachine();

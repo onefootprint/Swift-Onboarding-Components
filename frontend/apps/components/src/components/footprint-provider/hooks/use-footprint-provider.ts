@@ -1,4 +1,4 @@
-import { FootprintClient } from '../types';
+import type { FootprintClient } from '../types';
 
 type UseFootprintProvider = {
   client: FootprintClient;

@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import GoogleButton, { GoogleButtonProps } from './google-button';
+import type { GoogleButtonProps } from './google-button';
+import GoogleButton from './google-button';
 
 describe('<GoogleButton />', () => {
   const renderGoogleButton = ({

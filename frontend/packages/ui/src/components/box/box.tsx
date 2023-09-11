@@ -1,7 +1,9 @@
 import styled, { css } from '@onefootprint/styled';
-import React, { AriaRole, forwardRef } from 'react';
+import type { AriaRole } from 'react';
+import React, { forwardRef } from 'react';
 
-import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import useSX from '../../hooks/use-sx';
 
 type BoxTag = 'div' | 'section' | 'article' | 'aside' | 'span' | 'main';
 

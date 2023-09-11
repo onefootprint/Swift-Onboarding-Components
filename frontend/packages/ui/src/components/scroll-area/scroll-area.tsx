@@ -2,7 +2,8 @@ import styled, { css } from '@onefootprint/styled';
 import * as ScrollAreaRadix from '@radix-ui/react-scroll-area';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { SXStyleProps, SXStyles, useSX } from '../../hooks';
+import type { SXStyleProps, SXStyles } from '../../hooks';
+import { useSX } from '../../hooks';
 
 type ScrollAreaProps = {
   children: React.ReactNode;

@@ -1,7 +1,5 @@
-import {
-  OnboardingRequirementKind,
-  OnboardingStatusResponse,
-} from '@onefootprint/types';
+import type { OnboardingStatusResponse } from '@onefootprint/types';
+import { OnboardingRequirementKind } from '@onefootprint/types';
 
 type AlreadyDisplayedRequirements = {
   collectedKycData: boolean;

@@ -1,8 +1,9 @@
 import { IcoFaceid24 } from '@onefootprint/icons';
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import Button, { ButtonProps } from './button';
+import type { ButtonProps } from './button';
+import Button from './button';
 
 export default {
   component: Button,

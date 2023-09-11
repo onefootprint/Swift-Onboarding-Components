@@ -2,7 +2,8 @@ import { IcoClose24 } from '@onefootprint/icons';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import IconButton, { IconButtonProps } from './icon-button';
+import type { IconButtonProps } from './icon-button';
+import IconButton from './icon-button';
 
 describe('<IconButton />', () => {
   const renderIconButton = ({

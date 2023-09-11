@@ -2,7 +2,7 @@ import React from 'react';
 
 import RequirementsMachineProvider from './components/machine-provider';
 import Router from './pages/router';
-import { OnboardingRequirementsMachineArgs } from './utils/state-machine';
+import type { OnboardingRequirementsMachineArgs } from './utils/state-machine';
 
 type RequirementsProps = Partial<OnboardingRequirementsMachineArgs> & {
   onDone: () => void;

@@ -3,7 +3,7 @@ import { createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 
-import { NavLink } from '../../../../types';
+import type { NavLink } from '../../../../types';
 
 type MobileNavLinkProps = {
   link: NavLink;

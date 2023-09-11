@@ -1,4 +1,4 @@
-import { FootprintAppearance } from '@onefootprint/footprint-js';
+import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import { useContext } from 'react';
 
 import AppearanceContext from '../components/appearance-provider/appearance-context';

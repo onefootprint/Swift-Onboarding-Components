@@ -1,4 +1,4 @@
-import { InsightEvent } from './insight-event';
+import type { InsightEvent } from './insight-event';
 
 export type Liveness = {
   source: LivenessSource;

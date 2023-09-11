@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import CustomForm from '../../../../components/custom-form';
-import { DeclarationData } from '../../../../utils/state-machine/types';
+import type { DeclarationData } from '../../../../utils/state-machine/types';
 import UploadComplianceLetter from '../upload-compliance-letter';
 import filterNonTruthy from './utils/filter-non-truthy';
 import trimAndSplit from './utils/trim-and-split';

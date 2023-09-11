@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import TextArea, { TextAreaProps } from './text-area';
+import type { TextAreaProps } from './text-area';
+import TextArea from './text-area';
 
 export default {
   component: TextArea,

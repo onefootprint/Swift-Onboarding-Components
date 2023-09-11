@@ -2,7 +2,7 @@ import { screen } from '@onefootprint/test-utils';
 import React from 'react';
 
 import renderPage from '../../test-utils/render-page';
-import { MachineContext } from '../../utils/state-machine';
+import type { MachineContext } from '../../utils/state-machine';
 import IdDocFrontPhotoRetry from '.';
 import contextWithErrors from './id-doc-front-photo-retry.test.config';
 

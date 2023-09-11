@@ -1,6 +1,7 @@
 import { useTheme } from '@onefootprint/styled';
 import React from 'react';
-import { DayPicker, DayPickerSingleProps } from 'react-day-picker';
+import type { DayPickerSingleProps } from 'react-day-picker';
+import { DayPicker } from 'react-day-picker';
 
 import CustomCaption from './components/custom-caption';
 

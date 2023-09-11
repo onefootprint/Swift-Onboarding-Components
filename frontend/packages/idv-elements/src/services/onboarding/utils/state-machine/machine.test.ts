@@ -1,12 +1,10 @@
-import {
-  IdDI,
-  OnboardingConfigStatus,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { IdDI, OnboardingConfigStatus } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
-import createOnboardingMachine, { OnboardingMachineArgs } from './machine';
+import type { OnboardingMachineArgs } from './machine';
+import createOnboardingMachine from './machine';
 
 describe('Onboarding Machine Tests', () => {
   const testOnboardingConfig: PublicOnboardingConfig = {

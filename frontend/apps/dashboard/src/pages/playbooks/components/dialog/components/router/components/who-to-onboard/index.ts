@@ -1,1 +1,2 @@
-export { type WhoToOnboardProps, default } from './who-to-onboard';
+export type { WhoToOnboardProps } from './who-to-onboard';
+export { default } from './who-to-onboard';

@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { Icon } from '@onefootprint/icons';
 import {
   IcoBuilding24,
   IcoCake24,
@@ -10,7 +11,6 @@ import {
   IcoGlobe24,
   IcoGreenCard24,
   IcoIdCard24,
-  Icon,
   IcoPassport24,
   IcoPhone24,
   IcoSelfie24,
@@ -28,7 +28,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import { isKycCdo } from '../../../../../../utils/cdo-utils';
-import { FieldProps } from '../field';
+import type { FieldProps } from '../field';
 import FieldsList from '../fields-list';
 
 const IconByCollectedKycDataOption: Record<CollectedKycDataOption, Icon> = {

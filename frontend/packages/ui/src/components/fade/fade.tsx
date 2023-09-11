@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { AriaRole, forwardRef } from 'react';
+import type { AriaRole } from 'react';
+import React, { forwardRef } from 'react';
 
 type FadeProps = {
   'aria-label'?: string;

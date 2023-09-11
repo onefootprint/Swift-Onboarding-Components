@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import TextInput, { TextInputProps } from './text-input';
+import type { TextInputProps } from './text-input';
+import TextInput from './text-input';
 
 describe('<TextInput />', () => {
   const renderTextInput = ({

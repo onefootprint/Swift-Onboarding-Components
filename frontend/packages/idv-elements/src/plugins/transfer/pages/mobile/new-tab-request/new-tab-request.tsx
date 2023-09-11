@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { D2PGenerateResponse } from '@onefootprint/types';
+import type { D2PGenerateResponse } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 

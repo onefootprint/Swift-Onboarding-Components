@@ -1,16 +1,13 @@
+import type { FootprintProps } from '@onefootprint/footprint-js';
 import {
   FootprintPrivateEvent,
-  FootprintProps,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
-import { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
+import type { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 
-import {
-  CompletePayload,
-  FootprintClient,
-  LegacyFootprintInternalEvent,
-} from '../types';
+import type { CompletePayload, FootprintClient } from '../types';
+import { LegacyFootprintInternalEvent } from '../types';
 import EventEmitter from '../utils/event-emitter/event-emmiter';
 
 class IframeAdapter implements FootprintClient {

@@ -1,6 +1,6 @@
 import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
 
-import { MachineContext } from './types';
+import type { MachineContext } from './types';
 
 type MachineTarget = {
   target: string;

@@ -1,7 +1,8 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Shimmer, { ShimmerProps } from './shimmer';
+import type { ShimmerProps } from './shimmer';
+import Shimmer from './shimmer';
 
 describe('<Shimmer />', () => {
   const renderShimmer = ({

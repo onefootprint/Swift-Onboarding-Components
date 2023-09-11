@@ -8,13 +8,13 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import {
   CollectedKybDataOption,
   CollectedKycDataOption,
   IdDI,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
-  PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
@@ -25,8 +25,8 @@ import {
 import React from 'react';
 import { Layout } from 'src/components/layout';
 
-import { PluginContext } from '../base-plugin';
-import {
+import type { PluginContext } from '../base-plugin';
+import type {
   CollectKybDataContext,
   CollectKybDataProps,
 } from './collect-kyb-data.types';

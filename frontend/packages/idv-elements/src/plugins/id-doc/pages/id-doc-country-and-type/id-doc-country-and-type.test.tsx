@@ -1,13 +1,11 @@
-import { CountryRecord } from '@onefootprint/global-constants';
+import type { CountryRecord } from '@onefootprint/global-constants';
 import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import {
-  SubmitDocTypeResponse,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import type { SubmitDocTypeResponse } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
 import renderPage from '../../test-utils/render-page';
-import { MachineContext } from '../../utils/state-machine';
+import type { MachineContext } from '../../utils/state-machine';
 import IdDocCountryAndTypeContainer from './components/id-doc-country-and-type-container';
 import {
   initialContextAllDocTypes,

@@ -1,10 +1,11 @@
 import { IcoClose24, icos } from '@onefootprint/icons';
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import Button from '../button';
 import Typography from '../typography';
-import Dialog, { DialogProps } from './dialog';
+import type { DialogProps } from './dialog';
+import Dialog from './dialog';
 
 export default {
   component: Dialog,

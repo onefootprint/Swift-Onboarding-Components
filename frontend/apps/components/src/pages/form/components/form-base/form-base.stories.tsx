@@ -1,8 +1,9 @@
 import { FootprintFormType } from '@onefootprint/footprint-js';
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import FormBase, { FormBaseProps } from './form-base';
+import type { FormBaseProps } from './form-base';
+import FormBase from './form-base';
 
 export default {
   component: FormBase,

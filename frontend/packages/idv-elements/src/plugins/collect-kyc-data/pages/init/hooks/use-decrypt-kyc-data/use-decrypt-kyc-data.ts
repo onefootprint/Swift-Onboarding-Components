@@ -1,15 +1,13 @@
 import { getErrorMessage } from '@onefootprint/request';
-import {
-  CdoToAllDisMap,
+import type {
   CollectedKycDataOption,
-  IdDI,
   UserTokenResponse,
-  UserTokenScope,
 } from '@onefootprint/types';
+import { CdoToAllDisMap, IdDI, UserTokenScope } from '@onefootprint/types';
 
 import useUserToken from '../../../../../../hooks/api/hosted/user/use-user-token';
 import useDecryptUser from '../../../../hooks/use-decrypt-user';
-import { KycData } from '../../../../utils/data-types';
+import type { KycData } from '../../../../utils/data-types';
 
 // These fields are decryptable with any auth token. Other fields are only decryptable if authed
 // with biometric

@@ -1,11 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import {
+import type {
   CountryCode,
-  IdDocImageProcessingError,
   IdDocImageTypes,
-  IdDocImageUploadError,
   SupportedIdDocTypes,
+} from '@onefootprint/types';
+import {
+  IdDocImageProcessingError,
+  IdDocImageUploadError,
 } from '@onefootprint/types';
 import { Box, Button, Typography } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';

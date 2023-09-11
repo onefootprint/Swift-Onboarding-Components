@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import SearchInput, { SearchInputProps } from './search-input';
+import type { SearchInputProps } from './search-input';
+import SearchInput from './search-input';
 
 describe('<SearchInput />', () => {
   const renderSearchInput = ({

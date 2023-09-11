@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { State } from 'xstate';
+import type { State } from 'xstate';
 
 import { useObserveCollector } from '../use-observe-collector';
 

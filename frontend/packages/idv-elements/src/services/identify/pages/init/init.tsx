@@ -1,13 +1,12 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
-import { PublicOnboardingConfig } from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 
 import InitShimmer from '../../../../components/init-shimmer';
 import useGetOnboardingConfig from '../../../../hooks/api/org/get-onboarding-config';
-import useDeviceInfo, {
-  DeviceInfo,
-} from '../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import useDeviceInfo from '../../../../hooks/ui/use-device-info';
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
 
 const Init = () => {

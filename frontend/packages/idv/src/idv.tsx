@@ -8,7 +8,7 @@ import { MachineProvider } from './components/machine-provider';
 import { GOOGLE_MAPS_KEY } from './config/constants';
 import configureI18next from './config/initializers/react-i18next';
 import Router from './pages/router';
-import { IdvProps } from './types';
+import type { IdvProps } from './types';
 
 const App = (props: IdvProps) => (
   <>

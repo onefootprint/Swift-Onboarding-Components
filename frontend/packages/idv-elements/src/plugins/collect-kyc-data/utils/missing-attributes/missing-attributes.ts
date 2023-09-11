@@ -1,13 +1,13 @@
+import type { CollectKycDataRequirement } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
   CollectedKycDataOptionToRequiredAttributes,
-  CollectKycDataRequirement,
   IdDI,
   UsLegalStatus,
 } from '@onefootprint/types';
 import { pickBy } from 'lodash';
 
-import { KycData } from '../data-types';
+import type { KycData } from '../data-types';
 
 // The list of CollectedKycDataOption that may be input on the basic info screen
 const BASIC_ATTRIBUTES = [

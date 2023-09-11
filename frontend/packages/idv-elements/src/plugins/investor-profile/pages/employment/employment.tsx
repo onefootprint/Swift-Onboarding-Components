@@ -10,7 +10,7 @@ import InvestorProfileNavigationHeader from '../../components/investor-profile-n
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncErrorToast from '../../hooks/use-sync-error-toast';
-import { EmploymentData } from '../../utils/state-machine/types';
+import type { EmploymentData } from '../../utils/state-machine/types';
 import EmploymentForm from './components/employment-form';
 
 const Employment = () => {

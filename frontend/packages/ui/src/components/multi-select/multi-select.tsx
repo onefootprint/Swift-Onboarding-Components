@@ -1,12 +1,13 @@
 import { useTheme } from '@onefootprint/styled';
 import React, { useId } from 'react';
-import Select, {
+import type {
   ActionMeta,
   GroupBase,
   InputActionMeta,
   OptionsOrGroups,
   PropsValue,
 } from 'react-select';
+import Select from 'react-select';
 
 import { createTypography } from '../../utils';
 import Box from '../box';

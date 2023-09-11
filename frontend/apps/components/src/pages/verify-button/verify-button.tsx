@@ -1,8 +1,6 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import {
-  FootprintPublicEvent,
-  FootprintVerifyButtonProps,
-} from '@onefootprint/footprint-js';
+import type { FootprintVerifyButtonProps } from '@onefootprint/footprint-js';
+import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import { FootprintButton } from '@onefootprint/ui';
 import type { GetServerSideProps } from 'next';
 import React from 'react';

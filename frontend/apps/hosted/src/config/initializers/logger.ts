@@ -1,6 +1,7 @@
 import { getSessionId } from '@onefootprint/dev-tools';
 import { IS_BROWSER, IS_DEV } from '@onefootprint/global-constants';
-import { checkDeviceInfo, DeviceInfo } from '@onefootprint/idv-elements';
+import type { DeviceInfo } from '@onefootprint/idv-elements';
+import { checkDeviceInfo } from '@onefootprint/idv-elements';
 import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
 // @ts-ignore

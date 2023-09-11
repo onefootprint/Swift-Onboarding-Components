@@ -1,8 +1,9 @@
-import { CountryCode, IdDI, UsLegalStatus } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
+import { IdDI, UsLegalStatus } from '@onefootprint/types';
 import uniq from 'lodash/uniq';
 
-import { KycData } from '../../../../utils/data-types';
-import { FormData } from '../../types';
+import type { KycData } from '../../../../utils/data-types';
+import type { FormData } from '../../types';
 
 const useConvertFormData = () => (formData: FormData) => {
   const { usLegalStatus, nationality, citizenships, visa } = formData;

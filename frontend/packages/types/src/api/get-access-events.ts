@@ -1,4 +1,4 @@
-import { AccessEvent } from '../data/access-event';
+import type { AccessEvent } from '../data/access-event';
 
 export type GetAccessEventsRequest = {
   cursor?: number;

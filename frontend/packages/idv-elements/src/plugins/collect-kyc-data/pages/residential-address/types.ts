@@ -1,4 +1,4 @@
-import { CountrySelectOption, SelectOption } from '@onefootprint/ui';
+import type { CountrySelectOption, SelectOption } from '@onefootprint/ui';
 
 export type FormData = {
   addressLine1: string;

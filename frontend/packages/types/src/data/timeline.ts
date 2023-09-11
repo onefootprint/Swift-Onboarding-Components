@@ -1,15 +1,15 @@
-import { TriggerKind } from '../api/trigger';
-import { Actor } from './actor';
-import { Annotation } from './annotation';
-import {
+import type { TriggerKind } from '../api/trigger';
+import type { Actor } from './actor';
+import type { Annotation } from './annotation';
+import type {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from './collected-data-option';
-import { IdDocStatus, SupportedIdDocTypes } from './id-doc-type';
-import { InsightEvent } from './insight-event';
-import { LivenessAttribute, LivenessSource } from './liveness';
-import { OnboardingDecision } from './onboarding-decision';
+import type { IdDocStatus, SupportedIdDocTypes } from './id-doc-type';
+import type { InsightEvent } from './insight-event';
+import type { LivenessAttribute, LivenessSource } from './liveness';
+import type { OnboardingDecision } from './onboarding-decision';
 
 export enum TimelineEventKind {
   dataCollected = 'data_collected',

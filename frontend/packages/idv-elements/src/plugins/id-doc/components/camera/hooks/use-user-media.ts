@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import useHandleCameraError from '../../../hooks/use-handle-camera-error';
-import getCameraOptions, { CameraKind } from '../utils/get-camera-options';
+import type { CameraKind } from '../utils/get-camera-options';
+import getCameraOptions from '../utils/get-camera-options';
 
 const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
   const onCameraError = useHandleCameraError();

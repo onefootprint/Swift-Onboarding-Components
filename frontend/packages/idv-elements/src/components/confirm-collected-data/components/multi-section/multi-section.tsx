@@ -1,9 +1,10 @@
-import { Icon } from '@onefootprint/icons';
+import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Divider, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import Section, { SectionProps } from '../section';
+import type { SectionProps } from '../section';
+import Section from '../section';
 
 type MultiSectionProps = {
   title: string;

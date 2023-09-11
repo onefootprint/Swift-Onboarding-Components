@@ -1,4 +1,4 @@
-import {
+import type {
   BackgroundColor,
   DeprecatedTypography,
   FontFamily,
@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@onefootprint/design-tokens';
 import { css } from '@onefootprint/styled';
-import * as CSS from 'csstype';
+import type * as CSS from 'csstype';
 
 export const createFontStyles = (
   variant: FontVariant,

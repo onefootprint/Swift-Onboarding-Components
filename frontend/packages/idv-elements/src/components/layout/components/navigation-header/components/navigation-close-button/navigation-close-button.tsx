@@ -2,7 +2,7 @@ import { IcoClose24 } from '@onefootprint/icons';
 import { IconButton, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
 
-import { NavigationHeaderCloseButtonProps } from '../../types';
+import type { NavigationHeaderCloseButtonProps } from '../../types';
 
 type NavigationCloseButtonProps = Omit<
   NavigationHeaderCloseButtonProps,

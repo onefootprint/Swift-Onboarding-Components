@@ -1,4 +1,4 @@
-import { BasePluginProps } from '../base-plugin';
+import type { BasePluginProps } from '../base-plugin';
 
 export type InvestorProfileContext = {
   showTransition?: boolean;

@@ -1,13 +1,15 @@
-import {
+import type {
   CollectedKycDataOption,
-  CollectedKycDataOptionToRequiredAttributes,
   CollectKycDataRequirement,
+} from '@onefootprint/types';
+import {
+  CollectedKycDataOptionToRequiredAttributes,
   IdDI,
 } from '@onefootprint/types';
 import { pickBy } from 'lodash';
 
 import allAttributes from '../../../../utils/all-attributes';
-import { KycData } from '../../../../utils/data-types';
+import type { KycData } from '../../../../utils/data-types';
 
 const isDate = (di: string) =>
   di === IdDI.dob || di === IdDI.visaExpirationDate;

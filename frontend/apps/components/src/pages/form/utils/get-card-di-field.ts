@@ -1,4 +1,4 @@
-import { CardDIField } from '@onefootprint/types';
+import type { CardDIField } from '@onefootprint/types';
 
 const getCardDIField = (di: string): CardDIField | null => {
   try {

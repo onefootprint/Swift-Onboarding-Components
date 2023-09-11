@@ -5,7 +5,7 @@ import React from 'react';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import WritingLayout from 'src/components/writing-layout';
 import { getInitialPosts, PostType } from 'src/utils/ghost';
-import { Post } from 'src/utils/ghost/types';
+import type { Post } from 'src/utils/ghost/types';
 
 import SEO from '../../components/seo';
 import LibraryPostPreview from './components/library-post-preview';

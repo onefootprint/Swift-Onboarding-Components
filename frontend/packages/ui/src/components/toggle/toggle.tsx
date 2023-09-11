@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 
-import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import useSX from '../../hooks/use-sx';
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 
 export type ToggleProps = {

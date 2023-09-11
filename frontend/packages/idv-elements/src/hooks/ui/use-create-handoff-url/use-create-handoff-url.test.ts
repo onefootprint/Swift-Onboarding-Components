@@ -1,8 +1,6 @@
 import { customRenderHook } from '@onefootprint/test-utils';
-import {
-  OnboardingConfigStatus,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfigStatus } from '@onefootprint/types';
 
 import useCreateHandoffUrl from './use-create-handoff-url';
 

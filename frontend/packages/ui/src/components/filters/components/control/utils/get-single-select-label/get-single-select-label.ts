@@ -1,4 +1,7 @@
-import { FilterOption, FilterSelectedOption } from '../../../../filters.types';
+import type {
+  FilterOption,
+  FilterSelectedOption,
+} from '../../../../filters.types';
 
 const getSingleSelectLabel = (
   options: FilterOption[],

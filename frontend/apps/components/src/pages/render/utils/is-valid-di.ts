@@ -1,13 +1,13 @@
-import {
+import type {
   BusinessDI,
   CardDI,
   CustomDI,
   DataIdentifier,
-  DataIdentifierKeys,
   DocumentDI,
   IdDI,
   InvestorProfileDI,
 } from '@onefootprint/types';
+import { DataIdentifierKeys } from '@onefootprint/types';
 
 export const isCardDI = (id: string): id is CardDI => id.startsWith('card.');
 

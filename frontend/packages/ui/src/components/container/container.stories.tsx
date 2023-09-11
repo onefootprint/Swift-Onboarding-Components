@@ -1,9 +1,10 @@
-import { ComponentMeta, Story } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
 
 import Box from '../box';
 import Typography from '../typography';
-import Container, { ContainerProps } from './container';
+import type { ContainerProps } from './container';
+import Container from './container';
 
 export default {
   title: 'Components/Container',

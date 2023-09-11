@@ -1,9 +1,9 @@
 import './styles.css';
 
-import { Component, Footprint, Props } from './types/components';
+import type { Component, Footprint, Props } from './types/components';
 import initIframe from './utils/iframe-utils/iframe';
 import initIframeManager from './utils/iframe-utils/iframe-manager';
-import { Iframe } from './utils/iframe-utils/types';
+import type { Iframe } from './utils/iframe-utils/types';
 
 const getFootprint = (): Footprint => {
   const manager = initIframeManager();

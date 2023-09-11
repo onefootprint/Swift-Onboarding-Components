@@ -2,7 +2,8 @@ import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import TextArea, { TextAreaProps } from './text-area';
+import type { TextAreaProps } from './text-area';
+import TextArea from './text-area';
 
 describe('<TextArea />', () => {
   const renderTextArea = ({

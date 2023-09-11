@@ -1,7 +1,8 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoFaceid24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
-import { ChallengeKind, LoginChallengeResponse } from '@onefootprint/types';
+import type { LoginChallengeResponse } from '@onefootprint/types';
+import { ChallengeKind } from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 

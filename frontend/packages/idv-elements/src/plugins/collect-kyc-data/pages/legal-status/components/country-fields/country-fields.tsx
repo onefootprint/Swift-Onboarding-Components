@@ -2,14 +2,12 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import { LinkButton } from '@onefootprint/ui';
 import React from 'react';
-import {
-  Controller,
+import type {
   ControllerRenderProps,
   FieldError,
   FieldValues,
-  useFieldArray,
-  useFormContext,
 } from 'react-hook-form';
+import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 
 import CitizenshipField from './citizenship-field';
 import CountryOfBirthField from './country-of-birth-field';

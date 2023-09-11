@@ -1,11 +1,11 @@
-import { FootprintVariant } from '@onefootprint/footprint-js';
+import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { Box, ScrollArea } from '@onefootprint/ui';
 import React from 'react';
 
 import Container from '../../../container';
 import Footer from './components/footer';
 import Header from './components/header';
-import { AllButtons, OnlyPrimaryButton } from './types';
+import type { AllButtons, OnlyPrimaryButton } from './types';
 
 export type FormDialogProps = {
   title?: string;

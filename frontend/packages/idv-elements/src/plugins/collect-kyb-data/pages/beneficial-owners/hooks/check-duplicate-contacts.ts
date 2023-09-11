@@ -1,8 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  BeneficialOwner,
-  BeneficialOwnerDataAttribute,
-} from '@onefootprint/types';
+import type { BeneficialOwner } from '@onefootprint/types';
+import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 
 const useCheckDuplicateContacts = () => {

@@ -5,13 +5,8 @@ import {
   selectEvents,
   within,
 } from '@onefootprint/test-utils';
-import {
-  CountrySelect,
-  CountrySelectProps,
-  Select,
-  TextInput,
-  Typography,
-} from '@onefootprint/ui';
+import type { CountrySelectProps } from '@onefootprint/ui';
+import { CountrySelect, Select, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import { getClickedElementInfo } from './get-click-element-info';

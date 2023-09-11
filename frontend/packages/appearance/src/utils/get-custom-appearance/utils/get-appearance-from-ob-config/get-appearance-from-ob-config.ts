@@ -1,5 +1,5 @@
-import { FootprintAppearance } from '@onefootprint/footprint-js';
-import { GetPublicOnboardingConfigResponse } from '@onefootprint/types';
+import type { FootprintAppearance } from '@onefootprint/footprint-js';
+import type { GetPublicOnboardingConfigResponse } from '@onefootprint/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 

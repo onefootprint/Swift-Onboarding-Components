@@ -1,8 +1,9 @@
 import { IcoFaceid16, IcoFingerprint16 } from '@onefootprint/icons';
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useEffect } from 'react';
 
-import SegmentedControl, { SegmentedControlProps } from './segmented-control';
+import type { SegmentedControlProps } from './segmented-control';
+import SegmentedControl from './segmented-control';
 
 export default {
   component: SegmentedControl,

@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Pagination, { PaginationProps } from './pagination';
+import type { PaginationProps } from './pagination';
+import Pagination from './pagination';
 
 describe('<Pagination />', () => {
   const renderPagination = ({

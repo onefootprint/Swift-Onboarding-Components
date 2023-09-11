@@ -1,5 +1,5 @@
-import { Appearance } from './appearance';
-import { FootprintUserData as UserData } from './user-data';
+import type { Appearance } from './appearance';
+import type { FootprintUserData as UserData } from './user-data';
 
 export interface Footprint {
   init: (props: Props) => Component;

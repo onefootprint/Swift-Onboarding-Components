@@ -1,4 +1,4 @@
-import { GroupBase, OptionsOrGroups } from 'react-select';
+import type { GroupBase, OptionsOrGroups } from 'react-select';
 
 type OptionType = { value: string; label: string };
 

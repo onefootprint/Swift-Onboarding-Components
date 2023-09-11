@@ -5,7 +5,7 @@ import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import { FormData } from '../../types';
+import type { FormData } from '../../types';
 
 type CountryFieldProps = {
   disabled?: boolean;

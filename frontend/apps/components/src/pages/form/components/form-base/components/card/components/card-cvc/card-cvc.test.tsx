@@ -3,7 +3,8 @@ import { screen, userEvent } from '@onefootprint/test-utils';
 import React, { useState } from 'react';
 
 import { renderComponents } from '../../../../../../../../config/tests';
-import CardCvc, { CardCvcProps } from './card-cvc';
+import type { CardCvcProps } from './card-cvc';
+import CardCvc from './card-cvc';
 
 const Wrapper = ({
   hasError,

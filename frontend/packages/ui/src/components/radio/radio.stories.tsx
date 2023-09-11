@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useEffect, useState } from 'react';
 
-import Radio, { RadioProps } from './radio';
+import type { RadioProps } from './radio';
+import Radio from './radio';
 
 export default {
   component: Radio,

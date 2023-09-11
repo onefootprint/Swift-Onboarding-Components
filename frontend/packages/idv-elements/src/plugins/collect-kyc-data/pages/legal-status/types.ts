@@ -1,4 +1,4 @@
-import { CountryCode, UsLegalStatus, VisaKind } from '@onefootprint/types';
+import type { CountryCode, UsLegalStatus, VisaKind } from '@onefootprint/types';
 
 export type FormData = {
   usLegalStatus: UsLegalStatus;

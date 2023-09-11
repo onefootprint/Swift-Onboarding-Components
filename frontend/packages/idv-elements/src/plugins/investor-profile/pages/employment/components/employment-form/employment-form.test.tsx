@@ -9,7 +9,8 @@ import {
   waitFor,
 } from '@/investor-profile/config/tests';
 
-import EmploymentForm, { EmploymentFormProps } from './employment-form';
+import type { EmploymentFormProps } from './employment-form';
+import EmploymentForm from './employment-form';
 
 describe('<EmploymentForm />', () => {
   const renderForm = ({

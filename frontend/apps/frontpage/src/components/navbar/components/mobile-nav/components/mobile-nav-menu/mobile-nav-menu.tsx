@@ -4,7 +4,7 @@ import { createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import React from 'react';
 
-import { NavMenu } from '../../../../types';
+import type { NavMenu } from '../../../../types';
 import MobileNavMenuItem from '../mobile-nav-menu-item';
 
 type MobileNavMenuProps = {

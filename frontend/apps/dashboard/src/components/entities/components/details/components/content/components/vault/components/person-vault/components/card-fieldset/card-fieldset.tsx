@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { type Icon } from '@onefootprint/icons';
+import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { EntityCard, VaultValue } from '@onefootprint/types';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';

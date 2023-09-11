@@ -3,7 +3,8 @@ import styled from '@onefootprint/styled';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
-import Tooltip, { TooltipProps } from '../tooltip';
+import type { TooltipProps } from '../tooltip';
+import Tooltip from '../tooltip';
 
 export type CopyButtonProps = {
   ariaLabel?: string;

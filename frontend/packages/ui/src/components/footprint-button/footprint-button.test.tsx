@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import FootprintButton, { FootprintButtonProps } from './footprint-button';
+import type { FootprintButtonProps } from './footprint-button';
+import FootprintButton from './footprint-button';
 
 describe('<FootprintButton />', () => {
   const renderFootprintButton = ({

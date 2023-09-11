@@ -2,9 +2,8 @@ import { customRender, screen } from '@onefootprint/test-utils';
 import { CollectedKycDataOption } from '@onefootprint/types';
 import React from 'react';
 
-import CollectionAndScopes, {
-  type CollectionAndScopesProps,
-} from './collection-and-scopes';
+import type { CollectionAndScopesProps } from './collection-and-scopes';
+import CollectionAndScopes from './collection-and-scopes';
 import playbookFixture from './collection-and-scopes.test.config';
 
 const renderCollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {

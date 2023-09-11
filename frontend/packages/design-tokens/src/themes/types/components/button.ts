@@ -1,6 +1,6 @@
-import * as CSS from 'csstype';
+import type * as CSS from 'csstype';
 
-import { Typography } from '../types';
+import type { Typography } from '../types';
 
 type VariantStyles = Partial<{
   bg: CSS.Property.Background;

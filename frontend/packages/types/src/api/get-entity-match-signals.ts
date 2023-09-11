@@ -1,4 +1,4 @@
-import { MatchLevel, MatchSignal } from '../data';
+import type { MatchLevel, MatchSignal } from '../data';
 
 export type GetEntityMatchSignalsRequest = {
   id: string;

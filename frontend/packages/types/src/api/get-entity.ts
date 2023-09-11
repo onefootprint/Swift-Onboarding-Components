@@ -1,4 +1,4 @@
-import { Entity, OnboardingStatus } from '../data';
+import type { Entity, OnboardingStatus } from '../data';
 
 export type GetEntityRequest = {
   id: string;

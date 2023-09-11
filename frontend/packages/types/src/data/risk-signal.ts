@@ -1,4 +1,4 @@
-import { RiskSignalAttribute } from './risk-signal-attribute';
+import type { RiskSignalAttribute } from './risk-signal-attribute';
 
 export enum RiskSignalSeverity {
   Low = 'low',

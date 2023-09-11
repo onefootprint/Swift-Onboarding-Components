@@ -14,9 +14,9 @@ import FootprintProvider from 'src/components/footprint-provider';
 import { Layout } from 'src/components/layout';
 
 import type { DeviceInfo } from '../../hooks/ui/use-device-info';
-import { PluginContext } from '../base-plugin';
+import type { PluginContext } from '../base-plugin';
 import IdDoc from './index';
-import { IdDocCustomData, IdDocProps } from './types';
+import type { IdDocCustomData, IdDocProps } from './types';
 
 describe.skip('<IdDoc />', () => {
   const useRouterSpy = createUseRouterSpy();

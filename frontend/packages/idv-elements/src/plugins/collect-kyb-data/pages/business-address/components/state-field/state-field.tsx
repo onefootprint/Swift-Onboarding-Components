@@ -1,6 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { CountryCode } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
 import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';

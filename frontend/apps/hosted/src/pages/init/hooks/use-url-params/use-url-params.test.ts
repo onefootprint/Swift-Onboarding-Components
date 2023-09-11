@@ -9,7 +9,8 @@ import {
   KYB_BO_SESSION_AUTHORIZATION_HEADER,
 } from '@onefootprint/types';
 
-import useParseUrl, { UseParseUrlParamOptions } from './use-url-params';
+import type { UseParseUrlParamOptions } from './use-url-params';
+import useParseUrl from './use-url-params';
 
 describe('useUrlParams', () => {
   const useRouterSpy = createUseRouterSpy();

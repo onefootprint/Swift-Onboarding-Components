@@ -1,5 +1,10 @@
 import { RequiredCallbacksByComponent } from './constants/callbacks';
-import { ComponentKind, Footprint, Props, Variant } from './types/components';
+import type {
+  ComponentKind,
+  Footprint,
+  Props,
+  Variant,
+} from './types/components';
 import { getAppearanceForVanilla } from './utils/appearance-utils';
 import getUniqueId from './utils/get-unique-id';
 import {

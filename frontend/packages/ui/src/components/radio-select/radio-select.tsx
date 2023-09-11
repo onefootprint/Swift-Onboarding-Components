@@ -2,9 +2,8 @@ import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import media from 'styled-media-query';
 
-import RadioSelectOption, {
-  RadioSelectOptionFields,
-} from './components/radio-select-option';
+import type { RadioSelectOptionFields } from './components/radio-select-option';
+import RadioSelectOption from './components/radio-select-option';
 
 export type RadioSelectProps = {
   options: RadioSelectOptionFields[];

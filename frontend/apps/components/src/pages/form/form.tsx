@@ -12,12 +12,13 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { useFootprintProvider } from '../../components/footprint-provider';
 import useProps from '../../components/footprint-provider/hooks/use-props';
-import FormBase, { FormBaseHandler, FormData } from './components/form-base';
+import type { FormBaseHandler, FormData } from './components/form-base';
+import FormBase from './components/form-base';
 import Invalid from './components/invalid';
 import Loading from './components/loading';
 import useClientTokenFields from './hooks/use-client-token-fields';
 import useUsersVault from './hooks/use-users-vault';
-import { FootprintFormDataProps } from './types';
+import type { FootprintFormDataProps } from './types';
 import arePropsValid from './utils/are-props-valid';
 import checkIsExpired from './utils/check-is-expired';
 import getCardAlias from './utils/get-card-alias';

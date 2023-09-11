@@ -1,5 +1,5 @@
-import { RoleScope } from '../data';
-import { Organization } from '../data/organization';
+import type { RoleScope } from '../data';
+import type { Organization } from '../data/organization';
 
 export type OrgMemberResponse = {
   id: string;

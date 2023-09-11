@@ -7,7 +7,8 @@ import {
 import React from 'react';
 
 import Button from '../button';
-import Tooltip, { TooltipProps } from './tooltip';
+import type { TooltipProps } from './tooltip';
+import Tooltip from './tooltip';
 
 describe('<Tooltip />', () => {
   const renderTooltip = ({ text = 'Tooltip text' }: Partial<TooltipProps>) =>

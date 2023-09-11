@@ -1,6 +1,7 @@
 import { assign, createMachine } from 'xstate';
 
-import { MachineContext, MachineEvents } from './types';
+import type { Typegen0 } from './machine.typegen';
+import type { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 
 export const createHostedMachine = () =>
@@ -12,7 +13,7 @@ export const createHostedMachine = () =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as import('./machine.typegen').Typegen0,
+      tsTypes: {} as Typegen0,
       initial: 'init',
       context: {},
       on: {

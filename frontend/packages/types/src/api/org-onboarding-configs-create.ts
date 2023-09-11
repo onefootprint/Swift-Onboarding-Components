@@ -1,4 +1,4 @@
-import { CollectedDataOption } from '../data/collected-data-option';
+import type { CollectedDataOption } from '../data/collected-data-option';
 
 export type OrgOnboardingConfigCreateRequest = {
   name: string;

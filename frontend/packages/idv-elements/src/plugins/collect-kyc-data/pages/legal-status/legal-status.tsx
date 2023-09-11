@@ -2,7 +2,8 @@ import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, UsLegalStatus } from '@onefootprint/types';
-import { CountrySelectOption, Divider, media } from '@onefootprint/ui';
+import type { CountrySelectOption } from '@onefootprint/ui';
+import { Divider, media } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -11,12 +12,12 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import { KycData } from '../../utils/data-types';
+import type { KycData } from '../../utils/data-types';
 import CountryFields from './components/country-fields';
 import StatusFields from './components/status-fields';
 import VisaFields from './components/visa-fields';
 import useConvertFormData from './hooks/use-convert-form-data';
-import {
+import type {
   CountrySelectOptionOrPlaceholder,
   FormData,
   VisaFormData,

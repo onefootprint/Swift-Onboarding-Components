@@ -3,12 +3,12 @@ import { IcoFileText24 } from '@onefootprint/icons';
 import { BusinessDI } from '@onefootprint/types';
 import React, { useState } from 'react';
 
+import type { SectionAction } from '../../../../../../components/confirm-collected-data';
 import {
   Section,
-  SectionAction,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
-import { type SectionItemProps } from '../../../../../../components/confirm-collected-data/components/section-item';
+import type { SectionItemProps } from '../../../../../../components/confirm-collected-data/components/section-item';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import BasicData from '../../../basic-data';
 

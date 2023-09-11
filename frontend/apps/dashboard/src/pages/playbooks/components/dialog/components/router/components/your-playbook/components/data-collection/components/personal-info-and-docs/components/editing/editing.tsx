@@ -9,10 +9,8 @@ import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 
-import {
-  type PersonalInformationAndDocs,
-  Kind,
-} from '@/playbooks/utils/machine/types';
+import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
+import { Kind } from '@/playbooks/utils/machine/types';
 
 type EditingProps = {
   stopEditing: () => void;

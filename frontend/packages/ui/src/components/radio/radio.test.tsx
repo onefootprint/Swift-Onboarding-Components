@@ -1,7 +1,8 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Radio, { RadioProps } from './radio';
+import type { RadioProps } from './radio';
+import Radio from './radio';
 
 describe('<Radio />', () => {
   const renderRadio = ({

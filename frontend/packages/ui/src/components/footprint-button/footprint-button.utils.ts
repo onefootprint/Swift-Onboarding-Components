@@ -1,6 +1,6 @@
 import type { FontVariant } from '@onefootprint/design-tokens';
 
-import { FootprintButtonSize } from './footprint-button.types';
+import type { FootprintButtonSize } from './footprint-button.types';
 
 const footprintButtonFontVariantBySize: Record<
   FootprintButtonSize,

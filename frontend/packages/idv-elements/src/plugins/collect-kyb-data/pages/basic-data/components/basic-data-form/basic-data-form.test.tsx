@@ -7,7 +7,8 @@ import {
 import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
 
-import BasicDataForm, { BasicDataFormProps } from './basic-data-form';
+import type { BasicDataFormProps } from './basic-data-form';
+import BasicDataForm from './basic-data-form';
 
 describe('<BasicDataForm />', () => {
   const renderForm = ({

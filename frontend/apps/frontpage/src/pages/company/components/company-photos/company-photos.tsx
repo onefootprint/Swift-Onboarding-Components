@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CompanyPhoto } from './company-photos.types';
+import type { CompanyPhoto } from './company-photos.types';
 import CompanyPhotosDesktop from './company-photos-desktop';
 import CompanyPhotosMobile from './company-photos-mobile';
 

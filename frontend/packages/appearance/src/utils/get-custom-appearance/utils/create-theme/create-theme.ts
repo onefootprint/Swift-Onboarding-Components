@@ -1,5 +1,5 @@
-import { Theme } from '@onefootprint/design-tokens';
-import { FootprintAppearanceVariables } from '@onefootprint/footprint-js';
+import type { Theme } from '@onefootprint/design-tokens';
+import type { FootprintAppearanceVariables } from '@onefootprint/footprint-js';
 import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 

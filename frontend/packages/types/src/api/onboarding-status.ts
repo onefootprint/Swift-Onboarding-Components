@@ -1,12 +1,12 @@
-import { CountryCode } from '../data';
-import {
+import type { CountryCode } from '../data';
+import type {
   CollectedDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '../data/collected-data-option';
-import { SupportedIdDocTypes } from '../data/id-doc-type';
-import { PublicOnboardingConfig } from '../data/onboarding-config';
+import type { SupportedIdDocTypes } from '../data/id-doc-type';
+import type { PublicOnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {
   registerPasskey = 'liveness', // TODO: eventually we need to synchronously rename `liveness` or create a duplicate

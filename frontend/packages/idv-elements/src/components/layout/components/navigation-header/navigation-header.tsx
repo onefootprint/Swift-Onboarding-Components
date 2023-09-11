@@ -10,7 +10,7 @@ import NavigationBackButton from './components/navigation-back-button';
 import NavigationCloseButton from './components/navigation-close-button';
 import NavigationHeaderTitle from './components/navigation-header-title';
 import { NAVIGATION_HEADER_PORTAL_SELECTOR } from './constants';
-import { NavigationHeaderProps } from './types';
+import type { NavigationHeaderProps } from './types';
 
 const NavigationHeader = ({ button, content }: NavigationHeaderProps) => {
   const { onClose } = useLayoutOptions();

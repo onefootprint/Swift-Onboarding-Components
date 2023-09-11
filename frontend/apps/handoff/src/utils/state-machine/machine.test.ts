@@ -1,8 +1,5 @@
-import {
-  D2PStatus,
-  OnboardingConfigStatus,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { D2PStatus, OnboardingConfigStatus } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import { createHandoffMachine } from './machine';

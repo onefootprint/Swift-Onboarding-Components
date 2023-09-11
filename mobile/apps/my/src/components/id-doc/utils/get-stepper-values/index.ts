@@ -1,1 +1,1 @@
-export { type GetStepperValuesProps, default } from './get-stepper-values';
+export { default, GetStepperValuesProps } from './get-stepper-values';

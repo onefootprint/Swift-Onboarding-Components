@@ -1,4 +1,4 @@
-import {
+import type {
   Mat,
   MatVector,
   Point,
@@ -7,7 +7,7 @@ import {
   useOpenCv,
 } from 'opencv-react-ts';
 
-import { ParamsType } from './params';
+import type { ParamsType } from './params';
 
 export type OpenCVType = Exclude<
   ReturnType<typeof useOpenCv>['cv'],

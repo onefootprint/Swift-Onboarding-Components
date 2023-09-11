@@ -1,1 +1,2 @@
-export { type DisplayValueProps, default } from './display-value';
+export type { DisplayValueProps } from './display-value';
+export { default } from './display-value';

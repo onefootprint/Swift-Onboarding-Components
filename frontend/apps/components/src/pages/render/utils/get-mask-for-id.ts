@@ -1,6 +1,7 @@
-import { CardDIField, DataIdentifier } from '@onefootprint/types';
+import type { DataIdentifier } from '@onefootprint/types';
+import { CardDIField } from '@onefootprint/types';
 
-import { RenderMask } from '../components/render-base';
+import type { RenderMask } from '../components/render-base';
 import { isCardDI } from './is-valid-di';
 
 const maskByCardDIField: Partial<Record<CardDIField, RenderMask>> = {

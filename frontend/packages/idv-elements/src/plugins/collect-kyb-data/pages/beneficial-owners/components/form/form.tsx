@@ -1,10 +1,8 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import {
-  BeneficialOwner,
-  BeneficialOwnerDataAttribute,
-} from '@onefootprint/types';
+import type { BeneficialOwner } from '@onefootprint/types';
+import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { Divider, Typography, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
@@ -13,7 +11,7 @@ import EditableFormButtonContainer from '../../../../../../components/editable-f
 import AddButton from './components/add-button';
 import FormInvalidError from './components/error';
 import Fields from './components/fields';
-import { FormData } from './types';
+import type { FormData } from './types';
 
 export type FormProps = {
   defaultValues?: BeneficialOwner[];

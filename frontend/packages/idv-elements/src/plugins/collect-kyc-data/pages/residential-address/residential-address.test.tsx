@@ -10,8 +10,8 @@ import {
 import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
-import { KycData } from '../../utils';
-import { MachineContext } from '../../utils/state-machine';
+import type { KycData } from '../../utils';
+import type { MachineContext } from '../../utils/state-machine';
 import TestWrapper from '../../utils/test-wrapper';
 import ResidentialAddress from './residential-address';
 import getInitialContext, {

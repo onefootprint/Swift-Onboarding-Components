@@ -5,9 +5,8 @@ import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import useDeviceInfo, {
-  DeviceInfo,
-} from '../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import useDeviceInfo from '../../../../hooks/ui/use-device-info';
 import Error from '../../components/error';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import useOnboarding from './hooks/use-onboarding';

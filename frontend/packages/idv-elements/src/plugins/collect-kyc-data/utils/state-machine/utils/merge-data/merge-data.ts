@@ -1,6 +1,6 @@
-import { IdDI } from '@onefootprint/types';
+import type { IdDI } from '@onefootprint/types';
 
-import { KycData } from '../../../data-types';
+import type { KycData } from '../../../data-types';
 
 const mergeUpdatedData = (data: KycData, newData: KycData): KycData => {
   // Only allow the update if data has changed.

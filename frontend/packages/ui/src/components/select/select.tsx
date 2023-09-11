@@ -1,6 +1,7 @@
 import React from 'react';
 
-import BaseSelect, { BaseSelectProps } from '../internal/base-select';
+import type { BaseSelectProps } from '../internal/base-select';
+import BaseSelect from '../internal/base-select';
 import BaseSelectTrigger from '../internal/base-select-trigger';
 
 export type SelectOption<T extends StringOrNumber = string> = {

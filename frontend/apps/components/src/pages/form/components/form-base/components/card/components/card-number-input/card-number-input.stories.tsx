@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import CardNumberInput, { CardNumberInputProps } from './card-number-input';
+import type { CardNumberInputProps } from './card-number-input';
+import CardNumberInput from './card-number-input';
 
 export default {
   component: CardNumberInput,

@@ -1,6 +1,6 @@
-import { IdDocImageTypes } from '@onefootprint/types';
+import type { IdDocImageTypes } from '@onefootprint/types';
 
-import { MachineContext, ProccessingSucceededEvent } from './types';
+import type { MachineContext, ProccessingSucceededEvent } from './types';
 
 type MachineTarget = {
   target: string;

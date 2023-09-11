@@ -1,5 +1,5 @@
-import { Member } from '../data/org-member';
-import { Organization } from '../data/organization';
+import type { Member } from '../data/org-member';
+import type { Organization } from '../data/organization';
 
 export type OrgAssumeRoleResponse = {
   user: Member;

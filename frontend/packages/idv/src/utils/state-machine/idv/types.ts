@@ -1,5 +1,5 @@
 import type { DeviceInfo } from '@onefootprint/idv-elements';
-import {
+import type {
   IdDocOutcomes,
   IdvBootstrapData,
   ObConfigAuth,

@@ -1,4 +1,7 @@
-import { IdvBootstrapData, PublicOnboardingConfig } from '@onefootprint/types';
+import type {
+  IdvBootstrapData,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 
 export type MachineContext = {
   authToken?: string;

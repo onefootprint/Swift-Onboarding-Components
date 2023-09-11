@@ -8,7 +8,8 @@ import Link from 'next/link';
 import React from 'react';
 import LinkButton from 'src/components/linking-button';
 
-import { isNavLink, isNavMenu, NavEntry } from '../../types';
+import type { NavEntry } from '../../types';
+import { isNavLink, isNavMenu } from '../../types';
 import DesktopNavLink from './components/desktop-nav-link';
 import DesktopNavMenu from './components/desktop-nav-menu';
 import LogoCopyAssets from './components/logo-copy-assets';

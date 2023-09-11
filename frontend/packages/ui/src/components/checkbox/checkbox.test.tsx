@@ -2,7 +2,8 @@ import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Checkbox, { CheckboxProps } from './checkbox';
+import type { CheckboxProps } from './checkbox';
+import Checkbox from './checkbox';
 
 describe('<Checkbox />', () => {
   const renderCheckbox = ({

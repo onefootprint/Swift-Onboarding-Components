@@ -6,7 +6,7 @@ import InvestorProfileNavigationHeader from '../../components/investor-profile-n
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncErrorToast from '../../hooks/use-sync-error-toast';
-import { InvestmentGoalsData } from '../../utils/state-machine/types';
+import type { InvestmentGoalsData } from '../../utils/state-machine/types';
 import InvestmentGoalsForm from './components/investment-goals-form';
 
 const InvestmentGoals = () => {

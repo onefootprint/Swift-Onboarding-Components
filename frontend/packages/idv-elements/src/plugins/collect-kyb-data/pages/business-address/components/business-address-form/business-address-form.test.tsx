@@ -10,9 +10,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import BusinessAddressForm, {
-  BusinessAddressFormProps,
-} from './business-address-form';
+import type { BusinessAddressFormProps } from './business-address-form';
+import BusinessAddressForm from './business-address-form';
 
 describe('<BusinessAddressForm />', () => {
   const renderBusinessAddressForm = ({

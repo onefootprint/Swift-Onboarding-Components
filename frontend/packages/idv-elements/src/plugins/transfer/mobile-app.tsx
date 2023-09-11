@@ -7,7 +7,7 @@ import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import useMobileMachine from './hooks/mobile/use-mobile-machine';
 import Router from './pages/mobile/router';
-import { TransferProps } from './types';
+import type { TransferProps } from './types';
 
 const i18n = configureI18next();
 

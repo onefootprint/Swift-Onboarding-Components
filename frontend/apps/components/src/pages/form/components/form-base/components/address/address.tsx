@@ -1,5 +1,6 @@
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import { CountrySelectOption, Grid, SelectOption } from '@onefootprint/ui';
+import type { CountrySelectOption, SelectOption } from '@onefootprint/ui';
+import { Grid } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 

@@ -1,5 +1,8 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import { BusinessDataRequest, BusinessDataResponse } from '@onefootprint/types';
+import type {
+  BusinessDataRequest,
+  BusinessDataResponse,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '../../../../../config/constants';

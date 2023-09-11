@@ -3,7 +3,8 @@ import React, { useCallback, useState } from 'react';
 
 import { LAYOUT_CONTAINER_ID, LAYOUT_HEADER_ID } from '../../../../constants';
 import NavigationHeaderContainer from '../../../navigation-header/components/navigation-header-container';
-import SandboxBanner, { SandboxBannerHandler } from '../../../sandbox-banner';
+import type { SandboxBannerHandler } from '../../../sandbox-banner';
+import SandboxBanner from '../../../sandbox-banner';
 
 type HeaderProps = {
   hideDesktopSandboxBanner?: boolean;

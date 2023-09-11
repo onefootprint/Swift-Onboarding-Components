@@ -1,6 +1,6 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import { useLogStateMachine } from '@onefootprint/dev-tools';
-import { FootprintVariant } from '@onefootprint/footprint-js';
+import type { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
 import {
   AppErrorBoundary,

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { InvestorProfileData } from '@onefootprint/types';
 import {
-  InvestorProfileData,
   InvestorProfileDI,
   InvestorProfileNetWorth,
 } from '@onefootprint/types';
@@ -9,7 +9,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 import CustomForm from '../../../../components/custom-form';
-import { NetWorthData } from '../../../../utils/state-machine/types';
+import type { NetWorthData } from '../../../../utils/state-machine/types';
 
 export type NetWorthFormProps = {
   isLoading?: boolean;

@@ -1,8 +1,9 @@
-import { ComponentMeta, Story } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
 
 import Typography from '../typography';
-import Box, { BoxProps } from './box';
+import type { BoxProps } from './box';
+import Box from './box';
 
 export default {
   component: Box,

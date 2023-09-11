@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import AddressInput, { AddressInputProps } from './address-input';
+import type { AddressInputProps } from './address-input';
+import AddressInput from './address-input';
 
 export default {
   component: AddressInput,

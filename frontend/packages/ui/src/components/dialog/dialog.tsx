@@ -18,7 +18,7 @@ import Overlay from '../overlay';
 import Portal from '../portal';
 import ScrollArea from '../scroll-area';
 import Typography from '../typography';
-import {
+import type {
   DialogAllButtons,
   DialogHeaderIcon,
   DialogNoButtons,

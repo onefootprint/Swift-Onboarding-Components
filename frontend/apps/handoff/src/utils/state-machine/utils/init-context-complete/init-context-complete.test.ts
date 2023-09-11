@@ -1,9 +1,7 @@
-import {
-  OnboardingConfigStatus,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfigStatus } from '@onefootprint/types';
 
-import { MachineContext, MachineEvents } from '../../types';
+import type { MachineContext, MachineEvents } from '../../types';
 import initContextComplete from './init-context-complete';
 
 describe('initContextComplete', () => {

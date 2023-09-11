@@ -1,4 +1,2 @@
-export {
-  type DismissKeyboardProps,
-  default as DismissKeyboard,
-} from './dismiss-keyboard';
+export type { DismissKeyboardProps } from './dismiss-keyboard';
+export { default as DismissKeyboard } from './dismiss-keyboard';

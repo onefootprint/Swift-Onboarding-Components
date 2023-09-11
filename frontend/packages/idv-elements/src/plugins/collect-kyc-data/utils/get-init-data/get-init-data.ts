@@ -1,12 +1,12 @@
-import {
-  CdoToAllDisMap,
+import type {
   CollectedKycDataOption,
   IdDI,
   IdDIData,
 } from '@onefootprint/types';
+import { CdoToAllDisMap } from '@onefootprint/types';
 import { pickBy } from 'lodash';
 
-import { KycData } from '../data-types';
+import type { KycData } from '../data-types';
 
 const getInitData = (
   cdos: CollectedKycDataOption[],

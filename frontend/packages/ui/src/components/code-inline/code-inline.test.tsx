@@ -8,7 +8,8 @@ import {
 import React from 'react';
 
 import ToastProvider from '../toast/toast-provider';
-import CodeInline, { CodeInlineProps } from './code-inline';
+import type { CodeInlineProps } from './code-inline';
+import CodeInline from './code-inline';
 
 describe('<CodeInline />', () => {
   const renderCodeInline = ({

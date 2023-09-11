@@ -27,6 +27,7 @@
     "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
     "@types/lodash": "^4.14.191",
+    "@types/styled-components": "^5.1.26",
     "eslint-config-footprint": "*",
     "react": "18.2.0",
     "react-dom": "18.2.0",

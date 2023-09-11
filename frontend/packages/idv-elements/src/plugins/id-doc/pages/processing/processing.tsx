@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import { IdDocImageTypes, SubmitDocResponse } from '@onefootprint/types';
+import type { IdDocImageTypes, SubmitDocResponse } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';

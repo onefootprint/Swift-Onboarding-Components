@@ -1,7 +1,8 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import SearchInput, { SearchInputProps } from './search-input';
+import type { SearchInputProps } from './search-input';
+import SearchInput from './search-input';
 
 export default {
   component: SearchInput,

@@ -1,8 +1,9 @@
-import { Meta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
 import LinkButton from '../link-button';
-import InlineAlert, { InlineAlertProps } from './inline-alert';
+import type { InlineAlertProps } from './inline-alert';
+import InlineAlert from './inline-alert';
 
 export default {
   component: InlineAlert,

@@ -1,8 +1,8 @@
-import {
-  IdDI,
+import type {
   IdentifyBootstrapData,
   IdvBootstrapData,
 } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 
 const getIdentifyBootstrapData = (
   data?: IdvBootstrapData,

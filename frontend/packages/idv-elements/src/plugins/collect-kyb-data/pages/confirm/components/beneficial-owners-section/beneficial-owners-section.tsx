@@ -7,12 +7,14 @@ import {
 } from '@onefootprint/types';
 import React, { useState } from 'react';
 
+import type {
+  SectionItemProps,
+  SectionProps,
+} from '../../../../../../components/confirm-collected-data';
 import {
-  type SectionItemProps,
   MultiSection,
   Section,
   SectionItem,
-  SectionProps,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import BeneficialOwners from '../../../beneficial-owners/beneficial-owners';

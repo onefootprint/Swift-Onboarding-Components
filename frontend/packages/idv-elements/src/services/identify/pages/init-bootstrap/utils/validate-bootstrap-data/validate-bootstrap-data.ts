@@ -1,4 +1,4 @@
-import { IdentifyBootstrapData } from '@onefootprint/types';
+import type { IdentifyBootstrapData } from '@onefootprint/types';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 import IsEmail from 'isemail';
 

@@ -3,7 +3,8 @@ import { customRender, screen, selectEvents } from '@onefootprint/test-utils';
 import take from 'lodash/take';
 import React from 'react';
 
-import Select, { CountrySelectProps } from './country-select';
+import type { CountrySelectProps } from './country-select';
+import Select from './country-select';
 
 describe('<CountrySelect />', () => {
   const renderCountrySelect = ({

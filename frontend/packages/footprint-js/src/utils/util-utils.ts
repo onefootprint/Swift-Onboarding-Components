@@ -1,4 +1,5 @@
-import { ComponentKind, Props, VerifyProps } from '../types/components';
+import type { Props, VerifyProps } from '../types/components';
+import { ComponentKind } from '../types/components';
 import { getEncodedAppearance } from './appearance-utils';
 import { getDefaultVariantForKind } from './prop-utils';
 

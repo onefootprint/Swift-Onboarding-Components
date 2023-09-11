@@ -1,5 +1,5 @@
+import type { CollectedDataOption } from '@onefootprint/types';
 import {
-  CollectedDataOption,
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
