@@ -14,7 +14,7 @@ const withMDX = require('@next/mdx')({
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live usefathom.com *.usefathom.com *.ingest.sentry.io www.youtube.com api.onefootprint.com getform.io; 
+  connect-src 'self' vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live usefathom.com *.usefathom.com *.ingest.sentry.io www.youtube.com api.onefootprint.com getform.io cdn.unifygtm.com *.unifygtm.com; 
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
