@@ -32,6 +32,7 @@ const useUpdateProxyConfig = () => {
       updateProxyConfig(session.authHeaders, payload),
 
     onError: (error: unknown) => {
+      console.error('Updating proxy config failed', getErrorMessage(error));
       toast.show({
         description: getErrorMessage(error),
         title: t('error.title'),

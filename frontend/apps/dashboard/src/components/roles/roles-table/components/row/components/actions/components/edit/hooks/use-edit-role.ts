@@ -34,6 +34,7 @@ const useEditRole = (id: string) => {
     mutationFn: (payload: UpdateRoleRequest) =>
       updateRoleRequest(session.authHeaders, id, payload),
     onError: (error: unknown) => {
+      console.error(`Editing role failed`, getErrorMessage(error));
       toast.show({
         title: t('error.title'),
         description: getErrorMessage(error),

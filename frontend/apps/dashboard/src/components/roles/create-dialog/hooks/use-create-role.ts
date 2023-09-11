@@ -33,6 +33,7 @@ const useCreateRole = () => {
     mutationFn: (payload: CreateRoleRequest) =>
       createRoleRequest(session.authHeaders, payload),
     onError: (error: unknown) => {
+      console.error(`Creating role failed`, getErrorMessage(error));
       toast.show({
         title: t('error.title'),
         description: getErrorMessage(error),

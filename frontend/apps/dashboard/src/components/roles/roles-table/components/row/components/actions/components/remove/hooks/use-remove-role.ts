@@ -24,6 +24,7 @@ const useRemoveRole = (name: string) => {
   return useMutation({
     mutationFn: (id: string) => removeRoleRequest(session.authHeaders, id),
     onError: (error: unknown) => {
+      console.error(`Removing role failed`, getErrorMessage(error));
       toast.show({
         description: getErrorMessage(error),
         title: t('feedback.error.title'),

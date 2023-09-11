@@ -1,4 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { OnboardingConfigStatus } from '@onefootprint/types';
@@ -27,17 +28,26 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
   };
 
   const disable = () => {
+    const status =
+      playbook.status === 'enabled'
+        ? OnboardingConfigStatus.disabled
+        : OnboardingConfigStatus.enabled;
+
     mutation.mutate(
       {
         id: playbook.id,
-        status:
-          playbook.status === 'enabled'
-            ? OnboardingConfigStatus.disabled
-            : OnboardingConfigStatus.enabled,
+        status,
       },
       {
         onSuccess: hideConfirmation,
-        onError: showErrorToast,
+        onError: (error: unknown) => {
+          console.error(
+            `Failed to edit playbook status to ${status}`,
+            error,
+            getErrorMessage(error),
+          );
+          showErrorToast(error);
+        },
       },
     );
   };

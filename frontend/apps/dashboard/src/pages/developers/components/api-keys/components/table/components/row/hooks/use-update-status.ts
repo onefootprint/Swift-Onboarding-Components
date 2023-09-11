@@ -1,4 +1,4 @@
-import request from '@onefootprint/request';
+import request, { getErrorMessage } from '@onefootprint/request';
 import type {
   ApiKey,
   OrgApiKeyUpdateRequest,
@@ -48,6 +48,7 @@ const useUpdateStatus = (apiKey: ApiKey) => {
         return { previousApiKeys };
       },
       onError: (err, updatedApiKey, context: any) => {
+        console.error('Updating api key failed', getErrorMessage(err));
         if (context.previousApiKeys) {
           queryClient.setQueryData(
             ['api-keys', authHeaders],

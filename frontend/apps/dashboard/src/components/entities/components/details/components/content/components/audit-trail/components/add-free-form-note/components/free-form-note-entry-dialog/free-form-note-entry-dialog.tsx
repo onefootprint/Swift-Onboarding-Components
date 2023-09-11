@@ -1,4 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
 
@@ -32,7 +33,13 @@ const FreeFormNoteEntryDialog = ({
       },
       {
         onSuccess: onClose,
-        onError: showRequestErrorToast,
+        onError: (error: unknown) => {
+          console.error(
+            'Submitting free form note failed',
+            getErrorMessage(error),
+          );
+          showRequestErrorToast(error);
+        },
       },
     );
   };

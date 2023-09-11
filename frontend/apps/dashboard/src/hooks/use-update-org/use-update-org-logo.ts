@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import request from '@onefootprint/request';
+import request, { getErrorMessage } from '@onefootprint/request';
 import type { UpdateOrgResponse } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -30,7 +30,10 @@ const useUpdateOrgLogo = () => {
   return useMutation({
     mutationFn: (payload: FormData) =>
       updateOrgLogoRequest(session.authHeaders, payload),
-    onError: showErrorToast,
+    onError: (error: unknown) => {
+      console.error(`Updating org logo failed`, getErrorMessage(error));
+      showErrorToast(error);
+    },
     onSuccess: (response: UpdateOrgResponse) => {
       queryClient.invalidateQueries(['org']);
       queryClient.setQueryData(['org'], response);

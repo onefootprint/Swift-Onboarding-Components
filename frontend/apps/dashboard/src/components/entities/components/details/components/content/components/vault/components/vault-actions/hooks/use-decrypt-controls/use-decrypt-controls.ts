@@ -1,4 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import type {
   DataIdentifier,
   EntityVault,
@@ -47,7 +48,7 @@ const useDecryptControls = () => {
       onError?: (error: unknown) => void;
     },
   ) => {
-    const { reason, dis } = context;
+    const { reason, dis = [] } = context;
     decryptFields(
       { reason, dis, entityId, vaultData },
       {
@@ -57,6 +58,12 @@ const useDecryptControls = () => {
         },
         onError: (error: unknown) => {
           send(Event.decryptFailed);
+          console.error(
+            `Decrypting fields (${dis.join(
+              ', ',
+            )}) for reason (${reason}) failed`,
+            getErrorMessage(error),
+          );
           showRequestErrorToast(error);
           callbacks?.onError?.(error);
         },

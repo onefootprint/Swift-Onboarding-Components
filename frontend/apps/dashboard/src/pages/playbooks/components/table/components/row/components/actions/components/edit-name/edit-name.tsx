@@ -1,4 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Dialog, TextInput, useToast } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
@@ -50,7 +51,14 @@ const EditName = forwardRef<EditNameHandler, EditNameProps>(
                 description: t('feedback.success.description'),
               });
             },
-            onError: showErrorToast,
+            onError: (error: unknown) => {
+              console.error(
+                'Failed to edit playbook name',
+                error,
+                getErrorMessage(error),
+              );
+              showErrorToast(error);
+            },
           },
         );
       }

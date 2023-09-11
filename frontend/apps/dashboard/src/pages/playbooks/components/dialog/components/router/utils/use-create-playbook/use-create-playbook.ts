@@ -1,4 +1,3 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
 import type {
   OrgOnboardingConfigCreateRequest,
@@ -22,7 +21,6 @@ const createPlaybook = async (
 };
 
 const useCreatePlaybook = () => {
-  const showErrorToast = useRequestErrorToast();
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
@@ -33,7 +31,6 @@ const useCreatePlaybook = () => {
       onSettled: () => {
         queryClient.invalidateQueries();
       },
-      onError: showErrorToast,
     },
   );
 };

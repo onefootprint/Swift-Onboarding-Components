@@ -1,4 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { TriggerKind } from '@onefootprint/types';
 import { Dialog, useToast } from '@onefootprint/ui';
 import React from 'react';
@@ -47,7 +48,10 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
           });
           onClose();
         },
-        onError: showRequestErrorToast,
+        onError: (error: unknown) => {
+          console.error('Retriggering KYC failed', getErrorMessage(error));
+          showRequestErrorToast(error);
+        },
       },
     );
   };

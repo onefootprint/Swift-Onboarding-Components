@@ -25,6 +25,7 @@ const useRemoveProxyConfig = (proxyConfig: ProxyConfig) => {
   return useMutation({
     mutationFn: () => removeProxyConfig(session.authHeaders, proxyConfig.id),
     onError: (error: unknown) => {
+      console.error('Removing proxy config failed', getErrorMessage(error));
       toast.show({
         description: getErrorMessage(error),
         title: t('error.title'),

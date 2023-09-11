@@ -23,7 +23,11 @@ const Logo = ({ organization }: LogoProps) => {
     }
     const form = new FormData();
     form.set('file', files[0]);
-    updateOrgLogoMutation.mutate(form);
+    updateOrgLogoMutation.mutate(form, {
+      onError: (error: unknown) => {
+        console.error('Updating business profile logo failed', error);
+      },
+    });
   };
 
   return (

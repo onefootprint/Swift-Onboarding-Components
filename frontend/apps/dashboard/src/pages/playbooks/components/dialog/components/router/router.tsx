@@ -1,4 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
@@ -98,6 +99,7 @@ const Router = ({ onClose }: RouterProps) => {
           onClose();
         },
         onError: (error: unknown) => {
+          console.error('Failed to create playbook', getErrorMessage(error));
           showRequestError(error);
         },
       },

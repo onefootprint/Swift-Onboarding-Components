@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import request from '@onefootprint/request';
+import request, { getErrorMessage } from '@onefootprint/request';
 import type { OrgAuthLoginResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
@@ -28,6 +28,7 @@ const useLogin = () => {
       } else {
         description = t('workos-error.description');
       }
+      console.error(`Login failed`, getErrorMessage(e));
       toast.show({
         title: t('workos-error.title'),
         description,

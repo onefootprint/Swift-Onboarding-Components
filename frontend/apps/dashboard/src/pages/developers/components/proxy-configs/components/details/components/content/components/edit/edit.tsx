@@ -1,4 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
@@ -27,7 +28,10 @@ const Edit = ({ proxyConfig, children, title, Form }: EditProps) => {
   const handleSubmit = (formData: FormData) => {
     const payload = createPayload(proxyConfig.id, formData);
     proxyConfigMutation.mutate(payload, {
-      onError: showErrorToast,
+      onError: (error: unknown) => {
+        console.error('Updating proxy config failed', getErrorMessage(error));
+        showErrorToast(error);
+      },
       onSuccess: () => setShow(false),
     });
   };
