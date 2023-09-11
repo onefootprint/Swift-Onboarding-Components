@@ -874,4 +874,225 @@ describe('Collect KYC Data Machine Tests', () => {
       expect(state.value).toEqual('confirm');
     });
   });
+
+  describe('When navigating backward then forward through the flow', () => {
+    it('If there was at least one attribute missing from each page to begin with, takes user to all pages in order', () => {
+      const machine = createMachine(
+        [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.address,
+          CollectedKycDataOption.usLegalStatus,
+          CollectedKycDataOption.ssn9,
+        ],
+        { [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true } },
+        'sandboxTest',
+      );
+      machine.send({ type: 'initialized', payload: {} });
+      let { state } = machine;
+      let { context } = state;
+      expect(context.requirement.missingAttributes).toEqual([
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.address,
+        CollectedKycDataOption.usLegalStatus,
+        CollectedKycDataOption.ssn9,
+      ]);
+      expect(context.data[IdDI.email]).toEqual({
+        value: 'piip@onefootprint.com',
+        bootstrap: true,
+      });
+      expect(state.value).toEqual('basicInformation');
+
+      // Forward linearly through the entire flow
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.firstName]: { value: 'Otto' },
+          [IdDI.lastName]: { value: 'Footprint' },
+        },
+      });
+      expect(state.value).toEqual('residentialAddress');
+      context = state.context;
+      expect(context.data[IdDI.firstName]).toEqual({ value: 'Otto' });
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.country]: { value: 'US' },
+          [IdDI.zip]: { value: '94107' },
+        },
+      });
+      expect(state.value).toEqual('usLegalStatus');
+      context = state.context;
+      expect(context.data[IdDI.country]).toEqual({ value: 'US' });
+      expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen },
+        },
+      });
+      expect(state.value).toEqual('ssn');
+      context = state.context;
+      expect(context.data[IdDI.usLegalStatus]).toEqual({
+        value: UsLegalStatus.citizen,
+      });
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.ssn9]: { value: '101010101' },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.ssn9]).toEqual({ value: '101010101' });
+      expect(state.value).toEqual('confirm');
+
+      // Backward linearly through the entire flow
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('ssn');
+
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('usLegalStatus');
+
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('residentialAddress');
+
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('basicInformation');
+
+      // Forward linearly again
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.firstName]: { value: 'Otto' },
+          [IdDI.lastName]: { value: 'Footprint' },
+        },
+      });
+      expect(state.value).toEqual('residentialAddress');
+      context = state.context;
+      expect(context.data[IdDI.firstName]).toEqual({ value: 'Otto' });
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.country]: { value: 'US' },
+          [IdDI.zip]: { value: '94107' },
+        },
+      });
+      expect(state.value).toEqual('usLegalStatus');
+      context = state.context;
+      expect(context.data[IdDI.country]).toEqual({ value: 'US' });
+      expect(context.data[IdDI.zip]).toEqual({ value: '94107' });
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen },
+        },
+      });
+      expect(state.value).toEqual('ssn');
+      context = state.context;
+      expect(context.data[IdDI.usLegalStatus]).toEqual({
+        value: UsLegalStatus.citizen,
+      });
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.ssn9]: { value: '101010101' },
+        },
+      });
+      context = state.context;
+      expect(context.data[IdDI.ssn9]).toEqual({ value: '101010101' });
+      expect(state.value).toEqual('confirm');
+
+      state = machine.send({
+        type: 'confirmed',
+      });
+      context = state.context;
+      expect(state.value).toEqual('completed');
+    });
+
+    it('Skips pages that were completed by decrypted/bootstrapped data', () => {
+      const machine = createMachine(
+        [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.dob,
+          CollectedKycDataOption.address,
+          CollectedKycDataOption.ssn9,
+        ],
+        {
+          [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
+          [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
+          [IdDI.city]: { value: 'San Francisco', bootstrap: true },
+          [IdDI.state]: { value: 'CA', disabled: true },
+          [IdDI.zip]: { value: '94105', disabled: true },
+          [IdDI.country]: { value: 'US', disabled: true },
+        },
+      );
+      machine.send({
+        type: 'initialized',
+        payload: {
+          [IdDI.firstName]: { value: 'John', decrypted: true },
+          [IdDI.lastName]: { value: 'Smith', decrypted: true },
+          [IdDI.ssn9]: { value: '101010101', decrypted: true },
+        },
+      });
+      let { state } = machine;
+      let { context } = state;
+      expect(context.requirement.missingAttributes).toEqual([
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.dob,
+        CollectedKycDataOption.address,
+        CollectedKycDataOption.ssn9,
+      ]);
+
+      // We're only missing the DOB on the basic information page, but we show the whole page
+      expect(state.value).toEqual('basicInformation');
+
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.firstName]: { value: 'John' },
+          [IdDI.lastName]: { value: 'Smith' },
+          [IdDI.dob]: { value: '01/04/1998' },
+        },
+      });
+      context = state.context;
+      // Since we didn't change the name, we shouldn't overwrite the data decrypted from the vault.
+      // This prevents us from unnecessarily posting it to the backend
+      expect(state.context.data[IdDI.firstName]?.decrypted).toEqual(true);
+      expect(state.context.data[IdDI.lastName]?.decrypted).toEqual(true);
+      expect(state.context.data[IdDI.dob]?.value).toEqual('01/04/1998');
+      expect(state.value).toEqual('confirm');
+
+      // We should navigate straight back to basicInformation, skipping ssn and address which were
+      // provided in the initial data
+      state = machine.send({
+        type: 'navigatedToPrevPage',
+      });
+      expect(state.value).toEqual('basicInformation');
+
+      // Navigating forward again skips ssn and address
+      state = machine.send({
+        type: 'dataSubmitted',
+        payload: {
+          [IdDI.firstName]: { value: 'John' },
+          [IdDI.lastName]: { value: 'Smith' },
+          [IdDI.dob]: { value: '01/04/1998' },
+        },
+      });
+      context = state.context;
+      expect(state.value).toEqual('confirm');
+    });
+  });
 });

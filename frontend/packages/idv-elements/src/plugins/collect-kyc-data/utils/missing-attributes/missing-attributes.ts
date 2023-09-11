@@ -29,12 +29,14 @@ const SSN_ATTRIBUTES = [
 ];
 
 // An attribute is missing if
-// (1) it wasn't a disabled/bootstrapped/decrypted value
-// (2) it hasn't yet been collected
+// (1) it is in mustCollect
+// (2) it wasn't a disabled/bootstrapped/decrypted value
+// (3) it hasn't yet been collected (depending on ignoreCollectedData)
 export const isMissing = (
   options: CollectedKycDataOption[],
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
+  ignoreCollectedData?: boolean,
 ) => {
   const attributes = options
     .filter(option => mustCollect.includes(option))
@@ -77,38 +79,63 @@ export const isMissing = (
     );
   });
 
-  // Completely missing entries
-  const isMissingEntries = filteredAttributes.some(
-    attr => !collectedData[attr] || !collectedData[attr]?.value,
-  );
-
-  return isMissingEntries;
+  if (!ignoreCollectedData) {
+    // Completely missing entries
+    return filteredAttributes.some(
+      attr => !collectedData[attr] || !collectedData[attr]?.value,
+    );
+  }
+  return filteredAttributes.length > 0;
 };
 
 export const isMissingEmailAttribute = (
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
-) => isMissing([CollectedKycDataOption.email], mustCollect, collectedData);
+  ignoreCollectedData?: boolean,
+) =>
+  isMissing(
+    [CollectedKycDataOption.email],
+    mustCollect,
+    collectedData,
+    ignoreCollectedData,
+  );
 
 export const isMissingBasicAttribute = (
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
-) => isMissing(BASIC_ATTRIBUTES, mustCollect, collectedData);
+  ignoreCollectedData?: boolean,
+) =>
+  isMissing(BASIC_ATTRIBUTES, mustCollect, collectedData, ignoreCollectedData);
 
 export const isMissingUsLegalStatusAttribute = (
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
-) => isMissing(US_LEGAL_STATUS_ATTRIBUTES, mustCollect, collectedData);
+  ignoreCollectedData?: boolean,
+) =>
+  isMissing(
+    US_LEGAL_STATUS_ATTRIBUTES,
+    mustCollect,
+    collectedData,
+    ignoreCollectedData,
+  );
 
 export const isMissingResidentialAttribute = (
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
-) => isMissing(RESIDENTIAL_ATTRIBUTES, mustCollect, collectedData);
+  ignoreCollectedData?: boolean,
+) =>
+  isMissing(
+    RESIDENTIAL_ATTRIBUTES,
+    mustCollect,
+    collectedData,
+    ignoreCollectedData,
+  );
 
 export const isMissingSsnAttribute = (
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
-) => isMissing(SSN_ATTRIBUTES, mustCollect, collectedData);
+  ignoreCollectedData?: boolean,
+) => isMissing(SSN_ATTRIBUTES, mustCollect, collectedData, ignoreCollectedData);
 
 export const hasMissingAttributes = (
   mustCollect: CollectedKycDataOption[],

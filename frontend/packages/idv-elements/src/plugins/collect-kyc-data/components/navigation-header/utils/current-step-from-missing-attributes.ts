@@ -8,6 +8,7 @@ import {
   isMissingEmailAttribute,
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
+  isMissingUsLegalStatusAttribute,
 } from '../../../utils/missing-attributes';
 
 const getCurrentStepFromMissingAttributes = (
@@ -39,6 +40,12 @@ const getCurrentStepFromMissingAttributes = (
   if (isMissingResidentialAttribute(attributesToCollect, initData)) {
     currentStep += 1;
     if (state === 'residentialAddress') {
+      return currentStep;
+    }
+  }
+  if (isMissingUsLegalStatusAttribute(attributesToCollect, initData)) {
+    currentStep += 1;
+    if (state === 'usLegalAddress') {
       return currentStep;
     }
   }

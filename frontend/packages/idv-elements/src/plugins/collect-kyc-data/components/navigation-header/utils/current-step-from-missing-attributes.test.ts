@@ -2,6 +2,8 @@ import {
   CollectedKycDataOption,
   IdDI,
   OnboardingRequirementKind,
+  UsLegalStatus,
+  VisaKind,
 } from '@onefootprint/types';
 
 import getCurrentStepFromMissingAttributes from './current-step-from-missing-attributes';
@@ -46,6 +48,20 @@ describe('getCurrentStepFromMissingAttributes', () => {
           optionalAttributes: [],
         },
         {},
+        'usLegalStatus',
+      ),
+    ).toEqual(0);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
+          missingAttributes: [],
+          populatedAttributes: [],
+          optionalAttributes: [],
+        },
+        {},
         'ssn',
       ),
     ).toEqual(0);
@@ -77,6 +93,20 @@ describe('getCurrentStepFromMissingAttributes', () => {
         },
         {},
         'residentialAddress',
+      ),
+    ).toEqual(1);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
+          missingAttributes: [CollectedKycDataOption.usLegalStatus],
+          populatedAttributes: [],
+          optionalAttributes: [],
+        },
+        {},
+        'usLegalStatus',
       ),
     ).toEqual(1);
 
@@ -174,6 +204,24 @@ describe('getCurrentStepFromMissingAttributes', () => {
         'residentialAddress',
       ),
     ).toEqual(2);
+
+    expect(
+      getCurrentStepFromMissingAttributes(
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          isMet: false,
+          missingAttributes: [
+            CollectedKycDataOption.dob,
+            CollectedKycDataOption.address,
+            CollectedKycDataOption.usLegalStatus,
+          ],
+          populatedAttributes: [],
+          optionalAttributes: [],
+        },
+        {},
+        'usLegalStatus',
+      ),
+    ).toEqual(3);
 
     expect(
       getCurrentStepFromMissingAttributes(
@@ -324,6 +372,11 @@ describe('getCurrentStepFromMissingAttributes', () => {
           [IdDI.state]: { value: 'NY' },
           [IdDI.zip]: { value: '10001' },
           [IdDI.country]: { value: 'US' },
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.visa },
+          [IdDI.nationality]: { value: 'IT' },
+          [IdDI.citizenships]: { value: ['FR'] },
+          [IdDI.visaKind]: { value: VisaKind.h1b },
+          [IdDI.visaExpirationDate]: { value: '2050-01-01' },
           [IdDI.ssn4]: { value: '1234' },
         },
         'confirm',
