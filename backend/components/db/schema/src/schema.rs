@@ -478,6 +478,7 @@ table! {
         author -> Nullable<Jsonb>,
         skip_kyc -> Bool,
         doc_scan_for_optional_ssn -> Nullable<Text>,
+        enhanced_aml -> Jsonb,
     }
 }
 

@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ADD COLUMN enhanced_aml JSONB NOT NULL DEFAULT '{"kind": "no"}';

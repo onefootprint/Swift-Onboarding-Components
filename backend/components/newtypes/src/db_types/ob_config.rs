@@ -2,6 +2,7 @@ use crate::util::impl_enum_str_diesel;
 use crate::CollectedDataOption as CDO;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -67,4 +68,17 @@ impl CipKind {
             CipKind::Apex => vec![],
         }
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "kind", content = "data")]
+pub enum EnhancedAmlOption {
+    No,
+    Yes {
+        ofac: bool,
+        pep: bool,
+        adverse_media: bool,
+        continuous_monitoring: bool,
+    },
 }

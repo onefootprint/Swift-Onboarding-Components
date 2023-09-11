@@ -10,9 +10,9 @@ use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::CollectedDataOption as CDO;
 use newtypes::{CipKind, TenantId};
 use newtypes::{CollectedData as CD, Iso3166TwoDigitCountryCode};
+use newtypes::{CollectedDataOption as CDO, EnhancedAmlOption};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::collections::HashMap;
@@ -330,6 +330,8 @@ pub async fn post(
             .feature_flag_client
             .flag(BoolFlag::IsSkipKycTenant(&tenant_id));
 
+    let enhanced_aml = EnhancedAmlOption::No;
+
     let actor = auth.actor().into();
     let obc = state
         .db_pool
@@ -350,6 +352,7 @@ pub async fn post(
                 actor,
                 skip_kyc,
                 doc_scan_for_optional_ssn,
+                enhanced_aml,
             )?;
             let obc = db::actor::saturate_actor_nullable(conn, obc)?;
             Ok(obc)

@@ -16,6 +16,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::AppearanceId;
 use newtypes::DocumentCdoInfo;
+use newtypes::EnhancedAmlOption;
 use newtypes::IdDocKind;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::WorkflowId;
@@ -50,6 +51,7 @@ pub struct ObConfiguration {
     pub author: Option<DbActor>,
     pub skip_kyc: bool,
     pub doc_scan_for_optional_ssn: Option<CDO>,
+    pub enhanced_aml: EnhancedAmlOption,
 }
 
 #[derive(derive_more::Deref)]
@@ -188,6 +190,7 @@ struct NewObConfiguration {
     author: DbActor,
     skip_kyc: bool,
     doc_scan_for_optional_ssn: Option<CDO>,
+    enhanced_aml: EnhancedAmlOption,
 }
 
 #[derive(Debug)]
@@ -349,6 +352,7 @@ impl ObConfiguration {
         author: DbActor,
         skip_kyc: bool,
         doc_scan_for_optional_ssn: Option<CDO>,
+        enhanced_aml: EnhancedAmlOption,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -368,6 +372,7 @@ impl ObConfiguration {
             author,
             skip_kyc,
             doc_scan_for_optional_ssn,
+            enhanced_aml,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -436,13 +441,12 @@ impl ObConfiguration {
 mod tests {
     use std::str::FromStr;
 
-    use crate::test_helpers::assert_have_same_elements;
-
     use super::ObConfiguration;
+    use crate::test_helpers::assert_have_same_elements;
     use chrono::Utc;
     use newtypes::{
-        ApiKeyStatus, CollectedDataOption, DocumentCdoInfo, IdDocKind, Iso3166TwoDigitCountryCode,
-        ObConfigurationId, ObConfigurationKey, TenantId,
+        ApiKeyStatus, CollectedDataOption, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
+        Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, TenantId,
     };
     use strum::IntoEnumIterator;
     use test_case::test_case;
@@ -477,6 +481,7 @@ mod tests {
             author: None,
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
+            enhanced_aml: EnhancedAmlOption::No,
         };
 
         assert_have_same_elements(
@@ -514,6 +519,7 @@ mod tests {
             author: None,
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
+            enhanced_aml: EnhancedAmlOption::No,
         }
     }
 
@@ -644,6 +650,7 @@ mod tests {
             author: None,
             skip_kyc: false,
             doc_scan_for_optional_ssn: cdo.map(|c| (CollectedDataOption::from_str(c).unwrap())),
+            enhanced_aml: EnhancedAmlOption::No,
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()

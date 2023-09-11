@@ -1,5 +1,7 @@
 use crate::PgConn;
-use newtypes::{CipKind, CollectedDataOption as CDO, DbActor, Iso3166TwoDigitCountryCode, TenantId};
+use newtypes::{
+    CipKind, CollectedDataOption as CDO, DbActor, EnhancedAmlOption, Iso3166TwoDigitCountryCode, TenantId,
+};
 
 use crate::models::ob_configuration::ObConfiguration;
 
@@ -20,6 +22,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         DbActor::Footprint,
         false,
         None,
+        EnhancedAmlOption::No,
     )
     .expect("Could not create ob config")
 }
@@ -38,6 +41,7 @@ pub struct ObConfigurationOpts {
     pub author: DbActor,
     pub skip_kyc: bool,
     pub doc_scan_for_optional_ssn: Option<CDO>,
+    pub enhanced_aml: EnhancedAmlOption,
 }
 
 impl Default for ObConfigurationOpts {
@@ -56,6 +60,7 @@ impl Default for ObConfigurationOpts {
             author: DbActor::Footprint,
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
+            enhanced_aml: EnhancedAmlOption::No,
         }
     }
 }
@@ -81,6 +86,7 @@ pub fn create_with_opts(
         opts.author,
         opts.skip_kyc,
         opts.doc_scan_for_optional_ssn,
+        opts.enhanced_aml,
     )
     .expect("Could not create ob config")
 }
