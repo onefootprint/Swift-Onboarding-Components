@@ -565,6 +565,10 @@ impl Iso3166TwoDigitCountryCode {
         )
     }
 
+    pub fn is_us(&self) -> bool {
+        matches!(self, Self::US)
+    }
+
     pub fn all_codes_for_us_including_territories() -> Vec<Self> {
         Iso3166TwoDigitCountryCode::iter()
             .filter(|c| c.is_us_including_territories())

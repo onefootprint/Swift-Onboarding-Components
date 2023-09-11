@@ -136,9 +136,9 @@ impl ObConfiguration {
                 if self.allow_international_residents {
                     Iso3166TwoDigitCountryCode::iter().collect()
                 } else {
-                    Iso3166TwoDigitCountryCode::iter()
-                        .filter(|c| c.is_us_including_territories())
-                        .collect()
+                    // Temp reverting until we finish:
+                    // https://onefootprint.slack.com/archives/C044HVC8UM8/p1694183642166839?thread_ts=1694181526.687589&cid=C044HVC8UM8
+                    Iso3166TwoDigitCountryCode::iter().filter(|c| c.is_us()).collect()
                 }
             }
         }
@@ -449,7 +449,7 @@ mod tests {
 
     #[test_case(true, None, Iso3166TwoDigitCountryCode::iter().collect(); "allow international, any country acceptable")]
     #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX]; "obc has restrictions")]
-    #[test_case(false, None, Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories(); "obc doesn't allow international, only US")]
+    #[test_case(false, None, vec![Iso3166TwoDigitCountryCode::US]; "obc doesn't allow international, only US")] // temp reverting until we finish backend vendor for US territories
     fn test_ob_config_international_countries(
         allow_international: bool,
         international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
