@@ -2143,6 +2143,7 @@
             "documents": "Documents",
             "full_address": "Address",
             "custom": "Custom attributes",
+            "us_legal_status": "Legal status in the U.S.",
             "investor_profile": "Broker questions (Investor profile)",
             "card": "Card data"
           },

@@ -20,6 +20,7 @@ export enum DecryptOption {
   fullAddress = 'full_address',
   custom = 'custom',
   investorProfile = 'investor_profile',
+  usLegalStatus = 'us_legal_status',
   card = 'card',
 }
 
@@ -81,6 +82,10 @@ export const DecryptOptionToRoleScope: Record<DecryptOption, RoleScope> = {
   [DecryptOption.fullAddress]: {
     kind: RoleScopeKind.decrypt,
     data: CollectedKycDataOption.address,
+  },
+  [DecryptOption.usLegalStatus]: {
+    kind: RoleScopeKind.decrypt,
+    data: CollectedKycDataOption.usLegalStatus,
   },
   [DecryptOption.custom]: {
     kind: RoleScopeKind.decryptCustom,
@@ -166,6 +171,10 @@ const useDecryptOptions = () => {
         {
           value: DecryptOption.investorProfile,
           label: t('decrypt.investor_profile'),
+        },
+        {
+          value: DecryptOption.usLegalStatus,
+          label: t('decrypt.us_legal_status'),
         },
         {
           value: DecryptOption.card,
