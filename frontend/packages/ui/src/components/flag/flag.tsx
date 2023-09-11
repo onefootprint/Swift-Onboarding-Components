@@ -2,7 +2,7 @@ import { FlagUs } from '@onefootprint/flags';
 import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
 import capitalize from 'lodash/capitalize';
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, memo, Suspense } from 'react';
 
 export type FlagProps = {
   className?: string;
@@ -22,12 +22,19 @@ const LazyFlag = lazy(() =>
 );
 
 const NoFlag = (_: FlagProps) => null; // eslint-disable-line @typescript-eslint/no-unused-vars
-
-const FlagFallback = ({ code }: Pick<FlagProps, 'code'>) =>
-  code === 'US' ? <FlagUs /> : <NotAnimatedFlagShimmer />;
+const FlagFallback = ({ code, testID, className }: FlagProps) =>
+  code === 'US' ? (
+    <FlagUs testID={testID} className={className} />
+  ) : (
+    <NotAnimatedFlagShimmer className={className} />
+  );
 
 const Flag = ({ code, testID, className }: FlagProps): JSX.Element => (
-  <Suspense fallback={<FlagFallback code={code} />}>
+  <Suspense
+    fallback={
+      <FlagFallback code={code} testID={testID} className={className} />
+    }
+  >
     <LazyFlag code={code} testID={testID} className={className} />
   </Suspense>
 );
@@ -40,4 +47,4 @@ const NotAnimatedFlagShimmer = styled.div`
   `}
 `;
 
-export default process.env.NODE_ENV === 'test' ? NoFlag : Flag;
+export default process.env.NODE_ENV === 'test' ? NoFlag : memo(Flag);
