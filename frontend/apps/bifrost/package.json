@@ -12,6 +12,7 @@
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh"
@@ -48,7 +49,7 @@
     "usehooks-ts": "^2.9.1"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^12.3.4",
+    "@next/bundle-analyzer": "^13.4.19",
     "@onefootprint/jest-presets": "*",
     "@tanstack/react-query": "^4.32.5",
     "@types/lodash": "^4.14.191",

@@ -6,7 +6,7 @@ import React from 'react';
 import InitShimmer from '../../../../components/init-shimmer';
 import useGetOnboardingConfig from '../../../../hooks/api/org/get-onboarding-config';
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
-import useDeviceInfo from '../../../../hooks/ui/use-device-info';
+import { useDeviceInfo } from '../../../../hooks/ui/use-device-info';
 import { useIdentifyMachine } from '../../components/identify-machine-provider';
 
 const Init = () => {

@@ -3,7 +3,7 @@ import React from 'react';
 
 import Content from './components/content';
 import FullHeightContainer from './components/full-height-container';
-import LayoutOptionsProvider from './components/layout-options-provider';
+import { LayoutOptionsProvider } from './components/layout-options-provider';
 import { LAYOUT_CONTAINER_ID } from './constants';
 import type { Options } from './types';
 

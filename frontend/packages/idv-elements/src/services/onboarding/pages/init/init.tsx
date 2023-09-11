@@ -6,7 +6,7 @@ import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
-import useDeviceInfo from '../../../../hooks/ui/use-device-info';
+import { useDeviceInfo } from '../../../../hooks/ui/use-device-info';
 import Error from '../../components/error';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import useOnboarding from './hooks/use-onboarding';

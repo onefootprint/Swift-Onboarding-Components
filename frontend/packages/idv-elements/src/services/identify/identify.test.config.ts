@@ -43,7 +43,9 @@ const useDeviceInfoImpl = (onComplete: (deviceInfo: any) => void) => {
 };
 
 export const mockUseDeviceInfo = () =>
-  jest.spyOn(useDeviceInfo, 'default').mockImplementation(useDeviceInfoImpl);
+  jest
+    .spyOn(useDeviceInfo, 'useDeviceInfo')
+    .mockImplementation(useDeviceInfoImpl);
 
 export const getOnboardingConfig = (isLive?: boolean, noPhone?: boolean) => ({
   key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',

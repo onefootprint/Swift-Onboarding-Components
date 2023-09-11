@@ -1,5 +1,72 @@
-export * from './components';
-export * from './hooks';
-export * from './plugins';
-export * from './services';
-export * from './utils';
+export type {
+  CompletePayload,
+  FootprintClient,
+  HeaderTitleProps,
+  InfoBoxProps,
+  NavigationHeaderBackButtonProps,
+  NavigationHeaderButtonProps,
+  NavigationHeaderCloseButtonProps,
+  NavigationHeaderDynamicContent,
+  NavigationHeaderProps,
+  NavigationHeaderStaticContent,
+  SandboxBannerHandler,
+} from './components';
+export {
+  AppErrorBoundary,
+  BIFROST_CONTAINER_ID,
+  configureFootprint,
+  DeviceSignals,
+  FootprintProvider,
+  GenericTransition,
+  HEADER_TITLE_DEFAULT_ID,
+  HeaderTitle,
+  IdAnimation,
+  InfoBox,
+  InitShimmer,
+  Layout,
+  LayoutOptionsProvider,
+  LegacyFootprintInternalEvent,
+  NAVIGATION_HEADER_PORTAL_ID,
+  NAVIGATION_HEADER_PORTAL_SELECTOR,
+  NavigationHeader,
+  SandboxBanner,
+  SecuredByFootprint,
+  useFootprintProvider,
+  useLayoutOptions,
+} from './components';
+export type { DeviceInfo } from './hooks';
+export {
+  checkDeviceInfo,
+  useBusinessData,
+  useCreateHandoffUrl,
+  useD2PGenerate,
+  useD2PSms,
+  useDeviceInfo,
+  useGetD2PStatus,
+  useGetOnboardingConfig,
+  useGetOnboardingStatus,
+  useIdentify,
+  useIdentifyVerify,
+  useLoginChallenge,
+  useOnboarding,
+  useOnboardingAuthorize,
+  useOnboardingValidate,
+  useParseHandoffUrl,
+  useSignupChallenge,
+  useSkipLiveness,
+  useUpdateD2PStatus,
+  useUserData,
+  useUserEmail,
+  useUserToken,
+} from './hooks';
+export {
+  CollectKybData,
+  CollectKycData,
+  IdDoc,
+  InvestorProfile,
+  Liveness,
+  Transfer,
+} from './plugins';
+export { Identify, Onboarding } from './services';
+export type { BootstrapProps } from './utils';
+export { DesignSystemProvider, default as media, withProvider } from './utils';
