@@ -24,6 +24,7 @@ use newtypes::VaultId;
 use serde::{Deserialize, Serialize};
 
 use super::apple_device_attest::AppleDeviceAttestation;
+use super::google_device_attest::GoogleDeviceAttestation;
 use super::insight_event::InsightEvent;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -68,9 +69,8 @@ pub struct LoadedAuthEvent {
 }
 
 pub struct LinkedDeviceAttestation {
-    pub unique_vaults_associated_by_attestation: i64,
-    pub ios_devices: Vec<AppleDeviceAttestation>
-    // TODO: Android
+    pub ios_devices: Vec<AppleDeviceAttestation>,
+    pub android_devices: Vec<GoogleDeviceAttestation>
 }
 
 impl AuthEvent {
@@ -101,7 +101,10 @@ impl AuthEvent {
 
         // This is a bit hacky, but we may have >1 attestation per passkey cred
         // so we collect them together.
-        let (ios_attestations, unique_vault_associations) = AppleDeviceAttestation::list_for_scoped_user(conn, fp_id, tenant_id, is_live)?;
+        let (ios_attestations, _) = AppleDeviceAttestation::list_for_scoped_user(conn, fp_id, tenant_id, is_live)?;
+
+        let (android_attestations, _) = GoogleDeviceAttestation::list_for_scoped_user(conn, fp_id, tenant_id, is_live)?;
+
 
         let results = results
             .into_iter()
@@ -119,7 +122,11 @@ impl AuthEvent {
                         Some(LoadedAuthEvent {
                             insight,
                             attested_devices: Some(LinkedDeviceAttestation { 
-                                unique_vaults_associated_by_attestation: unique_vault_associations, 
+                                android_devices: android_attestations
+                                    .iter()
+                                    .filter(|att| att.webauthn_credential_id.as_ref() == Some(cred_id))
+                                    .cloned()
+                                    .collect(),
                                 ios_devices: ios_attestations
                                     .iter()
                                     .filter(|att| att.webauthn_credential_id.as_ref() == Some(cred_id))

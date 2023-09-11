@@ -34,6 +34,7 @@ pub enum SignalScope {
 
     IpAddress,
     Device,
+    NativeDevice,
     Document,
     Selfie,
 
@@ -62,6 +63,7 @@ impl SignalScope {
             SignalScope::PhoneNumber => true,
             SignalScope::IpAddress => true,
             SignalScope::Device => true,
+            SignalScope::NativeDevice => true,
             SignalScope::Document => true,
             SignalScope::Selfie => true,
             SignalScope::BusinessAddress => false,
@@ -89,6 +91,7 @@ impl SignalScope {
             | SignalScope::PhoneNumber => true,
             SignalScope::IpAddress
             | SignalScope::Device
+            | SignalScope::NativeDevice
             | SignalScope::Document
             | SignalScope::Selfie
             | SignalScope::BusinessAddress
@@ -115,6 +118,7 @@ impl SignalScope {
             | SignalScope::Email
             | SignalScope::IpAddress
             | SignalScope::Device
+            | SignalScope::NativeDevice
             | SignalScope::Document
             | SignalScope::Selfie
             | SignalScope::PhoneNumber => false,

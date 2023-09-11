@@ -1150,44 +1150,44 @@ footprint_reason_code_enum! {
         //
         // ~~~~~~~~~ Native Device ~~~~~~~~~~~
         //
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Attested Apple device", severity = SignalSeverity::Info,  description = "Apple device is attested to be authentic and shows no signs of tampering/jailbreaks."]
         AttestedDeviceApple,
 
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Attested Android device", severity = SignalSeverity::Info,  description = "Android device is attested to be authentic and shows no signs of tampering/jailbreaks."]
         AttestedDeviceAndroid,
 
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Android device has strong integrity", severity = SignalSeverity::Info,  description = "Android device powered by Google Play services and has a strong guarantee of system integrity such as a hardware-backed proof of boot integrity. The device passes system integrity checks."]
         AttestedDeviceAndroidStrongIntegrity,
 
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Android device running unlicensed code", severity = SignalSeverity::Medium,  description = "Android device code source could not be determined. The device is either not trustworthy enough, the version of app code on the device is unknown to Google Play, or the user is on a device not signed in to Google Play."]
         AttestedDeviceAndroidUnlicensed,
 
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Weak Android device attestation", severity = SignalSeverity::Medium,  description = "Android device is attested and meets basic integrity checks, but does not meet stronger compatibility requirements. The device may be running an unrecognized version of Android, may have an unlocked bootloader, or may not have been certified by the manufacturer."]
         AttestedDeviceAndroidRisky,
 
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Android device could not be evaluated", severity = SignalSeverity::High,  description = "Android device failed integrity evaluation because requirement was missed, such as the device not being trustworthy enough."]
         AttestedDeviceAndroidFailedEvaluation,
 
 
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Attested Device Unique", severity = SignalSeverity::Info,  description = "User's attested device indicates no duplicate associated identities."]
         AttestedDeviceNoFraudDuplicateRisk,
 
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Attested Device Low Duplicate Risk", severity = SignalSeverity::Low,  description = "User's attested device indicates low duplicate identity risk."]
         AttestedDeviceFraudDuplicateRiskLow,
 
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Attested Device Medium Duplicate Risk", severity = SignalSeverity::Medium,  description = "User's attested device indicates medium duplicate identity risk. Device may be associated with more than one identity."]
         AttestedDeviceFraudDuplicateRiskMedium,
 
-        #[scope = SignalScope::Device, additional_scopes = vec![], match_level = None]
+        #[scope = SignalScope::NativeDevice, additional_scopes = vec![], match_level = None]
         #[note = "Attested Device High Duplicate Risk", severity = SignalSeverity::High,  description = "User's attested device indicates high duplicate identity risk. Device may be associated with multiple identities."]
         AttestedDeviceFraudDuplicateRiskHigh
     }

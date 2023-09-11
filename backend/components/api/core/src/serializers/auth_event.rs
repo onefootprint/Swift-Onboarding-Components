@@ -1,6 +1,5 @@
 use api_wire_types::{AttestedDeviceData, DeviceFraudRiskLevel, DeviceType};
 use db::models::auth_event::{AuthEvent, LoadedAuthEvent};
-use newtypes::FootprintReasonCode;
 
 use crate::utils::db2api::DbToApi;
 
@@ -15,38 +14,40 @@ impl DbToApi<LoadedAuthEvent> for api_wire_types::AuthEvent {
         let AuthEvent { id, created_at, .. } = event;
 
         let linked_attestations = if let Some(attested_devices) = attested_devices {
-            let unique_vaults = attested_devices.unique_vaults_associated_by_attestation;
-
             attested_devices
                 .ios_devices
                 .into_iter()
                 .map(|ios| AttestedDeviceData {
-                    // this is placeholder -- maybe we shouldn't reveal this here?
-                    fraud_risk:
-                        crate::decision::features::fp_device_attestation::generate_apple_reason_codes(
-                            &ios,
-                            unique_vaults,
-                        )
-                        .into_iter()
-                        .filter_map(|r| match r {
-                            FootprintReasonCode::AttestedDeviceNoFraudDuplicateRisk
-                            | FootprintReasonCode::AttestedDeviceFraudDuplicateRiskLow => {
-                                Some(DeviceFraudRiskLevel::Low)
-                            }
-                            FootprintReasonCode::AttestedDeviceFraudDuplicateRiskMedium => {
-                                Some(DeviceFraudRiskLevel::Medium)
-                            }
-                            FootprintReasonCode::AttestedDeviceFraudDuplicateRiskHigh => {
-                                Some(DeviceFraudRiskLevel::High)
-                            }
-                            _ => None,
-                        })
-                        .next(),
                     app_bundle_id: ios.bundle_id,
                     model: ios.metadata.model,
                     os: ios.metadata.os,
                     device_type: DeviceType::Ios,
+                    // this is placeholder -- maybe we shouldn't reveal this here?
+                    fraud_risk: ios.receipt_risk_metric.map(|metric| match metric {
+                        0..=3 => DeviceFraudRiskLevel::Low,
+                        4 | 5 => DeviceFraudRiskLevel::Medium,
+                        _ => DeviceFraudRiskLevel::High,
+                    }),
                 })
+                .chain(
+                    attested_devices
+                        .android_devices
+                        .into_iter()
+                        .map(|att| AttestedDeviceData {
+                            app_bundle_id: att.package_name,
+                            model: att.metadata.model,
+                            os: att.metadata.os,
+                            device_type: DeviceType::Android,
+                            // this is also a placeholder
+                            fraud_risk: Some(if att.is_trustworthy_device {
+                                DeviceFraudRiskLevel::Low
+                            } else if att.is_evaluated_device {
+                                DeviceFraudRiskLevel::Medium
+                            } else {
+                                DeviceFraudRiskLevel::High
+                            }),
+                        }),
+                )
                 .collect()
         } else {
             vec![]
