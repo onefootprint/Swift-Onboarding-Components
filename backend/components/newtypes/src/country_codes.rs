@@ -2,7 +2,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum::Display;
+use strum::{Display, IntoEnumIterator};
 use strum_macros::{AsRefStr, EnumIter, EnumString};
 
 #[derive(
@@ -557,8 +557,18 @@ pub enum Iso3166TwoDigitCountryCode {
 }
 
 impl Iso3166TwoDigitCountryCode {
-    pub fn is_us(&self) -> bool {
-        matches!(self, Self::US)
+    pub fn is_us_including_territories(&self) -> bool {
+        matches!(
+            self,
+            // US + territories https://en.wikipedia.org/wiki/ISO_3166-2:US
+            Self::US | Self::AS | Self::GU | Self::MP | Self::PR | Self::UM | Self::VI
+        )
+    }
+
+    pub fn all_codes_for_us_including_territories() -> Vec<Self> {
+        Iso3166TwoDigitCountryCode::iter()
+            .filter(|c| c.is_us_including_territories())
+            .collect()
     }
 }
 

@@ -63,7 +63,8 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(restricted_d
         "country_code": "NO",
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
-    assert body["error"]["message"] == "Unsupported document country. Supported document countries: US"
+    assert body["error"]["message"].startswith("Unsupported document country. Supported document countries:")
+    assert set(body["error"]["message"].split(":")[1].replace(" ", "").split(",")) == set([ "UM", "VI", "MP", "GU", "PR", "AS", "US"])
 
     # Shouldn't be allowed to upload non-drivers-license
     data = {

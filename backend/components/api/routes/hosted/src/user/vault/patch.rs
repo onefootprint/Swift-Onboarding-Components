@@ -134,7 +134,10 @@ async fn patch_inner(
     if let Ok(workflow) = user_auth.workflow() {
         if let Some(address) = residential_address {
             // if we allow international and haven't requested a doc, we need to create a doc req
-            if obc.allow_international_residents && obc.document_cdo().is_none() && !address.is_us() {
+            if obc.allow_international_residents
+                && obc.document_cdo().is_none()
+                && !address.is_us_including_territories()
+            {
                 tracing::info!(scoped_vault_id=%sv_id2, wf_id=%workflow.id, "creating doc request for international onboarding");
 
                 let args = default_stepup_doc_args(&sv_id2, true, &workflow.id);
@@ -143,12 +146,10 @@ async fn patch_inner(
                     .db_pool
                     .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
                     .await?;
-            } else if address.is_us() {
+            } else if address.is_us_including_territories() {
                 handle_ssn_skipped(&state, obc.clone(), sv_id2.clone(), workflow.id.clone()).await?
             }
         }
-
-        
     }
 
     EmptyResponse::ok().json()

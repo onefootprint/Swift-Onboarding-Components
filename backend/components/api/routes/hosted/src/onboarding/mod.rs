@@ -171,7 +171,7 @@ fn is_cdo_met<Type>(
             let country = decrypted_values
                 .get(&IDK::Country.into())
                 .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
-            if country == Some(Iso3166TwoDigitCountryCode::US) {
+            if country.map(|c| c.is_us_including_territories()).unwrap_or(false) {
                 // US addresses always require City, State, and Zip
                 let addl_dis = [IDK::City.into(), IDK::State.into(), IDK::Zip.into()];
                 required_dis.extend(addl_dis.into_iter());
@@ -196,7 +196,7 @@ pub(crate) fn should_skip_us_only_cdos(
                 .get(&IDK::Country.into())
                 .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
             // skip if !us
-            country.map(|c| !c.is_us()).unwrap_or(false)
+            country.map(|c| !c.is_us_including_territories()).unwrap_or(false)
         }
         _ => false,
     }

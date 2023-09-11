@@ -111,7 +111,11 @@ impl ObConfiguration {
                 //
                 // That is to say, international country restrictions do not affect the countries you can submit a passport for, this just controls
                 // residential address - there are integration tests testing this part
-                if !is_passport && residential_country.map(|c| !c.is_us()).unwrap_or(false) {
+                if !is_passport
+                    && residential_country
+                        .map(|c| !c.is_us_including_territories())
+                        .unwrap_or(false)
+                {
                     acc
                 } else {
                     acc.entry(country).or_default().push(doc_type);
@@ -132,7 +136,9 @@ impl ObConfiguration {
                 if self.allow_international_residents {
                     Iso3166TwoDigitCountryCode::iter().collect()
                 } else {
-                    vec![Iso3166TwoDigitCountryCode::US]
+                    Iso3166TwoDigitCountryCode::iter()
+                        .filter(|c| c.is_us_including_territories())
+                        .collect()
                 }
             }
         }
@@ -140,18 +146,15 @@ impl ObConfiguration {
 
     // Assumes you've checked if the document type is supported already
     fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
+        let all_us_and_territories = Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories();
         match doc_type {
-            IdDocKind::IdCard => vec![Iso3166TwoDigitCountryCode::US],
-            IdDocKind::DriversLicense => vec![Iso3166TwoDigitCountryCode::US],
+            IdDocKind::IdCard => all_us_and_territories,
+            IdDocKind::DriversLicense => all_us_and_territories,
             IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
-            IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::US],
-            IdDocKind::Visa => vec![Iso3166TwoDigitCountryCode::US],
-            IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
+            IdDocKind::Permit => all_us_and_territories,
+            IdDocKind::Visa => all_us_and_territories,
+            IdDocKind::ResidenceDocument => all_us_and_territories,
         }
-    }
-
-    pub fn only_us(&self) -> bool {
-        self.supported_countries_for_residential_address() == vec![Iso3166TwoDigitCountryCode::US]
     }
 
     pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
@@ -446,7 +449,7 @@ mod tests {
 
     #[test_case(true, None, Iso3166TwoDigitCountryCode::iter().collect(); "allow international, any country acceptable")]
     #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX]; "obc has restrictions")]
-    #[test_case(false, None, vec![Iso3166TwoDigitCountryCode::US]; "obc doesn't allow international, only US")]
+    #[test_case(false, None, Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories(); "obc doesn't allow international, only US")]
     fn test_ob_config_international_countries(
         allow_international: bool,
         international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
@@ -536,7 +539,7 @@ mod tests {
         );
         // we also allow a passport from any country
         Iso3166TwoDigitCountryCode::iter()
-            .filter(|c| !c.is_us())
+            .filter(|c| !c.is_us_including_territories())
             .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
     }
 
@@ -582,7 +585,7 @@ mod tests {
 
         let mapping = obc.supported_country_mapping_for_document(residential_country);
 
-        match residential_country.map(|c| c.is_us()) {
+        match residential_country.map(|c| c.is_us_including_territories()) {
             // country provided
             Some(is_us) => {
                 // residential country is the us, we get DL + ppt
@@ -610,7 +613,7 @@ mod tests {
 
         // in all cases, non-US can just upload passport
         Iso3166TwoDigitCountryCode::iter()
-            .filter(|c| !c.is_us())
+            .filter(|c| !c.is_us_including_territories())
             .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
     }
 
