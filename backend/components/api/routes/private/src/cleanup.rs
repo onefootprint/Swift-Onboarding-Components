@@ -2,20 +2,24 @@ use crate::auth::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
-use api_core::ApiErrorKind;
-use api_core::errors::AssertionError;
+use actix_web::{post, web, web::Json};
+use api_core::errors::{ApiResult, AssertionError};
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::headers::SandboxId;
+use api_core::utils::vault_wrapper::{Any, VaultWrapper, VwArgs};
+use api_core::ApiErrorKind;
 use api_wire_types::IdentifyId;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use feature_flag::BoolFlag;
+use newtypes::email::Email;
 use newtypes::PhoneNumber;
-use actix_web::{post, web, web::Json};
 
 #[derive(Debug, Clone, serde::Deserialize)]
-pub struct Request {
-    phone_number: PhoneNumber,
+#[serde(rename_all = "snake_case")]
+pub enum Request {
+    PhoneNumber(PhoneNumber),
+    Email(Email),
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -32,23 +36,59 @@ async fn post(
     // When provided, identifies only sandbox users with the suffix
     sandbox_id: SandboxId,
 ) -> actix_web::Result<Json<ResponseData<CleanupResponse>>, ApiError> {
-    let Request { phone_number } = request.into_inner();
+    let (uv, is_allowlisted_real_vault) = match request.into_inner() {
+        Request::PhoneNumber(phone_number) => {
+            let is_allowlisted_real_vault = ensure_phone_number_allowed(&state, &phone_number)?;
 
-    // Use e164 without suffix to see if cleanup is allowed for this phone number
-    let is_integration_test_phone_number =
-        phone_number.e164() == state.config.integration_test_phone_number.e164();
-    let is_allowlisted_real_phone_number = state
-        .feature_flag_client
-        .flag(BoolFlag::CanCleanUpPhoneNumber(&phone_number.e164()));
+            // Use e164 with suffix to compute fingerprint
+            let id = VaultIdentifier::IdentifyId(IdentifyId::PhoneNumber(phone_number), sandbox_id.0);
+            (state.find_vault(id, None).await?, is_allowlisted_real_vault)
+        }
+        Request::Email(email) => {
+            // only allow footprint emails to be cleanable
+            if !["onefootprint.com", "footprint.dev"].contains(&email.domain().as_str()) {
+                return Err(AssertionError("Cannot clean up provided email").into());
+            }
+            let id = IdentifyId::Email(email);
+            let uv = state
+                .find_vault(VaultIdentifier::IdentifyId(id, sandbox_id.0), None)
+                .await?;
 
-    if !(is_integration_test_phone_number || is_allowlisted_real_phone_number) {
-        return Err(AssertionError("Cannot clean up provided number").into());
-    }
+            // this check above is not sufficient because the email may not be verified
+            // but attached to someone else's vault (rare -- but technically possible)
+            // so we need to fetch the contact info -- and make sure:
+            // the phone number associated with the vault either:
+            //  1) does not exist OR
+            //  2) is one of our allowed-to-clean phone numbers.
+            if let Some(uv) = uv {
+                let uvw = state
+                    .db_pool
+                    .db_query(move |conn| VaultWrapper::<Any>::build(conn, VwArgs::Vault(&uv.id)))
+                    .await??;
+                let phone = uvw
+                    .decrypt_contact_info(&state, newtypes::ContactInfoKind::Phone)
+                    .await?;
 
-    // Use e164 with suffix to compute fingerprint
-    let id = IdentifyId::PhoneNumber(phone_number);
-    let id = VaultIdentifier::IdentifyId(id, sandbox_id.0);
-    let uv = state.find_vault(id, None).await?;
+                if let Some(phone) = phone {
+                    if !phone.1.is_otp_verified {
+                        return Err(AssertionError(
+                            "Cannot clean up via email if user has unverfiied phone number",
+                        )
+                        .into());
+                    }
+
+                    (
+                        Some(uvw.vault),
+                        ensure_phone_number_allowed(&state, &PhoneNumber::parse(phone.0)?)?,
+                    )
+                } else {
+                    (Some(uvw.vault), true)
+                }
+            } else {
+                (None, true)
+            }
+        }
+    };
 
     let user_vault_id = if let Some(uv) = uv {
         uv.id
@@ -64,7 +104,7 @@ async fn post(
         .db_transaction(move |conn| -> Result<usize, ApiError> {
             Vault::lock(conn, &user_vault_id)?;
 
-            if is_production && is_allowlisted_real_phone_number {
+            if is_production && is_allowlisted_real_vault {
                 let impacted_tenants: Vec<Tenant> = Tenant::list_by_user_vault_id(conn, &user_vault_id)?;
 
                 let unallowed_affected_tenants: Vec<String> = impacted_tenants
@@ -87,4 +127,20 @@ async fn post(
         .await?;
 
     Ok(Json(ResponseData::ok(CleanupResponse { num_deleted_rows })))
+}
+
+/// check that this phone number can be used to clean a vault
+fn ensure_phone_number_allowed(state: &State, phone_number: &PhoneNumber) -> ApiResult<bool> {
+    // Use e164 without suffix to see if cleanup is allowed for this phone number
+    let is_integration_test_phone_number =
+        phone_number.e164() == state.config.integration_test_phone_number.e164();
+    let is_allowlisted_real_vault = state
+        .feature_flag_client
+        .flag(BoolFlag::CanCleanUpPhoneNumber(&phone_number.e164()));
+
+    if !(is_integration_test_phone_number || is_allowlisted_real_vault) {
+        return Err(AssertionError("Cannot clean up provided number").into());
+    }
+
+    Ok(is_allowlisted_real_vault)
 }

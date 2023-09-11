@@ -20,6 +20,13 @@ impl Email {
     pub fn to_piistring(&self) -> PiiString {
         self.email.clone()
     }
+
+    pub fn domain(&self) -> String {
+        // it's ok for unchecked because we validated this already
+        email_address::EmailAddress::new_unchecked(self.leak())
+            .domain()
+            .to_string()
+    }
 }
 
 impl serde::Serialize for Email {
