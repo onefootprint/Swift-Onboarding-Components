@@ -24,7 +24,7 @@ const Flash = styled.div<{ flash: boolean }>`
   ${({ flash }) =>
     flash &&
     css`
-      animation: ${flashAnimation} 750ms ease-out;
+      animation: ${flashAnimation} 300ms ease-out;
     `}
 `;
 

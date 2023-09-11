@@ -51,7 +51,6 @@ const Camera = ({
   const [videoHeight, setVideoHeight] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFlashing, setIsFlashing] = useState(false);
-  const [image, setImage] = useState<string | undefined>();
   const [autocaptureFeedback, setAutocaptureFeedback] = useState<
     string | undefined
   >();
@@ -143,7 +142,12 @@ const Camera = ({
       shouldSharpen: false,
     });
 
-    setImage(imageString || undefined);
+    if (imageString) {
+      onCapture(imageString);
+    } else {
+      setCanCapture(true); // if the no picture was taken successfully, reenable the capture button
+    }
+    clearCanvas();
   };
 
   const clearCanvas = () => {
@@ -157,15 +161,6 @@ const Camera = ({
       return;
     }
     context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-  };
-
-  const handleFlashEnd = () => {
-    if (image) {
-      onCapture(image);
-    } else {
-      setCanCapture(true); // if the no picture was taken successfully, reenable the capture button
-    }
-    clearCanvas();
   };
 
   useAutoCapture({
@@ -228,7 +223,7 @@ const Camera = ({
                 width={videoSize?.width}
                 height={videoSize?.height}
               />
-              <Flash flash={isFlashing} onAnimationEnd={handleFlashEnd} />
+              <Flash flash={isFlashing} />
               {shouldDetect && autocaptureFeedback && (
                 <Feedback>
                   {t(`autocapture.feedback.${autocaptureFeedback}`)}
