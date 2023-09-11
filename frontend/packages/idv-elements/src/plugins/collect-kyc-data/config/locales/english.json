@@ -36,12 +36,20 @@
         "first-name": {
           "label": "First name",
           "placeholder": "Jane",
-          "error": "First name cannot be empty or is invalid"
+          "error": {
+            "empty": "First name cannot be empty",
+            "invalid": "First name is invalid",
+            "special-chars": "First name can only contain alphanumeric characters, dashes, spaces or commas."
+          }
         },
         "last-name": {
           "label": "Last name",
           "placeholder": "Doe",
-          "error": "Last name cannot be empty or is invalid"
+          "error": {
+            "empty": "Last name cannot be empty",
+            "invalid": "Last name is invalid",
+            "special-chars": "Last name can only contain alphanumeric characters, dashes, spaces or commas."
+          }
         },
         "dob": {
           "label": "Date of Birth",
