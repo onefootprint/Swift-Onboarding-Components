@@ -181,10 +181,12 @@ pub fn get_decision(
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
     let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
     let include_doc = DocumentRequest::get(conn, &wf.id)?.is_some();
-    let document_only = should_execute_rules_for_document_only(vault, wf, &obc)?;
+    let document_only = should_execute_rules_for_document_only(vault, wf)?;
+    let skip_kyc = obc.skip_kyc;
     let config = KycRuleExecutionConfig {
         include_doc,
         document_only,
+        skip_kyc,
     };
     let rules_output = rule_group.rule_group().evaluate(risk_signals, config)?;
     Ok(rules_output)

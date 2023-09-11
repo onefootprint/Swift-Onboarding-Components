@@ -58,6 +58,7 @@ where
 pub struct KycRuleExecutionConfig {
     pub include_doc: bool,
     pub document_only: bool,
+    pub skip_kyc: bool,
 }
 
 pub struct KycRuleGroup {
@@ -105,7 +106,7 @@ impl KycRuleGroup {
                 .flatten()
                 .collect();
 
-        let (kyc_result, additional_results) = if !config.document_only {
+        let (kyc_result, additional_results) = if !(config.document_only || config.skip_kyc) {
             // First we evaluate KYC, choosing which of the potentially multiple vendors we might have
             let kyc_result = kyc_rule_results
                 .iter()

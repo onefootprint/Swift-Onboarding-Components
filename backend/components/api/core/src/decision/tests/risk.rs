@@ -72,6 +72,7 @@ fn test_evaluate_onboarding_rules(
             KycRuleExecutionConfig {
                 include_doc: false,
                 document_only: false,
+                skip_kyc: false,
             },
         )
         .unwrap()

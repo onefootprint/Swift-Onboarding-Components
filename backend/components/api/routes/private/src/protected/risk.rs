@@ -211,6 +211,7 @@ async fn make_decision(
             let config = KycRuleExecutionConfig {
                 include_doc,
                 document_only: false,
+                skip_kyc: false,
             };
             let rules_output = rule_group.evaluate(risk_signals, config)?;
             engine::save_onboarding_decision(

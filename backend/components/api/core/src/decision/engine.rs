@@ -263,6 +263,7 @@ pub fn calculate_decision(
         KycRuleExecutionConfig {
             include_doc: false,
             document_only: false,
+            skip_kyc: false,
         },
     )?;
 
