@@ -8,8 +8,10 @@ use crate::{decision, State};
 use actix_web::post;
 use actix_web::web::{self, Json};
 use api_core::decision::engine;
+use api_core::decision::features::risk_signals::risk_signal_group_struct::Kyc;
 use api_core::decision::features::risk_signals::{
     create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map, save_risk_signals,
+    RiskSignalGroupStruct,
 };
 use api_core::decision::onboarding::rules::KycRuleExecutionConfig;
 use api_core::decision::onboarding::{rules::KycRuleGroup, Decision, OnboardingRulesDecisionOutput};
@@ -193,13 +195,14 @@ async fn make_decision(
     }
 
     let vendor_results: Vec<VendorResult> = vendor_requests.completed_requests;
-    let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+    let (results_map, ids_map) = build_vendor_response_map_from_vendor_results(&vendor_results)?;
     let verification_result_ids: Vec<VerificationResultId> = vendor_results
         .iter()
         .map(|vr| vr.verification_result_id.clone())
         .collect();
     let vendor_result_ids = verification_result_ids.clone();
-    let risk_signals = create_risk_signals_from_vendor_results(vendor_result_maps, vw, obc)?;
+    let risk_signals: RiskSignalGroupStruct<Kyc> =
+        create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?;
 
     state
         .db_pool

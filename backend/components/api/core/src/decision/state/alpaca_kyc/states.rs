@@ -193,8 +193,8 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
                     group: risk_signal_group_struct::Kyc,
                 }
             } else {
-                let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
-                create_risk_signals_from_vendor_results(vendor_result_maps, vw, obc)?
+                let (results_map, ids_map) = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+                create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?
             };
 
         save_risk_signals(conn, &self.sv_id, &risk_signals, true)?;

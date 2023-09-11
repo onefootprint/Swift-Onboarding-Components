@@ -249,10 +249,10 @@ pub fn calculate_decision(
     obc: ObConfiguration,
     rule_group: KycRuleGroup,
 ) -> ApiResult<OnboardingRulesDecisionOutput> {
-    let vendor_result_maps = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+    let (response_map, ids_map) = build_vendor_response_map_from_vendor_results(&vendor_results)?;
     let risk_signals = RiskSignalsForDecision {
         kyc: Some(create_risk_signals_from_vendor_results(
-            vendor_result_maps,
+            (&response_map, &ids_map),
             vw,
             obc,
         )?),

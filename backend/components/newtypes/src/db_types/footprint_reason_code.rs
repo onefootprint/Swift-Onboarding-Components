@@ -1220,8 +1220,7 @@ impl FootprintReasonCode {
 }
 
 impl FootprintReasonCode {
-    #[allow(unused)]
-    pub fn is_watchlist(&self) -> bool {
+    fn is_watchlist(&self) -> bool {
         matches!(
             self,
             FootprintReasonCode::WatchlistHitOfac
@@ -1230,8 +1229,12 @@ impl FootprintReasonCode {
         )
     }
 
-    pub fn is_adverse_media(&self) -> bool {
+    fn is_adverse_media(&self) -> bool {
         matches!(self, FootprintReasonCode::AdverseMediaHit)
+    }
+
+    pub fn is_aml(&self) -> bool {
+        self.is_watchlist() || self.is_adverse_media()
     }
 }
 

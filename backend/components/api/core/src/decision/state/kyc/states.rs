@@ -17,7 +17,8 @@ use super::{
 };
 use crate::decision::{
     features::risk_signals::{
-        create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map, risk_signal_group_struct,
+        create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map,
+        risk_signal_group_struct::{Aml, Kyc},
         save_risk_signals, RiskSignalGroupStruct,
     },
     state::{
@@ -169,30 +170,45 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             RiskSignal::bulk_add(conn, ocr_reason_codes, false, rsg.id)?;
         }
 
-        // Save KYC risk signals, if we made KYC calls
+        // Save KYC + AML risk signals, if we made KYC calls
         if let Some(kyc_vendor_results) = kyc_vendor_results {
             let fixture_decision =
                 decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
-            let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> = if let Some(fd) =
-                fixture_decision
-            {
+            let (kyc_risk_signals, aml_risk_signals): (
+                RiskSignalGroupStruct<Kyc>,
+                RiskSignalGroupStruct<Aml>,
+            ) = if let Some(fd) = fixture_decision {
                 let reason_codes =
                     decision::sandbox::get_fixture_reason_codes(fd, VaultKind::Person, Some((&vw, &obc)));
                 let vres_id = get_vres_id_for_fixture(&kyc_vendor_results)?;
 
-                RiskSignalGroupStruct {
+                let sandbox_kyc_risk_signals = RiskSignalGroupStruct {
                     footprint_reason_codes: reason_codes
                         .into_iter()
                         .map(|r| (r.0, r.1, vres_id.clone()))
                         .collect(),
-                    group: risk_signal_group_struct::Kyc,
-                }
+                    group: Kyc,
+                };
+                // For now, never simulate AML hits in sandbox
+                let sandbox_aml_risk_signals = RiskSignalGroupStruct {
+                    footprint_reason_codes: vec![],
+                    group: Aml,
+                };
+                (sandbox_kyc_risk_signals, sandbox_aml_risk_signals)
             } else {
-                let vendor_result_maps = build_vendor_response_map_from_vendor_results(&kyc_vendor_results)?;
-                create_risk_signals_from_vendor_results(vendor_result_maps, vw, obc)?
+                let (results_map, ids_map) =
+                    build_vendor_response_map_from_vendor_results(&kyc_vendor_results)?;
+                let kyc_risk_signals: RiskSignalGroupStruct<Kyc> = create_risk_signals_from_vendor_results(
+                    (&results_map, &ids_map),
+                    vw.clone(),
+                    obc.clone(),
+                )?;
+                let aml_risk_signals: RiskSignalGroupStruct<Aml> =
+                    create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?;
+                (kyc_risk_signals, aml_risk_signals)
             };
-
-            save_risk_signals(conn, &self.sv_id, &risk_signals, true)?;
+            save_risk_signals(conn, &self.sv_id, &kyc_risk_signals, true)?;
+            save_risk_signals(conn, &self.sv_id, &aml_risk_signals, true)?;
         }
 
         Ok(KycState::from(KycDecisioning {

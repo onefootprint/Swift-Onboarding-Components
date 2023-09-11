@@ -13,7 +13,7 @@ use crate::decision::{
         experian::ExperianFeatures,
         idology_expectid::IDologyFeatures,
         incode_docv::IncodeDocumentFeatures,
-        risk_signals::{RiskSignalGroupStruct, RiskSignalsForDecision, WrappedRiskSignalGroupKind},
+        risk_signals::{RiskSignalGroupStruct, RiskSignalsForDecision},
     },
     rule::{
         rule_set::{Action, RuleSet},
@@ -29,27 +29,25 @@ use super::{
 };
 
 // Convert a typed group of risk signals into a Vendor specific FeatureSet
-pub fn rule_input_from_risk_signals<T, F>(risk_signals: RiskSignalGroupStruct<T>) -> ApiResult<F>
+pub fn rule_input_from_risk_signals<F>(risk_signals: RiskSignalsForDecision) -> ApiResult<F>
 where
-    F: TryFrom<RiskSignalGroupStruct<T>>,
+    F: TryFrom<RiskSignalsForDecision>,
     F: Clone + FeatureSet,
-    ApiError: std::convert::From<<F as std::convert::TryFrom<RiskSignalGroupStruct<T>>>::Error>,
-    T: Into<WrappedRiskSignalGroupKind> + Clone,
+    ApiError: std::convert::From<<F as std::convert::TryFrom<RiskSignalsForDecision>>::Error>,
 {
     let res = F::try_from(risk_signals)?;
 
     Ok(res)
 }
 
-pub fn evaluate_rule_set_from_risk_signals<T, F>(
+pub fn evaluate_rule_set_from_risk_signals<F>(
     rule_set: RuleSet<F>,
-    risk_signals: RiskSignalGroupStruct<T>,
+    risk_signals: RiskSignalsForDecision,
 ) -> ApiResult<OnboardingEvaluationResult>
 where
-    F: TryFrom<RiskSignalGroupStruct<T>>,
+    F: TryFrom<RiskSignalsForDecision>,
     F: Clone + FeatureSet,
-    ApiError: std::convert::From<<F as std::convert::TryFrom<RiskSignalGroupStruct<T>>>::Error>,
-    T: Into<WrappedRiskSignalGroupKind> + Clone,
+    ApiError: std::convert::From<<F as std::convert::TryFrom<RiskSignalsForDecision>>::Error>,
 {
     let input: F = rule_input_from_risk_signals(risk_signals)?;
     Ok(evaluate_onboarding_rule_set(rule_set, &input))
@@ -85,19 +83,14 @@ impl KycRuleGroup {
         // Since we waterfall here, we don't expect all the rule results to be available. But we do expect that at least _1_ is available
         // (for now, until we have doc only)
 
-        let idology_rule_result = risk_signals
-            .kyc
-            .clone()
-            .and_then(|r| evaluate_rule_set_from_risk_signals(self.idology_rules.clone(), r).ok());
+        let idology_rule_result =
+            evaluate_rule_set_from_risk_signals(self.idology_rules.clone(), risk_signals.clone()).ok();
 
-        let experian_rule_result = risk_signals
-            .kyc
-            .clone()
-            .and_then(|r| evaluate_rule_set_from_risk_signals(self.experian_rules.clone(), r).ok());
+        let experian_rule_result =
+            evaluate_rule_set_from_risk_signals(self.experian_rules.clone(), risk_signals.clone()).ok();
 
-        let incode_doc_rule_result = risk_signals
-            .doc
-            .and_then(|r| evaluate_rule_set_from_risk_signals(self.incode_doc_rules.clone(), r).ok());
+        let incode_doc_rule_result =
+            evaluate_rule_set_from_risk_signals(self.incode_doc_rules.clone(), risk_signals).ok();
 
         // Check we have a KYC result from one of the vendors
         let kyc_rule_results: Vec<OnboardingEvaluationResult> =

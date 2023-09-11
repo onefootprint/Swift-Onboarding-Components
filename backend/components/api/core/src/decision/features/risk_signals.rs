@@ -66,16 +66,16 @@ where
 }
 
 #[allow(dead_code)]
-pub struct VendorResultsAndVault {
-    response_map: VendorAPIResponseMap,
-    ids_map: VendorAPIResponseIdentifiersMap,
+pub struct VendorResultsAndVault<'a> {
+    response_map: &'a VendorAPIResponseMap,
+    ids_map: &'a VendorAPIResponseIdentifiersMap,
     vw: VaultWrapper, // TODO: use these bad boys
     obc: ObConfiguration,
 }
 
-impl VendorResultsAndVault {
+impl<'a> VendorResultsAndVault<'a> {
     pub fn new(
-        maps: (VendorAPIResponseMap, VendorAPIResponseIdentifiersMap),
+        maps: (&'a VendorAPIResponseMap, &'a VendorAPIResponseIdentifiersMap),
         vw: VaultWrapper,
         obc: ObConfiguration,
     ) -> Self {
@@ -91,14 +91,14 @@ impl VendorResultsAndVault {
 //
 // WRITE
 //
-pub fn create_risk_signals_from_vendor_results<T>(
-    vendor_result_maps: (VendorAPIResponseMap, VendorAPIResponseIdentifiersMap),
+pub fn create_risk_signals_from_vendor_results<'a, T>(
+    vendor_result_maps: (&'a VendorAPIResponseMap, &'a VendorAPIResponseIdentifiersMap),
     vw: VaultWrapper,
     obc: ObConfiguration,
 ) -> Result<RiskSignalGroupStruct<T>, ApiError>
 where
     T: Into<WrappedRiskSignalGroupKind> + Clone,
-    RiskSignalGroupStruct<T>: From<VendorResultsAndVault>,
+    RiskSignalGroupStruct<T>: From<VendorResultsAndVault<'a>>,
 {
     let res = RiskSignalGroupStruct::<T>::from(VendorResultsAndVault::new(vendor_result_maps, vw, obc));
 
@@ -151,7 +151,7 @@ pub fn user_input_based_risk_signals(vw: &VaultWrapper, obc: &ObConfiguration) -
     frcs
 }
 
-impl From<VendorResultsAndVault> for RiskSignalGroupStruct<Kyc> {
+impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Kyc> {
     fn from(results: VendorResultsAndVault) -> Self {
         let VendorResultsAndVault {
             response_map,
@@ -163,7 +163,7 @@ impl From<VendorResultsAndVault> for RiskSignalGroupStruct<Kyc> {
         // Risk Signals that should be created for every vendor, based purely on data in vault + obc
         let user_input_risk_signals = user_input_based_risk_signals(&vw, &obc);
 
-        let idology_features = IDologyFeatures::try_from(((&response_map, &ids_map), vw))
+        let idology_features = IDologyFeatures::try_from(((response_map, ids_map), vw))
             .ok()
             .map(|f| {
                 let vres = f.verification_result_id.clone();
@@ -171,11 +171,12 @@ impl From<VendorResultsAndVault> for RiskSignalGroupStruct<Kyc> {
                 f.footprint_reason_codes
                     .into_iter()
                     .chain(user_input_risk_signals.clone().into_iter())
+                    .filter(|r| !r.is_aml()) // Filter out AML reason codes!
                     .map(|r| (r, VendorAPI::IdologyExpectID, vres.to_owned()))
                     .collect()
             })
             .unwrap_or(vec![]);
-        let experian_features = ExperianFeatures::try_from((&response_map, &ids_map))
+        let experian_features = ExperianFeatures::try_from((response_map, ids_map))
             .ok()
             .map(|f| {
                 let vres = f.verification_result_id.clone();
@@ -183,6 +184,7 @@ impl From<VendorResultsAndVault> for RiskSignalGroupStruct<Kyc> {
                 f.footprint_reason_codes
                     .into_iter()
                     .chain(user_input_risk_signals.clone().into_iter())
+                    .filter(|r| !r.is_aml()) // Filter out AML reason codes!
                     .map(|r| (r, VendorAPI::ExperianPreciseID, vres.to_owned()))
                     .collect()
             })
@@ -195,6 +197,50 @@ impl From<VendorResultsAndVault> for RiskSignalGroupStruct<Kyc> {
                 .chain(experian_features.into_iter())
                 .collect(),
             group: Kyc,
+        }
+    }
+}
+
+impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Aml> {
+    fn from(results: VendorResultsAndVault) -> Self {
+        let VendorResultsAndVault {
+            response_map,
+            ids_map,
+            vw,
+            obc: _,
+        } = results;
+
+        let idology_features = IDologyFeatures::try_from(((response_map, ids_map), vw))
+            .ok()
+            .map(|f| {
+                let vres = f.verification_result_id.clone();
+
+                f.footprint_reason_codes
+                    .into_iter()
+                    .filter(|r| r.is_aml())  // Filter to only AML risk signals!
+                    .map(|r| (r, VendorAPI::IdologyExpectID, vres.to_owned()))
+                    .collect()
+            })
+            .unwrap_or(vec![]);
+        let experian_features = ExperianFeatures::try_from((response_map, ids_map))
+            .ok()
+            .map(|f| {
+                let vres = f.verification_result_id.clone();
+
+                f.footprint_reason_codes
+                    .into_iter()
+                    .filter(|r| r.is_aml()) // Filter to only AML risk signals!
+                    .map(|r| (r, VendorAPI::ExperianPreciseID, vres.to_owned()))
+                    .collect()
+            })
+            .unwrap_or(vec![]);
+
+        RiskSignalGroupStruct {
+            footprint_reason_codes: idology_features
+                .into_iter()
+                .chain(experian_features.into_iter())
+                .collect(),
+            group: Aml,
         }
     }
 }
@@ -218,8 +264,9 @@ pub fn fetch_latest_risk_signals_map(
     let kyc = extract_risk_signal_group(&mut db_risk_signals_map, Kyc);
     let doc = extract_risk_signal_group(&mut db_risk_signals_map, Doc);
     let kyb = extract_risk_signal_group(&mut db_risk_signals_map, Kyb);
+    let aml = extract_risk_signal_group(&mut db_risk_signals_map, Aml);
 
-    Ok(RiskSignalsForDecision { kyc, doc, kyb })
+    Ok(RiskSignalsForDecision { kyc, doc, kyb, aml })
 }
 
 fn extract_risk_signal_group<T>(
@@ -285,13 +332,16 @@ impl From<WrappedRiskSignalGroupKind> for RiskSignalGroupKind {
     }
 }
 
-impl TryFrom<RiskSignalGroupStruct<Kyc>> for IDologyFeatures {
+impl TryFrom<RiskSignalsForDecision> for IDologyFeatures {
     type Error = crate::decision::Error;
 
-    fn try_from(group: RiskSignalGroupStruct<Kyc>) -> Result<Self, Self::Error> {
-        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = group
-            .footprint_reason_codes
+    fn try_from(signals: RiskSignalsForDecision) -> Result<Self, Self::Error> {
+        let kyc_reason_codes = signals.kyc.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
+        let aml_reason_codes = signals.aml.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
+
+        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = kyc_reason_codes
             .into_iter()
+            .chain(aml_reason_codes)
             .filter_map(|(frc, vendor_api, verification_result_id)| {
                 if vendor_api == VendorAPI::IdologyExpectID {
                     Some((frc, verification_result_id))
@@ -316,13 +366,16 @@ impl TryFrom<RiskSignalGroupStruct<Kyc>> for IDologyFeatures {
     }
 }
 
-impl TryFrom<RiskSignalGroupStruct<Kyc>> for ExperianFeatures {
+impl TryFrom<RiskSignalsForDecision> for ExperianFeatures {
     type Error = crate::decision::Error;
 
-    fn try_from(group: RiskSignalGroupStruct<Kyc>) -> Result<Self, Self::Error> {
-        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = group
-            .footprint_reason_codes
+    fn try_from(signals: RiskSignalsForDecision) -> Result<Self, Self::Error> {
+        let kyc_reason_codes = signals.kyc.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
+        let aml_reason_codes = signals.aml.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
+
+        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = kyc_reason_codes
             .into_iter()
+            .chain(aml_reason_codes.into_iter())
             .filter_map(|(frc, vendor_api, verification_result_id)| {
                 if vendor_api == VendorAPI::ExperianPreciseID {
                     Some((frc, verification_result_id))
@@ -347,14 +400,14 @@ impl TryFrom<RiskSignalGroupStruct<Kyc>> for ExperianFeatures {
     }
 }
 
-impl TryFrom<RiskSignalGroupStruct<Doc>> for IncodeDocumentFeatures {
+impl TryFrom<RiskSignalsForDecision> for IncodeDocumentFeatures {
     type Error = crate::decision::Error;
 
-    fn try_from(group: RiskSignalGroupStruct<Doc>) -> Result<Self, Self::Error> {
+    fn try_from(signals: RiskSignalsForDecision) -> Result<Self, Self::Error> {
+        let doc_reason_codes = signals.doc.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
         let apis = vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOCR];
 
-        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = group
-            .footprint_reason_codes
+        let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = doc_reason_codes
             .into_iter()
             .filter_map(|(frc, vendor_api, verification_result_id)| {
                 if apis.contains(&vendor_api) {
@@ -385,4 +438,5 @@ pub struct RiskSignalsForDecision {
     pub kyc: Option<RiskSignalGroupStruct<Kyc>>,
     pub doc: Option<RiskSignalGroupStruct<Doc>>,
     pub kyb: Option<RiskSignalGroupStruct<Kyb>>,
+    pub aml: Option<RiskSignalGroupStruct<Aml>>,
 }
