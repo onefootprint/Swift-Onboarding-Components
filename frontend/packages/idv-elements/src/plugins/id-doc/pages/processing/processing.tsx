@@ -103,7 +103,7 @@ const Processing = () => {
         onSuccess: handleSubmitDocSuccess,
         onError: err => {
           console.error(
-            `Id-doc image submit failed. image: ${image}, side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
+            `Id-doc image submit failed. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
               err,
             )}`,
           );
