@@ -1,8 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button, media, Typography } from '@onefootprint/ui';
-import Image from 'next/image';
 import React from 'react';
+
+import WelcomeIllustration from './componens/welcome-illustration';
 
 export type WelcomeProps = {
   onComplete: () => void;
@@ -18,13 +19,7 @@ const Welcome = ({ onComplete }: WelcomeProps) => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <StyledImage
-        alt={t('img-alt')}
-        height={178}
-        priority
-        src="/onboarding/penguin.png"
-        width={137}
-      />
+      <WelcomeIllustration />
       <TitleContainer>
         <Typography variant="heading-3">{t('title')}</Typography>
       </TitleContainer>
@@ -48,15 +43,9 @@ const Form = styled.form`
   `}
 `;
 
-const StyledImage = styled(Image)`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[9]};
-  `}
-`;
-
 const TitleContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[3]};
+    margin: ${theme.spacing[8]} 0 ${theme.spacing[3]} 0;
   `}
 `;
 
