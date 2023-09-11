@@ -41,12 +41,8 @@ const Confirm = () => {
           type: 'confirmed',
         });
       },
-      onError: (error: unknown) => {
-        console.error(
-          'Vaulting data on kyc confirm page failed',
-          getErrorMessage(error),
-        );
-        showRequestErrorToast(error);
+      onError: (error: string) => {
+        console.error(`Vaulting data on kyc confirm page failed: ${error}`);
       },
     });
   };

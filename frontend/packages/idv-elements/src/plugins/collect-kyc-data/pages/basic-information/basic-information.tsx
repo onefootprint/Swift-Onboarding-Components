@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedKycDataOption,
@@ -77,10 +76,9 @@ const BasicInformation = ({
         });
         onComplete?.();
       },
-      onError: (error?: unknown) => {
+      onError: (error: string) => {
         console.error(
-          'Speculatively vaulting data failed in kyc basic-information page.',
-          getErrorMessage(error),
+          `Speculatively vaulting data failed in kyc basic-information page. ${error}`,
         );
       },
     });

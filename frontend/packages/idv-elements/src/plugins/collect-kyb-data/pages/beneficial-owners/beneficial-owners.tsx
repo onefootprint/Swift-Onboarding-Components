@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import type { BeneficialOwner } from '@onefootprint/types';
 import {
   BeneficialOwnerDataAttribute,
@@ -7,7 +6,6 @@ import {
   CollectedKybDataOption,
   IdDI,
 } from '@onefootprint/types';
-import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -40,8 +38,7 @@ const BeneficialOwners = ({
   } = state.context;
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
-  const toast = useToast();
-  const { t, allT } = useTranslation('pages.beneficial-owners');
+  const { t } = useTranslation('pages.beneficial-owners');
   const requireMultiKyc = missingAttributes.includes(
     CollectedKybDataOption.kycedBeneficialOwners,
   );
@@ -66,16 +63,10 @@ const BeneficialOwners = ({
       onComplete?.();
     };
 
-    const handleError = (error: unknown) => {
+    const handleError = (error: string) => {
       console.error(
-        'Speculatively vaulting data failed in kyb beneficial-owners page:',
-        getErrorMessage(error),
+        `Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`,
       );
-      toast.show({
-        title: allT('pages.sync-data-error.title'),
-        description: allT('pages.sync-data-error.description'),
-        variant: 'error',
-      });
     };
 
     if (!authToken) {

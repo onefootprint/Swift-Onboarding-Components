@@ -1,11 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import {
   BusinessDI,
   CollectedKybDataOption,
   CollectedKybDataOptionToRequiredAttributes,
 } from '@onefootprint/types';
-import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -32,8 +30,7 @@ const BasicData = ({
   const { authToken, data, kybRequirement } = state.context;
   const { missingAttributes } = kybRequirement || {};
   const { mutation, syncData } = useSyncData();
-  const toast = useToast();
-  const { allT, t } = useTranslation('pages.basic-data');
+  const { t } = useTranslation('pages.basic-data');
 
   const handleSubmit = (basicData: BasicDataFields) => {
     const handleSuccess = () => {
@@ -46,16 +43,10 @@ const BasicData = ({
       onComplete?.();
     };
 
-    const handleError = (error: unknown) => {
+    const handleError = (error: string) => {
       console.error(
-        'Speculatively vaulting data failed in kyb basic-data page:',
-        getErrorMessage(error),
+        `Speculatively vaulting data failed in kyb basic-data page: ${error}`,
       );
-      toast.show({
-        title: allT('pages.sync-data-error.title'),
-        description: allT('pages.sync-data-error.description'),
-        variant: 'error',
-      });
     };
 
     if (!authToken) {

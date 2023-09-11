@@ -1,6 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
-import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
@@ -11,12 +9,11 @@ import BeneficialOwnersSection from './components/beneficial-owners-section';
 import BusinessAddressSection from './components/business-address-section';
 
 const Confirm = () => {
-  const { allT, t } = useTranslation('pages.confirm.summary');
+  const { t } = useTranslation('pages.confirm.summary');
   const [state, send] = useCollectKybDataMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
   const { isLoading } = mutation;
-  const toast = useToast();
 
   const handleConfirm = () => {
     syncData({
@@ -28,16 +25,8 @@ const Confirm = () => {
           type: 'confirmed',
         });
       },
-      onError: (error: unknown) => {
-        console.error(
-          'Vaulting data failed in kyb confirm page:',
-          getErrorMessage(error),
-        );
-        toast.show({
-          title: allT('pages.sync-data-error.title'),
-          description: allT('pages.sync-data-error.description'),
-          variant: 'error',
-        });
+      onError: (error: string) => {
+        console.error(`Vaulting data failed in kyb confirm page: ${error}`);
       },
     });
   };

@@ -1,7 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import { BusinessDI } from '@onefootprint/types';
-import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -24,10 +22,9 @@ const BusinessAddress = ({
   onCancel,
   hideHeader,
 }: BusinessAddressProps) => {
-  const { allT, t } = useTranslation('pages.business-address');
+  const { t } = useTranslation('pages.business-address');
   const [state, send] = useCollectKybDataMachine();
   const { authToken, data } = state.context;
-  const toast = useToast();
   const { mutation, syncData } = useSyncData();
 
   const handleSubmit = (businessAddress: BusinessAddressData) => {
@@ -41,16 +38,10 @@ const BusinessAddress = ({
       onComplete?.();
     };
 
-    const handleError = (error: unknown) => {
+    const handleError = (error: string) => {
       console.error(
-        'Speculatively vaulting data failed in kyb business-address page:',
-        getErrorMessage(error),
+        `Speculatively vaulting data failed in kyb business-address page: ${error}`,
       );
-      toast.show({
-        title: allT('pages.sync-data-error.title'),
-        description: allT('pages.sync-data-error.description'),
-        variant: 'error',
-      });
     };
 
     if (!authToken) {

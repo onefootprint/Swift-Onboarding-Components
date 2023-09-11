@@ -85,9 +85,7 @@ const useStepUp = ({
   ) => {
     if (!payload?.challengeData) {
       onError?.(
-        new Error(
-          `Missing challenge data in response. Challenge kind received: ${payload.challengeData.challengeKind}`,
-        ),
+        `Missing challenge data in response. Challenge kind received: ${payload.challengeData.challengeKind}`,
       );
       return;
     }
@@ -102,7 +100,7 @@ const useStepUp = ({
     }
 
     if (!biometricChallengeJson || !challengeToken) {
-      onError?.(new Error('Missing challenge data in response.'));
+      onError?.('Missing challenge data in response.');
       return;
     }
 
@@ -155,9 +153,7 @@ const useStepUp = ({
 
     if (!canStepUp) {
       onError?.(
-        new Error(
-          `Cannot execute step up on current device. ${device.type} device kind, has support for webauthn: ${device.hasSupportForWebauthn}`,
-        ),
+        `Cannot execute step up on current device. ${device.type} device kind, has support for webauthn: ${device.hasSupportForWebauthn}`,
       );
       return;
     }

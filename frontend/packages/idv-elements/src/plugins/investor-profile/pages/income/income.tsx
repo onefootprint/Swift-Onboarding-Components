@@ -1,4 +1,3 @@
-import { getErrorMessage } from '@onefootprint/request';
 import {
   InvestorProfileAnnualIncome,
   InvestorProfileDI,
@@ -8,7 +7,6 @@ import React from 'react';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import useSyncErrorToast from '../../hooks/use-sync-error-toast';
 import type { IncomeData } from '../../utils/state-machine/types';
 import IncomeForm from './components/income-form';
 
@@ -16,7 +14,6 @@ const Income = () => {
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
-  const showToast = useSyncErrorToast();
 
   const handleSubmit = (incomeData: IncomeData) => {
     syncData({
@@ -31,12 +28,10 @@ const Income = () => {
           },
         });
       },
-      onError: (error: unknown) => {
+      onError: (error: string) => {
         console.error(
-          'Encountered error while speculatively syncing data on investor profile income page',
-          getErrorMessage(error),
+          `Encountered error while speculatively syncing data on investor profile income page: ${error}`,
         );
-        showToast();
       },
     });
   };

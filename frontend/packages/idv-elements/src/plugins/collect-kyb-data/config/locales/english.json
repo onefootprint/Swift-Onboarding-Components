@@ -1,4 +1,16 @@
 {
+  "components": {
+    "sync-data-error": {
+      "empty-auth-token": {
+        "title": "Your session is invalid",
+        "description": "Please refresh this page to try onboarding again."
+      },
+      "invalid-inputs": {
+        "title": "An error occurred",
+        "description": "An error occurred while saving data. Please fix the inputs and try again."
+      }
+    }
+  },
   "pages": {
     "introduction": {
       "title": "Let's get to know your business! 😊",
@@ -182,10 +194,6 @@
         "email": "Email",
         "ownership-stake": "Ownership stake"
       }
-    },
-    "sync-data-error": {
-      "title": "An error occurred",
-      "description": "An error occurred while saving data. Please fix the inputs and try again."
     },
     "cta": {
       "continue": "Continue",

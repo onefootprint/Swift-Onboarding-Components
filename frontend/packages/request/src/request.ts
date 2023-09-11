@@ -50,6 +50,9 @@ export const isLogoutError = (error: unknown) => {
 };
 
 export const getErrorMessage = (error?: unknown | Error): string => {
+  if (typeof error === 'string') {
+    return error;
+  }
   if (isFootprintError(error)) {
     if (error?.response?.data.error.message) {
       return error.response.data.error.message;

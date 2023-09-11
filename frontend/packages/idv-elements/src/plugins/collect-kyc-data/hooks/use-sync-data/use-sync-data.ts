@@ -11,7 +11,7 @@ type SyncDataArgs = {
   data: KycData;
   speculative?: boolean;
   onSuccess?: () => void;
-  onError?: (error?: unknown) => void;
+  onError?: (error: string) => void;
 };
 
 const useSyncData = () => {
@@ -28,12 +28,12 @@ const useSyncData = () => {
     onError,
   }: SyncDataArgs) => {
     if (!authToken) {
-      console.error('Found empty auth token while syncing kyc data fields.');
       toast.show({
         title: t('empty-auth-token.title'),
         description: t('empty-auth-token.description'),
         variant: 'error',
       });
+      onError?.('Found empty auth token while syncing kyc data fields.');
       return;
     }
 
@@ -48,32 +48,28 @@ const useSyncData = () => {
         {
           onSuccess,
           onError: err => {
-            console.error(
-              `Kyc useSyncData encountered error while syncing data${
-                speculative ? ' speculatively' : ''
-              }`,
-              getErrorMessage(err),
-            );
             toast.show({
               title: t('invalid-inputs.title'),
               description: t('invalid-inputs.description'),
               variant: 'error',
             });
-            onError?.(err);
+            onError?.(
+              `Kyc useSyncData encountered error while syncing data${
+                speculative ? ' speculatively' : ''
+              } ${getErrorMessage(err)}`,
+            );
           },
         },
       );
     } catch (e) {
-      console.error(
-        'Unable to generate a valid request data obj because of incomplete/dangling DIs.',
-        e,
-      );
       toast.show({
         title: t('request-data.title'),
         description: t('request-data.description'),
         variant: 'error',
       });
-      onError?.();
+      onError?.(
+        `Unable to generate a valid request data obj because of incomplete/dangling DIs. ${e}`,
+      );
     }
   };
 

@@ -1,11 +1,9 @@
-import { getErrorMessage } from '@onefootprint/request';
 import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import useSyncErrorToast from '../../hooks/use-sync-error-toast';
 import type { InvestmentGoalsData } from '../../utils/state-machine/types';
 import InvestmentGoalsForm from './components/investment-goals-form';
 
@@ -13,7 +11,6 @@ const InvestmentGoals = () => {
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
-  const showToast = useSyncErrorToast();
 
   const handleSubmit = (investmentGoalsData: InvestmentGoalsData) => {
     syncData({
@@ -30,10 +27,8 @@ const InvestmentGoals = () => {
       },
       onError: (error: unknown) => {
         console.error(
-          'Encountered error while speculatively syncing data on investor profile investment goals page',
-          getErrorMessage(error),
+          `Encountered error while speculatively syncing data on investor profile investment goals page: ${error}`,
         );
-        showToast();
       },
     });
   };

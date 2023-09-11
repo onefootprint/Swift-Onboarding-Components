@@ -1,6 +1,10 @@
 {
   "components": {
-    "sync-data-error": {
+    "empty-auth-token": {
+      "title": "Your session is invalid",
+      "description": "Please refresh this page to try onboarding again."
+    },
+    "invalid-inputs": {
       "title": "An error occurred",
       "description": "An error occurred while saving data. Please fix the inputs and try again."
     },

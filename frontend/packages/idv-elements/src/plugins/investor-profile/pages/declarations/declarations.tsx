@@ -6,7 +6,6 @@ import useUploadFile from '../../../../hooks/api/hosted/user/use-upload-file';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import useSyncErrorToast from '../../hooks/use-sync-error-toast';
 import type { DeclarationData } from '../../utils/state-machine/types';
 import DeclarationsForm from './components/declarations-form';
 
@@ -15,7 +14,6 @@ const Declarations = () => {
   const { authToken, data } = state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const uploadFileMutation = useUploadFile();
-  const showToast = useSyncErrorToast();
 
   const sendDeclarationData = (declarationData: DeclarationData) => {
     send({
@@ -55,17 +53,14 @@ const Declarations = () => {
                 'Encountered error while uploading declarations files',
                 getErrorMessage(error),
               );
-              showToast();
             },
           },
         );
       },
-      onError: (error: unknown) => {
+      onError: (error: string) => {
         console.error(
-          'Encountered error while vaulting data on investor profile declarations page',
-          getErrorMessage(error),
+          `Encountered error while vaulting data on investor profile declarations page ${error}`,
         );
-        showToast();
       },
     });
   };
@@ -82,10 +77,8 @@ const Declarations = () => {
       },
       onError: (error: unknown) => {
         console.error(
-          'Encountered error while speculatively saving data on investor profile declarations page',
-          getErrorMessage(error),
+          `Encountered error while speculatively saving data on investor profile declarations page: ${error}`,
         );
-        showToast();
       },
     });
   };
