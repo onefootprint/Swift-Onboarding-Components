@@ -110,7 +110,8 @@
         "selfie_image_orientation_incorrect": "Your selfie image has the wrong orientation. Please ensure the picture submitted is in portrait format and try again.",
         "selfie_bad_image_compression": "Your selfie image has the incorrect image compression. Please try again.",
         "drivers_license_permit_not_allowed": "Driver's license permits are not allowed, please retry with a full driver's license or reach out to the business for support.",
-        "unknown_error": "An error occurred. Please try again."
+        "unknown_error": "An error occurred. Please try again.",
+        "network_error": "Network error. {{errorInfo}}"
       }
     },
     "success": {

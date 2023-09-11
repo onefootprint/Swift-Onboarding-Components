@@ -10,6 +10,11 @@ import type {
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
+export type IdDocImageErrorType = {
+  errorType: IdDocImageProcessingError | IdDocImageUploadError;
+  errorInfo?: string;
+};
+
 export type MachineContext = {
   authToken: string;
   device: DeviceInfo;
@@ -21,7 +26,7 @@ export type MachineContext = {
     country?: CountryCode;
   };
   id?: string;
-  errors?: (IdDocImageProcessingError | IdDocImageUploadError)[];
+  errors?: IdDocImageErrorType[];
   sandboxOutcome?: IdDocOutcomes;
 };
 
@@ -57,13 +62,19 @@ export type MachineEvents =
   | {
       type: 'processingErrored';
       payload: {
-        errors: IdDocImageProcessingError[];
+        errors: {
+          errorType: IdDocImageProcessingError;
+          errorInfo?: string;
+        }[];
       };
     }
   | {
       type: 'uploadErrored';
       payload: {
-        errors: IdDocImageUploadError[];
+        errors: {
+          errorType: IdDocImageUploadError;
+          errorInfo?: string;
+        }[];
       };
     }
   | {

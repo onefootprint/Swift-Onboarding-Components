@@ -1,7 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
-import type { IdDocImageTypes, SubmitDocResponse } from '@onefootprint/types';
+import {
+  type IdDocImageTypes,
+  type SubmitDocResponse,
+  IdDocImageProcessingError,
+} from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -46,7 +50,9 @@ const DeskTopProcessing = () => {
       send({
         type: 'processingErrored',
         payload: {
-          errors,
+          errors: errors.map(err => ({
+            errorType: err,
+          })),
         },
       });
     } else if (!nextSideToCollect) {
@@ -57,11 +63,16 @@ const DeskTopProcessing = () => {
     }
   };
 
-  const handleSubmitDocError = () => {
+  const handleSubmitDocError = (err: unknown) => {
     send({
       type: 'processingErrored',
       payload: {
-        errors: [],
+        errors: [
+          {
+            errorType: IdDocImageProcessingError.networkError,
+            errorInfo: getErrorMessage(err),
+          },
+        ],
       },
     });
   };
@@ -99,7 +110,7 @@ const DeskTopProcessing = () => {
               err,
             )}`,
           );
-          handleSubmitDocError();
+          handleSubmitDocError(err);
         },
       },
     );

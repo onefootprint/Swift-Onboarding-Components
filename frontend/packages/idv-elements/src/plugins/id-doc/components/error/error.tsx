@@ -13,11 +13,12 @@ import NavigationHeader from '../../../../components/layout/components/navigatio
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { imageIcons } from '../../constants/image-types';
 import getImageSideLabel from '../../utils/get-image-side-label';
+import type { IdDocImageErrorType } from '../../utils/state-machine';
 import FeedbackIcon from '../feedback-icon';
 
 type ErrorProps = {
   imageType: IdDocImageTypes;
-  errors: (IdDocImageProcessingError | IdDocImageUploadError)[];
+  errors: IdDocImageErrorType[];
   docType: SupportedIdDocTypes;
   countryName: string;
   backgroundColor?: 'primary' | 'secondary';
@@ -40,14 +41,15 @@ const Error = ({
       ...Object.values(IdDocImageUploadError),
     ]);
 
-  const cleanedErrors = errors.filter(error => imageErrorsSet.has(error)) ?? [];
+  const cleanedErrors =
+    errors.filter(error => imageErrorsSet.has(error.errorType)) ?? [];
   if (cleanedErrors.length === 0) {
     console.error(
       `Detected unknown image processing (or upload) errors that doesn't exist on the list of defined image errors. Errors: ${errors
         .map(err => `${err}`)
         .join(', ')}`,
     );
-    cleanedErrors.push(IdDocImageProcessingError.unknownError);
+    cleanedErrors.push({ errorType: IdDocImageProcessingError.unknownError });
   }
 
   return (
@@ -77,16 +79,17 @@ const Error = ({
               textAlign: 'center',
             }}
           >
-            {t(`description.${cleanedErrors[0]}`, {
+            {t(`description.${cleanedErrors[0].errorType}`, {
               documentType: IdDocTypeToLabel[docType],
               side,
               countryName,
+              errorInfo: cleanedErrors[0].errorInfo,
             })}
           </Typography>
         ) : (
           cleanedErrors.map(error => (
             <Typography
-              key={error}
+              key={error.errorType}
               variant="body-2"
               color="secondary"
               as="li"
@@ -95,10 +98,11 @@ const Error = ({
                 width: '100%',
               }}
             >
-              {t(`description.${error}`, {
+              {t(`description.${error.errorType}`, {
                 documentType: IdDocTypeToLabel[docType],
                 side,
                 countryName,
+                errorInfo: error.errorInfo,
               })}
             </Typography>
           ))

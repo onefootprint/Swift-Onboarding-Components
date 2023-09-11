@@ -45,7 +45,9 @@ const DesktopSelfieRetry = () => {
         />
         <ErrorContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
           <Error
-            errors={errors ?? [IdDocImageProcessingError.unknownError]}
+            errors={
+              errors ?? [{ errorType: IdDocImageProcessingError.unknownError }]
+            }
             imageType={IdDocImageTypes.selfie}
             docType={type}
             countryName={countryName ?? country}

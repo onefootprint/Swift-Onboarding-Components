@@ -40,9 +40,9 @@ export const initialContextDL: MachineContext = {
 export const initialContextWithErrors: MachineContext = {
   ...initialContextDL,
   errors: [
-    IdDocImageProcessingError.countryCodeMismatch,
-    IdDocImageProcessingError.wrongDocumentSide,
-    IdDocImageUploadError.fileTypeNotAllowed,
+    { errorType: IdDocImageProcessingError.countryCodeMismatch },
+    { errorType: IdDocImageProcessingError.wrongDocumentSide },
+    { errorType: IdDocImageUploadError.fileTypeNotAllowed },
   ],
 };
 

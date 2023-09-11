@@ -45,5 +45,10 @@ export const argsRegularDesktop: MachineContext = {
   idDoc: {},
 };
 
-export const processingErrors = [IdDocImageProcessingError.documentNotReadable];
-export const uploadErrors = [IdDocImageUploadError.fileTypeNotAllowed];
+export const processingErrors = [
+  { errorType: IdDocImageProcessingError.countryCodeMismatch },
+  { errorType: IdDocImageProcessingError.wrongDocumentSide },
+];
+export const uploadErrors = [
+  { errorType: IdDocImageUploadError.fileTypeNotAllowed },
+];

@@ -32,9 +32,9 @@ const contextWithErrors: MachineContext = {
     supportedCountries: ['US', 'CA'],
   },
   errors: [
-    IdDocImageProcessingError.countryCodeMismatch,
-    IdDocImageProcessingError.wrongDocumentSide,
-    IdDocImageUploadError.fileTypeNotAllowed,
+    { errorType: IdDocImageProcessingError.countryCodeMismatch },
+    { errorType: IdDocImageProcessingError.wrongDocumentSide },
+    { errorType: IdDocImageUploadError.fileTypeNotAllowed },
   ],
   idDoc: {
     country: 'US',

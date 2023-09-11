@@ -23,6 +23,7 @@ export enum IdDocImageProcessingError {
   selfieBadImageCompression = 'selfie_bad_image_compression',
   driversLicensePermitNotAllowed = 'drivers_license_permit_not_allowed',
   unknownError = 'unknown_error',
+  networkError = 'network_error',
 }
 
 export enum IdDocImageUploadError {

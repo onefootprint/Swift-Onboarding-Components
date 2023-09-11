@@ -31,7 +31,7 @@ const initialContextWithErrors: MachineContext = {
 
     supportedCountries: ['US', 'CA'],
   },
-  errors: [IdDocImageProcessingError.selfieGlare],
+  errors: [{ errorType: IdDocImageProcessingError.selfieGlare }],
   idDoc: {
     country: 'US',
     type: SupportedIdDocTypes.driversLicense,

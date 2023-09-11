@@ -15,6 +15,7 @@ import React, { useRef, useState } from 'react';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import useProcessImage from '../../hooks/use-process-image';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
+import type { IdDocImageErrorType } from '../../utils/state-machine';
 import DesktopHeader from '../desktop-header/desktop-header';
 import Error from '../error';
 import Loading from '../loading';
@@ -27,7 +28,7 @@ type DesktopPhotoPromptProps = {
   imageType: IdDocImageTypes;
   country: CountryCode;
   isRetry?: boolean;
-  errors?: (IdDocImageProcessingError | IdDocImageUploadError)[];
+  errors?: IdDocImageErrorType[];
 };
 
 const DesktopPhotoPrompt = ({
@@ -92,7 +93,7 @@ const DesktopPhotoPrompt = ({
     send({
       type: 'uploadErrored',
       payload: {
-        errors: errs,
+        errors: errs.map(err => ({ errorType: err })),
       },
     });
   };
@@ -131,7 +132,11 @@ const DesktopPhotoPrompt = ({
         {isRetry && (
           <Box sx={{ paddingLeft: 6, paddingRight: 6 }}>
             <Error
-              errors={errors ?? [IdDocImageProcessingError.unknownError]}
+              errors={
+                errors ?? [
+                  { errorType: IdDocImageProcessingError.unknownError },
+                ]
+              }
               imageType={imageType}
               docType={type}
               countryName={countryName ?? country}

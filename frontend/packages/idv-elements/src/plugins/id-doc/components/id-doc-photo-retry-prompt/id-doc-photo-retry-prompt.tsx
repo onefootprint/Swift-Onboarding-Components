@@ -1,12 +1,8 @@
-import type {
-  IdDocImageProcessingError,
-  IdDocImageTypes,
-  IdDocImageUploadError,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 
+import type { IdDocImageErrorType } from '../../utils/state-machine';
 import Error from '../error';
 import FadeInContainer from '../fade-in-container';
 import IdDocPhotoButtons from '../id-doc-photo-buttons';
@@ -15,7 +11,7 @@ type IdDocPhotoRetryPromptProps = {
   docType: SupportedIdDocTypes;
   countryName: string;
   imageType: IdDocImageTypes.front | IdDocImageTypes.back;
-  errors: (IdDocImageProcessingError | IdDocImageUploadError)[];
+  errors: IdDocImageErrorType[];
   onComplete: (imageString: string, mimeType: string) => void;
 };
 
