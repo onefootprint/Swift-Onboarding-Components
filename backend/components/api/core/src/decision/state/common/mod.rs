@@ -130,7 +130,6 @@ pub fn kyc_decision_from_fixture(
     let output = WaterfallOnboardingRulesDecisionOutput::new(
         DecisionResult::Evaluated(rules_output),
         DecisionResult::NotRequired,
-        vec![],
     );
 
     Ok(output)
@@ -165,7 +164,6 @@ pub fn alpaca_kyc_decision_from_fixture(
     let rules_output = WaterfallOnboardingRulesDecisionOutput::new(
         DecisionResult::Evaluated(final_decision),
         DecisionResult::NotRequired,
-        vec![],
     );
 
     Ok(rules_output)

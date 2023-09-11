@@ -38,7 +38,6 @@ pub enum OnboardingRulesDecision {
 pub struct WaterfallOnboardingRulesDecisionOutput {
     kyc_decision: DecisionResult,
     doc_decision: DecisionResult,
-    additional_kyc_evaluated: Vec<OnboardingRulesDecisionOutput>,
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -48,21 +47,14 @@ pub struct KybOnboardingRulesDecisionOutput {
 
 #[enum_dispatch]
 pub trait FinalAndAdditionalDecisions {
-    fn final_decision_and_additional_evaluated(
-        &self,
-    ) -> ApiResult<(OnboardingRulesDecisionOutput, Vec<OnboardingRulesDecisionOutput>)>;
+    fn final_decision_and_additional_evaluated(&self) -> ApiResult<OnboardingRulesDecisionOutput>;
 }
 
 impl WaterfallOnboardingRulesDecisionOutput {
-    pub fn new(
-        kyc_decision: DecisionResult,
-        doc_decision: DecisionResult,
-        additional_kyc_evaluated: Vec<OnboardingRulesDecisionOutput>,
-    ) -> Self {
+    pub fn new(kyc_decision: DecisionResult, doc_decision: DecisionResult) -> Self {
         Self {
             kyc_decision,
             doc_decision,
-            additional_kyc_evaluated,
         }
     }
 
@@ -103,27 +95,10 @@ impl WaterfallOnboardingRulesDecisionOutput {
 }
 
 impl FinalAndAdditionalDecisions for WaterfallOnboardingRulesDecisionOutput {
-    fn final_decision_and_additional_evaluated(
-        &self,
-    ) -> ApiResult<(OnboardingRulesDecisionOutput, Vec<OnboardingRulesDecisionOutput>)> {
+    fn final_decision_and_additional_evaluated(&self) -> ApiResult<OnboardingRulesDecisionOutput> {
         let final_decision = self.final_kyc_decision()?;
-        let additional = match (self.kyc_decision.clone(), self.doc_decision.clone()) {
-            // we only choose 1 to be the "final decision" (for simplicity, for now), so append the other one to our additional eval list
-            (DecisionResult::Evaluated(r_kyc), DecisionResult::Evaluated(r_doc)) => {
-                if r_kyc == final_decision {
-                    vec![r_doc]
-                } else {
-                    vec![r_kyc]
-                }
-            }
-            // if only 1 is present, it will already be populated in `final_decision`
-            _ => vec![],
-        }
-        .into_iter()
-        .chain(self.additional_kyc_evaluated.clone().into_iter())
-        .collect();
 
-        Ok((final_decision, additional))
+        Ok(final_decision)
     }
 }
 
@@ -134,12 +109,10 @@ impl KybOnboardingRulesDecisionOutput {
 }
 
 impl FinalAndAdditionalDecisions for KybOnboardingRulesDecisionOutput {
-    fn final_decision_and_additional_evaluated(
-        &self,
-    ) -> ApiResult<(OnboardingRulesDecisionOutput, Vec<OnboardingRulesDecisionOutput>)> {
+    fn final_decision_and_additional_evaluated(&self) -> ApiResult<OnboardingRulesDecisionOutput> {
         let final_decision = self.kyb_decision_output.clone();
 
-        Ok((final_decision, vec![]))
+        Ok(final_decision)
     }
 }
 

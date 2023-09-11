@@ -280,7 +280,7 @@ pub fn save_onboarding_decision(
     is_sandbox: bool,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
-    let (final_decision, additional_evaluated) = rules_output.final_decision_and_additional_evaluated()?;
+    let final_decision = rules_output.final_decision_and_additional_evaluated()?;
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     risk::save_final_decision(
         conn,
@@ -300,11 +300,6 @@ pub fn save_onboarding_decision(
     if !is_sandbox {
         // Log our canonical line
         log_rule_evaluation(workflow, &final_decision, rule::CANONICAL_ONBOARDING_RULE_LINE);
-
-        // Log any additional decisions
-        additional_evaluated
-            .into_iter()
-            .for_each(|output| log_rule_evaluation(workflow, &output, "additional_decisions_for_onboarding"));
     }
 
     Ok(())

@@ -106,7 +106,7 @@ impl KycRuleGroup {
                 .flatten()
                 .collect();
 
-        let (kyc_result, additional_results) = if !(config.document_only || config.skip_kyc) {
+        let kyc_result = if !(config.document_only || config.skip_kyc) {
             // First we evaluate KYC, choosing which of the potentially multiple vendors we might have
             let kyc_result = kyc_rule_results
                 .iter()
@@ -115,18 +115,9 @@ impl KycRuleGroup {
                 .map_err(crate::decision::Error::from)?
                 .clone();
 
-            let additional_results = kyc_rule_results
-                .into_iter()
-                .filter(|ober| ober != &kyc_result)
-                .map(OnboardingRulesDecisionOutput::from)
-                .collect();
-
-            (
-                DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(kyc_result)),
-                additional_results,
-            )
+            DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(kyc_result))
         } else {
-            (DecisionResult::NotRequired, vec![])
+            DecisionResult::NotRequired
         };
 
         // handle document decisioning
@@ -140,7 +131,7 @@ impl KycRuleGroup {
             Err(crate::decision::Error::from(RuleError::MissingInputForDocRules))?
         }
 
-        let output = WaterfallOnboardingRulesDecisionOutput::new(kyc_result, doc_result, additional_results);
+        let output = WaterfallOnboardingRulesDecisionOutput::new(kyc_result, doc_result);
 
         Ok(output)
     }

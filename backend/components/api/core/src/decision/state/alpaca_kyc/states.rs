@@ -543,7 +543,6 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let output = WaterfallOnboardingRulesDecisionOutput::new(
             DecisionResult::Evaluated(decision),
             DecisionResult::NotRequired,
-            vec![],
         );
 
         common::save_kyc_decision(
