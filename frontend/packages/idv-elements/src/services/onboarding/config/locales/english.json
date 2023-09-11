@@ -2,7 +2,7 @@
   "components": {
     "error": {
       "title": "Uh-oh!",
-      "description": "There was an error while completing this request. Please contact the site admin."
+      "description": "There was an error while completing this request. Please refresh the page and try again."
     }
   },
   "pages": {
