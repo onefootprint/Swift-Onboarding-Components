@@ -1,4 +1,4 @@
-import styled from '@onefootprint/styled';
+import styled, { css } from '@onefootprint/styled';
 import identity from 'lodash/identity';
 import React, { useState } from 'react';
 
@@ -87,25 +87,19 @@ const PinInput = ({
           const key = pinIndex;
           const isDisabled = pinIndex > enteredPin.length;
           return (
-            <Input
+            <Pin
+              /** Do not change/remove these classes */
+              className="fp-pin-input fp-custom-appearance"
               hasError={hasError}
               inputMode="numeric"
+              isDisabled={isDisabled}
               key={key}
               onChange={handleChange(pinIndex)}
               onKeyDown={handleKeyDown(pinIndex)}
               placeholder=""
-              sx={{
-                height: '44px',
-                padding: 0,
-                pointerEvents: isDisabled ? 'none' : undefined,
-                textAlign: 'center',
-                width: '40px',
-              }}
               ref={pinInputs.refs[pinIndex]}
               required
               type="tel"
-              /** Do not change/remove these classes */
-              className="fp-pin-input fp-custom-appearance"
               value={enteredPin[pinIndex] || ''}
             />
           );
@@ -118,9 +112,19 @@ const PinInput = ({
 
 const Container = styled.div``;
 
-export const PinContainer = styled.div`
+const PinContainer = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing[3]};
+`;
+
+const Pin = styled(Input)<{ isDisabled: boolean }>`
+  ${({ isDisabled }) => css`
+    height: 44px;
+    padding: 0;
+    pointer-events: ${isDisabled ? 'none' : undefined};
+    text-align: center;
+    width: 40px;
+  `}
 `;
 
 export default PinInput;
