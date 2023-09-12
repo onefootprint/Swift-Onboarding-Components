@@ -101,7 +101,7 @@ pub async fn post(
         match challenge_kind {
             ChallengeKind::Biometric => {
                 // NOTE: it's possible we don't have a phone number, so don't fail here outright
-                let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await.ok();
+                let phone_number = uvw.get_decrypted_verified_primary_phone_optional(&state).await?;
                 let challenge = initiate_biometric_challenge_for_user(&state, &uvw.vault.id, creds).await?;
                 let challenge_data = ChallengeData::Passkey(challenge.state);
                 (challenge_data, 0, phone_number, Some(challenge.challenge_json))
