@@ -11,7 +11,7 @@ import type { BifrostProps } from '../../types';
 import parseLegacyUserData from '../../utils/parse-legacy-user-data';
 
 // Wait for a bit for post message to arrive before giving up
-const POST_MESSAGE_TIMEOUT = 500;
+const POST_MESSAGE_TIMEOUT = 1000;
 
 const usePropsFromParent = (
   onSuccess: (props: BifrostProps) => void,
