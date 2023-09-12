@@ -6,7 +6,7 @@ import DesktopPhotoPrompt from '../../components/desktop-photo-prompt';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
 const DesktopBackPhotoRetry = () => {
-  const [state] = useIdDocMachine();
+  const [state, send] = useIdDocMachine();
   const {
     idDoc: { type, country },
     errors,
@@ -15,10 +15,15 @@ const DesktopBackPhotoRetry = () => {
   if (!type || !country) {
     return null;
   }
+  const handleClickBack = () => {
+    send({
+      type: 'navigatedToCountryDoc',
+    });
+  };
 
   return (
     <>
-      <NavigationHeader />
+      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
       <DesktopPhotoPrompt
         imageType={IdDocImageTypes.back}
         type={type}

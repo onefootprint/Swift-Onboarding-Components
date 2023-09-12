@@ -75,6 +75,10 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
               target: 'frontImageRetryDesktop',
               actions: 'assignIdDocImageErrors',
             },
+            navigatedToCountryDoc: {
+              target: 'countryAndType',
+              actions: 'clearImageAndErrors',
+            },
           },
         },
         frontImageCaptureMobile: {
@@ -100,6 +104,10 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             startImageCapture: {
               target: 'frontImageCaptureMobile',
             },
+            navigatedToCountryDoc: {
+              target: 'countryAndType',
+              actions: 'clearImageAndErrors',
+            },
           },
         },
         frontImageRetryDesktop: {
@@ -111,6 +119,10 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             uploadErrored: {
               target: 'frontImageRetryDesktop',
               actions: 'assignIdDocImageErrors',
+            },
+            navigatedToCountryDoc: {
+              target: 'countryAndType',
+              actions: 'clearImageAndErrors',
             },
           },
         },
@@ -157,6 +169,10 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
               target: 'backImageRetryDesktop',
               actions: 'assignIdDocImageErrors',
             },
+            navigatedToCountryDoc: {
+              target: 'countryAndType',
+              actions: 'clearImageAndErrors',
+            },
           },
         },
         backImageRetryMobile: {
@@ -167,6 +183,10 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
             startImageCapture: {
               target: 'backImageCaptureMobile',
+            },
+            navigatedToCountryDoc: {
+              target: 'countryAndType',
+              actions: 'clearImageAndErrors',
             },
           },
         },
@@ -298,6 +318,11 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         }),
         assignConsent: assign(context => {
           context.requirement.shouldCollectConsent = false;
+          return context;
+        }),
+        clearImageAndErrors: assign(context => {
+          context.errors = [];
+          context.image = undefined;
           return context;
         }),
       },

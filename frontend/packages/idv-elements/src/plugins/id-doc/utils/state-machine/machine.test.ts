@@ -446,6 +446,93 @@ describe('Id Doc Machine Tests', () => {
       expect(state.context.errors).toEqual([]);
     });
 
+    it('Can select a different doc type from retry state desktop', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegularDesktop }));
+      machine.start();
+
+      let state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: SupportedIdDocTypes.driversLicense,
+            country: 'US',
+            id: 'id',
+          },
+        },
+        {
+          type: 'consentReceived',
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            imageString: 'image',
+            mimeType: 'image/png',
+          },
+        },
+        {
+          type: 'processingErrored',
+          payload: {
+            errors: processingErrors,
+          },
+        },
+      ]);
+      expect(state.value).toEqual('frontImageRetryDesktop');
+      expect(state.context.errors).toEqual(processingErrors);
+
+      state = machine.send([
+        {
+          type: 'navigatedToCountryDoc',
+        },
+      ]);
+      expect(state.value).toEqual('countryAndType');
+      expect(state.context.errors).toEqual([]);
+    });
+
+    it('Can select a different doc type from retry state mobile', () => {
+      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      machine.start();
+
+      let state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: SupportedIdDocTypes.driversLicense,
+            country: 'US',
+            id: 'id',
+          },
+        },
+        {
+          type: 'consentReceived',
+        },
+        {
+          type: 'startImageCapture',
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            imageString: 'image',
+            mimeType: 'image/png',
+          },
+        },
+        {
+          type: 'processingErrored',
+          payload: {
+            errors: processingErrors,
+          },
+        },
+      ]);
+      expect(state.value).toEqual('frontImageRetryMobile');
+      expect(state.context.errors).toEqual(processingErrors);
+
+      state = machine.send([
+        {
+          type: 'navigatedToCountryDoc',
+        },
+      ]);
+      expect(state.value).toEqual('countryAndType');
+      expect(state.context.errors).toEqual([]);
+    });
+
     it('Allows uploading any side/selfie based nextSideToCollect out of order on mobile', () => {
       const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
       machine.start();

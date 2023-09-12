@@ -92,4 +92,7 @@ export type MachineEvents =
   | {
       type: 'retryLimitExceeded';
     }
+  | {
+      type: 'navigatedToCountryDoc';
+    }
   | ProccessingSucceededEvent;
