@@ -69,6 +69,11 @@ describe('Onboarding Requirements Machine Tests', () => {
     allowInternationalResidents: false,
   };
 
+  const NoPhoneOnboardingConfig: PublicOnboardingConfig = {
+    ...TestOnboardingConfig,
+    isNoPhoneFlow: true,
+  };
+
   describe('with an existing user', () => {
     it('successfully completes when requirements are empty', () => {
       const machine = interpret(
@@ -259,6 +264,53 @@ describe('Onboarding Requirements Machine Tests', () => {
         payload: [],
       });
       expect(state.value).toBe('success');
+    });
+  });
+
+  describe('Additional cases', () => {
+    it('Skips transfer when it is a no phone flow', () => {
+      const machine = interpret(
+        createMachine({
+          device: {
+            type: 'mobile',
+            hasSupportForWebauthn: true,
+          },
+          userFound: false,
+          authToken: 'token',
+          config: { ...NoPhoneOnboardingConfig },
+        }),
+      );
+
+      machine.start();
+      let { state } = machine;
+      state = machine.send({
+        type: 'onboardingRequirementsReceived',
+        payload: [kycRequirement, livenessRequirement, authorizeRequirement],
+      });
+      expect(state.context.requirements).toEqual([
+        kycRequirement,
+        livenessRequirement,
+        authorizeRequirement,
+      ]);
+
+      expect(state.value).toBe('kycData');
+
+      state = machine.send({
+        type: 'requirementCompleted',
+      });
+      expect(state.value).toBe('checkRequirements');
+
+      state = machine.send({
+        type: 'onboardingRequirementsReceived',
+        payload: [livenessRequirement, idDocRequirement, authorizeRequirement],
+      });
+      expect(state.context.requirements).toEqual([
+        livenessRequirement,
+        idDocRequirement,
+        authorizeRequirement,
+      ]);
+
+      expect(state.value).toBe('liveness');
     });
   });
 });

@@ -124,10 +124,11 @@ const shouldRunTransfer = (context: MachineContext) => {
     onboardingContext: {
       device: { type },
       isTransfer,
+      config: { isNoPhoneFlow },
     },
     didRunTransfer,
   } = context;
-  if (didRunTransfer) {
+  if (didRunTransfer || isNoPhoneFlow) {
     return false;
   }
   const nextReqIsLiveness =
