@@ -1,6 +1,5 @@
 import { createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import { MachineEvents } from './types';
 
 export const createPasskeysMachine = () =>
@@ -10,7 +9,7 @@ export const createPasskeysMachine = () =>
     schema: {
       events: {} as MachineEvents,
     },
-    tsTypes: {} as Typegen0,
+    tsTypes: {} as import('./machine.typegen').Typegen0,
     initial: 'register',
     context: {},
     states: {

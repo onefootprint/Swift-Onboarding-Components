@@ -23,7 +23,11 @@ const Passkeys = ({ authToken, onDone }: PasskeysProps) => {
         />
       )}
       {state.matches('retry') && (
-        <Retry authToken={authToken} onSkip={onDone} onSuccess={onDone} />
+        <Retry
+          authToken={authToken}
+          onSkip={() => onDone(null)}
+          onSuccess={onDone}
+        />
       )}
     </>
   );
