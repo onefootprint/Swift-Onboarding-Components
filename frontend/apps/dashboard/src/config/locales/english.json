@@ -1225,6 +1225,8 @@
               "ssn": "SSN",
               "full": "Full",
               "last4": "Last 4",
+              "full_optional": "Full (Optional)",
+              "last4_optional": "Last 4 (Optional)",
               "document": "ID document scan",
               "selfie": "Selfie",
               "us-residents": "U.S. residents",

@@ -23,7 +23,8 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
     { value: 'authorized-scopes', label: t('basics.authorized-scopes') },
   ];
   const [segment, setSegment] = useState(options[0].value);
-  const { mustCollectData, canAccessData, isDocFirstFlow } = playbook;
+  const { mustCollectData, optionalData, canAccessData, isDocFirstFlow } =
+    playbook;
 
   const handleChange = (value: string) => {
     setSegment(value);
@@ -45,7 +46,6 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
           ))}
         </TabContainer>
       </Tabs>
-
       {segment === 'data' && (
         <>
           <DataCollection
@@ -56,6 +56,7 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
           <DataCollection
             displayFields={usResidentDisplayFields}
             mustCollectData={mustCollectData}
+            optionalData={optionalData}
             title={t('data-collection.us-residents')}
           />
           {isDocFirstFlow && (

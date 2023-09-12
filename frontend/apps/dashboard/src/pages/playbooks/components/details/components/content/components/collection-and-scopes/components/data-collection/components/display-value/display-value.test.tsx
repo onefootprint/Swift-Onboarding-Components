@@ -5,9 +5,17 @@ import React from 'react';
 import type { DisplayValueProps } from './display-value';
 import DisplayValue from './display-value';
 
-const renderDisplayValues = ({ mustCollectData, field }: DisplayValueProps) =>
+const renderDisplayValues = ({
+  field,
+  mustCollectData,
+  optionalData,
+}: DisplayValueProps) =>
   customRender(
-    <DisplayValue mustCollectData={mustCollectData} field={field} />,
+    <DisplayValue
+      field={field}
+      mustCollectData={mustCollectData}
+      optionalData={optionalData}
+    />,
   );
 
 describe('<DisplayValue />', () => {
@@ -29,41 +37,6 @@ describe('<DisplayValue />', () => {
         CollectedKycDataOption.email,
       ],
       field: CollectedKycDataOption.address,
-    });
-    expect(screen.getByTestId('close-icon')).toBeInTheDocument();
-  });
-
-  it('should show "last 4" if SSN4 is included', () => {
-    renderDisplayValues({
-      mustCollectData: [
-        CollectedKycDataOption.ssn4,
-        CollectedKycDataOption.name,
-        CollectedKycDataOption.email,
-      ],
-      field: 'ssn',
-    });
-    expect(screen.getByText('Last 4')).toBeInTheDocument();
-  });
-
-  it('should show "Full" if SSN9 is included', () => {
-    renderDisplayValues({
-      mustCollectData: [
-        CollectedKycDataOption.ssn9,
-        CollectedKycDataOption.name,
-        CollectedKycDataOption.email,
-      ],
-      field: 'ssn',
-    });
-    expect(screen.getByText('Full')).toBeInTheDocument();
-  });
-
-  it('should show close icon SSN is not included', () => {
-    renderDisplayValues({
-      mustCollectData: [
-        CollectedKycDataOption.name,
-        CollectedKycDataOption.email,
-      ],
-      field: 'ssn',
     });
     expect(screen.getByTestId('close-icon')).toBeInTheDocument();
   });
@@ -101,5 +74,67 @@ describe('<DisplayValue />', () => {
       field: 'selfie',
     });
     expect(screen.getByTestId('close-icon')).toBeInTheDocument();
+  });
+
+  describe('ssn', () => {
+    it('should show "last 4" if SSN4 is included', () => {
+      renderDisplayValues({
+        mustCollectData: [
+          CollectedKycDataOption.ssn4,
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.email,
+        ],
+        field: 'ssn',
+      });
+      expect(screen.getByText('Last 4')).toBeInTheDocument();
+    });
+
+    it('should show "Full" if SSN9 is included', () => {
+      renderDisplayValues({
+        mustCollectData: [
+          CollectedKycDataOption.ssn9,
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.email,
+        ],
+        field: 'ssn',
+      });
+      expect(screen.getByText('Full')).toBeInTheDocument();
+    });
+
+    it('should show close icon SSN is not included', () => {
+      renderDisplayValues({
+        mustCollectData: [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.email,
+        ],
+        field: 'ssn',
+      });
+      expect(screen.getByTestId('close-icon')).toBeInTheDocument();
+    });
+
+    it('should show "Last 4 (Optional)" if SSN4 is optional', () => {
+      renderDisplayValues({
+        mustCollectData: [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.email,
+        ],
+        optionalData: [CollectedKycDataOption.ssn4],
+        field: 'ssn',
+      });
+      expect(screen.getByText('Last 4 (Optional)')).toBeInTheDocument();
+    });
+
+    it('should show "Full (Optional)" if SSN9 is optional', () => {
+      renderDisplayValues({
+        mustCollectData: [
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.email,
+        ],
+        optionalData: [CollectedKycDataOption.ssn9],
+        field: 'ssn',
+      });
+
+      expect(screen.getByText('Full (Optional)')).toBeInTheDocument();
+    });
   });
 });

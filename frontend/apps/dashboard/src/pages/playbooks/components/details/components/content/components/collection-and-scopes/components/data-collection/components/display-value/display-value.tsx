@@ -11,9 +11,14 @@ import IdDocDisplay from 'src/pages/playbooks/components/id-doc-display';
 export type DisplayValueProps = {
   field: string;
   mustCollectData: string[];
+  optionalData?: string[];
 };
 
-const DisplayValue = ({ field, mustCollectData }: DisplayValueProps) => {
+const DisplayValue = ({
+  field,
+  mustCollectData,
+  optionalData = [],
+}: DisplayValueProps) => {
   const { t } = useTranslation(
     'pages.playbooks.table.details.content.data-collection',
   );
@@ -41,6 +46,12 @@ const DisplayValue = ({ field, mustCollectData }: DisplayValueProps) => {
     }
     if (mustCollectData.includes(CollectedKycDataOption.ssn4)) {
       return <Typography variant="body-3">{t('last4')}</Typography>;
+    }
+    if (optionalData.includes(CollectedKycDataOption.ssn9)) {
+      return <Typography variant="body-3">{t('full_optional')}</Typography>;
+    }
+    if (optionalData.includes(CollectedKycDataOption.ssn4)) {
+      return <Typography variant="body-3">{t('last4_optional')}</Typography>;
     }
     return <IcoCloseSmall24 testID="close-icon" />;
   }

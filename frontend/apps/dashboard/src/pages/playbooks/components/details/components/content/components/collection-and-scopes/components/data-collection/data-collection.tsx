@@ -9,13 +9,15 @@ import DisplayValue from './components/display-value';
 export type DataCollectionProps = {
   displayFields: string[];
   mustCollectData: string[];
+  optionalData?: string[];
   title: string;
 };
 
 const DataCollection = ({
   displayFields,
-  title,
   mustCollectData,
+  optionalData = [],
+  title,
 }: DataCollectionProps) => {
   const { t } = useTranslation(
     'pages.playbooks.table.details.content.data-collection',
@@ -56,7 +58,11 @@ const DataCollection = ({
               {getLabel(field)}
             </Typography>
             <ValueContainer>
-              <DisplayValue field={field} mustCollectData={mustCollectData} />
+              <DisplayValue
+                field={field}
+                mustCollectData={mustCollectData}
+                optionalData={optionalData}
+              />
             </ValueContainer>
           </ItemContainer>
         ))}
