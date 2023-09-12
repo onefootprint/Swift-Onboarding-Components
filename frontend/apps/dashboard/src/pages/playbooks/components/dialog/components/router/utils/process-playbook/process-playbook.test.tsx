@@ -64,7 +64,7 @@ describe('processPlaybook', () => {
   });
 
   it('should include full SSN in optional data but not mustCollectData if it is optional', () => {
-    const { mustCollectData, optionalData } = processPlaybook({
+    const { mustCollectData, optionalData, canAccessData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
         personalInformationAndDocs: {
@@ -83,10 +83,11 @@ describe('processPlaybook', () => {
     expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn4);
     expect(optionalData).toContain(CollectedKycDataOption.ssn9);
     expect(optionalData).not.toContain(CollectedKycDataOption.ssn4);
+    expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
   });
 
   it('should include SSN last 4 in optional data but not mustCollectData if it is optional', () => {
-    const { mustCollectData, optionalData } = processPlaybook({
+    const { mustCollectData, optionalData, canAccessData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
         personalInformationAndDocs: {
@@ -105,6 +106,8 @@ describe('processPlaybook', () => {
     expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn9);
     expect(optionalData).toContain(CollectedKycDataOption.ssn4);
     expect(optionalData).not.toContain(CollectedKycDataOption.ssn9);
+    expect(canAccessData).toContain(CollectedKycDataOption.ssn4);
+    expect(canAccessData).not.toContain(CollectedKycDataOption.ssn9);
   });
 
   it('should include full SSN in mustCollectData if required', () => {

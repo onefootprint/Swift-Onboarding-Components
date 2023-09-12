@@ -113,6 +113,9 @@ const processPlaybook = ({
   if (authorizedScopes[CollectedDocumentDataOption.document] && docString) {
     canAccessData.push(docString);
   }
+  if (optionalData.length > 0) {
+    canAccessData.push(...optionalData);
+  }
 
   // KYB field handling;
   const optionalKYBFields = [
