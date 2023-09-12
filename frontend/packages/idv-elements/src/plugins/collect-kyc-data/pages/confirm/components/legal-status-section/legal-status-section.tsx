@@ -27,6 +27,11 @@ const LegalStatusSection = () => {
   const legalStatus = [];
 
   const status = data[IdDI.usLegalStatus]?.value;
+  // we check status so we don't show this section for old onboarding configs that include the nationality field but not legal status
+  if (!isDomestic || !status) {
+    return null;
+  }
+
   if (status) {
     legalStatus.push({
       text: t('confirm.legal-status.text.status'),
@@ -74,10 +79,6 @@ const LegalStatusSection = () => {
       text: t('confirm.legal-status.text.visa-expiration'),
       subtext: visaExpirationVal,
     });
-  }
-
-  if (!isDomestic || !legalStatus.length) {
-    return null;
   }
 
   const stopEditing = () => {
