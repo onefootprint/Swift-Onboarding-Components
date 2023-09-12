@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ALTER COLUMN enhanced_aml DROP DEFAULT;
