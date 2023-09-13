@@ -1,3 +1,4 @@
+import { IdDocImageTypes } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { Typegen0 } from './machine.typegen';
@@ -30,12 +31,12 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
               {
                 target: 'frontImageMobile',
                 cond: context => context.device.type === 'mobile',
-                actions: ['assignCountryAndType', 'assignId'],
+                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
               },
               {
                 target: 'consentDesktop',
                 cond: context => context.device.type !== 'mobile',
-                actions: ['assignCountryAndType', 'assignId'],
+                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
               },
             ],
           },
@@ -302,6 +303,10 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         }),
         assignId: assign((context, event) => {
           context.id = event.payload.id;
+          return context;
+        }),
+        resetSide: assign(context => {
+          context.currSide = IdDocImageTypes.front;
           return context;
         }),
         assignImage: assign((context, event) => {

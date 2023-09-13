@@ -19,6 +19,7 @@ export interface Typegen0 {
     assignIdDocImageErrors: 'processingErrored' | 'uploadErrored';
     assignImage: 'receivedImage';
     clearImageAndErrors: 'navigatedToCountryDoc';
+    resetSide: 'receivedCountryAndType';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

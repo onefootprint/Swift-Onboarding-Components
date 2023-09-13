@@ -1,4 +1,4 @@
-import { SupportedIdDocTypes } from '@onefootprint/types';
+import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createIdDocMachine from './machine';
@@ -446,7 +446,7 @@ describe('Id Doc Machine Tests', () => {
       expect(state.context.errors).toEqual([]);
     });
 
-    it('Can select a different doc type from retry state desktop', () => {
+    it('Can select a different doc type from retry state desktop ans resets image side', () => {
       const machine = interpret(createIdDocMachine({ ...argsRegularDesktop }));
       machine.start();
 
@@ -470,13 +470,26 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
+          type: 'processingSucceeded',
+          payload: {
+            nextSideToCollect: 'back',
+          },
+        },
+        {
+          type: 'receivedImage',
+          payload: {
+            imageString: 'image',
+            mimeType: 'image/png',
+          },
+        },
+        {
           type: 'processingErrored',
           payload: {
             errors: processingErrors,
           },
         },
       ]);
-      expect(state.value).toEqual('frontImageRetryDesktop');
+      expect(state.value).toEqual('backImageRetryDesktop');
       expect(state.context.errors).toEqual(processingErrors);
 
       state = machine.send([
@@ -486,6 +499,16 @@ describe('Id Doc Machine Tests', () => {
       ]);
       expect(state.value).toEqual('countryAndType');
       expect(state.context.errors).toEqual([]);
+
+      state = machine.send({
+        type: 'receivedCountryAndType',
+        payload: {
+          type: SupportedIdDocTypes.driversLicense,
+          country: 'US',
+          id: 'id',
+        },
+      });
+      expect(state.context.currSide).toEqual(IdDocImageTypes.front);
     });
 
     it('Can select a different doc type from retry state mobile', () => {
@@ -531,6 +554,7 @@ describe('Id Doc Machine Tests', () => {
       ]);
       expect(state.value).toEqual('countryAndType');
       expect(state.context.errors).toEqual([]);
+      expect(state.context.currSide).toEqual(IdDocImageTypes.front);
     });
 
     it('Allows uploading any side/selfie based nextSideToCollect out of order on mobile', () => {
