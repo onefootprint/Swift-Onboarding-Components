@@ -1,57 +1,24 @@
 use db::models::onboarding_decision::OnboardingDecision;
-use newtypes::{DecisionStatus, VendorAPI};
+use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI};
 
 use crate::decision::features::kyb_features::KybFeatureVector;
 use crate::decision::features::risk_signals::risk_signal_group_struct::Kyb;
 use crate::decision::onboarding::FeatureVector;
+use crate::decision::rule::rule_set::Rule;
+use crate::decision::rule::rule_sets::RiskSignalRuleEvaluator;
 use crate::decision::rule::RuleName;
 use crate::errors::ApiResult;
-use crate::ApiError;
 
 use crate::decision::{
-    features::{
-        experian::ExperianFeatures,
-        idology_expectid::IDologyFeatures,
-        incode_docv::IncodeDocumentFeatures,
-        risk_signals::{RiskSignalGroupStruct, RiskSignalsForDecision},
-    },
-    rule::{
-        rule_set::{Action, RuleSet},
-        rule_sets,
-        rules_engine::{evaluate_onboarding_rule_set, OnboardingEvaluationResult},
-    },
+    features::risk_signals::{RiskSignalGroupStruct, RiskSignalsForDecision},
+    rule::{rule_set::Action, rule_sets, rules_engine::OnboardingEvaluationResult},
     RuleError,
 };
 
 use super::{
-    Decision, DecisionResult, FeatureSet, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
+    Decision, DecisionResult, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
     WaterfallOnboardingRulesDecisionOutput,
 };
-
-// Convert a typed group of risk signals into a Vendor specific FeatureSet
-pub fn rule_input_from_risk_signals<F>(risk_signals: RiskSignalsForDecision) -> ApiResult<F>
-where
-    F: TryFrom<RiskSignalsForDecision>,
-    F: Clone + FeatureSet,
-    ApiError: std::convert::From<<F as std::convert::TryFrom<RiskSignalsForDecision>>::Error>,
-{
-    let res = F::try_from(risk_signals)?;
-
-    Ok(res)
-}
-
-pub fn evaluate_rule_set_from_risk_signals<F>(
-    rule_set: RuleSet<F>,
-    risk_signals: RiskSignalsForDecision,
-) -> ApiResult<OnboardingEvaluationResult>
-where
-    F: TryFrom<RiskSignalsForDecision>,
-    F: Clone + FeatureSet,
-    ApiError: std::convert::From<<F as std::convert::TryFrom<RiskSignalsForDecision>>::Error>,
-{
-    let input: F = rule_input_from_risk_signals(risk_signals)?;
-    Ok(evaluate_onboarding_rule_set(rule_set, &input))
-}
 
 pub struct KycRuleExecutionConfig {
     pub include_doc: bool,
@@ -60,17 +27,27 @@ pub struct KycRuleExecutionConfig {
 }
 
 pub struct KycRuleGroup {
-    pub idology_rules: RuleSet<IDologyFeatures>,
-    pub experian_rules: RuleSet<ExperianFeatures>,
-    pub incode_doc_rules: RuleSet<IncodeDocumentFeatures>,
+    pub kyc_rules: Vec<Rule<Vec<FootprintReasonCode>>>,
+    pub doc_rules: Vec<Rule<Vec<FootprintReasonCode>>>,
+    pub aml_rules: Vec<Rule<Vec<FootprintReasonCode>>>,
+}
+
+impl KycRuleGroup {
+    fn risk_signal_rule_evaluator(&self) -> RiskSignalRuleEvaluator {
+        RiskSignalRuleEvaluator::new(
+            self.kyc_rules.clone(),
+            self.doc_rules.clone(),
+            self.aml_rules.clone(),
+        )
+    }
 }
 
 impl Default for KycRuleGroup {
     fn default() -> Self {
         Self {
-            idology_rules: rule_sets::kyc::idology_rule_set(),
-            experian_rules: rule_sets::kyc::experian_rule_set(),
-            incode_doc_rules: rule_sets::doc::incode_rule_set(),
+            kyc_rules: rule_sets::kyc::kyc_rules(),
+            doc_rules: rule_sets::doc::incode_rules(),
+            aml_rules: rule_sets::common::aml_rules(),
         }
     }
 }
@@ -80,32 +57,14 @@ impl KycRuleGroup {
         risk_signals: RiskSignalsForDecision,
         config: KycRuleExecutionConfig,
     ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
-        // Since we waterfall here, we don't expect all the rule results to be available. But we do expect that at least _1_ is available
-        // (for now, until we have doc only)
-        let idology_rule_result =
-            evaluate_rule_set_from_risk_signals(self.idology_rules.clone(), risk_signals.clone()).ok();
-
-        let experian_rule_result =
-            evaluate_rule_set_from_risk_signals(self.experian_rules.clone(), risk_signals.clone()).ok();
-
-        let incode_doc_rule_result =
-            evaluate_rule_set_from_risk_signals(self.incode_doc_rules.clone(), risk_signals).ok();
-
-        // Check we have a KYC result from one of the vendors
-        let kyc_rule_results: Vec<OnboardingEvaluationResult> =
-            vec![experian_rule_result, idology_rule_result]
-                .into_iter()
-                .flatten()
-                .collect();
+        let rule_result = self.risk_signal_rule_evaluator().evaluate(risk_signals);
 
         let kyc_result = if !(config.document_only || config.skip_kyc) {
             // First we evaluate KYC, choosing which of the potentially multiple vendors we might have
-            let kyc_result = kyc_rule_results
-                .iter()
-                .min_by(|x, y| x.triggered_action.cmp(&y.triggered_action))
+            let kyc_result = rule_result
+                .kyc
                 .ok_or(RuleError::MissingInputForKYCRules)
-                .map_err(crate::decision::Error::from)?
-                .clone();
+                .map_err(crate::decision::Error::from)?;
 
             DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(kyc_result))
         } else {
@@ -114,7 +73,7 @@ impl KycRuleGroup {
 
         // handle document decisioning
         let doc_result = if config.include_doc {
-            DecisionResult::Evaluated(Self::handle_doc_result(incode_doc_rule_result))
+            DecisionResult::Evaluated(Self::handle_doc_result(rule_result.doc))
         } else {
             DecisionResult::NotRequired
         };

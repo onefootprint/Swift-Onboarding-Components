@@ -52,9 +52,9 @@ pub struct AlpacaKycDecisioning {
 impl HasRuleGroup for AlpacaKycDecisioning {
     fn rule_group(&self) -> KycRuleGroup {
         KycRuleGroup {
-            idology_rules: rule_sets::alpaca::idology_rule_set(),
-            experian_rules: rule_sets::alpaca::experian_rule_set(),
-            incode_doc_rules: rule_sets::alpaca::incode_rule_set(),
+            kyc_rules: rule_sets::alpaca::alpaca_rules(),
+            doc_rules: vec![], // everything goes to review
+            aml_rules: vec![], // WL handled in state
         }
     }
 }
@@ -69,10 +69,11 @@ pub struct AlpacaKycWatchlistCheck {
 
 impl HasRuleGroup for AlpacaKycWatchlistCheck {
     fn rule_group(&self) -> KycRuleGroup {
+        // don't use rules for this really, maybe this trait is not right..
         KycRuleGroup {
-            idology_rules: rule_sets::alpaca::idology_rule_set(),
-            experian_rules: rule_sets::alpaca::experian_rule_set(),
-            incode_doc_rules: rule_sets::alpaca::incode_rule_set(),
+            kyc_rules: rule_sets::alpaca::alpaca_rules(),
+            doc_rules: vec![], // everything goes to review
+            aml_rules: vec![], // WL handled in state
         }
     }
 }

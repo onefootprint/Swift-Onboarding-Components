@@ -176,7 +176,7 @@ pub fn experian_rule_set() -> RuleSet<ExperianFeatures> {
 
 // NEW RULES
 pub fn kyc_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
-    vec![
+    let kyc = vec![
         Rule {
             rule: |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::IdNotLocated),
             name: RuleName::IdNotLocated,
@@ -196,11 +196,6 @@ pub fn kyc_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
         // IDOLOGY RULES
         //
         // If we don't have a located identity, we should fail
-        Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::IdNotLocated) },
-            name: RuleName::IdNotLocated,
-            action: Action::Fail,
-        },
         //
         // These rules fire when the id is located, but there's red flags
         //
@@ -222,11 +217,6 @@ pub fn kyc_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
             action: Action::Fail,
         },
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnDoesNotMatch) },
-            name: RuleName::SsnDoesNotMatch,
-            action: Action::Fail,
-        },
-        Rule {
             rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnInputIsInvalid) },
             name: RuleName::SsnInputIsInvalid,
             action: Action::Fail,
@@ -235,11 +225,6 @@ pub fn kyc_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
             rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnLocatedIsInvalid) },
             name: RuleName::SsnLocatedIsInvalid,
             action: Action::Fail,
-        },
-        Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnNotProvided) },
-            name: RuleName::SsnNotProvided,
-            action: Action::ManualReview,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
@@ -253,7 +238,12 @@ pub fn kyc_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
             name: RuleName::SsnIssuedPriorToDob,
             action: Action::Fail,
         },
-    ]
+    ];
+
+    // TODO: rm once we have transitioned to RSG<AML>
+    kyc.into_iter()
+        .chain(super::common::aml_rules().into_iter())
+        .collect()
 }
 #[cfg(test)]
 mod tests {

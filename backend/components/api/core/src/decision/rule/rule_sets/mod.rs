@@ -15,9 +15,9 @@ pub mod kyc;
 
 #[allow(dead_code)]
 pub struct RiskSignalRuleOutput {
-    kyc: Option<OnboardingEvaluationResult>,
-    doc: Option<OnboardingEvaluationResult>,
-    aml: Option<OnboardingEvaluationResult>,
+    pub kyc: Option<OnboardingEvaluationResult>,
+    pub doc: Option<OnboardingEvaluationResult>,
+    pub aml: Option<OnboardingEvaluationResult>,
 }
 
 pub struct RiskSignalRuleEvaluator {

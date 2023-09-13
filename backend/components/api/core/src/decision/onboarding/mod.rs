@@ -6,11 +6,17 @@ use crate::errors::ApiResult;
 use super::rule::RuleName;
 pub mod rules;
 
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(Eq, Debug, Clone)]
 pub struct OnboardingRulesDecisionOutput {
     pub decision: Decision,
     pub rules_triggered: Vec<RuleName>,
     pub rules_not_triggered: Vec<RuleName>,
+}
+
+impl PartialEq for OnboardingRulesDecisionOutput {
+    fn eq(&self, other: &Self) -> bool {
+        self.decision == other.decision && self.rules_triggered == other.rules_triggered
+    }
 }
 
 impl OnboardingRulesDecisionOutput {

@@ -4,6 +4,7 @@ use db::models::{
     ob_configuration::ObConfiguration,
     risk_signal::{IncludeHidden, RiskSignal},
 };
+use itertools::Itertools;
 use newtypes::{
     CollectedData, FootprintReasonCode, IdentityDataKind, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
     VerificationResultId,
@@ -307,6 +308,7 @@ where
         self.footprint_reason_codes
             .iter()
             .map(|(_, v, _)| v)
+            .unique()
             .cloned()
             .collect()
     }

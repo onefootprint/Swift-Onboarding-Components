@@ -14,7 +14,6 @@ use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
 use crate::decision::utils::should_execute_rules_for_document_only;
 use crate::decision::{
     onboarding::rules::KycRuleGroup,
-    rule::rule_sets,
     state::{
         actions::{DocCollected, WorkflowActions},
         common,
@@ -53,11 +52,7 @@ pub struct DocumentDecisioning {
 
 impl HasRuleGroup for DocumentDecisioning {
     fn rule_group(&self) -> KycRuleGroup {
-        KycRuleGroup {
-            idology_rules: rule_sets::kyc::idology_rule_set(),
-            experian_rules: rule_sets::kyc::experian_rule_set(),
-            incode_doc_rules: rule_sets::doc::incode_rule_set(),
-        }
+        KycRuleGroup::default()
     }
 }
 

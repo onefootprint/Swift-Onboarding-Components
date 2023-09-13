@@ -52,9 +52,9 @@ pub struct KycDecisioning {
 impl HasRuleGroup for KycDecisioning {
     fn rule_group(&self) -> KycRuleGroup {
         KycRuleGroup {
-            idology_rules: rule_sets::kyc::idology_rule_set(),
-            experian_rules: rule_sets::kyc::experian_rule_set(),
-            incode_doc_rules: rule_sets::doc::incode_rule_set(),
+            kyc_rules: rule_sets::kyc::kyc_rules(),
+            doc_rules: rule_sets::doc::incode_rules(),
+            aml_rules: rule_sets::common::aml_rules(),
         }
     }
 }

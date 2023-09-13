@@ -100,7 +100,7 @@ fn alpaca_field_validation_rules<T: FeatureSet>() -> Vec<Rule<T>> {
 
 // NEW RULES
 #[allow(dead_code)]
-fn alpaca_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
+pub fn alpaca_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
     super::kyc::kyc_rules()
         .into_iter()
         .chain(field_validation_rules().into_iter())
