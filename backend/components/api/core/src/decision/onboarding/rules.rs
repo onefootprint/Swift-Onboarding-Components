@@ -82,7 +82,6 @@ impl KycRuleGroup {
     ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
         // Since we waterfall here, we don't expect all the rule results to be available. But we do expect that at least _1_ is available
         // (for now, until we have doc only)
-
         let idology_rule_result =
             evaluate_rule_set_from_risk_signals(self.idology_rules.clone(), risk_signals.clone()).ok();
 

@@ -174,6 +174,87 @@ pub fn experian_rule_set() -> RuleSet<ExperianFeatures> {
     }
 }
 
+// NEW RULES
+pub fn kyc_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
+    vec![
+        Rule {
+            rule: |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::IdNotLocated),
+            name: RuleName::IdNotLocated,
+            action: Action::Fail,
+        },
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnDoesNotMatch) },
+            name: RuleName::SsnDoesNotMatch,
+            action: Action::Fail,
+        },
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnNotProvided) },
+            name: RuleName::SsnNotProvided,
+            action: Action::ManualReview,
+        },
+        //
+        // IDOLOGY RULES
+        //
+        // If we don't have a located identity, we should fail
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::IdNotLocated) },
+            name: RuleName::IdNotLocated,
+            action: Action::Fail,
+        },
+        //
+        // These rules fire when the id is located, but there's red flags
+        //
+        // This is an IDology recommended "always fail" rule
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SubjectDeceased) },
+            name: RuleName::SubjectDeceased,
+            action: Action::Fail,
+        },
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::AddressInputIsPoBox) },
+            name: RuleName::AddressInputIsPoBox,
+            action: Action::Fail,
+        },
+        // This is an IDology recommended "always fail" rule
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DobLocatedCoppaAlert) },
+            name: RuleName::CoppaAlert,
+            action: Action::Fail,
+        },
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnDoesNotMatch) },
+            name: RuleName::SsnDoesNotMatch,
+            action: Action::Fail,
+        },
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnInputIsInvalid) },
+            name: RuleName::SsnInputIsInvalid,
+            action: Action::Fail,
+        },
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnLocatedIsInvalid) },
+            name: RuleName::SsnLocatedIsInvalid,
+            action: Action::Fail,
+        },
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnNotProvided) },
+            name: RuleName::SsnNotProvided,
+            action: Action::ManualReview,
+        },
+        // This is an IDology recommended "always fail" rule
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::MultipleRecordsFound) },
+            name: RuleName::MultipleRecordsFound,
+            action: Action::Fail,
+        },
+        // This is an IDology recommended "always fail" rule
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnIssuedPriorToDob) },
+            name: RuleName::SsnIssuedPriorToDob,
+            action: Action::Fail,
+        },
+    ]
+}
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;

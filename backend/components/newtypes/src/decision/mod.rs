@@ -15,6 +15,7 @@ pub enum RuleSetName {
     Test(String),
     MiddeskBaseRules,
     BosMustPassKycRules,
+    AllFootprintReasonCodeRules,
 }
 
 #[derive(

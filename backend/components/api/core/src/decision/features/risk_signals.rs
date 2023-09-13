@@ -13,8 +13,9 @@ use super::{
     experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures,
 };
 use crate::{
-    decision::vendor::vendor_api::vendor_api_response::{
-        VendorAPIResponseIdentifiersMap, VendorAPIResponseMap,
+    decision::{
+        onboarding::FeatureSet,
+        vendor::vendor_api::vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
     },
     utils::vault_wrapper::VaultWrapper,
     ApiError,
@@ -289,6 +290,26 @@ where
             footprint_reason_codes: frcs,
             group,
         })
+}
+
+impl<T> FeatureSet for RiskSignalGroupStruct<T>
+where
+    T: Into<WrappedRiskSignalGroupKind> + Clone,
+{
+    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
+        self.footprint_reason_codes
+            .iter()
+            .map(|(frc, _, _)| frc.clone())
+            .collect()
+    }
+
+    fn vendor_apis(&self) -> Vec<VendorAPI> {
+        self.footprint_reason_codes
+            .iter()
+            .map(|(_, v, _)| v)
+            .cloned()
+            .collect()
+    }
 }
 
 // RiskSignalGroupKind is defined in `newtypes` with all the other

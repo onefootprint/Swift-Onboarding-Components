@@ -1,9 +1,9 @@
-use newtypes::VendorAPI;
+use newtypes::{FootprintReasonCode, VendorAPI};
 
 use crate::decision::{onboarding::FeatureSet, rule::RULE_LOG_LINE};
 
 use super::{
-    rule_set::{Action, RuleSet, RuleSetResult},
+    rule_set::{Action, Rule, RuleEvaluationSummary, RuleSet, RuleSetResult},
     *,
 };
 
@@ -22,6 +22,44 @@ where
         rules_not_triggered: evaluated_ruleset.not_triggered_rule_names(),
         triggered_action,
         vendor_apis: rule_input.vendor_apis(),
+    }
+}
+
+pub fn evaluate_reason_code_rules(
+    rules: Vec<Rule<Vec<FootprintReasonCode>>>,
+    footprint_reason_codes: &Vec<FootprintReasonCode>,
+    vendor_apis: Vec<VendorAPI>,
+) -> OnboardingEvaluationResult {
+    // for the rules in the rule set, evaluate each rule
+    let evaluated = rules.iter().cloned().map(|rule| RuleEvaluationSummary {
+        name: rule.name,
+        action: rule.action,
+        triggered: (rule.rule)(footprint_reason_codes),
+    });
+
+    // partition rules by whether or not the rule evaluated to true
+    let (rules_triggered, rules_not_triggered): (Vec<_>, Vec<_>) = evaluated.partition(|r| r.triggered);
+
+    // overall action for the rule set
+    let action_for_rule_set = rules_triggered.iter().map(|r| r.action.clone()).max();
+
+    // Build a struct that represents the result of evaluating the rule set
+    let evaluated_ruleset = RuleSetResult {
+        ruleset_name: RuleSetName::AllFootprintReasonCodeRules,
+        rules_triggered,
+        rules_not_triggered,
+        action: action_for_rule_set,
+    };
+    let triggered_action = evaluated_ruleset.action.clone();
+
+    // Log evaluation of a single rule set
+    log_ruleset_evaluation(&evaluated_ruleset, vendor_apis.clone());
+
+    OnboardingEvaluationResult {
+        rules_triggered: evaluated_ruleset.triggered_rule_names(),
+        rules_not_triggered: evaluated_ruleset.not_triggered_rule_names(),
+        triggered_action,
+        vendor_apis,
     }
 }
 

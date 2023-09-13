@@ -42,3 +42,24 @@ pub fn incode_rule_set() -> RuleSet<IncodeDocumentFeatures> {
         name: RuleSetName::IncodeRules,
     }
 }
+
+// NEW RULES
+pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
+    vec![
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentNotVerified) },
+            name: RuleName::DocumentNotVerified,
+            action: Action::Fail,
+        },
+        Rule {
+            rule: {
+                |f: &Vec<FootprintReasonCode>| {
+                    f.contains(&FootprintReasonCode::DocumentSelfieDoesNotMatch)
+                    // Only written when there's a selfie in the verification session
+                }
+            },
+            name: RuleName::SelfieDoesNotMatch,
+            action: Action::Fail,
+        },
+    ]
+}
