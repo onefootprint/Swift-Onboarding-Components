@@ -31,8 +31,10 @@ def test_international_address_req(sandbox_tenant, must_collect_data, twilio):
     req = get_requirement_from_requirements("collect_data", status["requirements"])
     assert "full_address" not in req["missing_attributes"]
     assert "ssn9" not in req["missing_attributes"]
-    fields_to_authorize = get_requirement_from_requirements("authorize", status['requirements'])["fields_to_authorize"]["collected_data"]
-    assert 'ssn9' not in fields_to_authorize
+    fields_to_authorize = get_requirement_from_requirements(
+        "authorize", status["requirements"]
+    )["fields_to_authorize"]["collected_data"]
+    assert "ssn9" not in fields_to_authorize
 
 
 def test_user_without_documents_international(
@@ -70,11 +72,11 @@ def test_user_without_documents_international(
     n_countries = 0
     for country, doc_types in country_doc_mapping.items():
         # all non-US have only passport
-        if country != 'US':
+        if country != "US":
             assert doc_types == ["passport"]
-        
+
         n_countries += 1
-    
+
     # we have all iso3166 countries allowed
     assert n_countries == 249
 
@@ -108,13 +110,14 @@ def test_with_documents_handles_international_address(
     n_countries = 0
     for country, doc_types in country_doc_mapping.items():
         # all non-US have only passport
-        if country != 'US':
+        if country != "US":
             assert doc_types == ["passport"]
-        
+
         n_countries += 1
-    
+
     # we have all iso3166 countries allowed
     assert n_countries == 249
+
 
 def test_with_documents_handles_international_address_restricted_documents(
     sandbox_tenant, must_collect_data, can_access_data, twilio
@@ -139,7 +142,7 @@ def test_with_documents_handles_international_address_restricted_documents(
     )
     assert doc_requirement["should_collect_selfie"]
     assert doc_requirement["supported_document_types"] == ["passport"]
-    assert len(doc_requirement['supported_countries']) == 249
+    assert len(doc_requirement["supported_countries"]) == 249
 
     country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
     assert country_doc_mapping["MX"] == ["passport"]
@@ -153,9 +156,8 @@ def test_with_documents_handles_international_address_restricted_documents(
 def test_with_documents_handles_international_address_restricted_documents_with_dl(
     sandbox_tenant, must_collect_data, can_access_data, twilio
 ):
-    
     # in this test we expect to see the following behavior:
-    # 
+    #
     # user can onboard from US, MX, or NO
     # user can supply DL or passport, but DL ONLY if they are residing in the US
     # if user is not in the US, they can only give passport
@@ -172,9 +174,15 @@ def test_with_documents_handles_international_address_restricted_documents_with_
     doc_requirement_before_address = get_requirement_from_requirements(
         "collect_document", status_before_address["requirements"]
     )
-    assert doc_requirement_before_address["supported_document_types"] == ["passport", "drivers_license"]
-    country_doc_mapping_before_address = doc_requirement_before_address["supported_country_and_doc_types"]
-    assert country_doc_mapping_before_address["US"] == ["drivers_license", "passport"]
+    assert set(doc_requirement_before_address["supported_document_types"]) == set(
+        ["passport", "drivers_license"]
+    )
+    country_doc_mapping_before_address = doc_requirement_before_address[
+        "supported_country_and_doc_types"
+    ]
+    assert set(country_doc_mapping_before_address["US"]) == set(
+        ["drivers_license", "passport"]
+    )
 
     # collect MX address
     bifrost.data["id.country"] = "MX"
@@ -189,7 +197,7 @@ def test_with_documents_handles_international_address_restricted_documents_with_
     )
     assert doc_requirement["should_collect_selfie"]
     assert doc_requirement["supported_document_types"] == ["passport"]
-    assert len(doc_requirement['supported_countries']) == 249
+    assert len(doc_requirement["supported_countries"]) == 249
 
     country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
     assert country_doc_mapping["MX"] == ["passport"]
@@ -220,7 +228,7 @@ def test_us_legal_status(sandbox_tenant, twilio):
             "us_legal_status",
         ],
         optional_data=[],
-        allow_international_residents=True
+        allow_international_residents=True,
     )
     bifrost = BifrostClient.new(obc, twilio)
 
@@ -228,9 +236,12 @@ def test_us_legal_status(sandbox_tenant, twilio):
     collect_data_requirement_before_address = get_requirement_from_requirements(
         "collect_data", status_before_address["requirements"]
     )
-    
-    assert 'us_legal_status' in collect_data_requirement_before_address["missing_attributes"]
-    
+
+    assert (
+        "us_legal_status"
+        in collect_data_requirement_before_address["missing_attributes"]
+    )
+
     # collect MX address
     bifrost.data["id.country"] = "MX"
     # remove legal status
@@ -245,5 +256,7 @@ def test_us_legal_status(sandbox_tenant, twilio):
 
     assert collect_data_requirement_after_address is None
 
-    fields_to_authorize = get_requirement_from_requirements("authorize", status_after_address['requirements'])["fields_to_authorize"]["collected_data"]
-    assert 'us_legal_status' not in fields_to_authorize
+    fields_to_authorize = get_requirement_from_requirements(
+        "authorize", status_after_address["requirements"]
+    )["fields_to_authorize"]["collected_data"]
+    assert "us_legal_status" not in fields_to_authorize

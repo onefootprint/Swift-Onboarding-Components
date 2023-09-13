@@ -69,6 +69,7 @@ async fn test(
     let mut mock_ff_client = MockFeatureFlagClient::new();
     mock_ff_client.expect_flag().returning(|f| match f {
         BoolFlag::EnableIdologyInNonProd(_) => true,
+        BoolFlag::EnableIncodeWatchlistCheckInNonProd(_) => true,
         _ => f.default(),
     });
 

@@ -5,18 +5,20 @@ use db::models::verification_request::RequestAndMaybeResult;
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
 use db::DbPool;
 use either::Either;
+use feature_flag::BoolFlag;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::incode::APIResponseToIncodeError;
 use idv::incode::{
     response::OnboardingStartResponse, watchlist::IncodeWatchlistCheckRequest, IncodeResponse,
     IncodeStartOnboardingRequest,
 };
+use idv::{ParsedResponse, VendorResponse};
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DecisionIntentId, IdvData, IncodeConfigurationId,
     ScopedVaultId, VendorAPI,
 };
 use newtypes::{
-    EncryptedVaultPrivateKey, ObConfigurationKey, VaultPublicKey, VerificationRequestId,
+    EncryptedVaultPrivateKey, ObConfigurationKey, PiiJsonValue, VaultPublicKey, VerificationRequestId,
     VerificationResultId, WorkflowId,
 };
 
@@ -189,7 +191,7 @@ pub async fn run_watchlist_check(
     let svid = di.scoped_vault_id.clone();
     let diid = di.id.clone();
     let wf_id = wf_id.clone();
-    let (latest_results, tenant_id, vw, _ob_configuration_key) = state
+    let (latest_results, tenant_id, vw, obc_key) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
@@ -216,11 +218,24 @@ pub async fn run_watchlist_check(
     let tvc =
         TenantVendorControl::new(tenant_id, &state.db_pool, &state.config, &state.enclave_client).await?;
 
-    // TODO: dont make real call if in Prod
-
-    make_watchlist_result_call(state, &tvc, &di.scoped_vault_id, &di.id, &vw.vault.public_key)
+    // dont make real call if non-Prod, unless specifically FF'd to do so
+    if state.config.service_config.is_production()
+        || state
+            .feature_flag_client
+            .flag(BoolFlag::EnableIncodeWatchlistCheckInNonProd(&obc_key))
+    {
+        make_watchlist_result_call(state, &tvc, &di.scoped_vault_id, &di.id, &vw.vault.public_key)
+            .await
+            .map(|(vr, wr)| (vr.id, wr)) //we return vres.id instead of vres just because we currently only get vres_id from our VendorAPIResponseIdentifiersMap
+    } else {
+        save_canned_response(
+            state,
+            di.scoped_vault_id.clone(),
+            di.id.clone(),
+            vw.vault.public_key.clone(),
+        )
         .await
-        .map(|(vr, wr)| (vr.id, wr)) //we return vres.id instead of vres just because we currently only get vres_id from our VendorAPIResponseIdentifiersMap
+    }
 }
 
 async fn existing_watchlist_check_response(
@@ -246,4 +261,31 @@ async fn existing_watchlist_check_response(
     } else {
         Ok(None)
     }
+}
+
+async fn save_canned_response(
+    state: &State,
+    sv_id: ScopedVaultId,
+    di_id: DecisionIntentId,
+    public_key: VaultPublicKey,
+) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let canned_res = idv::test_fixtures::incode_watchlist_result_response_no_hits();
+            let parsed = serde_json::from_value::<WatchlistResultResponse>(canned_res.clone())?;
+
+            let (_vreq, vres) = verification_result::save_vreq_and_vres(
+                conn,
+                &public_key,
+                &sv_id,
+                &di_id,
+                Ok(VendorResponse {
+                    raw_response: PiiJsonValue::new(serde_json::to_value(&canned_res)?),
+                    response: ParsedResponse::IncodeWatchlistCheck(parsed.clone()),
+                }),
+            )?;
+            Ok((vres.id, parsed))
+        })
+        .await
 }

@@ -55,6 +55,8 @@ pub enum BoolFlag<'a> {
     DisableConservativeSharpnessForDocument(&'a TenantId),
     #[strum(to_string = "DisallowDriverLicensePermits")]
     DisallowDriverLicensePermits(&'a TenantId),
+    #[strum(to_string = "EnableIncodeWatchlistCheckInNonProd")]
+    EnableIncodeWatchlistCheckInNonProd(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -90,6 +92,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisableConservativeGlareForDocument(k) => Some(k.to_string()),
             Self::DisableConservativeSharpnessForDocument(k) => Some(k.to_string()),
             Self::DisallowDriverLicensePermits(k) => Some(k.to_string()),
+            Self::EnableIncodeWatchlistCheckInNonProd(k) => Some(k.to_string()),
         }
     }
 
@@ -121,6 +124,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisableConservativeGlareForDocument(_) => false,
             Self::DisableConservativeSharpnessForDocument(_) => false,
             Self::DisallowDriverLicensePermits(_) => false,
+            Self::EnableIncodeWatchlistCheckInNonProd(_) => false,
         }
     }
 }
