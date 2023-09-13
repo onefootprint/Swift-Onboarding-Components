@@ -21,6 +21,7 @@ apt-get install -y --no-install-recommends \
   python3-pip \
   python3-venv \
   lsb-core \
+  clang \
   awscli
 
 ## install postgres
@@ -29,7 +30,7 @@ wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key a
 apt-get update -y
 apt-get install postgresql-14 -y
 service postgresql start
-sudo -u postgres createuser root --createdb
+sudo -u postgres createuser $USERNAME --createdb
 sed -i -e 's/peer/trust/g' /etc/postgresql/14/main/pg_hba.conf
 sed -i -e 's/scram-sha-256/trust/g' /etc/postgresql/14/main/pg_hba.conf
 service postgresql restart
@@ -37,13 +38,28 @@ createdb footprint_db
 
 ## Install rustup and common components
 curl https://sh.rustup.rs -sSf | sh -s -- -y 
+source "$HOME/.cargo/env"
 rustup install stable
+rustup default 1.70.0
 rustup component add rustfmt
 rustup component add clippy 
 
 cargo install cargo-expand
 cargo install cargo-edit
 cargo install diesel_cli --no-default-features --features postgres
+
+# install a faster linker: mold
+dir=$(pwd)
+cd /tmp
+git clone https://github.com/rui314/mold.git
+mkdir mold/build
+cd mold/build
+git checkout v2.0.0
+../install-build-deps.sh
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-10 ..
+cmake --build . -j $(nproc)
+sudo cmake --build . --target install
+cd $dir
 
 ## setup and install oh-my-zsh + some fun term things
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
