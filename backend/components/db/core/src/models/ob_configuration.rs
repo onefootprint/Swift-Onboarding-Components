@@ -148,14 +148,25 @@ impl ObConfiguration {
 
     // Assumes you've checked if the document type is supported already
     fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
-        let all_us_and_territories = Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories();
-        match doc_type {
-            IdDocKind::IdCard => all_us_and_territories,
-            IdDocKind::DriversLicense => all_us_and_territories,
-            IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
-            IdDocKind::Permit => all_us_and_territories,
-            IdDocKind::Visa => all_us_and_territories,
-            IdDocKind::ResidenceDocument => all_us_and_territories,
+        if self.tenant_id.is_findigs() {
+            match doc_type {
+                IdDocKind::IdCard => Iso3166TwoDigitCountryCode::iter().collect(),
+                IdDocKind::DriversLicense => Iso3166TwoDigitCountryCode::iter().collect(),
+                IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
+                IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::US],
+                IdDocKind::Visa => vec![Iso3166TwoDigitCountryCode::US],
+                IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
+            }
+        } else {
+            let all_us_and_territories = Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories();
+            match doc_type {
+                IdDocKind::IdCard => all_us_and_territories,
+                IdDocKind::DriversLicense => all_us_and_territories,
+                IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
+                IdDocKind::Permit => all_us_and_territories,
+                IdDocKind::Visa => all_us_and_territories,
+                IdDocKind::ResidenceDocument => all_us_and_territories,
+            }
         }
     }
 
