@@ -2,7 +2,7 @@ use crate::auth::tenant::AuthActor;
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
     mock_idology, mock_incode, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals,
-    setup_data, DocumentOutcome, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted,
+    setup_data, AmlKind, DocumentOutcome, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted,
     OnboardingStatusChanged, UserKind, WithHit, WithQualifier,
 };
 use crate::decision::state::MakeDecision;
@@ -80,7 +80,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
                 .return_once(move |_| true);
 
             mock_idology(state, WithQualifier(None));
-            mock_incode(state, WithHit(false));
+            mock_incode(state, WithHit(vec![]));
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -238,7 +238,7 @@ async fn pass_then_watchlist_hit(
                 .return_once(move |_| true);
 
             mock_idology(state, WithQualifier(None));
-            mock_incode(state, WithHit(true));
+            mock_incode(state, WithHit(vec![AmlKind::Ofac, AmlKind::Am]));
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -443,7 +443,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
                 state,
                 WithQualifier(Some("resultcode.first.name.does.not.match".to_owned())),
             );
-            mock_incode(state, WithHit(false));
+            mock_incode(state, WithHit(vec![]));
             mock_incode_doc_collection(state, svid2, DocumentOutcome::Success, wfid.clone(), false).await;
         }
     };
@@ -774,7 +774,7 @@ async fn redo_and_pass(
                 .return_once(move |_| true);
 
             mock_idology(state, WithQualifier(None));
-            mock_incode(state, WithHit(false));
+            mock_incode(state, WithHit(vec![]));
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));

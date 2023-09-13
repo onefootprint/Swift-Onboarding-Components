@@ -5,7 +5,22 @@ use crate::idology::IdologyExpectIDAPIResponse;
 use newtypes::PiiJsonValue;
 use serde_json::json;
 
-pub fn create_response(results: String, qualifier: Option<String>) -> IdologyExpectIDAPIResponse {
+pub fn create_response(
+    results: String,
+    qualifier: Option<String>,
+    pa_lists: Option<Vec<String>>,
+) -> IdologyExpectIDAPIResponse {
+    let restriction = pa_lists.map(|lists| {
+        let pa = lists
+            .into_iter()
+            .map(|l| json!({"list": l, "score": 94}))
+            .collect::<Vec<_>>();
+        crate::idology::expectid::response::Restriction {
+            key: Some("global.watch.list".to_owned()),
+            pa: Some(json!(pa)),
+            ..Default::default()
+        }
+    });
     let parsed_response = ExpectIDResponse {
         response: Response {
             qualifiers: qualifier.map(|q| IDologyQualifiers {
@@ -16,7 +31,7 @@ pub fn create_response(results: String, qualifier: Option<String>) -> IdologyExp
             id_number: None,
             id_scan: None,
             error: None,
-            restriction: None,
+            restriction,
         },
     };
     IdologyExpectIDAPIResponse {

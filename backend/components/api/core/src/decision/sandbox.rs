@@ -9,7 +9,7 @@ use db::{
     },
     DbPool,
 };
-use idv::{ParsedResponse, VendorResponse};
+use idv::{incode::watchlist::response::WatchlistResultResponse, ParsedResponse, VendorResponse};
 use newtypes::{
     DecisionIntentId, DecisionStatus, FootprintReasonCode, ScopedVaultId, SignalSeverity, VaultKind,
     VaultPublicKey, VendorAPI,
@@ -246,8 +246,9 @@ pub async fn save_fixture_incode_watchlist_result(
     di_id: &DecisionIntentId,
     sv_id: &ScopedVaultId,
     vault_public_key: &VaultPublicKey,
-) -> ApiResult<VerificationResult> {
+) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
     let raw = incode_watchlist_result_response_for_fixture(fixture_decision);
+    let parsed = serde_json::from_value::<WatchlistResultResponse>(raw.clone())?;
 
     let di_id = di_id.clone();
     let sv_id = sv_id.clone();
@@ -264,7 +265,7 @@ pub async fn save_fixture_incode_watchlist_result(
         })
         .await?;
 
-    Ok(vres)
+    Ok((vres, parsed))
 }
 
 #[cfg(test)]

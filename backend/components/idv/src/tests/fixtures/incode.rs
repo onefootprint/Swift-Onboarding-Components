@@ -29,63 +29,49 @@ pub fn start_onboarding_response() -> IncodeResponse<OnboardingStartResponse> {
     }
 }
 
-pub fn watchlist_result_response() -> IncodeResponse<WatchlistResultResponse> {
+pub fn watchlist_result_response(list_types: Vec<String>) -> IncodeResponse<WatchlistResultResponse> {
+    let content = Content {
+        data: Some(Data {
+            id: None,
+            ref_: None,
+            filters: None,
+            hits: Some(vec![Hit {
+                score: Some(3.3),
+                is_whitelisted: None,
+                match_types: None,
+                match_type_details: None,
+                doc: Some(Doc {
+                    aka: None,
+                    fields: None,
+                    id: None,
+                    last_updated_utc: None,
+                    media: None,
+                    name: None,
+                    sources: None,
+                    types: Some(list_types),
+                }),
+            }]),
+            searcher_id: None,
+            assignee_id: None,
+            match_status: None,
+            risk_level: None,
+            search_term: None,
+            total_hits: None,
+            total_matches: None,
+            updated_at: None,
+            created_at: None,
+            tags: None,
+            limit: None,
+            offset: None,
+            share_url: None,
+        }),
+    };
     IncodeResponse {
         result: IncodeAPIResult::Success(WatchlistResultResponse {
             status: Some("sucess".to_owned()),
-            content: None,
+            content: Some(content),
             error: None,
         }),
         raw_response: PiiJsonValue::from(json!({})),
-    }
-}
-
-pub fn watchlist_result_response_with_hit() -> IncodeResponse<WatchlistResultResponse> {
-    let result = WatchlistResultResponse {
-        status: Some("success".to_owned()),
-        content: Some(Content {
-            data: Some(Data {
-                id: None,
-                ref_: None,
-                filters: None,
-                hits: Some(vec![Hit {
-                    score: Some(3.3),
-                    is_whitelisted: None,
-                    match_types: None,
-                    match_type_details: None,
-                    doc: Some(Doc {
-                        aka: None,
-                        fields: None,
-                        id: None,
-                        last_updated_utc: None,
-                        media: None,
-                        name: None,
-                        sources: None,
-                        types: Some(vec![
-                            "sanction".to_owned(),
-                            "adverse-media-v2-terrorism".to_owned(),
-                        ]),
-                    }),
-                }]),
-                searcher_id: None,
-                assignee_id: None,
-                match_status: None,
-                risk_level: None,
-                search_term: None,
-                total_hits: None,
-                total_matches: None,
-                updated_at: None,
-                created_at: None,
-                tags: None,
-                limit: None,
-                offset: None,
-                share_url: None,
-            }),
-        }),
-        error: None,
-    };
-    IncodeResponse {
-        result: IncodeAPIResult::Success(result.clone()),
-        raw_response: PiiJsonValue::from(serde_json::to_value(result).unwrap()),
     }
 }

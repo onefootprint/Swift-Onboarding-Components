@@ -39,6 +39,7 @@ use newtypes::{
     DecisionIntentKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
     WorkflowFixtureResult, WorkflowId,
 };
+use strum_macros::EnumIter;
 use webhooks::events::WebhookEvent;
 use webhooks::MockWebhookClient;
 
@@ -102,6 +103,13 @@ impl DocumentCollectionKind {
             DocumentCollectionKind::DocumentNotRequested => None,
         }
     }
+}
+
+#[derive(EnumIter, PartialEq, Eq, Debug)]
+pub enum AmlKind {
+    Ofac,
+    Pep,
+    Am,
 }
 
 pub async fn setup_data(
@@ -178,8 +186,17 @@ pub async fn query_risk_signals(
         .unwrap()
 }
 
-pub struct WithHit(pub bool);
+pub struct WithHit(pub Vec<AmlKind>);
 pub fn mock_incode(state: &mut State, with_hit: WithHit) {
+    let lists = with_hit
+        .0
+        .into_iter()
+        .map(|k| match k {
+            AmlKind::Ofac => "sanction".to_owned(),
+            AmlKind::Pep => "pep-class-1".to_owned(),
+            AmlKind::Am => "adverse-media".to_owned(),
+        })
+        .collect::<Vec<_>>();
     let mut mock_incode_start_onboarding = MockVendorAPICall::<
         IncodeStartOnboardingRequest,
         IncodeResponse<OnboardingStartResponse>,
@@ -197,11 +214,7 @@ pub fn mock_incode(state: &mut State, with_hit: WithHit) {
         idv::incode::error::Error,
     >::new();
 
-    let res = if with_hit.0 {
-        idv::tests::fixtures::incode::watchlist_result_response_with_hit()
-    } else {
-        idv::tests::fixtures::incode::watchlist_result_response()
-    };
+    let res = idv::tests::fixtures::incode::watchlist_result_response(lists);
 
     mock_incode_watchlist_check
         .expect_make_request()
@@ -224,6 +237,34 @@ pub fn mock_idology(state: &mut State, with_qualifier: WithQualifier) {
             Ok(idv::tests::fixtures::idology::create_response(
                 "result.match".to_string(),
                 with_qualifier.0,
+                None,
+            ))
+        });
+    state.set_idology_expect_id(Arc::new(mock_idology_expect_id));
+}
+
+pub fn mock_idology_pa_hit(state: &mut State, aml_kinds: Vec<AmlKind>) {
+    let pa_lists = aml_kinds
+        .into_iter()
+        .map(|k| match k {
+            AmlKind::Ofac => "Office of Foreign Asset Control".to_owned(),
+            AmlKind::Pep => "Politically Exposed Persons".to_owned(),
+            AmlKind::Am => panic!("idology cannot return adverse media hits"),
+        })
+        .collect();
+    let mut mock_idology_expect_id = MockVendorAPICall::<
+        IdologyExpectIDRequest,
+        IdologyExpectIDAPIResponse,
+        idv::idology::error::Error,
+    >::new();
+    mock_idology_expect_id
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| {
+            Ok(idv::tests::fixtures::idology::create_response(
+                "result.match.restricted".to_owned(),
+                None,
+                Some(pa_lists),
             ))
         });
     state.set_idology_expect_id(Arc::new(mock_idology_expect_id));

@@ -6,11 +6,13 @@ use db::models::{
     risk_signal::{NewRiskSignalInfo, RiskSignal},
     risk_signal_group::RiskSignalGroup,
     vault::Vault,
+    verification_result::VerificationResult,
     workflow::{Workflow as DbWorkflow, WorkflowUpdate},
 };
 
 use feature_flag::FeatureFlagClient;
-use newtypes::{KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind, VaultKind};
+use idv::incode::watchlist::response::WatchlistResultResponse;
+use newtypes::{EnhancedAmlOption, KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind, VaultKind};
 
 use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
@@ -18,8 +20,7 @@ use super::{
 use crate::decision::{
     features::risk_signals::{
         create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map,
-        risk_signal_group_struct::{Aml, Kyc},
-        save_risk_signals, RiskSignalGroupStruct,
+        risk_signal_group_struct::Kyc, save_risk_signals, RiskSignalGroupStruct,
     },
     state::{
         actions::{Authorize, WorkflowActions},
@@ -116,6 +117,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     type AsyncRes = (
         Option<Vec<NewRiskSignalInfo>>,
         Option<Vec<VendorResult>>,
+        Option<(VerificationResult, WatchlistResultResponse)>,
         Arc<dyn FeatureFlagClient>,
     );
 
@@ -142,12 +144,20 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
+        let aml_vendor_result = match obc.enhanced_aml {
+            EnhancedAmlOption::No => None,
+            EnhancedAmlOption::Yes { .. } => {
+                Some(common::run_aml_call(state, &self.wf_id, &self.t_id).await?)
+            }
+        };
+
         let ocr_reason_codes =
             common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id).await?;
 
         Ok((
             ocr_reason_codes,
             kyc_vendor_results,
+            aml_vendor_result,
             state.feature_flag_client.clone(),
         ))
     }
@@ -159,7 +169,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KycState> {
-        let (ocr_reason_codes, kyc_vendor_results, ff_client) = async_res;
+        let (ocr_reason_codes, kyc_vendor_results, aml_vendor_result, ff_client) = async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
 
         // Save OCR risk signals for doc-first OBC if necessary
@@ -170,46 +180,39 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             RiskSignal::bulk_add(conn, ocr_reason_codes, false, rsg.id)?;
         }
 
-        // Save KYC + AML risk signals, if we made KYC calls
-        if let Some(kyc_vendor_results) = kyc_vendor_results {
+        // Save KYC risk signals, if we made KYC calls
+        if let Some(kyc_vendor_results) = &kyc_vendor_results {
             let fixture_decision =
                 decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
-            let (kyc_risk_signals, aml_risk_signals): (
-                RiskSignalGroupStruct<Kyc>,
-                RiskSignalGroupStruct<Aml>,
-            ) = if let Some(fd) = fixture_decision {
+            let kyc_risk_signals = if let Some(fd) = fixture_decision {
                 let reason_codes =
                     decision::sandbox::get_fixture_reason_codes(fd, VaultKind::Person, Some((&vw, &obc)));
-                let vres_id = get_vres_id_for_fixture(&kyc_vendor_results)?;
+                let vres_id = get_vres_id_for_fixture(kyc_vendor_results)?;
 
-                let sandbox_kyc_risk_signals = RiskSignalGroupStruct {
+                RiskSignalGroupStruct {
                     footprint_reason_codes: reason_codes
                         .into_iter()
                         .map(|r| (r.0, r.1, vres_id.clone()))
                         .collect(),
                     group: Kyc,
-                };
-                // For now, never simulate AML hits in sandbox
-                let sandbox_aml_risk_signals = RiskSignalGroupStruct {
-                    footprint_reason_codes: vec![],
-                    group: Aml,
-                };
-                (sandbox_kyc_risk_signals, sandbox_aml_risk_signals)
+                }
             } else {
                 let (results_map, ids_map) =
-                    build_vendor_response_map_from_vendor_results(&kyc_vendor_results)?;
-                let kyc_risk_signals: RiskSignalGroupStruct<Kyc> = create_risk_signals_from_vendor_results(
-                    (&results_map, &ids_map),
-                    vw.clone(),
-                    obc.clone(),
-                )?;
-                let aml_risk_signals: RiskSignalGroupStruct<Aml> =
-                    create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?;
-                (kyc_risk_signals, aml_risk_signals)
+                    build_vendor_response_map_from_vendor_results(kyc_vendor_results)?;
+                create_risk_signals_from_vendor_results((&results_map, &ids_map), vw.clone(), obc.clone())?
             };
             save_risk_signals(conn, &self.sv_id, &kyc_risk_signals, false)?;
-            save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
         }
+
+        // Save AML risk signals from Aml call or Kyc call (or save nothing if neither called)
+        if let Some((watchlist_vres, watchlist_result_response)) = aml_vendor_result {
+            let aml_risk_signals =
+                common::get_aml_risk_signals_from_aml_call(&obc, &watchlist_vres, &watchlist_result_response);
+            save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
+        } else if let Some(kyc_vendor_results) = kyc_vendor_results {
+            let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(obc, vw, &kyc_vendor_results)?;
+            save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
+        };
 
         Ok(KycState::from(KycDecisioning {
             wf_id: self.wf_id,

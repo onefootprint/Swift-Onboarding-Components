@@ -1,3 +1,6 @@
+use db::models::decision_intent::DecisionIntent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
 use db::DbPool;
 use either::Either;
@@ -11,10 +14,12 @@ use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DecisionIntentId, IdvData, IncodeConfigurationId,
     ScopedVaultId, VendorAPI,
 };
-use newtypes::{VaultPublicKey, VerificationRequestId};
+use newtypes::{ObConfigurationKey, VaultPublicKey, VerificationRequestId, WorkflowId};
 
+use super::vendor_result::VendorResult;
 use super::verification_result;
 use super::{build_request, tenant_vendor_control::TenantVendorControl};
+use crate::utils::vault_wrapper::{Any, VaultWrapper, VwArgs};
 use crate::{errors::ApiResult, ApiError, State};
 
 // TODO: similar to what incode state machine does, would be nice to code share more here
@@ -166,4 +171,42 @@ pub async fn make_watchlist_result_call(
 
     let res = call_watchlist_result(state, incode_credentials, sv_id, di_id, user_vault_public_key).await?;
     Ok(res)
+}
+
+// TODO: code share/new abstraction to consolidate this with run_kyc_vendor_calls
+pub async fn run_watchlist_check(
+    state: &State,
+    di: &DecisionIntent,
+    wf_id: &WorkflowId,
+) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
+    let svid = di.scoped_vault_id.clone();
+    let diid = di.id.clone();
+    let wf_id = wf_id.clone();
+    let (latest_results, tenant_id, vw, _ob_configuration_key) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let sv = ScopedVault::get(conn, &svid)?;
+
+            let latest_results =
+                VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, &diid)?;
+
+            let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
+
+            let ob_configuration_key: ObConfigurationKey = ObConfiguration::get(conn, &wf_id)?.0.key;
+
+            Ok((latest_results, sv.tenant_id, vw, ob_configuration_key))
+        })
+        .await??;
+
+    let tvc =
+        TenantVendorControl::new(tenant_id, &state.db_pool, &state.config, &state.enclave_client).await?;
+
+    let _latest_results =
+        VendorResult::hydrate_vendor_results(latest_results, &state.enclave_client, &vw.vault.e_private_key)
+            .await?;
+    // TODO: find if jawn exists and return instead of making new call
+
+    // TODO: dont make real call if in Prod
+
+    make_watchlist_result_call(state, &tvc, &di.scoped_vault_id, &di.id, &vw.vault.public_key).await
 }

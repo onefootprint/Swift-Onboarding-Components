@@ -2,13 +2,14 @@ use db::{
     models::{
         decision_intent::DecisionIntent, document_request::DocumentRequest,
         ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo, scoped_vault::ScopedVault,
-        vault::Vault, workflow::Workflow,
+        vault::Vault, verification_result::VerificationResult, workflow::Workflow,
     },
     DbPool, DbResult, TxnPgConn,
 };
+use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    DecisionIntentKind, DecisionStatus, FootprintReasonCode, ReviewReason, ScopedVaultId, TenantId,
-    VendorAPI, VerificationResultId, WorkflowId,
+    DecisionIntentKind, DecisionStatus, EnhancedAmlOption, FootprintReasonCode, ReviewReason, ScopedVaultId,
+    TenantId, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -16,7 +17,7 @@ use crate::{
         self, engine,
         features::{
             incode_docv::{self, IncodeOcrComparisonDataFields},
-            risk_signals::RiskSignalsForDecision,
+            risk_signals::{risk_signal_group_struct::Aml, RiskSignalGroupStruct, RiskSignalsForDecision},
         },
         onboarding::{
             rules::KycRuleExecutionConfig, Decision, DecisionResult, OnboardingRulesDecision,
@@ -89,6 +90,43 @@ pub async fn run_kyc_vendor_calls(
         ])
     } else {
         vendor::kyc_waterfall::run_kyc_waterfall(state, &di, &wf.id).await
+    }
+}
+
+// TODO: code share/new abstraction to consolidate this with run_kyc_vendor_calls
+pub async fn run_aml_call(
+    state: &State,
+    wf_id: &WorkflowId,
+    t_id: &TenantId,
+) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
+    let wfid = wf_id.clone();
+    let (wf, v, di) = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
+            let di = DecisionIntent::get_or_create_for_workflow(
+                conn,
+                &wf.scoped_vault_id,
+                &wfid,
+                DecisionIntentKind::OnboardingKyc,
+            )?;
+            Ok((wf, v, di))
+        })
+        .await?;
+    let ff_client = state.feature_flag_client.clone();
+    let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, t_id)?;
+
+    if let Some(fixture_decision) = fixture_decision {
+        decision::sandbox::save_fixture_incode_watchlist_result(
+            &state.db_pool,
+            fixture_decision,
+            &di.id,
+            &wf.scoped_vault_id,
+            &v.public_key,
+        )
+        .await
+    } else {
+        vendor::incode_watchlist::run_watchlist_check(state, &di, &wf.id).await
     }
 }
 
@@ -273,4 +311,44 @@ pub async fn maybe_generate_ocr_reason_codes(
             .collect();
 
     Ok(Some(ocr_reason_codes))
+}
+
+pub fn get_aml_risk_signals_from_aml_call(
+    obc: &ObConfiguration,
+    watchlist_vres: &VerificationResult,
+    watchlist_result_response: &WatchlistResultResponse,
+) -> RiskSignalGroupStruct<Aml> {
+    let wc_reason_codes =
+        decision::features::incode_watchlist::reason_codes_from_watchlist_result(watchlist_result_response);
+    // only save risk signals of kinds that the enhanced_aml config specifies
+    let footprint_reason_codes = wc_reason_codes
+        .into_iter()
+        .filter(|r| match obc.enhanced_aml {
+            EnhancedAmlOption::No => true, //shouldn't happen
+            EnhancedAmlOption::Yes {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring: _,
+            } => (ofac && r.is_watchlist()) || (pep && r.is_pep()) || (adverse_media && r.is_adverse_media()),
+        })
+        .map(|r| (r, VendorAPI::IncodeWatchlistCheck, watchlist_vres.id.clone()))
+        .collect::<Vec<_>>();
+    RiskSignalGroupStruct {
+        footprint_reason_codes,
+        group: Aml,
+    }
+}
+
+pub fn get_aml_risk_signals_from_kyc_call(
+    obc: ObConfiguration,
+    vw: VaultWrapper,
+    kyc_vendor_results: &[VendorResult],
+) -> ApiResult<RiskSignalGroupStruct<Aml>> {
+    let (results_map, ids_map) = build_vendor_response_map_from_vendor_results(kyc_vendor_results)?;
+    decision::features::risk_signals::create_risk_signals_from_vendor_results(
+        (&results_map, &ids_map),
+        vw,
+        obc,
+    )
 }

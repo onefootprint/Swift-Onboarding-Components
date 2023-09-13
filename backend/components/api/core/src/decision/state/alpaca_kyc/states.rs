@@ -409,7 +409,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
 
         let watchlist_res = if let Some(fixture_decision) = fixture_decision {
             // TODO: since we are now saving a mock incode response, we could make the sandbox reason_code logic in `on_commit` just operate on the mocked vres instead of synthetically deriving from fixture_decision
-            let vres = decision::sandbox::save_fixture_incode_watchlist_result(
+            let (vres, _) = decision::sandbox::save_fixture_incode_watchlist_result(
                 &state.db_pool,
                 fixture_decision,
                 &di.id,

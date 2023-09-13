@@ -265,7 +265,7 @@ mod test {
 
     #[test_state]
     async fn save_vreq_and_vres_idology_success(state: &mut State) {
-        let res = idv::tests::fixtures::idology::create_response("result.match".to_string(), None);
+        let res = idv::tests::fixtures::idology::create_response("result.match".to_string(), None, None);
         let json = res.raw_response.clone().into_leak();
 
         let res = Ok::<_, idv::idology::error::Error>(res);

@@ -1220,21 +1220,23 @@ impl FootprintReasonCode {
 }
 
 impl FootprintReasonCode {
-    fn is_watchlist(&self) -> bool {
+    pub fn is_watchlist(&self) -> bool {
         matches!(
             self,
-            FootprintReasonCode::WatchlistHitOfac
-                | FootprintReasonCode::WatchlistHitNonSdn
-                | FootprintReasonCode::WatchlistHitPep
+            FootprintReasonCode::WatchlistHitOfac | FootprintReasonCode::WatchlistHitNonSdn
         )
     }
 
-    fn is_adverse_media(&self) -> bool {
+    pub fn is_pep(&self) -> bool {
+        matches!(self, FootprintReasonCode::WatchlistHitPep)
+    }
+
+    pub fn is_adverse_media(&self) -> bool {
         matches!(self, FootprintReasonCode::AdverseMediaHit)
     }
 
     pub fn is_aml(&self) -> bool {
-        self.is_watchlist() || self.is_adverse_media()
+        self.is_watchlist() || self.is_pep() || self.is_adverse_media()
     }
 }
 
