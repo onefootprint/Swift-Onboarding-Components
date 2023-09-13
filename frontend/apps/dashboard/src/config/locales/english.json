@@ -891,7 +891,8 @@
               "label": "Note for user (optional)",
               "placeholder": "We need you to check if there's a typo in the address information you provided..."
             },
-            "description": "We'll send an SMS with a link with your request to the user's phone number on file.",
+            "description-phone": "We'll send an SMS with a link with your request to the user's phone number on file.",
+            "description-email": "We'll send an email with a link with your request to the user's email address on file.",
             "error": "You need to select an option before requesting more information from a user."
           },
           "success-toast": {

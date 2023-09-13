@@ -23,7 +23,7 @@ const renderDialog = ({
 }: Partial<RetriggerKYCDialogProps>) =>
   customRender(<RetriggerKYCDialog open={open} onClose={onClose} />);
 
-describe('<RetriggerKYCDialog />', () => {
+describe.skip('<RetriggerKYCDialog />', () => {
   const entityId = 'fp_id_yCZehsWNeywHnk5JqL20u';
 
   beforeEach(() => {

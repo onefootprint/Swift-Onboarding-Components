@@ -20,7 +20,6 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
   const submitRetriggerKYCMutation = useRetriggerKYC();
   const showRequestErrorToast = useRequestErrorToast();
   const toast = useToast();
-
   const entityId = useEntityId();
 
   const handleSubmit = (data: RetriggerKYCFormData) => {

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { TriggerKind } from '@onefootprint/types';
+import { IdDI, TriggerKind } from '@onefootprint/types';
 import {
   Checkbox,
   Divider,
@@ -11,6 +11,9 @@ import {
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import AnimatedContainer from 'src/components/animated-container';
+
+import useEntity from '@/entity/hooks/use-entity';
+import useEntityId from '@/entity/hooks/use-entity-id';
 
 export type RetriggerKYCFormData = {
   kind: TriggerKind;
@@ -25,6 +28,11 @@ type RetriggerKYCFormProps = {
 
 const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   const { t } = useTranslation('pages.entity.retrigger-kyc.dialog');
+  const entityId = useEntityId();
+  const entity = useEntity(entityId);
+  const userHasPhone = entity.data?.decryptableAttributes?.includes(
+    IdDI.phoneNumber,
+  );
   const {
     register,
     handleSubmit,
@@ -77,7 +85,9 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
       />
       <Divider />
       <Typography variant="body-3" color="tertiary">
-        {t('form.description')}
+        {userHasPhone
+          ? t('form.description-phone')
+          : t('form.description-email')}
       </Typography>
     </StyledForm>
   );
