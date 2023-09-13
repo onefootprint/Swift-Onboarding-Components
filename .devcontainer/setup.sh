@@ -35,7 +35,7 @@ wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key a
 apt-get update -y
 apt-get install postgresql-14 -y
 service postgresql start
-sudo -u postgres createuser $USERNAME --createdb
+sudo -u postgres createuser root --createdb
 sed -i -e 's/peer/trust/g' /etc/postgresql/14/main/pg_hba.conf
 sed -i -e 's/scram-sha-256/trust/g' /etc/postgresql/14/main/pg_hba.conf
 service postgresql restart
