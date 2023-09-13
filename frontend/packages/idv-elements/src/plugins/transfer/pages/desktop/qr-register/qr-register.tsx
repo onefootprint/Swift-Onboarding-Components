@@ -8,8 +8,8 @@ import {
   Shimmer,
   Typography,
 } from '@onefootprint/ui';
-import { QRCodeSVG } from 'qrcode.react';
 import React from 'react';
+import QRCode from 'react-qr-code';
 
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
@@ -111,9 +111,9 @@ const QRRegister = () => {
         </Typography>
         <QRCodeContainer>
           {isLoading ? (
-            <Shimmer sx={{ height: '128px', width: '128px' }} />
+            <Shimmer sx={{ height: '140px', width: '140px' }} />
           ) : (
-            <QRCodeSVG value={url} />
+            <QRCode size={140} value={url} />
           )}
         </QRCodeContainer>
         <Typography variant="body-4" color="tertiary">
