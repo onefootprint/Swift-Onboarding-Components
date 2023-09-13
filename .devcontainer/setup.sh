@@ -23,6 +23,7 @@ apt-get install -y --no-install-recommends \
   lsb-core \
   clang \
   awscli \
+  less \
   openssh-server
 
 ## enable ssh
