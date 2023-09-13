@@ -83,7 +83,7 @@ async fn call_start_onboarding(
     // we need to track `interviewId` / `token` at a user level and re-use?
     let request = IncodeStartOnboardingRequest {
         credentials: tvc.incode_credentials(false),
-        configuration_id: IncodeConfigurationId::from("646fa9181d194bb841b30b05".to_string()), // TODO: upstream this somewhere based on OBC, maybe not even necessary for watchlist
+        configuration_id: IncodeConfigurationId::from("65023dbdc221a0aba52791be".to_string()), // TODO: upstream this somewhere based on OBC, maybe not even necessary for watchlist
         session_id: None, // for now we just make a new session everytime we do watchlist-result call to Incode
         custom_name_fields: None, // TODO: this will be dropped from IncodeStartOnboardingRequest altogether. Was originally for doc scan but we decided we don't need even there
     };
