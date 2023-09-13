@@ -227,7 +227,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
     assert_eq!(WorkflowState::Kyc(KycState::Decisioning), wf.state);
     let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
     assert!(!rs.is_empty());
-    assert!(rs.iter().all(|r| r.hidden));
+    assert!(rs.iter().all(|r| !r.hidden));
 
     if document_requested.is_some() {
         let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Doc).await;
@@ -405,7 +405,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
 
     let rs_failing = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
     assert!(!rs_failing.is_empty());
-    assert!(rs_failing.iter().all(|r| r.hidden));
+    assert!(rs_failing.iter().all(|r| !r.hidden));
 
     if document_requested
     .map(|dr| !dr.doc_upload_failed()) // no risk signals if doc upload failed

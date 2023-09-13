@@ -17,11 +17,11 @@ use crate::{
 };
 
 impl FeatureSet for KybFeatureVector {
-    fn footprint_reason_codes(&self) -> &Vec<FootprintReasonCode> {
-        &self.footprint_reason_codes
+    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
+        self.footprint_reason_codes.clone()
     }
-    fn vendor_api(&self) -> newtypes::VendorAPI {
-        VendorAPI::MiddeskBusinessUpdateWebhook
+    fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
+        vec![VendorAPI::MiddeskBusinessUpdateWebhook]
     }
 }
 
@@ -67,7 +67,7 @@ impl FeatureVector for KybFeatureVector {
                 decision_status,
                 should_commit: false, // never commit business data for now
                 create_manual_review,
-                vendor_api: eval_result.vendor_api,
+                vendor_apis: eval_result.vendor_apis,
             },
             rules_triggered: eval_result.rules_triggered,
             rules_not_triggered: eval_result.rules_not_triggered,

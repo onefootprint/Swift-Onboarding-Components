@@ -80,7 +80,7 @@ async fn kyc_bo(state: &mut State, person_wf: &DbWorkflow) {
                     decision_status: DecisionStatus::Pass,
                     should_commit: false,
                     create_manual_review: false,
-                    vendor_api: VendorAPI::MiddeskBusinessUpdateWebhook,
+                    vendor_apis: vec![VendorAPI::MiddeskBusinessUpdateWebhook],
                 },
                 vec![],
             )

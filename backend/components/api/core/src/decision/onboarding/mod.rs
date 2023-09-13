@@ -85,13 +85,6 @@ impl WaterfallOnboardingRulesDecisionOutput {
     fn kyc_and_doc_decisions(&self) -> Vec<DecisionResult> {
         vec![self.kyc_decision.clone(), self.doc_decision.clone()]
     }
-
-    pub fn chosen_kyc_vendor(&self) -> Option<VendorAPI> {
-        match &self.kyc_decision {
-            DecisionResult::Evaluated(e) => Some(e.decision.vendor_api),
-            DecisionResult::NotRequired => None,
-        }
-    }
 }
 
 impl FinalAndAdditionalDecisions for WaterfallOnboardingRulesDecisionOutput {
@@ -123,13 +116,13 @@ pub struct Decision {
     pub decision_status: DecisionStatus,
     pub should_commit: bool,
     pub create_manual_review: bool,
-    pub vendor_api: VendorAPI,
+    pub vendor_apis: Vec<VendorAPI>,
 }
 pub trait FeatureVector {
     fn evaluate(&self) -> ApiResult<OnboardingRulesDecision>;
 }
 
 pub trait FeatureSet {
-    fn footprint_reason_codes(&self) -> &Vec<FootprintReasonCode>;
-    fn vendor_api(&self) -> VendorAPI;
+    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode>;
+    fn vendor_apis(&self) -> Vec<VendorAPI>;
 }

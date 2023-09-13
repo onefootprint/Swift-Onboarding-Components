@@ -114,7 +114,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     let rs_kyc = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
     assert!(!rs_kyc.is_empty());
     // hidden at this time, until decision
-    assert!(rs_kyc.iter().all(|r| r.hidden));
+    assert!(rs_kyc.iter().all(|r| !r.hidden));
     let mut risk_signals_for_doc = vec![];
 
     if !doc_upload_failed {
@@ -291,20 +291,16 @@ async fn redo_document_and_pass(
         .for_each(|r| assert!(!previous_rs_ids.contains(&r.id) && !r.hidden));
     match user_kind {
         UserKind::Sandbox(WorkflowFixtureResult::DocumentDecision) => {
-            // In this case, we run real rules to get a decision.
-            // We decide which vendor_apis to unhide when running rules/handling KYC fixtures
-            // however, as it's implemented now, real sandbox document decisions consider KYC rules to be `NotRequired` and thus,
-            // we do not unhide, hence the difference in risk signals between these branches. I think this is fine since the purpose of doing sandbox real document
-            // is just to see the doc outcome, not to get synthetic KYC risk signals
-            assert_have_same_elements(
-                vec![(
-                    VendorAPI::IncodeFetchScores,
-                    FootprintReasonCode::DocumentVerified,
-                )],
-                rs.into_iter()
-                    .map(|rs| (rs.vendor_api, rs.reason_code))
-                    .collect_vec(),
-            );
+            // In this case, we run real rules to get a decision. In this case, we do not generate synthetic KYC signals.
+            // I think this is fine since the purpose of doing sandbox real document is just to see the doc outcome, not to get synthetic KYC risk signals
+            assert!(rs
+                .into_iter()
+                .map(|rs| (rs.vendor_api, rs.reason_code))
+                .any(|vendor_rc_tuple| vendor_rc_tuple
+                    == (
+                        VendorAPI::IncodeFetchScores,
+                        FootprintReasonCode::DocumentVerified,
+                    )));
         }
         UserKind::Live => {
             assert_have_same_elements(

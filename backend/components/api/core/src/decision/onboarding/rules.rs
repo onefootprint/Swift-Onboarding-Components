@@ -142,7 +142,7 @@ impl KycRuleGroup {
                     rules_triggered: vec![RuleName::DocumentUploadFailed],
                     rules_not_triggered: vec![],
                     triggered_action: Some(Action::ManualReview),
-                    vendor_api: VendorAPI::IncodeFetchScores,
+                    vendor_apis: vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOCR],
                 }
                 .into()
             }
@@ -174,7 +174,7 @@ impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
                 should_commit: should_commit(&result.rules_triggered),
                 decision_status,
                 create_manual_review,
-                vendor_api: result.vendor_api,
+                vendor_apis: result.vendor_apis,
             },
             rules_triggered: result.rules_triggered.to_owned(),
             rules_not_triggered: result.rules_not_triggered.to_owned(),

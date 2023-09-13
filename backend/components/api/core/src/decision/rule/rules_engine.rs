@@ -15,13 +15,13 @@ where
     let triggered_action = evaluated_ruleset.action.clone();
 
     // Log evaluation of a single rule set
-    log_ruleset_evaluation(&evaluated_ruleset, rule_input.vendor_api());
+    log_ruleset_evaluation(&evaluated_ruleset, rule_input.vendor_apis());
 
     OnboardingEvaluationResult {
         rules_triggered: evaluated_ruleset.triggered_rule_names(),
         rules_not_triggered: evaluated_ruleset.not_triggered_rule_names(),
         triggered_action,
-        vendor_api: rule_input.vendor_api(),
+        vendor_apis: rule_input.vendor_apis(),
     }
 }
 
@@ -37,7 +37,7 @@ where
             let evaluated_ruleset = rs.evaluate(rule_input);
 
             // Log evaluation of a single rule set
-            log_ruleset_evaluation(&evaluated_ruleset, rule_input.vendor_api());
+            log_ruleset_evaluation(&evaluated_ruleset, rule_input.vendor_apis());
 
             evaluated_ruleset
         })
@@ -61,14 +61,14 @@ where
         rules_triggered,
         rules_not_triggered,
         triggered_action,
-        vendor_api: rule_input.vendor_api(),
+        vendor_apis: rule_input.vendor_apis(),
     }
 }
 
-fn log_ruleset_evaluation(rule_set_result: &RuleSetResult, vendor_api: VendorAPI) {
+fn log_ruleset_evaluation(rule_set_result: &RuleSetResult, vendor_apis: Vec<VendorAPI>) {
     tracing::info!(
         action=?rule_set_result.action,
-        vendor_api=%vendor_api,
+        vendor_api=format!("{:?}", vendor_apis),
         rules_triggered_fail=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == Action::Fail).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
         rules_triggered_steup=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == Action::StepUp).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
         rules_not_triggered=%super::rules_to_string(&rule_set_result.rules_not_triggered.iter().map(|r| r.name.clone()).collect::<Vec<RuleName>>()),
@@ -82,7 +82,7 @@ pub struct OnboardingEvaluationResult {
     pub rules_triggered: Vec<RuleName>,
     pub rules_not_triggered: Vec<RuleName>,
     pub triggered_action: Option<Action>,
-    pub vendor_api: VendorAPI,
+    pub vendor_apis: Vec<VendorAPI>,
 }
 
 #[cfg(test)]
@@ -100,7 +100,7 @@ mod tests {
             ],
             rules_not_triggered: vec![RuleName::Test("test.world".into())],
             triggered_action: Some(Action::Fail),
-            vendor_api: features.vendor_api(),
+            vendor_apis: features.vendor_apis(),
         };
         let result = evaluate_onboarding_rules(vec![test_ruleset_a(), test_ruleset_b()], &features);
 

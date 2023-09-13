@@ -62,7 +62,7 @@ impl From<OnboardingRulesDecisionOutput> for DecisionOutput {
                     decision_status,
                     create_manual_review,
                     should_commit: _,
-                    vendor_api: _,
+                    vendor_apis: _,
                 },
             rules_triggered,
             rules_not_triggered,

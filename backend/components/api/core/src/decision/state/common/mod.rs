@@ -156,7 +156,7 @@ pub fn alpaca_kyc_decision_from_fixture(
             should_commit: false,
             create_manual_review: false,
             // not used
-            vendor_api: VendorAPI::IdologyExpectID,
+            vendor_apis: vec![VendorAPI::IdologyExpectID],
         },
         rules_triggered: vec![],
         rules_not_triggered: vec![],

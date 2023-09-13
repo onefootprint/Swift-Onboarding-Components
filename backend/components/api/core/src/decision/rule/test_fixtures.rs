@@ -15,11 +15,11 @@ pub struct TestFeatures {
 }
 
 impl FeatureSet for TestFeatures {
-    fn footprint_reason_codes(&self) -> &Vec<newtypes::FootprintReasonCode> {
-        &self.frcs
+    fn footprint_reason_codes(&self) -> Vec<newtypes::FootprintReasonCode> {
+        self.frcs.clone()
     }
-    fn vendor_api(&self) -> newtypes::VendorAPI {
-        newtypes::VendorAPI::TwilioLookupV2
+    fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
+        vec![newtypes::VendorAPI::TwilioLookupV2]
     }
 }
 impl TestFeatures {

@@ -29,11 +29,11 @@ impl ExperianFeatures {
 }
 
 impl FeatureSet for ExperianFeatures {
-    fn footprint_reason_codes(&self) -> &Vec<FootprintReasonCode> {
-        &self.footprint_reason_codes
+    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
+        self.footprint_reason_codes.clone()
     }
-    fn vendor_api(&self) -> newtypes::VendorAPI {
-        VendorAPI::ExperianPreciseID
+    fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
+        vec![VendorAPI::ExperianPreciseID]
     }
 }
 

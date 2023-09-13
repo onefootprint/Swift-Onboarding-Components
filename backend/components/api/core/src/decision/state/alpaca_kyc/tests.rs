@@ -112,7 +112,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
     assert!(!rs.is_empty());
-    assert!(rs.iter().all(|r| r.hidden));
+    assert!(rs.iter().all(|r| !r.hidden));
 
     // MakeDecision
     let (ww, _) = ww
@@ -270,7 +270,7 @@ async fn pass_then_watchlist_hit(
 
     let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
     assert!(!rs.is_empty());
-    assert!(rs.iter().all(|r| r.hidden));
+    assert!(rs.iter().all(|r| !r.hidden));
 
     // MakeDecision
     let (ww, _) = ww
@@ -650,7 +650,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .unwrap();
     let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
     assert!(!rs.is_empty());
-    assert!(rs.iter().all(|r| r.hidden));
+    assert!(rs.iter().all(|r| !r.hidden));
 
     // Expect Webhook
     let _expect_review = match user_kind {

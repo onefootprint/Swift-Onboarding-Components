@@ -30,11 +30,11 @@ pub struct IDologyFeatures {
 }
 
 impl FeatureSet for IDologyFeatures {
-    fn footprint_reason_codes(&self) -> &Vec<FootprintReasonCode> {
-        &self.footprint_reason_codes
+    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
+        self.footprint_reason_codes.clone()
     }
-    fn vendor_api(&self) -> newtypes::VendorAPI {
-        VendorAPI::IdologyExpectID
+    fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
+        vec![VendorAPI::IdologyExpectID]
     }
 }
 

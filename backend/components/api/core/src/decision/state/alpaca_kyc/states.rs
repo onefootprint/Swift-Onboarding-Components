@@ -197,7 +197,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
                 create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?
             };
 
-        save_risk_signals(conn, &self.sv_id, &risk_signals, true)?;
+        save_risk_signals(conn, &self.sv_id, &risk_signals, false)?;
 
         // we might need doc signals here too, so we reload
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
@@ -281,14 +281,6 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         } else {
             common::get_decision(&self, conn, self.risk_signals.clone(), &wf, &v)?
         };
-
-        // TODO: what if doc failed by KYC passed? fix this
-
-        if let Some(chosen_kyc_vendor) = decision.chosen_kyc_vendor() {
-            // Now, we unhide the risk signals for the vendor that made the decision
-            let rsg = RiskSignalGroup::latest_by_kind(conn.conn(), &self.sv_id, RiskSignalGroupKind::Kyc)?;
-            RiskSignal::unhide_risk_signals_for_risk_signal_group(conn, &rsg.id, chosen_kyc_vendor)?;
-        }
 
         match decision.final_kyc_decision()?.decision.decision_status {
             DecisionStatus::Fail => {
@@ -517,7 +509,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 should_commit: true,
                 create_manual_review: false,
                 // TODO: fix this when this goes to rules
-                vendor_api: VendorAPI::IncodeWatchlistCheck,
+                vendor_apis: vec![VendorAPI::IncodeWatchlistCheck],
             }
         } else {
             Decision {
@@ -525,7 +517,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 should_commit: true,
                 create_manual_review: true,
                 // TODO: fix this when this goes to rules
-                vendor_api: VendorAPI::IncodeWatchlistCheck,
+                vendor_apis: vec![VendorAPI::IncodeWatchlistCheck],
             }
         };
         let review_reasons = get_review_reasons(

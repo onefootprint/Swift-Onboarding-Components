@@ -207,8 +207,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                     create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?;
                 (kyc_risk_signals, aml_risk_signals)
             };
-            save_risk_signals(conn, &self.sv_id, &kyc_risk_signals, true)?;
-            save_risk_signals(conn, &self.sv_id, &aml_risk_signals, true)?;
+            save_risk_signals(conn, &self.sv_id, &kyc_risk_signals, false)?;
+            save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
         }
 
         Ok(KycState::from(KycDecisioning {
@@ -289,12 +289,6 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         } else {
             common::get_decision(&self, conn, risk_signals, &wf, &v)?
         };
-
-        if let Some(chosen_kyc_vendor) = decision.chosen_kyc_vendor() {
-            // Now, we unhide the risk signals for the vendor that made the decision
-            let rsg = RiskSignalGroup::latest_by_kind(conn.conn(), &self.sv_id, RiskSignalGroupKind::Kyc)?;
-            RiskSignal::unhide_risk_signals_for_risk_signal_group(conn, &rsg.id, chosen_kyc_vendor)?;
-        }
 
         common::save_kyc_decision(
             conn,

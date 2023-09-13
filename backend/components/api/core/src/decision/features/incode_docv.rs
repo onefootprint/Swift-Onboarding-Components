@@ -51,13 +51,13 @@ pub struct IncodeDocumentFeatures {
 }
 
 impl FeatureSet for IncodeDocumentFeatures {
-    fn footprint_reason_codes(&self) -> &Vec<FootprintReasonCode> {
-        &self.footprint_reason_codes
+    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
+        self.footprint_reason_codes.clone()
     }
-    fn vendor_api(&self) -> newtypes::VendorAPI {
+    fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
         // TODO: Not quite right, but that's fine since this won't be used. 
         // eventually should move this to some sort of vendor api struct
-        VendorAPI::IncodeFetchScores
+        vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOCR]
     }
 }
 
