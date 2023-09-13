@@ -32,8 +32,8 @@ pub enum Error {
 
 #[derive(Debug, thiserror::Error)]
 pub enum ReqwestError {
-    #[error("error building reqwest client: {0}")]
-    InternalError(#[from] reqwest::Error),
+    #[error("{0}")]
+    ReqwestError(#[from] reqwest::Error),
     #[error("error sending request to lexis api: {0}")]
     ReqwestSendError(String),
     #[error("error setting api headers: {0}")]

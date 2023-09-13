@@ -50,7 +50,7 @@ impl IdologyClient {
         let idology_response = response
             .json::<serde_json::Value>()
             .await
-            .map_err(IdologyError::ReqwestError::InternalError)?;
+            .map_err(IdologyError::ReqwestError::Error)?;
         Ok(idology_response)
     }
 
@@ -81,7 +81,7 @@ impl IdologyClient {
         let idology_response = response
             .json::<serde_json::Value>()
             .await
-            .map_err(IdologyError::ReqwestError::InternalError)?;
+            .map_err(IdologyError::ReqwestError::Error)?;
         Ok(idology_response)
     }
 
@@ -110,7 +110,7 @@ impl IdologyClient {
         let idology_response = response
             .json::<serde_json::Value>()
             .await
-            .map_err(IdologyError::ReqwestError::InternalError)?;
+            .map_err(IdologyError::ReqwestError::from)?;
 
         // Here we parse the response in order to determine if we need to retry
         let parsed = scan_verify::response::parse_response(idology_response.clone())
@@ -157,7 +157,7 @@ impl IdologyClient {
         let idology_response = response
             .json::<serde_json::Value>()
             .await
-            .map_err(IdologyError::ReqwestError::InternalError)?;
+            .map_err(IdologyError::ReqwestError::from)?;
         Ok(idology_response)
     }
 }

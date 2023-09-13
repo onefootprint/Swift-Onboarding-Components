@@ -64,7 +64,7 @@ pub async fn verify_expectid(
     let idology_response = response
         .json::<serde_json::Value>()
         .await
-        .map_err(IdologyError::ReqwestError::InternalError)?;
+        .map_err(IdologyError::ReqwestError::from)?;
     Ok(idology_response)
 }
 pub async fn send_scan_verify_request(
@@ -148,7 +148,7 @@ pub async fn standalone_pa(
     let idology_response = response
         .json::<serde_json::Value>()
         .await
-        .map_err(IdologyError::ReqwestError::InternalError)?;
+        .map_err(IdologyError::ReqwestError::from)?;
     Ok(idology_response)
 }
 /// Scan onboarding

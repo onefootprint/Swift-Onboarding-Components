@@ -32,7 +32,7 @@ pub struct MiddeskGetBusinessResponse {
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("error building reqwest client: {0}")]
+    #[error("{0}")]
     ReqwestError(#[from] MiddeskReqwestError),
     #[error("error response from middesk api: {0}")]
     MiddeskErrorResponse(#[from] MiddeskApiErrorResponse),

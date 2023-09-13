@@ -4,8 +4,8 @@ use newtypes::PiiJsonValue;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("error building reqwest client: {0}")]
-    InternalError(#[from] reqwest::Error),
+    #[error("{0}")]
+    ReqwestError(#[from] reqwest::Error),
     #[error("error setting api headers: {0}")]
     InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
     #[error("Serde Json error {0}")]

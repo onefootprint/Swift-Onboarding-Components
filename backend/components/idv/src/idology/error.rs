@@ -71,11 +71,11 @@ pub enum ConversionError {
 
 #[derive(Debug, thiserror::Error)]
 pub enum ReqwestError {
-    #[error("error building reqwest client: {0}")]
-    InternalError(#[from] reqwest::Error),
+    #[error("{0}")]
+    Error(#[from] reqwest::Error),
     #[error("error setting api headers: {0}")]
     InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
-    #[error("error sending request to socure api: {0}")]
+    #[error("error sending request to idology api: {0}")]
     SendError(String),
 }
 

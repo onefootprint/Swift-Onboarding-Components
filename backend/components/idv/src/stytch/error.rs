@@ -10,8 +10,8 @@ use super::response::StytchErrorResponse;
 pub enum Error {
     #[error("Json error: {0}")]
     SerdeJson(#[from] serde_json::Error),
-    #[error("error building reqwest client: {0}")]
-    InternalError(#[from] reqwest::Error),
+    #[error("{0}")]
+    ReqwestError(#[from] reqwest::Error),
     #[error("error sending request to fingerprint js api: {0}")]
     RequestError(String),
     #[error("Stytch error response: {0:?}")]
