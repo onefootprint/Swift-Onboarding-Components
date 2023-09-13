@@ -107,44 +107,56 @@ const createCollectKycDataMachine = (
               {
                 target: 'basicInformation',
                 actions: 'assignData',
-                cond: context =>
-                  isMissingBasicAttribute(
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(context.data, event.payload);
+                  return isMissingBasicAttribute(
                     allAttributes(context.requirement),
-                    context.data,
+                    allData,
                     true,
-                  ),
+                  );
+                },
               },
               {
                 target: 'residentialAddress',
                 actions: ['assignData'],
-                cond: context =>
-                  isMissingResidentialAttribute(
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(context.data, event.payload);
+                  return isMissingResidentialAttribute(
                     allAttributes(context.requirement),
-                    context.data,
+                    allData,
                     true,
-                  ),
+                  );
+                },
               },
               {
                 target: 'usLegalStatus',
                 actions: 'assignData',
-                cond: context =>
-                  isInDomesticFlow(context.data) &&
-                  isMissingUsLegalStatusAttribute(
-                    allAttributes(context.requirement),
-                    context.data,
-                    true,
-                  ),
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(context.data, event.payload);
+                  return (
+                    isInDomesticFlow(allData) &&
+                    isMissingUsLegalStatusAttribute(
+                      allAttributes(context.requirement),
+                      allData,
+                      true,
+                    )
+                  );
+                },
               },
               {
                 target: 'ssn',
                 actions: ['assignData'],
-                cond: context =>
-                  isInDomesticFlow(context.data) &&
-                  isMissingSsnAttribute(
-                    allAttributes(context.requirement),
-                    context.data,
-                    true,
-                  ),
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(context.data, event.payload);
+                  return (
+                    isInDomesticFlow(allData) &&
+                    isMissingSsnAttribute(
+                      allAttributes(context.requirement),
+                      allData,
+                      true,
+                    )
+                  );
+                },
               },
               {
                 target: 'confirm',
@@ -159,34 +171,44 @@ const createCollectKycDataMachine = (
               {
                 target: 'residentialAddress',
                 actions: ['assignData'],
-                cond: context =>
-                  isMissingResidentialAttribute(
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(context.data, event.payload);
+                  return isMissingResidentialAttribute(
                     allAttributes(context.requirement),
-                    context.data,
+                    allData,
                     true,
-                  ),
+                  );
+                },
               },
               {
                 target: 'usLegalStatus',
                 actions: 'assignData',
-                cond: context =>
-                  isInDomesticFlow(context.data) &&
-                  isMissingUsLegalStatusAttribute(
-                    allAttributes(context.requirement),
-                    context.data,
-                    true,
-                  ),
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(context.data, event.payload);
+                  return (
+                    isInDomesticFlow(allData) &&
+                    isMissingUsLegalStatusAttribute(
+                      allAttributes(context.requirement),
+                      allData,
+                      true,
+                    )
+                  );
+                },
               },
               {
                 target: 'ssn',
                 actions: ['assignData'],
-                cond: context =>
-                  isInDomesticFlow(context.data) &&
-                  isMissingSsnAttribute(
-                    allAttributes(context.requirement),
-                    context.data,
-                    true,
-                  ),
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(context.data, event.payload);
+                  return (
+                    isInDomesticFlow(allData) &&
+                    isMissingSsnAttribute(
+                      allAttributes(context.requirement),
+                      allData,
+                      true,
+                    )
+                  );
+                },
               },
               {
                 target: 'confirm',
@@ -210,28 +232,32 @@ const createCollectKycDataMachine = (
               {
                 target: 'usLegalStatus',
                 actions: 'assignData',
-                cond: (context, event) =>
-                  isInDomesticFlow(
-                    mergeUpdatedData(context.data, event.payload),
-                  ) &&
-                  isMissingUsLegalStatusAttribute(
-                    allAttributes(context.requirement),
-                    context.data,
-                    true,
-                  ),
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(context.data, event.payload);
+                  return (
+                    isInDomesticFlow(allData) &&
+                    isMissingUsLegalStatusAttribute(
+                      allAttributes(context.requirement),
+                      allData,
+                      true,
+                    )
+                  );
+                },
               },
               {
                 target: 'ssn',
                 actions: ['assignData'],
-                cond: (context, event) =>
-                  isInDomesticFlow(
-                    mergeUpdatedData(context.data, event.payload),
-                  ) &&
-                  isMissingSsnAttribute(
-                    allAttributes(context.requirement),
-                    context.data,
-                    true,
-                  ),
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(context.data, event.payload);
+                  return (
+                    isInDomesticFlow(allData) &&
+                    isMissingSsnAttribute(
+                      allAttributes(context.requirement),
+                      allData,
+                      true,
+                    )
+                  );
+                },
               },
               {
                 target: 'confirm',
@@ -266,13 +292,17 @@ const createCollectKycDataMachine = (
               {
                 target: 'ssn',
                 actions: ['assignData'],
-                cond: context =>
-                  isInDomesticFlow(context.data) &&
-                  isMissingSsnAttribute(
-                    allAttributes(context.requirement),
-                    context.data,
-                    true,
-                  ),
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(context.data, event.payload);
+                  return (
+                    isInDomesticFlow(allData) &&
+                    isMissingSsnAttribute(
+                      allAttributes(context.requirement),
+                      allData,
+                      true,
+                    )
+                  );
+                },
               },
               {
                 target: 'confirm',
