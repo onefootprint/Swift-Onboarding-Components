@@ -44,6 +44,7 @@ pub enum OnboardingRulesDecision {
 pub struct WaterfallOnboardingRulesDecisionOutput {
     kyc_decision: DecisionResult,
     doc_decision: DecisionResult,
+    aml_decision: DecisionResult,
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -57,10 +58,15 @@ pub trait FinalAndAdditionalDecisions {
 }
 
 impl WaterfallOnboardingRulesDecisionOutput {
-    pub fn new(kyc_decision: DecisionResult, doc_decision: DecisionResult) -> Self {
+    pub fn new(
+        kyc_decision: DecisionResult,
+        doc_decision: DecisionResult,
+        aml_decision: DecisionResult,
+    ) -> Self {
         Self {
             kyc_decision,
             doc_decision,
+            aml_decision,
         }
     }
 
@@ -89,7 +95,11 @@ impl WaterfallOnboardingRulesDecisionOutput {
     }
 
     fn kyc_and_doc_decisions(&self) -> Vec<DecisionResult> {
-        vec![self.kyc_decision.clone(), self.doc_decision.clone()]
+        vec![
+            self.kyc_decision.clone(),
+            self.aml_decision.clone(),
+            self.doc_decision.clone(),
+        ]
     }
 }
 

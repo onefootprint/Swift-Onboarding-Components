@@ -1,4 +1,4 @@
-use crate::decision::features::risk_signals::risk_signal_group_struct::Kyc;
+use crate::decision::features::risk_signals::risk_signal_group_struct::{Aml, Kyc};
 use crate::decision::features::risk_signals::{RiskSignalGroupStruct, RiskSignalsForDecision};
 use crate::decision::onboarding::rules::{KycRuleExecutionConfig, KycRuleGroup};
 use crate::decision::onboarding::Decision;
@@ -38,13 +38,13 @@ fn create_onboarding_rules_decision_output(
 // id located, but was a watchlist hit so we commit, but fail onboarding and raise a review since it's just WL
 #[test_case(vec![FootprintReasonCode::WatchlistHitOfac] => create_onboarding_rules_decision_output(DecisionStatus::Fail, true, true, vec![RuleName::WatchlistHit]); "id located, watchlist hit -> fail but commit")]
 // 2 reasons for failing, we don't raise a review in any case if there's a hard fail
-#[test_case(vec![FootprintReasonCode::WatchlistHitNonSdn, FootprintReasonCode::SubjectDeceased] => create_onboarding_rules_decision_output(DecisionStatus::Fail, false, false, vec![RuleName::SubjectDeceased, RuleName::WatchlistHit]); "id located, watchlist hit + other reason -> fail and don't commit")]
+#[test_case(vec![FootprintReasonCode::WatchlistHitNonSdn, FootprintReasonCode::SubjectDeceased] => create_onboarding_rules_decision_output(DecisionStatus::Fail, false, false, vec![RuleName::SubjectDeceased]); "id located, watchlist hit + other reason -> fail and don't commit (the failing rule is from KYC)")]
 #[test_case(vec![FootprintReasonCode::SubjectDeceased]=> create_onboarding_rules_decision_output(DecisionStatus::Fail, false, false, vec![RuleName::SubjectDeceased]); "id located but hit a base rule -> fail")]
 #[test_case(vec![FootprintReasonCode::SubjectDeceased, FootprintReasonCode::AddressLocatedIsHighRiskAddress]=> create_onboarding_rules_decision_output(DecisionStatus::Fail, false, false, vec![RuleName::SubjectDeceased]); "id located, but hit a base rule and conservative rule -> fail")]
 fn test_evaluate_onboarding_rules(
     fp_reason_codes: Vec<FootprintReasonCode>,
 ) -> OnboardingRulesDecisionOutput {
-    let frcs = fp_reason_codes
+    let (kyc_frcs, aml_frcs) = fp_reason_codes
         .into_iter()
         .map(|f| {
             (
@@ -53,13 +53,18 @@ fn test_evaluate_onboarding_rules(
                 VerificationResultId::from_str("vres123").unwrap(),
             )
         })
-        .collect();
-
-    let rsg = RiskSignalsForDecision {
-        kyc: Some(RiskSignalGroupStruct {
-            footprint_reason_codes: frcs,
-            group: Kyc,
-        }),
+        .partition(|(f, _, _)| !f.is_aml());
+    let kyc_rsg = RiskSignalGroupStruct {
+        footprint_reason_codes: kyc_frcs,
+        group: Kyc,
+    };
+    let aml_rsg = RiskSignalGroupStruct {
+        footprint_reason_codes: aml_frcs,
+        group: Aml,
+    };
+    let risk_signals_for_decision = RiskSignalsForDecision {
+        kyc: Some(kyc_rsg),
+        aml: Some(aml_rsg),
         ..Default::default()
     };
 
@@ -68,7 +73,7 @@ fn test_evaluate_onboarding_rules(
     // function under test
     rule_group
         .evaluate(
-            rsg,
+            risk_signals_for_decision,
             KycRuleExecutionConfig {
                 include_doc: false,
                 document_only: false,

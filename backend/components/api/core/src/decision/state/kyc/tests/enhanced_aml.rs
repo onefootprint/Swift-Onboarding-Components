@@ -13,7 +13,7 @@ use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use macros::test_state_case;
 use newtypes::VendorAPI;
 use newtypes::{
-    EnhancedAmlOption, KycState, OnboardingStatus,
+    DecisionStatus, EnhancedAmlOption, KycState, OnboardingStatus,
     VendorAPI::{IdologyExpectID, IncodeWatchlistCheck},
     WorkflowState,
 };
@@ -46,7 +46,7 @@ async fn test(
     aml_call: VR,
     expected: (OnboardingStatus, RS),
 ) {
-    let (_expected_status, expected_rs) = expected;
+    let (expected_status, expected_rs) = expected;
     let user_kind = UserKind::Live;
     // DATA SETUP
     let (wf, _t, _obc, _tu) = setup_data(
@@ -93,10 +93,20 @@ async fn test(
         .await
         .unwrap();
 
-    let (wf, _, _mr, _obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     // TODO: This assertion will fail if enhanced_aml = Yes because we are not yet properly incorporating Incode Aml risk signals into rules decisioning!!!!!!!!!!
-    // assert_eq!(expected_status, wf.status.unwrap());
+    assert_eq!(expected_status, wf.status.unwrap());
+    let obd = obd.unwrap();
+    if expected_status == OnboardingStatus::Fail {
+        assert!(mr.is_some());
+        assert_eq!(obd.status, DecisionStatus::Fail);
+        assert!(obd.seqno.is_some());
+    } else {
+        assert!(mr.is_none());
+        assert_eq!(obd.status, DecisionStatus::Pass);
+        assert!(obd.seqno.is_some());
+    }
 
     AmlKind::iter().for_each(|k| {
         let rs_for_kind: Vec<&db::models::risk_signal::RiskSignal> = rs

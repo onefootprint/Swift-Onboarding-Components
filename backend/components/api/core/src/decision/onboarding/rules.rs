@@ -82,7 +82,16 @@ impl KycRuleGroup {
             Err(crate::decision::Error::from(RuleError::MissingInputForDocRules))?
         }
 
-        let output = WaterfallOnboardingRulesDecisionOutput::new(kyc_result, doc_result);
+        // :thinkies: we don't generate watchlist FRCs if there's no WL hits, so we can't tell the difference between no watchlist hit and no FRCs generated (incorrectly). i think that's ok for now, and
+        // this is prob the wrong place for that
+        let aml_decision = if let Some(aml_decision) = rule_result.aml {
+            DecisionResult::Evaluated(aml_decision.into())
+        } else {
+            // not required if doc only, or no WL FRCs to eval
+            DecisionResult::NotRequired
+        };
+
+        let output = WaterfallOnboardingRulesDecisionOutput::new(kyc_result, doc_result, aml_decision);
 
         Ok(output)
     }
