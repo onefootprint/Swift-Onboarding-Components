@@ -94,6 +94,7 @@ pub async fn run_kyc_vendor_calls(
 }
 
 // TODO: code share/new abstraction to consolidate this with run_kyc_vendor_calls
+#[tracing::instrument(skip(state))]
 pub async fn run_aml_call(
     state: &State,
     wf_id: &WorkflowId,

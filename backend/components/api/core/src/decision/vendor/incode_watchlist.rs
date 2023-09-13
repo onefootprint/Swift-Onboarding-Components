@@ -32,6 +32,7 @@ use crate::utils::vault_wrapper::{Any, VaultWrapper, VwArgs};
 use crate::{errors::ApiResult, ApiError, State};
 
 // TODO: similar to what incode state machine does, would be nice to code share more here
+#[tracing::instrument(skip(db_pool, res, user_vault_public_key, api_or_vreq_id))]
 async fn save_vres_and_maybe_vreq<T: APIResponseToIncodeError + serde::Serialize>(
     db_pool: &DbPool,
     res: IncodeResponse<T>,
@@ -70,6 +71,7 @@ async fn save_vres_and_maybe_vreq<T: APIResponseToIncodeError + serde::Serialize
     Ok(vres)
 }
 
+#[tracing::instrument(skip(state, user_vault_public_key, tvc))]
 async fn call_start_onboarding(
     state: &State,
     tvc: &TenantVendorControl,
@@ -110,6 +112,7 @@ async fn call_start_onboarding(
     Ok(res)
 }
 
+#[tracing::instrument(skip(state, user_vault_public_key, credentials))]
 async fn call_watchlist_result(
     state: &State,
     credentials: IncodeCredentialsWithToken,
@@ -163,6 +166,7 @@ async fn call_watchlist_result(
     Ok((vres, res))
 }
 
+#[tracing::instrument(skip(state, tvc, user_vault_public_key))]
 pub async fn make_watchlist_result_call(
     state: &State,
     tvc: &TenantVendorControl,
@@ -183,6 +187,7 @@ pub async fn make_watchlist_result_call(
 }
 
 // TODO: code share/new abstraction to consolidate this with run_kyc_vendor_calls
+#[tracing::instrument(skip(state))]
 pub async fn run_watchlist_check(
     state: &State,
     di: &DecisionIntent,

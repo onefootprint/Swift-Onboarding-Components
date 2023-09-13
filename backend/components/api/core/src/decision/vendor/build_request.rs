@@ -17,6 +17,7 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
 
+#[tracing::instrument(skip_all)]
 pub async fn build_idv_data_from_verification_request(
     db_pool: &DbPool, // TODO: migrate to PgConn
     enclave_client: &EnclaveClient,
