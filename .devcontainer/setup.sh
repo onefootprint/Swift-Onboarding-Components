@@ -22,7 +22,12 @@ apt-get install -y --no-install-recommends \
   python3-venv \
   lsb-core \
   clang \
-  awscli
+  awscli \
+  openssh-server
+
+## enable ssh
+sudo systemctl enable ssh --now
+sudo systemctl start ssh
 
 ## install postgres
 sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'

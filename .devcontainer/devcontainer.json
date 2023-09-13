@@ -16,6 +16,11 @@
 		"AWS_SECRET_ACCESS_KEY": "${localEnv:AWS_SECRET_ACCESS_KEY}",
 		"LC_ALL": "C"
 	},
+	"features": {
+		"ghcr.io/devcontainers/features/sshd:1": {
+			"version": "latest"
+		}
+	},
 	"postStartCommand": "./.devcontainer/startup.sh",
 	// Add the IDs of extensions you want installed when the container is created.
 	"customizations": {
