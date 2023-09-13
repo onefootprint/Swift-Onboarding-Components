@@ -45,8 +45,10 @@ fn get_waterfall_vec(
     available_vendor_apis: Vec<VendorAPI>,
     latest_results: Vec<RequestAndMaybeHydratedResult>,
 ) -> Vec<(VendorAPI, Option<RequestAndMaybeHydratedResult>)> {
-    let vendor_api_to_latest_result: HashMap<VendorAPI, RequestAndMaybeHydratedResult> =
-        latest_results.into_iter().map(|r| (r.0.vendor_api, r)).collect();
+    let vendor_api_to_latest_result: HashMap<VendorAPI, RequestAndMaybeHydratedResult> = latest_results
+        .into_iter()
+        .map(|r| (r.vreq.vendor_api, r))
+        .collect();
 
     KycVendorApiOrder::iter()
         .map(VendorAPI::from)
@@ -165,13 +167,13 @@ where
                 have_attempted_call = true;
                 waterfall_vec[i] = (
                     vendor_api,
-                    Some((
+                    Some(RequestAndMaybeHydratedResult {
                         vreq,
-                        Some(HydratedVerificationResult {
+                        vres: Some(HydratedVerificationResult {
                             vres,
                             response: res.ok(),
                         }),
-                    )),
+                    }),
                 );
             }
             Action::TryNextVendor => {
@@ -191,16 +193,7 @@ fn get_successful_vendor_responses(
 ) -> Vec<VendorResult> {
     waterfall_vec
         .into_iter()
-        .filter_map(|(_, vreq_vres)| {
-            vreq_vres.and_then(|(vreq, vres)| {
-                vres.and_then(|v| v.response.map(|rs| (vreq.id, v.vres.id, rs)))
-                    .map(|(vreq_id, vres_id, vr)| VendorResult {
-                        response: vr,
-                        verification_result_id: vres_id,
-                        verification_request_id: vreq_id,
-                    })
-            })
-        })
+        .filter_map(|(_, vreq_vres)| vreq_vres.and_then(|vreq_vres| vreq_vres.into_vendor_result()))
         .collect()
 }
 
@@ -213,7 +206,7 @@ enum Action {
 #[allow(clippy::collapsible_match)]
 fn next_action(req_res: &Option<RequestAndMaybeHydratedResult>, have_attempted_call: bool) -> Action {
     match req_res {
-        Some((_, res)) => match res {
+        Some(vreq_vres) => match &vreq_vres.vres {
             Some(res) => {
                 if res.vres.is_error {
                     // Right now, we retry transient errors within the client themselves. If the retry strategy doesn't succeed in a few seconds, then

@@ -1,6 +1,7 @@
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use db::models::verification_request::RequestAndMaybeResult;
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
 use db::DbPool;
 use either::Either;
@@ -14,11 +15,17 @@ use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, DecisionIntentId, IdvData, IncodeConfigurationId,
     ScopedVaultId, VendorAPI,
 };
-use newtypes::{ObConfigurationKey, VaultPublicKey, VerificationRequestId, WorkflowId};
+use newtypes::{
+    EncryptedVaultPrivateKey, ObConfigurationKey, VaultPublicKey, VerificationRequestId,
+    VerificationResultId, WorkflowId,
+};
 
+use super::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results;
+use super::vendor_api::vendor_api_struct::IncodeWatchlistCheck;
 use super::vendor_result::VendorResult;
 use super::verification_result;
 use super::{build_request, tenant_vendor_control::TenantVendorControl};
+use crate::enclave_client::EnclaveClient;
 use crate::utils::vault_wrapper::{Any, VaultWrapper, VwArgs};
 use crate::{errors::ApiResult, ApiError, State};
 
@@ -178,7 +185,7 @@ pub async fn run_watchlist_check(
     state: &State,
     di: &DecisionIntent,
     wf_id: &WorkflowId,
-) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
+) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
     let svid = di.scoped_vault_id.clone();
     let diid = di.id.clone();
     let wf_id = wf_id.clone();
@@ -198,15 +205,45 @@ pub async fn run_watchlist_check(
         })
         .await??;
 
+    // Check if a successful result already exists and idempotently return that if so
+    let existing_res =
+        existing_watchlist_check_response(&state.enclave_client, &vw.vault.e_private_key, latest_results)
+            .await?;
+    if let Some(existing_res) = existing_res {
+        return Ok(existing_res);
+    }
+
     let tvc =
         TenantVendorControl::new(tenant_id, &state.db_pool, &state.config, &state.enclave_client).await?;
 
-    let _latest_results =
-        VendorResult::hydrate_vendor_results(latest_results, &state.enclave_client, &vw.vault.e_private_key)
-            .await?;
-    // TODO: find if jawn exists and return instead of making new call
-
     // TODO: dont make real call if in Prod
 
-    make_watchlist_result_call(state, &tvc, &di.scoped_vault_id, &di.id, &vw.vault.public_key).await
+    make_watchlist_result_call(state, &tvc, &di.scoped_vault_id, &di.id, &vw.vault.public_key)
+        .await
+        .map(|(vr, wr)| (vr.id, wr)) //we return vres.id instead of vres just because we currently only get vres_id from our VendorAPIResponseIdentifiersMap
+}
+
+async fn existing_watchlist_check_response(
+    enclave_client: &EnclaveClient,
+    vault_private_key: &EncryptedVaultPrivateKey,
+    latest_results: Vec<RequestAndMaybeResult>,
+) -> ApiResult<Option<(VerificationResultId, WatchlistResultResponse)>> {
+    let latest_results =
+        VendorResult::hydrate_vendor_results(latest_results, enclave_client, vault_private_key).await?;
+
+    let vendor_results: Vec<VendorResult> = latest_results
+        .into_iter()
+        .flat_map(|r| r.into_vendor_result())
+        .collect();
+
+    let (vres_map, vres_ids_map) = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+
+    if let (Some(wr), Some(ids)) = (
+        vres_map.get(&IncodeWatchlistCheck),
+        vres_ids_map.get(&IncodeWatchlistCheck),
+    ) {
+        Ok(Some((ids.verification_result_id.clone(), wr.clone())))
+    } else {
+        Ok(None)
+    }
 }

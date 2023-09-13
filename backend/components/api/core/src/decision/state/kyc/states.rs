@@ -6,13 +6,15 @@ use db::models::{
     risk_signal::{NewRiskSignalInfo, RiskSignal},
     risk_signal_group::RiskSignalGroup,
     vault::Vault,
-    verification_result::VerificationResult,
     workflow::{Workflow as DbWorkflow, WorkflowUpdate},
 };
 
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
-use newtypes::{EnhancedAmlOption, KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind, VaultKind};
+use newtypes::{
+    EnhancedAmlOption, KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind, VaultKind,
+    VerificationResultId,
+};
 
 use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
@@ -117,7 +119,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     type AsyncRes = (
         Option<Vec<NewRiskSignalInfo>>,
         Option<Vec<VendorResult>>,
-        Option<(VerificationResult, WatchlistResultResponse)>,
+        Option<(VerificationResultId, WatchlistResultResponse)>,
         Arc<dyn FeatureFlagClient>,
     );
 
@@ -205,9 +207,12 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         }
 
         // Save AML risk signals from Aml call or Kyc call (or save nothing if neither called)
-        if let Some((watchlist_vres, watchlist_result_response)) = aml_vendor_result {
-            let aml_risk_signals =
-                common::get_aml_risk_signals_from_aml_call(&obc, &watchlist_vres, &watchlist_result_response);
+        if let Some((watchlist_vres_id, watchlist_result_response)) = aml_vendor_result {
+            let aml_risk_signals = common::get_aml_risk_signals_from_aml_call(
+                &obc,
+                &watchlist_vres_id,
+                &watchlist_result_response,
+            );
             save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
         } else if let Some(kyc_vendor_results) = kyc_vendor_results {
             let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(obc, vw, &kyc_vendor_results)?;

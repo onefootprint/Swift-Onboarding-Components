@@ -18,6 +18,7 @@ pub struct VendorResult {
     pub response: VendorResponse,
     pub verification_result_id: VerificationResultId,
     pub verification_request_id: VerificationRequestId,
+    // TODO ^ might make more sense to just have these be VerificationRequest and VerificationResult directly rather than just strip off the id's
 }
 
 #[derive(Clone)]
@@ -27,7 +28,23 @@ pub struct HydratedVerificationResult {
     pub response: Option<VendorResponse>,
 }
 
-pub type RequestAndMaybeHydratedResult = (VerificationRequest, Option<HydratedVerificationResult>);
+#[derive(Clone)]
+pub struct RequestAndMaybeHydratedResult {
+    pub vreq: VerificationRequest,
+    pub vres: Option<HydratedVerificationResult>,
+}
+
+impl RequestAndMaybeHydratedResult {
+    pub fn into_vendor_result(self) -> Option<VendorResult> {
+        self.vres.and_then(|hvr| {
+            hvr.response.map(|vr| VendorResult {
+                response: vr,
+                verification_result_id: hvr.vres.id,
+                verification_request_id: self.vreq.id,
+            })
+        })
+    }
+}
 
 impl VendorResult {
     // A convenience method that takes (vreq,vres)'s and decryptes and parses the vres (if present) into VendorResponse. Similar to from_verification_results_for_onboarding, but this method preserve the same (vreq, vres) list passed in instead of implicitly filtering to only non-None vres's
@@ -58,15 +75,15 @@ impl VendorResult {
             .map(|(vreq, vres)| {
                 let response = result_map.get(&vreq.id);
                 if let Some(vres) = vres {
-                    (
+                    RequestAndMaybeHydratedResult {
                         vreq,
-                        Some(HydratedVerificationResult {
+                        vres: Some(HydratedVerificationResult {
                             vres,
                             response: response.cloned(),
                         }),
-                    )
+                    }
                 } else {
-                    (vreq, None)
+                    RequestAndMaybeHydratedResult { vreq, vres: None }
                 }
             })
             .collect();

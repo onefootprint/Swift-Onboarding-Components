@@ -2,7 +2,7 @@ use db::{
     models::{
         decision_intent::DecisionIntent, document_request::DocumentRequest,
         ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo, scoped_vault::ScopedVault,
-        vault::Vault, verification_result::VerificationResult, workflow::Workflow,
+        vault::Vault, workflow::Workflow,
     },
     DbPool, DbResult, TxnPgConn,
 };
@@ -98,7 +98,7 @@ pub async fn run_aml_call(
     state: &State,
     wf_id: &WorkflowId,
     t_id: &TenantId,
-) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
+) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
     let wfid = wf_id.clone();
     let (wf, v, di) = state
         .db_pool
@@ -125,6 +125,7 @@ pub async fn run_aml_call(
             &v.public_key,
         )
         .await
+        .map(|(vr, wr)| (vr.id, wr))
     } else {
         vendor::incode_watchlist::run_watchlist_check(state, &di, &wf.id).await
     }
@@ -315,7 +316,7 @@ pub async fn maybe_generate_ocr_reason_codes(
 
 pub fn get_aml_risk_signals_from_aml_call(
     obc: &ObConfiguration,
-    watchlist_vres: &VerificationResult,
+    watchlist_vres_id: &VerificationResultId,
     watchlist_result_response: &WatchlistResultResponse,
 ) -> RiskSignalGroupStruct<Aml> {
     let wc_reason_codes =
@@ -332,7 +333,7 @@ pub fn get_aml_risk_signals_from_aml_call(
                 continuous_monitoring: _,
             } => (ofac && r.is_watchlist()) || (pep && r.is_pep()) || (adverse_media && r.is_adverse_media()),
         })
-        .map(|r| (r, VendorAPI::IncodeWatchlistCheck, watchlist_vres.id.clone()))
+        .map(|r| (r, VendorAPI::IncodeWatchlistCheck, watchlist_vres_id.clone()))
         .collect::<Vec<_>>();
     RiskSignalGroupStruct {
         footprint_reason_codes,
