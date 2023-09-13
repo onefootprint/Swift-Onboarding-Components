@@ -7,10 +7,8 @@ use strum_macros::EnumString;
 pub mod idology_match_codes {
     use crate::FootprintReasonCode;
 
-    pub const ADDRESS_DOES_NOT_MATCH_CODES: [FootprintReasonCode; 2] = [
-        FootprintReasonCode::AddressDoesNotMatch,
-        FootprintReasonCode::AddressNewerRecordFound,
-    ];
+    pub const ADDRESS_DOES_NOT_MATCH_CODES: [FootprintReasonCode; 1] =
+        [FootprintReasonCode::AddressDoesNotMatch];
     pub const ADDRESS_PARTIALLY_MATCHES_CODES: [FootprintReasonCode; 4] = [
         FootprintReasonCode::AddressZipCodeDoesNotMatch,
         FootprintReasonCode::AddressStreetNameDoesNotMatch,
