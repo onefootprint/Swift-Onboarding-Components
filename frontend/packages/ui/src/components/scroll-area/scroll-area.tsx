@@ -6,11 +6,12 @@ import type { SXStyleProps, SXStyles } from '../../hooks';
 import { useSX } from '../../hooks';
 
 type ScrollAreaProps = {
+  asChild?: boolean;
   children: React.ReactNode;
   sx?: SXStyleProps;
 };
 
-const ScrollArea = ({ children, sx }: ScrollAreaProps) => {
+const ScrollArea = ({ children, sx, asChild }: ScrollAreaProps) => {
   const viewportRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -62,6 +63,7 @@ const ScrollArea = ({ children, sx }: ScrollAreaProps) => {
       ref={scrollAreaRef}
       data-line={showLine}
       onScroll={handleScroll}
+      asChild={asChild}
     >
       <StyledViewport sx={sxStyles} asChild ref={viewportRef}>
         {children}
