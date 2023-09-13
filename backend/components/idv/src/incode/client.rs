@@ -149,11 +149,20 @@ impl AuthenticatedIncodeClientAdapter {
             .json(&request)
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?
-            .json()
-            .await?;
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        Ok(response)
+        let (cl, s) = (response.content_length(), response.status());
+
+        let json = match response.json().await {
+            Ok(j) => Ok(j),
+            Err(e) => {
+                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+
+                Err(e)
+            }
+        }?;
+
+        Ok(json)
     }
 
     pub async fn process_id(
