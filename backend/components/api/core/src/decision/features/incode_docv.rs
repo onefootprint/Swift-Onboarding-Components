@@ -70,7 +70,7 @@ pub fn footprint_reason_codes(
     expect_selfie: bool
 ) -> Result<Vec<FootprintReasonCode>, idv::Error> {
     let score_reason_codes = reason_codes_from_score_response(scores, expect_selfie)?;
-    let ocr_reason_codes = reason_codes_from_ocr_response(ocr, vault_data)?;
+    let ocr_reason_codes = reason_codes_from_ocr_response(ocr, vault_data);
 
     Ok(score_reason_codes.into_iter().chain(ocr_reason_codes.into_iter()).collect())
 }
@@ -132,14 +132,14 @@ fn merge<'a>(a: Option<&'a PiiString>, b: Option<&'a PiiString>) -> Option<(&'a 
     a.and_then(|a| b.map(|b| (a, b)))
 }
 
-pub fn reason_codes_from_ocr_response(ocr: FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Result<Vec<FootprintReasonCode>, idv::Error>  {
+pub fn reason_codes_from_ocr_response(ocr: FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Vec<FootprintReasonCode> {
         let first_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.first_name.clone().map(|f| f.into()));
         let given_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.given_name.clone().map(|f| f.into()));
         let paternal_last_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.paternal_last_name.clone().map(|s| s.into()));
         let maternal_last_name_ocr: Option<PiiString> = ocr.name.as_ref().and_then(|n| n.maternal_last_name.clone().map(|s| s.into()));
         // TODO: 
         //   switch MM-DD and DD-MM
-        let dob_ocr: PiiString = ocr.dob()?.into();
+        let dob_ocr: Option<PiiString> = ocr.dob().ok().map(|s| s.into());
 
         // matches, eventually should do levinstein or something else to determine "partial" matches
         let first_name_matches = merge(first_name_ocr.as_ref(), vault_data.first_name.as_ref()).map(|(a, b)| pii_strings_match(a, b));
@@ -162,14 +162,14 @@ pub fn reason_codes_from_ocr_response(ocr: FetchOCRResponse, vault_data: IncodeO
         
         let name_matches = first_name_matches.and_then(|x| last_name_matches.map(|y| x && y));
 
-        let dob_matches = vault_data.dob.map(|dob| pii_strings_match(&dob_ocr, &dob));
+        let dob_matches = vault_data.dob.and_then(|dob| dob_ocr.as_ref().map(|ocr_dob| pii_strings_match(ocr_dob, &dob)));
         // TODO: address w/ CDOs are a little harder here. also incode OCR includes a bunch of \n and random crap so will do this in followup
         // incode also theoretically provides `addressFields` which is address broken out, but it hasn't been filled in for any of the test 
         // requests i've done. ex. `test_fixtures::incode_fetch_ocr_response()` 
         // So maybe we just default the alpaca cip stuff to `consider` for now
 
 
-        let reason_codes = [
+        [
             (first_name_matches, FootprintReasonCode::DocumentOcrFirstNameMatches, FootprintReasonCode::DocumentOcrFirstNameDoesNotMatch),
             (last_name_matches, FootprintReasonCode::DocumentOcrLastNameMatches, FootprintReasonCode::DocumentOcrLastNameDoesNotMatch),
             (name_matches, FootprintReasonCode::DocumentOcrNameMatches, FootprintReasonCode::DocumentOcrNameDoesNotMatch),
@@ -181,8 +181,7 @@ pub fn reason_codes_from_ocr_response(ocr: FetchOCRResponse, vault_data: IncodeO
         } else {
             mismatch_signal
         }))
-        .collect();
-        Ok(reason_codes)
+        .collect()
     }
 
 fn pii_strings_match(p1: &PiiString, p2: &PiiString) -> bool {
@@ -307,7 +306,7 @@ mod tests {
         let raw = test_fixtures::incode_fetch_ocr_response(Some(ocr_opts));
         let parsed: FetchOCRResponse = serde_json::from_value(raw).unwrap();
 
-        assert_have_same_elements(reason_codes_from_ocr_response(parsed, vault_data).unwrap(), expected)
+        assert_have_same_elements(reason_codes_from_ocr_response(parsed, vault_data), expected)
     }
 
     #[test_case(

@@ -194,7 +194,7 @@ impl Complete {
         let ocr_reason_codes = if !obc.is_doc_first {
             // Only calculate OCR reason codes if we have already collected ID data
             let vault_data = vault_data.ok_or(AssertionError("Vault data not provided"))?;
-            incode_docv::reason_codes_from_ocr_response(fetch_ocr_response, vault_data)?
+            incode_docv::reason_codes_from_ocr_response(fetch_ocr_response, vault_data)
                 .into_iter()
                 .map(|r| (r, VendorAPI::IncodeFetchOCR, ocr_verification_result_id.clone()))
                 .collect_vec()
