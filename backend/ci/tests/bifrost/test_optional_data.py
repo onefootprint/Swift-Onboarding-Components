@@ -11,7 +11,8 @@ from tests.utils import create_ob_config
     [
         (True, False), 
         (False, False),
-        (False, True)
+        (False, True),
+        (True, True)
     ],
 )
 def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
@@ -63,7 +64,7 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
     # requirements should be empty
     assert collect_data_req is None
     
-    if step_up_to_doc:# no doc requirement either
+    if step_up_to_doc and not submit_ssn:
         assert set(collect_doc_req['supported_country_and_doc_types']['US']) == set(["passport", "drivers_license", "visa"])
     else:
         assert collect_doc_req is None
@@ -95,7 +96,7 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
     )
     reason_codes = [r["reason_code"] for r in risk_signals]
 
-    if submit_ssn:
+    if submit_ssn or step_up_to_doc:
         assert "ssn_not_provided" not in reason_codes
     else:
         assert "ssn_not_provided" in reason_codes

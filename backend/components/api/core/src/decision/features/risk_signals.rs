@@ -140,8 +140,9 @@ pub fn ssn_optional_and_missing<T>(vw: &VaultWrapper<T>, obc: &ObConfiguration) 
 pub fn user_input_based_risk_signals(vw: &VaultWrapper, obc: &ObConfiguration) -> Vec<FootprintReasonCode> {
     let mut frcs = Vec::<FootprintReasonCode>::new();
 
-    let ssn_optional_and_missing = ssn_optional_and_missing(vw, obc);
-    if ssn_optional_and_missing {
+    let ssn_optional_and_missing_and_no_doc_stepup =
+        ssn_optional_and_missing(vw, obc) && !obc.should_stepup_to_do_for_optional_ssn();
+    if ssn_optional_and_missing_and_no_doc_stepup {
         frcs.push(FootprintReasonCode::SsnNotProvided);
     }
 

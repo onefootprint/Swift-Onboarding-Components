@@ -167,6 +167,10 @@ impl ObConfiguration {
         self.document_cdo_for_optional_ssn()
             .and_then(|cdo| cdo.restricted_id_doc_kinds())
     }
+
+    pub fn should_stepup_to_do_for_optional_ssn(&self) -> bool {
+        self.document_cdo_for_optional_ssn().is_some()
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]
