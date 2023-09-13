@@ -51,11 +51,11 @@ import '@onefootprint/footprint-js/dist/footprint-js.css';
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 
 const Page = () => {
-  const handleVerifyCancel = () => {
+  const handleCancel = () => {
     console.log('user canceled');
   };
 
-  const handleVerifyComplete = (validationToken: string) => {
+  const handleComplete = (validationToken: string) => {
     console.log(validationToken);
   };
 
@@ -63,8 +63,8 @@ const Page = () => {
     <main>
       <FootprintVerifyButton
         publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
-        onComplete={handleVerifyComplete}
-        onCancel={handleVerifyCancel}
+        onComplete={handleComplete}
+        onCancel={handleCancel}
       />
     </main>
   );
