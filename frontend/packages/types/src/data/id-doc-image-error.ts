@@ -24,6 +24,7 @@ export enum IdDocImageProcessingError {
   driversLicensePermitNotAllowed = 'drivers_license_permit_not_allowed',
   unknownError = 'unknown_error',
   networkError = 'network_error',
+  faceNotFound = 'face_not_found',
 }
 
 export enum IdDocImageUploadError {

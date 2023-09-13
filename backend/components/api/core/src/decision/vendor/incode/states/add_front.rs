@@ -71,7 +71,7 @@ impl IncodeStateTransition for AddFront {
                 // status is a mix of custom error codes and http status codes
                 Err(idv::incode::error::Error::APIResponseError(e)) => {
                     let failure_reasons = match e.status {
-                        4019 => Ok(vec![IncodeFailureReason::SelfieFaceNotFound]),
+                        4019 => Ok(vec![IncodeFailureReason::FaceNotFound]),
                         1003 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
                         500 => Ok(vec![IncodeFailureReason::UnexpectedErrorOccurred]),
                         // TODO there are probably more retryable errors in here

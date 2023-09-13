@@ -83,6 +83,7 @@ pub enum IncodeFailureReason {
     DocTypeMismatch,
     FaceCroppingFailure,
     SelfieFaceNotFound,
+    FaceNotFound,
     SelfieLowConfidence,
     SelfieTooDark,
     SelfieGlare,

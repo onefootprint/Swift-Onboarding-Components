@@ -94,6 +94,7 @@ pub enum DocumentImageError {
     UnableToAlignDocument,
     IdTypeNotAcceptable,
     SelfieFaceNotFound,
+    FaceNotFound,
     SelfieLowConfidence,
     SelfieTooDark,
     SelfieGlare,
@@ -157,6 +158,7 @@ impl From<IncodeFailureReason> for DocumentImageError {
             IncodeFailureReason::SelfieImageOrientationIncorrect => Self::SelfieImageOrientationIncorrect,
             IncodeFailureReason::SelfieBadImageCompression => Self::SelfieBadImageCompression,
             IncodeFailureReason::DriversLicensePermitNotAllowed => Self::DriversLicensePermitNotAllowed,
+            IncodeFailureReason::FaceNotFound => Self::FaceNotFound,
         }
     }
 }
