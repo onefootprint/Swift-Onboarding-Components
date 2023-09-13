@@ -9,7 +9,7 @@ describe('ValidateDob', () => {
     expect(validateDob(`12/12/${before1900}`)).toBe(DobValidationError.TOO_OLD);
   });
 
-  it.skip('rejects dates that are younger than MIN_VALID_AGE', () => {
+  it('rejects dates that are younger than MIN_VALID_AGE', () => {
     const youngYear = new Date().getFullYear() - (MIN_VALID_AGE - 1);
     expect(validateDob(`01/01/${youngYear}`)).toBe(
       DobValidationError.TOO_YOUNG,
@@ -21,9 +21,7 @@ describe('ValidateDob', () => {
         ? youngDob.getMonth() + 1
         : `0${youngDob.getMonth() + 1}`; // JS Date months starts at month 0 for January
     const youngDobDay =
-      youngDob.getDate() > 9
-        ? youngDob.getDate() + 1
-        : `0${youngDob.getDate() + 1}`;
+      youngDob.getDate() > 9 ? youngDob.getDate() : `0${youngDob.getDate()}`;
     const youngDobYear = youngDob.getFullYear();
     expect(validateDob(`${youngDobMonth}/${youngDobDay}/${youngDobYear}`)).toBe(
       DobValidationError.TOO_YOUNG,
