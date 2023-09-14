@@ -60,7 +60,7 @@ const SecurityLogs = () => {
       </Typography>
       <FiltersContainer>
         <SearchInput
-          sx={{ width: '232px' }}
+          width="232px"
           onChangeText={value => filters.push({ search: value })}
           value={filters.query.search || ''}
         />

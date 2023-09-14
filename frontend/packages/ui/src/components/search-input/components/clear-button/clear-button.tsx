@@ -23,11 +23,15 @@ const ClearButtonContainer = styled.button`
     border: none;
     cursor: pointer;
     display: flex;
-    height: 100%;
-    margin-right: ${theme.spacing[4]};
+    right: ${theme.spacing[3]};
+    top: 50%;
+    transform: translateY(-50%);
+    padding: ${theme.spacing[3]};
+    background-color: ${theme.backgroundColor.primary};
     outline: none;
     padding: 0;
     transition: 0.2s opacity;
+    position: absolute;
 
     @media (hover: hover) {
       :hover {

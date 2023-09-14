@@ -46,6 +46,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
       required,
       size = 'default',
       suffixComponent,
+      width,
       sx,
       testID,
       ...props
@@ -77,7 +78,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             {label}
           </Label>
         )}
-        <InputContainer>
+        <InputContainer width={width}>
           {prefixComponent && (
             <PrefixContainer>{prefixComponent}</PrefixContainer>
           )}
@@ -103,6 +104,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             // These conditions are important in order to work with react-hook-forms
             ref={mask ? undefined : ref}
             htmlRef={mask ? ref : undefined}
+            data-has-suffix={!!suffixComponent}
           />
           {suffixComponent && (
             <SuffixContainer>{suffixComponent}</SuffixContainer>
@@ -114,9 +116,11 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
   },
 );
 
-const InputContainer = styled.div`
-  position: relative;
-  width: inherit;
+const InputContainer = styled.div<{ width?: string | number }>`
+  ${({ width }) => css`
+    position: relative;
+    width: ${width || 'inherit'};
+  `}
 `;
 
 const PrefixContainer = styled.div`
@@ -135,6 +139,10 @@ const StyledField = styled(Field)<{ $sx: SXStyles }>`
   ${({ theme }) => css`
     padding-left: ${theme.spacing[5]};
     padding-right: ${theme.spacing[5]};
+
+    &[data-has-suffix='true'] {
+      padding-right: ${theme.spacing[7]};
+    }
   `}
   ${({ $sx }) =>
     css`

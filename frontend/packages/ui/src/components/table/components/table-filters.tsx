@@ -38,7 +38,7 @@ const TableFilter = ({
       <SearchInput
         onChangeText={handleChangeText}
         placeholder={placeholder}
-        sx={{ width: '232px' }}
+        width="232px"
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"
