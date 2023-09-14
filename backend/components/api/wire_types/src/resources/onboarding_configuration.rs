@@ -20,6 +20,7 @@ pub struct OnboardingConfiguration {
     pub is_doc_first_flow: bool,
     pub author: Option<Actor>,
     pub skip_kyc: bool,
+    pub enhanced_aml: EnhancedAml,
 }
 
 export_schema!(OnboardingConfiguration);

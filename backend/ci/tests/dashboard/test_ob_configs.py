@@ -234,11 +234,11 @@ def test_config_create(sandbox_tenant, twilio):
                     "email",
                     "phone_number",
                     "dob",
-                    "document.passport.none.none"
+                    "document.passport.none.none",
                 ],
-                optional_data=['ssn9'],
+                optional_data=["ssn9"],
                 can_access_data=[],
-                doc_scan_for_optional_ssn="document.passport.none.none"
+                doc_scan_for_optional_ssn="document.passport.none.none",
             ),
             "Validation error: Cannot specify doc_scan_for_optional_ssn if already collecting a document",
         ),
@@ -253,11 +253,11 @@ def test_config_create(sandbox_tenant, twilio):
                 ],
                 optional_data=[],
                 can_access_data=[],
-                doc_scan_for_optional_ssn="document.passport.none.none"
+                doc_scan_for_optional_ssn="document.passport.none.none",
             ),
             "Validation error: Cannot specify doc_scan_for_optional_ssn if Ssn4 or Ssn9 is not optional",
         ),
-         (
+        (
             dict(
                 must_collect_data=[
                     "name",
@@ -266,9 +266,9 @@ def test_config_create(sandbox_tenant, twilio):
                     "phone_number",
                     "dob",
                 ],
-                optional_data=['ssn9'],
+                optional_data=["ssn9"],
                 can_access_data=[],
-                doc_scan_for_optional_ssn="full_address"
+                doc_scan_for_optional_ssn="full_address",
             ),
             "Validation error: doc_scan_for_optional_ssn must be a Document collected data option",
         ),
@@ -357,6 +357,68 @@ def test_skip_kyc(
         assert res["skip_kyc"] == True
 
 
+@pytest.mark.parametrize(
+    "enhanced_aml,expected_error",
+    [
+        (
+            dict(
+                enhanced_aml=False,
+                ofac=False,
+                pep=False,
+                adverse_media=False,
+            ),
+            None,
+        ),
+        (
+            dict(
+                enhanced_aml=True,
+                ofac=True,
+                pep=True,
+                adverse_media=False,
+            ),
+            None,
+        ),
+        (
+            dict(
+                enhanced_aml=False,
+                ofac=True,
+                pep=True,
+                adverse_media=False,
+            ),
+            "Validation error: cannot set adverse_media, ofac, or pep if enhanced_aml = false",
+        ),
+        (
+            dict(
+                enhanced_aml=True,
+                ofac=False,
+                pep=False,
+                adverse_media=False,
+            ),
+            "Validation error: at least one of adverse_media, ofac, or pep must be set if enhanced_aml = true",
+        ),
+    ],
+)
+def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_error):
+    data = dict(
+        name="Yo",
+        must_collect_data=must_collect_data,
+        optional_data=[],
+        can_access_data=must_collect_data,
+        enhanced_aml=enhanced_aml,
+    )
+    res = post(
+        "org/onboarding_configs",
+        data,
+        *sandbox_tenant.db_auths,
+        status_code=200 if expected_error is None else 400,
+    )
+
+    if expected_error:
+        assert res["error"]["message"] == expected_error
+    else:
+        assert res["enhanced_aml"] == enhanced_aml
+
+
 def test_config_update(sandbox_tenant, ob_configuration):
     # Test failing to update
     new_name = "Updated ob config name"
@@ -380,7 +442,7 @@ def test_config_update(sandbox_tenant, ob_configuration):
     assert ob_config["status"] == new_status
 
     # Verify the update
-    body = get(f"org/onboarding_configs", None, *sandbox_tenant.db_auths)
+    body = get(f"org/onboarding_configs?page_size=100", None, *sandbox_tenant.db_auths)
     configs = body["data"]
     ob_config = next(i for i in configs if i["id"] == ob_configuration.id)
     assert ob_config["name"] == new_name

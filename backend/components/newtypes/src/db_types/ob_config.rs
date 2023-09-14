@@ -82,3 +82,50 @@ pub enum EnhancedAmlOption {
         continuous_monitoring: bool,
     },
 }
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize, Eq, PartialEq, Apiv2Schema, JsonSchema)]
+pub struct EnhancedAml {
+    pub enhanced_aml: bool,
+    pub ofac: bool,
+    pub pep: bool,
+    pub adverse_media: bool,
+}
+
+impl From<EnhancedAml> for EnhancedAmlOption {
+    fn from(value: EnhancedAml) -> Self {
+        if value.enhanced_aml {
+            EnhancedAmlOption::Yes {
+                ofac: value.ofac,
+                pep: value.pep,
+                adverse_media: value.adverse_media,
+                continuous_monitoring: true,
+            }
+        } else {
+            EnhancedAmlOption::No
+        }
+    }
+}
+
+impl From<EnhancedAmlOption> for EnhancedAml {
+    fn from(value: EnhancedAmlOption) -> Self {
+        match value {
+            EnhancedAmlOption::No => EnhancedAml {
+                enhanced_aml: false,
+                ofac: false,
+                pep: false,
+                adverse_media: false,
+            },
+            EnhancedAmlOption::Yes {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring: _,
+            } => EnhancedAml {
+                enhanced_aml: true,
+                ofac,
+                pep,
+                adverse_media,
+            },
+        }
+    }
+}

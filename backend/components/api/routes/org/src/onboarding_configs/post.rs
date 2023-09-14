@@ -10,7 +10,7 @@ use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::{CipKind, TenantId};
+use newtypes::{CipKind, EnhancedAml, TenantId};
 use newtypes::{CollectedData as CD, Iso3166TwoDigitCountryCode};
 use newtypes::{CollectedDataOption as CDO, EnhancedAmlOption};
 use paperclip::actix::Apiv2Schema;
@@ -36,6 +36,8 @@ pub struct CreateOnboardingConfigurationRequest {
     skip_kyc: bool,
     #[serde(default)]
     doc_scan_for_optional_ssn: Option<CDO>,
+    #[serde(default)]
+    enhanced_aml: Option<EnhancedAml>,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -239,6 +241,8 @@ impl CreateOnboardingConfigurationRequest {
             vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber]
         };
 
+        self.validate_enhanced_aml()?;
+
         // Check for required fields
         let missing_required_fields: Vec<_> = required_fields
             .into_iter()
@@ -251,6 +255,26 @@ impl CreateOnboardingConfigurationRequest {
             ))
             .into());
         }
+        Ok(())
+    }
+
+    fn validate_enhanced_aml(&self) -> ApiResult<()> {
+        if let Some(r) = &self.enhanced_aml {
+            if !r.enhanced_aml && (r.adverse_media || r.ofac || r.pep) {
+                return Err(TenantError::ValidationError(
+                    "cannot set adverse_media, ofac, or pep if enhanced_aml = false".to_owned(),
+                )
+                .into());
+            }
+            if r.enhanced_aml && !(r.adverse_media || r.ofac || r.pep) {
+                return Err(TenantError::ValidationError(
+                    "at least one of adverse_media, ofac, or pep must be set if enhanced_aml = true"
+                        .to_owned(),
+                )
+                .into());
+            }
+        }
+
         Ok(())
     }
 
@@ -316,6 +340,7 @@ pub async fn post(
         international_country_restrictions,
         skip_kyc,
         doc_scan_for_optional_ssn,
+        enhanced_aml,
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -330,7 +355,7 @@ pub async fn post(
             .feature_flag_client
             .flag(BoolFlag::IsSkipKycTenant(&tenant_id));
 
-    let enhanced_aml = EnhancedAmlOption::No;
+    let enhanced_aml = enhanced_aml.map(|r| r.into()).unwrap_or(EnhancedAmlOption::No);
 
     let actor = auth.actor().into();
     let obc = state
@@ -417,6 +442,7 @@ mod test {
             international_country_restrictions: None,
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
+            enhanced_aml: Some(EnhancedAml::default()),
         };
         req.validate_inner().is_ok()
     }
@@ -442,6 +468,7 @@ mod test {
             international_country_restrictions: None,
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
+            enhanced_aml: Some(EnhancedAml::default()),
         };
         req.validate().is_ok()
     }
@@ -466,6 +493,7 @@ mod test {
             international_country_restrictions: None,
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
+            enhanced_aml: Some(EnhancedAml::default()),
         };
         req.validate().is_ok()
     }
@@ -486,6 +514,7 @@ mod test {
             international_country_restrictions: None,
             skip_kyc: true,
             doc_scan_for_optional_ssn: None,
+            enhanced_aml: Some(EnhancedAml::default()),
         };
         req.validate().is_ok()
     }

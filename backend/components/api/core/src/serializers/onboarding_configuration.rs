@@ -95,6 +95,7 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             international_country_restrictions,
             is_doc_first,
             skip_kyc,
+            enhanced_aml,
             ..
         } = ob_config;
         Self {
@@ -113,6 +114,7 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             international_country_restrictions,
             author: author.map(Actor::from_db),
             skip_kyc,
+            enhanced_aml: enhanced_aml.into(),
         }
     }
 }
