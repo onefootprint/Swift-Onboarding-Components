@@ -360,9 +360,10 @@ def identify_verify(
     tried_codes = {}
 
     def inner():
-        messages = twilio.messages.list(to=real_phone_number, limit=10)
+        messages = twilio.messages.list(to=real_phone_number, limit=25)
 
         last_error = None
+        
         for message in messages:
             try:
                 code = str(re.search("\\d{6}", message.body).group(0))
@@ -383,9 +384,10 @@ def identify_verify(
 
         if last_error:
             raise last_error
-        assert False, "Didn't find correct code for identify"
+        else:
+            raise Exception('code is not present')
 
-    return try_until_success(inner, 10)
+    return try_until_success(inner, 15)
 
 
 def create_user(twilio, phone_number, *headers) -> str:
