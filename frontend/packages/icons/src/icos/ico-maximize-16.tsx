@@ -16,7 +16,7 @@ const IcoMaximize16 = ({ color = 'primary', className, testID }: IconProps) => {
       aria-hidden="true"
     >
       <path
-        d="M1.958 10.292v3.75m0 0h3.75m-3.75 0 4.584-4.584m7.5-3.75v-3.75m0 0h-3.75m3.75 0L9.458 6.542"
+        d="M1.958 10.292v3.75m0 0 4.584-4.584m-4.584 4.584h3.783M14.04 5.707v-3.75m0 0L9.457 6.54m4.583-4.583h-3.782"
         stroke={theme.color[color]}
         strokeWidth={1.4}
         strokeLinecap="round"
