@@ -203,7 +203,7 @@ const getDistanceFromTop = (isConfirmation: boolean, size: DialogSize) => {
   if (size === 'full-screen') {
     return '0';
   }
-  return undefined;
+  return false;
 };
 
 const DialogContainer = styled(Fade)<{
