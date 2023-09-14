@@ -34,7 +34,7 @@ const SSN = ({
   const { t } = useTranslation('pages.ssn');
   const confirmationDialog = useConfirmationDialog();
   const [state, send] = useCollectKycDataMachine();
-  const { data, requirement } = state.context;
+  const { data, requirement, config } = state.context;
   const { mutation, syncData } = useSyncData();
   const convertFormData = useConvertFormData();
   const ssnKind = getSsnKind(requirement);
@@ -45,6 +45,8 @@ const SSN = ({
   const title = ssnKind === 'ssn9' ? t('full.title') : t('last-four.title');
   const subtitle =
     ssnKind === 'ssn9' ? t('full.subtitle') : t('last-four.subtitle');
+
+  const hasDocStepup = config.requiresIdDoc;
 
   const methods = useForm<FormData>({
     defaultValues: {
@@ -88,7 +90,9 @@ const SSN = ({
   const handleSkip = () => {
     confirmationDialog.open({
       title: t('skip.confirmation.title'),
-      description: t('skip.confirmation.description'),
+      description: hasDocStepup
+        ? t('skip.confirmation.with-stepup-description')
+        : t('skip.confirmation.without-stepup-description'),
       primaryButton: {
         label: t('skip.confirmation.yes'),
         onClick: onSubmitSkippedForm,

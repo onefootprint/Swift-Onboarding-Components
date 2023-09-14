@@ -195,10 +195,11 @@
       "skip": {
         "cta": "I don't have a Social Security Number",
         "confirmation": {
-          "title": "Are you sure?",
-          "description": "Not providing a Social Security Number might make your verification take a few days.",
-          "yes": "Yes",
-          "no": "No"
+          "title": "No SSN?",
+          "with-stepup-description": "Please confirm that you don’t have an SSN.",
+          "without-stepup-description": "Please confirm that you don’t have an SSN. It may take a bit longer to verify your identity.",
+          "yes": "Confirm",
+          "no": "Cancel"
         }
       }
     },
