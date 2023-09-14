@@ -211,7 +211,7 @@ const DialogContainer = styled(Fade)<{
     position: absolute;
     z-index: ${theme.zIndex.dialog};
     width: ${getSize(size, isConfirmation)};
-    max-width: 90%;
+    max-width: ${size !== 'full-screen' ? '90%' : '100%'};
     height: ${size === 'full-screen' ? '100vh' : 'inherit'};
     max-height: ${size !== 'full-screen'
       ? `calc(100vh - 2 * ${theme.spacing[9]})`
