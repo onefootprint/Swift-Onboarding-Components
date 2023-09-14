@@ -196,6 +196,16 @@ const getSize = (size: DialogSize, isConfirmation: boolean) => {
   }
 };
 
+const getDistanceFromTop = (isConfirmation: boolean, size: DialogSize) => {
+  if (isConfirmation) {
+    return '50%';
+  }
+  if (size === 'full-screen') {
+    return '0';
+  }
+  return undefined;
+};
+
 const DialogContainer = styled(Fade)<{
   size: DialogSize;
   disableResponsiveness: boolean;
@@ -217,9 +227,11 @@ const DialogContainer = styled(Fade)<{
       ? `calc(100vh - 2 * ${theme.spacing[9]})`
       : 'inherit'};
     border-radius: ${size === 'full-screen' ? 0 : theme.borderRadius.default};
-    top: ${size !== 'full-screen' ? theme.spacing[9] : '0'};
+    top: ${getDistanceFromTop(isConfirmation, size) || theme.spacing[9]};
     left: 50%;
-    transform: translate(-50%, 0%) !important;
+    transform: ${isConfirmation
+      ? 'translate(-50%, -50%)'
+      : 'translate(-50%, 0%)'} !important;
     z-index: ${isConfirmation
       ? theme.zIndex.confirmationDialog
       : theme.zIndex.dialog};
