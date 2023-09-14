@@ -355,7 +355,10 @@ pub async fn post(
             .feature_flag_client
             .flag(BoolFlag::IsSkipKycTenant(&tenant_id));
 
-    let enhanced_aml = enhanced_aml.map(|r| r.into()).unwrap_or(EnhancedAmlOption::No);
+    let enhanced_aml = enhanced_aml
+        .map(|r| r.into())
+        .or(hardcoded_tenant_enhanced_aml_option(&tenant_id))
+        .unwrap_or(EnhancedAmlOption::No);
 
     let actor = auth.actor().into();
     let obc = state
@@ -399,6 +402,26 @@ fn validate_for_cip(kind: CipKind, must_collect_data: &[CDO]) -> Result<(), Tena
         Err(TenantError::MissingCdosForCip(missing_cdos.into(), kind))
     } else {
         Ok(())
+    }
+}
+
+fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<EnhancedAmlOption> {
+    if tenant_id.is_coba() {
+        Some(EnhancedAmlOption::Yes {
+            ofac: true,
+            pep: true,
+            adverse_media: false,
+            continuous_monitoring: true,
+        })
+    } else if tenant_id.is_composer() {
+        Some(EnhancedAmlOption::Yes {
+            ofac: true,
+            pep: true,
+            adverse_media: true,
+            continuous_monitoring: false,
+        })
+    } else {
+        None
     }
 }
 
