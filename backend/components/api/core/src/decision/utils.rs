@@ -87,7 +87,6 @@ type ShouldInitiateRealDocumentRequests = bool;
 pub async fn should_initiate_requests_for_document(
     state: &State,
     uvw: &VaultWrapper<Person>,
-    tenant_id: &TenantId,
     document_decision: Option<IdentityDocumentFixtureResult>,
 ) -> ApiResult<(
     ShouldInitiateRealDocumentRequests,
@@ -111,12 +110,7 @@ pub async fn should_initiate_requests_for_document(
             None
         };
 
-        let can_make_demo_incode_requests_in_sandbox = state
-            .feature_flag_client
-            .flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(tenant_id));
-        let should_initiate_sandbox = matches!(document_decision, Some(IdentityDocumentFixtureResult::Real))
-            && can_make_demo_incode_requests_in_sandbox;
-
+        let should_initiate_sandbox = matches!(document_decision, Some(IdentityDocumentFixtureResult::Real));
         return Ok((should_initiate_sandbox, fixture_ocr_data));
     // guard against prod vaults from providing document fixtures (we prevent this in the API route that starts the flow, but double checking never hurt nobody)
     } else if document_decision.is_some() {

@@ -13,7 +13,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use feature_flag::BoolFlag;
 use newtypes::output::Csv;
-use newtypes::{WorkflowGuard, Iso3166TwoDigitCountryCode};
+use newtypes::{WorkflowGuard, Iso3166TwoDigitCountryCode, IdentityDocumentFixtureResult};
 use paperclip::actix::{self, api_v2_operation, web};
 use newtypes::IdentityDataKind as IDK;
 
@@ -72,11 +72,19 @@ pub async fn post(
                 return Err(OnboardingError::UnsupportedDocumentType(Csv::from(allowed_doc_types.clone())).into());
             }
             
-            let vault = Vault::get(conn, &su_id)?;
-            // Check we're in sandbox
-            if vault.is_live && fixture_result.is_some() {
-                return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
+            if let Some(fixture_result) = fixture_result {
+                // Check we're in sandbox
+                let vault = Vault::get(conn, &su_id)?;
+                if vault.is_live {
+                    return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
+                }
+
+                if matches!(fixture_result, IdentityDocumentFixtureResult::Real) && 
+                    !ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id)) {
+                    return Err(OnboardingError::RealDocumentFixtureNotAllowed.into());
+                }
             }
+
 
             // we don't want any tenant to be able to skip selfie by default, eventually this will
             // be in the OBC

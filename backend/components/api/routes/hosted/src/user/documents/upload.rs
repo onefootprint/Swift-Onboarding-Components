@@ -97,16 +97,10 @@ pub async fn post(
     let vault2 = vault.clone();
     let wf_id = wf.id.clone();
     let wf_id2 = wf.id.clone();
-    let tenant_id = user_auth.tenant()?.id.clone();
     let is_sandbox = id_doc.fixture_result.is_some();
     // Check if we should be initiating requests (e.g. check if we are testing)
-    let (should_initiate_reqs, ocr_fixture) = decision::utils::should_initiate_requests_for_document(
-        &state,
-        &uvw,
-        &tenant_id,
-        id_doc.fixture_result,
-    )
-    .await?;
+    let (should_initiate_reqs, ocr_fixture) =
+        decision::utils::should_initiate_requests_for_document(&state, &uvw, id_doc.fixture_result).await?;
 
     let (missing_sides, created_reqs) = state
         .db_pool

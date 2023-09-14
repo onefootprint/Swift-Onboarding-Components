@@ -50,6 +50,8 @@ pub enum OnboardingError {
     UnsupportedDocumentType(Csv<IdDocKind>),
     #[error("Cannot create a fixture result for a non-sandbox Vault")]
     CannotCreateFixtureResultForNonSandbox,
+    #[error("User not allowed to set fixture_result=Real")]
+    RealDocumentFixtureNotAllowed,
     #[error("Sandbox vaults must have a fixture result")]
     NoFixtureResultForSandboxUser,
     #[error("Workflow doesn't have an associated onboarding config")]
