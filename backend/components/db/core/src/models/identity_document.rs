@@ -54,6 +54,18 @@ impl IdentityDocument {
     pub fn collected_on_desktop(&self) -> bool {
         matches!(self.device_type, Some(DocumentScanDeviceType::Desktop))
     }
+
+    pub fn any_image_collected(&self) -> bool {
+        ![
+            self.front_lifetime_id.as_ref(),
+            self.back_lifetime_id.as_ref(),
+            self.selfie_lifetime_id.as_ref(),
+        ]
+        .iter()
+        .flatten()
+        .collect::<Vec<_>>()
+        .is_empty()
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]

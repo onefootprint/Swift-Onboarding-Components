@@ -117,6 +117,13 @@ def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config_on
     }
     post("hosted/user/documents", data, bifrost.auth_token)
 
+    bifrost.handle_requirements(kind="collect_document")
+    status_after_doc_upload = bifrost.get_status()
+    fields_to_authorize = get_requirement_from_requirements("authorize", status_after_doc_upload['requirements'])["fields_to_authorize"]
+    document_types_to_authorize = fields_to_authorize["document_types"]
+    # despite having created identity documents for NO passport, MX DL, we only actually uploaded successfully a DL
+    assert document_types_to_authorize == ["drivers_license"]
+
 
 
 def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
@@ -154,11 +161,14 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
         assert not body["errors"]
     # now check what fields we have to authorize
     status_after_doc = bifrost.get_status()
-    fields_to_authorize = get_requirement_from_requirements("authorize", status_after_doc['requirements'])["fields_to_authorize"]["collected_data"]
+    fields_to_authorize = get_requirement_from_requirements("authorize", status_after_doc['requirements'])["fields_to_authorize"]
+    collected_fields_to_authorize = fields_to_authorize["collected_data"]
+    document_types_to_authorize = fields_to_authorize["document_types"]
     
     # we didn't authorize selfie
     # TODO: i think this should authorize document but not doc + selfie. will check with frontend
-    assert "document_and_selfie" not in fields_to_authorize
+    assert "document_and_selfie" not in collected_fields_to_authorize
+    assert document_types_to_authorize == ["drivers_license"]
     
     # finish bifrost
     user = bifrost.run()

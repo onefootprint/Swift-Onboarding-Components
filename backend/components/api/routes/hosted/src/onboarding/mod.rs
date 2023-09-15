@@ -399,7 +399,14 @@ fn get_requirement_inner(
                 let (document_types, skipped_selfie) = if ob_config.can_access_document() {
                     // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
                     let id_docs = IdentityDocument::list_by_wf_id(conn, &args.workflow.id)?;
-                    let doc_types = id_docs.iter().map(|id| id.document_type).unique().collect();
+                    let doc_types = id_docs
+                        .iter()
+                        // check we've actually uploaded an image for it, it's not just an empty id doc
+                        // TODO: maybe we should revisit this empty ID doc shell design?
+                        .filter(|i| i.any_image_collected())
+                        .map(|id| id.document_type)
+                        .unique()
+                        .collect();
                     // unless all were skipped, we need to authorize since we may have collected it
                     let selfie_skipped = id_docs.iter().all(|id| id.should_skip_selfie());
                     (doc_types, selfie_skipped)
