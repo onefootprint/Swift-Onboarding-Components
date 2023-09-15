@@ -3,7 +3,12 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoSelfie16 = ({ color = 'primary', className, testID }: IconProps) => {
+const IcoSelfie16 = ({
+  'aria-label': ariaLabel,
+  color = 'primary',
+  className,
+  testID,
+}: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -12,8 +17,9 @@ const IcoSelfie16 = ({ color = 'primary', className, testID }: IconProps) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
+      aria-label={ariaLabel}
       className={className}
-      aria-hidden="true"
+      role="img"
     >
       <circle cx={6.435} cy={6.142} fill={theme.color[color]} r={0.782} />
       <circle cx={9.565} cy={6.142} fill={theme.color[color]} r={0.782} />

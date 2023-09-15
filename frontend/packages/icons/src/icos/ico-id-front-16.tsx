@@ -3,7 +3,12 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoIdFront16 = ({ color = 'primary', className, testID }: IconProps) => {
+const IcoIdFront16 = ({
+  'aria-label': ariaLabel,
+  color = 'primary',
+  className,
+  testID,
+}: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -12,8 +17,9 @@ const IcoIdFront16 = ({ color = 'primary', className, testID }: IconProps) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
+      aria-label={ariaLabel}
       className={className}
-      aria-hidden="true"
+      role="img"
     >
       <g clipPath="url(#prefix__a)">
         <circle cx={4.85} cy={5.15} fill={theme.color[color]} r={0.85} />

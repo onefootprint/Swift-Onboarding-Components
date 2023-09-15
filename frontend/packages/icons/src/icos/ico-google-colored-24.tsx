@@ -2,15 +2,20 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoGoogle24 = ({ className, testID }: IconProps) => (
+const IcoGoogle24 = ({
+  'aria-label': ariaLabel,
+  className,
+  testID,
+}: IconProps) => (
   <svg
     width={24}
     height={24}
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     data-testid={testID}
+    aria-label={ariaLabel}
     className={className}
-    aria-hidden="true"
+    role="img"
   >
     <path
       d="M19.844 10.433H19.2V10.4H12v3.2h4.521A4.798 4.798 0 0 1 7.2 12 4.8 4.8 0 0 1 12 7.2c1.224 0 2.337.462 3.184 1.216l2.263-2.263A7.963 7.963 0 0 0 12 4a8 8 0 1 0 7.844 6.433Z"

@@ -2,15 +2,20 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoVisaelectron16 = ({ className, testID }: IconProps) => (
+const IcoVisaelectron16 = ({
+  'aria-label': ariaLabel,
+  className,
+  testID,
+}: IconProps) => (
   <svg
     width={16}
     height={16}
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     data-testid={testID}
+    aria-label={ariaLabel}
     className={className}
-    aria-hidden="true"
+    role="img"
   >
     <path
       d="M6.933 9.115H5.637l.81-4.7h1.297l-.81 4.7ZM11.632 4.53a3.381 3.381 0 0 0-1.163-.2c-1.28 0-2.181.64-2.186 1.555-.011.675.645 1.05 1.135 1.275.502.23.672.38.672.585-.005.315-.405.46-.778.46-.517 0-.795-.075-1.216-.25l-.17-.075-.182 1.054c.304.13.864.246 1.445.25 1.36 0 2.246-.63 2.256-1.604.005-.535-.341-.945-1.088-1.28-.453-.215-.73-.36-.73-.58.005-.2.234-.405.746-.405.421-.01.73.085.965.18l.118.05.176-1.015Z"

@@ -59,7 +59,10 @@ describe('<Uploads />', () => {
       vault: entityVaultWithIdCard,
       currentDocument: successfulIDCardDocument,
     });
-    const images: HTMLImageElement[] = screen.getAllByRole('img');
+    const images = screen
+      .getAllByRole('img')
+      .filter(el => el.tagName === 'IMG') as HTMLImageElement[];
+
     expect(images).toHaveLength(3);
     expect(images[0]?.src).toContain(
       'data:image/jpg;base64,test ID selfie URL',

@@ -2,15 +2,16 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const CcMir24 = ({ className, testID }: IconProps) => (
+const CcMir24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (
   <svg
     width={24}
     height={17}
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     data-testid={testID}
+    aria-label={ariaLabel}
     className={className}
-    aria-hidden="true"
+    role="img"
   >
     <g clipPath="url(#prefix__a)">
       <path

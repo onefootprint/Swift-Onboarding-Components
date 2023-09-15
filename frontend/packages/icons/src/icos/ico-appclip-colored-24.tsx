@@ -2,15 +2,20 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoAppclip24 = ({ className, testID }: IconProps) => (
+const IcoAppclip24 = ({
+  'aria-label': ariaLabel,
+  className,
+  testID,
+}: IconProps) => (
   <svg
     width={24}
     height={24}
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     data-testid={testID}
+    aria-label={ariaLabel}
     className={className}
-    aria-hidden="true"
+    role="img"
   >
     <path
       d="M5.26 9.977c0-1.454 0-2.181.242-2.753A3.06 3.06 0 0 1 7.126 5.6c.572-.242 1.3-.242 2.754-.242h4.26c1.454 0 2.181 0 2.753.242a3.06 3.06 0 0 1 1.624 1.624c.242.572.242 1.3.242 2.753v4.257c0 1.454 0 2.181-.242 2.753a3.06 3.06 0 0 1-1.624 1.625c-.572.242-1.3.242-2.753.242H9.88c-1.455 0-2.182 0-2.754-.242a3.06 3.06 0 0 1-1.624-1.625c-.242-.572-.242-1.299-.242-2.753V9.977Z"

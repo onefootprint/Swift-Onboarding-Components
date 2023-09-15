@@ -4,6 +4,7 @@ import React from 'react';
 import type { IconProps } from '../types';
 
 const IcoToggleKnob16 = ({
+  'aria-label': ariaLabel,
   color = 'primary',
   className,
   testID,
@@ -16,8 +17,9 @@ const IcoToggleKnob16 = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
+      aria-label={ariaLabel}
       className={className}
-      aria-hidden="true"
+      role="img"
     >
       <g clipPath="url(#prefix__a)">
         <circle cx={8} cy={8} r={8} fill={theme.color[color]} />

@@ -4,6 +4,7 @@ import React from 'react';
 import type { IconProps } from '../types';
 
 const IcoSearchSmall24 = ({
+  'aria-label': ariaLabel,
   color = 'primary',
   className,
   testID,
@@ -16,8 +17,9 @@ const IcoSearchSmall24 = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
+      aria-label={ariaLabel}
       className={className}
-      aria-hidden="true"
+      role="img"
     >
       <path
         d="m18 18-3.103-3.103M6 11.172a5.172 5.172 0 1 1 10.345 0 5.172 5.172 0 0 1-10.345 0Z"

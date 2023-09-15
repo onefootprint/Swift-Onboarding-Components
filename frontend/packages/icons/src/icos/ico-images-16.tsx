@@ -3,7 +3,12 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoImages16 = ({ color = 'primary', className, testID }: IconProps) => {
+const IcoImages16 = ({
+  'aria-label': ariaLabel,
+  color = 'primary',
+  className,
+  testID,
+}: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -12,8 +17,9 @@ const IcoImages16 = ({ color = 'primary', className, testID }: IconProps) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
+      aria-label={ariaLabel}
       className={className}
-      aria-hidden="true"
+      role="img"
     >
       <path
         d="M13.133 3.8v-.467a1.404 1.404 0 0 0-1.4-1.4H2.4a1.404 1.404 0 0 0-1.4 1.4V10.8a1.404 1.404 0 0 0 1.4 1.4h.467m1.808-7.933h8.984c.74 0 1.341.6 1.341 1.341v7.117c0 .741-.6 1.342-1.341 1.342H4.675c-.741 0-1.342-.6-1.342-1.342V5.608c0-.74.6-1.341 1.342-1.341Z"

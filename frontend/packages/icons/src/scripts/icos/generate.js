@@ -35,8 +35,9 @@ const createIcoComponent = async icoPath => {
       },
       svgProps: {
         'data-testid': '{testID}',
+        'aria-label': '{ariaLabel}',
         className: '{className}',
-        'aria-hidden': 'true',
+        role: 'img',
       },
       plugins: [
         '@svgr/plugin-svgo',

@@ -3,7 +3,7 @@ const template = ({ componentName, jsx, exports }, { tpl }) => tpl`
   
   import type { IconProps } from '../types';
   
-  const ${componentName} = ({ className, testID }: IconProps) => {
+  const ${componentName} = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => {
     return ${jsx}
   }
    

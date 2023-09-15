@@ -3,7 +3,12 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoMaximize16 = ({ color = 'primary', className, testID }: IconProps) => {
+const IcoMaximize16 = ({
+  'aria-label': ariaLabel,
+  color = 'primary',
+  className,
+  testID,
+}: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -12,8 +17,9 @@ const IcoMaximize16 = ({ color = 'primary', className, testID }: IconProps) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
+      aria-label={ariaLabel}
       className={className}
-      aria-hidden="true"
+      role="img"
     >
       <path
         d="M1.958 10.292v3.75m0 0 4.584-4.584m-4.584 4.584h3.783M14.04 5.707v-3.75m0 0L9.457 6.54m4.583-4.583h-3.782"

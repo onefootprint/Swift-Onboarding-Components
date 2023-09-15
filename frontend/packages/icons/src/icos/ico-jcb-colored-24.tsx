@@ -2,15 +2,20 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoJcb24 = ({ className, testID }: IconProps) => (
+const IcoJcb24 = ({
+  'aria-label': ariaLabel,
+  className,
+  testID,
+}: IconProps) => (
   <svg
     width={24}
     height={24}
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     data-testid={testID}
+    aria-label={ariaLabel}
     className={className}
-    aria-hidden="true"
+    role="img"
   >
     <path
       d="M23 17.058a3.42 3.42 0 0 1-3.416 3.416H1V6.946A3.42 3.42 0 0 1 4.416 3.53H23v13.528Z"
