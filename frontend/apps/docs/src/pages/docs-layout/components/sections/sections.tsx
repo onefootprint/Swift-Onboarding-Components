@@ -31,6 +31,15 @@ const Sections = ({ sections }: SectionsProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSection]);
 
+  useEffect(() => {
+    if (window.location.hash) {
+      const element = document.querySelector(window.location.hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, []);
+
   const handleScroll = () => {
     const elementActiveClass = document.querySelector('.active');
     const elementID = elementActiveClass
