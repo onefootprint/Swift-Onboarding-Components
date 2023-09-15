@@ -637,6 +637,10 @@ footprint_reason_code_enum! {
         // ~~~~~~~~~~~~ Document ~~~~~~~~~~~~
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document upload failed", severity = SignalSeverity::High,  description = "User failed to successfully upload a document."]
+        DocumentUploadFailed,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document not verified", severity = SignalSeverity::High,  description = "Unable to verify the document provided because either the front or back was unable to be read or because it failed the verification check."]
         DocumentNotVerified,
 

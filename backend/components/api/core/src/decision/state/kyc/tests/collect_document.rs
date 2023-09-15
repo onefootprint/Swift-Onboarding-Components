@@ -115,14 +115,10 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     assert!(!rs_kyc.is_empty());
     // hidden at this time, until decision
     assert!(rs_kyc.iter().all(|r| !r.hidden));
-    let mut risk_signals_for_doc = vec![];
+    let risk_signals_for_doc = query_risk_signals(state, &svid, RiskSignalGroupKind::Doc).await;
 
-    if !doc_upload_failed {
-        let rs_doc = query_risk_signals(state, &svid, RiskSignalGroupKind::Doc).await;
-        assert!(!rs_doc.is_empty());
-        assert!(rs_doc.iter().all(|r| !r.hidden));
-        risk_signals_for_doc = rs_doc;
-    }
+    assert!(!risk_signals_for_doc.is_empty());
+    assert!(risk_signals_for_doc.iter().all(|r| !r.hidden));
 
     // Expect Webhook
     mock_webhooks(
@@ -175,6 +171,10 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
                         VendorAPI::IncodeFetchScores,
                         FootprintReasonCode::DocumentNotVerified,
                     )),
+                    (doc_upload_failed.then_some((
+                        VendorAPI::IncodeFetchScores,
+                        FootprintReasonCode::DocumentUploadFailed,
+                    ))),
                 ]
                 .into_iter()
                 .flatten()

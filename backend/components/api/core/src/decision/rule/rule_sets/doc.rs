@@ -61,5 +61,10 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
             name: RuleName::SelfieDoesNotMatch,
             action: Action::Fail,
         },
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentUploadFailed) },
+            name: RuleName::DocumentUploadFailed,
+            action: Action::ManualReview,
+        },
     ]
 }

@@ -464,13 +464,9 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         }
         UserKind::Live => {
             let doc_reason_code = document_requested.and_then(|outcome| {
-                if outcome.doc_upload_failed() {
-                    None
-                } else {
-                    outcome
-                        .footprint_reason_code()
-                        .map(|frc| (VendorAPI::IncodeFetchScores, frc))
-                }
+                outcome
+                    .footprint_reason_code()
+                    .map(|frc| (VendorAPI::IncodeFetchScores, frc))
             });
 
             assert_have_same_elements(

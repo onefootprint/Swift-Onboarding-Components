@@ -78,7 +78,7 @@ impl DocumentOutcome {
         match &self {
             DocumentOutcome::Success => Some(FootprintReasonCode::DocumentVerified),
             DocumentOutcome::Failure => Some(FootprintReasonCode::DocumentNotVerified),
-            DocumentOutcome::DocUploadFailed => None,
+            DocumentOutcome::DocUploadFailed => Some(FootprintReasonCode::DocumentUploadFailed),
         }
     }
 
