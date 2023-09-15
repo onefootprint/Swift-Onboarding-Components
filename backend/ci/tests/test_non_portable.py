@@ -82,6 +82,11 @@ def test_data_vaulting(tenant, key, value):
             "12",
             "Cannot specify this piece of data. It will automatically be derived.",
         ),
+        (
+            "document.drivers_license.front.image",
+            "laksdjflasdjhfahsdkfhiuewr",
+            "Cannot vault this piece of data.",
+        ),
     ],
 )
 def test_data_validation(tenant, key, value, expected_error):
