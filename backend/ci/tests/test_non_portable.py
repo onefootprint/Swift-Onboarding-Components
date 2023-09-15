@@ -40,6 +40,7 @@ def test_ssn_vaulting(tenant):
         ("id.phone_number", "+14444444444"),
         ("id.email", "piip@onefootprint.com"),
         ("id.email", "example#@gmail.com"),
+        ("document.drivers_license.document_number", "12345"),
     ],
 )
 def test_data_vaulting(tenant, key, value):
@@ -75,11 +76,6 @@ def test_data_vaulting(tenant, key, value):
             "card.flerp.number",
             "4026123412341233",
             "Invalid checksum. Please verify that the number is correct",
-        ),
-        (
-            "document.drivers_license.document_number",
-            "12345",
-            "Cannot vault this piece of data.",
         ),
         (
             "card.flerp.expiration_month",

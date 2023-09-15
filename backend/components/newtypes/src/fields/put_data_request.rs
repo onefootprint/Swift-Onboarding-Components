@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    flat_api_object_map_type, DataIdentifier, DataRequest, DataValidationError, NtResult, PiiString,
-    PiiValue, ValidateArgs, ValidationError,
+    flat_api_object_map_type, DataIdentifier, DataRequest, NtResult, PiiString, PiiValue, ValidateArgs,
 };
 
 flat_api_object_map_type!(
@@ -25,22 +24,6 @@ impl RawDataRequest {
                 Ok((k, v))
             })
             .collect::<NtResult<_>>()?;
-
-        // All write paths via API go through this struct, so we can filter out any DIs that we
-        // don't want to be written via API here
-        let unallowed_dis: HashMap<_, _> = map
-            .keys()
-            .filter_map(|di| {
-                let err = match di {
-                    DataIdentifier::Document(_) => Some(ValidationError::CannotVault.into()),
-                    _ => None,
-                };
-                err.map(|err| (di.clone(), err))
-            })
-            .collect();
-        if !unallowed_dis.is_empty() {
-            return Err(DataValidationError::FieldValidationError(unallowed_dis).into());
-        }
 
         let valid_request = DataRequest::<()>::clean_and_validate(map, opts)?;
         Ok(valid_request)
