@@ -11,6 +11,7 @@ import queryClient from './config/initializers/react-query';
 import { FaceModelProvider } from './hooks/use-face-model-loader';
 import Router from './pages/router';
 import type { IdDocProps } from './types';
+import getSupportedCountryDocTypes from './utils/get-supported-country-doc-types';
 import type { MachineContext } from './utils/state-machine';
 
 const App = ({ context, onDone }: IdDocProps) => {
@@ -32,6 +33,9 @@ const App = ({ context, onDone }: IdDocProps) => {
       type: undefined,
     },
     sandboxOutcome,
+    supportedCountryAndDocTypes: getSupportedCountryDocTypes({
+      ...customData.requirement.supportedCountryAndDocTypes,
+    }),
   };
 
   return (

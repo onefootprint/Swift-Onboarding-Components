@@ -15,6 +15,7 @@ import {
   D2PStatus,
   IdDI,
   OnboardingRequirementKind,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import {
@@ -682,6 +683,21 @@ describe('<Idv />', () => {
             onlyUsSupported: false,
             supportedDocumentTypes: [],
             supportedCountries: ['US', 'CA'],
+            supportedCountryAndDocTypes: {
+              us: [
+                SupportedIdDocTypes.driversLicense,
+                SupportedIdDocTypes.idCard,
+                SupportedIdDocTypes.passport,
+                SupportedIdDocTypes.residenceDocument,
+                SupportedIdDocTypes.visa,
+                SupportedIdDocTypes.workPermit,
+              ],
+              ca: [
+                SupportedIdDocTypes.driversLicense,
+                SupportedIdDocTypes.idCard,
+                SupportedIdDocTypes.passport,
+              ],
+            },
           },
         ],
         [],
@@ -736,6 +752,21 @@ describe('<Idv />', () => {
             onlyUsSupported: false,
             supportedDocumentTypes: [],
             supportedCountries: ['US', 'CA'],
+            supportedCountryAndDocTypes: {
+              us: [
+                SupportedIdDocTypes.driversLicense,
+                SupportedIdDocTypes.idCard,
+                SupportedIdDocTypes.passport,
+                SupportedIdDocTypes.residenceDocument,
+                SupportedIdDocTypes.visa,
+                SupportedIdDocTypes.workPermit,
+              ],
+              ca: [
+                SupportedIdDocTypes.driversLicense,
+                SupportedIdDocTypes.idCard,
+                SupportedIdDocTypes.passport,
+              ],
+            },
           },
         ],
         [],

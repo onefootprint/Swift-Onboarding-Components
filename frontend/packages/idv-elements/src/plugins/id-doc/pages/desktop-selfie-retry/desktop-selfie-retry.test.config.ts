@@ -28,13 +28,42 @@ const initialContextWithErrors: MachineContext = {
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
     ],
-
     supportedCountries: ['US', 'CA'],
+    supportedCountryAndDocTypes: {
+      us: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+        SupportedIdDocTypes.residenceDocument,
+        SupportedIdDocTypes.visa,
+        SupportedIdDocTypes.workPermit,
+      ],
+      ca: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+      ],
+    },
   },
   errors: [{ errorType: IdDocImageProcessingError.selfieGlare }],
   idDoc: {
     country: 'US',
     type: SupportedIdDocTypes.driversLicense,
+  },
+  supportedCountryAndDocTypes: {
+    US: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+      SupportedIdDocTypes.residenceDocument,
+      SupportedIdDocTypes.visa,
+      SupportedIdDocTypes.workPermit,
+    ],
+    CA: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
   },
 };
 

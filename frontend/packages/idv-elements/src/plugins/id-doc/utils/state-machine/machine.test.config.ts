@@ -21,6 +21,18 @@ export const requirement: IdDocRequirement = {
     SupportedIdDocTypes.passport,
   ],
   supportedCountries: ['US', 'CA'],
+  supportedCountryAndDocTypes: {
+    us: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
+    ca: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
+  },
 };
 
 export const argsRegularMobile: MachineContext = {
@@ -32,6 +44,18 @@ export const argsRegularMobile: MachineContext = {
   currSide: IdDocImageTypes.front,
   requirement: { ...requirement },
   idDoc: {},
+  supportedCountryAndDocTypes: {
+    US: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
+    CA: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
+  },
 };
 
 export const argsRegularDesktop: MachineContext = {
@@ -43,6 +67,18 @@ export const argsRegularDesktop: MachineContext = {
   currSide: IdDocImageTypes.front,
   requirement: { ...requirement },
   idDoc: {},
+  supportedCountryAndDocTypes: {
+    US: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
+    CA: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
+  },
 };
 
 export const processingErrors = [

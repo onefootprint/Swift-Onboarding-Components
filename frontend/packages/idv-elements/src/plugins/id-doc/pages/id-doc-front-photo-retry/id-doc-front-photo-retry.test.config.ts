@@ -29,6 +29,21 @@ const contextWithErrors: MachineContext = {
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
     ],
+    supportedCountryAndDocTypes: {
+      us: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+        SupportedIdDocTypes.residenceDocument,
+        SupportedIdDocTypes.visa,
+        SupportedIdDocTypes.workPermit,
+      ],
+      ca: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+      ],
+    },
     supportedCountries: ['US', 'CA'],
   },
   errors: [
@@ -39,6 +54,21 @@ const contextWithErrors: MachineContext = {
   idDoc: {
     country: 'US',
     type: SupportedIdDocTypes.driversLicense,
+  },
+  supportedCountryAndDocTypes: {
+    US: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+      SupportedIdDocTypes.residenceDocument,
+      SupportedIdDocTypes.visa,
+      SupportedIdDocTypes.workPermit,
+    ],
+    CA: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
   },
 };
 

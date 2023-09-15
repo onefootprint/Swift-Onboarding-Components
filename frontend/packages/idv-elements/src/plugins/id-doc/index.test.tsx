@@ -85,6 +85,18 @@ describe.skip('<IdDoc />', () => {
           SupportedIdDocTypes.passport,
         ],
         supportedCountries: ['US', 'CA'],
+        supportedCountryAndDocTypes: {
+          us: [
+            SupportedIdDocTypes.driversLicense,
+            SupportedIdDocTypes.idCard,
+            SupportedIdDocTypes.passport,
+          ],
+          ca: [
+            SupportedIdDocTypes.driversLicense,
+            SupportedIdDocTypes.idCard,
+            SupportedIdDocTypes.passport,
+          ],
+        },
       },
     },
     device: device ?? {

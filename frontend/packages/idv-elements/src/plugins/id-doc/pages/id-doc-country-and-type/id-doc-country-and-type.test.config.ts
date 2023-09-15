@@ -29,10 +29,40 @@ export const initialContextAllDocTypes: MachineContext = {
       SupportedIdDocTypes.workPermit,
     ],
     supportedCountries: ['US', 'CA'],
+    supportedCountryAndDocTypes: {
+      us: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+        SupportedIdDocTypes.residenceDocument,
+        SupportedIdDocTypes.visa,
+        SupportedIdDocTypes.workPermit,
+      ],
+      ca: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+      ],
+    },
   },
   idDoc: {
     country: undefined,
     type: undefined,
+  },
+  supportedCountryAndDocTypes: {
+    US: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+      SupportedIdDocTypes.residenceDocument,
+      SupportedIdDocTypes.visa,
+      SupportedIdDocTypes.workPermit,
+    ],
+    CA: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
   },
 };
 
@@ -55,10 +85,26 @@ export const initialContextSomeDocTypes: MachineContext = {
       SupportedIdDocTypes.passport,
     ],
     supportedCountries: ['US', 'CA'],
+    supportedCountryAndDocTypes: {
+      us: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+      ],
+      ca: [SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+    },
   },
   idDoc: {
     country: undefined,
     type: undefined,
+  },
+  supportedCountryAndDocTypes: {
+    US: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
+    CA: [SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
 };
 
@@ -81,10 +127,24 @@ export const initialContextOnlyUS: MachineContext = {
       SupportedIdDocTypes.passport,
     ],
     supportedCountries: ['US'],
+    supportedCountryAndDocTypes: {
+      us: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+      ],
+    },
   },
   idDoc: {
     country: 'US',
     type: undefined,
+  },
+  supportedCountryAndDocTypes: {
+    US: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
   },
 };
 
@@ -101,16 +161,18 @@ export const initialContextBD: MachineContext = {
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
     onlyUsSupported: true,
-    supportedDocumentTypes: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
-    supportedCountries: ['US'],
+    supportedDocumentTypes: [SupportedIdDocTypes.passport],
+    supportedCountries: ['BD'],
+    supportedCountryAndDocTypes: {
+      bd: [SupportedIdDocTypes.passport],
+    },
   },
   idDoc: {
     country: 'BD',
     type: undefined,
+  },
+  supportedCountryAndDocTypes: {
+    BD: [SupportedIdDocTypes.passport],
   },
 };
 
@@ -133,10 +195,24 @@ export const initialContextNoSupportedDoc: MachineContext = {
       SupportedIdDocTypes.passport,
     ],
     supportedCountries: ['US'],
+    supportedCountryAndDocTypes: {
+      us: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+      ],
+    },
   },
   idDoc: {
     country: 'SG',
     type: undefined,
+  },
+  supportedCountryAndDocTypes: {
+    US: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
   },
 };
 

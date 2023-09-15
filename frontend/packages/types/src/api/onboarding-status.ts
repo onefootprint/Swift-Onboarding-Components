@@ -46,6 +46,7 @@ export type IdDocRequirement = {
   onlyUsSupported: boolean;
   supportedDocumentTypes: SupportedIdDocTypes[];
   supportedCountries: CountryCode[];
+  supportedCountryAndDocTypes: Record<string, SupportedIdDocTypes[]>;
 };
 
 export type RegisterPasskeyRequirement = {

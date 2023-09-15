@@ -24,7 +24,6 @@ import { useIdDocMachine } from '../../../components/machine-provider';
 import { getCountryFromCode } from '../../../utils/get-country-from-code';
 import useOptionsByDocType from '../hooks/use-options-by-doc-type';
 import useSubmitDocType from '../hooks/use-submit-doc-type';
-import SupportedDocTypesByCountry from '../supported-doc-types-by-country.constants';
 import detectWebcam from '../utils/detect-webcam';
 
 type IdDocCountryAndTypeContainerProps = {
@@ -48,6 +47,9 @@ const getDefaultCountry = (
   return defaultCountry;
 };
 
+const getRecordKeys = <T extends object>(object: T) =>
+  Object.keys(object) as (keyof T)[];
+
 const IdDocCountryAndTypeContainer = ({
   onSubmitDocTypeSuccess,
 }: IdDocCountryAndTypeContainerProps) => {
@@ -59,10 +61,12 @@ const IdDocCountryAndTypeContainer = ({
     authToken,
     sandboxOutcome,
     device,
-    requirement,
+    supportedCountryAndDocTypes,
   } = state.context;
   const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
-  const supportedCountries = new Set(requirement.supportedCountries);
+  const supportedCountries = new Set(
+    getRecordKeys(supportedCountryAndDocTypes),
+  );
   const supportedCountryRecords = COUNTRIES.filter(country =>
     supportedCountries.has(country.value),
   );
@@ -77,10 +81,8 @@ const IdDocCountryAndTypeContainer = ({
     getCountryFromCode(defaultCountry) ?? defaultSupportedCountry,
   );
 
-  const { supportedDocumentTypes } = state.context.requirement;
-  const types: SupportedIdDocTypes[] = SupportedDocTypesByCountry[
-    country.value
-  ].filter(type => supportedDocumentTypes.includes(type));
+  const types: SupportedIdDocTypes[] =
+    supportedCountryAndDocTypes[country.value] ?? [];
   const firstTypeFromOptions = types.length
     ? types[0]
     : SupportedIdDocTypes.passport;
@@ -93,9 +95,8 @@ const IdDocCountryAndTypeContainer = ({
     // Update both selected country and type
     if (nextCountry) {
       setCountry(nextCountry);
-      const typesForNextCountry = SupportedDocTypesByCountry[
-        nextCountry.value
-      ].filter(type => supportedDocumentTypes.includes(type));
+      const typesForNextCountry =
+        supportedCountryAndDocTypes[nextCountry.value] ?? [];
       const nextType = typesForNextCountry.length
         ? typesForNextCountry[0]
         : SupportedIdDocTypes.passport;
@@ -134,7 +135,7 @@ const IdDocCountryAndTypeContainer = ({
     );
   };
 
-  const optionsByDocType = useOptionsByDocType(supportedDocumentTypes);
+  const optionsByDocType = useOptionsByDocType(types);
 
   // We only show the doc types supported by both the country and onboarding config
   const options: RadioSelectOptionFields[] = types

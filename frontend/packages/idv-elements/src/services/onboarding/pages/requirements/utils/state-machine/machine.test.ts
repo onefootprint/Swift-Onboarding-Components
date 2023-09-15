@@ -10,6 +10,7 @@ import {
   IdDI,
   OnboardingConfigStatus,
   OnboardingRequirementKind,
+  SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -29,6 +30,18 @@ const idDocRequirement: IdDocRequirement = {
   onlyUsSupported: false,
   supportedDocumentTypes: [],
   supportedCountries: ['US', 'CA'],
+  supportedCountryAndDocTypes: {
+    us: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
+    ca: [
+      SupportedIdDocTypes.driversLicense,
+      SupportedIdDocTypes.idCard,
+      SupportedIdDocTypes.passport,
+    ],
+  },
 };
 
 const kycRequirement: CollectKycDataRequirement = {

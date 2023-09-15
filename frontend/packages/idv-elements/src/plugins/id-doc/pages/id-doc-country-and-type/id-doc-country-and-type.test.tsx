@@ -1,8 +1,15 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import {
+  fireEvent,
+  screen,
+  selectEvents,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import type { SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
+import { act } from 'react-dom/test-utils';
 
 import renderPage from '../../test-utils/render-page';
 import type { MachineContext } from '../../utils/state-machine';
@@ -130,6 +137,64 @@ describe('<IdDocCountryAndType/>', () => {
 
       const workPermit = screen.queryAllByText('Work permit / EAD card');
       expect(workPermit).toHaveLength(0);
+    });
+
+    it('Only contains the countries and the doc types in the mapping', async () => {
+      renderFrontCountryAndDoc(initialContextSomeDocTypes);
+
+      const DL_US = screen.getByText("Driver's license");
+      expect(DL_US).toBeInTheDocument();
+
+      const ID_US = screen.getByText('Identity card');
+      expect(ID_US).toBeInTheDocument();
+
+      const passportUS = screen.getByText('Passport');
+      expect(passportUS).toBeInTheDocument();
+
+      const visaUS = screen.queryAllByText('Visa');
+      expect(visaUS).toHaveLength(0);
+
+      const residenceCardUS = screen.queryAllByText(
+        'Residence card / Green card',
+      );
+      expect(residenceCardUS).toHaveLength(0);
+
+      const workPermitUS = screen.queryAllByText('Work permit / EAD card');
+      expect(workPermitUS).toHaveLength(0);
+
+      const trigger = screen.getByRole('button', {
+        name: 'United States of America',
+      });
+      await selectEvents.openMenu(trigger);
+
+      const options = screen.queryAllByRole('option');
+      expect(options).toHaveLength(2);
+      const canadaOption = screen.getByRole('option', {
+        name: 'Canada',
+      });
+      expect(canadaOption).toBeInTheDocument();
+      // eslint-disable-next-line testing-library/no-unnecessary-act
+      act(() => fireEvent.click(canadaOption));
+
+      const passportCA = screen.getByText('Passport');
+      expect(passportCA).toBeInTheDocument();
+
+      const ID_CA = screen.getByText('Identity card');
+      expect(ID_CA).toBeInTheDocument();
+
+      const DL_CA = screen.queryAllByText("Driver's license");
+      expect(DL_CA).toHaveLength(0);
+
+      const visaCA = screen.queryAllByText('Visa');
+      expect(visaCA).toHaveLength(0);
+
+      const residenceCardCA = screen.queryAllByText(
+        'Residence card / Green card',
+      );
+      expect(residenceCardCA).toHaveLength(0);
+
+      const workPermitCA = screen.queryAllByText('Work permit / EAD card');
+      expect(workPermitCA).toHaveLength(0);
     });
   });
 

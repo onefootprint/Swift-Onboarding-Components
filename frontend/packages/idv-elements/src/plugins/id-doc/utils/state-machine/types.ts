@@ -28,6 +28,9 @@ export type MachineContext = {
   id?: string;
   errors?: IdDocImageErrorType[];
   sandboxOutcome?: IdDocOutcomes;
+  supportedCountryAndDocTypes: Partial<
+    Record<CountryCode, SupportedIdDocTypes[]>
+  >;
 };
 
 export type ProccessingSucceededEvent = {
