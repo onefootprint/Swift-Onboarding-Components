@@ -92,7 +92,7 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/v
 	-X POST \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
 	-d '{
-			"fields": ["id.last_name`, `id.dob`, `id.ssn9`, `custom.ach_account"],
+			"fields": ["id.last_name", "id.dob", "id.ssn9", "custom.ach_account"],
 			"reason": "direct deposit verification"
 		}'
 ```
@@ -279,7 +279,7 @@ Note that not all fields may be populated in the vault.
 | `investor_profile.family_member_names`      | If the user selected `senior_political_figure` in declarations, the names of the user's immediate family members                 | An array of names, each UTF-8 Strings <1KB                                                                             |
 | `investor_profile.political_organization`   | If the user selected `senior_political_figure` in declarations, the name of the political organization                           | Any valid UTF-8 String <1KB                                                                                            |
 
-### Document fields
+### Document extracted fields
 
 If a document is uploaded during onboarding, Footprint will attempt to extracted the following fields from respective documents. These extracted fields can be accessed through the document's type, which is one of `id_card`, `drivers_license`, `passport`, `permit`, `visa`, or `residence_document`. For example, `document.drivers_license.document_number` represents the driver's license document number.
 
@@ -295,6 +295,15 @@ If a document is uploaded during onboarding, Footprint will attempt to extracted
 | `document.*.issuing_state`   | The name of the state that issued the document | Any UTF-8 String <200B                                                          |
 | `document.*.issuing_country` | The the country that issued the document       | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes) |
 | `document.*.nationality`     | The nationality extracted from the document    | Any UTF-8 String <200B                                                          |
+
+### Document images
+
+If a document is uploaded during onboarding or vaulted via the API, the document images can be accessed via the following data identifiers. Fields can be accessed through the document's type, which is one of `id_card`, `drivers_license`, `passport`, `permit`, `visa`, or `residence_document`
+
+| Data Identifier          | Description                                                              | Format               |
+| ------------------------ | ------------------------------------------------------------------------ | -------------------- |
+| `document.*.front.image` | The front image of the document                                          | Base64 encoded image |
+| `document.*.back.image`  | The back image of the document (note: not all document types have backs) | Base64 encoded image |
 
 ### Card fields
 

@@ -85,7 +85,7 @@ def test_data_vaulting(tenant, key, value):
         (
             "document.drivers_license.front.image",
             "laksdjflasdjhfahsdkfhiuewr",
-            "Cannot vault this piece of data.",
+            "Cannot vault document data. Please use the vault upload endpoint instead for this attribute.",
         ),
     ],
 )

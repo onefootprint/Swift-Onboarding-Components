@@ -75,6 +75,8 @@ pub enum Error {
     CannotSpecifyDerivedEntry,
     #[error("Cannot vault this piece of data.")]
     CannotVault,
+    #[error("Cannot vault document data. Please use the vault upload endpoint instead for this attribute.")]
+    CannotVaultDocument,
     #[error("Cannot add {0} when vault already has full data")]
     PartialUpdateNotAllowed(CollectedDataOption),
     #[error("This piece of data is already set and cannot be replaced.")]

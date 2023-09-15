@@ -34,7 +34,7 @@ impl RawDataRequest {
                 let err = match di {
                     DataIdentifier::Document(k) => match k {
                         DocumentKind::OcrData(_, _) => None, // allow vaulting OCR data
-                        _ => Some(ValidationError::CannotVault.into()),
+                        _ => Some(ValidationError::CannotVaultDocument.into()),
                     },
                     _ => None,
                 };
