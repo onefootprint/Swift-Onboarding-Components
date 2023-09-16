@@ -27,6 +27,21 @@ pub struct UpdateSession {
 }
 
 impl Session {
+    #[tracing::instrument("Session::check_expiration", skip_all)]
+    pub fn check_is_expired(conn: &mut PgConn, key: AuthTokenHash) -> Result<Option<bool>, crate::DbError> {
+        let session = session::table
+            .filter(session::key.eq(key))
+            .first::<Session>(conn)
+            .optional()?;
+        // check session expiration every time we get session
+        if let Some(session) = &session {
+            let now = Utc::now();
+            Ok(Some(session.expires_at <= now))
+        } else {
+            Ok(None)
+        }
+    }
+
     #[tracing::instrument("Session::get", skip_all)]
     pub fn get(conn: &mut PgConn, key: AuthTokenHash) -> Result<Option<Session>, crate::DbError> {
         let session = session::table

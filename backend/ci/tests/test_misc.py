@@ -55,3 +55,15 @@ def test_get_user(
     assert body["id"] == user.fp_id
     assert body["requires_manual_review"] == expected_requires_manual_review
     assert body["status"] == expected_status
+
+
+def test_check_session(sandbox_tenant, twilio):
+    seed = _gen_random_n_digit_number(10)
+    sandbox_id = f"session_check_{seed}"
+
+    bifrost = BifrostClient.create(
+        sandbox_tenant.default_ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
+    )
+    bifrost.run()
+    body = get(f"hosted/check_session", None, bifrost.auth_token)
+    assert body == "active"

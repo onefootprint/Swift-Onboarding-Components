@@ -14,6 +14,8 @@ use crate::errors::ApiError;
 use feature_flag::FeatureFlagClient;
 use paperclip::v2::schema::Apiv2Schema;
 
+pub mod check;
+
 /// Allows an auth session to be extracted from an actix request using the extractor SessionContext utility
 pub trait ExtractableAuthSession: Apiv2Schema + Sized + Send + Sync + 'static {
     fn header_names() -> Vec<&'static str>;
