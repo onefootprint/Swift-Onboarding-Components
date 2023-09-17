@@ -218,7 +218,7 @@ const DialogContainer = styled(Fade)<{
     flex-direction: column;
     isolation: isolate;
     justify-content: stretch;
-    position: absolute;
+    position: fixed;
     z-index: ${theme.zIndex.dialog};
     width: ${getSize(size, isConfirmation)};
     max-width: ${size !== 'full-screen' ? '90%' : '100%'};
