@@ -2,7 +2,7 @@ import airplane from 'airplane';
 
 const task = async params => {
   const stuckUsersJson = JSON.parse(params.stuck_users);
-  if (!stuckUsersJson) {
+  if (!stuckUsersJson.length) {
     return;
   }
   const fmtUser = u =>
