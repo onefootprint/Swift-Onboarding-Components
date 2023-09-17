@@ -26,14 +26,14 @@ const blobToBase64 = async (blob: Blob): Promise<string> => {
 
 const encodeImagePath = async (path: string) => {
   const originalSize = await getImageSize(path);
-  const newWidth = originalSize.width / 2;
-  const newHeight = originalSize.height / 2;
+  const newWidth = originalSize.width;
+  const newHeight = originalSize.height;
   const newImage = await ImageResizer.createResizedImage(
     path,
     newWidth,
     newHeight,
     'JPEG',
-    80,
+    90,
     0,
   );
   const response = await fetch(`file://${newImage.path}`);
