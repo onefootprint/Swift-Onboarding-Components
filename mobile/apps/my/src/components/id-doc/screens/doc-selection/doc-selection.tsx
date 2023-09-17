@@ -1,5 +1,4 @@
 import { CountryRecord, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import styled, { css } from '@onefootprint/styled';
 import {
   CountryCode,
   IdDocRequirement,
@@ -8,7 +7,6 @@ import {
 import {
   Box,
   Button,
-  Container,
   CountrySelect,
   Divider,
   RadioSelect,
@@ -16,10 +14,8 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { NativeScrollEvent } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
 
-import StickyFooter from '@/components/sticky-footer';
+import ScrollLayout from '@/components/scroll-layout';
 import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
 import useApp from '@/domains/idv/hooks/use-app';
 import useTranslation from '@/hooks/use-translation';
@@ -59,15 +55,10 @@ const DocSelection = ({
     defaultType || docTypeOptions[0].value,
   );
   const docTypeMutation = useSubmitDocType();
-  const isEndOfScroll = useSharedValue(false);
   const onlyOneCountrySupported = supportedCountries.length === 1;
   const countrySelectHint =
     onlyOneCountrySupported &&
     t('country-select.hint', { country: country.label });
-
-  const handleScroll = (event: NativeScrollEvent, isEnd: boolean) => {
-    isEndOfScroll.value = isEnd;
-  };
 
   const handleCountryChange = (newCountry: SelectOption<CountryRecord>) => {
     setCountry(newCountry);
@@ -95,47 +86,39 @@ const DocSelection = ({
   };
 
   return (
-    <>
-      <StyledContainer scroll onScroll={handleScroll}>
-        <Box center marginBottom={7}>
-          <Typography variant="heading-3" marginTop={7} marginBottom={3}>
-            {t('title')}
-          </Typography>
-          <Typography variant="body-2">{t('subtitle')}</Typography>
-        </Box>
-        <Box justifyContent="space-between" flex={1}>
-          <Box>
-            <CountrySelect
-              disabled={onlyOneCountrySupported}
-              hint={countrySelectHint}
-              onChange={handleCountryChange}
-              options={countryOptions}
-              value={country}
-            />
-            <Divider marginVertical={7} />
-            <RadioSelect<SupportedIdDocTypes>
-              marginBottom={7}
-              onChange={setDocType}
-              options={docTypeOptions}
-              value={docType}
-            />
-          </Box>
-        </Box>
-      </StyledContainer>
-      <StickyFooter isFixed={isEndOfScroll}>
+    <ScrollLayout
+      Footer={
         <PermissionsDialog onContinue={handleSubmit}>
           <Button onPress={handleSubmit}>{t('cta')}</Button>
         </PermissionsDialog>
-      </StickyFooter>
-    </>
+      }
+    >
+      <Box center marginBottom={7}>
+        <Typography variant="heading-3" marginTop={7} marginBottom={3}>
+          {t('title')}
+        </Typography>
+        <Typography variant="body-2">{t('subtitle')}</Typography>
+      </Box>
+      <Box justifyContent="space-between" flex={1}>
+        <Box>
+          <CountrySelect
+            disabled={onlyOneCountrySupported}
+            hint={countrySelectHint}
+            onChange={handleCountryChange}
+            options={countryOptions}
+            value={country}
+          />
+          <Divider marginVertical={7} />
+          <RadioSelect<SupportedIdDocTypes>
+            marginBottom={7}
+            onChange={setDocType}
+            options={docTypeOptions}
+            value={docType}
+          />
+        </Box>
+      </Box>
+    </ScrollLayout>
   );
 };
-
-const StyledContainer = styled(Container)`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[4]};
-    margin-top: -${theme.spacing[7]};
-  `}
-`;
 
 export default DocSelection;

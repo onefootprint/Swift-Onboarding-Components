@@ -9,12 +9,7 @@ type HeaderProps = {
 
 const Header = ({ children, headerLeft, headerRight }: HeaderProps) => {
   return (
-    <Box
-      alignItems="center"
-      flexDirection="row"
-      justifyContent="space-between"
-      paddingVertical={3}
-    >
+    <Box alignItems="center" flexDirection="row" justifyContent="space-between">
       <Box flex={1}>{headerLeft}</Box>
       <Box>{children}</Box>
       <Box flex={1}>{headerRight}</Box>

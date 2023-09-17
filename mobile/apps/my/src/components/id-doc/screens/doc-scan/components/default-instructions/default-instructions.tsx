@@ -4,11 +4,12 @@ import {
   IcoSparkles24,
   IcoSquareFrame24,
 } from '@onefootprint/icons';
-import { Box, Button, Container, Typography } from '@onefootprint/ui';
+import { Box, Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import BackButton from '@/components/back-button';
 import Header from '@/components/header';
+import ScrollLayout from '@/components/scroll-layout';
 import useTranslation from '@/hooks/use-translation';
 
 import { useScanContext } from '../scan-context';
@@ -63,7 +64,7 @@ const DefaultInstructions = ({
       })}
     </Box>
   ) : (
-    <Container>
+    <ScrollLayout Footer={<Button onPress={handleContinue}>{t('cta')}</Button>}>
       <Box flex={1} justifyContent="space-between">
         <Box>
           <Header
@@ -97,10 +98,7 @@ const DefaultInstructions = ({
           </Box>
         </Box>
       </Box>
-      <Box top={24}>
-        <Button onPress={handleContinue}>{t('cta')}</Button>
-      </Box>
-    </Container>
+    </ScrollLayout>
   );
 };
 

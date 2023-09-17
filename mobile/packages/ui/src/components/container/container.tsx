@@ -1,19 +1,15 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
-import { NativeScrollEvent, StyleProp, ViewStyle } from 'react-native';
-import Animated, {
-  runOnJS,
-  useAnimatedScrollHandler,
-} from 'react-native-reanimated';
+import { StyleProp, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export type ContainerProps = {
   center?: boolean;
   children?: React.ReactNode;
   keyboardShouldPersistTaps?: 'always' | 'never' | 'handled';
-  onScroll?: (event: NativeScrollEvent, isEnd: boolean) => void;
   scroll?: boolean;
   style?: StyleProp<ViewStyle>;
+  onLayout?: (event: any) => void;
 };
 
 const Container = ({
@@ -21,20 +17,9 @@ const Container = ({
   children,
   keyboardShouldPersistTaps,
   scroll,
-  onScroll,
   style,
+  onLayout,
 }: ContainerProps) => {
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: event => {
-      const { contentOffset, layoutMeasurement, contentSize } = event;
-      const hasEndReached =
-        contentOffset.y >= contentSize.height - layoutMeasurement.height;
-      if (onScroll) {
-        runOnJS(onScroll)(event, hasEndReached);
-      }
-    },
-  });
-
   return !scroll ? (
     <ViewContainer>
       <View center={center} style={style}>
@@ -43,9 +28,9 @@ const Container = ({
     </ViewContainer>
   ) : (
     <AnimatedScrollView
+      onLayout={onLayout}
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps={keyboardShouldPersistTaps}
-      onScroll={onScroll ? scrollHandler : undefined}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
     >
@@ -76,7 +61,7 @@ const View = styled.View<{ center: boolean }>`
     `}
 `;
 
-const AnimatedScrollView = styled(Animated.ScrollView)<{
+const AnimatedScrollView = styled.ScrollView<{
   center: boolean;
 }>`
   ${({ theme }) => css`

@@ -2,7 +2,6 @@ import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   Button,
-  Container,
   FeedbackButton,
   Image,
   Typography,
@@ -13,6 +12,7 @@ import { PhotoFile } from 'react-native-vision-camera';
 
 import BackButton from '@/components/back-button';
 import Header from '@/components/header';
+import ScrollLayout from '@/components/scroll-layout';
 import useTranslation from '@/hooks/use-translation';
 
 import { useScanContext } from '../../../scan-context';
@@ -44,7 +44,7 @@ const Preview = ({
 }: PreviewProps) => {
   const { t } = useTranslation('components.scan.preview');
   const { value, max } = stepperValues;
-  const { isLoading, isError, isSuccess, onSubmit, errors, onResetErrors } =
+  const { isLoading, isError, errors, isSuccess, onSubmit, onResetErrors } =
     useScanContext();
   const showActionButtons = !isError && !isSuccess;
   const imageHeight = size === 'default' ? DEFAULT_HEIGHT : LARGE_HEIGHT;
@@ -63,69 +63,70 @@ const Preview = ({
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <Container>
-        <Box flex={1}>
-          <Header headerLeft={<BackButton onPress={onBack} />}>
-            {max > 1 && (
-              <Box center>
-                <Stepper value={value} max={max} />
-              </Box>
+      <ScrollLayout
+        Footer={
+          <Box gap={4}>
+            {isSuccess && (
+              <>
+                <FeedbackButton>{t('cta-success')}</FeedbackButton>
+                <Button disabled variant="secondary">
+                  {t('retake')}
+                </Button>
+              </>
             )}
-          </Header>
-          <Box marginVertical={5}>
-            <Typography variant="heading-3" center>
-              {title}
+            {isError && (
+              <Button disabled={isLoading} onPress={handleRetakeAfterError}>
+                {t('retake')}
+              </Button>
+            )}
+            {showActionButtons && (
+              <>
+                <Button
+                  onPress={handleSubmit}
+                  loading={isLoading}
+                  loadingLabel={t('cta-loading')}
+                >
+                  {t('cta')}
+                </Button>
+                <Button
+                  disabled={isLoading}
+                  variant="secondary"
+                  onPress={onReset}
+                >
+                  {t('retake')}
+                </Button>
+              </>
+            )}
+          </Box>
+        }
+      >
+        <Header headerLeft={<BackButton onPress={onBack} />}>
+          {max > 1 && (
+            <Box center>
+              <Stepper value={value} max={max} />
+            </Box>
+          )}
+        </Header>
+        <Box marginTop={5} marginBottom={1}>
+          <Typography variant="heading-3" center>
+            {title}
+          </Typography>
+          {subtitle && (
+            <Typography variant="label-2" center>
+              {subtitle}
             </Typography>
-            {subtitle && (
-              <Typography variant="label-2" center>
-                {subtitle}
-              </Typography>
-            )}
-          </Box>
-          <Box height={imageHeight} marginBottom={7}>
-            <PreviewImg
-              hasError={isError}
-              height={imageHeight}
-              size={size}
-              source={{ uri: sanitizeImagePath(photo.path) }}
-            />
-          </Box>
-          {isError && <Errors errors={errors} />}
-        </Box>
-        <Box gap={4}>
-          {isSuccess && (
-            <>
-              <FeedbackButton>{t('cta-success')}</FeedbackButton>
-              <Button disabled variant="secondary">
-                {t('retake')}
-              </Button>
-            </>
-          )}
-          {isError && (
-            <Button disabled={isLoading} onPress={handleRetakeAfterError}>
-              {t('retake')}
-            </Button>
-          )}
-          {showActionButtons && (
-            <>
-              <Button
-                onPress={handleSubmit}
-                loading={isLoading}
-                loadingLabel={t('cta-loading')}
-              >
-                {t('cta')}
-              </Button>
-              <Button
-                disabled={isLoading}
-                variant="secondary"
-                onPress={onReset}
-              >
-                {t('retake')}
-              </Button>
-            </>
           )}
         </Box>
-      </Container>
+        <Box height={imageHeight} marginBottom={7}>
+          <PreviewImg
+            hasError={isError}
+            height={imageHeight}
+            size={size}
+            source={{ uri: sanitizeImagePath(photo.path) }}
+          />
+        </Box>
+        {isError && <Errors errors={errors} />}
+      </ScrollLayout>
     </>
   );
 };
