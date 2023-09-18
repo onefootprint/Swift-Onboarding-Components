@@ -1,26 +1,6 @@
-import pytest
 from tests.utils import get, patch
 from tests.utils import get_requirement_from_requirements
 from tests.bifrost_client import BifrostClient
-from tests.utils import create_ob_config
-
-
-@pytest.fixture(scope="session")
-def doc_first_obc(sandbox_tenant):
-    return create_ob_config(
-        sandbox_tenant,
-        "KYC with optional ssn",
-        must_collect_data=[
-            "phone_number",
-            "full_address",
-            "name",
-            "email",
-            "document.drivers_license.none.none",
-            "ssn9",
-        ],
-        can_access_data=["phone_number", "full_address", "name", "email"],
-        is_doc_first_flow=True,
-    )
 
 
 def test_doc_first(sandbox_tenant, doc_first_obc, twilio):

@@ -11,10 +11,12 @@ use api_core::auth::session::user::UserSession;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::types::EmptyResponse;
 use api_core::utils;
 use api_core::utils::contact::{EmailMessage, SmsMessage};
 use api_core::utils::email::SendgridClient;
+use api_core::utils::onboarding::create_doc_request_if_needed;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -22,6 +24,7 @@ use api_wire_types::TriggerRequest;
 use chrono::Duration;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::workflow::NewWorkflowArgs;
@@ -91,7 +94,14 @@ pub async fn post(
                         ob_configuration_id: last_wf.ob_configuration_id,
                         insight_event_id: None,
                     };
-                    Workflow::create(conn, args)?
+                    let wf = Workflow::create(conn, args)?;
+                    let obc_id = wf
+                        .ob_configuration_id
+                        .as_ref()
+                        .ok_or(AssertionError("KYC workflow without OBC"))?;
+                    let (obc, _) = ObConfiguration::get(conn, obc_id)?;
+                    create_doc_request_if_needed(conn, &wf, &obc)?;
+                    wf
                 }
                 TriggerInfo::IdDocument { collect_selfie } => {
                     let last_wf = last_alpaca_kyc_wf

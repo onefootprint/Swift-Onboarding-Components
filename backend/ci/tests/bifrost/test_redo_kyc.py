@@ -1,3 +1,4 @@
+import pytest
 from tests.headers import FpAuth
 from tests.utils import _gen_random_sandbox_id, post
 from tests.utils import (
@@ -23,10 +24,15 @@ def extract_trigger_sms(twilio, phone_number, id):
     return try_until_success(inner, 5)
 
 
-def test_redo_kyc(sandbox_tenant, twilio):
+@pytest.mark.parametrize("with_document", [True, False])
+def test_redo_kyc(sandbox_tenant, twilio, with_document, doc_first_obc):
+    if with_document:
+        obc = doc_first_obc
+    else:
+        obc = sandbox_tenant.default_ob_config
     sandbox_id = _gen_random_sandbox_id()
     bifrost = BifrostClient.create(
-        sandbox_tenant.default_ob_config,
+        obc,
         twilio,
         LIVE_PHONE_NUMBER,  # Have to make with the live phone number in order to receive SMSes
         sandbox_id,
@@ -58,11 +64,23 @@ def test_redo_kyc(sandbox_tenant, twilio):
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(
-        sandbox_tenant.default_ob_config,
+        obc,
         auth_token,
         sandbox_user.client.data["id.phone_number"],
         sandbox_user.client.sandbox_id,
     )
+
+    # Check that requirements are what we expect
+    requirements = bifrost.get_status()["all_requirements"]
+    if with_document:
+        assert requirements[0]["kind"] == "collect_document"
+        assert not requirements[0]["is_met"]
+        assert requirements[1]["kind"] == "collect_data"
+        assert requirements[1]["is_met"]
+    else:
+        assert requirements[0]["kind"] == "collect_data"
+        assert requirements[0]["is_met"]
+
     # Edit some data
     data = {"id.ssn9": "999-99-9999"}
     patch("/hosted/user/vault", data, bifrost.auth_token)
@@ -76,3 +94,9 @@ def test_redo_kyc(sandbox_tenant, twilio):
     )
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 2
+
+    if with_document:
+        docs = [
+            i for i in timeline if i["event"]["kind"] == "identity_document_uploaded"
+        ]
+        assert len(docs) == 2
