@@ -272,6 +272,41 @@ def test_config_create(sandbox_tenant, twilio):
             ),
             "Validation error: doc_scan_for_optional_ssn must be a Document collected data option",
         ),
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                    "dob",
+                ],
+                optional_data=[],
+                can_access_data=[],
+                allow_international_residents=False,
+                allow_us_residents = False,
+            ),
+            "Validation error: Must set one of allow_us_residents or allow_international_residents to true",
+        ),
+
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                    "dob",
+                ],
+                optional_data=[],
+                can_access_data=[],
+                allow_international_residents=True,
+                allow_us_territory_residents = True,
+                allow_us_residents = True,
+            ),
+            "Validation error: Specifying allow_us_territory_residents with allow_international_residents is redundant",
+        ),
+
     ],
 )
 def test_config_create_validation(sandbox_tenant, config_data, expected_error):

@@ -558,10 +558,13 @@ pub enum Iso3166TwoDigitCountryCode {
 
 impl Iso3166TwoDigitCountryCode {
     pub fn is_us_including_territories(&self) -> bool {
+        self.is_us() || self.is_us_territory()
+    }
+    pub fn is_us_territory(&self) -> bool {
         matches!(
             self,
-            // US + territories https://en.wikipedia.org/wiki/ISO_3166-2:US
-            Self::US | Self::AS | Self::GU | Self::MP | Self::PR | Self::UM | Self::VI
+            // territories https://en.wikipedia.org/wiki/ISO_3166-2:US
+            Self::AS | Self::GU | Self::MP | Self::PR | Self::UM | Self::VI
         )
     }
 
@@ -572,6 +575,18 @@ impl Iso3166TwoDigitCountryCode {
     pub fn all_codes_for_us_including_territories() -> Vec<Self> {
         Iso3166TwoDigitCountryCode::iter()
             .filter(|c| c.is_us_including_territories())
+            .collect()
+    }
+
+    pub fn codes_for_us_territories() -> Vec<Self> {
+        Iso3166TwoDigitCountryCode::iter()
+            .filter(|c| c.is_us_territory())
+            .collect()
+    }
+
+    pub fn all_international() -> Vec<Self> {
+        Iso3166TwoDigitCountryCode::iter()
+            .filter(|c| !c.is_us())
             .collect()
     }
 }

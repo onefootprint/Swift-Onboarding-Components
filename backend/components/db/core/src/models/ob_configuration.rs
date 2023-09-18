@@ -14,6 +14,7 @@ use db_schema::schema::{ob_configuration, tenant};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use itertools::Itertools;
 use newtypes::AppearanceId;
 use newtypes::DocumentCdoInfo;
 use newtypes::EnhancedAmlOption;
@@ -52,6 +53,8 @@ pub struct ObConfiguration {
     pub skip_kyc: bool,
     pub doc_scan_for_optional_ssn: Option<CDO>,
     pub enhanced_aml: EnhancedAmlOption,
+    pub allow_us_residents: bool,
+    pub allow_us_territory_residents: bool,
 }
 
 #[derive(derive_more::Deref)]
@@ -128,22 +131,37 @@ impl ObConfiguration {
         SupportedDocumentAndCountryMapping(map)
     }
 
+    /// Construct the set of countries that we'll collect in bifrost.
     pub fn supported_countries_for_residential_address(&self) -> Vec<Iso3166TwoDigitCountryCode> {
-        match self.international_country_restrictions.as_ref() {
-            // first check if we have restrictions on country.
-            // Note: US is not included by default here.
-            Some(supported) => supported.clone(),
-            None => {
-                // if we don't, we could allow or disallow international, so check that here
-                if self.allow_international_residents {
-                    Iso3166TwoDigitCountryCode::iter().collect()
-                } else {
-                    // Temp reverting until we finish:
-                    // https://onefootprint.slack.com/archives/C044HVC8UM8/p1694183642166839?thread_ts=1694181526.687589&cid=C044HVC8UM8
-                    Iso3166TwoDigitCountryCode::iter().filter(|c| c.is_us()).collect()
-                }
+        let mut countries = Vec::new();
+
+        // Note: these are all checked in post org/onboarding_configs, so we'll respect what's on the OBC
+
+        if self.allow_us_residents {
+            countries.push(Iso3166TwoDigitCountryCode::US)
+        }
+
+        if self.allow_us_territory_residents {
+            Iso3166TwoDigitCountryCode::codes_for_us_territories()
+                .into_iter()
+                .for_each(|c| countries.push(c))
+        }
+
+        if let Some(supported) = self.international_country_restrictions.as_ref() {
+            supported.iter().for_each(|c| countries.push(*c))
+        } else {
+            // if we don't, we could allow or disallow international, so check that here
+            if self.allow_international_residents {
+                Iso3166TwoDigitCountryCode::all_international()
+                    .into_iter()
+                    .for_each(|c| {
+                        // US is handled above
+                        countries.push(c);
+                    })
             }
         }
+
+        countries.into_iter().unique().collect()
     }
 
     // Assumes you've checked if the document type is supported already
@@ -206,6 +224,8 @@ struct NewObConfiguration {
     skip_kyc: bool,
     doc_scan_for_optional_ssn: Option<CDO>,
     enhanced_aml: EnhancedAmlOption,
+    pub allow_us_residents: bool,
+    pub allow_us_territory_residents: bool,
 }
 
 #[derive(Debug)]
@@ -368,6 +388,8 @@ impl ObConfiguration {
         skip_kyc: bool,
         doc_scan_for_optional_ssn: Option<CDO>,
         enhanced_aml: EnhancedAmlOption,
+        allow_us_residents: bool,
+        allow_us_territory_residents: bool,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -388,6 +410,8 @@ impl ObConfiguration {
             skip_kyc,
             doc_scan_for_optional_ssn,
             enhanced_aml,
+            allow_us_residents,
+            allow_us_territory_residents,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -466,11 +490,16 @@ mod tests {
     use strum::IntoEnumIterator;
     use test_case::test_case;
 
-    #[test_case(true, None, Iso3166TwoDigitCountryCode::iter().collect(); "allow international, any country acceptable")]
-    #[test_case(true, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX]; "obc has restrictions")]
-    #[test_case(false, None, vec![Iso3166TwoDigitCountryCode::US]; "obc doesn't allow international, only US")] // temp reverting until we finish backend vendor for US territories
+    #[test_case(true, true, false, None, Iso3166TwoDigitCountryCode::iter().collect(); "allow international, any country acceptable")]
+    #[test_case(false, false, false, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX]; "obc has restrictions")]
+    #[test_case(true, true, false, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX, Iso3166TwoDigitCountryCode::US]; "obc has restrictions and allow us")]
+    #[test_case(false, true, false,  None, vec![Iso3166TwoDigitCountryCode::US]; "obc doesn't allow international, only US")]
+    #[test_case(false, true, true,  None, Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories(); "obc is for territories + US")]
+    #[test_case(true, false, false,  None, Iso3166TwoDigitCountryCode::all_international(); "obc is international without US")]
     fn test_ob_config_international_countries(
         allow_international: bool,
+        allow_us_residents: bool,
+        allow_us_territory_residents: bool,
         international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
         expected_countries: Vec<Iso3166TwoDigitCountryCode>,
     ) {
@@ -497,6 +526,8 @@ mod tests {
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
             enhanced_aml: EnhancedAmlOption::No,
+            allow_us_residents,
+            allow_us_territory_residents,
         };
 
         assert_have_same_elements(
@@ -535,6 +566,8 @@ mod tests {
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
             enhanced_aml: EnhancedAmlOption::No,
+            allow_us_residents: true,
+            allow_us_territory_residents: false,
         }
     }
 
@@ -666,6 +699,8 @@ mod tests {
             skip_kyc: false,
             doc_scan_for_optional_ssn: cdo.map(|c| (CollectedDataOption::from_str(c).unwrap())),
             enhanced_aml: EnhancedAmlOption::No,
+            allow_us_residents: true,
+            allow_us_territory_residents: false,
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()

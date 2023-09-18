@@ -479,6 +479,8 @@ table! {
         skip_kyc -> Bool,
         doc_scan_for_optional_ssn -> Nullable<Text>,
         enhanced_aml -> Jsonb,
+        allow_us_residents -> Bool,
+        allow_us_territory_residents -> Bool,
     }
 }
 

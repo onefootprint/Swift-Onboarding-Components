@@ -23,6 +23,8 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         false,
         None,
         EnhancedAmlOption::No,
+        true,
+        false,
     )
     .expect("Could not create ob config")
 }
@@ -87,6 +89,8 @@ pub fn create_with_opts(
         opts.skip_kyc,
         opts.doc_scan_for_optional_ssn,
         opts.enhanced_aml,
+        true,
+        false,
     )
     .expect("Could not create ob config")
 }

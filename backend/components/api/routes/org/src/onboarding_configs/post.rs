@@ -38,6 +38,10 @@ pub struct CreateOnboardingConfigurationRequest {
     doc_scan_for_optional_ssn: Option<CDO>,
     #[serde(default)]
     enhanced_aml: Option<EnhancedAml>,
+    // TODO: drop this option
+    allow_us_residents: Option<bool>,
+    // TODO: drop this option
+    allow_us_territory_residents: Option<bool>,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -115,23 +119,6 @@ impl CreateOnboardingConfigurationRequest {
             }
         }
 
-        if let Some(country_restrictions) = self.international_country_restrictions.as_ref() {
-            if !self.allow_international_residents {
-                return Err(TenantError::ValidationError(
-                    "Cannot specify international_country_restrictions without allow_international_residents"
-                        .to_owned(),
-                )
-                .into());
-            }
-
-            if country_restrictions.is_empty() {
-                return Err(TenantError::ValidationError(
-                    "Must specify 1 or more countries in international_country_restrictions".to_owned(),
-                )
-                .into());
-            }
-        }
-
         if self.skip_kyc && !self.allow_international_residents && doc_cdo.is_none() {
             return Err(TenantError::ValidationError(
                 "Cannot specify skip_kyc if allow_international_residents=false and no Document is collected in must_collect_data"
@@ -139,6 +126,8 @@ impl CreateOnboardingConfigurationRequest {
             )
             .into());
         }
+
+        self.validate_countries()?;
 
         // Optional ssn
         if [CDO::Ssn4, CDO::Ssn9]
@@ -278,6 +267,44 @@ impl CreateOnboardingConfigurationRequest {
         Ok(())
     }
 
+    fn validate_countries(&self) -> ApiResult<()> {
+        if self.allow_us_residents == Some(false) && !self.allow_international_residents {
+            return Err(TenantError::ValidationError(
+                "Must set one of allow_us_residents or allow_international_residents to true".to_owned(),
+            )
+            .into());
+        }
+
+        if let Some(country_restrictions) = self.international_country_restrictions.as_ref() {
+            if !self.allow_international_residents {
+                return Err(TenantError::ValidationError(
+                    "Cannot specify international_country_restrictions without allow_international_residents"
+                        .to_owned(),
+                )
+                .into());
+            }
+
+            if country_restrictions.is_empty() {
+                return Err(TenantError::ValidationError(
+                    "Must specify 1 or more countries in international_country_restrictions".to_owned(),
+                )
+                .into());
+            }
+        }
+
+        if self.allow_us_territory_residents == Some(true)
+            && self.international_country_restrictions.is_none()
+            && self.allow_international_residents
+        {
+            return Err(TenantError::ValidationError(
+                "Specifying allow_us_territory_residents with allow_international_residents is redundant"
+                    .to_owned(),
+            )
+            .into());
+        }
+        Ok(())
+    }
+
     fn validate_flags(&self, state: &State, tenant_id: &TenantId) -> ApiResult<()> {
         let is_alpaca_tenant = state
             .feature_flag_client
@@ -341,6 +368,8 @@ pub async fn post(
         skip_kyc,
         doc_scan_for_optional_ssn,
         enhanced_aml,
+        allow_us_residents,
+        allow_us_territory_residents,
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -381,6 +410,9 @@ pub async fn post(
                 skip_kyc,
                 doc_scan_for_optional_ssn,
                 enhanced_aml,
+                // TODO: remove these once frontend is merged
+                allow_us_residents.unwrap_or(true),
+                allow_us_territory_residents.unwrap_or(false),
             )?;
             let obc = db::actor::saturate_actor_nullable(conn, obc)?;
             Ok(obc)
@@ -466,6 +498,8 @@ mod test {
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
             enhanced_aml: Some(EnhancedAml::default()),
+            allow_us_residents: Some(true),
+            allow_us_territory_residents: Some(false),
         };
         req.validate_inner().is_ok()
     }
@@ -492,6 +526,8 @@ mod test {
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
             enhanced_aml: Some(EnhancedAml::default()),
+            allow_us_residents: Some(true),
+            allow_us_territory_residents: Some(false),
         };
         req.validate().is_ok()
     }
@@ -517,6 +553,8 @@ mod test {
             skip_kyc: false,
             doc_scan_for_optional_ssn: None,
             enhanced_aml: Some(EnhancedAml::default()),
+            allow_us_residents: Some(true),
+            allow_us_territory_residents: Some(false),
         };
         req.validate().is_ok()
     }
@@ -538,6 +576,8 @@ mod test {
             skip_kyc: true,
             doc_scan_for_optional_ssn: None,
             enhanced_aml: Some(EnhancedAml::default()),
+            allow_us_residents: Some(true),
+            allow_us_territory_residents: Some(false),
         };
         req.validate().is_ok()
     }
