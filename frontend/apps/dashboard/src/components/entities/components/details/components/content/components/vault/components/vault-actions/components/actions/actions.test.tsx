@@ -25,88 +25,111 @@ describe('<Actions />', () => {
   beforeEach(() => {
     withEntity(entityFixture.id);
     useRouterSpy({
-      pathname: `/entities/${entityFixture.id}/trigger`,
+      asPath: `/entities/${entityFixture.id}&mode=sandbox`,
+      pathname: '/users/[id]',
       query: {
         id: entityFixture.id,
       },
     });
   });
 
-  describe('when the request to trigger request succeeds', () => {
-    beforeEach(() => {
-      withTrigger(entityFixture.id);
+  describe('when retriggering a KYC', () => {
+    describe('when the request to trigger request succeeds', () => {
+      beforeEach(() => {
+        withTrigger(entityFixture.id);
+      });
+
+      it('should close the dialog and show a confirmation message', async () => {
+        renderActions();
+
+        const button = screen.getByRole('button', {
+          name: 'Open actions',
+        });
+        await userEvent.click(button);
+
+        const dropdownItem = screen.getByText('Request more information');
+        await userEvent.click(dropdownItem);
+
+        const dialog = screen.getByRole('dialog', {
+          name: 'Request more information',
+        });
+        const reuploadPhotoRadio = screen.getByRole('radio', {
+          name: 'Re-upload ID photo',
+        });
+        await userEvent.click(reuploadPhotoRadio);
+
+        const noteTextArea = screen.getByRole('textbox', {
+          name: 'Note for user (optional)',
+        });
+        await userEvent.type(noteTextArea, 'Lorem ipsum');
+
+        const submitButton = screen.getByRole('button', {
+          name: 'Send request',
+        });
+        await userEvent.click(submitButton);
+
+        await waitForElementToBeRemoved(dialog);
+
+        await waitFor(() => {
+          const successConfirmation = screen.getByText(
+            'User will receive an SMS detailing the next steps shortly',
+          );
+          expect(successConfirmation).toBeInTheDocument();
+        });
+      });
     });
 
-    it('should close the dialog and show a confirmation message', async () => {
-      renderActions();
-
-      const button = screen.getByRole('button', {
-        name: 'Open actions',
+    describe('when the request to trigger request fails', () => {
+      beforeEach(() => {
+        withTriggerError(entityFixture.id);
       });
-      await userEvent.click(button);
 
-      const dropdownItem = screen.getByText('Request more information');
-      await userEvent.click(dropdownItem);
+      it('should show an error message', async () => {
+        renderActions();
 
-      const dialog = screen.getByRole('dialog', {
-        name: 'Request more information',
-      });
-      const reuploadPhotoRadio = screen.getByRole('radio', {
-        name: 'Re-upload ID photo',
-      });
-      await userEvent.click(reuploadPhotoRadio);
+        const button = screen.getByRole('button', {
+          name: 'Open actions',
+        });
+        await userEvent.click(button);
 
-      const noteTextArea = screen.getByRole('textbox', {
-        name: 'Note for user (optional)',
-      });
-      await userEvent.type(noteTextArea, 'Lorem ipsum');
+        const dropdownItem = screen.getByText('Request more information');
+        await userEvent.click(dropdownItem);
 
-      const submitButton = screen.getByRole('button', {
-        name: 'Send request',
-      });
-      await userEvent.click(submitButton);
+        const reuploadPhotoRadio = screen.getByRole('radio', {
+          name: 'Re-upload ID photo',
+        });
+        await userEvent.click(reuploadPhotoRadio);
 
-      await waitForElementToBeRemoved(dialog);
+        const submitButton = screen.getByRole('button', {
+          name: 'Send request',
+        });
+        await userEvent.click(submitButton);
 
-      await waitFor(() => {
-        const successConfirmation = screen.getByText(
-          'User will receive an SMS detailing the next steps shortly',
-        );
-        expect(successConfirmation).toBeInTheDocument();
+        await waitFor(() => {
+          const errorMessage = screen.getByText('Something went wrong');
+          expect(errorMessage).toBeInTheDocument();
+        });
       });
     });
   });
 
-  describe('when the request to trigger request fails', () => {
-    beforeEach(() => {
-      withTriggerError(entityFixture.id);
-    });
-
-    it('should show an error message', async () => {
+  describe('when sharing a link', () => {
+    it('should copy the link correctly', async () => {
       renderActions();
+      const user = userEvent.setup();
 
       const button = screen.getByRole('button', {
         name: 'Open actions',
       });
-      await userEvent.click(button);
+      await user.click(button);
 
-      const dropdownItem = screen.getByText('Request more information');
+      const dropdownItem = screen.getByText('Share');
       await userEvent.click(dropdownItem);
 
-      const reuploadPhotoRadio = screen.getByRole('radio', {
-        name: 'Re-upload ID photo',
-      });
-      await userEvent.click(reuploadPhotoRadio);
-
-      const submitButton = screen.getByRole('button', {
-        name: 'Send request',
-      });
-      await userEvent.click(submitButton);
-
-      await waitFor(() => {
-        const errorMessage = screen.getByText('Something went wrong');
-        expect(errorMessage).toBeInTheDocument();
-      });
+      const clipboardText = await navigator.clipboard.readText();
+      expect(clipboardText).toBe(
+        `http://localhost/entities/fp_id_yCZehsWNeywHnk5JqL20u&mode=sandbox`,
+      );
     });
   });
 });

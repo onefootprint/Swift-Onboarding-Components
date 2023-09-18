@@ -3,6 +3,7 @@ import { EntityKind } from '@onefootprint/types';
 import { Pagination, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
+import useSession from 'src/hooks/use-session';
 
 import useFilters from '../../hooks/use-filters';
 import IntroDialog from './components/intro-dialog';
@@ -28,6 +29,7 @@ const List = ({
 }: ListProps) => {
   const router = useRouter();
   const filters = useFilters();
+  const session = useSession();
   const {
     data: response,
     isLoading,
@@ -36,9 +38,10 @@ const List = ({
   } = useEntities(kind, defaultFilters);
 
   const handleRowClick = (entity: Entity) => {
+    const mode = session.isLive ? 'live' : 'sandbox';
     router.push({
       pathname: `/${basePath}/${entity.id}`,
-      query: filters.query,
+      query: { ...filters.query, mode },
     });
   };
 
