@@ -16,6 +16,7 @@ use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::DbResult;
 use itertools::Itertools;
+use newtypes::FootprintReasonCode;
 use newtypes::FpId;
 use newtypes::RiskSignalId;
 
@@ -48,7 +49,15 @@ pub async fn get(
         })
         .await??
         .into_iter()
-        .map(|(_, rs)| rs)
+        .filter_map(|(_, rs)| {
+            // FP-5097
+            if !matches!(rs.reason_code, FootprintReasonCode::Other(_)) {
+                Some(rs)
+            } else {
+                tracing::error!(reason_code=%rs.reason_code, risk_signal_id=%rs.id, "FootprintReasonCode::Other retrieved in /risk_signals");
+                None
+            }
+        })
         .collect();
 
     // TODO this is fine to do in RAM when there aren't many signals. Will be harder with pagination.
