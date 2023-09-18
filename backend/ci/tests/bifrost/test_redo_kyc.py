@@ -51,11 +51,15 @@ def test_redo_kyc(sandbox_tenant, twilio, with_document, doc_first_obc):
     # trigger RedoKYC
     note = _gen_random_n_digit_number(10)
     trigger = dict(kind="redo_kyc")
-    post(
-        f"entities/{sandbox_user.fp_id}/trigger",
-        dict(trigger=trigger, note=note),
-        *sandbox_user.tenant.db_auths,
-    )
+
+    def send_trigger():
+        post(
+            f"entities/{sandbox_user.fp_id}/trigger",
+            dict(trigger=trigger, note=note),
+            *sandbox_user.tenant.db_auths,
+        )
+
+    try_until_success(send_trigger, 15, 3)
     # find link we sent to user via Twilio
     token = extract_trigger_sms(
         twilio, sandbox_user.client.data["id.phone_number"], note
