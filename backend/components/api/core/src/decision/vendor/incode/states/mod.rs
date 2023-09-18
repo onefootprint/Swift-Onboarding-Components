@@ -298,9 +298,10 @@ impl AddSideResponseHelper {
         n_attempts: i64,
     ) -> Vec<IncodeDocumentRestriction> {
         let check_glare = !ff_client.flag(BoolFlag::DisableConservativeGlareForDocument(tenant_id))
-            && n_attempts < DocumentUpload::MAX_ATTEMPTS_PER_SIDE - 1;
+            // n_attempts is 0 indexed
+            && n_attempts < DocumentUpload::MAX_ATTEMPTS_PER_SIDE - 2;
         let check_sharpness = !ff_client.flag(BoolFlag::DisableConservativeSharpnessForDocument(tenant_id))
-            && n_attempts < DocumentUpload::MAX_ATTEMPTS_PER_SIDE - 1;
+            && n_attempts < DocumentUpload::MAX_ATTEMPTS_PER_SIDE - 2;
         let check_dl_permit = ff_client.flag(BoolFlag::DisallowDriverLicensePermits(tenant_id));
         [
             check_glare.then_some(IncodeDocumentRestriction::ConservativeGlare),
@@ -327,7 +328,7 @@ mod tests {
     #[test_case(true, true, true, 0 => vec![IncodeDocumentRestriction::NoDriverLicensePermit])]
     #[test_case(false, false, true, 4 => vec![IncodeDocumentRestriction::NoDriverLicensePermit])]
     #[test_case(true, true, true, 4 => vec![IncodeDocumentRestriction::NoDriverLicensePermit])]
-    #[test_case(false, false, false, 3 => vec![IncodeDocumentRestriction::ConservativeGlare, IncodeDocumentRestriction::ConservativeSharpness])]
+    #[test_case(false, false, false, 2 => vec![IncodeDocumentRestriction::ConservativeGlare, IncodeDocumentRestriction::ConservativeSharpness])]
     fn test_add_side_get_restrictions(
         disable_check_glare: bool,
         disable_check_sharpness: bool,

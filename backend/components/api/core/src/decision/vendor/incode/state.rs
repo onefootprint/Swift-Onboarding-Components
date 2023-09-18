@@ -115,7 +115,7 @@ where
         self,
         db_pool: &DbPool,
         clients: &IncodeClients,
-        mut ctx: IncodeContext,
+        ctx: IncodeContext,
         session: VerificationSession,
     ) -> ApiResult<(IncodeState, StepResult, IncodeContext, VerificationSession)> {
         let starting_state = self.into();
@@ -144,10 +144,8 @@ where
 
                         // AFTER marking the uploads as failed, count if we have failed too many times
                         let attempts_by_side = DocumentUpload::count_failed_attempts(conn, &ctx.id_doc_id)?;
-                        // Stash attempts
                         let max_attempts_for_any_side =
                             attempts_by_side.iter().map(|(_, n)| n).max().unwrap_or(&(0_i64));
-                        ctx.n_attempts = *max_attempts_for_any_side;
 
                         if *max_attempts_for_any_side >= DocumentUpload::MAX_ATTEMPTS_PER_SIDE {
                             // Override the next state to a failed state if we've reached the max

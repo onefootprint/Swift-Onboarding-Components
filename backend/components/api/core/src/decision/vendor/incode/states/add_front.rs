@@ -64,7 +64,7 @@ impl IncodeStateTransition for AddFront {
                     response.failure_reasons(AddSideResponseHelper::get_restrictions(
                         &ctx.tenant_id,
                         ctx.ff_client.clone(),
-                        ctx.n_attempts,
+                        ctx.failed_attempts_for_side,
                     )),
                     vec![],
                 )),

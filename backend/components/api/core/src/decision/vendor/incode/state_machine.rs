@@ -35,7 +35,7 @@ pub struct IncodeContext {
     pub enclave_client: EnclaveClient,
     pub tenant_id: TenantId,
     pub ff_client: Arc<dyn FeatureFlagClient>,
-    pub n_attempts: i64,
+    pub failed_attempts_for_side: i64,
 }
 
 impl IncodeState {

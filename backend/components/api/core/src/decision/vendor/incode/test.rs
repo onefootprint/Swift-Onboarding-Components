@@ -114,7 +114,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         enclave_client: state.enclave_client.clone(),
         tenant_id: tenant.id.clone(),
         ff_client: state.feature_flag_client.clone(),
-        n_attempts: 0,
+        failed_attempts_for_side: 0,
     };
     let config_id = get_config_id(&state.config, is_selfie, false);
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx, false)
@@ -353,7 +353,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         enclave_client: state.enclave_client.clone(),
         tenant_id: tenant.id.clone(),
         ff_client: state.feature_flag_client.clone(),
-        n_attempts: 0,
+        failed_attempts_for_side: 0,
     };
     let config_id = get_config_id(&state.config, is_selfie, false);
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx, false)

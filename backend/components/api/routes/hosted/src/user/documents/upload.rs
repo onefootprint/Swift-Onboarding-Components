@@ -142,7 +142,12 @@ pub async fn post(
                     &wf_id,
                     DecisionIntentKind::DocScan,
                 )?;
-                Some((decision_intent, doc_request, id_doc.id))
+
+                let attempts_for_side = DocumentUpload::count_failed_attempts(conn, &id_doc.id)?
+                    .iter()
+                    .filter_map(|(s, n)| (side == *s).then_some(*n))
+                    .next();
+                Some((decision_intent, doc_request, id_doc.id, attempts_for_side))
             } else {
                 if missing_sides.is_empty() {
                     // Create fixture data once all of the sides are uploaded
@@ -184,7 +189,7 @@ pub async fn post(
         .await?;
 
     // Compose the API response
-    let response = if let Some((di, doc_request, id_doc_id)) = created_reqs {
+    let response = if let Some((di, doc_request, id_doc_id, failed_attempts_for_side)) = created_reqs {
         // Not sandbox - make our request to vendors!
         let t_id = user_auth.scoped_user.tenant_id.clone();
         handle_incode_request(
@@ -198,6 +203,7 @@ pub async fn post(
             should_collect_selfie,
             &wf_id2,
             state.feature_flag_client.clone(),
+            failed_attempts_for_side,
         )
         .await?
     } else {
@@ -230,6 +236,7 @@ pub(in crate::user) async fn handle_incode_request(
     should_collect_selfie: bool,
     workflow_id: &WorkflowId,
     ff_client: Arc<dyn FeatureFlagClient>,
+    failed_attempts_for_side: Option<i64>,
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
     let sv_id = doc_request.scoped_vault_id.clone();
@@ -246,7 +253,7 @@ pub(in crate::user) async fn handle_incode_request(
         enclave_client: state.enclave_client.clone(),
         tenant_id: tenant_id.clone(),
         ff_client,
-        n_attempts: 0,
+        failed_attempts_for_side: failed_attempts_for_side.unwrap_or(0),
     };
     let machine = IncodeStateMachine::init(
         state,
