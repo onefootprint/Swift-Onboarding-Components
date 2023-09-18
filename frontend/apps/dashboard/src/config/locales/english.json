@@ -350,7 +350,8 @@
     "business_tin": "Taxpayer Identification Number (TIN)",
     "business_dba": "Business DBA",
     "beneficial_owners": "Business beneficial owners",
-    "selfie": "Selfie image"
+    "selfie": "Selfie image",
+    "native_device": "Native Device"
   },
   "components": {
     "timeline": {

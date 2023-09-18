@@ -89,6 +89,14 @@ const RiskSignalsFilters = () => {
               label: allT('signal-attributes.ip_address'),
               value: RiskSignalAttribute.ipAddress,
             },
+            {
+              label: allT('signal-attributes.device'),
+              value: RiskSignalAttribute.device,
+            },
+            {
+              label: allT('signal-attributes.native_device'),
+              value: RiskSignalAttribute.native_device,
+            },
           ],
           selectedOptions: filters.values.scope,
         },
