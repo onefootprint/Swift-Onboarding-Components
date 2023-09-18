@@ -188,6 +188,23 @@ impl PreciseIDAPIResponse {
             })
             .unwrap_or(ExperianPhoneMatchReasonCodes::NX)
     }
+
+    pub fn precise_match_version_is_correct(&self) -> bool {
+        self.precise_match
+            .as_ref()
+            .and_then(|pm| pm.version.clone())
+            .map(|v| v == "04.00")
+            .unwrap_or(false)
+    }
+
+    pub fn precise_id_model_version_is_correct(&self) -> bool {
+        self.summary
+            .as_ref()
+            .and_then(|s| s.scores.as_ref())
+            .and_then(|scores| scores.precise_id_score_card.clone())
+            .map(|v| v == "IDS_V3.0")
+            .unwrap_or(false)
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -360,7 +377,7 @@ mod tests {
     #[test_case("9001" => PreciseIDParsedScore::Deceased)]
     #[test_case("9013" => PreciseIDParsedScore::BlockedFile)]
     fn test_score_success(score: &str) -> PreciseIDParsedScore {
-        let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response(score))
+        let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response(score, None, None))
             .expect("could not parse experian precise id");
 
         r.score().unwrap()
@@ -369,7 +386,7 @@ mod tests {
     #[test_case("1000" => "invalid score".to_string())]
     #[test_case("9999" => "missing or invalid input data".to_string())]
     fn test_score_errors(score: &str) -> String {
-        let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response(score))
+        let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response(score, None, None))
             .expect("could not parse experian precise id");
 
         match r.score() {
@@ -382,10 +399,28 @@ mod tests {
     }
     #[test]
     fn test_parses() {
-        let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response("656"))
+        let r: PreciseIDAPIResponse = serde_json::from_value(experian_precise_id_response("656", None, None))
             .expect("could not parse experian precise id");
         let pm = r.precise_match.unwrap();
         assert!(pm.clone().consumer_id.unwrap().summary.is_some());
         assert!(pm.phones.unwrap().phone.unwrap().pop().unwrap().summary.is_some());
+    }
+
+    #[test_case("02.00" => false)]
+    #[test_case("04.00" => true)]
+    fn test_precise_match_version(version: &str) -> bool {
+        let r: PreciseIDAPIResponse =
+            serde_json::from_value(experian_precise_id_response("656", Some(version), None)).unwrap();
+
+        r.precise_match_version_is_correct()
+    }
+
+    #[test_case("bad model" => false)]
+    #[test_case("IDS_V3.0" => true)]
+    fn test_precise_id_model_score(version: &str) -> bool {
+        let r: PreciseIDAPIResponse =
+            serde_json::from_value(experian_precise_id_response("656", None, Some(version))).unwrap();
+
+        r.precise_id_model_version_is_correct()
     }
 }

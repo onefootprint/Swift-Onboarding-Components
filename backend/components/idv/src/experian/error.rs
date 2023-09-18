@@ -36,6 +36,8 @@ pub enum Error {
     UnknownError,
     #[error("Username/Password Error")]
     UserNamePasswordError,
+    #[error("Incorrect PreciseID Version (model or precise match)")]
+    IncorrectPreciseIdVersion,
 }
 
 impl Error {

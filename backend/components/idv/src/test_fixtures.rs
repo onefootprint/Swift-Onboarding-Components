@@ -344,7 +344,7 @@ pub fn experian_cross_core_response() -> serde_json::Value {
                             "fraudSolutions": {
                                 "response": {
                                     "products": {
-                                        "preciseIDServer": experian_precise_id_response("656"),
+                                        "preciseIDServer": experian_precise_id_response("656", None, None),
                                         "customerManagement": {
                                             "version": "1.00",
                                             "reportDate": "03062023",
@@ -647,7 +647,11 @@ pub fn experian_cross_core_response() -> serde_json::Value {
     })
 }
 
-pub fn experian_precise_id_response(score: &str) -> serde_json::Value {
+pub fn experian_precise_id_response(
+    score: &str,
+    precise_match_version: Option<&str>,
+    precise_id_model_version: Option<&str>,
+) -> serde_json::Value {
     serde_json::json!({
         "sessionID": "YMWK2SXF855BNZGM01HDWMW2.pidd4v-2303060915341255630306",
         "header": {
@@ -662,7 +666,7 @@ pub fn experian_precise_id_response(score: &str) -> serde_json::Value {
             "finalDecision": "ACC",
             "scores": {
                 "preciseIDScore": score,
-                "preciseIDScorecard": "IDS_V3.0",
+                "preciseIDScorecard": precise_id_model_version.unwrap_or("IDS_V3.0"),
                 "validationScore": "000000",
                 "verificationScore": "000000",
                 "complianceDescription": "No Compliance Code",
@@ -670,7 +674,7 @@ pub fn experian_precise_id_response(score: &str) -> serde_json::Value {
             }
         },
         "preciseMatch": {
-            "version": "02.00",
+            "version": precise_match_version.unwrap_or("04.00"),
             "responseStatusCode": {
                 "value": "",
                 "code": "00"

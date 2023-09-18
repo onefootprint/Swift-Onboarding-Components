@@ -100,17 +100,24 @@ impl CrossCoreAPIResponse {
     }
 
     pub fn validate(&self) -> Result<(), Error> {
-        let err = self
-            .precise_id_response()?
+        let pm = self.precise_id_response()?;
+        let err = pm
             .error
-            .and_then(|e| e.error_code)
+            .as_ref()
+            .and_then(|e| e.error_code.clone())
             .map(|code| Error::ResponseError(CrossCoreResponseError::Error(code)));
 
+        // Check for errors
         if let Some(e) = err {
-            Err(e)
-        } else {
-            Ok(())
+            return Err(e);
         }
+
+        // Check precise match and precise ID model versions, otherwise our reason codes and score thresholds are not correct
+        if !(pm.precise_id_model_version_is_correct() && pm.precise_match_version_is_correct()) {
+            return Err(Error::IncorrectPreciseIdVersion);
+        }
+
+        Ok(())
     }
 }
 
