@@ -96,7 +96,15 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             is_doc_first,
             skip_kyc,
             enhanced_aml,
-            ..
+            allow_us_residents,
+            allow_us_territory_residents,
+            tenant_id: _,
+            _created_at: _,
+            _updated_at: _,
+            appearance_id: _,
+            cip_kind: _,
+            author: _,
+            doc_scan_for_optional_ssn: _,
         } = ob_config;
         Self {
             id,
@@ -115,6 +123,8 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             author: author.map(Actor::from_db),
             skip_kyc,
             enhanced_aml: enhanced_aml.into(),
+            allow_us_residents,
+            allow_us_territory_residents,
         }
     }
 }

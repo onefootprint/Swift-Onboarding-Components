@@ -16,6 +16,8 @@ pub struct OnboardingConfiguration {
     pub can_access_data: Vec<CollectedDataOption>,
     pub allow_international_residents: bool,
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
+    pub allow_us_residents: bool,
+    pub allow_us_territory_residents: bool,
     pub is_no_phone_flow: bool,
     pub is_doc_first_flow: bool,
     pub author: Option<Actor>,
