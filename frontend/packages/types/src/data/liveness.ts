@@ -27,6 +27,7 @@ export enum LivenessSource {
   skipped = 'skipped',
   webauthnAttestation = 'webauthn_attestation',
   privacyPass = 'privacyPass',
+  appleDeviceAttestation = 'apple_device_attestation',
 }
 
 export enum LivenessIssuer {

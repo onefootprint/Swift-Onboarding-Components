@@ -9,7 +9,10 @@ type LivenessEventIconProps = {
 
 const LivenessEventIcon = ({ data }: LivenessEventIconProps) => {
   const { source } = data;
-  if (source === LivenessSource.webauthnAttestation) {
+  if (
+    source === LivenessSource.webauthnAttestation ||
+    source === LivenessSource.appleDeviceAttestation
+  ) {
     return <IcoFaceid16 />;
   }
   if (source === LivenessSource.privacyPass) {
