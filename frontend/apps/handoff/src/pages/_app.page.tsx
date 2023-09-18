@@ -22,7 +22,7 @@ configureReactI18next();
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
   // https://developer.apple.com/documentation/app_clips/supporting_invocations_from_your_website_and_the_messages_app
-  const shouldShowAppClipSmartBanner = router.pathname === '/appclip';
+  const shouldShowAppClipSmartBanner = router.pathname.includes('/appclip');
 
   return (
     <>
