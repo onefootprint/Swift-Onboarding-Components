@@ -1,4 +1,5 @@
 import type { Theme } from '@onefootprint/design-tokens';
+import { LoadFlagsSprite } from '@onefootprint/flags';
 import { createGlobalStyle, css, ThemeProvider } from '@onefootprint/styled';
 import React from 'react';
 
@@ -187,6 +188,7 @@ const DesignSystemProvider = ({ children, theme }: BootstrapProps) => (
     </ConfirmationDialogProvider>
     <div id="footprint-portal" />
     <div id="footprint-toast-portal" />
+    <LoadFlagsSprite />
   </ThemeProvider>
 );
 

@@ -1,2 +1,8 @@
 export { default } from './use-sx';
-export * from './use-sx.types';
+export type {
+  BaseStyleProps,
+  CustomStyleProps,
+  SXStyleProps,
+  SXStyles,
+  SXStylesKeys,
+} from './use-sx.types';

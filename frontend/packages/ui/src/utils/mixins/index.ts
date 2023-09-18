@@ -1,1 +1,5 @@
-export * from './mixins';
+export {
+  createFontStyles,
+  createOverlayBackground,
+  createTypography,
+} from './mixins';

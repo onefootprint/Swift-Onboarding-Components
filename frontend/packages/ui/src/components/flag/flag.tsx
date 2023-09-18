@@ -1,8 +1,5 @@
-import { FlagUs } from '@onefootprint/flags';
-import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
-import capitalize from 'lodash/capitalize';
-import React, { lazy, memo, Suspense } from 'react';
+import React from 'react';
 
 export type FlagProps = {
   className?: string;
@@ -10,41 +7,20 @@ export type FlagProps = {
   testID?: string;
 };
 
-const LazyFlag = lazy(() =>
-  import('@onefootprint/flags').then(module => ({
-    default: function InnerFlag({ code, testID, className }: FlagProps) {
-      const key = capitalize(code) as Capitalize<Lowercase<CountryCode>>;
-      const CountryFlag = module.flags[`Flag${key}`];
-
-      return <CountryFlag testID={testID} className={className} />;
-    },
-  })),
-);
-
-const NoFlag = (_: FlagProps) => null; // eslint-disable-line @typescript-eslint/no-unused-vars
-const FlagFallback = ({ code, testID, className }: FlagProps) =>
-  code === 'US' ? (
-    <FlagUs testID={testID} className={className} />
-  ) : (
-    <NotAnimatedFlagShimmer className={className} />
-  );
-
-const Flag = ({ code, testID, className }: FlagProps): JSX.Element => (
-  <Suspense
-    fallback={
-      <FlagFallback code={code} testID={testID} className={className} />
-    }
+const Flag = ({ code, testID, className }: FlagProps) => (
+  <svg
+    className={className}
+    data-testid={testID}
+    width={20}
+    height={15}
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
   >
-    <LazyFlag code={code} testID={testID} className={className} />
-  </Suspense>
+    <use xlinkHref={`#flag-${code.toLowerCase()}`} />
+  </svg>
 );
 
-const NotAnimatedFlagShimmer = styled.div`
-  ${({ theme }) => css`
-    width: 20px;
-    height: 15px;
-    background-color: ${theme.backgroundColor.senary};
-  `}
-`;
-
-export default process.env.NODE_ENV === 'test' ? NoFlag : memo(Flag);
+export default process.env.NODE_ENV === 'test'
+  ? (_: FlagProps) => null // eslint-disable-line @typescript-eslint/no-unused-vars
+  : Flag;

@@ -15,15 +15,15 @@ module.exports = {
             path: '/*',
             options: {},
             timings: /* milliseconds */ [
-              { metric: 'interactive', budget: 1000 },
+              { metric: 'interactive', budget: 1200 },
               { metric: 'first-meaningful-paint', budget: 1000 },
             ],
             resourceSizes: /* kibibytes (1 KiB = 1024 bytes) */ [
-              { resourceType: 'total', budget: 769 }, //       737.3 KiB
-              { resourceType: 'script', budget: 700 }, //      669.0 KiB
+              { resourceType: 'total', budget: 678 }, //       677.1 KiB
+              { resourceType: 'script', budget: 439 }, //      437.3 KiB
               { resourceType: 'font', budget: 51 }, //         50.7 KiB
               { resourceType: 'third-party', budget: 58 }, //  57.8 KiB
-              { resourceType: 'document', budget: 8 }, //      7.2 KiB
+              { resourceType: 'document', budget: 179 }, //    178.7 KiB
               { resourceType: 'image', budget: 6 }, //         5.5 KiB
               { resourceType: 'stylesheet', budget: 4 }, //    3.8 KiB
               { resourceType: 'other', budget: 2 }, //         1.2 KiB
@@ -51,7 +51,7 @@ module.exports = {
         'service-worker': 'warn', //          Does not register a service worker that controls page and `start_url`
         'splash-screen': 'warn', //           Is not configured for a custom splash screen
         'themed-omnibox': 'warn', //          Does not set a theme color for the address bar.
-        'timing-budget': 'warn', //           ...
+        'timing-budget': 'warn', //           Enable me, once we are stable
         'unused-javascript': 'warn', //       Reduce unused JavaScript
         'uses-responsive-images': 'warn', //  Properly size images
         'valid-source-maps': 'warn', //       Missing source maps for large first-party JavaScript

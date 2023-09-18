@@ -15,10 +15,12 @@
     "typecheck": "yarn tsc --noEmit",
     "generate:flags": "node ./src/scripts/flags/generate.js",
     "generate": "yarn generate:flags",
+    "generate:flags-sprite": "bun ./src/scripts/flags/generate-flags-sprite.js",
     "postgenerate": "yarn lint:fix && yarn format:fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "@onefootprint/global-constants": "*",
     "@onefootprint/jest-presets": "*",
     "@onefootprint/styled": "*",
     "@svgr/core": "^6.2.1",
@@ -33,6 +35,7 @@
     "lodash": "^4.17.21",
     "react-dom": "18.2.0",
     "react": "18.2.0",
+    "svg-sprite": "^2.0.2",
     "tsconfig": "*",
     "typescript": "4.9.5"
   },
