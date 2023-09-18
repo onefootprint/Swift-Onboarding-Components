@@ -869,10 +869,10 @@
           }
         }
       },
-      "retrigger-kyc": {
+      "actions": {
         "cta": "Open actions",
-        "option": "Request more information",
-        "dialog": {
+        "retrigger-kyc": {
+          "label": "Request more information",
           "title": "Request more information",
           "send-request": "Send request",
           "cancel": "Cancel",
@@ -899,6 +899,9 @@
             "description": "User will receive an SMS detailing the next steps shortly",
             "title": "Request sent"
           }
+        },
+        "share": {
+          "label": "Share"
         }
       },
       "manual-note-entry-form": {

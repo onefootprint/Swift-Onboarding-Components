@@ -1,5 +1,4 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import { TriggerKind } from '@onefootprint/types';
 import { Dialog, useToast } from '@onefootprint/ui';
 import React from 'react';
@@ -16,7 +15,7 @@ export type RetriggerKYCDialogProps = {
 };
 
 const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
-  const { t } = useTranslation('pages.entity.retrigger-kyc');
+  const { t } = useTranslation('pages.entity.actions.retrigger-kyc');
   const submitRetriggerKYCMutation = useRetriggerKYC();
   const showRequestErrorToast = useRequestErrorToast();
   const toast = useToast();
@@ -41,14 +40,13 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
       {
         onSuccess: () => {
           toast.show({
-            description: t('dialog.success-toast.description'),
-            title: t('dialog.success-toast.title'),
+            description: t('success-toast.description'),
+            title: t('success-toast.title'),
             variant: 'default',
           });
           onClose();
         },
         onError: (error: unknown) => {
-          console.error('Retriggering KYC failed', getErrorMessage(error));
           showRequestErrorToast(error);
         },
       },
@@ -57,17 +55,17 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
   return (
     <Dialog
       size="compact"
-      title={t('dialog.title')}
+      title={t('title')}
       onClose={onClose}
       open={open}
       primaryButton={{
         form: 'retrigger-kyc-form',
-        label: t('dialog.send-request'),
+        label: t('send-request'),
         loading: submitRetriggerKYCMutation.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
-        label: t('dialog.cancel'),
+        label: t('cancel'),
         onClick: onClose,
         disabled: submitRetriggerKYCMutation.isLoading,
       }}

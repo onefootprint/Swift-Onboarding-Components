@@ -27,7 +27,7 @@ type RetriggerKYCFormProps = {
 };
 
 const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
-  const { t } = useTranslation('pages.entity.retrigger-kyc.dialog');
+  const { t } = useTranslation('pages.entity.actions.retrigger-kyc');
   const entityId = useEntityId();
   const entity = useEntity(entityId);
   const userHasPhone = entity.data?.decryptableAttributes?.includes(

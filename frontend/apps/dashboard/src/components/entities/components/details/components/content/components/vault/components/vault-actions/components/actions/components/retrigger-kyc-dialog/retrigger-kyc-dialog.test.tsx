@@ -9,6 +9,7 @@ import React from 'react';
 
 import type { RetriggerKYCDialogProps } from './retrigger-kyc-dialog';
 import RetriggerKYCDialog from './retrigger-kyc-dialog';
+import { entityFixture, withEntity } from './retrigger-kyc-dialog.test.config';
 
 const defaultOptions = {
   open: true,
@@ -23,14 +24,13 @@ const renderDialog = ({
 }: Partial<RetriggerKYCDialogProps>) =>
   customRender(<RetriggerKYCDialog open={open} onClose={onClose} />);
 
-describe.skip('<RetriggerKYCDialog />', () => {
-  const entityId = 'fp_id_yCZehsWNeywHnk5JqL20u';
-
+describe('<RetriggerKYCDialog />', () => {
   beforeEach(() => {
+    withEntity(entityFixture.id);
     useRouterSpy({
-      pathname: `/entities/${entityId}/trigger`,
+      pathname: `/entities/${entityFixture.id}/trigger`,
       query: {
-        id: entityId,
+        id: entityFixture.id,
       },
     });
   });

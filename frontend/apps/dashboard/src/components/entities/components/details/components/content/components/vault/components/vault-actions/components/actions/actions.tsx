@@ -7,9 +7,12 @@ import React, { useState } from 'react';
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import RetriggerKYCDialog from './components/retrigger-kyc-dialog';
 
-const RetriggerKYC = ({ entity }: WithEntityProps) => {
-  const { t } = useTranslation('pages.entity.retrigger-kyc');
+const Actions = ({ entity }: WithEntityProps) => {
+  const { t } = useTranslation('pages.entity.actions');
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const shouldShowActionsDropdown =
+    entity?.isPortable && entity.kind === EntityKind.person;
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
@@ -19,8 +22,6 @@ const RetriggerKYC = ({ entity }: WithEntityProps) => {
     setDialogOpen(true);
   };
 
-  const shouldShowActionsDropdown =
-    entity?.isPortable && entity.kind === EntityKind.person;
   return shouldShowActionsDropdown ? (
     <>
       <Dropdown.Root>
@@ -29,7 +30,7 @@ const RetriggerKYC = ({ entity }: WithEntityProps) => {
         </Dropdown.Trigger>
         <Dropdown.Content align="end" sideOffset={8}>
           <Dropdown.Item onSelect={handleOpenDialog}>
-            {t('option')}
+            {t('retrigger-kyc.label')}
           </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>
@@ -38,4 +39,4 @@ const RetriggerKYC = ({ entity }: WithEntityProps) => {
   ) : null;
 };
 
-export default RetriggerKYC;
+export default Actions;

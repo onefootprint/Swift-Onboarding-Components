@@ -6,9 +6,9 @@ import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_SELECTOR, VAULT_FORM_ID } from '@/entity/constants';
 
+import Actions from './components/actions';
 import ManualReview from './components/manual-review';
 import ReasonDialog from './components/reason-dialog';
-import RetriggerKYC from './components/retrigger-kyc';
 import useDecryptControls from './hooks/use-decrypt-controls';
 
 type DecryptControlsProps = WithEntityProps;
@@ -39,7 +39,7 @@ const DecryptControls = ({ entity }: DecryptControlsProps) => {
               {t('start')}
             </Button>
             <ManualReview />
-            <RetriggerKYC />
+            <Actions />
           </Box>
         </Tooltip>
       )}
