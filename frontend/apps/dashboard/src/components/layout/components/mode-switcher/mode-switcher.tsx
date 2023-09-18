@@ -15,8 +15,11 @@ const ModeSwitcher = ({ children }: ModeSwitcherProps) => {
   const toggleMode = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const mode = urlParams.get('mode');
-    const isSameMode = mode === 'sandbox' && sandbox.isSandbox;
+    const isSameMode =
+      (mode === 'sandbox' && sandbox.isSandbox) ||
+      (mode === 'live' && !sandbox.isSandbox);
     if (!mode || isSameMode || !sandbox.canToggle) return;
+
     sandbox.toggle();
     if (mode === 'sandbox') {
       toast.show({
