@@ -8,6 +8,7 @@ use crate::decision::vendor::incode::state_machine::IncodeContext;
 use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
 use crate::errors::AssertionError;
+use crate::utils::vault_wrapper::NewDocument;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::IncodeClients;
 
@@ -28,7 +29,6 @@ use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::DocumentKind;
-use newtypes::DocumentSide;
 use newtypes::FootprintReasonCode;
 use newtypes::IdDocKind;
 use newtypes::IdentityDataKind as IDK;
@@ -78,19 +78,22 @@ impl Complete {
 
         // Now that we have the correct type of the document, add the images to the vault
         // under the correct type
-        let mut lifetime_ids: HashMap<_, _> = id_doc
+        let docs = id_doc
             .images(conn, true)?
             .into_iter()
-            .map(|u| -> ApiResult<_> {
+            .map(|u| {
                 let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
-                let name = format!("{}.png", kind);
-                let mime_type = "image/png".to_string();
-                let source = DataLifetimeSource::Hosted;
-                let (r, _) =
-                    uvw.put_document_unsafe(conn, kind, mime_type, name, u.e_data_key, u.s3_url, source)?;
-                Ok((u.side, r.lifetime_id))
+                NewDocument {
+                    mime_type: "image/png".to_string(),
+                    filename: format!("{}.png", kind),
+                    kind,
+                    e_data_key: u.e_data_key,
+                    s3_url: u.s3_url,
+                    source: DataLifetimeSource::Hosted,
+                }
             })
-            .collect::<ApiResult<_>>()?;
+            .collect_vec();
+        uvw.put_documents_unsafe(conn, docs)?;
 
         // Add some extracted OCR data to the vault.
         let di = |ocr_dk: ODK, pii: Option<ScrubbedPiiString>| -> Option<(DataIdentifier, PiiString)> {
@@ -168,9 +171,6 @@ impl Complete {
         let selfie_score = score_response.selfie_match().ok().map(|(s, _)| s);
 
         let update = IdentityDocumentUpdate {
-            front_lifetime_id: lifetime_ids.remove(&DocumentSide::Front),
-            back_lifetime_id: lifetime_ids.remove(&DocumentSide::Back),
-            selfie_lifetime_id: lifetime_ids.remove(&DocumentSide::Selfie),
             completed_seqno: Some(completed_seqno),
             document_score: Some(document_score),
             selfie_score,

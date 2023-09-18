@@ -23,9 +23,6 @@ impl Fail {
     pub fn enter(conn: &mut TxnPgConn, ctx: &IncodeContext) -> ApiResult<()> {
         // Mark the id doc as failed
         let update = IdentityDocumentUpdate {
-            front_lifetime_id: None,
-            back_lifetime_id: None,
-            selfie_lifetime_id: None,
             completed_seqno: None,
             document_score: None,
             selfie_score: None,

@@ -28,10 +28,12 @@ pub struct IdentityDocument {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    // TODO I don't think these lifetime_id columns are ever read - we could probably drop them in
-    // favor of the completed_seqno
+    // TODO these lifetime_id columns are never read - we can drop them in favor of the completed_seqno
+    /// DEPRECATED
     pub front_lifetime_id: Option<DataLifetimeId>,
+    /// DEPRECATED
     pub back_lifetime_id: Option<DataLifetimeId>,
+    /// DEPRECATED
     pub selfie_lifetime_id: Option<DataLifetimeId>,
     pub completed_seqno: Option<DataLifetimeSeqno>,
     // DO NOT CHANGE THE ORDER OF THESE FIELDS
@@ -53,18 +55,6 @@ impl IdentityDocument {
 
     pub fn collected_on_desktop(&self) -> bool {
         matches!(self.device_type, Some(DocumentScanDeviceType::Desktop))
-    }
-
-    pub fn any_image_collected(&self) -> bool {
-        ![
-            self.front_lifetime_id.as_ref(),
-            self.back_lifetime_id.as_ref(),
-            self.selfie_lifetime_id.as_ref(),
-        ]
-        .iter()
-        .flatten()
-        .collect::<Vec<_>>()
-        .is_empty()
     }
 }
 
@@ -95,9 +85,6 @@ struct NewIdentityDocumentRow {
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = identity_document)]
 pub struct IdentityDocumentUpdate {
-    pub front_lifetime_id: Option<DataLifetimeId>,
-    pub back_lifetime_id: Option<DataLifetimeId>,
-    pub selfie_lifetime_id: Option<DataLifetimeId>,
     pub completed_seqno: Option<DataLifetimeSeqno>,
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,

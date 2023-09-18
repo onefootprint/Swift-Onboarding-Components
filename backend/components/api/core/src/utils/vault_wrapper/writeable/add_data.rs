@@ -27,6 +27,15 @@ pub struct PatchDataResult {
     pub seqno: DataLifetimeSeqno,
 }
 
+pub struct NewDocument {
+    pub kind: DataIdentifier,
+    pub mime_type: String,
+    pub filename: String,
+    pub e_data_key: SealedVaultDataKey,
+    pub s3_url: S3Url,
+    pub source: DataLifetimeSource,
+}
+
 /// Right now, we only allow adding data to a user vault inside of a locked transaction and when
 /// we have built the VaultWrapper for a specific tenant.
 /// These are the publically accessible utils to update data on a VaultWrapper.
@@ -205,17 +214,55 @@ impl WriteableVw<Person> {
         s3_url: S3Url,
         source: DataLifetimeSource,
     ) -> ApiResult<(DocumentData, DataLifetimeSeqno)> {
+        let new_doc = NewDocument {
+            kind,
+            mime_type,
+            filename,
+            e_data_key,
+            s3_url,
+            source,
+        };
+
+        let (docs, seqno) = self.put_documents_unsafe(conn, vec![new_doc])?;
+        let doc = docs
+            .into_iter()
+            .next()
+            .ok_or(AssertionError("No document inserted"))?;
+
+        Ok((doc, seqno))
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn put_documents_unsafe(
+        &self,
+        conn: &mut TxnPgConn,
+        docs: Vec<NewDocument>,
+    ) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
         let vault_id = self.vault.id.clone();
         let su_id = self.scoped_vault_id.clone();
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        DataLifetime::bulk_deactivate_speculative(conn, &su_id, vec![kind.clone()], seqno)?;
+        let kinds = docs.iter().map(|d| d.kind.clone()).collect_vec();
+        DataLifetime::bulk_deactivate_speculative(conn, &su_id, kinds, seqno)?;
 
-        let doc = DocumentData::create(
-            conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key, seqno, source,
-        )?;
+        let docs = docs
+            .into_iter()
+            .map(|d| {
+                let NewDocument {
+                    kind,
+                    mime_type,
+                    filename,
+                    s3_url,
+                    e_data_key,
+                    source,
+                } = d;
+                DocumentData::create(
+                    conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key, seqno, source,
+                )
+            })
+            .collect::<db::DbResult<Vec<_>>>()?;
 
-        Ok((doc, seqno))
+        Ok((docs, seqno))
     }
 }
 

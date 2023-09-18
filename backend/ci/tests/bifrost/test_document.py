@@ -12,8 +12,11 @@ def restricted_doc_ob_config(sandbox_tenant, must_collect_data, can_access_data)
         can_access_data + ["document.drivers_license.us_only.require_selfie"],
     )
 
+
 @pytest.fixture(scope="session")
-def restricted_doc_ob_config_only_international(sandbox_tenant, must_collect_data, can_access_data):
+def restricted_doc_ob_config_only_international(
+    sandbox_tenant, must_collect_data, can_access_data
+):
     return create_ob_config(
         sandbox_tenant,
         "Restricted doc request config (new)",
@@ -21,8 +24,9 @@ def restricted_doc_ob_config_only_international(sandbox_tenant, must_collect_dat
         must_collect_data + ["document.drivers_license,passport.none.require_selfie"],
         can_access_data + ["document.drivers_license,passport.none.require_selfie"],
         allow_international_residents=True,
-        international_country_restrictions=["MX"]
+        international_country_restrictions=["MX"],
     )
+
 
 def test_upload_documents(doc_request_sandbox_ob_config, twilio):
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
@@ -50,7 +54,9 @@ def test_upload_documents(doc_request_sandbox_ob_config, twilio):
     assert len([i for i in body if i["kind"] == "drivers_license"]) == 2
 
 
-def test_upload_documents_with_ob_config_restriction_legacy_version(restricted_doc_ob_config, twilio):
+def test_upload_documents_with_ob_config_restriction_legacy_version(
+    restricted_doc_ob_config, twilio
+):
     bifrost = BifrostClient.new(restricted_doc_ob_config, twilio)
 
     # Manually handle the document requirement with some invalid data
@@ -63,8 +69,12 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(restricted_d
         "country_code": "NO",
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
-    assert body["error"]["message"].startswith("Unsupported document country. Supported document countries:")
-    assert set(body["error"]["message"].split(":")[1].replace(" ", "").split(",")) == set([ "UM", "VI", "MP", "GU", "PR", "AS", "US"])
+    assert body["error"]["message"].startswith(
+        "Unsupported document country. Supported document countries:"
+    )
+    assert set(
+        body["error"]["message"].split(":")[1].replace(" ", "").split(",")
+    ) == set(["UM", "VI", "MP", "GU", "PR", "AS", "US"])
 
     # Shouldn't be allowed to upload non-drivers-license
     data = {
@@ -81,7 +91,9 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(restricted_d
     bifrost.run()
 
 
-def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config_only_international, twilio):
+def test_upload_documents_with_ob_config_restriction(
+    restricted_doc_ob_config_only_international, twilio
+):
     bifrost = BifrostClient.new(restricted_doc_ob_config_only_international, twilio)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
@@ -89,7 +101,7 @@ def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config_on
     met_requirements = get_requirement_from_requirements(
         "collect_data", bifrost.get_status()["met_requirements"]
     )
-    assert 'full_address' in met_requirements["populated_attributes"]
+    assert "full_address" in met_requirements["populated_attributes"]
 
     # Manually handle the document requirement with some invalid data
     consent_data = {"consent_language_text": "I consent"}
@@ -101,7 +113,10 @@ def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config_on
         "country_code": "MX",
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
-    assert body["error"]["message"] == "Unsupported document type. Supported document types: passport"
+    assert (
+        body["error"]["message"]
+        == "Unsupported document type. Supported document types: passport"
+    )
 
     # Can upload a non-US passport
     data = {
@@ -119,11 +134,12 @@ def test_upload_documents_with_ob_config_restriction(restricted_doc_ob_config_on
 
     bifrost.handle_requirements(kind="collect_document")
     status_after_doc_upload = bifrost.get_status()
-    fields_to_authorize = get_requirement_from_requirements("authorize", status_after_doc_upload['requirements'])["fields_to_authorize"]
+    fields_to_authorize = get_requirement_from_requirements(
+        "authorize", status_after_doc_upload["requirements"]
+    )["fields_to_authorize"]
     document_types_to_authorize = fields_to_authorize["document_types"]
     # despite having created identity documents for NO passport, MX DL, we only actually uploaded successfully a DL
     assert document_types_to_authorize == ["drivers_license"]
-
 
 
 def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
@@ -131,8 +147,10 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
     status = bifrost.get_status()
-    doc_requirement = get_requirement_from_requirements("collect_document", status['requirements'])
-    
+    doc_requirement = get_requirement_from_requirements(
+        "collect_document", status["requirements"]
+    )
+
     assert doc_requirement["should_collect_selfie"]
     # consent
     consent_data = {"consent_language_text": "I consent"}
@@ -142,7 +160,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
         "document_type": "drivers_license",
         "country_code": "US",
         "skip_selfie": True,
-        "device_type": "desktop"
+        "device_type": "desktop",
     }
     body = post("hosted/user/documents", data, bifrost.auth_token)
     doc_id = body["id"]
@@ -161,20 +179,21 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
         assert not body["errors"]
     # now check what fields we have to authorize
     status_after_doc = bifrost.get_status()
-    fields_to_authorize = get_requirement_from_requirements("authorize", status_after_doc['requirements'])["fields_to_authorize"]
+    fields_to_authorize = get_requirement_from_requirements(
+        "authorize", status_after_doc["requirements"]
+    )["fields_to_authorize"]
     collected_fields_to_authorize = fields_to_authorize["collected_data"]
     document_types_to_authorize = fields_to_authorize["document_types"]
-    
+
     # we didn't authorize selfie
     # TODO: i think this should authorize document but not doc + selfie. will check with frontend
     assert "document_and_selfie" not in collected_fields_to_authorize
     assert document_types_to_authorize == ["drivers_license"]
-    
+
     # finish bifrost
     user = bifrost.run()
-    
+
     tenant = user.tenant
     fp_id = user.fp_id
     body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
-    assert all([d['device_type'] == "desktop" for d in body])
-    
+    assert all([d["device_type"] == "desktop" for d in body])

@@ -401,9 +401,9 @@ fn get_requirement_inner(
                     let id_docs = IdentityDocument::list_by_wf_id(conn, &args.workflow.id)?;
                     let doc_types = id_docs
                         .iter()
-                        // check we've actually uploaded an image for it, it's not just an empty id doc
+                        // check we've actually completed the document, it's not just an empty id doc
                         // TODO: maybe we should revisit this empty ID doc shell design?
-                        .filter(|i| i.any_image_collected())
+                        .filter(|i| i.completed_seqno.is_some())
                         .map(|id| id.document_type)
                         .unique()
                         .collect();
