@@ -1,0 +1,118 @@
+name: Frontend E2E
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/frontend_e2e.yml'
+      - 'frontend/apps/bifrost/**'
+      - 'frontend/apps/handoff/**'
+      - 'frontend/packages/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  CI: true
+  IS_E2E: true
+  API_BASE_URL: https://api.dev.onefootprint.com
+  E2E_BASE_URL: http://localhost:3002
+  GHOST_API_URL: 'https://footprint-blog.ghost.io' # Required by demos project
+  GHOST_CONTENT_API_KEY: ${{ secrets.GHOST_CONTENT_API_KEY }} # Required by demos project
+  NEXT_PUBLIC_API_BASE_URL: https://api.dev.onefootprint.com
+  NEXT_PUBLIC_E2E_TENANT_PK: ob_test_Gw8TsnS2xWOYazI0pugdxu
+  NEXT_PUBLIC_GOOGLE_MAPS_KEY: AIzaSyCgSmhug-DYfU5ozUNCyTfKyVX3VvPTSUs
+  REVALIDATE_SECRET_TOKEN: ECgdRpW1ZO54LORCul3r
+
+jobs:
+  install-dependencies:
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'e2e-on') }}
+    name: 'Install dependencies'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the project depth 0
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install + Cache for frontend/node_modules
+        uses: ./.github/actions/install_npm_dependencies
+        with:
+          node-version: 18
+
+  build-apps:
+    name: Build bifrost, handoff, demos with cache
+    runs-on: ubuntu-latest
+    needs: install-dependencies
+    steps:
+      - name: Checkout the project depth 0
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install + Cache for bifrost, handoff, demos
+        uses: ./.github/actions/build_e2e_apps
+        with:
+          node-version: 18
+
+  e2e:
+    name: 'End-to-End test'
+    timeout-minutes: 30
+    needs: build-apps
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the project
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Fetching "frontend/node_modules"
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: frontend/node_modules
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Fetching "bifrost,handoff,demos" apps
+        uses: actions/cache@v3
+        id: cache-build-bhd
+        with:
+          key: ${{ runner.os }}-e2e-apps-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            frontend/apps/bifrost/.next
+            frontend/apps/handoff/.next
+            frontend/apps/demos/.next
+            frontend/packages/e2e
+          restore-keys: |
+            ${{ runner.os }}-e2e-apps-
+
+      - name: Install Playwright Browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: Run apps locally, using production mode
+        working-directory: ./frontend
+        run: yarn start --filter=bifrost --filter=handoff --filter=demos &
+
+      - name: Run Playwright tests
+        working-directory: ./frontend
+        run: yarn test:e2e:ci
+
+      - name: Stop web servers
+        working-directory: ./frontend
+        run: npx kill-port 3000 3002 3005
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: ./frontend/packages/e2e/test-results/
+          retention-days: 3

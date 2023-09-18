@@ -4,18 +4,15 @@ import path from 'path';
 
 import readQrCode from './qr-code';
 
-export const selectOutcome = async (
-  {
-    frame,
-  }: {
-    frame: FrameLocator;
-  },
-  outcome: 'Success' | 'Manual Review' | 'Fail',
-) => {
+type WithFrame = { frame: FrameLocator };
+type WithPage = { page: Page };
+type Outcome = 'Success' | 'Manual Review' | 'Fail';
+
+export const selectOutcome = async ({ frame }: WithFrame, outcome: Outcome) => {
   return frame.getByRole('button', { name: outcome }).first().click();
 };
 
-export const clickOnContinue = async ({ frame }: { frame: FrameLocator }) => {
+export const clickOnContinue = async ({ frame }: WithFrame) => {
   return frame
     .getByRole('button')
     .filter({ hasText: /continue/i })
@@ -23,22 +20,14 @@ export const clickOnContinue = async ({ frame }: { frame: FrameLocator }) => {
 };
 
 export const fillEmail = async (
-  {
-    frame,
-  }: {
-    frame: FrameLocator;
-  },
+  { frame }: WithFrame,
   payload: { email: string },
 ) => {
   await frame.getByLabel('Email').type(payload.email, { delay: 100 });
 };
 
 export const fillPhoneNumber = async (
-  {
-    frame,
-  }: {
-    frame: FrameLocator;
-  },
+  { frame }: WithFrame,
   payload: { phoneNumber: string },
 ) => {
   await frame
@@ -49,12 +38,10 @@ export const fillPhoneNumber = async (
 export const verifyPhoneNumber = async ({
   frame,
   page,
-}: {
-  frame: FrameLocator;
-  page: Page;
-}) => {
+}: WithFrame & WithPage) => {
   await expect(frame.getByText('Verify your phone number')).toBeAttached();
 
+  // eslint-disable-next-line playwright/no-wait-for-timeout
   await page.waitForTimeout(3000); // 3 seconds, receiving the SMS
 
   await frame.locator('input[type="tel"]').first().focus();
@@ -69,11 +56,7 @@ export const verifyPhoneNumber = async ({
 };
 
 export const fillBasicData = async (
-  {
-    frame,
-  }: {
-    frame: FrameLocator;
-  },
+  { frame }: WithFrame,
   payload: { firstName: string; lastName: string; dob: string },
 ) => {
   await expect(frame.getByText('Basic data').first()).toBeAttached();
@@ -83,13 +66,7 @@ export const fillBasicData = async (
 };
 
 export const fillAddress = async (
-  {
-    frame,
-    page,
-  }: {
-    frame: FrameLocator;
-    page: Page;
-  },
+  { frame, page }: { frame: FrameLocator; page: Page },
   payload: { addressLine1: string; city: string; zipCode: string },
 ) => {
   await expect(
@@ -101,17 +78,16 @@ export const fillAddress = async (
     .type(payload.addressLine1, { delay: 100 });
   await frame.getByLabel('City').type(payload.city, { delay: 100 });
   await frame.getByLabel('Zip code').type(payload.zipCode, { delay: 100 });
-  await frame.getByRole('button', { name: 'Select' }).click();
+  await frame
+    .getByRole('button', { name: 'State', disabled: false })
+    .first()
+    .click();
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
 };
 
 export const fillSSN = async (
-  {
-    frame,
-  }: {
-    frame: FrameLocator;
-  },
+  { frame }: WithFrame,
   payload: { ssn: string },
 ) => {
   await expect(
@@ -122,11 +98,7 @@ export const fillSSN = async (
 };
 
 export const confirmData = async (
-  {
-    frame,
-  }: {
-    frame: FrameLocator;
-  },
+  { frame }: WithFrame,
   payload: {
     firstName: string;
     lastName: string;
@@ -152,17 +124,14 @@ export const doLivenessCheck = async (
     frame,
     page,
     browser,
-  }: {
-    frame: FrameLocator;
-    page: Page;
-    browser: Browser;
-  },
+  }: { frame: FrameLocator; page: Page; browser: Browser },
   { flowId }: { flowId: string },
 ) => {
   await expect(frame.getByText('Liveness check')).toBeAttached();
-  await page.waitForTimeout(2000);
+  // eslint-disable-next-line playwright/no-wait-for-timeout
+  await page.waitForTimeout(2000); // We need to give a moment for the QR code to be generated
   await frame
-    .locator('form svg')
+    .locator('#idv-body-content-container svg')
     .first()
     .screenshot({ path: `./src/media/qr-${flowId}.png` });
 
@@ -180,7 +149,7 @@ export const doLivenessCheck = async (
   ).toBeAttached();
 };
 
-export const authorizeAccess = async ({ frame }: { frame: FrameLocator }) => {
+export const authorizeAccess = async ({ frame }: WithFrame) => {
   await expect(frame.getByText('Authorize access')).toBeAttached();
   await frame.getByRole('button', { name: /Authorize/i }).click();
 };

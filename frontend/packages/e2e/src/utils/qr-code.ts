@@ -2,8 +2,8 @@ import fs from 'fs';
 import Jimp from 'jimp';
 import QrCode from 'qrcode-reader';
 
-const readQrCode = (path: string): Promise<string> =>
-  new Promise<string>((resolve, reject) => {
+export default function readQrCode(path: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
     const buffer = fs.readFileSync(path);
     Jimp.read(buffer, (e1, image) => {
       if (e1) {
@@ -20,5 +20,4 @@ const readQrCode = (path: string): Promise<string> =>
       qr.decode(image.bitmap);
     });
   });
-
-export default readQrCode;
+}

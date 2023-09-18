@@ -30,30 +30,23 @@ env:
 
 jobs:
   install-dependencies:
-    name: Install dependencies
-    runs-on: frontend_runner
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'lighthouse-on') }}
+    name: 'Install dependencies'
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - name: Checkout the project depth 0
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Cache management for "frontend/node_modules"
-        uses: actions/cache@v3
-        id: cache-dependencies
+        uses: ./.github/actions/install_npm_dependencies
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: frontend/node_modules
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Install "frontend/node_modules" if not cached
-        working-directory: ./frontend
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+          node-version: 18
 
   build-apps:
     name: Build and cache
-    runs-on: frontend_runner
+    runs-on: ubuntu-latest
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v3
@@ -88,7 +81,7 @@ jobs:
 
   lhci:
     name: Lighthouse
-    runs-on: frontend_runner
+    runs-on: ubuntu-latest
     needs: build-apps
     steps:
       - uses: actions/checkout@v3

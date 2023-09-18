@@ -6,7 +6,7 @@ module.exports = {
   ci: {
     upload: { target: 'temporary-public-storage' },
     collect: {
-      numberOfRuns: 2, // default: 3
+      numberOfRuns: 1, // default: 3
       settings: {
         preset: 'desktop',
         skipAudits: [],

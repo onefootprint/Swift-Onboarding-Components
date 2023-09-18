@@ -1,0 +1,34 @@
+name: 'Install npm dependencies'
+description: 'This action installs and caches node modules packages'
+inputs:
+  node-version:
+    description: 'NodeJS version'
+    required: false
+    default: ${{ matrix.node-version }}
+outputs:
+  cache-hit:
+    description: The output of cache-dependencies step
+    value: ${{ steps.cache-dependencies.outputs.cache-hit }}
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ inputs.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Cache management for "frontend/node_modules"
+      uses: actions/cache@v3
+      id: cache-dependencies
+      with:
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        path: frontend/node_modules
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - name: Install "frontend/node_modules" if not cached
+      working-directory: ./frontend
+      if: steps.cache-dependencies.outputs.cache-hit != 'true'
+      shell: bash
+      run: yarn install --frozen-lockfile

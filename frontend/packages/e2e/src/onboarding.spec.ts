@@ -28,6 +28,8 @@ test('smoke tests', async ({ browserName, page, browser }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   await page.goto('/e2e');
 
+  await page.waitForSelector('.footprint-verify-button', { timeout: 20000 }); // Increasing the waiting time for CI
+
   await page.getByRole('button', { name: 'Verify with Footprint' }).click();
   const frame = page.frameLocator('iframe');
 
@@ -78,16 +80,10 @@ test('smoke tests', async ({ browserName, page, browser }) => {
   );
   await clickOnContinue({ frame });
 
-  await doLivenessCheck(
-    {
-      page,
-      frame,
-      browser,
-    },
-    {
-      flowId,
-    },
-  );
+  await doLivenessCheck({ page, frame, browser }, { flowId });
+
+  // eslint-disable-next-line playwright/no-wait-for-timeout
+  await page.waitForTimeout(2500); // Give time for QR check
 
   await authorizeAccess({ frame });
   return expect(frame.getByTestId('result').innerText).toBeDefined();
