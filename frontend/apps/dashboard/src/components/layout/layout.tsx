@@ -4,6 +4,7 @@ import useSession from 'src/hooks/use-session';
 
 import { TRANSITION_ROUTES } from '../../config/constants';
 import Gate from './components/gate';
+import ModeSwitcher from './components/mode-switcher';
 import PrivateLayout from './components/private-layout';
 import PublicLayout from './components/public-layout';
 
@@ -22,7 +23,9 @@ const Layout = ({ children, name = 'default' }: LayoutProps) => {
   return (
     <Gate>
       {isLoggedIn ? (
-        <PrivateLayout name={name}>{children}</PrivateLayout>
+        <ModeSwitcher>
+          <PrivateLayout name={name}>{children}</PrivateLayout>
+        </ModeSwitcher>
       ) : (
         <PublicLayout>{children}</PublicLayout>
       )}

@@ -375,6 +375,16 @@
           "tooltip-disabled": "To access live data you have to activate your account first. Please contact us to do so."
         }
       },
+      "mode-switcher": {
+        "live-to-sandbox": {
+          "title": "We've switched you to sandbox mode",
+          "description": "The link you opened uses sandbox mode, however you're currently in live mode."
+        },
+        "sandbox-to-live": {
+          "title": "We've switched you to live mode",
+          "description": "The link you opened uses live mode, however you're currently in sandbox mode."
+        }
+      },
       "sandbox-banner": {
         "title": "Sandbox mode.",
         "disable": "Disable",

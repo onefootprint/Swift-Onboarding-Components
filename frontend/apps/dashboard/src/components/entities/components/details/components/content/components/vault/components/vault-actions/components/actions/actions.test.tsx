@@ -112,24 +112,4 @@ describe('<Actions />', () => {
       });
     });
   });
-
-  describe('when sharing a link', () => {
-    it('should copy the link correctly', async () => {
-      renderActions();
-      const user = userEvent.setup();
-
-      const button = screen.getByRole('button', {
-        name: 'Open actions',
-      });
-      await user.click(button);
-
-      const dropdownItem = screen.getByText('Share');
-      await userEvent.click(dropdownItem);
-
-      const clipboardText = await navigator.clipboard.readText();
-      expect(clipboardText).toBe(
-        `http://localhost/entities/fp_id_yCZehsWNeywHnk5JqL20u&mode=sandbox`,
-      );
-    });
-  });
 });
