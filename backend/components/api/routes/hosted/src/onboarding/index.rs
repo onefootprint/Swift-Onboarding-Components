@@ -66,7 +66,7 @@ pub async fn post(
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
-    state
+    let wf = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let (wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
@@ -84,7 +84,7 @@ pub async fn post(
             if user_auth.workflow_id().is_none() {
                 // No need to add the workflow scope if we already have one from a redo flow
                 // TODO: one day we should just have the client not hit this endpoint for redo flows
-                new_scopes.push(UserAuthScope::Workflow { wf_id: wf.id });
+                new_scopes.push(UserAuthScope::Workflow { wf_id: wf.id.clone() });
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
@@ -95,9 +95,13 @@ pub async fn post(
             let data = user_auth.data.clone().session_with_added_scopes(new_scopes);
             user_auth.update_session(conn, &session_key, data)?;
 
-            Ok(())
+            Ok(wf)
         })
         .await?;
+
+    // This log line will be used to link su_id to a session_id. Then, for a given scoped vault,
+    // we can see which other requests the user made
+    tracing::info!(sv_id=%wf.scoped_vault_id, wf_id=%wf.id, "Starting onboarding");
 
     let ff_client = state.feature_flag_client.clone();
     let onboarding_config =
