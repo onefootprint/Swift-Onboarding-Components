@@ -15,12 +15,17 @@ type OnlyImage = {
   renderHeader: () => React.ReactNode;
 };
 
+type NoIconOrImage = {
+  iconComponent?: never;
+  renderHeader?: never;
+};
+
 export type EmptyStateProps = {
   cta?: { label: string; onClick: () => void };
   description: string;
   title: string;
   testID?: string;
-} & (OnlyIcon | OnlyImage);
+} & (OnlyIcon | OnlyImage | NoIconOrImage);
 
 const EmptyState = ({
   cta,

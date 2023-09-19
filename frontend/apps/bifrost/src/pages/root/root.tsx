@@ -6,14 +6,12 @@ import {
   AppErrorBoundary,
   useFootprintProvider,
 } from '@onefootprint/idv-elements';
-import { getErrorMessage } from '@onefootprint/request';
-import { CLIENT_PUBLIC_KEY_HEADER, SessionStatus } from '@onefootprint/types';
+import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import type { GetServerSideProps } from 'next';
 import React from 'react';
 import Layout from 'src/components/layout';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import useTenantPublicKey from 'src/hooks/use-tenant-public-key';
-import useValidateSession from 'src/hooks/use-validate-session';
 
 import Init from '../init';
 
@@ -25,29 +23,9 @@ const Root = ({ variant }: RootProps) => {
   const footprint = useFootprintProvider();
   const [state, send] = useBifrostMachine();
   const tenantPk = useTenantPublicKey();
-  const { authToken, bootstrapData, showCompletionPage, showLogo } =
-    state.context;
+  const { bootstrapData, showCompletionPage, showLogo } = state.context;
   useLogStateMachine('bifrost', state);
   const obConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk };
-
-  useValidateSession(
-    { authToken },
-    {
-      onSuccess: ({ sessionStatus }) => {
-        if (sessionStatus === SessionStatus.expired) {
-          send({
-            type: 'expireSession',
-          });
-        }
-      },
-      onError: error => {
-        console.warn(
-          'Validating user session failed with error: ',
-          getErrorMessage(error),
-        );
-      },
-    },
-  );
 
   const handleComplete = (validationToken?: string, delay?: number) => {
     if (validationToken) {

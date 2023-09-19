@@ -1,5 +1,5 @@
 enum SessionStatus {
-  active = 'first_name',
+  active = 'active',
   expired = 'expired',
   unknown = 'unknown',
 }

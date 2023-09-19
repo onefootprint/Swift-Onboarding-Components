@@ -55,6 +55,9 @@ const createIdvMachine = (args: IdvMachineArgs) =>
         },
         identify: {
           on: {
+            expireSession: {
+              target: 'sessionExpired',
+            },
             identifyCompleted: [
               {
                 target: 'onboarding',
@@ -71,10 +74,23 @@ const createIdvMachine = (args: IdvMachineArgs) =>
         },
         onboarding: {
           on: {
+            expireSession: {
+              target: 'sessionExpired',
+            },
             onboardingCompleted: {
               target: 'complete',
               actions: ['assignValidationToken'],
             },
+          },
+        },
+        sessionExpired: {
+          on: {
+            reset: [
+              {
+                target: 'init',
+                actions: ['eraseAuthToken', 'resetContext'],
+              },
+            ],
           },
         },
         configInvalid: {
@@ -115,6 +131,10 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           if (newAuthToken) {
             context.authToken = newAuthToken;
           }
+          return context;
+        }),
+        eraseAuthToken: assign(context => {
+          context.authToken = undefined;
           return context;
         }),
         assignValidationToken: assign((context, event) => ({

@@ -34,3 +34,4 @@ export {
   SecuredByFootprint,
   useLayoutOptions,
 } from './layout';
+export { default as SessionExpired } from './session-expired';

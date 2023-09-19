@@ -19,6 +19,7 @@ export interface Typegen0 {
     assignPhoneNumber: 'identifyCompleted';
     assignUserFound: 'identifyCompleted';
     assignValidationToken: 'onboardingCompleted';
+    eraseAuthToken: 'reset';
     resetContext: 'reset';
   };
   eventsCausingDelays: {};
@@ -30,6 +31,7 @@ export interface Typegen0 {
     | 'expired'
     | 'identify'
     | 'init'
-    | 'onboarding';
+    | 'onboarding'
+    | 'sessionExpired';
   tags: never;
 }

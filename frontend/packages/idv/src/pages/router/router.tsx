@@ -3,10 +3,14 @@ import {
   AppErrorBoundary,
   Identify,
   Onboarding,
+  SessionExpired,
 } from '@onefootprint/idv-elements';
+import { getErrorMessage } from '@onefootprint/request';
+import { SessionStatus } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import useIdvMachine from '../../hooks/use-idv-machine';
+import useValidateSession from '../../hooks/use-validate-session';
 import Complete from '../complete';
 import getIdentifyBootstrapData from './utils/get-identify-bootstrap-data';
 
@@ -28,6 +32,26 @@ const Router = () => {
     idDocOutcome,
   } = state.context;
   useLogStateMachine('idv', state);
+
+  useValidateSession(
+    { authToken },
+    {
+      onSuccess: sessionStatus => {
+        if (sessionStatus !== SessionStatus.active) {
+          send({
+            type: 'expireSession',
+          });
+        }
+      },
+      onError: error => {
+        console.warn(
+          'Validating user session failed with error: ',
+          getErrorMessage(error),
+        );
+      },
+    },
+  );
+
   const isDone = state.matches('complete');
   const identifyBootstrapData = getIdentifyBootstrapData(bootstrapData);
   const shouldShowComplete =
@@ -79,6 +103,13 @@ const Router = () => {
           onComplete={onComplete}
           onDone={payload => {
             send({ type: 'onboardingCompleted', payload });
+          }}
+        />
+      )}
+      {state.matches('sessionExpired') && (
+        <SessionExpired
+          onRestart={() => {
+            send({ type: 'reset' });
           }}
         />
       )}

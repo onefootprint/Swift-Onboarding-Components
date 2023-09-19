@@ -8,7 +8,13 @@
       }
     }
   },
-  "components": {},
+  "components": {
+    "session-expired": {
+      "title": "Session expired",
+      "description": "Your session has expired. Please restart it.",
+      "cta": "Restart"
+    }
+  },
   "pages": {
     "complete": {
       "title": "Submission completed!",

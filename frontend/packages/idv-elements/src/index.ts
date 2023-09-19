@@ -31,6 +31,7 @@ export {
   NavigationHeader,
   SandboxBanner,
   SecuredByFootprint,
+  SessionExpired,
   useFootprintProvider,
   useLayoutOptions,
 } from './components';

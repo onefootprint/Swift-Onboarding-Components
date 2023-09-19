@@ -50,4 +50,7 @@ export type MachineEvents =
     }
   | {
       type: 'reset';
+    }
+  | {
+      type: 'expireSession';
     };
