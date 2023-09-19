@@ -13,6 +13,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::IncodeClients;
 
 use async_trait::async_trait;
+use db::models::data_lifetime::DataLifetime;
 use db::models::identity_document::IdentityDocument;
 use db::models::identity_document::IdentityDocumentUpdate;
 use db::models::ob_configuration::ObConfiguration;
@@ -43,6 +44,7 @@ use newtypes::ValidateArgs;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
 use std::collections::HashMap;
+use strum::IntoEnumIterator;
 
 // TODO this is more like the other workflow state transitions where it's actually a function
 // of previous states. Our incode state machine workflow doesn't have a general way to handle
@@ -95,11 +97,17 @@ impl Complete {
             .collect_vec();
         uvw.put_documents_unsafe(conn, docs)?;
 
-        // Add some extracted OCR data to the vault.
+        // First, clear all OCR data for this document kind
+        let odks_to_clear = ODK::iter()
+            .map(|odk| DocumentKind::OcrData(dk, odk).into())
+            .collect();
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        DataLifetime::bulk_deactivate_speculative(conn, sv_id, odks_to_clear, seqno)?;
+
+        // Then add some extracted OCR data to the vault.
         let di = |ocr_dk: ODK, pii: Option<ScrubbedPiiString>| -> Option<(DataIdentifier, PiiString)> {
             pii.map(|x| (DataIdentifier::from(DocumentKind::OcrData(dk, ocr_dk)), x.into()))
         };
-
         let r = fetch_ocr_response.clone();
         let data = vec![
             di(ODK::Dob, r.dob().ok()),
