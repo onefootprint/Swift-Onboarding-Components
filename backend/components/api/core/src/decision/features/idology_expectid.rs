@@ -9,7 +9,6 @@ use newtypes::{
     idology_match_codes, FootprintReasonCode, IDologyReasonCode, IdentityDataKind, VendorAPI,
     VerificationResultId,
 };
-use strum::IntoEnumIterator;
 
 use crate::{
     decision::{
@@ -60,6 +59,8 @@ impl IDologyFeatures {
         dob_submitted: bool,
         ssn_submitted: bool,
     ) -> Vec<FootprintReasonCode> {
+        let id_located = resp.response.id_located();
+
         //
         // first we compute all reason codes directly from the response
         //
@@ -74,34 +75,30 @@ impl IDologyFeatures {
             .map(|r| PaWatchlistHit::to_footprint_reason_codes(r.watchlists()))
             .unwrap_or_default();
 
-        // Add reason code for not locating
-        let id_located = resp.response.id_located();
-        if !id_located {
-            reason_codes.push(FootprintReasonCode::IdNotLocated);
-
-            return reason_codes;
-        }
-
         reason_codes = reason_codes
             .into_iter()
             .chain(restriction_reason_codes.into_iter())
             .collect();
-
         //
-        // Add derived reason codes, derived from the existing response codes
+        // Construct final set of codes
         //
-        // Important Note: idology does _not_ provide match related codes if identity attributes match.
-        // so, we cannot conclude anything about matching if the identity was not located
-        if reason_codes.contains(&FootprintReasonCode::IdNotLocated)
-        // Idology considers this a "restricted match" and doesn't return additional qualifiers so 
-        // we shouldn't infer anything about "info" codes here
-        || reason_codes.contains(&FootprintReasonCode::DobLocatedCoppaAlert)
-        {
-            return reason_codes;
+        // Idology considers this a "restricted match" and doesn't return additional qualifiers so
+        // we shouldn't infer anything about other codes here
+        let out = if reason_codes.contains(&FootprintReasonCode::DobLocatedCoppaAlert) {
+            reason_codes
+        } else if !id_located {
+            // Important Note: When Idology does not locate an id, they do not provide additional match related signals specifying how identity attributes match.
+            // But, to keep things consistent and be more understandable to our customers, we generate NoMatch reason codes, as this is a reasonable explanation for "not locating".
+            reason_codes
+                .into_iter()
+                .chain(Self::id_not_located_codes(dob_submitted, ssn_submitted).into_iter())
+                .collect()
+        } else {
+            // If ID was located, continue with the logic to add in match codes
+            Self::add_top_level_match_reason_codes(reason_codes, dob_submitted, ssn_submitted)
         };
-        reason_codes = Self::add_top_level_match_reason_codes(reason_codes, dob_submitted, ssn_submitted);
 
-        reason_codes
+        out.into_iter().unique().collect()
     }
 
     fn add_top_level_match_reason_codes(
@@ -177,6 +174,19 @@ impl IDologyFeatures {
         footprint_reason_codes.into_iter().unique().collect()
     }
 
+    fn id_not_located_codes(dob_submitted: bool, ssn_submitted: bool) -> Vec<FootprintReasonCode> {
+        [
+            ssn_submitted.then_some(FootprintReasonCode::SsnDoesNotMatch),
+            dob_submitted.then_some(FootprintReasonCode::DobDoesNotMatch),
+            Some(FootprintReasonCode::AddressDoesNotMatch),
+            Some(FootprintReasonCode::NameDoesNotMatch),
+            Some(FootprintReasonCode::IdNotLocated),
+        ]
+        .into_iter()
+        .flatten()
+        .collect()
+    }
+
     fn qualifier_reason_codes(qualifiers: Option<&IDologyQualifiers>) -> Vec<FootprintReasonCode> {
         if let Some(qualifiers) = qualifiers {
             qualifiers
@@ -199,27 +209,6 @@ impl IDologyFeatures {
         } else {
             vec![]
         }
-    }
-
-    /// Based on the set of computed reason codes, add in `Info` codes for idology.
-    // TODO: add this back in later, not needed for now. We just need the high level codes
-    // IMO it's okay for now to have the contract be:
-    //    - we will always provide you "top level" matching codes for name/dob/ssn/address
-    //    - different vendors produce different subcodes, so there may be variations in the sub-codes, and we're working on standardizing the set of reason codes you'd receive across vendors
-    //    - this is non-ideal because we expose a lot of risk signals in our API docs, but we can punt this for a little while. This is super hard to test
-    #[allow(dead_code)]
-    fn enrich_reason_codes_with_info_codes(
-        mut reason_codes: Vec<FootprintReasonCode>,
-    ) -> Vec<FootprintReasonCode> {
-        FootprintReasonCode::iter().for_each(|r| {
-            if let Some(info_code) = r.to_info_code() {
-                if !reason_codes.contains(&r) {
-                    reason_codes.push(info_code)
-                }
-            }
-        });
-
-        reason_codes
     }
 }
 
@@ -301,7 +290,7 @@ mod test {
         IDologyFeatures::qualifier_reason_codes(resp.response.qualifiers.as_ref())
     }
 
-    #[test_case("result.no.match", false, json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop, IdNotLocated])]
+    #[test_case("result.no.match", false, json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop, SsnDoesNotMatch, DobDoesNotMatch, AddressDoesNotMatch, NameDoesNotMatch, IdNotLocated])]
     #[test_case("result.match", false, json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop, AddressMatches, DobMatches, SsnMatches, NameMatches])]
     #[test_case("result.match", true, json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop, WatchlistHitOfac, AddressMatches,DobMatches,  SsnMatches, NameMatches])]
     #[test_case("result.match", false, construct_matching_qualifier(MatchLevel::Exact) => vec![AddressMatches, DobMatches, SsnMatches, NameMatches])]
@@ -323,6 +312,7 @@ mod test {
     #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), true, false => vec![AddressMatches, DobMatches, NameMatches])]
     #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), false, true => vec![AddressMatches, SsnMatches, NameMatches])]
     #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), false, false => vec![AddressMatches, NameMatches])]
+    #[test_case("result.no.match", json!({}), false, false => vec![AddressDoesNotMatch, NameDoesNotMatch, IdNotLocated])] // qualif not used
     fn test_dob_ssn_filtering(
         result_key: &str,
         qualifier: serde_json::Value,
