@@ -7,6 +7,8 @@ pub struct ValidateRequest {
     pub validation_token: SessionAuthToken,
 }
 
+export_schema!(ValidateRequest);
+
 /// Validates the onboarding token and returns the associated stable fp_id token with status information
 #[derive(Debug, Clone, serde::Serialize, JsonSchema)]
 pub struct ValidateResponse {

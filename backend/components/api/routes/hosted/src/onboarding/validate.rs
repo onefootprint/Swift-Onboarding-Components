@@ -12,7 +12,7 @@ use api_core::{
     types::JsonApiResponse,
     utils::session::AuthSession,
 };
-use api_wire_types::hosted::validate::ValidateResponse;
+use api_wire_types::hosted::validate::HostedValidateResponse;
 use chrono::Duration;
 use itertools::Itertools;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -25,7 +25,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 pub async fn post(
     user_auth: UserObAuthContext,
     state: web::Data<State>,
-) -> JsonApiResponse<ValidateResponse> {
+) -> JsonApiResponse<HostedValidateResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     // Verify there are no unmet requirements
@@ -47,5 +47,5 @@ pub async fn post(
         })
         .await??;
 
-    ResponseData::ok(ValidateResponse { validation_token }).json()
+    ResponseData::ok(HostedValidateResponse { validation_token }).json()
 }
