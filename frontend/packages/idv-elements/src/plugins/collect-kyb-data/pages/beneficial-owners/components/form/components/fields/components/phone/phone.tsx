@@ -1,14 +1,15 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
-import { PhoneInput, PhoneInputRegex } from '@onefootprint/ui';
+import { PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import checkIsPhoneValid from '../../../../../../../../../../services/identify/pages/phone-identification/components/form/utils/check-is-phone-valid/check-is-phone-valid';
 import type { FormData } from '../../../../types';
 
-type PhoneProps = {
-  index: number;
-};
+type PhoneProps = { index: number };
+
+const PhoneFieldName = BeneficialOwnerDataAttribute.phoneNumber;
 
 const Phone = ({ index }: PhoneProps) => {
   const { t } = useTranslation('pages.beneficial-owners.form.fields.phone');
@@ -17,25 +18,20 @@ const Phone = ({ index }: PhoneProps) => {
     formState: { errors },
   } = useFormContext<FormData>();
 
-  const phoneErrors =
-    errors.beneficialOwners?.[index]?.[
-      BeneficialOwnerDataAttribute.phoneNumber
-    ];
   const shouldHide = index === 0;
+  const phoneErrors = errors.beneficialOwners?.[index]?.[PhoneFieldName];
 
   return shouldHide ? null : (
     <Controller
       control={control}
-      name={`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.phoneNumber}`}
+      name={`beneficialOwners.${index}.${PhoneFieldName}`}
       rules={{
         required: {
           value: true,
           message: t('errors.required'),
         },
-        pattern: {
-          value: PhoneInputRegex,
-          message: t('errors.pattern'),
-        },
+        validate: value =>
+          (value && !checkIsPhoneValid(value, false)) || t('errors.pattern'),
       }}
       render={({
         field: { onChange, onBlur, value, name },

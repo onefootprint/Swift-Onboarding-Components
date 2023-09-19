@@ -1,11 +1,13 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { BusinessDI } from '@onefootprint/types';
-import { PhoneInput, PhoneInputRegex, TextInput } from '@onefootprint/ui';
+import { PhoneInput, TextInput } from '@onefootprint/ui';
 import React from 'react';
+import type { UseFormSetError } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
+import checkIsPhoneValid from '../../../../../../services/identify/pages/phone-identification/components/form/utils/check-is-phone-valid';
 import type { BasicData } from '../../../../utils/state-machine/types';
 
 type FormData = {
@@ -16,6 +18,11 @@ type FormData = {
   website?: string;
 };
 
+type FormHints = Partial<{ [K in keyof FormData]: string }>;
+type FormProps = (keyof FormData)[];
+type FormErrors = Partial<{ [K in keyof FormData]: { message?: string } }>;
+type T = ReturnType<typeof useTranslation>['t'];
+
 export type BasicDataFormProps = {
   defaultValues?: Partial<FormData>;
   optionalFields?: (BusinessDI.phoneNumber | BusinessDI.website)[];
@@ -24,6 +31,33 @@ export type BasicDataFormProps = {
   onCancel?: () => void;
   ctaLabel?: string;
 };
+
+const getFormHints = (list: FormProps, errors: FormErrors): FormHints =>
+  list.reduce<FormHints>((hints, prop) => {
+    const error = errors[prop];
+    if (error && error?.message) {
+      hints[prop] = error.message; // eslint-disable-line no-param-reassign
+    }
+    return hints;
+  }, Object.create(null));
+
+const getFormPhoneState = (
+  t: T,
+  setError: UseFormSetError<FormData>,
+  value?: string,
+): boolean => {
+  if (value && !checkIsPhoneValid(value, false)) {
+    setError(
+      'phoneNumber',
+      { message: t('phone-number.errors.pattern') },
+      { shouldFocus: true },
+    );
+    return false;
+  }
+  return true;
+};
+
+const FormHintsList: FormProps = ['phoneNumber', 'tin', 'website'];
 
 const BasicDataForm = ({
   defaultValues,
@@ -34,31 +68,24 @@ const BasicDataForm = ({
   ctaLabel,
 }: BasicDataFormProps) => {
   const { t } = useTranslation('pages.basic-data.form');
+  const inputMasks = useInputMask('en-US');
   const {
     control,
     register,
     handleSubmit,
     getValues,
+    setError,
     setValue,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues,
   });
-  const inputMasks = useInputMask('en-US');
 
-  const tinErrors = errors.tin;
-  const hasTinError = !!tinErrors;
-  const tinHint = hasTinError ? tinErrors?.message : undefined;
-
-  const phoneNumberErrors = errors.phoneNumber;
-  const hasPhoneNumberError = !!phoneNumberErrors;
-  const phoneNumberHint = hasPhoneNumberError
-    ? phoneNumberErrors?.message
-    : undefined;
-
-  const websiteErrors = errors.website;
-  const hasWebsiteError = !!websiteErrors;
-  const websiteHint = hasWebsiteError ? websiteErrors?.message : undefined;
+  const {
+    phoneNumber: phoneNumberHint = undefined,
+    tin: tinHint = undefined,
+    website: websiteHint = undefined,
+  } = getFormHints(FormHintsList, errors);
 
   const onSubmitFormData = (formData: FormData) => {
     const basicData = {
@@ -70,6 +97,9 @@ const BasicDataForm = ({
       [BusinessDI.phoneNumber]: formData.phoneNumber,
       [BusinessDI.website]: formData.website,
     };
+    const isPhoneValid = getFormPhoneState(t, setError, formData.phoneNumber);
+    if (!isPhoneValid) return;
+
     onSubmit(basicData);
   };
 
@@ -91,7 +121,7 @@ const BasicDataForm = ({
       />
       <TextInput
         data-private
-        hasError={hasTinError}
+        hasError={!!tinHint}
         hint={tinHint}
         mask={inputMasks.tin}
         value={getValues('tin')}
@@ -111,7 +141,7 @@ const BasicDataForm = ({
       {optionalFields?.includes(BusinessDI.website) && (
         <TextInput
           data-private
-          hasError={hasWebsiteError}
+          hasError={!!websiteHint}
           hint={websiteHint}
           label={t('website.label')}
           placeholder={t('website.placeholder')}
@@ -134,10 +164,6 @@ const BasicDataForm = ({
               value: true,
               message: t('phone-number.errors.required'),
             },
-            pattern: {
-              value: PhoneInputRegex,
-              message: t('phone-number.errors.pattern'),
-            },
           }}
           render={({
             field: { onChange, onBlur, value, name },
@@ -145,7 +171,7 @@ const BasicDataForm = ({
           }) => (
             <PhoneInput
               data-private
-              hasError={!!error}
+              hasError={!!error && !!phoneNumberHint}
               hint={phoneNumberHint}
               label={t('phone-number.label')}
               name={name}

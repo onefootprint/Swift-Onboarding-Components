@@ -7,7 +7,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@/investor-profile/*": ["./src/plugins/investor-profile/*"],
+      "@/investor-profile/*": ["./src/plugins/investor-profile/*"]
     }
-  },
+  }
 }
