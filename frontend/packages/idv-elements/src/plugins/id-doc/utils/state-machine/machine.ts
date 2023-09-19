@@ -313,6 +313,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           context.image = {
             imageString: event.payload.imageString,
             mimeType: event.payload.mimeType,
+            captureKind: event.payload.captureKind,
           };
           return context;
         }),

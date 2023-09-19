@@ -2,6 +2,7 @@ import React from 'react';
 
 import PhotoCapture from '../../components/photo-capture/photo-capture';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import type { CaptureKind } from '../../utils/state-machine';
 import DesktopCameraPermission from './desktop-camera-permission';
 import useCameraPermission from './hooks/use-camera-permission';
 
@@ -11,12 +12,17 @@ const DesktopSelfie = () => {
   const [, send] = useIdDocMachine();
   const permissionState = useCameraPermission();
 
-  const onComplete = (imageString: string, mimeType: string) =>
+  const onComplete = (
+    imageString: string,
+    mimeType: string,
+    captureKind?: CaptureKind,
+  ) =>
     send({
       type: 'receivedImage',
       payload: {
         imageString,
         mimeType,
+        captureKind,
       },
     });
 

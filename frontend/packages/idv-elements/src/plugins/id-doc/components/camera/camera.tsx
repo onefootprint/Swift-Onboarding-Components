@@ -6,6 +6,7 @@ import { useTimeout } from 'usehooks-ts';
 
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
+import type { CaptureKind } from '../../utils/state-machine';
 import CaptureButton from './components/capture-button';
 import Feedback from './components/feedback';
 import Flash from './components/flash';
@@ -24,7 +25,7 @@ import getVideoHeight from './utils/get-video-height';
 export type DeviceKind = 'mobile' | 'desktop';
 
 type CameraProps = {
-  onCapture: (image: string) => void;
+  onCapture: (image: string, capturKind: CaptureKind) => void;
   onError?: () => void;
   cameraKind: CameraKind;
   outlineWidthRatio: number; // with respect to the video width
@@ -104,7 +105,7 @@ const Camera = ({
     videoRef.current.play();
   };
 
-  const handleClick = () => {
+  const handleClick = (captureKind: CaptureKind) => {
     if (!canvasRef.current || !videoRef.current) {
       console.error('Video ref or canvas not initialized for camera capture');
       return;
@@ -143,7 +144,7 @@ const Camera = ({
     });
 
     if (imageString) {
-      onCapture(imageString);
+      onCapture(imageString, captureKind);
     } else {
       setCanCapture(true); // if the no picture was taken successfully, reenable the capture button
     }
@@ -169,7 +170,7 @@ const Camera = ({
     mediaStream,
     outlineWidth,
     outlineHeight,
-    onCapture: handleClick,
+    onCapture: () => handleClick('auto'),
     onStatusChange: setAutocaptureFeedback,
     autocaptureKind,
     shouldDetect,
@@ -231,7 +232,7 @@ const Camera = ({
               )}
               {deviceKind === 'mobile' && (
                 <CaptureButton
-                  onClick={handleClick}
+                  onClick={() => handleClick('manual')}
                   disabled={!canCapture}
                   variant="round"
                 />
@@ -251,7 +252,7 @@ const Camera = ({
         </VideoContainer>
         {deviceKind === 'desktop' && (
           <CaptureButton
-            onClick={handleClick}
+            onClick={() => handleClick('manual')}
             disabled={!canCapture}
             variant="default"
           />

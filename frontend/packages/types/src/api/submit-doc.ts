@@ -6,6 +6,9 @@ export type SubmitDocRequest = {
   side: string;
   mimeType: string;
   id: string;
+  meta: {
+    manual?: boolean;
+  };
 };
 
 export type SubmitDocResponse = {

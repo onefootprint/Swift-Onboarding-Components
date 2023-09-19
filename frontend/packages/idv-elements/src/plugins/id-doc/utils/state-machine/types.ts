@@ -15,11 +15,13 @@ export type IdDocImageErrorType = {
   errorInfo?: string;
 };
 
+export type CaptureKind = 'auto' | 'manual';
+
 export type MachineContext = {
   authToken: string;
   device: DeviceInfo;
   requirement: IdDocRequirement;
-  image?: { imageString: string; mimeType: string };
+  image?: { imageString: string; mimeType: string; captureKind?: CaptureKind };
   currSide?: IdDocImageTypes;
   idDoc: {
     type?: SupportedIdDocTypes;
@@ -54,6 +56,7 @@ export type MachineEvents =
       payload: {
         imageString: string;
         mimeType: string;
+        captureKind?: CaptureKind;
       };
     }
   | {

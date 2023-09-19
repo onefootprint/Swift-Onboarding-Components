@@ -5,6 +5,7 @@ import React from 'react';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import PhotoCapture from '../../components/photo-capture/photo-capture';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import type { CaptureKind } from '../../utils/state-machine';
 
 const ID_OUTLINE_WIDTH_RATIO = 0.9;
 const ID_OUTLINE_HEIGHT_RATIO = 0.56;
@@ -28,12 +29,17 @@ const FrontPhotoCapture = () => {
 
   if (!docType) return null;
 
-  const onComplete = (imageString: string, mimeType: string) =>
+  const onComplete = (
+    imageString: string,
+    mimeType: string,
+    captureKind?: CaptureKind,
+  ) =>
     send({
       type: 'receivedImage',
       payload: {
         imageString,
         mimeType,
+        captureKind,
       },
     });
 

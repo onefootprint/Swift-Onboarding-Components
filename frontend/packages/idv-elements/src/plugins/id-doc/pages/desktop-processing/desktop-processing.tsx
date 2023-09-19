@@ -92,7 +92,7 @@ const DeskTopProcessing = () => {
       return;
     }
 
-    const { imageString, mimeType } = image;
+    const { imageString, mimeType, captureKind } = image;
 
     submitDocMutation.mutate(
       {
@@ -101,6 +101,9 @@ const DeskTopProcessing = () => {
         mimeType,
         side: currSide,
         id,
+        meta: {
+          manual: captureKind ? captureKind === 'manual' : captureKind,
+        },
       },
       {
         onSuccess: handleSubmitDocSuccess,

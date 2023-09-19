@@ -89,7 +89,7 @@ const Processing = () => {
       return;
     }
 
-    const { imageString, mimeType } = image;
+    const { imageString, mimeType, captureKind } = image;
 
     submitDocMutation.mutate(
       {
@@ -98,6 +98,9 @@ const Processing = () => {
         mimeType,
         side: currSide,
         id,
+        meta: {
+          manual: captureKind ? captureKind === 'manual' : captureKind,
+        },
       },
       {
         onSuccess: handleSubmitDocSuccess,

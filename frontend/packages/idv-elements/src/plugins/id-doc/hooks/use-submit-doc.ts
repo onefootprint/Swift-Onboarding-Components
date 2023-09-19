@@ -5,7 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AUTH_HEADER } from '../config/constants';
 
 const submitDoc = async (payload: SubmitDocRequest) => {
-  const { authToken, image, side, mimeType, id } = payload;
+  const { authToken, image, side, mimeType, id, meta } = payload;
   const response = await request<SubmitDocResponse>({
     method: 'POST',
     url: `/hosted/user/documents/${id}/upload`,
@@ -13,6 +13,7 @@ const submitDoc = async (payload: SubmitDocRequest) => {
       image,
       side,
       mimeType,
+      meta,
     },
     headers: {
       [AUTH_HEADER]: authToken,

@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { HeaderTitle, NavigationHeader } from '../../../../components';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image';
+import type { CaptureKind } from '../../utils/state-machine';
 import Camera from '../camera';
 import type { DeviceKind } from '../camera/camera';
 import type { OutlineKind } from '../camera/components/overlay/overlay';
@@ -17,7 +18,11 @@ type PhotoCaptureProps = {
   outlineHeightRatio: number; // with respect to the video width (not height)
   cameraKind: CameraKind;
   outlineKind: OutlineKind;
-  onComplete: (imageString: string, mimeType: string) => void;
+  onComplete: (
+    imageString: string,
+    mimeType: string,
+    captureKind?: CaptureKind,
+  ) => void;
   autocaptureKind: AutocaptureKind;
   deviceKind: DeviceKind;
 };
@@ -37,6 +42,7 @@ const PhotoCapture = ({
   const { processImageUrl, convertImageFileToStrippedBase64 } =
     useProcessImage();
   const [isLoading, setIsLoading] = useState(false);
+  const [captureKind, setCaptureKind] = useState<CaptureKind>();
 
   const handleRetake = () => {
     setImage(null);
@@ -77,7 +83,7 @@ const PhotoCapture = ({
     }
 
     setIsLoading(false);
-    onComplete(imageString, mimeType);
+    onComplete(imageString, mimeType, captureKind);
   };
 
   const handleError = () => {
@@ -86,8 +92,9 @@ const PhotoCapture = ({
     });
   };
 
-  const handleCapture = async (newImage: string) => {
+  const handleCapture = (newImage: string, newCaptureKind: CaptureKind) => {
     setImage(newImage);
+    setCaptureKind(newCaptureKind);
   };
 
   return image ? (

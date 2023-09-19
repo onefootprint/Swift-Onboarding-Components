@@ -4,6 +4,7 @@ import React from 'react';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import PhotoCapture from '../../components/photo-capture/photo-capture';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import type { CaptureKind } from '../../utils/state-machine';
 
 const FACE_OUTLINE_TO_WIDTH_RATIO = 0.7;
 
@@ -11,12 +12,17 @@ const SelfiePhoto = () => {
   const { t } = useTranslation('pages.selfie-photo');
   const [, send] = useIdDocMachine();
 
-  const onComplete = (imageString: string, mimeType: string) =>
+  const onComplete = (
+    imageString: string,
+    mimeType: string,
+    captureKind?: CaptureKind,
+  ) =>
     send({
       type: 'receivedImage',
       payload: {
         imageString,
         mimeType,
+        captureKind,
       },
     });
 
