@@ -8,7 +8,7 @@ import { Trans } from 'react-i18next';
 import { HeaderTitle } from '../../../../components';
 
 export type ImageConsentHandler = {
-  getConsentText: () => string;
+  getConsentInfo: () => { consentLanguageText: string; mlConsent: boolean };
 };
 
 const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
@@ -18,7 +18,7 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
   useImperativeHandle(
     ref,
     () => ({
-      getConsentText: () => {
+      getConsentInfo: () => {
         const descriptionWithoutHyperlinks = t('description')
           .replaceAll('<privacy>', '')
           .replaceAll('</privacy>', '')
@@ -33,15 +33,15 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
         consentLanguages.push(t('cta'));
 
         const consentLanguageText = consentLanguages.join('. ');
-        return consentLanguageText;
+        return { consentLanguageText, mlConsent: isThirdPartyConsented };
       },
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [isThirdPartyConsented],
   );
 
   const handleThirdPartyConsent = () => {
-    setIsThirdPartyConsented(!isThirdPartyConsented);
+    setIsThirdPartyConsented(prev => !prev);
   };
 
   const linkStyle = { textDecoration: 'underline', color: '#2D2D2D' };
@@ -81,6 +81,7 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
         <Checkbox
           onChange={handleThirdPartyConsent}
           id="third-party-consent"
+          label="third-party-consent"
           checked={isThirdPartyConsented}
         />
         <LabelContainer onClick={handleThirdPartyConsent}>

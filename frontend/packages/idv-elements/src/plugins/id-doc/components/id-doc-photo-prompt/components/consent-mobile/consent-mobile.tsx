@@ -26,21 +26,23 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
   };
 
   const handleConsent = () => {
-    const consentLanguageText = consentRef.current?.getConsentText();
-    if (!authToken || !consentLanguageText) {
+    const consentInfo = consentRef.current?.getConsentInfo();
+    if (!authToken || !consentInfo) {
       if (!authToken)
         console.error("Could not submit consent - auth token doesn't exist");
-      if (!consentLanguageText)
+      if (!consentInfo)
         console.error(
           'Could not submit consent - consent language is empty or undefined',
         );
       return;
     }
 
+    const { consentLanguageText, mlConsent } = consentInfo;
+
     if (consentMutation.isLoading) return;
 
     consentMutation.mutate(
-      { consentLanguageText, authToken },
+      { consentLanguageText, mlConsent, authToken },
       {
         onSuccess: onConsent,
         onError: err => {

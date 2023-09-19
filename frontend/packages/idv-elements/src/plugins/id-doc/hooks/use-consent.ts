@@ -6,6 +6,7 @@ import { AUTH_HEADER } from '../config/constants';
 
 const consentRequest = async ({
   consentLanguageText,
+  mlConsent,
   authToken,
 }: ConsentRequest) => {
   const response = await request<ConsentResponse>({
@@ -13,6 +14,7 @@ const consentRequest = async ({
     url: '/hosted/user/consent',
     data: {
       consentLanguageText,
+      mlConsent,
     },
     headers: {
       [AUTH_HEADER]: authToken,
