@@ -1,23 +1,19 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 import { Checkbox, LinkButton, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import useSession from 'src/hooks/use-session';
 
 import type {
   PersonalInformationAndDocs,
   SummaryMeta,
 } from '@/playbooks/utils/machine/types';
-import {
-  basicInformationFields,
-  PlaybookKind,
-  usResidentFormFields,
-} from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import CollectedInformation from './components/collected-information';
-import useFormValues from './hooks/use-form-values';
+import useIdDocFirstFlowEnabled from './hooks/use-id-doc-first-flow-enabled';
 
 type PreviewProps = {
   onStartEditing: () => void;
@@ -25,44 +21,17 @@ type PreviewProps = {
 };
 
 const Preview = ({ onStartEditing, meta }: PreviewProps) => {
-  const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.form.personal-info-and-docs',
-  );
-  const {
-    data: { user, org },
-  } = useSession();
-  const { formValues } = useFormValues();
-  const { getValues, watch, register } = useFormContext();
-  const personalInfoAndDocs: PersonalInformationAndDocs = getValues(
+  const { t } = useTranslation('pages.playbooks.dialog.summary.form.person');
+  const { getValues, register } = useFormContext();
+  const values: PersonalInformationAndDocs = getValues(
     'personalInformationAndDocs',
   );
-  const hasIdDoc = watch('personalInformationAndDocs.idDocKind').length > 0;
-  const hasUserPermission = user?.isFirmEmployee;
-  // TODO: Move to a feature flag
-  const hasOrgPermissionForIdDocFirst = org?.name
-    .toLowerCase()
-    .includes('flexcar');
-  const showIdDocFirstFlowOption =
-    hasIdDoc &&
-    meta.kind === PlaybookKind.Kyc &&
-    (hasUserPermission || hasOrgPermissionForIdDocFirst);
-
-  const basicInformationFormValues = formValues.filter(field =>
-    basicInformationFields.includes(field as keyof PersonalInformationAndDocs),
+  const isIdDocFirstFlowEnabled = useIdDocFirstFlowEnabled(
+    meta.kind === PlaybookKind.Kyc,
   );
-
-  const usResidentFormValues = formValues
-    .filter(field =>
-      usResidentFormFields.includes(field as keyof PersonalInformationAndDocs),
-    )
-    // preserve order so ID doc and selfie are together
-    .sort(
-      (a, b) =>
-        usResidentFormFields.indexOf(a) - usResidentFormFields.indexOf(b),
-    );
-
-  const showNonUsResidentEmptyState =
+  const showNonUsResidentsEmptyState =
     meta.residency?.allowInternationalResidents === false;
+  const showUsResidentsEmptyState = meta.residency?.allowUsResidents === false;
 
   return (
     <Container>
@@ -71,8 +40,8 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
           <TitleContainer>
             <Typography variant="label-3">{t('title.kyb.main')}</Typography>
             <Tooltip
-              position="right"
               alignment="center"
+              position="right"
               text={t('title.kyb.tooltip')}
             >
               <IcoInfo16 testID="info-tooltip" />
@@ -82,9 +51,9 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
           <Typography variant="label-3">{t('title.kyc')}</Typography>
         )}
         <LinkButton
-          onClick={onStartEditing}
           iconComponent={IcoPencil16}
           iconPosition="left"
+          onClick={onStartEditing}
           size="tiny"
         >
           {t('preview.edit')}
@@ -92,23 +61,50 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
       </Header>
       <FormElementsContainer>
         <CollectedInformation
-          fields={basicInformationFormValues}
-          personalInfoAndDocs={personalInfoAndDocs}
-          title={t('basic-information.title')}
-        />
-        <CollectedInformation
-          fields={usResidentFormValues}
-          personalInfoAndDocs={personalInfoAndDocs}
           title={t('us-residents.title')}
+          options={{
+            email: values.email,
+            phoneNumber: values.phone_number,
+            dob: values.dob,
+            fullAddress: values.full_address,
+          }}
         />
-        {showNonUsResidentEmptyState && (
+        {showUsResidentsEmptyState ? (
+          <CollectedInformation
+            title={t('us-residents.title')}
+            subtitle={t('us-residents.empty')}
+          />
+        ) : (
+          <CollectedInformation
+            title={t('us-residents.title')}
+            options={{
+              idDocKind: values.idDocKind,
+              selfie: values.idDocKind.length > 0 && values.selfie,
+              usLegalStatus: values.us_legal_status,
+              ssn: {
+                active: values.ssn,
+                kind: values.ssnKind,
+                optional: values.ssnOptional,
+              },
+            }}
+          />
+        )}
+        {showNonUsResidentsEmptyState ? (
           <CollectedInformation
             title={t('non-us-residents.title')}
             subtitle={t('non-us-residents.empty')}
           />
+        ) : (
+          <CollectedInformation
+            title={t('non-us-residents.title')}
+            options={{
+              idDocKind: [SupportedIdDocTypes.passport],
+              selfie: true,
+            }}
+          />
         )}
       </FormElementsContainer>
-      {showIdDocFirstFlowOption && (
+      {isIdDocFirstFlowEnabled && (
         <Subsection>
           <Checkbox
             label={t('id-doc-first.checkbox')}

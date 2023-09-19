@@ -2,8 +2,8 @@ import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import { CollectedKybDataOption } from '@onefootprint/types';
 import React from 'react';
 
-import type { BusinessInformationWithContext } from './business-information.test.config';
-import BusinesssInformationWithContext from './business-information.test.config';
+import type { BusinessInformationWithContext } from './business.test.config';
+import BusinesssInformationWithContext from './business.test.config';
 
 const renderBusinessInformation = ({
   startingValues,

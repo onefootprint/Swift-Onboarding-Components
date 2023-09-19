@@ -13,7 +13,7 @@ const EditingWithContext = () => {
   return (
     <FormProvider {...formMethods}>
       <form>
-        <Editing stopEditing={() => {}} />
+        <Editing onStopEditing={() => {}} />
       </form>
     </FormProvider>
   );

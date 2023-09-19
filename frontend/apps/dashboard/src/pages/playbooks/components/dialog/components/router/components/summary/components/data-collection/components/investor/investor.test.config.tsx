@@ -5,7 +5,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import type { SummaryFormData } from '@/playbooks/utils/machine/types';
 import { defaultPlaybookValuesKYC } from '@/playbooks/utils/machine/types';
 
-import InvestorProfile from './investor-profile';
+import InvestorProfile from './investor';
 
 export type InvestorProfileWithContextProps = {
   investorProfileAdded: boolean;

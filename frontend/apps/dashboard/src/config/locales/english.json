@@ -1441,7 +1441,7 @@
             }
           },
           "form": {
-            "personal-info-and-docs": {
+            "person": {
               "title": {
                 "kyb": {
                   "main": "KYC of a beneficial owner",
@@ -1457,7 +1457,8 @@
                 "title": "Basic information"
               },
               "us-residents": {
-                "title": "U.S. residents"
+                "title": "U.S. residents",
+                "empty": "U.S. residents aren't allowed to be onboarded."
               },
               "non-us-residents": {
                 "title": "Non U.S. residents",
@@ -1501,18 +1502,15 @@
                 "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
                 "no-id-doc-selected": "You must select at least one ID document type."
               },
-              "save": "Save",
-              "cancel": "Cancel",
               "preview": {
                 "edit": "Edit",
                 "email": "Email",
-                "phone_number": "Phone number",
+                "phone-number": "Phone number",
                 "name": "First & last name",
                 "dob": "Date of birth",
-                "us_legal_status": "Legal status in the U.S.",
-                "full_address": "Address",
-                "idDoc": "ID document scan",
-                "idDocKind": "ID document scan",
+                "us-legal-status": "Legal status in the U.S.",
+                "full-address": "Address",
+                "id-doc-kind": "ID document scan",
                 "and": "and",
                 "more": "more",
                 "selfie": "Selfie",
@@ -1523,9 +1521,9 @@
                 "residence_document": "Residence card",
                 "permit": "Work permit",
                 "ssn": "SSN",
-                "ssnKind": "SSN",
                 "ssn4": "Last 4",
                 "ssn9": "Full",
+                "optional": "(Optional)",
                 "address-display": "Address line, Zip code, City, State"
               }
             },

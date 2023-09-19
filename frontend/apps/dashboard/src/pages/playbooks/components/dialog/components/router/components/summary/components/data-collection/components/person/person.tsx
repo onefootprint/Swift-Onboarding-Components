@@ -6,14 +6,15 @@ import type { SummaryMeta } from '@/playbooks/utils/machine/types';
 import Editing from './components/editing';
 import Preview from './components/preview';
 
-type PersonalInfoAndDocsProps = {
+type PersonProps = {
   meta: SummaryMeta;
 };
 
-const PersonalInfoAndDocs = ({ meta }: PersonalInfoAndDocsProps) => {
+const Person = ({ meta }: PersonProps) => {
   const [editing, setEditing] = useState(false);
 
   const stopEditing = () => setEditing(false);
+
   const startEditing = () => setEditing(true);
 
   return (
@@ -29,13 +30,13 @@ const PersonalInfoAndDocs = ({ meta }: PersonalInfoAndDocsProps) => {
 
 const Container = styled.div`
   ${({ theme }) => css`
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderColor.tertiary} ${theme.borderWidth[1]} solid;
     display: flex;
     flex-direction: column;
-    padding: ${theme.spacing[5]} ${theme.spacing[6]};
     gap: ${theme.spacing[5]};
-    border: ${theme.borderColor.tertiary} ${theme.borderWidth[1]} solid;
-    border-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[5]} ${theme.spacing[6]};
   `}
 `;
 
-export default PersonalInfoAndDocs;
+export default Person;

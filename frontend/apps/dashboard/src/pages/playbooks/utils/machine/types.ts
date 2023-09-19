@@ -78,7 +78,7 @@ export type PersonalInformationAndDocs = {
   [CollectedKycDataOption.usLegalStatus]: boolean;
   [CollectedKycDataOption.address]: boolean;
   ssn: boolean;
-  ssnKind?: CollectedKycDataOption;
+  ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
   idDoc: boolean;
   idDocKind: SupportedIdDocTypes[];
   idDocFirst?: boolean;

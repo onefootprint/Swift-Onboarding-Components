@@ -6,8 +6,8 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import type { InvestorProfileWithContextProps } from './investor-profile.test.config';
-import InvestorProfileWithContext from './investor-profile.test.config';
+import type { InvestorProfileWithContextProps } from './investor.test.config';
+import InvestorProfileWithContext from './investor.test.config';
 
 const renderInvestorProfile = ({
   investorProfileAdded,

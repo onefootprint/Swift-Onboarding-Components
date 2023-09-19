@@ -7,10 +7,10 @@ import {
   PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
-import type { DataCollectionWithContextProps } from './data-collection.test.config';
-import DataCollectionWithContext from './data-collection.test.config';
+import type { DataCollectionWithContextProps } from './summary.test.config';
+import DataCollectionWithContext from './summary.test.config';
 
-const renderDataCollection = ({
+const renderSummary = ({
   startingValues,
   kind,
 }: DataCollectionWithContextProps) => {
@@ -18,14 +18,14 @@ const renderDataCollection = ({
     <DataCollectionWithContext kind={kind} startingValues={startingValues} />,
   );
 };
-describe('<DataCollection />', () => {
+describe('<Summary />', () => {
   it('should show investor profile questions in KYC', async () => {
-    renderDataCollection({ kind: PlaybookKind.Kyc });
+    renderSummary({ kind: PlaybookKind.Kyc });
     expect(screen.getByText('Investor profile questions')).toBeInTheDocument();
   });
 
   it('should not show investor profile questions in KYB', async () => {
-    renderDataCollection({
+    renderSummary({
       kind: PlaybookKind.Kyb,
       startingValues: {
         ...defaultPlaybookValuesKYC,
@@ -38,7 +38,7 @@ describe('<DataCollection />', () => {
   });
 
   it('should show BO info alert for KYB', async () => {
-    renderDataCollection({
+    renderSummary({
       kind: PlaybookKind.Kyb,
       startingValues: {
         ...defaultPlaybookValuesKYC,
@@ -54,7 +54,7 @@ describe('<DataCollection />', () => {
   });
 
   it('should not show BO info alert for KYC', async () => {
-    renderDataCollection({ kind: PlaybookKind.Kyc });
+    renderSummary({ kind: PlaybookKind.Kyc });
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(
       screen.queryByText(

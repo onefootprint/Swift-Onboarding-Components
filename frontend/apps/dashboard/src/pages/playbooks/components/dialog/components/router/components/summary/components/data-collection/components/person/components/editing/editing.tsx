@@ -22,8 +22,8 @@ type EditingProps = {
 
 const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const { control, register, watch, setValue, getValues } = useFormContext();
-  const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.form.personal-info-and-docs',
+  const { t, allT } = useTranslation(
+    'pages.playbooks.dialog.summary.form.person',
   );
   const { kind } = meta;
   const {
@@ -42,7 +42,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
     ...getValues('personalInformationAndDocs'),
   });
 
-  const onSave = () => {
+  const handleSave = () => {
     if (idDocOpen && idDocKind?.length >= 1) {
       onStopEditing();
     } else if (!idDocOpen) {
@@ -52,7 +52,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
     }
   };
 
-  const onCancel = () => {
+  const handleCancel = () => {
     setValue('personalInformationAndDocs', initialValues);
     onStopEditing();
   };
@@ -253,11 +253,16 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
         )}
       </Section>
       <ButtonContainer>
-        <Button variant="primary" fullWidth size="compact" onClick={onSave}>
-          {t('save')}
+        <Button fullWidth size="compact" variant="primary" onClick={handleSave}>
+          {allT('save')}
         </Button>
-        <Button variant="secondary" fullWidth size="compact" onClick={onCancel}>
-          {t('cancel')}
+        <Button
+          variant="secondary"
+          fullWidth
+          size="compact"
+          onClick={handleCancel}
+        >
+          {allT('cancel')}
         </Button>
       </ButtonContainer>
     </EditingContainer>

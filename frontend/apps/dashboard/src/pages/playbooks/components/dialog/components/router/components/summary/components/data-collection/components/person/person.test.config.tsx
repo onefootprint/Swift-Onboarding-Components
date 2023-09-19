@@ -4,23 +4,31 @@ import { FormProvider, useForm } from 'react-hook-form';
 import type {
   PersonalInformationAndDocs,
   SummaryFormData,
+  SummaryMeta,
 } from '@/playbooks/utils/machine/types';
 import {
   defaultPlaybookValuesKYC,
   PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
-import PersonalInfoAndDocs from './personal-info-and-docs';
+import PersonalInfoAndDocs from './person';
 
-export type PersonalInfoAndDocsWithContextProps = {
+export type PersonInformationWithContextProps = {
   startingValues: Partial<PersonalInformationAndDocs>;
-  kind?: PlaybookKind;
+  meta?: SummaryMeta;
 };
 
 const PersonalInfoAndDocsWithContext = ({
   startingValues,
-  kind,
-}: PersonalInfoAndDocsWithContextProps) => {
+  meta = {
+    kind: PlaybookKind.Kyc,
+    residency: {
+      allowUsResidents: true,
+      allowUsTerritories: true,
+      allowInternationalResidents: false,
+    },
+  },
+}: PersonInformationWithContextProps) => {
   const formMethods = useForm<SummaryFormData>({
     defaultValues: {
       ...defaultPlaybookValuesKYC,
@@ -30,19 +38,11 @@ const PersonalInfoAndDocsWithContext = ({
       },
     },
   });
+
   return (
     <FormProvider {...formMethods}>
       <form>
-        <PersonalInfoAndDocs
-          meta={{
-            kind: kind ?? PlaybookKind.Kyc,
-            residency: {
-              allowUsResidents: true,
-              allowUsTerritories: false,
-              allowInternationalResidents: false,
-            },
-          }}
-        />
+        <PersonalInfoAndDocs meta={meta} />
       </form>
     </FormProvider>
   );

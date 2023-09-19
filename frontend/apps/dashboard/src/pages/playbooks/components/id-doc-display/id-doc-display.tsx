@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoCloseSmall24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { SupportedIdDocTypes } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
@@ -10,9 +11,11 @@ export type IdDocDisplayProps = {
 };
 
 const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
-  const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.form.personal-info-and-docs',
-  );
+  const { t } = useTranslation('pages.playbooks.dialog.summary.form.person');
+
+  if (idDocKind.length === 0) {
+    return <IcoCloseSmall24 />;
+  }
 
   // this function only supports these options right now!
   // possibly will genericize further later
