@@ -8,7 +8,8 @@ use chrono::{NaiveDate, NaiveDateTime, Utc};
 use newtypes::{
     incode::{IncodeDocumentRestriction, IncodeDocumentType, IncodeStatus, IncodeTest},
     IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
-    Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiString, DATE_FORMAT,
+    Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiInt, ScrubbedPiiLong,
+    ScrubbedPiiString, DATE_FORMAT,
 };
 
 use super::normalize_issuing_state;
@@ -370,7 +371,7 @@ pub struct FetchOCRResponse {
     pub document_front_subtype: Option<PiiString>,
     pub document_back_subtype: Option<PiiString>,
     // Long, UTC millis
-    pub birth_date: Option<i64>,
+    pub birth_date: Option<ScrubbedPiiLong>,
     pub gender: Option<ScrubbedPiiString>,
     pub document_number: Option<ScrubbedPiiString>,
     pub personal_number: Option<ScrubbedPiiString>,
@@ -379,14 +380,14 @@ pub struct FetchOCRResponse {
     // Optional. Personal tax identification number.
     pub tax_id_number: Option<ScrubbedPiiString>,
     // UTC timestamp, in ms
-    pub expire_at: Option<String>,
+    pub expire_at: Option<ScrubbedPiiString>,
     // UTC timestamp, in ms
-    pub issued_at: Option<String>,
+    pub issued_at: Option<ScrubbedPiiString>,
     // year of expiration
-    pub expiration_date: Option<i32>,
+    pub expiration_date: Option<ScrubbedPiiInt>,
     pub additional_timestamps: Option<serde_json::Value>,
     // year of issue
-    pub issue_date: Option<i32>,
+    pub issue_date: Option<ScrubbedPiiInt>,
     // Three-digit ISO, it seems
     pub issuing_country: Option<ScrubbedPiiString>,
     pub issuing_state: Option<ScrubbedPiiString>,
@@ -416,9 +417,10 @@ pub struct IncodeOcrFixtureResponseFields {
 }
 
 impl FetchOCRResponse {
-    fn format_date(date: Option<&String>) -> Result<ScrubbedPiiString, IncodeError> {
+    fn format_date(date: Option<&ScrubbedPiiString>) -> Result<ScrubbedPiiString, IncodeError> {
         let expiration_timestamp = date
             .ok_or(IncodeError::OcrError("missing timestamp field".into()))?
+            .leak()
             .parse::<i64>()?;
 
         let naive = NaiveDateTime::from_timestamp_opt(expiration_timestamp / 1000, 0)
@@ -452,10 +454,11 @@ impl FetchOCRResponse {
     pub fn dob(&self) -> Result<ScrubbedPiiString, IncodeError> {
         let date = self
             .birth_date
+            .as_ref()
             .ok_or(IncodeError::OcrError("missing field birth_date".into()))?;
 
         // in ms, so divide by 1000
-        let naive = NaiveDateTime::from_timestamp_opt(date / 1000, 0).ok_or(IncodeError::OcrError(
+        let naive = NaiveDateTime::from_timestamp_opt(date.leak() / 1000, 0).ok_or(IncodeError::OcrError(
             "could not parse birth_date timestamp".into(),
         ))?;
 
@@ -629,7 +632,7 @@ pub struct OCRAddress {
 mod tests {
     use newtypes::{
         incode::{IncodeDocumentRestriction, IncodeStatus, IncodeTest},
-        IncodeFailureReason,
+        IncodeFailureReason, PiiLong, ScrubbedPiiLong,
     };
 
     use crate::{
@@ -778,13 +781,13 @@ mod tests {
 
         let mut parsed: FetchOCRResponse = serde_json::from_value(raw_response).unwrap();
         // serde_json doens't like i32, so add in the bday
-        parsed.birth_date = Some(529873860000);
+        parsed.birth_date = Some(ScrubbedPiiLong::new(PiiLong::new(529873860000)));
 
         assert_eq!(parsed.expiration_date().unwrap().leak(), "2024-10-15");
         assert_eq!(parsed.dob().unwrap().leak(), "1986-10-16");
 
         // check negatives
-        parsed.birth_date = Some(-631152000000);
+        parsed.birth_date = Some(ScrubbedPiiLong::new(PiiLong::new(-631152000000)));
         assert_eq!(parsed.dob().unwrap().leak(), "1950-01-01");
     }
 }

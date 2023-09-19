@@ -1,5 +1,7 @@
 mod bytes;
+mod int;
 mod json;
+mod long;
 mod string;
 mod value;
 
@@ -7,7 +9,9 @@ mod value;
 pub mod macros;
 
 pub use bytes::*;
+pub use int::*;
 pub use json::*;
+pub use long::*;
 pub use string::*;
 pub use value::*;
 
