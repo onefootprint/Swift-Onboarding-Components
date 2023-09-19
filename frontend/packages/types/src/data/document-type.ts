@@ -11,9 +11,10 @@ export type DocumentUpload = {
   timestamp: string;
 };
 
-export enum DeviceType {
+export enum UploadSource {
   Mobile = 'mobile',
   Desktop = 'desktop',
+  Api = 'api',
 }
 
 export type Document = {
@@ -25,5 +26,5 @@ export type Document = {
   documentScore: number | null;
   selfieScore: number | null;
   ocrConfidenceScore: number | null;
-  deviceType?: DeviceType;
+  uploadSource: UploadSource;
 };

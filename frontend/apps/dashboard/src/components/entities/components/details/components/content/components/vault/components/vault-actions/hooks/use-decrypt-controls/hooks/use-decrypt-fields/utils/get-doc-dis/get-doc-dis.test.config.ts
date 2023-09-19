@@ -4,6 +4,7 @@ import {
   IdDocImageTypes,
   IdDocStatus,
   SupportedIdDocTypes,
+  UploadSource,
 } from '@onefootprint/types';
 
 export const entityVaultWithJustIDCardDIs: EntityVault = {
@@ -44,6 +45,7 @@ export const idCardDocument1: Document = {
   kind: SupportedIdDocTypes.idCard,
   startedAt: '2020-01-01T00:00:00.000Z',
   status: IdDocStatus.pending,
+  uploadSource: UploadSource.Mobile,
   uploads: [
     {
       version: 123,
@@ -74,6 +76,7 @@ export const idCardDocument2: Document = {
   kind: SupportedIdDocTypes.idCard,
   startedAt: '2020-01-01T00:00:00.000Z',
   status: IdDocStatus.pending,
+  uploadSource: UploadSource.Mobile,
   uploads: [
     {
       version: 250,
@@ -104,6 +107,7 @@ export const driversLicenseDocument1: Document = {
   kind: SupportedIdDocTypes.driversLicense,
   startedAt: '2020-01-01T00:00:00.000Z',
   status: IdDocStatus.pending,
+  uploadSource: UploadSource.Mobile,
   uploads: [
     {
       version: 450,
@@ -134,6 +138,7 @@ export const driversLicenseDocument2: Document = {
   kind: SupportedIdDocTypes.driversLicense,
   startedAt: '2020-01-01T00:00:00.000Z',
   status: IdDocStatus.pending,
+  uploadSource: UploadSource.Mobile,
   uploads: [
     {
       version: 789,
@@ -164,6 +169,7 @@ export const incompleteDriversLicense: Document = {
   kind: SupportedIdDocTypes.driversLicense,
   startedAt: '2020-01-01T00:00:00.000Z',
   status: IdDocStatus.pending,
+  uploadSource: UploadSource.Mobile,
   uploads: [
     {
       version: 789,

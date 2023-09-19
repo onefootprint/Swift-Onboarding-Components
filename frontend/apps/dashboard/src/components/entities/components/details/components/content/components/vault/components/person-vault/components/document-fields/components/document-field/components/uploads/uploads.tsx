@@ -51,7 +51,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
     )}`;
   };
 
-  const { deviceType } = currentDocument;
+  const { uploadSource } = currentDocument;
 
   const uploadsSortedByDate = currentDocument.uploads.sort(
     (a, b) => Number(new Date(b.timestamp)) - Number(new Date(a.timestamp)),
@@ -71,10 +71,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
             variant="body-4"
             sx={{ whiteSpace: 'nowrap' }}
           >
-            {`${t('uploaded-from')} ${t(
-              // should show 'Uploaded from mobile' if unspecified
-              `device-type.${deviceType ?? 'mobile'}`,
-            )}`}
+            {`${t('uploaded-from')} ${t(`upload-source.${uploadSource}`)}`}
           </Typography>
         </DocumentUploadContainer>
       </Header>

@@ -1,5 +1,9 @@
 import type { Document } from '@onefootprint/types';
-import { IdDocStatus, SupportedIdDocTypes } from '@onefootprint/types';
+import {
+  IdDocStatus,
+  SupportedIdDocTypes,
+  UploadSource,
+} from '@onefootprint/types';
 
 export const driversLicenseDoc1: Document = {
   completedVersion: 1,
@@ -10,6 +14,7 @@ export const driversLicenseDoc1: Document = {
   documentScore: 55,
   selfieScore: 50,
   ocrConfidenceScore: 45,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const driversLicenseDoc2: Document = {
@@ -21,6 +26,7 @@ export const driversLicenseDoc2: Document = {
   documentScore: 55,
   selfieScore: null,
   ocrConfidenceScore: 45,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const driversLicenseDoc3: Document = {
@@ -32,6 +38,7 @@ export const driversLicenseDoc3: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: 45,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const driversLicenseDoc4: Document = {
@@ -43,6 +50,7 @@ export const driversLicenseDoc4: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: null,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const driversLicenseViaApi: Document = {
@@ -54,4 +62,5 @@ export const driversLicenseViaApi: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: null,
+  uploadSource: UploadSource.Mobile,
 };

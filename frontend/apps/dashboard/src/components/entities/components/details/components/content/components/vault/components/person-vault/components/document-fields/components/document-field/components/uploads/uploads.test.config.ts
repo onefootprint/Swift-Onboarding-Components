@@ -1,10 +1,10 @@
 import type { Document, EntityVault } from '@onefootprint/types';
 import {
-  DeviceType,
   DocumentDI,
   IdDocImageTypes,
   IdDocStatus,
   SupportedIdDocTypes,
+  UploadSource,
 } from '@onefootprint/types';
 
 export const entityVaultWithIdCard: EntityVault = {
@@ -21,7 +21,7 @@ export const idCardMobile: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: null,
-  deviceType: DeviceType.Mobile,
+  uploadSource: UploadSource.Mobile,
   uploads: [
     {
       version: 675,
@@ -40,7 +40,26 @@ export const idCardDesktop: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: null,
-  deviceType: DeviceType.Desktop,
+  uploadSource: UploadSource.Desktop,
+  uploads: [
+    {
+      version: 675,
+      failureReasons: [],
+      side: IdDocImageTypes.front,
+      timestamp: '2022-05-06T06:12:00.000Z',
+    },
+  ],
+};
+
+export const idCardApi: Document = {
+  completedVersion: 3,
+  kind: SupportedIdDocTypes.idCard,
+  startedAt: '2020-01-01T00:00:00.000Z',
+  status: IdDocStatus.complete,
+  documentScore: null,
+  selfieScore: null,
+  ocrConfidenceScore: null,
+  uploadSource: UploadSource.Api,
   uploads: [
     {
       version: 675,
@@ -59,6 +78,7 @@ export const successfulIDCardDocument: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: null,
+  uploadSource: UploadSource.Mobile,
   uploads: [
     {
       version: 675,
@@ -89,6 +109,7 @@ export const failedIdCardDocument: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: null,
+  uploadSource: UploadSource.Mobile,
   uploads: [
     {
       version: 675,

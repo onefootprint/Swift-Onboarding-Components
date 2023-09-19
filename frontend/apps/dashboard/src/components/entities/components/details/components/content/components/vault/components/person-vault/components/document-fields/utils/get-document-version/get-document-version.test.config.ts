@@ -1,5 +1,9 @@
 import type { Document } from '@onefootprint/types';
-import { IdDocStatus, SupportedIdDocTypes } from '@onefootprint/types';
+import {
+  IdDocStatus,
+  SupportedIdDocTypes,
+  UploadSource,
+} from '@onefootprint/types';
 
 export const documentWithCompletedVersion: Document = {
   completedVersion: 1234,
@@ -10,6 +14,7 @@ export const documentWithCompletedVersion: Document = {
   documentScore: 55,
   selfieScore: 50,
   ocrConfidenceScore: 45,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const documentWithNoCompleteVersion1: Document = {
@@ -21,6 +26,7 @@ export const documentWithNoCompleteVersion1: Document = {
   documentScore: 55,
   selfieScore: 50,
   ocrConfidenceScore: 45,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const documentWithNoCompleteVersion2: Document = {
@@ -32,4 +38,5 @@ export const documentWithNoCompleteVersion2: Document = {
   documentScore: 60,
   selfieScore: 55,
   ocrConfidenceScore: 50,
+  uploadSource: UploadSource.Mobile,
 };

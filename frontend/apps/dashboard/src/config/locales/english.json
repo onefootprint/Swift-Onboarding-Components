@@ -780,10 +780,11 @@
               "success": "successfully uploaded",
               "failed": "upload failed",
               "image-alt": "Upload image",
-              "uploaded-from": "Uploaded from",
-              "device-type": {
+              "uploaded-from": "Uploaded via",
+              "upload-source": {
                 "mobile": "mobile",
-                "desktop": "desktop"
+                "desktop": "desktop",
+                "api": "API"
               },
               "document-types": {
                 "id_card": "ID",

@@ -6,6 +6,7 @@ import Uploads from './uploads';
 import {
   entityVaultWithIdCard,
   failedIdCardDocument,
+  idCardApi,
   idCardDesktop,
   idCardMobile,
   successfulIDCardDocument,
@@ -71,27 +72,27 @@ describe('<Uploads />', () => {
     expect(images[2]?.src).toContain('data:image/jpg;base64,test ID front URL');
   });
 
-  it('should show proper device type for mobile uploads', () => {
+  it('should show proper upload source for mobile uploads', () => {
     renderUploads({
       vault: entityVaultWithIdCard,
       currentDocument: idCardMobile,
     });
-    expect(screen.getByText('Uploaded from mobile')).toBeInTheDocument();
+    expect(screen.getByText('Uploaded via mobile')).toBeInTheDocument();
   });
 
-  it('should show proper device type for desktop uploads', () => {
+  it('should show proper upload source for desktop uploads', () => {
     renderUploads({
       vault: entityVaultWithIdCard,
       currentDocument: idCardDesktop,
     });
-    expect(screen.getByText('Uploaded from desktop')).toBeInTheDocument();
+    expect(screen.getByText('Uploaded via desktop')).toBeInTheDocument();
   });
 
-  it('should show mobile upload for unspecified upload', () => {
+  it('should show API upload souce for API uploads', () => {
     renderUploads({
       vault: entityVaultWithIdCard,
-      currentDocument: successfulIDCardDocument,
+      currentDocument: idCardApi,
     });
-    expect(screen.getByText('Uploaded from mobile')).toBeInTheDocument();
+    expect(screen.getByText('Uploaded via API')).toBeInTheDocument();
   });
 });

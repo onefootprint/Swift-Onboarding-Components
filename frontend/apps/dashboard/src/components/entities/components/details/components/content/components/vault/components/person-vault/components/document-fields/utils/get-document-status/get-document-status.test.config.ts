@@ -1,5 +1,9 @@
 import type { Document } from '@onefootprint/types';
-import { IdDocStatus, SupportedIdDocTypes } from '@onefootprint/types';
+import {
+  IdDocStatus,
+  SupportedIdDocTypes,
+  UploadSource,
+} from '@onefootprint/types';
 
 export const driversLicenseSuccess: Document = {
   completedVersion: 1,
@@ -10,6 +14,7 @@ export const driversLicenseSuccess: Document = {
   documentScore: 55,
   selfieScore: 50,
   ocrConfidenceScore: 45,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const driversLicenseFailed: Document = {
@@ -21,6 +26,7 @@ export const driversLicenseFailed: Document = {
   documentScore: 55,
   selfieScore: null,
   ocrConfidenceScore: 45,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const driversLicenseViaApi: Document = {
@@ -32,6 +38,7 @@ export const driversLicenseViaApi: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: null,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const driversLicensePending: Document = {
@@ -43,6 +50,7 @@ export const driversLicensePending: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: 45,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const idCardSuccess: Document = {
@@ -54,6 +62,7 @@ export const idCardSuccess: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: null,
+  uploadSource: UploadSource.Mobile,
 };
 
 export const idCardFail: Document = {
@@ -65,4 +74,5 @@ export const idCardFail: Document = {
   documentScore: null,
   selfieScore: null,
   ocrConfidenceScore: null,
+  uploadSource: UploadSource.Mobile,
 };
