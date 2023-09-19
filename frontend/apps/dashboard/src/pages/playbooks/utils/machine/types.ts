@@ -13,7 +13,7 @@ export enum PlaybookKind {
   Kyc = 'kyc',
 }
 
-export type PlaybookFormData = {
+export type SummaryFormData = {
   kind: PlaybookKind;
   personalInformationAndDocs: PersonalInformationAndDocs;
   businessInformation?: BusinessInformation;
@@ -101,7 +101,7 @@ export const defaultBusinessInformation = {
   [CollectedKybDataOption.phoneNumber]: false,
 };
 
-export const defaultPlaybookValuesKYC: PlaybookFormData = {
+export const defaultPlaybookValuesKYC: SummaryFormData = {
   kind: PlaybookKind.Kyc,
   personalInformationAndDocs: {
     email: true,
@@ -118,7 +118,7 @@ export const defaultPlaybookValuesKYC: PlaybookFormData = {
   [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
-export const defaultPlaybookValuesKYB: PlaybookFormData = {
+export const defaultPlaybookValuesKYB: SummaryFormData = {
   ...defaultPlaybookValuesKYC,
   kind: PlaybookKind.Kyb,
   businessInformation: defaultBusinessInformation,
@@ -142,7 +142,7 @@ export type MachineContext = {
   kind: PlaybookKind;
   nameForm?: NameFormData;
   residencyForm?: ResidencyFormData;
-  playbook?: PlaybookFormData;
+  playbook?: SummaryFormData;
 };
 
 export type MachineEvents =
@@ -179,7 +179,7 @@ export type MachineEvents =
   | {
       type: 'playbookSubmitted';
       payload: {
-        formData: PlaybookFormData;
+        formData: SummaryFormData;
       };
     };
 

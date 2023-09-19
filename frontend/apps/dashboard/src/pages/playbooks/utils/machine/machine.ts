@@ -59,12 +59,12 @@ export const createPlaybookMachine = () =>
               },
             ],
             nameYourPlaybookSubmitted: {
-              target: 'yourPlaybook',
+              target: 'summary',
               actions: ['assignNameYourPlaybook'],
             },
           },
         },
-        yourPlaybook: {
+        summary: {
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
@@ -84,10 +84,10 @@ export const createPlaybookMachine = () =>
               target: 'whoToOnboard',
             },
             yourPlaybookSelected: {
-              target: 'yourPlaybook',
+              target: 'summary',
             },
             navigationBackward: {
-              target: 'yourPlaybook',
+              target: 'summary',
             },
           },
         },

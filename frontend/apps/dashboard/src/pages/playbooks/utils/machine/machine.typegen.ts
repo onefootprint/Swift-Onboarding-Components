@@ -26,7 +26,7 @@ export interface Typegen0 {
     | 'authorizedScopes'
     | 'nameYourPlaybook'
     | 'residency'
-    | 'whoToOnboard'
-    | 'yourPlaybook';
+    | 'summary'
+    | 'whoToOnboard';
   tags: never;
 }

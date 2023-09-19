@@ -11,7 +11,7 @@ export type IdDocDisplayProps = {
 
 const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
   const { t } = useTranslation(
-    'pages.playbooks.dialog.your-playbook.form.personal-info-and-docs',
+    'pages.playbooks.dialog.summary.form.personal-info-and-docs',
   );
 
   // this function only supports these options right now!

@@ -18,8 +18,8 @@ import {
 import AuthorizedScopes from './components/authorized-scopes';
 import NameYourPlaybook from './components/name-your-playbook';
 import Residency from './components/residency';
+import Summary from './components/summary';
 import WhoToOnboard from './components/who-to-onboard';
-import YourPlaybook from './components/your-playbook';
 import useOptions from './hooks/use-options';
 import getStep from './utils/get-step';
 import processPlaybook from './utils/process-playbook';
@@ -127,7 +127,7 @@ const Router = ({ onClose }: RouterProps) => {
               send('nameYourPlaybookSelected');
             } else if (option.value === 'whoToOnboard') {
               send('whoToOnboardSelected');
-            } else if (option.value === 'yourPlaybook') {
+            } else if (option.value === 'summary') {
               send('yourPlaybookSelected');
             }
           }}
@@ -171,8 +171,8 @@ const Router = ({ onClose }: RouterProps) => {
             }}
           />
         )}
-        {state.matches('yourPlaybook') && (
-          <YourPlaybook
+        {state.matches('summary') && (
+          <Summary
             defaultValues={playbookValuesToPrefill}
             kind={state.context.kind}
             onBack={() => {

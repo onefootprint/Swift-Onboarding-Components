@@ -7,7 +7,7 @@ import { useFormContext } from 'react-hook-form';
 const BusinessScopes = () => {
   const { register } = useFormContext();
   const { t } = useTranslation(
-    'pages.playbooks.dialog.your-playbook.data-collection.authorized-scopes',
+    'pages.playbooks.dialog.summary.data-collection.authorized-scopes',
   );
 
   return (

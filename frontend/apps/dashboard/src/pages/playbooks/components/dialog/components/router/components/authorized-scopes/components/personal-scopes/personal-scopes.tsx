@@ -9,18 +9,18 @@ import { Box, Checkbox, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import type { PlaybookFormData } from '@/playbooks/utils/machine/types';
+import type { SummaryFormData } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 type PersonalScopesProps = {
-  playbook: PlaybookFormData;
+  playbook: SummaryFormData;
   kind: PlaybookKind;
 };
 
 const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
   const { register } = useFormContext();
   const { allT, t } = useTranslation(
-    'pages.playbooks.dialog.your-playbook.data-collection.authorized-scopes',
+    'pages.playbooks.dialog.summary.data-collection.authorized-scopes',
   );
 
   const { personalInformationAndDocs } = playbook;

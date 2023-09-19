@@ -1405,7 +1405,7 @@
             }
           }
         },
-        "your-playbook": {
+        "summary": {
           "title": "Your Playbook recommendation",
           "subtitle": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
           "data-collection": {

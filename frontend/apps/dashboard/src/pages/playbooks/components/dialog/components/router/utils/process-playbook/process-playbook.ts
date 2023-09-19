@@ -10,8 +10,8 @@ import type {
   AuthorizedScopesFormData,
   BusinessInformation,
   NameFormData,
-  PlaybookFormData,
   ResidencyFormData,
+  SummaryFormData,
 } from '@/playbooks/utils/machine/types';
 import {
   CountryRestriction,
@@ -19,7 +19,7 @@ import {
 } from '@/playbooks/utils/machine/types';
 
 type ProcessPlaybookProps = {
-  playbook: PlaybookFormData;
+  playbook: SummaryFormData;
   kind: PlaybookKind;
   authorizedScopes: AuthorizedScopesFormData;
   residencyForm?: ResidencyFormData;

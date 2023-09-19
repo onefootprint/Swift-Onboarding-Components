@@ -6,7 +6,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import type {
   AuthorizedScopesFormData,
-  PlaybookFormData,
+  SummaryFormData,
 } from '@/playbooks/utils/machine/types';
 import {
   defaultAuthorizedScopesValues,
@@ -18,7 +18,7 @@ import PersonalScopes from './components/personal-scopes';
 
 type AuthorizedScopesProps = {
   onBack: () => void;
-  playbook: PlaybookFormData;
+  playbook: SummaryFormData;
   kind?: PlaybookKind;
   onSubmit: (data: AuthorizedScopesFormData) => void;
   submissionLoading: boolean;
@@ -32,7 +32,7 @@ const AuthorizedScopes = ({
   submissionLoading,
 }: AuthorizedScopesProps) => {
   const { t } = useTranslation(
-    'pages.playbooks.dialog.your-playbook.data-collection.authorized-scopes',
+    'pages.playbooks.dialog.summary.data-collection.authorized-scopes',
   );
 
   // defaultValues populates only the fields that are in the form
