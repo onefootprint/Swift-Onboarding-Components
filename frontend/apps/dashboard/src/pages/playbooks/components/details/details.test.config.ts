@@ -28,6 +28,14 @@ export const playbookDetailsFixture: OnboardingConfig = {
   isNoPhoneFlow: false,
   allowInternationalResidents: false,
   isDocFirstFlow: false,
+  allowUsResidents: true,
+  internationalCountryRestrictions: null,
+  enhancedAml: {
+    enhancedAml: false,
+    ofac: false,
+    pep: false,
+    adverseMedia: false,
+  },
 };
 
 export const withPlaybookDetails = (

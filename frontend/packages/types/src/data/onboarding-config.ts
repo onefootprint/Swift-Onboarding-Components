@@ -54,6 +54,13 @@ export type OnboardingConfig = {
   isNoPhoneFlow: boolean;
   allowUsResidents: boolean;
   allowInternationalResidents: boolean;
+  internationalCountryRestrictions: null | CountryCode[];
   supportedCountries?: CountryCode[];
   isDocFirstFlow: boolean;
+  enhancedAml: {
+    enhancedAml: boolean;
+    ofac: boolean;
+    pep: boolean;
+    adverseMedia: boolean;
+  };
 };

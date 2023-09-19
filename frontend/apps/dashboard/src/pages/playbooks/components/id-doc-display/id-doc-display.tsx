@@ -1,8 +1,11 @@
+// TODO: Deprecate this file
+
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCloseSmall24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { SupportedIdDocTypes } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
+import kebabCase from 'lodash/kebabCase';
 import React from 'react';
 
 export type IdDocDisplayProps = {
@@ -11,7 +14,7 @@ export type IdDocDisplayProps = {
 };
 
 const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog.summary.form.person');
+  const { t } = useTranslation('pages.playbooks.collected-data');
 
   if (idDocKind.length === 0) {
     return <IcoCloseSmall24 />;
@@ -26,17 +29,15 @@ const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
 
   const remainingIdDocTypes = idDocKind.slice(threshold - 1);
   const remainingDocString = remainingIdDocTypes
-    .map(k => t(`preview.${k as string}`))
+    .map(k => t(`${kebabCase(k as string)}`))
     .join(', ');
 
   if (idDocKind.length > threshold) {
-    const displayStringFirstTwo = `${t(`preview.${idDocKind[0]}`)}, ${t(
-      `preview.${idDocKind[1]}`,
-    )}, ${t('preview.and')}`;
+    const displayStringFirstTwo = `${t(`${kebabCase(idDocKind[0])}`)}, ${t(
+      `${kebabCase(idDocKind[1])}`,
+    )}, ${t('and')}`;
 
-    const displayStringFirst = `${t(`preview.${idDocKind[0]}`)} ${t(
-      'preview.and',
-    )}`;
+    const displayStringFirst = `${t(`${kebabCase(idDocKind[0])}`)} ${t('and')}`;
 
     return (
       <DocPreviewContainer>
@@ -48,14 +49,14 @@ const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
             variant="body-3"
             sx={{ textDecoration: 'underline', whiteSpace: 'nowrap' }}
           >
-            {`${remainingIdDocTypes.length} ${t('preview.more')}`}
+            {`${remainingIdDocTypes.length} ${t('more')}`}
           </Typography>
         </Tooltip>
       </DocPreviewContainer>
     );
   }
   const possibleIdDocs = idDocKind
-    .map(k => t(`preview.${k as string}`))
+    .map(k => t(`${kebabCase(k as string)}`))
     .join(', ');
   return <Typography variant="body-3">{possibleIdDocs}</Typography>;
 };

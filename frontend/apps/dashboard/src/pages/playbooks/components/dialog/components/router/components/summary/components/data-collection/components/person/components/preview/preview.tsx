@@ -6,13 +6,13 @@ import { Checkbox, LinkButton, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import CollectedInformation from '@/playbooks/components/collected-information';
 import type {
   PersonalInformationAndDocs,
   SummaryMeta,
 } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
-import CollectedInformation from './components/collected-information';
 import useIdDocFirstFlowEnabled from './hooks/use-id-doc-first-flow-enabled';
 
 type PreviewProps = {
@@ -21,7 +21,7 @@ type PreviewProps = {
 };
 
 const Preview = ({ onStartEditing, meta }: PreviewProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog.summary.form.person');
+  const { t } = useTranslation('pages.playbooks.dialog.summary.person');
   const { getValues, register } = useFormContext();
   const values: PersonalInformationAndDocs = getValues(
     'personalInformationAndDocs',
@@ -61,7 +61,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
             onClick={onStartEditing}
             size="tiny"
           >
-            {t('preview.edit')}
+            {t('edit')}
           </LinkButton>
         )}
       </Header>
@@ -69,6 +69,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
         <CollectedInformation
           title={t('us-residents.title')}
           options={{
+            name: true,
             email: values.email,
             phoneNumber: values.phone_number,
             dob: values.dob,

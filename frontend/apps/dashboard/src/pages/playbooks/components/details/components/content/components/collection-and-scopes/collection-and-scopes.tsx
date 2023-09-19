@@ -1,14 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
-import { InlineAlert, Tab, Tabs } from '@onefootprint/ui';
+import { Tab, Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import {
-  basicInformationFields,
-  usResidentDisplayFields,
-} from '@/playbooks/utils/machine/types';
-
+import AmlMonitoring from './components/aml-monitoring';
 import AuthorizedScopes from './components/authorized-scopes';
 import DataCollection from './components/data-collection';
 
@@ -16,24 +12,28 @@ export type CollectionAndScopesProps = {
   playbook: OnboardingConfig;
 };
 
-const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
-  const { t } = useTranslation('pages.playbooks.details.content');
-  const options = [
-    { value: 'data', label: t('basics.data-collection') },
-    { value: 'authorized-scopes', label: t('basics.authorized-scopes') },
-  ];
-  const [segment, setSegment] = useState(options[0].value);
-  const {
-    mustCollectData,
-    optionalData,
-    canAccessData,
-    isDocFirstFlow,
+const CollectionAndScopes = ({
+  playbook: {
     allowInternationalResidents,
     allowUsResidents,
-  } = playbook;
+    canAccessData,
+    enhancedAml,
+    internationalCountryRestrictions,
+    isDocFirstFlow,
+    mustCollectData,
+    optionalData,
+  },
+}: CollectionAndScopesProps) => {
+  const { t } = useTranslation('pages.playbooks.details');
+  const options = [
+    { value: 'data', label: t('tabs.data-collection') },
+    { value: 'authorized-scopes', label: t('tabs.authorized-scopes') },
+    { value: 'aml-monitoring', label: t('tabs.aml-monitoring') },
+  ];
+  const [tab, setTab] = useState(options[0].value);
 
   const handleChange = (value: string) => {
-    setSegment(value);
+    setTab(value);
   };
 
   return (
@@ -42,51 +42,38 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
         <TabContainer>
           {options.map(({ value, label }) => (
             <Tab
-              as="button"
               key={value}
               onClick={() => handleChange(value)}
-              selected={segment === value}
+              selected={tab === value}
             >
               {label}
             </Tab>
           ))}
         </TabContainer>
       </Tabs>
-      {segment === 'data' && (
-        <>
-          <DataCollection
-            displayFields={basicInformationFields}
-            mustCollectData={mustCollectData}
-            title={t('data-collection.basic-information')}
-          />
-          {allowUsResidents && (
-            <DataCollection
-              displayFields={usResidentDisplayFields}
-              mustCollectData={mustCollectData}
-              optionalData={optionalData}
-              title={t('data-collection.us-residents')}
-            />
-          )}
-          {allowInternationalResidents && (
-            <DataCollection
-              displayFields={usResidentDisplayFields}
-              mustCollectData={mustCollectData}
-              optionalData={optionalData}
-              title={t('data-collection.non-us-residents')}
-            />
-          )}
-          {isDocFirstFlow && (
-            <InlineAlert variant="info">
-              {t('data-collection.id-doc-first')}
-            </InlineAlert>
-          )}
-        </>
-      )}
-      {segment === 'authorized-scopes' && (
-        <AuthorizedScopes
-          canAccessData={canAccessData}
-          allowUsResidents={allowUsResidents}
+      {tab === 'data' && (
+        <DataCollection
           allowInternationalResidents={allowInternationalResidents}
+          allowUsResidents={allowUsResidents}
+          internationalCountryRestrictions={internationalCountryRestrictions}
+          isDocFirstFlow={isDocFirstFlow}
+          mustCollectData={mustCollectData}
+          optionalData={optionalData}
+        />
+      )}
+      {tab === 'authorized-scopes' && (
+        <AuthorizedScopes
+          allowInternationalResidents={allowInternationalResidents}
+          allowUsResidents={allowUsResidents}
+          canAccessData={canAccessData}
+        />
+      )}
+      {tab === 'aml-monitoring' && (
+        <AmlMonitoring
+          adverseMedia={enhancedAml.adverseMedia}
+          enhancedAml={enhancedAml.enhancedAml}
+          ofac={enhancedAml.ofac}
+          pep={enhancedAml.pep}
         />
       )}
     </Container>

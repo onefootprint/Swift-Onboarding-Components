@@ -6,8 +6,9 @@ import { useMachine } from '@xstate/react';
 import React from 'react';
 
 import playbookMachine from '@/playbooks/utils/machine';
-import type { AuthorizedScopesFormData } from '@/playbooks/utils/machine/types';
+import type { AMLFormData } from '@/playbooks/utils/machine/types';
 import {
+  defaultAmlFormData,
   defaultNameFormData,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
@@ -15,6 +16,7 @@ import {
   PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
+import AML from './components/aml';
 import AuthorizedScopes from './components/authorized-scopes';
 import NameYourPlaybook from './components/name-your-playbook';
 import Residency from './components/residency';
@@ -28,14 +30,11 @@ import useCreatePlaybook from './utils/use-create-playbook';
 type RouterProps = {
   onClose: () => void;
 };
-type HandleCreateProps = {
-  authorizedScopes: AuthorizedScopesFormData;
-};
 
 const Router = ({ onClose }: RouterProps) => {
   const [state, send] = useMachine(playbookMachine);
   const { kind } = state.context;
-  const { t } = useTranslation('pages.playbooks.dialog.router');
+  const { t } = useTranslation('pages.playbooks.dialog');
   const toast = useToast();
   const showRequestError = useRequestErrorToast();
   const mutation = useCreatePlaybook();
@@ -44,6 +43,7 @@ const Router = ({ onClose }: RouterProps) => {
   const step = getStep({ value: state.value as string });
   const stepperValue = options[step];
 
+  // TODO: IMPROVE
   const playbookDefaultValues =
     kind === PlaybookKind.Kyb
       ? defaultPlaybookValuesKYB
@@ -64,9 +64,15 @@ const Router = ({ onClose }: RouterProps) => {
       ? state.context.residencyForm
       : defaultResidencyFormData;
 
-  const createPlaybook = ({ authorizedScopes }: HandleCreateProps) => {
-    const { playbook, nameForm, residencyForm } = state.context;
-    if (!playbook || !authorizedScopes || !nameForm) {
+  const amlValueToPrefill = state.context.amlForm
+    ? state.context.amlForm
+    : defaultAmlFormData;
+
+  const createPlaybook = (enhancedAml: AMLFormData) => {
+    const { playbook, nameForm, residencyForm, authorizedScopesForm } =
+      state.context;
+
+    if (!playbook || !nameForm || !authorizedScopesForm || !enhancedAml) {
       return;
     }
     const {
@@ -81,7 +87,7 @@ const Router = ({ onClose }: RouterProps) => {
       name,
       optionalData,
     } = processPlaybook({
-      authorizedScopes,
+      authorizedScopes: authorizedScopesForm,
       kind,
       nameForm,
       playbook,
@@ -99,6 +105,7 @@ const Router = ({ onClose }: RouterProps) => {
         mustCollectData,
         name,
         optionalData,
+        enhancedAml,
       },
       {
         onSuccess: () => {
@@ -127,7 +134,9 @@ const Router = ({ onClose }: RouterProps) => {
             } else if (option.value === 'whoToOnboard') {
               send('whoToOnboardSelected');
             } else if (option.value === 'summary') {
-              send('yourPlaybookSelected');
+              send('summarySelected');
+            } else if (option.value === 'authorizedScopes') {
+              send('authorizedScopesSelected');
             }
           }}
           value={stepperValue}
@@ -196,11 +205,21 @@ const Router = ({ onClose }: RouterProps) => {
               send('navigationBackward');
             }}
             onSubmit={formData => {
-              createPlaybook({
-                authorizedScopes: formData,
-              });
+              send('authorizedScopesSubmitted', { payload: { formData } });
             }}
-            submissionLoading={mutation.isLoading}
+          />
+        )}
+        {state.matches('aml') && (
+          <AML
+            defaultValues={amlValueToPrefill}
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={formData => {
+              send('amlSubmitted', { payload: { formData } });
+              createPlaybook(formData);
+            }}
+            isLoading={mutation.isLoading}
           />
         )}
       </Content>

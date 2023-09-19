@@ -57,6 +57,20 @@ export const defaultResidencyFormData: ResidencyFormData = {
   restrictCountries: CountryRestriction.all,
 };
 
+export type AMLFormData = {
+  enhancedAml: boolean;
+  ofac: boolean;
+  pep: boolean;
+  adverseMedia: boolean;
+};
+
+export const defaultAmlFormData: AMLFormData = {
+  enhancedAml: false,
+  ofac: false,
+  pep: false,
+  adverseMedia: false,
+};
+
 export type AuthorizedScopesFormData = {
   [CollectedKycDataOption.name]: boolean;
   [CollectedKycDataOption.email]: boolean;
@@ -69,6 +83,20 @@ export type AuthorizedScopesFormData = {
   [CollectedDocumentDataOption.document]?: boolean;
   [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
   allBusinessData?: boolean;
+};
+
+export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
+  [CollectedKycDataOption.email]: true,
+  [CollectedKycDataOption.phoneNumber]: true,
+  [CollectedKycDataOption.name]: true,
+  [CollectedKycDataOption.dob]: true,
+  [CollectedKycDataOption.address]: true,
+  [CollectedKycDataOption.ssn4]: true,
+  [CollectedKycDataOption.ssn9]: true,
+  [CollectedKycDataOption.usLegalStatus]: true,
+  [CollectedDocumentDataOption.document]: true,
+  [CollectedInvestorProfileDataOption.investorProfile]: true,
+  allBusinessData: true,
 };
 
 export type PersonalInformationAndDocs = {
@@ -129,25 +157,13 @@ export const defaultPlaybookValuesKYB: SummaryFormData = {
   businessInformation: defaultBusinessInformation,
 };
 
-export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
-  [CollectedKycDataOption.email]: true,
-  [CollectedKycDataOption.phoneNumber]: true,
-  [CollectedKycDataOption.name]: true,
-  [CollectedKycDataOption.dob]: true,
-  [CollectedKycDataOption.address]: true,
-  [CollectedKycDataOption.ssn4]: true,
-  [CollectedKycDataOption.ssn9]: true,
-  [CollectedKycDataOption.usLegalStatus]: true,
-  [CollectedDocumentDataOption.document]: true,
-  [CollectedInvestorProfileDataOption.investorProfile]: true,
-  allBusinessData: true,
-};
-
 export type MachineContext = {
   kind: PlaybookKind;
   nameForm?: NameFormData;
-  residencyForm?: ResidencyFormData;
   playbook?: SummaryFormData;
+  residencyForm?: ResidencyFormData;
+  authorizedScopesForm?: AuthorizedScopesFormData;
+  amlForm?: AMLFormData;
 };
 
 export type MachineEvents =
@@ -161,7 +177,10 @@ export type MachineEvents =
       type: 'whoToOnboardSelected';
     }
   | {
-      type: 'yourPlaybookSelected';
+      type: 'summarySelected';
+    }
+  | {
+      type: 'authorizedScopesSelected';
     }
   | {
       type: 'whoToOnboardSubmitted';
@@ -185,6 +204,18 @@ export type MachineEvents =
       type: 'playbookSubmitted';
       payload: {
         formData: SummaryFormData;
+      };
+    }
+  | {
+      type: 'authorizedScopesSubmitted';
+      payload: {
+        formData: AuthorizedScopesFormData;
+      };
+    }
+  | {
+      type: 'amlSubmitted';
+      payload: {
+        formData: AMLFormData;
       };
     };
 

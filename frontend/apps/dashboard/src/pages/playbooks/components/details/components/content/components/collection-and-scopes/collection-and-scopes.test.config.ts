@@ -26,6 +26,14 @@ const playbookFixture: OnboardingConfig = {
   appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
   allowInternationalResidents: false,
   isDocFirstFlow: false,
+  allowUsResidents: true,
+  internationalCountryRestrictions: null,
+  enhancedAml: {
+    enhancedAml: false,
+    ofac: false,
+    pep: false,
+    adverseMedia: false,
+  },
 };
 
 export default playbookFixture;

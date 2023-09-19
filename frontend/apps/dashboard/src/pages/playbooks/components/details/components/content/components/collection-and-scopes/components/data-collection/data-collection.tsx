@@ -1,72 +1,93 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { CollectedKycDataOption } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { type CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import { InlineAlert } from '@onefootprint/ui';
 import React from 'react';
 
-import DisplayValue from './components/display-value';
+import CollectedInformation from '@/playbooks/components/collected-information';
 
 export type DataCollectionProps = {
-  displayFields: string[];
+  allowInternationalResidents: boolean;
+  allowUsResidents: boolean;
+  internationalCountryRestrictions: null | CountryCode[];
+  isDocFirstFlow: boolean;
   mustCollectData: string[];
   optionalData?: string[];
-  title: string;
 };
 
 const DataCollection = ({
-  displayFields,
+  allowInternationalResidents,
+  allowUsResidents,
+  internationalCountryRestrictions,
+  isDocFirstFlow,
   mustCollectData,
   optionalData = [],
-  title,
 }: DataCollectionProps) => {
-  const { t } = useTranslation(
-    'pages.playbooks.details.content.data-collection',
+  const { t } = useTranslation('pages.playbooks.details.data-collection');
+  const requiresSSN =
+    mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
+  const optionalSSN =
+    optionalData.includes('ssn9') || optionalData.includes('ssn4');
+  const documentsAsString = mustCollectData.filter(scopes =>
+    scopes.includes('document'),
+  )?.[0];
+  const idDocKinds = Object.values(SupportedIdDocTypes).filter(docType =>
+    documentsAsString?.includes(docType),
   );
-
-  const getLabel = (field: string) => {
-    if (field.includes('document')) {
-      return t('document');
-    }
-    if (field.includes('ssn')) {
-      return t('ssn');
-    }
-    return t(field);
-  };
-
-  // We should only show nationality field for backwards compatibility if the obc collects it
-  // If it's not collected, we should not show include it in the list
-  const hasNationality = mustCollectData.includes(
-    CollectedKycDataOption.nationality,
-  );
-  const filteredDisplayFields = !hasNationality
-    ? displayFields.filter(field => field !== 'nationality')
-    : displayFields;
+  const selfie = documentsAsString?.includes('selfie');
 
   return (
     <Container>
-      <Typography variant="label-3" color="secondary">
-        {title}
-      </Typography>
-      <ValuesContainer>
-        {filteredDisplayFields.map(field => (
-          <ItemContainer key={field}>
-            <Typography
-              variant="body-3"
-              color="tertiary"
-              sx={{ whiteSpace: 'nowrap', textAlign: 'right' }}
-            >
-              {getLabel(field)}
-            </Typography>
-            <ValueContainer>
-              <DisplayValue
-                field={field}
-                mustCollectData={mustCollectData}
-                optionalData={optionalData}
-              />
-            </ValueContainer>
-          </ItemContainer>
-        ))}
-      </ValuesContainer>
+      <CollectedInformation
+        title={t('basic-information')}
+        options={{
+          name: true,
+          email: mustCollectData.includes('email'),
+          phoneNumber: mustCollectData.includes('phone_number'),
+          dob: mustCollectData.includes('dob'),
+          fullAddress: mustCollectData.includes('full_address'),
+        }}
+      />
+      {allowUsResidents ? (
+        <CollectedInformation
+          title={t('us-residents.title')}
+          options={{
+            idDocKind: idDocKinds,
+            selfie,
+            usLegalStatus: mustCollectData.includes('us_legal_status'),
+            ssn: {
+              active: requiresSSN || optionalSSN,
+              kind: mustCollectData.includes('ssn9') ? 'ssn9' : 'ssn4',
+              optional: optionalSSN,
+            },
+          }}
+        />
+      ) : (
+        <CollectedInformation
+          title={t('us-residents.title')}
+          subtitle={t('us-residents.empty')}
+        />
+      )}
+      {allowInternationalResidents ? (
+        <CollectedInformation
+          title={t('non-us-residents.title')}
+          options={{
+            internationalCountryRestrictions,
+            idDocKind: [SupportedIdDocTypes.passport],
+            selfie: true,
+          }}
+        />
+      ) : (
+        <CollectedInformation
+          title={t('non-us-residents.title')}
+          subtitle={t('non-us-residents.empty')}
+        />
+      )}
+      {isDocFirstFlow && (
+        <InlineAlert variant="info">
+          {t('data-collection.id-doc-first')}
+        </InlineAlert>
+      )}
     </Container>
   );
 };
@@ -75,34 +96,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[5]};
-  `}
-`;
-
-const ValueContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  white-space: pre-wrap;
-`;
-
-const ItemContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-    gap: ${theme.spacing[10]};
-    height: ${theme.spacing[7]};
-  `}
-`;
-
-const ValuesContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: ${theme.spacing[2]};
+    gap: ${theme.spacing[8]};
   `}
 `;
 

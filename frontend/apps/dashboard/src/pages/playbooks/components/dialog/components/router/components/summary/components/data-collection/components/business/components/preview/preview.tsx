@@ -15,7 +15,7 @@ type PreviewProps = {
 
 const Preview = ({ onStartEditing }: PreviewProps) => {
   const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.form.business-information.preview',
+    'pages.playbooks.dialog.summary.business-information.preview',
   );
   const { getValues } = useFormContext();
   const businessInformation: BusinessInformation = getValues(

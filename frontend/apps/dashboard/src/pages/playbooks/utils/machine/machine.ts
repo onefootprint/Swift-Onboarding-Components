@@ -98,11 +98,38 @@ export const createPlaybookMachine = () =>
             nameYourPlaybookSelected: {
               target: 'nameYourPlaybook',
             },
-            yourPlaybookSelected: {
+            summarySelected: {
               target: 'summary',
             },
             navigationBackward: {
               target: 'summary',
+            },
+            authorizedScopesSubmitted: {
+              target: 'aml',
+              actions: 'assignAuthorizedScopes',
+            },
+          },
+        },
+        aml: {
+          on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+              actions: ['resetKind'],
+            },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
+            },
+            summarySelected: {
+              target: 'summary',
+            },
+            authorizedScopesSelected: {
+              target: 'authorizedScopes',
+            },
+            navigationBackward: {
+              target: 'authorizedScopes',
+            },
+            amlSubmitted: {
+              actions: 'assignAml',
             },
           },
         },
@@ -110,13 +137,13 @@ export const createPlaybookMachine = () =>
     },
     {
       actions: {
-        resetKind: assign(context => ({
-          ...context,
-          kind: PlaybookKind.Unknown,
-        })),
         assignWhoToOnboard: assign((context, event) => ({
           ...context,
           kind: event.payload.kind,
+        })),
+        resetKind: assign(context => ({
+          ...context,
+          kind: PlaybookKind.Unknown,
         })),
         assignNameYourPlaybook: assign((context, event) => ({
           ...context,
@@ -129,6 +156,14 @@ export const createPlaybookMachine = () =>
         assignPlaybook: assign((context, event) => ({
           ...context,
           playbook: event.payload.formData,
+        })),
+        assignAuthorizedScopes: assign((context, event) => ({
+          ...context,
+          authorizedScopesForm: event.payload.formData,
+        })),
+        assignAml: assign((context, event) => ({
+          ...context,
+          amlForm: event.payload.formData,
         })),
       },
     },

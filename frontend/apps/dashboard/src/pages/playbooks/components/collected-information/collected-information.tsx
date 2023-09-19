@@ -17,7 +17,7 @@ const CollectedInformation = ({
   subtitle,
   options,
 }: CollectedInformationProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog.summary.form.person');
+  const { t } = useTranslation('pages.playbooks.collected-data');
 
   return (
     <Container>
@@ -27,9 +27,9 @@ const CollectedInformation = ({
       {options && (
         <OptionsContainer>
           {Object.entries(options).map(([name, value]) => (
-            <OptionItem key={name}>
+            <OptionItem key={name} role="row" aria-label={t(kebabCase(name))}>
               <Label variant="body-3" color="tertiary">
-                {t(`preview.${kebabCase(name)}`)}
+                {t(kebabCase(name))}
               </Label>
               <DisplayValue name={name as any} value={value} />
             </OptionItem>

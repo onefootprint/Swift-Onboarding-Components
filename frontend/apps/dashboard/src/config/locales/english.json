@@ -1294,76 +1294,77 @@
       },
       "details": {
         "title": "Playbook details",
-        "content": {
-          "data-collection": {
-            "basic-information": "Basic information",
-            "email": "Email",
-            "phone_number": "Phone number",
-            "name": "First & Last name",
-            "dob": "Date of birth",
-            "full_address": "Address",
-            "nationality": "Nationality",
-            "us_legal_status": "Legal status in the U.S.",
-            "ssn": "SSN",
-            "full": "Full",
-            "last4": "Last 4",
-            "full_optional": "Full (Optional)",
-            "last4_optional": "Last 4 (Optional)",
-            "document": "ID document scan",
-            "selfie": "Selfie",
-            "us-residents": "U.S. residents",
-            "non-us-residents": "Non U.S. residents",
-            "ssn9": "SSN (Full)",
-            "ssn4": "SSN (Last 4)",
-            "drivers_license": "Driver's license",
-            "id_card": "Identity card",
-            "passport": "Passport (photo page)",
-            "visa": "Visa",
-            "residence_document": "Residence card",
-            "permit": "Work permit",
-            "id-doc-first": "Document scan will be used to autofill basic identity data"
-          },
-          "basics": {
+        "basics": {
+          "title": "Playbook basics",
+          "edit-name": {
             "title": "Playbook basics",
-            "edit-name": {
-              "title": "Playbook basics",
-              "edit": "Edit Playbook name",
-              "form": {
-                "label": "Playbook name",
-                "cancel": "Cancel",
-                "save": "Save"
-              }
-            },
-            "type": {
-              "label": "Type",
-              "kyc": "KYC",
-              "kyb": "KYB"
-            },
-            "name": "Playbook name",
-            "publishable-key": "Publishable key",
-            "data-collection": "Data collection",
-            "authorized-scopes": "Authorized scopes"
+            "edit": "Edit Playbook name",
+            "form": {
+              "label": "Playbook name",
+              "cancel": "Cancel",
+              "save": "Save"
+            }
+          },
+          "type": {
+            "label": "Type",
+            "kyc": "KYC",
+            "kyb": "KYB"
+          },
+          "name": "Playbook name",
+          "publishable-key": "Publishable key"
+        },
+        "tabs": {
+          "data-collection": "Data collection",
+          "authorized-scopes": "Authorized scopes",
+          "aml-monitoring": "AML Monitoring"
+        },
+        "data-collection": {
+          "basic-information": "Basic information",
+          "us-residents": {
+            "title": "U.S. residents",
+            "empty": "U.S. residents aren't allowed to be onboarded."
+          },
+          "non-us-residents": {
+            "title": "Non-U.S. residents",
+            "empty": "Non-U.S. residents aren't allowed to be onboarded."
+          },
+          "id-doc-first": "Document scan will be used to autofill basic identity data",
+          "last4": "Last 4",
+          "full": "Full",
+          "full_optional": "Full (Optional)",
+          "last4_optional": "Last 4 (Optional)"
+        },
+        "authorized-scopes": {
+          "title": "Authorized scopes",
+          "basic-information": "Basic information",
+          "us-residents": {
+            "title": "U.S. residents"
+          },
+          "non-us-residents": {
+            "title": "Non U.S. residents"
+          }
+        },
+        "aml-monitoring": {
+          "title": "AML checks",
+          "footer": {
+            "label": "Note:",
+            "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
           }
         }
       },
       "dialog": {
         "title": "Create Playbook",
-        "router": {
-          "stepper": {
-            "aria-label": "Progress indicator for Playbooks"
-          },
-          "name-your-playbook": "Name your Playbook",
-          "who-to-onboard": "Who to onboard",
-          "your-playbook": "Your Playbook",
-          "authorized-scopes": "Authorized scopes",
-          "feedback": {
-            "success": {
-              "title": "Success",
-              "description": "Playbook created successfully."
-            }
+        "stepper": {
+          "aria-label": "Progress indicator for Playbooks"
+        },
+        "feedback": {
+          "success": {
+            "title": "Success",
+            "description": "Playbook created successfully."
           }
         },
         "who-to-onboard": {
+          "nav": "Who to onboard",
           "title": "Who would you like to onboard?",
           "subtitle": "This helps us better recommend which data to collect.",
           "kyc": {
@@ -1376,9 +1377,11 @@
           }
         },
         "residency": {
+          "nav": "Residency",
           "title": "Residency",
           "subtitle": "Select the countries from which your users may onboard.",
           "us-residents": "United States",
+          "non-us-residents": "Non U.S. residents",
           "us-territories": "Allow residents from U.S. territories to be onboarded",
           "other-countries": "Other countries",
           "all-countries": {
@@ -1389,6 +1392,7 @@
           "countries": "Countries"
         },
         "name-your-playbook": {
+          "nav": "Name your Playbook",
           "title": "Name your playbook",
           "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones.",
           "kyc": "KYC",
@@ -1403,6 +1407,7 @@
           }
         },
         "summary": {
+          "nav": "Your Playbook",
           "title": "Your Playbook recommendation",
           "subtitle-default": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
           "subtitle-international-only": "Here’s our recommended Playbook configuration.",
@@ -1426,129 +1431,104 @@
             },
             "alert": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
           },
-          "form": {
-            "person": {
-              "title": {
-                "kyb": {
-                  "main": "KYC of a beneficial owner",
-                  "tooltip": "To successfully verify a business we also need to verify its beneficial owner's identity."
-                },
-                "kyc": "Personal information & docs"
+          "person": {
+            "title": {
+              "kyb": {
+                "main": "KYC of a beneficial owner",
+                "tooltip": "To successfully verify a business we also need to verify its beneficial owner's identity."
               },
-              "editing": {
-                "kyc": "Edit personal information & docs",
-                "kyb": "Edit KYC of a beneficial owner"
-              },
-              "basic-information": {
-                "title": "Basic information"
-              },
-              "us-residents": {
-                "title": "U.S. residents",
-                "empty": "U.S. residents aren't allowed to be onboarded."
-              },
-              "non-us-residents": {
-                "title": "Non U.S. residents",
-                "empty": "Non U.S. residents aren't allowed to be onboarded."
-              },
-              "phone": {
-                "toggle": "Request users to provide their phone number",
-                "title": "Phone number"
-              },
-              "ssn": {
-                "title": "SSN",
-                "toggle": "Request users to provide their SSN",
-                "full": "Full",
-                "last4": "Last 4"
-              },
-              "ssn-optional": {
-                "checkbox": "Allow users without an SSN to proceed with the verification",
-                "warning": "They will need to be manually reviewed by you."
-              },
-              "selfie": {
-                "checkbox": "Request a selfie",
-                "warning": "You can optionally request users to take a selfie to validate the ID document requested."
-              },
-              "id-doc-first": {
-                "checkbox": "Use document scan to autofill basic identity data",
-                "warning": "Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan."
-              },
-              "us-legal-status": {
-                "title": "Legal status",
-                "toggle": "Request users to provide their legal status in the U.S."
-              },
-              "id-doc": {
-                "title": "ID document scan",
-                "toggle": "Request users to scan an ID document",
-                "drivers_license": "Driver's license",
-                "id_card": "Identity card",
-                "passport": "Passport (photo page)",
-                "visa": "Visa",
-                "residence_document": "Residence card",
-                "work_permit": "Work permit",
-                "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
-                "no-id-doc-selected": "You must select at least one ID document type."
-              },
-              "preview": {
-                "edit": "Edit",
-                "email": "Email",
-                "phone-number": "Phone number",
-                "name": "First & last name",
-                "dob": "Date of birth",
-                "us-legal-status": "Legal status in the U.S.",
-                "full-address": "Address",
-                "id-doc-kind": "ID document scan",
-                "countries-restrictions": "Restricted to these countries",
-                "and": "and",
-                "more": "more",
-                "selfie": "Selfie",
-                "drivers_license": "Driver's license",
-                "id_card": "Identity card",
-                "passport": "Passport",
-                "visa": "Visa",
-                "residence_document": "Residence card",
-                "permit": "Work permit",
-                "ssn": "SSN",
-                "ssn4": "Last 4",
-                "ssn9": "Full",
-                "optional": "(Optional)",
-                "address-display": "Address line, Zip code, City, State"
-              }
+              "kyc": "Personal information & docs"
             },
-            "business-information": {
-              "editing": {
-                "business-information": "Editing business information",
-                "legal-entity-type": {
-                  "title": "Legal entity type",
-                  "toggle": "Request users to provide their business legal entity type"
-                },
-                "website": {
-                  "title": "Website",
-                  "toggle": "Request users to provide their business website"
-                },
-                "phone-number": {
-                  "title": "Phone number",
-                  "toggle": "Request that users provide their business phone number"
-                },
-                "save": "Save",
-                "cancel": "Cancel"
+            "edit": "Edit",
+            "editing": {
+              "kyc": "Edit personal information & docs",
+              "kyb": "Edit KYC of a beneficial owner"
+            },
+            "basic-information": {
+              "title": "Basic information"
+            },
+            "us-residents": {
+              "title": "U.S. residents",
+              "empty": "U.S. residents aren't allowed to be onboarded."
+            },
+            "non-us-residents": {
+              "title": "Non U.S. residents",
+              "empty": "Non U.S. residents aren't allowed to be onboarded."
+            },
+            "phone": {
+              "toggle": "Request users to provide their phone number",
+              "title": "Phone number"
+            },
+            "ssn": {
+              "title": "SSN",
+              "toggle": "Request users to provide their SSN",
+              "full": "Full",
+              "last4": "Last 4"
+            },
+            "ssn-optional": {
+              "checkbox": "Allow users without an SSN to proceed with the verification",
+              "warning": "They will need to be manually reviewed by you."
+            },
+            "selfie": {
+              "checkbox": "Request a selfie",
+              "warning": "You can optionally request users to take a selfie to validate the ID document requested."
+            },
+            "id-doc-first": {
+              "checkbox": "Use document scan to autofill basic identity data",
+              "warning": "Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan."
+            },
+            "us-legal-status": {
+              "title": "Legal status",
+              "toggle": "Request users to provide their legal status in the U.S."
+            },
+            "id-doc": {
+              "title": "ID document scan",
+              "toggle": "Request users to scan an ID document",
+              "drivers_license": "Driver's license",
+              "id_card": "Identity card",
+              "passport": "Passport (photo page)",
+              "visa": "Visa",
+              "residence_document": "Residence card",
+              "work_permit": "Work permit",
+              "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
+              "no-id-doc-selected": "You must select at least one ID document type."
+            }
+          },
+          "business-information": {
+            "editing": {
+              "business-information": "Editing business information",
+              "legal-entity-type": {
+                "title": "Legal entity type",
+                "toggle": "Request users to provide their business legal entity type"
               },
-              "preview": {
-                "title": "Business information",
-                "edit": "Edit",
-                "remove": "Remove",
-                "business_corporation_type": "Legal entity type",
-                "business_website": "Website",
-                "business_phone_number": "Phone number",
-                "business_name": "Legal business name",
-                "doingBusinessAs": "Doing Business As (optional)",
-                "business_beneficial_owners": "Beneficial owners",
-                "business_address": "Registered business address",
-                "business_tin": "EIN"
-              }
+              "website": {
+                "title": "Website",
+                "toggle": "Request users to provide their business website"
+              },
+              "phone-number": {
+                "title": "Phone number",
+                "toggle": "Request that users provide their business phone number"
+              },
+              "save": "Save",
+              "cancel": "Cancel"
+            },
+            "preview": {
+              "title": "Business information",
+              "edit": "Edit",
+              "remove": "Remove",
+              "business_corporation_type": "Legal entity type",
+              "business_website": "Website",
+              "business_phone_number": "Phone number",
+              "business_name": "Legal business name",
+              "doingBusinessAs": "Doing Business As (optional)",
+              "business_beneficial_owners": "Beneficial owners",
+              "business_address": "Registered business address",
+              "business_tin": "EIN"
             }
           }
         },
         "authorized-scopes": {
+          "nav": "Authorized scopes",
           "title": "Authorized scopes",
           "subtitle": "Select the data attributes you need read access to after an onboarding. During onboarding, the user will 'authorize' access to the scopes you choose below. If you are not sure what you will need, leave all the default fields selected.",
           "all-business-info": "All business information",
@@ -1556,11 +1536,69 @@
           "basic-information": "Basic information",
           "investor-profile": "Investor profile",
           "investor-profile-questions": "Investor profile questions",
-          "residency": {
-            "us-residents": "U.S. residents",
-            "non-us-residents": "Non U.S. residents"
+          "us-residents": "U.S. residents",
+          "non-us-residents": "Non U.S. residents"
+        },
+        "aml": {
+          "nav": "AML Monitoring",
+          "title": "AML monitoring",
+          "subtitle": "You can optionally add Anti-money Laundering (AML) monitoring to your onboarding flow.",
+          "recommended": "Recommended",
+          "aml": {
+            "label": "AML monitoring",
+            "hint": "Continuous monitoring, governmental watchlists, PEP and adverse media"
+          },
+          "ofac": {
+            "label": "Office of Foreign Assets Control (OFAC)",
+            "hint": "An agency within the U.S. Department of the Treasury that is responsible for administering and enforcing economic and trade sanctions against targeted foreign countries, organizations, and individuals"
+          },
+          "pep": {
+            "label": "Politically Exposed Person (PEP)",
+            "hint": "An individual who has been entrusted with a prominent public function"
+          },
+          "adverse-media": {
+            "label": "Adverse media",
+            "hint": "Negative or unfavorable information about individuals, entities, or organizations that could indicate potential involvement in financial crimes, corruption, or other illicit activities"
+          },
+          "footer": {
+            "label": "Note:",
+            "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
           }
         }
+      },
+      "collected-data": {
+        "and": "and",
+        "more": "more",
+        "none": "None",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "optional": "(Optional)",
+        "email": "Email",
+        "phone-number": "Phone number",
+        "name": "First & last name",
+        "dob": "Date of birth",
+        "us-legal-status": "Legal status in the U.S.",
+        "full-address": "Address",
+        "id-doc-kind": "Doc. scan",
+        "countries-restrictions": "Restricted to these countries",
+        "selfie": "Selfie",
+        "drivers-license": "Driver's license",
+        "id-card": "Identity card",
+        "passport": "Passport",
+        "visa": "Visa",
+        "residence-document": "Residence card",
+        "permit": "Work permit",
+        "ssn": "SSN",
+        "ssn4": "Last 4",
+        "ssn9": "Full",
+        "ssn-4": "SSN (Last 4)",
+        "ssn-9": "SSN (Full)",
+        "address-display": "Address line, Zip code, City, State",
+        "enhanced-aml": "Enhanced AML monitoring",
+        "ofac": "Office of Foreign Assets Control (OFAC)",
+        "pep": "Politically Exposed Person (PEP)",
+        "adverse-media": "Adverse media",
+        "international-country-restrictions": "International country restrictions"
       }
     },
     "manual-review": {

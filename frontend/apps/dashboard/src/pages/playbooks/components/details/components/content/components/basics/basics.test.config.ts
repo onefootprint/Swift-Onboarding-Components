@@ -26,6 +26,14 @@ const playbookFixture: OnboardingConfig = {
   isInstantAppEnabled: false,
   allowInternationalResidents: false,
   isDocFirstFlow: false,
+  allowUsResidents: true,
+  internationalCountryRestrictions: null,
+  enhancedAml: {
+    enhancedAml: true,
+    ofac: true,
+    pep: true,
+    adverseMedia: true,
+  },
 };
 
 export default playbookFixture;

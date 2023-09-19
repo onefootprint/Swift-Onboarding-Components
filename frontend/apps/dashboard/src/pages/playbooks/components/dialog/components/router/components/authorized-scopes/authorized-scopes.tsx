@@ -22,7 +22,6 @@ type AuthorizedScopesProps = {
   onBack: () => void;
   onSubmit: (data: AuthorizedScopesFormData) => void;
   playbook: SummaryFormData;
-  submissionLoading: boolean;
 };
 
 const AuthorizedScopes = ({
@@ -30,7 +29,6 @@ const AuthorizedScopes = ({
   onBack,
   onSubmit,
   playbook,
-  submissionLoading,
 }: AuthorizedScopesProps) => {
   const { t, allT } = useTranslation(
     'pages.playbooks.dialog.authorized-scopes',
@@ -55,16 +53,11 @@ const AuthorizedScopes = ({
           {meta.kind === PlaybookKind.Kyb && <Business />}
           <Person playbook={playbook} meta={meta} />
           <ButtonContainer>
-            <Button
-              size="compact"
-              variant="secondary"
-              onClick={onBack}
-              disabled={submissionLoading}
-            >
+            <Button size="compact" variant="secondary" onClick={onBack}>
               {allT('back')}
             </Button>
-            <Button loading={submissionLoading} size="compact" type="submit">
-              {allT('create')}
+            <Button size="compact" type="submit">
+              {allT('next')}
             </Button>
           </ButtonContainer>
         </Form>

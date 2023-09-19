@@ -12,6 +12,8 @@ const getStep = ({ value }: GetStepProps) => {
     step = 2;
   } else if (value === 'authorizedScopes') {
     step = 3;
+  } else if (value === 'aml') {
+    step = 4;
   }
   return step;
 };

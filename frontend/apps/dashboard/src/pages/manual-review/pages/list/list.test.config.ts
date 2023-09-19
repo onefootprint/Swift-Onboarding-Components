@@ -94,6 +94,14 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     isNoPhoneFlow: false,
     allowInternationalResidents: false,
     isDocFirstFlow: false,
+    allowUsResidents: true,
+    internationalCountryRestrictions: null,
+    enhancedAml: {
+      enhancedAml: false,
+      ofac: false,
+      pep: false,
+      adverseMedia: false,
+    },
   },
 ];
 

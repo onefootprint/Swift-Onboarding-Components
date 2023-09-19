@@ -17,9 +17,7 @@ type FormData = {
 };
 
 const EditName = ({ playbook, open, setOpen }: EditNameProps) => {
-  const { t } = useTranslation(
-    'pages.playbooks.details.content.basics.edit-name',
-  );
+  const { t } = useTranslation('pages.playbooks.details.basics.edit-name');
   const mutation = useUpdatePlaybook();
   const {
     reset,

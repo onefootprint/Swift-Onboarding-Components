@@ -19,9 +19,7 @@ const DisplayValue = ({
   mustCollectData,
   optionalData = [],
 }: DisplayValueProps) => {
-  const { t } = useTranslation(
-    'pages.playbooks.details.content.data-collection',
-  );
+  const { t } = useTranslation('pages.playbooks.details.data-collection');
 
   if (field === 'document') {
     const documentString = mustCollectData.find(a => a.match('document'));

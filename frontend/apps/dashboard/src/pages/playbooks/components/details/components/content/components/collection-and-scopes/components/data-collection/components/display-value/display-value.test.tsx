@@ -86,6 +86,7 @@ describe('<DisplayValue />', () => {
         ],
         field: 'ssn',
       });
+
       expect(screen.getByText('Last 4')).toBeInTheDocument();
     });
 

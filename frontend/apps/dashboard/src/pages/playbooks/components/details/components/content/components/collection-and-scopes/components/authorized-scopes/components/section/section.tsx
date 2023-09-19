@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import { Tag, Typography } from '@onefootprint/ui';
+import kebabCase from 'lodash/kebabCase';
 import React from 'react';
 
 export type SectionProps = {
@@ -11,9 +12,7 @@ export type SectionProps = {
 };
 
 const Section = ({ canAccessData, title, displayScopes }: SectionProps) => {
-  const { t } = useTranslation(
-    'pages.playbooks.details.content.data-collection',
-  );
+  const { t } = useTranslation('pages.playbooks.collected-data');
 
   const dataToDisplay = canAccessData.filter(
     scope =>
@@ -43,7 +42,7 @@ const Section = ({ canAccessData, title, displayScopes }: SectionProps) => {
       </Typography>
       <TagContainer>
         {dataToDisplay.map(field => (
-          <Tag key={field}>{t(field)}</Tag>
+          <Tag key={field}>{t(kebabCase(field))}</Tag>
         ))}
       </TagContainer>
     </Container>

@@ -26,10 +26,7 @@ const Details = () => {
   };
 
   const handleClose = () => {
-    push({
-      ...query,
-      onboarding_config_id: undefined,
-    });
+    push({ ...query, onboarding_config_id: undefined });
   };
 
   return (

@@ -1,10 +1,12 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import type { SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 
 export type Option = Partial<{
+  name: boolean;
   dob: boolean;
   email: boolean;
   fullAddress: boolean;
+  idDocs: any;
   idDocKind: SupportedIdDocTypes[];
   phoneNumber: boolean;
   selfie: boolean;
@@ -15,4 +17,11 @@ export type Option = Partial<{
   };
   usLegalStatus: boolean;
   countriesRestrictions: CountryRecord[];
+  internationalCountryRestrictions: null | CountryCode[];
+
+  // AML
+  enhancedAml: boolean;
+  ofac: boolean;
+  pep: boolean;
+  adverseMedia: boolean;
 }>;

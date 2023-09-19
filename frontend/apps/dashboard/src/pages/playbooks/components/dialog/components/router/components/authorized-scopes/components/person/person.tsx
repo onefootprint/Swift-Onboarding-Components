@@ -64,9 +64,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
       </ScopeSection>
       {(ssn || usLegalStatus || idDoc) && allowUS && (
         <ScopeSection>
-          <Typography variant="label-3">
-            {t('residency.us-residents')}
-          </Typography>
+          <Typography variant="label-3">{t('us-residents')}</Typography>
           <OptionsContainer>
             {usLegalStatus && (
               <Checkbox
@@ -103,9 +101,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
       )}
       {allowInternational && (
         <ScopeSection>
-          <Typography variant="label-3">
-            {t('residency.non-us-residents')}
-          </Typography>
+          <Typography variant="label-3">{t('non-us-residents')}</Typography>
           <OptionsContainer>
             <Box>
               <Checkbox

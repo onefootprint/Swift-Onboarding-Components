@@ -14,6 +14,12 @@ export type OrgOnboardingConfigCreateRequest = {
   allowUsResidents?: boolean;
   allowUsTerritories?: boolean;
   internationalCountryRestrictions?: string[] | null;
+  enhancedAml?: {
+    enhancedAml: boolean;
+    ofac: boolean;
+    pep: boolean;
+    adverseMedia: boolean;
+  };
 };
 
 export type OrgOnboardingConfigCreateResponse = string;

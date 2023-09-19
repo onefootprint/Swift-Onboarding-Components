@@ -1,3 +1,4 @@
+import { COUNTRIES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import type { SupportedIdDocTypes } from '@onefootprint/types';
@@ -15,10 +16,14 @@ type DisplayValueProps<K extends keyof Option = keyof Option> = {
 };
 
 const DisplayValue = ({ name, value }: DisplayValueProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog.summary.form.person');
+  const { t } = useTranslation('pages.playbooks.collected-data');
 
   if (typeof value === 'boolean') {
-    return value ? <IcoCheck24 /> : <IcoCloseSmall24 />;
+    return value ? (
+      <IcoCheck24 aria-label={t('enabled')} />
+    ) : (
+      <IcoCloseSmall24 aria-label={t('disabled')} />
+    );
   }
 
   if (name === 'idDocKind') {
@@ -30,12 +35,33 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
     if (ssnValue.active) {
       return (
         <Typography variant="body-3">
-          {t(`preview.${ssnValue.kind}`)}{' '}
-          {ssnValue.optional ? t('preview.optional') : ''}
+          {t(`${ssnValue.kind}`)} {ssnValue.optional ? t('optional') : ''}
         </Typography>
       );
     }
     return <IcoCloseSmall24 />;
+  }
+
+  if (name === 'internationalCountryRestrictions') {
+    const countries = value as NonNullable<
+      Option['internationalCountryRestrictions']
+    >;
+    if (!countries || countries.length === 0) {
+      return <Typography variant="body-3">{t('none')}</Typography>;
+    }
+
+    return (
+      <ListValue
+        value={countries.map(countryCode => {
+          const countryFound = COUNTRIES.find(
+            country => country.value === countryCode,
+          );
+          if (countryFound) return countryFound.label;
+          return countryCode;
+        })}
+        threshold={2}
+      />
+    );
   }
 
   if (name === 'countriesRestrictions' && value) {

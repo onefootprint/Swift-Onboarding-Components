@@ -22,9 +22,7 @@ type EditingProps = {
 
 const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const { control, register, watch, setValue, getValues } = useFormContext();
-  const { t, allT } = useTranslation(
-    'pages.playbooks.dialog.summary.form.person',
-  );
+  const { t, allT } = useTranslation('pages.playbooks.dialog.summary.person');
   const { kind } = meta;
   const {
     data: { user, org },

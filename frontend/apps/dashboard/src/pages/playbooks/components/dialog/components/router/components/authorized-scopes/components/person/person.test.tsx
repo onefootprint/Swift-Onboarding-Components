@@ -224,7 +224,7 @@ describe('<PersonalScopes />', () => {
       },
     });
 
-    const usResidents = screen.queryByText('U.S. residents');
+    const usResidents = screen.getByText('U.S. residents');
     expect(usResidents).toBeInTheDocument();
   });
 });

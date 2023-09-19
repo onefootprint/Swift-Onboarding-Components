@@ -14,7 +14,7 @@ type EditingProps = {
 const Editing = ({ onStopEditing }: EditingProps) => {
   const { control, setValue, getValues } = useFormContext();
   const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.form.business-information.editing',
+    'pages.playbooks.dialog.summary.business-information.editing',
   );
 
   const [initialValues] = useState<BusinessInformation>({
