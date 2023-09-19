@@ -1,17 +1,16 @@
-pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
-use strum_macros::{AsRefStr, EnumString};
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum_macros::{AsRefStr, Display, EnumString};
 
 #[derive(
     Debug,
     Display,
     Clone,
     Copy,
-    Deserialize,
-    Serialize,
+    DeserializeFromStr,
+    SerializeDisplay,
     Apiv2Schema,
     AsExpression,
     FromSqlRow,

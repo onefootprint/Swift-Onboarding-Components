@@ -10,13 +10,14 @@ use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanVault;
 use api_core::utils::body_bytes::BodyBytes;
 use api_core::utils::file_upload::FileUpload;
+use api_core::utils::vault_wrapper::NewDocument;
 use api_core::utils::{self};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use macros::route_alias;
-use newtypes::{AccessEventKind, AccessEventPurpose, DataIdentifier, FpId, PiiBytes};
+use newtypes::{AccessEventKind, AccessEventPurpose, DataIdentifier, DocumentKind, FpId, PiiBytes};
 use paperclip::actix::{self, api_v2_operation, web, web::Path};
 
 api_headers_schema! {
@@ -95,7 +96,7 @@ async fn post_upload_inner(
     headers: UploadHeaderParams,
     auth: Box<dyn TenantAuth>,
     fp_id: FpId,
-    data_identifier: DataIdentifier,
+    di: DataIdentifier,
     insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let insight = CreateInsightEvent::from(insight);
@@ -105,7 +106,7 @@ async fn post_upload_inner(
     let source = auth.source();
 
     // temporarily: block non custom/document objects
-    match data_identifier {
+    match di {
         DataIdentifier::Custom(_) | DataIdentifier::Document(_) => {}
         _ => {
             return Err(api_core::ApiErrorKind::AssertionError(
@@ -123,35 +124,42 @@ async fn post_upload_inner(
         })
         .await?;
 
-    let file = FileUpload {
-        bytes: PiiBytes::new(body.into_inner().to_vec()),
-        mime_type: headers.mime_type.unwrap_or("application/octet-stream".into()),
-        filename: data_identifier.to_string(),
-        file_extension: "bin".to_string(),
-    };
+    let mime_type = headers.mime_type.unwrap_or("application/octet-stream".into());
+    let image_bytes = PiiBytes::new(body.into_inner().to_vec());
+    let file = FileUpload::new_simple(image_bytes, format!("{}", di), &mime_type);
 
-    let (e_data_key, s3_url) = utils::vault_wrapper::seal_file_and_upload_to_s3(
-        state,
-        &file,
-        data_identifier.clone(),
-        &vault,
-        &scoped_vault.id,
-    )
-    .await?;
+    let (e_data_key, s3_url) =
+        utils::vault_wrapper::seal_file_and_upload_to_s3(state, &file, di.clone(), &vault, &scoped_vault.id)
+            .await?;
 
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &scoped_vault.id)?;
-            let doc = uvw.put_document_unsafe(
-                conn,
-                data_identifier.clone(),
-                file.mime_type,
-                file.filename,
+            let doc = NewDocument {
+                kind: di.clone(),
+                mime_type: file.mime_type,
+                filename: file.filename,
                 e_data_key,
                 s3_url,
                 source,
-            )?;
+            };
+            let derived_doc = if let DataIdentifier::Document(DocumentKind::Image(kind, side)) = di {
+                // Derive latest_upload DI if the image is vaulted
+                let latest_upload_kind = DocumentKind::LatestUpload(kind, side).into();
+                Some(NewDocument {
+                    filename: format!("{}", latest_upload_kind),
+                    kind: latest_upload_kind,
+                    mime_type: doc.mime_type.clone(),
+                    e_data_key: doc.e_data_key.clone(),
+                    s3_url: doc.s3_url.clone(),
+                    source: doc.source,
+                })
+            } else {
+                None
+            };
+            let docs = vec![Some(doc), derived_doc].into_iter().flatten().collect();
+            let doc = uvw.put_documents_unsafe(conn, docs)?;
 
             // Create an access event to show data was added
             NewAccessEvent {
@@ -162,7 +170,7 @@ async fn post_upload_inner(
                 principal,
                 insight,
                 kind: AccessEventKind::Update,
-                targets: vec![data_identifier],
+                targets: vec![di],
                 purpose: AccessEventPurpose::Api,
             }
             .create(conn)?;

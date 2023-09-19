@@ -13,6 +13,7 @@ doctest = false
 newtypes = {path = "../../newtypes" }
 chrono = { workspace = true }
 serde = { workspace = true }
+serde_with = { workspace = true }
 serde_json = { workspace = true }
 paperclip = { workspace = true }
 uuid = { workspace = true }

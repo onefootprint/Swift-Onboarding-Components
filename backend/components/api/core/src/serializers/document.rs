@@ -1,10 +1,15 @@
-use api_wire_types::DocumentImageError;
-use db::models::{document_upload::DocumentUpload, identity_document::IdentityDocument};
-use newtypes::DocumentScanDeviceType;
+use api_wire_types::{DocumentImageError, UploadSource};
+use db::models::{
+    data_lifetime::DataLifetime, document_upload::DocumentUpload, identity_document::IdentityDocument,
+};
+use newtypes::{DocumentScanDeviceType, DocumentSide, IdDocKind};
 
 use crate::utils::db2api::DbToApi;
 
+/// Document info from IdentityDocuments, created via hosted bifrost
 pub type DocumentInfo = (IdentityDocument, Vec<DocumentUpload>);
+/// Document info from the vault, created via API
+pub type DocumentVaultInfo = (IdDocKind, Vec<(DocumentSide, DataLifetime)>);
 
 impl DbToApi<DocumentInfo> for api_wire_types::Document {
     fn from_db((identity_doc, uploads): DocumentInfo) -> Self {
@@ -27,15 +32,17 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
 
         Self {
             kind: document_type,
-            started_at: created_at,
-            status,
+            started_at: Some(created_at),
+            status: Some(status),
             completed_version: completed_seqno,
             uploads,
             document_score,
             selfie_score,
             ocr_confidence_score,
-            // TODO: Should we have default here? I think so
+            // TODO deprecate
             device_type: device_type.unwrap_or(DocumentScanDeviceType::Mobile),
+            // TODO: Should we have default here? I think so
+            upload_source: device_type.unwrap_or(DocumentScanDeviceType::Mobile).into(),
         }
     }
 }
@@ -59,6 +66,40 @@ impl DbToApi<DocumentUpload> for api_wire_types::DocumentUpload {
             side,
             version: created_seqno,
             failure_reasons,
+        }
+    }
+}
+
+impl DbToApi<DocumentVaultInfo> for api_wire_types::Document {
+    fn from_db((kind, uploads): DocumentVaultInfo) -> Self {
+        let uploads = uploads
+            .into_iter()
+            .map(api_wire_types::DocumentUpload::from_db)
+            .collect();
+
+        Self {
+            kind,
+            started_at: None,
+            status: None,
+            completed_version: None,
+            uploads,
+            document_score: None,
+            selfie_score: None,
+            ocr_confidence_score: None,
+            // TODO deprecate
+            device_type: DocumentScanDeviceType::Mobile,
+            upload_source: UploadSource::Api,
+        }
+    }
+}
+
+impl DbToApi<(DocumentSide, DataLifetime)> for api_wire_types::DocumentUpload {
+    fn from_db((side, dl): (DocumentSide, DataLifetime)) -> Self {
+        Self {
+            timestamp: dl.created_at,
+            side,
+            version: dl.created_seqno,
+            failure_reasons: vec![],
         }
     }
 }

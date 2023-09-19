@@ -7,6 +7,8 @@ from tests.utils import (
     post,
     get_raw,
 )
+
+from tests.image_fixtures import test_image_dl_front
 from tests.bifrost_client import BifrostClient
 
 
@@ -119,6 +121,26 @@ def test_get_entity_documents(user_with_documents):
     assert front["version"] < back["version"]
     assert back["version"] < selfie["version"]
     assert selfie["version"] < doc["completed_version"]
+
+
+def test_get_entity_documents_uploaded_via_api(sandbox_tenant):
+    body = post("users", None, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+
+    post(
+        f"users/{fp_id}/vault/document.drivers_license.front.image/upload",
+        None,
+        sandbox_tenant.sk.key,
+        raw_data=base64.b64decode(test_image_dl_front),
+    )
+
+    body = get(f"entities/{fp_id}/documents", None, *sandbox_tenant.db_auths)
+    doc = body[0]
+    assert doc["kind"] == "drivers_license"
+    assert not doc["status"]
+    assert not doc["started_at"]
+    assert all(u["failure_reasons"] == [] for u in doc["uploads"])
+    assert any(u["side"] == "front" for u in doc["uploads"])
 
 
 def test_decrypt_historical(user_with_documents):

@@ -80,6 +80,7 @@ pub async fn get(
     } else {
         resp.content_type(ContentType::plaintext());
     }
+    // TODO makes sure the image is bytes
     let response = match result {
         Pii::String(s) => resp.body(s.leak_to_string()),
         Pii::Bytes(b) => resp.body(b.into_leak()),
