@@ -12,7 +12,6 @@ import {
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import CdoTagList from 'src/components/cdo-tag-list';
-import createStringList from 'src/utils/create-string-list';
 
 import AnnotationNote from '../annotation-note';
 import EventBodyEntry from '../event-body-entry';
@@ -25,14 +24,13 @@ type OnboardingDecisionEventBodyProps = {
 const OnboardingDecisionEventBody = ({
   data,
 }: OnboardingDecisionEventBodyProps) => {
-  const { t, allT } = useTranslation(
+  const { t } = useTranslation(
     'pages.entity.audit-trail.timeline.onboarding-decision-event',
   );
   const {
     annotation,
     decision: {
       source,
-      vendors,
       status,
       obConfiguration: { mustCollectData, mustCollectIdentityDocument },
     },
@@ -44,11 +42,6 @@ const OnboardingDecisionEventBody = ({
   }
 
   if (status === DecisionStatus.pass) {
-    const uniqueVendors = Array.from(new Set(vendors));
-    const vendorsList = createStringList(
-      uniqueVendors.map(vendor => allT(`vendor.${vendor}`)) ?? [],
-    );
-
     const collectedDataOptions: CollectedDataOption[] = [...mustCollectData];
     if (mustCollectIdentityDocument) {
       collectedDataOptions.push(CollectedDocumentDataOption.document);
@@ -75,16 +68,6 @@ const OnboardingDecisionEventBody = ({
               {statusStr}
             </Typography>
             <CdoTagList cdos={collectedDataOptions} />
-            {vendors.length > 0 && (
-              <>
-                <Typography variant="body-3" as="span" sx={{ marginLeft: 1 }}>
-                  {t('with')}
-                </Typography>
-                <Typography variant="body-3" as="span">
-                  {vendorsList}
-                </Typography>
-              </>
-            )}
             <FieldValidationDetails />
           </Container>
         }
