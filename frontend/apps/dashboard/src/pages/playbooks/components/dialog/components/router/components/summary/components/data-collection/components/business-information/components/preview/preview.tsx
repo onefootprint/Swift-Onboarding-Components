@@ -10,10 +10,10 @@ import type { BusinessInformation } from '@/playbooks/utils/machine/types';
 import DisplayValue from './components/display-value';
 
 type PreviewProps = {
-  startEditing: () => void;
+  onStartEditing: () => void;
 };
 
-const Preview = ({ startEditing }: PreviewProps) => {
+const Preview = ({ onStartEditing }: PreviewProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.summary.form.business-information.preview',
   );
@@ -28,7 +28,7 @@ const Preview = ({ startEditing }: PreviewProps) => {
       <Header>
         <Typography variant="label-3">{t('title')}</Typography>
         <LinkButton
-          onClick={startEditing}
+          onClick={onStartEditing}
           iconComponent={IcoPencil16}
           iconPosition="left"
           size="compact"

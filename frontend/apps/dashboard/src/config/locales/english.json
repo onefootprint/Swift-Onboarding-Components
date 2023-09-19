@@ -1453,8 +1453,16 @@
                 "kyc": "Edit personal information & docs",
                 "kyb": "Edit KYC of a beneficial owner"
               },
-              "us-residents": "U.S. residents",
-              "basic-information": "Basic information",
+              "basic-information": {
+                "title": "Basic information"
+              },
+              "us-residents": {
+                "title": "U.S. residents"
+              },
+              "non-us-residents": {
+                "title": "Non U.S. residents",
+                "empty": "Non U.S. residents aren't allowed to be onboarded."
+              },
               "phone": {
                 "toggle": "Request users to provide their phone number",
                 "title": "Phone number"

@@ -7,7 +7,7 @@ import {
   PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
-import DataCollection from './data-collection';
+import DataCollection from './components/data-collection/data-collection';
 
 export type DataCollectionWithContextProps = {
   startingValues?: Partial<SummaryFormData>;
@@ -27,7 +27,16 @@ const DataCollectionWithContext = ({
   return (
     <FormProvider {...formMethods}>
       <form>
-        <DataCollection kind={kind ?? PlaybookKind.Kyc} />
+        <DataCollection
+          meta={{
+            kind: kind ?? PlaybookKind.Kyc,
+            residency: {
+              allowUsResidents: true,
+              allowUsTerritories: false,
+              allowInternationalResidents: false,
+            },
+          }}
+        />
       </form>
     </FormProvider>
   );

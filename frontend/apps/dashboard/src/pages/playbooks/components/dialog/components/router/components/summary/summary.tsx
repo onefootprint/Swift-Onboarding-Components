@@ -6,19 +6,23 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import type {
   PlaybookKind,
+  ResidencyFormData,
   SummaryFormData,
 } from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
 
 type SummaryProps = {
-  kind: PlaybookKind;
+  meta: {
+    kind: PlaybookKind;
+    residency?: ResidencyFormData;
+  };
   onSubmit: (data: SummaryFormData) => void;
   onBack: () => void;
   defaultValues: SummaryFormData;
 };
 
-const Summary = ({ kind, onSubmit, onBack, defaultValues }: SummaryProps) => {
+const Summary = ({ meta, onSubmit, onBack, defaultValues }: SummaryProps) => {
   const { t, allT } = useTranslation('pages.playbooks.dialog.summary');
   const formMethods = useForm<SummaryFormData>({
     defaultValues,
@@ -37,7 +41,7 @@ const Summary = ({ kind, onSubmit, onBack, defaultValues }: SummaryProps) => {
       </Header>
       <FormProvider {...formMethods}>
         <Form id="your-playbook-form" onSubmit={handleSubmit(onSubmit)}>
-          <DataCollection kind={kind} />
+          <DataCollection meta={meta} />
           <ButtonContainer>
             <Button size="compact" variant="secondary" onClick={onBack}>
               {allT('back')}

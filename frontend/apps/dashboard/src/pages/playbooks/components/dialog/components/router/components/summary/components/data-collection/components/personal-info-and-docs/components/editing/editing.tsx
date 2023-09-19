@@ -9,19 +9,23 @@ import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 
-import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
+import type {
+  PersonalInformationAndDocs,
+  SummaryMeta,
+} from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 type EditingProps = {
-  stopEditing: () => void;
-  kind: PlaybookKind;
+  onStopEditing: () => void;
+  meta: SummaryMeta;
 };
 
-const Editing = ({ stopEditing, kind }: EditingProps) => {
+const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const { control, register, watch, setValue, getValues } = useFormContext();
   const { t } = useTranslation(
     'pages.playbooks.dialog.summary.form.personal-info-and-docs',
   );
+  const { kind } = meta;
   const {
     data: { user, org },
   } = useSession();
@@ -40,9 +44,9 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
 
   const onSave = () => {
     if (idDocOpen && idDocKind?.length >= 1) {
-      stopEditing();
+      onStopEditing();
     } else if (!idDocOpen) {
-      stopEditing();
+      onStopEditing();
     } else {
       setUnselectedIDDoc(true);
     }
@@ -50,7 +54,7 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
 
   const onCancel = () => {
     setValue('personalInformationAndDocs', initialValues);
-    stopEditing();
+    onStopEditing();
   };
 
   const title =
@@ -66,7 +70,7 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
         <Section>
           {title}
           <Typography sx={{ paddingBottom: 2 }} variant="label-1">
-            {t('basic-information')}
+            {t('basic-information.title')}
           </Typography>
           <Typography variant="label-3">{t('phone.title')}</Typography>
           <Controller
@@ -91,7 +95,7 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
       <Section>
         {!showNoPhoneFlow && title}
         <Typography sx={{ paddingBottom: 3 }} variant="label-1">
-          {t('us-residents')}
+          {t('us-residents.title')}
         </Typography>
         <Typography variant="label-3">{t('ssn.title')}</Typography>
         <Controller

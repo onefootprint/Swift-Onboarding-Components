@@ -33,7 +33,17 @@ const EditingWithContext = ({
   return (
     <FormProvider {...formMethods}>
       <form>
-        <Editing stopEditing={() => {}} kind={kind ?? PlaybookKind.Kyc} />
+        <Editing
+          onStopEditing={() => {}}
+          meta={{
+            kind: kind ?? PlaybookKind.Kyc,
+            residency: {
+              allowUsResidents: true,
+              allowUsTerritories: false,
+              allowInternationalResidents: false,
+            },
+          }}
+        />
       </form>
     </FormProvider>
   );

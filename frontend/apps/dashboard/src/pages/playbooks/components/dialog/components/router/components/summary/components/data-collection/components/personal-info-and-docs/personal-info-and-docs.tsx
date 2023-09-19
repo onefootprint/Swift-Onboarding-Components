@@ -1,16 +1,16 @@
 import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
 
-import type { PlaybookKind } from '@/playbooks/utils/machine/types';
+import type { SummaryMeta } from '@/playbooks/utils/machine/types';
 
 import Editing from './components/editing';
 import Preview from './components/preview';
 
 type PersonalInfoAndDocsProps = {
-  kind: PlaybookKind;
+  meta: SummaryMeta;
 };
 
-const PersonalInfoAndDocs = ({ kind }: PersonalInfoAndDocsProps) => {
+const PersonalInfoAndDocs = ({ meta }: PersonalInfoAndDocsProps) => {
   const [editing, setEditing] = useState(false);
 
   const stopEditing = () => setEditing(false);
@@ -19,9 +19,9 @@ const PersonalInfoAndDocs = ({ kind }: PersonalInfoAndDocsProps) => {
   return (
     <Container>
       {editing ? (
-        <Editing stopEditing={stopEditing} kind={kind} />
+        <Editing onStopEditing={stopEditing} meta={meta} />
       ) : (
-        <Preview startEditing={startEditing} kind={kind} />
+        <Preview onStartEditing={startEditing} meta={meta} />
       )}
     </Container>
   );

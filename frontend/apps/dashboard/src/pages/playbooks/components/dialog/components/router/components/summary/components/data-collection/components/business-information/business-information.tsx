@@ -13,9 +13,9 @@ const BusinessInformation = () => {
   return (
     <Container>
       {editing ? (
-        <Editing stopEditing={stopEditing} />
+        <Editing onStopEditing={stopEditing} />
       ) : (
-        <Preview startEditing={startEditing} />
+        <Preview onStartEditing={startEditing} />
       )}
     </Container>
   );

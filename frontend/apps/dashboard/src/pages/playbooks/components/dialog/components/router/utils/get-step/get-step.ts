@@ -8,7 +8,7 @@ const getStep = ({ value }: GetStepProps) => {
     step = 0;
   } else if (value === 'nameYourPlaybook') {
     step = 1;
-  } else if (value === 'yourPlaybook') {
+  } else if (value === 'summary') {
     step = 2;
   } else if (value === 'authorizedScopes') {
     step = 3;

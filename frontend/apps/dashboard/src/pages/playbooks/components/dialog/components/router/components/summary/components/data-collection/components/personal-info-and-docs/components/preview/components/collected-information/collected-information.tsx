@@ -8,14 +8,16 @@ import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types
 import DisplayValue from './components/display-value';
 
 type CollectedInformationProps = {
-  fields: string[];
+  fields?: string[];
   title: string;
-  personalInfoAndDocs: PersonalInformationAndDocs;
+  subtitle?: string;
+  personalInfoAndDocs?: PersonalInformationAndDocs;
 };
 const CollectedInformation = ({
-  fields,
+  fields = [],
   title,
   personalInfoAndDocs,
+  subtitle,
 }: CollectedInformationProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.summary.form.personal-info-and-docs',
@@ -26,25 +28,32 @@ const CollectedInformation = ({
       <Typography variant="label-3" color="secondary">
         {title}
       </Typography>
-      <ValuesContainer>
-        {fields.map(field => (
-          <ItemContainer key={field}>
-            <Typography
-              variant="body-3"
-              color="tertiary"
-              sx={{ whiteSpace: 'nowrap', textAlign: 'right' }}
-            >
-              {t(`preview.${field}`)}
-            </Typography>
-            <ValueContainer>
-              <DisplayValue
-                field={field as keyof PersonalInformationAndDocs}
-                personalInfoAndDocs={personalInfoAndDocs}
-              />
-            </ValueContainer>
-          </ItemContainer>
-        ))}
-      </ValuesContainer>
+      {fields.length && personalInfoAndDocs ? (
+        <ValuesContainer>
+          {fields.map(field => (
+            <ItemContainer key={field}>
+              <Typography
+                variant="body-3"
+                color="tertiary"
+                sx={{ whiteSpace: 'nowrap', textAlign: 'right' }}
+              >
+                {t(`preview.${field}`)}
+              </Typography>
+              <ValueContainer>
+                <DisplayValue
+                  field={field as keyof PersonalInformationAndDocs}
+                  personalInfoAndDocs={personalInfoAndDocs}
+                />
+              </ValueContainer>
+            </ItemContainer>
+          ))}
+        </ValuesContainer>
+      ) : null}
+      {subtitle ? (
+        <Typography color="tertiary" variant="body-3">
+          {subtitle}
+        </Typography>
+      ) : null}
     </Container>
   );
 };

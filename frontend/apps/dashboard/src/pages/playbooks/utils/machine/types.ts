@@ -20,6 +20,11 @@ export type SummaryFormData = {
   [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
 };
 
+export type SummaryMeta = {
+  kind: PlaybookKind;
+  residency?: ResidencyFormData;
+};
+
 export type NameFormData = {
   kind: PlaybookKind;
   name: string;

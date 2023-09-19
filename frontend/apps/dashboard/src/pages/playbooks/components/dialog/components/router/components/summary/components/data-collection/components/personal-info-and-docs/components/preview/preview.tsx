@@ -6,7 +6,10 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 
-import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
+import type {
+  PersonalInformationAndDocs,
+  SummaryMeta,
+} from '@/playbooks/utils/machine/types';
 import {
   basicInformationFields,
   PlaybookKind,
@@ -17,11 +20,11 @@ import CollectedInformation from './components/collected-information';
 import useFormValues from './hooks/use-form-values';
 
 type PreviewProps = {
-  startEditing: () => void;
-  kind: PlaybookKind;
+  onStartEditing: () => void;
+  meta: SummaryMeta;
 };
 
-const Preview = ({ startEditing, kind }: PreviewProps) => {
+const Preview = ({ onStartEditing, meta }: PreviewProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.summary.form.personal-info-and-docs',
   );
@@ -41,7 +44,7 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
     .includes('flexcar');
   const showIdDocFirstFlowOption =
     hasIdDoc &&
-    kind === PlaybookKind.Kyc &&
+    meta.kind === PlaybookKind.Kyc &&
     (hasUserPermission || hasOrgPermissionForIdDocFirst);
 
   const basicInformationFormValues = formValues.filter(field =>
@@ -58,10 +61,13 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
         usResidentFormFields.indexOf(a) - usResidentFormFields.indexOf(b),
     );
 
+  const showNonUsResidentEmptyState =
+    meta.residency?.allowInternationalResidents === false;
+
   return (
     <Container>
       <Header>
-        {kind === PlaybookKind.Kyb ? (
+        {meta.kind === PlaybookKind.Kyb ? (
           <TitleContainer>
             <Typography variant="label-3">{t('title.kyb.main')}</Typography>
             <Tooltip
@@ -76,7 +82,7 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
           <Typography variant="label-3">{t('title.kyc')}</Typography>
         )}
         <LinkButton
-          onClick={startEditing}
+          onClick={onStartEditing}
           iconComponent={IcoPencil16}
           iconPosition="left"
           size="tiny"
@@ -88,13 +94,19 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
         <CollectedInformation
           fields={basicInformationFormValues}
           personalInfoAndDocs={personalInfoAndDocs}
-          title={t('basic-information')}
+          title={t('basic-information.title')}
         />
         <CollectedInformation
           fields={usResidentFormValues}
           personalInfoAndDocs={personalInfoAndDocs}
-          title={t('us-residents')}
+          title={t('us-residents.title')}
         />
+        {showNonUsResidentEmptyState && (
+          <CollectedInformation
+            title={t('non-us-residents.title')}
+            subtitle={t('non-us-residents.empty')}
+          />
+        )}
       </FormElementsContainer>
       {showIdDocFirstFlowOption && (
         <Subsection>

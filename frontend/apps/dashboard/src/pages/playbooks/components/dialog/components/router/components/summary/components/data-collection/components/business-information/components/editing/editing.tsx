@@ -8,10 +8,10 @@ import { Controller, useFormContext } from 'react-hook-form';
 import type { BusinessInformation } from '@/playbooks/utils/machine/types';
 
 type EditingProps = {
-  stopEditing: () => void;
+  onStopEditing: () => void;
 };
 
-const Editing = ({ stopEditing }: EditingProps) => {
+const Editing = ({ onStopEditing }: EditingProps) => {
   const { control, setValue, getValues } = useFormContext();
   const { t } = useTranslation(
     'pages.playbooks.dialog.summary.form.business-information.editing',
@@ -23,7 +23,7 @@ const Editing = ({ stopEditing }: EditingProps) => {
 
   const handleCancel = () => {
     setValue('businessInformation', initialValues);
-    stopEditing();
+    onStopEditing();
   };
 
   return (
@@ -97,7 +97,7 @@ const Editing = ({ stopEditing }: EditingProps) => {
           variant="primary"
           fullWidth
           size="compact"
-          onClick={stopEditing}
+          onClick={onStopEditing}
         >
           {t('save')}
         </Button>

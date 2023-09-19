@@ -33,7 +33,17 @@ const PreviewWithContext = ({
   return (
     <FormProvider {...formMethods}>
       <form>
-        <Preview startEditing={() => {}} kind={kind ?? PlaybookKind.Kyc} />
+        <Preview
+          onStartEditing={() => {}}
+          meta={{
+            kind: kind || PlaybookKind.Kyc,
+            residency: {
+              allowUsResidents: true,
+              allowUsTerritories: false,
+              allowInternationalResidents: false,
+            },
+          }}
+        />
       </form>
     </FormProvider>
   );

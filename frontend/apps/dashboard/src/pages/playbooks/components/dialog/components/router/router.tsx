@@ -174,7 +174,10 @@ const Router = ({ onClose }: RouterProps) => {
         {state.matches('summary') && (
           <Summary
             defaultValues={playbookValuesToPrefill}
-            kind={state.context.kind}
+            meta={{
+              kind: state.context.kind,
+              residency: state.context.residencyForm,
+            }}
             onBack={() => {
               send('navigationBackward');
             }}

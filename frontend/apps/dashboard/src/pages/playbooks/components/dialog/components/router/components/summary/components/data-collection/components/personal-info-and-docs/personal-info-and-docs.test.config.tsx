@@ -33,7 +33,16 @@ const PersonalInfoAndDocsWithContext = ({
   return (
     <FormProvider {...formMethods}>
       <form>
-        <PersonalInfoAndDocs kind={kind ?? PlaybookKind.Kyc} />
+        <PersonalInfoAndDocs
+          meta={{
+            kind: kind ?? PlaybookKind.Kyc,
+            residency: {
+              allowUsResidents: true,
+              allowUsTerritories: false,
+              allowInternationalResidents: false,
+            },
+          }}
+        />
       </form>
     </FormProvider>
   );

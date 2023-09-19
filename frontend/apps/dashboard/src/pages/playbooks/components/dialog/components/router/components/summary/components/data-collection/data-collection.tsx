@@ -4,6 +4,7 @@ import { InlineAlert } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import type { SummaryMeta } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import BusinessInformation from './components/business-information';
@@ -11,25 +12,25 @@ import InvestorProfile from './components/investor-profile';
 import PersonalInfoAndDocs from './components/personal-info-and-docs';
 
 type DataCollectionProps = {
-  kind: PlaybookKind;
+  meta: SummaryMeta;
 };
 
-const DataCollection = ({ kind }: DataCollectionProps) => {
+const DataCollection = ({ meta }: DataCollectionProps) => {
   const { t } = useTranslation(
     'pages.playbooks.dialog.summary.data-collection',
   );
   const { setValue } = useFormContext();
 
   useEffect(() => {
-    setValue('kind', kind);
-  }, [kind, setValue]);
+    setValue('meta', meta);
+  }, [meta, setValue]);
 
   return (
     <Container>
-      {kind === PlaybookKind.Kyb && <BusinessInformation />}
-      <PersonalInfoAndDocs kind={kind} />
-      {kind === PlaybookKind.Kyc && <InvestorProfile />}
-      {kind === PlaybookKind.Kyb && (
+      {meta.kind === PlaybookKind.Kyb && <BusinessInformation />}
+      <PersonalInfoAndDocs meta={meta} />
+      {meta.kind === PlaybookKind.Kyc && <InvestorProfile />}
+      {meta.kind === PlaybookKind.Kyb && (
         <InlineAlert variant="info">{t('alert')}</InlineAlert>
       )}
     </Container>
