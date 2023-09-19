@@ -3,11 +3,10 @@ import { StatusBar } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Camera as VisionCamera,
-  PhotoFile,
   useCameraDevices,
 } from 'react-native-vision-camera';
 
-import type { ScanType } from '../../scan.types';
+import type { ScanPicture, ScanType } from '../../scan.types';
 import CaptureButton from './components/capture-button';
 import Feedback from './components/feedback';
 import Flash from './components/flash';
@@ -21,11 +20,11 @@ type CameraProps = {
   feedback?: string;
   frameProcessor?: any;
   isObjectDetected?: boolean;
-  onPhotoTaken: (photo: PhotoFile) => void;
+  onBack?: () => void;
+  onPhotoTaken: (picture: ScanPicture) => void;
   subtitle?: string;
   title: string;
   type?: ScanType;
-  onBack?: () => void;
 };
 
 const AUTO_CAPTURE_DELAY = 750;
@@ -36,11 +35,11 @@ const Camera = ({
   feedback,
   frameProcessor,
   isObjectDetected,
+  onBack,
   onPhotoTaken,
   subtitle,
   title,
   type = 'back',
-  onBack,
 }: CameraProps) => {
   const [isFlashing, setIsFlashing] = useState(false);
   const camera = useRef<VisionCamera>(null);
@@ -50,7 +49,9 @@ const Camera = ({
 
   useEffect(() => {
     if (isObjectDetected) {
-      timerId = setTimeout(takePhoto, AUTO_CAPTURE_DELAY);
+      timerId = setTimeout(() => {
+        takePhoto({ manual: false });
+      }, AUTO_CAPTURE_DELAY);
       return () => clearTimeout(timerId);
     } else {
       resetAutoCapture();
@@ -64,7 +65,7 @@ const Camera = ({
     }
   };
 
-  const takePhoto = async () => {
+  const takePhoto = async (meta: Record<string, boolean>) => {
     if (!camera.current) return;
     setIsFlashing(true);
     setShowFeedback(false);
@@ -72,7 +73,7 @@ const Camera = ({
       qualityPrioritization: 'balanced',
     });
     resetAutoCapture();
-    onPhotoTaken(newPhoto);
+    onPhotoTaken({ photo: newPhoto, meta });
     setIsFlashing(false);
   };
 
@@ -100,7 +101,11 @@ const Camera = ({
         {isFlashing ? <Flash /> : null}
         <Buttons>
           {showFeedback && feedback && <Feedback>{feedback}</Feedback>}
-          <CaptureButton onPress={takePhoto} />
+          <CaptureButton
+            onPress={() => {
+              takePhoto({ manual: true });
+            }}
+          />
         </Buttons>
       </CameraContainer>
     </>

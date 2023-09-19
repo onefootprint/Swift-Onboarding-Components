@@ -1,6 +1,7 @@
 import request from '@onefootprint/request';
 import { UploadDocRequest, UploadDocResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
+import { Platform } from 'react-native';
 
 import { AUTH_HEADER } from '@/config/constants';
 
@@ -10,6 +11,7 @@ const uploadDoc = async ({
   side,
   image,
   mimeType,
+  meta,
 }: UploadDocRequest) => {
   const response = await request<UploadDocResponse>({
     method: 'POST',
@@ -18,6 +20,11 @@ const uploadDoc = async ({
       image,
       side,
       mimeType,
+      meta: {
+        ...meta,
+        isAppClip: Platform.OS === 'ios',
+        isInstantApp: Platform.OS === 'android',
+      },
     },
     headers: {
       [AUTH_HEADER]: authToken,

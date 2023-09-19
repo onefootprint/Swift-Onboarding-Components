@@ -71,17 +71,18 @@ const DocScan = ({
     setErrors([]);
   };
 
-  const handleSubmit = (image: string) => {
+  const handleSubmit = (image: string, meta: Record<string, boolean>) => {
     if (isPreview) {
       onDone(getPreviewNextSide(side, type));
     } else {
       uploadMutation.mutate(
         {
+          authToken,
           docId,
           image,
-          authToken,
-          side,
+          meta,
           mimeType: 'image/jpeg',
+          side,
         },
         {
           onSuccess: response => {

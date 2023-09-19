@@ -8,7 +8,6 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { StatusBar } from 'react-native';
-import { PhotoFile } from 'react-native-vision-camera';
 
 import BackButton from '@/components/back-button';
 import Header from '@/components/header';
@@ -17,7 +16,7 @@ import useTranslation from '@/hooks/use-translation';
 
 import { useScanContext } from '../../../scan-context';
 import Stepper, { StepperProps } from '../../../stepper';
-import type { ScanSize } from '../../scan.types';
+import type { ScanPicture, ScanSize } from '../../scan.types';
 import Errors from './components/errors';
 import { DEFAULT_HEIGHT, LARGE_HEIGHT } from './preview.constants';
 import encodeImagePath from './utils/encode-image-path';
@@ -26,7 +25,7 @@ import sanitizeImagePath from './utils/sanitize-image-path';
 type PreviewProps = {
   onBack?: () => void;
   onReset: () => void;
-  photo: PhotoFile;
+  picture: ScanPicture;
   size?: ScanSize;
   stepperValues: StepperProps;
   subtitle?: string;
@@ -36,7 +35,7 @@ type PreviewProps = {
 const Preview = ({
   onBack,
   onReset,
-  photo,
+  picture,
   size,
   stepperValues,
   subtitle,
@@ -50,9 +49,9 @@ const Preview = ({
   const imageHeight = size === 'default' ? DEFAULT_HEIGHT : LARGE_HEIGHT;
 
   const handleSubmit = async () => {
-    if (!photo) return;
-    const encodedImage = await encodeImagePath(photo.path);
-    onSubmit(encodedImage);
+    if (!picture.photo) return;
+    const encodedImage = await encodeImagePath(picture.photo.path);
+    onSubmit(encodedImage, picture.meta);
   };
 
   const handleRetakeAfterError = () => {
@@ -122,7 +121,7 @@ const Preview = ({
             hasError={isError}
             height={imageHeight}
             size={size}
-            source={{ uri: sanitizeImagePath(photo.path) }}
+            source={{ uri: sanitizeImagePath(picture.photo.path) }}
           />
         </Box>
         {isError && <Errors errors={errors} />}

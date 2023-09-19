@@ -12,6 +12,7 @@ export type UploadDocRequest = {
   side?: UploadDocumentSide;
   image: string;
   mimeType: string;
+  meta: Record<string, any>;
 };
 
 export type UploadDocResponse = {

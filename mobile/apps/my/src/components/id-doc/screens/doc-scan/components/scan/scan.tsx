@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { PhotoFile } from 'react-native-vision-camera';
 
 import { StepperProps } from '../stepper';
 import Camera from './components/camera';
 import Preview from './components/preview';
-import type { ScanSize, ScanType } from './scan.types';
+import type { ScanPicture, ScanSize, ScanType } from './scan.types';
 
 type ScanProps = {
   children?: React.ReactNode;
@@ -20,6 +19,11 @@ type ScanProps = {
   onBack?: () => void;
 };
 
+const initialPictureState = {
+  photo: null,
+  meta: {},
+};
+
 const Scan = ({
   children,
   disabled = false,
@@ -33,22 +37,22 @@ const Scan = ({
   stepperValues,
   onBack,
 }: ScanProps) => {
-  const [photo, setPhoto] = useState<PhotoFile | null>(null);
-  const showPreview = !!photo;
+  const [picture, setPicture] = useState<ScanPicture>(initialPictureState);
+  const showPreview = !!picture.photo;
 
-  const handlePhotoTaken = (newPhoto: PhotoFile) => {
-    setPhoto(newPhoto);
+  const handlePhotoTaken = (picture: ScanPicture) => {
+    setPicture(picture);
   };
 
   const handleResetPhoto = () => {
-    setPhoto(null);
+    setPicture(initialPictureState);
   };
 
   return showPreview ? (
     <Preview
       onBack={onBack}
       onReset={handleResetPhoto}
-      photo={photo}
+      picture={picture}
       size={size}
       stepperValues={stepperValues}
       subtitle={subtitle}

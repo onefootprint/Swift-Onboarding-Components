@@ -7,7 +7,7 @@ const ScanContext = createContext<{
   isSuccess: boolean;
   errors: string[];
   isLoading: boolean;
-  onSubmit: (image: string) => void;
+  onSubmit: (image: string, meta: Record<string, boolean>) => void;
   onBack: () => void;
   onResetErrors: () => void;
 }>({
