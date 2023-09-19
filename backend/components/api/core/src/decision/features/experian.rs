@@ -117,25 +117,22 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
         vec![]
     };
 
-    let mut reason_codes: Vec<FootprintReasonCode> = fraud_shield_reason_codes
+    let score_code = resp
+        .precise_id_response()
+        .ok()
+        .and_then(|p| p.score().ok().and_then(score_to_reason_code).map(|frc| vec![frc]))
+        .unwrap_or(vec![]);
+
+    fraud_shield_reason_codes
         .into_iter()
         .chain(dob_reason_codes)
         .chain(name_and_address_reason_codes.into_iter())
         .chain(ssn_reason_codes.into_iter())
         .chain(watchlist_codes.into_iter())
         .chain(phone_codes.into_iter())
+        .chain(score_code.into_iter())
         .unique()
-        .collect();
-
-    if let Some(s) = resp
-        .precise_id_response()
-        .ok()
-        .and_then(|p| p.score().ok().and_then(score_to_reason_code))
-    {
-        reason_codes.push(s)
-    };
-
-    reason_codes
+        .collect()
 }
 
 impl TryFrom<(&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap)> for ExperianFeatures {
