@@ -6,9 +6,6 @@ use newtypes::OnboardingRequirement;
 pub struct OnboardingStatusResponse {
     pub all_requirements: Vec<ApiOnboardingRequirement>,
     pub ob_configuration: PublicOnboardingConfiguration,
-    // TODO deprecate
-    pub requirements: Vec<ApiOnboardingRequirement>,
-    pub met_requirements: Vec<ApiOnboardingRequirement>,
 }
 
 export_schema!(OnboardingStatusResponse);

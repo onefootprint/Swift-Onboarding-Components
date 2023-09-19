@@ -19,7 +19,7 @@ def incomplete_client(investor_profile_ob_config, twilio):
     Sandbox user partially onboarded onto an ob config requiring investor profile
     """
     bifrost = BifrostClient.new(investor_profile_ob_config, twilio)
-    requirements = bifrost.get_status()["requirements"]
+    requirements = bifrost.get_status()["all_requirements"]
     ip_requirements = get_requirement_from_requirements(
         "collect_investor_profile", requirements
     )
@@ -88,14 +88,14 @@ def test_put_ip_info_incomplete_data(incomplete_client):
 def test_document_requirement(incomplete_client):
     auth_token = incomplete_client.auth_token
 
-    requirements = incomplete_client.get_status()["requirements"]
+    requirements = incomplete_client.get_status()["all_requirements"]
     req = next(r for r in requirements if r["kind"] == "collect_investor_profile")
     assert not req["missing_document"]
 
     # When we add a specific declaration, we should now have a missing requirement
     data = {**IP_DATA, "investor_profile.declarations": ["affiliated_with_us_broker"]}
     patch("hosted/user/vault", data, auth_token)
-    requirements = incomplete_client.get_status()["requirements"]
+    requirements = incomplete_client.get_status()["all_requirements"]
     req = next(r for r in requirements if r["kind"] == "collect_investor_profile")
     assert req["missing_document"]
 

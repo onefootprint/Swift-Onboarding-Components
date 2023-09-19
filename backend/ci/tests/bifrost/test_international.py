@@ -18,7 +18,7 @@ def test_international_address_req(sandbox_tenant, must_collect_data, twilio):
 
     # We should still be required to collect address and ssn9
     status = bifrost.get_status()
-    req = get_requirement_from_requirements("collect_data", status["requirements"])
+    req = get_requirement_from_requirements("collect_data", status["all_requirements"])
     assert "full_address" in req["missing_attributes"]
     assert "ssn9" in req["missing_attributes"]
 
@@ -28,11 +28,11 @@ def test_international_address_req(sandbox_tenant, must_collect_data, twilio):
 
     # Address CDO shuold be met, as well as ssn9
     status = bifrost.get_status()
-    req = get_requirement_from_requirements("collect_data", status["requirements"])
+    req = get_requirement_from_requirements("collect_data", status["all_requirements"])
     assert "full_address" not in req["missing_attributes"]
     assert "ssn9" not in req["missing_attributes"]
     fields_to_authorize = get_requirement_from_requirements(
-        "authorize", status["requirements"]
+        "authorize", status["all_requirements"]
     )["fields_to_authorize"]["collected_data"]
     assert "ssn9" not in fields_to_authorize
 
@@ -50,7 +50,7 @@ def test_user_without_documents_international(
     bifrost = BifrostClient.new(obc, twilio)
     status = bifrost.get_status()
     doc_requirement_before = get_requirement_from_requirements(
-        "collect_document", status["requirements"]
+        "collect_document", status["all_requirements"]
     )
     assert doc_requirement_before is None
 
@@ -61,7 +61,7 @@ def test_user_without_documents_international(
 
     status = bifrost.get_status()
     doc_requirement_after = get_requirement_from_requirements(
-        "collect_document", status["requirements"]
+        "collect_document", status["all_requirements"]
     )
 
     # now we have to collect a document since they are non-US
@@ -99,7 +99,7 @@ def test_with_documents_handles_international_address(
     status = bifrost.get_status()
 
     doc_requirement = get_requirement_from_requirements(
-        "collect_document", status["requirements"]
+        "collect_document", status["all_requirements"]
     )
     assert doc_requirement["should_collect_selfie"]
     assert doc_requirement["supported_document_types"] == ["passport"]
@@ -138,7 +138,7 @@ def test_with_documents_handles_international_address_restricted_documents(
     status = bifrost.get_status()
 
     doc_requirement = get_requirement_from_requirements(
-        "collect_document", status["requirements"]
+        "collect_document", status["all_requirements"]
     )
     assert doc_requirement["should_collect_selfie"]
     assert doc_requirement["supported_document_types"] == ["passport"]
@@ -172,7 +172,7 @@ def test_with_documents_handles_international_address_restricted_documents_with_
     bifrost = BifrostClient.new(obc, twilio)
     status_before_address = bifrost.get_status()
     doc_requirement_before_address = get_requirement_from_requirements(
-        "collect_document", status_before_address["requirements"]
+        "collect_document", status_before_address["all_requirements"]
     )
     assert set(doc_requirement_before_address["supported_document_types"]) == set(
         ["passport", "drivers_license"]
@@ -193,7 +193,7 @@ def test_with_documents_handles_international_address_restricted_documents_with_
 
     # Now we should only see passport available for us
     doc_requirement = get_requirement_from_requirements(
-        "collect_document", status["requirements"]
+        "collect_document", status["all_requirements"]
     )
     assert doc_requirement["should_collect_selfie"]
     assert doc_requirement["supported_document_types"] == ["passport"]
@@ -234,7 +234,7 @@ def test_us_legal_status(sandbox_tenant, twilio):
 
     status_before_address = bifrost.get_status()
     collect_data_requirement_before_address = get_requirement_from_requirements(
-        "collect_data", status_before_address["requirements"]
+        "collect_data", status_before_address["all_requirements"]
     )
 
     assert (
@@ -251,12 +251,12 @@ def test_us_legal_status(sandbox_tenant, twilio):
 
     status_after_address = bifrost.get_status()
     collect_data_requirement_after_address = get_requirement_from_requirements(
-        "collect_data", status_after_address["requirements"]
+        "collect_data", status_after_address["all_requirements"]
     )
 
     assert collect_data_requirement_after_address is None
 
     fields_to_authorize = get_requirement_from_requirements(
-        "authorize", status_after_address["requirements"]
+        "authorize", status_after_address["all_requirements"]
     )["fields_to_authorize"]["collected_data"]
     assert "us_legal_status" not in fields_to_authorize

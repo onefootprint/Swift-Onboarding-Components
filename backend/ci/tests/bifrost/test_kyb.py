@@ -11,7 +11,7 @@ from tests.constants import FIXTURE_PHONE_NUMBER
 @pytest.fixture(scope="session")
 def incomplete_bifrost(kyb_sandbox_ob_config, twilio, kyb_cdos):
     bifrost = BifrostClient.new(kyb_sandbox_ob_config, twilio)
-    requirements = bifrost.get_status()["requirements"]
+    requirements = bifrost.get_status()["all_requirements"]
     business_requirement = get_requirement_from_requirements(
         "collect_business_data", requirements
     )

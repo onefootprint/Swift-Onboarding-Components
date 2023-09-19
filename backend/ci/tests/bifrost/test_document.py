@@ -98,10 +98,10 @@ def test_upload_documents_with_ob_config_restriction(
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
     # make sure we've collected country
-    met_requirements = get_requirement_from_requirements(
-        "collect_data", bifrost.get_status()["met_requirements"]
+    met_requirement = get_requirement_from_requirements(
+        "collect_data", bifrost.get_status()["all_requirements"], is_met=True
     )
-    assert "full_address" in met_requirements["populated_attributes"]
+    assert "full_address" in met_requirement["populated_attributes"]
 
     # Manually handle the document requirement with some invalid data
     consent_data = {"consent_language_text": "I consent"}
@@ -135,7 +135,7 @@ def test_upload_documents_with_ob_config_restriction(
     bifrost.handle_requirements(kind="collect_document")
     status_after_doc_upload = bifrost.get_status()
     fields_to_authorize = get_requirement_from_requirements(
-        "authorize", status_after_doc_upload["requirements"]
+        "authorize", status_after_doc_upload["all_requirements"]
     )["fields_to_authorize"]
     document_types_to_authorize = fields_to_authorize["document_types"]
     # despite having created identity documents for NO passport, MX DL, we only actually uploaded successfully a DL
@@ -148,7 +148,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     bifrost.handle_requirements(kind="liveness")
     status = bifrost.get_status()
     doc_requirement = get_requirement_from_requirements(
-        "collect_document", status["requirements"]
+        "collect_document", status["all_requirements"]
     )
 
     assert doc_requirement["should_collect_selfie"]
@@ -180,7 +180,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     # now check what fields we have to authorize
     status_after_doc = bifrost.get_status()
     fields_to_authorize = get_requirement_from_requirements(
-        "authorize", status_after_doc["requirements"]
+        "authorize", status_after_doc["all_requirements"]
     )["fields_to_authorize"]
     collected_fields_to_authorize = fields_to_authorize["collected_data"]
     document_types_to_authorize = fields_to_authorize["document_types"]

@@ -39,7 +39,9 @@ def test_onboarding_init(bifrost):
     body = bifrost.get_status()
     assert body["ob_configuration"]["org_name"] == bifrost.ob_config.tenant.name
 
-    req = lambda kind: next(r for r in body["requirements"] if r["kind"] == kind)
+    req = lambda kind: next(
+        r for r in body["all_requirements"] if r["kind"] == kind and not r["is_met"]
+    )
 
     collect_data_req = req("collect_data")
     expected_data = set(bifrost.ob_config.must_collect_data) - {"phone_number", "email"}

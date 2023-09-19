@@ -21,13 +21,19 @@ def test_skip_liveness(twilio, sandbox_tenant):
 
     # Liveness requirement exists
     body = bifrost.get_status()
-    assert list(r for r in body["requirements"] if r["kind"] == "liveness")
+    assert list(
+        r
+        for r in body["all_requirements"]
+        if r["kind"] == "liveness" and not r["is_met"]
+    )
 
     post("hosted/onboarding/skip_passkey_register", None, bifrost.auth_token)
 
     # After skipping, liveness requirement does not exist
     body = bifrost.get_status()
-    assert not list(r for r in body["requirements"] if r["kind"] == "liveness")
+    assert not any(
+        r["kind"] == "liveness" and not r["is_met"] for r in body["all_requirements"]
+    )
 
 
 def test_d2p_biometric(twilio, sandbox_tenant):
@@ -94,7 +100,8 @@ def test_d2p_biometric(twilio, sandbox_tenant):
 
     # Make sure the liveness requirement is met
     assert not any(
-        i["kind"] == "liveness" for i in bifrost.get_status()["requirements"]
+        r["kind"] == "liveness" and not r["is_met"]
+        for r in bifrost.get_status()["all_requirements"]
     )
 
 

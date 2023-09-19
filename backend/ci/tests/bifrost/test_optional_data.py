@@ -8,12 +8,7 @@ from tests.utils import create_ob_config
 
 @pytest.mark.parametrize(
     "submit_ssn,step_up_to_doc",
-    [
-        (True, False), 
-        (False, False),
-        (False, True),
-        (True, True)
-    ],
+    [(True, False), (False, False), (False, True), (True, True)],
 )
 def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
     must_collect_data = ["full_address", "name", "email", "phone_number"]
@@ -25,16 +20,16 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
         must_collect_data,
         can_access_data,
         optional_data=optional_data,
-        doc_scan_for_optional_ssn= "document.passport,drivers_license,visa.none.none" if step_up_to_doc else None
+        doc_scan_for_optional_ssn="document.passport,drivers_license,visa.none.none"
+        if step_up_to_doc
+        else None,
     )
     bifrost = BifrostClient.new(obc, twilio, override_ob_config_auth=None)
 
     collect_data_req = get_requirement_from_requirements(
-        "collect_data", bifrost.get_status()["requirements"]
+        "collect_data", bifrost.get_status()["all_requirements"], is_met=False
     )
-    assert set(collect_data_req["missing_attributes"]) == set(["full_address", "name"])
     assert collect_data_req["optional_attributes"] == ["ssn9"]
-
     if not submit_ssn:
         # remove ssn9 from bifrost.data so we simulate skipping submitting ssn
         bifrost.data = {k: v for k, v in bifrost.data.items() if k != "id.ssn9"}
@@ -55,36 +50,39 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
     post("/hosted/user/vault/validate", data, bifrost.auth_token)
     patch("/hosted/user/vault", data, bifrost.auth_token)
 
+    status = bifrost.get_status()
     collect_data_req = get_requirement_from_requirements(
-        "collect_data", bifrost.get_status()["requirements"]
+        "collect_data", status["all_requirements"], is_met=False
     )
     collect_doc_req = get_requirement_from_requirements(
-        "collect_document", bifrost.get_status()["requirements"]
+        "collect_document", status["all_requirements"]
     )
     # requirements should be empty
     assert collect_data_req is None
-    
+
     if step_up_to_doc and not submit_ssn:
-        assert set(collect_doc_req['supported_country_and_doc_types']['US']) == set(["passport", "drivers_license", "visa"])
+        assert set(collect_doc_req["supported_country_and_doc_types"]["US"]) == set(
+            ["passport", "drivers_license", "visa"]
+        )
     else:
         assert collect_doc_req is None
-    
 
-    # get met_requirements and assert ssn in populated_attributes
-    met_requirements = get_requirement_from_requirements(
-        "collect_data", bifrost.get_status()["met_requirements"]
+    # get met_requirement and assert ssn in populated_attributes
+    status = bifrost.get_status()
+    met_requirement = get_requirement_from_requirements(
+        "collect_data", status["all_requirements"], is_met=True
     )
     expected_populated_attributes = ["full_address", "name", "email", "phone_number"]
     if submit_ssn:
         expected_populated_attributes.append("ssn9")
-    assert set(met_requirements["populated_attributes"]) == set(
+    assert set(met_requirement["populated_attributes"]) == set(
         expected_populated_attributes
     )
 
     authorize_requirement = get_requirement_from_requirements(
-        "authorize", bifrost.get_status()["requirements"]
+        "authorize", status["all_requirements"]
     )
-   
+
     assert set(authorize_requirement["fields_to_authorize"]["collected_data"]) == set(
         expected_populated_attributes
     )

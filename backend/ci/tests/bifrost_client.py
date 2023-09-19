@@ -193,7 +193,9 @@ class BifrostClient:
                 raise RepeatRequirement(next_requirement)
 
             self.handled_requirements.append(next_requirement)
-            self.already_met_requirements = body["met_requirements"]
+            self.already_met_requirements = [
+                r for r in body["all_requirements"] if r["is_met"]
+            ]
             self.handle_requirement(next_requirement)
             last_handled_requirement = next_requirement
 

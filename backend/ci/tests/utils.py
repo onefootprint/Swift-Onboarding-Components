@@ -486,8 +486,10 @@ def clean_up_user(phone_number, email):
         assert not body["available_challenge_kinds"]
 
 
-def get_requirement_from_requirements(kind, requirements):
-    f = lambda kind, requirements: next(r for r in requirements if r["kind"] == kind)
+def get_requirement_from_requirements(kind, requirements, is_met=False):
+    f = lambda kind, requirements: next(
+        r for r in requirements if r["kind"] == kind and r["is_met"] == is_met
+    )
     try:
         return f(kind, requirements)
     except StopIteration:

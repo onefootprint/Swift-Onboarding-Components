@@ -5,7 +5,7 @@ from tests.headers import FpAuth
 from tests.constants import FIXTURE_PHONE_NUMBER, INTEGRATION_SANDBOX_EMAIL_OTP_PIN
 from tests.utils import _gen_random_sandbox_id
 from tests.constants import EMAIL
-from tests.utils import patch, post
+from tests.utils import post
 from tests.utils import get_requirement_from_requirements
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
@@ -82,7 +82,7 @@ def test_new_user(skip_phone_obc):
         skip_phone_obc, auth_token, FIXTURE_PHONE_NUMBER, _gen_random_sandbox_id(), True
     )
 
-    reqs = bifrost.get_status()["requirements"]
+    reqs = bifrost.get_status()["all_requirements"]
 
     assert get_requirement_from_requirements("liveness", reqs) is None
 
