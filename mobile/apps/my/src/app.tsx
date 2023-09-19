@@ -11,7 +11,8 @@ import Wallet from './domains/wallet';
 import useShouldOpenIdv from './hooks/use-should-open-idv';
 
 const App = () => {
-  const { linkingUrl, shouldOpen, isPreview, isDemo } = useShouldOpenIdv();
+  const { linkingUrl, shouldOpen, isPreview, isDemo, isDebug } =
+    useShouldOpenIdv();
 
   const handleLoad = useCallback(async () => {
     SplashScreen.hide();
@@ -19,7 +20,7 @@ const App = () => {
 
   return isPreview ? (
     <QueryClientProvider client={queryClient}>
-      <Preview isDemo={isDemo} />
+      <Preview isDemo={isDemo} isDebug={isDebug} />
     </QueryClientProvider>
   ) : (
     <QueryClientProvider client={queryClient}>

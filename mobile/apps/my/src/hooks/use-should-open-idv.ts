@@ -12,9 +12,10 @@ const useShouldOpenIdv = () => {
   const url = debugUrl || linkingUrl;
   const isPreview = url?.endsWith(REVIEW_AUTH_TOKEN);
   const isDemo = url?.includes('demo=true');
+  const isDebug = url?.includes('debug=true');
   const shouldOpen = url?.includes('https://handoff');
 
-  return { shouldOpen, linkingUrl, isPreview, isDemo };
+  return { shouldOpen, linkingUrl, isPreview, isDemo, isDebug };
 };
 
 export default useShouldOpenIdv;
