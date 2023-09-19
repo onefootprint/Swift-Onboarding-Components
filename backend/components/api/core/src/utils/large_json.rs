@@ -21,9 +21,16 @@ impl<T: DeserializeOwned, const LIMIT: usize> FromRequest for LargeJson<T, LIMIT
     type Future = actix_json::JsonExtractFut<T, LIMIT>;
 
     fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
-        actix_json::JsonExtractFut {
-            fut: JsonBody::new(req, payload, None, false).limit(LIMIT),
-        }
+        let fut = JsonBody::new(req, payload, None, false).limit(LIMIT);
+        let length = req
+            .headers()
+            .get(&http::header::CONTENT_LENGTH)
+            .and_then(|l| l.to_str().ok())
+            .and_then(|s| s.parse::<usize>().ok());
+
+        tracing::info!(size=?length, "parsing large json");
+
+        actix_json::JsonExtractFut { fut }
     }
 }
 
