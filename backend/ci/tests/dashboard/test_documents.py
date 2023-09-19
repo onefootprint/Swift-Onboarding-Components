@@ -139,6 +139,7 @@ def test_get_entity_documents_uploaded_via_api(sandbox_tenant):
     assert doc["kind"] == "drivers_license"
     assert not doc["status"]
     assert not doc["started_at"]
+    assert doc["upload_source"] == "api"
     assert all(u["failure_reasons"] == [] for u in doc["uploads"])
     assert any(u["side"] == "front" for u in doc["uploads"])
 

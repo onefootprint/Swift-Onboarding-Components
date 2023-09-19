@@ -196,4 +196,4 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     tenant = user.tenant
     fp_id = user.fp_id
     body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
-    assert all([d["device_type"] == "desktop" for d in body])
+    assert all([d["upload_source"] == "desktop" for d in body])

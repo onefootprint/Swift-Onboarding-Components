@@ -39,8 +39,6 @@ impl DbToApi<DocumentInfo> for api_wire_types::Document {
             document_score,
             selfie_score,
             ocr_confidence_score,
-            // TODO deprecate
-            device_type: device_type.unwrap_or(DocumentScanDeviceType::Mobile),
             // TODO: Should we have default here? I think so
             upload_source: device_type.unwrap_or(DocumentScanDeviceType::Mobile).into(),
         }
@@ -86,8 +84,6 @@ impl DbToApi<DocumentVaultInfo> for api_wire_types::Document {
             document_score: None,
             selfie_score: None,
             ocr_confidence_score: None,
-            // TODO deprecate
-            device_type: DocumentScanDeviceType::Mobile,
             upload_source: UploadSource::Api,
         }
     }

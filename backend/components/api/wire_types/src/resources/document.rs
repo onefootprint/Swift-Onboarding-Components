@@ -33,8 +33,6 @@ pub struct Document {
     pub document_score: Option<f64>,
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
-    /// Deprecated
-    pub device_type: DocumentScanDeviceType,
     pub upload_source: UploadSource,
 }
 

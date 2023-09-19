@@ -9,9 +9,9 @@ use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
-    DataLifetimeId, DataLifetimeSeqno, DocumentRequestId, DocumentScanDeviceType, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
-    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, WorkflowId,
+    DataLifetimeSeqno, DocumentRequestId, DocumentScanDeviceType, IdDocKind, IdentityDocumentFixtureResult,
+    IdentityDocumentId, IdentityDocumentStatus, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode,
+    ScopedVaultId, TenantId, WorkflowId,
 };
 
 use super::document_request::DocumentRequest;
@@ -28,13 +28,6 @@ pub struct IdentityDocument {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    // TODO these lifetime_id columns are never read - we can drop them in favor of the completed_seqno
-    /// DEPRECATED
-    pub front_lifetime_id: Option<DataLifetimeId>,
-    /// DEPRECATED
-    pub back_lifetime_id: Option<DataLifetimeId>,
-    /// DEPRECATED
-    pub selfie_lifetime_id: Option<DataLifetimeId>,
     pub completed_seqno: Option<DataLifetimeSeqno>,
     // DO NOT CHANGE THE ORDER OF THESE FIELDS
     pub document_score: Option<f64>,
