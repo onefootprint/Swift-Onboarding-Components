@@ -52,6 +52,7 @@ export type OnboardingConfig = {
   appClipExperienceId: string;
   isInstantAppEnabled: boolean;
   isNoPhoneFlow: boolean;
+  allowUsResidents: boolean;
   allowInternationalResidents: boolean;
   supportedCountries?: CountryCode[];
   isDocFirstFlow: boolean;

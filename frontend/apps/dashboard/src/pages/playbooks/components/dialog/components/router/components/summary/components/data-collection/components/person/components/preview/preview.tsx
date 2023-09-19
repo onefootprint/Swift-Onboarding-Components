@@ -30,8 +30,12 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
     meta.kind === PlaybookKind.Kyc,
   );
   const showNonUsResidentsEmptyState =
-    meta.residency?.allowInternationalResidents === false;
+    meta.residency?.allowInternationalResidents === false ||
+    meta.kind === PlaybookKind.Kyb;
   const showUsResidentsEmptyState = meta.residency?.allowUsResidents === false;
+  const internationalOnly =
+    meta.residency?.allowInternationalResidents &&
+    !meta.residency.allowUsResidents;
 
   return (
     <Container>
@@ -50,14 +54,16 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
         ) : (
           <Typography variant="label-3">{t('title.kyc')}</Typography>
         )}
-        <LinkButton
-          iconComponent={IcoPencil16}
-          iconPosition="left"
-          onClick={onStartEditing}
-          size="tiny"
-        >
-          {t('preview.edit')}
-        </LinkButton>
+        {internationalOnly ? null : (
+          <LinkButton
+            iconComponent={IcoPencil16}
+            iconPosition="left"
+            onClick={onStartEditing}
+            size="tiny"
+          >
+            {t('preview.edit')}
+          </LinkButton>
+        )}
       </Header>
       <FormElementsContainer>
         <CollectedInformation
@@ -98,6 +104,9 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
           <CollectedInformation
             title={t('non-us-residents.title')}
             options={{
+              ...(meta.residency?.countryList
+                ? { countriesRestrictions: meta.residency?.countryList }
+                : {}),
               idDocKind: [SupportedIdDocTypes.passport],
               selfie: true,
             }}

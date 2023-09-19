@@ -17,14 +17,20 @@ export type CollectionAndScopesProps = {
 };
 
 const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
-  const { t } = useTranslation('pages.playbooks.table.details.content');
+  const { t } = useTranslation('pages.playbooks.details.content');
   const options = [
     { value: 'data', label: t('basics.data-collection') },
     { value: 'authorized-scopes', label: t('basics.authorized-scopes') },
   ];
   const [segment, setSegment] = useState(options[0].value);
-  const { mustCollectData, optionalData, canAccessData, isDocFirstFlow } =
-    playbook;
+  const {
+    mustCollectData,
+    optionalData,
+    canAccessData,
+    isDocFirstFlow,
+    allowInternationalResidents,
+    allowUsResidents,
+  } = playbook;
 
   const handleChange = (value: string) => {
     setSegment(value);
@@ -53,12 +59,22 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
             mustCollectData={mustCollectData}
             title={t('data-collection.basic-information')}
           />
-          <DataCollection
-            displayFields={usResidentDisplayFields}
-            mustCollectData={mustCollectData}
-            optionalData={optionalData}
-            title={t('data-collection.us-residents')}
-          />
+          {allowUsResidents && (
+            <DataCollection
+              displayFields={usResidentDisplayFields}
+              mustCollectData={mustCollectData}
+              optionalData={optionalData}
+              title={t('data-collection.us-residents')}
+            />
+          )}
+          {allowInternationalResidents && (
+            <DataCollection
+              displayFields={usResidentDisplayFields}
+              mustCollectData={mustCollectData}
+              optionalData={optionalData}
+              title={t('data-collection.non-us-residents')}
+            />
+          )}
           {isDocFirstFlow && (
             <InlineAlert variant="info">
               {t('data-collection.id-doc-first')}
@@ -67,7 +83,11 @@ const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
         </>
       )}
       {segment === 'authorized-scopes' && (
-        <AuthorizedScopes canAccessData={canAccessData} />
+        <AuthorizedScopes
+          canAccessData={canAccessData}
+          allowUsResidents={allowUsResidents}
+          allowInternationalResidents={allowInternationalResidents}
+        />
       )}
     </Container>
   );

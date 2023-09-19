@@ -4,11 +4,9 @@ import { Checkbox, Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-const BusinessScopes = () => {
+const Business = () => {
   const { register } = useFormContext();
-  const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.data-collection.authorized-scopes',
-  );
+  const { t } = useTranslation('pages.playbooks.dialog.authorized-scopes');
 
   return (
     <Container>
@@ -30,4 +28,4 @@ const Container = styled.div`
   `};
 `;
 
-export default BusinessScopes;
+export default Business;

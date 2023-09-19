@@ -13,7 +13,7 @@ export type BasicsProps = {
 };
 
 const Basics = ({ playbook }: BasicsProps) => {
-  const { t } = useTranslation('pages.playbooks.table.details.content.basics');
+  const { t } = useTranslation('pages.playbooks.details.content.basics');
   const isKYB = isKybPlaybook(playbook);
   const kind = isKYB ? 'kyb' : 'kyc';
   const [open, setOpen] = useState(false);

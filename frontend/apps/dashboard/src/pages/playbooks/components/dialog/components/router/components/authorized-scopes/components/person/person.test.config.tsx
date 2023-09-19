@@ -5,6 +5,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import type {
   AuthorizedScopesFormData,
   PersonalInformationAndDocs,
+  SummaryMeta,
 } from '@/playbooks/utils/machine/types';
 import {
   defaultAuthorizedScopesValues,
@@ -12,18 +13,25 @@ import {
   PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
-import PersonalScopes from './personal-scopes';
+import PersonalScopes from './person';
 
 export type PersonalScopesWithContextProps = {
   startingPersonalValues?: Partial<PersonalInformationAndDocs>;
   investorProfile?: boolean;
-  kind?: PlaybookKind;
+  meta?: SummaryMeta;
 };
 
 const PersonalScopesWithContext = ({
   startingPersonalValues,
   investorProfile,
-  kind = PlaybookKind.Kyc,
+  meta = {
+    kind: PlaybookKind.Kyc,
+    residency: {
+      allowUsResidents: true,
+      allowInternationalResidents: true,
+      allowUsTerritories: false,
+    },
+  },
 }: PersonalScopesWithContextProps) => {
   const formMethods = useForm<AuthorizedScopesFormData>({
     defaultValues: defaultAuthorizedScopesValues,
@@ -33,7 +41,7 @@ const PersonalScopesWithContext = ({
     <FormProvider {...formMethods}>
       <form>
         <PersonalScopes
-          kind={kind}
+          meta={meta}
           playbook={{
             ...defaultPlaybookValuesKYC,
             personalInformationAndDocs: {

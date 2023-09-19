@@ -87,7 +87,6 @@ const Router = ({ onClose }: RouterProps) => {
       playbook,
       residencyForm,
     });
-
     mutation.mutate(
       {
         allowInternationalResidents,
@@ -188,7 +187,10 @@ const Router = ({ onClose }: RouterProps) => {
         )}
         {state.matches('authorizedScopes') && (
           <AuthorizedScopes
-            kind={state.context.kind}
+            meta={{
+              kind: state.context.kind,
+              residency: state.context.residencyForm,
+            }}
             playbook={state.context.playbook ?? playbookValuesToPrefill}
             onBack={() => {
               send('navigationBackward');

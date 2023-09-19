@@ -1210,6 +1210,9 @@
         "title": "Playbooks",
         "subtitle": "Playbooks help companies onboard users to match your needs. Prescriptive yet custom to give you our guidance while recognizing this is not a one-size fits all solution."
       },
+      "create-button": "Create Playbook",
+      "empty-description": "You haven't created any Playbooks just yet.",
+      "cta-not-allowed": "You're not allowed to create Playbooks",
       "table": {
         "aria-label": "Playbooks",
         "header": {
@@ -1224,63 +1227,6 @@
             "label": "Status",
             "enabled": "Enabled",
             "disabled": "Disabled"
-          }
-        },
-        "details": {
-          "title": "Playbook details",
-          "content": {
-            "data-collection": {
-              "basic-information": "Basic information",
-              "email": "Email",
-              "phone_number": "Phone number",
-              "name": "First & Last name",
-              "dob": "Date of birth",
-              "full_address": "Address",
-              "nationality": "Nationality",
-              "us_legal_status": "Legal status in the U.S.",
-              "ssn": "SSN",
-              "full": "Full",
-              "last4": "Last 4",
-              "full_optional": "Full (Optional)",
-              "last4_optional": "Last 4 (Optional)",
-              "document": "ID document scan",
-              "selfie": "Selfie",
-              "us-residents": "U.S. residents",
-              "ssn9": "SSN (Full)",
-              "ssn4": "SSN (Last 4)",
-              "drivers_license": "Driver's license",
-              "id_card": "Identity card",
-              "passport": "Passport (photo page)",
-              "visa": "Visa",
-              "residence_document": "Residence card",
-              "permit": "Work permit",
-              "id-doc-first": "Document scan will be used to autofill basic identity data"
-            },
-            "authorized-scopes": {
-              "basic-information": "Basic information",
-              "us-residents": "U.S. residents"
-            },
-            "basics": {
-              "title": "Playbook basics",
-              "edit-name": {
-                "title": "Playbook basics",
-                "edit": "Edit Playbook name",
-                "form": {
-                  "label": "Playbook name",
-                  "cancel": "Cancel",
-                  "save": "Save"
-                }
-              },
-              "type": {
-                "label": "Type",
-                "kyc": "KYC",
-                "kyb": "KYB"
-              },
-              "name": "Playbook name",
-              "publishable-key": "Publishable key",
-              "data-collection": "Data collection",
-              "authorized-scopes": "Authorized scopes"
-            }
           }
         },
         "actions": {
@@ -1346,9 +1292,60 @@
           }
         }
       },
-      "create-button": "Create Playbook",
-      "empty-description": "You haven't created any Playbooks just yet.",
-      "cta-not-allowed": "You're not allowed to create Playbooks",
+      "details": {
+        "title": "Playbook details",
+        "content": {
+          "data-collection": {
+            "basic-information": "Basic information",
+            "email": "Email",
+            "phone_number": "Phone number",
+            "name": "First & Last name",
+            "dob": "Date of birth",
+            "full_address": "Address",
+            "nationality": "Nationality",
+            "us_legal_status": "Legal status in the U.S.",
+            "ssn": "SSN",
+            "full": "Full",
+            "last4": "Last 4",
+            "full_optional": "Full (Optional)",
+            "last4_optional": "Last 4 (Optional)",
+            "document": "ID document scan",
+            "selfie": "Selfie",
+            "us-residents": "U.S. residents",
+            "non-us-residents": "Non U.S. residents",
+            "ssn9": "SSN (Full)",
+            "ssn4": "SSN (Last 4)",
+            "drivers_license": "Driver's license",
+            "id_card": "Identity card",
+            "passport": "Passport (photo page)",
+            "visa": "Visa",
+            "residence_document": "Residence card",
+            "permit": "Work permit",
+            "id-doc-first": "Document scan will be used to autofill basic identity data"
+          },
+          "basics": {
+            "title": "Playbook basics",
+            "edit-name": {
+              "title": "Playbook basics",
+              "edit": "Edit Playbook name",
+              "form": {
+                "label": "Playbook name",
+                "cancel": "Cancel",
+                "save": "Save"
+              }
+            },
+            "type": {
+              "label": "Type",
+              "kyc": "KYC",
+              "kyb": "KYB"
+            },
+            "name": "Playbook name",
+            "publishable-key": "Publishable key",
+            "data-collection": "Data collection",
+            "authorized-scopes": "Authorized scopes"
+          }
+        }
+      },
       "dialog": {
         "title": "Create Playbook",
         "router": {
@@ -1407,7 +1404,8 @@
         },
         "summary": {
           "title": "Your Playbook recommendation",
-          "subtitle": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
+          "subtitle-default": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
+          "subtitle-international-only": "Here’s our recommended Playbook configuration.",
           "data-collection": {
             "investor-profile": {
               "title": "Investor profile questions",
@@ -1426,19 +1424,7 @@
                 "immediate-family": "Do any of the following apply to you or your immediate family?"
               }
             },
-            "alert": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business.",
-            "authorized-scopes": {
-              "title": "Authorized scopes",
-              "subtitle": "Select the data attributes you need read access to after an onboarding. During onboarding, the user will 'authorize' access to the scopes you choose below. If you are not sure what you will need, leave all the default fields selected.",
-              "back": "Back",
-              "create-playbook": "Create Playbook",
-              "all-business-info": "All business information",
-              "beneficial-owners": "Beneficial owners",
-              "basic-information": "Basic information",
-              "us-residents": "U.S. residents",
-              "investor-profile": "Investor profile",
-              "investor-profile-questions": "Investor profile questions"
-            }
+            "alert": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
           },
           "form": {
             "person": {
@@ -1511,6 +1497,7 @@
                 "us-legal-status": "Legal status in the U.S.",
                 "full-address": "Address",
                 "id-doc-kind": "ID document scan",
+                "countries-restrictions": "Restricted to these countries",
                 "and": "and",
                 "more": "more",
                 "selfie": "Selfie",
@@ -1559,6 +1546,19 @@
                 "business_tin": "EIN"
               }
             }
+          }
+        },
+        "authorized-scopes": {
+          "title": "Authorized scopes",
+          "subtitle": "Select the data attributes you need read access to after an onboarding. During onboarding, the user will 'authorize' access to the scopes you choose below. If you are not sure what you will need, leave all the default fields selected.",
+          "all-business-info": "All business information",
+          "beneficial-owners": "Beneficial owners",
+          "basic-information": "Basic information",
+          "investor-profile": "Investor profile",
+          "investor-profile-questions": "Investor profile questions",
+          "residency": {
+            "us-residents": "U.S. residents",
+            "non-us-residents": "Non U.S. residents"
           }
         }
       }

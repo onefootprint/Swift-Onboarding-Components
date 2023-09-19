@@ -9,20 +9,22 @@ import { Box, Checkbox, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import type { SummaryFormData } from '@/playbooks/utils/machine/types';
+import type {
+  SummaryFormData,
+  SummaryMeta,
+} from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
-type PersonalScopesProps = {
+type PersonProps = {
   playbook: SummaryFormData;
-  kind: PlaybookKind;
+  meta: SummaryMeta;
 };
 
-const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
-  const { register } = useFormContext();
+const Person = ({ playbook, meta }: PersonProps) => {
   const { allT, t } = useTranslation(
-    'pages.playbooks.dialog.summary.data-collection.authorized-scopes',
+    'pages.playbooks.dialog.authorized-scopes',
   );
-
+  const { register } = useFormContext();
   const { personalInformationAndDocs } = playbook;
   const { selfie, idDoc, ssn, ssnKind } = personalInformationAndDocs;
   const usLegalStatus =
@@ -32,7 +34,10 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
 
   const isCollectingInvestorProfile =
     playbook[CollectedInvestorProfileDataOption.investorProfile] &&
-    kind === PlaybookKind.Kyc;
+    meta.kind === PlaybookKind.Kyc;
+  const allowUS =
+    meta.kind === PlaybookKind.Kyb || meta.residency?.allowUsResidents;
+  const allowInternational = meta.residency?.allowInternationalResidents;
 
   return (
     <Sections>
@@ -57,11 +62,18 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
           />
         </OptionsContainer>
       </ScopeSection>
-
-      {(ssn || usLegalStatus || idDoc) && (
+      {(ssn || usLegalStatus || idDoc) && allowUS && (
         <ScopeSection>
-          <Typography variant="label-3">{t('us-residents')}</Typography>
+          <Typography variant="label-3">
+            {t('residency.us-residents')}
+          </Typography>
           <OptionsContainer>
+            {usLegalStatus && (
+              <Checkbox
+                label={allT('cdo.us_legal_status')}
+                {...register(CollectedKycDataOption.usLegalStatus)}
+              />
+            )}
             {ssn &&
               (ssnKind === CollectedKycDataOption.ssn4 ? (
                 <Checkbox
@@ -74,12 +86,6 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
                   {...register(CollectedKycDataOption.ssn9)}
                 />
               ))}
-            {usLegalStatus && (
-              <Checkbox
-                label={allT('cdo.us_legal_status')}
-                {...register(CollectedKycDataOption.usLegalStatus)}
-              />
-            )}
             {idDoc && (
               <Box>
                 <Checkbox
@@ -95,7 +101,22 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
           </OptionsContainer>
         </ScopeSection>
       )}
-
+      {allowInternational && (
+        <ScopeSection>
+          <Typography variant="label-3">
+            {t('residency.non-us-residents')}
+          </Typography>
+          <OptionsContainer>
+            <Box>
+              <Checkbox
+                label={`${allT('cdo.passport')} & ${allT('cdo.selfie')}`}
+                disabled
+                checked
+              />
+            </Box>
+          </OptionsContainer>
+        </ScopeSection>
+      )}
       {isCollectingInvestorProfile && (
         <ScopeSection>
           <Typography variant="label-3">{t('investor-profile')}</Typography>
@@ -133,9 +154,9 @@ const ScopeSection = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    width: 100%;
     gap: ${theme.spacing[7]};
+    width: 100%;
   `}
 `;
 
-export default PersonalScopes;
+export default Person;

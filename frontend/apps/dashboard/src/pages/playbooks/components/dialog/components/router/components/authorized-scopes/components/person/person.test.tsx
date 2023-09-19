@@ -7,19 +7,19 @@ import React from 'react';
 
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
-import type { PersonalScopesWithContextProps } from './personal-scopes.test.config';
-import PersonalScopesWithContext from './personal-scopes.test.config';
+import type { PersonalScopesWithContextProps } from './person.test.config';
+import PersonalScopesWithContext from './person.test.config';
 
 const renderPersonalScopes = ({
   startingPersonalValues,
   investorProfile,
-  kind,
+  meta,
 }: PersonalScopesWithContextProps) => {
   customRender(
     <PersonalScopesWithContext
-      startingPersonalValues={startingPersonalValues}
       investorProfile={investorProfile}
-      kind={kind}
+      meta={meta}
+      startingPersonalValues={startingPersonalValues}
     />,
   );
 };
@@ -28,9 +28,11 @@ describe('<PersonalScopes />', () => {
     renderPersonalScopes({
       startingPersonalValues: { [CollectedKycDataOption.usLegalStatus]: false },
     });
+
     const email = screen.getByRole('checkbox', { name: 'Email' });
     expect(email).toBeInTheDocument();
     expect(email).toBeDisabled();
+
     const phone = screen.getByRole('checkbox', { name: 'Phone number' });
     expect(phone).toBeInTheDocument();
     expect(phone).toBeDisabled();
@@ -42,28 +44,31 @@ describe('<PersonalScopes />', () => {
         phone_number: false,
       },
     });
-    expect(
-      screen.queryByRole('checkbox', { name: 'Phone number' }),
-    ).not.toBeInTheDocument();
+
+    const phone = screen.queryByRole('checkbox', { name: 'Phone number' });
+    expect(phone).not.toBeInTheDocument();
   });
 
   it('should show name, date of birth, and address by default', () => {
     renderPersonalScopes({
       startingPersonalValues: { [CollectedKycDataOption.usLegalStatus]: false },
     });
+
     const name = screen.getByRole('checkbox', { name: 'Full name' });
     expect(name).toBeInTheDocument();
+
     const dob = screen.getByRole('checkbox', { name: 'Date of birth' });
     expect(dob).toBeInTheDocument();
+
     const address = screen.getByRole('checkbox', { name: 'Address' });
     expect(address).toBeInTheDocument();
   });
 
   it('should not show SSN if not collecting', () => {
     renderPersonalScopes({ startingPersonalValues: { ssn: false } });
-    expect(
-      screen.queryByRole('checkbox', { name: 'SSN' }),
-    ).not.toBeInTheDocument();
+
+    const ssn = screen.queryByRole('checkbox', { name: 'SSN' });
+    expect(ssn).not.toBeInTheDocument();
   });
 
   it('should show SSN (Full) if collecting', () => {
@@ -73,9 +78,9 @@ describe('<PersonalScopes />', () => {
         ssnKind: CollectedKycDataOption.ssn9,
       },
     });
-    expect(
-      screen.getByRole('checkbox', { name: 'SSN (Full)' }),
-    ).toBeInTheDocument();
+
+    const ssn = screen.getByRole('checkbox', { name: 'SSN (Full)' });
+    expect(ssn).toBeInTheDocument();
   });
 
   it('should show SSN (Last 4) if collecting', () => {
@@ -85,9 +90,9 @@ describe('<PersonalScopes />', () => {
         ssnKind: CollectedKycDataOption.ssn4,
       },
     });
-    expect(
-      screen.getByRole('checkbox', { name: 'SSN (Last 4)' }),
-    ).toBeInTheDocument();
+
+    const ssn = screen.getByRole('checkbox', { name: 'SSN (Last 4)' });
+    expect(ssn).toBeInTheDocument();
   });
 
   it('should show SSN (Last 4) enabled by default', () => {
@@ -97,9 +102,9 @@ describe('<PersonalScopes />', () => {
         ssnKind: CollectedKycDataOption.ssn4,
       },
     });
-    expect(
-      screen.getByRole('checkbox', { name: 'SSN (Last 4)' }),
-    ).toBeChecked();
+
+    const ssn = screen.getByRole('checkbox', { name: 'SSN (Last 4)' });
+    expect(ssn).toBeChecked();
   });
 
   it('should show SSN Full enabled by default', () => {
@@ -109,13 +114,16 @@ describe('<PersonalScopes />', () => {
         ssnKind: CollectedKycDataOption.ssn9,
       },
     });
-    expect(screen.getByRole('checkbox', { name: 'SSN (Full)' })).toBeChecked();
+
+    const ssn = screen.getByRole('checkbox', { name: 'SSN (Full)' });
+    expect(ssn).toBeChecked();
   });
 
   it('should not show usLegalStatus if not collecting', () => {
     renderPersonalScopes({
       startingPersonalValues: { [CollectedKycDataOption.usLegalStatus]: false },
     });
+
     const usLegalStatus = screen.queryByRole('checkbox', {
       name: 'Legal status in the U.S.',
     });
@@ -126,6 +134,7 @@ describe('<PersonalScopes />', () => {
     renderPersonalScopes({
       startingPersonalValues: { [CollectedKycDataOption.usLegalStatus]: true },
     });
+
     const usLegalStatus = screen.getByRole('checkbox', {
       name: 'Legal status in the U.S.',
     });
@@ -134,6 +143,7 @@ describe('<PersonalScopes />', () => {
 
   it('should not show investor profile if not collecting', () => {
     renderPersonalScopes({ investorProfile: false });
+
     const investorProfile = screen.queryByRole('checkbox', {
       name: 'Investor profile',
     });
@@ -141,7 +151,13 @@ describe('<PersonalScopes />', () => {
   });
 
   it('should not show investor profile if KYB', () => {
-    renderPersonalScopes({ investorProfile: true, kind: PlaybookKind.Kyb });
+    renderPersonalScopes({
+      investorProfile: true,
+      meta: {
+        kind: PlaybookKind.Kyb,
+      },
+    });
+
     const investorProfile = screen.queryByRole('checkbox', {
       name: 'Investor profile',
     });
@@ -150,6 +166,7 @@ describe('<PersonalScopes />', () => {
 
   it('should show investor profile if collecting', () => {
     renderPersonalScopes({ investorProfile: true });
+
     const investorProfile = screen.getByRole('checkbox', {
       name: 'Investor profile questions',
     });
@@ -163,6 +180,7 @@ describe('<PersonalScopes />', () => {
         idDocKind: [SupportedIdDocTypes.driversLicense],
       },
     });
+
     const idDoc = screen.getByRole('checkbox', {
       name: 'ID Document & Selfie',
     });
@@ -175,6 +193,7 @@ describe('<PersonalScopes />', () => {
         idDoc: false,
       },
     });
+
     const idDoc = screen.queryByRole('checkbox', {
       name: 'ID Document & Selfie',
     });
@@ -190,7 +209,9 @@ describe('<PersonalScopes />', () => {
         [CollectedKycDataOption.usLegalStatus]: false,
       },
     });
-    expect(screen.queryByText('U.S. residents')).not.toBeInTheDocument();
+
+    const usResidents = screen.queryByText('U.S. residents');
+    expect(usResidents).not.toBeInTheDocument();
   });
 
   it('should render US residents section if at least one of the options exist', () => {
@@ -202,6 +223,8 @@ describe('<PersonalScopes />', () => {
         [CollectedKycDataOption.usLegalStatus]: false,
       },
     });
-    expect(screen.getByText('U.S. residents')).toBeInTheDocument();
+
+    const usResidents = screen.queryByText('U.S. residents');
+    expect(usResidents).toBeInTheDocument();
   });
 });

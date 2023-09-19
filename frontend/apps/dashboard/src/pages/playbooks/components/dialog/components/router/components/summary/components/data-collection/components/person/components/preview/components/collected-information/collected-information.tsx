@@ -31,7 +31,7 @@ const CollectedInformation = ({
               <Label variant="body-3" color="tertiary">
                 {t(`preview.${kebabCase(name)}`)}
               </Label>
-              <DisplayValue name={name} value={value} />
+              <DisplayValue name={name as any} value={value} />
             </OptionItem>
           ))}
         </OptionsContainer>

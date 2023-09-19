@@ -104,6 +104,7 @@ describe('<AuthorizedScopes />', () => {
     renderAuthorizedScopes({
       canAccessData: [CollectedKycDataOption.ssn9],
     });
+
     expect(screen.getByText('U.S. residents')).toBeInTheDocument();
   });
 });

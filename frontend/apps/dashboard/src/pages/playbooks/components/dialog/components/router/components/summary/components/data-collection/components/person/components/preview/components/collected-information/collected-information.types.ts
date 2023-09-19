@@ -1,3 +1,4 @@
+import type { CountryRecord } from '@onefootprint/global-constants';
 import type { SupportedIdDocTypes } from '@onefootprint/types';
 
 export type Option = Partial<{
@@ -13,4 +14,5 @@ export type Option = Partial<{
     optional?: boolean;
   };
   usLegalStatus: boolean;
+  countriesRestrictions: CountryRecord[];
 }>;

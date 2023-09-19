@@ -30,7 +30,9 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
       defaultValues,
     },
   );
-  const usResidentsChecked = watch('allowUsResidents');
+  // TODO: Enable US territories
+  // https://linear.app/footprint/issue/FP-6072/playbooks-enable-us-territories
+  // const usResidentsChecked = watch('allowUsResidents');
   const internationalChecked = watch('allowInternationalResidents');
   const restrictCountriesChecked =
     watch('restrictCountries') === CountryRestriction.restrict;
@@ -55,14 +57,14 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
             label={t('us-residents')}
             {...register('allowUsResidents')}
           />
-          {usResidentsChecked && (
+          {/* {usResidentsChecked && (
             <UsTerritoriesContainer>
               <Checkbox
                 label={t('us-territories')}
                 {...register('allowUsTerritories')}
               />
             </UsTerritoriesContainer>
-          )}
+          )} */}
           <Checkbox
             label={t('other-countries')}
             {...register('allowInternationalResidents')}

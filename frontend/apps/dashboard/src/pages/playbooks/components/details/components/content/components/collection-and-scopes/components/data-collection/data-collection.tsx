@@ -20,7 +20,7 @@ const DataCollection = ({
   title,
 }: DataCollectionProps) => {
   const { t } = useTranslation(
-    'pages.playbooks.table.details.content.data-collection',
+    'pages.playbooks.details.content.data-collection',
   );
 
   const getLabel = (field: string) => {

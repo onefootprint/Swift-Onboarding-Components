@@ -5,46 +5,14 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import IdDocDisplay from '@/playbooks/components/id-doc-display';
+import ListValue from '@/playbooks/components/list-value';
 
 import type { Option } from '../../collected-information.types';
 
-type DisplayValueProps =
-  | {
-      name: 'dob';
-      value: Option['dob'];
-    }
-  | {
-      name: 'email';
-      value: Option['email'];
-    }
-  | {
-      name: 'fullAddress';
-      value: Option['fullAddress'];
-    }
-  | {
-      name: 'idDocKind';
-      value: Option['idDocKind'];
-    }
-  | {
-      name: 'phoneNumber';
-      value: Option['phoneNumber'];
-    }
-  | {
-      name: 'selfie';
-      value: Option['selfie'];
-    }
-  | {
-      name: 'ssn';
-      value: Option['ssn'];
-    }
-  | {
-      name: 'usLegalStatus';
-      value: Option['usLegalStatus'];
-    }
-  | {
-      name: string;
-      value: any;
-    };
+type DisplayValueProps<K extends keyof Option = keyof Option> = {
+  name: K;
+  value: Option[K];
+};
 
 const DisplayValue = ({ name, value }: DisplayValueProps) => {
   const { t } = useTranslation('pages.playbooks.dialog.summary.form.person');
@@ -58,15 +26,26 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
   }
 
   if (name === 'ssn') {
-    if (value.active) {
+    const ssnValue = value as NonNullable<Option['ssn']>;
+    if (ssnValue.active) {
       return (
         <Typography variant="body-3">
-          {t(`preview.${value.kind}`)}{' '}
-          {value.optional ? t('preview.optional') : ''}
+          {t(`preview.${ssnValue.kind}`)}{' '}
+          {ssnValue.optional ? t('preview.optional') : ''}
         </Typography>
       );
     }
     return <IcoCloseSmall24 />;
+  }
+
+  if (name === 'countriesRestrictions' && value) {
+    const countries = value as NonNullable<Option['countriesRestrictions']>;
+    return (
+      <ListValue
+        value={countries.map(country => country.label)}
+        threshold={2}
+      />
+    );
   }
 
   return null;

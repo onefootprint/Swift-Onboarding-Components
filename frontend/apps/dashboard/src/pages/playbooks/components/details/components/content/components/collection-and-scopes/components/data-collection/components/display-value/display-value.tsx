@@ -20,7 +20,7 @@ const DisplayValue = ({
   optionalData = [],
 }: DisplayValueProps) => {
   const { t } = useTranslation(
-    'pages.playbooks.table.details.content.data-collection',
+    'pages.playbooks.details.content.data-collection',
   );
 
   if (field === 'document') {

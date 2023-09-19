@@ -10,14 +10,19 @@ import {
 import Section from './components/section';
 
 export type AuthorizedScopesProps = {
+  allowInternationalResidents: boolean;
+  allowUsResidents: boolean;
   canAccessData: string[];
 };
 
-const AuthorizedScopes = ({ canAccessData }: AuthorizedScopesProps) => {
+const AuthorizedScopes = ({
+  allowUsResidents,
+  allowInternationalResidents,
+  canAccessData,
+}: AuthorizedScopesProps) => {
   const { t } = useTranslation(
-    'pages.playbooks.table.details.content.authorized-scopes',
+    'pages.playbooks.details.content.data-collection',
   );
-
   const ssn =
     canAccessData.includes(CollectedKycDataOption.ssn9) ||
     canAccessData.includes(CollectedKycDataOption.ssn4);
@@ -34,11 +39,18 @@ const AuthorizedScopes = ({ canAccessData }: AuthorizedScopesProps) => {
         canAccessData={canAccessData}
         title={t('basic-information')}
       />
-      {(ssn || usLegalStatus || idDoc) && (
+      {(ssn || usLegalStatus || idDoc) && allowUsResidents && (
         <Section
           displayScopes={usResidentDisplayScopes}
           canAccessData={canAccessData}
           title={t('us-residents')}
+        />
+      )}
+      {allowInternationalResidents && (
+        <Section
+          displayScopes={usResidentDisplayScopes}
+          canAccessData={canAccessData}
+          title={t('non-us-residents')}
         />
       )}
     </Container>

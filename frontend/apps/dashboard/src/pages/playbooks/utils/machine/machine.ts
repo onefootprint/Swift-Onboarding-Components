@@ -36,6 +36,10 @@ export const createPlaybookMachine = () =>
         },
         residency: {
           on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+              actions: ['resetKind'],
+            },
             residencySubmitted: {
               target: 'nameYourPlaybook',
               actions: ['assignResidency'],
@@ -48,6 +52,10 @@ export const createPlaybookMachine = () =>
         },
         nameYourPlaybook: {
           on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+              actions: ['resetKind'],
+            },
             navigationBackward: [
               {
                 target: 'residency',
@@ -55,7 +63,6 @@ export const createPlaybookMachine = () =>
               },
               {
                 target: 'whoToOnboard',
-                actions: ['resetKind'],
               },
             ],
             nameYourPlaybookSubmitted: {
@@ -68,6 +75,10 @@ export const createPlaybookMachine = () =>
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
+              actions: ['resetKind'],
+            },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
             },
             playbookSubmitted: {
               target: 'authorizedScopes',
@@ -82,6 +93,10 @@ export const createPlaybookMachine = () =>
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
+              actions: ['resetKind'],
+            },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
             },
             yourPlaybookSelected: {
               target: 'summary',

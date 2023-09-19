@@ -12,7 +12,7 @@ export type SectionProps = {
 
 const Section = ({ canAccessData, title, displayScopes }: SectionProps) => {
   const { t } = useTranslation(
-    'pages.playbooks.table.details.content.data-collection',
+    'pages.playbooks.details.content.data-collection',
   );
 
   const dataToDisplay = canAccessData.filter(

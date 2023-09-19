@@ -7,36 +7,34 @@ import { FormProvider, useForm } from 'react-hook-form';
 import type {
   AuthorizedScopesFormData,
   SummaryFormData,
+  SummaryMeta,
 } from '@/playbooks/utils/machine/types';
 import {
   defaultAuthorizedScopesValues,
   PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
-import BusinessScopes from './components/business-scopes';
-import PersonalScopes from './components/personal-scopes';
+import Business from './components/business';
+import Person from './components/person';
 
 type AuthorizedScopesProps = {
+  meta: SummaryMeta;
   onBack: () => void;
-  playbook: SummaryFormData;
-  kind?: PlaybookKind;
   onSubmit: (data: AuthorizedScopesFormData) => void;
+  playbook: SummaryFormData;
   submissionLoading: boolean;
 };
 
 const AuthorizedScopes = ({
+  meta,
   onBack,
-  playbook,
-  kind = PlaybookKind.Kyc,
   onSubmit,
+  playbook,
   submissionLoading,
 }: AuthorizedScopesProps) => {
-  const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.data-collection.authorized-scopes',
+  const { t, allT } = useTranslation(
+    'pages.playbooks.dialog.authorized-scopes',
   );
-
-  // defaultValues populates only the fields that are in the form
-  // so we can set everything to true and only the fields we display will submit
   const formMethods = useForm<AuthorizedScopesFormData>({
     defaultValues: { ...defaultAuthorizedScopesValues },
   });
@@ -54,8 +52,8 @@ const AuthorizedScopes = ({
       </Header>
       <FormProvider {...formMethods}>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          {kind === PlaybookKind.Kyb && <BusinessScopes />}
-          <PersonalScopes playbook={playbook} kind={kind} />
+          {meta.kind === PlaybookKind.Kyb && <Business />}
+          <Person playbook={playbook} meta={meta} />
           <ButtonContainer>
             <Button
               size="compact"
@@ -63,10 +61,10 @@ const AuthorizedScopes = ({
               onClick={onBack}
               disabled={submissionLoading}
             >
-              {t('back')}
+              {allT('back')}
             </Button>
             <Button loading={submissionLoading} size="compact" type="submit">
-              {t('create-playbook')}
+              {allT('create')}
             </Button>
           </ButtonContainer>
         </Form>

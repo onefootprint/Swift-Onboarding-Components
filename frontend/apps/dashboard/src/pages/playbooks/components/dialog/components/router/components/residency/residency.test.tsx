@@ -29,7 +29,7 @@ const renderResidencyForm = ({
 describe('<Residency />', () => {
   describe('default values', () => {
     describe('initial', () => {
-      it('should show "US Residents" selected and "International" and "US territories" unselected', async () => {
+      it('should show "US Residents" selected and "International" unselected', async () => {
         renderResidencyForm({});
 
         const usResidents = screen.getByRole('checkbox', {
@@ -37,10 +37,10 @@ describe('<Residency />', () => {
         });
         expect(usResidents).toBeChecked();
 
-        const usTerritories = screen.getByRole('checkbox', {
-          name: 'Allow residents from U.S. territories to be onboarded',
-        });
-        expect(usTerritories).not.toBeChecked();
+        // const usTerritories = screen.getByRole('checkbox', {
+        //   name: 'Allow residents from U.S. territories to be onboarded',
+        // });
+        // expect(usTerritories).not.toBeChecked();
 
         const international = screen.getByRole('checkbox', {
           name: 'Other countries',
@@ -64,10 +64,10 @@ describe('<Residency />', () => {
         });
         expect(usResidents).toBeChecked();
 
-        const usTerritories = screen.getByRole('checkbox', {
-          name: 'Allow residents from U.S. territories to be onboarded',
-        });
-        expect(usTerritories).not.toBeChecked();
+        // const usTerritories = screen.getByRole('checkbox', {
+        //   name: 'Allow residents from U.S. territories to be onboarded',
+        // });
+        // expect(usTerritories).not.toBeChecked();
 
         const international = screen.getByRole('checkbox', {
           name: 'Other countries',
@@ -91,10 +91,10 @@ describe('<Residency />', () => {
         });
         expect(usResidents).toBeChecked();
 
-        const usTerritories = screen.getByRole('checkbox', {
-          name: 'Allow residents from U.S. territories to be onboarded',
-        });
-        expect(usTerritories).toBeChecked();
+        // const usTerritories = screen.getByRole('checkbox', {
+        //   name: 'Allow residents from U.S. territories to be onboarded',
+        // });
+        // expect(usTerritories).toBeChecked();
 
         const international = screen.getByRole('checkbox', {
           name: 'Other countries',
@@ -146,28 +146,29 @@ describe('<Residency />', () => {
       });
     });
 
-    describe('when "US residents" and "US territories" is selected', () => {
-      it('should call onSubmit with the correct values', async () => {
-        const onSubmit = jest.fn();
-        renderResidencyForm({ onSubmit });
+    // TODO: https://linear.app/footprint/issue/FP-6072/playbooks-enable-us-territories
+    // describe('when "US residents" and "US territories" is selected', () => {
+    //   it('should call onSubmit with the correct values', async () => {
+    //     const onSubmit = jest.fn();
+    //     renderResidencyForm({ onSubmit });
 
-        const usTerritories = screen.getByRole('checkbox', {
-          name: 'Allow residents from U.S. territories to be onboarded',
-        });
-        await userEvent.click(usTerritories);
+    //     // const usTerritories = screen.getByRole('checkbox', {
+    //     //   name: 'Allow residents from U.S. territories to be onboarded',
+    //     // });
+    //     // await userEvent.click(usTerritories);
 
-        const submit = screen.getByRole('button', { name: 'Next' });
-        await userEvent.click(submit);
-        await waitFor(() =>
-          expect(onSubmit).toHaveBeenCalledWith({
-            allowInternationalResidents: false,
-            allowUsResidents: true,
-            allowUsTerritories: true,
-            restrictCountries: CountryRestriction.all,
-          }),
-        );
-      });
-    });
+    //     const submit = screen.getByRole('button', { name: 'Next' });
+    //     await userEvent.click(submit);
+    //     await waitFor(() =>
+    //       expect(onSubmit).toHaveBeenCalledWith({
+    //         allowInternationalResidents: false,
+    //         allowUsResidents: true,
+    //         allowUsTerritories: true,
+    //         restrictCountries: CountryRestriction.all,
+    //       }),
+    //     );
+    //   });
+    // });
 
     describe('when "US residents" and "International" are selected', () => {
       it('should call onSubmit with the correct values', async () => {

@@ -5,18 +5,14 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type {
-  PlaybookKind,
-  ResidencyFormData,
   SummaryFormData,
+  SummaryMeta,
 } from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
 
 type SummaryProps = {
-  meta: {
-    kind: PlaybookKind;
-    residency?: ResidencyFormData;
-  };
+  meta: SummaryMeta;
   onSubmit: (data: SummaryFormData) => void;
   onBack: () => void;
   defaultValues: SummaryFormData;
@@ -28,6 +24,9 @@ const Summary = ({ meta, onSubmit, onBack, defaultValues }: SummaryProps) => {
     defaultValues,
   });
   const { handleSubmit } = formMethods;
+  const internationalOnly =
+    meta.residency?.allowInternationalResidents &&
+    !meta.residency.allowUsResidents;
 
   return (
     <Container>
@@ -36,7 +35,9 @@ const Summary = ({ meta, onSubmit, onBack, defaultValues }: SummaryProps) => {
           {t('title')}
         </Typography>
         <Typography variant="body-2" color="secondary">
-          {t('subtitle')}
+          {internationalOnly
+            ? t('subtitle-international-only')
+            : t('subtitle-default')}
         </Typography>
       </Header>
       <FormProvider {...formMethods}>
