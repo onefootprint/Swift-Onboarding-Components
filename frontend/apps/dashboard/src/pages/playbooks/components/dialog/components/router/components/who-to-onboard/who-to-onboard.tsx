@@ -5,21 +5,22 @@ import { Button, RadioSelect, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { Kind } from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 export type WhoToOnboardProps = {
   onSubmit: (formData: FormData) => void;
-  defaultKind?: Kind;
+  defaultKind?: PlaybookKind;
 };
 
 type FormData = {
-  kind: Kind;
+  kind: PlaybookKind;
 };
 
 const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog.who-to-onboard');
+  const { t, allT } = useTranslation('pages.playbooks.dialog.who-to-onboard');
+  const kind = PlaybookKind.Unknown ? PlaybookKind.Kyc : defaultKind;
   const { handleSubmit, control } = useForm<FormData>({
-    defaultValues: { kind: defaultKind },
+    defaultValues: { kind },
   });
 
   const submit = (data: FormData) => {
@@ -40,20 +41,20 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
         <Controller
           control={control}
           name="kind"
-          defaultValue={Kind.KYC}
+          defaultValue={PlaybookKind.Kyc}
           render={({ field }) => (
             <RadioSelect
               options={[
                 {
                   title: t('kyc.title'),
                   description: t('kyc.description'),
-                  value: Kind.KYC,
+                  value: PlaybookKind.Kyc,
                   IconComponent: IcoUsers24,
                 },
                 {
                   title: t('kyb.title'),
                   description: t('kyb.description'),
-                  value: Kind.KYB,
+                  value: PlaybookKind.Kyb,
                   IconComponent: IcoStore24,
                 },
               ]}
@@ -64,7 +65,7 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
         />
         <ButtonContainer>
           <Button variant="primary" size="compact" type="submit">
-            {t('buttons.continue')}
+            {allT('next')}
           </Button>
         </ButtonContainer>
       </Form>

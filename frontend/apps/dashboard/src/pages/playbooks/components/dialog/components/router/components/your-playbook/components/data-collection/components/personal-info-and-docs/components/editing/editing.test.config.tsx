@@ -7,13 +7,13 @@ import type {
 } from '@/playbooks/utils/machine/types';
 import {
   defaultPlaybookValuesKYC,
-  Kind,
+  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 import Editing from './editing';
 
 export type EditingWithContextProps = {
-  kind?: Kind;
+  kind?: PlaybookKind;
   startingValues?: Partial<PersonalInformationAndDocs>;
 };
 
@@ -33,7 +33,7 @@ const EditingWithContext = ({
   return (
     <FormProvider {...formMethods}>
       <form>
-        <Editing stopEditing={() => {}} kind={kind ?? Kind.KYC} />
+        <Editing stopEditing={() => {}} kind={kind ?? PlaybookKind.Kyc} />
       </form>
     </FormProvider>
   );

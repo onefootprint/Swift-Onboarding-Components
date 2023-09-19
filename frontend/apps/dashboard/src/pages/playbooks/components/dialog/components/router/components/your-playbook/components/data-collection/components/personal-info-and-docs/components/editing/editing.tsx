@@ -10,11 +10,11 @@ import { Controller, useFormContext } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 
 import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
-import { Kind } from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 type EditingProps = {
   stopEditing: () => void;
-  kind: Kind;
+  kind: PlaybookKind;
 };
 
 const Editing = ({ stopEditing, kind }: EditingProps) => {
@@ -31,7 +31,7 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
   const idDocKind = watch('personalInformationAndDocs.idDocKind');
   const showNoPhoneFlow =
     (user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs')) &&
-    kind === Kind.KYC;
+    kind === PlaybookKind.Kyc;
 
   // need to store this so we don't re-fetch on add'l renders
   const [initialValues] = useState<PersonalInformationAndDocs>({
@@ -54,7 +54,7 @@ const Editing = ({ stopEditing, kind }: EditingProps) => {
   };
 
   const title =
-    kind === Kind.KYB ? (
+    kind === PlaybookKind.Kyb ? (
       <Typography variant="label-3">{t('editing.kyb')}</Typography>
     ) : (
       <Typography variant="label-3">{t('editing.kyc')}</Typography>

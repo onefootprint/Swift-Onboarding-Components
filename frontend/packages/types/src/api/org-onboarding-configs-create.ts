@@ -10,6 +10,10 @@ export type OrgOnboardingConfigCreateRequest = {
   optionalData: CollectedDataOption[];
   isDocFirstFlow?: boolean;
   isNoPhoneFlow?: boolean;
+  allowInternationalResidents?: boolean;
+  allowUsResidents?: boolean;
+  allowUsTerritories?: boolean;
+  internationalCountryRestrictions?: string[] | null;
 };
 
 export type OrgOnboardingConfigCreateResponse = string;

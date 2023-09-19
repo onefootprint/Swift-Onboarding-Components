@@ -9,7 +9,7 @@ import useSession from 'src/hooks/use-session';
 import type { PersonalInformationAndDocs } from '@/playbooks/utils/machine/types';
 import {
   basicInformationFields,
-  Kind,
+  PlaybookKind,
   usResidentFormFields,
 } from '@/playbooks/utils/machine/types';
 
@@ -18,7 +18,7 @@ import useFormValues from './hooks/use-form-values';
 
 type PreviewProps = {
   startEditing: () => void;
-  kind: Kind;
+  kind: PlaybookKind;
 };
 
 const Preview = ({ startEditing, kind }: PreviewProps) => {
@@ -41,7 +41,7 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
     .includes('flexcar');
   const showIdDocFirstFlowOption =
     hasIdDoc &&
-    kind === Kind.KYC &&
+    kind === PlaybookKind.Kyc &&
     (hasUserPermission || hasOrgPermissionForIdDocFirst);
 
   const basicInformationFormValues = formValues.filter(field =>
@@ -61,7 +61,7 @@ const Preview = ({ startEditing, kind }: PreviewProps) => {
   return (
     <Container>
       <Header>
-        {kind === Kind.KYB ? (
+        {kind === PlaybookKind.Kyb ? (
           <TitleContainer>
             <Typography variant="label-3">{t('title.kyb.main')}</Typography>
             <Tooltip

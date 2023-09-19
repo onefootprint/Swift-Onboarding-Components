@@ -1,7 +1,7 @@
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
+import { PlaybookKind } from './types';
 
 export const createPlaybookMachine = () =>
   createMachine(
@@ -12,23 +12,52 @@ export const createPlaybookMachine = () =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'whoToOnboard',
-      context: {},
+      context: {
+        kind: PlaybookKind.Unknown,
+      },
       states: {
         whoToOnboard: {
           on: {
-            whoToOnboardSubmitted: {
+            whoToOnboardSubmitted: [
+              {
+                target: 'residency',
+                actions: ['assignWhoToOnboard'],
+                cond: (_, event) => event.payload.kind === PlaybookKind.Kyc,
+              },
+              {
+                target: 'nameYourPlaybook',
+                actions: ['assignWhoToOnboard'],
+              },
+            ],
+          },
+        },
+        residency: {
+          on: {
+            residencySubmitted: {
               target: 'nameYourPlaybook',
-              actions: ['assignWhoToOnboard'],
+              actions: ['assignResidency'],
+            },
+            navigationBackward: {
+              target: 'whoToOnboard',
+              actions: ['resetKind'],
             },
           },
         },
         nameYourPlaybook: {
           on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
-            },
+            navigationBackward: [
+              {
+                target: 'residency',
+                cond: context => context.kind === PlaybookKind.Kyc,
+              },
+              {
+                target: 'whoToOnboard',
+                actions: ['resetKind'],
+              },
+            ],
             nameYourPlaybookSubmitted: {
               target: 'yourPlaybook',
               actions: ['assignNameYourPlaybook'],
@@ -44,7 +73,7 @@ export const createPlaybookMachine = () =>
               target: 'authorizedScopes',
               actions: 'assignPlaybook',
             },
-            nameYourPlaybookSelected: {
+            navigationBackward: {
               target: 'nameYourPlaybook',
             },
           },
@@ -57,8 +86,8 @@ export const createPlaybookMachine = () =>
             yourPlaybookSelected: {
               target: 'yourPlaybook',
             },
-            nameYourPlaybookSelected: {
-              target: 'nameYourPlaybook',
+            navigationBackward: {
+              target: 'yourPlaybook',
             },
           },
         },
@@ -66,17 +95,25 @@ export const createPlaybookMachine = () =>
     },
     {
       actions: {
-        assignNameYourPlaybook: assign((context, event) => ({
+        resetKind: assign(context => ({
           ...context,
-          nameForm: event.payload.nameForm,
+          kind: PlaybookKind.Unknown,
         })),
         assignWhoToOnboard: assign((context, event) => ({
           ...context,
           kind: event.payload.kind,
         })),
+        assignNameYourPlaybook: assign((context, event) => ({
+          ...context,
+          nameForm: event.payload.formData,
+        })),
+        assignResidency: assign((context, event) => ({
+          ...context,
+          residencyForm: event.payload.formData,
+        })),
         assignPlaybook: assign((context, event) => ({
           ...context,
-          playbook: event.payload.playbook,
+          playbook: event.payload.formData,
         })),
       },
     },

@@ -1376,33 +1376,24 @@
           "kyb": {
             "title": "Onboard businesses and their beneficial owners",
             "description": "Know Your Business (KYB) is the obligation to verify the identity of any entity that you do business with."
-          },
-          "buttons": {
-            "back": "Back",
-            "continue": "Continue"
           }
         },
         "residency": {
           "title": "Residency",
           "subtitle": "Select the countries from which your users may onboard.",
-          "us": "United States",
+          "us-residents": "United States",
+          "us-territories": "Allow residents from U.S. territories to be onboarded",
           "other-countries": "Other countries",
           "all-countries": {
             "label": "All countries",
-            "hint": "Except for embargoed or sancionted countries"
+            "hint": "Except for embargoed or sanctioned countries"
           },
           "restrict": "Restrict onboarding to specific countries",
-          "initial": "Initial",
-          "buttons": {
-            "back": "Back",
-            "continue": "Continue"
-          }
+          "countries": "Countries"
         },
         "name-your-playbook": {
           "title": "Name your playbook",
           "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones.",
-          "back": "Back",
-          "next": "Next",
           "kyc": "KYC",
           "kyb": "KYB",
           "form": {
@@ -1417,8 +1408,6 @@
         "your-playbook": {
           "title": "Your Playbook recommendation",
           "subtitle": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
-          "back": "Back",
-          "next": "Next",
           "data-collection": {
             "investor-profile": {
               "title": "Investor profile questions",

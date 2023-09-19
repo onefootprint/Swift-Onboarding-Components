@@ -7,14 +7,14 @@ import type {
 } from '@/playbooks/utils/machine/types';
 import {
   defaultPlaybookValuesKYC,
-  Kind,
+  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 import Preview from './preview';
 
 export type PreviewWithContextProps = {
   startingValues?: Partial<PersonalInformationAndDocs>;
-  kind?: Kind;
+  kind?: PlaybookKind;
 };
 
 const PreviewWithContext = ({
@@ -33,7 +33,7 @@ const PreviewWithContext = ({
   return (
     <FormProvider {...formMethods}>
       <form>
-        <Preview startEditing={() => {}} kind={kind ?? Kind.KYC} />
+        <Preview startEditing={() => {}} kind={kind ?? PlaybookKind.Kyc} />
       </form>
     </FormProvider>
   );

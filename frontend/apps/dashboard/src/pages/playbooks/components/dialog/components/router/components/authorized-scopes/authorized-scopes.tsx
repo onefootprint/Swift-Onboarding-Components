@@ -10,7 +10,7 @@ import type {
 } from '@/playbooks/utils/machine/types';
 import {
   defaultAuthorizedScopesValues,
-  Kind,
+  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 import BusinessScopes from './components/business-scopes';
@@ -19,7 +19,7 @@ import PersonalScopes from './components/personal-scopes';
 type AuthorizedScopesProps = {
   onBack: () => void;
   playbook: PlaybookFormData;
-  kind?: Kind;
+  kind?: PlaybookKind;
   onSubmit: (data: AuthorizedScopesFormData) => void;
   submissionLoading: boolean;
 };
@@ -27,7 +27,7 @@ type AuthorizedScopesProps = {
 const AuthorizedScopes = ({
   onBack,
   playbook,
-  kind = Kind.KYC,
+  kind = PlaybookKind.Kyc,
   onSubmit,
   submissionLoading,
 }: AuthorizedScopesProps) => {
@@ -54,7 +54,7 @@ const AuthorizedScopes = ({
       </Header>
       <FormProvider {...formMethods}>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          {kind === Kind.KYB && <BusinessScopes />}
+          {kind === PlaybookKind.Kyb && <BusinessScopes />}
           <PersonalScopes playbook={playbook} kind={kind} />
           <ButtonContainer>
             <Button

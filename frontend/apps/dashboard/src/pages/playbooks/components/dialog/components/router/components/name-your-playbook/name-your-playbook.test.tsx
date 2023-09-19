@@ -6,7 +6,7 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
-import { Kind } from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import type { NameYourPlaybookWithContextProps } from './name-your-playbook.test.config';
 import NameYourPlaybookWithContext from './name-your-playbook.test.config';
@@ -17,7 +17,7 @@ const renderNameYourPlaybook = ({ kind }: NameYourPlaybookWithContextProps) => {
 
 describe('<NameYourPlaybook />', () => {
   it('should show error if no name provided', async () => {
-    renderNameYourPlaybook({ kind: Kind.KYB });
+    renderNameYourPlaybook({ kind: PlaybookKind.Kyb });
     const next = screen.getByRole('button', { name: 'Next' });
     await userEvent.click(next);
     await waitFor(() => {

@@ -10,7 +10,7 @@ import {
   asAdminUserInOrg,
 } from 'src/config/tests';
 
-import { Kind } from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import type { PreviewWithContextProps } from './preview.test.config';
 import PreviewWithContext from './preview.test.config';
@@ -64,12 +64,12 @@ describe('<Preview />', () => {
   });
 
   it('should show correct title for KYC flow', () => {
-    renderForm({ kind: Kind.KYC });
+    renderForm({ kind: PlaybookKind.Kyc });
     expect(screen.getByText('Personal information & docs')).toBeInTheDocument();
   });
 
   it('should show correct title for KYB flow', async () => {
-    renderForm({ kind: Kind.KYB });
+    renderForm({ kind: PlaybookKind.Kyb });
     expect(screen.getByText('KYC of a beneficial owner')).toBeInTheDocument();
     const tooltip = screen.getByTestId('info-tooltip');
     expect(tooltip).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe('<Preview />', () => {
   it('should show doc first flow option if firm employee and ID doc kind exists and kind is KYC', async () => {
     asAdminUserFirmEmployee();
     renderForm({
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       startingValues: {
         idDoc: true,
         idDocKind: [SupportedIdDocTypes.driversLicense],
@@ -99,7 +99,7 @@ describe('<Preview />', () => {
   it('should show doc first flow option if flexcar employee', async () => {
     asAdminUserInOrg('flexcar');
     renderForm({
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       startingValues: {
         idDoc: true,
         idDocKind: [SupportedIdDocTypes.driversLicense],
@@ -115,7 +115,7 @@ describe('<Preview />', () => {
   it('should NOT doc first flow option if firm employee and ID doc kind exists BUT kind is KYB', async () => {
     asAdminUserFirmEmployee();
     renderForm({
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       startingValues: {
         idDoc: true,
         idDocKind: [SupportedIdDocTypes.driversLicense],
@@ -136,7 +136,7 @@ describe('<Preview />', () => {
   it('should not show doc first flow option if firm employee but no ID doc kind shown', async () => {
     asAdminUserFirmEmployee();
     renderForm({
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       startingValues: {
         idDoc: true,
         idDocKind: [],
@@ -157,7 +157,7 @@ describe('<Preview />', () => {
   it('should not show doc first flow option if non-firm employee', async () => {
     asAdminUser();
     renderForm({
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       startingValues: {
         idDoc: true,
         idDocKind: [

@@ -4,12 +4,15 @@ import { Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type { Kind, PlaybookFormData } from '@/playbooks/utils/machine/types';
+import type {
+  PlaybookFormData,
+  PlaybookKind,
+} from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
 
 type YourPlaybookProps = {
-  kind: Kind;
+  kind: PlaybookKind;
   onSubmit: (data: PlaybookFormData) => void;
   onBack: () => void;
   defaultValues: PlaybookFormData;
@@ -21,7 +24,7 @@ const YourPlaybook = ({
   onBack,
   defaultValues,
 }: YourPlaybookProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog.your-playbook');
+  const { t, allT } = useTranslation('pages.playbooks.dialog.your-playbook');
   const formMethods = useForm<PlaybookFormData>({
     defaultValues,
   });
@@ -42,10 +45,10 @@ const YourPlaybook = ({
           <DataCollection kind={kind} />
           <ButtonContainer>
             <Button size="compact" variant="secondary" onClick={onBack}>
-              {t('back')}
+              {allT('back')}
             </Button>
             <Button size="compact" type="submit">
-              {t('next')}
+              {allT('next')}
             </Button>
           </ButtonContainer>
         </Form>

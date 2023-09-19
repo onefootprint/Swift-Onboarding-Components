@@ -11,7 +11,7 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 
-import { Kind } from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import type { AuthorizedScopesWithContextProps } from './authorized-scopes.test.config';
 import AuthorizedScopesWithContext from './authorized-scopes.test.config';
@@ -31,7 +31,7 @@ const renderAuthorizedScopes = ({
 };
 describe('<AuthorizedScopes />', () => {
   it('should show BusinessScopes when KYB', () => {
-    renderAuthorizedScopes({ kind: Kind.KYB });
+    renderAuthorizedScopes({ kind: PlaybookKind.Kyb });
     expect(
       screen.getByRole('checkbox', { name: 'All business information' }),
     ).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe('<AuthorizedScopes />', () => {
   });
 
   it('should not show BusinessScopes when KYC', () => {
-    renderAuthorizedScopes({ kind: Kind.KYC });
+    renderAuthorizedScopes({ kind: PlaybookKind.Kyc });
     expect(
       screen.queryByRole('checkbox', { name: 'All business information' }),
     ).not.toBeInTheDocument();
@@ -47,14 +47,17 @@ describe('<AuthorizedScopes />', () => {
   });
 
   it('shows regular "create playbook" button when not loading', () => {
-    renderAuthorizedScopes({ kind: Kind.KYC, submissionLoading: false });
+    renderAuthorizedScopes({
+      kind: PlaybookKind.Kyc,
+      submissionLoading: false,
+    });
     expect(
       screen.getByRole('button', { name: 'Create Playbook' }),
     ).toBeInTheDocument();
   });
 
   it('shows loading state if mutation is loading', () => {
-    renderAuthorizedScopes({ kind: Kind.KYC, submissionLoading: true });
+    renderAuthorizedScopes({ kind: PlaybookKind.Kyc, submissionLoading: true });
     const createButton = screen.getByRole('progressbar', {
       name: 'Loading...',
     });
@@ -62,7 +65,7 @@ describe('<AuthorizedScopes />', () => {
   });
 
   it('should disable back button if mutation is loading', () => {
-    renderAuthorizedScopes({ kind: Kind.KYC, submissionLoading: true });
+    renderAuthorizedScopes({ kind: PlaybookKind.Kyc, submissionLoading: true });
     const backButton = screen.getByRole('button', {
       name: 'Back',
     });
@@ -71,7 +74,7 @@ describe('<AuthorizedScopes />', () => {
 
   it('always contains email and phone number in access scopes', async () => {
     const onSubmit = jest.fn();
-    renderAuthorizedScopes({ kind: Kind.KYC, onSubmit });
+    renderAuthorizedScopes({ kind: PlaybookKind.Kyc, onSubmit });
 
     const submitButton = screen.getByRole('button', {
       name: 'Create Playbook',

@@ -4,7 +4,7 @@ import React from 'react';
 import {
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
-  Kind,
+  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 import type { DataCollectionWithContextProps } from './data-collection.test.config';
@@ -20,13 +20,13 @@ const renderDataCollection = ({
 };
 describe('<DataCollection />', () => {
   it('should show investor profile questions in KYC', async () => {
-    renderDataCollection({ kind: Kind.KYC });
+    renderDataCollection({ kind: PlaybookKind.Kyc });
     expect(screen.getByText('Investor profile questions')).toBeInTheDocument();
   });
 
   it('should not show investor profile questions in KYB', async () => {
     renderDataCollection({
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       startingValues: {
         ...defaultPlaybookValuesKYC,
         businessInformation: defaultPlaybookValuesKYB.businessInformation,
@@ -39,7 +39,7 @@ describe('<DataCollection />', () => {
 
   it('should show BO info alert for KYB', async () => {
     renderDataCollection({
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       startingValues: {
         ...defaultPlaybookValuesKYC,
         businessInformation: defaultPlaybookValuesKYB.businessInformation,
@@ -54,7 +54,7 @@ describe('<DataCollection />', () => {
   });
 
   it('should not show BO info alert for KYC', async () => {
-    renderDataCollection({ kind: Kind.KYC });
+    renderDataCollection({ kind: PlaybookKind.Kyc });
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(
       screen.queryByText(

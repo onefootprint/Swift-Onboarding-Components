@@ -10,11 +10,11 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import type { PlaybookFormData } from '@/playbooks/utils/machine/types';
-import { Kind } from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 type PersonalScopesProps = {
   playbook: PlaybookFormData;
-  kind: Kind;
+  kind: PlaybookKind;
 };
 
 const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
@@ -32,7 +32,7 @@ const PersonalScopes = ({ playbook, kind }: PersonalScopesProps) => {
 
   const isCollectingInvestorProfile =
     playbook[CollectedInvestorProfileDataOption.investorProfile] &&
-    kind === Kind.KYC;
+    kind === PlaybookKind.Kyc;
 
   return (
     <Sections>

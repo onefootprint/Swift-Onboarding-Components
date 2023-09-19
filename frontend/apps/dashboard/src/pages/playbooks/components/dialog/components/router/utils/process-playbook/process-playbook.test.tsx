@@ -1,3 +1,5 @@
+import type { CountryRecord } from '@onefootprint/global-constants';
+import { COUNTRIES } from '@onefootprint/global-constants';
 import {
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
@@ -6,12 +8,13 @@ import {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import {
+  CountryRestriction,
   defaultAuthorizedScopesValues,
   defaultBusinessInformation,
   defaultNameFormData,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
-  Kind,
+  PlaybookKind,
 } from 'src/pages/playbooks/utils/machine/types';
 
 import processPlaybook from './process-playbook';
@@ -29,7 +32,7 @@ describe('processPlaybook', () => {
           [CollectedKycDataOption.address]: false,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -52,7 +55,7 @@ describe('processPlaybook', () => {
           [CollectedKybDataOption.beneficialOwners]: false,
         },
       },
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -74,7 +77,7 @@ describe('processPlaybook', () => {
           ssnKind: CollectedKycDataOption.ssn9,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -97,7 +100,7 @@ describe('processPlaybook', () => {
           ssnKind: CollectedKycDataOption.ssn4,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -120,7 +123,7 @@ describe('processPlaybook', () => {
           ssnKind: CollectedKycDataOption.ssn9,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -141,7 +144,7 @@ describe('processPlaybook', () => {
           ssnKind: CollectedKycDataOption.ssn4,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -163,7 +166,7 @@ describe('processPlaybook', () => {
         },
         [CollectedInvestorProfileDataOption.investorProfile]: true,
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -182,7 +185,7 @@ describe('processPlaybook', () => {
           [CollectedKybDataOption.corporationType]: true,
         },
       },
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -199,7 +202,7 @@ describe('processPlaybook', () => {
           [CollectedKybDataOption.corporationType]: false,
         },
       },
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -218,7 +221,7 @@ describe('processPlaybook', () => {
           [CollectedKybDataOption.website]: true,
         },
       },
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -235,7 +238,7 @@ describe('processPlaybook', () => {
           [CollectedKybDataOption.website]: false,
         },
       },
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -252,7 +255,7 @@ describe('processPlaybook', () => {
           [CollectedKybDataOption.phoneNumber]: true,
         },
       },
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -269,7 +272,7 @@ describe('processPlaybook', () => {
           [CollectedKybDataOption.website]: false,
         },
       },
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -280,7 +283,7 @@ describe('processPlaybook', () => {
   it('should handle authorized scopes as expected for default KYC values', () => {
     const { canAccessData } = processPlaybook({
       playbook: defaultPlaybookValuesKYC,
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -304,7 +307,7 @@ describe('processPlaybook', () => {
         ...defaultPlaybookValuesKYC,
         [CollectedInvestorProfileDataOption.investorProfile]: true,
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: {
         ...defaultAuthorizedScopesValues,
         [CollectedKycDataOption.email]: false,
@@ -333,7 +336,7 @@ describe('processPlaybook', () => {
   it('should handle authorized scopes as expected for default KYB values', () => {
     const { canAccessData } = processPlaybook({
       playbook: defaultPlaybookValuesKYB,
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       authorizedScopes: {
         ...defaultAuthorizedScopesValues,
         allBusinessData: true,
@@ -361,7 +364,7 @@ describe('processPlaybook', () => {
           [CollectedKybDataOption.phoneNumber]: true,
         },
       },
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       authorizedScopes: {
         ...defaultAuthorizedScopesValues,
         allBusinessData: true,
@@ -389,7 +392,7 @@ describe('processPlaybook', () => {
           [CollectedKybDataOption.phoneNumber]: true,
         },
       },
-      kind: Kind.KYB,
+      kind: PlaybookKind.Kyb,
       authorizedScopes: {
         ...defaultAuthorizedScopesValues,
         allBusinessData: false,
@@ -419,7 +422,7 @@ describe('processPlaybook', () => {
           selfie: false,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: {
         ...defaultAuthorizedScopesValues,
         [CollectedDocumentDataOption.document]: true,
@@ -444,7 +447,7 @@ describe('processPlaybook', () => {
           selfie: true,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: {
         ...defaultAuthorizedScopesValues,
         [CollectedDocumentDataOption.document]: true,
@@ -467,7 +470,7 @@ describe('processPlaybook', () => {
           selfie: false,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -489,7 +492,7 @@ describe('processPlaybook', () => {
           selfie: false,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -510,7 +513,7 @@ describe('processPlaybook', () => {
           selfie: true,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -532,7 +535,7 @@ describe('processPlaybook', () => {
           selfie: true,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -557,7 +560,7 @@ describe('processPlaybook', () => {
           selfie: true,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -578,7 +581,7 @@ describe('processPlaybook', () => {
           selfie: true,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -600,7 +603,7 @@ describe('processPlaybook', () => {
           idDocFirst: false,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -615,7 +618,7 @@ describe('processPlaybook', () => {
           ...defaultPlaybookValuesKYC.personalInformationAndDocs,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -632,7 +635,7 @@ describe('processPlaybook', () => {
           [CollectedKycDataOption.phoneNumber]: false,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -649,7 +652,7 @@ describe('processPlaybook', () => {
           [CollectedKycDataOption.phoneNumber]: true,
         },
       },
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -660,7 +663,7 @@ describe('processPlaybook', () => {
   it('should include phone number and not submit isNoPhoneFlow for default case', () => {
     const { isNoPhoneFlow, mustCollectData } = processPlaybook({
       playbook: defaultPlaybookValuesKYC,
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
       nameForm: defaultNameFormData,
     });
@@ -671,10 +674,154 @@ describe('processPlaybook', () => {
   it('should correctly extract name', () => {
     const { name } = processPlaybook({
       playbook: defaultPlaybookValuesKYC,
-      kind: Kind.KYC,
+      kind: PlaybookKind.Kyc,
       authorizedScopes: defaultAuthorizedScopesValues,
-      nameForm: { kind: Kind.KYC, name: 'test name' },
+      nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
     });
     expect(name).toBe('test name');
+  });
+
+  describe('residency', () => {
+    describe('when only "US residents" is selected', () => {
+      it('should generate the payload correctly', () => {
+        const {
+          allowUsResidents,
+          allowUsTerritories,
+          allowInternationalResidents,
+          internationalCountryRestrictions,
+        } = processPlaybook({
+          playbook: defaultPlaybookValuesKYC,
+          kind: PlaybookKind.Kyc,
+          authorizedScopes: defaultAuthorizedScopesValues,
+          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+          residencyForm: {
+            allowUsResidents: true,
+            allowUsTerritories: false,
+            allowInternationalResidents: false,
+          },
+        });
+
+        expect(allowUsResidents).toBeTruthy();
+        expect(allowUsTerritories).toBeFalsy();
+        expect(allowInternationalResidents).toBeFalsy();
+        expect(internationalCountryRestrictions).toBeNull();
+      });
+    });
+
+    describe('when "US residents" and "US territories" is selected', () => {
+      it('should generate the payload correctly', () => {
+        const {
+          allowUsResidents,
+          allowUsTerritories,
+          allowInternationalResidents,
+          internationalCountryRestrictions,
+        } = processPlaybook({
+          playbook: defaultPlaybookValuesKYC,
+          kind: PlaybookKind.Kyc,
+          authorizedScopes: defaultAuthorizedScopesValues,
+          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+          residencyForm: {
+            allowUsResidents: true,
+            allowUsTerritories: true,
+            allowInternationalResidents: false,
+          },
+        });
+
+        expect(allowUsResidents).toBeTruthy();
+        expect(allowUsTerritories).toBeTruthy();
+        expect(allowInternationalResidents).toBeFalsy();
+        expect(internationalCountryRestrictions).toBeNull();
+      });
+    });
+
+    describe('when "US residents" and "International" are selected', () => {
+      it('should generate the payload correctly', () => {
+        const {
+          allowUsResidents,
+          allowUsTerritories,
+          allowInternationalResidents,
+          internationalCountryRestrictions,
+        } = processPlaybook({
+          playbook: defaultPlaybookValuesKYC,
+          kind: PlaybookKind.Kyc,
+          authorizedScopes: defaultAuthorizedScopesValues,
+          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+          residencyForm: {
+            allowUsResidents: true,
+            allowUsTerritories: false,
+            allowInternationalResidents: true,
+            restrictCountries: CountryRestriction.all,
+          },
+        });
+        expect(allowUsResidents).toBeTruthy();
+        expect(allowUsTerritories).toBeFalsy();
+        expect(allowInternationalResidents).toBeTruthy();
+        expect(internationalCountryRestrictions).toBeNull();
+      });
+    });
+
+    describe('when "US Residents", "International" and "Restrict onboarding to specific countries" is selected', () => {
+      it('should generate the payload correctly', () => {
+        const chile = COUNTRIES.find(
+          country => country.label === 'Chile',
+        ) as CountryRecord;
+
+        const {
+          allowUsResidents,
+          allowUsTerritories,
+          allowInternationalResidents,
+          internationalCountryRestrictions,
+        } = processPlaybook({
+          playbook: defaultPlaybookValuesKYC,
+          kind: PlaybookKind.Kyc,
+          authorizedScopes: defaultAuthorizedScopesValues,
+          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+          residencyForm: {
+            allowUsResidents: true,
+            allowUsTerritories: false,
+            allowInternationalResidents: true,
+            restrictCountries: CountryRestriction.restrict,
+            countryList: [chile],
+          },
+        });
+
+        expect(allowUsResidents).toBeTruthy();
+        expect(allowUsTerritories).toBeFalsy();
+        expect(allowInternationalResidents).toBe(true);
+        expect(internationalCountryRestrictions).toEqual(['CL']);
+      });
+    });
+
+    describe('when "US Residents" is unselected and "International" and is selected', () => {
+      it('should process restricted US-inclusive international config properly', () => {
+        const chile = COUNTRIES.find(
+          country => country.label === 'Chile',
+        ) as CountryRecord;
+
+        const {
+          allowUsResidents,
+          allowUsTerritories,
+          allowInternationalResidents,
+          internationalCountryRestrictions,
+        } = processPlaybook({
+          playbook: defaultPlaybookValuesKYC,
+          kind: PlaybookKind.Kyc,
+          authorizedScopes: defaultAuthorizedScopesValues,
+          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+          residencyForm: {
+            allowUsResidents: false,
+            allowUsTerritories: false,
+            allowInternationalResidents: true,
+            restrictCountries: CountryRestriction.restrict,
+            countryList: [chile],
+          },
+        });
+
+        expect(allowUsResidents).toBeFalsy();
+        expect(allowUsTerritories).toBeFalsy();
+        expect(allowInternationalResidents).toBeTruthy();
+        expect(internationalCountryRestrictions).toEqual(['CL']);
+      });
+    });
   });
 });

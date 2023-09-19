@@ -14,7 +14,7 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       context: {
         requirement,
         currentSide: UploadDocumentSide.Front,

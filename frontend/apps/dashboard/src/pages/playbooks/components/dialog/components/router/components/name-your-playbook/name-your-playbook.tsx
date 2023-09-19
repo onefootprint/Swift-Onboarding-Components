@@ -6,24 +6,26 @@ import { FormProvider, useForm } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 
 import type { NameFormData } from '@/playbooks/utils/machine/types';
-import { Kind } from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import getPlaceholder from './utils/get-placeholder';
 
 type NameYourPlaybookProps = {
-  kind?: Kind;
+  kind?: PlaybookKind;
   onSubmit: (data: NameFormData) => void;
   onBack: () => void;
   defaultValues: NameFormData;
 };
 
 const NameYourPlaybook = ({
-  kind = Kind.KYC,
+  kind = PlaybookKind.Kyc,
   onSubmit,
   onBack,
   defaultValues,
 }: NameYourPlaybookProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog.name-your-playbook');
+  const { t, allT } = useTranslation(
+    'pages.playbooks.dialog.name-your-playbook',
+  );
   const formMethods = useForm<NameFormData>({
     defaultValues,
   });
@@ -76,10 +78,10 @@ const NameYourPlaybook = ({
           </NameContainer>
           <ButtonContainer>
             <Button size="compact" variant="secondary" onClick={onBack}>
-              {t('back')}
+              {allT('back')}
             </Button>
             <Button size="compact" type="submit">
-              {t('next')}
+              {allT('next')}
             </Button>
           </ButtonContainer>
         </Form>

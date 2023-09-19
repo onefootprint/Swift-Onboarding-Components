@@ -7,14 +7,14 @@ import type {
 } from '@/playbooks/utils/machine/types';
 import {
   defaultPlaybookValuesKYC,
-  Kind,
+  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 import PersonalInfoAndDocs from './personal-info-and-docs';
 
 export type PersonalInfoAndDocsWithContextProps = {
   startingValues: Partial<PersonalInformationAndDocs>;
-  kind?: Kind;
+  kind?: PlaybookKind;
 };
 
 const PersonalInfoAndDocsWithContext = ({
@@ -33,7 +33,7 @@ const PersonalInfoAndDocsWithContext = ({
   return (
     <FormProvider {...formMethods}>
       <form>
-        <PersonalInfoAndDocs kind={kind ?? Kind.KYC} />
+        <PersonalInfoAndDocs kind={kind ?? PlaybookKind.Kyc} />
       </form>
     </FormProvider>
   );

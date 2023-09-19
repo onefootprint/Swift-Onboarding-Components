@@ -1,4 +1,5 @@
-import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountryRecord } from '@onefootprint/global-constants';
+import type { SupportedIdDocTypes } from '@onefootprint/types';
 import {
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
@@ -6,27 +7,28 @@ import {
   CollectedKycDataOption,
 } from '@onefootprint/types';
 
-export enum Kind {
-  KYB = 'kyb',
-  KYC = 'kyc',
+export enum PlaybookKind {
+  Unknown = 'unknown',
+  Kyb = 'kyb',
+  Kyc = 'kyc',
 }
 
 export type PlaybookFormData = {
-  kind: Kind;
+  kind: PlaybookKind;
   personalInformationAndDocs: PersonalInformationAndDocs;
   businessInformation?: BusinessInformation;
   [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
 };
 
 export type NameFormData = {
-  kind: Kind;
+  kind: PlaybookKind;
   name: string;
 };
 
 export const defaultNameValue = '';
 
 export const defaultNameFormData: NameFormData = {
-  kind: Kind.KYC,
+  kind: PlaybookKind.Kyc,
   name: defaultNameValue,
 };
 
@@ -36,15 +38,17 @@ export enum CountryRestriction {
 }
 
 export type ResidencyFormData = {
-  unitedStates: boolean;
-  otherCountries: boolean;
+  allowUsResidents: boolean;
+  allowUsTerritories: boolean;
+  allowInternationalResidents: boolean;
   restrictCountries?: CountryRestriction;
-  countryList: CountryCode[];
+  countryList?: CountryRecord[];
 };
 
-export const defaultResidencyFormData = {
-  unitedStates: true,
-  otherCountries: false,
+export const defaultResidencyFormData: ResidencyFormData = {
+  allowUsResidents: true,
+  allowUsTerritories: false,
+  allowInternationalResidents: false,
   restrictCountries: CountryRestriction.all,
 };
 
@@ -98,7 +102,7 @@ export const defaultBusinessInformation = {
 };
 
 export const defaultPlaybookValuesKYC: PlaybookFormData = {
-  kind: Kind.KYC,
+  kind: PlaybookKind.Kyc,
   personalInformationAndDocs: {
     email: true,
     [CollectedKycDataOption.phoneNumber]: true,
@@ -116,7 +120,7 @@ export const defaultPlaybookValuesKYC: PlaybookFormData = {
 
 export const defaultPlaybookValuesKYB: PlaybookFormData = {
   ...defaultPlaybookValuesKYC,
-  kind: Kind.KYB,
+  kind: PlaybookKind.Kyb,
   businessInformation: defaultBusinessInformation,
 };
 
@@ -135,23 +139,15 @@ export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
 };
 
 export type MachineContext = {
-  kind?: Kind;
+  kind: PlaybookKind;
   nameForm?: NameFormData;
+  residencyForm?: ResidencyFormData;
   playbook?: PlaybookFormData;
 };
 
 export type MachineEvents =
   | {
-      type: 'nameYourPlaybookSubmitted';
-      payload: {
-        nameForm: NameFormData;
-      };
-    }
-  | {
-      type: 'whoToOnboardSubmitted';
-      payload: {
-        kind: Kind;
-      };
+      type: 'navigationBackward';
     }
   | {
       type: 'nameYourPlaybookSelected';
@@ -163,9 +159,27 @@ export type MachineEvents =
       type: 'yourPlaybookSelected';
     }
   | {
+      type: 'whoToOnboardSubmitted';
+      payload: {
+        kind: PlaybookKind;
+      };
+    }
+  | {
+      type: 'nameYourPlaybookSubmitted';
+      payload: {
+        formData: NameFormData;
+      };
+    }
+  | {
+      type: 'residencySubmitted';
+      payload: {
+        formData: ResidencyFormData;
+      };
+    }
+  | {
       type: 'playbookSubmitted';
       payload: {
-        playbook: PlaybookFormData;
+        formData: PlaybookFormData;
       };
     };
 

@@ -5,19 +5,22 @@ import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
-import PlaybookMachine from '@/playbooks/utils/machine';
+import playbookMachine from '@/playbooks/utils/machine';
 import type { AuthorizedScopesFormData } from '@/playbooks/utils/machine/types';
 import {
   defaultNameFormData,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
-  Kind,
+  defaultResidencyFormData,
+  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 import AuthorizedScopes from './components/authorized-scopes';
 import NameYourPlaybook from './components/name-your-playbook';
+import Residency from './components/residency';
 import WhoToOnboard from './components/who-to-onboard';
 import YourPlaybook from './components/your-playbook';
+import useOptions from './hooks/use-options';
 import getStep from './utils/get-step';
 import processPlaybook from './utils/process-playbook';
 import useCreatePlaybook from './utils/use-create-playbook';
@@ -30,65 +33,73 @@ type HandleCreateProps = {
 };
 
 const Router = ({ onClose }: RouterProps) => {
-  const [state, send] = useMachine(PlaybookMachine);
+  const [state, send] = useMachine(playbookMachine);
+  const { kind } = state.context;
   const { t } = useTranslation('pages.playbooks.dialog.router');
   const toast = useToast();
   const showRequestError = useRequestErrorToast();
   const mutation = useCreatePlaybook();
+  const allOptions = useOptions();
+  const options = allOptions[kind];
+  const step = getStep({ value: state.value as string });
+  const stepperValue = options[step];
 
-  const options = [
-    { value: 'whoToOnboard', label: t('who-to-onboard') },
-    { value: 'nameYourPlaybook', label: t('name-your-playbook') },
-    { value: 'yourPlaybook', label: t('your-playbook') },
-    { value: 'authorizedScopes', label: t('authorized-scopes') },
-  ];
   const playbookDefaultValues =
-    state.context.kind === Kind.KYB
+    kind === PlaybookKind.Kyb
       ? defaultPlaybookValuesKYB
       : defaultPlaybookValuesKYC;
 
   const playbookValuesToPrefill =
-    state.context?.playbook?.kind === state.context.kind &&
-    state.context.playbook
+    state.context?.playbook?.kind === kind && state.context.playbook
       ? state.context.playbook
       : playbookDefaultValues;
 
   const nameValueToPrefill =
-    state.context?.nameForm?.kind === state.context.kind &&
-    state.context.nameForm
+    state.context?.nameForm?.kind === kind && state.context.nameForm
       ? state.context.nameForm
       : defaultNameFormData;
 
-  const step = getStep({ value: state.value as string });
-  const stepperValue = options[step];
+  const residencyValueToPrefill =
+    kind === PlaybookKind.Kyc && state.context.residencyForm
+      ? state.context.residencyForm
+      : defaultResidencyFormData;
 
-  // we can't break this out into a separate util b/c of hook dependencies
   const createPlaybook = ({ authorizedScopes }: HandleCreateProps) => {
-    const { kind, playbook, nameForm } = state.context;
-    if (!kind || !playbook || !authorizedScopes || !nameForm) {
+    const { playbook, nameForm, residencyForm } = state.context;
+    if (!playbook || !authorizedScopes || !nameForm) {
       return;
     }
     const {
-      mustCollectData,
+      allowInternationalResidents,
+      allowUsResidents,
+      allowUsTerritories,
       canAccessData,
-      optionalData,
+      internationalCountryRestrictions,
       isDocFirstFlow,
       isNoPhoneFlow,
+      mustCollectData,
       name,
+      optionalData,
     } = processPlaybook({
-      kind,
-      playbook,
       authorizedScopes,
+      kind,
       nameForm,
+      playbook,
+      residencyForm,
     });
+
     mutation.mutate(
       {
-        name,
-        mustCollectData,
+        allowInternationalResidents,
+        allowUsResidents,
+        allowUsTerritories,
         canAccessData,
-        optionalData,
+        internationalCountryRestrictions,
         isDocFirstFlow,
         isNoPhoneFlow,
+        mustCollectData,
+        name,
+        optionalData,
       },
       {
         onSuccess: () => {
@@ -128,8 +139,21 @@ const Router = ({ onClose }: RouterProps) => {
         {state.matches('whoToOnboard') && (
           <WhoToOnboard
             defaultKind={state.context.kind}
-            onSubmit={({ kind }) => {
-              send('whoToOnboardSubmitted', { payload: { kind } });
+            onSubmit={payload => {
+              send('whoToOnboardSubmitted', { payload });
+            }}
+          />
+        )}
+        {state.matches('residency') && (
+          <Residency
+            defaultValues={residencyValueToPrefill}
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={formData => {
+              send('residencySubmitted', {
+                payload: { formData },
+              });
             }}
           />
         )}
@@ -137,33 +161,38 @@ const Router = ({ onClose }: RouterProps) => {
           <NameYourPlaybook
             kind={state.context.kind}
             defaultValues={nameValueToPrefill}
-            onBack={() => send('whoToOnboardSelected')}
-            onSubmit={data => {
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={formData => {
               send('nameYourPlaybookSubmitted', {
-                payload: { nameForm: data },
+                payload: { formData },
               });
             }}
           />
         )}
-        {state.matches('yourPlaybook') && state.context.kind && (
+        {state.matches('yourPlaybook') && (
           <YourPlaybook
             defaultValues={playbookValuesToPrefill}
             kind={state.context.kind}
-            onSubmit={data => {
-              send('playbookSubmitted', { payload: { playbook: data } });
+            onBack={() => {
+              send('navigationBackward');
             }}
-            onBack={() => send('nameYourPlaybookSelected')}
+            onSubmit={formData => {
+              send('playbookSubmitted', { payload: { formData } });
+            }}
           />
         )}
         {state.matches('authorizedScopes') && (
           <AuthorizedScopes
             kind={state.context.kind}
             playbook={state.context.playbook ?? playbookValuesToPrefill}
-            onBack={() => send('yourPlaybookSelected')}
-            onSubmit={data => {
-              // avoid state machine call — we don't store authorized scopes in context
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={formData => {
               createPlaybook({
-                authorizedScopes: data,
+                authorizedScopes: formData,
               });
             }}
             submissionLoading={mutation.isLoading}

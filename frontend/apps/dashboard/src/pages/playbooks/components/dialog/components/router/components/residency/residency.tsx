@@ -15,32 +15,29 @@ import { Controller, useForm } from 'react-hook-form';
 import {
   type ResidencyFormData,
   CountryRestriction,
-  defaultResidencyFormData,
 } from '@/playbooks/utils/machine/types';
 
 export type ResidencyProps = {
+  defaultValues: ResidencyFormData;
+  onBack: () => void;
   onSubmit: (formData: ResidencyFormData) => void;
 };
 
-const Residency = ({ onSubmit }: ResidencyProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog.residency');
-  // TK - logic to ensure we populate previous values and clear this when swapping steps
+const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
+  const { t, allT } = useTranslation('pages.playbooks.dialog.residency');
   const { handleSubmit, register, watch, control } = useForm<ResidencyFormData>(
     {
-      defaultValues: defaultResidencyFormData,
+      defaultValues,
     },
   );
-
-  // placeholder
-  const submit = (data: ResidencyFormData) => {
-    onSubmit(data);
-  };
-
-  const otherCountriesSelected = watch('otherCountries');
-  const restrictCountriesSelected =
+  const usResidentsChecked = watch('allowUsResidents');
+  const internationalChecked = watch('allowInternationalResidents');
+  const restrictCountriesChecked =
     watch('restrictCountries') === CountryRestriction.restrict;
 
-  const onBack = () => {};
+  const submit = (formData: ResidencyFormData) => {
+    onSubmit(formData);
+  };
 
   return (
     <Container>
@@ -54,18 +51,29 @@ const Residency = ({ onSubmit }: ResidencyProps) => {
       </Header>
       <Form onSubmit={handleSubmit(submit)}>
         <OptionContainer>
-          <Checkbox label={t('us')} {...register('unitedStates')} />
+          <Checkbox
+            label={t('us-residents')}
+            {...register('allowUsResidents')}
+          />
+          {usResidentsChecked && (
+            <UsTerritoriesContainer>
+              <Checkbox
+                label={t('us-territories')}
+                {...register('allowUsTerritories')}
+              />
+            </UsTerritoriesContainer>
+          )}
           <Checkbox
             label={t('other-countries')}
-            {...register('otherCountries')}
+            {...register('allowInternationalResidents')}
           />
-          {otherCountriesSelected && (
-            <OtherCountriesAdditionalOptions>
+          {internationalChecked && (
+            <InternationalOptions>
               <AllCountriesContainer>
                 <Radio
+                  label={t('all-countries.label')}
                   value={CountryRestriction.all}
                   {...register('restrictCountries')}
-                  label={t('all-countries.label')}
                 />
                 <AllCountriesHint>
                   <Typography variant="body-3" color="tertiary">
@@ -74,38 +82,55 @@ const Residency = ({ onSubmit }: ResidencyProps) => {
                 </AllCountriesHint>
               </AllCountriesContainer>
               <Radio
-                {...register('restrictCountries')}
-                value={CountryRestriction.restrict}
                 label={t('restrict')}
+                value={CountryRestriction.restrict}
+                {...register('restrictCountries')}
               />
-              {restrictCountriesSelected && (
+              {restrictCountriesChecked && (
                 <>
                   <Divider />
                   <Controller
                     control={control}
                     name="countryList"
-                    render={() => (
-                      <MultiSelect label={t('initial')} options={COUNTRIES} />
+                    render={({ field }) => (
+                      <MultiSelect
+                        label={t('countries')}
+                        onBlur={field.onBlur}
+                        onChange={field.onChange}
+                        options={countriesExceptUs}
+                        value={field.value}
+                      />
                     )}
                   />
                 </>
               )}
-            </OtherCountriesAdditionalOptions>
+            </InternationalOptions>
           )}
         </OptionContainer>
-
         <ButtonContainer>
           <Button variant="secondary" size="compact" onClick={onBack}>
-            {t('buttons.back')}
+            {allT('back')}
           </Button>
           <Button variant="primary" size="compact" type="submit">
-            {t('buttons.continue')}
+            {allT('next')}
           </Button>
         </ButtonContainer>
       </Form>
     </Container>
   );
 };
+
+const countriesExceptUs = COUNTRIES.filter(country => country.value !== 'US');
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[7]};
+    width: 520px;
+    white-space: pre-wrap;
+  `};
+`;
 
 const Header = styled.div`
   ${({ theme }) => css`
@@ -124,13 +149,9 @@ const OptionContainer = styled.div`
   `};
 `;
 
-const Container = styled.div`
+const UsTerritoriesContainer = styled.div`
   ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[7]};
-    width: 520px;
-    white-space: pre-wrap;
+    margin-left: calc(${theme.spacing[7]} + ${theme.spacing[2]});
   `};
 `;
 
@@ -144,7 +165,7 @@ const AllCountriesContainer = styled.div`
   flex-direction: column;
 `;
 
-const OtherCountriesAdditionalOptions = styled.div`
+const InternationalOptions = styled.div`
   ${({ theme }) => css`
     margin-top: ${theme.spacing[2]};
     display: flex;

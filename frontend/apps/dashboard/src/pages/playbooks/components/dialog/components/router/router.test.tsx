@@ -8,237 +8,242 @@ import React from 'react';
 
 import Router from './router';
 import {
-  confirmPlaybookRecommendation,
+  createPlaybook,
   enterName,
-  selectWhoToOnboard,
-  withOnboardingConfigs,
+  moveForward,
+  withCreateOnboardingConfigs,
 } from './router.test.config';
 
 const renderRouter = ({ onClose }: { onClose: () => void }) =>
   customRender(<Router onClose={onClose} />);
 
 describe('<Router />', () => {
-  it("should navigate from 'Name your Playbook' to 'Who to Onboard' screen by way of stepper", async () => {
-    renderRouter({ onClose: jest.fn() });
-    await selectWhoToOnboard();
-    expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
-    const whoToOnboard = screen.getByRole('button', {
-      name: 'Who to onboard',
+  describe('when doing KYC', () => {
+    describe('when the request to create an ob config succeeds', () => {
+      it('should create an onboarding config and show a confirmation', async () => {
+        withCreateOnboardingConfigs();
+        renderRouter({ onClose: jest.fn() });
+
+        // Who to onboard
+        await moveForward();
+
+        // Residency
+        await moveForward();
+
+        // Name
+        await enterName('KYC');
+        await moveForward();
+
+        // Summary
+        await moveForward();
+
+        // Authorized scopes
+        await createPlaybook();
+
+        await waitFor(() => {
+          const confirmation = screen.getByText(
+            'Playbook created successfully.',
+          );
+          expect(confirmation).toBeInTheDocument();
+        });
+      });
     });
-    await userEvent.click(whoToOnboard);
-    expect(
-      screen.getByText('Who would you like to onboard?'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('This helps us better recommend which data to collect.'),
-    ).toBeInTheDocument();
-  });
 
-  it("should navigate from 'Name your playbook' to 'Who to Onboard' screen by way of back button", async () => {
-    renderRouter({ onClose: jest.fn() });
-    await selectWhoToOnboard();
-    expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
-    const back = screen.getByRole('button', {
-      name: 'Back',
+    describe('when in the "Residency" step', () => {
+      it('should go to "Who to onboard" when clicking "Back"', async () => {
+        renderRouter({ onClose: jest.fn() });
+
+        // Who to onboard
+        await moveForward();
+
+        // Residency
+        const back = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(back);
+
+        // Who to onboard
+        const title = screen.getByText('Who would you like to onboard?');
+        expect(title).toBeInTheDocument();
+      });
     });
-    await userEvent.click(back);
-    await waitFor(() => {
-      expect(
-        screen.getByText('Who would you like to onboard?'),
-      ).toBeInTheDocument();
+
+    describe('when in the "Name your Playbook" step', () => {
+      it('should go to "Residency" when clicking "Back"', async () => {
+        renderRouter({ onClose: jest.fn() });
+
+        // Who to onboard
+        await moveForward();
+
+        // Residency
+        await moveForward();
+
+        // Name
+        const back = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(back);
+
+        // Residency
+        const title = screen.getByText(
+          'Select the countries from which your users may onboard.',
+        );
+        expect(title).toBeInTheDocument();
+      });
     });
-    expect(
-      screen.getByText('This helps us better recommend which data to collect.'),
-    ).toBeInTheDocument();
-  });
 
-  it("should navigate from 'Your Playbook' to 'Who to onboard' screen by way of stepper", async () => {
-    renderRouter({ onClose: jest.fn() });
-    await selectWhoToOnboard();
-    await enterName();
-    expect(
-      screen.getByText('Your Playbook recommendation'),
-    ).toBeInTheDocument();
+    describe('when in the "Summary" step', () => {
+      it('should go to "Name your Playbook" when clicking "Back"', async () => {
+        renderRouter({ onClose: jest.fn() });
 
-    const whoToOnboard = screen.getByRole('button', {
-      name: 'Who to onboard',
+        // Who to onboard
+        await moveForward();
+
+        // Residency
+        await moveForward();
+
+        // Name
+        await enterName('KYC');
+        await moveForward();
+
+        // Summary
+        const back = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(back);
+
+        // Name
+        const title = screen.getByText('Name your playbook');
+        expect(title).toBeInTheDocument();
+      });
     });
-    await userEvent.click(whoToOnboard);
-    expect(
-      screen.getByText('Who would you like to onboard?'),
-    ).toBeInTheDocument();
-  });
 
-  it("should navigate from 'Your Playbook' back to 'Name your Playbook' via stepper", async () => {
-    renderRouter({ onClose: jest.fn() });
-    await selectWhoToOnboard();
-    await enterName();
-    const nameYourPlaybook = screen.getByRole('button', {
-      name: 'Name your Playbook',
+    describe('when in the "Authorized scopes" step', () => {
+      it('should go to "Summary" when clicking "Back"', async () => {
+        renderRouter({ onClose: jest.fn() });
+
+        // Who to onboard
+        await moveForward();
+
+        // Residency
+        await moveForward();
+
+        // Name
+        await enterName('KYC');
+        await moveForward();
+
+        // Summary
+        await moveForward();
+
+        // Authorized scopes
+        const back = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(back);
+
+        // Summary
+        const title = screen.getByText('Your Playbook recommendation');
+        expect(title).toBeInTheDocument();
+      });
     });
-    await userEvent.click(nameYourPlaybook);
-    expect(
-      screen.getByText(
-        'This helps you easily identify your Playbook, especially if you have multiple ones.',
-      ),
-    ).toBeInTheDocument();
   });
 
-  it("should navigate from 'Your Playbook' to 'Name your playbook' screen by way of back button", async () => {
-    renderRouter({ onClose: jest.fn() });
-    await selectWhoToOnboard();
-    await enterName();
-    expect(
-      screen.getByText('Your Playbook recommendation'),
-    ).toBeInTheDocument();
+  describe('when doing KYB', () => {
+    describe('when the request to create an ob config succeeds', () => {
+      it('should create an onboarding config and show a confirmation', async () => {
+        withCreateOnboardingConfigs();
+        renderRouter({ onClose: jest.fn() });
 
-    const backButton = screen.getByRole('button', {
-      name: 'Back',
+        // Who to onboard
+        const option = screen.getByRole('button', {
+          name: 'Onboard businesses and their beneficial owners',
+        });
+        await userEvent.click(option);
+        await moveForward();
+
+        // Name
+        await enterName('KYB');
+        await moveForward();
+
+        // Summary
+        await moveForward();
+
+        // Authorized scopes
+        await createPlaybook();
+
+        await waitFor(() => {
+          const confirmation = screen.getByText(
+            'Playbook created successfully.',
+          );
+          expect(confirmation).toBeInTheDocument();
+        });
+      });
     });
-    await userEvent.click(backButton);
-    expect(
-      screen.getByText(
-        'This helps you easily identify your Playbook, especially if you have multiple ones.',
-      ),
-    ).toBeInTheDocument();
-  });
 
-  it("should navigate from 'Your Playbook' to 'Authorized scopes'", async () => {
-    renderRouter({ onClose: jest.fn() });
-    await selectWhoToOnboard();
-    await enterName();
+    describe('when in the "Name your Playbook" step', () => {
+      it('should go to "Who to onboard" when clicking "Back"', async () => {
+        renderRouter({ onClose: jest.fn() });
 
-    expect(
-      screen.getByText('Your Playbook recommendation'),
-    ).toBeInTheDocument();
-    const next = screen.getByRole('button', { name: 'Next' });
-    await userEvent.click(next);
-    // stepper value and header
-    expect(screen.getAllByText('Authorized scopes').length).toEqual(2);
-  });
+        // Who to onboard
+        const option = screen.getByRole('button', {
+          name: 'Onboard businesses and their beneficial owners',
+        });
+        await userEvent.click(option);
+        await moveForward();
 
-  it("should navigate from 'Authorized scopes' back to 'Your Playbook' with back button", async () => {
-    renderRouter({ onClose: jest.fn() });
-    await selectWhoToOnboard();
-    await enterName();
-    await confirmPlaybookRecommendation();
-    const back = screen.getByRole('button', { name: 'Back' });
-    await userEvent.click(back);
-    expect(
-      screen.getByText('Your Playbook recommendation'),
-    ).toBeInTheDocument();
-  });
+        // Name
+        const back = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(back);
 
-  it("should navigate from 'Authorized scopes' back to 'Your Playbook' via stepper", async () => {
-    renderRouter({ onClose: jest.fn() });
-    await selectWhoToOnboard();
-    await enterName();
-    await confirmPlaybookRecommendation();
-    const yourPlaybook = screen.getByRole('button', { name: 'Your Playbook' });
-    await userEvent.click(yourPlaybook);
-    expect(
-      screen.getByText('Your Playbook recommendation'),
-    ).toBeInTheDocument();
-  });
-
-  it("should navigate from 'Authorized scopes' back to 'Who to onboard' via stepper", async () => {
-    renderRouter({ onClose: jest.fn() });
-    await selectWhoToOnboard();
-    await enterName();
-    await confirmPlaybookRecommendation();
-    const whoToOnboard = screen.getByRole('button', { name: 'Who to onboard' });
-    await userEvent.click(whoToOnboard);
-    expect(
-      screen.getByText('Who would you like to onboard?'),
-    ).toBeInTheDocument();
-  });
-
-  it("should navigate from 'Authorized scopes' back to 'Name your Playbook' via stepper", async () => {
-    renderRouter({ onClose: jest.fn() });
-    await selectWhoToOnboard();
-    await enterName();
-    await confirmPlaybookRecommendation();
-    const nameYourPlaybook = screen.getByRole('button', {
-      name: 'Name your Playbook',
+        // Who to onboard
+        const title = screen.getByText('Who would you like to onboard?');
+        expect(title).toBeInTheDocument();
+      });
     });
-    await userEvent.click(nameYourPlaybook);
-    expect(
-      screen.getByText(
-        'This helps you easily identify your Playbook, especially if you have multiple ones.',
-      ),
-    ).toBeInTheDocument();
-  });
 
-  it('should show toast on success', async () => {
-    const closeFn = jest.fn();
-    withOnboardingConfigs();
-    renderRouter({ onClose: closeFn });
-    await selectWhoToOnboard();
-    await enterName();
-    await confirmPlaybookRecommendation();
-    const createPlaybook = screen.getByRole('button', {
-      name: 'Create Playbook',
-    });
-    await userEvent.click(createPlaybook);
-    await waitFor(() => {
-      expect(screen.getByText('Success')).toBeInTheDocument();
-    });
-    expect(
-      screen.getByText('Playbook created successfully.'),
-    ).toBeInTheDocument();
-    expect(closeFn).toHaveBeenCalled();
-  });
+    describe('when in the "Summary" step', () => {
+      it('should go to "Name your Playbook" when clicking "Back"', async () => {
+        renderRouter({ onClose: jest.fn() });
 
-  it('should allow user to create a KYC playbook, navigate back, and create a KYB playbookw ithout error', async () => {
-    renderRouter({ onClose: jest.fn() });
-    // KYC
-    await selectWhoToOnboard();
-    expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
-    const back = screen.getByRole('button', {
-      name: 'Back',
-    });
-    await userEvent.click(back);
-    expect(
-      screen.getByText('Who would you like to onboard?'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('This helps us better recommend which data to collect.'),
-    ).toBeInTheDocument();
-    const KYB = screen.getByText(
-      'Onboard businesses and their beneficial owners',
-    );
-    await userEvent.click(KYB);
-    const continueButton = screen.getByRole('button', { name: 'Continue' });
-    await userEvent.click(continueButton);
-    expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
-  });
+        // Who to onboard
+        const option = screen.getByRole('button', {
+          name: 'Onboard businesses and their beneficial owners',
+        });
+        await userEvent.click(option);
+        await moveForward();
 
-  it('should reset name value if user swaps between KYC and KYB', async () => {
-    renderRouter({ onClose: jest.fn() });
-    // KYC
-    await selectWhoToOnboard();
-    expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
-    let nameField = screen.getByRole('textbox');
-    await userEvent.type(nameField, 'Test KYC name');
-    expect(nameField).toHaveValue('Test KYC name');
-    const back = screen.getByRole('button', {
-      name: 'Back',
+        // Name
+        await enterName('KYB');
+        await moveForward();
+
+        // Summary
+        const back = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(back);
+
+        // Name
+        const title = screen.getByText('Name your playbook');
+        expect(title).toBeInTheDocument();
+      });
     });
-    await userEvent.click(back);
-    expect(
-      screen.getByText('Who would you like to onboard?'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('This helps us better recommend which data to collect.'),
-    ).toBeInTheDocument();
-    const KYB = screen.getByText(
-      'Onboard businesses and their beneficial owners',
-    );
-    await userEvent.click(KYB);
-    const continueButton = screen.getByRole('button', { name: 'Continue' });
-    await userEvent.click(continueButton);
-    expect(screen.getByText('Name your Playbook')).toBeInTheDocument();
-    nameField = screen.getByRole('textbox');
-    expect(nameField).not.toHaveValue('Test KYC name');
+
+    describe('when in the "Authorized scopes" step', () => {
+      it('should go to "Summary" when clicking "Back"', async () => {
+        renderRouter({ onClose: jest.fn() });
+
+        // Who to onboard
+        const option = screen.getByRole('button', {
+          name: 'Onboard businesses and their beneficial owners',
+        });
+        await userEvent.click(option);
+        await moveForward();
+
+        // Name
+        await enterName('KYB');
+        await moveForward();
+
+        // Summary
+        await moveForward();
+
+        // Authorized scopes
+        const back = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(back);
+
+        // Summary
+        const title = screen.getByText('Your Playbook recommendation');
+        expect(title).toBeInTheDocument();
+      });
+    });
   });
 });

@@ -9,7 +9,7 @@ import type {
 import {
   defaultAuthorizedScopesValues,
   defaultPlaybookValuesKYC,
-  Kind,
+  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 import PersonalScopes from './personal-scopes';
@@ -17,13 +17,13 @@ import PersonalScopes from './personal-scopes';
 export type PersonalScopesWithContextProps = {
   startingPersonalValues?: Partial<PersonalInformationAndDocs>;
   investorProfile?: boolean;
-  kind?: Kind;
+  kind?: PlaybookKind;
 };
 
 const PersonalScopesWithContext = ({
   startingPersonalValues,
   investorProfile,
-  kind = Kind.KYC,
+  kind = PlaybookKind.Kyc,
 }: PersonalScopesWithContextProps) => {
   const formMethods = useForm<AuthorizedScopesFormData>({
     defaultValues: defaultAuthorizedScopesValues,

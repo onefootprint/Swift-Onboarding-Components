@@ -4,14 +4,14 @@ import { InlineAlert } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { Kind } from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import BusinessInformation from './components/business-information';
 import InvestorProfile from './components/investor-profile';
 import PersonalInfoAndDocs from './components/personal-info-and-docs';
 
 type DataCollectionProps = {
-  kind: Kind;
+  kind: PlaybookKind;
 };
 
 const DataCollection = ({ kind }: DataCollectionProps) => {
@@ -26,10 +26,10 @@ const DataCollection = ({ kind }: DataCollectionProps) => {
 
   return (
     <Container>
-      {kind === Kind.KYB && <BusinessInformation />}
+      {kind === PlaybookKind.Kyb && <BusinessInformation />}
       <PersonalInfoAndDocs kind={kind} />
-      {kind === Kind.KYC && <InvestorProfile />}
-      {kind === Kind.KYB && (
+      {kind === PlaybookKind.Kyc && <InvestorProfile />}
+      {kind === PlaybookKind.Kyb && (
         <InlineAlert variant="info">{t('alert')}</InlineAlert>
       )}
     </Container>

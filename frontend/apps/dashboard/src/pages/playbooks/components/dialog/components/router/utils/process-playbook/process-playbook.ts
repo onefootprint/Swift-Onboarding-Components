@@ -11,13 +11,18 @@ import type {
   BusinessInformation,
   NameFormData,
   PlaybookFormData,
+  ResidencyFormData,
 } from '@/playbooks/utils/machine/types';
-import { Kind } from '@/playbooks/utils/machine/types';
+import {
+  CountryRestriction,
+  PlaybookKind,
+} from '@/playbooks/utils/machine/types';
 
 type ProcessPlaybookProps = {
   playbook: PlaybookFormData;
-  kind: Kind;
+  kind: PlaybookKind;
   authorizedScopes: AuthorizedScopesFormData;
+  residencyForm?: ResidencyFormData;
   nameForm: NameFormData;
 };
 
@@ -36,10 +41,11 @@ const getRequiredKycCollectFields = () => [
 ];
 
 const processPlaybook = ({
-  playbook,
-  kind,
   authorizedScopes,
+  kind,
   nameForm,
+  playbook,
+  residencyForm,
 }: ProcessPlaybookProps) => {
   const mustCollectData: CollectedDataOption[] = [];
   const canAccessData: CollectedDataOption[] = [];
@@ -92,7 +98,7 @@ const processPlaybook = ({
   // investor profile handling
   if (
     playbook?.[CollectedInvestorProfileDataOption.investorProfile] &&
-    kind === Kind.KYC
+    kind === PlaybookKind.Kyc
   ) {
     mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
@@ -124,7 +130,7 @@ const processPlaybook = ({
     CollectedKybDataOption.phoneNumber,
   ];
 
-  if (kind === Kind.KYB && businessInformation) {
+  if (kind === PlaybookKind.Kyb && businessInformation) {
     const requiredKybFields = getRequiredKybCollectFields();
     mustCollectData.push(...requiredKybFields);
     optionalKYBFields.forEach(field => {
@@ -149,12 +155,44 @@ const processPlaybook = ({
   const { name } = nameForm;
 
   return {
-    mustCollectData,
     canAccessData,
-    optionalData,
     isDocFirstFlow,
     isNoPhoneFlow,
+    mustCollectData,
     name,
+    optionalData,
+    ...getResidency(residencyForm),
+  };
+};
+
+const getResidency = (residencyForm?: ResidencyFormData) => {
+  if (!residencyForm) {
+    return {};
+  }
+  const {
+    allowUsResidents,
+    allowUsTerritories,
+    allowInternationalResidents,
+    restrictCountries,
+    countryList,
+  } = residencyForm;
+
+  if (restrictCountries === CountryRestriction.restrict && countryList) {
+    const internationalCountryRestrictions: string[] = [];
+    const countryListCode = countryList.map(country => country.value);
+    internationalCountryRestrictions.push(...countryListCode);
+    return {
+      allowUsResidents,
+      allowUsTerritories,
+      allowInternationalResidents,
+      internationalCountryRestrictions,
+    };
+  }
+  return {
+    allowUsResidents,
+    allowUsTerritories,
+    allowInternationalResidents,
+    internationalCountryRestrictions: null,
   };
 };
 

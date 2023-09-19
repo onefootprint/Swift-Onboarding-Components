@@ -6,13 +6,13 @@ import {
   defaultAuthorizedScopesValues,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
-  Kind,
+  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 import AuthorizedScopes from './authorized-scopes';
 
 export type AuthorizedScopesWithContextProps = {
-  kind: Kind;
+  kind: PlaybookKind;
   submissionLoading?: boolean;
   onSubmit?: (data: AuthorizedScopesFormData) => void;
 };
@@ -26,7 +26,9 @@ const AuthorizedScopesWithContext = ({
     defaultValues: defaultAuthorizedScopesValues,
   });
   const playbook =
-    kind === Kind.KYB ? defaultPlaybookValuesKYB : defaultPlaybookValuesKYC;
+    kind === PlaybookKind.Kyb
+      ? defaultPlaybookValuesKYB
+      : defaultPlaybookValuesKYC;
 
   return (
     <FormProvider {...formMethods}>

@@ -7,7 +7,7 @@ import {
   asAdminUserInOrg,
 } from 'src/config/tests';
 
-import { Kind } from '@/playbooks/utils/machine/types';
+import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import type { EditingWithContextProps } from './editing.test.config';
 import EditingWithContext from './editing.test.config';
@@ -125,14 +125,14 @@ describe('<Editing />', () => {
   });
 
   it('should show correct title for KYC', async () => {
-    renderEditing({ kind: Kind.KYC });
+    renderEditing({ kind: PlaybookKind.Kyc });
     expect(
       screen.getByText('Edit personal information & docs'),
     ).toBeInTheDocument();
   });
 
   it('should show correct title for KYB', async () => {
-    renderEditing({ kind: Kind.KYB });
+    renderEditing({ kind: PlaybookKind.Kyb });
     expect(
       screen.getByText('Edit KYC of a beneficial owner'),
     ).toBeInTheDocument();
@@ -140,7 +140,7 @@ describe('<Editing />', () => {
 
   it('should show no phone flow option if firm employee', async () => {
     asAdminUserFirmEmployee();
-    renderEditing({ kind: Kind.KYC });
+    renderEditing({ kind: PlaybookKind.Kyc });
     expect(
       screen.getByRole('switch', {
         name: 'Request users to provide their phone number',
@@ -151,7 +151,7 @@ describe('<Editing />', () => {
 
   it('should show no phone flow option if findigs employee', async () => {
     asAdminUserInOrg('Findigs.com');
-    renderEditing({ kind: Kind.KYC });
+    renderEditing({ kind: PlaybookKind.Kyc });
 
     expect(
       screen.getByRole('switch', {
@@ -162,7 +162,7 @@ describe('<Editing />', () => {
 
   it('should not show no phone flow option if firm employee but KYB', async () => {
     asAdminUserFirmEmployee();
-    renderEditing({ kind: Kind.KYB });
+    renderEditing({ kind: PlaybookKind.Kyb });
     expect(
       screen.queryByRole('switch', {
         name: 'Request users to provide their phone number',
@@ -172,7 +172,7 @@ describe('<Editing />', () => {
 
   it('should hide phone option flow option if non-firm employee', async () => {
     asAdminUser();
-    renderEditing({ kind: Kind.KYC });
+    renderEditing({ kind: PlaybookKind.Kyc });
     expect(
       screen.queryByRole('switch', {
         name: 'Request users to provide their phone number',

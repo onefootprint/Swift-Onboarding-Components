@@ -15,7 +15,9 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignNameYourPlaybook: 'nameYourPlaybookSubmitted';
     assignPlaybook: 'playbookSubmitted';
+    assignResidency: 'residencySubmitted';
     assignWhoToOnboard: 'whoToOnboardSubmitted';
+    resetKind: 'navigationBackward';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
@@ -23,6 +25,7 @@ export interface Typegen0 {
   matchesStates:
     | 'authorizedScopes'
     | 'nameYourPlaybook'
+    | 'residency'
     | 'whoToOnboard'
     | 'yourPlaybook';
   tags: never;
