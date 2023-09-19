@@ -52,6 +52,7 @@ export { default as RiskSignalAttribute } from './risk-signal-attribute';
 export * from './role';
 export * from './rolebinding';
 export * from './sandbox-outcomes-type';
+export { default as SessionStatus } from './session-status';
 export * from './timeline';
 export { default as UsLegalStatus } from './us-legal-status';
 export * from './vault';

@@ -71,3 +71,4 @@ export * from './user-token';
 export * from './user-update';
 export * from './users-update-annotation';
 export * from './users-vault';
+export * from './validate-session';
