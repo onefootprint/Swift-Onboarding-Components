@@ -54,7 +54,7 @@ const DocumentField = ({
           <Typography variant="body-3" color="tertiary" as="label">
             {label}
           </Typography>
-          <DocumentStatusBadge status={documentStatus} />
+          {documentStatus && <DocumentStatusBadge status={documentStatus} />}
         </LabelContainer>
         <LinkButton size="compact" onClick={show}>
           {t('see-details')}

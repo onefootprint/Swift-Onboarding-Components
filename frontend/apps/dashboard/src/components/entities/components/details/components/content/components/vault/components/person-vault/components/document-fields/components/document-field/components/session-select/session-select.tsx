@@ -21,9 +21,15 @@ const SessionSelect = ({
   const { t } = useTranslation(
     'pages.entity.fieldset.document.drawer.session-selector',
   );
-  const documentOptions = documents.map((document, index) => ({
+  // Hide the whole session selector if any of the sessions don't have a start date.
+  // These aren't real sessions, just a series of images uploaded via API rather than via bifrost.
+  const sessionsToRender = documents.filter(d => !!d.startedAt);
+  if (!sessionsToRender.length) {
+    return null;
+  }
+  const documentOptions = sessionsToRender.map((document, index) => ({
     label: `${t('session')} ${index + 1} (${formatUtcDate(
-      new Date(document.startedAt),
+      new Date(document.startedAt as string),
     )})`,
     value: getDocumentVersion(document, documents),
   }));

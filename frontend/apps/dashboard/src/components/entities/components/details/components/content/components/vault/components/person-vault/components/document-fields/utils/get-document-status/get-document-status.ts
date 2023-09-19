@@ -33,7 +33,12 @@ const getDocumentStatus = ({
   ) {
     return DocStatusToUIState[IdDocStatus.pending];
   }
-  return DocStatusToUIState[IdDocStatus.failed];
+  if (
+    relevantDocuments.some(document => document.status === IdDocStatus.failed)
+  ) {
+    return DocStatusToUIState[IdDocStatus.failed];
+  }
+  return undefined;
 };
 
 export default getDocumentStatus;

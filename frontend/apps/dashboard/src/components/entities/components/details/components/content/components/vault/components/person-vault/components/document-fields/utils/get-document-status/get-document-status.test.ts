@@ -5,6 +5,7 @@ import {
   driversLicenseFailed,
   driversLicensePending,
   driversLicenseSuccess,
+  driversLicenseViaApi,
   idCardFail,
   idCardSuccess,
 } from './get-document-status.test.config';
@@ -54,6 +55,15 @@ describe('getDocumentStatus', () => {
   it('should return undefined if there are no documents', () => {
     expect(
       getDocumentStatus({
+        documentType: SupportedIdDocTypes.driversLicense,
+      }),
+    ).toEqual(undefined);
+  });
+
+  it('should return undefined if all documents have undefined status', () => {
+    expect(
+      getDocumentStatus({
+        documents: [driversLicenseViaApi],
         documentType: SupportedIdDocTypes.driversLicense,
       }),
     ).toEqual(undefined);

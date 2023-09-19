@@ -23,6 +23,17 @@ export const driversLicenseFailed: Document = {
   ocrConfidenceScore: 45,
 };
 
+export const driversLicenseViaApi: Document = {
+  completedVersion: 2,
+  kind: SupportedIdDocTypes.driversLicense,
+  startedAt: undefined,
+  status: undefined,
+  uploads: [],
+  documentScore: null,
+  selfieScore: null,
+  ocrConfidenceScore: null,
+};
+
 export const driversLicensePending: Document = {
   completedVersion: 3,
   kind: SupportedIdDocTypes.driversLicense,

@@ -44,3 +44,14 @@ export const driversLicenseDoc4: Document = {
   selfieScore: null,
   ocrConfidenceScore: null,
 };
+
+export const driversLicenseViaApi: Document = {
+  completedVersion: 3,
+  kind: SupportedIdDocTypes.driversLicense,
+  startedAt: undefined,
+  status: undefined,
+  uploads: [],
+  documentScore: null,
+  selfieScore: null,
+  ocrConfidenceScore: null,
+};

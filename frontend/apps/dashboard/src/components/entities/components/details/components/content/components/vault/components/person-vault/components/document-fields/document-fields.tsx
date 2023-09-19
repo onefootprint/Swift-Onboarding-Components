@@ -25,8 +25,15 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
 
   return vault ? (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      {fields.map(field =>
-        entity.attributes.includes(field.main) ? (
+      {fields.map(field => {
+        if (!entity.attributes.includes(field.main)) {
+          return null;
+        }
+        const docStatus = getDocumentStatus({
+          documents,
+          documentType: getDocumentType(field.main),
+        });
+        return (
           <Box key={field.main}>
             {isVaultDataDecrypted(vault?.[field.main]) ? (
               <DocumentField
@@ -42,19 +49,12 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
               <Field
                 di={field.main}
                 entity={entity}
-                status={
-                  <DocumentStatusBadge
-                    status={getDocumentStatus({
-                      documents,
-                      documentType: getDocumentType(field.main),
-                    })}
-                  />
-                }
+                status={docStatus && <DocumentStatusBadge status={docStatus} />}
               />
             )}
           </Box>
-        ) : null,
-      )}
+        );
+      })}
     </Box>
   ) : null;
 };

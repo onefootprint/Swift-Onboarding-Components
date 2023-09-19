@@ -19,8 +19,8 @@ export enum DeviceType {
 export type Document = {
   completedVersion: number | null;
   kind: SupportedIdDocTypes;
-  startedAt: string;
-  status: IdDocStatus;
+  startedAt?: string;
+  status?: IdDocStatus;
   uploads: DocumentUpload[];
   documentScore: number | null;
   selfieScore: number | null;

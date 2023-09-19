@@ -13,6 +13,7 @@ import {
   driversLicenseDoc2,
   driversLicenseDoc3,
   driversLicenseDoc4,
+  driversLicenseViaApi,
 } from './session-select.test.config';
 
 const renderSessionSelector = ({
@@ -48,5 +49,23 @@ describe('<SessionSelector />', () => {
     });
     expect(screen.getByText('Session 3 (07/25/2023)')).toBeInTheDocument();
     expect(screen.getByText('Session 4 (07/26/2023)')).toBeInTheDocument();
+  });
+
+  it('should display nothing when there are no sessions', async () => {
+    renderSessionSelector({
+      documents: [],
+      activeDocumentVersion: '1',
+      onActiveDocumentVersionChange: jest.fn(),
+    });
+    expect(screen.queryByText('Session 1')).not.toBeInTheDocument();
+  });
+
+  it('should display nothing when there is only an API sesson', async () => {
+    renderSessionSelector({
+      documents: [driversLicenseViaApi],
+      activeDocumentVersion: '1',
+      onActiveDocumentVersionChange: jest.fn(),
+    });
+    expect(screen.queryByText('Session 1')).not.toBeInTheDocument();
   });
 });
