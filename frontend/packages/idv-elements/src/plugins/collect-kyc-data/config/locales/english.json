@@ -32,6 +32,7 @@
     "basic-information": {
       "title": "Basic Data",
       "subtitle": "We're legally required to collect this information.",
+      "hint": "Data should match the details on your ID",
       "form": {
         "first-name": {
           "label": "First name",

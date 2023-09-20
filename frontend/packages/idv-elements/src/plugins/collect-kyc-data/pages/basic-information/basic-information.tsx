@@ -1,10 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedKycDataOption,
   IdDI,
   isCountryCode,
 } from '@onefootprint/types';
+import { Banner, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -96,6 +98,14 @@ const BasicInformation = ({
           />
         </>
       )}
+      <HintBannerContainer>
+        <Banner variant="info">
+          <BannerChildrenContainer>
+            <IcoInfo16 color="info" />
+            {t('hint')}
+          </BannerChildrenContainer>
+        </Banner>
+      </HintBannerContainer>
       <FormProvider {...methods}>
         <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
           {requiresName && (
@@ -118,6 +128,27 @@ const BasicInformation = ({
     </>
   );
 };
+
+const BannerChildrenContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing[3]};
+    ${createFontStyles('body-2')};
+
+    ${media.lessThan('sm')`
+      ${createFontStyles('body-3')};
+    `}
+  `};
+`;
+
+const HintBannerContainer = styled.div`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.spacing[7]};
+    border-radius: ${theme.borderRadius.default};
+    overflow: hidden;
+  `};
+`;
 
 const Form = styled.form`
   ${({ theme }) => css`
