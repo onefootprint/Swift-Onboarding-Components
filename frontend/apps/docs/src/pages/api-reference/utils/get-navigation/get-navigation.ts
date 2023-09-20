@@ -1,5 +1,3 @@
-import { API_REFERENCE_PATH } from '../../../../config/constants';
-
 const getNavigation = (data: any) => {
   const paths = Object.keys(data.paths);
   const navigationElements = paths.map(path => {
@@ -11,10 +9,13 @@ const getNavigation = (data: any) => {
     const entities = filteredElements.join(' ');
     const title = filteredElements[0];
     const methods = Object.keys(data.paths[path]);
+    const joinedEntities = filteredElements.join('-');
+    const client = path.startsWith('/users/{fp_id}/vault') ? '-client' : '';
     const subsections = methods.map(method => ({
       method,
       entities,
-      slug: `/${API_REFERENCE_PATH}/${title}-${entities}-${method}`,
+      id: `${joinedEntities}-${method}${client}`,
+      slug: `#${joinedEntities}-${method}${client}`,
     }));
 
     return {

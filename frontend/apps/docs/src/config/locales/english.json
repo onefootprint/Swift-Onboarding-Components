@@ -92,6 +92,10 @@
       }
     },
     "navigation-api-reference": {
+      "sections": {
+        "footprint-api": "Footprint API",
+        "footprint-api-preview": "Footprint API (Preview)"
+      },
       "navigation": {
         "business": {
           "label": "Businesses",
@@ -200,6 +204,18 @@
           }
         }
       }
+    },
+    "api-reference": {
+      "html-title": "Footprint - API Reference",
+      "request": "Request",
+      "auth-method": "Auth method",
+      "what-is-api-key": "An API key is a token that you provide when making API calls. Include the token in a header parameter called",
+      "example": "Example",
+      "path-parameters": "Path parameters",
+      "query-parameters": "Query parameters",
+      "header-parameters": "Header parameters",
+      "responses": "Responses",
+      "examples": "Examples"
     },
     "404": {
       "title": "Oops! Page couldn't be found.",

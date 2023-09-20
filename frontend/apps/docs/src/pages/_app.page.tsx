@@ -10,21 +10,17 @@ import CustomDesignSystemProvider from '../components/custom-design-system-provi
 import { API_REFERENCE_PATH } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
-import ApiReferenceLayout from './api-reference-layout';
+import ApiReference from './api-reference';
 import DocsLayout from './docs-layout';
 
 configureReactI18next();
 
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  useEffect(
-    () => setMounted(true),
-
-    [],
-  );
-  if (!mounted) return null;
   const isApiReference = router.asPath.startsWith(API_REFERENCE_PATH);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
 
   return (
     <>
@@ -52,9 +48,7 @@ const App = ({ Component, pageProps }: AppProps) => {
         <CustomDesignSystemProvider>
           <GlobalStyle />
           {isApiReference ? (
-            <ApiReferenceLayout>
-              <p> isAPIReference </p>
-            </ApiReferenceLayout>
+            <ApiReference />
           ) : (
             <DocsLayout
               article={pageProps.article}

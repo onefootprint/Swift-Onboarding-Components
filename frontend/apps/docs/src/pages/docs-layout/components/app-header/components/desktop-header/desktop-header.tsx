@@ -15,7 +15,7 @@ const DesktopHeader = () => {
   return (
     <Container>
       <Nav>
-        <NavigationLogo section="docs" />
+        <NavigationLogo />
       </Nav>
       <ThemeToggle onChange={handleToggleTheme} checked={theme === 'dark'} />
     </Container>

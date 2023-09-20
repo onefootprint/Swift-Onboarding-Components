@@ -10,6 +10,8 @@ export enum FormField {
   message = 'message',
 }
 
+export type Navigation = NavigationSection[];
+
 export type NavigationSection = {
   title: string;
   subsections: NavigationSubsection[];
@@ -19,6 +21,5 @@ export type NavigationSubsection = {
   method: 'post' | 'get' | 'put' | 'delete' | 'patch';
   entities: string;
   slug: string;
+  id: string;
 };
-
-export type Navigation = NavigationSection[];
