@@ -45,6 +45,11 @@ const useProps = (onSuccess: (props: BifrostProps) => void) => {
     }
   };
   const handleTimeout = () => {
+    if (!urlProps) {
+      console.warn(
+        'Getting provider prop from parent iFrame timed out on bifrost while the url prop is also empty.',
+      );
+    }
     setProviderProps({
       userData: {},
       options: {},
