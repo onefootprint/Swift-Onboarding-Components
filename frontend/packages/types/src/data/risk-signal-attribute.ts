@@ -13,6 +13,7 @@ export enum RiskSignalAttribute {
   phoneNumber = 'phone_number',
   ipAddress = 'ip_address',
   document = 'document',
+  selfie = 'selfie',
   device = 'device',
   native_device = 'native_device',
 }

@@ -70,6 +70,7 @@ const isAddress = (signalAttribute: RiskSignalAttribute) => {
 };
 
 const isDocument = (signalAttribute: RiskSignalAttribute) =>
-  signalAttribute === RiskSignalAttribute.document;
+  signalAttribute === RiskSignalAttribute.document ||
+  signalAttribute === RiskSignalAttribute.selfie;
 
 export default groupBySection;
