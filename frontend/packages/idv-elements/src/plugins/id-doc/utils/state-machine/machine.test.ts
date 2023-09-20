@@ -859,6 +859,9 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
+          type: 'consentReceived',
+        },
+        {
           type: 'startImageCapture',
         },
         {
