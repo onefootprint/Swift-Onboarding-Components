@@ -106,11 +106,12 @@ pub enum IncodeFailureReason {
 
 impl IncodeFailureReason {
     pub fn can_ignore(&self) -> bool {
-        self.reason_code().is_some()
+        self.reason_code().is_some() || matches!(self, Self::SelfieHasLenses)
     }
 
     pub fn reason_code(&self) -> Option<FootprintReasonCode> {
         match self {
+            // These cause the user to be put in manual review
             Self::DocTypeMismatch => Some(FootprintReasonCode::DocumentTypeMismatch),
             Self::UnknownCountryCode => Some(FootprintReasonCode::DocumentUnknownCountryCode),
             Self::CountryCodeMismatch => Some(FootprintReasonCode::DocumentCountryCodeMismatch),

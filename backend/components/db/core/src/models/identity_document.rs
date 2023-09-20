@@ -28,6 +28,7 @@ pub struct IdentityDocument {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    /// This may be set for failed or complete IdentityDocuments
     pub completed_seqno: Option<DataLifetimeSeqno>,
     // DO NOT CHANGE THE ORDER OF THESE FIELDS
     pub document_score: Option<f64>,

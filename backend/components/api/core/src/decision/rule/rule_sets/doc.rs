@@ -71,7 +71,6 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 |f: &Vec<FootprintReasonCode>| {
                     f.iter().any(|rc| {
                         vec![
-                            FootprintReasonCode::DocumentCollectionErrored,
                             FootprintReasonCode::DocumentTypeMismatch,
                             FootprintReasonCode::DocumentUnknownCountryCode,
                             FootprintReasonCode::DocumentCountryCodeMismatch,
