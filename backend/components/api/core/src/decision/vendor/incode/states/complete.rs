@@ -9,7 +9,9 @@ use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::NewDocument;
+use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::WriteableVw;
 use crate::vendor_clients::IncodeClients;
 
 use async_trait::async_trait;
@@ -51,6 +53,87 @@ use strum::IntoEnumIterator;
 // it yet so we do it in a custom way
 pub struct Complete {}
 
+/// Now that we have the correct type of the document, add the images to the vault under the correct type
+fn vault_complete_images(
+    conn: &mut TxnPgConn,
+    vw: &WriteableVw<Person>,
+    dk: IdDocKind,
+    id_doc: &IdentityDocument,
+) -> ApiResult<()> {
+    let docs = id_doc
+        .images(conn, true)?
+        .into_iter()
+        .map(|u| {
+            let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
+            NewDocument {
+                mime_type: "image/png".to_string(),
+                filename: format!("{}.png", kind),
+                kind,
+                e_data_key: u.e_data_key,
+                s3_url: u.s3_url,
+                source: DataLifetimeSource::Hosted,
+            }
+        })
+        .collect_vec();
+    vw.put_documents_unsafe(conn, docs)?;
+    Ok(())
+}
+
+fn ocr_data(r: FetchOCRResponse, dk: IdDocKind) -> Vec<(DataIdentifier, PiiString)> {
+    let di = |ocr_dk: ODK, pii: Option<ScrubbedPiiString>| -> Option<(DataIdentifier, PiiString)> {
+        pii.map(|x| (DataIdentifier::from(DocumentKind::OcrData(dk, ocr_dk)), x.into()))
+    };
+    vec![
+        di(ODK::Dob, r.dob().ok()),
+        di(ODK::ExpiresAt, r.expiration_date().ok()),
+        di(ODK::IssuedAt, r.issue_date().ok()),
+        di(ODK::IssuingCountry, r.issuing_country_two_digit()),
+        di(ODK::IssuingState, r.normalized_issuing_state()),
+        di(ODK::Gender, r.gender),
+        di(ODK::FullAddress, r.address),
+        di(ODK::DocumentNumber, r.document_number),
+        di(ODK::RefNumber, r.ref_number),
+        di(ODK::Nationality, r.nationality_mrz.or(r.nationality)),
+        di(
+            ODK::FullName,
+            // prefer MRZ decoded name to OCR, since OCR has a higher rate of whoopsies
+            r.name.and_then(|n| n.machine_readable_full_name.or(n.full_name)),
+        ),
+        di(ODK::Curp, r.curp),
+    ]
+    .into_iter()
+    .flatten()
+    .collect_vec()
+}
+
+fn doc_first_id_data(r: &FetchOCRResponse, validate_args: ValidateArgs) -> Vec<(DataIdentifier, PiiString)> {
+    let name = r.name.as_ref();
+    let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
+    vec![
+        (
+            IDK::FirstName,
+            // TODO given name seems to include middle name and be all uppercase
+            name.and_then(|n| n.given_name_mrz.as_ref().or(n.given_name.as_ref())),
+        ),
+        (
+            IDK::LastName,
+            name.and_then(|n| n.last_name_mrz.as_ref().or(n.paternal_last_name.as_ref())),
+        ),
+        (IDK::AddressLine1, address.and_then(|n| n.street.as_ref())),
+        (IDK::City, address.and_then(|n| n.city.as_ref())),
+        (IDK::State, address.and_then(|n| n.state.as_ref())),
+        (IDK::Zip, address.and_then(|n| n.postal_code.as_ref())),
+        (IDK::Country, r.issuing_country_two_digit().as_ref()),
+        (IDK::Dob, r.dob().ok().as_ref()),
+    ]
+    .into_iter()
+    .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))
+    // Don't add OCR data that fails validation - don't want it to block sign up
+    .flat_map(|(k, v)| k.validate(v.clone(), validate_args, &HashMap::new()).is_ok().then_some((k, v)))
+    // Don't add OCR data to the vault that already exists
+    .collect()
+}
+
 impl Complete {
     #[allow(clippy::too_many_arguments)]
     /// Must call this before instantiating Complete
@@ -78,26 +161,10 @@ impl Complete {
         };
         UserTimeline::create(conn, info, vault.id.clone(), sv_id.clone())?;
 
-        // Now that we have the correct type of the document, add the images to the vault
-        // under the correct type
-        let docs = id_doc
-            .images(conn, true)?
-            .into_iter()
-            .map(|u| {
-                let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
-                NewDocument {
-                    mime_type: "image/png".to_string(),
-                    filename: format!("{}.png", kind),
-                    kind,
-                    e_data_key: u.e_data_key,
-                    s3_url: u.s3_url,
-                    source: DataLifetimeSource::Hosted,
-                }
-            })
-            .collect_vec();
-        uvw.put_documents_unsafe(conn, docs)?;
+        // Populate OCR data if we proceeded without ignoring any failure reasons
+        vault_complete_images(conn, &uvw, dk, &id_doc)?;
 
-        // First, clear all OCR data for this document kind
+        // Clear all OCR data for this document kind
         let odks_to_clear = ODK::iter()
             .map(|odk| DocumentKind::OcrData(dk, odk).into())
             .collect();
@@ -105,81 +172,32 @@ impl Complete {
         DataLifetime::bulk_deactivate_speculative(conn, sv_id, odks_to_clear, seqno)?;
 
         // Then add some extracted OCR data to the vault.
-        let di = |ocr_dk: ODK, pii: Option<ScrubbedPiiString>| -> Option<(DataIdentifier, PiiString)> {
-            pii.map(|x| (DataIdentifier::from(DocumentKind::OcrData(dk, ocr_dk)), x.into()))
-        };
-        let r = fetch_ocr_response.clone();
-        let data = vec![
-            di(ODK::Dob, r.dob().ok()),
-            di(ODK::ExpiresAt, r.expiration_date().ok()),
-            di(ODK::IssuedAt, r.issue_date().ok()),
-            di(ODK::IssuingCountry, r.issuing_country_two_digit()),
-            di(ODK::IssuingState, r.normalized_issuing_state()),
-            di(ODK::Gender, r.gender),
-            di(ODK::FullAddress, r.address),
-            di(ODK::DocumentNumber, r.document_number),
-            di(ODK::RefNumber, r.ref_number),
-            di(ODK::Nationality, r.nationality_mrz.or(r.nationality)),
-            di(
-                ODK::FullName,
-                // prefer MRZ decoded name to OCR, since OCR has a higher rate of whoopsies
-                r.name.and_then(|n| n.machine_readable_full_name.or(n.full_name)),
-            ),
-            di(ODK::Curp, r.curp),
-        ]
-        .into_iter()
-        .flatten()
-        .collect_vec();
+        let ocr_data = ocr_data(fetch_ocr_response.clone(), dk);
 
-        // For doc-first onboardings, populate identity data
         let mut validate_args = ValidateArgs::for_bifrost(vault.is_live);
-        // A little bit of a hack to allow vaulting all address fields that exist
-        // But, bifrost will display an empty address screen if ANY address field is missing
         validate_args.allow_dangling_keys = true;
+        // For doc-first onboardings, populate identity data
         let id_data: Vec<(DataIdentifier, PiiString)> = if obc.is_doc_first && !wf.config.is_redo() {
-            let r = &fetch_ocr_response;
-            let name = r.name.as_ref();
-            let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
-            vec![
-                (
-                    IDK::FirstName,
-                    // TODO given name seems to include middle name and be all uppercase
-                    name.and_then(|n| n.given_name_mrz.as_ref().or(n.given_name.as_ref())),
-                ),
-                (
-                    IDK::LastName,
-                    name.and_then(|n| n.last_name_mrz.as_ref().or(n.paternal_last_name.as_ref())),
-                ),
-                (IDK::AddressLine1, address.and_then(|n| n.street.as_ref())),
-                (IDK::City, address.and_then(|n| n.city.as_ref())),
-                (IDK::State, address.and_then(|n| n.state.as_ref())),
-                (IDK::Zip, address.and_then(|n| n.postal_code.as_ref())),
-                (IDK::Country, r.issuing_country_two_digit().as_ref()),
-                (IDK::Dob, r.dob().ok().as_ref()),
-            ]
-            .into_iter()
-            .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))
-            // Don't add OCR data that fails validation - don't want it to block sign up
-            .flat_map(|(k, v)| k.validate(v.clone(), validate_args, &HashMap::new()).is_ok().then_some((k, v)))
-            // Don't add OCR data to the vault that already exists
-            .filter(|(k, _)| !uvw.has_field(k.clone()))
-            .collect()
+            doc_first_id_data(&fetch_ocr_response, validate_args)
+                .into_iter()
+                .filter(|(k, _)| !uvw.has_field(k.clone()))
+                .collect()
         } else {
             vec![]
         };
 
-        let data = HashMap::from_iter(data.into_iter().chain(id_data.into_iter()));
+        let data = HashMap::from_iter(ocr_data.into_iter().chain(id_data.into_iter()));
         let data = DataRequest::clean_and_validate(data, validate_args)?;
         let data = data.no_fingerprints();
         let source = DataLifetimeSource::Ocr;
-        let completed_seqno = uvw.patch_data(conn, data, source)?.seqno;
+        let seqno = uvw.patch_data(conn, data, source)?.seqno;
 
         let (document_score, _) = score_response.document_score().map_err(map_to_api_err)?;
         let (ocr_confidence_score, _) = score_response.id_ocr_confidence().map_err(map_to_api_err)?;
         let selfie_score = score_response.selfie_match().ok().map(|(s, _)| s);
 
         let update = IdentityDocumentUpdate {
-            completed_seqno: Some(completed_seqno),
+            completed_seqno: Some(seqno),
             document_score: Some(document_score),
             selfie_score,
             ocr_confidence_score: Some(ocr_confidence_score),
