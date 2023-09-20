@@ -173,6 +173,7 @@ pub async fn post(
                         &su_id,
                         &id_doc.id,
                         id_doc.document_type,
+                        vec![],
                         ocr,
                         fake_score_response,
                         id_data,

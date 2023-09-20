@@ -79,12 +79,14 @@ impl IncodeStateTransition for AddSelfie {
         self,
         _: &mut TxnPgConn,
         _ctx: &IncodeContext,
-        _session: &VerificationSession,
+        session: &VerificationSession,
     ) -> ApiResult<StateResult> {
-        if !self.failure_reasons.is_empty() {
+        let mut failure_reasons = self.failure_reasons;
+        failure_reasons.retain(|r| !session.ignored_failure_reasons.contains(r));
+        if !failure_reasons.is_empty() {
             return Ok(StateResult::Retry {
                 next_state: Self::new(),
-                reasons: self.failure_reasons,
+                reasons: failure_reasons,
                 clear_sides: vec![DocumentSide::Selfie],
             });
         }

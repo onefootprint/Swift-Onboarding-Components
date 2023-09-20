@@ -350,6 +350,7 @@ table! {
         completed_at -> Nullable<Timestamptz>,
         kind -> Text,
         latest_failure_reasons -> Array<Text>,
+        ignored_failure_reasons -> Array<Text>,
     }
 }
 

@@ -15,6 +15,7 @@ use db::{
     DbPool, TxnPgConn,
 };
 use enum_dispatch::enum_dispatch;
+use itertools::Itertools;
 use newtypes::{DocumentSide, IncodeFailureReason};
 use std::marker::PhantomData;
 
@@ -128,10 +129,11 @@ where
 
         let result = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
-                let (next_state, retry_reasons) = match init_state.transition(conn, &ctx, &session)? {
+                let next = init_state.transition(conn, &ctx, &session)?;
+                let (next_state, retry_reasons, ignore_reasons) = match next {
                     StateResult::Ok(next_state) => {
                         // Atomically update the state of the session in the DB
-                        (next_state, vec![])
+                        (next_state, vec![], None)
                     }
                     StateResult::Retry {
                         mut next_state,
@@ -142,22 +144,41 @@ where
                         // could re-initiate the incode machine without uploading a new doc
                         DocumentUpload::deactivate(conn, &ctx.id_doc_id, clear_sides, reasons.clone())?;
 
-                        // AFTER marking the uploads as failed, count if we have failed too many times
-                        let attempts_by_side = DocumentUpload::count_failed_attempts(conn, &ctx.id_doc_id)?;
-                        let max_attempts_for_any_side =
-                            attempts_by_side.iter().map(|(_, n)| n).max().unwrap_or(&(0_i64));
+                        // Count if we have failed too many times
+                        let exceeded_max_attempts =
+                            ctx.failed_attempts_for_side + 1 >= DocumentUpload::MAX_ATTEMPTS_PER_SIDE;
 
-                        if *max_attempts_for_any_side >= DocumentUpload::MAX_ATTEMPTS_PER_SIDE {
-                            // Override the next state to a failed state if we've reached the max
-                            // attempts
-                            Fail::enter(conn, &ctx)?;
-                            next_state = Fail::new();
-                        }
-                        (next_state, reasons)
+                        let ignore_reasons = if exceeded_max_attempts {
+                            if reasons.iter().all(|s| s.can_ignore()) {
+                                // TODO some ignored errors will cause future incode reqs to fail. Need to
+                                // handle those cases. For now, we can only allow ignoring certain
+                                // errors
+                                // Chain together existing ignored errors and new errors to ignore
+                                let ignore_reasons = reasons
+                                    .clone()
+                                    .into_iter()
+                                    .chain(session.ignored_failure_reasons.clone().into_iter())
+                                    .unique()
+                                    .collect();
+                                Some(ignore_reasons)
+                            } else {
+                                // Override the next state to a failed state if we've reached the max
+                                // attempts
+                                Fail::enter(conn, &ctx)?;
+                                next_state = Fail::new();
+                                None
+                            }
+                        } else {
+                            None
+                        };
+                        (next_state, reasons, ignore_reasons)
                     }
                 };
-                let update =
-                    UpdateIncodeVerificationSession::set_state(next_state.name(), retry_reasons.clone());
+                let update = UpdateIncodeVerificationSession::set_state(
+                    next_state.name(),
+                    retry_reasons.clone(),
+                    ignore_reasons,
+                );
                 IncodeVerificationSession::update(conn, &session.id, update)?;
                 let result = if retry_reasons.is_empty() {
                     StepResult::Ready

@@ -37,6 +37,7 @@ use newtypes::IdDocKind;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::IdentityDocumentId;
 use newtypes::IdentityDocumentStatus;
+use newtypes::IncodeFailureReason;
 use newtypes::OcrDataKind as ODK;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
@@ -130,7 +131,6 @@ fn doc_first_id_data(r: &FetchOCRResponse, validate_args: ValidateArgs) -> Vec<(
     .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))
     // Don't add OCR data that fails validation - don't want it to block sign up
     .flat_map(|(k, v)| k.validate(v.clone(), validate_args, &HashMap::new()).is_ok().then_some((k, v)))
-    // Don't add OCR data to the vault that already exists
     .collect()
 }
 
@@ -143,6 +143,7 @@ impl Complete {
         sv_id: &ScopedVaultId,
         id_doc_id: &IdentityDocumentId,
         dk: IdDocKind,
+        ignored_failure_reasons: Vec<IncodeFailureReason>,
         fetch_ocr_response: FetchOCRResponse,
         score_response: FetchScoresResponse,
         vault_data: Option<IncodeOcrComparisonDataFields>,
@@ -161,7 +162,8 @@ impl Complete {
         };
         UserTimeline::create(conn, info, vault.id.clone(), sv_id.clone())?;
 
-        // Populate OCR data if we proceeded without ignoring any failure reasons
+        // The images were only vaulted under `.latest_upload` DIs. Now, vault them under the `.image` DIs.
+        // Note that the dk here may be incorrect if we can't extract it from incode
         vault_complete_images(conn, &uvw, dk, &id_doc)?;
 
         // Clear all OCR data for this document kind
@@ -180,6 +182,7 @@ impl Complete {
         let id_data: Vec<(DataIdentifier, PiiString)> = if obc.is_doc_first && !wf.config.is_redo() {
             doc_first_id_data(&fetch_ocr_response, validate_args)
                 .into_iter()
+                // Don't add OCR data to the vault that already exists
                 .filter(|(k, _)| !uvw.has_field(k.clone()))
                 .collect()
         } else {
@@ -195,7 +198,6 @@ impl Complete {
         let (document_score, _) = score_response.document_score().map_err(map_to_api_err)?;
         let (ocr_confidence_score, _) = score_response.id_ocr_confidence().map_err(map_to_api_err)?;
         let selfie_score = score_response.selfie_match().ok().map(|(s, _)| s);
-
         let update = IdentityDocumentUpdate {
             completed_seqno: Some(seqno),
             document_score: Some(document_score),
@@ -254,12 +256,28 @@ impl Complete {
         .into_iter()
         .flatten();
 
+        // For all ignored errors from incode, generate a reason code. Each of these reason
+        // codes will trigger a rule that puts the user in manual review
+        let ignored_error_reason_codes = ignored_failure_reasons
+            .into_iter()
+            .map(|r| {
+                (
+                    r.reason_code()
+                        .unwrap_or(FootprintReasonCode::DocumentCollectionErrored),
+                    // Note: this is an incorrect vendor API
+                    VendorAPI::IncodeFetchScores,
+                    score_verification_result_id.clone(),
+                )
+            })
+            .unique();
+
         RiskSignal::bulk_create(
             conn,
             sv_id,
             score_reason_codes
                 .chain(ocr_reason_codes.into_iter())
                 .chain(additional_reason_codes)
+                .chain(ignored_error_reason_codes)
                 .collect(),
             newtypes::RiskSignalGroupKind::Doc,
             false,

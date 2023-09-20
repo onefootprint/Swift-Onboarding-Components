@@ -101,7 +101,7 @@ impl IncodeStateTransition for AddFront {
         self,
         _: &mut TxnPgConn,
         ctx: &IncodeContext,
-        _session: &VerificationSession,
+        session: &VerificationSession,
     ) -> ApiResult<StateResult> {
         // Ensure we've gotten a doc we can support
         let type_of_id = self.add_side_response_helper.type_of_id.as_ref();
@@ -116,6 +116,8 @@ impl IncodeStateTransition for AddFront {
         if let Some(reason) = mismatch_reason {
             failure_reasons.push(reason);
         }
+        failure_reasons.retain(|r| !session.ignored_failure_reasons.contains(r));
+        // TODO do we want to save the failure reasons on the upload even if we move on?
         if !failure_reasons.is_empty() {
             return Ok(StateResult::Retry {
                 next_state: Self::new(),

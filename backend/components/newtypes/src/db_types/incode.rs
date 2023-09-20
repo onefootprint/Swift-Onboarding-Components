@@ -5,6 +5,8 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumIter, EnumString};
 
+use crate::FootprintReasonCode;
+
 #[derive(
     Debug,
     Display,
@@ -46,6 +48,7 @@ pub enum IncodeVerificationSessionState {
     Clone,
     Eq,
     PartialEq,
+    Hash,
     Deserialize,
     Serialize,
     AsExpression,
@@ -99,6 +102,21 @@ pub enum IncodeFailureReason {
     DocumentGlare,
     DocumentSharpness,
     Other(String),
+}
+
+impl IncodeFailureReason {
+    pub fn can_ignore(&self) -> bool {
+        self.reason_code().is_some()
+    }
+
+    pub fn reason_code(&self) -> Option<FootprintReasonCode> {
+        match self {
+            Self::DocTypeMismatch => Some(FootprintReasonCode::DocumentTypeMismatch),
+            Self::UnknownCountryCode => Some(FootprintReasonCode::DocumentUnknownCountryCode),
+            Self::CountryCodeMismatch => Some(FootprintReasonCode::DocumentCountryCodeMismatch),
+            _ => None,
+        }
+    }
 }
 
 #[derive(

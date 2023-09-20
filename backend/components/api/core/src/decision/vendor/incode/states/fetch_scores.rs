@@ -1,10 +1,10 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddFront, Complete, IncodeStateTransition,
+    map_to_api_err, save_incode_verification_result, Complete, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
-use crate::errors::ApiResult;
+use crate::errors::{ApiResult, AssertionError};
 use crate::utils::vault_wrapper::{Person, TenantVw, VaultWrapper};
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
@@ -12,8 +12,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::{DbPool, TxnPgConn};
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use idv::incode::doc::{IncodeFetchOCRRequest, IncodeFetchScoresRequest};
-use newtypes::{DocumentSide, VendorAPI, VerificationResultId};
-use strum::IntoEnumIterator;
+use newtypes::{VendorAPI, VerificationResultId};
 
 pub struct FetchScores {
     ocr_response: FetchOCRResponse,
@@ -110,29 +109,32 @@ impl IncodeStateTransition for FetchScores {
     ) -> ApiResult<StateResult> {
         let type_of_id = self.ocr_response.type_of_id.as_ref();
         let country_code = self.ocr_response.issuing_country.as_ref();
-        match super::parse_type_of_id(ctx, type_of_id, country_code)? {
-            Ok(dk) => {
-                // TODO could represent enter inside the state transition
-                Complete::enter(
-                    conn,
-                    &ctx.vault,
-                    &ctx.sv_id,
-                    &ctx.id_doc_id,
-                    dk,
-                    self.ocr_response,
-                    self.score_response,
-                    self.vault_data,
-                    session.kind.requires_selfie(),
-                    self.ocr_verification_result_id,
-                    self.score_verification_result_id,
-                )?;
-                Ok(Complete::new().into())
+        let dk = match super::parse_type_of_id(ctx, type_of_id, country_code)? {
+            Ok(dk) => dk,
+            Err(_) => {
+                // We had an error parsing the document kind from incode - just use the document
+                // kind selected by the user, even though it may be wrong
+                ctx.docv_data
+                    .document_type
+                    .ok_or(AssertionError("Docv data has no document_type"))?
             }
-            Err(reason) => Ok(StateResult::Retry {
-                next_state: AddFront::new(),
-                reasons: vec![reason],
-                clear_sides: DocumentSide::iter().collect(),
-            }),
-        }
+        };
+
+        // TODO could represent enter inside the state transition
+        Complete::enter(
+            conn,
+            &ctx.vault,
+            &ctx.sv_id,
+            &ctx.id_doc_id,
+            dk,
+            session.ignored_failure_reasons.clone(),
+            self.ocr_response,
+            self.score_response,
+            self.vault_data,
+            session.kind.requires_selfie(),
+            self.ocr_verification_result_id,
+            self.score_verification_result_id,
+        )?;
+        Ok(Complete::new().into())
     }
 }

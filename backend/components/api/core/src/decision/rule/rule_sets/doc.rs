@@ -66,5 +66,22 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
             name: RuleName::DocumentUploadFailed,
             action: Action::ManualReview,
         },
+        Rule {
+            rule: {
+                |f: &Vec<FootprintReasonCode>| {
+                    f.iter().any(|rc| {
+                        vec![
+                            FootprintReasonCode::DocumentCollectionErrored,
+                            FootprintReasonCode::DocumentTypeMismatch,
+                            FootprintReasonCode::DocumentUnknownCountryCode,
+                            FootprintReasonCode::DocumentCountryCodeMismatch,
+                        ]
+                        .contains(rc)
+                    })
+                }
+            },
+            name: RuleName::DocumentCollectionErrored,
+            action: Action::ManualReview,
+        },
     ]
 }

@@ -41,6 +41,7 @@ pub enum RuleName {
     DocumentNotVerified,
     SelfieDoesNotMatch,
     DocumentUploadFailed,
+    DocumentCollectionErrored,
     #[cfg(test)]
     Test(String),
     BusinessWatchlistHit,

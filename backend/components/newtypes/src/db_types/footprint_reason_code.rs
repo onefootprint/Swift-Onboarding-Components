@@ -788,6 +788,22 @@ footprint_reason_code_enum! {
         #[note = "Document image does not match selfie", severity = SignalSeverity::High,  description = "The image on the document does not match the captured selfie."]
         DocumentSelfieDoesNotMatch,
 
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Unexpected document type provided", severity = SignalSeverity::High,  description = "The document uploaded was classified as a different type of document than was selected to be uploaded by the user."]
+        DocumentTypeMismatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Unknown document country code", severity = SignalSeverity::High,  description = "We aren't able to determine the origin country of the uploaded document."]
+        DocumentUnknownCountryCode,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Unexpected document country code", severity = SignalSeverity::High,  description = "The country issuing the uploaded document does not match the selected country."]
+        DocumentCountryCodeMismatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "An error occurred during document collection", severity = SignalSeverity::High,  description = "During document collection, the user experienced repeat failures. Footprint continued to collect the document images, but they may not have been verified."]
+        DocumentCollectionErrored,
+
         #[scope = SignalScope::Selfie, additional_scopes = vec![], match_level = None]
         #[note = "Selfie was skipped", severity = SignalSeverity::High,  description = "Although requested, selfie image was not captured because the user completed the onboarding on a device that did not have a camera available"]
         DocumentSelfieWasSkipped,

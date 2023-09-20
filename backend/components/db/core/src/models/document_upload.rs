@@ -45,7 +45,8 @@ struct NewDocumentUploadRow {
 
 impl DocumentUpload {
     /// Max number attempts to upload a given side before we fail the document request
-    pub const MAX_ATTEMPTS_PER_SIDE: i64 = 5;
+    pub const MAX_ATTEMPTS_PER_SIDE: i64 = 3;
+    pub const MAX_ATTEMPTS_BEFORE_DROPPING_GLARE_CHECK: i64 = 2;
 
     #[tracing::instrument("DocumentUpload::create", skip_all)]
     pub fn create(

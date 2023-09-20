@@ -144,6 +144,7 @@ impl IncodeStateMachine {
                     credentials: tenant_vendor_control.incode_credentials(is_sandbox),
                     authentication_token: token.into(),
                 },
+                ignored_failure_reasons: session.ignored_failure_reasons,
             }
         };
 

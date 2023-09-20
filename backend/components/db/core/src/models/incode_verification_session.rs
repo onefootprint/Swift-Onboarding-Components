@@ -31,17 +31,19 @@ pub struct IncodeVerificationSession {
     pub kind: IncodeVerificationSessionKind,
     /// Not used by application code anywhere, just used for debugging
     pub latest_failure_reasons: Vec<IncodeFailureReason>,
+    pub ignored_failure_reasons: Vec<IncodeFailureReason>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = incode_verification_session)]
-pub struct NewIncodeVerificationSession {
-    pub created_at: DateTime<Utc>,
-    pub state: IncodeVerificationSessionState,
-    pub incode_configuration_id: IncodeConfigurationId,
-    pub identity_document_id: IdentityDocumentId,
-    pub kind: IncodeVerificationSessionKind,
-    pub latest_failure_reasons: Vec<IncodeFailureReason>,
+struct NewIncodeVerificationSession {
+    created_at: DateTime<Utc>,
+    state: IncodeVerificationSessionState,
+    incode_configuration_id: IncodeConfigurationId,
+    identity_document_id: IdentityDocumentId,
+    kind: IncodeVerificationSessionKind,
+    latest_failure_reasons: Vec<IncodeFailureReason>,
+    ignored_failure_reasons: Vec<IncodeFailureReason>,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -54,12 +56,14 @@ pub struct UpdateIncodeVerificationSession {
     pub completed_at: Option<DateTime<Utc>>,
     pub state: Option<IncodeVerificationSessionState>,
     pub latest_failure_reasons: Option<Vec<IncodeFailureReason>>,
+    pub ignored_failure_reasons: Option<Vec<IncodeFailureReason>>,
 }
 
 impl UpdateIncodeVerificationSession {
     pub fn set_state(
         state: IncodeVerificationSessionState,
         failure_reasons: Vec<IncodeFailureReason>,
+        ignored_failure_reasons: Option<Vec<IncodeFailureReason>>,
     ) -> Self {
         Self {
             state: Some(state),
@@ -68,6 +72,7 @@ impl UpdateIncodeVerificationSession {
             // failure reason. Need to wrap in outer option since by default, a diesel changeset
             // ignores any updates with value None
             latest_failure_reasons: Some(failure_reasons),
+            ignored_failure_reasons,
             ..Self::default()
         }
     }
@@ -104,6 +109,7 @@ impl IncodeVerificationSession {
             identity_document_id,
             kind: kind.clone(),
             latest_failure_reasons: vec![],
+            ignored_failure_reasons: vec![],
         };
 
         let res: IncodeVerificationSession = diesel::insert_into(incode_verification_session::table)
