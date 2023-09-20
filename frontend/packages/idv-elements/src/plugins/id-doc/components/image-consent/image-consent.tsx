@@ -81,7 +81,7 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
         <Checkbox
           onChange={handleThirdPartyConsent}
           id="third-party-consent"
-          label="third-party-consent"
+          testID="third-party-consent"
           checked={isThirdPartyConsented}
         />
         <LabelContainer onClick={handleThirdPartyConsent}>

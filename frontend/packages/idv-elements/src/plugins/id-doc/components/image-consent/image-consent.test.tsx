@@ -47,7 +47,7 @@ describe('<ImageConsent/>', () => {
       submittedConsentInfo = { ...consentInfo };
     };
     renderImageConsent(onConsentSubmit);
-    const optionalConsentCheckbox = screen.getByLabelText(
+    const optionalConsentCheckbox = screen.getByTestId(
       'third-party-consent',
     ) as HTMLInputElement;
     await userEvent.click(optionalConsentCheckbox);
