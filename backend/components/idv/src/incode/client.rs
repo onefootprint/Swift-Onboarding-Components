@@ -353,7 +353,7 @@ impl AuthenticatedIncodeClientAdapter {
         session_kind: IncodeVerificationSessionKind,
         incode_verification_session_id: IncodeVerificationSessionId,
     ) -> Result<serde_json::Value, IncodeError> {
-        let retry_strategy = FixedInterval::from_millis(1000).take(20);
+        let retry_strategy = FixedInterval::from_millis(1000).take(30);
 
         let response = RetryIf::spawn(
             retry_strategy,
