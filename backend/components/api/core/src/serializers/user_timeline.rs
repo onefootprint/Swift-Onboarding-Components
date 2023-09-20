@@ -32,13 +32,12 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 )))
             } // TODO
             SaturatedTimelineEvent::OnboardingDecision(
-                (decision, ob_config, vrs, tenant_user, mr),
+                (decision, ob_config, tenant_user, mr),
                 annotation,
             ) => Self::OnboardingDecision {
                 decision: api_wire_types::OnboardingDecision::from_db((
                     decision,
                     Some(ob_config),
-                    Some(vrs),
                     tenant_user,
                     mr,
                 )),

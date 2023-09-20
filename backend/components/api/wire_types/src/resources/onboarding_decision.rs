@@ -12,8 +12,6 @@ pub struct OnboardingDecision {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ob_configuration: Option<LiteObConfiguration>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub vendors: Option<Vec<Vendor>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub manual_review: Option<ManualReview>,
 }
 

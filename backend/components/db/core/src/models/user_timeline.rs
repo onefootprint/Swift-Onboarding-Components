@@ -12,9 +12,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::user_timeline;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use itertools::Itertools;
 use newtypes::DbUserTimelineEventKind;
-use newtypes::VendorAPI;
 use newtypes::{DbUserTimelineEvent, ScopedVaultId, UserTimelineId, VaultId};
 use serde::{Deserialize, Serialize};
 
@@ -26,7 +24,7 @@ use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecision
 use super::scoped_vault::ScopedVaultIdentifier;
 use super::watchlist_check::WatchlistCheck;
 use super::workflow::Workflow;
-use strum::IntoEnumIterator;
+
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = user_timeline)]
 pub struct UserTimeline {
@@ -118,7 +116,6 @@ impl UserTimeline {
     pub fn list<'a, T>(
         conn: &mut PgConn,
         scoped_vault_id: T,
-        tenant_can_view_socure_risk_signal: bool,
         kinds: Vec<DbUserTimelineEventKind>,
     ) -> DbResult<Vec<UserTimelineInfo>>
     where
@@ -182,15 +179,6 @@ impl UserTimeline {
         let liveness_events = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?;
         let identity_documents_and_requests =
             IdentityDocument::get_bulk_with_requests(conn, identity_document_ids.collect())?;
-        let vendor_apis_to_include = VendorAPI::iter()
-            .filter(|v| {
-                let can_see_socure =
-                    matches!(v, &VendorAPI::SocureIDPlus) && tenant_can_view_socure_risk_signal;
-                let included_in_verification_decision = v.is_kyc_call() || v.is_incode_doc_flow_api();
-
-                included_in_verification_decision || can_see_socure
-            })
-            .collect_vec();
         let actors: HashMap<_, _> = saturate_actors(conn, db_actors.collect())?.into_iter().collect();
         let watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
         let workflows = Workflow::get_bulk(conn, workflow_ids.collect())?;
@@ -204,15 +192,12 @@ impl UserTimeline {
                         SaturatedTimelineEvent::DataCollected(e.clone())
                     }
                     DbUserTimelineEvent::OnboardingDecision(ref e) => {
-                        let (obd, ob_config, mut verification_requests, actor, mr) = decisions
+                        let (obd, ob_config, actor, mr) = decisions
                             .get(&e.id)
                             .ok_or(DbError::RelatedObjectNotFound)?
                             .clone();
-                        // filter out socure, if applicable
-                        verification_requests.retain(|v| vendor_apis_to_include.contains(&v.vendor_api));
 
-                        let decision: SaturatedOnboardingDecisionInfo =
-                            (obd, ob_config, verification_requests, actor, mr);
+                        let decision: SaturatedOnboardingDecisionInfo = (obd, ob_config, actor, mr);
 
                         SaturatedTimelineEvent::OnboardingDecision(
                             decision,
@@ -375,7 +360,7 @@ mod tests {
         .0;
 
         let user_timeline_infos =
-            UserTimeline::list(conn, (&scoped_vault.fp_id, &tenant.id, is_live), true, vec![]).unwrap();
+            UserTimeline::list(conn, (&scoped_vault.fp_id, &tenant.id, is_live), vec![]).unwrap();
 
         assert_eq!(3, user_timeline_infos.len());
 

@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use crate::actor::SaturatedActor;
-use crate::models::verification_request::VerificationRequest;
 use crate::models::workflow::Workflow;
 use crate::PgConn;
 use crate::TxnPgConn;
@@ -12,7 +11,6 @@ use db_schema::schema::scoped_vault;
 use db_schema::schema::{onboarding_decision, onboarding_decision_verification_result_junction};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use itertools::Itertools;
 use newtypes::FpId;
 use newtypes::ReviewReason;
 use newtypes::TenantId;
@@ -77,7 +75,6 @@ pub struct NewDecisionArgs {
 pub type SaturatedOnboardingDecisionInfo = (
     OnboardingDecision,
     ObConfiguration,
-    Vec<VerificationRequest>,
     SaturatedActor,
     Option<ManualReview>,
 );
@@ -132,7 +129,7 @@ impl OnboardingDecision {
         conn: &mut PgConn,
         ids: Vec<&OnboardingDecisionId>,
     ) -> DbResult<HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>> {
-        use db_schema::schema::{ob_configuration, verification_request, verification_result, workflow};
+        use db_schema::schema::{ob_configuration, workflow};
         let results: Vec<(Self, (Workflow, ObConfiguration), Option<ManualReview>)> =
             onboarding_decision::table
                 .inner_join(workflow::table.inner_join(ob_configuration::table))
@@ -144,31 +141,14 @@ impl OnboardingDecision {
             results.clone().into_iter().map(|r| r.0).collect();
         let onboarding_decisions_with_actors = actor::saturate_actors(conn, onboarding_decisions)?;
 
-        let decision_ids: Vec<_> = results.iter().map(|(decision, _, _)| &decision.id).collect();
-
-        // Get VRs associated with each decision
-        let vrs = onboarding_decision_verification_result_junction::table
-            .inner_join(verification_result::table.inner_join(verification_request::table))
-            .filter(
-                onboarding_decision_verification_result_junction::onboarding_decision_id.eq_any(decision_ids),
-            )
-            .select((
-                onboarding_decision_verification_result_junction::onboarding_decision_id,
-                verification_request::all_columns,
-            ))
-            .get_results::<(OnboardingDecisionId, VerificationRequest)>(conn)?
-            .into_iter()
-            .into_group_map();
-
         let result_map = results
             .into_iter()
             .zip(onboarding_decisions_with_actors.into_iter())
             .map(
                 |((onboarding_decision, (_, onboarding_configuration), mr), (_, saturated_db_actor))| {
                     (
-                        onboarding_decision.clone(),
+                        onboarding_decision,
                         onboarding_configuration,
-                        vrs.get(&onboarding_decision.id).unwrap_or(&vec![]).clone(),
                         saturated_db_actor,
                         mr,
                     )

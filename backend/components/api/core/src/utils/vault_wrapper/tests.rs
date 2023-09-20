@@ -196,7 +196,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(!uvw.has_field(IDK::Email));
 
     // The UserTimeline events shouldn't be portable right now
-    let timeline_events = UserTimeline::list(conn, &su.id, true, vec![]).unwrap();
+    let timeline_events = UserTimeline::list(conn, &su.id, vec![]).unwrap();
     assert!(!timeline_events.is_empty());
     assert!(!timeline_events.iter().any(|x| x.0.is_portable));
 
@@ -214,7 +214,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(uvw.has_field(IDK::Email));
 
     // And the user timeline events should be made portable
-    let timeline_events = UserTimeline::list(conn, &su.id, true, vec![]).unwrap();
+    let timeline_events = UserTimeline::list(conn, &su.id, vec![]).unwrap();
     assert!(!timeline_events.is_empty());
     assert!(timeline_events.iter().all(|x| x.0.is_portable));
 }
@@ -247,7 +247,7 @@ fn test_business_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(!uvw.has_field(BDK::PhoneNumber));
 
     // The UserTimeline events shouldn't be portable right now
-    let timeline_events = UserTimeline::list(conn, &sb.id, true, vec![]).unwrap();
+    let timeline_events = UserTimeline::list(conn, &sb.id, vec![]).unwrap();
     assert!(!timeline_events.is_empty());
     assert!(!timeline_events.iter().any(|x| x.0.is_portable));
 

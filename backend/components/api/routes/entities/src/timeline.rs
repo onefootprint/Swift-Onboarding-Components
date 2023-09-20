@@ -5,7 +5,6 @@ use crate::auth::tenant::TenantSessionAuth;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use api_wire_types::ListTimelineRequest;
-use feature_flag::BoolFlag;
 
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -31,22 +30,12 @@ pub async fn get(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
-    // Not all tenants should see socure related risk signals
-    let tenant_can_view_socure_risk_signal = state
-        .feature_flag_client
-        .flag(BoolFlag::CanViewSocureRiskSignals(&tenant_id));
+
     let ListTimelineRequest { kinds } = filters.into_inner();
 
     let events = state
         .db_pool
-        .db_query(move |conn| {
-            UserTimeline::list(
-                conn,
-                (&fp_id, &tenant_id, is_live),
-                tenant_can_view_socure_risk_signal,
-                kinds,
-            )
-        })
+        .db_query(move |conn| UserTimeline::list(conn, (&fp_id, &tenant_id, is_live), kinds))
         .await??;
     let events = events
         .into_iter()
