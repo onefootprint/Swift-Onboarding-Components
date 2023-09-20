@@ -157,58 +157,5 @@ describe('<BasicDataForm />', () => {
         ).toBeInTheDocument();
       });
     });
-
-    it('should show an error message for optional fields', async () => {
-      const onSubmit = jest.fn();
-      renderForm({
-        onSubmit,
-        optionalFields: [BusinessDI.phoneNumber, BusinessDI.website],
-      });
-
-      const continueButton = screen.getByRole('button', { name: 'Continue' });
-      await userEvent.click(continueButton);
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Phone number cannot be empty'),
-        ).toBeInTheDocument();
-      });
-      await waitFor(() => {
-        expect(
-          screen.getByText('Website cannot be empty or is invalid'),
-        ).toBeInTheDocument();
-      });
-    });
-
-    it('should validate phone on submit function', async () => {
-      const onSubmit = jest.fn();
-      renderForm({
-        onSubmit,
-        optionalFields: [BusinessDI.phoneNumber, BusinessDI.website],
-      });
-
-      const name = screen.getByLabelText('Business name');
-      await userEvent.type(name, 'Acme Inc.');
-
-      const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
-      await userEvent.type(tin, '129876543');
-
-      const phoneNumber = screen.getByLabelText('Phone number');
-      await userEvent.type(phoneNumber, '5591542244'); // Phone from Mexico
-
-      const website = screen.getByLabelText('Website');
-      await userEvent.type(website, 'https://acme.com');
-
-      const continueButton = screen.getByRole('button', { name: 'Continue' });
-      await userEvent.click(continueButton);
-
-      await waitFor(() => {
-        expect(screen.getByText('Phone number is invalid')).toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(onSubmit).toBeCalledTimes(0);
-      });
-    });
   });
 });

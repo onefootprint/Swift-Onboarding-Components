@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Button, PhoneInput } from '@onefootprint/ui';
+import { Button, PhoneInput, PhoneInputRegex } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -52,6 +52,10 @@ const Form = ({ isLoading, defaultPhone, onSubmit, validator }: FormProps) => {
           required: {
             value: true,
             message: t('phone.errors.required'),
+          },
+          pattern: {
+            value: PhoneInputRegex,
+            message: t('phone.errors.invalid'),
           },
         }}
         render={({
