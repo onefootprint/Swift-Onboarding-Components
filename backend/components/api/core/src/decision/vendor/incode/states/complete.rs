@@ -190,6 +190,15 @@ impl Complete {
         // ////////////
         // Save Risk Signals
         // ////////////
+        fetch_ocr_response
+            .age()
+            .map(|a| {
+                if a < 18 {
+                    tracing::error!(scoped_vault_id=%sv_id, "document submitted with age under 18");
+                }
+            })
+            .ok();
+
         let score_reason_codes =
             incode_docv::reason_codes_from_score_response(score_response, expect_selfie)?
                 .into_iter()
