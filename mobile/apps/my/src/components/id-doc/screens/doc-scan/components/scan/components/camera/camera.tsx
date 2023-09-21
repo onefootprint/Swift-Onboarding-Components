@@ -26,7 +26,7 @@ type CameraProps = {
   type?: ScanType;
 };
 
-const AUTO_CAPTURE_DELAY = 750;
+const AUTO_CAPTURE_DELAY = 900;
 
 const Camera = ({
   children,
