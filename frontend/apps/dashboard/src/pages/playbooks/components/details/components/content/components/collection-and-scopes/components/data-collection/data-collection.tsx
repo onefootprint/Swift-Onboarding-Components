@@ -34,7 +34,7 @@ const DataCollection = ({
   const idDocKinds = Object.values(SupportedIdDocTypes).filter(docType =>
     documentsAsString?.includes(docType),
   );
-  const selfie = documentsAsString?.includes('selfie');
+  const selfie = !!documentsAsString?.includes('selfie');
 
   return (
     <Container>
