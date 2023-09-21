@@ -108,6 +108,9 @@ export const confirmData = async (
     zipCode: string;
   },
 ) => {
+  const header = frame.getByText('Confirm your personal data').first();
+  await header.waitFor({ state: 'attached', timeout: 20000 }); // Increasing the waiting time for CI
+
   await expect(
     frame.getByText('Confirm your personal data').first(),
   ).toBeAttached();
