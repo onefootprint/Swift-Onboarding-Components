@@ -82,9 +82,7 @@ pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_self
     // We check for the existence of this at the vendor call layer, but our decisioning relies most heavily on the score (for now)
     // and we should not proceed if we don't have it
     if scores
-        .document_score()
-        .map(|s| s.1 == IncodeStatus::Fail)
-        .map_err(idv::Error::from)?
+        .document_score().1.unwrap_or(IncodeStatus::Fail) == IncodeStatus::Fail
     {
         reason_codes.push(FootprintReasonCode::DocumentNotVerified);
     } else {
@@ -96,9 +94,7 @@ pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_self
     //  should we just not vault it if OCR confidence isn't high?
     //  would overall score always be failure then?
     if scores
-        .id_ocr_confidence()
-        .map(|s| s.1 == IncodeStatus::Fail)
-        .map_err(idv::Error::from)?
+        .id_ocr_confidence().1.unwrap_or(IncodeStatus::Fail) == IncodeStatus::Fail
     {
         reason_codes.push(FootprintReasonCode::DocumentOcrNotSuccessful);
     } else {
@@ -107,9 +103,7 @@ pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_self
     
     // only populate reason code if we collected a selfie
     if expect_selfie {
-        if scores.selfie_match()
-        .map(|s| s.1 == IncodeStatus::Fail)
-        .map_err(idv::Error::from)?
+        if scores.selfie_match().1.unwrap_or(IncodeStatus::Fail)  == IncodeStatus::Fail
         {
             reason_codes.push(FootprintReasonCode::DocumentSelfieDoesNotMatch);
         } else {

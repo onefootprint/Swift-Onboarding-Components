@@ -1,4 +1,3 @@
-use super::map_to_api_err;
 use super::IncodeStateTransition;
 use super::VerificationSession;
 use crate::decision::features::incode_docv;
@@ -199,15 +198,15 @@ impl Complete {
         let source = DataLifetimeSource::Ocr;
         let seqno = uvw.patch_data(conn, data, source)?.seqno;
 
-        let (document_score, _) = score_response.document_score().map_err(map_to_api_err)?;
-        let (ocr_confidence_score, _) = score_response.id_ocr_confidence().map_err(map_to_api_err)?;
-        let selfie_score = score_response.selfie_match().ok().map(|(s, _)| s);
+        let (document_score, _) = score_response.document_score();
+        let (ocr_confidence_score, _) = score_response.id_ocr_confidence();
+        let selfie_score = score_response.selfie_match().0;
 
         let update = IdentityDocumentUpdate {
             completed_seqno: Some(seqno),
-            document_score: Some(document_score),
+            document_score,
             selfie_score,
-            ocr_confidence_score: Some(ocr_confidence_score),
+            ocr_confidence_score,
             status: Some(IdentityDocumentStatus::Complete),
             vaulted_document_type: Some(dk),
         };

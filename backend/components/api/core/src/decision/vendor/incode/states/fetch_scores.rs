@@ -47,14 +47,9 @@ impl IncodeStateTransition for FetchScores {
             .into_success()
             .map_err(map_to_api_err)?;
 
-        // we need an overall score or else we should fail
-        score_response.document_score().map_err(map_to_api_err)?;
-
-        // There's a really annoying/subtle thing with the incode API:
-        //    if you don't have selfie enabled in the incode flow builder, it will gladly allow you to send selfie image, it just silently doesn't include the selfie in the actual score/result
-        // So let's assert here that we have gotten back a score
-        if session.kind.requires_selfie() {
-            score_response.selfie_match().map_err(map_to_api_err)?;
+        let (overall_score, overall_status) = score_response.document_score();
+        if overall_score.is_none() || overall_status.is_none() {
+            tracing::error!("[FetchScores] overall_score or overall_status is null");
         }
 
         // make the OCR to incode
