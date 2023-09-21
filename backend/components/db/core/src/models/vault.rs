@@ -28,6 +28,7 @@ pub struct Vault {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub is_live: IsLive, // true IFF sandbox_id is null
+    /// True if the user was created via bifrost. False if the user was made via API and won't be portablized
     pub is_portable: bool,
     pub kind: VaultKind,
     /// A subset of the sandbox, non-is-live users are "fixture" users created specifically with

@@ -11,10 +11,10 @@ use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
-    description = "Creates a new user vault, optionally initializing with the provided data",
-    tags(Users, Vault, PublicApi)
+    description = "Creates a new business vault, optionally initializing with the provided data",
+    tags(Businesses, Vault, PublicApi)
 )]
-#[post("/users")]
+#[post("/businesses")]
 pub async fn post(
     state: web::Data<State>,
     request: OptionalJson<RawDataRequest>,
@@ -23,6 +23,6 @@ pub async fn post(
     idempotency_id: IdempotencyId,
 ) -> ApiResult<ResponseData<api_wire_types::UserId>> {
     let result =
-        create_non_portable_vault(state, request, auth, insight, idempotency_id, VaultKind::Person).await?;
+        create_non_portable_vault(state, request, auth, insight, idempotency_id, VaultKind::Business).await?;
     Ok(result)
 }

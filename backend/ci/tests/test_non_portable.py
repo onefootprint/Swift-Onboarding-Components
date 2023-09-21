@@ -61,6 +61,7 @@ def test_data_vaulting(tenant, key, value):
         ("id.ssn9", "12345678", "Invalid length"),
         ("id.ssn4", "123456789", "Invalid length"),
         ("id.ssn4", "123", "Invalid length"),
+        ("business.name", "Flerp", "Cannot add to this type of vault"),
         ("id.ssn4", "123a", "Invalid character: can only provide ascii digits"),
         (
             "id.dob",

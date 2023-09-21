@@ -31,6 +31,7 @@ pub mod telemetry;
 mod tests;
 pub mod types;
 pub mod utils;
+pub mod vault;
 pub mod vendor_clients;
 
 pub use crate::errors::ApiError;
