@@ -34,13 +34,16 @@ export type CollectInvestorProfileRequirement = {
   missingAttributes: CollectedInvestorProfileDataOption[];
 };
 
+export type IdDocSupportedCountryAndDocTypes = Record<
+  CountryCode,
+  SupportedIdDocTypes[]
+>;
+
 export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
   isMet: boolean;
-  shouldCollectSelfie: boolean;
   shouldCollectConsent: boolean;
-  supportedDocumentTypes: SupportedIdDocTypes[];
-  supportedCountries: CountryCode[];
+  supportedCountryAndDocTypes: IdDocSupportedCountryAndDocTypes;
 };
 
 export type LivenessRequirement = {

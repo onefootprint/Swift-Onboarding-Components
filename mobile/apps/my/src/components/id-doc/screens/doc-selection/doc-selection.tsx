@@ -24,7 +24,6 @@ import useSubmitDocType from '../doc-scan/hooks/use-submit-doc-type';
 import PermissionsDialog from './components/permissions-dialog';
 import useCountryOptions from './hooks/use-country-options';
 import useDocumentOptions from './hooks/use-document-options';
-import { getDocTypeByCountry } from './utils/get-documents-by-country';
 
 export type DocSelectionProps = {
   requirement: IdDocRequirement;
@@ -39,7 +38,7 @@ export type DocSelectionProps = {
 };
 
 const DocSelection = ({
-  requirement,
+  requirement: { supportedCountryAndDocTypes },
   defaultType,
   defaultCountry = DEFAULT_COUNTRY,
   authToken,
@@ -47,27 +46,30 @@ const DocSelection = ({
 }: DocSelectionProps) => {
   const { t } = useTranslation('components.scan.doc-selection');
   const app = useApp();
-  const { supportedCountries, supportedDocumentTypes } = requirement;
+  const docTypeMutation = useSubmitDocType();
   const [country, setCountry] = useState<CountryRecord>(defaultCountry);
-  const docTypeOptions = useDocumentOptions(supportedDocumentTypes, country);
-  const countryOptions = useCountryOptions(supportedCountries);
+  const docTypeOptions = useDocumentOptions(
+    supportedCountryAndDocTypes,
+    country,
+  );
+  const countryOptions = useCountryOptions(supportedCountryAndDocTypes);
   const [docType, setDocType] = useState<SupportedIdDocTypes>(
     defaultType || docTypeOptions[0].value,
   );
-  const docTypeMutation = useSubmitDocType();
-  const onlyOneCountrySupported = supportedCountries.length === 1;
+
+  const oneCountrySupported =
+    Object.keys(supportedCountryAndDocTypes).length === 1;
   const countrySelectHint =
-    onlyOneCountrySupported &&
-    t('country-select.hint', { country: country.label });
+    oneCountrySupported && t('country-select.hint', { country: country.label });
 
   const handleCountryChange = (newCountry: SelectOption<CountryRecord>) => {
     setCountry(newCountry);
-    setDocType(getDocTypeByCountry(newCountry));
+    setDocType(supportedCountryAndDocTypes[newCountry.value][0]);
   };
 
   const handleSubmit = () => {
     if (authToken === PREVIEW_AUTH_TOKEN) {
-      onSubmit(country.value, docType, '12345');
+      onSubmit(country.value, docType, '1234512345');
     } else {
       docTypeMutation.mutate(
         {
@@ -102,7 +104,7 @@ const DocSelection = ({
       <Box justifyContent="space-between" flex={1}>
         <Box>
           <CountrySelect
-            disabled={onlyOneCountrySupported}
+            disabled={oneCountrySupported}
             hint={countrySelectHint}
             onChange={handleCountryChange}
             options={countryOptions}

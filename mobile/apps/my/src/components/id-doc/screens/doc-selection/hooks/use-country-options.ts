@@ -1,14 +1,18 @@
-import { COUNTRIES, getCountryFromCode } from '@onefootprint/global-constants';
-import { CountryCode } from '@onefootprint/types';
+import { getCountryFromCode } from '@onefootprint/global-constants';
+import {
+  CountryCode,
+  IdDocSupportedCountryAndDocTypes,
+} from '@onefootprint/types';
 import identity from 'lodash/identity';
 
-const useCountryOptions = (supportedCountries: CountryCode[]) => {
-  if (supportedCountries.length) {
-    return supportedCountries
-      .map(countryCode => getCountryFromCode(countryCode))
-      .filter(identity);
-  }
-  return COUNTRIES;
+const useCountryOptions = (
+  supportedCountryAndDocTypes: IdDocSupportedCountryAndDocTypes,
+) => {
+  return Object.entries(supportedCountryAndDocTypes)
+    .map(([countryCode]) => {
+      return getCountryFromCode(countryCode as CountryCode);
+    })
+    .filter(identity);
 };
 
 export default useCountryOptions;

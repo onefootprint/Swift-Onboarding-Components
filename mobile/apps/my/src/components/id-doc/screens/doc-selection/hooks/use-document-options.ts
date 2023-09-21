@@ -7,21 +7,19 @@ import {
   IcoVisaPassport24,
   IcoWork24,
 } from '@onefootprint/icons';
-import { SupportedIdDocTypes } from '@onefootprint/types';
+import {
+  IdDocSupportedCountryAndDocTypes,
+  SupportedIdDocTypes,
+} from '@onefootprint/types';
 
 import useTranslation from '@/hooks/use-translation';
 
-import { getAvailableDocTypesByCountry } from '../utils/get-documents-by-country';
-
 const useDocumentOptions = (
-  supportedDocumentTypes: SupportedIdDocTypes[],
+  supportedCountryAndDocTypes: IdDocSupportedCountryAndDocTypes,
   country: CountryRecord,
 ) => {
   const { t } = useTranslation('components.scan.doc-selection');
-  const availableDocTypes: SupportedIdDocTypes[] =
-    getAvailableDocTypesByCountry(country).filter(type =>
-      supportedDocumentTypes.includes(type),
-    );
+  const availableDocTypes = supportedCountryAndDocTypes[country.value];
   const options = {
     [SupportedIdDocTypes.driversLicense]: {
       title: t('options.dl.title'),
