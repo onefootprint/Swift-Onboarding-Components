@@ -66,6 +66,8 @@ pub enum OcrDataKind {
     RefNumber,
     Nationality,
     Curp,
+    /// Incode-determined document type
+    ClassifiedDocumentType,
 }
 
 impl From<DocumentKind> for DataIdentifier {

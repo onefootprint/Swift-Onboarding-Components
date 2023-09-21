@@ -101,6 +101,10 @@ fn ocr_data(r: FetchOCRResponse, dk: IdDocKind) -> Vec<(DataIdentifier, PiiStrin
             r.name.and_then(|n| n.machine_readable_full_name.or(n.full_name)),
         ),
         di(ODK::Curp, r.curp),
+        di(
+            ODK::ClassifiedDocumentType,
+            r.type_of_id.map(ScrubbedPiiString::from),
+        ),
     ]
     .into_iter()
     .flatten()
