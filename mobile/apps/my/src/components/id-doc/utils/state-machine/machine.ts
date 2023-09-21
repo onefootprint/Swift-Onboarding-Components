@@ -1,5 +1,9 @@
 import { getCountryFromCode } from '@onefootprint/global-constants';
-import { IdDocRequirement, UploadDocumentSide } from '@onefootprint/types';
+import {
+  CountryCode,
+  IdDocRequirement,
+  UploadDocumentSide,
+} from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { MachineContext, MachineEvents } from './types';
@@ -146,13 +150,13 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
     },
   );
 
-const getInitialCountry = (requirement: IdDocRequirement) => {
-  const hasUS = requirement.supportedCountries.includes('US');
-  if (hasUS) {
-    return getCountryFromCode('US').value;
-  }
-  const [firstCountry] = requirement.supportedCountries;
-  return getCountryFromCode(firstCountry).value;
+const getInitialCountry = ({
+  supportedCountryAndDocTypes,
+}: IdDocRequirement) => {
+  const hasUS = supportedCountryAndDocTypes.US;
+  if (hasUS) return getCountryFromCode('US').value;
+  const firstCountry = Object.keys(supportedCountryAndDocTypes).at(0);
+  return getCountryFromCode(firstCountry as CountryCode).value;
 };
 
 export default createIdDocMachine;
