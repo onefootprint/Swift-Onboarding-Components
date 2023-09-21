@@ -311,6 +311,7 @@ table! {
         fixture_result -> Nullable<Text>,
         skip_selfie -> Nullable<Bool>,
         device_type -> Nullable<Text>,
+        vaulted_document_type -> Nullable<Text>,
     }
 }
 

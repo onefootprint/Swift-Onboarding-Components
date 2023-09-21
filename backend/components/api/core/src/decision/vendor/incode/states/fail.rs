@@ -33,6 +33,7 @@ impl Fail {
             document_score: None,
             selfie_score: None,
             ocr_confidence_score: None,
+            vaulted_document_type: None,
             status: Some(IdentityDocumentStatus::Failed),
         };
 

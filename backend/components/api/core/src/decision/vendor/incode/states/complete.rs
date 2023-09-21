@@ -209,6 +209,7 @@ impl Complete {
             selfie_score,
             ocr_confidence_score: Some(ocr_confidence_score),
             status: Some(IdentityDocumentStatus::Complete),
+            vaulted_document_type: Some(dk),
         };
         IdentityDocument::update(conn, id_doc_id, update)?;
 

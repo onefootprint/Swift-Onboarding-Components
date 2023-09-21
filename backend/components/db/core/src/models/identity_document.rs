@@ -40,6 +40,8 @@ pub struct IdentityDocument {
     pub skip_selfie: Option<bool>,
     // the device type that was used to collect this document (currently provided by bifrost, in the future perhaps derived from Stytch)
     pub device_type: Option<DocumentScanDeviceType>,
+    // the document_type we stored this in the vault as
+    pub vaulted_document_type: Option<IdDocKind>,
 }
 
 impl IdentityDocument {
@@ -84,6 +86,7 @@ pub struct IdentityDocumentUpdate {
     pub selfie_score: Option<f64>,
     pub ocr_confidence_score: Option<f64>,
     pub status: Option<IdentityDocumentStatus>,
+    pub vaulted_document_type: Option<IdDocKind>,
 }
 
 impl IdentityDocument {
