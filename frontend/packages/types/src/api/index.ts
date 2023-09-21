@@ -1,74 +1,220 @@
-export * from './biometric-register';
-export * from './business';
-export * from './business-data';
-export * from './consent';
-export * from './create-org-member';
-export * from './create-org-role';
-export * from './create-proxy-config';
-export * from './d2p-generate';
-export * from './d2p-sms';
-export * from './decrypt';
-export * from './decrypt-user';
-export * from './entities-vault-decrypt';
-export * from './get-access-events';
-export * from './get-auth-roles';
-export * from './get-business-owners';
-export * from './get-d2p-status';
-export * from './get-entities';
-export * from './get-entity';
-export * from './get-entity-match-signals';
-export * from './get-entity-risk-signals';
-export * from './get-liveness';
-export * from './get-members';
-export * from './get-onboarding-config';
-export * from './get-onboarding-configs';
-export * from './get-org';
-export * from './get-pinned-annotations';
-export * from './get-proxy-config';
-export * from './get-proxy-configs';
-export * from './get-risk-signal-details';
-export * from './get-roles';
-export * from './get-timeline';
-export * from './identify';
-export * from './identify-verify';
-export * from './login-challenge';
-export * from './onboarding';
-export * from './onboarding-authorize';
-export * from './onboarding-process';
-export * from './onboarding-status';
-export * from './onboarding-submit';
-export * from './org-api-key-reveal';
-export * from './org-api-key-update';
-export * from './org-assume-role';
-export * from './org-auth-login';
-export * from './org-auth-magic-link';
-export * from './org-create-api-key';
-export * from './org-member-response';
-export * from './org-onboarding-configs-create';
-export * from './org-onboarding-configs-update';
-export * from './send-socure-device-session-d';
-export * from './send-stytch-telemetry';
-export * from './session-validate';
-export * from './signup-challenge';
-export * from './skip-liveness';
-export * from './submit-doc';
-export * from './submit-doc-type';
-export * from './submit-free-form-note';
-export * from './submit-review';
-export * from './trigger';
-export * from './update-d2p-status';
-export * from './update-member';
-export * from './update-org';
-export * from './update-org-role';
-export * from './update-proxy-config';
-export * from './upload-file';
-export * from './user-data-identity';
-export * from './user-decrypt';
-export * from './user-email';
-export * from './user-email-challenge';
-export * from './user-email-verify';
-export * from './user-token';
-export * from './user-update';
-export * from './users-update-annotation';
-export * from './users-vault';
-export * from './validate-session';
+export type {
+  BiometricRegisterRequest,
+  BiometricRegisterResponse,
+} from './biometric-register';
+export type { BusinessRequest, BusinessResponse } from './business';
+export type {
+  BusinessDataRequest,
+  BusinessDataResponse,
+} from './business-data';
+export type { ConsentRequest, ConsentResponse } from './consent';
+export type {
+  CreateMembersRequest,
+  CreateMembersResponse,
+} from './create-org-member';
+export type { CreateRoleRequest, CreateRoleResponse } from './create-org-role';
+export type {
+  CreateProxyConfigRequest,
+  CreateProxyConfigResponse,
+} from './create-proxy-config';
+export type { D2PGenerateRequest, D2PGenerateResponse } from './d2p-generate';
+export type { D2PSmsRequest, D2PSmsResponse } from './d2p-sms';
+export type { DecryptRequest, DecryptResponse } from './decrypt';
+export type { DecryptUserRequest, DecryptUserResponse } from './decrypt-user';
+export type {
+  EntitiesVaultDecryptRequest,
+  EntitiesVaultDecryptResponse,
+} from './entities-vault-decrypt';
+export type {
+  GetAccessEventsRequest,
+  GetAccessEventsResponse,
+} from './get-access-events';
+export type {
+  GetAuthRoleResponse,
+  GetAuthRolesOrg,
+  GetAuthRolesRequest,
+} from './get-auth-roles';
+export type {
+  GetBusinessOwnersRequest,
+  GetBusinessOwnersResponse,
+} from './get-business-owners';
+export type { GetD2PRequest, GetD2PResponse } from './get-d2p-status';
+export type { GetEntitiesRequest, GetEntitiesResponse } from './get-entities';
+export type { GetEntityRequest, GetEntityResponse } from './get-entity';
+export type {
+  GetEntityMatchSignalsRequest,
+  GetEntityMatchSignalsResponse,
+} from './get-entity-match-signals';
+export type {
+  GetEntityRiskSignalsRequest,
+  GetEntityRiskSignalsResponse,
+} from './get-entity-risk-signals';
+export type { GetLivenessRequest, GetLivenessResponse } from './get-liveness';
+export type { GetMembersRequest, GetMembersResponse } from './get-members';
+export type {
+  GetOnboardingConfigRequest,
+  GetOnboardingConfigResponse,
+  GetPublicOnboardingConfigResponse,
+} from './get-onboarding-config';
+export type {
+  GetOnboardingConfigsRequest,
+  GetOnboardingConfigsResponse,
+} from './get-onboarding-configs';
+export type { GetOrgRequest, GetOrgResponse } from './get-org';
+export type {
+  GetPinnedAnnotationsRequest,
+  GetPinnedAnnotationsResponse,
+} from './get-pinned-annotations';
+export type {
+  GetProxyConfigRequest,
+  GetProxyConfigResponse,
+} from './get-proxy-config';
+export type {
+  GetProxyConfigsRequest,
+  GetProxyConfigsResponse,
+} from './get-proxy-configs';
+export type {
+  GetRiskSignalDetailsRequest,
+  GetRiskSignalDetailsResponse,
+} from './get-risk-signal-details';
+export type { GetRolesRequest, GetRolesResponse } from './get-roles';
+export type { GetTimelineRequest, GetTimelineResponse } from './get-timeline';
+export type { IdentifyRequest, IdentifyResponse } from './identify';
+export { SANDBOX_ID_HEADER } from './identify';
+export type {
+  IdentifyVerifyRequest,
+  IdentifyVerifyResponse,
+} from './identify-verify';
+export type {
+  LoginChallengeRequest,
+  LoginChallengeResponse,
+} from './login-challenge';
+export type { OnboardingRequest, OnboardingResponse } from './onboarding';
+export type { OnboardingAuthorizeRequest } from './onboarding-authorize';
+export type { OnboardingProcessRequest } from './onboarding-process';
+export type {
+  AuthorizeFields,
+  AuthorizeRequirement,
+  CollectInvestorProfileRequirement,
+  CollectKybDataRequirement,
+  CollectKycDataRequirement,
+  IdDocRequirement,
+  OnboardingRequirement,
+  OnboardingStatusRequest,
+  OnboardingStatusResponse,
+  ProcessRequirement,
+  RegisterPasskeyRequirement,
+  RequirementForKind,
+} from './onboarding-status';
+export { getRequirement, OnboardingRequirementKind } from './onboarding-status';
+export type {
+  OnboardingSubmitRequest,
+  OnboardingSubmitResponse,
+} from './onboarding-submit';
+export type {
+  OrgApiKeyRevealRequest,
+  OrgApiKeyRevealResponse,
+} from './org-api-key-reveal';
+export type {
+  OrgApiKeyUpdateRequest,
+  OrgApiKeyUpdateResponse,
+} from './org-api-key-update';
+export type {
+  OrgAssumeRoleRequest,
+  OrgAssumeRoleResponse,
+} from './org-assume-role';
+export type {
+  OrgAuthLoginRequest,
+  OrgAuthLoginResponse,
+} from './org-auth-login';
+export type {
+  OrgAuthMagicLinkRequest,
+  OrgAuthMagicLinkResponse,
+} from './org-auth-magic-link';
+export type {
+  OrgCreateApiKeyRequest,
+  OrgCreateApiKeysResponse,
+} from './org-create-api-key';
+export type { OrgMemberResponse } from './org-member-response';
+export type {
+  OrgOnboardingConfigCreateRequest,
+  OrgOnboardingConfigCreateResponse,
+} from './org-onboarding-configs-create';
+export type {
+  OrgOnboardingConfigUpdateRequest,
+  OrgOnboardingConfigUpdateResponse,
+} from './org-onboarding-configs-update';
+export type {
+  SendSocureDeviceSessionIdRequest,
+  SendSocureDeviceSessionIdResponse,
+} from './send-socure-device-session-d';
+export type {
+  StytchTelemetryRequest,
+  StytchTelemetryResponse,
+} from './send-stytch-telemetry';
+export type {
+  SessionValidateRequest,
+  SessionValidateResponse,
+} from './session-validate';
+export type {
+  SignupChallengeRequest,
+  SignupChallengeResponse,
+} from './signup-challenge';
+export type {
+  SkipLivenessRequest,
+  SkipLivenessResponse,
+} from './skip-liveness';
+export type { SubmitDocRequest, SubmitDocResponse } from './submit-doc';
+export type {
+  SubmitDocTypeRequest,
+  SubmitDocTypeResponse,
+} from './submit-doc-type';
+export type {
+  SubmitFreeFormNoteRequest,
+  SubmitFreeFormNoteResponse,
+} from './submit-free-form-note';
+export type {
+  SubmitReviewRequest,
+  SubmitReviewResponse,
+} from './submit-review';
+export type { Trigger, TriggerRequest, TriggerResponse } from './trigger';
+export { TriggerKind } from './trigger';
+export type {
+  UpdateD2PStatusRequest,
+  UpdateD2PStatusResponse,
+} from './update-d2p-status';
+export type {
+  UpdateMemberRequest,
+  UpdateMemberResponse,
+} from './update-member';
+export type { UpdateOrgRequest, UpdateOrgResponse } from './update-org';
+export type { UpdateRoleRequest, UpdateRoleResponse } from './update-org-role';
+export type {
+  UpdateProxyConfigRequest,
+  UpdateProxyConfigResponse,
+} from './update-proxy-config';
+export type { UploadFileRequest, UploadFileResponse } from './upload-file';
+export type { UserDataRequest, UserDataResponse } from './user-data-identity';
+export type { UserDecryptRequest, UserDecryptResponse } from './user-decrypt';
+export type {
+  UserEmailObj,
+  UserEmailRequest,
+  UserEmailResponse,
+} from './user-email';
+export type {
+  UserEmailChallengeRequest,
+  UserEmailChallengeResponse,
+} from './user-email-challenge';
+export type {
+  UserEmailVerifyRequest,
+  UserEmailVerifyResponse,
+} from './user-email-verify';
+export type { UserTokenRequest, UserTokenResponse } from './user-token';
+export { UserTokenScope } from './user-token';
+export type { UserUpdateRequest, UserUpdateResponse } from './user-update';
+export type {
+  UpdateAnnotationRequest,
+  UpdateAnnotationResponse,
+} from './users-update-annotation';
+export type { UsersVaultRequest, UsersVaultResponse } from './users-vault';
+export type { ValidateSessionRequest } from './validate-session';
