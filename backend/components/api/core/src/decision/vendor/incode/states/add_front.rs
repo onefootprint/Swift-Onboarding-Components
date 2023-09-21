@@ -101,7 +101,7 @@ impl IncodeStateTransition for AddFront {
         self,
         _: &mut TxnPgConn,
         ctx: &IncodeContext,
-        session: &VerificationSession,
+        _: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
         // Ensure we've gotten a doc we can support
         let type_of_id = self.add_side_response_helper.type_of_id.as_ref();
@@ -116,8 +116,6 @@ impl IncodeStateTransition for AddFront {
         if let Some(reason) = mismatch_reason {
             failure_reasons.push(reason);
         }
-        // TODO do this in the orchestration part
-        failure_reasons.retain(|r| !session.ignored_failure_reasons.contains(r));
         let result = TransitionResult {
             next_state: should_collect_back_or_process_id(&ctx.docv_data)?,
             failure_reasons,

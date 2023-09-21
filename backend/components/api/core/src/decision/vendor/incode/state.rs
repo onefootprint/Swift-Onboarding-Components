@@ -28,7 +28,9 @@ impl<T> Uninitialized<T> {
 }
 
 pub struct TransitionResult {
+    /// The state handled after this one if we proceed successfully
     pub next_state: IncodeState,
+    /// Any failure reasons experienced during the handling of this state
     pub failure_reasons: Vec<IncodeFailureReason>,
     /// The side being handled by this step of the Incode machine. It will be cleared if there is an error.
     pub side: Option<DocumentSide>,
@@ -126,65 +128,73 @@ where
         let result = db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 let result = init_state.transition(conn, &ctx, &session)?;
-                let (next_state, retry_reasons, ignore_reasons) = if result.failure_reasons.is_empty() {
-                    // No errors - atomically update the state of the session in the DB
-                    (result.next_state, vec![], None)
+                let TransitionResult {
+                    next_state,
+                    failure_reasons: all_failure_reasons,
+                    side,
+                } = result;
+
+                // Calculate the reasons that are specifically not ignored
+                let unhandled_failure_reasons = all_failure_reasons
+                    .clone()
+                    .into_iter()
+                    .filter(|r| !session.ignored_failure_reasons.contains(r))
+                    .collect_vec();
+
+                let (step_result, next_state, new_ignore_reasons) = if unhandled_failure_reasons.is_empty() {
+                    (StepResult::Ready, next_state, None)
                 } else {
-                    // Some errors - decide how to proceed.
+                    // Some unhandled errors - decide how to proceed.
                     // We'll either retry the current state, or ignore the errors and move to the next state
-                    let TransitionResult {
-                        next_state: _, // Discard the next_result since there's special handling for errors
-                        failure_reasons,
-                        side,
-                    } = result;
-                    let mut next_state = T::new();
-                    // Mark the sides as failed to require re-uploading. Otherwise, the user
-                    // could re-initiate the incode machine without uploading a new doc
-                    let sides = side.into_iter().collect();
-                    // TODO we want to deactivate only if we retry, but we always want to post the failure reasons
-                    DocumentUpload::deactivate(conn, &ctx.id_doc_id, sides, failure_reasons.clone())?;
 
                     // Count if we have failed too many times
                     let exceeded_max_attempts =
                         ctx.failed_attempts_for_side + 1 >= DocumentUpload::MAX_ATTEMPTS_PER_SIDE;
 
-                    let ignore_reasons = if exceeded_max_attempts {
-                        if failure_reasons.iter().all(|s| s.can_ignore()) {
-                            // TODO some ignored errors will cause future incode reqs to fail. Need to
-                            // handle those cases. For now, we can only allow ignoring certain
-                            // errors
-                            // Chain together existing ignored errors and new errors to ignore
-                            let ignore_reasons = failure_reasons
-                                .clone()
+                    let (result, deactivate) = if !exceeded_max_attempts {
+                        // We haven't reached the max attempts - stay in the current state.
+                        // But, only return the unhandled_failure_reasons to the client
+                        (
+                            (StepResult::Retry(unhandled_failure_reasons), T::new(), None),
+                            true,
+                        )
+                    } else {
+                        // We've reached the max attempts for this side
+                        // TODO some ignored errors will cause future incode reqs to fail. Need to
+                        // handle those cases. For now, we can only allow ignoring certain
+                        // errors
+                        let can_ignore_all_errors = unhandled_failure_reasons.iter().all(|s| s.can_ignore());
+                        if !can_ignore_all_errors {
+                            // Fail if theres an unhandled error
+                            Fail::enter(conn, &ctx)?;
+                            ((StepResult::Ready, Fail::new(), None), true)
+                        } else {
+                            let new_ignore_reasons = unhandled_failure_reasons
                                 .into_iter()
                                 .chain(session.ignored_failure_reasons.clone().into_iter())
                                 .unique()
                                 .collect();
-                            Some(ignore_reasons)
-                        } else {
-                            // Override the next state to a failed state if we've reached the max
-                            // attempts
-                            Fail::enter(conn, &ctx)?;
-                            next_state = Fail::new();
-                            None
+                            // All of the unhandled failures are ignorable.
+                            // Advance to the next state and add new ignore_reasons
+                            ((StepResult::Ready, next_state, Some(new_ignore_reasons)), false)
                         }
-                    } else {
-                        None
                     };
-                    (next_state, failure_reasons, ignore_reasons)
+                    if let Some(side) = side {
+                        // Add the failure reasons to the DocumentUpload.
+                        // Optionally mark the upload as failed to require re-uploading
+                        let reasons = all_failure_reasons.clone();
+                        DocumentUpload::set_failure_reasons(conn, &ctx.id_doc_id, side, reasons, deactivate)?;
+                    }
+                    result
                 };
+
                 let update = UpdateIncodeVerificationSession::set_state(
                     next_state.name(),
-                    retry_reasons.clone(),
-                    ignore_reasons,
+                    all_failure_reasons,
+                    new_ignore_reasons,
                 );
                 IncodeVerificationSession::update(conn, &session.id, update)?;
-                let result = if retry_reasons.is_empty() {
-                    StepResult::Ready
-                } else {
-                    StepResult::Retry(retry_reasons)
-                };
-                Ok((next_state, result, ctx, session))
+                Ok((next_state, step_result, ctx, session))
             })
             .await?;
         Ok(result)

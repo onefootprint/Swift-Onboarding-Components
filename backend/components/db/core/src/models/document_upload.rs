@@ -43,6 +43,13 @@ struct NewDocumentUploadRow {
     pub failure_reasons: Vec<IncodeFailureReason>,
 }
 
+#[derive(Debug, AsChangeset)]
+#[diesel(table_name = document_upload)]
+pub struct IdentityDocumentUpdate {
+    pub deactivated_at: Option<DateTime<Utc>>,
+    pub failure_reasons: Option<Vec<IncodeFailureReason>>,
+}
+
 impl DocumentUpload {
     /// Max number attempts to upload a given side before we fail the document request
     pub const MAX_ATTEMPTS_PER_SIDE: i64 = 3;
@@ -60,7 +67,7 @@ impl DocumentUpload {
         // Deactivate existing upload, if any
         // TODO this kind of silently replaces an old image, but maybe we don't want to allow this...
         // only allow re-uploading an image if the last image explicitly failed.
-        Self::deactivate(conn, &document_id, vec![side], vec![])?;
+        Self::set_failure_reasons(conn, &document_id, side, vec![], true)?;
 
         // Add the new upload
         let new = NewDocumentUploadRow {
@@ -78,21 +85,23 @@ impl DocumentUpload {
         Ok(result)
     }
 
-    #[tracing::instrument("DocumentUpload::deactivate", skip_all)]
-    pub fn deactivate(
+    #[tracing::instrument("DocumentUpload::set_failure_reasons", skip_all)]
+    pub fn set_failure_reasons(
         conn: &mut TxnPgConn,
         document_id: &IdentityDocumentId,
-        sides: Vec<DocumentSide>,
+        side: DocumentSide,
         failure_reasons: Vec<IncodeFailureReason>,
+        deactivate: bool,
     ) -> DbResult<()> {
+        let update = IdentityDocumentUpdate {
+            deactivated_at: deactivate.then_some(Utc::now()),
+            failure_reasons: Some(failure_reasons),
+        };
         diesel::update(document_upload::table)
             .filter(document_upload::document_id.eq(document_id))
-            .filter(document_upload::side.eq_any(sides))
+            .filter(document_upload::side.eq(side))
             .filter(document_upload::deactivated_at.is_null())
-            .set((
-                document_upload::deactivated_at.eq(Utc::now()),
-                document_upload::failure_reasons.eq(failure_reasons),
-            ))
+            .set(update)
             .execute(conn.conn())?;
         Ok(())
     }

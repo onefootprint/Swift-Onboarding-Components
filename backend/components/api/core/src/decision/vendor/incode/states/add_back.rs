@@ -91,7 +91,7 @@ impl IncodeStateTransition for AddBack {
         self,
         _: &mut TxnPgConn,
         ctx: &IncodeContext,
-        session: &VerificationSession,
+        _: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
         // Ensure we've gotten a doc type we can support
         //
@@ -111,7 +111,6 @@ impl IncodeStateTransition for AddBack {
         if let Some(reason) = mismatch_reason {
             failure_reasons.push(reason);
         }
-        failure_reasons.retain(|r| !session.ignored_failure_reasons.contains(r));
         let result = TransitionResult {
             next_state: ProcessId::new(),
             failure_reasons,
