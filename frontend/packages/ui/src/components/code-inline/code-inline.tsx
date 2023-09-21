@@ -52,11 +52,12 @@ const CodeInline = ({
 };
 
 const CodeContent = styled.code<{ size?: 'default' | 'compact' }>`
-  ${({ theme, size }) => css`
+  ${({ theme, size = 'default' }) => css`
     text-align: left;
     white-space: break-spaces;
     word-break: break-word;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    display: inline-block;
 
     ${size === 'default' &&
     css`
@@ -64,7 +65,6 @@ const CodeContent = styled.code<{ size?: 'default' | 'compact' }>`
       background: ${theme.backgroundColor.secondary};
       border-radius: ${theme.borderRadius.compact};
       color: ${theme.color.error};
-      display: inline-block;
       flex-flow: wrap;
       height: 24px;
       height: auto;
