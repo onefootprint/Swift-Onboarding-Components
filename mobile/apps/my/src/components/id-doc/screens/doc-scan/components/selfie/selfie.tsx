@@ -7,6 +7,7 @@ import { detectFace } from 'vision-camera-plugin-face-detection';
 import useTranslation from '@/hooks/use-translation';
 
 import Camera from '../scan';
+import type { ScanObject } from '../scan/scan.types';
 import { StepperProps } from '../stepper';
 import Frame from './components/frame';
 import Instructions from './components/instructions';
@@ -18,9 +19,12 @@ export type SelfieProps = {
 const Selfie = ({ stepperValues }: SelfieProps) => {
   const { width, height } = Dimensions.get('window');
   const { t } = useTranslation('components.scan.selfie');
-  const [feedback, setFeedback] = useState('');
-  const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
+  const [object, setObject] = useState<ScanObject>({
+    isDetected: false,
+    feedback: '',
+    data: {},
+  });
 
   const frameProcessor = useFrameProcessor(
     frame => {
@@ -35,22 +39,36 @@ const Selfie = ({ stepperValues }: SelfieProps) => {
         result.isStable
       ) {
         detector.value = true;
-        runOnJS(setObjectDetected)(true);
-        runOnJS(setFeedback)('Hold still...');
+        runOnJS(setObject)({
+          isDetected: true,
+          feedback: 'Hold still..',
+          data: {},
+        });
       } else {
         detector.value = false;
-        runOnJS(setObjectDetected)(false);
 
-        if (!result.hasFace || !result.isStable) {
-          runOnJS(setFeedback)('Position face, stay steady');
+        if (!result.hasFace) {
+          runOnJS(setObject)({
+            isDetected: false,
+            feedback: 'Position face, stay steady',
+            data: {},
+          });
           return;
         }
         if (!result.isFaceInCenter) {
-          runOnJS(setFeedback)('Face is outside the frame outline');
+          runOnJS(setObject)({
+            isDetected: false,
+            feedback: 'Face is outside the frame outline',
+            data: {},
+          });
           return;
         }
         if (!result.isFaceStraight) {
-          runOnJS(setFeedback)('Face is tilted or looking other way');
+          runOnJS(setObject)({
+            isDetected: false,
+            feedback: 'Face is tilted or looking other way',
+            data: {},
+          });
         }
       }
     },
@@ -60,13 +78,12 @@ const Selfie = ({ stepperValues }: SelfieProps) => {
   return (
     <Instructions stepperValues={stepperValues}>
       <Camera
-        feedback={feedback}
         frameProcessor={frameProcessor}
-        isObjectDetected={objectedDetected}
+        object={object}
         size="large"
+        stepperValues={stepperValues}
         title={t('title')}
         type="front"
-        stepperValues={stepperValues}
       >
         <Frame detector={detector} />
       </Camera>

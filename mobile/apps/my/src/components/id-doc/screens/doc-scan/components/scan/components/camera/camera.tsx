@@ -6,7 +6,7 @@ import {
   useCameraDevices,
 } from 'react-native-vision-camera';
 
-import type { ScanPicture, ScanType } from '../../scan.types';
+import type { ScanObject, ScanPicture, ScanType } from '../../scan.types';
 import CaptureButton from './components/capture-button';
 import Feedback from './components/feedback';
 import Flash from './components/flash';
@@ -17,9 +17,8 @@ let timerId: NodeJS.Timeout | null = null;
 type CameraProps = {
   children?: React.ReactNode;
   disabled?: boolean;
-  feedback?: string;
   frameProcessor?: any;
-  isObjectDetected?: boolean;
+  object: ScanObject;
   onBack?: () => void;
   onPhotoTaken: (picture: ScanPicture) => void;
   subtitle?: string;
@@ -32,9 +31,8 @@ const AUTO_CAPTURE_DELAY = 750;
 const Camera = ({
   children,
   disabled = false,
-  feedback,
   frameProcessor,
-  isObjectDetected,
+  object,
   onBack,
   onPhotoTaken,
   subtitle,
@@ -48,7 +46,7 @@ const Camera = ({
   const device = devices[type];
 
   useEffect(() => {
-    if (isObjectDetected) {
+    if (object.isDetected) {
       timerId = setTimeout(() => {
         takePhoto({ manual: false });
       }, AUTO_CAPTURE_DELAY);
@@ -56,7 +54,7 @@ const Camera = ({
     } else {
       resetAutoCapture();
     }
-  }, [isObjectDetected]);
+  }, [object.isDetected]);
 
   const resetAutoCapture = () => {
     if (timerId) {
@@ -73,7 +71,13 @@ const Camera = ({
       qualityPrioritization: 'balanced',
     });
     resetAutoCapture();
-    onPhotoTaken({ photo: newPhoto, meta });
+    onPhotoTaken({
+      photo: newPhoto,
+      meta: {
+        ...meta,
+        ...object.data,
+      },
+    });
     setIsFlashing(false);
   };
 
@@ -100,7 +104,9 @@ const Camera = ({
         {children}
         {isFlashing ? <Flash /> : null}
         <Buttons>
-          {showFeedback && feedback && <Feedback>{feedback}</Feedback>}
+          {showFeedback && object.feedback && (
+            <Feedback>{object.feedback}</Feedback>
+          )}
           <CaptureButton
             onPress={() => {
               takePhoto({ manual: true });

@@ -17286,6 +17286,11 @@ vfile@^4.0.0:
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
 
+vision-camera-plugin-barcode-detection@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/vision-camera-plugin-barcode-detection/-/vision-camera-plugin-barcode-detection-1.0.0.tgz#dfd1181df183eff08fe8ed4412d679db25bf80dd"
+  integrity sha512-n/HHYKXQy+9g6hwlhimRZMIppH6mwotLd68zwGpotTc/6TGcM9w9wlXjZsoZIRXDECw7Ssbv8QlcOOhRcA130A==
+
 vision-camera-plugin-document@0.8.0:
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/vision-camera-plugin-document/-/vision-camera-plugin-document-0.8.0.tgz#7bff3229b5c25f31ca25c3146cf8972b59bdfb1b"

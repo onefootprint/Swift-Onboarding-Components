@@ -8,3 +8,9 @@ export type ScanPicture = {
   photo: PhotoFile | null;
   meta: Record<string, boolean>;
 };
+
+export type ScanObject = {
+  isDetected: boolean;
+  feedback: string;
+  data: Record<string, any>;
+};

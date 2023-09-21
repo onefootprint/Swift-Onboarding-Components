@@ -9,6 +9,7 @@ import useTranslation from '@/hooks/use-translation';
 import Frame from '../default-frame';
 import Instructions from '../default-instructions';
 import Scan from '../scan';
+import type { ScanObject } from '../scan/scan.types';
 import ScanContext from '../scan-context';
 import { StepperProps } from '../stepper';
 
@@ -22,9 +23,12 @@ const DEFAULT_ASPECT_RATIO = 1.586;
 const ResidenceDocument = ({ side, stepperValues }: ResidenceDocumentProps) => {
   const { t, allT } = useTranslation('components.scan.residence-document');
   const { country } = useContext(ScanContext);
-  const [feedback, setFeedback] = useState('');
-  const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
+  const [object, setObject] = useState<ScanObject>({
+    isDetected: false,
+    feedback: '',
+    data: {},
+  });
 
   const frameProcessor = useFrameProcessor(
     frame => {
@@ -34,12 +38,18 @@ const ResidenceDocument = ({ side, stepperValues }: ResidenceDocumentProps) => {
       const result = detectDocument(frame, options);
       if (result.isDocument) {
         detector.value = true;
-        runOnJS(setObjectDetected)(true);
-        runOnJS(setFeedback)('Hold still...');
+        runOnJS(setObject)({
+          isDetected: true,
+          feedback: 'Hold still..',
+          data: {},
+        });
       } else {
         detector.value = false;
-        runOnJS(setObjectDetected)(false);
-        runOnJS(setFeedback)('Position the document in view');
+        runOnJS(setObject)({
+          isDetected: false,
+          feedback: 'Position the document in view',
+          data: {},
+        });
       }
     },
     [detector],
@@ -51,12 +61,11 @@ const ResidenceDocument = ({ side, stepperValues }: ResidenceDocumentProps) => {
       stepperValues={stepperValues}
     >
       <Scan
-        feedback={feedback}
         frameProcessor={frameProcessor}
-        isObjectDetected={objectedDetected}
+        object={object}
+        stepperValues={stepperValues}
         subtitle={allT(`doc-side.${side}`)}
         title={t('title')}
-        stepperValues={stepperValues}
       >
         <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
       </Scan>

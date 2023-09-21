@@ -29,7 +29,7 @@ module.exports = function (api) {
       [
         'react-native-reanimated/plugin',
         {
-          globals: ['__detectDocument', '__detectFace'],
+          globals: ['__detectDocument', '__detectFace', '__detectBarcode'],
         },
       ],
     ],

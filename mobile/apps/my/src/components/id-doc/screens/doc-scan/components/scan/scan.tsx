@@ -3,20 +3,19 @@ import React, { useState } from 'react';
 import { StepperProps } from '../stepper';
 import Camera from './components/camera';
 import Preview from './components/preview';
-import type { ScanPicture, ScanSize, ScanType } from './scan.types';
+import type { ScanObject, ScanPicture, ScanSize, ScanType } from './scan.types';
 
 type ScanProps = {
   children?: React.ReactNode;
   disabled?: boolean;
-  feedback?: string;
   frameProcessor?: any;
-  isObjectDetected?: boolean;
-  size?: ScanSize;
-  title: string;
-  subtitle?: string;
-  type?: ScanType;
-  stepperValues: StepperProps;
+  object: ScanObject;
   onBack?: () => void;
+  size?: ScanSize;
+  stepperValues: StepperProps;
+  subtitle?: string;
+  title: string;
+  type?: ScanType;
 };
 
 const initialPictureState = {
@@ -27,15 +26,14 @@ const initialPictureState = {
 const Scan = ({
   children,
   disabled = false,
-  feedback,
   frameProcessor,
-  isObjectDetected,
-  size = 'default',
-  title,
-  subtitle,
-  type = 'back',
-  stepperValues,
+  object,
   onBack,
+  size = 'default',
+  stepperValues,
+  subtitle,
+  title,
+  type = 'back',
 }: ScanProps) => {
   const [picture, setPicture] = useState<ScanPicture>(initialPictureState);
   const showPreview = !!picture.photo;
@@ -61,9 +59,8 @@ const Scan = ({
   ) : (
     <Camera
       disabled={disabled}
-      feedback={feedback}
       frameProcessor={frameProcessor}
-      isObjectDetected={isObjectDetected}
+      object={object}
       onBack={onBack}
       onPhotoTaken={handlePhotoTaken}
       subtitle={subtitle}

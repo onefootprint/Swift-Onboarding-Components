@@ -8,6 +8,7 @@ import useTranslation from '@/hooks/use-translation';
 import Frame from '../default-frame';
 import Instructions from '../default-instructions';
 import Scan from '../scan';
+import type { ScanObject } from '../scan/scan.types';
 import ScanContext from '../scan-context';
 import { StepperProps } from '../stepper';
 
@@ -20,9 +21,12 @@ type VisaProps = {
 const Visa = ({ stepperValues }: VisaProps) => {
   const { t } = useTranslation('components.scan.visa');
   const { country } = useContext(ScanContext);
-  const [feedback, setFeedback] = useState('');
-  const [objectedDetected, setObjectDetected] = useState(false);
   const detector = useSharedValue(false);
+  const [object, setObject] = useState<ScanObject>({
+    isDetected: false,
+    feedback: '',
+    data: {},
+  });
 
   const frameProcessor = useFrameProcessor(
     frame => {
@@ -32,12 +36,18 @@ const Visa = ({ stepperValues }: VisaProps) => {
       const result = detectDocument(frame, options);
       if (result.isDocument) {
         detector.value = true;
-        runOnJS(setObjectDetected)(true);
-        runOnJS(setFeedback)('Hold still...');
+        runOnJS(setObject)({
+          isDetected: true,
+          feedback: 'Hold still..',
+          data: {},
+        });
       } else {
         detector.value = false;
-        runOnJS(setFeedback)('Position the document in view');
-        runOnJS(setObjectDetected)(false);
+        runOnJS(setObject)({
+          isDetected: false,
+          feedback: 'Position the document in view',
+          data: {},
+        });
       }
     },
     [detector],
@@ -49,11 +59,10 @@ const Visa = ({ stepperValues }: VisaProps) => {
       stepperValues={stepperValues}
     >
       <Scan
-        feedback={feedback}
         frameProcessor={frameProcessor}
-        isObjectDetected={objectedDetected}
-        title={t('title')}
+        object={object}
         stepperValues={stepperValues}
+        title={t('title')}
       >
         <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
       </Scan>

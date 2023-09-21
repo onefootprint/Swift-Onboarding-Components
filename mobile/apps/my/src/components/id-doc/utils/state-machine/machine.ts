@@ -2,7 +2,6 @@ import { getCountryFromCode } from '@onefootprint/global-constants';
 import { IdDocRequirement, UploadDocumentSide } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import { MachineContext, MachineEvents } from './types';
 
 const createIdDocMachine = (requirement: IdDocRequirement) =>
