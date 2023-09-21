@@ -3,7 +3,7 @@ use super::{
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::state::IncodeState;
-use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
+use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
@@ -45,7 +45,7 @@ impl IncodeStateTransition for ProcessId {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<StateResult> {
+    ) -> ApiResult<TransitionResult> {
         let next = next_state(session);
         Ok(next.into())
     }

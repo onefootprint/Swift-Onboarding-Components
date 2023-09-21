@@ -1,6 +1,6 @@
 use super::IncodeStateTransition;
 use super::VerificationSession;
-use crate::decision::vendor::incode::state::StateResult;
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
@@ -56,7 +56,7 @@ impl IncodeStateTransition for Fail {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<StateResult> {
+    ) -> ApiResult<TransitionResult> {
         Err(ApiErrorKind::AssertionError(
             "Incode machine already failed".into(),
         ))?

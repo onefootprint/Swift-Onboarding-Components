@@ -2,7 +2,7 @@ use super::{
     map_to_api_err, save_incode_verification_result, IncodeStateTransition, ProcessFace,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::incode::state::StateResult;
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
@@ -80,18 +80,15 @@ impl IncodeStateTransition for AddSelfie {
         _: &mut TxnPgConn,
         _ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<StateResult> {
+    ) -> ApiResult<TransitionResult> {
         let mut failure_reasons = self.failure_reasons;
         failure_reasons.retain(|r| !session.ignored_failure_reasons.contains(r));
-        if !failure_reasons.is_empty() {
-            return Ok(StateResult::Retry {
-                next_state: Self::new(),
-                reasons: failure_reasons,
-                clear_sides: vec![DocumentSide::Selfie],
-            });
-        }
 
-        let next = ProcessFace::new();
-        Ok(next.into())
+        let result = TransitionResult {
+            next_state: ProcessFace::new(),
+            failure_reasons,
+            side: Some(DocumentSide::Selfie),
+        };
+        Ok(result)
     }
 }

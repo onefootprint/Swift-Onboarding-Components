@@ -3,7 +3,7 @@ use super::{
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
-use crate::decision::vendor::incode::{state::StateResult, IncodeContext};
+use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
 use crate::errors::{ApiResult, AssertionError};
 use crate::utils::vault_wrapper::{Person, TenantVw, VaultWrapper};
 use crate::vendor_clients::IncodeClients;
@@ -106,7 +106,7 @@ impl IncodeStateTransition for FetchScores {
         conn: &mut TxnPgConn,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<StateResult> {
+    ) -> ApiResult<TransitionResult> {
         let type_of_id = self.ocr_response.type_of_id.as_ref();
         let country_code = self.ocr_response.issuing_country.as_ref();
         let dk = match super::parse_type_of_id(ctx, type_of_id, country_code)? {

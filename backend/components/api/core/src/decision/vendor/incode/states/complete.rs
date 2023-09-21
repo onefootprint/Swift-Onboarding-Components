@@ -3,7 +3,7 @@ use super::IncodeStateTransition;
 use super::VerificationSession;
 use crate::decision::features::incode_docv;
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
-use crate::decision::vendor::incode::state::StateResult;
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
 use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
@@ -306,7 +306,7 @@ impl IncodeStateTransition for Complete {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<StateResult> {
+    ) -> ApiResult<TransitionResult> {
         Err(ApiErrorKind::AssertionError(
             "Incode machine already complete".into(),
         ))?

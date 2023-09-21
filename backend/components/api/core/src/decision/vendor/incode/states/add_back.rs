@@ -2,7 +2,7 @@ use super::{
     map_to_api_err, save_incode_verification_result, AddSideResponseHelper, IncodeStateTransition, ProcessId,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::incode::state::StateResult;
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
@@ -92,7 +92,7 @@ impl IncodeStateTransition for AddBack {
         _: &mut TxnPgConn,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<StateResult> {
+    ) -> ApiResult<TransitionResult> {
         // Ensure we've gotten a doc type we can support
         //
         // Theoretically if we progressed to back fine, and are _now_ getting this error, it
@@ -112,13 +112,11 @@ impl IncodeStateTransition for AddBack {
             failure_reasons.push(reason);
         }
         failure_reasons.retain(|r| !session.ignored_failure_reasons.contains(r));
-        if !failure_reasons.is_empty() {
-            return Ok(StateResult::Retry {
-                next_state: Self::new(),
-                reasons: failure_reasons,
-                clear_sides: vec![DocumentSide::Back],
-            });
-        }
-        Ok(ProcessId::new().into())
+        let result = TransitionResult {
+            next_state: ProcessId::new(),
+            failure_reasons,
+            side: Some(DocumentSide::Back),
+        };
+        Ok(result)
     }
 }
