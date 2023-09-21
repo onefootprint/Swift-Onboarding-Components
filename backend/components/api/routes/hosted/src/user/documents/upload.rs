@@ -23,7 +23,6 @@ use db::models::document_request::DocumentRequest;
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::IdentityDocument;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::RiskSignal;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
@@ -33,8 +32,7 @@ use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
     DataIdentifier, DataLifetimeSource, DecisionIntentId, DecisionIntentKind, DocumentKind, DocumentSide,
-    FootprintReasonCode, IdentityDocumentId, IdentityDocumentStatus, IncodeVerificationSessionState,
-    TenantId, VerificationResultId, WorkflowId,
+    IdentityDocumentId, IdentityDocumentStatus, IncodeVerificationSessionState, TenantId, WorkflowId,
 };
 use newtypes::{ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
@@ -241,7 +239,6 @@ pub(in crate::user) async fn handle_incode_request(
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
     let sv_id = doc_request.scoped_vault_id.clone();
-    let di_id = decision_intent_id.clone();
     // Initialize our state machine
     let ctx = IncodeContext {
         di_id: decision_intent_id,
@@ -282,34 +279,6 @@ pub(in crate::user) async fn handle_incode_request(
         s => return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into()),
     };
     let is_retry_limit_exceeded = machine.state.name() == IncodeVerificationSessionState::Fail;
-    if is_retry_limit_exceeded {
-        state
-            .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
-                let (vres_id, vendor_api): (VerificationResultId, VendorAPI) =
-                    VerificationRequest::list(conn, &di_id)?
-                        .into_iter()
-                        .filter(|(vreq, _)| vreq.vendor_api.is_incode_doc_flow_api())
-                        .filter_map(|(vreq, vres)| vres.map(|v| (v.id, vreq.vendor_api)))
-                        .collect::<Vec<_>>()
-                        .first()
-                        .cloned()
-                        .ok_or(AssertionError(
-                            "cannot find incode vres for doc upload failed FRC",
-                        ))?;
-
-                let _ = RiskSignal::bulk_create(
-                    conn,
-                    &sv_id,
-                    vec![(FootprintReasonCode::DocumentUploadFailed, vendor_api, vres_id)],
-                    newtypes::RiskSignalGroupKind::Doc,
-                    false,
-                );
-
-                Ok(())
-            })
-            .await?;
-    }
     let errors = retry_reasons.into_iter().map(DocumentImageError::from).collect();
     let result = DocumentResponse {
         next_side_to_collect,
