@@ -102,8 +102,8 @@ impl IncodeStateMachine {
                     existing
                 } else {
                     // Create a brand new session
-                    let (_, doc_request) = IdentityDocument::get(conn, &id_doc_id)?;
-                    let session_kind = if doc_request.should_collect_selfie {
+                    let (id_doc, doc_request) = IdentityDocument::get(conn, &id_doc_id)?;
+                    let session_kind = if doc_request.should_collect_selfie && !id_doc.should_skip_selfie() {
                         IncodeVerificationSessionKind::Selfie
                     } else {
                         IncodeVerificationSessionKind::IdDocument
