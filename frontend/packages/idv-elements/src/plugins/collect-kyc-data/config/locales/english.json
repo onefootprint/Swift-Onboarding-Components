@@ -21,7 +21,7 @@
       "subtitle": "We are required to collect your email address.",
       "email": {
         "label": "Email",
-        "placeholder": "your.email@email.com",
+        "placeholder": "jane.doe@acme.com",
         "hint": "Add ”#string” (e.g., #test1) at the end of your email address.",
         "errors": {
           "required": "Email is required",

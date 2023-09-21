@@ -67,7 +67,7 @@ const EmailLogin = () => {
               hasError={!!errors.email}
               hint={errors?.email?.message}
               label={t('form.email.label')}
-              placeholder="your.email@email.com"
+              placeholder="jane.doe@acme.com"
               type="email"
               {...register('email', {
                 required: {

@@ -245,7 +245,7 @@
       "form": {
         "email": {
           "label": "Email",
-          "placeholder": "your.email@email.com",
+          "placeholder": "jane.doe@acme.com",
           "errors": {
             "required": "Please enter an email"
           }

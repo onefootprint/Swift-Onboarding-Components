@@ -109,7 +109,7 @@ describe('<Form />', () => {
 
     const emailFields = screen.getAllByLabelText('Email');
     expect(
-      screen.getByPlaceholderText('your.email@email.com'),
+      screen.getByPlaceholderText('jane.doe@acme.com'),
     ).toBeInTheDocument();
     expect(emailFields).toHaveLength(1);
     await userEvent.type(emailFields[0], 'Lily@smith.com');

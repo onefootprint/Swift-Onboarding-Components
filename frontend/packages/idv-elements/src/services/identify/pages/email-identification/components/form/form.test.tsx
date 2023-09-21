@@ -23,7 +23,7 @@ describe.skip('<Form />', () => {
     renderForm({});
     expect(screen.getByText('Email')).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText('your.email@email.com'),
+      screen.getByPlaceholderText('jane.doe@acme.com'),
     ).toBeInTheDocument();
     const button = screen.getByRole('button', { name: 'Continue' });
     expect(button).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe.skip('<Form />', () => {
     const input = screen.getByLabelText('Email');
     expect(input).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText('your.email@email.com'),
+      screen.getByPlaceholderText('jane.doe@acme.com'),
     ).toBeInTheDocument();
 
     await userEvent.type(input, 'footprint@onefootprint.com');
