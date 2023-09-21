@@ -110,7 +110,7 @@ pub async fn post(
                     let args = NewWorkflowArgs {
                         scoped_vault_id: sv.id.clone(),
                         config: DocumentConfig {}.into(),
-                        fixture_result: None,
+                        fixture_result: last_wf.fixture_result,
                         ob_configuration_id: last_wf.ob_configuration_id,
                         insight_event_id: None,
                     };
