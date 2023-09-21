@@ -104,7 +104,7 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             appearance_id: _,
             cip_kind: _,
             author: _,
-            doc_scan_for_optional_ssn: _,
+            doc_scan_for_optional_ssn,
         } = ob_config;
         Self {
             id,
@@ -125,6 +125,7 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             enhanced_aml: enhanced_aml.into(),
             allow_us_residents,
             allow_us_territory_residents,
+            doc_scan_for_optional_ssn,
         }
     }
 }

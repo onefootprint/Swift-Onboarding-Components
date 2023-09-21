@@ -23,6 +23,7 @@ pub struct OnboardingConfiguration {
     pub author: Option<Actor>,
     pub skip_kyc: bool,
     pub enhanced_aml: EnhancedAml,
+    pub doc_scan_for_optional_ssn: Option<CollectedDataOption>,
 }
 
 export_schema!(OnboardingConfiguration);
