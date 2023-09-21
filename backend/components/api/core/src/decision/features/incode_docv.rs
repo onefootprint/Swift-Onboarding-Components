@@ -117,13 +117,21 @@ pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_self
         }
     }
     
-
+    // ID Tests => FRC
     scores
         .get_id_tests()
         .iter()
         .filter_map(get_frc_from_test)
         .for_each(|frc| reason_codes.push(frc));
 
+    // Face tests => FRC
+    let (glasses_check, mask_check) = scores.get_face_test_results();
+    if glasses_check == Some(true) {
+        reason_codes.push(FootprintReasonCode::DocumentSelfieGlasses);
+    }
+    if mask_check == Some(true) {
+        reason_codes.push(FootprintReasonCode::DocumentSelfieMask);
+    }
 
     Ok(reason_codes)
 }
@@ -321,7 +329,8 @@ mod tests {
             barcode_content: Ok,
             fake: Ok,
             ocr_confidence: Ok,
-            selfie_match: Ok
+            selfie_match: Ok,
+            lenses_and_mask_check: Ok,
         }, 
         vec![
             DocumentPhotoIsNotScreenCapture,
@@ -351,7 +360,8 @@ mod tests {
                 barcode_content: Fail,
                 fake: Fail,
                 ocr_confidence: Fail,
-                selfie_match: Fail
+                selfie_match: Fail,
+                lenses_and_mask_check: Fail,
             }, 
             vec![
                 DocumentPhotoIsScreenCapture,
@@ -367,7 +377,9 @@ mod tests {
                 DocumentSelfieDoesNotMatch,
                 DocumentSelfieNotUsedWithDifferentInformation,
                 DocumentNoImageAlterationFront,
-                DocumentNoImageAlterationBack
+                DocumentNoImageAlterationBack,
+                DocumentSelfieGlasses,
+                DocumentSelfieMask,
             ], true; "everything fails")]
         #[test_case(
             DocTestOpts {
@@ -382,6 +394,7 @@ mod tests {
                 fake: Ok,
                 ocr_confidence: Ok,
                 selfie_match: Fail,
+                lenses_and_mask_check: Ok
             }, 
             vec![
                 DocumentPhotoIsNotScreenCapture,
@@ -411,7 +424,8 @@ mod tests {
                     barcode_content: Ok,
                     fake: Ok,
                     ocr_confidence: Ok,
-                    selfie_match: Ok
+                    selfie_match: Ok,
+                    lenses_and_mask_check: Ok
                 }, 
                 vec![
                     DocumentPhotoIsNotScreenCapture,

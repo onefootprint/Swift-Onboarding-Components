@@ -744,6 +744,14 @@ footprint_reason_code_enum! {
         #[note = "Selfie not used with different information", severity = SignalSeverity::Info,  description = "The face from the selfie image not been used with different information across Footprint's network."]
         DocumentSelfieNotUsedWithDifferentInformation,
 
+        #[scope = SignalScope::Selfie, additional_scopes = vec![SignalScope::Document], match_level = None]
+        #[note = "Selfie was taken wearing a mask", severity = SignalSeverity::Low,  description = "The selfie may have been captured with the person wearing a mask. This could have potentially impacted the comparison with the document image."]
+        DocumentSelfieMask,
+
+        #[scope = SignalScope::Selfie, additional_scopes = vec![SignalScope::Document], match_level = None]
+        #[note = "Selfie was taken wearing glasses", severity = SignalSeverity::Low,  description = "The selfie may have been captured with the person wearing glasses. This could have potentially impacted the comparison with the document image."]
+        DocumentSelfieGlasses,
+
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document image possible fake", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being a fake document. For example: slight difference in layout of the ID, different font or font size."]
         DocumentPossibleFakeImage,

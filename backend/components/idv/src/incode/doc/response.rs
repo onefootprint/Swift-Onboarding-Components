@@ -179,6 +179,24 @@ impl FetchScoresResponse {
             .collect()
     }
 
+    pub fn get_face_test_results(&self) -> (Option<bool>, Option<bool>) {
+        let had_lenses = self
+            .face_recognition
+            .as_ref()
+            .and_then(|fr| fr.lenses_check.as_ref())
+            .and_then(|lc| lc.status.as_ref())
+            .map(|status| IncodeStatus::try_from(status.as_str()).ok() == Some(IncodeStatus::Fail));
+
+        let had_mask = self
+            .face_recognition
+            .as_ref()
+            .and_then(|fr| fr.mask_check.as_ref())
+            .and_then(|lc| lc.status.as_ref())
+            .map(|status| IncodeStatus::try_from(status.as_str()).ok() == Some(IncodeStatus::Fail));
+
+        (had_lenses, had_mask)
+    }
+
     pub fn id_ocr_confidence(&self) -> Result<(f64, IncodeStatus), IncodeError> {
         Self::score_and_status(
             "ocr_confidence",
