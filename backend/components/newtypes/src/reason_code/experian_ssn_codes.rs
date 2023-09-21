@@ -34,10 +34,6 @@ experian_reason_code_enum! {
         #[ser = "EF"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Exact), FullNameSimple(Exact), FullAddressSimple(NoMatch)).into()]
         EF,
-        // Exact SSN match, Exact Name match, Address missing
-        #[ser = "EG"]
-        #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Exact), FullNameSimple(Exact), FullAddressSimple(NoMatch)).into()]
-        EG,
         // Exact SSN match, Close Name match, Close Address match
         #[ser = "EH"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Exact), FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
@@ -50,10 +46,6 @@ experian_reason_code_enum! {
         #[ser = "EJ"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Exact), FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
         EJ,
-        // Exact SSN match, Name missing, Exact Address match
-        #[ser = "EL"]
-        #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Exact), FullNameSimple(NoMatch), FullAddressSimple(Exact)).into()]
-        EL,
         // Exact SSN match, Close Name match, Low Confidence Address match
         #[ser = "EN"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Exact), FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
@@ -62,10 +54,6 @@ experian_reason_code_enum! {
         #[ser = "EO"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Exact), FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
         EO,
-        // Exact SSN match, Close Name match, Address missing
-        #[ser = "EP"]
-        #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Exact), FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
-        EP,
         // Close SSN match, Exact Name match, Exact Address match
         #[ser = "CA"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(Exact), FullAddressSimple(Exact)).into()]
@@ -90,10 +78,6 @@ experian_reason_code_enum! {
         #[ser = "CF"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(Exact), FullAddressSimple(NoMatch)).into()]
         CF,
-        // Close SSN match, Exact Name match, Address missing
-        #[ser = "CG"]
-        #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(Exact), FullAddressSimple(NoMatch)).into()]
-        CG,
         // Exact SSN match (only last 4 digits provided), Exact Name match, Exact Address match
         #[ser = "4A"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn4ExactMatch, FullNameSimple(Exact), FullAddressSimple(Exact)).into()]
@@ -150,10 +134,6 @@ experian_reason_code_enum! {
         #[ser = "CJ"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
         CJ,
-        // Close SSN match, Name missing, Exact Address match
-        #[ser = "CL"]
-        #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(NoMatch), FullAddressSimple(Exact)).into()]
-        CL,
         // Close SSN match, Close Name match, Low Confidence Address match
         #[ser = "CN"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
@@ -162,10 +142,6 @@ experian_reason_code_enum! {
         #[ser = "CO"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
         CO,
-        // Close SSN match, Close Name match, Address missing
-        #[ser = "CP"]
-        #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
-        CP,
         // Partial SSN match, Exact Name match, Exact Address match
         #[ser = "PA"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(Exact), FullAddressSimple(Exact)).into()]
@@ -190,10 +166,6 @@ experian_reason_code_enum! {
         #[ser = "PF"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(Exact), FullAddressSimple(NoMatch)).into()]
         PF,
-        // Partial SSN match, Exact Name match, Address missing
-        #[ser = "PG"]
-        #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(Partial), FullNameSimple(Exact), FullAddressSimple(NoMatch)).into()]
-        PG,
         // Exact SSN match (only last 4 digits provided), Close Name match, Close Address match
         #[ser = "4H"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn4ExactMatch, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
@@ -206,10 +178,6 @@ experian_reason_code_enum! {
         #[ser = "4J"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn4ExactMatch, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
         FourJ,
-        // Exact SSN match (only last 4 digits provided), Name missing, Exact Address match
-        #[ser = "4L"]
-        #[footprint_reason_codes = ExpSsnRCH::new(Ssn4ExactMatch, FullNameSimple(NoMatch), FullAddressSimple(Exact)).into()]
-        FourL,
         // Exact SSN match (only last 4 digits provided), Close Name match, Low Confidence Address match
         #[ser = "4N"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn4ExactMatch, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
@@ -218,10 +186,6 @@ experian_reason_code_enum! {
         #[ser = "4O"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn4ExactMatch, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
         FourO,
-        // Exact SSN match (only last 4 digits provided), Close Name match, Address missing
-        #[ser = "4P"]
-        #[footprint_reason_codes = ExpSsnRCH::new(Ssn4ExactMatch, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
-        FourP,
         // No match to SSN, Exact Name match, Exact Address match
         #[ser = "FA"]
         #[footprint_reason_codes = ExpSsnRCH::new(Ssn9(NoMatch), FullNameSimple(Exact), FullAddressSimple(Exact)).into()]
@@ -267,6 +231,28 @@ experian_reason_code_enum! {
     }
 }
 
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub enum ExperianMatchLevel {
+    Level5,
+    Level4,
+    Level3,
+    Level2,
+    Level1,
+    Level0,
+}
+impl From<ExperianSSNReasonCodes> for ExperianMatchLevel {
+    fn from(code: ExperianSSNReasonCodes) -> Self {
+        use ExperianSSNReasonCodes::*;
+        match code {
+            EA | EB | EC | ED | EE | EF => Self::Level5,
+            EH | EI | EJ | EN | EO | CA | CB | CC | CD | CE | CF | FourA | FourB | FourC | FourD | FourE
+            | FourF | MA => Self::Level4,
+            EK | EM | ER | ET | CH | CI | CJ | CN | CO | PA | PB | PC | PD | PE | PF | FourH | FourI
+            | FourJ | FourN | FourO | FA | FB | FC | MB | MC => Self::Level3,
+            NX | MX | IX | VX => Self::Level0,
+        }
+    }
+}
 impl ExperianSSNReasonCodes {
     pub fn input_missing_ssn(&self) -> bool {
         matches!(self, ExperianSSNReasonCodes::MX)
@@ -275,9 +261,10 @@ impl ExperianSSNReasonCodes {
 
 #[cfg(test)]
 mod tests {
+    use strum::IntoEnumIterator;
     use test_case::test_case;
 
-    use crate::{ExperianSSNReasonCodes, FootprintReasonCode};
+    use crate::{ExperianMatchLevel, ExperianSSNReasonCodes, FootprintReasonCode};
     use FootprintReasonCode::*;
 
     #[test_case(ExperianSSNReasonCodes::EA => vec![NameMatches, AddressMatches, SsnMatches])]
@@ -285,5 +272,18 @@ mod tests {
         reason_code: ExperianSSNReasonCodes,
     ) -> Vec<FootprintReasonCode> {
         (&reason_code).into()
+    }
+
+    #[test]
+    fn test_level_mapping() {
+        let l5_frcs: Vec<Vec<FootprintReasonCode>> = ExperianSSNReasonCodes::iter()
+            .filter(|rc| ExperianMatchLevel::from(rc.clone()) == ExperianMatchLevel::Level5)
+            .map(|rc| std::convert::Into::<Vec<FootprintReasonCode>>::into(&rc))
+            .collect();
+
+        // not many other tests we can really do here unfortunately
+        assert!(l5_frcs
+            .iter()
+            .all(|frcs_per_code| frcs_per_code.contains(&FootprintReasonCode::SsnMatches)))
     }
 }
