@@ -7,14 +7,6 @@ import React from 'react';
 
 import playbookMachine from '@/playbooks/utils/machine';
 import type { AMLFormData } from '@/playbooks/utils/machine/types';
-import {
-  defaultAmlFormData,
-  defaultNameFormData,
-  defaultPlaybookValuesKYB,
-  defaultPlaybookValuesKYC,
-  defaultResidencyFormData,
-  PlaybookKind,
-} from '@/playbooks/utils/machine/types';
 
 import AML from './components/aml';
 import AuthorizedScopes from './components/authorized-scopes';
@@ -22,6 +14,7 @@ import NameYourPlaybook from './components/name-your-playbook';
 import Residency from './components/residency';
 import Summary from './components/summary';
 import WhoToOnboard from './components/who-to-onboard';
+import useDefaultValues from './hooks/use-default-values';
 import useOptions from './hooks/use-options';
 import getStep from './utils/get-step';
 import processPlaybook from './utils/process-playbook';
@@ -42,31 +35,7 @@ const Router = ({ onClose }: RouterProps) => {
   const options = allOptions[kind];
   const step = getStep({ value: state.value as string });
   const stepperValue = options[step];
-
-  // TODO: IMPROVE
-  const playbookDefaultValues =
-    kind === PlaybookKind.Kyb
-      ? defaultPlaybookValuesKYB
-      : defaultPlaybookValuesKYC;
-
-  const playbookValuesToPrefill =
-    state.context?.playbook?.kind === kind && state.context.playbook
-      ? state.context.playbook
-      : playbookDefaultValues;
-
-  const nameValueToPrefill =
-    state.context?.nameForm?.kind === kind && state.context.nameForm
-      ? state.context.nameForm
-      : defaultNameFormData;
-
-  const residencyValueToPrefill =
-    kind === PlaybookKind.Kyc && state.context.residencyForm
-      ? state.context.residencyForm
-      : defaultResidencyFormData;
-
-  const amlValueToPrefill = state.context.amlForm
-    ? state.context.amlForm
-    : defaultAmlFormData;
+  const defaultValues = useDefaultValues(state.context);
 
   const createPlaybook = (enhancedAml: AMLFormData) => {
     const { playbook, nameForm, residencyForm, authorizedScopesForm } =
@@ -154,7 +123,7 @@ const Router = ({ onClose }: RouterProps) => {
         )}
         {state.matches('residency') && (
           <Residency
-            defaultValues={residencyValueToPrefill}
+            defaultValues={defaultValues.residency}
             onBack={() => {
               send('navigationBackward');
             }}
@@ -168,7 +137,7 @@ const Router = ({ onClose }: RouterProps) => {
         {state.matches('nameYourPlaybook') && (
           <NameYourPlaybook
             kind={state.context.kind}
-            defaultValues={nameValueToPrefill}
+            defaultValues={defaultValues.name}
             onBack={() => {
               send('navigationBackward');
             }}
@@ -181,7 +150,7 @@ const Router = ({ onClose }: RouterProps) => {
         )}
         {state.matches('summary') && (
           <Summary
-            defaultValues={playbookValuesToPrefill}
+            defaultValues={defaultValues.playbook}
             meta={{
               kind: state.context.kind,
               residency: state.context.residencyForm,
@@ -200,7 +169,7 @@ const Router = ({ onClose }: RouterProps) => {
               kind: state.context.kind,
               residency: state.context.residencyForm,
             }}
-            playbook={state.context.playbook ?? playbookValuesToPrefill}
+            playbook={state.context.playbook ?? defaultValues.playbook}
             onBack={() => {
               send('navigationBackward');
             }}
@@ -211,7 +180,7 @@ const Router = ({ onClose }: RouterProps) => {
         )}
         {state.matches('aml') && (
           <AML
-            defaultValues={amlValueToPrefill}
+            defaultValues={defaultValues.aml}
             onBack={() => {
               send('navigationBackward');
             }}
