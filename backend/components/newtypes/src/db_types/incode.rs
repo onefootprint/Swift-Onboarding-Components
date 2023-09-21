@@ -42,6 +42,24 @@ pub enum IncodeVerificationSessionState {
     Fail,
 }
 
+impl IncodeVerificationSessionState {
+    // Indicates the current state is not a state contingent on user input but rather a state involving processing the doc with Incode
+    pub fn is_processing_state(&self) -> bool {
+        match self {
+            Self::StartOnboarding
+            | Self::AddFront
+            | Self::AddBack
+            | Self::AddConsent
+            | Self::AddSelfie
+            | Self::ProcessId
+            | Self::ProcessFace
+            | Self::Complete
+            | Self::Fail => false,
+            Self::GetOnboardingStatus | Self::FetchScores => true,
+        }
+    }
+}
+
 #[derive(
     Debug,
     Display,

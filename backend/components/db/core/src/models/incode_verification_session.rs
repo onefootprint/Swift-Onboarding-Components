@@ -1,11 +1,14 @@
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Duration, Utc};
-use db_schema::schema::incode_verification_session::{self, BoxedQuery};
+use db_schema::schema::{
+    document_request, identity_document,
+    incode_verification_session::{self, BoxedQuery},
+};
 use diesel::{pg::Pg, prelude::*};
 use newtypes::{
     IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeFailureReason,
     IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
-    IncodeVerificationSessionState,
+    IncodeVerificationSessionState, WorkflowId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -169,6 +172,23 @@ impl IncodeVerificationSession {
     {
         let vs = Self::query(id.into()).first(conn).optional()?;
         Ok(vs)
+    }
+
+    #[tracing::instrument("IncodeVerificationSession::latest_for_workflow", skip_all)]
+    pub fn latest_for_workflow(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
+        let res = document_request::table
+            .filter(document_request::workflow_id.eq(wf_id))
+            .inner_join(identity_document::table)
+            .inner_join(
+                incode_verification_session::table
+                    .on(incode_verification_session::identity_document_id.eq(identity_document::id)),
+            )
+            .order_by(incode_verification_session::created_at.desc())
+            .select(incode_verification_session::all_columns)
+            .first(conn)
+            .optional()?;
+
+        Ok(res)
     }
 }
 

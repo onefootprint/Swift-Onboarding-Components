@@ -12,17 +12,20 @@ use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::alpaca_kyc::AlpacaKycState;
 use api_core::decision::state::document::DocumentState;
 use api_core::decision::state::kyc::KycState;
+use api_core::decision::state::traits::Workflow;
 use api_core::decision::state::BoKycCompleted;
 use api_core::decision::state::DocCollected;
 use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
+use api_core::decision::vendor::incode::IncodeStateMachine;
 use api_core::errors::workflow::WorkflowError;
 use api_core::errors::ApiResult;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use api_core::utils::actix::OptionalJson;
 use api_wire_types::ProcessRequest;
-use db::models::workflow::Workflow;
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::workflow::Workflow as DbWorkflow;
 use decision::state::Authorize;
 use itertools::Itertools;
 use newtypes::OnboardingRequirement;
@@ -63,7 +66,7 @@ pub async fn post(
         let wf_id = wf.id.clone();
         state
             .db_pool
-            .db_transaction(move |conn| Workflow::update_fixture_result(conn, &wf_id, fixture_result))
+            .db_transaction(move |conn| DbWorkflow::update_fixture_result(conn, &wf_id, fixture_result))
             .await?
     } else {
         wf.clone()
@@ -72,31 +75,61 @@ pub async fn post(
     let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
     // Since actions are typed right now, infer which action needs to be sent to the workflow
     // in order to make it proceed
-    match ww.state {
+    // First run the Authorize action since this generates a requirement for Bifrost.
+    let (ww, _) = match ww.state {
         WorkflowKind::Kyc(KycState::DataCollection(_))
         | WorkflowKind::AlpacaKyc(AlpacaKycState::DataCollection(_)) => {
-            // If Authorize fails, we don't want to block the user from finishing onboarding onto bifrost
-            let res = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await;
-            match res {
-                Ok(ww) => {
-                    tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "[Authorize] Ran workflow");
-                }
-                Err(e) => {
-                    tracing::error!(error=?e, "[Authorize] Error running workflow");
-                }
-            };
+            ww.action(&state, WorkflowActions::Authorize(Authorize {}))
+                .await?
         }
         WorkflowKind::AlpacaKyc(AlpacaKycState::DocCollection(_))
         | WorkflowKind::Document(DocumentState::DataCollection(_)) => {
-            ww.run(&state, WorkflowActions::DocCollected(DocCollected {}))
-                .await?;
+            ww.action(&state, WorkflowActions::DocCollected(DocCollected {}))
+                .await?
         }
         s => return Err(WorkflowError::WorkflowCannotProceed(newtypes::WorkflowState::from(&s)).into()),
-    }
+    };
 
+    match run_incode_machine_and_workflow(&state, ww).await {
+        Ok(_) => {}
+        Err(error) => {
+            tracing::error!(?error, "Error running incode machine or workflow in /process");
+        }
+    }
     run_kyb_if_needed(&state, user_auth).await?;
 
     ResponseData::ok(EmptyResponse {}).json()
+}
+
+#[tracing::instrument(skip_all)]
+async fn run_incode_machine_and_workflow(state: &State, ww: WorkflowWrapper) -> ApiResult<()> {
+    let wfid = ww.workflow_id.clone();
+    let ivs = state
+        .db_pool
+        .db_query(move |conn| IncodeVerificationSession::latest_for_workflow(conn, &wfid))
+        .await??;
+
+    if let Some(ivs) = ivs {
+        if ivs.state.is_processing_state() {
+            let machine = IncodeStateMachine::init_from_existing(state, ivs).await?;
+            let (machine, _) = machine
+                .run(&state.db_pool, &state.vendor_clients.incode)
+                .await
+                .map_err(|e| e.error)?;
+            if machine.state.name().is_processing_state() {
+                // we still timed out polling Incode and shouldn't proceed with running the workflow
+                tracing::error!("Incode processing timed out, not running Workflow");
+                return Ok(());
+            }
+        }
+    }
+
+    let next_action = ww.state.default_action();
+    if let Some(next_action) = next_action {
+        ww.run(state, next_action).await?;
+    }
+
+    Ok(())
 }
 
 #[tracing::instrument(skip_all)]

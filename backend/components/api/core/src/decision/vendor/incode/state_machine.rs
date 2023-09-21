@@ -1,23 +1,27 @@
 use std::sync::Arc;
 
 use super::state::{IncodeState, IncodeStateTransition, RunTransition, StepResult};
-use super::states::*;
+use super::{get_config_id, states::*};
+use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use crate::decision::vendor::incode::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::enclave_client::EnclaveClient;
 use crate::errors::{ApiResult, AssertionError};
+use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::vendor_clients::IncodeClients;
 use crate::{ApiError, State};
+use db::models::decision_intent::DecisionIntent;
 use db::models::identity_document::IdentityDocument;
 use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use db::DbPool;
 use feature_flag::FeatureFlagClient;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DecisionIntentId, DocVData, DocumentRequestId, IdentityDocumentId, IncodeConfigurationId,
-    IncodeFailureReason, IncodeVerificationSessionKind, IncodeVerificationSessionState, ScopedVaultId,
-    TenantId, WorkflowId,
+    DecisionIntentId, DecisionIntentKind, DocVData, DocumentRequestId, IdentityDocumentId,
+    IncodeConfigurationId, IncodeFailureReason, IncodeVerificationSessionKind,
+    IncodeVerificationSessionState, ScopedVaultId, TenantId, WorkflowId,
 };
 
 pub type IsReady = bool;
@@ -194,5 +198,56 @@ impl IncodeStateMachine {
         };
 
         Ok((machine, failure_reasons))
+    }
+
+    // TODO:: use this from /upload as well?
+    #[tracing::instrument(skip_all)]
+    pub async fn init_from_existing(state: &State, ivs: IncodeVerificationSession) -> ApiResult<Self> {
+        let idi = ivs.identity_document_id.clone();
+        let (di, id_doc, doc_req, obc, uvw) = state
+            .db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                let (id_doc, doc_req) = IdentityDocument::get(conn, &idi)?;
+
+                let di = DecisionIntent::get_or_create_for_workflow(
+                    conn,
+                    &doc_req.scoped_vault_id,
+                    &doc_req.workflow_id,
+                    DecisionIntentKind::DocScan,
+                )?;
+
+                let uvw: VaultWrapper<Person> =
+                    VaultWrapper::build(conn, VwArgs::Tenant(&doc_req.scoped_vault_id))?;
+                let (obc, _) = ObConfiguration::get(conn, &doc_req.workflow_id)?;
+
+                Ok((di, id_doc, doc_req, obc, uvw))
+            })
+            .await?;
+
+        let docv_data = build_docv_data_from_identity_doc(state, id_doc.id.clone()).await?;
+
+        let ctx = IncodeContext {
+            di_id: di.id.clone(),
+            sv_id: doc_req.scoped_vault_id.clone(),
+            id_doc_id: id_doc.id.clone(),
+            wf_id: doc_req.workflow_id.clone(),
+            vault: uvw.vault,
+            docv_data,
+            doc_request_id: doc_req.id,
+            enclave_client: state.enclave_client.clone(),
+            tenant_id: obc.tenant_id.clone(),
+            ff_client: state.feature_flag_client.clone(),
+            failed_attempts_for_side: 0, // !! this is the one thing that is hard coded here that would differ from the existing code path that inits a IVS. We could have this method pass in DocumentSide and calculate this for real and then also call this init method from /upload and consolidate code paths
+        };
+        let is_sandbox = id_doc.fixture_result.is_some();
+        let should_collect_selfie = doc_req.should_collect_selfie && !id_doc.should_skip_selfie();
+        Self::init(
+            state,
+            obc.tenant_id,
+            get_config_id(&state.config, should_collect_selfie, is_sandbox),
+            ctx,
+            is_sandbox,
+        )
+        .await
     }
 }
