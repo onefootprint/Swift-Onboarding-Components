@@ -13,7 +13,8 @@ use crate::{errors::ApiError, State};
 
 use self::tasks::{
     fire_webhook_task::FireWebhookTask, log_message_task::LogMessageTask,
-    log_num_tenant_api_keys_task::LogNumTenantApiKeysTask, watchlist_check_task::WatchlistCheckTask,
+    log_num_tenant_api_keys_task::LogNumTenantApiKeysTask,
+    run_incode_stuck_workflow_task::RunIncodeStuckWorkflowTask, watchlist_check_task::WatchlistCheckTask,
 };
 
 mod tasks;
@@ -22,6 +23,7 @@ mod tests;
 
 // constant for now, but can make this a property of task type too
 #[allow(unused)]
+// TODO: add this to Task
 const MAX_NUM_ATTEMPTS: i32 = 1; // since Task and our first use case (WatchlistCheck) are brand new, we want to manually react to every error so we aren't allowing automated retries yet
 
 #[derive(Debug, Error)]
@@ -129,6 +131,9 @@ async fn execute_task(task: &Task, state: &State) -> Result<(), TaskError> {
             FireWebhookTask::new(state.webhook_client.clone())
                 .execute(args)
                 .await
+        }
+        newtypes::TaskData::RunIncodeStuckWorkflow(args) => {
+            RunIncodeStuckWorkflowTask::new(state.clone()).execute(args).await
         }
     }
 }

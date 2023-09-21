@@ -1,4 +1,4 @@
-use db::models::workflow::Workflow as DbWorkflow;
+use db::models::{incode_verification_session::IncodeVerificationSession, workflow::Workflow as DbWorkflow};
 use enum_dispatch::enum_dispatch;
 use newtypes::WorkflowId;
 use thiserror::Error;
@@ -39,6 +39,8 @@ pub enum StateError {
 use alpaca_kyc::AlpacaKycState;
 use document::DocumentState;
 use kyc::KycState;
+
+use super::vendor::incode::IncodeStateMachine;
 
 #[enum_dispatch(Workflow)]
 #[derive(Clone)]
@@ -120,4 +122,43 @@ impl WorkflowWrapper {
         }
         Ok(ww)
     }
+}
+
+pub enum RunIncodeMachineAndWorkflowResult {
+    IncodeStuck,
+    WorkflowRan,
+}
+
+#[tracing::instrument(skip_all)]
+pub async fn run_incode_machine_and_workflow(
+    state: &State,
+    ww: WorkflowWrapper,
+) -> ApiResult<RunIncodeMachineAndWorkflowResult> {
+    let wfid = ww.workflow_id.clone();
+    let ivs = state
+        .db_pool
+        .db_query(move |conn| IncodeVerificationSession::latest_for_workflow(conn, &wfid))
+        .await??;
+
+    if let Some(ivs) = ivs {
+        if ivs.state.is_processing_state() {
+            let machine = IncodeStateMachine::init_from_existing(state, ivs).await?;
+            let (machine, _) = machine
+                .run(&state.db_pool, &state.vendor_clients.incode)
+                .await
+                .map_err(|e| e.error)?;
+            if machine.state.name().is_processing_state() {
+                // we still timed out polling Incode and shouldn't proceed with running the workflow
+                tracing::error!("Incode processing timed out, not running Workflow");
+                return Ok(RunIncodeMachineAndWorkflowResult::IncodeStuck);
+            }
+        }
+    }
+
+    let next_action = ww.state.default_action();
+    if let Some(next_action) = next_action {
+        ww.run(state, next_action).await?;
+    }
+
+    Ok(RunIncodeMachineAndWorkflowResult::WorkflowRan)
 }

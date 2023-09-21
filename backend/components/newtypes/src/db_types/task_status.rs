@@ -8,7 +8,10 @@ use serde::{Deserialize, Serialize};
 use strum::EnumDiscriminants;
 use strum_macros::{AsRefStr, EnumString};
 
-use crate::{FpId, OnboardingStatus, ScopedVaultId, TenantId, WatchlistCheckError, WatchlistCheckStatusKind};
+use crate::{
+    FpId, OnboardingStatus, ScopedVaultId, TenantId, WatchlistCheckError, WatchlistCheckStatusKind,
+    WorkflowId,
+};
 
 // TODO: can probs rename this to task.rs now
 
@@ -55,6 +58,7 @@ pub enum TaskData {
     LogNumTenantApiKeys(LogNumTenantApiKeysArgs), // proof of concept non-trivial task that does DB stuffs, can remove in future
     WatchlistCheck(WatchlistCheckArgs),
     FireWebhook(FireWebhookArgs),
+    RunIncodeStuckWorkflow(RunIncodeStuckWorkflowArgs),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -79,6 +83,11 @@ pub struct FireWebhookArgs {
     pub tenant_id: TenantId,
     pub is_live: bool,
     pub webhook_event: WebhookEvent,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RunIncodeStuckWorkflowArgs {
+    pub workflow_id: WorkflowId,
 }
 
 #[derive(Debug, strum::Display, Clone, Eq, PartialEq, Serialize, Deserialize)]
