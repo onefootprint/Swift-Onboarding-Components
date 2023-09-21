@@ -47,7 +47,7 @@ const Container = styled.div`
 
 const ResponsesTitle = styled.h3`
   ${({ theme }) => css`
-    ${createFontStyles('label-3')}
+    ${createFontStyles('label-1')}
     display: flex;
     color: ${theme.color.primary};
     margin-bottom: ${theme.spacing[3]};
@@ -58,7 +58,7 @@ const ResponseContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[4]};
     margin: ${theme.spacing[4]} 0 0 ${theme.spacing[3]};
   `}
 `;

@@ -4,9 +4,9 @@ import React from 'react';
 import type { ArticlesProps } from './articles.types';
 import Article from './components/article';
 
-const Articles = ({ articles, staticPreviewArticles }: ArticlesProps) => (
+const Articles = ({ staticArticles, staticPreviewArticles }: ArticlesProps) => (
   <ArticleList id="articles-container">
-    {articles?.map(article => (
+    {staticArticles?.map(article => (
       <Article
         id={article.id}
         parameters={article.parameters}
@@ -15,6 +15,7 @@ const Articles = ({ articles, staticPreviewArticles }: ArticlesProps) => (
         path={article.path}
         security={article.security}
         responses={article.responses}
+        requestBody={article.requestBody}
         key={article.id}
         tags={article.tags}
       />
@@ -28,6 +29,7 @@ const Articles = ({ articles, staticPreviewArticles }: ArticlesProps) => (
         path={article.path}
         security={article.security}
         responses={article.responses}
+        requestBody={article.requestBody}
         key={article.id}
         tags={article.tags}
       />

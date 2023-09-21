@@ -215,7 +215,9 @@
       "query-parameters": "Query parameters",
       "header-parameters": "Header parameters",
       "responses": "Responses",
-      "examples": "Examples"
+      "examples": "Examples",
+      "response-example": "Response example",
+      "request-example": "Request example"
     },
     "404": {
       "title": "Oops! Page couldn't be found.",

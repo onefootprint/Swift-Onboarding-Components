@@ -21,6 +21,7 @@ const Article = ({
   path,
   security,
   responses,
+  requestBody: requests,
 }: ArticleProps) => {
   const { t } = useTranslation('pages.api-reference');
 
@@ -33,18 +34,22 @@ const Article = ({
         </Container>
         {security && (
           <Requests>
-            <Typography variant="label-3">{t('request')}</Typography>
+            <Typography variant="label-1" sx={{ marginTop: 3 }}>
+              {t('request')}
+            </Typography>
             {security?.map((element: SecurityTypes) =>
               Object.keys(element).map(type => (
                 <Security key={_.uniqueId()} type={type as SecurityTypes} />
               )),
             )}
+            {parameters && <Parameters parameters={parameters} />}
+            {responses && requests && <Responses responses={responses} />}
           </Requests>
         )}
-        {parameters && <Parameters parameters={parameters} />}
-        {responses && <Responses responses={responses} />}
       </ContentColumn>
-      <CodeColumn>{responses && <DemoCode responses={responses} />}</CodeColumn>
+      <CodeColumn>
+        {responses && <DemoCode responses={responses} requests={requests} />}
+      </CodeColumn>
     </ArticleContainer>
   );
 };
@@ -73,7 +78,7 @@ const Container = styled.div`
 const ContentColumn = styled.div`
   ${({ theme }) => css`
     grid-area: article;
-    padding: ${theme.spacing[10]} ${theme.spacing[5]} ${theme.spacing[5]}
+    padding: ${theme.spacing[8]} ${theme.spacing[5]} ${theme.spacing[8]}
       ${theme.spacing[8]};
   `}
 `;
@@ -92,7 +97,7 @@ const CodeColumn = styled.div`
     padding: ${theme.spacing[4]} ${theme.spacing[6]} ${theme.spacing[10]};
 
     ${media.greaterThan('md')`
-      padding: ${theme.spacing[10]} ${theme.spacing[6]};
+      padding: ${theme.spacing[4]} ${theme.spacing[6]};
     `}
   `}
 `;

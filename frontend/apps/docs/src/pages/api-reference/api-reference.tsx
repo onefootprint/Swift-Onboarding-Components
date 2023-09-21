@@ -30,7 +30,7 @@ const ApiReference = () => {
           navigationPreviewSection={staticPreviewNavigation}
         />
         <Articles
-          articles={staticArticles}
+          staticArticles={staticArticles}
           staticPreviewArticles={staticPreviewArticles}
         />
       </Layout>

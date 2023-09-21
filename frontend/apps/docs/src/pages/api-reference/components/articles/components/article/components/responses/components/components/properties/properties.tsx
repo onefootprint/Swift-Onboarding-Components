@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles } from '@onefootprint/ui';
+import { CodeInline, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 
 type PropertiesProps = {
@@ -10,7 +10,7 @@ type PropertiesProps = {
 const Properties = ({ properties, title }: PropertiesProps) => (
   <Container>
     <Title>
-      <Property>{title}</Property>
+      <CodeInline disable>{title}</CodeInline>
       {properties.type && (
         <>
           <Separator>·</Separator>
@@ -47,13 +47,6 @@ const Title = styled.div`
     display: flex;
     align-items: center;
     gap: ${theme.spacing[2]};
-  `}
-`;
-
-const Property = styled.h4`
-  ${({ theme }) => css`
-    ${createFontStyles('label-3')}
-    color: ${theme.color.secondary};
   `}
 `;
 

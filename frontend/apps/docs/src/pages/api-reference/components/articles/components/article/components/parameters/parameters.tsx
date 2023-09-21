@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CodeInline, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
+import React, { Fragment } from 'react';
 
 import type { ParameterProps } from '../../../../articles.types';
 import Description from './components/description';
@@ -21,44 +21,45 @@ const Parameters = ({ parameters }: { parameters: ParameterProps[] }) => {
     parameter => parameter.in === 'header',
   );
 
+  const sections = [
+    {
+      title: 'path-parameters',
+      parameters: pathParameters,
+    },
+    {
+      title: 'query-parameters',
+      parameters: queryParameters,
+    },
+    {
+      title: 'header-parameters',
+      parameters: headerParameters,
+    },
+  ];
+
   return (
     <Container>
-      {pathParameters?.length > 0 && (
-        <ParameterGroup>
-          <ParameterTitle>{t('path-parameters')}</ParameterTitle>
-          {pathParameters?.map((parameter: ParameterProps) => (
-            <ParameterLabel key={parameter.name}>
-              {parameter.name}
-            </ParameterLabel>
-          ))}
-        </ParameterGroup>
-      )}
-      {queryParameters?.length > 0 && (
-        <ParameterGroup>
-          <>
-            <ParameterTitle>{t('query-parameters')}</ParameterTitle>
-            {queryParameters?.map((parameter: ParameterProps) => (
-              <ParameterLabel key={parameter.name}>
-                {parameter.name}
-              </ParameterLabel>
-            ))}
-          </>
-        </ParameterGroup>
-      )}
-      {headerParameters?.length > 0 && (
-        <ParameterGroup>
-          <ParameterTitle>{t('header-parameters')}</ParameterTitle>
-          {headerParameters?.map((parameter: ParameterProps) => (
-            <HeaderParametersContainer key={parameter.name}>
-              <Title>
-                <CodeInline disable>{parameter.name}</CodeInline>
-                <Type>{parameter.schema.type}</Type>
-              </Title>
-              <Description>{parameter.description}</Description>
-            </HeaderParametersContainer>
-          ))}
-        </ParameterGroup>
-      )}
+      {sections.map(section => {
+        if (section.parameters?.length > 0) {
+          return (
+            <ParameterGroup key={section.title}>
+              <ParameterTitle>{t(section.title)}</ParameterTitle>
+              {section.parameters?.map((parameter: ParameterProps) => (
+                <Fragment key={parameter.name}>
+                  <Title>
+                    <CodeInline disable>{parameter.name}</CodeInline>
+                    <Separator>·</Separator>
+                    <Type>{parameter.schema.type}</Type>
+                  </Title>
+                  {parameter.description && (
+                    <Description>{parameter.description}</Description>
+                  )}
+                </Fragment>
+              ))}
+            </ParameterGroup>
+          );
+        }
+        return null;
+      })}
     </Container>
   );
 };
@@ -69,6 +70,7 @@ const Title = styled.div`
     align-items: center;
     gap: ${theme.spacing[2]};
     ${createFontStyles('snippet-2')}
+    color: ${theme.color.secondary};
   `}
 `;
 
@@ -103,20 +105,14 @@ const ParameterTitle = styled.h3`
   `}
 `;
 
-const ParameterLabel = styled.p`
+const Separator = styled.span`
   ${({ theme }) => css`
     ${createFontStyles('body-4')}
     color: ${theme.color.secondary};
-  `}
-`;
-
-const HeaderParametersContainer = styled.div`
-  ${({ theme }) => css`
+    padding: 0 ${theme.spacing[2]};
     display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[2]};
-    margin-bottom: ${theme.spacing[3]};
+    align-items: center;
+    justify-content: center;
   `}
 `;
-
 export default Parameters;

@@ -15,6 +15,16 @@ export type ResponseProps = {
   content: ResponseContentProps;
 };
 
+export type RequestProps = {
+  content: {
+    'application/json': {
+      schema: {
+        $ref: string;
+      };
+    };
+  };
+};
+
 export type PathProps = {
   url: string;
   type: string;
@@ -51,6 +61,7 @@ export type ArticleProps = {
   parameters?: ParameterProps[];
   path?: string;
   responses?: ResponseProps;
+  requestBody?: RequestProps;
   security?: SecurityTypes[];
   tags?: string[];
 };
@@ -60,7 +71,7 @@ export type ParametersProps = {
 };
 
 export type ArticlesProps = {
-  articles: ArticleProps[];
+  staticArticles: ArticleProps[];
   staticPreviewArticles: ArticleProps[];
 };
 
