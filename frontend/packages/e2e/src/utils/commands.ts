@@ -9,7 +9,9 @@ type WithPage = { page: Page };
 type Outcome = 'Success' | 'Manual Review' | 'Fail';
 
 export const selectOutcome = async ({ frame }: WithFrame, outcome: Outcome) => {
-  return frame.getByRole('button', { name: outcome }).first().click();
+  const outcomeCTA = frame.getByRole('button', { name: outcome }).first();
+  await outcomeCTA.waitFor({ state: 'attached', timeout: 20000 });
+  return outcomeCTA.click();
 };
 
 export const clickOnContinue = async ({ frame }: WithFrame) => {
@@ -65,25 +67,127 @@ export const fillBasicData = async (
   await frame.getByLabel('Date of Birth').type(payload.dob, { delay: 100 });
 };
 
+export const fillBasicDataKYB = async (
+  { frame }: WithFrame,
+  payload: {
+    businessName: string;
+    businessNameOptional: string;
+    userTIN: string;
+  },
+) => {
+  await expect(frame.getByText('Basic data').first()).toBeAttached();
+  await frame
+    .getByLabel('Business name')
+    .type(payload.businessName, { delay: 100 });
+  await frame
+    .getByLabel('Doing Business As (optional)')
+    .type(payload.businessNameOptional, { delay: 100 });
+  await frame
+    .getByLabel('Taxpayer Identification Number (TIN)')
+    .type(payload.userTIN, { delay: 100 });
+};
+
 export const fillAddress = async (
   { frame, page }: { frame: FrameLocator; page: Page },
   payload: { addressLine1: string; city: string; zipCode: string },
 ) => {
-  await expect(
-    frame.getByText("What's your residential address?"),
-  ).toBeAttached();
+  const title = frame.getByText("What's your residential address?").first();
+  await title.waitFor({ state: 'attached', timeout: 20000 });
 
   await frame
     .getByLabel('Address line 1')
+    .first()
     .type(payload.addressLine1, { delay: 100 });
-  await frame.getByLabel('City').type(payload.city, { delay: 100 });
-  await frame.getByLabel('Zip code').type(payload.zipCode, { delay: 100 });
+  await frame.getByLabel('City').first().type(payload.city, { delay: 100 });
   await frame
-    .getByRole('button', { name: 'State', disabled: false })
+    .getByLabel('Zip code')
+    .first()
+    .type(payload.zipCode, { delay: 100 });
+  await frame
+    .getByRole('button', { name: 'State', disabled: false }) // For KYC is "State"
     .first()
     .click();
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
+};
+
+export const fillAddressKYB = async (
+  { frame, page }: { frame: FrameLocator; page: Page },
+  payload: { addressLine1: string; city: string; zipCode: string },
+) => {
+  const title = frame
+    .getByText("What's your registered business address?")
+    .first();
+  await title.waitFor({ state: 'attached', timeout: 20000 });
+
+  await frame
+    .getByLabel('Address line 1')
+    .first()
+    .type(payload.addressLine1, { delay: 100 });
+  await frame.getByLabel('City').first().type(payload.city, { delay: 100 });
+  await frame
+    .getByLabel('Zip code')
+    .first()
+    .type(payload.zipCode, { delay: 100 });
+  await frame
+    .getByRole('button', { name: 'Select', disabled: false }) // For KYB is "Select"
+    .first()
+    .click();
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+};
+
+export const fillBeneficialOwners = async (
+  { frame }: { frame: FrameLocator },
+  payload: {
+    beneficialOwner1Email: string;
+    beneficialOwner1LastName: string;
+    beneficialOwner1Name: string;
+    beneficialOwner1Phone: string;
+    userFirstName: string;
+    userLastName: string;
+  },
+) => {
+  const header = frame.getByText('Who are the beneficial owners?').first();
+  await header.waitFor({ state: 'attached', timeout: 20000 });
+
+  await frame
+    .locator('input[name="beneficialOwners.0.first_name"]')
+    .first()
+    .type(payload.userFirstName, { delay: 100 });
+  await frame
+    .locator('input[name="beneficialOwners.0.last_name"]')
+    .first()
+    .type(payload.userLastName, { delay: 100 });
+  const share0 = frame
+    .locator('input[name="beneficialOwners.0.ownership_stake"]')
+    .first();
+  await share0.clear();
+  await share0.type('50', { delay: 100 });
+
+  await frame.getByRole('button', { name: 'Add more' }).first().click();
+
+  await frame
+    .locator('input[name="beneficialOwners.1.first_name"]')
+    .first()
+    .type(payload.beneficialOwner1Name, { delay: 100 });
+  await frame
+    .locator('input[name="beneficialOwners.1.last_name"]')
+    .first()
+    .type(payload.beneficialOwner1LastName, { delay: 100 });
+  await frame
+    .locator('input[name="beneficialOwners.1.email"]')
+    .first()
+    .type(payload.beneficialOwner1Email, { delay: 100 });
+  await frame
+    .locator('input[name="beneficialOwners.1.phone_number"]')
+    .first()
+    .type(payload.beneficialOwner1Phone, { delay: 100 });
+  const share1 = frame
+    .locator('input[name="beneficialOwners.1.ownership_stake"]')
+    .first();
+  await share1.clear();
+  await share1.type('50', { delay: 100 });
 };
 
 export const fillSSN = async (

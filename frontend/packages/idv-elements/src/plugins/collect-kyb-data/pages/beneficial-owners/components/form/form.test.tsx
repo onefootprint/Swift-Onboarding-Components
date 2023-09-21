@@ -117,7 +117,7 @@ describe('<Form />', () => {
     const phoneFields = screen.getAllByLabelText('Phone number');
     expect(screen.getByPlaceholderText('(123) 456-7890')).toBeInTheDocument();
     expect(phoneFields).toHaveLength(1);
-    await userEvent.type(phoneFields[0], '9999999999');
+    await userEvent.type(phoneFields[0], '5555550100');
 
     const ownershipStakeFields = screen.getAllByLabelText(
       'Approximate ownership stake (%)',
@@ -143,7 +143,7 @@ describe('<Form />', () => {
           [BeneficialOwnerDataAttribute.lastName]: 'Smith',
           [BeneficialOwnerDataAttribute.ownershipStake]: 50,
           [BeneficialOwnerDataAttribute.email]: 'Lily@smith.com',
-          [BeneficialOwnerDataAttribute.phoneNumber]: '+1 (999) 999-9999',
+          [BeneficialOwnerDataAttribute.phoneNumber]: '+1 (555) 555-0100',
         },
       ]);
     });

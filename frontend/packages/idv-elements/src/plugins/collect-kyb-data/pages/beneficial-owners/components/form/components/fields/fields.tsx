@@ -1,4 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 
 import Email from './components/email';
@@ -10,9 +11,10 @@ import Phone from './components/phone';
 export type FieldsProps = {
   index: number;
   onRemove: (index: number) => void;
+  config?: PublicOnboardingConfig;
 };
 
-const Fields = ({ index, onRemove }: FieldsProps) => {
+const Fields = ({ index, onRemove, config }: FieldsProps) => {
   const handleRemove = () => {
     onRemove(index);
   };
@@ -22,7 +24,7 @@ const Fields = ({ index, onRemove }: FieldsProps) => {
       <Header shouldShowRemove={index > 0} onRemove={handleRemove} />
       <Name index={index} />
       <Email index={index} />
-      <Phone index={index} />
+      <Phone index={index} config={config} />
       <OwnershipStake index={index} />
     </Container>
   );

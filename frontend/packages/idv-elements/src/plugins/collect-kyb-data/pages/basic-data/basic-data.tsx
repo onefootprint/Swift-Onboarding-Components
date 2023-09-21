@@ -30,7 +30,7 @@ const BasicData = ({
   onCancel,
 }: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const { authToken, data, kybRequirement } = state.context;
+  const { authToken, data, kybRequirement, config } = state.context;
   const { missingAttributes } = kybRequirement || {};
   const { mutation, syncData } = useSyncData();
   const { t } = useTranslation('pages.basic-data');
@@ -47,7 +47,7 @@ const BasicData = ({
     };
 
     const handleError = (error: string) => {
-      console.error(
+      /* eslint-disable-line no-console */ console.error(
         `Speculatively vaulting data failed in kyb basic-data page: ${error}`,
       );
     };
@@ -107,6 +107,7 @@ const BasicData = ({
         isLoading={mutation.isLoading}
         onCancel={onCancel}
         ctaLabel={ctaLabel}
+        config={config}
       />
     </>
   );

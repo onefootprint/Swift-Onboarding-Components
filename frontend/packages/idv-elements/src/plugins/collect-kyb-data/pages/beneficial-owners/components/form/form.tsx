@@ -1,7 +1,10 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import type { BeneficialOwner } from '@onefootprint/types';
+import type {
+  BeneficialOwner,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { Divider, Typography, useToast } from '@onefootprint/ui';
 import React from 'react';
@@ -20,6 +23,7 @@ export type FormProps = {
   onCancel?: () => void;
   ctaLabel?: string;
   requireMultiKyc?: boolean;
+  config?: PublicOnboardingConfig;
 };
 
 const Form = ({
@@ -29,6 +33,7 @@ const Form = ({
   onCancel,
   ctaLabel,
   requireMultiKyc,
+  config,
 }: FormProps) => {
   const [animate] = useAutoAnimate<HTMLFormElement>();
   const { t } = useTranslation('pages.beneficial-owners.form');
@@ -124,7 +129,7 @@ const Form = ({
       <StyledForm onSubmit={handleSubmit(onSubmitFormData)} ref={animate}>
         {fields.map((field, index) => (
           <React.Fragment key={field.id}>
-            <Fields index={index} onRemove={removeIndex} />
+            <Fields index={index} onRemove={removeIndex} config={config} />
             {index === 0 && fields.length > 1 && <Divider />}
           </React.Fragment>
         ))}

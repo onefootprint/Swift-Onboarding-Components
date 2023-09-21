@@ -24,7 +24,8 @@ const userCity = 'Seward';
 const userZipCode = '99664';
 const userSSN = '418437970';
 
-test('smoke tests', async ({ browserName, page, browser }) => {
+test('KYC smoke test', async ({ browserName, page, browser }) => {
+  test.setTimeout(120000);
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   await page.goto('/e2e');
 

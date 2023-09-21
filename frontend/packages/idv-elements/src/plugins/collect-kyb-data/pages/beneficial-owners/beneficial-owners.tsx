@@ -64,7 +64,7 @@ const BeneficialOwners = ({
     };
 
     const handleError = (error: string) => {
-      console.error(
+      /* eslint-disable-line no-console */ console.error(
         `Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`,
       );
     };
@@ -115,6 +115,7 @@ const BeneficialOwners = ({
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
         requireMultiKyc={requireMultiKyc}
+        config={config}
       />
     </>
   );

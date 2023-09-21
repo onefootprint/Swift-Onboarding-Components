@@ -30,7 +30,7 @@ jobs:
   install-dependencies:
     if: ${{ contains(github.event.pull_request.labels.*.name, 'e2e-on') }}
     name: 'Install dependencies'
-    runs-on: ubuntu-latest
+    runs-on: frontend_runner
     steps:
       - name: Checkout the project depth 0
         uses: actions/checkout@v3
@@ -44,7 +44,7 @@ jobs:
 
   build-apps:
     name: Build bifrost, handoff, demos with cache
-    runs-on: ubuntu-latest
+    runs-on: frontend_runner
     needs: install-dependencies
     steps:
       - name: Checkout the project depth 0
@@ -61,7 +61,7 @@ jobs:
     name: 'End-to-End test'
     timeout-minutes: 30
     needs: build-apps
-    runs-on: ubuntu-latest
+    runs-on: frontend_runner
     steps:
       - name: Checkout the project
         uses: actions/checkout@v3
@@ -95,7 +95,7 @@ jobs:
 
       - name: Install Playwright Browsers
         working-directory: ./frontend
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
       - name: Run apps locally, using production mode
         working-directory: ./frontend

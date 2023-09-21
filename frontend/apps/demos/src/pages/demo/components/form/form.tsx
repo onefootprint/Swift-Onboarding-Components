@@ -11,7 +11,6 @@ import {
   createFontStyles,
   Divider,
   PhoneInput,
-  PhoneInputRegex,
   TextInput,
   Typography,
 } from '@onefootprint/ui';
@@ -128,12 +127,6 @@ const Form = ({ html, onSuccess }: FormProps) => {
           <Controller
             control={control}
             name="phoneNumber"
-            rules={{
-              pattern: {
-                value: PhoneInputRegex,
-                message: 'Phone number format is incorrect',
-              },
-            }}
             render={({
               field: { onChange, onBlur, value, name },
               fieldState: { error },

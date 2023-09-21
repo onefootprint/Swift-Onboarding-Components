@@ -93,7 +93,7 @@ export { default as Overlay } from './overlay';
 export type { PaginationProps } from './pagination';
 export { default as Pagination } from './pagination';
 export type { PhoneInputProps } from './phone-input';
-export { default as PhoneInput, PhoneInputRegex } from './phone-input';
+export { default as PhoneInput } from './phone-input';
 export type { PinInputProps } from './pin-input';
 export { default as PinInput } from './pin-input';
 export type { PortalProps } from './portal';

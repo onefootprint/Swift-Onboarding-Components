@@ -25,7 +25,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
     ref,
   ) => {
     const localRef = useRef<HTMLInputElement>(null);
-    const [selectedCountry, setCountry] = useState<PhoneSelectOption>(
+    const [selectedCountry, setCountry] = useState<PhoneSelectOption>(() =>
       detectCountry(value),
     );
     const countryCode = selectedCountry.value;

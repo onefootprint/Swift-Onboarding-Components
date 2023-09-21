@@ -8,7 +8,7 @@
     "lint:ci": "eslint src",
     "postinstall": "npx playwright install",
     "test:e2e": "npx playwright test --ui",
-    "test:e2e:ci": "npx playwright test",
+    "test:e2e:ci": "npx playwright test --workers=1",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "keywords": [],
@@ -21,6 +21,7 @@
     "qrcode-reader": "^1.0.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.38.0",
     "@types/node": "^20.4.4",
     "eslint-config-footprint": "*",
     "typescript": "4.9.5"
