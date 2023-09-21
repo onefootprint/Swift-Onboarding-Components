@@ -42,11 +42,14 @@ impl IncodeStateTransition for ProcessId {
 
     fn transition(
         self,
-        _: &mut TxnPgConn,
-        _: &IncodeContext,
+        conn: &mut TxnPgConn,
+        ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
         let next = next_state(session);
+        if matches!(next, IncodeState::GetOnboardingStatus(_)) {
+            GetOnboardingStatus::enter(conn, &ctx.id_doc_id)?;
+        }
         Ok(next.into())
     }
 }

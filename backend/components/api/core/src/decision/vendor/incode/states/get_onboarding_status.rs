@@ -6,11 +6,26 @@ use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
+use db::models::identity_document::{IdentityDocument, IdentityDocumentUpdate};
 use db::{DbPool, TxnPgConn};
 use idv::incode::doc::IncodeGetOnboardingStatusRequest;
-use newtypes::VendorAPI;
+use newtypes::{IdentityDocumentId, IdentityDocumentStatus, VendorAPI};
 
 pub struct GetOnboardingStatus {}
+
+impl GetOnboardingStatus {
+    pub fn enter(conn: &mut TxnPgConn, id_doc_id: &IdentityDocumentId) -> ApiResult<()> {
+        // Update IdentityDocument to status = complete so we clear the Bifrost req
+        // TODO: we are setting status to complete here but set completed_seqno later- is that gunna cause any problems??
+        // It would actually be nice to write the timeline event, vault the docs, etc here but it sounds like the problem is our DI data model requires us to know the doc type and we can't confirm that until the processing part of the flow is complete
+        let update = IdentityDocumentUpdate {
+            status: Some(IdentityDocumentStatus::Complete),
+            ..Default::default()
+        };
+        IdentityDocument::update(conn, id_doc_id, update)?;
+        Ok(())
+    }
+}
 
 #[async_trait]
 impl IncodeStateTransition for GetOnboardingStatus {
@@ -32,13 +47,24 @@ impl IncodeStateTransition for GetOnboardingStatus {
         let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeGetOnboardingStatus, ctx);
         save_incode_verification_result(db_pool, args).await?;
 
-        // Now ensure we don't have an error
-        res.map_err(map_to_api_err)?
-            .result
-            .into_success()
-            .map_err(map_to_api_err)?;
-
-        Ok(Some(Self {}))
+        match res {
+            Ok(res) => {
+                res.result.into_success().map_err(map_to_api_err)?;
+                Ok(Some(Self {}))
+            }
+            Err(e) => {
+                // If polling Incode times out, return None to terminate the state machine.
+                // This prevents us from hard erroring during Bifrost and allows us to re-run the Incode state machine later (in /proceed or async thereafter)
+                if matches!(e, idv::incode::error::Error::ResultsNotReady) {
+                    tracing::error!(
+                        "IncodeStateTransition::GetOnboardingStatus ResultsNotReady, not transitioning"
+                    );
+                    Ok(None)
+                } else {
+                    Err(map_to_api_err(e))?
+                }
+            }
+        }
     }
 
     fn transition(

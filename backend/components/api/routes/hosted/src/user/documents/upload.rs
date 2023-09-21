@@ -275,6 +275,7 @@ pub(in crate::user) async fn handle_incode_request(
         IncodeVerificationSessionState::AddSelfie => Some(DocumentSide::Selfie),
         IncodeVerificationSessionState::Fail => None,
         IncodeVerificationSessionState::Complete => None,
+        IncodeVerificationSessionState::GetOnboardingStatus => None, // this would indicate we timed out while polling Incode
         // We shouldn't cleanly break from the machine in any other state
         s => return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into()),
     };

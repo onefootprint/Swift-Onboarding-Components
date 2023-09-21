@@ -41,10 +41,11 @@ impl IncodeStateTransition for ProcessFace {
 
     fn transition(
         self,
-        _: &mut TxnPgConn,
-        _: &IncodeContext,
+        conn: &mut TxnPgConn,
+        ctx: &IncodeContext,
         _: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
+        GetOnboardingStatus::enter(conn, &ctx.id_doc_id)?;
         Ok(GetOnboardingStatus::new().into())
     }
 }
