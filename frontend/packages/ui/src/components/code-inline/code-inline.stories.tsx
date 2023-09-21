@@ -44,6 +44,12 @@ export default {
       description: 'Toast title description',
       table: { defaultValue: { summary: 'Copied to clipboard' } },
     },
+    size: {
+      control: {
+        type: 'select',
+        options: ['default', 'compact'],
+      },
+    },
   },
 } as Meta;
 
@@ -54,6 +60,7 @@ const Template: Story<CodeInlineProps> = ({
   tooltipText,
   tooltipTextConfirmation,
   truncate,
+  size,
 }: CodeInlineProps) => (
   <CodeInline
     ariaLabel={ariaLabel}
@@ -61,6 +68,7 @@ const Template: Story<CodeInlineProps> = ({
     tooltipText={tooltipText}
     tooltipTextConfirmation={tooltipTextConfirmation}
     truncate={truncate}
+    size={size}
   >
     {children}
   </CodeInline>
@@ -74,4 +82,5 @@ Base.args = {
   tooltipText: 'Copy to clipboard',
   tooltipTextConfirmation: 'Copied!',
   truncate: false,
+  size: 'default',
 };

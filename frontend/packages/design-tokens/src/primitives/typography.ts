@@ -111,6 +111,11 @@ export const typography: Typographies = {
     fontSize: '0.882rem',
     lineHeight: '133.33%',
   },
+  'snippet-3': {
+    fontWeight: 400,
+    fontSize: '0.75rem',
+    lineHeight: '133.33%',
+  },
 };
 
 export const typographyExtra = {

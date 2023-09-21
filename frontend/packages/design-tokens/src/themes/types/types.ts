@@ -52,7 +52,8 @@ export type FontVariant =
   | 'caption-3'
   | 'caption-4'
   | 'snippet-1'
-  | 'snippet-2';
+  | 'snippet-2'
+  | 'snippet-3';
 
 export type Typography = {
   fontWeight: CSS.Property.FontWeight;
