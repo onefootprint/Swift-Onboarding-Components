@@ -30,6 +30,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.idCardIssuingCountry,
     DocumentDI.idCardRefNumber,
     DocumentDI.idCardNationality,
+    DocumentDI.idCardClassifiedDocumentType,
   ],
   [SupportedIdDocTypes.driversLicense]: [
     DocumentDI.driversLicenseFullName,
@@ -43,6 +44,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.driversLicenseIssuingCountry,
     DocumentDI.driversLicenseRefNumber,
     DocumentDI.driversLicenseNationality,
+    DocumentDI.driversLicenseClassifiedDocumentType,
   ],
   [SupportedIdDocTypes.passport]: [
     DocumentDI.passportFullName,
@@ -56,6 +58,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.passportIssuingCountry,
     DocumentDI.passportRefNumber,
     DocumentDI.passportNationality,
+    DocumentDI.passportClassifiedDocumentType,
   ],
   [SupportedIdDocTypes.visa]: [
     DocumentDI.visaFullName,
@@ -69,6 +72,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.visaIssuingCountry,
     DocumentDI.visaRefNumber,
     DocumentDI.visaNationality,
+    DocumentDI.visaClassifiedDocumentType,
   ],
   [SupportedIdDocTypes.workPermit]: [
     DocumentDI.workPermitFullName,
@@ -82,6 +86,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.workPermitIssuingCountry,
     DocumentDI.workPermitRefNumber,
     DocumentDI.workPermitNationality,
+    DocumentDI.workPermitClassifiedDocumentType,
   ],
   [SupportedIdDocTypes.residenceDocument]: [
     DocumentDI.residenceDocumentFullName,
@@ -95,6 +100,7 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.residenceDocumentIssuingCountry,
     DocumentDI.residenceDocumentRefNumber,
     DocumentDI.residenceDocumentNationality,
+    DocumentDI.residenceDocumentClassifiedDocumentType,
   ],
 };
 

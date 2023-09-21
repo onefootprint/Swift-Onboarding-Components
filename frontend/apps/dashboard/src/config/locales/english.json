@@ -761,7 +761,8 @@
                 "expires_at": "Expires at",
                 "issuing_country": "Issuing country",
                 "issuing_state": "Issuing state",
-                "ref_number": "Ref number"
+                "ref_number": "Ref number",
+                "document_type": "Classified document type"
               }
             },
             "confidence-scores": {

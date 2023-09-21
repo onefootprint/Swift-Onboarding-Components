@@ -23,6 +23,7 @@ const useDocumentFields = () => {
         DocumentDI.idCardIssuingCountry,
         DocumentDI.idCardRefNumber,
         DocumentDI.idCardNationality,
+        DocumentDI.idCardClassifiedDocumentType,
       ],
     },
     {
@@ -43,6 +44,7 @@ const useDocumentFields = () => {
         DocumentDI.driversLicenseIssuingCountry,
         DocumentDI.driversLicenseRefNumber,
         DocumentDI.driversLicenseNationality,
+        DocumentDI.driversLicenseClassifiedDocumentType,
       ],
     },
     {
@@ -62,6 +64,7 @@ const useDocumentFields = () => {
         DocumentDI.passportIssuingCountry,
         DocumentDI.passportRefNumber,
         DocumentDI.passportNationality,
+        DocumentDI.passportClassifiedDocumentType,
       ],
     },
     {
@@ -81,6 +84,7 @@ const useDocumentFields = () => {
         DocumentDI.visaIssuingCountry,
         DocumentDI.visaRefNumber,
         DocumentDI.visaNationality,
+        DocumentDI.visaClassifiedDocumentType,
       ],
     },
     {
@@ -101,6 +105,7 @@ const useDocumentFields = () => {
         DocumentDI.residenceDocumentIssuingCountry,
         DocumentDI.residenceDocumentRefNumber,
         DocumentDI.residenceDocumentNationality,
+        DocumentDI.residenceDocumentClassifiedDocumentType,
       ],
     },
     {
@@ -121,6 +126,7 @@ const useDocumentFields = () => {
         DocumentDI.workPermitIssuingCountry,
         DocumentDI.workPermitRefNumber,
         DocumentDI.workPermitNationality,
+        DocumentDI.workPermitClassifiedDocumentType,
       ],
     },
   ];

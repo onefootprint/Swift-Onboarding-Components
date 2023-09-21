@@ -67,6 +67,7 @@ export enum DocumentDI {
   passportIssuingCountry = 'document.passport.issuing_country',
   passportRefNumber = 'document.passport.ref_number',
   passportNationality = 'document.passport.nationality',
+  passportClassifiedDocumentType = 'document.passport.classifed_document_type',
 
   latestDriversLicenseFront = 'document.drivers_license.front.latest_upload',
   latestDriversLicenseBack = 'document.drivers_license.back.latest_upload',
@@ -82,6 +83,7 @@ export enum DocumentDI {
   driversLicenseIssuingCountry = 'document.drivers_license.issuing_country',
   driversLicenseRefNumber = 'document.drivers_license.ref_number',
   driversLicenseNationality = 'document.drivers_license.nationality',
+  driversLicenseClassifiedDocumentType = 'document.drivers_license.classifed_document_type',
 
   latestIdCardFront = 'document.id_card.front.latest_upload',
   latestIdCardBack = 'document.id_card.back.latest_upload',
@@ -97,6 +99,7 @@ export enum DocumentDI {
   idCardIssuingCountry = 'document.id_card.issuing_country',
   idCardRefNumber = 'document.id_card.ref_number',
   idCardNationality = 'document.id_card.nationality',
+  idCardClassifiedDocumentType = 'document.id_card.classifed_document_type',
 
   latestVisa = 'document.visa.front.latest_upload',
   latestVisaSelfie = 'document.visa.selfie.latest_upload',
@@ -111,6 +114,7 @@ export enum DocumentDI {
   visaIssuingCountry = 'document.visa.issuing_country',
   visaRefNumber = 'document.visa.ref_number',
   visaNationality = 'document.visa.nationality',
+  visaClassifiedDocumentType = 'document.visa.classifed_document_type',
 
   latestResidenceDocumentFront = 'document.residence_document.front.latest_upload',
   latestResidenceDocumentBack = 'document.residence_document.back.latest_upload',
@@ -126,6 +130,7 @@ export enum DocumentDI {
   residenceDocumentIssuingCountry = 'document.residence_document.issuing_country',
   residenceDocumentRefNumber = 'document.residence_document.ref_number',
   residenceDocumentNationality = 'document.residence_document.nationality',
+  residenceDocumentClassifiedDocumentType = 'document.residence_document.classifed_document_type',
 
   latestWorkPermitFront = 'document.permit.front.latest_upload',
   latestWorkPermitBack = 'document.permit.back.latest_upload',
@@ -141,6 +146,7 @@ export enum DocumentDI {
   workPermitIssuingCountry = 'document.permit.issuing_country',
   workPermitRefNumber = 'document.permit.ref_number',
   workPermitNationality = 'document.permit.nationality',
+  workPermitClassifiedDocumentType = 'document.permit.classifed_document_type',
 }
 
 export type VersionedDocumentDI<Version extends string = string> =
@@ -157,6 +163,7 @@ export type VersionedDocumentDI<Version extends string = string> =
   | `${DocumentDI.passportIssuingCountry}:${Version}`
   | `${DocumentDI.passportRefNumber}:${Version}`
   | `${DocumentDI.passportNationality}:${Version}`
+  | `${DocumentDI.passportClassifiedDocumentType}:${Version}`
   | `${DocumentDI.latestDriversLicenseFront}:${Version}`
   | `${DocumentDI.latestDriversLicenseBack}:${Version}`
   | `${DocumentDI.latestDriversLicenseSelfie}:${Version}`
@@ -171,6 +178,7 @@ export type VersionedDocumentDI<Version extends string = string> =
   | `${DocumentDI.driversLicenseIssuingCountry}:${Version}`
   | `${DocumentDI.driversLicenseRefNumber}:${Version}`
   | `${DocumentDI.driversLicenseNationality}:${Version}`
+  | `${DocumentDI.driversLicenseClassifiedDocumentType}:${Version}`
   | `${DocumentDI.latestIdCardFront}:${Version}`
   | `${DocumentDI.latestIdCardBack}:${Version}`
   | `${DocumentDI.latestIdCardSelfie}:${Version}`
@@ -185,6 +193,7 @@ export type VersionedDocumentDI<Version extends string = string> =
   | `${DocumentDI.idCardIssuingCountry}:${Version}`
   | `${DocumentDI.idCardRefNumber}:${Version}`
   | `${DocumentDI.idCardNationality}:${Version}`
+  | `${DocumentDI.idCardClassifiedDocumentType}:${Version}`
   | `${DocumentDI.visaFullName}:${Version}`
   | `${DocumentDI.visaDOB}:${Version}`
   | `${DocumentDI.visaGender}:${Version}`
@@ -196,6 +205,7 @@ export type VersionedDocumentDI<Version extends string = string> =
   | `${DocumentDI.visaIssuingCountry}:${Version}`
   | `${DocumentDI.visaRefNumber}:${Version}`
   | `${DocumentDI.visaNationality}:${Version}`
+  | `${DocumentDI.visaClassifiedDocumentType}:${Version}`
   | `${DocumentDI.residenceDocumentFullName}:${Version}`
   | `${DocumentDI.residenceDocumentDOB}:${Version}`
   | `${DocumentDI.residenceDocumentGender}:${Version}`
@@ -207,6 +217,7 @@ export type VersionedDocumentDI<Version extends string = string> =
   | `${DocumentDI.residenceDocumentIssuingCountry}:${Version}`
   | `${DocumentDI.residenceDocumentRefNumber}:${Version}`
   | `${DocumentDI.residenceDocumentNationality}:${Version}`
+  | `${DocumentDI.residenceDocumentClassifiedDocumentType}:${Version}`
   | `${DocumentDI.workPermitFullName}:${Version}`
   | `${DocumentDI.workPermitDOB}:${Version}`
   | `${DocumentDI.workPermitGender}:${Version}`
@@ -217,7 +228,8 @@ export type VersionedDocumentDI<Version extends string = string> =
   | `${DocumentDI.workPermitIssuingState}:${Version}`
   | `${DocumentDI.workPermitIssuingCountry}:${Version}`
   | `${DocumentDI.workPermitRefNumber}:${Version}`
-  | `${DocumentDI.workPermitNationality}:${Version}`;
+  | `${DocumentDI.workPermitNationality}:${Version}`
+  | `${DocumentDI.workPermitClassifiedDocumentType}:${Version}`;
 
 export enum CardDIField {
   name = 'name',
