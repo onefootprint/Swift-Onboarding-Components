@@ -2,7 +2,7 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type {
-  personal,
+  Personal,
   SummaryFormData,
   SummaryMeta,
 } from '@/playbooks/utils/machine/types';
@@ -14,7 +14,7 @@ import {
 import PersonalInfoAndDocs from './person';
 
 export type PersonInformationWithContextProps = {
-  startingValues: Partial<personal>;
+  startingValues: Partial<Personal>;
   meta?: SummaryMeta;
 };
 

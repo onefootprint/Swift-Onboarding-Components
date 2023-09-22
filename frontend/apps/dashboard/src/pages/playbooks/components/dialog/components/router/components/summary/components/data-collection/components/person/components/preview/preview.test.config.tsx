@@ -2,7 +2,7 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type {
-  personal,
+  Personal,
   SummaryFormData,
 } from '@/playbooks/utils/machine/types';
 import {
@@ -13,7 +13,7 @@ import {
 import Preview from './preview';
 
 export type PreviewWithContextProps = {
-  startingValues?: Partial<personal>;
+  startingValues?: Partial<Personal>;
   kind?: PlaybookKind;
 };
 

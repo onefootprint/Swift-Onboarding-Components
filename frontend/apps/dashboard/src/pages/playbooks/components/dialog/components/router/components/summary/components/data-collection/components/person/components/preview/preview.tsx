@@ -7,7 +7,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
-import type { personal, SummaryMeta } from '@/playbooks/utils/machine/types';
+import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import useIdDocFirstFlowEnabled from './hooks/use-id-doc-first-flow-enabled';
@@ -20,7 +20,7 @@ type PreviewProps = {
 const Preview = ({ onStartEditing, meta }: PreviewProps) => {
   const { t } = useTranslation('pages.playbooks.dialog.summary.person');
   const { getValues, register } = useFormContext();
-  const values: personal = getValues('personal');
+  const values: Personal = getValues('personal');
   const isIdDocFirstFlowEnabled = useIdDocFirstFlowEnabled(
     meta.kind === PlaybookKind.Kyc,
   );
@@ -80,6 +80,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
           <CollectedInformation
             title={t('us-residents.title')}
             options={{
+              ssnDocScanStepUp: values.ssnDocScanStepUp,
               idDocKind: values.idDocKind,
               selfie: values.idDocKind.length > 0 && values.selfie,
               usLegalStatus: values.us_legal_status,

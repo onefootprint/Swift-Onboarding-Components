@@ -138,16 +138,17 @@ export const defaultBusinessInformation = {
 export const defaultPlaybookValuesKYC: SummaryFormData = {
   kind: PlaybookKind.Kyc,
   personal: {
-    email: true,
-    [CollectedKycDataOption.phoneNumber]: true,
-    [CollectedKycDataOption.dob]: true,
-    [CollectedKycDataOption.usLegalStatus]: false,
     [CollectedKycDataOption.address]: true,
-    ssn: true,
+    [CollectedKycDataOption.dob]: true,
+    [CollectedKycDataOption.phoneNumber]: true,
+    [CollectedKycDataOption.usLegalStatus]: false,
+    email: true,
     idDoc: false,
-    ssnKind: CollectedKycDataOption.ssn9,
     idDocKind: [],
     selfie: true,
+    ssn: true,
+    ssnDocScanStepUp: false,
+    ssnKind: CollectedKycDataOption.ssn9,
   },
   [CollectedInvestorProfileDataOption.investorProfile]: false,
 };

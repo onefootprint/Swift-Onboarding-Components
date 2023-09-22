@@ -18,6 +18,7 @@ export type Option = Partial<{
   usLegalStatus: boolean;
   countriesRestrictions: CountryRecord[];
   internationalCountryRestrictions: null | CountryCode[];
+  ssnDocScanStepUp: boolean;
 
   // AML
   enhancedAml: boolean;

@@ -26,7 +26,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
   );
   const { register } = useFormContext();
   const { personal } = playbook;
-  const { selfie, idDoc, ssn, ssnKind } = personal;
+  const { selfie, idDocKind, ssn, ssnKind } = personal;
   const usLegalStatus = personal[CollectedKycDataOption.usLegalStatus];
   const phoneNumber = personal[CollectedKycDataOption.phoneNumber];
 
@@ -60,7 +60,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
           />
         </OptionsContainer>
       </ScopeSection>
-      {(ssn || usLegalStatus || idDoc) && allowUS && (
+      {(ssn || usLegalStatus || idDocKind.length) && allowUS && (
         <ScopeSection>
           <Typography variant="label-3">{t('us-residents')}</Typography>
           <OptionsContainer>
@@ -82,7 +82,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
                   {...register(CollectedKycDataOption.ssn9)}
                 />
               ))}
-            {idDoc && (
+            {idDocKind.length && (
               <Box>
                 <Checkbox
                   label={

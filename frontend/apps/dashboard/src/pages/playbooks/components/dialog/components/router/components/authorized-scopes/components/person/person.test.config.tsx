@@ -4,7 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import type {
   AuthorizedScopesFormData,
-  personal,
+  Personal,
   SummaryMeta,
 } from '@/playbooks/utils/machine/types';
 import {
@@ -16,7 +16,7 @@ import {
 import PersonalScopes from './person';
 
 export type PersonalScopesWithContextProps = {
-  startingPersonalValues?: Partial<personal>;
+  startingPersonalValues?: Partial<Personal>;
   investorProfile?: boolean;
   meta?: SummaryMeta;
 };
