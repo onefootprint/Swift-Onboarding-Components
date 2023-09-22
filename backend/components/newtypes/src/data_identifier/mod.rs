@@ -34,7 +34,7 @@ pub use self::{
 };
 use crate::{
     util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, NtResult, PiiJsonValue,
-    PiiString, PiiValueKind, ValidateArgs, VaultKind,
+    PiiString, ValidateArgs, VaultDataFormat, VaultKind,
 };
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -353,10 +353,10 @@ impl DataIdentifier {
         }
     }
 
-    fn serialization(&self) -> PiiValueKind {
+    fn serialization(&self) -> VaultDataFormat {
         match self {
-            Self::Id(IdentityDataKind::Citizenships) => PiiValueKind::Json,
-            _ => PiiValueKind::String,
+            Self::Id(IdentityDataKind::Citizenships) => VaultDataFormat::Json,
+            _ => VaultDataFormat::String,
         }
     }
 

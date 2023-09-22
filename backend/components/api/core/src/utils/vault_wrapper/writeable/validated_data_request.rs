@@ -17,7 +17,7 @@ use itertools::Itertools;
 use newtypes::{
     BusinessDataKind as BDK, CollectedDataOption, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource,
     DataRequest, FingerprintRequest, FingerprintScopeKind, Fingerprints, IdentityDataKind as IDK,
-    ScopedVaultId, ValidationError,
+    ScopedVaultId, ValidationError, VaultDataFormat,
 };
 
 /// DataRequest that has been validated through a UserVaultWrapper
@@ -89,13 +89,23 @@ impl<Type> VaultWrapper<Type> {
         }
 
         // Transform the request into a Vec<NewVaultData>
-        let (data, fingerprints) = request.decompose();
+        let (data, json_fields, fingerprints) = request.decompose();
         let data = data
             .into_iter()
             .map(|(kind, pii)| {
                 let e_data = self.vault().public_key.seal_pii(&pii)?;
                 let p_data = kind.store_plaintext().then_some(pii);
-                Ok(NewVaultData { kind, e_data, p_data })
+                let format = if json_fields.contains(&kind) {
+                    VaultDataFormat::Json
+                } else {
+                    VaultDataFormat::String
+                };
+                Ok(NewVaultData {
+                    kind,
+                    e_data,
+                    p_data,
+                    format,
+                })
             })
             .collect::<ApiResult<Vec<_>>>()?;
 

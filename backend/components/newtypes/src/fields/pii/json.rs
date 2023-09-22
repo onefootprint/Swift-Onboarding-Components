@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-use crate::{PiiBytes, PiiString, PiiValueKind, VResult};
+use crate::{PiiBytes, PiiString, VResult, VaultDataFormat};
 
 /// Wrapper to hide PII around serde_json::Value that contains all variants of values
 #[derive(Clone, Default, PartialEq, Eq, Deserialize, Serialize)]
@@ -15,6 +15,11 @@ impl PiiJsonValue {
             serde_json::Value::String(s) => Ok(PiiString::new(s)),
             _ => Err(crate::data_identifier::ValidationError::ExpectedStringFormat),
         }
+    }
+
+    /// Returns true if the value is a String and doesn't need to be serialized to be stored in the vault
+    pub fn is_string(&self) -> bool {
+        matches!(self.0, serde_json::Value::String(_))
     }
 
     /// Creates a variant that is Value::String
@@ -51,10 +56,10 @@ impl PiiJsonValue {
 }
 
 impl PiiString {
-    pub fn str_or_json(self, serialization: PiiValueKind) -> PiiJsonValue {
+    pub fn str_or_json(self, serialization: VaultDataFormat) -> PiiJsonValue {
         match serialization {
-            PiiValueKind::String => PiiJsonValue(serde_json::Value::String(self.0)),
-            PiiValueKind::Json => {
+            VaultDataFormat::String => PiiJsonValue(serde_json::Value::String(self.0)),
+            VaultDataFormat::Json => {
                 PiiJsonValue::try_from(&self)
                 // If the value isn't json serializable, just return it as a string
                 .unwrap_or(PiiJsonValue(serde_json::Value::String(self.0)))

@@ -16,6 +16,7 @@ use newtypes::IdentityDataKind as IDK;
 use newtypes::KvDataKey;
 use newtypes::PiiString;
 use newtypes::S3Url;
+use newtypes::VaultDataFormat;
 use newtypes::{
     BusinessDataKind as BDK, DocumentSide, IdDocKind, InvestorProfileKind as IPK, SealedVaultBytes,
 };
@@ -37,26 +38,31 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             kind: IDK::FirstName.into(),
             e_data: SealedVaultBytes(vec![1]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
         NewVaultData {
             kind: IDK::LastName.into(),
             e_data: SealedVaultBytes(vec![2]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
         NewVaultData {
             kind: IDK::Ssn4.into(),
             e_data: SealedVaultBytes(vec![3]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
         NewVaultData {
             kind: IDK::Email.into(),
             e_data: SealedVaultBytes(vec![4]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
         NewVaultData {
             kind: IDK::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![5]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
@@ -126,16 +132,19 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
             kind: BDK::Name.into(),
             e_data: SealedVaultBytes(vec![1]),
             p_data: Some(PiiString::from("Acme Inc")),
+            format: VaultDataFormat::String,
         },
         NewVaultData {
             kind: BDK::Website.into(),
             e_data: SealedVaultBytes(vec![2]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
         NewVaultData {
             kind: BDK::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![3]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();

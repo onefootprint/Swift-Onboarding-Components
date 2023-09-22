@@ -1,4 +1,4 @@
-use newtypes::{DataLifetimeSource, IdentityDataKind, Locked, SealedVaultBytes};
+use newtypes::{DataLifetimeSource, IdentityDataKind, Locked, SealedVaultBytes, VaultDataFormat};
 
 use db::{
     models::{
@@ -36,26 +36,31 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             kind: IdentityDataKind::FirstName.into(),
             e_data: SealedVaultBytes(vec![1]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
         NewVaultData {
             kind: IdentityDataKind::LastName.into(),
             e_data: SealedVaultBytes(vec![2]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
         NewVaultData {
             kind: IdentityDataKind::Ssn4.into(),
             e_data: SealedVaultBytes(vec![3]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
         NewVaultData {
             kind: IdentityDataKind::Email.into(),
             e_data: SealedVaultBytes(vec![4]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
         NewVaultData {
             kind: IdentityDataKind::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![5]),
             p_data: None,
+            format: VaultDataFormat::String,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();

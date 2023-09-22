@@ -904,6 +904,7 @@ table! {
         kind -> Text,
         e_data -> Bytea,
         p_data -> Nullable<Text>,
+        format -> Text,
     }
 }
 

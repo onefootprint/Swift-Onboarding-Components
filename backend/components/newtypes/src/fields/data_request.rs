@@ -26,6 +26,7 @@ pub struct DataRequest<T> {
     #[deref]
     #[deref_mut]
     data: HashMap<DataIdentifier, PiiString>,
+    json_fields: Vec<DataIdentifier>,
     fingerprints: T,
 }
 
@@ -34,8 +35,8 @@ impl<T> DataRequest<T> {
         self.data.is_empty()
     }
 
-    pub fn decompose(self) -> (HashMap<DataIdentifier, PiiString>, T) {
-        (self.data, self.fingerprints)
+    pub fn decompose(self) -> (HashMap<DataIdentifier, PiiString>, Vec<DataIdentifier>, T) {
+        (self.data, self.json_fields, self.fingerprints)
     }
 }
 
@@ -144,8 +145,6 @@ impl DataRequest<()> {
             .collect();
 
         // Clean and validate each individual piece of data
-        // Can just use AllData to grab the original types of each piece of data.
-        // we would then miss the types of derived data, though
         let all_data = map.clone();
         let (cleaned_data, errors): (Vec<_>, HashMap<_, _>) =
             map.into_iter()
@@ -157,11 +156,18 @@ impl DataRequest<()> {
             return Err(DataValidationError::FieldValidationError(errors).into());
         }
 
+        // NOTE: we're missing any derived fields that are JSON. But we don't have any of those yet...
+        let json_fields = all_data
+            .into_iter()
+            .filter(|(_, v)| !v.is_string())
+            .map(|(k, _)| k)
+            .collect();
         let cleaned_data = cleaned_data.into_iter().flatten().collect();
         let request = Self {
             data: cleaned_data,
             // Initially create the request with no fingerprints - they need to be added with an
             // async function
+            json_fields,
             fingerprints: (),
         };
         Ok(request)
@@ -213,6 +219,7 @@ impl<T> DataRequest<T> {
 
         let request = DataRequest {
             data: self.data,
+            json_fields: self.json_fields,
             fingerprints,
         };
         Ok(request)
@@ -248,6 +255,7 @@ impl<T> DataRequest<T> {
 
         let request = DataRequest {
             data: self.data,
+            json_fields: self.json_fields,
             fingerprints,
         };
         Ok(request)
@@ -257,6 +265,7 @@ impl<T> DataRequest<T> {
     pub fn manual_fingerprints(self, fingerprints: Fingerprints) -> DataRequest<Fingerprints> {
         DataRequest {
             data: self.data,
+            json_fields: self.json_fields,
             fingerprints,
         }
     }
@@ -264,6 +273,7 @@ impl<T> DataRequest<T> {
     pub fn no_fingerprints(self) -> DataRequest<Fingerprints> {
         DataRequest {
             data: self.data,
+            json_fields: self.json_fields,
             fingerprints: HashSet::new(),
         }
     }

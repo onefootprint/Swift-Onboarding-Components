@@ -14,13 +14,13 @@ use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::SealedVaultBytes;
 use newtypes::StorageType;
+use newtypes::VaultDataFormat;
 use newtypes::VaultId;
 use newtypes::{DataLifetimeId, VdId};
-use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = vault_data)]
 pub struct VaultData {
     pub id: VdId,
@@ -32,21 +32,25 @@ pub struct VaultData {
     pub e_data: SealedVaultBytes,
     /// Plaintext data, only stored for certain data types
     pub p_data: Option<PiiString>,
+    /// Whether the encrypted data is stored as a plaintext string or a serialized JSON value
+    pub format: VaultDataFormat,
 }
 
 pub struct NewVaultData {
     pub kind: DataIdentifier,
     pub e_data: SealedVaultBytes,
     pub p_data: Option<PiiString>,
+    pub format: VaultDataFormat,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = vault_data)]
 pub struct NewVaultDataRow {
     pub lifetime_id: DataLifetimeId,
     pub kind: DataIdentifier,
     pub e_data: SealedVaultBytes,
     pub p_data: Option<PiiString>,
+    pub format: VaultDataFormat,
 }
 
 impl VaultData {
@@ -96,6 +100,7 @@ impl VaultData {
                 kind: new_vd.kind,
                 e_data: new_vd.e_data,
                 p_data: new_vd.p_data,
+                format: new_vd.format,
             })
             .collect();
         let results = diesel::insert_into(vault_data::table)

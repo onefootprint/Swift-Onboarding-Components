@@ -26,8 +26,3 @@ where
 {
     s.serialize_str("<SCRUBBED>")
 }
-
-pub enum PiiValueKind {
-    String,
-    Json,
-}
