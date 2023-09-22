@@ -785,7 +785,10 @@ async fn redo_and_pass(
     mock_webhooks(
         state,
         vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
-        vec![],
+        vec![OnboardingCompleted(
+            ExpectedStatus(OnboardingStatus::Pass),
+            ExpectedRequiresManualReview(false),
+        )],
     );
 
     let _: WorkflowWrapper = ww

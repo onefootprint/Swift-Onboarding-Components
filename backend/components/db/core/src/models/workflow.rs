@@ -462,35 +462,36 @@ impl Workflow {
             // Must lock to make sure scoped vault status isn't stale
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
             let tenant = Tenant::get(conn, &sv.tenant_id)?;
-            let old_status = sv.status;
-            if old_status != Some(new_status) {
-                // !! it's important that code in the same txn that is going to write a review does it before this update call
-                let mr = ManualReview::get_active(conn, &wf.id)?;
-                let old_status_has_decision = match old_status {
+            // !! it's important that code in the same txn that is going to write a review does it before this update call
+            let mr = ManualReview::get_active(conn, &wf.id)?;
+            // Since the OnboardingCompletedPayload webhook has `requires_manual_review`, its semantics currently really mean we have to fire it when we make a
+            // decision for the first time or in a redo flow
+            // If the current Workflow status is not pass/fail but the new status is, fire OnboardingCompleted (ie anytime a Workflow completes)
+            if !wf.status.map(|s| s.has_decision()).unwrap_or(false) && new_status.has_decision() {
+                let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
+                    fp_id: sv.fp_id.clone(),
+                    footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
+                    timestamp: Utc::now(),
+                    status: new_status,
+                    requires_manual_review: mr.is_some(),
+                });
+                let task_data = TaskData::FireWebhook(FireWebhookArgs {
+                    scoped_vault_id: wf.scoped_vault_id.clone(),
+                    tenant_id: tenant.id.clone(),
+                    is_live: sv.is_live,
+                    webhook_event,
+                });
+                Task::create(conn, Utc::now(), task_data)?;
+            };
+
+            let old_sv_status = sv.status;
+            if old_sv_status != Some(new_status) {
+                let old_sv_status_has_decision = match old_sv_status {
                     None => false,
                     Some(s) => s.has_decision(),
                 };
 
-                // Since the OnboardingCompletedPayload webhook has `requires_manual_review`, its semantics currently really mean we have to fire it when we make a
-                // decision for the first time or in a redo flow
-                if !old_status_has_decision && new_status.has_decision() {
-                    let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
-                        fp_id: sv.fp_id.clone(),
-                        footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
-                        timestamp: Utc::now(),
-                        status: new_status,
-                        requires_manual_review: mr.is_some(),
-                    });
-                    let task_data = TaskData::FireWebhook(FireWebhookArgs {
-                        scoped_vault_id: wf.scoped_vault_id.clone(),
-                        tenant_id: tenant.id.clone(),
-                        is_live: sv.is_live,
-                        webhook_event,
-                    });
-                    Task::create(conn, Utc::now(), task_data)?;
-                };
-
-                if !old_status_has_decision || new_status.has_decision() {
+                if !old_sv_status_has_decision || new_status.has_decision() {
                     // Only set to non-decision status if the current status is a non-decision status
                     // This has the effect of never letting the scoped vault status go from a decision to a non-decision status
                     ScopedVault::update_status(conn, &sv.id, new_status)?;
