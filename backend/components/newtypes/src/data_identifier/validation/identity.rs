@@ -2,8 +2,8 @@ use super::utils;
 use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
 use crate::{
-    AllData, DataIdentifier, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, PhoneNumber, PiiString,
-    PiiValue, ValidateArgs, DATE_FORMAT,
+    AllData, DataIdentifier, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, PhoneNumber, PiiJsonValue,
+    PiiString, ValidateArgs, DATE_FORMAT,
 };
 use chrono::{Datelike, NaiveDate, Utc};
 use serde_with::DeserializeFromStr;
@@ -13,7 +13,7 @@ use strum_macros::EnumString;
 impl Validate for IDK {
     fn validate(
         self,
-        value: PiiValue,
+        value: PiiJsonValue,
         args: ValidateArgs,
         _: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
@@ -159,7 +159,7 @@ mod test {
 
     use super::IDK::*;
     use crate::IdentityDataKind as IDK;
-    use crate::PiiValue;
+    use crate::PiiJsonValue;
     use crate::Validate;
     use crate::ValidateArgs;
     use test_case::test_case;
@@ -197,7 +197,7 @@ mod test {
     #[test_case(Nationality, "Flerp" => None)]
     fn test_clean_and_validate_field_not_bifrost(idk: IDK, pii: &str) -> Option<String> {
         idk.validate(
-            PiiValue::string(pii),
+            PiiJsonValue::string(pii),
             ValidateArgs::for_non_portable(true),
             &HashMap::new(),
         )
@@ -222,7 +222,7 @@ mod test {
             for_bifrost: true,
             ..ValidateArgs::for_tests()
         };
-        idk.validate(PiiValue::string(pii), args, &HashMap::new())
+        idk.validate(PiiJsonValue::string(pii), args, &HashMap::new())
             .ok()
             .and_then(|pii| pii.into_iter().next())
             .map(|pii| pii.1.leak_to_string())

@@ -1,6 +1,6 @@
 use crate::{
     AllData, CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant, NtResult,
-    PiiString, PiiValue, StorageType, Validate, ValidateArgs,
+    PiiJsonValue, PiiString, StorageType, Validate, ValidateArgs,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
@@ -89,7 +89,7 @@ impl TryFrom<DataIdentifier> for DocumentKind {
 impl Validate for DocumentKind {
     fn validate(
         self,
-        value: PiiValue,
+        value: PiiJsonValue,
         _: ValidateArgs,
         _: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {

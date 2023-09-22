@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use crate::{
     flat_api_object_map_type, DataIdentifier, DataRequest, DataValidationError, DocumentKind, NtResult,
-    PiiValue, ValidateArgs, ValidationError,
+    PiiJsonValue, ValidateArgs, ValidationError,
 };
 
 flat_api_object_map_type!(
-    RawDataRequest<DataIdentifier, PiiValue>,
+    RawDataRequest<DataIdentifier, PiiJsonValue>,
     description="Key-value map for data to store in the vault",
     example=r#"{ "id.first_name": "Peter", "custom.ach_account_number": "1234567890", "custom.cc_last_4": "4242" }"#
 );

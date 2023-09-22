@@ -38,6 +38,7 @@ use newtypes::IdentityDocumentId;
 use newtypes::IdentityDocumentStatus;
 use newtypes::IncodeFailureReason;
 use newtypes::OcrDataKind as ODK;
+use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::ScrubbedPiiString;
@@ -133,7 +134,7 @@ fn doc_first_id_data(r: &FetchOCRResponse, validate_args: ValidateArgs) -> Vec<(
     .into_iter()
     .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))
     // Don't add OCR data that fails validation - don't want it to block sign up
-    .filter(|(k, v)| k.clone().validate(v.clone().into(), validate_args, &HashMap::new()).is_ok())
+    .filter(|(k, v)| k.clone().validate(PiiJsonValue::string(v.leak()), validate_args, &HashMap::new()).is_ok())
     .collect()
 }
 

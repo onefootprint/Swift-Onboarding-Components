@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use newtypes::{flat_api_object_map_type, DataIdentifier, PiiString, PiiValue, VersionedDataIdentifier};
+use newtypes::{flat_api_object_map_type, DataIdentifier, PiiJsonValue, PiiString, VersionedDataIdentifier};
 
 flat_api_object_map_type!(
-    DecryptResponse<VersionedDataIdentifier, Option<PiiValue>>,
+    DecryptResponse<VersionedDataIdentifier, Option<PiiJsonValue>>,
     description="A key-value map with the corresponding decrypted values",
     example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
 );

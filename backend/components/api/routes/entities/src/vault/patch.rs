@@ -16,7 +16,7 @@ use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{AccessEventKind, AccessEventPurpose, FpId, PiiString, PiiValue, ValidateArgs};
+use newtypes::{AccessEventKind, AccessEventPurpose, FpId, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 
 #[route_alias(
@@ -122,10 +122,7 @@ async fn patch_inner(
             // This is pretty hacky since no other vaulting endpoints have this logic, and this isn't
             // represented in POST /validate
             // TODO https://linear.app/footprint/issue/FP-4973/make-all-vault-writes-idempotent
-            let new_ssn4 = match new_ssn4 {
-                PiiValue::String(s) => s.clone(),
-                PiiValue::Json(s) => PiiString::try_from(s)?,
-            };
+            let new_ssn4 = new_ssn4.clone().as_string().map_err(newtypes::Error::from)?;
             if existing_ssn4.safe_compare(&new_ssn4) {
                 request.remove(&ssn4);
             }

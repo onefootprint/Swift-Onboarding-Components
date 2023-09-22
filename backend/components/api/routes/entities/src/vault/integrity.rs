@@ -6,8 +6,8 @@ use api_core::types::ResponseData;
 use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
 use newtypes::{
-    flat_api_object_map_type, FilterFunction, FpId, HmacSha256Args, IntegritySigningKey, PiiBytes, PiiValue,
-    VersionedDataIdentifier,
+    flat_api_object_map_type, FilterFunction, FpId, HmacSha256Args, IntegritySigningKey, PiiBytes,
+    PiiJsonValue, VersionedDataIdentifier,
 };
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
@@ -23,7 +23,7 @@ pub struct IntegrityRequest {
 }
 
 flat_api_object_map_type!(
-    IntegrityResponse<VersionedDataIdentifier, Option<PiiValue>>,
+    IntegrityResponse<VersionedDataIdentifier, Option<PiiJsonValue>>,
     description="A key-value map with the corresponding hex-encoded hash values",
     example=r#"{ "id.last_name": "f7ee801830...", "id.ssn9": "1cefe40fa...", "custom.credit_card": "f7dbdc6..." }"#
 );

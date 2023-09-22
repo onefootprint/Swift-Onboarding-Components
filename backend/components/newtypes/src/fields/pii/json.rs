@@ -1,12 +1,67 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-use crate::{PiiBytes, PiiString};
+use crate::{PiiBytes, PiiString, PiiValueKind, VResult};
 
-/// Represents a struct that hides PII contained in JsonValues (usually from vendor responses)
+/// Wrapper to hide PII around serde_json::Value that contains all variants of values
 #[derive(Clone, Default, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(transparent)]
 pub struct PiiJsonValue(pub(super) serde_json::Value);
+
+impl PiiJsonValue {
+    /// Extracts the PiiString value from self, IF self is a Value::String variant
+    pub fn as_string(self) -> VResult<PiiString> {
+        match self.0 {
+            serde_json::Value::String(s) => Ok(PiiString::new(s)),
+            _ => Err(crate::data_identifier::ValidationError::ExpectedStringFormat),
+        }
+    }
+
+    /// Creates a variant that is Value::String
+    pub fn string(value: &str) -> Self {
+        Self(serde_json::Value::String(value.to_owned()))
+    }
+
+    /// Utility to deserialize the value into T.
+    /// This is unique in that it also tries to deserialize Value::String values into T,
+    /// instead of just the respective Value::Array or Value::Object
+    pub fn deserialize_maybe_str<T>(self) -> Result<T, serde_json::Error>
+    where
+        T: serde::de::DeserializeOwned,
+    {
+        let result = if let serde_json::Value::String(s) = &self.0 {
+            serde_json::de::from_str(s)?
+        } else {
+            serde_json::value::from_value::<T>(self.0)?
+        };
+        Ok(result)
+    }
+
+    /// Utility to serialize the value a PiiString.
+    /// This is unique in that it returns a PiiString if self is a Value::String, otherwise
+    /// it uses serde to serialize the value into a PiiString
+    pub fn to_piistring(self) -> Result<PiiString, serde_json::Error> {
+        let result = if let serde_json::Value::String(s) = &self.0 {
+            PiiString::new(s.to_owned())
+        } else {
+            PiiString::new(serde_json::ser::to_string(&self.0)?)
+        };
+        Ok(result)
+    }
+}
+
+impl PiiString {
+    pub fn str_or_json(self, serialization: PiiValueKind) -> PiiJsonValue {
+        match serialization {
+            PiiValueKind::String => PiiJsonValue(serde_json::Value::String(self.0)),
+            PiiValueKind::Json => {
+                PiiJsonValue::try_from(&self)
+                // If the value isn't json serializable, just return it as a string
+                .unwrap_or(PiiJsonValue(serde_json::Value::String(self.0)))
+            }
+        }
+    }
+}
 
 impl PiiJsonValue {
     pub fn new(value: serde_json::Value) -> Self {
@@ -37,7 +92,9 @@ impl From<serde_json::Value> for PiiJsonValue {
 
 impl Debug for PiiJsonValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("<redacted json value>")
+        f.debug_struct("PiiJsonValue")
+            .field("data", &"<redacted>")
+            .finish()
     }
 }
 
@@ -106,6 +163,8 @@ impl From<ScrubbedPiiJsonValue> for PiiJsonValue {
 
 impl Debug for ScrubbedPiiJsonValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("<redacted json value>")
+        f.debug_struct("ScrubbedPiiJsonValue")
+            .field("data", &"<redacted>")
+            .finish()
     }
 }

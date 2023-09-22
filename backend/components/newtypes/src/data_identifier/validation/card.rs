@@ -1,6 +1,7 @@
 use super::{utils, Error, VResult};
 use crate::{
-    AliasId, AllData, CardDataKind as CDK, CardInfo as CI, DataIdentifier, PiiString, PiiValue, ValidateArgs,
+    AliasId, AllData, CardDataKind as CDK, CardInfo as CI, DataIdentifier, PiiJsonValue, PiiString,
+    ValidateArgs,
 };
 use crate::{NtResult, Validate};
 use card_validate::Validate as CardValidate;
@@ -11,7 +12,7 @@ use strum::{Display, EnumString};
 impl Validate for CI {
     fn validate(
         self,
-        value: PiiValue,
+        value: PiiJsonValue,
         args: ValidateArgs,
         all_data: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
@@ -295,7 +296,7 @@ mod test {
 
     use super::CDK::*;
     use super::{CDK, CI};
-    use crate::{AliasId, PiiValue, Validate};
+    use crate::{AliasId, PiiJsonValue, Validate};
     use crate::{PiiString, ValidateArgs};
     use test_case::test_case;
 
@@ -316,7 +317,7 @@ mod test {
             ..ValidateArgs::for_tests()
         };
         CI { alias, kind }
-            .validate(PiiValue::string(pii), args, &HashMap::new())
+            .validate(PiiJsonValue::string(pii), args, &HashMap::new())
             .ok()
             .and_then(|pii| pii.into_iter().next())
             .map(|pii| pii.1.leak_to_string())
@@ -338,7 +339,7 @@ mod test {
             alias,
             kind: CDK::Number,
         }
-        .validate(PiiValue::string(pii), args, &HashMap::new())
+        .validate(PiiJsonValue::string(pii), args, &HashMap::new())
         .ok()
         .and_then(|pii| pii.into_iter().next())
         .map(|pii| pii.1.leak_to_string())
@@ -357,14 +358,16 @@ mod test {
             alias: alias.clone(),
             kind: CDK::Number,
         };
-        let other_data = [(number_di.into(), PiiValue::string(card_number))]
+        let other_data = [(number_di.into(), PiiJsonValue::string(card_number))]
             .into_iter()
             .collect();
         let cvc_di = CI {
             alias,
             kind: CDK::Cvc,
         };
-        cvc_di.validate(PiiValue::string(cvc), args, &other_data).is_ok()
+        cvc_di
+            .validate(PiiJsonValue::string(cvc), args, &other_data)
+            .is_ok()
     }
 
     #[test_case("12/24" => Some("12/2024".into()))]

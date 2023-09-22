@@ -34,7 +34,7 @@ pub use self::{
 };
 use crate::{
     util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, NtResult, PiiJsonValue,
-    PiiString, PiiValue, PiiValueKind, ValidateArgs, VaultKind,
+    PiiString, PiiValueKind, ValidateArgs, VaultKind,
 };
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -128,7 +128,7 @@ impl Validate for DataIdentifier {
     /// input type was a JSON.
     fn validate(
         self,
-        value: PiiValue,
+        value: PiiJsonValue,
         args: ValidateArgs,
         all_data: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
@@ -361,17 +361,8 @@ impl DataIdentifier {
     }
 
     /// Serialize the PiiString value specifically to the type of data expecte to be found in this DI
-    pub fn serialize(&self, v: PiiString) -> PiiValue {
-        // TODO There's some fun overlap between PiiJsonValue and PiiString... should consolidate at some point
-        match self.serialization() {
-            PiiValueKind::String => PiiValue::String(v),
-            PiiValueKind::Json => {
-                PiiJsonValue::try_from(&v)
-                .map(PiiValue::Json)
-                // If the value isn't json serializable, just return it as a string
-                .unwrap_or(PiiValue::String(v))
-            }
-        }
+    pub fn serialize(&self, v: PiiString) -> PiiJsonValue {
+        v.str_or_json(self.serialization())
     }
 }
 

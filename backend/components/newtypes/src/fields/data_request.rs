@@ -1,7 +1,7 @@
 use crate::data_identifier::ValidationError;
 use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
 use crate::{
-    CollectedDataOption, DataIdentifier, Error, Fingerprint, FingerprintScopeKind, PiiString, PiiValue,
+    CollectedDataOption, DataIdentifier, Error, Fingerprint, FingerprintScopeKind, PiiJsonValue, PiiString,
     StorageType, TenantId, Validate, VaultKind,
 };
 use crate::{DataValidationError, NtResult};
@@ -90,13 +90,19 @@ impl DataRequest<()> {
         map: HashMap<DataIdentifier, PiiString>,
         args: ValidateArgs,
     ) -> NtResult<Self> {
-        let map = map.into_iter().map(|(k, v)| (k, v.into())).collect();
+        let map = map
+            .into_iter()
+            .map(|(k, v)| (k, PiiJsonValue::string(v.leak())))
+            .collect();
         Self::clean_and_validate(map, args)
     }
 
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data
-    pub fn clean_and_validate(map: HashMap<DataIdentifier, PiiValue>, args: ValidateArgs) -> NtResult<Self> {
+    pub fn clean_and_validate(
+        map: HashMap<DataIdentifier, PiiJsonValue>,
+        args: ValidateArgs,
+    ) -> NtResult<Self> {
         let unallowed_entries: HashMap<_, _> = map
             .keys()
             .filter_map(|di| {

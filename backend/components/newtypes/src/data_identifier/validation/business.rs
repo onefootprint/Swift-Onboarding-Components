@@ -2,8 +2,8 @@ use super::utils;
 use super::{Error, VResult};
 use crate::email::Email;
 use crate::{
-    AllData, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, DataIdentifier, PhoneNumber, PiiString,
-    PiiValue, ValidateArgs,
+    AllData, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, DataIdentifier, PhoneNumber, PiiJsonValue,
+    PiiString, ValidateArgs,
 };
 use crate::{NtResult, Validate};
 use itertools::Itertools;
@@ -15,7 +15,7 @@ use url::{Host, Url};
 impl Validate for BDK {
     fn validate(
         self,
-        value: PiiValue,
+        value: PiiJsonValue,
         args: ValidateArgs,
         _: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
@@ -63,7 +63,7 @@ pub struct BusinessOwnerData {
     pub ownership_stake: u32,
 }
 
-fn clean_and_validate_beneficial_owners(input: PiiValue) -> VResult<PiiString> {
+fn clean_and_validate_beneficial_owners(input: PiiJsonValue) -> VResult<PiiString> {
     utils::parse_json_and_validate::<Vec<BusinessOwnerData>, _>(input, |l| {
         if l.is_empty() {
             return Err(Error::InvalidLength);
@@ -93,7 +93,7 @@ where
 
 type KycedBusinessOwnerDataDe = KycedBusinessOwnerData<Option<()>>;
 
-fn clean_and_validate_kyced_beneficial_owners(input: PiiValue, args: ValidateArgs) -> VResult<PiiString> {
+fn clean_and_validate_kyced_beneficial_owners(input: PiiJsonValue, args: ValidateArgs) -> VResult<PiiString> {
     utils::parse_json_and_map::<Vec<KycedBusinessOwnerDataDe>, _>(input, |bos| {
         if bos.is_empty() {
             return Err(Error::InvalidLength);
@@ -181,8 +181,7 @@ mod test {
     use super::KycedBusinessOwnerData;
     use super::BDK::*;
     use crate::BusinessDataKind as BDK;
-    use crate::PiiString;
-    use crate::PiiValue;
+    use crate::PiiJsonValue;
     use crate::Validate;
     use crate::ValidateArgs;
     use serde_json::json;
@@ -217,10 +216,14 @@ mod test {
     #[test_case(BeneficialOwners, "[{\"first_name\": \"Piip\", \"last_name\": \"The Penguin\", \"ownership_stake\": 90}, {\"first_name\": \"Marco\", \"last_name\": \"The Penguin\", \"ownership_stake\": 90}]" => None)]
     #[test_case(BeneficialOwners, "I am not json" => None)]
     fn test_clean_and_validate_field_not_bifrost(bdk: BDK, pii: &str) -> Option<String> {
-        bdk.validate(PiiValue::string(pii), ValidateArgs::for_tests(), &HashMap::new())
-            .ok()
-            .and_then(|pii| pii.into_iter().next())
-            .map(|pii| pii.1.leak_to_string())
+        bdk.validate(
+            PiiJsonValue::string(pii),
+            ValidateArgs::for_tests(),
+            &HashMap::new(),
+        )
+        .ok()
+        .and_then(|pii| pii.into_iter().next())
+        .map(|pii| pii.1.leak_to_string())
     }
 
     #[test]
@@ -236,7 +239,7 @@ mod test {
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners
             .validate(
-                PiiValue::string(&input_str),
+                PiiJsonValue::string(&input_str),
                 ValidateArgs::for_tests(),
                 &HashMap::new(),
             )
@@ -265,7 +268,7 @@ mod test {
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners.validate(
-            PiiString::new(input_str).into(),
+            PiiJsonValue::string(&input_str),
             ValidateArgs::for_tests(),
             &HashMap::new(),
         );
@@ -282,7 +285,7 @@ mod test {
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners.validate(
-            PiiString::new(input_str).into(),
+            PiiJsonValue::string(&input_str),
             ValidateArgs::for_tests(),
             &HashMap::new(),
         );
@@ -305,7 +308,7 @@ mod test {
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners.validate(
-            PiiValue::string(&input_str),
+            PiiJsonValue::string(&input_str),
             ValidateArgs::for_tests(),
             &HashMap::new(),
         );

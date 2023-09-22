@@ -1,5 +1,5 @@
 use super::{Error, VResult};
-use crate::{Iso3166TwoDigitCountryCode, PiiString, PiiValue};
+use crate::{Iso3166TwoDigitCountryCode, PiiJsonValue, PiiString};
 use regex::Regex;
 use serde::de::DeserializeOwned;
 use std::str::FromStr;
@@ -39,14 +39,14 @@ where
     Ok(value)
 }
 
-pub(super) fn parse_json<T>(value: PiiValue) -> VResult<PiiString>
+pub(super) fn parse_json<T>(value: PiiJsonValue) -> VResult<PiiString>
 where
     T: DeserializeOwned,
 {
     parse_json_and_validate::<T, _>(value, |_| Ok(()))
 }
 
-pub(super) fn parse_json_and_validate<T, F>(value: PiiValue, f: F) -> VResult<PiiString>
+pub(super) fn parse_json_and_validate<T, F>(value: PiiJsonValue, f: F) -> VResult<PiiString>
 where
     T: DeserializeOwned,
     F: FnOnce(T) -> VResult<()>,
@@ -58,7 +58,7 @@ where
     })
 }
 
-pub(super) fn parse_json_and_map<T, F>(value: PiiValue, f: F) -> VResult<PiiString>
+pub(super) fn parse_json_and_map<T, F>(value: PiiJsonValue, f: F) -> VResult<PiiString>
 where
     T: DeserializeOwned,
     F: FnOnce(T) -> VResult<PiiString>,

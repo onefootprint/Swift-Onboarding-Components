@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{CollectedDataOption, DataIdentifier, NtResult, PiiString, PiiValue, ValidateArgs};
+use crate::{CollectedDataOption, DataIdentifier, NtResult, PiiJsonValue, PiiString, ValidateArgs};
 
 mod business;
 mod card;
@@ -13,7 +13,7 @@ pub use card::CardIssuer;
 pub use identity::UsLegalStatus;
 pub use investor_profile::Declaration;
 
-pub type AllData = HashMap<DataIdentifier, PiiValue>;
+pub type AllData = HashMap<DataIdentifier, PiiJsonValue>;
 
 pub const DATE_FORMAT: &str = "%Y-%m-%d";
 
@@ -21,7 +21,7 @@ pub trait Validate {
     /// Performs basic cleaning and validation for all data that we store in our vaults.
     fn validate(
         self,
-        value: PiiValue,
+        value: PiiJsonValue,
         args: ValidateArgs,
         all_data: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>>;

@@ -5,7 +5,7 @@ use crate::DataIdentifier;
 use crate::NtResult;
 use crate::Validate;
 use crate::ValidateArgs;
-use crate::{InvestorProfileKind as IPK, PiiString, PiiValue};
+use crate::{InvestorProfileKind as IPK, PiiJsonValue, PiiString};
 use itertools::Itertools;
 use serde_with::DeserializeFromStr;
 use strum_macros::EnumString;
@@ -13,7 +13,7 @@ use strum_macros::EnumString;
 impl Validate for IPK {
     fn validate(
         self,
-        value: PiiValue,
+        value: PiiJsonValue,
         _: ValidateArgs,
         _: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {

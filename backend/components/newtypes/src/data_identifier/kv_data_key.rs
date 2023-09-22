@@ -1,20 +1,16 @@
 use crate::{
-    AllData, CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, KvDataKey, NtResult, PiiString,
-    PiiValue, Validate, ValidateArgs,
+    AllData, CollectedData, DataIdentifier, IsDataIdentifierDiscriminant, KvDataKey, NtResult, PiiJsonValue,
+    PiiString, Validate, ValidateArgs,
 };
 
 impl Validate for KvDataKey {
     fn validate(
         self,
-        value: PiiValue,
+        value: PiiJsonValue,
         _: ValidateArgs,
         _: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
-        let value = match value {
-            PiiValue::String(s) => s,
-            PiiValue::Json(v) => PiiString::try_from(&v)?,
-        };
-        Ok(vec![(self.into(), value)])
+        Ok(vec![(self.into(), value.to_piistring()?)])
     }
 }
 
