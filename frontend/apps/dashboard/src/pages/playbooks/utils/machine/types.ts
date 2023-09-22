@@ -112,6 +112,7 @@ export type Personal = {
   idDocFirst?: boolean;
   selfie?: boolean;
   ssnOptional?: boolean;
+  ssnDocScanStepUp?: boolean;
 };
 
 export type BusinessInformation = {

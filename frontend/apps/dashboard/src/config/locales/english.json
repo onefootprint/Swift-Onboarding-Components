@@ -1511,7 +1511,7 @@
             },
             "us-legal-status": {
               "title": "Legal status",
-              "toggle": "Request users to provide their legal status in the U.S."
+              "label": "Request users to provide their legal status in the U.S."
             },
             "id-doc": {
               "title": "ID document scan",

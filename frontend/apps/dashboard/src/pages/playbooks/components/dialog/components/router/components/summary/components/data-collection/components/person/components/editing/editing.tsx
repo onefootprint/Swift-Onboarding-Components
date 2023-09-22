@@ -14,7 +14,7 @@ import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 
-import type { personal, SummaryMeta } from '@/playbooks/utils/machine/types';
+import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import IdDocPicker from './components/id-doc-picker';
@@ -33,7 +33,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   } = useSession();
   const [unselectedIDDoc, setUnselectedIDDoc] = useState(false);
   const ssnOpen = watch('personal.ssn');
-  const idDocOpen = watch('personal.idDoc');
+  const shouldCollectIdDoc = watch('personal.idDoc');
   const idDocKind = watch('personal.idDocKind');
   const isSsnOptional = !!watch('personal.ssnOptional');
   const docStepUp = watch('personal.ssnDocScanStepUp');
@@ -44,14 +44,14 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const showSsnDocStepUp = isSsnOptional;
 
   // need to store this so we don't re-fetch on add'l renders
-  const [initialValues] = useState<personal>({
+  const [initialValues] = useState<Personal>({
     ...getValues('personal'),
   });
 
   const handleSave = () => {
-    if (idDocOpen && idDocKind?.length >= 1) {
+    if (shouldCollectIdDoc && idDocKind?.length >= 1) {
       onStopEditing();
-    } else if (!idDocOpen) {
+    } else if (!shouldCollectIdDoc) {
       onStopEditing();
     } else {
       setUnselectedIDDoc(true);
@@ -166,6 +166,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                   <Checkbox
                     hint={t('ssn-doc-scan-step-up.hint')}
                     label={t('ssn-doc-scan-step-up.label')}
+                    disabled={shouldCollectIdDoc}
                     {...register('personal.ssnDocScanStepUp', {
                       onChange: () => {
                         resetDocs();
@@ -210,23 +211,9 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
       </Section>
       <Section>
         <Typography variant="label-3">{t('us-legal-status.title')}</Typography>
-        <Controller
-          control={control}
-          name={`personal.${CollectedKycDataOption.usLegalStatus}`}
-          render={({ field }) => (
-            <ToggleContainer>
-              <Toggle
-                onBlur={field.onBlur}
-                onChange={nextValue => {
-                  field.onChange(nextValue);
-                }}
-                defaultChecked={false}
-                checked={field.value}
-                label={t('us-legal-status.toggle')}
-                labelPlacement="right"
-              />
-            </ToggleContainer>
-          )}
+        <Checkbox
+          label={t('us-legal-status.label')}
+          {...register(`personal.${CollectedKycDataOption.usLegalStatus}`)}
         />
       </Section>
       <Section>
@@ -249,7 +236,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
             </ToggleContainer>
           )}
         />
-        {idDocOpen && (
+        {shouldCollectIdDoc && (
           <Box>
             <Box sx={{ marginBottom: 5 }}>
               <Divider variant="secondary" />

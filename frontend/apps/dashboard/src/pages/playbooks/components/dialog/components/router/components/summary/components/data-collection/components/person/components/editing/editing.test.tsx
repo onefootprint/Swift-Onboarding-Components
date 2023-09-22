@@ -434,6 +434,25 @@ describe('<Editing />', () => {
       expect(workPermit).toBeInTheDocument();
     });
 
+    it('should disable the option to "Do document scan step-up"', async () => {
+      renderEditing({});
+
+      const optionalSsn = screen.getByRole('checkbox', {
+        name: 'Allow users without an SSN to proceed with the verification',
+      });
+      await userEvent.click(optionalSsn);
+
+      const collectIdDoc = screen.getByRole('switch', {
+        name: 'Request users to scan an ID document',
+      });
+      await userEvent.click(collectIdDoc);
+
+      const docStepUp = screen.getByRole('checkbox', {
+        name: 'Do document scan step-up',
+      });
+      expect(docStepUp).toBeDisabled();
+    });
+
     describe('when selecting DL, then un-selecting the option to collect id doc and selecting it again', () => {
       it('should unselect any id doc that was previously selected', async () => {
         renderEditing({});
