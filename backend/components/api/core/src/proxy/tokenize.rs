@@ -119,7 +119,7 @@ pub async fn vault_pii(
         }
 
         // prepare the data
-        let data = DataRequest::clean_and_validate(data, ValidateArgs::for_non_portable(is_live))?;
+        let data = DataRequest::clean_and_validate_str(data, ValidateArgs::for_non_portable(is_live))?;
         let data = data.build_tenant_fingerprints(state, &tenant_id).await?;
 
         // prepare the documents

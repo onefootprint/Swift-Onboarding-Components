@@ -226,7 +226,7 @@ impl CollectedDataOption {
         match self {
             Self::Name => vec![IDK::FirstName.into(), IDK::LastName.into()],
             Self::Dob => vec![IDK::Dob.into()],
-            Self::Ssn9 => vec![IDK::Ssn9.into(), IDK::Ssn4.into()],
+            Self::Ssn9 => vec![IDK::Ssn9.into()], // No ssn4 here since it's derived
             Self::Ssn4 => vec![IDK::Ssn4.into()],
             // We'll optionally add City, State, and Zip to US addresses
             Self::FullAddress => vec![IDK::AddressLine1.into(), IDK::Country.into()],

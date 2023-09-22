@@ -1,24 +1,29 @@
 use super::utils;
 use super::Error;
 use crate::AllData;
+use crate::DataIdentifier;
 use crate::NtResult;
 use crate::Validate;
 use crate::ValidateArgs;
-use crate::{InvestorProfileKind as IPK, PiiString};
+use crate::{InvestorProfileKind as IPK, PiiString, PiiValue};
 use itertools::Itertools;
 use serde_with::DeserializeFromStr;
 use strum_macros::EnumString;
 
 impl Validate for IPK {
-    fn validate(&self, value: PiiString, _: ValidateArgs, _: &AllData) -> NtResult<PiiString> {
+    fn validate(
+        self,
+        value: PiiValue,
+        _: ValidateArgs,
+        _: &AllData,
+    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
         // Don't want anything to be empty
-        let value = utils::validate_not_empty(value)?;
         let value = match self {
-            Self::EmploymentStatus => utils::parse_enum::<EmploymentStatus>(value)?,
-            Self::Occupation => value,
-            Self::Employer => value,
-            Self::AnnualIncome => utils::parse_enum::<AnnualIncome>(value)?,
-            Self::NetWorth => utils::parse_enum::<NetWorth>(value)?,
+            Self::EmploymentStatus => utils::parse_enum::<EmploymentStatus>(value.as_string()?)?,
+            Self::Occupation => value.as_string()?,
+            Self::Employer => value.as_string()?,
+            Self::AnnualIncome => utils::parse_enum::<AnnualIncome>(value.as_string()?)?,
+            Self::NetWorth => utils::parse_enum::<NetWorth>(value.as_string()?)?,
             Self::InvestmentGoals => utils::parse_json_and_validate::<Vec<InvestmentGoal>, _>(value, |l| {
                 if l.is_empty() {
                     Err(Error::InvalidLength)
@@ -26,9 +31,9 @@ impl Validate for IPK {
                     Ok(())
                 }
             })?,
-            Self::RiskTolerance => utils::parse_enum::<RiskTolerance>(value)?,
+            Self::RiskTolerance => utils::parse_enum::<RiskTolerance>(value.as_string()?)?,
             Self::Declarations => utils::parse_json::<Vec<Declaration>>(value)?,
-            Self::BrokerageFirmEmployer => value,
+            Self::BrokerageFirmEmployer => value.as_string()?,
             Self::SeniorExecutiveSymbols => utils::parse_json_and_map::<Vec<String>, _>(value, |l| {
                 if l.is_empty() || l.iter().any(|symbol| symbol.len() < 3 || symbol.len() > 5) {
                     Err(Error::InvalidLength)
@@ -50,9 +55,10 @@ impl Validate for IPK {
                     Ok(())
                 }
             })?,
-            Self::PoliticalOrganization => value,
+            Self::PoliticalOrganization => value.as_string()?,
         };
-        Ok(value)
+        let value = utils::validate_not_empty(value)?;
+        Ok(vec![(self.into(), value)])
     }
 }
 

@@ -2,7 +2,8 @@ use super::utils;
 use super::{Error, VResult};
 use crate::email::Email;
 use crate::{
-    AllData, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, PhoneNumber, PiiString, ValidateArgs,
+    AllData, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, DataIdentifier, PhoneNumber, PiiString,
+    PiiValue, ValidateArgs,
 };
 use crate::{NtResult, Validate};
 use itertools::Itertools;
@@ -12,25 +13,30 @@ use strum::EnumString;
 use url::{Host, Url};
 
 impl Validate for BDK {
-    fn validate(&self, value: PiiString, args: ValidateArgs, _: &AllData) -> NtResult<PiiString> {
-        let value = utils::validate_not_empty(value)?;
-        let result = match self {
-            BDK::Name => value,
-            BDK::Dba => value,
-            BDK::Website => clean_and_validate_website(value)?,
-            BDK::PhoneNumber => PhoneNumber::parse(value)?.e164(),
-            BDK::Tin => clean_and_validate_tin(value)?,
-            BDK::AddressLine1 => value,
-            BDK::AddressLine2 => value,
-            BDK::City => value,
-            BDK::State => value,
-            BDK::Zip => utils::clean_and_validate_zip(value)?,
-            BDK::Country => utils::clean_and_validate_country(value)?,
+    fn validate(
+        self,
+        value: PiiValue,
+        args: ValidateArgs,
+        _: &AllData,
+    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
+        let value = match self {
+            BDK::Name => value.as_string()?,
+            BDK::Dba => value.as_string()?,
+            BDK::Website => clean_and_validate_website(value.as_string()?)?,
+            BDK::PhoneNumber => PhoneNumber::parse(value.as_string()?)?.e164(),
+            BDK::Tin => clean_and_validate_tin(value.as_string()?)?,
+            BDK::AddressLine1 => value.as_string()?,
+            BDK::AddressLine2 => value.as_string()?,
+            BDK::City => value.as_string()?,
+            BDK::State => value.as_string()?,
+            BDK::Zip => utils::clean_and_validate_zip(value.as_string()?)?,
+            BDK::Country => utils::clean_and_validate_country(value.as_string()?)?,
             BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?,
             BDK::KycedBeneficialOwners => clean_and_validate_kyced_beneficial_owners(value, args)?,
-            BDK::CorporationType => utils::parse_enum::<CorporationType>(value)?,
+            BDK::CorporationType => utils::parse_enum::<CorporationType>(value.as_string()?)?,
         };
-        Ok(result)
+        let value = utils::validate_not_empty(value)?;
+        Ok(vec![(self.into(), value)])
     }
 }
 
@@ -57,7 +63,7 @@ pub struct BusinessOwnerData {
     pub ownership_stake: u32,
 }
 
-fn clean_and_validate_beneficial_owners(input: PiiString) -> VResult<PiiString> {
+fn clean_and_validate_beneficial_owners(input: PiiValue) -> VResult<PiiString> {
     utils::parse_json_and_validate::<Vec<BusinessOwnerData>, _>(input, |l| {
         if l.is_empty() {
             return Err(Error::InvalidLength);
@@ -87,7 +93,7 @@ where
 
 type KycedBusinessOwnerDataDe = KycedBusinessOwnerData<Option<()>>;
 
-fn clean_and_validate_kyced_beneficial_owners(input: PiiString, args: ValidateArgs) -> VResult<PiiString> {
+fn clean_and_validate_kyced_beneficial_owners(input: PiiValue, args: ValidateArgs) -> VResult<PiiString> {
     utils::parse_json_and_map::<Vec<KycedBusinessOwnerDataDe>, _>(input, |bos| {
         if bos.is_empty() {
             return Err(Error::InvalidLength);
@@ -176,6 +182,7 @@ mod test {
     use super::BDK::*;
     use crate::BusinessDataKind as BDK;
     use crate::PiiString;
+    use crate::PiiValue;
     use crate::Validate;
     use crate::ValidateArgs;
     use serde_json::json;
@@ -210,13 +217,10 @@ mod test {
     #[test_case(BeneficialOwners, "[{\"first_name\": \"Piip\", \"last_name\": \"The Penguin\", \"ownership_stake\": 90}, {\"first_name\": \"Marco\", \"last_name\": \"The Penguin\", \"ownership_stake\": 90}]" => None)]
     #[test_case(BeneficialOwners, "I am not json" => None)]
     fn test_clean_and_validate_field_not_bifrost(bdk: BDK, pii: &str) -> Option<String> {
-        bdk.validate(
-            PiiString::new(pii.to_owned()),
-            ValidateArgs::for_tests(),
-            &HashMap::new(),
-        )
-        .ok()
-        .map(|pii| pii.leak_to_string())
+        bdk.validate(PiiValue::string(pii), ValidateArgs::for_tests(), &HashMap::new())
+            .ok()
+            .and_then(|pii| pii.into_iter().next())
+            .map(|pii| pii.1.leak_to_string())
     }
 
     #[test]
@@ -232,11 +236,15 @@ mod test {
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners
             .validate(
-                PiiString::new(input_str),
+                PiiValue::string(&input_str),
                 ValidateArgs::for_tests(),
                 &HashMap::new(),
             )
-            .unwrap();
+            .unwrap()
+            .into_iter()
+            .next()
+            .unwrap()
+            .1;
         let result: Vec<KycedBusinessOwnerData> = serde_json::de::from_str(result.leak()).unwrap();
         let owner = result.into_iter().next().unwrap();
         assert!(owner.link_id.to_string().starts_with("bo_link_"));
@@ -257,7 +265,7 @@ mod test {
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners.validate(
-            PiiString::new(input_str),
+            PiiString::new(input_str).into(),
             ValidateArgs::for_tests(),
             &HashMap::new(),
         );
@@ -274,7 +282,7 @@ mod test {
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners.validate(
-            PiiString::new(input_str),
+            PiiString::new(input_str).into(),
             ValidateArgs::for_tests(),
             &HashMap::new(),
         );
@@ -297,7 +305,7 @@ mod test {
 
         let input_str = serde_json::ser::to_string(&input).unwrap();
         let result = BDK::KycedBeneficialOwners.validate(
-            PiiString::new(input_str),
+            PiiValue::string(&input_str),
             ValidateArgs::for_tests(),
             &HashMap::new(),
         );

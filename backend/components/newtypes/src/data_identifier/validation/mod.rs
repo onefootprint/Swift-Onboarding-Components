@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{CollectedDataOption, DataIdentifier, NtResult, PiiString, ValidateArgs};
+use crate::{CollectedDataOption, DataIdentifier, NtResult, PiiString, PiiValue, ValidateArgs};
 
 mod business;
 mod card;
@@ -9,17 +9,22 @@ mod investor_profile;
 mod utils;
 
 pub use business::{BusinessOwnerData, KycedBusinessOwnerData};
-pub use card::{CardIssuer, Expiration as CardExpiration};
+pub use card::CardIssuer;
 pub use identity::UsLegalStatus;
 pub use investor_profile::Declaration;
 
-pub type AllData = HashMap<DataIdentifier, PiiString>;
+pub type AllData = HashMap<DataIdentifier, PiiValue>;
 
 pub const DATE_FORMAT: &str = "%Y-%m-%d";
 
 pub trait Validate {
     /// Performs basic cleaning and validation for all data that we store in our vaults.
-    fn validate(&self, value: PiiString, args: ValidateArgs, all_data: &AllData) -> NtResult<PiiString>;
+    fn validate(
+        self,
+        value: PiiValue,
+        args: ValidateArgs,
+        all_data: &AllData,
+    ) -> NtResult<Vec<(DataIdentifier, PiiString)>>;
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -81,6 +86,8 @@ pub enum Error {
     PartialUpdateNotAllowed(CollectedDataOption),
     #[error("This piece of data is already set and cannot be replaced.")]
     CannotReplaceData,
+    #[error("Expected string value, received JSON value.")]
+    ExpectedStringFormat,
 }
 
 pub type VResult<T> = Result<T, Error>;

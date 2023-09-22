@@ -1,18 +1,15 @@
 use crate::data_identifier::ValidationError;
 use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
 use crate::{
-    CardDataKind as CDK, CardInfo, CardIssuer, CollectedDataOption, DataIdentifier, Error, Fingerprint,
-    FingerprintScopeKind, IdentityDataKind as IDK, PiiString, StorageType, TenantId, Validate, VaultKind,
+    CollectedDataOption, DataIdentifier, Error, Fingerprint, FingerprintScopeKind, PiiString, PiiValue,
+    StorageType, TenantId, Validate, VaultKind,
 };
 use crate::{DataValidationError, NtResult};
-use card_validate::Validate as CardValidate;
 use either::Either::{Left, Right};
 use itertools::Itertools;
 use std::clone::Clone;
 use std::collections::{HashMap, HashSet};
 use strum::IntoEnumIterator;
-
-pub type DataIdentifierRequest = HashMap<DataIdentifier, PiiString>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FingerprintRequest {
@@ -28,7 +25,7 @@ pub type Fingerprints = HashSet<FingerprintRequest>;
 pub struct DataRequest<T> {
     #[deref]
     #[deref_mut]
-    data: DataIdentifierRequest,
+    data: HashMap<DataIdentifier, PiiString>,
     fingerprints: T,
 }
 
@@ -36,10 +33,8 @@ impl<T> DataRequest<T> {
     pub fn is_empty(&self) -> bool {
         self.data.is_empty()
     }
-}
 
-impl<T> DataRequest<T> {
-    pub fn decompose(self) -> (DataIdentifierRequest, T) {
+    pub fn decompose(self) -> (HashMap<DataIdentifier, PiiString>, T) {
         (self.data, self.fingerprints)
     }
 }
@@ -90,81 +85,22 @@ impl ValidateArgs {
     }
 }
 
-/// Given an entry in a DataIdentifierRequest, determines if we should add any other derived
-/// entries to the DataIdentifierRequest that are a function of other DIs
-fn derived_entry(di: &DataIdentifier, v: &PiiString) -> Vec<(DataIdentifier, PiiString)> {
-    match di {
-        // Autopopulate Ssn4 if we have Ssn9
-        DataIdentifier::Id(IDK::Ssn9) => {
-            let ssn4 = PiiString::new(v.leak().chars().skip(v.leak().len() - 4).collect());
-            vec![(IDK::Ssn4.into(), ssn4)]
-        }
-        // Autopopulate CDK last4 and exp_month/year
-        DataIdentifier::Card(CardInfo { alias, kind }) => match kind {
-            CDK::Number => {
-                let last4: PiiString = PiiString::new(v.leak().chars().skip(v.leak().len() - 4).collect());
-                let last4_di = CardInfo {
-                    alias: alias.clone(),
-                    kind: CDK::Last4,
-                }
-                .into();
-                let last4_entry = Some((last4_di, last4));
-                // If we can't parse the number, silently fail to derive the issuer - we'll get a
-                // nicer error later on when we try to parse the number
-                let issuer_entry = CardValidate::from(v.leak())
-                    .ok()
-                    .map(|v| CardIssuer::from(v.card_type))
-                    .map(|issuer| {
-                        let di = CardInfo {
-                            alias: alias.clone(),
-                            kind: CDK::Issuer,
-                        }
-                        .into();
-                        (di, PiiString::new(issuer.to_string()))
-                    });
-                vec![last4_entry, issuer_entry].into_iter().flatten().collect()
-            }
-            CDK::Expiration => {
-                // TODO: derivation should encapsulate validation so we don't need this check here
-                let Some(expiration) = crate::CardExpiration::validate(v).ok() else {
-                    return vec![];
-                };
-
-                vec![
-                    (
-                        CardInfo {
-                            alias: alias.clone(),
-                            kind: CDK::ExpMonth,
-                        }
-                        .into(),
-                        expiration.month,
-                    ),
-                    (
-                        CardInfo {
-                            alias: alias.clone(),
-                            kind: CDK::ExpYear,
-                        }
-                        .into(),
-                        expiration.year,
-                    ),
-                ]
-            }
-            _ => vec![],
-        },
-        _ => vec![],
-    }
-}
-
 impl DataRequest<()> {
+    pub fn clean_and_validate_str(
+        map: HashMap<DataIdentifier, PiiString>,
+        args: ValidateArgs,
+    ) -> NtResult<Self> {
+        let map = map.into_iter().map(|(k, v)| (k, v.into())).collect();
+        Self::clean_and_validate(map, args)
+    }
+
     /// Parses, cleans, and validates DataIdentifiers of type T into a DataRequest<T> and returns
     /// the remaining unused data
-    pub fn clean_and_validate(map: DataIdentifierRequest, args: ValidateArgs) -> NtResult<Self> {
-        let unallowed_derived_dis: HashMap<_, _> = map
+    pub fn clean_and_validate(map: HashMap<DataIdentifier, PiiValue>, args: ValidateArgs) -> NtResult<Self> {
+        let unallowed_entries: HashMap<_, _> = map
             .keys()
             .filter_map(|di| {
-                let err = if di.is_derived() {
-                    Some(ValidationError::CannotSpecifyDerivedEntry.into())
-                } else if di.storage_type() != StorageType::VaultData {
+                let err = if di.storage_type() != StorageType::VaultData {
                     Some(ValidationError::CannotVault.into())
                 } else {
                     None
@@ -172,36 +108,50 @@ impl DataRequest<()> {
                 err.map(|e| (di.clone(), e))
             })
             .collect();
-        if !unallowed_derived_dis.is_empty() {
-            return Err(DataValidationError::FieldValidationError(unallowed_derived_dis).into());
+        if !unallowed_entries.is_empty() {
+            return Err(DataValidationError::FieldValidationError(unallowed_entries).into());
         }
 
-        // Purposefully overlay derived entries on top of existing entries in order to overwrite
-        // an ssn4 that's provided and might not match the given ssn9
-        let derived_entries = map.iter().flat_map(|(di, v)| derived_entry(di, v));
-        let data: DataIdentifierRequest = map.clone().into_iter().chain(derived_entries).collect();
-
         // Then, validate that there are no "dangling" extra keys in this request.
-        // For example, don't allow updating only AddressLine1 - need the whoel address
-        let new_dis = data.keys().cloned().collect_vec();
+        // For example, don't allow updating only AddressLine1 - need the whole address
+        let new_dis = map.keys().cloned().collect_vec();
         let dangling_keys = CollectedDataOption::dangling_identifiers(new_dis);
         if !args.allow_dangling_keys && !dangling_keys.is_empty() {
             let err = Error::from(DataValidationError::ExtraFieldError(dangling_keys));
             return Err(err);
         }
 
+        // Remove any entries that will be overwritten with derived entries.
+        // TODO: I don't love that this has to be independently maintained. But all except ssn4
+        // have protection - ssn4 is unique because it is both derived _and_ can be written
+        use crate::IdentityDataKind as IDK;
+        let derived_dis = map
+            .keys()
+            .flat_map(|di| match di {
+                DataIdentifier::Id(IDK::Ssn9) => vec![IDK::Ssn4.into()],
+                _ => vec![],
+            })
+            .collect_vec();
+        let map: HashMap<_, _> = map
+            .into_iter()
+            .filter(|(k, _)| !derived_dis.contains(k))
+            .collect();
+
         // Clean and validate each individual piece of data
-        let all_data = data.clone();
-        let (cleaned_data, errors): (HashMap<_, _>, HashMap<_, _>) =
-            data.into_iter()
-                .partition_map(|(k, v)| match k.validate(v, args, &all_data) {
-                    Ok(v) => Left((k, v)),
-                    Err(v) => Right((k, v)),
+        // Can just use AllData to grab the original types of each piece of data.
+        // we would then miss the types of derived data, though
+        let all_data = map.clone();
+        let (cleaned_data, errors): (Vec<_>, HashMap<_, _>) =
+            map.into_iter()
+                .partition_map(|(k, v)| match k.clone().validate(v, args, &all_data) {
+                    Ok(v) => Left(v),
+                    Err(err) => Right((k, err)),
                 });
         if !errors.is_empty() {
             return Err(DataValidationError::FieldValidationError(errors).into());
         }
 
+        let cleaned_data = cleaned_data.into_iter().flatten().collect();
         let request = Self {
             data: cleaned_data,
             // Initially create the request with no fingerprints - they need to be added with an

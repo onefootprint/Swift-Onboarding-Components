@@ -70,7 +70,7 @@ fn test_discriminant(di: DI) {
 #[test_case(vec![IDK::FirstName.into(), IDK::LastName.into(), IDK::Dob.into(), IDK::Email.into()] => HashSet::from_iter([CDO::Name, CDO::Dob, CDO::Email]))]
 #[test_case(vec![IDK::Ssn4.into(), IDK::Dob.into()] => HashSet::from_iter([CDO::Ssn4, CDO::Dob]))]
 #[test_case(vec![IDK::Ssn4.into(), IDK::Ssn9.into(), IDK::Dob.into()] => HashSet::from_iter([CDO::Ssn9, CDO::Dob]))]
-#[test_case(vec![IDK::Ssn9.into()] => HashSet::from_iter([]))]
+#[test_case(vec![IDK::Ssn9.into()] => HashSet::from_iter([CDO::Ssn9]))]
 #[test_case(vec![IDK::AddressLine1.into(), IDK::City.into(), IDK::State.into(), IDK::Zip.into(), IDK::Country.into()] => HashSet::from_iter([CDO::FullAddress]))]
 #[test_case(vec![IDK::AddressLine1.into(), IDK::AddressLine2.into(), IDK::City.into(), IDK::State.into(), IDK::Zip.into(), IDK::Country.into()] => HashSet::from_iter([CDO::FullAddress]))]
 #[test_case(vec![IDK::AddressLine1.into(), IDK::AddressLine2.into(), IDK::City.into(), IDK::State.into(), IDK::Zip.into(), IDK::Country.into(), IDK::FirstName.into()] => HashSet::from_iter([CDO::FullAddress]))]

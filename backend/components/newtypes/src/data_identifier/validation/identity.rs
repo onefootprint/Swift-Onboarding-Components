@@ -2,8 +2,8 @@ use super::utils;
 use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
 use crate::{
-    AllData, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, PhoneNumber, PiiString, ValidateArgs,
-    DATE_FORMAT,
+    AllData, DataIdentifier, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, PhoneNumber, PiiString,
+    PiiValue, ValidateArgs, DATE_FORMAT,
 };
 use chrono::{Datelike, NaiveDate, Utc};
 use serde_with::DeserializeFromStr;
@@ -11,27 +11,30 @@ use std::str::FromStr;
 use strum_macros::EnumString;
 
 impl Validate for IDK {
-    fn validate(&self, value: PiiString, args: ValidateArgs, _: &AllData) -> NtResult<PiiString> {
+    fn validate(
+        self,
+        value: PiiValue,
+        args: ValidateArgs,
+        _: &AllData,
+    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
         // Generally don't want anything to be empty
-        let value = utils::validate_not_empty(value)?;
-        let result = match self {
-            IDK::FirstName => validate_name(value, args.for_bifrost)?,
-            IDK::LastName => validate_name(value, args.for_bifrost)?,
-            IDK::Dob => clean_and_validate_dob(value, args.for_bifrost)?,
-            IDK::Ssn4 => clean_and_validate_ssn4(value)?,
-            IDK::Ssn9 => clean_and_validate_ssn9(value)?,
-            IDK::AddressLine1 => validate_address(value, args.for_bifrost)?,
-            IDK::AddressLine2 => value,
-            IDK::City => value,
-            IDK::State => value, // maybe we'll want to validate state based on country some day
-            IDK::Zip => utils::clean_and_validate_zip(value)?,
-            IDK::Country => utils::clean_and_validate_country(value)?,
-            IDK::Email => clean_and_validate_email(value)?,
-            IDK::PhoneNumber => clean_and_validate_phone(value)?,
-            IDK::Nationality => utils::clean_and_validate_country(value)?,
-            IDK::UsLegalStatus => utils::parse_enum::<UsLegalStatus>(value)?,
-            IDK::VisaKind => utils::parse_enum::<VisaKind>(value)?,
-            IDK::VisaExpirationDate => clean_and_validate_date(value)?,
+        let value = match self {
+            IDK::FirstName => validate_name(value.as_string()?, args.for_bifrost)?,
+            IDK::LastName => validate_name(value.as_string()?, args.for_bifrost)?,
+            IDK::Dob => clean_and_validate_dob(value.as_string()?, args.for_bifrost)?,
+            IDK::Ssn4 => clean_and_validate_ssn4(value.as_string()?)?,
+            IDK::AddressLine1 => validate_address(value.as_string()?, args.for_bifrost)?,
+            IDK::AddressLine2 => value.as_string()?,
+            IDK::City => value.as_string()?,
+            IDK::State => value.as_string()?, // maybe we'll want to validate state based on country some day
+            IDK::Zip => utils::clean_and_validate_zip(value.as_string()?)?,
+            IDK::Country => utils::clean_and_validate_country(value.as_string()?)?,
+            IDK::Email => clean_and_validate_email(value.as_string()?)?,
+            IDK::PhoneNumber => clean_and_validate_phone(value.as_string()?)?,
+            IDK::Nationality => utils::clean_and_validate_country(value.as_string()?)?,
+            IDK::UsLegalStatus => utils::parse_enum::<UsLegalStatus>(value.as_string()?)?,
+            IDK::VisaKind => utils::parse_enum::<VisaKind>(value.as_string()?)?,
+            IDK::VisaExpirationDate => clean_and_validate_date(value.as_string()?)?,
             IDK::Citizenships => {
                 utils::parse_json_and_validate::<Vec<Iso3166TwoDigitCountryCode>, _>(value, |v| {
                     if v.is_empty() {
@@ -40,8 +43,15 @@ impl Validate for IDK {
                     Ok(())
                 })?
             }
+            // Special one that returns derived entries
+            IDK::Ssn9 => {
+                let ssn9 = clean_and_validate_ssn9(value.as_string()?)?;
+                let ssn4 = PiiString::new(ssn9.leak().chars().skip(ssn9.leak().len() - 4).collect());
+                return Ok(vec![(IDK::Ssn9.into(), ssn9), (IDK::Ssn4.into(), ssn4)]);
+            }
         };
-        Ok(result)
+        let value = utils::validate_not_empty(value)?;
+        Ok(vec![(self.into(), value)])
     }
 }
 
@@ -149,7 +159,7 @@ mod test {
 
     use super::IDK::*;
     use crate::IdentityDataKind as IDK;
-    use crate::PiiString;
+    use crate::PiiValue;
     use crate::Validate;
     use crate::ValidateArgs;
     use test_case::test_case;
@@ -187,12 +197,13 @@ mod test {
     #[test_case(Nationality, "Flerp" => None)]
     fn test_clean_and_validate_field_not_bifrost(idk: IDK, pii: &str) -> Option<String> {
         idk.validate(
-            PiiString::new(pii.to_owned()),
+            PiiValue::string(pii),
             ValidateArgs::for_non_portable(true),
             &HashMap::new(),
         )
         .ok()
-        .map(|pii| pii.leak_to_string())
+        .and_then(|pii| pii.into_iter().next())
+        .map(|pii| pii.1.leak_to_string())
     }
 
     #[test_case(Dob, "1876-12-25" => None)]
@@ -211,8 +222,9 @@ mod test {
             for_bifrost: true,
             ..ValidateArgs::for_tests()
         };
-        idk.validate(PiiString::new(pii.to_owned()), args, &HashMap::new())
+        idk.validate(PiiValue::string(pii), args, &HashMap::new())
             .ok()
-            .map(|pii| pii.leak_to_string())
+            .and_then(|pii| pii.into_iter().next())
+            .map(|pii| pii.1.leak_to_string())
     }
 }

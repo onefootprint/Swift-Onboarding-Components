@@ -1,5 +1,5 @@
 use super::{Error, VResult};
-use crate::{Iso3166TwoDigitCountryCode, PiiString};
+use crate::{Iso3166TwoDigitCountryCode, PiiString, PiiValue};
 use regex::Regex;
 use serde::de::DeserializeOwned;
 use std::str::FromStr;
@@ -39,30 +39,31 @@ where
     Ok(value)
 }
 
-pub(super) fn parse_json<T>(value: PiiString) -> VResult<PiiString>
+pub(super) fn parse_json<T>(value: PiiValue) -> VResult<PiiString>
 where
     T: DeserializeOwned,
 {
     parse_json_and_validate::<T, _>(value, |_| Ok(()))
 }
 
-pub(super) fn parse_json_and_validate<T, F>(value: PiiString, f: F) -> VResult<PiiString>
+pub(super) fn parse_json_and_validate<T, F>(value: PiiValue, f: F) -> VResult<PiiString>
 where
     T: DeserializeOwned,
     F: FnOnce(T) -> VResult<()>,
 {
     parse_json_and_map(value.clone(), |v| {
         f(v)?;
-        Ok(value) // Return unchanged value
+        let result = value.to_piistring()?; // Return unchanged value
+        Ok(result)
     })
 }
 
-pub(super) fn parse_json_and_map<T, F>(value: PiiString, f: F) -> VResult<PiiString>
+pub(super) fn parse_json_and_map<T, F>(value: PiiValue, f: F) -> VResult<PiiString>
 where
     T: DeserializeOwned,
     F: FnOnce(T) -> VResult<PiiString>,
 {
-    let parsed_value = value.deserialize()?;
+    let parsed_value = value.deserialize_maybe_str()?;
     let value = f(parsed_value)?;
     Ok(value)
 }

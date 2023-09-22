@@ -90,7 +90,8 @@ impl VaultWrapper<Person> {
 
         // Add the phone number to the vault since it was used to create it
         let data = HashMap::from_iter([((&authed_data).into(), authed_data.data())].into_iter());
-        let request = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(ob_config.is_live))?;
+        let request =
+            DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(ob_config.is_live))?;
         let request = request.manual_fingerprints(HashSet::from_iter(
             [
                 // Don't create a globally-scoped fingerprint for our fixture phone number, otherwise

@@ -1,5 +1,7 @@
 use super::{utils, Error, VResult};
-use crate::{AliasId, AllData, CardDataKind as CDK, CardInfo as CI, PiiString, ValidateArgs};
+use crate::{
+    AliasId, AllData, CardDataKind as CDK, CardInfo as CI, DataIdentifier, PiiString, PiiValue, ValidateArgs,
+};
 use crate::{NtResult, Validate};
 use card_validate::Validate as CardValidate;
 use itertools::Itertools;
@@ -7,21 +9,28 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 
 impl Validate for CI {
-    fn validate(&self, value: PiiString, args: ValidateArgs, all_data: &AllData) -> NtResult<PiiString> {
-        let Self { alias, kind } = self;
+    fn validate(
+        self,
+        value: PiiValue,
+        args: ValidateArgs,
+        all_data: &AllData,
+    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
+        let Self { alias, kind } = &self;
+        let value = value.as_string()?;
         let result = match kind {
-            CDK::Number => validate_card_number(value, args)?,
             CDK::Cvc => validate_cc_cvc(value, alias, all_data)?,
-            CDK::Expiration => Expiration::validate(&value)?.into(),
-            CDK::ExpMonth => Expiration::validate_month(value.leak())?,
-            CDK::ExpYear => Expiration::validate_year(value.leak())?,
-            CDK::Last4 => validate_card_number_last4(value)?,
             CDK::Name => validate_card_name(value)?,
             CDK::BillingZip => utils::clean_and_validate_zip(value)?,
             CDK::BillingCountry => utils::clean_and_validate_country(value)?,
-            CDK::Issuer => utils::parse_enum::<CardIssuer>(value)?,
+            // Special ones that return derived entries
+            CDK::Number => return validate_card_number(alias, value, args),
+            CDK::Expiration => return validate_expiration(alias, value),
+            CDK::Last4 => return Err(Error::CannotSpecifyDerivedEntry.into()),
+            CDK::Issuer => return Err(Error::CannotSpecifyDerivedEntry.into()),
+            CDK::ExpMonth => return Err(Error::CannotSpecifyDerivedEntry.into()),
+            CDK::ExpYear => return Err(Error::CannotSpecifyDerivedEntry.into()),
         };
-        Ok(result)
+        Ok(vec![(self.into(), result)])
     }
 }
 
@@ -67,22 +76,29 @@ impl From<card_validate::Type> for CardIssuer {
     }
 }
 
-fn validate_card_number(value: PiiString, args: ValidateArgs) -> VResult<PiiString> {
-    if args.ignore_luhn_validation {
+fn validate_card_number(
+    alias: &AliasId,
+    value: PiiString,
+    args: ValidateArgs,
+) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
+    // Derive the issuer
+    let issuer_entry = if args.ignore_luhn_validation {
         // Silence almost all validation for a handful of cards that don't obey the normal validation rules
         if !value.leak().chars().all(|c| c.is_numeric()) {
             return Err(Error::CardError(
                 "Invalid format. Please verify that the number is correct".to_owned(),
-            ));
+            )
+            .into());
         }
         if value.len() < 10 || value.len() > 19 {
             return Err(Error::CardError(
                 "Invalid length. Please verify that the number is correct".to_owned(),
-            ));
+            )
+            .into());
         }
-        return Ok(value);
+        None
     } else {
-        CardValidate::from(value.leak()).map_err(|e| {
+        let validate = CardValidate::from(value.leak()).map_err(|e| {
             Error::CardError(match e {
                 card_validate::ValidateError::InvalidLuhn => {
                     "Invalid checksum. Please verify that the number is correct".to_owned()
@@ -99,15 +115,65 @@ fn validate_card_number(value: PiiString, args: ValidateArgs) -> VResult<PiiStri
                 _ => format!("{:?}", e),
             })
         })?;
+        let issuer = CardIssuer::from(validate.card_type);
+        let di = CI {
+            alias: alias.clone(),
+            kind: CDK::Issuer,
+        }
+        .into();
+        Some((di, PiiString::from(issuer)))
+    };
+    // Derive the last 4
+    let last4: PiiString = PiiString::new(value.leak().chars().skip(value.leak().len() - 4).collect());
+    let last4_di = CI {
+        alias: alias.clone(),
+        kind: CDK::Last4,
     }
-    Ok(value)
+    .into();
+    let last4_entry = Some((last4_di, last4));
+
+    let number_di = CI {
+        alias: alias.clone(),
+        kind: CDK::Number,
+    }
+    .into();
+    let number_entry = Some((number_di, value));
+    let entries = vec![number_entry, last4_entry, issuer_entry]
+        .into_iter()
+        .flatten()
+        .collect();
+    Ok(entries)
 }
 
-fn validate_card_number_last4(value: PiiString) -> VResult<PiiString> {
-    if !(value.leak().len() == 4 && value.leak().chars().all(|c| c.is_ascii_digit())) {
-        return Err(Error::CardError("Card last 4 are invalid".into()));
-    }
-    Ok(value)
+fn validate_expiration(alias: &AliasId, value: PiiString) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
+    let exp = Expiration::validate(&value)?;
+    let entries = vec![
+        (
+            CI {
+                alias: alias.clone(),
+                kind: CDK::Expiration,
+            }
+            .into(),
+            exp.clone().into(),
+        ),
+        (
+            CI {
+                alias: alias.clone(),
+                kind: CDK::ExpMonth,
+            }
+            .into(),
+            exp.month,
+        ),
+        (
+            CI {
+                alias: alias.clone(),
+                kind: CDK::ExpYear,
+            }
+            .into(),
+            exp.year,
+        ),
+    ];
+    Ok(entries)
 }
 
 fn validate_card_name(value: PiiString) -> VResult<PiiString> {
@@ -122,7 +188,7 @@ fn validate_card_name(value: PiiString) -> VResult<PiiString> {
 }
 
 #[derive(Debug, Clone)]
-pub struct Expiration {
+struct Expiration {
     pub month: PiiString,
     pub year: PiiString,
 }
@@ -137,7 +203,7 @@ impl Expiration {
     /// year_4     = [0-9][0-9][0-9][0-9]
     ///
     /// But stored as `MM/YYYY`
-    pub fn validate(value: &PiiString) -> VResult<Expiration> {
+    fn validate(value: &PiiString) -> VResult<Expiration> {
         let mut iter = value
             .leak()
             .chars()
@@ -208,6 +274,8 @@ fn validate_cc_cvc(value: PiiString, alias: &AliasId, all_data: &AllData) -> VRe
     };
     let validated_card_number = all_data
         .get(&number_di.into())
+        .map(|v| v.clone().as_string())
+        .transpose()?
         .and_then(|v| CardValidate::from(v.leak()).ok());
     if let Some(card_number) = validated_card_number {
         let expected_length = match CardIssuer::from(card_number.card_type) {
@@ -227,7 +295,7 @@ mod test {
 
     use super::CDK::*;
     use super::{CDK, CI};
-    use crate::{AliasId, Validate};
+    use crate::{AliasId, PiiValue, Validate};
     use crate::{PiiString, ValidateArgs};
     use test_case::test_case;
 
@@ -248,9 +316,10 @@ mod test {
             ..ValidateArgs::for_tests()
         };
         CI { alias, kind }
-            .validate(PiiString::new(pii.to_owned()), args, &HashMap::new())
+            .validate(PiiValue::string(pii), args, &HashMap::new())
             .ok()
-            .map(|pii| pii.leak_to_string())
+            .and_then(|pii| pii.into_iter().next())
+            .map(|pii| pii.1.leak_to_string())
     }
 
     #[test_case("4428680502681658" => Some("4428680502681658".to_owned()))]
@@ -269,9 +338,10 @@ mod test {
             alias,
             kind: CDK::Number,
         }
-        .validate(PiiString::new(pii.to_owned()), args, &HashMap::new())
+        .validate(PiiValue::string(pii), args, &HashMap::new())
         .ok()
-        .map(|pii| pii.leak_to_string())
+        .and_then(|pii| pii.into_iter().next())
+        .map(|pii| pii.1.leak_to_string())
     }
 
     // Visa
@@ -287,16 +357,14 @@ mod test {
             alias: alias.clone(),
             kind: CDK::Number,
         };
-        let other_data = [(number_di.into(), PiiString::new(card_number.into()))]
+        let other_data = [(number_di.into(), PiiValue::string(card_number))]
             .into_iter()
             .collect();
         let cvc_di = CI {
             alias,
             kind: CDK::Cvc,
         };
-        cvc_di
-            .validate(PiiString::new(cvc.into()), args, &other_data)
-            .is_ok()
+        cvc_di.validate(PiiValue::string(cvc), args, &other_data).is_ok()
     }
 
     #[test_case("12/24" => Some("12/2024".into()))]

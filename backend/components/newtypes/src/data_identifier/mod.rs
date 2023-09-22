@@ -33,8 +33,8 @@ pub use self::{
     investor_profile_kind::*, validation::Error as ValidationError, validation::*,
 };
 use crate::{
-    util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, PiiJsonValue, PiiString,
-    PiiValue, PiiValueKind, ValidateArgs, VaultKind,
+    util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, NtResult, PiiJsonValue,
+    PiiString, PiiValue, PiiValueKind, ValidateArgs, VaultKind,
 };
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -116,30 +116,22 @@ impl DataIdentifier {
         )
     }
 
-    /// True if the given DI can only be derived and should not be allowed to be vaulted directly
-    /// via API
-    pub fn is_derived(&self) -> bool {
-        match self {
-            Self::Card(CardInfo { alias: _, kind }) => matches!(
-                kind,
-                CardDataKind::Issuer | CardDataKind::ExpMonth | CardDataKind::ExpYear | CardDataKind::Last4
-            ),
-            _ => false,
-        }
-    }
-
     pub fn globally_unique(&self) -> bool {
         matches!(self, Self::Id(IdentityDataKind::PhoneNumber))
     }
 }
 
 impl Validate for DataIdentifier {
+    /// Validate the value for the given DataIdentifier.
+    /// Returns an Ok result with all of entries to be vaulted (including derived entries).
+    /// Each entry's value is represented as a PiiString when saved in the vault, even if the
+    /// input type was a JSON.
     fn validate(
-        &self,
-        value: crate::PiiString,
+        self,
+        value: PiiValue,
         args: ValidateArgs,
         all_data: &AllData,
-    ) -> crate::NtResult<crate::PiiString> {
+    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
         match self {
             Self::Id(s) => s.validate(value, args, all_data),
             Self::Custom(s) => s.validate(value, args, all_data),

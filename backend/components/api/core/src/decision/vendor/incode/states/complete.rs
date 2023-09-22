@@ -133,7 +133,7 @@ fn doc_first_id_data(r: &FetchOCRResponse, validate_args: ValidateArgs) -> Vec<(
     .into_iter()
     .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))
     // Don't add OCR data that fails validation - don't want it to block sign up
-    .flat_map(|(k, v)| k.validate(v.clone(), validate_args, &HashMap::new()).is_ok().then_some((k, v)))
+    .filter(|(k, v)| k.clone().validate(v.clone().into(), validate_args, &HashMap::new()).is_ok())
     .collect()
 }
 
@@ -193,7 +193,7 @@ impl Complete {
         };
 
         let data = HashMap::from_iter(ocr_data.into_iter().chain(id_data.into_iter()));
-        let data = DataRequest::clean_and_validate(data, validate_args)?;
+        let data = DataRequest::clean_and_validate_str(data, validate_args)?;
         let data = data.no_fingerprints();
         let source = DataLifetimeSource::Ocr;
         let seqno = uvw.patch_data(conn, data, source)?.seqno;
