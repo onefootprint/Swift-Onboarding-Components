@@ -10,7 +10,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::decision_intent::DecisionIntent;
-use super::verification_request::VerificationRequest;
+use super::verification_request::{RequestAndResult, VerificationRequest};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
 #[diesel(table_name = verification_result)]
@@ -101,10 +101,11 @@ impl VerificationResult {
     }
 
     #[tracing::instrument("VerificationResult::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &VerificationResultId) -> DbResult<Self> {
-        let user = verification_result::table
+    pub fn get(conn: &mut PgConn, id: &VerificationResultId) -> DbResult<RequestAndResult> {
+        let res = verification_request::table
+            .inner_join(verification_result::table)
             .filter(verification_result::id.eq(id))
             .first(conn)?;
-        Ok(user)
+        Ok(res)
     }
 }

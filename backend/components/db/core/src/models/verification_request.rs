@@ -45,6 +45,7 @@ struct NewVerificationRequestRow {
     decision_intent_id: DecisionIntentId,
 }
 
+pub type RequestAndResult = (VerificationRequest, VerificationResult);
 pub type RequestAndMaybeResult = (VerificationRequest, Option<VerificationResult>);
 
 impl VerificationRequest {

@@ -470,15 +470,10 @@ mod tests {
     }
 
     async fn assert_vendor_result(state: &mut State, expected_vendor: Vendor, vr: VendorResult) {
-        let vreqid = vr.verification_request_id.clone();
         let vresid = vr.verification_result_id.clone();
         let (vreq, vres) = state
             .db_pool
-            .db_query(move |conn| {
-                let vreq = VerificationRequest::get(conn, &vreqid).unwrap();
-                let vres = VerificationResult::get(conn, &vresid).unwrap();
-                (vreq, vres)
-            })
+            .db_query(move |conn| VerificationResult::get(conn, &vresid).unwrap())
             .await
             .unwrap();
 

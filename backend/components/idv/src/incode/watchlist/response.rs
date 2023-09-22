@@ -10,7 +10,6 @@ impl APIResponseToIncodeError for WatchlistResultResponse {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct WatchlistResultResponse {
     pub status: Option<String>,
     pub content: Option<Content>,
@@ -20,13 +19,11 @@ pub struct WatchlistResultResponse {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Content {
     pub data: Option<Data>,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Data {
     pub id: Option<i32>,
     #[serde(rename = "ref")]
@@ -40,8 +37,8 @@ pub struct Data {
     pub search_term: Option<ScrubbedPiiString>,
     pub total_hits: Option<i32>,
     pub total_matches: Option<i32>,
-    pub updated_at: Option<DateTime<Utc>>,
-    pub created_at: Option<DateTime<Utc>>,
+    pub updated_at: Option<String>, // dont make this DateTime<Utc>
+    pub created_at: Option<String>,
     pub tags: Option<Vec<String>>,
     pub limit: Option<i32>,
     pub offset: Option<i32>,
@@ -49,7 +46,6 @@ pub struct Data {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Filters {
     pub country_codes: Option<Vec<String>>,
     pub exact_match: Option<bool>,
@@ -59,7 +55,6 @@ pub struct Filters {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Hit {
     pub score: Option<f32>,
     pub is_whitelisted: Option<bool>,
@@ -69,7 +64,6 @@ pub struct Hit {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct MatchTypeDetail {
     pub aml_types: Option<Vec<String>>,
     pub matching_name: Option<ScrubbedPiiString>,
@@ -80,14 +74,12 @@ pub struct MatchTypeDetail {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct NameMatch {
     pub match_types: Option<Vec<String>>,
     pub query_term: Option<ScrubbedPiiString>,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Doc {
     pub aka: Option<Vec<Aka>>,
     pub fields: Option<Vec<Field>>,
@@ -100,13 +92,11 @@ pub struct Doc {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Aka {
     pub name: Option<ScrubbedPiiString>,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Field {
     pub name: Option<String>,
     pub source: Option<String>,
@@ -115,7 +105,6 @@ pub struct Field {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Media {
     pub date: Option<DateTime<Utc>>,
     pub pdf_url: Option<String>,
@@ -221,7 +210,6 @@ impl From<Media> for LeakedMedia {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct LeakedHit {
     pub score: Option<f32>,
     pub is_whitelisted: Option<bool>,
@@ -231,7 +219,6 @@ pub struct LeakedHit {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct LeakedMatchTypeDetail {
     pub aml_types: Option<Vec<String>>,
     pub matching_name: Option<PiiString>,
@@ -241,14 +228,12 @@ pub struct LeakedMatchTypeDetail {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct LeakedNameMatch {
     pub match_types: Option<Vec<String>>,
     pub query_term: Option<PiiString>,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct LeakedDoc {
     pub aka: Option<Vec<LeakedAka>>,
     pub fields: Option<Vec<LeakedField>>,
@@ -261,13 +246,11 @@ pub struct LeakedDoc {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct LeakedAka {
     pub name: Option<PiiString>,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct LeakedField {
     pub name: Option<String>,
     pub source: Option<String>,
@@ -276,7 +259,6 @@ pub struct LeakedField {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct LeakedMedia {
     pub date: Option<DateTime<Utc>>,
     pub pdf_url: Option<String>,

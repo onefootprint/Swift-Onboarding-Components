@@ -6242,6 +6242,7 @@ pub fn incode_watchlist_result_response_yes_hits() -> serde_json::Value {
                 [],
                 "limit": 100,
                 "offset": 0,
+                "share_url": "https://app.eu.complyadvantage.com/public/search/abc/123",
                 "hits":
                 [
                     {

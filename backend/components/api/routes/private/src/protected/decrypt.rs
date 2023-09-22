@@ -6,9 +6,7 @@ use api_core::{
     auth::tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard},
     types::{JsonApiResponse, ResponseData},
 };
-use db::models::{
-    vault::Vault, verification_request::VerificationRequest, verification_result::VerificationResult,
-};
+use db::models::{vault::Vault, verification_result::VerificationResult};
 use db::DbResult;
 use newtypes::{PiiJsonValue, VerificationResultId};
 
@@ -37,8 +35,7 @@ pub async fn post(
     let (vres, uv) = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
-            let vres = VerificationResult::get(conn, &vres_id)?;
-            let vreq = VerificationRequest::get(conn, &vres.request_id)?;
+            let (vreq, vres) = VerificationResult::get(conn, &vres_id)?;
             let uv = Vault::get(conn, &vreq.scoped_vault_id)?;
 
             Ok((vres, uv))

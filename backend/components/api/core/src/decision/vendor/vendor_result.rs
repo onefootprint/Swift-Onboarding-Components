@@ -2,9 +2,13 @@ use std::collections::HashMap;
 
 use crate::{enclave_client::EnclaveClient, errors::ApiError};
 
-use db::models::{
-    verification_request::{RequestAndMaybeResult, VerificationRequest},
-    verification_result::VerificationResult,
+use crate::errors::ApiResult;
+use db::{
+    models::{
+        verification_request::{RequestAndMaybeResult, RequestAndResult, VerificationRequest},
+        verification_result::VerificationResult,
+    },
+    DbError,
 };
 use idv::{ParsedResponse, VendorResponse};
 use newtypes::{
@@ -53,7 +57,7 @@ impl VendorResult {
         requests_and_results: Vec<RequestAndMaybeResult>,
         enclave_client: &EnclaveClient,
         user_vault_private_key: &EncryptedVaultPrivateKey,
-    ) -> Result<Vec<RequestAndMaybeHydratedResult>, ApiError> {
+    ) -> ApiResult<Vec<RequestAndMaybeHydratedResult>> {
         // TODO: our saving/derser of vendor "Errors" is pretty sketch and
         // from_verification_results_for_onboarding decrypting and deser'ing Vres's that are
         // is_error = true seems a bit scary to me. Need to overhaul our approach to vendor errors
@@ -89,6 +93,22 @@ impl VendorResult {
             .collect();
 
         Ok(res)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn hydrate_vendor_result(
+        request_and_result: RequestAndResult,
+        enclave_client: &EnclaveClient,
+        user_vault_private_key: &EncryptedVaultPrivateKey,
+    ) -> ApiResult<RequestAndMaybeHydratedResult> {
+        Self::hydrate_vendor_results(
+            vec![(request_and_result.0, Some(request_and_result.1))],
+            enclave_client,
+            user_vault_private_key,
+        )
+        .await?
+        .pop()
+        .ok_or(DbError::ObjectNotFound.into())
     }
 
     #[tracing::instrument(skip_all)]
