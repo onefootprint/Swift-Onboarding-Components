@@ -124,7 +124,18 @@ pub enum IncodeFailureReason {
 
 impl IncodeFailureReason {
     pub fn can_ignore(&self) -> bool {
-        self.reason_code().is_some() || matches!(self, Self::SelfieHasLenses)
+        match self {
+            IncodeFailureReason::SelfieLowConfidence
+            | IncodeFailureReason::SelfieTooDark
+            | IncodeFailureReason::SelfieGlare
+            | IncodeFailureReason::SelfieHasLenses
+            | IncodeFailureReason::SelfieHasFaceMask
+            | IncodeFailureReason::SelfieBlurry
+            | IncodeFailureReason::SelfieImageSizeUnsupported
+            | IncodeFailureReason::SelfieImageOrientationIncorrect
+            | IncodeFailureReason::SelfieBadImageCompression => true,
+            _ => self.reason_code().is_some(),
+        }
     }
 
     pub fn reason_code(&self) -> Option<FootprintReasonCode> {
