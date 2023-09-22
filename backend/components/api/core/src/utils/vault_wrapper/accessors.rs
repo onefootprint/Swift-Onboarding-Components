@@ -74,7 +74,7 @@ impl<Type> VaultWrapper<Type> {
         T: Into<DataIdentifier> + Clone,
     {
         self.get(id).and_then(|v| match v.data() {
-            VaultedData::NonPrivate(s) => Some(s),
+            VaultedData::NonPrivate(s, _) => Some(s),
             _ => None,
         })
     }
@@ -89,7 +89,7 @@ impl<Type> VaultWrapper<Type> {
         T: Into<DataIdentifier> + Clone,
     {
         self.get(id).and_then(|v| match v.data() {
-            VaultedData::Sealed(s) => Some(s),
+            VaultedData::Sealed(s, _) => Some(s),
             _ => None,
         })
     }

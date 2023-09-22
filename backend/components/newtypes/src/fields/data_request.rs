@@ -93,7 +93,7 @@ impl DataRequest<()> {
     ) -> NtResult<Self> {
         let map = map
             .into_iter()
-            .map(|(k, v)| (k, PiiJsonValue::string(v.leak())))
+            .map(|(k, v)| (k, PiiJsonValue::from_piistring(v)))
             .collect();
         Self::clean_and_validate(map, args)
     }

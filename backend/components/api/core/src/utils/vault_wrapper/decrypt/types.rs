@@ -3,12 +3,20 @@ use crate::ApiErrorKind;
 use derive_more::{Deref, DerefMut};
 use enclave_proxy::DataTransform;
 use newtypes::output::Csv;
-use newtypes::{DataIdentifier, PiiBytes, PiiString};
+use newtypes::{DataIdentifier, PiiBytes, PiiJsonValue, PiiString, VaultDataFormat};
 use std::collections::HashMap;
 
 pub enum Pii {
-    String(PiiString),
+    Value(PiiJsonValue),
     Bytes(PiiBytes),
+}
+
+impl Pii {
+    // TODO it would be nice if the input to this weren't a PiiString - a different newtypes
+    // that represents the raw format of data from the vault
+    pub fn format(v: PiiString, format: VaultDataFormat) -> Self {
+        Pii::Value(v.str_or_json(format))
+    }
 }
 
 /// The operation perfomed by the enclave
@@ -71,13 +79,49 @@ impl DecryptUncheckedResult<Pii> {
             .into_iter()
             .map(|(k, v)| -> ApiResult<_> {
                 let pii = match v {
-                    Pii::String(s) => s,
+                    // Since the value may be either JSON or a string, we map it into a string representation here
+                    // One day, the callers of this may actually want the full PiiJsonValue - then we'll
+                    // use the below map_to_piijsonvalues
+                    Pii::Value(s) => s.to_piistring()?,
                     Pii::Bytes(b) => {
                         if k.is_identity_transform() {
                             b.into_leak_base64_pii()
                         } else {
                             PiiString::try_from(b)?
                         }
+                    }
+                };
+                Ok((k, pii))
+            })
+            .collect::<ApiResult<_>>()?;
+
+        let result = DecryptUncheckedResult {
+            results,
+            decrypted_dis,
+        };
+        Ok(result)
+    }
+
+    pub(in crate::utils::vault_wrapper) fn map_to_piijsonvalues(
+        self,
+    ) -> ApiResult<DecryptUncheckedResult<PiiJsonValue>> {
+        let DecryptUncheckedResult {
+            results,
+            decrypted_dis,
+        } = self;
+        // Map the PiiBytes to PiiJsonValues
+        let results = results
+            .into_iter()
+            .map(|(k, v)| -> ApiResult<_> {
+                let pii = match v {
+                    Pii::Value(s) => s,
+                    Pii::Bytes(b) => {
+                        let v_string = if k.is_identity_transform() {
+                            b.into_leak_base64_pii()
+                        } else {
+                            PiiString::try_from(b)?
+                        };
+                        PiiJsonValue::from_piistring(v_string)
                     }
                 };
                 Ok((k, pii))

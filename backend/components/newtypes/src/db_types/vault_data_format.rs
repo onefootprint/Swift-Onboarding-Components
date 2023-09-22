@@ -3,7 +3,18 @@ use schemars::JsonSchema;
 use strum_macros::{AsRefStr, Display, EnumString};
 
 #[derive(
-    Debug, Clone, Display, Copy, AsExpression, FromSqlRow, EnumString, AsRefStr, PartialEq, JsonSchema, Eq,
+    Debug,
+    Clone,
+    Display,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    AsRefStr,
+    JsonSchema,
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]

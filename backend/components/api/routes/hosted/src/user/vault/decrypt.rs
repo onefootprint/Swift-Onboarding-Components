@@ -48,7 +48,9 @@ pub async fn post(
         })
         .await??;
 
-    let mut results = uvw.decrypt_unchecked(&state.enclave_client, &fields).await?;
+    let mut results = uvw
+        .decrypt_unchecked_value(&state.enclave_client, &fields)
+        .await?;
     // Is this step necessary? Every key is present in the response if it was in the request?
     let results = HashMap::from_iter(
         fields

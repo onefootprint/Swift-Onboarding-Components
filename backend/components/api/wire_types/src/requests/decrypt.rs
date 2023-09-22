@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use newtypes::{flat_api_object_map_type, DataIdentifier, PiiJsonValue, PiiString, VersionedDataIdentifier};
+use newtypes::{flat_api_object_map_type, DataIdentifier, PiiJsonValue, VersionedDataIdentifier};
 
 flat_api_object_map_type!(
     DecryptResponse<VersionedDataIdentifier, Option<PiiJsonValue>>,
@@ -8,22 +8,8 @@ flat_api_object_map_type!(
     example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
 );
 
-impl From<HashMap<VersionedDataIdentifier, Option<PiiString>>> for DecryptResponse {
-    fn from(value: HashMap<VersionedDataIdentifier, Option<PiiString>>) -> Self {
-        let map = value
-            .into_iter()
-            .map(|(k, v)| {
-                // Serialize each value to its correct type based on the DI
-                let value = v.map(|v| k.di.serialize(v));
-                (k, value)
-            })
-            .collect();
-        Self { map }
-    }
-}
-
-impl From<HashMap<DataIdentifier, Option<PiiString>>> for DecryptResponse {
-    fn from(value: HashMap<DataIdentifier, Option<PiiString>>) -> Self {
+impl From<HashMap<DataIdentifier, Option<PiiJsonValue>>> for DecryptResponse {
+    fn from(value: HashMap<DataIdentifier, Option<PiiJsonValue>>) -> Self {
         let map: HashMap<_, _> = value
             .into_iter()
             .map(|(di, v)| (VersionedDataIdentifier::new(di), v))

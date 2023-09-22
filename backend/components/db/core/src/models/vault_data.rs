@@ -135,9 +135,9 @@ impl HasLifetime for VaultData {
 
     fn data(&self) -> VaultedData {
         if let Some(p_data) = self.p_data.as_ref() {
-            VaultedData::NonPrivate(p_data)
+            VaultedData::NonPrivate(p_data, self.format)
         } else {
-            VaultedData::Sealed(&self.e_data)
+            VaultedData::Sealed(&self.e_data, self.format)
         }
     }
 }

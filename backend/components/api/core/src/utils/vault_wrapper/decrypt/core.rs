@@ -9,7 +9,10 @@ use enclave_proxy::{DataTransformer, DataTransforms};
 use futures_util::StreamExt;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{DataIdentifier, DocumentKind, EncryptedVaultPrivateKey, PiiBytes, PiiString};
+use newtypes::{
+    DataIdentifier, DocumentKind, EncryptedVaultPrivateKey, PiiBytes, PiiJsonValue, PiiString,
+    VaultDataFormat,
+};
 use std::collections::HashMap;
 
 impl<Type> VaultWrapper<Type> {
@@ -24,11 +27,33 @@ impl<Type> VaultWrapper<Type> {
         enclave_client: &EnclaveClient,
         ops: &[DataIdentifier],
     ) -> ApiResult<DecryptUncheckedResult> {
-        let ops: Vec<_> = ops.iter().map(|di| di.clone().into()).collect();
         let results = self
-            .fn_decrypt_unchecked_raw(enclave_client, ops)
+            ._decrypt_unchecked_raw(enclave_client, ops)
             .await?
             .map_to_piistrings()?;
+        Ok(results)
+    }
+
+    /// Same as decrypt_unchecked, but more modern version that returns PiiJsonValues instead of PiiStrings
+    pub async fn decrypt_unchecked_value(
+        &self,
+        enclave_client: &EnclaveClient,
+        ops: &[DataIdentifier],
+    ) -> ApiResult<DecryptUncheckedResult<PiiJsonValue>> {
+        let results = self
+            ._decrypt_unchecked_raw(enclave_client, ops)
+            .await?
+            .map_to_piijsonvalues()?;
+        Ok(results)
+    }
+
+    async fn _decrypt_unchecked_raw(
+        &self,
+        enclave_client: &EnclaveClient,
+        ops: &[DataIdentifier],
+    ) -> ApiResult<DecryptUncheckedResult<Pii>> {
+        let ops: Vec<_> = ops.iter().map(|di| di.clone().into()).collect();
+        let results = self.fn_decrypt_unchecked_raw(enclave_client, ops).await?;
         Ok(results)
     }
 
@@ -41,7 +66,10 @@ impl<Type> VaultWrapper<Type> {
             let speculative_doc = self.speculative.documents.iter().find(|d| d.kind == di);
             let portable_doc = || self.portable.documents.iter().find(|d| d.kind == di);
             let document = speculative_doc.or_else(portable_doc)?;
-            return Some(VaultedData::NonPrivate(&document.mime_type));
+            return Some(VaultedData::NonPrivate(
+                &document.mime_type,
+                VaultDataFormat::String,
+            ));
         }
         self.get(di).map(|v| v.data())
     }
@@ -123,9 +151,9 @@ where
     let (p_data, e_data): (Vec<_>, Vec<_>) =
         data.into_iter()
             .partition_map(|(id, VwDecryptRequest(e_private_key, op, d))| match d {
-                VaultedData::NonPrivate(p_data) => Either::Left(((id, op), p_data)),
-                VaultedData::Sealed(e_data) => Either::Right(Either::Left((
-                    (id, op.clone()),
+                VaultedData::NonPrivate(p_data, format) => Either::Left(((id, op, format), p_data)),
+                VaultedData::Sealed(e_data, format) => Either::Right(Either::Left((
+                    (id, op.clone(), format),
                     DecryptReq(e_private_key, e_data, op.transforms),
                 ))),
                 VaultedData::LargeSealed(s3_url, e_data_key) => {
@@ -138,11 +166,11 @@ where
     let p_data = {
         p_data
             .into_iter()
-            .map(|((id, op), p_data)| -> ApiResult<_> {
+            .map(|((id, op, format), p_data)| -> ApiResult<_> {
                 // We apply the data transforms for p_data outside of the enclave here.
                 let p_data = p_data.leak();
                 let transformed = DataTransforms(op.transforms.clone()).apply_str::<PiiString>(p_data)?;
-                Ok((id, (op, Pii::String(transformed))))
+                Ok((id, (op, Pii::format(transformed, format))))
             })
             .collect::<ApiResult<Vec<_>>>()?
     };
@@ -165,7 +193,7 @@ where
             .collect::<Result<Vec<_>, EnclaveError>>()?
             .into_iter()
             .flatten()
-            .map(|((id, op), d)| (id, (op, Pii::String(d))))
+            .map(|((id, op, format), d)| (id, (op, Pii::format(d, format))))
             .collect()
     };
 

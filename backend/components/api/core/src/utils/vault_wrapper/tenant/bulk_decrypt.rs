@@ -5,7 +5,7 @@ use db::models::{
     insight_event::CreateInsightEvent,
 };
 use itertools::Itertools;
-use newtypes::{AccessEventKind, AccessEventPurpose, DbActor, PiiString};
+use newtypes::{AccessEventKind, AccessEventPurpose, DbActor, PiiJsonValue};
 
 use crate::{
     errors::{ApiResult, AssertionError},
@@ -33,7 +33,7 @@ pub async fn bulk_decrypt<'a, TKey, T>(
     reason: String,
     principal: DbActor,
     purpose: AccessEventPurpose,
-) -> ApiResult<Vec<(TKey, HashMap<EnclaveDecryptOperation, PiiString>)>>
+) -> ApiResult<Vec<(TKey, HashMap<EnclaveDecryptOperation, PiiJsonValue>)>>
 where
     TKey: Eq + std::hash::Hash + 'static + Clone,
 {
@@ -61,10 +61,10 @@ where
     let (access_events, decrypted_results): (Vec<_>, Vec<_>) = results
         .into_iter()
         .map(|(key, res)| -> ApiResult<_> {
-            let DecryptUncheckedResult::<PiiString> {
+            let DecryptUncheckedResult::<PiiJsonValue> {
                 decrypted_dis,
                 results,
-            } = res.map_to_piistrings()?;
+            } = res.map_to_piijsonvalues()?;
             let decrypted_dis = decrypted_dis.into_iter().map(|t| t.identifier).collect_vec();
             let sv = key_to_sv
                 .get(&key)

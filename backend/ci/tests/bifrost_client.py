@@ -134,23 +134,8 @@ class BifrostClient:
 
     @property
     def decrypted_data(self):
-        # TODO rm this when we start serializing these as lists
-        TEMPORARILY_STRINGIFIED_DIS = [
-            "business.beneficial_owners",
-            "business.kyced_beneficial_owners",
-            "investor_profile.investment_goals",
-            "investor_profile.declarations",
-            "investor_profile.senior_executive_symbols",
-            "investor_profile.family_member_names",
-        ]
-        stringified_entries = {
-            k: json.dumps(v, separators=(",", ":"))
-            for (k, v) in self.data.items()
-            if k in TEMPORARILY_STRINGIFIED_DIS
-        }
         return {
             **self.data,
-            **stringified_entries,
             "id.ssn4": self.data["id.ssn9"][-4:],
             "id.email": self.data["id.email"].split("#")[0],
             "id.phone_number": self.data["id.phone_number"]

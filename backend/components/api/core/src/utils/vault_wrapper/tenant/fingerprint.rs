@@ -31,7 +31,7 @@ impl<Type> TenantVw<Type> {
                 self.uvw
                     .get(id.clone())
                     .and_then(|ed| -> Option<_> {
-                        let VaultedData::Sealed(data) = ed.data() else {
+                        let VaultedData::Sealed(data, _) = ed.data() else {
                             return None
                         };
                         Some((ed.lifetime_id(), data))

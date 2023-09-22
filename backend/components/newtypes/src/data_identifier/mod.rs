@@ -34,7 +34,7 @@ pub use self::{
 };
 use crate::{
     util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, NtResult, PiiJsonValue,
-    PiiString, ValidateArgs, VaultDataFormat, VaultKind,
+    PiiString, ValidateArgs, VaultKind,
 };
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -351,18 +351,6 @@ impl DataIdentifier {
             | DataIdentifier::Custom(_)
             | DataIdentifier::Card(_) => StorageType::VaultData,
         }
-    }
-
-    fn serialization(&self) -> VaultDataFormat {
-        match self {
-            Self::Id(IdentityDataKind::Citizenships) => VaultDataFormat::Json,
-            _ => VaultDataFormat::String,
-        }
-    }
-
-    /// Serialize the PiiString value specifically to the type of data expecte to be found in this DI
-    pub fn serialize(&self, v: PiiString) -> PiiJsonValue {
-        v.str_or_json(self.serialization())
     }
 }
 

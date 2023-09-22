@@ -81,10 +81,10 @@ pub async fn detokenize(
 
     let out = decrypted_results
         .into_iter()
-        .flat_map(|(fp_id, results)| {
-            results
+        .map(|(fp_id, results)| -> ApiResult<_> {
+            let results = results
                 .into_iter()
-                .map(|(op, pii)| {
+                .map(|(op, pii)| -> ApiResult<_> {
                     let filter_functions = op
                         .transforms
                         .into_iter()
@@ -95,10 +95,15 @@ pub async fn detokenize(
                         identifier: op.identifier,
                         filter_functions,
                     };
-                    (token, pii)
+                    let pii = pii.to_piistring()?;
+                    Ok((token, pii))
                 })
-                .collect_vec()
+                .collect::<ApiResult<Vec<_>>>()?;
+            Ok(results)
         })
+        .collect::<ApiResult<Vec<_>>>()?
+        .into_iter()
+        .flatten()
         .collect();
     Ok(out)
 }
