@@ -2,7 +2,7 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type {
-  PersonalInformationAndDocs,
+  personal,
   SummaryFormData,
   SummaryMeta,
 } from '@/playbooks/utils/machine/types';
@@ -14,7 +14,7 @@ import {
 import PersonalInfoAndDocs from './person';
 
 export type PersonInformationWithContextProps = {
-  startingValues: Partial<PersonalInformationAndDocs>;
+  startingValues: Partial<personal>;
   meta?: SummaryMeta;
 };
 
@@ -32,8 +32,8 @@ const PersonalInfoAndDocsWithContext = ({
   const formMethods = useForm<SummaryFormData>({
     defaultValues: {
       ...defaultPlaybookValuesKYC,
-      personalInformationAndDocs: {
-        ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+      personal: {
+        ...defaultPlaybookValuesKYC.personal,
         ...startingValues,
       },
     },

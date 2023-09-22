@@ -15,7 +15,7 @@ export enum PlaybookKind {
 
 export type SummaryFormData = {
   kind: PlaybookKind;
-  personalInformationAndDocs: PersonalInformationAndDocs;
+  personal: Personal;
   businessInformation?: BusinessInformation;
   [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
 };
@@ -99,7 +99,7 @@ export const defaultAuthorizedScopesValues: AuthorizedScopesFormData = {
   allBusinessData: true,
 };
 
-export type PersonalInformationAndDocs = {
+export type Personal = {
   [CollectedKycDataOption.email]: boolean;
   [CollectedKycDataOption.phoneNumber]: boolean;
   [CollectedKycDataOption.dob]: boolean;
@@ -136,7 +136,7 @@ export const defaultBusinessInformation = {
 
 export const defaultPlaybookValuesKYC: SummaryFormData = {
   kind: PlaybookKind.Kyc,
-  personalInformationAndDocs: {
+  personal: {
     email: true,
     [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.dob]: true,

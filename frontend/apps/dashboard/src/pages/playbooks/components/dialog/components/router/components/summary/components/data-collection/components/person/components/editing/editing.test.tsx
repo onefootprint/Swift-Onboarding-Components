@@ -33,44 +33,6 @@ describe('<Editing />', () => {
     ).toBeInTheDocument();
   });
 
-  it('should show ID doc options when toggling', async () => {
-    renderEditing({});
-    const ssnToggle = screen.getByRole('switch', {
-      name: 'Request users to scan an ID document',
-    });
-    await userEvent.click(ssnToggle);
-    expect(
-      screen.getByRole('checkbox', {
-        name: "Driver's license",
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('checkbox', {
-        name: 'Identity card',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('checkbox', {
-        name: 'Passport (photo page)',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('checkbox', {
-        name: 'Visa',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('checkbox', {
-        name: 'Residence card',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('checkbox', {
-        name: 'Work permit',
-      }),
-    ).toBeInTheDocument();
-  });
-
   it('should show warning if ID doc not selected', async () => {
     renderEditing({ startingValues: { idDoc: true, idDocKind: [] } });
     await userEvent.click(screen.getByRole('button', { name: 'Save' }));
@@ -170,14 +132,347 @@ describe('<Editing />', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('should hide phone option flow option if non-firm employee', async () => {
-    asAdminUser();
-    renderEditing({ kind: PlaybookKind.Kyc });
-    expect(
-      screen.queryByRole('switch', {
+  describe('when selecting "Allow users without an SSN to proceed with the verification"', () => {
+    it('should show the "Do document scan step-up" option', async () => {
+      renderEditing({});
+
+      const ssnOptional = screen.getByLabelText(
+        'Allow users without an SSN to proceed with the verification',
+      );
+      await userEvent.click(ssnOptional);
+
+      const stepUp = screen.getByLabelText('Do document scan step-up');
+      expect(stepUp).toBeInTheDocument();
+    });
+
+    describe('when selecting "Do document scan step-up"', () => {
+      it('should show the list of id docs', async () => {
+        renderEditing({});
+
+        const ssnOptional = screen.getByLabelText(
+          'Allow users without an SSN to proceed with the verification',
+        );
+        await userEvent.click(ssnOptional);
+
+        const stepUp = screen.getByLabelText('Do document scan step-up');
+        await userEvent.click(stepUp);
+
+        const dl = screen.getByRole('checkbox', {
+          name: "Driver's license",
+        });
+        expect(dl).toBeInTheDocument();
+
+        const idCard = screen.getByRole('checkbox', { name: 'Identity card' });
+        expect(idCard).toBeInTheDocument();
+
+        const passport = screen.getByRole('checkbox', {
+          name: 'Passport (photo page)',
+        });
+        expect(passport).toBeInTheDocument();
+
+        const visa = screen.getByRole('checkbox', { name: 'Visa' });
+        expect(visa).toBeInTheDocument();
+
+        const residenceCard = screen.getByRole('checkbox', {
+          name: 'Residence card',
+        });
+        expect(residenceCard).toBeInTheDocument();
+
+        const workPermit = screen.getByRole('checkbox', {
+          name: 'Work permit',
+        });
+        expect(workPermit).toBeInTheDocument();
+      });
+
+      describe('when un-selecting "Allow users without an SSN to proceed with the verification" and selecting it again', () => {
+        it('should reset the "Do document scan step-up" option', async () => {
+          renderEditing({});
+
+          const ssnOptional = screen.getByLabelText(
+            'Allow users without an SSN to proceed with the verification',
+          );
+          await userEvent.click(ssnOptional);
+
+          const stepUp = screen.getByLabelText('Do document scan step-up');
+          await userEvent.click(stepUp);
+
+          // un-select
+          await userEvent.click(ssnOptional);
+
+          // select again
+          await userEvent.click(ssnOptional);
+
+          const stepUpAgain = screen.getByLabelText('Do document scan step-up');
+          expect(stepUpAgain).not.toBeChecked();
+        });
+      });
+
+      describe('when selecting DL, then un-selecting "Do document scan step-up" and selecting it again', () => {
+        it('should unselect any id doc that was previously selected', async () => {
+          renderEditing({});
+
+          const ssnOptional = screen.getByLabelText(
+            'Allow users without an SSN to proceed with the verification',
+          );
+          await userEvent.click(ssnOptional);
+
+          const stepUp = screen.getByLabelText('Do document scan step-up');
+          await userEvent.click(stepUp);
+
+          const dl = screen.getByRole('checkbox', {
+            name: "Driver's license",
+          });
+          await userEvent.click(dl);
+          expect(dl).toBeChecked();
+
+          // un-select
+          await userEvent.click(stepUp);
+
+          // select again
+          await userEvent.click(stepUp);
+
+          expect(dl).not.toBeChecked();
+        });
+      });
+
+      describe('when selecting DL, then un-selecting "Allow users without an SSN to proceed with the verification" and selecting it again', () => {
+        it('should unselect any id doc that was previously selected', async () => {
+          renderEditing({});
+
+          const ssnOptional = screen.getByLabelText(
+            'Allow users without an SSN to proceed with the verification',
+          );
+          await userEvent.click(ssnOptional);
+
+          const stepUp = screen.getByLabelText('Do document scan step-up');
+          await userEvent.click(stepUp);
+
+          const dl = screen.getByRole('checkbox', {
+            name: "Driver's license",
+          });
+          await userEvent.click(dl);
+          expect(dl).toBeChecked();
+
+          // un-select
+          await userEvent.click(ssnOptional);
+
+          // select again
+          await userEvent.click(ssnOptional);
+          await userEvent.click(stepUp);
+
+          expect(dl).not.toBeChecked();
+        });
+      });
+    });
+  });
+
+  describe('when un-selecting the option to collect SSN', () => {
+    it('should show the "Do document scan step-up" option', async () => {
+      renderEditing({});
+
+      const collectSsn = screen.getByRole('switch', {
+        name: 'Request users to provide their SSN',
+      });
+      await userEvent.click(collectSsn);
+
+      const stepUp = screen.getByLabelText('Do document scan step-up');
+      expect(stepUp).toBeInTheDocument();
+    });
+
+    describe('when selecting "Do document scan step-up"', () => {
+      it('should show the list of id docs', async () => {
+        renderEditing({});
+
+        const collectSsn = screen.getByRole('switch', {
+          name: 'Request users to provide their SSN',
+        });
+        await userEvent.click(collectSsn);
+
+        const stepUp = screen.getByLabelText('Do document scan step-up');
+        await userEvent.click(stepUp);
+
+        const dl = screen.getByRole('checkbox', {
+          name: "Driver's license",
+        });
+        expect(dl).toBeInTheDocument();
+
+        const idCard = screen.getByRole('checkbox', { name: 'Identity card' });
+        expect(idCard).toBeInTheDocument();
+
+        const passport = screen.getByRole('checkbox', {
+          name: 'Passport (photo page)',
+        });
+        expect(passport).toBeInTheDocument();
+
+        const visa = screen.getByRole('checkbox', { name: 'Visa' });
+        expect(visa).toBeInTheDocument();
+
+        const residenceCard = screen.getByRole('checkbox', {
+          name: 'Residence card',
+        });
+        expect(residenceCard).toBeInTheDocument();
+
+        const workPermit = screen.getByRole('checkbox', {
+          name: 'Work permit',
+        });
+        expect(workPermit).toBeInTheDocument();
+      });
+
+      describe('when un-selecting "Request users to provide their SSN" and selecting it again', () => {
+        it('should reset the "Do document scan step-up" option', async () => {
+          renderEditing({});
+
+          const collectSsn = screen.getByRole('switch', {
+            name: 'Request users to provide their SSN',
+          });
+          await userEvent.click(collectSsn);
+
+          const stepUp = screen.getByLabelText('Do document scan step-up');
+          await userEvent.click(stepUp);
+
+          // un-select
+          await userEvent.click(collectSsn);
+
+          // select again
+          await userEvent.click(collectSsn);
+
+          const stepUpAgain = screen.getByLabelText('Do document scan step-up');
+          expect(stepUpAgain).not.toBeChecked();
+        });
+      });
+
+      describe('when selecting DL, then un-selecting "Do document scan step-up" and selecting it again', () => {
+        it('should unselect any id doc that was previously selected', async () => {
+          renderEditing({});
+
+          const collectSsn = screen.getByRole('switch', {
+            name: 'Request users to provide their SSN',
+          });
+          await userEvent.click(collectSsn);
+
+          const stepUp = screen.getByLabelText('Do document scan step-up');
+          await userEvent.click(stepUp);
+
+          const dl = screen.getByRole('checkbox', {
+            name: "Driver's license",
+          });
+          await userEvent.click(dl);
+
+          // un-select
+          await userEvent.click(stepUp);
+
+          // select again
+          await userEvent.click(stepUp);
+
+          expect(dl).not.toBeChecked();
+        });
+      });
+
+      describe('when selecting DL, then un-selecting "Allow users without an SSN to proceed with the verification" and selecting it again', () => {
+        it('should unselect any id doc that was previously selected', async () => {
+          renderEditing({});
+
+          const collectSsn = screen.getByRole('switch', {
+            name: 'Request users to provide their SSN',
+          });
+          await userEvent.click(collectSsn);
+
+          const stepUp = screen.getByLabelText('Do document scan step-up');
+          await userEvent.click(stepUp);
+
+          const dl = screen.getByRole('checkbox', {
+            name: "Driver's license",
+          });
+          await userEvent.click(dl);
+
+          // un-select
+          await userEvent.click(collectSsn);
+
+          // select again
+          await userEvent.click(collectSsn);
+          await userEvent.click(stepUp);
+
+          expect(dl).not.toBeChecked();
+        });
+      });
+    });
+  });
+
+  describe('when selecting the option to collect id doc', () => {
+    it('should show the list of id docs', async () => {
+      renderEditing({});
+
+      const requestIdDoc = screen.getByRole('switch', {
+        name: 'Request users to scan an ID document',
+      });
+      await userEvent.click(requestIdDoc);
+
+      const dl = screen.getByRole('checkbox', {
+        name: "Driver's license",
+      });
+      expect(dl).toBeInTheDocument();
+
+      const idCard = screen.getByRole('checkbox', { name: 'Identity card' });
+      expect(idCard).toBeInTheDocument();
+
+      const passport = screen.getByRole('checkbox', {
+        name: 'Passport (photo page)',
+      });
+      expect(passport).toBeInTheDocument();
+
+      const visa = screen.getByRole('checkbox', { name: 'Visa' });
+      expect(visa).toBeInTheDocument();
+
+      const residenceCard = screen.getByRole('checkbox', {
+        name: 'Residence card',
+      });
+      expect(residenceCard).toBeInTheDocument();
+
+      const workPermit = screen.getByRole('checkbox', {
+        name: 'Work permit',
+      });
+      expect(workPermit).toBeInTheDocument();
+    });
+
+    describe('when selecting DL, then un-selecting the option to collect id doc and selecting it again', () => {
+      it('should unselect any id doc that was previously selected', async () => {
+        renderEditing({});
+
+        const requestIdDoc = screen.getByRole('switch', {
+          name: 'Request users to scan an ID document',
+        });
+        await userEvent.click(requestIdDoc);
+
+        const dl = screen.getByRole('checkbox', {
+          name: "Driver's license",
+        });
+        await userEvent.click(dl);
+        expect(dl).toBeChecked();
+
+        // un-select
+        await userEvent.click(requestIdDoc);
+
+        // select again
+        await userEvent.click(requestIdDoc);
+
+        expect(dl).not.toBeChecked();
+      });
+    });
+  });
+
+  describe('when it is non-firm employee', () => {
+    it('should hide phone option flow optione', async () => {
+      asAdminUser();
+
+      renderEditing({ kind: PlaybookKind.Kyc });
+
+      const phoneToggle = screen.queryByRole('switch', {
         name: 'Request users to provide their phone number',
-      }),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText('Basic information')).not.toBeInTheDocument();
+      });
+      expect(phoneToggle).not.toBeInTheDocument();
+
+      const basicInfo = screen.queryByText('Basic information');
+      expect(basicInfo).not.toBeInTheDocument();
+    });
   });
 });

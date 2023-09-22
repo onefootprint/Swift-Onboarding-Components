@@ -4,7 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import type {
   AuthorizedScopesFormData,
-  PersonalInformationAndDocs,
+  personal,
   SummaryMeta,
 } from '@/playbooks/utils/machine/types';
 import {
@@ -16,7 +16,7 @@ import {
 import PersonalScopes from './person';
 
 export type PersonalScopesWithContextProps = {
-  startingPersonalValues?: Partial<PersonalInformationAndDocs>;
+  startingPersonalValues?: Partial<personal>;
   investorProfile?: boolean;
   meta?: SummaryMeta;
 };
@@ -44,8 +44,8 @@ const PersonalScopesWithContext = ({
           meta={meta}
           playbook={{
             ...defaultPlaybookValuesKYC,
-            personalInformationAndDocs: {
-              ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+            personal: {
+              ...defaultPlaybookValuesKYC.personal,
               ...startingPersonalValues,
             },
             [CollectedInvestorProfileDataOption.investorProfile]:

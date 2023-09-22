@@ -51,39 +51,31 @@ const processPlaybook = ({
   const canAccessData: CollectedDataOption[] = [];
   const optionalData: CollectedDataOption[] = [];
 
-  const { personalInformationAndDocs, businessInformation } = playbook;
+  const { personal, businessInformation } = playbook;
 
   const requiredKycFields = getRequiredKycCollectFields();
   mustCollectData.push(...requiredKycFields);
 
   // US Legal Status
-  if (personalInformationAndDocs[CollectedKycDataOption.usLegalStatus]) {
+  if (personal[CollectedKycDataOption.usLegalStatus]) {
     mustCollectData.push(CollectedKycDataOption.usLegalStatus);
   }
 
   // SSN handling
-  if (
-    personalInformationAndDocs.ssn &&
-    !personalInformationAndDocs.ssnOptional &&
-    personalInformationAndDocs.ssnKind
-  ) {
-    mustCollectData.push(personalInformationAndDocs.ssnKind);
-  } else if (
-    personalInformationAndDocs.ssnOptional &&
-    personalInformationAndDocs.ssnKind
-  ) {
-    optionalData.push(personalInformationAndDocs.ssnKind);
+  if (personal.ssn && !personal.ssnOptional && personal.ssnKind) {
+    mustCollectData.push(personal.ssnKind);
+  } else if (personal.ssnOptional && personal.ssnKind) {
+    optionalData.push(personal.ssnKind);
   }
 
   // no phone flows handling
-  if (personalInformationAndDocs[CollectedKycDataOption.phoneNumber]) {
+  if (personal[CollectedKycDataOption.phoneNumber]) {
     mustCollectData.push(CollectedKycDataOption.phoneNumber);
   }
-  const isNoPhoneFlow =
-    !personalInformationAndDocs[CollectedKycDataOption.phoneNumber];
+  const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber];
 
   // id doc handling
-  const { idDoc, idDocKind, selfie, idDocFirst } = personalInformationAndDocs;
+  const { idDoc, idDocKind, selfie, idDocFirst } = personal;
   let docString = '';
   if (idDoc && idDocKind?.length > 0) {
     const docKinds = idDocKind.join(',');

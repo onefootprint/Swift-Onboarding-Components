@@ -24,8 +24,8 @@ describe('processPlaybook', () => {
     const { mustCollectData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           [CollectedKycDataOption.email]: false,
           [CollectedKycDataOption.phoneNumber]: false,
           [CollectedKycDataOption.dob]: false,
@@ -70,8 +70,8 @@ describe('processPlaybook', () => {
     const { mustCollectData, optionalData, canAccessData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           ssn: true,
           ssnOptional: true,
           ssnKind: CollectedKycDataOption.ssn9,
@@ -93,8 +93,8 @@ describe('processPlaybook', () => {
     const { mustCollectData, optionalData, canAccessData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           ssn: true,
           ssnOptional: true,
           ssnKind: CollectedKycDataOption.ssn4,
@@ -117,8 +117,8 @@ describe('processPlaybook', () => {
     const { mustCollectData, optionalData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           ssn: true,
           ssnKind: CollectedKycDataOption.ssn9,
         },
@@ -138,8 +138,8 @@ describe('processPlaybook', () => {
     const { mustCollectData, optionalData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           ssn: true,
           ssnKind: CollectedKycDataOption.ssn4,
         },
@@ -161,8 +161,8 @@ describe('processPlaybook', () => {
     const { mustCollectData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
         },
         [CollectedInvestorProfileDataOption.investorProfile]: true,
       },
@@ -415,8 +415,8 @@ describe('processPlaybook', () => {
     const { canAccessData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           idDoc: true,
           idDocKind: [SupportedIdDocTypes.passport],
           selfie: false,
@@ -437,8 +437,8 @@ describe('processPlaybook', () => {
     const { canAccessData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           idDoc: true,
           idDocKind: [
             SupportedIdDocTypes.passport,
@@ -463,8 +463,8 @@ describe('processPlaybook', () => {
     const { mustCollectData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           idDoc: true,
           idDocKind: [SupportedIdDocTypes.passport],
           selfie: false,
@@ -482,8 +482,8 @@ describe('processPlaybook', () => {
     const { mustCollectData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           idDoc: true,
           idDocKind: [
             SupportedIdDocTypes.passport,
@@ -506,8 +506,8 @@ describe('processPlaybook', () => {
     const { mustCollectData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           idDoc: true,
           idDocKind: [SupportedIdDocTypes.passport],
           selfie: true,
@@ -525,8 +525,8 @@ describe('processPlaybook', () => {
     const { mustCollectData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           idDoc: true,
           idDocKind: [
             SupportedIdDocTypes.passport,
@@ -549,8 +549,8 @@ describe('processPlaybook', () => {
     const { isDocFirstFlow } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           idDoc: true,
           idDocKind: [
             SupportedIdDocTypes.passport,
@@ -571,8 +571,8 @@ describe('processPlaybook', () => {
     const { isDocFirstFlow } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           idDoc: true,
           idDocKind: [
             SupportedIdDocTypes.passport,
@@ -592,8 +592,8 @@ describe('processPlaybook', () => {
     const { isDocFirstFlow } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           idDoc: true,
           idDocKind: [
             SupportedIdDocTypes.passport,
@@ -614,8 +614,8 @@ describe('processPlaybook', () => {
     const { isNoPhoneFlow, mustCollectData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
         },
       },
       kind: PlaybookKind.Kyc,
@@ -630,8 +630,8 @@ describe('processPlaybook', () => {
     const { isNoPhoneFlow, mustCollectData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           [CollectedKycDataOption.phoneNumber]: false,
         },
       },
@@ -647,8 +647,8 @@ describe('processPlaybook', () => {
     const { isNoPhoneFlow, mustCollectData } = processPlaybook({
       playbook: {
         ...defaultPlaybookValuesKYC,
-        personalInformationAndDocs: {
-          ...defaultPlaybookValuesKYC.personalInformationAndDocs,
+        personal: {
+          ...defaultPlaybookValuesKYC.personal,
           [CollectedKycDataOption.phoneNumber]: true,
         },
       },

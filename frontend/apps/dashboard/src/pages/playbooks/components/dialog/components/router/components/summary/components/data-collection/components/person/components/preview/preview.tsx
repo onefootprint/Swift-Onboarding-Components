@@ -7,10 +7,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
-import type {
-  PersonalInformationAndDocs,
-  SummaryMeta,
-} from '@/playbooks/utils/machine/types';
+import type { personal, SummaryMeta } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import useIdDocFirstFlowEnabled from './hooks/use-id-doc-first-flow-enabled';
@@ -23,9 +20,7 @@ type PreviewProps = {
 const Preview = ({ onStartEditing, meta }: PreviewProps) => {
   const { t } = useTranslation('pages.playbooks.dialog.summary.person');
   const { getValues, register } = useFormContext();
-  const values: PersonalInformationAndDocs = getValues(
-    'personalInformationAndDocs',
-  );
+  const values: personal = getValues('personal');
   const isIdDocFirstFlowEnabled = useIdDocFirstFlowEnabled(
     meta.kind === PlaybookKind.Kyc,
   );
@@ -119,7 +114,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
           <Checkbox
             label={t('id-doc-first.label')}
             hint={t('id-doc-first.hint')}
-            {...register('personalInformationAndDocs.idDocFirst')}
+            {...register('personal.idDocFirst')}
           />
         </Subsection>
       )}

@@ -25,12 +25,10 @@ const Person = ({ playbook, meta }: PersonProps) => {
     'pages.playbooks.dialog.authorized-scopes',
   );
   const { register } = useFormContext();
-  const { personalInformationAndDocs } = playbook;
-  const { selfie, idDoc, ssn, ssnKind } = personalInformationAndDocs;
-  const usLegalStatus =
-    personalInformationAndDocs[CollectedKycDataOption.usLegalStatus];
-  const phoneNumber =
-    personalInformationAndDocs[CollectedKycDataOption.phoneNumber];
+  const { personal } = playbook;
+  const { selfie, idDoc, ssn, ssnKind } = personal;
+  const usLegalStatus = personal[CollectedKycDataOption.usLegalStatus];
+  const phoneNumber = personal[CollectedKycDataOption.phoneNumber];
 
   const isCollectingInvestorProfile =
     playbook[CollectedInvestorProfileDataOption.investorProfile] &&

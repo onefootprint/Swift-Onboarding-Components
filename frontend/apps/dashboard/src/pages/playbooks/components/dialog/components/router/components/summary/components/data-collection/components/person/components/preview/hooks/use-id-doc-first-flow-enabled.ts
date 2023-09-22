@@ -6,7 +6,7 @@ const useIdDocFirstFlowEnabled = (isKyc: boolean) => {
     data: { user, org },
   } = useSession();
   const { watch } = useFormContext();
-  const hasIdDoc = watch('personalInformationAndDocs.idDocKind').length > 0;
+  const hasIdDoc = watch('personal.idDocKind').length > 0;
 
   const hasUserPermission = user?.isFirmEmployee;
   const hasOrgPermissionForIdDocFirst = org?.name

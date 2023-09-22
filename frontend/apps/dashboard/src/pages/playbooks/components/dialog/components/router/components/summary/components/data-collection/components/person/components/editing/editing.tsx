@@ -1,19 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import { CollectedKycDataOption } from '@onefootprint/types';
 import {
-  CollectedKycDataOption,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
-import { Button, Checkbox, Radio, Toggle, Typography } from '@onefootprint/ui';
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  Radio,
+  Toggle,
+  Typography,
+} from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 
-import type {
-  PersonalInformationAndDocs,
-  SummaryMeta,
-} from '@/playbooks/utils/machine/types';
+import type { personal, SummaryMeta } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
+
+import IdDocPicker from './components/id-doc-picker';
 
 type EditingProps = {
   onStopEditing: () => void;
@@ -28,16 +32,20 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
     data: { user, org },
   } = useSession();
   const [unselectedIDDoc, setUnselectedIDDoc] = useState(false);
-  const ssnOpen = watch('personalInformationAndDocs.ssn');
-  const idDocOpen = watch('personalInformationAndDocs.idDoc');
-  const idDocKind = watch('personalInformationAndDocs.idDocKind');
+  const ssnOpen = watch('personal.ssn');
+  const idDocOpen = watch('personal.idDoc');
+  const idDocKind = watch('personal.idDocKind');
+  const isSsnOptional = !!watch('personal.ssnOptional');
+  const docStepUp = watch('personal.ssnDocScanStepUp');
+
   const showNoPhoneFlow =
     (user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs')) &&
     kind === PlaybookKind.Kyc;
+  const showSsnDocStepUp = isSsnOptional;
 
   // need to store this so we don't re-fetch on add'l renders
-  const [initialValues] = useState<PersonalInformationAndDocs>({
-    ...getValues('personalInformationAndDocs'),
+  const [initialValues] = useState<personal>({
+    ...getValues('personal'),
   });
 
   const handleSave = () => {
@@ -51,8 +59,16 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   };
 
   const handleCancel = () => {
-    setValue('personalInformationAndDocs', initialValues);
+    setValue('personal', initialValues);
     onStopEditing();
+  };
+
+  const resetSsnDocStepUp = () => {
+    setValue('personal.ssnDocScanStepUp', false);
+  };
+
+  const resetDocs = () => {
+    setValue('personal.idDocKind', []);
   };
 
   const title =
@@ -73,7 +89,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
           <Typography variant="label-3">{t('phone.title')}</Typography>
           <Controller
             control={control}
-            name={`personalInformationAndDocs.${CollectedKycDataOption.phoneNumber}`}
+            name={`personal.${CollectedKycDataOption.phoneNumber}`}
             render={({ field }) => (
               <ToggleContainer>
                 <Toggle
@@ -98,13 +114,15 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
         <Typography variant="label-3">{t('ssn.title')}</Typography>
         <Controller
           control={control}
-          name="personalInformationAndDocs.ssn"
+          name="personal.ssn"
           render={({ field }) => (
             <ToggleContainer>
               <Toggle
                 onBlur={field.onBlur}
                 onChange={nextValue => {
                   field.onChange(nextValue);
+                  resetSsnDocStepUp();
+                  resetDocs();
                 }}
                 checked={field.value}
                 label={t('ssn.toggle')}
@@ -113,36 +131,80 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
             </ToggleContainer>
           )}
         />
-        {ssnOpen && (
+        {ssnOpen ? (
           <>
             <Subsection>
               <OptionsContainer>
                 <Radio
-                  value={CollectedKycDataOption.ssn9}
                   label={t('ssn.full')}
-                  {...register('personalInformationAndDocs.ssnKind')}
+                  value={CollectedKycDataOption.ssn9}
+                  {...register('personal.ssnKind')}
                 />
                 <Radio
-                  value={CollectedKycDataOption.ssn4}
                   label={t('ssn.last4')}
-                  {...register('personalInformationAndDocs.ssnKind')}
+                  value={CollectedKycDataOption.ssn4}
+                  {...register('personal.ssnKind')}
                 />
               </OptionsContainer>
             </Subsection>
             <Subsection>
               <Checkbox
-                label={t('ssn-optional.label')}
                 hint={t('ssn-optional.hint')}
-                {...register('personalInformationAndDocs.ssnOptional')}
+                label={t('ssn-optional.label')}
+                {...register('personal.ssnOptional', {
+                  onChange: () => {
+                    resetSsnDocStepUp();
+                    resetDocs();
+                  },
+                })}
               />
-              <SsnDocStepUp>
-                <Checkbox
-                  label={t('ssn-doc-scan-step-up.label')}
-                  hint={t('ssn-doc-scan-step-up.hint')}
-                  {...register('personalInformationAndDocs.ssnDocScanStepUp')}
-                />
-              </SsnDocStepUp>
+              {showSsnDocStepUp && (
+                <LeftSpacing>
+                  <Box sx={{ marginY: 5 }}>
+                    <Divider variant="secondary" />
+                  </Box>
+                  <Checkbox
+                    hint={t('ssn-doc-scan-step-up.hint')}
+                    label={t('ssn-doc-scan-step-up.label')}
+                    {...register('personal.ssnDocScanStepUp', {
+                      onChange: () => {
+                        resetDocs();
+                      },
+                    })}
+                  />
+                  {docStepUp && (
+                    <Box>
+                      <Box sx={{ marginY: 5 }}>
+                        <Divider variant="secondary" />
+                      </Box>
+                      <IdDocPicker unselectedIDDoc={unselectedIDDoc} />
+                    </Box>
+                  )}
+                </LeftSpacing>
+              )}
             </Subsection>
+          </>
+        ) : (
+          <>
+            <Subsection>
+              <Checkbox
+                hint={t('ssn-doc-scan-step-up.hint')}
+                label={t('ssn-doc-scan-step-up.label')}
+                {...register('personal.ssnDocScanStepUp', {
+                  onChange: () => {
+                    resetDocs();
+                  },
+                })}
+              />
+            </Subsection>
+            {docStepUp && (
+              <LeftSpacing>
+                <Box sx={{ marginY: 5 }}>
+                  <Divider variant="secondary" />
+                </Box>
+                <IdDocPicker unselectedIDDoc={unselectedIDDoc} />
+              </LeftSpacing>
+            )}
           </>
         )}
       </Section>
@@ -150,7 +212,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
         <Typography variant="label-3">{t('us-legal-status.title')}</Typography>
         <Controller
           control={control}
-          name={`personalInformationAndDocs.${CollectedKycDataOption.usLegalStatus}`}
+          name={`personal.${CollectedKycDataOption.usLegalStatus}`}
           render={({ field }) => (
             <ToggleContainer>
               <Toggle
@@ -171,13 +233,14 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
         <Typography variant="label-3">{t('id-doc.title')}</Typography>
         <Controller
           control={control}
-          name="personalInformationAndDocs.idDoc"
+          name="personal.idDoc"
           render={({ field }) => (
             <ToggleContainer>
               <Toggle
                 onBlur={field.onBlur}
                 onChange={nextValue => {
                   field.onChange(nextValue);
+                  resetDocs();
                 }}
                 checked={field.value}
                 label={t('id-doc.toggle')}
@@ -187,61 +250,12 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
           )}
         />
         {idDocOpen && (
-          <>
-            <Subsection>
-              <OptionsContainer>
-                <Checkbox
-                  value={SupportedIdDocTypes.driversLicense}
-                  label={t('id-doc.drivers_license')}
-                  {...register('personalInformationAndDocs.idDocKind')}
-                />
-                <Checkbox
-                  value={SupportedIdDocTypes.idCard}
-                  label={t('id-doc.id_card')}
-                  {...register('personalInformationAndDocs.idDocKind')}
-                />
-                <Checkbox
-                  value={SupportedIdDocTypes.passport}
-                  label={t('id-doc.passport')}
-                  {...register('personalInformationAndDocs.idDocKind')}
-                />
-                <Checkbox
-                  value={SupportedIdDocTypes.visa}
-                  label={t('id-doc.visa')}
-                  {...register('personalInformationAndDocs.idDocKind')}
-                />
-                <Checkbox
-                  value={SupportedIdDocTypes.residenceDocument}
-                  label={t('id-doc.residence_document')}
-                  {...register('personalInformationAndDocs.idDocKind')}
-                />
-                <Checkbox
-                  value={SupportedIdDocTypes.workPermit}
-                  label={t('id-doc.work_permit')}
-                  {...register('personalInformationAndDocs.idDocKind')}
-                />
-                {(!idDocKind || idDocKind.length === 0) && unselectedIDDoc && (
-                  <Typography
-                    color="error"
-                    variant="body-3"
-                    sx={{ paddingTop: 5 }}
-                  >
-                    {t('id-doc.no-id-doc-selected')}
-                  </Typography>
-                )}
-              </OptionsContainer>
-            </Subsection>
-            {idDocKind?.length > 0 && (
-              <Subsection>
-                <Checkbox
-                  value={false}
-                  label={t('selfie.label')}
-                  hint={t('selfie.hint')}
-                  {...register('personalInformationAndDocs.selfie')}
-                />
-              </Subsection>
-            )}
-          </>
+          <Box>
+            <Box sx={{ marginBottom: 5 }}>
+              <Divider variant="secondary" />
+            </Box>
+            <IdDocPicker unselectedIDDoc={unselectedIDDoc} />
+          </Box>
         )}
       </Section>
       <ButtonContainer>
@@ -268,9 +282,8 @@ const Subsection = styled.div`
   `}
 `;
 
-const SsnDocStepUp = styled.div`
+const LeftSpacing = styled.div`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[5]};
     margin-left: calc(${theme.spacing[7]} + ${theme.spacing[2]});
   `}
 `;
@@ -303,6 +316,7 @@ const OptionsContainer = styled.div`
     gap: ${theme.spacing[3]};
   `}
 `;
+
 const ButtonContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
