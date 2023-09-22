@@ -190,7 +190,7 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         except Exception as e:
             last_exception = e
         time.sleep(retry_interval_s)
-    if last_exception:        
+    if last_exception:
         raise last_exception
 
 
@@ -376,7 +376,9 @@ def identify_verify(
     def inner():
         sent_after = datetime.now() - timedelta(minutes=2)
 
-        messages = twilio.messages.list(to=real_phone_number, limit=25, date_sent_after=sent_after)
+        messages = twilio.messages.list(
+            to=real_phone_number, limit=25, date_sent_after=sent_after
+        )
         last_error = None
         for message in messages:
             try:
@@ -395,11 +397,11 @@ def identify_verify(
                     # The specific error we expected to see was returned from verify - we can exit
                     return
                 last_error = e
-        
+
         if last_error:
             raise last_error
         else:
-            raise Exception("code is not present")
+            raise Exception("SMS 2fac code is not present")
 
     return try_until_success(inner, 60)
 
