@@ -8,7 +8,7 @@ import type {
   EntityVault,
 } from '@onefootprint/types';
 import { IdDocImageTypes } from '@onefootprint/types';
-import { createFontStyles, Typography } from '@onefootprint/ui';
+import { createFontStyles, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import HoverableImage from './components/hoverable-image';
@@ -57,6 +57,14 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
     (a, b) => Number(new Date(b.timestamp)) - Number(new Date(a.timestamp)),
   );
 
+  const getFailureReasons = (relevantUpload: DocumentUpload) => {
+    const reasons = relevantUpload.failureReasons.map(reason =>
+      t(`failure-reasons.${reason}`),
+    );
+    const reasonsWithBullets = reasons.map(reason => `- ${reason}`).join('\n');
+    return reasons.length > 1 ? reasonsWithBullets : reasons[0];
+  };
+
   return (
     <Section>
       <Header>
@@ -89,7 +97,14 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
             <Line data-last={i === currentDocument.uploads.length - 1} />
           </IconAndLine>
           <Content>
-            <Typography variant="body-3">{getEventText(upload)}</Typography>
+            <Title>
+              <Typography variant="body-3">{getEventText(upload)}</Typography>
+              {getFailureReasons(upload) && (
+                <Tooltip alignment="end" text={getFailureReasons(upload)}>
+                  <IcoInfo16 />
+                </Tooltip>
+              )}
+            </Title>
             <HoverableImage
               isSuccess={upload.failureReasons.length === 0}
               src={getSrc(upload.side, upload.version.toString())}
@@ -100,6 +115,16 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
     </Section>
   );
 };
+
+const Title = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: ${theme.spacing[2]};
+  `};
+`;
 
 const Time = styled.div`
   ${({ theme }) => css`
@@ -170,6 +195,7 @@ const Content = styled.div`
     width: 100%;
     gap: ${theme.spacing[6]};
     margin-bottom: ${theme.spacing[9]};
+    white-space: pre-line;
   `}
 `;
 

@@ -794,6 +794,33 @@
                 "residence_document": "Residence card / Green card",
                 "permit": "Work permit / EAD card",
                 "visa": "Visa"
+              },
+              "failure-reasons": {
+                "doc_type_mismatch": "Document type didn't match.",
+                "unknown_document_type": "We couldn't classify this document.",
+                "unsupported_document_type": "The uploaded document type is not supported.",
+                "wrong_document_side": "Wrong side of your document.",
+                "wrong_one_sided_document": "Incorrect document type detected.",
+                "document_not_readable": "Your document could not be read.",
+                "document_glare": "Your document's picture has image glare.",
+                "document_sharpness": "The document image is blurry.",
+                "id_type_not_acceptable": "Invalid document type detected.",
+                "unable_to_align_document": "One or more corners of the document are not within the borders of the image.",
+                "unknown_country_code": "We couldn't detect the issuer country from your document.",
+                "country_code_mismatch": "The issuer country didn't match.",
+                "selfie_face_not_found": "We could not detect a face in the selfie.",
+                "selfie_low_confidence": "We could not verify the selfie.",
+                "selfie_too_dark": "Your image was too dark.",
+                "selfie_glare": "Your selfie had image glare.",
+                "selfie_has_lenses": "We detected glasses in the selfie.",
+                "selfie_has_face_mask": "We detected a face mask in the selfie.",
+                "selfie_blurry": "Your selfie was too blurry.",
+                "selfie_image_size_unsupported": "Your selfie image was too small.",
+                "selfie_image_orientation_incorrect": "Your selfie image has the wrong orientation.",
+                "selfie_bad_image_compression": "Your selfie image has the incorrect image compression.",
+                "drivers_license_permit_not_allowed": "Driver's license permits are not allowed.",
+                "unknown_error": "An error occurred.",
+                "face_not_found": "We could not detect a face in the document provided."
               }
             }
           }
