@@ -48,15 +48,17 @@ pub struct Error {
     pub timestamp: i64,
     pub status: i32,
     pub error: String,
-    pub message: String,
-    pub path: String,
+    pub message: Option<String>,
+    pub path: Option<String>,
 }
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "IncodeAPIResponseError {}: {} in {}>",
-            self.error, self.message, self.path
+            self.error,
+            self.message.as_ref().unwrap_or(&"".to_string()),
+            self.path.as_ref().unwrap_or(&"".to_string())
         )
     }
 }

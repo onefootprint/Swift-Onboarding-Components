@@ -642,7 +642,7 @@ mod tests {
     };
 
     use crate::{
-        incode::doc::response::AddSelfieResponse,
+        incode::{doc::response::AddSelfieResponse, IncodeAPIResult},
         test_fixtures::{self, DocTestOpts},
     };
 
@@ -779,6 +779,16 @@ mod tests {
 
         let parsed: AddSelfieResponse = serde_json::from_value(raw_response).unwrap();
         assert!(parsed.failure_reasons().is_empty());
+    }
+
+    #[test]
+    fn test_add_selfie_error() {
+        let raw_response = serde_json::json!(
+            {"timestamp":1695335887367i64,"status":4019,"error":"Face not found.","path":"/omni/add/face/third-party"}
+        );
+        let res = IncodeAPIResult::<AddSelfieResponse>::try_from(raw_response.clone()).unwrap();
+        let e = res.into_success().unwrap_err();
+        assert!(matches!(e, crate::incode::error::Error::APIResponseError(_)));
     }
 
     #[test]
