@@ -60,7 +60,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
           />
         </OptionsContainer>
       </ScopeSection>
-      {(ssn || usLegalStatus || idDocKind.length) && allowUS && (
+      {(ssn || usLegalStatus || idDocKind.length > 0) && allowUS && (
         <ScopeSection>
           <Typography variant="label-3">{t('us-residents')}</Typography>
           <OptionsContainer>
@@ -82,7 +82,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
                   {...register(CollectedKycDataOption.ssn9)}
                 />
               ))}
-            {idDocKind.length && (
+            {idDocKind.length > 0 && (
               <Box>
                 <Checkbox
                   label={
