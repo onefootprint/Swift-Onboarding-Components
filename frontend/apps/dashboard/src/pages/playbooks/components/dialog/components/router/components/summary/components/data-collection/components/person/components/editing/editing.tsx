@@ -36,7 +36,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const shouldCollectIdDoc = watch('personal.idDoc');
   const idDocKind = watch('personal.idDocKind');
   const isSsnOptional = !!watch('personal.ssnOptional');
-  const docStepUp = watch('personal.ssnDocScanStepUp');
+  const shouldStepUpIdDoc = !!watch('personal.ssnDocScanStepUp');
 
   const showNoPhoneFlow =
     (user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs')) &&
@@ -173,7 +173,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                       },
                     })}
                   />
-                  {docStepUp && (
+                  {shouldStepUpIdDoc && (
                     <Box>
                       <Box sx={{ marginY: 5 }}>
                         <Divider variant="secondary" />
@@ -198,7 +198,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                 })}
               />
             </Subsection>
-            {docStepUp && (
+            {shouldStepUpIdDoc && (
               <LeftSpacing>
                 <Box sx={{ marginY: 5 }}>
                   <Divider variant="secondary" />
@@ -224,14 +224,15 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
           render={({ field }) => (
             <ToggleContainer>
               <Toggle
+                checked={field.value}
+                disabled={shouldStepUpIdDoc}
+                label={t('id-doc.toggle')}
+                labelPlacement="right"
                 onBlur={field.onBlur}
                 onChange={nextValue => {
                   field.onChange(nextValue);
                   resetDocs();
                 }}
-                checked={field.value}
-                label={t('id-doc.toggle')}
-                labelPlacement="right"
               />
             </ToggleContainer>
           )}

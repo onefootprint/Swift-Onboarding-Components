@@ -145,6 +145,25 @@ describe('<Editing />', () => {
       expect(stepUp).toBeInTheDocument();
     });
 
+    it('should disable the option to do regular id doc scan', async () => {
+      renderEditing({});
+
+      const ssnOptional = screen.getByLabelText(
+        'Allow users without an SSN to proceed with the verification',
+      );
+      await userEvent.click(ssnOptional);
+
+      const docStepUp = screen.getByRole('checkbox', {
+        name: 'Do document scan step-up',
+      });
+      await userEvent.click(docStepUp);
+
+      const idDoc = screen.getByRole('switch', {
+        name: 'Request users to scan an ID document',
+      });
+      expect(idDoc).toBeDisabled();
+    });
+
     describe('when selecting "Do document scan step-up"', () => {
       it('should show the list of id docs', async () => {
         renderEditing({});
