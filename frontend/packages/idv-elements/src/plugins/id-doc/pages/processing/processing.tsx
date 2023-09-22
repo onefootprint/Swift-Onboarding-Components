@@ -106,7 +106,7 @@ const Processing = () => {
         onSuccess: handleSubmitDocSuccess,
         onError: err => {
           console.error(
-            `Id-doc image submit failed. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
+            `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
               err,
             )}`,
           );
