@@ -99,3 +99,12 @@ impl DbToApi<(DocumentSide, DataLifetime)> for api_wire_types::DocumentUpload {
         }
     }
 }
+
+impl DbToApi<IdentityDocument> for api_wire_types::PublicDocument {
+    fn from_db(id_doc: IdentityDocument) -> Self {
+        Self {
+            document_type: id_doc.vaulted_document_type.unwrap_or(id_doc.document_type), // unwrap_or for backwards compat
+            created_at: id_doc.created_at,
+        }
+    }
+}

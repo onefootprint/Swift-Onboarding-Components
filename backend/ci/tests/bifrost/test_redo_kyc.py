@@ -88,7 +88,9 @@ def test_redo_kyc(sandbox_tenant, twilio, with_document, doc_first_obc):
     # Edit some data
     data = {"id.ssn9": "999-99-9999"}
     patch("/hosted/user/vault", data, bifrost.auth_token)
-    bifrost.run()
+    user = bifrost.run()
+    fp_id = user.fp_id
+    tenant = bifrost.ob_config.tenant
 
     # we should have re-run KYC and now have 2 OBDs
     timeline = get(
@@ -104,3 +106,8 @@ def test_redo_kyc(sandbox_tenant, twilio, with_document, doc_first_obc):
             i for i in timeline if i["event"]["kind"] == "identity_document_uploaded"
         ]
         assert len(docs) == 2
+
+        users_docs = get(f"users/{fp_id}/documents", None, *tenant.db_auths)
+        assert len(users_docs) == 2
+        assert all(map(lambda x: x["document_type"] == "drivers_license", users_docs))
+        assert users_docs[1]["created_at"] >  users_docs[0]["created_at"]

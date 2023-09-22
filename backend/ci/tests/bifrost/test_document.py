@@ -53,6 +53,9 @@ def test_upload_documents(doc_request_sandbox_ob_config, twilio):
     assert len([i for i in body if i["kind"] == "id_card"]) == 1
     assert len([i for i in body if i["kind"] == "drivers_license"]) == 2
 
+    users_docs = get(f"users/{fp_id}/documents", None, *tenant.db_auths)
+    assert users_docs[0]["document_type"] == "drivers_license"
+
 
 def test_upload_documents_with_ob_config_restriction_legacy_version(
     restricted_doc_ob_config, twilio
@@ -88,7 +91,11 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
     )
 
     # Bifrost client uploads the right kind of doc, so this should work
-    bifrost.run()
+    user = bifrost.run()
+    fp_id = user.fp_id
+    tenant = bifrost.ob_config.tenant
+    users_docs = get(f"users/{fp_id}/documents", None, *tenant.db_auths)
+    assert users_docs[0]["document_type"] == "drivers_license"
 
 
 def test_upload_documents_with_ob_config_restriction(

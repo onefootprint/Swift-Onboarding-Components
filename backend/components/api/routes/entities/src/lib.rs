@@ -2,9 +2,9 @@ use api_core::*;
 use paperclip::actix::web;
 
 mod annotations;
+mod auth_events;
 mod client_token;
 mod decisions;
-mod auth_events;
 mod documents;
 mod get;
 mod kyc;

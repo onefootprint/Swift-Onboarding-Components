@@ -45,4 +45,10 @@ pub struct DocumentUpload {
     pub version: DataLifetimeSeqno,
 }
 
+#[derive(Debug, Serialize, Apiv2Schema, JsonSchema)]
+pub struct PublicDocument {
+    /// Document type of the successfully uploaded document. Can be used to fetch from vault
+    pub document_type: IdDocKind,
+    pub created_at: DateTime<Utc>,
+}
 export_schema!(Document);
