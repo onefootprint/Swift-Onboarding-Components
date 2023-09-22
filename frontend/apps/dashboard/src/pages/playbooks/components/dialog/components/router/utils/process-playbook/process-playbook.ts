@@ -75,13 +75,20 @@ const processPlaybook = ({
   const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber];
 
   // id doc handling
-  const { idDoc, idDocKind, selfie, idDocFirst } = personal;
+  const { idDoc, idDocKind, selfie, idDocFirst, ssnDocScanStepUp } = personal;
   let docString = '';
   if (idDoc && idDocKind?.length > 0) {
     const docKinds = idDocKind.join(',');
     const selfieParam = selfie ? 'require_selfie' : 'none';
     docString = `document.${docKinds}.none.${selfieParam}`;
     mustCollectData.push(docString);
+  }
+
+  let docScanForOptionalSsn;
+  if (ssnDocScanStepUp && idDocKind?.length > 0) {
+    const docKinds = idDocKind.join(',');
+    const selfieParam = selfie ? 'require_selfie' : 'none';
+    docScanForOptionalSsn = `document.${docKinds}.none.${selfieParam}`;
   }
 
   const isDocFirstFlow =
@@ -153,6 +160,7 @@ const processPlaybook = ({
     mustCollectData,
     name,
     optionalData,
+    docScanForOptionalSsn,
     ...getResidency(residencyForm),
   };
 };

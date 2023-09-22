@@ -80,15 +80,17 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
           <CollectedInformation
             title={t('us-residents.title')}
             options={{
-              ssnDocScanStepUp: values.ssnDocScanStepUp,
-              idDocKind: values.idDocKind,
-              selfie: values.idDocKind.length > 0 && values.selfie,
-              usLegalStatus: values.us_legal_status,
               ssn: {
                 active: values.ssn,
                 kind: values.ssnKind,
                 optional: values.ssnOptional,
               },
+              usLegalStatus: values.us_legal_status,
+              idDocKind: values.idDocKind,
+              selfie: values.idDocKind.length > 0 && values.selfie,
+              ...(values.ssnDocScanStepUp
+                ? { ssnDocScanStepUp: values.ssnDocScanStepUp }
+                : {}),
             }}
           />
         )}

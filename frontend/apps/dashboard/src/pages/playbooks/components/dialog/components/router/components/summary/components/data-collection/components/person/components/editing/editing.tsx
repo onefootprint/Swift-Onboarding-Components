@@ -131,7 +131,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
             </ToggleContainer>
           )}
         />
-        {ssnOpen ? (
+        {ssnOpen && (
           <>
             <Subsection>
               <OptionsContainer>
@@ -184,28 +184,6 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                 </LeftSpacing>
               )}
             </Subsection>
-          </>
-        ) : (
-          <>
-            <Subsection>
-              <Checkbox
-                hint={t('ssn-doc-scan-step-up.hint')}
-                label={t('ssn-doc-scan-step-up.label')}
-                {...register('personal.ssnDocScanStepUp', {
-                  onChange: () => {
-                    resetDocs();
-                  },
-                })}
-              />
-            </Subsection>
-            {shouldStepUpIdDoc && (
-              <LeftSpacing>
-                <Box sx={{ marginY: 5 }}>
-                  <Divider variant="secondary" />
-                </Box>
-                <IdDocPicker unselectedIDDoc={unselectedIDDoc} />
-              </LeftSpacing>
-            )}
           </>
         )}
       </Section>

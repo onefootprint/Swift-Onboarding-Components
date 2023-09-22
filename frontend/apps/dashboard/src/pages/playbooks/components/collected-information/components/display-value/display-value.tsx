@@ -27,7 +27,9 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
   }
 
   if (name === 'idDocKind') {
-    return <IdDocDisplay idDocKind={value as SupportedIdDocTypes[]} />;
+    return (
+      <IdDocDisplay idDocKind={value as SupportedIdDocTypes[]} threshold={2} />
+    );
   }
 
   if (name === 'ssn') {

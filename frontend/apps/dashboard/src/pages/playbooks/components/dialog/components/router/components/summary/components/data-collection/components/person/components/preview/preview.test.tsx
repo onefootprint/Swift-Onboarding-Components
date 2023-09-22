@@ -35,7 +35,7 @@ describe('<Preview />', () => {
     expect(screen.getByText('Address')).toBeInTheDocument();
     expect(screen.getByText('Legal status in the U.S.')).toBeInTheDocument();
     expect(screen.getByText('SSN')).toBeInTheDocument();
-    expect(screen.getByText('Doc. scan types')).toBeInTheDocument();
+    expect(screen.getByText('ID document scan')).toBeInTheDocument();
   });
 
   it('should show SSN only once when we are showing', () => {
@@ -47,7 +47,7 @@ describe('<Preview />', () => {
 
   it("should show ID doc only once when we aren't showing", () => {
     renderForm({ startingValues: { idDoc: false } });
-    expect(screen.getAllByText('Doc. scan types').length).toBe(1);
+    expect(screen.getAllByText('ID document scan').length).toBe(1);
   });
 
   it('should show ID doc only once when we are showing', () => {
@@ -60,7 +60,7 @@ describe('<Preview />', () => {
         ],
       },
     });
-    expect(screen.getAllByText('Doc. scan types').length).toBe(1);
+    expect(screen.getAllByText('ID document scan').length).toBe(1);
   });
 
   it('should show correct title for KYC flow', () => {

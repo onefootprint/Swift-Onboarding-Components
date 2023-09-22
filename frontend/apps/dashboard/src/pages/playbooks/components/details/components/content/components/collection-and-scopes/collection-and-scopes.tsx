@@ -17,6 +17,7 @@ const CollectionAndScopes = ({
     allowInternationalResidents,
     allowUsResidents,
     canAccessData,
+    docScanForOptionalSsn,
     enhancedAml,
     internationalCountryRestrictions,
     isDocFirstFlow,
@@ -55,6 +56,7 @@ const CollectionAndScopes = ({
         <DataCollection
           allowInternationalResidents={allowInternationalResidents}
           allowUsResidents={allowUsResidents}
+          docScanForOptionalSsn={docScanForOptionalSsn}
           internationalCountryRestrictions={internationalCountryRestrictions}
           isDocFirstFlow={isDocFirstFlow}
           mustCollectData={mustCollectData}
@@ -66,6 +68,7 @@ const CollectionAndScopes = ({
           allowInternationalResidents={allowInternationalResidents}
           allowUsResidents={allowUsResidents}
           canAccessData={canAccessData}
+          docScanForOptionalSsn={docScanForOptionalSsn}
         />
       )}
       {tab === 'aml-monitoring' && (

@@ -57,6 +57,8 @@ export type OnboardingConfig = {
   internationalCountryRestrictions: null | CountryCode[];
   supportedCountries?: CountryCode[];
   isDocFirstFlow: boolean;
+  docScanForOptionalSsn?: string;
+
   enhancedAml: {
     enhancedAml: boolean;
     ofac: boolean;

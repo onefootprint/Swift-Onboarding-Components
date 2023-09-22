@@ -55,6 +55,7 @@ const Router = ({ onClose }: RouterProps) => {
       mustCollectData,
       name,
       optionalData,
+      docScanForOptionalSsn,
     } = processPlaybook({
       authorizedScopes: authorizedScopesForm,
       kind,
@@ -75,6 +76,7 @@ const Router = ({ onClose }: RouterProps) => {
         name,
         optionalData,
         enhancedAml,
+        docScanForOptionalSsn,
       },
       {
         onSuccess: () => {

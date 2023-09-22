@@ -13,12 +13,14 @@ export type AuthorizedScopesProps = {
   allowInternationalResidents: boolean;
   allowUsResidents: boolean;
   canAccessData: string[];
+  docScanForOptionalSsn?: string;
 };
 
 const AuthorizedScopes = ({
   allowUsResidents,
   allowInternationalResidents,
   canAccessData,
+  docScanForOptionalSsn,
 }: AuthorizedScopesProps) => {
   const { t } = useTranslation('pages.playbooks.details.authorized-scopes');
   const ssn =
@@ -28,6 +30,7 @@ const AuthorizedScopes = ({
     CollectedKycDataOption.usLegalStatus,
   );
   const idDoc =
+    !!docScanForOptionalSsn ||
     canAccessData.filter(scope => scope.includes('document'))?.length > 0;
 
   return (
@@ -39,15 +42,16 @@ const AuthorizedScopes = ({
       />
       {(ssn || usLegalStatus || idDoc) && allowUsResidents && (
         <Section
-          displayScopes={usResidentDisplayScopes}
           canAccessData={canAccessData}
+          displayScopes={usResidentDisplayScopes}
+          docScanForOptionalSsn={docScanForOptionalSsn}
           title={t('us-residents.title')}
         />
       )}
       {allowInternationalResidents && (
         <Section
-          displayScopes={['document', 'selfie']}
           canAccessData={['document.passport.require_selfie']}
+          displayScopes={['document', 'selfie']}
           title={t('non-us-residents.title')}
         />
       )}

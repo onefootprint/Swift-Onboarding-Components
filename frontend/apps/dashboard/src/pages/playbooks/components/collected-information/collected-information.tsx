@@ -26,14 +26,17 @@ const CollectedInformation = ({
       </Typography>
       {options && (
         <OptionsContainer>
-          {Object.entries(options).map(([name, value]) => (
-            <OptionItem key={name} role="row" aria-label={t(kebabCase(name))}>
-              <Label variant="body-3" color="tertiary">
-                {t(kebabCase(name))}
-              </Label>
-              <DisplayValue name={name as any} value={value} />
-            </OptionItem>
-          ))}
+          {Object.entries(options).map(([name, value]) => {
+            if (value == null || value === undefined) return null;
+            return (
+              <OptionItem key={name} role="row" aria-label={t(kebabCase(name))}>
+                <Label variant="body-3" color="tertiary">
+                  {t(kebabCase(name))}
+                </Label>
+                <DisplayValue name={name as any} value={value} />
+              </OptionItem>
+            );
+          })}
         </OptionsContainer>
       )}
       {subtitle ? (

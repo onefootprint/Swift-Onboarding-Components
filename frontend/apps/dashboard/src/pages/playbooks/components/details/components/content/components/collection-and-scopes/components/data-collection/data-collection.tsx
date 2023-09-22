@@ -9,6 +9,7 @@ import CollectedInformation from '@/playbooks/components/collected-information';
 export type DataCollectionProps = {
   allowInternationalResidents: boolean;
   allowUsResidents: boolean;
+  docScanForOptionalSsn?: string;
   internationalCountryRestrictions: null | CountryCode[];
   isDocFirstFlow: boolean;
   mustCollectData: string[];
@@ -18,6 +19,7 @@ export type DataCollectionProps = {
 const DataCollection = ({
   allowInternationalResidents,
   allowUsResidents,
+  docScanForOptionalSsn,
   internationalCountryRestrictions,
   isDocFirstFlow,
   mustCollectData,
@@ -28,9 +30,9 @@ const DataCollection = ({
     mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
   const optionalSSN =
     optionalData.includes('ssn9') || optionalData.includes('ssn4');
-  const documentsAsString = mustCollectData.filter(scopes =>
-    scopes.includes('document'),
-  )?.[0];
+  const documentsAsString =
+    docScanForOptionalSsn ||
+    mustCollectData.filter(scopes => scopes.includes('document'))?.[0];
   const idDocKinds = Object.values(SupportedIdDocTypes).filter(docType =>
     documentsAsString?.includes(docType),
   );
@@ -52,14 +54,15 @@ const DataCollection = ({
         <CollectedInformation
           title={t('us-residents.title')}
           options={{
-            idDocKind: idDocKinds,
-            selfie,
-            usLegalStatus: mustCollectData.includes('us_legal_status'),
             ssn: {
               active: requiresSSN || optionalSSN,
               kind: mustCollectData.includes('ssn9') ? 'ssn9' : 'ssn4',
               optional: optionalSSN,
             },
+            usLegalStatus: mustCollectData.includes('us_legal_status'),
+            idDocKind: idDocKinds,
+            selfie,
+            ssnDocScanStepUp: !!docScanForOptionalSsn,
           }}
         />
       ) : (
