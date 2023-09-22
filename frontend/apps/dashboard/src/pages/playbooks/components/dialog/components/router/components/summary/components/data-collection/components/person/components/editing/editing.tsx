@@ -131,17 +131,17 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
             </Subsection>
             <Subsection>
               <Checkbox
-                value={false}
-                label={t('ssn-optional.checkbox')}
+                label={t('ssn-optional.label')}
+                hint={t('ssn-optional.hint')}
                 {...register('personalInformationAndDocs.ssnOptional')}
               />
-              <Typography
-                color="tertiary"
-                sx={{ paddingLeft: 7, marginLeft: 2 }}
-                variant="body-3"
-              >
-                {t('ssn-optional.warning')}
-              </Typography>
+              <SsnDocStepUp>
+                <Checkbox
+                  label={t('ssn-doc-scan-step-up.label')}
+                  hint={t('ssn-doc-scan-step-up.hint')}
+                  {...register('personalInformationAndDocs.ssnDocScanStepUp')}
+                />
+              </SsnDocStepUp>
             </Subsection>
           </>
         )}
@@ -235,16 +235,10 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
               <Subsection>
                 <Checkbox
                   value={false}
-                  label={t('selfie.checkbox')}
+                  label={t('selfie.label')}
+                  hint={t('selfie.hint')}
                   {...register('personalInformationAndDocs.selfie')}
                 />
-                <Typography
-                  color="tertiary"
-                  sx={{ paddingLeft: 7, marginLeft: 2 }}
-                  variant="body-3"
-                >
-                  {t('selfie.warning')}
-                </Typography>
               </Subsection>
             )}
           </>
@@ -271,6 +265,13 @@ const Subsection = styled.div`
   ${({ theme }) => css`
     border-top: ${theme.borderWidth[1]} ${theme.borderColor.tertiary} dashed;
     padding-top: ${theme.spacing[5]};
+  `}
+`;
+
+const SsnDocStepUp = styled.div`
+  ${({ theme }) => css`
+    margin-top: ${theme.spacing[5]};
+    margin-left: calc(${theme.spacing[7]} + ${theme.spacing[2]});
   `}
 `;
 

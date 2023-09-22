@@ -10,9 +10,9 @@ import type { AMLFormData } from '@/playbooks/utils/machine/types';
 
 import AML from './components/aml';
 import AuthorizedScopes from './components/authorized-scopes';
-import NameYourPlaybook from './components/name-your-playbook';
+import Name from './components/name-your-playbook';
 import Residency from './components/residency';
-import Summary from './components/summary';
+import Config from './components/summary';
 import WhoToOnboard from './components/who-to-onboard';
 import useDefaultValues from './hooks/use-default-values';
 import useOptions from './hooks/use-options';
@@ -135,7 +135,7 @@ const Router = ({ onClose }: RouterProps) => {
           />
         )}
         {state.matches('nameYourPlaybook') && (
-          <NameYourPlaybook
+          <Name
             kind={state.context.kind}
             defaultValues={defaultValues.name}
             onBack={() => {
@@ -149,7 +149,7 @@ const Router = ({ onClose }: RouterProps) => {
           />
         )}
         {state.matches('summary') && (
-          <Summary
+          <Config
             defaultValues={defaultValues.playbook}
             meta={{
               kind: state.context.kind,

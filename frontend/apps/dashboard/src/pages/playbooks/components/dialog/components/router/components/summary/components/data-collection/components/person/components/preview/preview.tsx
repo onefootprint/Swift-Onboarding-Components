@@ -117,16 +117,10 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
       {isIdDocFirstFlowEnabled && (
         <Subsection>
           <Checkbox
-            label={t('id-doc-first.checkbox')}
+            label={t('id-doc-first.label')}
+            hint={t('id-doc-first.hint')}
             {...register('personalInformationAndDocs.idDocFirst')}
           />
-          <Typography
-            color="tertiary"
-            sx={{ paddingLeft: 7, marginLeft: 2, width: '100%' }}
-            variant="body-3"
-          >
-            {t('id-doc-first.warning')}
-          </Typography>
         </Subsection>
       )}
     </Container>
