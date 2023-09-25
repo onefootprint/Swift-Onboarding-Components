@@ -78,6 +78,8 @@ pub trait IncodeStateTransition: Sized {
     {
         Uninitialized::<Self>::new().into()
     }
+
+    fn next_state(session: &VerificationSession) -> IncodeState;
 }
 
 #[async_trait]

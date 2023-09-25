@@ -6,6 +6,7 @@ use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use crate::decision::vendor::incode::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::enclave_client::EnclaveClient;
+use crate::errors::user::UserError;
 use crate::errors::{ApiResult, AssertionError};
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::vendor_clients::IncodeClients;
@@ -149,6 +150,8 @@ impl IncodeStateMachine {
                     authentication_token: token.into(),
                 },
                 ignored_failure_reasons: session.ignored_failure_reasons,
+                // TODO: be more intelligent about using incode classified doc type here.. but do we trust it?
+                document_type: ctx.docv_data.document_type.ok_or(UserError::NoDocumentType)?,
             }
         };
 

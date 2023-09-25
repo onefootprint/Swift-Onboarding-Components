@@ -3,6 +3,7 @@ use super::{
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
+use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
 use crate::errors::{ApiResult, AssertionError};
 use crate::utils::vault_wrapper::{Person, TenantVw, VaultWrapper};
@@ -131,5 +132,9 @@ impl IncodeStateTransition for FetchScores {
             self.score_verification_result_id,
         )?;
         Ok(Complete::new().into())
+    }
+
+    fn next_state(_: &VerificationSession) -> IncodeState {
+        Complete::new()
     }
 }

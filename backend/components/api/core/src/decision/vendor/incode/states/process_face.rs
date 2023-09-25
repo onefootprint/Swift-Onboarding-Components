@@ -2,6 +2,7 @@ use super::{
     map_to_api_err, save_incode_verification_result, GetOnboardingStatus, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
+use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
@@ -47,5 +48,9 @@ impl IncodeStateTransition for ProcessFace {
     ) -> ApiResult<TransitionResult> {
         GetOnboardingStatus::enter(conn, &ctx.id_doc_id)?;
         Ok(GetOnboardingStatus::new().into())
+    }
+
+    fn next_state(_: &VerificationSession) -> IncodeState {
+        GetOnboardingStatus::new()
     }
 }

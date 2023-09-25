@@ -116,6 +116,14 @@ impl IncodeStateTransition for AddFront {
         };
         Ok(result)
     }
+
+    fn next_state(session: &VerificationSession) -> IncodeState {
+        if session.document_type.sides().contains(&DocumentSide::Back) {
+            AddBack::new()
+        } else {
+            ProcessId::new()
+        }
+    }
 }
 
 fn should_collect_back_or_process_id(docv_data: &DocVData) -> ApiResult<IncodeState> {

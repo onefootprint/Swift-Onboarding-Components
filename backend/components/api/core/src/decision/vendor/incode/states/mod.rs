@@ -67,6 +67,7 @@ pub struct VerificationSession {
     pub kind: IncodeVerificationSessionKind,
     pub credentials: IncodeCredentialsWithToken,
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
+    pub document_type: IdDocKind,
 }
 
 /// Struct to make sure we handle the different cases of Incode vendor call errors we may see

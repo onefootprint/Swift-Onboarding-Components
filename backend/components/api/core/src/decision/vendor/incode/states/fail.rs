@@ -1,5 +1,6 @@
 use super::IncodeStateTransition;
 use super::VerificationSession;
+use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::ApiErrorKind;
@@ -88,5 +89,9 @@ impl IncodeStateTransition for Fail {
         Err(ApiErrorKind::AssertionError(
             "Incode machine already failed".into(),
         ))?
+    }
+
+    fn next_state(_: &VerificationSession) -> IncodeState {
+        Fail::new()
     }
 }

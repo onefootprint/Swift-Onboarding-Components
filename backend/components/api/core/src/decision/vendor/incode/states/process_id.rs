@@ -52,6 +52,15 @@ impl IncodeStateTransition for ProcessId {
         }
         Ok(next.into())
     }
+
+    // After processing the ID portion, we move on to selfie if applicable, or start polling for scores
+    fn next_state(session: &VerificationSession) -> IncodeState {
+        if session.kind.requires_selfie() {
+            AddConsent::new()
+        } else {
+            GetOnboardingStatus::new()
+        }
+    }
 }
 
 // After processing the ID portion, we move on to selfie if applicable, or start polling for scores
