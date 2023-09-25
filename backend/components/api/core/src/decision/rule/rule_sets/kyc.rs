@@ -6,18 +6,14 @@ use crate::decision::{
     },
 };
 
-use newtypes::{FootprintReasonCode, RuleSetName};
+use newtypes::{FootprintReasonCode as FRC, RuleSetName};
+const SSN_DOES_NOT_EXACTLY_MATCH_CODES: [FRC; 2] = [FRC::SsnDoesNotMatch, FRC::SsnPartiallyMatches];
 
 pub fn idology_base_rules() -> Vec<Rule<IDologyFeatures>> {
     vec![
         // If we don't have a located identity, we should fail
         Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::IdNotLocated)
-                }
-            },
+            rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::IdNotLocated) },
             name: RuleName::IdNotLocated,
             action: Action::Fail,
         },
@@ -26,33 +22,18 @@ pub fn idology_base_rules() -> Vec<Rule<IDologyFeatures>> {
         //
         // This is an IDology recommended "always fail" rule
         Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::SubjectDeceased)
-                }
-            },
+            rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::SubjectDeceased) },
             name: RuleName::SubjectDeceased,
             action: Action::Fail,
         },
         Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::AddressInputIsPoBox)
-                }
-            },
+            rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::AddressInputIsPoBox) },
             name: RuleName::AddressInputIsPoBox,
             action: Action::Fail,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::DobLocatedCoppaAlert)
-                }
-            },
+            rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::DobLocatedCoppaAlert) },
             name: RuleName::CoppaAlert,
             action: Action::Fail,
         },
@@ -60,61 +41,37 @@ pub fn idology_base_rules() -> Vec<Rule<IDologyFeatures>> {
             rule: {
                 |f: &IDologyFeatures| {
                     f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::SsnDoesNotMatch)
+                        .iter()
+                        .any(|frc| SSN_DOES_NOT_EXACTLY_MATCH_CODES.contains(frc))
                 }
             },
             name: RuleName::SsnDoesNotMatch,
             action: Action::Fail,
         },
         Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::SsnInputIsInvalid)
-                }
-            },
+            rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::SsnInputIsInvalid) },
             name: RuleName::SsnInputIsInvalid,
             action: Action::Fail,
         },
         Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::SsnLocatedIsInvalid)
-                }
-            },
+            rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::SsnLocatedIsInvalid) },
             name: RuleName::SsnLocatedIsInvalid,
             action: Action::Fail,
         },
         Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::SsnNotProvided)
-                }
-            },
+            rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::SsnNotProvided) },
             name: RuleName::SsnNotProvided,
             action: Action::ManualReview,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::MultipleRecordsFound)
-                }
-            },
+            rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::MultipleRecordsFound) },
             name: RuleName::MultipleRecordsFound,
             action: Action::Fail,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
-            rule: {
-                |f: &IDologyFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::SsnIssuedPriorToDob)
-                }
-            },
+            rule: { |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::SsnIssuedPriorToDob) },
             name: RuleName::SsnIssuedPriorToDob,
             action: Action::Fail,
         },
@@ -134,10 +91,7 @@ pub fn idology_rule_set() -> RuleSet<IDologyFeatures> {
 pub fn experian_base_rules() -> Vec<Rule<ExperianFeatures>> {
     vec![
         Rule {
-            rule: |f: &ExperianFeatures| {
-                f.footprint_reason_codes
-                    .contains(&FootprintReasonCode::IdNotLocated)
-            },
+            rule: |f: &ExperianFeatures| f.footprint_reason_codes.contains(&FRC::IdNotLocated),
             name: RuleName::IdNotLocated,
             action: Action::Fail,
         },
@@ -145,19 +99,15 @@ pub fn experian_base_rules() -> Vec<Rule<ExperianFeatures>> {
             rule: {
                 |f: &ExperianFeatures| {
                     f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::SsnDoesNotMatch)
+                        .iter()
+                        .any(|frc| SSN_DOES_NOT_EXACTLY_MATCH_CODES.contains(frc))
                 }
             },
             name: RuleName::SsnDoesNotMatch,
             action: Action::Fail,
         },
         Rule {
-            rule: {
-                |f: &ExperianFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::SsnNotProvided)
-                }
-            },
+            rule: { |f: &ExperianFeatures| f.footprint_reason_codes.contains(&FRC::SsnNotProvided) },
             name: RuleName::SsnNotProvided,
             action: Action::ManualReview,
         },
@@ -175,20 +125,20 @@ pub fn experian_rule_set() -> RuleSet<ExperianFeatures> {
 }
 
 // NEW RULES
-pub fn kyc_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
+pub fn kyc_rules() -> Vec<Rule<Vec<FRC>>> {
     let kyc = vec![
         Rule {
-            rule: |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::IdNotLocated),
+            rule: |f: &Vec<FRC>| f.contains(&FRC::IdNotLocated),
             name: RuleName::IdNotLocated,
             action: Action::Fail,
         },
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnDoesNotMatch) },
+            rule: { |f: &Vec<FRC>| f.iter().any(|frc| SSN_DOES_NOT_EXACTLY_MATCH_CODES.contains(frc)) },
             name: RuleName::SsnDoesNotMatch,
             action: Action::Fail,
         },
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnNotProvided) },
+            rule: { |f: &Vec<FRC>| f.contains(&FRC::SsnNotProvided) },
             name: RuleName::SsnNotProvided,
             action: Action::ManualReview,
         },
@@ -201,40 +151,40 @@ pub fn kyc_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
         //
         // This is an IDology recommended "always fail" rule
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SubjectDeceased) },
+            rule: { |f: &Vec<FRC>| f.contains(&FRC::SubjectDeceased) },
             name: RuleName::SubjectDeceased,
             action: Action::Fail,
         },
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::AddressInputIsPoBox) },
+            rule: { |f: &Vec<FRC>| f.contains(&FRC::AddressInputIsPoBox) },
             name: RuleName::AddressInputIsPoBox,
             action: Action::Fail,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DobLocatedCoppaAlert) },
+            rule: { |f: &Vec<FRC>| f.contains(&FRC::DobLocatedCoppaAlert) },
             name: RuleName::CoppaAlert,
             action: Action::Fail,
         },
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnInputIsInvalid) },
+            rule: { |f: &Vec<FRC>| f.contains(&FRC::SsnInputIsInvalid) },
             name: RuleName::SsnInputIsInvalid,
             action: Action::Fail,
         },
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnLocatedIsInvalid) },
+            rule: { |f: &Vec<FRC>| f.contains(&FRC::SsnLocatedIsInvalid) },
             name: RuleName::SsnLocatedIsInvalid,
             action: Action::Fail,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::MultipleRecordsFound) },
+            rule: { |f: &Vec<FRC>| f.contains(&FRC::MultipleRecordsFound) },
             name: RuleName::MultipleRecordsFound,
             action: Action::Fail,
         },
         // This is an IDology recommended "always fail" rule
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::SsnIssuedPriorToDob) },
+            rule: { |f: &Vec<FRC>| f.contains(&FRC::SsnIssuedPriorToDob) },
             name: RuleName::SsnIssuedPriorToDob,
             action: Action::Fail,
         },

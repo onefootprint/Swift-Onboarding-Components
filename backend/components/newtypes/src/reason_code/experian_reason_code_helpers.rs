@@ -220,6 +220,8 @@ pub enum SsnTypes {
     // there are no partial cases for this
     Ssn4ExactMatch,
     Ssn9(MatchLevel),
+    Ssn9PartialMatchSubjectDeceased,
+    Ssn9ExactMatchSubjectDeceased,
     SsnIsItin,
     SsnInvalid,
 }
@@ -227,6 +229,14 @@ impl SsnTypes {
     fn codes(self) -> Vec<FootprintReasonCode> {
         match self {
             SsnTypes::Ssn4ExactMatch => vec![FootprintReasonCode::SsnMatches],
+            SsnTypes::Ssn9PartialMatchSubjectDeceased => vec![
+                FootprintReasonCode::SsnPartiallyMatches,
+                FootprintReasonCode::SubjectDeceased,
+            ],
+            SsnTypes::Ssn9ExactMatchSubjectDeceased => vec![
+                FootprintReasonCode::SsnMatches,
+                FootprintReasonCode::SubjectDeceased,
+            ],
             SsnTypes::Ssn9(ml) => match ml {
                 MatchLevel::NoMatch => vec![FootprintReasonCode::SsnDoesNotMatch],
                 MatchLevel::Partial => vec![FootprintReasonCode::SsnPartiallyMatches],
@@ -395,6 +405,8 @@ mod tests {
     #[test_case(SsnTypes::Ssn9(MatchLevel::Exact) => vec![SsnMatches])]
     #[test_case(SsnTypes::Ssn9(MatchLevel::Partial) => vec![SsnPartiallyMatches])]
     #[test_case(SsnTypes::Ssn9(MatchLevel::NoMatch) => vec![SsnDoesNotMatch])]
+    #[test_case(SsnTypes::Ssn9PartialMatchSubjectDeceased => vec![SsnPartiallyMatches, SubjectDeceased])]
+    #[test_case(SsnTypes::Ssn9ExactMatchSubjectDeceased => vec![SsnMatches, SubjectDeceased])]
     fn test_ssn(ssn_type: SsnTypes) -> Vec<FootprintReasonCode> {
         ssn_type.codes()
     }
