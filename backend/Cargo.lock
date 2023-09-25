@@ -370,9 +370,9 @@ dependencies = [
 
 [[package]]
 name = "aes-gcm"
-version = "0.10.1"
+version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "82e1366e0c69c9f927b1fa5ce2c7bf9eafc8f9268c0b9800729e8b267612447c"
+checksum = "831010a0f742e1209b3bcea8fab6a8e149051ba6099432c8cb2cc117dec3ead1"
 dependencies = [
  "aead 0.5.1",
  "aes 0.8.3",
@@ -2746,7 +2746,7 @@ name = "crypto"
 version = "0.1.0"
 dependencies = [
  "aead 0.5.1",
- "aes-gcm 0.10.1",
+ "aes-gcm 0.10.3",
  "base64 0.13.0",
  "chacha20poly1305",
  "elliptic-curve 0.12.3",
