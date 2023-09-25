@@ -32,7 +32,8 @@ const securityHeaders = [
   },
   {
     key: 'Permissions-Policy',
-    value: 'camera=*, microphone=(), geolocation=()',
+    value:
+      'camera=*, otp-credentials=*, publickey-credentials-get=*, clipboard-write=*',
   },
   {
     key: 'X-Content-Type-Options',

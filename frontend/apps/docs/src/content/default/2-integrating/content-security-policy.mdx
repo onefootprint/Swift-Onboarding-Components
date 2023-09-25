@@ -22,7 +22,7 @@ However, you should ensure the following values are added to your policies:
 ```json
 {
   key: 'Permissions-Policy',
-  value: 'camera=(self "https://*.onefootprint.com/*"), publickey-credentials-get=(self "https://*.onefootprint.com/*")',
+  value: 'camera=(self "https://*.onefootprint.com/*"), publickey-credentials-get=(self "https://*.onefootprint.com/*"),  otp-credentials=(self "https://*.onefootprint.com/*"), clipboard-write=(self "https://*.onefootprint.com/*")'
 },
 {
   key: 'Content-Security-Policy',
@@ -34,6 +34,7 @@ However, you should ensure the following values are added to your policies:
 
    - Footprint identity verification flows require access to the browser's public key credentials to register and verify passkeys.
    - Our flows may also require access to the browser camera if your onboarding configurations collect ID documents and selfies.
+   - We also have some functionality that copies content to clipboard, such as copying the test ID in sandbox mode.
 
 More information on Permissions Policy can be found [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/Permissions_Policy).
 

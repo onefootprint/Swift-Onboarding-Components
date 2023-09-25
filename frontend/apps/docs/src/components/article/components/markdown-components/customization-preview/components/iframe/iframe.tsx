@@ -10,7 +10,7 @@ type IframeProps = {
 const Iframe = ({ name, src, selected }: IframeProps) => (
   <IframeContainer show={selected}>
     <StyledIframe
-      allow="otp-credentials; publickey-credentials-get *; camera *;"
+      allow="otp-credentials *; publickey-credentials-get *; camera *; clipboard-write *;"
       src={src}
       title={name}
     />
