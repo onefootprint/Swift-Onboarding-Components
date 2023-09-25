@@ -8,6 +8,7 @@ use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
+use either::Either;
 use idv::incode::doc::IncodeAddBackRequest;
 use newtypes::{DocVData, VendorAPI};
 use newtypes::{DocumentSide, IncodeFailureReason};
@@ -45,12 +46,12 @@ impl IncodeStateTransition for AddBack {
         let args = SaveVerificationResultArgs::from(&request_result, VendorAPI::IncodeAddBack, ctx);
         save_incode_verification_result(db_pool, args).await?;
 
+        // TODO: fix this
         let response = request_result.map_err(map_to_api_err)?.result;
 
         let (type_of_id, country_code, failure_reasons_from_response, failure_reasons_from_api_error) =
-            match response.into_success() {
-                // Incode returns 200 for upload failures, so catch these here
-                Ok(response) => Ok((
+            match response.safe_into_success() {
+                Either::Left(response) => (
                     response.type_of_id.clone(),
                     response.country_code.clone(),
                     // TODO: add restrictions from OBC
@@ -60,22 +61,14 @@ impl IncodeStateTransition for AddBack {
                         ctx.failed_attempts_for_side,
                     )),
                     vec![],
-                )),
-                // status is a mix of custom error codes and http status codes
-                Err(idv::incode::error::Error::APIResponseError(e)) => {
-                    let failure_reasons = match e.status {
-                        1003 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
-                        500 => Ok(vec![IncodeFailureReason::UnexpectedErrorOccurred]),
-                        // TODO there are probably more retryable errors in here
-                        _ => Err(idv::incode::error::Error::APIResponseError(e)),
-                    }
-                    .map_err(map_to_api_err)?;
-
-                    Ok((None, None, vec![], failure_reasons))
-                }
-                Err(e) => Err(e),
-            }
-            .map_err(map_to_api_err)?;
+                ),
+                Either::Right(failure_reasons) => (
+                    None,
+                    None,
+                    vec![],
+                    failure_reasons.unwrap_or(vec![IncodeFailureReason::UnexpectedErrorOccurred]),
+                ),
+            };
 
         Ok(Some(Self {
             add_side_response_helper: AddSideResponseHelper {

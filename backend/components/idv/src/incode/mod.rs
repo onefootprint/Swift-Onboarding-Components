@@ -1,3 +1,4 @@
+use itertools::Either;
 use newtypes::{
     vendor_credentials::IncodeCredentials, IncodeConfigurationId, IncodeFailureReason, IncodeSessionId,
     PiiJsonValue, ScrubbedPiiJsonValue,
@@ -25,9 +26,6 @@ pub struct IncodeStartOnboardingRequest {
 pub trait APIResponseToIncodeError {
     fn to_error(&self) -> Option<response::Error>;
     fn custom_failure_reasons(error: response::Error) -> Option<Vec<IncodeFailureReason>>;
-    fn to_failure_reasons(&self) -> Option<Vec<IncodeFailureReason>> {
-        self.to_error().and_then(|e| Self::custom_failure_reasons(e))
-    }
 }
 
 /// Struct representing a deserialized response that can include errors
@@ -48,6 +46,14 @@ impl<T: APIResponseToIncodeError + serde::Serialize> IncodeAPIResult<T> {
         match self {
             IncodeAPIResult::Success(s) => Ok(s),
             IncodeAPIResult::ResponseError(e) => Err(error::Error::APIResponseError(e)),
+        }
+    }
+
+    pub fn safe_into_success(self) -> Either<T, Option<Vec<IncodeFailureReason>>> {
+        match self.into_success() {
+            Ok(s) => Either::Left(s),
+            Err(error::Error::APIResponseError(e)) => Either::Right(T::custom_failure_reasons(e)),
+            Err(_) => Either::Right(Some(vec![IncodeFailureReason::UnexpectedErrorOccurred])),
         }
     }
 

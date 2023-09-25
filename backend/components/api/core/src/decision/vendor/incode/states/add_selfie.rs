@@ -8,6 +8,7 @@ use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
+use either::Either;
 use idv::incode::doc::IncodeAddSelfieRequest;
 use newtypes::{DocVData, VendorAPI};
 use newtypes::{DocumentSide, IncodeFailureReason};
@@ -47,30 +48,13 @@ impl IncodeStateTransition for AddSelfie {
 
         // Now ensure we don't have an error
         let response = request_result.map_err(map_to_api_err)?.result;
-        let failure_reasons = match response.into_success() {
+        let failure_reasons = match response.safe_into_success() {
             // Incode returns 200 for upload failures, so catch these here
-            Ok(response) => Ok(response.failure_reasons()),
-            // status is a mix of custom error codes and http status codes
-            Err(idv::incode::error::Error::APIResponseError(e)) => match e.status {
-                4019 => Ok(vec![IncodeFailureReason::SelfieFaceNotFound]),
-                4010 => Ok(vec![IncodeFailureReason::SelfieFaceNotFound]),
-                1001 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
-                1003 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
-                3002 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
-                3004 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
-                3005 => Ok(vec![IncodeFailureReason::FaceCroppingFailure]),
-                3006 => Ok(vec![IncodeFailureReason::SelfieBlurry]),
-                3007 => Ok(vec![IncodeFailureReason::SelfieGlare]),
-                3008 => Ok(vec![IncodeFailureReason::SelfieImageSizeUnsupported]),
-                3009 => Ok(vec![IncodeFailureReason::SelfieImageOrientationIncorrect]),
-                3010 => Ok(vec![IncodeFailureReason::SelfieBadImageCompression]),
-                500 => Ok(vec![IncodeFailureReason::UnexpectedErrorOccurred]),
-                // TODO there are probably more retryable errors in here
-                _ => Err(idv::incode::error::Error::APIResponseError(e)),
-            },
-            Err(e) => Err(e),
-        }
-        .map_err(map_to_api_err)?;
+            Either::Left(response) => response.failure_reasons(),
+            Either::Right(failure_reasons) => {
+                failure_reasons.unwrap_or(vec![IncodeFailureReason::UnexpectedErrorOccurred])
+            }
+        };
 
         Ok(Some(Self { failure_reasons }))
     }
