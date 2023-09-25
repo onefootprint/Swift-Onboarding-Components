@@ -3793,6 +3793,7 @@ pub struct DocTestOpts {
     pub ocr_confidence: IncodeStatus,
     pub selfie_match: IncodeStatus,
     pub lenses_and_mask_check: IncodeStatus,
+    pub cross_checks: IncodeStatus,
 }
 impl Default for DocTestOpts {
     fn default() -> Self {
@@ -3809,6 +3810,7 @@ impl Default for DocTestOpts {
             ocr_confidence: IncodeStatus::Ok,
             selfie_match: IncodeStatus::Ok,
             lenses_and_mask_check: IncodeStatus::Ok,
+            cross_checks: IncodeStatus::Ok,
         }
     }
 }
@@ -3903,7 +3905,42 @@ pub fn incode_fetch_scores_response(opts: DocTestOpts) -> serde_json::Value {
             "value": "20",
             "status": opts.fake.to_string(),
             "key": "fakeCheck"
-          }
+          },
+          {
+            "value": "PASSED",
+            "status": opts.cross_checks.to_string(),
+            "key": "sexCrosscheck"
+          },
+          {
+            "value": "PASSED",
+            "status": opts.cross_checks.to_string(),
+            "key": "fullNameCrosscheck"
+          },
+          {
+            "value": "PASSED",
+            "status": opts.cross_checks.to_string(),
+            "key": "documentNumberCrosscheck"
+          },
+          {
+            "value": "PASSED",
+            "status": opts.cross_checks.to_string(),
+            "key": "birthDateCrosscheck"
+          },
+          {
+            "value": "PASSED",
+            "status": opts.cross_checks.to_string(),
+            "key": "documentNumberCheckDigit"
+          },
+          {
+            "value": "PASSED",
+            "status": opts.cross_checks.to_string(),
+            "key": "birthDateCheckDigit"
+          },
+          {
+            "value": "PASSED",
+            "status": opts.cross_checks.to_string(),
+            "key": "expirationDateCheckDigit"
+          },
 
         ],
         "customFields": [

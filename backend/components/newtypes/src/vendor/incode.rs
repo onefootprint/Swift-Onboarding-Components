@@ -161,13 +161,13 @@ incode_reason_code_enum! {
         QrScan,
         // TODO: Not sure what check digits are
         #[ser = "documentNumberCheckDigit"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNumberCheckDigitMatches, FRC::DocumentNumberCheckDigitDoesNotMatch))]
         DocumentNumberCheckDigit,
         #[ser = "birthDateCheckDigit"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentDobCheckDigitMatches, FRC::DocumentDobCheckDigitDoesNotMatch))]
         BirthDateCheckDigit,
         #[ser = "expirationDateCheckDigit"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentExpirationCheckDigitMatches, FRC::DocumentExpirationCheckDigitDoesNotMatch))]
         ExpirationDateCheckDigit,
         #[ser = "compositeCheckDigit"]
         #[footprint_reason_code = None]
@@ -178,22 +178,22 @@ incode_reason_code_enum! {
         // TODO
         // Match DOB with MRZ
         #[ser = "birthDateCrosscheck"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentDobCrosscheckMatches, FRC::DocumentDobCrosscheckDoesNotMatch))]
         BirthDateCrosscheck,
         // TODO
         // Match expiration with MRZ
         #[ser = "expirationDateCrosscheck"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentExpirationDateCrosscheckMatches, FRC::DocumentExpirationDateCrosscheckDoesNotMatch))]
         ExpirationDateCrosscheck,
         // TODO
         // Match sex with MRZ
         #[ser = "sexCrosscheck"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentSexCrosscheckMatches, FRC::DocumentSexCrosscheckDoesNotMatch))]
         SexCrosscheck,
         // TODO
         // Match full name with MRZ
         #[ser = "fullNameCrosscheck"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentFullNameCrosscheckMatches, FRC::DocumentFullNameCrosscheckDoesNotMatch))]
         FullNameCrosscheck,
         // ?
         #[ser = "emissionNumberCrosscheck"]
@@ -202,7 +202,7 @@ incode_reason_code_enum! {
         // TODO
         // Match document number with MRZ
         #[ser = "documentNumberCrosscheck"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNumberCrosscheckMatches, FRC::DocumentNumberCrosscheckDoesNotMatch))]
         DocumentNumberCrosscheck,
         // TODO
         // Match personal number with MRZ

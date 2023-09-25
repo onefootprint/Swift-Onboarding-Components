@@ -312,20 +312,7 @@ mod tests {
     }
 
     #[test_case(
-        DocTestOpts {
-            screen: Ok,
-            paper: Ok,
-            expiration: Ok,
-            overall: Ok,
-            tamper: Ok,
-            visible_photo_features: Ok,
-            barcode: Ok,
-            barcode_content: Ok,
-            fake: Ok,
-            ocr_confidence: Ok,
-            selfie_match: Ok,
-            lenses_and_mask_check: Ok,
-        }, 
+        DocTestOpts::default(),
         vec![
             DocumentPhotoIsNotScreenCapture,
             DocumentVisiblePhotoFeaturesVerified,
@@ -340,7 +327,14 @@ mod tests {
             DocumentSelfieMatches,
             DocumentSelfieNotUsedWithDifferentInformation,
             DocumentNoImageAlterationFront,
-            DocumentNoImageAlterationBack
+            DocumentNoImageAlterationBack,
+            DocumentFullNameCrosscheckMatches,
+            DocumentDobCrosscheckMatches, 
+            DocumentNumberCheckDigitMatches,
+            DocumentDobCheckDigitMatches,
+            DocumentSexCrosscheckMatches, 
+            DocumentExpirationCheckDigitMatches, 
+            DocumentNumberCrosscheckMatches,
         ], true; "everything passes")]
         #[test_case(
             DocTestOpts {
@@ -356,6 +350,7 @@ mod tests {
                 ocr_confidence: Fail,
                 selfie_match: Fail,
                 lenses_and_mask_check: Fail,
+                cross_checks: Fail,
             }, 
             vec![
                 DocumentPhotoIsScreenCapture,
@@ -374,6 +369,13 @@ mod tests {
                 DocumentNoImageAlterationBack,
                 DocumentSelfieGlasses,
                 DocumentSelfieMask,
+                DocumentFullNameCrosscheckDoesNotMatch,
+                DocumentDobCrosscheckDoesNotMatch, 
+                DocumentNumberCheckDigitDoesNotMatch,
+                DocumentDobCheckDigitDoesNotMatch,
+                DocumentSexCrosscheckDoesNotMatch, 
+                DocumentExpirationCheckDigitDoesNotMatch, 
+                DocumentNumberCrosscheckDoesNotMatch,
             ], true; "everything fails")]
         #[test_case(
             DocTestOpts {
@@ -388,7 +390,8 @@ mod tests {
                 fake: Ok,
                 ocr_confidence: Ok,
                 selfie_match: Fail,
-                lenses_and_mask_check: Ok
+                lenses_and_mask_check: Ok,
+                cross_checks: Ok,
             }, 
             vec![
                 DocumentPhotoIsNotScreenCapture,
@@ -404,23 +407,17 @@ mod tests {
                 DocumentSelfieDoesNotMatch,
                 DocumentSelfieNotUsedWithDifferentInformation,
                 DocumentNoImageAlterationFront,
-                DocumentNoImageAlterationBack   
+                DocumentNoImageAlterationBack,
+                DocumentFullNameCrosscheckMatches,
+                DocumentDobCrosscheckMatches, 
+                DocumentNumberCheckDigitMatches,
+                DocumentDobCheckDigitMatches,
+                DocumentSexCrosscheckMatches, 
+                DocumentExpirationCheckDigitMatches, 
+                DocumentNumberCrosscheckMatches,
             ], true; "mix of things")]
             #[test_case(
-                DocTestOpts {
-                    screen: Ok,
-                    paper: Ok,
-                    expiration: Ok,
-                    overall: Ok,
-                    tamper: Ok,
-                    visible_photo_features: Ok,
-                    barcode: Ok,
-                    barcode_content: Ok,
-                    fake: Ok,
-                    ocr_confidence: Ok,
-                    selfie_match: Ok,
-                    lenses_and_mask_check: Ok
-                }, 
+                DocTestOpts::default(),
                 vec![
                     DocumentPhotoIsNotScreenCapture,
                     DocumentVisiblePhotoFeaturesVerified,
@@ -434,7 +431,14 @@ mod tests {
                     DocumentOcrSuccessful,
                     DocumentSelfieNotUsedWithDifferentInformation, // not quite correct, but this just won't appear in ID tests if we don't send selfie so we won't get any id test
                     DocumentNoImageAlterationFront,
-                    DocumentNoImageAlterationBack
+                    DocumentNoImageAlterationBack,
+                    DocumentFullNameCrosscheckMatches,
+                    DocumentDobCrosscheckMatches, 
+                    DocumentNumberCheckDigitMatches,
+                    DocumentDobCheckDigitMatches,
+                    DocumentSexCrosscheckMatches, 
+                    DocumentExpirationCheckDigitMatches, 
+                    DocumentNumberCrosscheckMatches,
                     // no selfie code
                 ], false; "everything passes, but selfie isn't collected")]  
     fn test_reason_codes_from_score_response(doc_opts: DocTestOpts, expected: Vec<FootprintReasonCode>, expect_selfie: bool) {

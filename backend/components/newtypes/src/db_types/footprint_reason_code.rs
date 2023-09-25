@@ -818,36 +818,101 @@ footprint_reason_code_enum! {
 
         // OCR matching
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Document OCR name does not match input", severity = SignalSeverity::Medium,  description = "The OCR name does not match the name that was input."]
+        #[note = "OCR name does not match input", severity = SignalSeverity::Medium,  description = "The OCR name does not match the name that was input."]
         DocumentOcrNameDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "Document OCR name matches input", severity = SignalSeverity::Info,  description = "The OCR name matches the name that was input."]
+        #[note = "OCR name matches input", severity = SignalSeverity::Info,  description = "The OCR name matches the name that was input."]
         DocumentOcrNameMatches,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Document OCR first name does not match input", severity = SignalSeverity::Medium,  description = "The OCR first name does not match the name that was input."]
+        #[note = "OCR first name does not match input", severity = SignalSeverity::Medium,  description = "The OCR first name does not match the name that was input."]
         DocumentOcrFirstNameDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "Document OCR first name matches input", severity = SignalSeverity::Info,  description = "The OCR first name matches the name that was input."]
+        #[note = "OCR first name matches input", severity = SignalSeverity::Info,  description = "The OCR first name matches the name that was input."]
         DocumentOcrFirstNameMatches,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Document OCR last name does not match input", severity = SignalSeverity::Medium,  description = "The OCR last name does not match the name that was input."]
+        #[note = "OCR last name does not match input", severity = SignalSeverity::Medium,  description = "The OCR last name does not match the name that was input."]
         DocumentOcrLastNameDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "Document OCR last name matches input", severity = SignalSeverity::Info,  description = "The OCR last name matches the name that was input."]
+        #[note = "OCR last name matches input", severity = SignalSeverity::Info,  description = "The OCR last name matches the name that was input."]
         DocumentOcrLastNameMatches,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Document OCR DOB does not match input", severity = SignalSeverity::Medium,  description = "The OCR DOB does not match the DOB that was input."]
+        #[note = "OCR DOB does not match input", severity = SignalSeverity::Medium,  description = "The OCR DOB does not match the DOB that was input."]
         DocumentOcrDobDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "Document OCR DOB matches input", severity = SignalSeverity::Info,  description = "The OCR DOB matches the DOB that was input."]
+        #[note = "OCR DOB matches input", severity = SignalSeverity::Info,  description = "The OCR DOB matches the DOB that was input."]
         DocumentOcrDobMatches,
+
+        // Cross Checks
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[note = "OCR DOB matches barcode DOB", severity = SignalSeverity::Info,  description = "The OCR DOB matches the DOB extracted from the barcode or MRZ"]
+        DocumentDobCrosscheckMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR DOB does not match barcode DOB", severity = SignalSeverity::Medium,  description = "The OCR DOB does not match the DOB extracted from the barcode or MRZ"]
+        DocumentDobCrosscheckDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR expiration date matches barcode expiration date", severity = SignalSeverity::Info,  description = "The OCR expiration date matches the expiration date extracted from the barcode or MRZ"]
+        DocumentExpirationDateCrosscheckMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR expiration date does not match barcode expiration date", severity = SignalSeverity::Medium,  description = "The OCR expiration date does not match the expiration date extracted from the barcode or MRZ"]
+        DocumentExpirationDateCrosscheckDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR sex matches barcode sex", severity = SignalSeverity::Info,  description = "The OCR sex matches the sex extracted from the barcode or MRZ"]
+        DocumentSexCrosscheckMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR sex does not match barcode sex", severity = SignalSeverity::Medium,  description = "The OCR sex does not match the sex extracted from the barcode or MRZ"]
+        DocumentSexCrosscheckDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR full name matches barcode full name", severity = SignalSeverity::Info,  description = "The OCR full name matches the full name extracted from the barcode or MRZ"]
+        DocumentFullNameCrosscheckMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR full name does not match barcode full name", severity = SignalSeverity::Medium,  description = "The OCR full name does not match the full name extracted from the barcode or MRZ"]
+        DocumentFullNameCrosscheckDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR document number matches barcode document number", severity = SignalSeverity::Info,  description = "The OCR document number matches the document number extracted from the barcode or MRZ"]
+        DocumentNumberCrosscheckMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR document number does not match barcode document number", severity = SignalSeverity::Medium,  description = "The OCR document number does not match the document number extracted from the barcode or MRZ"]
+        DocumentNumberCrosscheckDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR Expiration check digit matches barcode check digit", severity = SignalSeverity::Info,  description = "The expiration check digit from the MRZ matches what was in the expiration date OCR result"]
+        DocumentExpirationCheckDigitMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR expiration check digit does not match barcode", severity = SignalSeverity::Medium,  description = "The expiration check digit from the MRZ does not match what was in the expiration date OCR result"]
+        DocumentExpirationCheckDigitDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR DOB check digit matches barcode", severity = SignalSeverity::Info,  description = "The DOB check digit from the MRZ matches what was in the DOB OCR result"]
+        DocumentDobCheckDigitMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR DOB check digit does not match barcoe", severity = SignalSeverity::Medium,  description = "The DOB check digit from the MRZ does not match what was in the DOB OCR result"]
+        DocumentDobCheckDigitDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR number check digit matches barcode", severity = SignalSeverity::Info,  description = "The document number check digit from the MRZ matches what was in the document number OCR result"]
+        DocumentNumberCheckDigitMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "OCR number check digit does not match barcode", severity = SignalSeverity::Medium,  description = "The document number check digit from the MRZ does not match what was in the document number OCR result"]
+        DocumentNumberCheckDigitDoesNotMatch,
 
         // ~~~~~ Info ~~~~~~~~
         // These are present if:
