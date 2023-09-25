@@ -292,11 +292,11 @@ vendor_reason_code_enum! {
         IpNotLocated,
 
         #[ser = "resultcode.high.risk.ip.bot", description = "Indicates that the IP address is part of a network of computers infected with malware."]
-        #[footprint_reason_code = Some(FootprintReasonCode::IpAlertHighRiskBot)]
+        #[footprint_reason_code = None]
         HighRiskIpBot,
 
         #[ser = "resultcode.high.risk.ip.spam", description = "Indicates that the IP address is associated with a device infected with malware."]
-        #[footprint_reason_code = Some(FootprintReasonCode::IpAlertHighRiskSpam)]
+        #[footprint_reason_code = None]
         HighRiskIpSpam,
 
         #[ser = "resultcode.high.risk.ip.tor", description = "Indicates that the IP address is associated with a TOR network."]
