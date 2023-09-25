@@ -1,12 +1,14 @@
 import { IcoChevronLeft24, IcoChevronRight24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { format } from 'date-fns';
 import React from 'react';
 import type { CaptionProps } from 'react-day-picker';
 import { useNavigation } from 'react-day-picker';
 
 import IconButton from '../../../icon-button';
 import Typograhy from '../../../typography';
+
+const shortMonthDateFormatter = (date: Date) =>
+  date.toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
 
 const CustomCaption = ({ displayMonth }: CaptionProps) => {
   const { goToMonth, nextMonth, previousMonth } = useNavigation();
@@ -20,7 +22,7 @@ const CustomCaption = ({ displayMonth }: CaptionProps) => {
         <IcoChevronLeft24 />
       </IconButton>
       <Typograhy variant="label-2" as="h2">
-        {format(displayMonth, 'MMM yyy')}
+        {shortMonthDateFormatter(displayMonth)}
       </Typograhy>
       <IconButton
         aria-label="Next"

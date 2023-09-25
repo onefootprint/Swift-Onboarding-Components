@@ -1,4 +1,6 @@
-module.exports = {
+const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
+
+const config = {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-links',
@@ -10,3 +12,7 @@ module.exports = {
     builder: '@storybook/builder-webpack5',
   },
 };
+
+module.exports = IS_ANALYZE_ACTIVE
+  ? require('@next/bundle-analyzer')({ enabled: true })(config)
+  : config;
