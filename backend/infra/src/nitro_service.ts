@@ -192,7 +192,7 @@ export async function CreateNitroService(
         id: launchTemplate.id,
         version: pulumi.output(launchTemplate.latestVersion).apply(v => `${v}`),
       },
-      healthCheckGracePeriod: 60,
+      healthCheckGracePeriod: 120,
       vpcZoneIdentifiers: g.vpc.privateSubnetIds,
       protectFromScaleIn: false,
       healthCheckType: 'ELB',
