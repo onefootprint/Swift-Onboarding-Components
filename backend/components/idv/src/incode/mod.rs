@@ -1,6 +1,6 @@
 use newtypes::{
-    vendor_credentials::IncodeCredentials, IncodeConfigurationId, IncodeSessionId, PiiJsonValue,
-    ScrubbedPiiJsonValue,
+    vendor_credentials::IncodeCredentials, IncodeConfigurationId, IncodeFailureReason, IncodeSessionId,
+    PiiJsonValue, ScrubbedPiiJsonValue,
 };
 use serde::de::DeserializeOwned;
 
@@ -24,6 +24,10 @@ pub struct IncodeStartOnboardingRequest {
 /// response that is in the incode API response
 pub trait APIResponseToIncodeError {
     fn to_error(&self) -> Option<response::Error>;
+    fn custom_failure_reasons(error: response::Error) -> Option<Vec<IncodeFailureReason>>;
+    fn to_failure_reasons(&self) -> Option<Vec<IncodeFailureReason>> {
+        self.to_error().and_then(|e| Self::custom_failure_reasons(e))
+    }
 }
 
 /// Struct representing a deserialized response that can include errors

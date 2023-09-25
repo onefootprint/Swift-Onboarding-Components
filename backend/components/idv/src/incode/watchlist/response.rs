@@ -1,11 +1,15 @@
 use chrono::{DateTime, Utc};
-use newtypes::{scrub_pii_value, PiiJsonValue, PiiString, ScrubbedPiiString};
+use newtypes::{scrub_pii_value, IncodeFailureReason, PiiJsonValue, PiiString, ScrubbedPiiString};
 
 use crate::incode::{response::Error, APIResponseToIncodeError};
 
 impl APIResponseToIncodeError for WatchlistResultResponse {
     fn to_error(&self) -> Option<Error> {
         self.error.clone()
+    }
+
+    fn custom_failure_reasons(_error: Error) -> Option<Vec<IncodeFailureReason>> {
+        None
     }
 }
 

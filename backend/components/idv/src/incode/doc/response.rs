@@ -102,6 +102,17 @@ impl APIResponseToIncodeError for AddSideResponse {
     fn to_error(&self) -> Option<Error> {
         self.error.clone()
     }
+
+    fn custom_failure_reasons(error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        let e = match error.status {
+            1003 => vec![IncodeFailureReason::FaceCroppingFailure],
+            4019 => vec![IncodeFailureReason::FaceNotFound],
+            500 => vec![IncodeFailureReason::UnexpectedErrorOccurred],
+            _ => vec![IncodeFailureReason::UnexpectedErrorOccurred],
+        };
+
+        Some(e)
+    }
 }
 
 /// Response we get from telling Incode to process the image
@@ -116,6 +127,10 @@ pub struct ProcessIdResponse {
 impl APIResponseToIncodeError for ProcessIdResponse {
     fn to_error(&self) -> Option<Error> {
         self.error.clone()
+    }
+
+    fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        None
     }
 }
 
@@ -292,6 +307,10 @@ impl APIResponseToIncodeError for FetchScoresResponse {
     fn to_error(&self) -> Option<Error> {
         self.error.clone()
     }
+
+    fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        None
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -305,6 +324,10 @@ pub struct AddConsentResponse {
 impl APIResponseToIncodeError for AddConsentResponse {
     fn to_error(&self) -> Option<Error> {
         self.error.clone()
+    }
+
+    fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        None
     }
 }
 
@@ -344,6 +367,27 @@ impl AddSelfieResponse {
 impl APIResponseToIncodeError for AddSelfieResponse {
     fn to_error(&self) -> Option<Error> {
         self.error.clone()
+    }
+
+    fn custom_failure_reasons(error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        let e = match error.status {
+            4019 => vec![IncodeFailureReason::SelfieFaceNotFound],
+            4010 => vec![IncodeFailureReason::SelfieFaceNotFound],
+            1001 => vec![IncodeFailureReason::FaceCroppingFailure],
+            1003 => vec![IncodeFailureReason::FaceCroppingFailure],
+            3002 => vec![IncodeFailureReason::FaceCroppingFailure],
+            3004 => vec![IncodeFailureReason::FaceCroppingFailure],
+            3005 => vec![IncodeFailureReason::FaceCroppingFailure],
+            3006 => vec![IncodeFailureReason::SelfieBlurry],
+            3007 => vec![IncodeFailureReason::SelfieGlare],
+            3008 => vec![IncodeFailureReason::SelfieImageSizeUnsupported],
+            3009 => vec![IncodeFailureReason::SelfieImageOrientationIncorrect],
+            3010 => vec![IncodeFailureReason::SelfieBadImageCompression],
+            500 => vec![IncodeFailureReason::UnexpectedErrorOccurred],
+            _ => vec![IncodeFailureReason::UnexpectedErrorOccurred],
+        };
+
+        Some(e)
     }
 }
 
@@ -558,6 +602,10 @@ impl APIResponseToIncodeError for FetchOCRResponse {
     fn to_error(&self) -> Option<Error> {
         self.error.clone()
     }
+
+    fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        None
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
@@ -585,6 +633,10 @@ impl APIResponseToIncodeError for GetOnboardingStatusResponse {
     fn to_error(&self) -> Option<Error> {
         None
     }
+
+    fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        None
+    }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
@@ -605,6 +657,10 @@ impl APIResponseToIncodeError for ProcessFaceResponse {
     // no custom error codes here
     // TODO: in future PR handle http errors
     fn to_error(&self) -> Option<Error> {
+        None
+    }
+
+    fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
         None
     }
 }
@@ -786,7 +842,7 @@ mod tests {
         let raw_response = serde_json::json!(
             {"timestamp":1695335887367i64,"status":4019,"error":"Face not found.","path":"/omni/add/face/third-party"}
         );
-        let res = IncodeAPIResult::<AddSelfieResponse>::try_from(raw_response.clone()).unwrap();
+        let res = IncodeAPIResult::<AddSelfieResponse>::try_from(raw_response).unwrap();
         let e = res.into_success().unwrap_err();
         assert!(matches!(e, crate::incode::error::Error::APIResponseError(_)));
     }

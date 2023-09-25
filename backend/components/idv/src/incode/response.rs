@@ -1,4 +1,4 @@
-use newtypes::PiiString;
+use newtypes::{IncodeFailureReason, PiiString};
 
 use super::APIResponseToIncodeError;
 
@@ -39,6 +39,10 @@ pub struct OnboardingStartResponse {
 impl APIResponseToIncodeError for OnboardingStartResponse {
     fn to_error(&self) -> Option<Error> {
         self.error.clone()
+    }
+
+    fn custom_failure_reasons(_error: Error) -> Option<Vec<IncodeFailureReason>> {
+        None
     }
 }
 
