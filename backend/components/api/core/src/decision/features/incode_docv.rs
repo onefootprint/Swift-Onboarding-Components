@@ -69,65 +69,69 @@ pub fn footprint_reason_codes(
     // not all documents collect will have selfie
     expect_selfie: bool
 ) -> Result<Vec<FootprintReasonCode>, idv::Error> {
-    let score_reason_codes = reason_codes_from_score_response(scores, expect_selfie)?;
+    let score_reason_codes = reason_codes_from_score_response(scores, expect_selfie);
     let ocr_reason_codes = reason_codes_from_ocr_response(ocr, vault_data);
 
     Ok(score_reason_codes.into_iter().chain(ocr_reason_codes.into_iter()).collect())
 }
 
-pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_selfie: bool) -> Result<Vec<FootprintReasonCode>, idv::Error> {
-    let mut reason_codes = vec![];
+pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_selfie: bool) -> Vec<FootprintReasonCode> {
     // Overall score
     // 
     // We check for the existence of this at the vendor call layer, but our decisioning relies most heavily on the score (for now)
     // and we should not proceed if we don't have it
-    if scores
+    let document_score_code = if scores
         .document_score().1.unwrap_or(IncodeStatus::Fail) == IncodeStatus::Fail
     {
-        reason_codes.push(FootprintReasonCode::DocumentNotVerified);
+        vec![FootprintReasonCode::DocumentNotVerified]
     } else {
-        reason_codes.push(FootprintReasonCode::DocumentVerified)
+        vec![FootprintReasonCode::DocumentVerified]
     };
 
     // OCR
     // TODO: if this happens, would we not be able to retrieve OCR from incode?
     //  should we just not vault it if OCR confidence isn't high?
     //  would overall score always be failure then?
-    if scores
+    let ocr_code = if scores
         .id_ocr_confidence().1.unwrap_or(IncodeStatus::Fail) == IncodeStatus::Fail
     {
-        reason_codes.push(FootprintReasonCode::DocumentOcrNotSuccessful);
+        vec![FootprintReasonCode::DocumentOcrNotSuccessful]
     } else {
-        reason_codes.push(FootprintReasonCode::DocumentOcrSuccessful);
+        vec![FootprintReasonCode::DocumentOcrSuccessful]
     };
     
     // only populate reason code if we collected a selfie
-    if expect_selfie {
+    let selfie_code = if expect_selfie {
         if scores.selfie_match().1.unwrap_or(IncodeStatus::Fail)  == IncodeStatus::Fail
         {
-            reason_codes.push(FootprintReasonCode::DocumentSelfieDoesNotMatch);
+            vec![FootprintReasonCode::DocumentSelfieDoesNotMatch]
         } else {
-            reason_codes.push(FootprintReasonCode::DocumentSelfieMatches);
+            vec![FootprintReasonCode::DocumentSelfieMatches]
         }
-    }
+    } else {
+        vec![]
+    };
     
     // ID Tests => FRC
-    scores
+    let id_tests: Vec<FootprintReasonCode> = scores
         .get_id_tests()
         .iter()
         .filter_map(get_frc_from_test)
-        .for_each(|frc| reason_codes.push(frc));
+        .collect();
 
     // Face tests => FRC
     let (glasses_check, mask_check) = scores.get_face_test_results();
-    if glasses_check == Some(true) {
-        reason_codes.push(FootprintReasonCode::DocumentSelfieGlasses);
-    }
-    if mask_check == Some(true) {
-        reason_codes.push(FootprintReasonCode::DocumentSelfieMask);
-    }
+    let face_codes: Vec<FootprintReasonCode> = [
+        glasses_check.and_then(|has_glasses| has_glasses.then_some(FootprintReasonCode::DocumentSelfieGlasses)),
+        mask_check.and_then(|has_glasses| has_glasses.then_some(FootprintReasonCode::DocumentSelfieMask))
+    ].into_iter().flatten().collect();
 
-    Ok(reason_codes)
+    document_score_code.into_iter()
+        .chain(ocr_code.into_iter())
+        .chain(selfie_code.into_iter())
+        .chain(id_tests.into_iter())
+        .chain(face_codes.into_iter())
+        .collect()
 }
 
 fn merge<'a>(a: Option<&'a PiiString>, b: Option<&'a PiiString>) -> Option<(&'a PiiString, &'a PiiString)> {
@@ -320,8 +324,8 @@ mod tests {
             DocumentNoImageTampering,
             DocumentNotExpired,
             DocumentVerified,
-            DocumentBarcodeContentMatches,
             DocumentBarcodeCouldBeRead,
+            DocumentBarcodeDetected,
             DocumentNotFakeImage,
             DocumentOcrSuccessful,
             DocumentSelfieMatches,
@@ -359,8 +363,8 @@ mod tests {
                 DocumentPossibleImageTampering,
                 DocumentExpired,
                 DocumentNotVerified,
-                DocumentBarcodeContentDoesNotMatch,
                 DocumentBarcodeCouldNotBeRead,
+                DocumentBarcodeCouldNotBeDetected,
                 DocumentPossibleFakeImage,
                 DocumentOcrNotSuccessful,
                 DocumentSelfieDoesNotMatch,
@@ -400,8 +404,8 @@ mod tests {
                 DocumentNotVerified,
                 DocumentNoImageTampering,
                 DocumentVisiblePhotoFeaturesVerified,
-                DocumentBarcodeContentDoesNotMatch,
                 DocumentBarcodeCouldNotBeRead,
+                DocumentBarcodeCouldNotBeDetected,
                 DocumentNotFakeImage,
                 DocumentOcrSuccessful,
                 DocumentSelfieDoesNotMatch,
@@ -425,8 +429,8 @@ mod tests {
                     DocumentNoImageTampering,
                     DocumentNotExpired,
                     DocumentVerified,
-                    DocumentBarcodeContentMatches,
                     DocumentBarcodeCouldBeRead,
+                    DocumentBarcodeDetected,
                     DocumentNotFakeImage,
                     DocumentOcrSuccessful,
                     DocumentSelfieNotUsedWithDifferentInformation, // not quite correct, but this just won't appear in ID tests if we don't send selfie so we won't get any id test
@@ -445,6 +449,6 @@ mod tests {
         let raw_response = idv::test_fixtures::incode_fetch_scores_response(doc_opts);
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
 
-        assert_have_same_elements(super::reason_codes_from_score_response(parsed, expect_selfie).unwrap(), expected)
+        assert_have_same_elements(super::reason_codes_from_score_response(parsed, expect_selfie), expected)
     }
 }

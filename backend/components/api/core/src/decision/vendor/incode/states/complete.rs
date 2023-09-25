@@ -225,16 +225,15 @@ impl Complete {
             })
             .ok();
 
-        let score_reason_codes =
-            incode_docv::reason_codes_from_score_response(score_response, expect_selfie)?
-                .into_iter()
-                .map(|r| {
-                    (
-                        r,
-                        VendorAPI::IncodeFetchScores,
-                        score_verification_result_id.clone(),
-                    )
-                });
+        let score_reason_codes = incode_docv::reason_codes_from_score_response(score_response, expect_selfie)
+            .into_iter()
+            .map(|r| {
+                (
+                    r,
+                    VendorAPI::IncodeFetchScores,
+                    score_verification_result_id.clone(),
+                )
+            });
 
         let ocr_reason_codes = if !obc.is_doc_first {
             // Only calculate OCR reason codes if we have already collected ID data

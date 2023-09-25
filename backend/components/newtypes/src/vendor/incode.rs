@@ -209,13 +209,13 @@ incode_reason_code_enum! {
         #[ser = "personalNumberCrosscheck"]
         #[footprint_reason_code = None]
         PersonalNumberCrosscheck,
-        // Barcode is converted to text and then compared against OCR and front ID.  Information extracted from a barcode may include: name, address, DOB, eye color, SSN, etc.
+        // Barcode was able to be converted to text
         #[ser = "2DBarcodeContent"]
-        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentBarcodeContentMatches, FRC::DocumentBarcodeContentDoesNotMatch))]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentBarcodeCouldBeRead, FRC::DocumentBarcodeCouldNotBeRead))]
         TwoDBarcodeContent,
         // Barcode was detected on the back of the document
         #[ser = "barcode2DDetected"]
-        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentBarcodeCouldBeRead, FRC::DocumentBarcodeCouldNotBeRead))]
+        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentBarcodeDetected, FRC::DocumentBarcodeCouldNotBeDetected))]
         Barcode2DDetected,
         // TODO
         // Check front/back id of document (if somebody put for example both front ID side during upload)

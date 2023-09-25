@@ -657,12 +657,13 @@ footprint_reason_code_enum! {
         DocumentOcrSuccessful,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document barcode illegible", severity = SignalSeverity::High,  description = "The reading and extracting of the barcode on the back of the document failed."]
+        #[note = "Document barcode illegible", severity = SignalSeverity::Medium,  description = "The reading and extracting of the barcode on the back of the document failed."]
         DocumentBarcodeCouldNotBeRead,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document barcode was read", severity = SignalSeverity::Info,  description = "The reading and extracting of the barcode on the back of the document succeeded."]
         DocumentBarcodeCouldBeRead,
+
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document barcode content matches OCR data", severity = SignalSeverity::Info,  description = "Data extracted from the barcode matches. Information extracted from a barcode may include: name, address, DOB, eye color, SSN, etc"]
@@ -671,6 +672,14 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document barcode content does not match OCR data", severity = SignalSeverity::Medium,  description = "Data extracted from the barcode does not match. Information extracted from a barcode may include: name, address, DOB, eye color, SSN, etc"]
         DocumentBarcodeContentDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document barcode was detected", severity = SignalSeverity::Info,  description = "Barcode was detected on the document"]
+        DocumentBarcodeDetected,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document barcode was not detected", severity = SignalSeverity::Medium,  description = "Barcode could not be detected on the document, perhaps because the image captured was low quality."]
+        DocumentBarcodeCouldNotBeDetected,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document requires review", severity = SignalSeverity::Medium,  description = "Indicates that further review of the document is required."]
