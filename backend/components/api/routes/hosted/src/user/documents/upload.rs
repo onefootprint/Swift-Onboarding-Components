@@ -239,9 +239,11 @@ pub(in crate::user) async fn handle_incode_request(
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
     let sv_id = doc_request.scoped_vault_id.clone();
+    let vault_id = vault.id.clone();
+    let id_doc_id = identity_document_id.clone();
     // Initialize our state machine
     let ctx = IncodeContext {
-        di_id: decision_intent_id,
+        di_id: decision_intent_id.clone(),
         sv_id: sv_id.clone(),
         id_doc_id: identity_document_id,
         wf_id: workflow_id.clone(),
@@ -263,12 +265,32 @@ pub(in crate::user) async fn handle_incode_request(
     )
     .await?; // TODO: handle this with better requirement checking
 
-    let (machine, retry_reasons) = machine
-        .run(&state.db_pool, &state.vendor_clients.incode)
-        .await
-        .map_err(|e| e.error)?;
+    let (machine_state_name, retry_reasons) =
+        match machine.run(&state.db_pool, &state.vendor_clients.incode).await {
+            Ok((machine, retry_reasons)) => (machine.state.name(), retry_reasons),
+            Err(e) => {
+                tracing::error!(error=%e.error, "IncodeMachineError");
 
-    let next_side_to_collect = match machine.state.name() {
+                state
+                    .db_pool
+                    .db_transaction(move |conn| -> ApiResult<_> {
+                        vendor::incode::states::Fail::enter(
+                            conn,
+                            &decision_intent_id,
+                            &sv_id,
+                            &vault_id,
+                            &id_doc_id,
+                        )?;
+
+                        Ok(())
+                    })
+                    .await?;
+
+                (IncodeVerificationSessionState::Fail, vec![])
+            }
+        };
+
+    let next_side_to_collect = match machine_state_name {
         IncodeVerificationSessionState::AddFront => Some(DocumentSide::Front),
         IncodeVerificationSessionState::AddBack => Some(DocumentSide::Back),
         IncodeVerificationSessionState::AddConsent => Some(DocumentSide::Selfie),
@@ -279,7 +301,7 @@ pub(in crate::user) async fn handle_incode_request(
         // We shouldn't cleanly break from the machine in any other state
         s => return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into()),
     };
-    let is_retry_limit_exceeded = machine.state.name() == IncodeVerificationSessionState::Fail;
+    let is_retry_limit_exceeded = machine_state_name == IncodeVerificationSessionState::Fail;
     let errors = retry_reasons.into_iter().map(DocumentImageError::from).collect();
     let result = DocumentResponse {
         next_side_to_collect,

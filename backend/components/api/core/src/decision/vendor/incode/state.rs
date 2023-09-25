@@ -166,7 +166,7 @@ where
                         let can_ignore_all_errors = unhandled_failure_reasons.iter().all(|s| s.can_ignore());
                         if !can_ignore_all_errors {
                             // Fail if theres an unhandled error
-                            Fail::enter(conn, &ctx)?;
+                            Fail::enter(conn, &ctx.di_id, &ctx.sv_id, &ctx.vault.id, &ctx.id_doc_id)?;
                             ((StepResult::Ready, Fail::new(), None), true)
                         } else {
                             let new_ignore_reasons = unhandled_failure_reasons
