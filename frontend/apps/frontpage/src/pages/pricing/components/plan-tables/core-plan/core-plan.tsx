@@ -31,13 +31,10 @@ const translationKeys = [
 
 const CorePlan = () => {
   const { t } = useTranslation('pages.pricing');
-
   const [showDialogBanner, setShowDialogBanner] = useState(false);
-
   const handleClickTriggeBanner = () => {
     setShowDialogBanner(true);
   };
-
   const handleClose = () => {
     setShowDialogBanner(false);
   };

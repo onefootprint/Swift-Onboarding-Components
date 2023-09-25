@@ -1,7 +1,7 @@
 export const KYC_INITIAL_VALUE = 500;
 export const KYC_DELTA = 500;
 export const KYC_MINIMUM_VALUE = 1000;
-export const KYC_COST = 0.5;
+export const KYC_COST = 0.6;
 export const KYC_THRESHOLD = 10000;
 
 export const KYB_INITIAL_VALUE = 50;
