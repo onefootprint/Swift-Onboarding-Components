@@ -35,6 +35,7 @@ import {
   identifyUserByPhone,
   TestAuthorizeRequirement,
   withAuthorize,
+  withCheckSession,
   withD2PGenerate,
   withD2PStatus,
   withDecrypt,
@@ -68,10 +69,8 @@ describe('<Idv />', () => {
 
   beforeEach(() => {
     queryCache.clear();
-    useRouterSpy({
-      pathname: '/',
-      query: {},
-    });
+    useRouterSpy({ pathname: '/', query: {} });
+    withCheckSession();
   });
 
   const renderIdv = ({
@@ -121,13 +120,11 @@ describe('<Idv />', () => {
     describe('When onboarding to same config', () => {
       describe('When there are empty requirements', () => {
         beforeEach(() => {
-          withRequirements([], []);
+          withRequirements([]);
         });
-
         it.skip('skips completion page', async () => {
           const onComplete = jest.fn();
           const onClose = jest.fn();
-
           renderIdv({
             onComplete,
             onClose,
@@ -155,10 +152,10 @@ describe('<Idv />', () => {
             onClose,
           });
 
-          await checkComplete();
           await waitFor(() => {
             expect(onComplete).toBeCalledWith(validationToken, closeDelay);
           });
+          await checkComplete();
 
           const linkButton = screen.getByText('Return to site');
           expect(linkButton).toBeInTheDocument();
@@ -188,22 +185,20 @@ describe('<Idv />', () => {
       it.skip('prompts user to confirm previous data when there are met requirements if redoing kyc', async () => {
         withUserToken();
         withIdentify(true);
-        withRequirements(
-          [TestAuthorizeRequirement],
-          [
-            {
-              kind: OnboardingRequirementKind.collectKycData,
-              isMet: false,
-              missingAttributes: [],
-              optionalAttributes: [],
-              populatedAttributes: [
-                CollectedKycDataOption.name,
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
-            },
-          ],
-        );
+        withRequirements([
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            isMet: true,
+            missingAttributes: [],
+            optionalAttributes: [],
+            populatedAttributes: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+            ],
+          },
+          TestAuthorizeRequirement,
+        ]);
         withDecrypt({
           [IdDI.firstName]: 'Piip',
           [IdDI.lastName]: 'Foot',
@@ -232,22 +227,19 @@ describe('<Idv />', () => {
         // Update the mock response after we entered the authorize page
         // For next time we are checking for requirements
         // The CollectKycData plugin will only be shown once
-        withRequirements(
-          [],
-          [
-            {
-              kind: OnboardingRequirementKind.collectKycData,
-              isMet: true,
-              missingAttributes: [],
-              optionalAttributes: [],
-              populatedAttributes: [
-                CollectedKycDataOption.name,
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
-            },
-          ],
-        );
+        withRequirements([
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            isMet: true,
+            missingAttributes: [],
+            optionalAttributes: [],
+            populatedAttributes: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+            ],
+          },
+        ]);
 
         await authorizeData();
         await checkComplete();
@@ -280,22 +272,20 @@ describe('<Idv />', () => {
       });
 
       it.skip('can onboard after identify, confirm and authorize', async () => {
-        withRequirements(
-          [TestAuthorizeRequirement],
-          [
-            {
-              kind: OnboardingRequirementKind.collectKycData,
-              isMet: true,
-              missingAttributes: [],
-              optionalAttributes: [],
-              populatedAttributes: [
-                CollectedKycDataOption.name,
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
-            },
-          ],
-        );
+        withRequirements([
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            isMet: true,
+            missingAttributes: [],
+            optionalAttributes: [],
+            populatedAttributes: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+            ],
+          },
+          TestAuthorizeRequirement,
+        ]);
 
         withDecrypt({
           [IdDI.firstName]: 'Piip',
@@ -323,22 +313,19 @@ describe('<Idv />', () => {
         // Update the mock response after we entered the authorize page
         // For next time we are checking for requirements
         // The CollectKycData plugin will only be shown once
-        withRequirements(
-          [],
-          [
-            {
-              kind: OnboardingRequirementKind.collectKycData,
-              isMet: true,
-              missingAttributes: [],
-              optionalAttributes: [],
-              populatedAttributes: [
-                CollectedKycDataOption.name,
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
-            },
-          ],
-        );
+        withRequirements([
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            isMet: true,
+            missingAttributes: [],
+            optionalAttributes: [],
+            populatedAttributes: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+            ],
+          },
+        ]);
 
         await authorizeData();
         await checkComplete();
@@ -348,7 +335,7 @@ describe('<Idv />', () => {
       });
 
       it.skip('skips completion page', async () => {
-        withRequirements([TestAuthorizeRequirement], []);
+        withRequirements([TestAuthorizeRequirement]);
 
         const onComplete = jest.fn();
         const onClose = jest.fn();
@@ -369,7 +356,7 @@ describe('<Idv />', () => {
         });
 
         // Update the mock response after we entered the authorize page
-        withRequirements([], []);
+        withRequirements([]);
 
         await authorizeData();
         await waitFor(() => {
@@ -378,22 +365,19 @@ describe('<Idv />', () => {
       });
 
       it.skip('can onboard after filling remaining missing attributes', async () => {
-        withRequirements(
-          [
-            {
-              kind: OnboardingRequirementKind.collectKycData,
-              isMet: true,
-              missingAttributes: [CollectedKycDataOption.name],
-              optionalAttributes: [],
-              populatedAttributes: [
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
-            },
-            TestAuthorizeRequirement,
-          ],
-          [],
-        );
+        withRequirements([
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            isMet: false,
+            missingAttributes: [CollectedKycDataOption.name],
+            optionalAttributes: [],
+            populatedAttributes: [
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+            ],
+          },
+          TestAuthorizeRequirement,
+        ]);
 
         withDecrypt({
           [IdDI.dob]: '05/23/1996',
@@ -435,44 +419,39 @@ describe('<Idv />', () => {
           ).toBeInTheDocument();
         });
 
-        withRequirements(
-          [TestAuthorizeRequirement],
-          [
-            {
-              kind: OnboardingRequirementKind.collectKycData,
-              isMet: true,
-              missingAttributes: [],
-              optionalAttributes: [],
-              populatedAttributes: [
-                CollectedKycDataOption.name,
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
-            },
-          ],
-        );
+        withRequirements([
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            isMet: true,
+            missingAttributes: [],
+            optionalAttributes: [],
+            populatedAttributes: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+            ],
+          },
+          TestAuthorizeRequirement,
+        ]);
 
         await confirmKycData();
 
         await waitFor(() => {
           expect(screen.getByText('Authorize access')).toBeInTheDocument();
         });
-        withRequirements(
-          [],
-          [
-            {
-              kind: OnboardingRequirementKind.collectKycData,
-              isMet: true,
-              missingAttributes: [],
-              optionalAttributes: [],
-              populatedAttributes: [
-                CollectedKycDataOption.name,
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
-            },
-          ],
-        );
+        withRequirements([
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            isMet: true,
+            missingAttributes: [],
+            optionalAttributes: [],
+            populatedAttributes: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+            ],
+          },
+        ]);
 
         await authorizeData();
         await checkComplete();
@@ -512,23 +491,20 @@ describe('<Idv />', () => {
       });
 
       it('collects missing data before confirm', async () => {
-        withRequirements(
-          [
-            {
-              kind: OnboardingRequirementKind.collectKycData,
-              isMet: false,
-              missingAttributes: [
-                CollectedKycDataOption.name,
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
-              populatedAttributes: [],
-              optionalAttributes: [],
-            },
-            TestAuthorizeRequirement,
-          ],
-          [],
-        );
+        withRequirements([
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            isMet: false,
+            missingAttributes: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+            ],
+            populatedAttributes: [],
+            optionalAttributes: [],
+          },
+          TestAuthorizeRequirement,
+        ]);
         withUserToken();
         withIdentify(true);
         withUserVaultValidate();
@@ -569,22 +545,19 @@ describe('<Idv />', () => {
         withIdentify(true);
         withUserVaultValidate();
         withUserVault();
-        withRequirements(
-          [
-            {
-              kind: OnboardingRequirementKind.collectKycData,
-              isMet: false,
-              missingAttributes: [
-                CollectedKycDataOption.dob,
-                CollectedKycDataOption.ssn9,
-              ],
-              populatedAttributes: [CollectedKycDataOption.name],
-              optionalAttributes: [],
-            },
-            TestAuthorizeRequirement,
-          ],
-          [],
-        );
+        withRequirements([
+          {
+            kind: OnboardingRequirementKind.collectKycData,
+            isMet: false,
+            missingAttributes: [
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn9,
+            ],
+            populatedAttributes: [CollectedKycDataOption.name],
+            optionalAttributes: [],
+          },
+          TestAuthorizeRequirement,
+        ]);
       });
 
       it('bootstrap data takes precendence over decryption', async () => {
@@ -650,7 +623,7 @@ describe('<Idv />', () => {
       withOnboardingConfig(config);
       withUserToken();
       withIdentify(true);
-      withRequirements([TestAuthorizeRequirement], []);
+      withRequirements([TestAuthorizeRequirement]);
       withD2PGenerate();
       withOnboardingValidate('validation-token');
       withAuthorize();
@@ -673,35 +646,32 @@ describe('<Idv />', () => {
 
       // Update the mock response after we entered the authorize page
       // For next time we are checking for requirements
-      withRequirements(
-        [
-          {
-            kind: OnboardingRequirementKind.idDoc,
-            isMet: false,
-            shouldCollectConsent: false,
-            shouldCollectSelfie: false,
-            onlyUsSupported: false,
-            supportedDocumentTypes: [],
-            supportedCountries: ['US', 'CA'],
-            supportedCountryAndDocTypes: {
-              us: [
-                SupportedIdDocTypes.driversLicense,
-                SupportedIdDocTypes.idCard,
-                SupportedIdDocTypes.passport,
-                SupportedIdDocTypes.residenceDocument,
-                SupportedIdDocTypes.visa,
-                SupportedIdDocTypes.workPermit,
-              ],
-              ca: [
-                SupportedIdDocTypes.driversLicense,
-                SupportedIdDocTypes.idCard,
-                SupportedIdDocTypes.passport,
-              ],
-            },
+      withRequirements([
+        {
+          kind: OnboardingRequirementKind.idDoc,
+          isMet: false,
+          shouldCollectConsent: false,
+          shouldCollectSelfie: false,
+          onlyUsSupported: false,
+          supportedDocumentTypes: [],
+          supportedCountries: ['US', 'CA'],
+          supportedCountryAndDocTypes: {
+            us: [
+              SupportedIdDocTypes.driversLicense,
+              SupportedIdDocTypes.idCard,
+              SupportedIdDocTypes.passport,
+              SupportedIdDocTypes.residenceDocument,
+              SupportedIdDocTypes.visa,
+              SupportedIdDocTypes.workPermit,
+            ],
+            ca: [
+              SupportedIdDocTypes.driversLicense,
+              SupportedIdDocTypes.idCard,
+              SupportedIdDocTypes.passport,
+            ],
           },
-        ],
-        [],
-      );
+        },
+      ]);
 
       await authorizeData();
 
@@ -721,15 +691,12 @@ describe('<Idv />', () => {
     });
 
     it('transfers when there is a liveness requirement', async () => {
-      withRequirements(
-        [
-          {
-            kind: OnboardingRequirementKind.registerPasskey,
-            isMet: false,
-          },
-        ],
-        [],
-      );
+      withRequirements([
+        {
+          kind: OnboardingRequirementKind.registerPasskey,
+          isMet: false,
+        },
+      ]);
 
       renderIdv({
         authToken: 'token',
@@ -742,35 +709,32 @@ describe('<Idv />', () => {
     });
 
     it('transfers when there is an id doc requirement', async () => {
-      withRequirements(
-        [
-          {
-            kind: OnboardingRequirementKind.idDoc,
-            isMet: false,
-            shouldCollectConsent: false,
-            shouldCollectSelfie: false,
-            onlyUsSupported: false,
-            supportedDocumentTypes: [],
-            supportedCountries: ['US', 'CA'],
-            supportedCountryAndDocTypes: {
-              us: [
-                SupportedIdDocTypes.driversLicense,
-                SupportedIdDocTypes.idCard,
-                SupportedIdDocTypes.passport,
-                SupportedIdDocTypes.residenceDocument,
-                SupportedIdDocTypes.visa,
-                SupportedIdDocTypes.workPermit,
-              ],
-              ca: [
-                SupportedIdDocTypes.driversLicense,
-                SupportedIdDocTypes.idCard,
-                SupportedIdDocTypes.passport,
-              ],
-            },
+      withRequirements([
+        {
+          kind: OnboardingRequirementKind.idDoc,
+          isMet: false,
+          shouldCollectConsent: false,
+          shouldCollectSelfie: false,
+          onlyUsSupported: false,
+          supportedDocumentTypes: [],
+          supportedCountries: ['US', 'CA'],
+          supportedCountryAndDocTypes: {
+            us: [
+              SupportedIdDocTypes.driversLicense,
+              SupportedIdDocTypes.idCard,
+              SupportedIdDocTypes.passport,
+              SupportedIdDocTypes.residenceDocument,
+              SupportedIdDocTypes.visa,
+              SupportedIdDocTypes.workPermit,
+            ],
+            ca: [
+              SupportedIdDocTypes.driversLicense,
+              SupportedIdDocTypes.idCard,
+              SupportedIdDocTypes.passport,
+            ],
           },
-        ],
-        [],
-      );
+        },
+      ]);
 
       renderIdv({
         authToken: 'token',

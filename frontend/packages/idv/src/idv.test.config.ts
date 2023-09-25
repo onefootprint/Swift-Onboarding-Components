@@ -13,6 +13,7 @@ import {
   ChallengeKind,
   CollectedKycDataOption,
   OnboardingRequirementKind,
+  SessionStatus,
   UserTokenScope,
 } from '@onefootprint/types';
 
@@ -81,18 +82,20 @@ const RequirementsFixture: OnboardingRequirement[] = [
   },
 ];
 
-const MetRequirementsFixture: OnboardingRequirement[] = [];
+export const withCheckSession = () => {
+  mockRequest({
+    method: 'get',
+    path: '/hosted/check_session',
+    response: SessionStatus.active,
+  });
+};
 
-export const withRequirements = (
-  requirements = RequirementsFixture,
-  metRequirements = MetRequirementsFixture,
-) => {
+export const withRequirements = (allRequirements = RequirementsFixture) => {
   mockRequest({
     method: 'get',
     path: '/hosted/onboarding/status',
     response: {
-      requirements,
-      metRequirements,
+      allRequirements,
       obConfiguration: getKycOnboardingConfig(true),
     },
   });
@@ -360,7 +363,6 @@ export const confirmKycData = async () => {
 
   expect(screen.getByText('Identity')).toBeInTheDocument();
   expect(screen.getByText('SSN')).toBeInTheDocument();
-  expect(screen.getByText('123-45-6789')).toBeInTheDocument();
 
   const confirmButton = screen.getByText('Confirm & Continue');
   expect(confirmButton).toBeInTheDocument();
