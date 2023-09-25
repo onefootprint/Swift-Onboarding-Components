@@ -13,7 +13,7 @@ serde = { workspace = true }
 serde_cbor = { workspace = true }
 thiserror = { workspace = true }
 hex = { workspace = true }
-aes-gcm = "0.10.1"
+aes-gcm = "0.10.3"
 sha2 = "0.10.2"
 p256 = { version = "0.11.1", features = ["ecdh", "pem", "pkcs8"] }
 rand_core = "0.6.3"
