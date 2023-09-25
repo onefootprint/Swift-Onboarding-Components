@@ -61,6 +61,7 @@ pub async fn get(
         })
         .await??
         .into_iter()
+        .filter(|(_, rs)| !rs.reason_code.to_be_deprecated())
         .filter_map(|(_, rs)| {
             // FP-5097
             if !matches!(rs.reason_code, FootprintReasonCode::Other(_)) {

@@ -280,15 +280,15 @@ vendor_reason_code_enum! {
         NetworkAlertDocumentNumber,
 
         #[ser = "resultcode.ip.state.does.not.match", description = "Indicates that the located IP State does not match the located State for the customer."]
-        #[footprint_reason_code = Some(FootprintReasonCode::IpStateDoesNotMatch)]
+        #[footprint_reason_code = None]
         IpStateDoesNotMatch,
 
         #[ser = "resultcode.ip.invalid", description = "Indicates that the IP address submitted does not fit the proper structure of an IP address and/or is found to be an unassigned IP address. This might also indicate that the IP address is a private or multicast address."]
-        #[footprint_reason_code = Some(FootprintReasonCode::IpInputInvalid)]
+        #[footprint_reason_code = None]
         InvalidIp,
 
         #[ser = "resultcode.ip.not.located", description = "Indicates that the IP address could not be located within IDology data sources."]
-        #[footprint_reason_code = Some(FootprintReasonCode::IpNotLocated)]
+        #[footprint_reason_code = None]
         IpNotLocated,
 
         #[ser = "resultcode.high.risk.ip.bot", description = "Indicates that the IP address is part of a network of computers infected with malware."]
@@ -304,7 +304,7 @@ vendor_reason_code_enum! {
         HighRiskIpTor,
 
         #[ser = "resultcode.ip.location.not.available", description = "Indicates that the location of the IP address cannot be determined."]
-        #[footprint_reason_code = Some(FootprintReasonCode::IpLocationNotAvailable)]
+        #[footprint_reason_code = None]
         IpLocationNotAvailable,
 
         #[ser = "resultcode.low.risk", description = "Triggered when the total ID Score is less than or equal to the value entered for the Low Risk threshold."]
@@ -401,35 +401,35 @@ vendor_reason_code_enum! {
         MobileChangeEventSimswap,
 
         #[ser = "resultcode.mobile.account.type.postpaid", description = "Determines the type of mobile account being used to create the mobile identity. Account Type = Postpaid"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountTypePostpaid)]
+        #[footprint_reason_code = None]
         MobileAccountTypePostpaid,
 
         #[ser = "resultcode.mobile.account.type.prepaid", description = "Determines the type of mobile account being used to create the mobile identity. Account Type = Prepaid"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountTypePrepaid)]
+        #[footprint_reason_code = None]
         MobileAccountTypePrepaid,
 
         #[ser = "resultcode.mobile.account.type.unknown", description = "Determines the type of mobile account being used to create the mobile identity. Account Type = Unknown"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountTypeUnknown)]
+        #[footprint_reason_code = None]
         MobileAccountTypeUnknown,
 
         #[ser = "resultcode.mobile.account.status.active", description = "Determines the status of the mobile account. Account Status = Active"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountStatusActive)]
+        #[footprint_reason_code = None]
         MobileAccountStatusActive,
 
         #[ser = "resultcode.mobile.account.status.deactivated", description = "Determines the status of the mobile account. Account Status = Deactivated"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountStatusDeactivated)]
+        #[footprint_reason_code = None]
         MobileAccountStatusDeactivated,
 
         #[ser = "resultcode.mobile.account.status.suspended", description = "Determines the status of the mobile account. Account Status = Suspended"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountStatusSuspended)]
+        #[footprint_reason_code = None]
         MobileAccountStatusSuspended,
 
         #[ser = "resultcode.mobile.account.status.absent", description = "Determines the status of the mobile account. Account Status = Absent"]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberMobileAccountStatusAbsent)]
+        #[footprint_reason_code = None]
         MobileAccountStatusAbsent,
 
         #[ser = "resultcode.invalid.phone.number", description = "The phone number submitted was not a valid phone number."]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberInputInvalid)]
+        #[footprint_reason_code = None]
         InvalidPhoneNumber,
 
         #[ser = "idphone.match", description = "The phone number submitted matches the phone number for the consumer."]
@@ -461,59 +461,59 @@ vendor_reason_code_enum! {
         InputPhoneNumberDoesNotMatchLocatedStateHistory,
 
         #[ser = "resultcode.input.phone.number.does.not.match.ip.state", description = "The area code for the phone number provided does not match the state detected through the IP Address provided."]
-        #[footprint_reason_code = Some(FootprintReasonCode::InputPhoneNumberDoesNotMatchIpState)]
+        #[footprint_reason_code =  None]
         InputPhoneNumberDoesNotMatchIpState,
 
         #[ser = "resultcode.scan.capture.document.not.verified", description = "IDology was unable to verify the document provided because either the front or back was unable to be read or because it failed the verification check."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentNotVerified)]
+        #[footprint_reason_code =  None]
         DocumentNotVerified,
 
         #[ser = "resultcode.scan.capture.ocr.not.successful", description = "The OCR for the front of the document failed."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentOcrNotSuccessful)]
+        #[footprint_reason_code =  None]
         OcrNotSuccessful,
 
         #[ser = "resultcode.scan.capture.barcode.not.read", description = "The reading and extracting of the barcode on the back of the document failed."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentBarcodeCouldNotBeRead)]
+        #[footprint_reason_code =  None]
         BarcodeNotRead,
 
         #[ser = "resultcode.scan.capture.review.document", description = "Indicates that further review of the document is required."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentRequiresReview)]
+        #[footprint_reason_code = None]
         ReviewDocument,
 
         #[ser = "resultcode.scan.capture.document.expired", description = "The document is expired."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentExpired)]
+        #[footprint_reason_code =  None]
         DocumentExpired,
 
         #[ser = "resultcode.scan.capture.restricted.country", description = "The document is from a country that has been labeled as high-risk in the enterprise settings."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentFromRestrictedCountry)]
+        #[footprint_reason_code =  None]
         DocumentFromRestrictedCountry,
 
         #[ser = "resultcode.scan.capture.restricted.template", description = "Indicates that the template type identified for the document provided is restricted in the Enterprise settings."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentRestrictedTemplateType)]
+        #[footprint_reason_code =  None]
         RestrictedTemplateType,
 
         #[ser = "resultcode.scan.capture.document.type.not.allowed", description = "Indicates that the document type provided is a not allowed for the Enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentTypeNotAllowed)]
+        #[footprint_reason_code = None]
         DocumentTypeNotAllowed,
 
         #[ser = "resultcode.scan.field.crosscheck.failed", description = "A field crosscheck (comparing data  on the front of the document to the back) failed during the document authentication."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentFieldCrosscheckFailed)]
+        #[footprint_reason_code =  None]
         FieldCrosscheckFailed,
 
         #[ser = "resultcode.scan.invalid.issuance.expiration.date", description = "The Issuance Date, Expiration Date, or both do not align to the timeline of the identified document. The Issuance Date or the Expiration Date are not in a valid format."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentInvalidIssuanceOrExpirationDate)]
+        #[footprint_reason_code =  None]
         InvalidIssuanceOrExpirationDate,
 
         #[ser = "resultcode.scan.invalid.template.layout", description = "The layout, or relative positions of specifically identified features of the document, were not within the proper place, are missing, or show signs of tampering."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentInvalidTemplateLayout)]
+        #[footprint_reason_code =  None]
         InvalidTemplateLayout,
 
         #[ser = "resultcode.scan.possible.image.tampering", description = "The image of the document has evidence or appearances of being manipulated or tampered."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentPossibleImageTampering)]
+        #[footprint_reason_code =  None]
         PossibleImageTampering,
 
         #[ser = "resultcode.scan.capture.face.compare.alert", description = "Indicates that the customer's Face Compare Score is beneath the Facial Match Score allowed by the enterprise."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DocumentLowMatchScoreWithSelfie)]
+        #[footprint_reason_code =  None]
         FaceCompareAlert
     }
 }

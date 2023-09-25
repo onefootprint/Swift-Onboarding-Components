@@ -152,13 +152,13 @@ footprint_reason_code_enum! {
         #[note = "Address does not match", severity = SignalSeverity::High,  description = "Address located does not match address input."]
         AddressDoesNotMatch,
 
- #[scope = SignalScope::Address, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
- #[note = "Address partially matches", severity = SignalSeverity::Low,  description = "Address located partially matches address input."]
- AddressPartiallyMatches,
+        #[scope = SignalScope::Address, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+        #[note = "Address partially matches", severity = SignalSeverity::Low,  description = "Address located partially matches address input."]
+        AddressPartiallyMatches,
 
- #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::Zip], match_level = Some(MatchLevel::NoMatch)]
- #[note = "ZIP code does not match", severity = SignalSeverity::Low,  description = "ZIP code located does not match the ZIP code input."]
- AddressZipCodeDoesNotMatch,
+        #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::Zip], match_level = Some(MatchLevel::NoMatch)]
+        #[note = "ZIP code does not match", severity = SignalSeverity::Low,  description = "ZIP code located does not match the ZIP code input."]
+        AddressZipCodeDoesNotMatch,
 
         #[scope = SignalScope::Address, additional_scopes = vec![SignalScope::City], match_level = Some(MatchLevel::NoMatch)]
         #[note = "City does not match", severity = SignalSeverity::Low,  description = "City located does not match the city input."]
@@ -1293,27 +1293,27 @@ footprint_reason_code_enum! {
 crate::util::impl_enum_str_diesel!(FootprintReasonCode);
 
 impl FootprintReasonCode {
-    pub fn to_info_code(&self) -> Option<Self> {
-        match self {
-            FootprintReasonCode::AddressDoesNotMatch => Some(Self::AddressMatches),
-            FootprintReasonCode::AddressZipCodeDoesNotMatch => Some(Self::AddressZipCodeMatches),
-            FootprintReasonCode::AddressStreetNameDoesNotMatch => Some(Self::AddressStreetNameMatches),
-            FootprintReasonCode::AddressStreetNumberDoesNotMatch => Some(Self::AddressStreetNumberMatches),
-            FootprintReasonCode::AddressStateDoesNotMatch => Some(Self::AddressStateMatches),
-            FootprintReasonCode::DobYobDoesNotMatch => Some(Self::DobYobMatches),
-            FootprintReasonCode::DobMobDoesNotMatch => Some(Self::DobMobMatches),
-            FootprintReasonCode::SsnDoesNotMatch => Some(Self::SsnMatches),
-            FootprintReasonCode::NameLastDoesNotMatch => Some(Self::NameLastMatches),
-            FootprintReasonCode::IpStateDoesNotMatch => Some(Self::IpStateMatches), // TODO: right now we dont even send ip_address to Idology so this is pretty bogus. If we aren't getting an explicit match qualifier from idolgoy (or other vendors i guess since this is generic) then we should probably also assert here that we did indeed send up ip_address. Easiest for now might be to just remove this- this doesn't seem like the most useful reason code in isolation
-            FootprintReasonCode::PhoneNumberDoesNotMatch => Some(Self::PhoneNumberMatches),
-            FootprintReasonCode::InputPhoneNumberDoesNotMatchInputState => {
-                Some(Self::InputPhoneNumberMatchesInputState)
-            }
-            FootprintReasonCode::InputPhoneNumberDoesNotMatchLocatedStateHistory => {
-                Some(Self::InputPhoneNumberMatchesLocatedStateHistory)
-            }
-            _ => None,
-        }
+    // 2023-09-25: Removing these
+    pub fn to_be_deprecated(&self) -> bool {
+        matches!(
+            self,
+            Self::PhoneNumberMobileAccountTypePostpaid
+                | Self::PhoneNumberMobileAccountTypePrepaid
+                | Self::PhoneNumberMobileAccountTypeUnknown
+                | Self::PhoneNumberMobileAccountStatusActive
+                | Self::PhoneNumberMobileAccountStatusDeactivated
+                | Self::PhoneNumberMobileAccountStatusSuspended
+                | Self::PhoneNumberMobileAccountStatusAbsent
+                | Self::IpNotLocated
+                | Self::IpStateDoesNotMatch
+                | Self::IpLocationNotAvailable
+                | Self::IpInputInvalid
+                | Self::IpAlertHighRiskBot
+                | Self::IpAlertHighRiskSpam
+                | Self::InputPhoneNumberDoesNotMatchIpState
+                | Self::DocumentRequiresReview
+                | Self::DocumentLowMatchScoreWithSelfie
+        )
     }
 }
 
