@@ -1,8 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Drawer } from '@onefootprint/ui';
 import React from 'react';
-import useFilters from 'src/pages/playbooks/utils/use-filters';
-import usePlaybook from 'src/pages/playbooks/utils/use-playbook';
+
+import useFilters from '@/playbooks/hooks/use-filters';
+import usePlaybook from '@/playbooks/hooks/use-playbook';
 
 import Content from './components/content';
 import Error from './components/error';

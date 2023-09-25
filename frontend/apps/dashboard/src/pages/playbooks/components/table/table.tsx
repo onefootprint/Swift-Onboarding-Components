@@ -3,7 +3,7 @@ import type { OnboardingConfig } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
 import React from 'react';
 
-import useFilters from '../../utils/use-filters';
+import useFilters from '../../hooks/use-filters';
 import Row from './components/row';
 
 type TableProps = {

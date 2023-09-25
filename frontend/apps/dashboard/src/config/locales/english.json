@@ -1326,7 +1326,8 @@
           "title": "Playbook basics",
           "edit-name": {
             "title": "Playbook basics",
-            "edit": "Edit Playbook name",
+            "cta": "Edit Playbook name",
+            "cta-not-allowed": "You're not allowed to edit Playbooks",
             "form": {
               "label": "Playbook name",
               "cancel": "Cancel",

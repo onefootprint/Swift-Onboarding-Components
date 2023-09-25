@@ -2,8 +2,10 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoPencil16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 import { CodeInline, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import PermissionGate from 'src/components/permission-gate';
 import isKybPlaybook from 'src/pages/playbooks/components/table/components/row/utils/is-kyb-playbook';
 
 import EditName from './components/edit-name';
@@ -16,8 +18,15 @@ const Basics = ({ playbook }: BasicsProps) => {
   const { t } = useTranslation('pages.playbooks.details.basics');
   const isKYB = isKybPlaybook(playbook);
   const kind = isKYB ? 'kyb' : 'kyc';
-  const [open, setOpen] = useState(false);
-  const toggleOpen = () => setOpen(!open);
+  const [showForm, setShowForm] = useState(false);
+
+  const handleShowForm = () => {
+    setShowForm(true);
+  };
+
+  const handleHideForm = () => {
+    setShowForm(false);
+  };
 
   return (
     <Container>
@@ -25,19 +34,25 @@ const Basics = ({ playbook }: BasicsProps) => {
         <Typography sx={{ whiteSpace: 'nowrap' }} variant="label-3">
           {t('title')}
         </Typography>
-        {!open && (
-          <LinkButton
-            onClick={toggleOpen}
-            iconComponent={IcoPencil16}
-            iconPosition="left"
-            size="tiny"
+        {!showForm && (
+          <PermissionGate
+            scopeKind={RoleScopeKind.onboardingConfiguration}
+            fallbackText={t('edit-name.cta-not-allowed')}
+            tooltipPosition="left"
           >
-            {t('edit-name.edit')}
-          </LinkButton>
+            <LinkButton
+              iconComponent={IcoPencil16}
+              iconPosition="left"
+              onClick={handleShowForm}
+              size="tiny"
+            >
+              {t('edit-name.cta')}
+            </LinkButton>
+          </PermissionGate>
         )}
       </Header>
-      {open ? (
-        <EditName open={open} setOpen={setOpen} playbook={playbook} />
+      {showForm ? (
+        <EditName onDone={handleHideForm} playbook={playbook} />
       ) : (
         <ItemsContainer>
           <Item>

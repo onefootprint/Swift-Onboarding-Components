@@ -4,7 +4,8 @@ import type { OnboardingConfig } from '@onefootprint/types';
 import { Dialog, TextInput, useToast } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import useUpdatePlaybook from 'src/pages/playbooks/utils/use-update-playbook';
+
+import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
 
 export type EditNameHandler = {
   launch: () => void;

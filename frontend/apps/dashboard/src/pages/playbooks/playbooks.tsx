@@ -10,7 +10,7 @@ import WaveAnimation from 'src/components/wave-animation';
 import Details from './components/details';
 import Dialog from './components/dialog';
 import Table from './components/table';
-import usePlaybooks from './utils/use-playbooks';
+import usePlaybooks from './hooks/use-playbooks';
 
 const Playbooks = () => {
   const { t } = useTranslation('pages.playbooks');

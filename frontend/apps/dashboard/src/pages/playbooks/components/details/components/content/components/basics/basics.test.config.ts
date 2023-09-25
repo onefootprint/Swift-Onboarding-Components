@@ -4,7 +4,7 @@ import {
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 
-const playbookFixture: OnboardingConfig = {
+const onboardingConfigFixture: OnboardingConfig = {
   id: 'test id',
   name: 'Lucas Playbook',
   key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
@@ -36,4 +36,4 @@ const playbookFixture: OnboardingConfig = {
   },
 };
 
-export default playbookFixture;
+export default onboardingConfigFixture;

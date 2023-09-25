@@ -7,7 +7,8 @@ import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans } from 'react-i18next';
 import ConfirmationDialog from 'src/components/confirmation-dialog';
-import useUpdatePlaybook from 'src/pages/playbooks/utils/use-update-playbook';
+
+import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
 
 export type StatusHandler = {
   toggle: () => void;

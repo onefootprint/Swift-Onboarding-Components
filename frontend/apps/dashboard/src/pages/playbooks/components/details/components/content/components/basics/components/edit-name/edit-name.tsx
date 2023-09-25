@@ -4,23 +4,22 @@ import type { OnboardingConfig } from '@onefootprint/types';
 import { Button, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import useUpdatePlaybook from 'src/pages/playbooks/utils/use-update-playbook';
+
+import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
 
 export type EditNameProps = {
   playbook: OnboardingConfig;
-  open: boolean;
-  setOpen: (open: boolean) => void;
+  onDone: () => void;
 };
 
 type FormData = {
   name: string;
 };
 
-const EditName = ({ playbook, open, setOpen }: EditNameProps) => {
+const EditName = ({ playbook, onDone }: EditNameProps) => {
   const { t } = useTranslation('pages.playbooks.details.basics.edit-name');
   const mutation = useUpdatePlaybook();
   const {
-    reset,
     register,
     handleSubmit,
     formState: { errors },
@@ -29,11 +28,9 @@ const EditName = ({ playbook, open, setOpen }: EditNameProps) => {
       name: playbook.name,
     },
   });
-  const toggleOpen = () => setOpen(!open);
 
   const handleClose = () => {
-    reset();
-    setOpen(false);
+    onDone();
   };
 
   const handleBeforeSubmit = (formData: FormData) => {
@@ -45,7 +42,7 @@ const EditName = ({ playbook, open, setOpen }: EditNameProps) => {
         },
       },
     );
-    setOpen(false);
+    onDone();
   };
   return (
     <Form onSubmit={handleSubmit(handleBeforeSubmit)} id="edit-playbook-form">
@@ -63,7 +60,7 @@ const EditName = ({ playbook, open, setOpen }: EditNameProps) => {
         />
       </InputContainer>
       <ButtonContainer>
-        <Button variant="secondary" size="small" onClick={toggleOpen}>
+        <Button variant="secondary" size="small" onClick={onDone}>
           {t('form.cancel')}
         </Button>
         <Button variant="primary" size="small" type="submit">
