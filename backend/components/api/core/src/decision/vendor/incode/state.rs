@@ -28,8 +28,6 @@ impl<T> Uninitialized<T> {
 }
 
 pub struct TransitionResult {
-    /// The state handled after this one if we proceed successfully
-    pub next_state: IncodeState,
     /// Any failure reasons experienced during the handling of this state
     pub failure_reasons: Vec<IncodeFailureReason>,
     /// The side being handled by this step of the Incode machine. It will be cleared if there is an error.
@@ -38,9 +36,8 @@ pub struct TransitionResult {
 
 impl From<IncodeState> for TransitionResult {
     /// Shorthand for the common case that has no possibility to fail
-    fn from(value: IncodeState) -> Self {
+    fn from(_value: IncodeState) -> Self {
         Self {
-            next_state: value,
             failure_reasons: vec![],
             side: None,
         }
@@ -120,6 +117,8 @@ where
         session: VerificationSession,
     ) -> ApiResult<(IncodeState, StepResult, IncodeContext, VerificationSession)> {
         let starting_state = self.into();
+        // we know what we'll transition to, based properties of the session
+        let default_next_state = T::next_state(&session);
         let init_state = T::run(db_pool, clients, &ctx, &session).await?;
         let Some(init_state) = init_state else {
             // First, check if the state is ready to run. It's possible we're in a state like
@@ -131,7 +130,6 @@ where
             .db_transaction(move |conn| -> ApiResult<_> {
                 let result = init_state.transition(conn, &ctx, &session)?;
                 let TransitionResult {
-                    next_state,
                     failure_reasons: all_failure_reasons,
                     side,
                 } = result;
@@ -144,7 +142,7 @@ where
                     .collect_vec();
 
                 let (step_result, next_state, new_ignore_reasons) = if unhandled_failure_reasons.is_empty() {
-                    (StepResult::Ready, next_state, None)
+                    (StepResult::Ready, default_next_state, None)
                 } else {
                     // Some unhandled errors - decide how to proceed.
                     // We'll either retry the current state, or ignore the errors and move to the next state
@@ -178,7 +176,10 @@ where
                                 .collect();
                             // All of the unhandled failures are ignorable.
                             // Advance to the next state and add new ignore_reasons
-                            ((StepResult::Ready, next_state, Some(new_ignore_reasons)), false)
+                            (
+                                (StepResult::Ready, default_next_state, Some(new_ignore_reasons)),
+                                false,
+                            )
                         }
                     };
                     if let Some(side) = side {

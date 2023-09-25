@@ -4,7 +4,6 @@ use super::{
 };
 use crate::decision::vendor::incode::state::{IncodeState, TransitionResult};
 use crate::decision::vendor::incode::IncodeContext;
-use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
@@ -110,7 +109,6 @@ impl IncodeStateTransition for AddFront {
             failure_reasons.push(reason);
         }
         let result = TransitionResult {
-            next_state: should_collect_back_or_process_id(&ctx.docv_data)?,
             failure_reasons,
             side: Some(DocumentSide::Front),
         };
@@ -124,15 +122,4 @@ impl IncodeStateTransition for AddFront {
             ProcessId::new()
         }
     }
-}
-
-fn should_collect_back_or_process_id(docv_data: &DocVData) -> ApiResult<IncodeState> {
-    let doc_type = docv_data.document_type.ok_or(UserError::NoDocumentType)?;
-    let next = if doc_type.sides().contains(&DocumentSide::Back) {
-        AddBack::new()
-    } else {
-        ProcessId::new()
-    };
-
-    Ok(next)
 }

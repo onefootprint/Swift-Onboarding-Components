@@ -66,7 +66,6 @@ impl IncodeStateTransition for AddSelfie {
         _: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
         let result = TransitionResult {
-            next_state: ProcessFace::new(),
             failure_reasons: self.failure_reasons,
             side: Some(DocumentSide::Selfie),
         };

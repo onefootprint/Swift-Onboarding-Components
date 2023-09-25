@@ -105,7 +105,6 @@ impl IncodeStateTransition for AddBack {
             failure_reasons.push(reason);
         }
         let result = TransitionResult {
-            next_state: ProcessId::new(),
             failure_reasons,
             side: Some(DocumentSide::Back),
         };
