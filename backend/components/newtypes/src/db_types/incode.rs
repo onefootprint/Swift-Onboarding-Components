@@ -125,7 +125,8 @@ pub enum IncodeFailureReason {
 impl IncodeFailureReason {
     pub fn can_ignore(&self) -> bool {
         match self {
-            IncodeFailureReason::SelfieLowConfidence
+            IncodeFailureReason::SelfieFaceNotFound
+            | IncodeFailureReason::SelfieLowConfidence
             | IncodeFailureReason::SelfieTooDark
             | IncodeFailureReason::SelfieGlare
             | IncodeFailureReason::SelfieHasLenses
