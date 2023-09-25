@@ -30,6 +30,7 @@ const List = () => {
       >
         <EntitiesTable
           aria-label={t('table.aria-label')}
+          searchPlaceholder={t('table.search-placeholder')}
           columns={columns}
           emptyStateText={t('table.empty-state')}
           renderTr={entity => <Row entity={entity} />}

@@ -1187,51 +1187,6 @@
         "see-less": "See less"
       }
     },
-    "businesses": {
-      "page-title": "Footprint | Businesses",
-      "header": {
-        "title": "Businesses"
-      },
-      "table": {
-        "aria-label": "Businesses table",
-        "empty-state": "No businesses found",
-        "header": {
-          "name": "Name",
-          "token": "Footprint Token",
-          "status": "KYB status",
-          "submitted-by": "Submitted by (beneficial owner)",
-          "start": "Date"
-        },
-        "row": {
-          "status": {
-            "on-watchlist": "This business is on a watchlist"
-          }
-        }
-      }
-    },
-    "business": {
-      "page-title": "Footprint | Business",
-      "header": {
-        "title": "Business"
-      },
-      "vault": {
-        "basic": {
-          "title": "Basic data"
-        },
-        "bos": {
-          "title": "Beneficial owners",
-          "link": "View profile",
-          "hint": {
-            "primary": "Owns {{stake}}%  of the business & submitted the business information",
-            "primary_no_stake": "Submitted the business information",
-            "secondary": "Owns {{stake}}% of the business"
-          }
-        },
-        "address": {
-          "title": "Registered business address"
-        }
-      }
-    },
     "playbooks": {
       "page-title": "Footprint | Playbooks",
       "header": {
@@ -1661,6 +1616,7 @@
       },
       "table": {
         "aria-label": "Users table",
+        "search-placeholder": "Search by name, email or phone number...",
         "empty-state": "No users found",
         "header": {
           "name": "Name",
@@ -1796,6 +1752,52 @@
         },
         "id-documents-and-selfie": {
           "title": "ID documents & Selfie"
+        }
+      }
+    },
+    "businesses": {
+      "page-title": "Footprint | Businesses",
+      "header": {
+        "title": "Businesses"
+      },
+      "table": {
+        "aria-label": "Businesses table",
+        "search-placeholder": "Search by name...",
+        "empty-state": "No businesses found",
+        "header": {
+          "name": "Name",
+          "token": "Footprint Token",
+          "status": "KYB status",
+          "submitted-by": "Submitted by (beneficial owner)",
+          "start": "Date"
+        },
+        "row": {
+          "status": {
+            "on-watchlist": "This business is on a watchlist"
+          }
+        }
+      }
+    },
+    "business": {
+      "page-title": "Footprint | Business",
+      "header": {
+        "title": "Business"
+      },
+      "vault": {
+        "basic": {
+          "title": "Basic data"
+        },
+        "bos": {
+          "title": "Beneficial owners",
+          "link": "View profile",
+          "hint": {
+            "primary": "Owns {{stake}}%  of the business & submitted the business information",
+            "primary_no_stake": "Submitted the business information",
+            "secondary": "Owns {{stake}}% of the business"
+          }
+        },
+        "address": {
+          "title": "Registered business address"
         }
       }
     },

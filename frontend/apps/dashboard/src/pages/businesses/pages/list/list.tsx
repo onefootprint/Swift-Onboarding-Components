@@ -31,6 +31,7 @@ const List = () => {
           columns={columns}
           emptyStateText={t('table.empty-state')}
           renderTr={entity => <Row entity={entity} />}
+          searchPlaceholder={t('table.search-placeholder')}
         />
       </EntitiesList>
     </>

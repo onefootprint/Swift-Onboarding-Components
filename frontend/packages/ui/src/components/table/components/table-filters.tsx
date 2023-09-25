@@ -36,13 +36,13 @@ const TableFilter = ({
   return (
     <TableFilterContainer>
       <SearchInput
-        onChangeText={handleChangeText}
-        placeholder={placeholder}
-        width="232px"
+        autoCapitalize="off"
         autoComplete="off"
         autoCorrect="off"
-        autoCapitalize="off"
+        onChangeText={handleChangeText}
+        placeholder={placeholder}
         value={search}
+        width="330px"
       />
       {children}
     </TableFilterContainer>

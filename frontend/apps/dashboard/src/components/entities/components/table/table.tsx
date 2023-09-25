@@ -10,12 +10,14 @@ export type TableProps = {
   columns: { width: string; text: string }[];
   emptyStateText: string;
   renderTr: (entity: Entity) => JSX.Element;
+  searchPlaceholder: string;
 };
 
 const Table = ({
   'aria-label': ariaLabel,
   columns,
   emptyStateText,
+  searchPlaceholder,
   renderTr,
 }: TableProps) => {
   const context = useEntitiesContext();
@@ -33,6 +35,7 @@ const Table = ({
       onRowClick={context.onRowClick}
       renderActions={() => <Filters />}
       renderTr={({ item }) => renderTr(item)}
+      searchPlaceholder={searchPlaceholder}
     />
   );
 };

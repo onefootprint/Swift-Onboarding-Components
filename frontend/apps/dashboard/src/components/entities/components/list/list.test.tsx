@@ -48,6 +48,7 @@ describe.skip('<List />', () => {
       >
         <Table
           aria-label="Entities table"
+          searchPlaceholder="Search..."
           columns={columns}
           emptyStateText="No results found"
           renderTr={entity => (
