@@ -39,7 +39,7 @@ diesel = { workspace = true }
 diesel-derive-newtype = { workspace = true }
 
 diesel_as_jsonb = "1.0.0"
-phonenumber = "0.3.1"
+phonenumber = "0.3.3"
 url = { workspace = true }
 
 email_address = "0.2.4"

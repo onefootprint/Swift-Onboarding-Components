@@ -407,9 +407,9 @@ dependencies = [
 
 [[package]]
 name = "aho-corasick"
-version = "0.7.18"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e37cfd5e7657ada45f742d6e99ca5788580b5c529dc78faf11ece6dc702656f"
+checksum = "ea5d730647d4fadd988536d06fecce94b7b4f2a7efdae548f1cf4b63205518ab"
 dependencies = [
  "memchr",
 ]
@@ -437,7 +437,7 @@ dependencies = [
  "base64 0.13.0",
  "chrono",
  "derive_more",
- "itertools 0.10.3",
+ "itertools",
  "macros",
  "newtypes",
  "paperclip",
@@ -523,7 +523,7 @@ dependencies = [
  "gethostname",
  "http",
  "idv",
- "itertools 0.10.3",
+ "itertools",
  "jsonpath_lib",
  "lazy_static",
  "levenshtein",
@@ -578,7 +578,7 @@ dependencies = [
  "api_wire_types",
  "db",
  "either",
- "itertools 0.10.3",
+ "itertools",
  "newtypes",
  "paperclip",
  "serde_json",
@@ -612,7 +612,7 @@ dependencies = [
  "futures-util",
  "gethostname",
  "idv",
- "itertools 0.10.3",
+ "itertools",
  "jsonpath_lib",
  "lazy_static",
  "levenshtein",
@@ -676,7 +676,7 @@ dependencies = [
  "futures-util",
  "gethostname",
  "idv",
- "itertools 0.10.3",
+ "itertools",
  "jsonpath_lib",
  "lazy_static",
  "levenshtein",
@@ -739,7 +739,7 @@ dependencies = [
  "futures-util",
  "gethostname",
  "idv",
- "itertools 0.10.3",
+ "itertools",
  "jsonpath_lib",
  "lazy_static",
  "levenshtein",
@@ -825,7 +825,7 @@ dependencies = [
  "futures-util",
  "gethostname",
  "idv",
- "itertools 0.10.3",
+ "itertools",
  "jsonpath_lib",
  "lazy_static",
  "levenshtein",
@@ -886,7 +886,7 @@ dependencies = [
  "futures-util",
  "gethostname",
  "idv",
- "itertools 0.10.3",
+ "itertools",
  "jsonpath_lib",
  "lazy_static",
  "levenshtein",
@@ -947,7 +947,7 @@ dependencies = [
  "futures-util",
  "gethostname",
  "idv",
- "itertools 0.10.3",
+ "itertools",
  "jsonpath_lib",
  "lazy_static",
  "levenshtein",
@@ -1008,7 +1008,7 @@ dependencies = [
  "futures-util",
  "gethostname",
  "idv",
- "itertools 0.10.3",
+ "itertools",
  "jsonpath_lib",
  "lazy_static",
  "levenshtein",
@@ -1069,7 +1069,7 @@ dependencies = [
  "futures-util",
  "gethostname",
  "idv",
- "itertools 0.10.3",
+ "itertools",
  "jsonpath_lib",
  "lazy_static",
  "levenshtein",
@@ -1159,7 +1159,7 @@ dependencies = [
  "diesel",
  "enclave",
  "futures",
- "itertools 0.10.3",
+ "itertools",
  "log",
  "newtypes",
  "opentelemetry_api 0.18.0",
@@ -1215,12 +1215,6 @@ dependencies = [
 
 [[package]]
 name = "arrayvec"
-version = "0.5.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
-
-[[package]]
-name = "arrayvec"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "96d30a06541fbafbc7f82ed10c06164cfbd2c401138f6addd8404629c4b16711"
@@ -1234,7 +1228,7 @@ dependencies = [
  "asn1-rs-derive 0.1.0",
  "asn1-rs-impl",
  "displaydoc",
- "nom 7.1.1",
+ "nom",
  "num-traits",
  "rusticata-macros",
  "thiserror",
@@ -1250,7 +1244,7 @@ dependencies = [
  "asn1-rs-derive 0.4.0",
  "asn1-rs-impl",
  "displaydoc",
- "nom 7.1.1",
+ "nom",
  "num-traits",
  "rusticata-macros",
  "thiserror",
@@ -2668,7 +2662,7 @@ dependencies = [
  "clap",
  "criterion-plot",
  "is-terminal",
- "itertools 0.10.3",
+ "itertools",
  "num-traits",
  "once_cell",
  "oorandom",
@@ -2689,7 +2683,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b50826342786a51a89e2da3a28f1c32b06e387201bc2d19791f622c673706b1"
 dependencies = [
  "cast",
- "itertools 0.10.3",
+ "itertools",
 ]
 
 [[package]]
@@ -2937,7 +2931,7 @@ dependencies = [
  "dotenv",
  "hex",
  "ipnetwork",
- "itertools 0.10.3",
+ "itertools",
  "log",
  "macros",
  "newtypes",
@@ -3057,7 +3051,7 @@ checksum = "fe398ac75057914d7d07307bf67dc7f3f574a26783b4fc7805a20ffa9f506e82"
 dependencies = [
  "asn1-rs 0.3.1",
  "displaydoc",
- "nom 7.1.1",
+ "nom",
  "num-bigint",
  "num-traits",
  "rusticata-macros",
@@ -3071,7 +3065,7 @@ checksum = "dbd676fbbab537128ef0278adb5576cf363cff6aa22a7b24effe97347cfab61e"
 dependencies = [
  "asn1-rs 0.5.1",
  "displaydoc",
- "nom 7.1.1",
+ "nom",
  "num-bigint",
  "num-traits",
  "rusticata-macros",
@@ -3277,9 +3271,9 @@ dependencies = [
 
 [[package]]
 name = "either"
-version = "1.7.0"
+version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f107b87b6afc2a64fd13cac55fe06d6c8859f12d4b14cbcdd2c67d0976781be"
+checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
 
 [[package]]
 name = "elliptic-curve"
@@ -4263,7 +4257,7 @@ dependencies = [
  "derive_more",
  "dotenv",
  "image",
- "itertools 0.10.3",
+ "itertools",
  "macros",
  "mockall",
  "newtypes",
@@ -4425,15 +4419,6 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "284f18f85651fe11e8a991b2adb42cb078325c996ed026d994719efcfca1d54b"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itertools"
 version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a9a9d19fa1e79b6215ff29b9d6880b706147f16e9b1dbb1e4e5947b5b02bc5e3"
@@ -4586,7 +4571,7 @@ checksum = "5c27dd31ce69c55fca526d1c22c2dcca96fd0c98e496529d37eeef6c41652173"
 dependencies = [
  "base16ct 0.1.1",
  "chrono",
- "itertools 0.10.3",
+ "itertools",
  "lazy_static",
  "log",
  "maplit",
@@ -4619,19 +4604,6 @@ name = "levenshtein"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "db13adb97ab515a3691f56e4dbab09283d0b86cb45abd991d8634a9d6f501760"
-
-[[package]]
-name = "lexical-core"
-version = "0.7.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6607c62aa161d23d17a9072cc5da0be67cdfc89d3afb1e8d9c842bebc2525ffe"
-dependencies = [
- "arrayvec 0.5.2",
- "bitflags",
- "cfg-if",
- "ryu",
- "static_assertions",
-]
 
 [[package]]
 name = "libc"
@@ -4747,7 +4719,7 @@ version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8263075bb86c5a1b1427b5ae862e8889656f126e9f77c484496e8b47cf5c5558"
 dependencies = [
- "regex-automata",
+ "regex-automata 0.1.10",
 ]
 
 [[package]]
@@ -4973,7 +4945,7 @@ dependencies = [
  "enum_variant_type",
  "futures",
  "futures-util",
- "itertools 0.10.3",
+ "itertools",
  "lazy_static",
  "mime",
  "paperclip",
@@ -5004,17 +4976,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "memoffset 0.6.5",
-]
-
-[[package]]
-name = "nom"
-version = "5.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ffb4262d26ed83a1c0a33a38fe2bb15797329c85770da05e6b828ddb782627af"
-dependencies = [
- "lexical-core",
- "memchr",
- "version_check",
 ]
 
 [[package]]
@@ -5418,7 +5379,7 @@ checksum = "461c6d9997c512648e9cfd41575a3e0d3f46a1ec3c8214a32dd91b729487b1dc"
 dependencies = [
  "anyhow",
  "indexmap 1.9.1",
- "itertools 0.10.3",
+ "itertools",
  "once_cell",
  "openapiv3",
  "paperclip-actix",
@@ -5612,21 +5573,22 @@ checksum = "478c572c3d73181ff3c2539045f6eb99e5491218eae919370993b890cdbdd98e"
 
 [[package]]
 name = "phonenumber"
-version = "0.3.1+8.12.9"
+version = "0.3.3+8.13.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1261a014e5f5e048bf2c6f1a72fa5e4c223009dc5f296a385b95fe19b464608f"
+checksum = "635f3e6288e4f01c049d89332a031bd74f25d64b6fb94703ca966e819488cd06"
 dependencies = [
  "bincode",
  "either",
  "fnv",
- "itertools 0.9.0",
+ "itertools",
  "lazy_static",
- "nom 5.1.2",
+ "nom",
  "quick-xml",
  "regex",
  "regex-cache",
  "serde",
  "serde_derive",
+ "strum",
  "thiserror",
 ]
 
@@ -5841,7 +5803,7 @@ checksum = "59230a63c37f3e18569bdb90e4a89cbf5bf8b06fea0b84e65ea10cc4df47addd"
 dependencies = [
  "difflib",
  "float-cmp",
- "itertools 0.10.3",
+ "itertools",
  "normalize-line-endings",
  "predicates-core",
  "regex",
@@ -5986,7 +5948,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5d2d8d10f3c6ded6da8b05b5fb3b8a5082514344d56c9f871412d29b4e075b4"
 dependencies = [
  "anyhow",
- "itertools 0.10.3",
+ "itertools",
  "proc-macro2 1.0.66",
  "quote 1.0.33",
  "syn 1.0.98",
@@ -6068,9 +6030,9 @@ checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
 name = "quick-xml"
-version = "0.18.1"
+version = "0.28.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3cc440ee4802a86e357165021e3e255a9143724da31db1e2ea540214c96a0f82"
+checksum = "0ce5e73202a820a31f8a0ee32ada5e21029c81fd9e3ebf668a40832e4219d9d1"
 dependencies = [
  "memchr",
 ]
@@ -6223,13 +6185,14 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.6.0"
+version = "1.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c4eb3267174b8c6c2f654116623910a0fef09c4753f8dd83db29c48a0df988b"
+checksum = "12de2eff854e5fa4b1295edd650e227e9d8fb0c9e90b12e7f36d6a6811791a29"
 dependencies = [
  "aho-corasick",
  "memchr",
- "regex-syntax",
+ "regex-automata 0.3.7",
+ "regex-syntax 0.7.5",
 ]
 
 [[package]]
@@ -6238,7 +6201,18 @@ version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c230d73fb8d8c1b9c0b3135c5142a8acee3a0558fb8db5cf1cb65f8d7862132"
 dependencies = [
- "regex-syntax",
+ "regex-syntax 0.6.27",
+]
+
+[[package]]
+name = "regex-automata"
+version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "49530408a136e16e5b486e883fbb6ba058e8e4e8ae6621a77b048b314336e629"
+dependencies = [
+ "aho-corasick",
+ "memchr",
+ "regex-syntax 0.7.5",
 ]
 
 [[package]]
@@ -6250,7 +6224,7 @@ dependencies = [
  "lru-cache",
  "oncemutex",
  "regex",
- "regex-syntax",
+ "regex-syntax 0.6.27",
 ]
 
 [[package]]
@@ -6258,6 +6232,12 @@ name = "regex-syntax"
 version = "0.6.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
+
+[[package]]
+name = "regex-syntax"
+version = "0.7.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dbb5fb1acd8a1a18b3dd5be62d25485eb770e05afb408a9627d14d451bae12da"
 
 [[package]]
 name = "remove_dir_all"
@@ -6543,7 +6523,7 @@ version = "1.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4c4216490d5a413bc6d10fa4742bd7d4955941d062c0ef873141d6b0e7b30fd"
 dependencies = [
- "arrayvec 0.7.4",
+ "arrayvec",
  "borsh",
  "bytes 1.3.0",
  "num-traits",
@@ -6574,7 +6554,7 @@ version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf0c4a6ece9950b9abdb62b1cfcf2a68b3b67a10ba445b3bb85be2a293d0632"
 dependencies = [
- "nom 7.1.1",
+ "nom",
 ]
 
 [[package]]
@@ -7270,12 +7250,6 @@ dependencies = [
  "base64ct",
  "der 0.7.7",
 ]
-
-[[package]]
-name = "static_assertions"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
 name = "strsim"
@@ -8337,7 +8311,7 @@ dependencies = [
  "base64urlsafedata",
  "der-parser 7.0.0",
  "jwt-simple",
- "nom 7.1.1",
+ "nom",
  "openssl",
  "rand 0.8.5",
  "serde",
@@ -8647,7 +8621,7 @@ dependencies = [
  "db_schema",
  "diesel",
  "dotenv",
- "itertools 0.10.3",
+ "itertools",
  "tokio",
  "workos 0.2.0",
 ]
@@ -8690,7 +8664,7 @@ dependencies = [
  "data-encoding",
  "der-parser 7.0.0",
  "lazy_static",
- "nom 7.1.1",
+ "nom",
  "oid-registry 0.4.0",
  "rusticata-macros",
  "thiserror",
@@ -8708,7 +8682,7 @@ dependencies = [
  "data-encoding",
  "der-parser 8.2.0",
  "lazy_static",
- "nom 7.1.1",
+ "nom",
  "oid-registry 0.6.1",
  "rusticata-macros",
  "thiserror",
