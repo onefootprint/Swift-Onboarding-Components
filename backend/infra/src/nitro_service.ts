@@ -61,21 +61,6 @@ export async function CreateNitroService(
     { provider },
   );
 
-  // get our base image AMI
-  const instanceAmi = await aws.ec2.getAmi(
-    {
-      mostRecent: true,
-      owners: ['amazon'],
-      filters: [
-        {
-          name: 'name',
-          values: ['amzn2-ami-ecs-hvm-*-x86_64-*'],
-        },
-      ],
-    },
-    { provider },
-  );
-
   const instanceSecurityGroup = new awsx.ec2.SecurityGroup(
     `${serviceName}-sg`,
     {
@@ -150,7 +135,9 @@ export async function CreateNitroService(
       enclaveOptions: {
         enabled: true,
       },
-      imageId: instanceAmi.id,
+      // TODO: build our own AMI with pre-installed dependencies
+      // to optimize startup!
+      imageId: 'ami-0fec9863172e50c93',
       iamInstanceProfile: {
         arn: instanceProfile.arn,
       },
@@ -499,8 +486,10 @@ sudo systemctl enable --now tailscaled
 
 cat <<'EOF' > tailscale_connect.sh
 #!/bin/sh
-export TS_KEY="$(aws --region us-east-1 ssm get-parameter --name '${tailscaleSecretName}' --with-decryption | jq -r '.Parameter.Value')"
-sudo tailscale up --authkey "$TS_KEY" --ssh --hostname "${hostName}" --accept-dns=false
+tsKey="$(aws --region us-east-1 ssm get-parameter --name '${tailscaleSecretName}' --with-decryption | jq -r '.Parameter.Value')"
+instanceId=$(cat /run/cloud-init/instance-data.json | jq -r '.ds["meta-data"]["instance-id"]')
+
+sudo tailscale up --authkey "$tsKey" --ssh --hostname "${hostName}-$instanceId" --accept-dns=false
 EOF
 
 chmod +x tailscale_connect.sh
