@@ -75,9 +75,12 @@
       "third-party-consent": "Optional:  By ticking this box and providing Incode with your Personal Data, including your Biometric Information and government identification information, you consent to and provide a written release to Incode for the collection, storage, retention, use and disclosure of such information to improve, modify or update Incode’s products or services (including its algorithm), in accordance with its Privacy Notice. You can exercise your rights under applicable privacy laws, including withdrawal of consent, by contacting dataprotection@incode.com. IMPORTANT: Your consent is voluntary, even if you do not consent you will still be able to access Company's services."
     },
     "loading": {
-      "processing-front": "Processing image...",
-      "processing-back": "Processing image...",
-      "processing-selfie": "Processing your selfie..."
+      "title": {
+        "processing-front": "Processing image",
+        "processing-back": "Processing image",
+        "processing-selfie": "Processing your selfie"
+      },
+      "subtitle": "This can take a few seconds"
     },
     "error": {
       "title-front": "We couldn't process your image",

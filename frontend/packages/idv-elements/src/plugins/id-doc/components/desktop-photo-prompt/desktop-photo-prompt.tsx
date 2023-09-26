@@ -144,9 +144,7 @@ const DesktopPhotoPrompt = ({
             />
           </Box>
         )}
-        {!isRetry && isLoading && (
-          <Loading imageType={imageType} backgroundColor="secondary" />
-        )}
+        {!isRetry && isLoading && <Loading imageType={imageType} />}
         {!isRetry && !isLoading && (
           <>
             <Box sx={{ display: 'flex' }}>

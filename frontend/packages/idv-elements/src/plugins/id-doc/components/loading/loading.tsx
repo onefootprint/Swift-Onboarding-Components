@@ -1,33 +1,41 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { IdDocImageTypes } from '@onefootprint/types';
-import { LoadingIndicator, Typography } from '@onefootprint/ui';
+import { Box, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
-
-import { imageIcons } from '../../constants/image-types';
-import FeedbackIcon from '../feedback-icon';
 
 export type LoadingProps = {
   imageType: IdDocImageTypes;
-  backgroundColor?: 'primary' | 'secondary';
 };
 
-const Loading = ({ imageType, backgroundColor = 'primary' }: LoadingProps) => {
+const Loading = ({ imageType }: LoadingProps) => {
   const { t } = useTranslation('components.loading');
 
   return (
     <Container>
-      <FeedbackIcon
-        imageIcon={{ component: imageIcons[imageType] }}
-        statusIndicator={{
-          component: <LoadingIndicator size="compact" color="warning" />,
-          status: 'loading',
-          backgroundColor,
+      <LoadingIndicator />
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 3,
         }}
-      />
-      <Typography variant="label-1" sx={{ marginTop: 5, textAlign: 'center' }}>
-        {t(`processing-${imageType}`)}
-      </Typography>
+      >
+        <Typography
+          variant="label-1"
+          sx={{ marginTop: 5, textAlign: 'center' }}
+        >
+          {t(`title.processing-${imageType}`)}
+        </Typography>
+        <Typography
+          variant="body-4"
+          sx={{ textAlign: 'center', color: 'tertiary' }}
+        >
+          {t('subtitle')}
+        </Typography>
+      </Box>
     </Container>
   );
 };

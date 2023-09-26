@@ -147,9 +147,7 @@ const DeskTopProcessing = () => {
       <DesktopHeader type={type} country={country} imageType={currSide} />
       <FeedbackContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         <IdDocAnimation
-          loadingComponent={
-            <Loading imageType={currSide} backgroundColor="secondary" />
-          }
+          loadingComponent={<Loading imageType={currSide} />}
           successComponent={
             <Success
               imageType={currSide}
