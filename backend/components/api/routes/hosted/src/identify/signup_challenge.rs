@@ -53,7 +53,7 @@ pub async fn post(
             let tenant_name = ob_context.as_ref().map(|obc| obc.tenant().name.clone());
             let (challenge_state_data, time_before_retry_s) = state
                 .twilio_client
-                .send_challenge(&state, tenant_name, &req.phone_number, sandbox_id.0)
+                .send_challenge_non_blocking(&state, tenant_name, &req.phone_number, sandbox_id.0)
                 .await?;
 
             let challenge_state = ChallengeState {
@@ -86,7 +86,7 @@ pub async fn post(
             };
 
             let challenge_data =
-                identify::send_email_challenge(&state, &req.email, tenant, sandbox_id.0).await?;
+                identify::send_email_challenge_non_blocking(&state, &req.email, tenant, sandbox_id.0)?;
 
             let challenge_state = ChallengeState { data: challenge_data };
 

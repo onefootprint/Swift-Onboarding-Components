@@ -147,14 +147,16 @@ async fn get_user_challenge_context(
     Ok(Some((uvw, creds, kinds)))
 }
 
-pub async fn send_email_challenge(
+pub fn send_email_challenge_non_blocking(
     state: &State,
     email: &Email,
     tenant: &Tenant,
     sandbox_id: Option<SandboxId>, // pointless pass through for now, but may use later with a fixture email
 ) -> ApiResult<ChallengeData> {
-    // we can't currently view sent emails from our integration tests, so this temporarily allows us to still OTP emails from integration tests. sandbox check as a lil extra precaution
+    // Send non-blocking to prevent us from returning the challenge data to the frontend while
+    // we wait for sendrid latency
     let code = if tenant.id.is_integration_test_tenant() && sandbox_id.is_some() {
+        // we can't currently view sent emails from our integration tests, so this temporarily allows us to still OTP emails from integration tests. sandbox check as a lil extra precaution
         "424242".to_owned()
     } else {
         crypto::random::gen_rand_n_digit_code(6)
@@ -162,12 +164,19 @@ pub async fn send_email_challenge(
 
     let h_code = crypto::sha256(code.as_bytes()).to_vec();
 
-    let tenant_url = tenant.website_url.as_ref().unwrap_or(&tenant.name); // better to default name here than error probably?
+    let tenant_url = tenant.website_url.as_ref().unwrap_or(&tenant.name).to_owned(); // better to default name here than error probably?
 
-    state
-        .sendgrid_client
-        .send_email_otp_verify_email(email.email.clone(), code, tenant_url.to_string())
-        .await?;
+    let state = state.clone();
+    let email2 = email.email.clone();
+    tokio::spawn(async move {
+        let _ = state
+            .sendgrid_client
+            .send_email_otp_verify_email(email2, code, tenant_url)
+            .await
+            .map_err(|err| {
+                tracing::error!(error=?err, "Failed to send email challenge");
+            });
+    });
 
     Ok(ChallengeData::Email(EmailChallengeState {
         email: email.email.clone(),

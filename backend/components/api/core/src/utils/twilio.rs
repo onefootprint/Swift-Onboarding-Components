@@ -113,14 +113,46 @@ impl TwilioClient {
         Ok(())
     }
 
+    async fn send_message_non_blocking(
+        &self,
+        state: &State,
+        message_body: PiiString,
+        destination: &PhoneNumber,
+        rate_limit_scope: &str,
+    ) -> ApiResult<()> {
+        if destination.is_fixture_phone_number() {
+            // Don't rate limit or send SMS messages to the fixture phone number
+            return Ok(());
+        }
+        RateLimit {
+            state,
+            phone_number: destination,
+            period: self.duration_between_challenges,
+            scope: rate_limit_scope,
+        }
+        .enforce_and_update()
+        .await?;
+        let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
+        let client = self.client.clone();
+        let e164 = destination.e164();
+        tokio::spawn(async move {
+            let _ = client.send_message(e164, message_body).await.map_err(|err| {
+                tracing::error!(error=?err, "Failed to send SMS message");
+            });
+        });
+        Ok(())
+    }
+
     #[tracing::instrument(skip_all)]
-    pub async fn send_challenge(
+    pub async fn send_challenge_non_blocking(
         &self,
         state: &State,
         tenant_name: Option<String>,
         destination: &PhoneNumber,
         sandbox_id: Option<SandboxId>,
     ) -> ApiResult<(PhoneChallengeState, SecondsBeforeRetry)> {
+        // Send non-blocking to prevent us from returning the challenge data to the frontend while
+        // we wait for twilio latency
         if destination.is_fixture_phone_number() && sandbox_id.is_none() {
             return Err(UserError::FixtureNumberInLive.into());
         }
@@ -137,7 +169,7 @@ impl TwilioClient {
             PiiString::from(format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
         };
 
-        self.send_message(state, message_body, destination, rate_limit::SMS_CHALLENGE)
+        self.send_message_non_blocking(state, message_body, destination, rate_limit::SMS_CHALLENGE)
             .await?;
 
         Ok((

@@ -110,7 +110,7 @@ pub async fn post(
                 let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
                 let tenant_name = tenant.map(|t| t.name.clone());
                 let (challenge_state, time_before_retry_s) = twilio_client
-                    .send_challenge(&state, tenant_name, &phone_number, sandbox_id)
+                    .send_challenge_non_blocking(&state, tenant_name, &phone_number, sandbox_id)
                     .await?;
                 let challenge_data = ChallengeData::Sms(challenge_state);
                 (
@@ -125,7 +125,7 @@ pub async fn post(
                 let tenant = tenant.ok_or(OnboardingError::MissingObPkAuth)?;
 
                 let challenge_data =
-                    identify::send_email_challenge(&state, &email, tenant, sandbox_id).await?;
+                    identify::send_email_challenge_non_blocking(&state, &email, tenant, sandbox_id)?;
 
                 (
                     challenge_data,
