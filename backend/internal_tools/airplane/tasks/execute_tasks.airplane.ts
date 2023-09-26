@@ -20,10 +20,10 @@ export default airplane.task(
     schedules:
       process.env.AIRPLANE_ENV_SLUG === 'prod'
         ? {
-            every_five_minutes: {
-              cron: '*/5 * * * *',
-              description: 'Runs every 5 minutes',
-              paramValues: { num_tasks: 25 },
+            every_minute: {
+              cron: '*/1 * * * *',
+              description: 'Runs every minute',
+              paramValues: { num_tasks: 100 },
             },
           }
         : {},
