@@ -68,7 +68,7 @@ impl GetRequirementsArgs {
     fn from(value: &CheckedUserObAuthContext) -> ApiResult<Self> {
         Ok(Self {
             ob_config: value.ob_config()?.clone(),
-            workflow: value.workflow()?.clone(),
+            workflow: value.workflow().clone(),
             sb_id: value.scoped_business_id(),
         })
     }

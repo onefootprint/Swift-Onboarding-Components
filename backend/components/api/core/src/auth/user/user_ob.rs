@@ -35,7 +35,7 @@ pub struct UserObSession {
     pub scoped_user: ScopedVault,
     ob_config: Option<ObConfiguration>,
     tenant: Option<Tenant>,
-    workflow: Option<Workflow>,
+    workflow: Workflow,
 }
 
 #[derive(Debug, Clone, Apiv2Security)]
@@ -69,19 +69,15 @@ impl ExtractableAuthSession for ParsedUserObSession {
         // Confirm that the onboarding in the auth token belongs to the user
         let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &user_session.user.id))?;
 
-        let workflow = if let Some(wf_id) = user_session.workflow_id() {
-            Some(Workflow::get(conn, &wf_id)?)
-        } else {
-            None
+        let Some(workflow_id) = user_session.workflow_id() else {
+            return Err(AuthError::MissingScope(vec![UserAuthGuard::Workflow].into()))?;
         };
+        let workflow = Workflow::get(conn, &workflow_id)?;
 
         // Get the obc ID first from the workflow, the real source of truth.
         // Otherwise, get from OrgOnboarding scope.
         let scope_obc_id = user_session.ob_configuration_id();
-        let obc_id = workflow
-            .as_ref()
-            .and_then(|wf| wf.ob_configuration_id.as_ref())
-            .or(scope_obc_id.as_ref());
+        let obc_id = workflow.ob_configuration_id.as_ref().or(scope_obc_id.as_ref());
 
         let (ob_config, tenant) = if let Some(obc_id) = obc_id {
             // Confirm that the ob config is active
@@ -171,9 +167,8 @@ impl UserObSession {
         Ok(tenant)
     }
 
-    pub fn workflow(&self) -> ApiResult<&Workflow> {
-        let wf = self.workflow.as_ref().ok_or(OnboardingError::NoWorkflow)?;
-        Ok(wf)
+    pub fn workflow(&self) -> &Workflow {
+        &self.workflow
     }
 
     pub fn check_workflow_guard(&self, guard: WorkflowGuard) -> ApiResult<()> {
@@ -181,20 +176,12 @@ impl UserObSession {
         // workflow state, otherwise this could be stale
         // TODO to solve ^, maybe we add this check to the write path on the VW. I believe
         // everything checking this makes a new DataLifetime
-        if self
-            .workflow
-            .as_ref()
-            .is_some_and(|wf| wf.deactivated_at.is_some())
-        {
+        if self.workflow.deactivated_at.is_some() {
             return Err(AuthError::WorkflowDeactivated(guard).into());
         }
-        let allowed_guards = if let Some(wf) = self.workflow.as_ref() {
-            wf.state.allowed_guards()
-        } else {
-            // If the auth token isn't associated with a workflow, allow everything for legacy.
-            // This allows adding an email as soon as the vault is created
-            vec![WorkflowGuard::AddData]
-        };
+        let allowed_guards = self.workflow.state.allowed_guards();
+        // TODO make sure we don't fail to add email when the vault is created - auth tokens don't
+        // have a workflow when they are first created
         if !allowed_guards.contains(&guard) {
             Err(AuthError::MissingWorkflowGuard(guard).into())
         } else {

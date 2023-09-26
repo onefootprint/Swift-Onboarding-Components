@@ -30,7 +30,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     span.record("tenant_name", &format!("{:?}", user_auth.tenant()?.id.as_str()));
     span.record("scoped_user_id", &format!("{}", user_auth.scoped_user.id));
     span.record("ob_configuration_id", &format!("{}", user_auth.ob_config()?.id));
-    span.record("workflow_id", &format!("{}", user_auth.workflow()?.id));
+    span.record("workflow_id", &format!("{}", user_auth.workflow().id));
 
     // Verify there are no unmet requirements
     let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
@@ -46,7 +46,7 @@ pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> Json
     }
 
     // mark person and business wf as authorized
-    let wf_id = user_auth.workflow()?.id.clone();
+    let wf_id = user_auth.workflow().id.clone();
     let (biz_wf, set_biz_is_authorized) = state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {

@@ -40,7 +40,7 @@ pub async fn post(
     let su_id = user_auth.scoped_user.id.clone();
     let su_id2 = su_id.clone();
     let tenant_id = user_auth.tenant()?.id.clone();
-    let wf_id = user_auth.workflow()?.id.clone();
+    let wf_id = user_auth.workflow().id.clone();
     let ff_client = state.feature_flag_client.clone();
     let uvw = state
         .db_pool

@@ -36,7 +36,7 @@ pub async fn post(
         return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
     }
 
-    let wf_id = user_auth.workflow()?.id.clone();
+    let wf_id = user_auth.workflow().id.clone();
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool

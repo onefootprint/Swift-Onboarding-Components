@@ -63,7 +63,7 @@ pub async fn post(
     }
 
     // Update the fixture result on the workflow, if provided
-    let wf = user_auth.workflow()?;
+    let wf = user_auth.workflow();
     let wf = if let Some(fixture_result) = fixture_result {
         if user_auth.user().is_live {
             return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());

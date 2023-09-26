@@ -51,7 +51,7 @@ pub async fn post(
     tracing::info!("Starting handler");
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
-    let wf = user_auth.workflow()?;
+    let wf = user_auth.workflow();
     let wf_id = wf.id.clone();
     let document_id: IdentityDocumentId = document_id.into_inner();
     tracing::info!("Before unpacking request");
