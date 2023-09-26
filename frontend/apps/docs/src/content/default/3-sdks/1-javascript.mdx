@@ -166,14 +166,14 @@ Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vite-
 Footprint provides some events based on some actions performed by the user. To listen to event, just pass it from the `init` method.
 
 ```typescript
-footprint.init({
+const component = footprint.init({
   kind: 'verify',
   publicKey: 'ob_test_WNgSBRR7uxoT8JRDBBflgw',
   onComplete: validationToken => {
     console.log(validationToken);
   },
 });
-footprint.render();
+component.render();
 ```
 
 | Name         | Description                                                                                                                     |
