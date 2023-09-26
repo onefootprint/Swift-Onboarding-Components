@@ -17,6 +17,11 @@ pub fn idology_base_rules() -> Vec<Rule<IDologyFeatures>> {
             name: RuleName::IdNotLocated,
             action: Action::Fail,
         },
+        Rule {
+            rule: |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::IdNotVerified),
+            name: RuleName::IdNotVerified,
+            action: Action::Fail,
+        },
         //
         // These rules fire when the id is located, but there's red flags
         //
@@ -96,6 +101,11 @@ pub fn experian_base_rules() -> Vec<Rule<ExperianFeatures>> {
             action: Action::Fail,
         },
         Rule {
+            rule: |f: &ExperianFeatures| f.footprint_reason_codes.contains(&FRC::IdNotVerified),
+            name: RuleName::IdNotVerified,
+            action: Action::Fail,
+        },
+        Rule {
             rule: {
                 |f: &ExperianFeatures| {
                     f.footprint_reason_codes
@@ -130,6 +140,11 @@ pub fn kyc_rules() -> Vec<Rule<Vec<FRC>>> {
         Rule {
             rule: |f: &Vec<FRC>| f.contains(&FRC::IdNotLocated),
             name: RuleName::IdNotLocated,
+            action: Action::Fail,
+        },
+        Rule {
+            rule: |f: &Vec<FRC>| f.contains(&FRC::IdNotVerified),
+            name: RuleName::IdNotVerified,
             action: Action::Fail,
         },
         Rule {

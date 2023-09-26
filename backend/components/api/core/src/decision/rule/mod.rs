@@ -20,6 +20,7 @@ pub use newtypes::decision::RuleSetName;
 #[strum(serialize_all = "snake_case")]
 pub enum RuleName {
     IdNotLocated,
+    IdNotVerified,
     SubjectDeceased,
     AddressInputIsPoBox,
     CoppaAlert,
