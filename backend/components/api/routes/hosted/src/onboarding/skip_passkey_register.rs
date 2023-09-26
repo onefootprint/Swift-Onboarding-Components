@@ -3,7 +3,7 @@ use crate::errors::ApiError;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::headers::InsightHeaders;
 use crate::State;
-use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use macros::route_alias;
@@ -22,12 +22,12 @@ use paperclip::actix::{api_v2_operation, post, web};
 #[post("/hosted/onboarding/skip_passkey_register")]
 pub async fn post(
     state: web::Data<State>,
-    user_auth: UserObAuthContext,
+    user_auth: UserWfAuthContext,
     insights: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
-    
+
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {

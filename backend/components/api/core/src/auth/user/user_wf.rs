@@ -30,7 +30,7 @@ use super::{ParsedUserSessionContext, UserAuthScope, UserSessionContext};
 /// onboarding session linked to a scoped user.
 /// We preload information for the scoped vault and onboarding that is commonly used by HTTP handlers
 #[derive(Debug, Clone)]
-pub struct UserObSession {
+pub struct UserWfSession {
     user_session: UserSessionContext,
     pub scoped_user: ScopedVault,
     ob_config: Option<ObConfiguration>,
@@ -46,9 +46,9 @@ pub struct UserObSession {
     name = "X-Fp-Authorization",
     description = "Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions."
 )]
-pub struct ParsedUserObSession(UserObSession);
+pub struct ParsedUserWfSession(UserWfSession);
 
-impl ExtractableAuthSession for ParsedUserObSession {
+impl ExtractableAuthSession for ParsedUserWfSession {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Authorization"]
     }
@@ -87,14 +87,14 @@ impl ExtractableAuthSession for ParsedUserObSession {
             (None, None)
         };
 
-        let onboarding_session = UserObSession {
+        let onboarding_session = UserWfSession {
             user_session,
             scoped_user,
             ob_config,
             tenant,
             workflow,
         };
-        Ok(ParsedUserObSession(onboarding_session))
+        Ok(ParsedUserWfSession(onboarding_session))
     }
 
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
@@ -106,15 +106,15 @@ impl ExtractableAuthSession for ParsedUserObSession {
 /// A shorthand for the commonly used ParsedUserSession context.
 /// Only extracts a user session linked to a scoped vault for the purpose of onboarding.
 /// Optionally populates the Onboarding, ObConfig, and Tenant on the session if they exist
-pub type UserObAuthContext = SessionContext<ParsedUserObSession>;
+pub type UserWfAuthContext = SessionContext<ParsedUserWfSession>;
 
 /// A shorthand for the commonly used UserSession context
-pub type CheckedUserObAuthContext = SessionContext<UserObSession>;
+pub type CheckUserWfAuthContext = SessionContext<UserWfSession>;
 
-impl UserObAuthContext {
+impl UserWfAuthContext {
     /// Verifies that the auth token has one of the required scopes. If so, returns a UserAuth
     /// that is accessible
-    pub fn check_guard<T>(self, guard: T) -> Result<CheckedUserObAuthContext, AuthError>
+    pub fn check_guard<T>(self, guard: T) -> Result<CheckUserWfAuthContext, AuthError>
     where
         T: IsGuardMet<UserAuthScope>,
     {
@@ -127,7 +127,7 @@ impl UserObAuthContext {
     }
 }
 
-impl CheckedUserObAuthContext {
+impl CheckUserWfAuthContext {
     /// Extracts the business vault_id from the `UserAuthScope::Business` scope on this session, if
     /// exists
     pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
@@ -156,7 +156,7 @@ impl CheckedUserObAuthContext {
     }
 }
 
-impl UserObSession {
+impl UserWfSession {
     pub fn ob_config(&self) -> ApiResult<&ObConfiguration> {
         let obc = self.ob_config.as_ref().ok_or(OnboardingError::NoOnboarding)?;
         Ok(obc)
@@ -194,7 +194,7 @@ impl UserObSession {
     }
 }
 
-impl UserAuth for UserObSession {
+impl UserAuth for UserWfSession {
     fn user_vault_id(&self) -> &VaultId {
         self.user_session.user_vault_id()
     }

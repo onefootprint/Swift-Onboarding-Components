@@ -4,7 +4,7 @@ use crate::utils::email::send_email_challenge;
 use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::auth::user::{UserAuthContext, UserAuthGuard, UserObAuthContext};
+use api_core::auth::user::{UserAuthContext, UserAuthGuard, UserWfAuthContext};
 use api_core::auth::AuthError;
 use api_core::decision::features::risk_signals::ssn_optional_and_missing;
 use api_core::utils::vault_wrapper::{Any, Person, TenantVw, VwArgs};
@@ -27,7 +27,7 @@ use std::str::FromStr;
 async fn parse_auth(
     state: &State,
     user_auth: UserAuthContext,
-    user_wf_auth: Option<UserObAuthContext>,
+    user_wf_auth: Option<UserWfAuthContext>,
 ) -> ApiResult<(Vault, ScopedVaultId, Tenant, Option<(ObConfiguration, Workflow)>)> {
     // TODO We should move this to only take UserWfAuth at some point, but the client makes one request
     // to this API before POST /hosted/onboarding to add the email to a vault after it's created
@@ -65,7 +65,7 @@ pub async fn post_validate(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
     user_auth: UserAuthContext,
-    user_wf_auth: Option<UserObAuthContext>,
+    user_wf_auth: Option<UserWfAuthContext>,
     allow_extra_fields: AllowExtraFieldsHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let (user, su_id, _, _) = parse_auth(&state, user_auth, user_wf_auth).await?;
@@ -96,7 +96,7 @@ pub async fn patch(
     // We should move this to UserWfAuth at some point, but the client makes one request to this
     // API before POST /hosted/onboarding to add the email to a vault after it's created
     user_auth: UserAuthContext,
-    user_wf_auth: Option<UserObAuthContext>,
+    user_wf_auth: Option<UserWfAuthContext>,
 ) -> JsonApiResponse<EmptyResponse> {
     let (user, su_id, tenant, wf_info) = parse_auth(&state, user_auth, user_wf_auth).await?;
     let is_fixture = user.is_fixture;

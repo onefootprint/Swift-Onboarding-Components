@@ -6,7 +6,7 @@ use crate::{auth::user::UserAuthGuard, onboarding::GetRequirementsArgs};
 use api_core::{
     auth::{
         session::{user::ValidateUserToken, AuthSessionData},
-        user::UserObAuthContext,
+        user::UserWfAuthContext,
     },
     errors::ApiResult,
     types::JsonApiResponse,
@@ -23,7 +23,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 )]
 #[actix::post("/hosted/onboarding/validate")]
 pub async fn post(
-    user_auth: UserObAuthContext,
+    user_auth: UserWfAuthContext,
     state: web::Data<State>,
 ) -> JsonApiResponse<HostedValidateResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;

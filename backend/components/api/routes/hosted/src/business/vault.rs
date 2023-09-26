@@ -5,7 +5,7 @@ use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::vault_wrapper::{Business, VaultWrapper};
 use crate::State;
-use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use api_core::errors::business::BusinessError;
 use api_core::errors::AssertionError;
 use api_core::types::ResponseData;
@@ -28,7 +28,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 #[actix::post("/hosted/business/vault/validate")]
 pub async fn post_validate(
     state: web::Data<State>,
-    user_auth: UserObAuthContext,
+    user_auth: UserWfAuthContext,
     request: Json<RawDataRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::Business)?;
@@ -69,7 +69,7 @@ pub async fn post_validate(
 pub async fn patch(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
-    user_auth: UserObAuthContext,
+    user_auth: UserWfAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::Business)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;

@@ -2,7 +2,7 @@ use std::{str::FromStr, sync::Arc};
 
 use crate::utils::vault_wrapper::{Business, Person, VaultWrapper, VwArgs};
 use api_core::{
-    auth::user::CheckedUserObAuthContext,
+    auth::user::CheckUserWfAuthContext,
     errors::{business::BusinessError, ApiResult},
     utils::vault_wrapper::DecryptUncheckedResult,
     State,
@@ -65,7 +65,7 @@ pub struct GetRequirementsArgs {
 }
 
 impl GetRequirementsArgs {
-    fn from(value: &CheckedUserObAuthContext) -> ApiResult<Self> {
+    fn from(value: &CheckUserWfAuthContext) -> ApiResult<Self> {
         Ok(Self {
             ob_config: value.ob_config()?.clone(),
             workflow: value.workflow().clone(),

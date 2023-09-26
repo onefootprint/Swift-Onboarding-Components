@@ -6,8 +6,8 @@ use crate::onboarding::get_requirements;
 use crate::onboarding::GetRequirementsArgs;
 use crate::types::response::ResponseData;
 use crate::State;
-use api_core::auth::user::CheckedUserObAuthContext;
-use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::CheckUserWfAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::alpaca_kyc::AlpacaKycState;
 use api_core::decision::state::document::DocumentState;
@@ -42,7 +42,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 )]
 #[actix::post("/hosted/onboarding/process")]
 pub async fn post(
-    user_auth: UserObAuthContext,
+    user_auth: UserWfAuthContext,
     state: web::Data<State>,
     request: OptionalJson<ProcessRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
@@ -128,7 +128,7 @@ async fn enqueue_run_incode_stuck_workflow_task(db_pool: &DbPool, workflow_id: &
 }
 
 #[tracing::instrument(skip_all)]
-async fn run_kyb_if_needed(state: &State, user_auth: CheckedUserObAuthContext) -> ApiResult<()> {
+async fn run_kyb_if_needed(state: &State, user_auth: CheckUserWfAuthContext) -> ApiResult<()> {
     // Run KYB
     let tenant = user_auth.tenant()?.clone();
     let biz_wf = state

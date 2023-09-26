@@ -4,7 +4,7 @@ use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use crate::{auth::user::UserAuthGuard, onboarding::GetRequirementsArgs};
-use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use api_wire_types::hosted::onboarding_status::{ApiOnboardingRequirement, OnboardingStatusResponse};
 use itertools::Itertools;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -13,7 +13,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 #[actix::get("/hosted/onboarding/status")]
 pub async fn get(
     state: web::Data<State>,
-    user_auth: UserObAuthContext,
+    user_auth: UserWfAuthContext,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 

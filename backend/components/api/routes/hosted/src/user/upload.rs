@@ -6,7 +6,7 @@ use crate::utils::{self, file_upload};
 use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
-use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use newtypes::{DataIdentifier, DataLifetimeSource, DocumentKind, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -16,7 +16,7 @@ const MAX_DOC_SIZE_BYTES: usize = 5_048_576;
 #[actix::post("/hosted/user/upload/{document_identifier}")]
 pub async fn post(
     state: web::Data<State>,
-    user_auth: UserObAuthContext,
+    user_auth: UserWfAuthContext,
     document_identifier: web::Path<DataIdentifier>,
     mut payload: Multipart,
     request: HttpRequest,

@@ -5,7 +5,7 @@ use crate::onboarding::get_requirements;
 use crate::onboarding::GetRequirementsArgs;
 use crate::types::response::ResponseData;
 use crate::State;
-use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::Authorize;
 use api_core::decision::state::WorkflowWrapper;
@@ -22,7 +22,7 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Mark the onboarding as authorized and initiate IDV checks"
 )]
 #[actix::post("/hosted/onboarding/authorize")]
-pub async fn post(user_auth: UserObAuthContext, state: web::Data<State>) -> JsonApiResponse<EmptyResponse> {
+pub async fn post(user_auth: UserWfAuthContext, state: web::Data<State>) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
 
     let span = tracing::Span::current();

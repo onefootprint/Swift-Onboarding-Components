@@ -3,7 +3,7 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use crate::State;
-use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::{VaultWrapper, Person, VwArgs};
 use api_wire_types::{CreateIdentityDocumentRequest, CreateIdentityDocumentResponse};
@@ -24,7 +24,7 @@ use newtypes::IdentityDataKind as IDK;
 #[actix::post("/hosted/user/documents")]
 pub async fn post(
     state: web::Data<State>,
-    user_auth: UserObAuthContext,
+    user_auth: UserWfAuthContext,
     request: web::Json<CreateIdentityDocumentRequest>,
 ) -> JsonApiResponse<CreateIdentityDocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;

@@ -6,7 +6,7 @@ use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
-use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::vendor;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
@@ -44,7 +44,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 #[actix::post("/hosted/user/documents/{id}/upload")]
 pub async fn post(
     state: web::Data<State>,
-    user_auth: UserObAuthContext,
+    user_auth: UserWfAuthContext,
     document_id: web::Path<IdentityDocumentId>,
     request: LargeJson<CreateIdentityDocumentUploadRequest, 5_242_880>,
 ) -> JsonApiResponse<DocumentResponse> {

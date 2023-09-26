@@ -4,7 +4,7 @@ use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
-use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use api_wire_types::hosted::consent::ConsentRequest;
 use chrono::Utc;
 use db::models::insight_event::CreateInsightEvent;
@@ -18,7 +18,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 #[actix::post("/hosted/user/consent")]
 pub async fn post(
     state: web::Data<State>,
-    user_auth: UserObAuthContext,
+    user_auth: UserWfAuthContext,
     insight: InsightHeaders,
     request: Json<ConsentRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {

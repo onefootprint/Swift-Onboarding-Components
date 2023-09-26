@@ -4,7 +4,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_core::auth::user::UserObAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use api_core::auth::Any;
 use db::{
     models::{appearance::Appearance, tenant_client_config::TenantClientConfig},
@@ -25,7 +25,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 #[get("/hosted/onboarding/config")]
 pub fn get(
     state: web::Data<State>,
-    auth: Either<ObConfigAuth, UserObAuthContext>,
+    auth: Either<ObConfigAuth, UserWfAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::PublicOnboardingConfiguration>>, ApiError> {
     let (tenant, ob_config) = match auth {
         Either::Left(ob_pk_auth) => {
