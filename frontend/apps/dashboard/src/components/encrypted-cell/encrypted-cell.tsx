@@ -1,16 +1,16 @@
 import { IcoLock16 } from '@onefootprint/icons';
-import { Box, Typography } from '@onefootprint/ui';
+import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const EncryptedCell = () => (
-  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-    <Box sx={{ marginRight: 2 }}>
+  <Stack align="center">
+    <Stack align="center" sx={{ marginRight: 2 }}>
       <IcoLock16 />
-    </Box>
+    </Stack>
     <Typography variant="body-3" color="primary" sx={{ userSelect: 'none' }}>
       •••••••••
     </Typography>
-  </Box>
+  </Stack>
 );
 
 export default EncryptedCell;

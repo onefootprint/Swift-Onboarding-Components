@@ -127,6 +127,7 @@ export {
   SegmentedControl,
   Select,
   Shimmer,
+  Stack,
   Stepper,
   Tab,
   Table,
