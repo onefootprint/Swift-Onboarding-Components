@@ -151,7 +151,12 @@ pub struct FetchScoresResponse {
 
 impl FetchScoresResponse {
     pub fn document_score(&self) -> (Option<f64>, Option<IncodeStatus>) {
-        Self::score_and_status(&self.overall)
+        let overall_test = &self
+            .id_validation
+            .as_ref()
+            .and_then(|i| i.overall.clone())
+            .or(self.overall.clone());
+        Self::score_and_status(overall_test)
     }
 
     pub fn get_id_tests(&self) -> HashMap<IncodeTest, IncodeStatus> {
@@ -267,6 +272,7 @@ pub struct IdValidation {
     pub id_specific: Option<Vec<IdTest>>,
     pub custom_fields: Option<Vec<IdTest>>,
     pub applied_rule: Option<serde_json::Value>,
+    pub overall: Option<IdTest>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
