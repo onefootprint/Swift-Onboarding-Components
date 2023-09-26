@@ -108,9 +108,15 @@ pub async fn post(
         true => 5 * 60,
         false => 30 * 60,
     };
+    let max_ttl = if auth.tenant().is_demo_tenant {
+        // Allow our demo tenants to create longer-lived tokens
+        30 * 24 * 60 * 60 // 30d
+    } else {
+        24 * 60 * 60 // 1d
+    };
     let ttl = ttl.unwrap_or(default_ttl);
     #[allow(clippy::manual_range_contains)]
-    if ttl < 60 || ttl > (24 * 60 * 60) {
+    if ttl < 60 || ttl > max_ttl {
         return Err(TenantError::InvalidExpiry.into());
     }
 
