@@ -35,7 +35,7 @@ export type CollectInvestorProfileRequirement = {
 };
 
 export type IdDocSupportedCountryAndDocTypes = Record<
-  CountryCode,
+  string,
   SupportedIdDocTypes[]
 >;
 
@@ -43,6 +43,7 @@ export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
   isMet: boolean;
   shouldCollectConsent: boolean;
+  shouldCollectSelfie: boolean;
   supportedCountryAndDocTypes: IdDocSupportedCountryAndDocTypes;
 };
 

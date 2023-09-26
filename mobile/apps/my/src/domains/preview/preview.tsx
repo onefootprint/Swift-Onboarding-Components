@@ -53,6 +53,7 @@ const Preview = ({ isDemo, isDebug }: PreviewProps) => {
                 isMet: false,
                 kind: OnboardingRequirementKind.idDoc,
                 shouldCollectConsent: false,
+                shouldCollectSelfie: true,
                 supportedCountryAndDocTypes: {
                   AI: [SupportedIdDocTypes.passport],
                   MV: [SupportedIdDocTypes.passport],
@@ -146,7 +147,6 @@ const Preview = ({ isDemo, isDebug }: PreviewProps) => {
                   MM: [SupportedIdDocTypes.passport],
                   RW: [SupportedIdDocTypes.passport],
                   IE: [SupportedIdDocTypes.passport],
-                  AQ: [SupportedIdDocTypes.passport],
                   TK: [SupportedIdDocTypes.passport],
                   CY: [SupportedIdDocTypes.passport],
                   CM: [SupportedIdDocTypes.passport],
@@ -197,7 +197,6 @@ const Preview = ({ isDemo, isDebug }: PreviewProps) => {
                   NA: [SupportedIdDocTypes.passport],
                   UY: [SupportedIdDocTypes.passport],
                   BB: [SupportedIdDocTypes.passport],
-                  KP: [SupportedIdDocTypes.passport],
                   ZM: [SupportedIdDocTypes.passport],
                   PA: [SupportedIdDocTypes.passport],
                   MS: [SupportedIdDocTypes.passport],

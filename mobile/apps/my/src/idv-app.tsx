@@ -13,14 +13,14 @@ import useShouldOpenIdv from './hooks/use-should-open-idv';
 configureReactI18next();
 
 const IdvApp = () => {
-  const { linkingUrl, isPreview, isDemo } = useShouldOpenIdv();
+  const { linkingUrl, isPreview, isDemo, isDebug } = useShouldOpenIdv();
 
   const handleLoad = useCallback(async () => {
     SplashScreen.hide();
   }, []);
 
   return isPreview ? (
-    <Preview isDemo={isDemo} />
+    <Preview isDemo={isDemo} isDebug={isDebug} />
   ) : (
     <QueryClientProvider client={queryClient}>
       <Idv onLoad={handleLoad} linkingUrl={linkingUrl} />

@@ -6,6 +6,7 @@ import {
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import getSupportedCountryByCode from '../get-supported-country-by-code';
 import { MachineContext, MachineEvents } from './types';
 
 const createIdDocMachine = (requirement: IdDocRequirement) =>
@@ -153,7 +154,8 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
 const getInitialCountry = ({
   supportedCountryAndDocTypes,
 }: IdDocRequirement) => {
-  const hasUS = supportedCountryAndDocTypes.US;
+  const hasUS =
+    supportedCountryAndDocTypes.US || supportedCountryAndDocTypes.us;
   if (hasUS) return getCountryFromCode('US').value;
   const firstCountry = Object.keys(supportedCountryAndDocTypes).at(0);
   return getCountryFromCode(firstCountry as CountryCode).value;

@@ -20,6 +20,7 @@ import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
 import useApp from '@/domains/idv/hooks/use-app';
 import useTranslation from '@/hooks/use-translation';
 
+import getSupportedCountryByCode from '../../utils/get-supported-country-by-code';
 import useSubmitDocType from '../doc-scan/hooks/use-submit-doc-type';
 import PermissionsDialog from './components/permissions-dialog';
 import useCountryOptions from './hooks/use-country-options';
@@ -64,7 +65,13 @@ const DocSelection = ({
 
   const handleCountryChange = (newCountry: SelectOption<CountryRecord>) => {
     setCountry(newCountry);
-    setDocType(supportedCountryAndDocTypes[newCountry.value][0]);
+    const docs = getSupportedCountryByCode(
+      supportedCountryAndDocTypes,
+      newCountry.value,
+    );
+    if (docs) {
+      setDocType(docs.at(0));
+    }
   };
 
   const handleSubmit = () => {
