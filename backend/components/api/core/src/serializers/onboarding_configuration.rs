@@ -33,6 +33,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             is_no_phone_flow,
             must_collect_data,
             allow_international_residents,
+            doc_scan_for_optional_ssn,
             ..
         } = ob_config;
         let Tenant {
@@ -44,6 +45,8 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             ..
         } = tenant;
         let appearance = appearance.map(|a| a.data);
+        // we only need to tell FE about this if we're in the skip ssn step up flow
+        let doc_scan_required_if_ssn_skipped = doc_scan_for_optional_ssn.map(|_| true);
         let is_app_clip_enabled = ff_client.flag(BoolFlag::IsAppClipEnabled(&tenant_id));
         let is_instant_app_enabled = ff_client.flag(BoolFlag::IsInstantAppEnabled(&tenant_id));
         let can_make_real_doc_scan_calls_in_sandbox = (!ob_config.is_live)
@@ -74,6 +77,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             app_clip_experience_id,
             allow_international_residents,
             supported_countries,
+            doc_scan_required_if_ssn_skipped,
         }
     }
 }

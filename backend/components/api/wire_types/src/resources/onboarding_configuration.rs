@@ -44,6 +44,8 @@ pub struct PublicOnboardingConfiguration {
     pub is_app_clip_enabled: bool,
     pub is_instant_app_enabled: bool,
     pub app_clip_experience_id: AppClipExperienceId,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub doc_scan_required_if_ssn_skipped: Option<bool>,
 
     pub is_no_phone_flow: bool,
     pub requires_id_doc: bool,
