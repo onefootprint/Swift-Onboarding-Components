@@ -3,6 +3,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::{task, State};
 use actix_web::{post, web, web::Json};
+use api_core::types::{EmptyResponse, JsonApiResponse};
 use chrono::Utc;
 use db::models::task::{Task, TaskCreateArgs};
 use db::models::watchlist_check::WatchlistCheck;
@@ -14,24 +15,15 @@ pub struct ExecuteTasksRequest {
     pub num_tasks: i64,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
-pub struct ExecuteTasksResponse {
-    pub num_executed_tasks: usize,
-}
-
 #[post("/private/protected/task/execute_tasks")]
 async fn execute_tasks(
     state: web::Data<State>,
     _: ProtectedCustodianAuthContext,
     request: Json<ExecuteTasksRequest>,
-) -> actix_web::Result<Json<ResponseData<ExecuteTasksResponse>>, ApiError> {
+) -> JsonApiResponse<EmptyResponse> {
     let ExecuteTasksRequest { num_tasks } = request.into_inner();
-
-    let executed_tasks = task::poll_and_execute_tasks(&state, num_tasks, None).await?;
-
-    Ok(Json(ResponseData::ok(ExecuteTasksResponse {
-        num_executed_tasks: executed_tasks.len(),
-    })))
+    task::poll_and_execute_tasks_non_blocking((*state.into_inner()).clone(), num_tasks, None);
+    EmptyResponse::ok().json()
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]

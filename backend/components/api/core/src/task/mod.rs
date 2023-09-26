@@ -6,6 +6,8 @@ use db::{
     },
     DbError, DbPool, DbResult,
 };
+use tracing::Instrument;
+
 use newtypes::{TaskExecutionId, TaskId, TaskKind, TaskStatus};
 use thiserror::Error;
 
@@ -41,12 +43,12 @@ pub enum TaskError {
 }
 
 pub fn execute_webhook_tasks(state: State) {
-    poll_and_execute_tasks_non_blocking(state, 10, TaskKind::FireWebhook)
+    poll_and_execute_tasks_non_blocking(state, 10, Some(TaskKind::FireWebhook))
 }
 
-pub fn poll_and_execute_tasks_non_blocking(state: State, limit: i64, kind: TaskKind) {
+pub fn poll_and_execute_tasks_non_blocking(state: State, limit: i64, kind: Option<TaskKind>) {
     let fut = async move {
-        let _ = poll_and_execute_tasks(&state, limit, Some(kind))
+        let _ = poll_and_execute_tasks(&state, limit, kind)
             .await
             .map_err(|err| {
                 tracing::error!(error=?err, kind=?kind, "poll_and_execute_tasks_non_blocking failed to execute 1 or more tasks");
@@ -58,7 +60,7 @@ pub fn poll_and_execute_tasks_non_blocking(state: State, limit: i64, kind: TaskK
             futures::executor::block_on(fut);
         });
     } else {
-        tokio::spawn(fut);
+        tokio::spawn(fut.in_current_span());
     }
 }
 
