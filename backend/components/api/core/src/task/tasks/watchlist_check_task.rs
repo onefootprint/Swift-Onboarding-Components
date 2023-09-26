@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::config::Config;
 use crate::decision::vendor;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
@@ -8,6 +6,7 @@ use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::utils::webhook_app::IntoWebhookApp;
 use crate::vendor_clients::VendorClient;
+use crate::State;
 use crate::{
     decision::{self},
     enclave_client::EnclaveClient,
@@ -40,34 +39,15 @@ use newtypes::{
     WatchlistCheckNotNeededReason, WatchlistCheckStatus, WatchlistCheckStatusKind,
 };
 use webhooks::events::WebhookEvent;
-use webhooks::WebhookClient;
 
 pub(crate) struct WatchlistCheckTask {
-    db_pool: DbPool,
+    state: State,
     task_id: TaskId,
-    enclave_client: EnclaveClient,
-    idology_client: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
-    webhook_client: Arc<dyn WebhookClient>,
-    config: Config,
 }
 
 impl WatchlistCheckTask {
-    pub fn new(
-        db_pool: DbPool,
-        task_id: TaskId,
-        enclave_client: EnclaveClient,
-        idology_client: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
-        webhook_client: Arc<dyn WebhookClient>,
-        config: Config,
-    ) -> Self {
-        Self {
-            db_pool,
-            task_id,
-            enclave_client,
-            idology_client,
-            webhook_client,
-            config,
-        }
+    pub fn new(state: State, task_id: TaskId) -> Self {
+        Self { state, task_id }
     }
 }
 
@@ -82,6 +62,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         //  - Create it with state Pending and a decision_intent and verification_request at the same time
         //  - Create it with state NotNeeded or Error and no decision_intent/verification_request, meaning no vendor call is to be made
         let (tenant, sv, uvw, (wc, vr)) = self
+            .state
             .db_pool
             .db_transaction(move |conn| -> Result<_, TaskError> {
                 // not strictly needed since we ever only execute a single task 1 at a time, but nice to be extra safe
@@ -108,7 +89,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             let vendor_response = if let Some(vres) = vres {
                 Self::decrypt_existing_vendor_response(
                     &uvw.vault().e_private_key,
-                    &self.enclave_client,
+                    &self.state.enclave_client,
                     &vreq,
                     &vres,
                 )
@@ -116,13 +97,13 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             } else {
                 let tenant_id = sv.tenant_id.clone();
                 Self::make_vendor_call(
-                    &self.db_pool,
-                    &self.enclave_client,
-                    &self.idology_client,
+                    &self.state.db_pool,
+                    &self.state.enclave_client,
+                    &self.state.vendor_clients.idology_pa,
                     &vreq,
                     &svid,
                     &tenant_id,
-                    &self.config,
+                    &self.state.config,
                 )
                 .await?
             };
@@ -130,7 +111,8 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             let pa_res = PaResponse::try_from(vendor_response.response)?;
             let (status, reason_codes) = Self::calculate_decision(pa_res)?;
             let version = Some(crate::GIT_HASH.to_string());
-            self.db_pool
+            self.state
+                .db_pool
                 .db_transaction(move |conn| wc.update(conn, status, version, reason_codes, Some(Utc::now())))
                 .await?
         } else {
@@ -146,7 +128,8 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         ) {
             let vault_id = uvw.vault().id.clone();
             let svid = args.scoped_vault_id.clone();
-            self.db_pool
+            self.state
+                .db_pool
                 .db_transaction(move |conn| -> DbResult<()> {
                     let ut = UserTimeline::get_by_event_data_id(conn, &svid, wc.id.to_string())?;
                     if ut.is_none() {
@@ -169,7 +152,8 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     status: wc.status,
                     error,
                 });
-            self.webhook_client
+            self.state
+                .webhook_client
                 .send_event_to_tenant_non_blocking(sv.webhook_app(), wh_event, None);
         }
         Ok(())

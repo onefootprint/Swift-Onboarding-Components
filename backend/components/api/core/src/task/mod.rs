@@ -113,16 +113,9 @@ async fn execute_task(task: &Task, state: &State) -> Result<(), TaskError> {
                 .await
         }
         newtypes::TaskData::WatchlistCheck(args) => {
-            WatchlistCheckTask::new(
-                state.db_pool.clone(),
-                task.id.clone(),
-                state.enclave_client.clone(),
-                state.vendor_clients.idology_pa.clone(),
-                state.webhook_client.clone(),
-                state.config.clone(),
-            )
-            .execute(args)
-            .await
+            WatchlistCheckTask::new(state.clone(), task.id.clone())
+                .execute(args)
+                .await
         }
         newtypes::TaskData::FireWebhook(args) => {
             FireWebhookTask::new(state.webhook_client.clone())

@@ -28,6 +28,7 @@ use crate::vendor_clients::VendorClient;
 #[cfg(test)]
 use idv::{
     experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
+    idology::pa::{IdologyPaAPIResponse, IdologyPaRequest},
     idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
     incode::{
         doc::{
@@ -338,6 +339,14 @@ impl State {
         >,
     ) {
         self.vendor_clients.idology_expect_id = idology_expect_id;
+    }
+
+    #[cfg(test)]
+    pub fn set_idology_pa(
+        &mut self,
+        idology_pa: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
+    ) {
+        self.vendor_clients.idology_pa = idology_pa;
     }
 
     #[cfg(test)]
