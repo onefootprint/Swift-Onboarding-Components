@@ -111,6 +111,7 @@ export type { SelectOption, SelectProps } from './select';
 export { default as Select } from './select';
 export type { ShimmerProps } from './shimmer';
 export { default as Shimmer } from './shimmer';
+export { default as Stack } from './stack';
 export type { StepperOption, StepperProps } from './stepper';
 export { default as Stepper } from './stepper';
 export type { TableProps, TableRow } from './table';
