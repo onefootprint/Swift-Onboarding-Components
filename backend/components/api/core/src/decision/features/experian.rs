@@ -45,7 +45,7 @@ fn score_to_reason_code(score: PreciseIDParsedScore) -> Option<FootprintReasonCo
             if s >= SCORE_THRESHOLD {
                 None
             } else {
-                Some(FootprintReasonCode::IdNotVerified)
+                Some(FootprintReasonCode::IdFlagged)
             }
         }
     }
@@ -183,7 +183,7 @@ mod tests {
         FootprintReasonCode::AddressMatches,
         FootprintReasonCode::SsnMatches,
         // from score
-        FootprintReasonCode::IdNotVerified,
+        FootprintReasonCode::IdFlagged,
         // from phone
         FootprintReasonCode::PhoneLocatedMatches,
     ] => (); "address code says no match, but we opt for ssn codes since it's present")]
@@ -205,7 +205,7 @@ mod tests {
         // from watchlist
         FootprintReasonCode::WatchlistHitOfac,
         // from score
-        FootprintReasonCode::IdNotVerified,
+        FootprintReasonCode::IdFlagged,
         // from phone
         FootprintReasonCode::PhoneLocatedMatches,
     ] => (); "no ssn is provided, so we take address codes")]

@@ -18,8 +18,8 @@ pub fn idology_base_rules() -> Vec<Rule<IDologyFeatures>> {
             action: Action::Fail,
         },
         Rule {
-            rule: |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::IdNotVerified),
-            name: RuleName::IdNotVerified,
+            rule: |f: &IDologyFeatures| f.footprint_reason_codes.contains(&FRC::IdFlagged),
+            name: RuleName::IdFlagged,
             action: Action::Fail,
         },
         //
@@ -101,8 +101,8 @@ pub fn experian_base_rules() -> Vec<Rule<ExperianFeatures>> {
             action: Action::Fail,
         },
         Rule {
-            rule: |f: &ExperianFeatures| f.footprint_reason_codes.contains(&FRC::IdNotVerified),
-            name: RuleName::IdNotVerified,
+            rule: |f: &ExperianFeatures| f.footprint_reason_codes.contains(&FRC::IdFlagged),
+            name: RuleName::IdFlagged,
             action: Action::Fail,
         },
         Rule {
@@ -143,8 +143,8 @@ pub fn kyc_rules() -> Vec<Rule<Vec<FRC>>> {
             action: Action::Fail,
         },
         Rule {
-            rule: |f: &Vec<FRC>| f.contains(&FRC::IdNotVerified),
-            name: RuleName::IdNotVerified,
+            rule: |f: &Vec<FRC>| f.contains(&FRC::IdFlagged),
+            name: RuleName::IdFlagged,
             action: Action::Fail,
         },
         Rule {
