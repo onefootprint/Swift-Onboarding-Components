@@ -61,6 +61,24 @@ pub enum TaskData {
     RunIncodeStuckWorkflow(RunIncodeStuckWorkflowArgs),
 }
 
+impl TaskData {
+    pub fn kind(&self) -> TaskKind {
+        self.into()
+    }
+}
+
+impl TaskKind {
+    pub fn max_attempts(&self) -> i32 {
+        match self {
+            TaskKind::LogMessage => 1,
+            TaskKind::LogNumTenantApiKeys => 1,
+            TaskKind::WatchlistCheck => 1, // errors here are unexpected and the task is not time sensitive so we'd rather investigate a failure as soon as it happens
+            TaskKind::FireWebhook => 3,
+            TaskKind::RunIncodeStuckWorkflow => 3,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LogMessageTaskArgs {
     pub message: String,

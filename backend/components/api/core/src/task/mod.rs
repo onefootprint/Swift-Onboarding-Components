@@ -23,11 +23,6 @@ mod tasks;
 #[cfg(test)]
 mod tests;
 
-// constant for now, but can make this a property of task type too
-#[allow(unused)]
-// TODO: add this to Task
-const MAX_NUM_ATTEMPTS: i32 = 1; // since Task and our first use case (WatchlistCheck) are brand new, we want to manually react to every error so we aren't allowing automated retries yet
-
 #[derive(Debug, Error)]
 pub enum TaskError {
     #[error("{0}")]
@@ -144,7 +139,7 @@ fn task_result_to_status(task: &Task, task_result: Result<(), TaskError>) -> Tas
     match task_result {
         Ok(_) => TaskStatus::Completed,
         Err(_) => {
-            if task.num_attempts >= MAX_NUM_ATTEMPTS {
+            if task.num_attempts >= task.task_data.kind().max_attempts() {
                 TaskStatus::Failed
             } else {
                 // if we havent exceeded our max number of attempts, then we set the task back to pending so it will be re-polled and execution re-tried again in a future run
