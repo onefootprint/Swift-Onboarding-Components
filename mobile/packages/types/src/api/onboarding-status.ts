@@ -1,4 +1,3 @@
-import { CountryCode } from '../data';
 import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,

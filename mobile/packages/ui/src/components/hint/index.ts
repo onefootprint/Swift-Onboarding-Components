@@ -1,1 +1,1 @@
-export { HintProps, default as Hint } from './hint';
+export { default as Hint, HintProps } from './hint';

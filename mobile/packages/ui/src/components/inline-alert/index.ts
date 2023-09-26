@@ -1,1 +1,1 @@
-export { InlineAlertProps, default as InlineAlert } from './inline-alert';
+export { default as InlineAlert, InlineAlertProps } from './inline-alert';

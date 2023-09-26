@@ -6,7 +6,6 @@ import {
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import getSupportedCountryByCode from '../get-supported-country-by-code';
 import { MachineContext, MachineEvents } from './types';
 
 const createIdDocMachine = (requirement: IdDocRequirement) =>
