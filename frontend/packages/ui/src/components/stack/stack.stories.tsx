@@ -13,8 +13,8 @@ export default {
         options: ['row', 'column'],
         type: 'select',
       },
-      description: 'Direction',
-      name: 'Direction',
+      description: 'Flex direction',
+      name: 'direction',
     },
     gap: {
       control: 'number',
@@ -22,8 +22,8 @@ export default {
       name: 'Gap',
     },
     align: {
-      description: 'Align items',
-      name: 'Align items',
+      description: 'alignItems',
+      name: 'align',
       control: {
         options: ['center', 'flex-start', 'flex-end', 'stretch', 'unset'],
         type: 'select',
@@ -31,7 +31,7 @@ export default {
     },
     justify: {
       description: 'Justify content',
-      name: 'Justify content',
+      name: 'justify',
       control: {
         options: [
           'center',

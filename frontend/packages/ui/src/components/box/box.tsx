@@ -16,6 +16,7 @@ export type BoxProps = {
   role?: AriaRole;
   sx?: SXStyleProps;
   testID?: string;
+  className?: string;
 };
 
 const Box = forwardRef<HTMLElement, BoxProps>(
@@ -29,6 +30,7 @@ const Box = forwardRef<HTMLElement, BoxProps>(
       role,
       sx,
       testID,
+      className,
     }: BoxProps,
     ref: any,
   ) => {
@@ -43,6 +45,7 @@ const Box = forwardRef<HTMLElement, BoxProps>(
         ref={ref}
         sx={sxStyles}
         role={role}
+        className={className}
       >
         {children}
       </StyledBox>
