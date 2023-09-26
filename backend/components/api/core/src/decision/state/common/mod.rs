@@ -109,7 +109,7 @@ pub async fn run_aml_call(
                 conn,
                 &wf.scoped_vault_id,
                 &wfid,
-                DecisionIntentKind::OnboardingKyc,
+                DecisionIntentKind::WatchlistCheck,
             )?;
             Ok((wf, v, di))
         })
