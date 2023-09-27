@@ -8,8 +8,8 @@ use diesel::{
     prelude::*,
 };
 use newtypes::{
-    DecisionIntentId, FootprintReasonCode, ScopedVaultId, TaskId, TenantId, VaultKind, WatchlistCheckId,
-    WatchlistCheckStatus, WatchlistCheckStatusKind, WorkflowKind,
+    DecisionIntentId, FootprintReasonCode, Locked, ScopedVaultId, TaskId, TenantId, VaultKind,
+    WatchlistCheckId, WatchlistCheckStatus, WatchlistCheckStatusKind, WorkflowKind,
 };
 use serde::{Deserialize, Serialize};
 
@@ -116,17 +116,26 @@ impl WatchlistCheck {
         Ok(res)
     }
 
+    #[tracing::instrument("WatchlistCheck::lock", skip_all)]
+    pub fn lock(conn: &mut TxnPgConn, id: &WatchlistCheckId) -> DbResult<Locked<Self>> {
+        let result = watchlist_check::table
+            .filter(watchlist_check::id.eq(id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
+    }
+
     #[tracing::instrument("WatchlistCheck::update", skip_all)]
     pub fn update(
-        self,
+        wc: Locked<Self>,
         conn: &mut TxnPgConn,
         status: WatchlistCheckStatus,
-        logic_git_hash: Option<String>,
         reason_codes: Option<Vec<FootprintReasonCode>>,
         completed_at: Option<DateTime<Utc>>,
+        logic_git_hash: Option<String>,
     ) -> DbResult<Self> {
         if let Some(completed_at) = completed_at {
-            Self::deactivate_old(conn, &self.scoped_vault_id, completed_at)?;
+            Self::deactivate_old(conn, &wc.scoped_vault_id, completed_at)?;
         }
         let update = UpdateWatchlistCheck {
             status: status.into(),
@@ -136,7 +145,7 @@ impl WatchlistCheck {
             status_details: status,
         };
         let result = diesel::update(watchlist_check::table)
-            .filter(watchlist_check::id.eq(&self.id))
+            .filter(watchlist_check::id.eq(&wc.id))
             .set(update)
             .get_result(conn.conn())?;
 

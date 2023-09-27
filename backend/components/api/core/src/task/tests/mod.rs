@@ -3,6 +3,7 @@ use crate::task::tasks::watchlist_check_task::WatchlistCheckTask;
 use crate::task::ExecuteTask;
 use crate::task::TaskError;
 use crate::State;
+use db::models::decision_intent::DecisionIntent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::task::Task;
 use db::models::user_timeline::UserTimeline;
@@ -72,21 +73,29 @@ async fn run_task(state: &mut State, sv_id: &ScopedVaultId, task_id: &TaskId) ->
 async fn get_data(
     db_pool: &DbPool,
     svid: ScopedVaultId,
-) -> (WatchlistCheck, Vec<RequestAndMaybeResult>, Option<UserTimeline>) {
-    let (wc, vreqs, ut) = db_pool
+) -> (
+    WatchlistCheck,
+    Option<DecisionIntent>,
+    Vec<RequestAndMaybeResult>,
+    Option<UserTimeline>,
+) {
+    db_pool
         .db_query(move |conn| {
             let wc = WatchlistCheck::_get_by_svid(conn, &svid).unwrap();
             let ut = UserTimeline::get_by_event_data_id(conn, &svid, wc.id.to_string()).unwrap();
-            let vreqs =
-                VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(conn, svid)
-                    .unwrap();
 
-            // TODO: add usertimeline
-            (wc, vreqs, ut)
+            let (di, vreqs) = if let Some(di_id) = wc.decision_intent_id.as_ref() {
+                let di = DecisionIntent::get(conn, di_id).unwrap();
+                let vreqs = VerificationRequest::list(conn, di_id).unwrap();
+                (Some(di), vreqs)
+            } else {
+                (None, vec![])
+            };
+
+            (wc, di, vreqs, ut)
         })
         .await
-        .unwrap();
-    (wc, vreqs, ut)
+        .unwrap()
 }
 
 fn full_vault() -> Vec<IDK> {

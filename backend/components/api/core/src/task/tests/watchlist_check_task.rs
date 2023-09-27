@@ -45,19 +45,21 @@ async fn sandbox_and_inactive_users(
     run_task(state, &sv.id, &task.id).await.unwrap();
 
     // ASSERTIONS
-    let (wc, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
+    let (wc, di, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
 
     assert_eq!(WatchlistCheckStatusKind::NotNeeded, wc.status);
     assert_eq!(
         WatchlistCheckStatus::NotNeeded(expected_reason),
         wc.status_details
     );
-    assert!(vreqs.is_empty());
     assert!(ut.is_none());
+
+    assert!(di.is_none());
+    assert!(vreqs.is_empty());
 }
 
 #[test_state_case(true)]
-// #[test_state_case(false)]
+#[test_state_case(false)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn insufficient_data_in_vault(state: &mut State, is_portable: bool) {
     // SETUP
@@ -75,11 +77,13 @@ async fn insufficient_data_in_vault(state: &mut State, is_portable: bool) {
     run_task(state, &sv.id, &task.id).await.unwrap();
 
     // ASSERTIONS
-    let (wc, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
+    let (wc, di, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
 
     assert_eq!(WatchlistCheckStatusKind::Error, wc.status);
-    assert!(vreqs.is_empty());
     assert!(ut.is_some());
+
+    assert!(di.is_some());
+    assert!(vreqs.is_empty());
 }
 
 #[test_state]
@@ -95,12 +99,22 @@ async fn vendor_error(state: &mut State) {
     let res = run_task(state, &sv.id, &task.id).await;
 
     // ASSERTIONS
-    let (wc, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
-    assert!(matches!(res.err().unwrap(), TaskError::IdologyError(_)));
+    let (wc, di, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
+
+    let TaskError::ApiError(e) = res.err().unwrap() else {
+        panic!();
+    };
+    assert!(matches!(e.kind(), crate::ApiErrorKind::VendorRequestFailed(_)));
+
     assert_eq!(WatchlistCheckStatusKind::Pending, wc.status);
-    assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
-    assert!(vreqs[0].1.is_none()); // TODO: move over to paradigm of saving vreq/vres on every call, even errors. Assert vres.is_error here
     assert!(ut.is_none());
+
+    assert!(di.is_some());
+    // vreq + vres is saved with is_error=true
+    assert_eq!(1, vreqs.len());
+    assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
+    assert!(vreqs[0].1.is_some());
+    assert!(vreqs[0].1.as_ref().unwrap().is_error);
 }
 
 #[test_state_case(true, OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
@@ -131,11 +145,15 @@ async fn active_users(
     let _ = run_task(state, &sv.id, &task.id).await;
 
     // ASSERTIONS
-    let (wc, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
+    let (wc, di, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
 
     assert_eq!(expected_status, wc.status);
     assert_eq!(Some(expected_reason_codes), wc.reason_codes);
+    assert!(ut.is_some());
+
+    assert!(di.is_some());
+    assert_eq!(1, vreqs.len());
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_some());
-    assert!(ut.is_some());
+    assert!(!vreqs[0].1.as_ref().unwrap().is_error);
 }
