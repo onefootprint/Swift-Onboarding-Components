@@ -131,10 +131,6 @@ footprint_reason_code_enum! {
         IdNotLocated,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Name, SignalScope::Dob, SignalScope::Address], match_level = None]
-        #[note = "Identity not verified", severity = SignalSeverity::High,  description = "Identity could not be verified with the information provided"]
-        IdNotVerified,
-
-        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Name, SignalScope::Dob, SignalScope::Address], match_level = None]
         #[note = "Identity flagged for elevated risk", severity = SignalSeverity::High,  description = "Either the located identity was flagged for elevated risk, or a confident match for the identity could not be found"]
         IdFlagged,
 
