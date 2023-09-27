@@ -10,7 +10,7 @@ use crate::decision::{
     },
 };
 
-const SCORE_THRESHOLD: i32 = 580;
+const SCORE_THRESHOLD: i32 = 500;
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
 #[derive(Debug, Clone, PartialEq, Eq)]
