@@ -1387,6 +1387,7 @@ mod tests {
     use super::SignalScope;
     use super::SignalSeverity;
     use std::cmp::Ordering;
+    use strum::IntoEnumIterator;
 
     #[test_case(SignalSeverity::Low, SignalSeverity::High => Ordering::Less)]
     #[test_case(SignalSeverity::Info, SignalSeverity::Low => Ordering::Less)]
@@ -1413,5 +1414,10 @@ mod tests {
     // Just a little script to dump our reason codes into CSV format for uploading to google docs so non-eng folks can work on them
     fn test_export_reason_codes() {
         super::export_reason_codes()
+    }
+
+    #[test]
+    fn test_scopes_are_ordered() {
+        FootprintReasonCode::iter().for_each(|frc| assert_eq!(frc.scopes().first().cloned(), frc.scope()));
     }
 }
