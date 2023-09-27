@@ -5,8 +5,10 @@ import React from 'react';
 import useTelemetryRequest from './hooks/use-send-telemetry';
 import STYTCH_PUBLIC_TOKEN from './stytch.constants';
 
-const IS_TEST = typeof jest !== 'undefined';
-const IS_DISABLED = IS_SERVER || IS_TEST;
+const IS_TEST = process.env.NODE_ENV === 'test';
+const IS_E2E = process.env.IS_E2E === 'true';
+const IS_CI = process.env.CI === 'true';
+const IS_DISABLED = IS_SERVER || IS_TEST || IS_E2E || IS_CI;
 
 export type StytchProps = {
   fpAuthToken: string;

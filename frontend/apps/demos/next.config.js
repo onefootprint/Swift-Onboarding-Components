@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 
-const IS_DEV = process.env.NODE_ENV === 'development';
-
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
   connect-src 'self' *.onefootprint.com http://localhost:8000 vitals.vercel-insights.com *.usefathom.com *.ingest.sentry.io *.pusher.com wss://*.pusher.com vercel.live unpkg.com; 
@@ -49,7 +47,7 @@ const securityHeaders = [
   },
 ];
 
-module.exports = {
+const nextConfig = {
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   reactStrictMode: true,
   compiler: {
@@ -109,4 +107,10 @@ module.exports = {
       },
     ];
   },
+  env: {
+    CI: process.env.CI,
+    IS_E2E: process.env.IS_E2E,
+  },
 };
+
+module.exports = nextConfig;

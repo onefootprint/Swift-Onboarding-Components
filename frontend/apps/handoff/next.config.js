@@ -50,7 +50,7 @@ const securityHeaders = [
   },
 ];
 
-module.exports = {
+const nextConfig = {
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   reactStrictMode: false,
   compiler: {
@@ -77,4 +77,10 @@ module.exports = {
       },
     ];
   },
+  env: {
+    CI: process.env.CI,
+    IS_E2E: process.env.IS_E2E,
+  },
 };
+
+module.exports = nextConfig;

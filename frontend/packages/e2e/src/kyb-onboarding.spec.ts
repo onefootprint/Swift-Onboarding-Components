@@ -33,7 +33,7 @@ const userTIN = '123456789';
 const businessName = 'Business name';
 const businessNameOptional = 'Optional name';
 
-test('KYB smoke test', async ({ browser, browserName, page }) => {
+test('KYB basic flow', async ({ browser, browserName, page }) => {
   test.setTimeout(120000);
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_5zu2usM1ilTzDnqQpaZ6Sg';

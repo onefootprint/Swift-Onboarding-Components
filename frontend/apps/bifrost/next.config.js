@@ -75,6 +75,10 @@ const nextConfig = {
     '@onefootprint/types',
     '@onefootprint/appearance',
   ],
+  env: {
+    CI: process.env.CI,
+    IS_E2E: process.env.IS_E2E,
+  },
 };
 
 module.exports = IS_ANALYZE_ACTIVE
