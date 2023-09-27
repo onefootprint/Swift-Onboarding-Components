@@ -1,4 +1,4 @@
-import { useObserveCollector } from '@onefootprint/dev-tools';
+import { getSessionId, useObserveCollector } from '@onefootprint/dev-tools';
 import {
   NavigationHeader,
   useGetD2PStatus,
@@ -20,6 +20,7 @@ const Init = () => {
   const { authToken = '' } = state.context;
   const updateD2PStatusMutation = useUpdateD2PStatus();
   const observeCollector = useObserveCollector();
+  const sessionId = getSessionId();
 
   useParseHandoffUrl({
     onSuccess: (authTokenFromUrl: string) => {
@@ -68,7 +69,9 @@ const Init = () => {
           opener,
           bifrostSessionId,
         });
-        LogRocket.identify(bifrostSessionId);
+        LogRocket.identify(sessionId, {
+          bifrostSessionId,
+        });
 
         send({
           type: 'initContextUpdated',
@@ -89,6 +92,15 @@ const Init = () => {
 
   useGetOnboardingStatus(authToken, {
     onSuccess: ({ obConfiguration }) => {
+      observeCollector.setAppContext({
+        config: obConfiguration,
+      });
+      const { orgName, key } = obConfiguration;
+      LogRocket.identify(sessionId, {
+        orgName,
+        publicKey: key,
+      });
+
       send({
         type: 'initContextUpdated',
         payload: {

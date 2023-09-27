@@ -1,10 +1,13 @@
+import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
 import { AppErrorBoundary } from '@onefootprint/idv-elements';
 import { IdDI } from '@onefootprint/types';
+import * as LogRocket from 'logrocket';
 import React from 'react';
 import Layout from 'src/components/layout';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
+import { useEffectOnce } from 'usehooks-ts';
 
 import Expired from './expired';
 import Init from './init';
@@ -20,6 +23,15 @@ const Root = ({ variant }: RootProps) => {
   const { businessBoKycData, obConfigAuth, authToken } = state.context;
   const { invited } = businessBoKycData || {};
   const { email, phoneNumber } = invited || {};
+
+  const observeCollector = useObserveCollector();
+  useEffectOnce(() => {
+    LogRocket.getSessionURL(logRocketSessionUrl => {
+      observeCollector.setAppContext({
+        logRocketSessionUrl,
+      });
+    });
+  });
 
   return (
     <Layout variant={variant}>

@@ -1,5 +1,8 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import { useLogStateMachine } from '@onefootprint/dev-tools';
+import {
+  useLogStateMachine,
+  useObserveCollector,
+} from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
 import {
@@ -7,11 +10,13 @@ import {
   useFootprintProvider,
 } from '@onefootprint/idv-elements';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
+import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';
 import React from 'react';
 import Layout from 'src/components/layout';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import useTenantPublicKey from 'src/hooks/use-tenant-public-key';
+import { useEffectOnce } from 'usehooks-ts';
 
 import Init from '../init';
 
@@ -24,7 +29,17 @@ const Root = ({ variant }: RootProps) => {
   const [state, send] = useBifrostMachine();
   const tenantPk = useTenantPublicKey();
   const { bootstrapData, showCompletionPage, showLogo } = state.context;
+
+  const observeCollector = useObserveCollector();
   useLogStateMachine('bifrost', state);
+  useEffectOnce(() => {
+    LogRocket.getSessionURL(logRocketSessionUrl => {
+      observeCollector.setAppContext({
+        logRocketSessionUrl,
+      });
+    });
+  });
+
   const obConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk };
 
   const handleComplete = (validationToken?: string, delay?: number) => {

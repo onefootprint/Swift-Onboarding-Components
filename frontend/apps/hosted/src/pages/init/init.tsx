@@ -1,9 +1,11 @@
+import { getSessionId, useObserveCollector } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { useGetOnboardingConfig } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import type { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
 import { LoadingIndicator, media } from '@onefootprint/ui';
+import * as LogRocket from 'logrocket';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
@@ -14,6 +16,8 @@ const Init = () => {
   const [state, send] = useHostedMachine();
   const { obConfigAuth, authToken } = state.context;
   const showRequestError = useRequestErrorToast();
+  const observeCollector = useObserveCollector();
+  const sessionId = getSessionId();
 
   useParseUrl({
     onSuccess: (
@@ -64,6 +68,15 @@ const Init = () => {
     { obConfigAuth, authToken },
     {
       onSuccess: onboardingConfig => {
+        observeCollector.setAppContext({
+          config: onboardingConfig,
+        });
+        const { orgName, key } = onboardingConfig;
+        LogRocket.identify(sessionId, {
+          orgName,
+          key,
+        });
+
         send({
           type: 'initContextUpdated',
           payload: {

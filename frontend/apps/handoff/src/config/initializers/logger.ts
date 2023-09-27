@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
 // @ts-ignore
 import * as setupLogRocketReact from 'logrocket-react';
+import { UAParser } from 'ua-parser-js';
 
 import { COMMIT_SHA, SENTRY_DSN, VERCEL_ENV } from '../constants';
 
@@ -45,11 +46,16 @@ export const configureLogRocket = () => {
     // Log the context of the user
     const sessionId = getSessionId();
     checkDeviceInfo().then((deviceInfo: DeviceInfo) => {
+      const userAgent = new UAParser().getResult();
       LogRocket.identify(sessionId, {
         app: 'handoff',
-        handoffSessionId: sessionId,
         deviceType: deviceInfo.type,
         deviceHasSupportForWebauthn: deviceInfo.hasSupportForWebauthn,
+        release: COMMIT_SHA ?? '',
+        browser: userAgent.browser.name ?? '',
+        device: userAgent.device.vendor ?? '',
+        osName: userAgent.os.name ?? '',
+        osVersion: userAgent.os.version ?? '',
       });
     });
     // Tie sentry issues to logrocket recordings

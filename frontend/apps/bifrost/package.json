@@ -45,7 +45,8 @@
     "mockdate": "^3.0.5",
     "react-error-boundary": "^3.1.4",
     "use-places-autocomplete": "^4.0.0",
-    "usehooks-ts": "^2.9.1"
+    "usehooks-ts": "^2.9.1",
+    "ua-parser-js": "^1.0.33"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^13.4.19",
@@ -68,7 +69,8 @@
     "react-i18next": "^12.3.1",
     "tsconfig": "*",
     "typescript": "4.9.5",
-    "xstate": "^4.37.1"
+    "xstate": "^4.37.1",
+    "@types/ua-parser-js": "^0.7.36"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
