@@ -1,6 +1,7 @@
 import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { useTimeout } from 'usehooks-ts';
 
 import getSourceDimensions from '../utils/get-source-dimensions';
 import {
@@ -27,6 +28,10 @@ const HEIGHT_ERROR_OFFSET = 30;
 // We pass through the graphics params set in batches of this size.
 // This is to make sure that the autocapture algorithm doesn't block the event queue for too long while passing through all params in one go
 const DOC_DETECTION_PARAMS_BATCH_SIZE = 1;
+
+// In some cases iOS captures too quick before focusing and captures a blurry image
+// This delay will make sure that there is some time to focus before autocapture
+const AUTOCAPTURE_DELAY = 3000;
 
 export type AutocaptureKind = 'document' | 'face';
 
@@ -64,6 +69,9 @@ const useAutoCapture = ({
   const { getFaceStatus } = useFaceDetection();
   const [isCaptured, setIsCaptured] = useState(false);
   const { cv, loaded } = useOpenCv();
+  const [shouldAutocapture, setShouldAutocapture] = useState(false);
+
+  useTimeout(() => setShouldAutocapture(true), AUTOCAPTURE_DELAY);
 
   useEffect(() => {
     // Bring the selected param to the front
@@ -190,7 +198,7 @@ const useAutoCapture = ({
 
     const id = setInterval(
       async () => {
-        detectAndCapture();
+        if (shouldAutocapture) detectAndCapture();
         if (successCount.current >= REQUIRED_SUCCESSES) {
           onCapture();
           clearInterval(id);
@@ -212,6 +220,7 @@ const useAutoCapture = ({
     onStatusChange,
     outlineHeight,
     outlineWidth,
+    shouldAutocapture,
     shouldDetect,
     shouldShowInstructions,
     videoRef,
