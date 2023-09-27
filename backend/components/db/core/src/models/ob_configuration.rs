@@ -167,12 +167,13 @@ impl ObConfiguration {
     // Assumes you've checked if the document type is supported already
     fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
         if self.tenant_id.is_findigs() {
+            // latest list from 2023-09-27: https://onefootprint.slack.com/archives/C05768Z3JRY/p1695821817977629?thread_ts=1695821455.535009&cid=C05768Z3JRY
             match doc_type {
                 IdDocKind::IdCard => Iso3166TwoDigitCountryCode::iter().collect(),
                 IdDocKind::DriversLicense => Iso3166TwoDigitCountryCode::iter().collect(),
                 IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
                 IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::US],
-                IdDocKind::Visa => vec![Iso3166TwoDigitCountryCode::US],
+                IdDocKind::Visa => Iso3166TwoDigitCountryCode::iter().collect(),
                 IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
             }
         } else {
