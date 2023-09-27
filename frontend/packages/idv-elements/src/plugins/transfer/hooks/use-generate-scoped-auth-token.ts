@@ -35,11 +35,7 @@ const useGenerateScopedAuthToken = ({
     const isMobile = device?.type === 'mobile';
     const redirectUrl = isMobile ? window.location.href : undefined;
 
-    if (
-      d2pGenerateMutation.isLoading ||
-      d2pGenerateMutation.isSuccess ||
-      !authToken
-    ) {
+    if (!authToken) {
       return;
     }
     d2pGenerateMutation.mutate(
@@ -68,6 +64,10 @@ const useGenerateScopedAuthToken = ({
   };
 
   useEffect(() => {
+    if (d2pGenerateMutation.isLoading || d2pGenerateMutation.isSuccess) {
+      return;
+    }
+
     generateScopedAuthToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
