@@ -3941,6 +3941,11 @@ pub fn incode_fetch_scores_response(opts: DocTestOpts) -> serde_json::Value {
             "status": opts.cross_checks.to_string(),
             "key": "expirationDateCheckDigit"
           },
+          {
+            "value": "PASSED",
+            "status": opts.cross_checks.to_string(),
+            "key": "compositeCheckDigit"
+          },
 
         ],
         "customFields": [

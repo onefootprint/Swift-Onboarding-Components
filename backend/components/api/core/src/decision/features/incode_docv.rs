@@ -113,11 +113,24 @@ pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_self
     };
     
     // ID Tests => FRC
-    let id_tests: Vec<FootprintReasonCode> = scores
+    let (id_test_frcs, barcode_crosscheck_results): (Vec<FootprintReasonCode>, Vec<(bool, bool)>) = scores
         .get_id_tests()
         .iter()
         .filter_map(get_frc_from_test)
-        .collect();
+        .unzip();
+    let barcode_check_failed = barcode_crosscheck_results.iter().any(|(fail,_)| *fail);
+    let barcode_check_passed = barcode_crosscheck_results.iter().any(|(_, pass)| *pass);
+    let barcode_checks_ran = barcode_check_passed || barcode_check_failed;
+
+    let barcode_frc = if barcode_checks_ran {
+        if barcode_check_failed {
+            vec![FootprintReasonCode::DocumentBarcodeContentDoesNotMatch]
+        } else {
+            vec![FootprintReasonCode::DocumentBarcodeContentMatches]
+        }
+    } else {
+        vec![]
+    };
 
     // Face tests => FRC
     let (glasses_check, mask_check) = scores.get_face_test_results();
@@ -129,8 +142,9 @@ pub fn reason_codes_from_score_response(scores: FetchScoresResponse, expect_self
     document_score_code.into_iter()
         .chain(ocr_code.into_iter())
         .chain(selfie_code.into_iter())
-        .chain(id_tests.into_iter())
+        .chain(id_test_frcs.into_iter())
         .chain(face_codes.into_iter())
+        .chain(barcode_frc.into_iter())
         .collect()
 }
 
@@ -200,20 +214,22 @@ fn normalize_pii(p: &PiiString) -> PiiString {
     p.leak().trim().to_lowercase().into()
 }
 
-fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<FootprintReasonCode> {
+fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintReasonCode, (bool, bool))> {
     let (t, s) = value;
     let frc_helper: Option<IncodeRCH> = t.into();
     frc_helper.map(|f| {
         if s == &IncodeStatus::Fail {
-            f.fail_code
+            (f.fail_code, (t.is_crosscheck(), false))
         } else {
-            f.ok_code
+            (f.ok_code,  (false, t.is_crosscheck()))
         }
     })
 }
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use db::test_helpers::assert_have_same_elements;
     use idv::{incode::doc::response::FetchScoresResponse, test_fixtures::{DocTestOpts, OcrTestOpts, self}};
     use newtypes::{
@@ -304,6 +320,7 @@ mod tests {
             DocumentSexCrosscheckMatches, 
             DocumentExpirationCheckDigitMatches, 
             DocumentNumberCrosscheckMatches,
+            DocumentBarcodeContentMatches,
         ], true; "everything passes")]
         #[test_case(
             DocTestOpts {
@@ -345,6 +362,7 @@ mod tests {
                 DocumentSexCrosscheckDoesNotMatch, 
                 DocumentExpirationCheckDigitDoesNotMatch, 
                 DocumentNumberCrosscheckDoesNotMatch,
+                DocumentBarcodeContentDoesNotMatch,
             ], true; "everything fails")]
         #[test_case(
             DocTestOpts {
@@ -384,6 +402,7 @@ mod tests {
                 DocumentSexCrosscheckMatches, 
                 DocumentExpirationCheckDigitMatches, 
                 DocumentNumberCrosscheckMatches,
+                DocumentBarcodeContentDoesNotMatch
             ], true; "mix of things")]
             #[test_case(
                 DocTestOpts::default(),
@@ -408,6 +427,7 @@ mod tests {
                     DocumentSexCrosscheckMatches, 
                     DocumentExpirationCheckDigitMatches, 
                     DocumentNumberCrosscheckMatches,
+                    DocumentBarcodeContentMatches
                     // no selfie code
                 ], false; "everything passes, but selfie isn't collected")]  
     fn test_reason_codes_from_score_response(doc_opts: DocTestOpts, expected: Vec<FootprintReasonCode>, expect_selfie: bool) {
@@ -416,4 +436,37 @@ mod tests {
 
         assert_have_same_elements(super::reason_codes_from_score_response(parsed, expect_selfie), expected)
     }
+
+    #[test]
+    fn test_summary_barcode_reason_code() {
+        // everything passes
+        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts::default());
+        let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
+        let id_test_results = only_id_tests_for_ones_that_have_frcs_from_parsed(parsed.clone());
+        id_test_results.iter().for_each(|(test, status)| if test.is_crosscheck() {
+            assert_eq!(status, &IncodeStatus::Ok)
+        });
+        let frcs = super::reason_codes_from_score_response(parsed, false);
+        assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
+
+        // partial fail
+        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode: Fail, cross_checks: Ok, ..Default::default()});
+        let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
+        let frcs = super::reason_codes_from_score_response(parsed, false);
+        assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
+
+        // full fail
+        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode: Fail, cross_checks: Fail, ..Default::default()});
+        let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
+        let frcs = super::reason_codes_from_score_response(parsed, false);
+        assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
+    }
+
+    fn only_id_tests_for_ones_that_have_frcs_from_parsed(parsed: FetchScoresResponse) -> HashMap<IncodeTest, IncodeStatus> {
+        parsed.get_id_tests().into_iter().filter(|(t, _)| {
+            let frc_helper: Option<IncodeRCH> = t.into(); // filter to only
+            frc_helper.is_some()
+        }).collect()
+    }
+    
 }

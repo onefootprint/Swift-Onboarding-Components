@@ -241,6 +241,61 @@ incode_reason_code_enum! {
     }
 }
 
+impl IncodeTest {
+    pub fn is_crosscheck(&self) -> bool {
+        match self {
+            IncodeTest::TamperCheck
+            | IncodeTest::PostitCheckFront
+            | IncodeTest::PostitCheckBack
+            | IncodeTest::IdAlterationCheckFront
+            | IncodeTest::IdAlterationCheckBack
+            | IncodeTest::IdAlreadyUsedCheck
+            | IncodeTest::Alignment
+            | IncodeTest::FakeCheck
+            | IncodeTest::OcrIdentityCheck
+            | IncodeTest::ScreenIdLiveness
+            | IncodeTest::PaperIdLiveness
+            | IncodeTest::ReadabilityCheck
+            | IncodeTest::BalancedLightFront
+            | IncodeTest::BalancedLightBack
+            | IncodeTest::SharpnessFront
+            | IncodeTest::SharpnessBack
+            | IncodeTest::DocumentClassification
+            | IncodeTest::VisiblePhotoFeatures
+            | IncodeTest::IssueDateValidity
+            | IncodeTest::DocumentExpired
+            | IncodeTest::DocumentSeriesExpired
+            | IncodeTest::BirthDateValidity
+            | IncodeTest::ExpirationDateValidity
+            | IncodeTest::IssuingStateValidity
+            | IncodeTest::QrScan
+            | IncodeTest::UnderageCheck
+            | IncodeTest::IliterationCheck
+            | IncodeTest::FirstNameMatch
+            | IncodeTest::LastNameMatch => false,
+            
+            // Tests relating to checking MRZ/Barcode against OCR
+            IncodeTest::DocumentNumberCheckDigit
+            | IncodeTest::BirthDateCheckDigit
+            | IncodeTest::ExpirationDateCheckDigit
+            | IncodeTest::CompositeCheckDigit
+            | IncodeTest::BirthDateCrosscheck
+            | IncodeTest::ExpirationDateCrosscheck
+            | IncodeTest::SexCrosscheck
+            | IncodeTest::FullNameCrosscheck
+            | IncodeTest::EmissionNumberCrosscheck
+            | IncodeTest::DocumentNumberCrosscheck
+            | IncodeTest::PersonalNumberCrosscheck
+            | IncodeTest::DocumentTypeSideCrosscheck
+            | IncodeTest::DDReferenceNumberCrosscheck 
+            // My hope is that incode wouldn't pass the other crosscehcks if these fail,
+            // but lets just be careful
+            | IncodeTest::TwoDBarcodeContent
+            | IncodeTest::Barcode2DDetected => true,
+        }
+    }
+}
+
 #[derive(Display, Debug, Clone, EnumString, Eq, PartialEq, Hash, DeserializeFromStr, SerializeDisplay)]
 pub enum IncodeDocumentType {
     #[strum(serialize = "Unknown")]
