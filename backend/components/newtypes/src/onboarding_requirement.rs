@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{CollectedDataOption, DocumentRequestId, IdDocKind, Iso3166TwoDigitCountryCode};
+use chrono::{DateTime, Utc};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use strum::EnumDiscriminants;
@@ -46,7 +47,10 @@ pub enum OnboardingRequirement {
         supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
     },
     /// The client needs to display the authorization consent page and confirm the user authorizes access
-    Authorize { fields_to_authorize: AuthorizeFields },
+    Authorize {
+        fields_to_authorize: AuthorizeFields,
+        authorized_at: Option<DateTime<Utc>>,
+    },
     /// The client needs to tell us when user input is done in order for us to continue processing
     Process,
 }
@@ -95,6 +99,10 @@ impl OnboardingRequirement {
                 missing_attributes,
                 populated_attributes: _,
             } => missing_attributes.is_empty(),
+            Self::Authorize {
+                fields_to_authorize: _,
+                authorized_at,
+            } => authorized_at.is_some(),
             // The below requirements only exist when they are unmet, so they are always unmet
             Self::RegisterPasskey => false,
             Self::CollectDocument {
@@ -105,9 +113,6 @@ impl OnboardingRequirement {
                 supported_document_types: _,
                 supported_countries: _,
                 supported_country_and_doc_types: _,
-            } => false,
-            Self::Authorize {
-                fields_to_authorize: _,
             } => false,
             Self::Process => false,
         }

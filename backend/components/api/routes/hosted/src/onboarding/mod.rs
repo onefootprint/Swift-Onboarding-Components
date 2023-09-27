@@ -395,56 +395,54 @@ fn get_requirement_inner(
             }
         }
         OnboardingRequirementKind::Authorize => {
-            if args.workflow.authorized_at.is_none() {
-                let (document_types, skipped_selfie) = if ob_config.can_access_document() {
-                    // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-                    let id_docs = IdentityDocument::list_by_wf_id(conn, &args.workflow.id)?;
-                    let doc_types = id_docs
-                        .iter()
-                        // check we've actually completed the document, it's not just an empty id doc
+            let (document_types, skipped_selfie) = if ob_config.can_access_document() {
+                // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
+                let id_docs = IdentityDocument::list_by_wf_id(conn, &args.workflow.id)?;
+                let doc_types = id_docs
+                        .iter() // check we've actually completed the document, it's not just an empty id doc
                         // TODO: maybe we should revisit this empty ID doc shell design?
                         .filter(|i| i.completed_seqno.is_some())
                         .map(|id| id.document_type)
                         .unique()
                         .collect();
-                    // unless all were skipped, we need to authorize since we may have collected it
-                    let selfie_skipped = id_docs.iter().all(|id| id.should_skip_selfie());
-                    (doc_types, selfie_skipped)
-                } else {
-                    (vec![], false)
-                };
-
-                let collected_data = ob_config
-                    .can_access_data
-                    .iter()
-                    .filter(|cdo| {
-                        // Only include CDO's from optional_data if they were collected
-                        if ob_config.optional_data.contains(cdo) {
-                            cdo.required_data_identifiers()
-                                .into_iter()
-                                .all(|di| uvw.has_field(di))
-                        } else {
-                            true
-                        }
-                    })
-                    .filter(|cdo| {
-                        !(matches!(
-                            cdo,
-                            CollectedDataOption::Document(DocumentCdoInfo(_, _, Selfie::RequireSelfie))
-                        ) && skipped_selfie)
-                    })
-                    .filter(|cdo| !should_skip_us_only_cdos(cdo, decrypted_values))
-                    .cloned()
-                    .collect();
-
-                let fields_to_authorize = AuthorizeFields {
-                    collected_data,
-                    document_types,
-                };
-                Some(OnboardingRequirement::Authorize { fields_to_authorize })
+                // unless all were skipped, we need to authorize since we may have collected it
+                let selfie_skipped = id_docs.iter().all(|id| id.should_skip_selfie());
+                (doc_types, selfie_skipped)
             } else {
-                None
-            }
+                (vec![], false)
+            };
+
+            let collected_data = ob_config
+                .can_access_data
+                .iter()
+                .filter(|cdo| {
+                    // Only include CDO's from optional_data if they were collected
+                    if ob_config.optional_data.contains(cdo) {
+                        cdo.required_data_identifiers()
+                            .into_iter()
+                            .all(|di| uvw.has_field(di))
+                    } else {
+                        true
+                    }
+                })
+                .filter(|cdo| {
+                    !(matches!(
+                        cdo,
+                        CollectedDataOption::Document(DocumentCdoInfo(_, _, Selfie::RequireSelfie))
+                    ) && skipped_selfie)
+                })
+                .filter(|cdo| !should_skip_us_only_cdos(cdo, decrypted_values))
+                .cloned()
+                .collect();
+
+            let fields_to_authorize = AuthorizeFields {
+                collected_data,
+                document_types,
+            };
+            Some(OnboardingRequirement::Authorize {
+                fields_to_authorize,
+                authorized_at: args.workflow.authorized_at,
+            })
         }
         OnboardingRequirementKind::Process => {
             if args.workflow.state.requires_user_input() {

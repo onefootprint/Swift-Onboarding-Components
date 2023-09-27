@@ -159,9 +159,12 @@ class BifrostClient:
         If `kind` is provided, will only handle the requested requirement
         """
         self.handled_requirements = []
+        body = self.get_status()
+        self.already_met_requirements = [
+            r for r in body["all_requirements"] if r["is_met"]
+        ]
         last_handled_requirement = None
         while True:
-            body = self.get_status()
             requirements = [r for r in body["all_requirements"] if not r["is_met"]]
             try:
                 next_requirement = (
@@ -178,11 +181,9 @@ class BifrostClient:
                 raise RepeatRequirement(next_requirement)
 
             self.handled_requirements.append(next_requirement)
-            self.already_met_requirements = [
-                r for r in body["all_requirements"] if r["is_met"]
-            ]
             self.handle_requirement(next_requirement)
             last_handled_requirement = next_requirement
+            body = self.get_status()
 
     def handle_requirement(self, requirement):
         """

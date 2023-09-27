@@ -43,6 +43,7 @@ def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
     body = post("hosted/identify", data, ob_config.key, sandbox_id_h)
     assert body["user_found"]
 
+    print("HELLOOOOOOOOOOOOO")
     bifrost2 = BifrostClient.inherit(
         ob_config2, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
     )
