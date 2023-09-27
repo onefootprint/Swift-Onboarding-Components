@@ -4,6 +4,7 @@ import { Query } from './query';
 export interface Threshold {
   op: '>' | '>=' | '<' | '<=';
   value: number;
+  exceeded_limit?: number;
 }
 
 export interface SlackRecipientDetails {

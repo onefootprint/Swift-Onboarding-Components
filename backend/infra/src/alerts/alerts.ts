@@ -14,7 +14,10 @@ export interface Alert {
   pageThreshold?: Threshold;
 }
 
-// Note, add alert runbooks at: https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25
+/// Generally higher-latency HTTP requests that we want to have a higher alert threshold
+const LATENT_HTTP_ROUTES = ['/hosted/user/documents/{id}/upload'];
+
+/// Note, add alert runbooks at: https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25
 const staticAlerts: Alert[] = [
   {
     name: 'HTTP 5xx Errors',
@@ -90,6 +93,61 @@ const staticAlerts: Alert[] = [
           column: 'duration_ms',
           op: '>=',
           value: 15000,
+        },
+        {
+          column: 'http.route',
+          op: 'not-in',
+          value: LATENT_HTTP_ROUTES,
+        },
+      ],
+      filter_combination: 'AND',
+    },
+    slackThreshold: {
+      op: '>',
+      value: 0,
+    },
+    pageThreshold: {
+      op: '>',
+      value: 5,
+    },
+  },
+  {
+    name: 'Extra Latent HTTP request',
+    description: 'HTTP request took longer than 25s',
+    datasetName: 'fpc-api',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#1430bed953954300827cc3a07777a84f',
+    query: {
+      time_range: 240,
+      breakdowns: ['http.method', 'http.route', 'http.status_code'],
+      calculations: [
+        {
+          op: 'COUNT',
+        },
+      ],
+      filters: [
+        {
+          column: 'trace.parent_id',
+          op: 'does-not-exist',
+        },
+        {
+          column: 'http.route',
+          op: 'exists',
+        },
+        {
+          column: 'http.route',
+          op: '!=',
+          value: '/private/invoices',
+        },
+        {
+          column: 'duration_ms',
+          op: '>=',
+          value: 30000,
+        },
+        {
+          column: 'http.route',
+          op: 'in',
+          value: LATENT_HTTP_ROUTES,
         },
       ],
       filter_combination: 'AND',
@@ -289,10 +347,16 @@ const staticAlerts: Alert[] = [
     slackThreshold: {
       op: '>',
       value: 0,
+      // Only trigger alert after it's hit 3 times consecutively. This will hopefully help absorb
+      // some noise during enclave deploys
+      exceeded_limit: 3,
     },
     pageThreshold: {
       op: '>',
       value: 2,
+      // Only trigger alert after it's hit 3 times consecutively. This will hopefully help absorb
+      // some noise during enclave deploys
+      exceeded_limit: 3,
     },
   },
 ];
