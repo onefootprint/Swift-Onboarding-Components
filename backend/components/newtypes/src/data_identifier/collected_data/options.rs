@@ -166,7 +166,11 @@ impl CollectedDataOption {
     /// Maps each CDO to the list of DataIdentifiers to be collected for the option
     pub fn data_identifiers(&self) -> Option<Vec<DataIdentifier>> {
         match self {
-            Self::Name => Some(vec![IDK::FirstName.into(), IDK::LastName.into()]),
+            Self::Name => Some(vec![
+                IDK::FirstName.into(),
+                IDK::MiddleName.into(),
+                IDK::LastName.into(),
+            ]),
             Self::Dob => Some(vec![IDK::Dob.into()]),
             Self::Ssn9 => Some(vec![IDK::Ssn9.into(), IDK::Ssn4.into()]),
             Self::Ssn4 => Some(vec![IDK::Ssn4.into()]),

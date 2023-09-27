@@ -134,7 +134,7 @@ CREDIT_CARD_DATA = {
 }
 
 CDO_TO_DIS = {
-    "name": ["id.first_name", "id.last_name"],
+    "name": ["id.first_name", "id.middle_name", "id.last_name"],
     "dob": ["id.dob"],
     "ssn9": [
         "id.ssn9"

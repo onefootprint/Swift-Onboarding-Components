@@ -20,6 +20,7 @@ impl Validate for IDK {
         // Generally don't want anything to be empty
         let value = match self {
             IDK::FirstName => validate_name(value.as_string()?, args.for_bifrost)?,
+            IDK::MiddleName => validate_name(value.as_string()?, args.for_bifrost)?,
             IDK::LastName => validate_name(value.as_string()?, args.for_bifrost)?,
             IDK::Dob => clean_and_validate_dob(value.as_string()?, args.for_bifrost)?,
             IDK::Ssn4 => clean_and_validate_ssn4(value.as_string()?)?,

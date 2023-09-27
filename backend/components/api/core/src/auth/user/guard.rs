@@ -23,6 +23,7 @@ impl IsGuardMet<UserAuthScope> for CanDecrypt {
                 | IDK::Country
                 | IDK::Zip
                 | IDK::FirstName
+                | IDK::MiddleName
                 | IDK::LastName
                 | IDK::UsLegalStatus
                 | IDK::Citizenships

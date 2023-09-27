@@ -7,6 +7,7 @@ use strum_macros::{Display, EnumIter, EnumString};
 /// "Footprint ID card" and that we send off to be verified by data vendors.
 pub enum IdentityDataKind {
     FirstName,
+    MiddleName,
     LastName,
     Dob,
     Ssn4,
@@ -47,6 +48,7 @@ impl IsDataIdentifierDiscriminant for IdentityDataKind {
     fn parent(&self) -> Option<CollectedData> {
         match self {
             Self::FirstName => Some(CollectedData::Name),
+            Self::MiddleName => Some(CollectedData::Name),
             Self::LastName => Some(CollectedData::Name),
             Self::Dob => Some(CollectedData::Dob),
             Self::Ssn4 => Some(CollectedData::Ssn),

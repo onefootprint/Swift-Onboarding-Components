@@ -98,3 +98,62 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
         assert "ssn_not_provided" not in reason_codes
     else:
         assert "ssn_not_provided" in reason_codes
+
+
+@pytest.mark.parametrize("middle_name", [None, "Billy"])
+@pytest.mark.parametrize("can_access_name", [True, False])
+def test_middle_name(sandbox_tenant, twilio, middle_name, can_access_name):
+    base_data = ["full_address", "email", "phone_number"]
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Doc request config",
+        base_data + ["name"],
+        base_data + ["name"] if can_access_name else base_data,
+    )
+
+    di = "id.middle_name"
+    bifrost = BifrostClient.new(obc, twilio)
+
+    if middle_name:
+        bifrost.data[di] = middle_name
+    else:
+        bifrost.data.pop(di, None)
+
+    user = bifrost.run()
+
+    # test decrypt permissions
+    if (
+        can_access_name or middle_name is None
+    ):  # if you don't have permission to decrypt a DI but its not set, we just return null instead of throwing a permission error
+        expected_decrypt_error = None
+    else:
+        expected_decrypt_error = (
+            f"Not allowed: insufficient permissions to decrypt attributes: {di}"
+        )
+
+    res = post(
+        f"/users/{user.fp_id}/vault/decrypt",
+        dict(
+            reason="a",
+            fields=[di],
+        ),
+        sandbox_tenant.sk.key,
+        status_code=200 if expected_decrypt_error is None else 401,
+    )
+
+    if expected_decrypt_error:
+        assert res["error"]["message"] == expected_decrypt_error
+    else:
+        assert res[di] == middle_name
+
+    # assert that /users/ includes id.middle_name cause why not
+    res = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    if middle_name:
+        assert di in res["attributes"]
+    else:
+        assert di not in res["attributes"]
+
+    if middle_name and can_access_name:
+        assert di in res["decryptable_attributes"]
+    else:
+        assert di not in res["decryptable_attributes"]
