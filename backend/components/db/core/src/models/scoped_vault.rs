@@ -18,8 +18,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus, ScopedVaultId, TenantId,
-    VaultCreatedInfo, VaultId, WorkflowId,
+    DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus, ScopedVaultId, SessionId,
+    TenantId, VaultCreatedInfo, VaultId, WorkflowId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -40,6 +40,10 @@ pub struct ScopedVault {
     /// Denormalized from the user vault just to make querying easier
     pub is_live: bool,
     pub status: Option<OnboardingStatus>,
+    /// Client-provided identifier during the request that created this ScopedVault. Other HTTP
+    /// requests in the same session have the same ID. This is useful to search logs for this
+    /// scoped vault
+    pub session_id: Option<SessionId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -51,6 +55,7 @@ struct NewScopedVault {
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
     is_live: bool,
+    session_id: Option<SessionId>,
 }
 
 pub enum ScopedVaultIdentifier<'a> {
@@ -115,6 +120,7 @@ impl ScopedVault {
         conn: &mut TxnPgConn,
         uv: &Locked<Vault>,
         ob_configuration_id: ObConfigurationId,
+        session_id: Option<SessionId>,
     ) -> DbResult<Self> {
         // Get the ob config to do some validation before we make the SV
         let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
@@ -143,6 +149,7 @@ impl ScopedVault {
             start_timestamp: Utc::now(),
             tenant_id: ob_config.tenant_id,
             is_live: ob_config.is_live,
+            session_id,
         };
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
@@ -174,6 +181,7 @@ impl ScopedVault {
                 tenant_id,
                 is_live: uv.is_live,
                 vault_id: uv.id.clone(),
+                session_id: None,
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)

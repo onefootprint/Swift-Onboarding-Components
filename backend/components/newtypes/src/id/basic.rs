@@ -218,3 +218,8 @@ define_newtype_id!(
     String,
     "Identifier for a google device attestation"
 );
+define_newtype_id!(
+    SessionId,
+    String,
+    "Client-generated identifier sent for all HTTP requests in the same session"
+);

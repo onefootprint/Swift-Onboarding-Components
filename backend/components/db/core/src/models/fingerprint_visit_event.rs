@@ -4,7 +4,9 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::fingerprint_visit_event;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FingerprintRequestId, FingerprintVisitEventId, FingerprintVisitorId, ScopedVaultId, VaultId};
+use newtypes::{
+    FingerprintRequestId, FingerprintVisitEventId, FingerprintVisitorId, ScopedVaultId, SessionId, VaultId,
+};
 use serde::{Deserialize, Serialize};
 
 /// Represents a single visit from a FootprintVisitorId
@@ -16,13 +18,14 @@ pub struct FingerprintVisitEvent {
     pub vault_id: Option<VaultId>,
     pub scoped_vault_id: Option<ScopedVaultId>,
     pub path: String,
-    pub session_id: Option<String>,
+    pub session_id: Option<SessionId>,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub fingerprint_request_id: FingerprintRequestId,
     pub response: Option<serde_json::Value>,
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = fingerprint_visit_event)]
 pub struct NewFingerprintVisit {
@@ -30,11 +33,12 @@ pub struct NewFingerprintVisit {
     pub vault_id: Option<VaultId>,
     pub scoped_vault_id: Option<ScopedVaultId>,
     pub path: String,
-    pub session_id: Option<String>,
+    pub session_id: Option<SessionId>,
     pub created_at: DateTime<Utc>,
     pub request_id: FingerprintRequestId,
     pub response: Option<serde_json::Value>,
 }
+
 impl FingerprintVisitEvent {
     #[allow(clippy::too_many_arguments)]
     #[tracing::instrument("FingerprintVisitEvent::create", skip_all)]
@@ -45,7 +49,7 @@ impl FingerprintVisitEvent {
         vault_id: Option<VaultId>,
         scoped_vault_id: Option<ScopedVaultId>,
         path: String,
-        session_id: Option<String>,
+        session_id: Option<SessionId>,
         response: Option<serde_json::Value>,
     ) -> DbResult<Self> {
         let new_row = NewFingerprintVisit {

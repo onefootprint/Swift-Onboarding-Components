@@ -639,6 +639,7 @@ table! {
         start_timestamp -> Timestamptz,
         is_live -> Bool,
         status -> Nullable<Text>,
+        session_id -> Nullable<Text>,
     }
 }
 

@@ -17,7 +17,7 @@ use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::utils::headers::InsightHeaders;
+use api_core::utils::headers::{InsightHeaders, TelemetryHeaders};
 use api_core::utils::vault_wrapper::AuthedData;
 use chrono::{Duration, Utc};
 use crypto::sha256;
@@ -34,7 +34,7 @@ use newtypes::email::Email;
 use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::{
     AuthEventKind, DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, Fingerprinter, PhoneNumber,
-    SandboxId, ScopedVaultId, SessionAuthToken, VaultId, VaultPublicKey, WebauthnCredentialId,
+    SandboxId, ScopedVaultId, SessionAuthToken, SessionId, VaultId, VaultPublicKey, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use std::str::FromStr;
@@ -74,6 +74,7 @@ pub async fn post(
     // When provided, augments the existing user_auth token with the scopes gained from the challenge
     user_auth: Option<UserAuthContext>,
     insight_headers: InsightHeaders,
+    telemetry_headers: TelemetryHeaders,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let VerifyRequest {
@@ -82,6 +83,7 @@ pub async fn post(
     } = request.into_inner();
     let challenge_state =
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
+    let session_id = telemetry_headers.session_id;
 
     // Generate fingerprints and keypairs async if needed
     let challenge_data = match challenge_state.data {
@@ -121,11 +123,11 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let (uv_id, user_kind, auth_factor, event_kind, passkey_cred_id) = match challenge_data {
                 ChallengeContext::Sms(ctx) => {
-                    let (tok, uk) = validate(conn, ctx, &challenge_response)?;
+                    let (tok, uk) = validate(conn, ctx, &challenge_response, session_id.clone())?;
                     (tok, uk, AuthFactor::Sms, AuthEventKind::Sms, None)
                 }
                 ChallengeContext::Email(ctx) => {
-                    let (tok, uk) = validate(conn, ctx, &challenge_response)?;
+                    let (tok, uk) = validate(conn, ctx, &challenge_response, session_id.clone())?;
                     (tok, uk, AuthFactor::Email, AuthEventKind::Email, None)
                 }
                 ChallengeContext::Passkey(context) => {
@@ -159,7 +161,7 @@ pub async fn post(
             } else {
                 // Otherwise, create a new token with the scopes for bifrost or my1fp
                 let (new_token_scopes, duration, scoped_vault_id) = if let Some(ob_pk_auth) = ob_pk_auth {
-                    let (sv_id, scopes) = onboarding_scopes(conn, ob_pk_auth, &uv_id)?;
+                    let (sv_id, scopes) = onboarding_scopes(conn, ob_pk_auth, &uv_id, session_id)?;
                     let duration = Duration::minutes(30); // Onboarding is pretty short
                     (scopes.into_iter(), duration, Some(sv_id))
                 } else {
@@ -210,12 +212,13 @@ fn onboarding_scopes(
     conn: &mut TxnPgConn,
     ob_pk_auth: ObConfigAuth,
     uv_id: &VaultId,
+    session_id: Option<SessionId>,
 ) -> ApiResult<(ScopedVaultId, Vec<Option<UserAuthScope>>)> {
     let obc = ob_pk_auth.ob_config();
     // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
     // created with an ob config
     let uv = Vault::lock(conn, uv_id)?;
-    let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone())?;
+    let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone(), session_id)?;
 
     // If we verified with a BoSessionAuth, update the corresponding BO
     let bo_scope = if let Some(bo) = ob_pk_auth.business_owner() {
@@ -336,6 +339,7 @@ fn validate(
     conn: &mut TxnPgConn,
     ctx: VaultContext,
     challenge_response: &str,
+    session_id: Option<SessionId>,
 ) -> Result<(VaultId, VerifyKind), ApiError> {
     if ctx.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
@@ -364,6 +368,7 @@ fn validate(
                 ctx.global_sh,
                 tenant_sh,
                 ctx.sandbox_id,
+                session_id,
             )?;
             (uv.into_inner().id, VerifyKind::UserCreated)
         }

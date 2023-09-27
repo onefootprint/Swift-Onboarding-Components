@@ -3,7 +3,7 @@ use std::pin::Pin;
 use super::get_header;
 use actix_web::{http::header::HeaderMap, FromRequest};
 use futures_util::Future;
-use newtypes::Uuid;
+use newtypes::{SessionId, Uuid};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 pub struct TelemetryHeaders {
     /// Optional client-generated and -provided session identifier that links multiple HTTP requests
     /// that occured in the same "session"
-    pub session_id: Option<String>,
+    pub session_id: Option<SessionId>,
     pub is_integration_test_req: bool,
 }
 
@@ -25,7 +25,8 @@ impl TelemetryHeaders {
             .map(|h| Uuid::parse_str(&h))
             .transpose()
             .unwrap_or(None)
-            .map(|uuid| uuid.to_string());
+            .map(|uuid| uuid.to_string())
+            .map(SessionId::from);
         let is_integration_test_req = get_header(Self::INTEGRATION_TESTS_HEADER_NAME, headers)
             .map(|h| h == "true")
             .unwrap_or_default();

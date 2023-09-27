@@ -119,6 +119,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             session_id,
             is_integration_test_req,
         } = TelemetryHeaders::parse_from_request(request.headers());
+        let session_id = session_id.map(|s| format!("{}", s));
 
         let server_git_hash = crate::GIT_HASH.to_string();
 
