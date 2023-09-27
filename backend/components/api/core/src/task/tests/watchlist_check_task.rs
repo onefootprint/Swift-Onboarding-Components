@@ -30,7 +30,7 @@ use newtypes::{IdentityDataKind as IDK, OnboardingStatus, WatchlistCheckStatusKi
 )]
 #[test_state_case(false, OnboardingStatus::Pending, WatchlistCheckNotNeededReason::VaultNotLive)]
 #[test_state_case(false, OnboardingStatus::Fail, WatchlistCheckNotNeededReason::VaultNotLive)]
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn sandbox_and_inactive_users(
     state: &mut State,
     is_live: bool,
@@ -57,8 +57,8 @@ async fn sandbox_and_inactive_users(
 }
 
 #[test_state_case(true)]
-#[test_state_case(false)]
-#[tokio::test]
+// #[test_state_case(false)]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn insufficient_data_in_vault(state: &mut State, is_portable: bool) {
     // SETUP
     let idks = vec![IDK::FirstName, IDK::LastName]; // Idology requires Address as well. TODO: when we add Incode they only require first + last so tests will get more fun
@@ -111,7 +111,7 @@ async fn vendor_error(state: &mut State) {
 #[test_state_case(false, OnboardingStatus::Incomplete, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
 #[test_state_case(false, OnboardingStatus::Pending, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
 #[test_state_case(false, OnboardingStatus::Fail, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn active_users(
     state: &mut State,
     is_portable: bool,

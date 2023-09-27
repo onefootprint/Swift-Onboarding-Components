@@ -4,14 +4,13 @@ use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_trait::VendorAPIResponse;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
-use crate::utils::webhook_app::IntoWebhookApp;
 use crate::vendor_clients::VendorClient;
-use crate::State;
 use crate::{
     decision::{self},
     enclave_client::EnclaveClient,
     task::{ExecuteTask, TaskError},
 };
+use crate::{task, State};
 use async_trait::async_trait;
 use chrono::Utc;
 use db::models::scoped_vault::ScopedVault;
@@ -34,11 +33,11 @@ use idv::{
     VendorResponse,
 };
 use newtypes::{
-    DecisionIntentKind, EncryptedVaultPrivateKey, FootprintReasonCode, OnboardingStatus, ScopedVaultId,
-    TaskId, TenantId, VendorAPI, WatchlistCheckArgs, WatchlistCheckError, WatchlistCheckInfo,
-    WatchlistCheckNotNeededReason, WatchlistCheckStatus, WatchlistCheckStatusKind,
+    DecisionIntentKind, EncryptedVaultPrivateKey, FireWebhookArgs, FootprintReasonCode, OnboardingStatus,
+    ScopedVaultId, TaskData, TaskId, TenantId, VendorAPI, WatchlistCheckArgs, WatchlistCheckCompletedPayload,
+    WatchlistCheckError, WatchlistCheckInfo, WatchlistCheckNotNeededReason, WatchlistCheckStatus,
+    WatchlistCheckStatusKind, WebhookEvent,
 };
-use webhooks::events::WebhookEvent;
 
 pub(crate) struct WatchlistCheckTask {
     state: State,
@@ -128,33 +127,40 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         ) {
             let vault_id = uvw.vault().id.clone();
             let svid = args.scoped_vault_id.clone();
+            let is_live = sv.is_live;
             self.state
                 .db_pool
                 .db_transaction(move |conn| -> DbResult<()> {
                     let ut = UserTimeline::get_by_event_data_id(conn, &svid, wc.id.to_string())?;
                     if ut.is_none() {
-                        UserTimeline::create(conn, WatchlistCheckInfo { id: wc.id }, vault_id, svid)?;
+                        UserTimeline::create(conn, WatchlistCheckInfo { id: wc.id }, vault_id, svid.clone())?;
                     }
+
+                    let error = match wc.status_details {
+                        WatchlistCheckStatus::Error(e) => Some(e),
+                        _ => None,
+                    };
+                    let webhook_event =
+                        WebhookEvent::WatchlistCheckCompleted(WatchlistCheckCompletedPayload {
+                            fp_id: sv.fp_id.clone(),
+                            footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
+                            timestamp: Utc::now(),
+                            status: wc.status,
+                            error,
+                        });
+                    let task_data = TaskData::FireWebhook(FireWebhookArgs {
+                        scoped_vault_id: svid.clone(),
+                        tenant_id: tenant.id.clone(),
+                        is_live,
+                        webhook_event,
+                    });
+                    Task::create(conn, Utc::now(), task_data)?;
+
                     Ok(())
                 })
                 .await?;
 
-            let error = match wc.status_details {
-                WatchlistCheckStatus::Error(e) => Some(e),
-                _ => None,
-            };
-
-            let wh_event =
-                WebhookEvent::WatchlistCheckCompleted(webhooks::events::WatchlistCheckCompletedPayload {
-                    fp_id: sv.fp_id.clone(),
-                    footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
-                    timestamp: Utc::now(),
-                    status: wc.status,
-                    error,
-                });
-            self.state
-                .webhook_client
-                .send_event_to_tenant_non_blocking(sv.webhook_app(), wh_event, None);
+            task::execute_webhook_tasks(self.state.clone());
         }
         Ok(())
     }
