@@ -201,10 +201,10 @@ impl WatchlistCheckTask {
 
         let has_onboarding_in_non_pass_status =
             uvw.vault.is_portable && sv.status != Some(OnboardingStatus::Pass);
-        let status = if has_onboarding_in_non_pass_status {
-            WatchlistCheckStatus::NotNeeded(WatchlistCheckNotNeededReason::VaultOffboarded)
-        } else if !sv.is_live {
+        let status = if !sv.is_live {
             WatchlistCheckStatus::NotNeeded(WatchlistCheckNotNeededReason::VaultNotLive)
+        } else if has_onboarding_in_non_pass_status {
+            WatchlistCheckStatus::NotNeeded(WatchlistCheckNotNeededReason::VaultOffboarded)
         } else if !requirements_satisfied {
             WatchlistCheckStatus::Error(WatchlistCheckError::RequiredDataNotPresent)
         } else {

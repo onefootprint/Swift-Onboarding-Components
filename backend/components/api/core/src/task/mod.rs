@@ -20,6 +20,7 @@ use self::tasks::{
 };
 
 mod tasks;
+#[allow(clippy::unwrap_used)]
 #[cfg(test)]
 mod tests;
 
