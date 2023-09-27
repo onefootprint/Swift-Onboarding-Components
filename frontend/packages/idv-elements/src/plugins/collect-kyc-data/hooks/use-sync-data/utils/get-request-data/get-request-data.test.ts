@@ -248,6 +248,104 @@ describe('getRequestData', () => {
     ).toThrowError();
   });
 
+  it('does not error if state or zip fields are missing for international addresses', () => {
+    // Missing required city field
+    expect(() =>
+      getRequestData(
+        {
+          [IdDI.addressLine1]: {
+            value: '1234 main st',
+            decrypted: true,
+          },
+          [IdDI.state]: {
+            value: 'State',
+            decrypted: true,
+          },
+          [IdDI.zip]: {
+            value: '1234',
+            decrypted: true,
+          },
+          [IdDI.country]: {
+            value: 'MX',
+            bootstrap: true,
+          },
+        },
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [CollectedKycDataOption.address],
+          populatedAttributes: [],
+          optionalAttributes: [],
+          isMet: false,
+        },
+        true,
+      ),
+    ).toThrowError();
+
+    // Missing state / zip fields
+    expect(() =>
+      getRequestData(
+        {
+          [IdDI.addressLine1]: {
+            value: '1234 main st',
+            decrypted: true,
+          },
+          [IdDI.city]: {
+            value: '1234 main st',
+            decrypted: true,
+          },
+          [IdDI.state]: {
+            value: 'State',
+            decrypted: true,
+          },
+          [IdDI.country]: {
+            value: 'MX',
+            bootstrap: true,
+          },
+        },
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [CollectedKycDataOption.address],
+          populatedAttributes: [],
+          optionalAttributes: [],
+          isMet: false,
+        },
+        true,
+      ),
+    ).not.toThrowError();
+
+    // Missing state / zip fields
+    expect(() =>
+      getRequestData(
+        {
+          [IdDI.addressLine1]: {
+            value: '1234 main st',
+            decrypted: true,
+          },
+          [IdDI.city]: {
+            value: '1234 main st',
+            decrypted: true,
+          },
+          [IdDI.zip]: {
+            value: '12324',
+            decrypted: true,
+          },
+          [IdDI.country]: {
+            value: 'MX',
+            bootstrap: true,
+          },
+        },
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [CollectedKycDataOption.address],
+          populatedAttributes: [],
+          optionalAttributes: [],
+          isMet: false,
+        },
+        true,
+      ),
+    ).not.toThrowError();
+  });
+
   it('removes decrypted values', () => {
     expect(
       getRequestData(

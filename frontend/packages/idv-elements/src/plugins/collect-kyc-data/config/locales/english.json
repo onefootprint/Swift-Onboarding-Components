@@ -103,7 +103,7 @@
         "zipCode": {
           "label": "Zip code",
           "placeholder": "11206",
-          "error": "Zip code cannot be empty"
+          "error": "Zip code cannot be empty or is invalid"
         }
       },
       "title": "What's your residential address?",

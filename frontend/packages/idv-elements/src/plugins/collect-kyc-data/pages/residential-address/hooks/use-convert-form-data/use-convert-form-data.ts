@@ -18,37 +18,37 @@ const useConvertFormData = () => {
     const convertedData: KycData = {};
     const { addressLine1, addressLine2, city, state, zip, country } = formData;
 
-    if (addressLine1 && !isAddressLine1Disabled) {
+    if (!isAddressLine1Disabled) {
       convertedData[IdDI.addressLine1] = {
         value: addressLine1,
       };
     }
 
-    if (addressLine2 && !isAddressLine2Disabled) {
+    if (!isAddressLine2Disabled) {
       convertedData[IdDI.addressLine2] = {
         value: addressLine2,
       };
     }
 
-    if (city && !isCityDisabled) {
+    if (!isCityDisabled) {
       convertedData[IdDI.city] = {
         value: city,
       };
     }
 
-    if (state && !isStateDisabled) {
+    if (!isStateDisabled) {
       convertedData[IdDI.state] = {
         value: typeof state === 'object' ? state.value : state,
       };
     }
 
-    if (zip && !isZipDisabled) {
+    if (!isZipDisabled) {
       convertedData[IdDI.zip] = {
         value: zip,
       };
     }
 
-    if (country && !isCountryDisabled) {
+    if (!isCountryDisabled) {
       convertedData[IdDI.country] = {
         value: country.value,
       };

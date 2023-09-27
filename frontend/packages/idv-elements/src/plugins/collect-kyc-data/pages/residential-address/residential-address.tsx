@@ -89,12 +89,12 @@ const ResidentialAddress = ({
   };
 
   const handleCountryChange = () => {
-    setFocus('addressLine1');
     resetField('addressLine1');
     resetField('addressLine2');
     resetField('city');
     resetField('state');
     resetField('zip');
+    setFocus('addressLine1');
   };
 
   return (

@@ -25,14 +25,14 @@ const ZipField = () => {
       hasError={!!errors.zip}
       hint={errors.zip && t('error')}
       label={t('label')}
-      mask={zipcode.mask}
-      maxLength={zipcode.maxLength}
-      minLength={zipcode.minLength}
       placeholder={t('placeholder')}
-      value={getValues('zip')}
+      defaultValue={getValues('zip')}
       {...register('zip', {
         required: isDomestic,
-        pattern: zipcode.pattern,
+        validate: isDomestic
+          ? (value: string) =>
+              zipcode.pattern ? zipcode.pattern.test(value) : undefined
+          : undefined,
       })}
     />
   );

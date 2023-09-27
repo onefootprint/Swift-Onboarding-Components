@@ -66,7 +66,7 @@ const getRequestData = (
         return;
       }
 
-      const danglingDis: string[] = [];
+      let danglingDis: string[] = [];
       requiredDis.forEach(di => {
         const value = data[di]?.value;
         if (typeof value === 'undefined') {
@@ -75,6 +75,14 @@ const getRequestData = (
           requestData[di] = value;
         }
       });
+
+      // Ignore missing state & zip DIs if address is international
+      const isInternational = requestData[IdDI.country] !== 'US';
+      if (isInternational) {
+        danglingDis = danglingDis.filter(
+          di => di !== IdDI.state && di !== IdDI.zip,
+        );
+      }
 
       if (danglingDis.length > 0) {
         throw new Error(`Dangling DIs: ${danglingDis.join(', ')}`);
