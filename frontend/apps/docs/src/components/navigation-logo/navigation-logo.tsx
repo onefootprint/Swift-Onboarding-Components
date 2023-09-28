@@ -4,10 +4,9 @@ import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { API_REFERENCE_PATH } from 'src/config/constants';
 
 import LogoCopyAssets from './components/logo-copy-assets';
-
-const API_REFERENCE_PATH = '/api-reference';
 
 const NavigationLogo = () => {
   const { t } = useTranslation('components.header.nav');
