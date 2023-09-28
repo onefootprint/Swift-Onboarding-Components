@@ -241,7 +241,7 @@ impl SupportedCountriesForDocType for Default {
             IdDocKind::Permit => all_us_and_territories,
             IdDocKind::Visa => all_us_and_territories,
             IdDocKind::ResidenceDocument => all_us_and_territories,
-            IdDocKind::VoterIdentification => vec![],
+            IdDocKind::VoterIdentification => all_us_and_territories,
         }
     }
     fn is_override(&self) -> bool {
