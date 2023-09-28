@@ -46,13 +46,12 @@ const Content = styled.p`
   ${({ theme }) => css`
     ${createFontStyles('body-4')}
     align-items: center;
-    color: ${theme.color.secondary};
+    color: ${theme.color.tertiary};
     display: inline;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
     margin-right: ${theme.spacing[2]};
-    margin-left: ${theme.spacing[4]};
   `}
 `;
 

@@ -18,6 +18,7 @@ export default {
       description: 'Code to be displayed',
       required: true,
     },
+
     language: {
       control: 'text',
       description: 'Code language to display in header',
@@ -39,6 +40,11 @@ export default {
       description: 'Toast title description',
       table: { defaultValue: { summary: 'Copied to clipboard' } },
     },
+    title: {
+      control: 'text',
+      description: 'Copy to clipboard',
+      required: true,
+    },
   },
 } as Meta;
 
@@ -46,12 +52,14 @@ const Template: Story<CodeBlockProps> = ({
   ariaLabel = 'Copy to clipboard',
   children,
   language,
+  title,
   tooltipText,
   tooltipTextConfirmation,
 }: CodeBlockProps) => (
   <CodeBlock
-    language={language}
     ariaLabel={ariaLabel}
+    language={language}
+    title={title}
     tooltipText={tooltipText}
     tooltipTextConfirmation={tooltipTextConfirmation}
   >
@@ -61,6 +69,7 @@ const Template: Story<CodeBlockProps> = ({
 
 export const Base = Template.bind({});
 Base.args = {
+  title: 'Example',
   ariaLabel: 'Copy',
   children: `
   function doSomething(){

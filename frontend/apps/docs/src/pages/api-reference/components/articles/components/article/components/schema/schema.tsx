@@ -12,9 +12,10 @@ import Properties from './components/properties/properties';
 
 type SchemaProps = {
   schema: ContentSchema;
+  isInBrackets?: boolean;
 };
 
-const Schema = ({ schema }: SchemaProps) => {
+const Schema = ({ schema, isInBrackets = false }: SchemaProps) => {
   // We should make this a fully recursive component, similar to getExample
   let schemaToRender: ContentSchema | undefined = schema;
   if (schema.type === 'array') {
@@ -37,17 +38,20 @@ const Schema = ({ schema }: SchemaProps) => {
         <Description>{schemaToRender.description}</Description>
       )}
       {Object.entries(properties).map(([title, property]) => (
-        <LinedContainer
+        <BracketContainer
+          isInBrackets={isInBrackets}
           key={title}
           data-last-child={
             Object.keys(properties).indexOf(title) ===
             Object.keys(properties).length - 1
           }
+          data-first-child={Object.keys(properties).indexOf(title) === 0}
         >
           <Header
             title={title}
             type={property.type}
             isRequired={required.length > 0 && required.includes(title)}
+            isInBrackets={isInBrackets}
           />
           <Grid>
             {property.description ? (
@@ -66,30 +70,46 @@ const Schema = ({ schema }: SchemaProps) => {
               </Box>
             ) : null}
           </Grid>
-        </LinedContainer>
+        </BracketContainer>
       ))}
     </Container>
   ) : null;
 };
 
-const LinedContainer = styled.div`
-  ${({ theme }) => css`
+const BracketContainer = styled.div<{ isInBrackets?: boolean }>`
+  ${({ theme, isInBrackets }) => css`
     display: flex;
     flex-direction: column;
-    padding-left: ${theme.spacing[4]};
     position: relative;
 
-    &[data-last-child='false'] {
-      &:before {
-        content: '';
-        background: ${theme.borderColor.tertiary};
-        height: calc(100% + ${theme.spacing[2]});
-        width: ${theme.borderWidth[1]};
-        left: 0;
-        position: absolute;
-        top: 20px;
+    ${isInBrackets &&
+    css`
+      padding-left: ${theme.spacing[4]};
+
+      &[data-first-child='true'] {
+        &:after {
+          content: '';
+          background: ${theme.borderColor.tertiary};
+          height: ${theme.spacing[6]};
+          width: ${theme.borderWidth[1]};
+          left: 0;
+          top: 0;
+          position: absolute;
+        }
       }
-    }
+
+      &[data-last-child='false'] {
+        &:before {
+          content: '';
+          background: ${theme.borderColor.tertiary};
+          height: calc(100% + ${theme.spacing[2]});
+          width: ${theme.borderWidth[1]};
+          left: 0;
+          position: absolute;
+          top: 20px;
+        }
+      }
+    `}
   `}
 `;
 
@@ -98,7 +118,6 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[2]};
-    padding-left: ${theme.spacing[4]};
     position: relative;
   `}
 `;

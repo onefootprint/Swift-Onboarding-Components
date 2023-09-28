@@ -31,7 +31,7 @@ const Properties = ({
 
   return (
     <Box>
-      <Box>
+      <TitleContainer>
         <Header>
           <Button disabled={!property.properties} onClick={handleToggle}>
             <Connector
@@ -39,7 +39,11 @@ const Properties = ({
               data-has-children={!!property.properties}
               data-level={level}
             />
-            {property.properties && <IcoChevronRight16 color="tertiary" />}
+            {property.properties && (
+              <IconBounds expanded={expanded}>
+                <IcoChevronRight16 color="tertiary" />
+              </IconBounds>
+            )}
             <CodeInline disabled size="compact">
               {title}
             </CodeInline>
@@ -56,7 +60,7 @@ const Properties = ({
             {property.enum && <Enum enums={property.enum} />}
           </Content>
         ) : null}
-      </Box>
+      </TitleContainer>
       {property.properties && expanded && (
         <Child>
           {Object.entries(property.properties).map(
@@ -74,6 +78,22 @@ const Properties = ({
     </Box>
   );
 };
+
+const IconBounds = styled.div<{ expanded: boolean }>`
+  ${({ theme, expanded }) => css`
+    margin-right: ${theme.spacing[2]};
+    transform: rotate(${expanded ? '90deg' : '0deg'});
+    transition: transform 0.2s ease-in-out;
+  `}
+`;
+
+const TitleContainer = styled.div`
+  ${({ theme }) => css`
+    position: relative;
+    overflow: visible;
+    padding-bottom: ${theme.spacing[4]};
+  `}
+`;
 
 const Header = styled.div`
   display: flex;

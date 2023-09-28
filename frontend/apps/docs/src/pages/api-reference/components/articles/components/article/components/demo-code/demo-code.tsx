@@ -1,9 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CodeBlock, media } from '@onefootprint/ui';
-import React from 'react';
+import React, { useMemo } from 'react';
 
-import type { Content } from '@/api-reference/api-reference.types';
+import type {
+  Content,
+  ContentSchema,
+} from '@/api-reference/api-reference.types';
 import {
   getExample,
   getSchemaFromComponent,
@@ -20,21 +23,31 @@ const DemoCode = ({ requestBody, responses }: DemoCodeProps) => {
   return (
     <Container>
       {requestSchema && (
-        <CodeBlock language={t('request-example')}>
-          {JSON.stringify(getExample(requestSchema), null, 2)}
-        </CodeBlock>
+        <Block title={t('request-example')} schema={requestSchema} />
       )}
       {responses
         ? Object.entries(responses).map(([code]) => {
             const schema = getSchemaFromComponent(responses[code]);
             return schema ? (
-              <CodeBlock key={code} language={t('response-example')}>
-                {JSON.stringify(getExample(schema), null, 2)}
-              </CodeBlock>
+              <Block key={code} title={t('response-example')} schema={schema} />
             ) : null;
           })
         : null}
     </Container>
+  );
+};
+
+type BlockProps = {
+  title: string;
+  schema: ContentSchema;
+};
+
+const Block = ({ title, schema }: BlockProps) => {
+  const example = useMemo(() => getExample(schema), []);
+  return (
+    <CodeBlock language="json" title={title}>
+      {JSON.stringify(example, null, 2)}
+    </CodeBlock>
   );
 };
 

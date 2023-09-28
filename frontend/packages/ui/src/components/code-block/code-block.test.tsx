@@ -18,14 +18,16 @@ describe('<CodeBlock />', () => {
     ariaLabel = 'Copy to clipboard',
     children = content,
     language = 'html',
+    title,
     tooltipText = 'Copy to clipboard',
     tooltipTextConfirmation = 'Copied!',
   }: Partial<CodeBlockProps>) =>
     customRender(
       <ToastProvider>
         <CodeBlock
-          language={language}
           ariaLabel={ariaLabel}
+          language={language}
+          title={title}
           tooltipText={tooltipText}
           tooltipTextConfirmation={tooltipTextConfirmation}
         >
@@ -33,6 +35,18 @@ describe('<CodeBlock />', () => {
         </CodeBlock>
       </ToastProvider>,
     );
+
+  it('should show the title', () => {
+    renderCode({ title: 'Example' });
+    const title = screen.getByText('Example');
+    expect(title).toBeInTheDocument();
+  });
+
+  it('should show the language if no title is provided', () => {
+    renderCode({ language: 'html' });
+    const title = screen.getByText('html');
+    expect(title).toBeInTheDocument();
+  });
 
   describe('when hovering the button', () => {
     it('should show a tooltip', async () => {

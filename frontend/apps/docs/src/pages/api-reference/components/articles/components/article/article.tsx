@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Box, media, Typography } from '@onefootprint/ui';
+import { Box, media, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Element } from 'react-scroll';
 
@@ -33,10 +33,10 @@ const Article = ({
   return (
     <ArticleContainer id={encodedId} name={encodedId}>
       <ContentColumn>
-        <Container>
+        <TitleContainer direction="column" gap={3}>
           {method && path && <Path type={method} url={path} />}
           {description && <Description>{description}</Description>}
-        </Container>
+        </TitleContainer>
         {security && (
           <Requests>
             <Typography variant="label-1" sx={{ marginTop: 3 }}>
@@ -81,9 +81,16 @@ const ArticleContainer = styled(Element)<{ name: string }>`
   `}
 `;
 
-const Container = styled.div`
-  width: 100%;
-  margin: 0 auto;
+const TitleContainer = styled(Stack)`
+  ${({ theme }) => css`
+    width: 100%;
+    margin: 0 auto;
+    margin-bottom: ${theme.spacing[3]};
+
+    & > *:first-child {
+      margin-left: calc(-1 * ${theme.spacing[2]});
+    }
+  `}
 `;
 
 const ContentColumn = styled.div`

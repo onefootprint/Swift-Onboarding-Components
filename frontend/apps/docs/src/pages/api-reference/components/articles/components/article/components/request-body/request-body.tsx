@@ -27,8 +27,8 @@ const RequestBody = ({ requestBody }: RequestBodyProps) => {
 const Title = styled.h3`
   ${({ theme }) => css`
     ${createFontStyles('label-3')}
-    color: ${theme.color.primary};
-    margin-bottom: ${theme.spacing[5]};
+    color: ${theme.color.secondary};
+    margin-bottom: ${theme.spacing[2]};
   `}
 `;
 

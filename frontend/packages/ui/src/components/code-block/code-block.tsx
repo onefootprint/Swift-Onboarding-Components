@@ -1,5 +1,5 @@
 import styled, { css, useTheme } from '@onefootprint/styled';
-import React from 'react';
+import React, { memo } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 
 import { createFontStyles } from '../../utils/mixins';
@@ -7,6 +7,7 @@ import CopyButton from '../copy-button';
 import Typography from '../typography';
 
 export type CodeBlockProps = {
+  title?: string;
   language: string;
   children: string;
   tooltipText?: string;
@@ -15,6 +16,7 @@ export type CodeBlockProps = {
 };
 
 const CodeBlock = ({
+  title,
   language,
   children,
   tooltipText = 'Copy to clipboard',
@@ -26,7 +28,7 @@ const CodeBlock = ({
   return (
     <Container>
       <Header>
-        <Typography variant="label-3">{language}</Typography>
+        <Typography variant="label-3">{title || language}</Typography>
         <CopyButton
           contentToCopy={children}
           tooltipText={tooltipText}

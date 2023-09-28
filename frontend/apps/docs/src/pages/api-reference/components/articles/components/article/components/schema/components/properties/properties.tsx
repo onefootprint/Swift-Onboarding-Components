@@ -19,13 +19,12 @@ const Properties = ({ properties }: PropertiesProps) => (
 
 const Container = styled.div`
   ${({ theme }) => css`
-    border-left: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[5]};
     padding-left: ${theme.spacing[2]};
     margin-left: ${theme.spacing[4]};
     position: relative;
+    border-left: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
 `;
 

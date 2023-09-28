@@ -40,7 +40,6 @@ const Container = styled.div`
     display: flex;
     align-items: center;
     gap: ${theme.spacing[2]};
-    margin-left: -${theme.spacing[1]};
   `}
 `;
 

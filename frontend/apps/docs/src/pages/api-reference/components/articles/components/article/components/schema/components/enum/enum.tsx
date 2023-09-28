@@ -18,7 +18,7 @@ const Enum = ({ enums }: EnumProps) => {
 
   return (
     <Container>
-      <Typography variant="body-4" color="secondary">
+      <Typography variant="body-4" color="tertiary">
         {t('allowed-values')}
       </Typography>
       <List>
