@@ -304,6 +304,8 @@ export { default as IcoVisa24 } from './ico-visa-colored-24';
 export { default as IcoVisaPassport24 } from './ico-visa-passport-24';
 export { default as IcoVisaelectron16 } from './ico-visaelectron-colored-16';
 export { default as IcoVisaelectron24 } from './ico-visaelectron-colored-24';
+export { default as IcoVoter16 } from './ico-voter-16';
+export { default as IcoVoter24 } from './ico-voter-24';
 export { default as IcoWallet16 } from './ico-wallet-16';
 export { default as IcoWallet24 } from './ico-wallet-24';
 export { default as IcoWand16 } from './ico-wand-16';
