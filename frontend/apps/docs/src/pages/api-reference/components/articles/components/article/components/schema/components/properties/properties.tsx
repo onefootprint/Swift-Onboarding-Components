@@ -1,12 +1,12 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import type { SchemaPropertyItem } from '@/api-reference/api-reference.types';
+import type { ContentSchema } from '@/api-reference/api-reference.types';
 
 import Property from './components/property';
 
 export type PropertiesProps = {
-  properties: Record<string, SchemaPropertyItem>;
+  properties: Record<string, ContentSchema>;
 };
 
 const Properties = ({ properties }: PropertiesProps) => (

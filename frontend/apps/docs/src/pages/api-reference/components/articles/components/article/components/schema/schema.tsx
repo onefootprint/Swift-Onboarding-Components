@@ -1,8 +1,9 @@
 import styled, { css } from '@onefootprint/styled';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
+import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
 
-import type { ComponentSchema } from '@/api-reference/api-reference.types';
+import type { ContentSchema } from '@/api-reference/api-reference.types';
 
 import Description from '../description';
 import Enum from './components/enum';
@@ -10,15 +11,31 @@ import Header from './components/header';
 import Properties from './components/properties/properties';
 
 type SchemaProps = {
-  schema: ComponentSchema;
+  schema: ContentSchema;
 };
 
 const Schema = ({ schema }: SchemaProps) => {
-  const { properties, required = [] } = schema;
+  // We should make this a fully recursive component, similar to getExample
+  let schemaToRender: ContentSchema | undefined = schema;
+  if (schema.type === 'array') {
+    // TODO we need to provide another distinction in the UI that the body is an array and not an
+    // object
+    schemaToRender = schema.items;
+  }
+  const ref = schemaToRender?.$ref;
+  if (ref) {
+    schemaToRender = evaluateSchemaRef(ref);
+  }
+  if (!schemaToRender) {
+    return null;
+  }
+  const { properties, required = [] } = schemaToRender;
 
   return properties ? (
     <Container>
-      {schema.description && <Description>{schema.description}</Description>}
+      {schemaToRender.description && (
+        <Description>{schemaToRender.description}</Description>
+      )}
       {Object.entries(properties).map(([title, property]) => (
         <LinedContainer
           key={title}

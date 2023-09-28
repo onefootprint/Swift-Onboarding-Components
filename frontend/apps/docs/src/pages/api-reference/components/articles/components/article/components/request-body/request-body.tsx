@@ -16,7 +16,7 @@ const RequestBody = ({ requestBody }: RequestBodyProps) => {
   const { t } = useTranslation('pages.api-reference');
   const schema = getSchemaFromComponent(requestBody);
 
-  return schema && schema.properties ? (
+  return schema ? (
     <Box>
       <Title>{t('request-body')}</Title>
       <Schema schema={schema} />

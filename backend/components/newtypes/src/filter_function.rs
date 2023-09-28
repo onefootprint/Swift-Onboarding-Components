@@ -21,6 +21,8 @@ use crate::PiiBytes;
 #[strum_discriminants(vis(pub))]
 #[strum_discriminants(strum(serialize_all = "snake_case"))]
 #[serde(rename_all = "snake_case")]
+// TODO this is a really unconventional format for filters... we should change the serde serialization
+// to tagged, with {"kind": "date_format", "args": {}}
 pub enum FilterFunction {
     ToLowercase,
     ToUppercase,

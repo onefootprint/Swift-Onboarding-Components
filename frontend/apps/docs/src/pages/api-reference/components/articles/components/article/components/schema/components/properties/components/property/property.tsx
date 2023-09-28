@@ -4,7 +4,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Box, CodeInline, createFontStyles } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import type { SchemaPropertyItem } from '@/api-reference/api-reference.types';
+import type { ContentSchema } from '@/api-reference/api-reference.types';
 
 import Description from '../../../../../description';
 import Enum from '../../../enum';
@@ -12,7 +12,7 @@ import Enum from '../../../enum';
 export type PropertyProps = {
   isRequired?: boolean;
   level?: number;
-  property: SchemaPropertyItem;
+  property: ContentSchema;
   title: string;
 };
 

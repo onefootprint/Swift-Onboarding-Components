@@ -7,7 +7,7 @@ use crate::{
 
 flat_api_object_map_type!(
     RawDataRequest<DataIdentifier, PiiJsonValue>,
-    description="Key-value map for data to store in the vault",
+    description="Key-value map of data to add to the vault",
     example=r#"{ "id.first_name": "Jane", "custom.ach_account_number": "1234567890", "custom.cc_last_4": "4242" }"#
 );
 

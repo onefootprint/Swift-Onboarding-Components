@@ -16,6 +16,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateOnboardingSessionRequest {
+    // TODO this should be a key
     pub onboarding_config_id: ObConfigurationId,
 }
 

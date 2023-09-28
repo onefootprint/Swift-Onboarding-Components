@@ -4,7 +4,10 @@ import { CodeBlock, media } from '@onefootprint/ui';
 import React from 'react';
 
 import type { Content } from '@/api-reference/api-reference.types';
-import { getSchemaFromComponent } from '@/api-reference/utils/get-schemas';
+import {
+  getExample,
+  getSchemaFromComponent,
+} from '@/api-reference/utils/get-schemas';
 
 export type DemoCodeProps = {
   responses: Record<string, Content>;
@@ -13,23 +16,26 @@ export type DemoCodeProps = {
 
 const DemoCode = ({ requestBody, responses }: DemoCodeProps) => {
   const { t } = useTranslation('pages.api-reference');
-  // this is the guy that we need to implement
-  // we first get the schema, and from there, you'll understand
   const requestSchema = getSchemaFromComponent(requestBody);
-  console.log(requestSchema);
-
-  return responses ? (
+  return (
     <Container>
-      {Object.entries(responses).map(([code]) => {
-        const schema = getSchemaFromComponent(responses[code]);
-        return schema && schema.example ? (
-          <CodeBlock key={code} language={t('response-example')}>
-            {JSON.stringify(schema.example, null, 2)}
-          </CodeBlock>
-        ) : null;
-      })}
+      {requestSchema && (
+        <CodeBlock language={t('request-example')}>
+          {JSON.stringify(getExample(requestSchema), null, 2)}
+        </CodeBlock>
+      )}
+      {responses
+        ? Object.entries(responses).map(([code]) => {
+            const schema = getSchemaFromComponent(responses[code]);
+            return schema ? (
+              <CodeBlock key={code} language={t('response-example')}>
+                {JSON.stringify(getExample(schema), null, 2)}
+              </CodeBlock>
+            ) : null;
+          })
+        : null}
     </Container>
-  ) : null;
+  );
 };
 
 const Container = styled.div`
