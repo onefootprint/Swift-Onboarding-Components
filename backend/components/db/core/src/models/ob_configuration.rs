@@ -85,11 +85,13 @@ impl ObConfiguration {
             IdDocKind::iter().collect()
         };
 
+        let doc_country_mapping_helper = self.get_supported_country_struct();
+
         // For each id doc kind configured, compute which countries we support
         let countries_and_doc_types: Vec<(Iso3166TwoDigitCountryCode, IdDocKind)> = id_doc_kinds
             .into_iter()
             .flat_map(|doc_type| {
-                let out: Vec<(Iso3166TwoDigitCountryCode, IdDocKind)> = self
+                let out: Vec<(Iso3166TwoDigitCountryCode, IdDocKind)> = doc_country_mapping_helper
                     .supported_countries_for_doc_type(doc_type)
                     .into_iter()
                     .map(|c| (c, doc_type))
@@ -120,6 +122,7 @@ impl ObConfiguration {
                     && residential_country
                         .map(|c| !c.is_us_including_territories())
                         .unwrap_or(false)
+                    && !doc_country_mapping_helper.is_override()
                 {
                     acc
                 } else {
@@ -165,29 +168,11 @@ impl ObConfiguration {
     }
 
     // Assumes you've checked if the document type is supported already
-    fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
+    fn get_supported_country_struct(&self) -> Box<dyn SupportedCountriesForDocType> {
         if self.tenant_id.is_findigs() {
-            // latest list from 2023-09-27: https://onefootprint.slack.com/archives/C05768Z3JRY/p1695821817977629?thread_ts=1695821455.535009&cid=C05768Z3JRY
-            match doc_type {
-                IdDocKind::IdCard => Iso3166TwoDigitCountryCode::iter().collect(),
-                IdDocKind::DriversLicense => Iso3166TwoDigitCountryCode::iter().collect(),
-                IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
-                IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::US],
-                IdDocKind::Visa => Iso3166TwoDigitCountryCode::iter().collect(),
-                IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
-                IdDocKind::VoterIdentification => vec![],
-            }
+            Box::new(Findigs)
         } else {
-            let all_us_and_territories = Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories();
-            match doc_type {
-                IdDocKind::IdCard => all_us_and_territories,
-                IdDocKind::DriversLicense => all_us_and_territories,
-                IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
-                IdDocKind::Permit => all_us_and_territories,
-                IdDocKind::Visa => all_us_and_territories,
-                IdDocKind::ResidenceDocument => all_us_and_territories,
-                IdDocKind::VoterIdentification => vec![],
-            }
+            Box::new(Default)
         }
     }
 
@@ -202,6 +187,46 @@ impl ObConfiguration {
 
     pub fn should_stepup_to_do_for_optional_ssn(&self) -> bool {
         self.document_cdo_for_optional_ssn().is_some()
+    }
+}
+
+trait SupportedCountriesForDocType {
+    fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode>;
+    fn is_override(&self) -> bool;
+}
+struct Findigs;
+impl SupportedCountriesForDocType for Findigs {
+    fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
+        match doc_type {
+            IdDocKind::IdCard => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::DriversLicense => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::US],
+            IdDocKind::Visa => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
+            IdDocKind::VoterIdentification => vec![],
+        }
+    }
+    fn is_override(&self) -> bool {
+        true
+    }
+}
+struct Default;
+impl SupportedCountriesForDocType for Default {
+    fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
+        let all_us_and_territories = Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories();
+        match doc_type {
+            IdDocKind::IdCard => all_us_and_territories,
+            IdDocKind::DriversLicense => all_us_and_territories,
+            IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::Permit => all_us_and_territories,
+            IdDocKind::Visa => all_us_and_territories,
+            IdDocKind::ResidenceDocument => all_us_and_territories,
+            IdDocKind::VoterIdentification => vec![],
+        }
+    }
+    fn is_override(&self) -> bool {
+        false
     }
 }
 
