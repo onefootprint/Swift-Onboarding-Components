@@ -64,6 +64,7 @@ pub struct NewWorkflow {
     pub status: Option<OnboardingStatus>,
     pub ob_configuration_id: Option<ObConfigurationId>,
     pub insight_event_id: Option<InsightEventId>,
+    pub authorized_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone)]
@@ -74,6 +75,7 @@ pub struct NewWorkflowArgs {
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub ob_configuration_id: Option<ObConfigurationId>,
     pub insight_event_id: Option<InsightEventId>,
+    pub authorized: bool,
 }
 
 #[derive(Debug, Default, AsChangeset)]
@@ -163,6 +165,7 @@ pub struct OnboardingWorkflowArgs {
     pub scoped_vault_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event: Option<CreateInsightEvent>,
+    pub authorized: bool,
 }
 
 pub type IsNew = bool;
@@ -196,6 +199,7 @@ impl Workflow {
             scoped_vault_id,
             ob_configuration_id,
             insight_event,
+            authorized,
         } = args;
 
         let sv = ScopedVault::lock(conn, &scoped_vault_id)?;
@@ -245,6 +249,7 @@ impl Workflow {
             config,
             fixture_result,
             ob_configuration_id: Some(ob_configuration_id),
+            authorized,
             insight_event_id,
         };
         let wf = Self::create(conn, args)?;
@@ -265,6 +270,7 @@ impl Workflow {
             fixture_result,
             ob_configuration_id,
             insight_event_id,
+            authorized,
         } = args;
         let kind = config.kind();
         let initial_state = match kind {
@@ -283,6 +289,7 @@ impl Workflow {
             status: Some(OnboardingStatus::Incomplete),
             ob_configuration_id,
             insight_event_id,
+            authorized_at: authorized.then_some(Utc::now()),
         };
 
         Self::insert(conn, new_workflow)
@@ -607,6 +614,7 @@ mod tests {
                 status: Some(OnboardingStatus::Incomplete),
                 ob_configuration_id: None,
                 insight_event_id: None,
+                authorized_at: None,
             },
         )
         .unwrap();
@@ -631,6 +639,7 @@ mod tests {
                 status: Some(OnboardingStatus::Incomplete),
                 ob_configuration_id: None,
                 insight_event_id: None,
+                authorized_at: None,
             },
         )
         .unwrap();

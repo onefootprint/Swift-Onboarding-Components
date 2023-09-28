@@ -60,6 +60,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
                     status: Some(OnboardingStatus::Incomplete),
                     ob_configuration_id: Some(obc.id),
                     insight_event_id: None,
+                    authorized_at: None,
                 },
             )
         })
@@ -538,6 +539,7 @@ async fn redo_and_pass(
                 fixture_result,
                 ob_configuration_id: obc_id,
                 insight_event_id: None,
+                authorized: false,
             };
             Workflow::create(conn, args)
         })

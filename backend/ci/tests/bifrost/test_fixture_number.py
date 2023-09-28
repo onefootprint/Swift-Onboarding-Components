@@ -6,28 +6,31 @@ from tests.constants import FIXTURE_PHONE_NUMBER
 
 
 @pytest.fixture(scope="session")
-def ob_config2(sandbox_tenant, must_collect_data, can_access_data):
+def ob_config2(sandbox_tenant, must_collect_data):
     ob_conf_data = {
         "name": "Acme Bank Card 2",
         "must_collect_data": must_collect_data,
-        "can_access_data": can_access_data,
+        "can_access_data": must_collect_data,
     }
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
 
 @pytest.mark.parametrize("use_phone", [True, False])
-def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
+def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
-    ob_config = sandbox_tenant.default_ob_config
 
     identify_data = dict(identifier=dict(phone_number=FIXTURE_PHONE_NUMBER))
-    body = post("hosted/identify", identify_data, ob_config.key, sandbox_id_h)
+    body = post("hosted/identify", identify_data, ob_config2.key, sandbox_id_h)
     assert not body["user_found"]
 
-    bifrost = BifrostClient.create(ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id)
+    bifrost = BifrostClient.create(ob_config2, twilio, FIXTURE_PHONE_NUMBER, sandbox_id)
     bifrost.run()
-    assert bifrost.handled_requirements
+    assert [i["kind"] for i in bifrost.handled_requirements] == [
+        "collect_data",
+        "liveness",
+        "process",
+    ]
 
     # User exists now, but shouldn't be able to find it without exact tenant auth
     if use_phone:
@@ -40,10 +43,36 @@ def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
     assert not body["user_found"]
     body = post("hosted/identify", data, tenant.default_ob_config.key, sandbox_id_h)
     assert not body["user_found"]
-    body = post("hosted/identify", data, ob_config.key, sandbox_id_h)
+    body = post("hosted/identify", data, ob_config2.key, sandbox_id_h)
     assert body["user_found"]
 
-    print("HELLOOOOOOOOOOOOO")
+    bifrost2 = BifrostClient.inherit(
+        sandbox_tenant.default_ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
+    )
+    bifrost2.run()
+    assert [i["kind"] for i in bifrost2.handled_requirements] == [
+        "process",
+    ]
+    assert set(i["kind"] for i in bifrost2.already_met_requirements) == {
+        "authorize",
+        "collect_data",
+    }
+
+
+def test_one_click_same_tenant_no_decryption_bleeding(
+    sandbox_tenant, ob_config2, twilio
+):
+    # If we onboard onto sandbox_tenant.default_ob_config first, the second onboarding _must_ require authorizing
+    # default_ob_config doesn't have full decryption permissions - so if we automatically authorized
+    # the second workflow, it would instantly grant decryption permissions to the second workflow
+    # that the user didn't already have
+    sandbox_id = _gen_random_sandbox_id()
+    ob_config = sandbox_tenant.default_ob_config
+    bifrost = BifrostClient.create(ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id)
+    bifrost.run()
+
+    # Now onboard onto second ob config. This ob config needs access to more data than is already
+    # granted by the first ob config, so it cannot be automatically authorized
     bifrost2 = BifrostClient.inherit(
         ob_config2, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
     )
@@ -52,7 +81,9 @@ def test_one_click(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
         "authorize",
         "process",
     ]
-    assert set(i["kind"] for i in bifrost2.already_met_requirements) == {"collect_data"}
+    assert set(i["kind"] for i in bifrost2.already_met_requirements) == {
+        "collect_data",
+    }
 
 
 def test_identify_fixture_phone_number_non_sandbox(sandbox_tenant):

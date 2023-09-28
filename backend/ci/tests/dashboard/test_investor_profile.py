@@ -16,7 +16,6 @@ def sb_user_with_investor_profile(sandbox_tenant, investor_profile_ob_config, tw
         "collect_data",
         "collect_investor_profile",
         "liveness",
-        "authorize",
         "process",
     ]
     return user

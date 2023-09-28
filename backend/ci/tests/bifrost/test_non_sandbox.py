@@ -7,6 +7,7 @@ from tests.utils import (
     post,
     patch,
     clean_up_user,
+    get_requirement_from_requirements,
 )
 
 
@@ -39,18 +40,18 @@ def test_onboarding_init(bifrost):
     body = bifrost.get_status()
     assert body["ob_configuration"]["org_name"] == bifrost.ob_config.tenant.name
 
-    req = lambda kind: next(
-        r for r in body["all_requirements"] if r["kind"] == kind and not r["is_met"]
+    collect_data_req = get_requirement_from_requirements(
+        "collect_data", body["all_requirements"]
     )
-
-    collect_data_req = req("collect_data")
     expected_data = set(bifrost.ob_config.must_collect_data) - {"phone_number", "email"}
     assert set(collect_data_req["missing_attributes"]) == expected_data
 
-    authorize_fields = req("authorize")["fields_to_authorize"]["collected_data"]
+    authorize_fields = get_requirement_from_requirements(
+        "authorize", body["all_requirements"], is_met=True
+    )["fields_to_authorize"]["collected_data"]
     assert set(authorize_fields) == set(bifrost.ob_config.can_access_data)
 
-    assert req("liveness")
+    assert get_requirement_from_requirements("liveness", body["all_requirements"])
 
     # Shouldn't be able to complete the onboarding until user data is provided
     bifrost.handle_authorize(status_code=400)

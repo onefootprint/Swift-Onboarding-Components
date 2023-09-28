@@ -17,6 +17,8 @@ use newtypes::{
 
 use crate::errors::ApiResult;
 
+use super::vault_wrapper::{Any, TenantVw, VaultWrapper};
+
 pub struct NewBusinessVaultArgs {
     pub public_key: VaultPublicKey,
     pub e_private_key: EncryptedVaultPrivateKey,
@@ -33,11 +35,22 @@ pub fn get_or_start_onboarding(
 ) -> ApiResult<(Workflow, Option<Workflow>)> {
     let user_vault = Vault::lock(conn, v_id)?;
 
-    // Create the onboarding for this scoped user
+    let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, sv_id)?;
+    let is_all_visible_data_added_by_tenant = vw.populated_dis().into_iter().all(|di| {
+        let Some(dl) = vw.get_lifetime(di.clone()) else {
+            return false; // Shouldn't happen
+        };
+        // Data must be added by tenant AND already decryptable
+        &dl.scoped_vault_id == sv_id && vw.can_decrypt(di)
+    });
+
+    // Create the workflow for this scoped user
     let ob_create_args = OnboardingWorkflowArgs {
         scoped_vault_id: sv_id.clone(),
         ob_configuration_id: obc.id.clone(),
         insight_event: insight_event.clone(),
+        // If all visible data was added by this tenant, we can immediately mark the Workflow as authorized.
+        authorized: is_all_visible_data_added_by_tenant,
     };
 
     // TODO rm this when fixture result is passed in process
@@ -72,6 +85,7 @@ pub fn get_or_start_onboarding(
             let ob_create_args = OnboardingWorkflowArgs {
                 scoped_vault_id: sb.id,
                 ob_configuration_id: obc.id.clone(),
+                authorized: true,
                 insight_event,
             };
             let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result)?;

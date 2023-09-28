@@ -79,11 +79,10 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
         expected_populated_attributes
     )
 
-    authorize_requirement = get_requirement_from_requirements(
-        "authorize", status["all_requirements"]
+    authorize = get_requirement_from_requirements(
+        "authorize", status["all_requirements"], is_met=True
     )
-
-    assert set(authorize_requirement["fields_to_authorize"]["collected_data"]) == set(
+    assert set(authorize["fields_to_authorize"]["collected_data"]) == set(
         expected_populated_attributes
     )
 

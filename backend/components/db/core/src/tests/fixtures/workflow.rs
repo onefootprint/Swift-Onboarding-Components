@@ -17,6 +17,7 @@ pub fn create(
     let args = OnboardingWorkflowArgs {
         scoped_vault_id: sv_id,
         ob_configuration_id: obc_id,
+        authorized: false,
         insight_event: Some(CreateInsightEvent { ..Default::default() }),
     };
     let (wf, _) = Workflow::get_or_create_onboarding(conn, args, fixture_result).unwrap();

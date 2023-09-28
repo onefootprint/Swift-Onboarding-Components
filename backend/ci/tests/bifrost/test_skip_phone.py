@@ -90,7 +90,7 @@ def test_new_user(skip_phone_obc):
     assert set(collect_data_req["missing_attributes"]) == set(["full_address", "name"])
     assert set(collect_data_req["populated_attributes"]) == set(["email"])
 
-    authorize_req = get_requirement_from_requirements("authorize", reqs)
+    authorize_req = get_requirement_from_requirements("authorize", reqs, is_met=True)
     assert set(authorize_req["fields_to_authorize"]["collected_data"]) == set(
         collect_data
     )

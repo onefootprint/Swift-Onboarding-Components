@@ -140,9 +140,9 @@ def test_upload_documents_with_ob_config_restriction(
     post("hosted/user/documents", data, bifrost.auth_token)
 
     bifrost.handle_requirements(kind="collect_document")
-    status_after_doc_upload = bifrost.get_status()
+    status = bifrost.get_status()
     fields_to_authorize = get_requirement_from_requirements(
-        "authorize", status_after_doc_upload["all_requirements"]
+        "authorize", status["all_requirements"], is_met=True
     )["fields_to_authorize"]
     document_types_to_authorize = fields_to_authorize["document_types"]
     # despite having created identity documents for NO passport, MX DL, we only actually uploaded successfully a DL
@@ -185,9 +185,9 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
         assert body["next_side_to_collect"] == next_side
         assert not body["errors"]
     # now check what fields we have to authorize
-    status_after_doc = bifrost.get_status()
+    status = bifrost.get_status()
     fields_to_authorize = get_requirement_from_requirements(
-        "authorize", status_after_doc["all_requirements"]
+        "authorize", status["all_requirements"], is_met=True
     )["fields_to_authorize"]
     collected_fields_to_authorize = fields_to_authorize["collected_data"]
     document_types_to_authorize = fields_to_authorize["document_types"]

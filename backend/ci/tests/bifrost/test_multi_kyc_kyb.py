@@ -118,14 +118,26 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     )
 
 
-def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
+@pytest.fixture(scope="session")
+def ob_config2(sandbox_tenant, must_collect_data):
+    # Need a new ob config that has access to decrypt everything - otherwise, one-click workflows
+    # won't be auto-authorized
+    ob_conf_data = {
+        "name": "Acme Bank Card 2",
+        "must_collect_data": must_collect_data,
+        "can_access_data": must_collect_data,
+    }
+    return create_ob_config(sandbox_tenant, **ob_conf_data)
+
+
+def test_one_click_bos(sandbox_tenant, ob_config2, kyb_sandbox_ob_config, twilio):
     # Create two users onboarded onto the default OB config
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+    bifrost = BifrostClient.new(ob_config2, twilio)
     primary_bo = bifrost.run()
     assert primary_bo.fp_id
     assert not primary_bo.fp_bid
 
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+    bifrost = BifrostClient.new(ob_config2, twilio)
     secondary_bo = bifrost.run()
     assert secondary_bo.fp_id
     assert not secondary_bo.fp_bid
@@ -151,9 +163,9 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     assert bifrost.validate_response["business"]["status"] == "incomplete"
     # Assert we only had business requirements to satisfy - identity data filled out in previous
     # onboarding
+    # No Authorize since they already onboarded at this tenant
     assert [r["kind"] for r in primary_bo.client.handled_requirements] == [
         "collect_business_data",
-        "authorize",
         "process",
     ]
 
@@ -183,7 +195,6 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
     # Assert we had no requirements to satisfy - business filled out by primary_bo, and identity
     # filled out in previous onboarding
     assert [r["kind"] for r in secondary_bo.client.handled_requirements] == [
-        "authorize",
         "process",
     ]
 

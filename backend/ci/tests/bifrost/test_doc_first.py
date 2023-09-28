@@ -12,7 +12,6 @@ def test_doc_first(sandbox_tenant, doc_first_obc, twilio):
         "liveness",
         "collect_document",
         "collect_data",
-        "authorize",
         "process",
     ]
     # When we handled the collect_data requirement, make sure some attributes were autofilled from

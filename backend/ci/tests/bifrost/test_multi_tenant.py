@@ -54,7 +54,7 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
     foo_fp_id = foo_user.fp_id
 
     assert [i["kind"] for i in foo_bifrost.handled_requirements] == [
-        "authorize",
+        "authorize",  # Should have authorize here because it's a one-click at another tenant
         "process",
     ]
 

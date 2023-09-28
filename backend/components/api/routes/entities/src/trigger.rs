@@ -93,6 +93,7 @@ pub async fn post(
                         fixture_result: last_wf.fixture_result,
                         ob_configuration_id: last_wf.ob_configuration_id,
                         insight_event_id: None,
+                        authorized: false,
                     };
                     let wf = Workflow::create(conn, args)?;
                     let obc_id = wf
@@ -113,6 +114,7 @@ pub async fn post(
                         fixture_result: last_wf.fixture_result,
                         ob_configuration_id: last_wf.ob_configuration_id,
                         insight_event_id: None,
+                        authorized: false,
                     };
                     let wf = Workflow::create(conn, args)?;
                     let args = NewDocumentRequestArgs {

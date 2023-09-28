@@ -399,7 +399,8 @@ fn get_requirement_inner(
                 // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
                 let id_docs = IdentityDocument::list_by_wf_id(conn, &args.workflow.id)?;
                 let doc_types = id_docs
-                        .iter() // check we've actually completed the document, it's not just an empty id doc
+                        .iter()
+                        // check we've actually completed the document, it's not just an empty id doc
                         // TODO: maybe we should revisit this empty ID doc shell design?
                         .filter(|i| i.completed_seqno.is_some())
                         .map(|id| id.document_type)

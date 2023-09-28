@@ -55,6 +55,7 @@ async fn create_workflow(
                     status: Some(OnboardingStatus::Incomplete),
                     ob_configuration_id: None,
                     insight_event_id: None,
+                    authorized_at: None,
                 },
             )
         })

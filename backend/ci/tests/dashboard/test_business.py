@@ -23,7 +23,6 @@ def primary_bo(kyb_sandbox_ob_config, twilio):
         "collect_business_data",
         "collect_data",
         "liveness",
-        "authorize",
         "process",
     ]
     return user

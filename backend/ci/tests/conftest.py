@@ -129,6 +129,7 @@ def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_
         can_access_data + ["document_and_selfie"],
     )
 
+
 @pytest.fixture(scope="session")
 def kyb_cdos():
     return [
@@ -180,7 +181,6 @@ def sandbox_user(sandbox_tenant, twilio):
     assert [i["kind"] for i in bifrost.handled_requirements] == [
         "collect_data",
         "liveness",
-        "authorize",
         "process",
     ]
     return user

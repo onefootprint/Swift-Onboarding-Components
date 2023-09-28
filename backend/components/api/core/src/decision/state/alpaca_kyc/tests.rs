@@ -741,6 +741,7 @@ async fn redo_and_pass(
                 fixture_result,
                 ob_configuration_id: obc_id,
                 insight_event_id: None,
+                authorized: false,
             };
             Workflow::create(conn, args)
         })

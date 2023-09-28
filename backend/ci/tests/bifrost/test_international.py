@@ -32,7 +32,7 @@ def test_international_address_req(sandbox_tenant, must_collect_data, twilio):
     assert "full_address" not in req["missing_attributes"]
     assert "ssn9" not in req["missing_attributes"]
     fields_to_authorize = get_requirement_from_requirements(
-        "authorize", status["all_requirements"]
+        "authorize", status["all_requirements"], is_met=True
     )["fields_to_authorize"]["collected_data"]
     assert "ssn9" not in fields_to_authorize
 
@@ -249,14 +249,14 @@ def test_us_legal_status(sandbox_tenant, twilio):
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
 
-    status_after_address = bifrost.get_status()
+    status = bifrost.get_status()
     collect_data_requirement_after_address = get_requirement_from_requirements(
-        "collect_data", status_after_address["all_requirements"]
+        "collect_data", status["all_requirements"]
     )
 
     assert collect_data_requirement_after_address is None
 
     fields_to_authorize = get_requirement_from_requirements(
-        "authorize", status_after_address["all_requirements"]
+        "authorize", status["all_requirements"], is_met=True
     )["fields_to_authorize"]["collected_data"]
     assert "us_legal_status" not in fields_to_authorize

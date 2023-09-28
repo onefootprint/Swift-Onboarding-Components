@@ -52,6 +52,8 @@ pub async fn post(user_auth: UserWfAuthContext, state: web::Data<State>) -> Json
                 Workflow::update(wf, c, WorkflowUpdate::is_authorized())?;
             }
 
+            // TODO we eventually won't hit this anymore because business workflows are now
+            // automatically authorized
             let biz_wf = user_auth.business_workflow(c)?;
             if let Some(biz_wf) = biz_wf {
                 let biz_wf = Workflow::lock(c, &biz_wf.id)?;
