@@ -1,7 +1,7 @@
 use crate::{FootprintReasonCode as FRC, IdDocKind};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::Display;
-use strum_macros::EnumString;
+use strum_macros::{EnumString, EnumIter};
 
 #[derive(Clone)]
 pub struct IncodeRCH {
@@ -296,7 +296,7 @@ impl IncodeTest {
     }
 }
 
-#[derive(Display, Debug, Clone, EnumString, Eq, PartialEq, Hash, DeserializeFromStr, SerializeDisplay)]
+#[derive(Display, Debug, Clone, EnumString, Eq, PartialEq, Hash, DeserializeFromStr, SerializeDisplay, EnumIter)]
 pub enum IncodeDocumentType {
     #[strum(serialize = "Unknown")]
     Unknown,
@@ -349,6 +349,7 @@ impl<'a> TryFrom<&'a IncodeDocumentType> for IdDocKind {
             IncodeDocumentType::Permit => Ok(Self::Permit),
             IncodeDocumentType::Visa => Ok(Self::Visa),
             IncodeDocumentType::ResidenceDocument => Ok(Self::ResidenceDocument),
+            IncodeDocumentType::VoterIdentification => Ok(Self::VoterIdentification),
             _ => Err(crate::Error::Custom(format!(
                 "Incode document type {} not supported",
                 value
@@ -362,4 +363,20 @@ pub enum IncodeDocumentRestriction {
     NoDriverLicensePermit,
     ConservativeGlare,
     ConservativeSharpness,
+}
+
+
+#[cfg(test)]
+mod tests {
+    use strum::IntoEnumIterator;
+
+    use crate::IdDocKind;
+
+    use super::IncodeDocumentType;
+
+    #[test]
+    fn test_we_added_incode_kind_to_id_doc_kind_mapping() {
+        let incode_doc_types_mapped_to_our_doc_types: Vec<IdDocKind> = IncodeDocumentType::iter().filter_map(|dt| IdDocKind::try_from(&dt).ok()).collect();
+        IdDocKind::iter().for_each(|doc_kind| assert!(incode_doc_types_mapped_to_our_doc_types.contains(&doc_kind), "{}", format!("Make sure you add {} to TryFrom<&'a IncodeDocumentType> for IdDocKind", doc_kind)))
+    }
 }

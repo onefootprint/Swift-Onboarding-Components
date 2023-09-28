@@ -175,6 +175,7 @@ impl ObConfiguration {
                 IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::US],
                 IdDocKind::Visa => Iso3166TwoDigitCountryCode::iter().collect(),
                 IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
+                IdDocKind::VoterIdentification => vec![],
             }
         } else {
             let all_us_and_territories = Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories();
@@ -185,6 +186,7 @@ impl ObConfiguration {
                 IdDocKind::Permit => all_us_and_territories,
                 IdDocKind::Visa => all_us_and_territories,
                 IdDocKind::ResidenceDocument => all_us_and_territories,
+                IdDocKind::VoterIdentification => vec![],
             }
         }
     }

@@ -36,6 +36,7 @@ pub enum IdDocKind {
     Permit,
     Visa,
     ResidenceDocument,
+    VoterIdentification,
 }
 
 crate::util::impl_enum_string_diesel!(IdDocKind);
@@ -51,6 +52,7 @@ impl IdDocKind {
             Self::Permit => vec![DocumentSide::Front, DocumentSide::Back],
             Self::Visa => vec![DocumentSide::Front],
             Self::ResidenceDocument => vec![DocumentSide::Front, DocumentSide::Back],
+            Self::VoterIdentification => vec![DocumentSide::Front, DocumentSide::Back],
         }
     }
 
@@ -81,6 +83,9 @@ impl TryFrom<IdDocKind> for AlpacaDocumentType {
                 "not a supported alpaca document type".into(),
             )),
             IdDocKind::ResidenceDocument => Err(crate::Error::Custom(
+                "not a supported alpaca document type".into(),
+            )),
+            IdDocKind::VoterIdentification => Err(crate::Error::Custom(
                 "not a supported alpaca document type".into(),
             )),
         }
