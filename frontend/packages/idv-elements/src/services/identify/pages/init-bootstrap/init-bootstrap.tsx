@@ -1,3 +1,4 @@
+import type { Identifier } from '@onefootprint/types';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -15,57 +16,41 @@ const InitBootstrap = () => {
   } = state.context;
   const identifyMutation = useIdentify();
 
+  const tryIdentifier = async (identifier: Identifier) => {
+    try {
+      const authTokenIdentify = await identifyMutation.mutateAsync({
+        obConfigAuth,
+        sandboxId,
+        identifier,
+      });
+
+      if (authTokenIdentify.userFound) {
+        return {
+          successfulIdentifier: identifier,
+          hasSyncablePassKey: !!authTokenIdentify.hasSyncablePassKey,
+          availableChallengeKinds: authTokenIdentify.availableChallengeKinds,
+        };
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return undefined;
+  };
+
   const identify = async (email?: string, phoneNumber?: string) => {
-    // If both email and phone identified successfully, we will give preference to phone
-    try {
-      if (phoneNumber) {
-        const identifier = { phoneNumber };
-        const phoneIdentify = await identifyMutation.mutateAsync({
-          identifier,
-          obConfigAuth,
-          sandboxId,
-        });
-
-        if (phoneIdentify.userFound) {
-          return {
-            userFound: true,
-            successfulIdentifier: identifier,
-            hasSyncablePassKey: !!phoneIdentify.hasSyncablePassKey,
-            availableChallengeKinds: phoneIdentify.availableChallengeKinds,
-          };
-        }
+    if (phoneNumber) {
+      const result = await tryIdentifier({ phoneNumber });
+      if (result) {
+        return result;
       }
-    } catch (e) {
-      console.error(e);
     }
-
-    try {
-      if (email) {
-        const identifier = { email };
-        const emailIdentify = await identifyMutation.mutateAsync({
-          identifier,
-          obConfigAuth,
-          sandboxId,
-        });
-
-        if (emailIdentify.userFound) {
-          return {
-            userFound: true,
-            successfulIdentifier: identifier,
-            hasSyncablePassKey: !!emailIdentify.hasSyncablePassKey,
-            availableChallengeKinds: emailIdentify.availableChallengeKinds,
-          };
-        }
+    if (email) {
+      const result = await tryIdentifier({ email });
+      if (result) {
+        return result;
       }
-    } catch (e) {
-      console.error(e);
     }
-
-    return {
-      email,
-      phoneNumber,
-      userFound: false,
-    };
+    return undefined;
   };
 
   const processBootstrapData = async () => {
@@ -80,14 +65,8 @@ const InitBootstrap = () => {
       return;
     }
 
-    const {
-      successfulIdentifier,
-      userFound,
-      availableChallengeKinds,
-      hasSyncablePassKey,
-    } = await identify(email, phoneNumber);
-
-    if (!userFound || !availableChallengeKinds?.length) {
+    const identifyResult = await identify(email, phoneNumber);
+    if (!identifyResult || !identifyResult.availableChallengeKinds?.length) {
       // If the user is not found, take them through the normal identify flow but
       // prefill the form fields
       send({
@@ -101,12 +80,18 @@ const InitBootstrap = () => {
       return;
     }
 
+    const {
+      successfulIdentifier,
+      availableChallengeKinds,
+      hasSyncablePassKey,
+    } = identifyResult;
+
     send({
       type: 'identified',
       payload: {
+        userFound: true,
         email,
         phoneNumber,
-        userFound,
         successfulIdentifier,
         availableChallengeKinds,
         hasSyncablePassKey,

@@ -7,9 +7,9 @@ import {
   render,
   screen,
   userEvent,
-  waitFor,
 } from '@onefootprint/test-utils';
 import {
+  ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
   CollectedKycDataOption,
   D2PStatus,
@@ -34,32 +34,34 @@ import {
   getKycOnboardingConfig,
   identifyUserByPhone,
   TestAuthorizeRequirement,
+  waitFor,
   withAuthorize,
   withCheckSession,
   withD2PGenerate,
   withD2PStatus,
   withDecrypt,
   withIdentify,
+  withIdentifyVerify,
+  withLoginChallenge,
   withOnboarding,
   withOnboardingConfig,
   withOnboardingValidate,
   withRequirements,
   withUserToken,
+  withUserTokenInsufficientScopes,
   withUserVault,
   withUserVaultValidate,
 } from './idv.test.config';
 import type { IdvProps } from './types';
+
+const defaultObConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: 'pk' };
 
 describe('<Idv />', () => {
   const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
     queryCache,
-    logger: {
-      log: () => {},
-      warn: () => {},
-      error: () => {},
-    },
+    logger: { log: () => {}, warn: () => {}, error: () => {} },
     defaultOptions: {
       queries: {
         retry: false,
@@ -74,7 +76,7 @@ describe('<Idv />', () => {
   });
 
   const renderIdv = ({
-    obConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: 'pk' },
+    obConfigAuth = undefined,
     isTransfer = false,
     bootstrapData,
     onComplete = jest.fn(),
@@ -126,6 +128,7 @@ describe('<Idv />', () => {
           const onComplete = jest.fn();
           const onClose = jest.fn();
           renderIdv({
+            obConfigAuth: defaultObConfigAuth,
             onComplete,
             onClose,
           });
@@ -142,10 +145,12 @@ describe('<Idv />', () => {
         });
 
         it('can one-click when given an auth token', async () => {
+          withUserToken();
           const onComplete = jest.fn();
           const onClose = jest.fn();
 
           renderIdv({
+            obConfigAuth: defaultObConfigAuth,
             authToken: 'token',
             showCompletionPage: true,
             onComplete,
@@ -162,12 +167,12 @@ describe('<Idv />', () => {
           await userEvent.click(linkButton);
           expect(onClose).toBeCalled();
         });
-
         it.skip('can onboard directly after identify if already authorized', async () => {
           const onComplete = jest.fn();
           const onClose = jest.fn();
 
           renderIdv({
+            obConfigAuth: defaultObConfigAuth,
             showCompletionPage: true,
             onComplete,
             onClose,
@@ -207,11 +212,11 @@ describe('<Idv />', () => {
         });
         withUserVault();
         withAuthorize();
-
         const onComplete = jest.fn();
         const onClose = jest.fn();
 
         renderIdv({
+          obConfigAuth: defaultObConfigAuth,
           authToken: 'token',
           showCompletionPage: true,
           onComplete,
@@ -257,20 +262,6 @@ describe('<Idv />', () => {
         withAuthorize();
       });
 
-      it('skips identify flow when provided an auth token', async () => {
-        withIdentify();
-        withRequirements();
-
-        renderIdv({
-          authToken: 'token',
-          showCompletionPage: true,
-        });
-
-        await waitFor(() => {
-          expect(screen.getByText('Basic Data')).toBeInTheDocument();
-        });
-      });
-
       it.skip('can onboard after identify, confirm and authorize', async () => {
         withRequirements([
           {
@@ -298,6 +289,7 @@ describe('<Idv />', () => {
         const onClose = jest.fn();
 
         renderIdv({
+          obConfigAuth: defaultObConfigAuth,
           showCompletionPage: true,
           onComplete,
           onClose,
@@ -341,6 +333,7 @@ describe('<Idv />', () => {
         const onClose = jest.fn();
 
         renderIdv({
+          obConfigAuth: defaultObConfigAuth,
           onComplete,
           onClose,
         });
@@ -388,6 +381,7 @@ describe('<Idv />', () => {
         const onClose = jest.fn();
 
         renderIdv({
+          obConfigAuth: defaultObConfigAuth,
           showCompletionPage: true,
           onComplete,
           onClose,
@@ -399,13 +393,11 @@ describe('<Idv />', () => {
         await waitFor(() => {
           expect(screen.getByText('Basic Data')).toBeInTheDocument();
         });
-
         const firstName = screen.getByLabelText('First name');
         await userEvent.type(firstName, 'Piip');
 
         const lastName = screen.getByLabelText('Last name');
         await userEvent.type(lastName, 'Foot');
-
         const dob = screen.getByLabelText('Date of Birth');
         // Should be pre-filled since it was decrypted from api
         expect(dob).toHaveValue('05/23/1996');
@@ -472,12 +464,54 @@ describe('<Idv />', () => {
 
       it.skip('starts flow on sandbox outcome page', async () => {
         renderIdv({
+          obConfigAuth: defaultObConfigAuth,
           showCompletionPage: true,
         });
 
         await waitFor(() => {
           expect(screen.getByText('Select test outcome')).toBeInTheDocument();
         });
+      });
+    });
+  });
+
+  describe('When initialized with an auth token', () => {
+    beforeEach(() => {
+      withUserVaultValidate();
+      withUserVault();
+      withAuthorize();
+    });
+
+    it('skips identify flow when provided an auth token with proper scope', async () => {
+      withUserToken();
+      withRequirements();
+      const sandboxConfig = getKycOnboardingConfig();
+      withOnboarding(sandboxConfig);
+
+      renderIdv({
+        authToken: 'token',
+        showCompletionPage: true,
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('Basic Data')).toBeInTheDocument();
+      });
+    });
+
+    it('goes through identify flow when provided an auth token with insufficient scopes', async () => {
+      withUserTokenInsufficientScopes();
+      withIdentify(true);
+      withLoginChallenge(ChallengeKind.sms);
+      withIdentifyVerify();
+
+      renderIdv({
+        authToken: 'token',
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Validate your identity to continue.'),
+        ).toBeInTheDocument();
       });
     });
   });
@@ -511,6 +545,7 @@ describe('<Idv />', () => {
         withUserVault();
 
         renderIdv({
+          obConfigAuth: defaultObConfigAuth,
           authToken: 'token',
           showCompletionPage: true,
           bootstrapData: {
@@ -567,6 +602,7 @@ describe('<Idv />', () => {
         });
 
         renderIdv({
+          obConfigAuth: defaultObConfigAuth,
           authToken: 'token',
           showCompletionPage: true,
           bootstrapData: {
@@ -587,6 +623,7 @@ describe('<Idv />', () => {
         });
 
         renderIdv({
+          obConfigAuth: defaultObConfigAuth,
           authToken: 'token',
           showCompletionPage: true,
           bootstrapData: {
@@ -634,6 +671,7 @@ describe('<Idv />', () => {
       const onClose = jest.fn();
 
       renderIdv({
+        obConfigAuth: defaultObConfigAuth,
         authToken: 'token',
         showCompletionPage: true,
         onComplete,
@@ -688,6 +726,7 @@ describe('<Idv />', () => {
       withOnboardingConfig(config);
       withD2PGenerate();
       withD2PStatus(D2PStatus.waiting);
+      withUserToken();
     });
 
     it('transfers when there is a liveness requirement', async () => {
@@ -699,6 +738,7 @@ describe('<Idv />', () => {
       ]);
 
       renderIdv({
+        obConfigAuth: defaultObConfigAuth,
         authToken: 'token',
         showCompletionPage: true,
       });
@@ -737,6 +777,7 @@ describe('<Idv />', () => {
       ]);
 
       renderIdv({
+        obConfigAuth: defaultObConfigAuth,
         authToken: 'token',
         showCompletionPage: true,
       });

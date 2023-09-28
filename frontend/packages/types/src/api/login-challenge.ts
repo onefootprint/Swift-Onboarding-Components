@@ -8,7 +8,8 @@ import type {
 export type LoginChallengeRequest = {
   identifier: Identifier;
   preferredChallengeKind: ChallengeKind;
-  obConfigAuth: ObConfigAuth;
+  // Must be provided when identifier is anything other than an authToken
+  obConfigAuth?: ObConfigAuth;
   sandboxId?: string;
   isResend?: boolean;
 };

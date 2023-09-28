@@ -11,13 +11,14 @@ import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type MachineContext = {
   bootstrapData: IdentifyBootstrapData;
-  obConfigAuth: ObConfigAuth;
+  obConfigAuth?: ObConfigAuth;
   config?: PublicOnboardingConfig;
   device?: DeviceInfo;
   identify: MachineIdentifyContext;
   challenge: MachineChallengeContext;
   showLogo?: boolean;
   idDocOutcome?: IdDocOutcomes;
+  initialAuthToken?: string;
 };
 
 export type MachineIdentifyContext = {
@@ -54,6 +55,15 @@ export type MachineEvents =
     }
   | {
       type: 'bootstrapDataInvalid';
+    }
+  | {
+      type: 'hasSufficientScopes';
+      payload: {
+        authToken: string;
+      };
+    }
+  | {
+      type: 'authTokenInvalid';
     }
   | {
       type: 'identified';

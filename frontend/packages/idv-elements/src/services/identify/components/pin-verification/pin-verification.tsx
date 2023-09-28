@@ -116,6 +116,7 @@ const PinVerification = ({
         challengeToken,
         obConfigAuth,
         sandboxId,
+        identifier,
       },
       {
         onSuccess: handlePinValidationSucceeded,
@@ -145,6 +146,19 @@ const PinVerification = ({
   };
 
   const initiateSignupChallenge = () => {
+    if (!obConfigAuth) {
+      console.error(
+        'Cannot initiate signup challenge challenge without obConfigAuth',
+      );
+      return;
+    }
+    if ('authToken' in identifier) {
+      console.error(
+        'Cannot initiate signup challenge challenge with an authToken',
+      );
+      return;
+    }
+
     signupChallengeMutation.mutate(
       {
         ...identifier,

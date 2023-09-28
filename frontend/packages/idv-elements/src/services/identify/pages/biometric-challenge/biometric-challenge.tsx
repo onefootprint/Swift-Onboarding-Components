@@ -14,15 +14,17 @@ const BiometricChallenge = () => {
   const [state, send] = useIdentifyMachine();
   const {
     config,
+    initialAuthToken,
     bootstrapData,
     identify: { userFound },
   } = state.context;
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
   const title = t('title');
   const subtitle =
-    isBootstrap && userFound
-      ? t('bootstrap-subtitle', { tenantName: config?.orgName })
+    isBootstrap && userFound && config
+      ? t('bootstrap-subtitle', { tenantName: config.orgName })
       : t('subtitle');
+  const hasInitialAuthToken = !!initialAuthToken;
 
   const handleLoginWithDifferent = () => {
     send({
@@ -39,7 +41,7 @@ const BiometricChallenge = () => {
   return (
     <Container>
       <ChallengeHeader
-        shouldShowBack={!isBootstrap}
+        shouldShowBack={!isBootstrap && !hasInitialAuthToken}
         title={title}
         subtitle={subtitle}
       />

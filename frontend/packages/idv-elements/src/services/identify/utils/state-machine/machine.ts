@@ -2,7 +2,6 @@ import type { IdentifyBootstrapData, ObConfigAuth } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { getCanChallengeBiometrics } from '../biometrics';
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldBootstrap from './utils/should-bootstrap';
@@ -11,12 +10,40 @@ import shouldSelectSandboxOutcome from './utils/should-select-sandbox-outcome';
 
 export type IdentifyMachineArgs = {
   bootstrapData?: IdentifyBootstrapData;
-  obConfigAuth: ObConfigAuth;
+  // When provided, acts as the sole identifier for a user.
+  // We will skip requesting email and phone, and we will optionally step up if the provded auth
+  // token needs additional scopes.
+  // When provided, we won't be able to create a new user, only log into this existing user.
+  initialAuthToken?: string;
+  // Must be provided if initialAuthToken is not provided
+  obConfigAuth?: ObConfigAuth;
   showLogo?: boolean;
+};
+
+const validateMachineArgs = ({
+  bootstrapData,
+  initialAuthToken,
+  obConfigAuth,
+  showLogo,
+}: IdentifyMachineArgs): MachineContext => {
+  if (!obConfigAuth && !initialAuthToken) {
+    console.error(
+      'Error initializing Identify machine: obConfigAuth must be provided if initialAuthToken is absent',
+    );
+  }
+  return {
+    obConfigAuth,
+    bootstrapData: bootstrapData ?? {},
+    identify: {},
+    challenge: {},
+    showLogo,
+    initialAuthToken,
+  };
 };
 
 const createIdentifyMachine = ({
   bootstrapData,
+  initialAuthToken,
   obConfigAuth,
   showLogo,
 }: IdentifyMachineArgs) =>
@@ -28,15 +55,15 @@ const createIdentifyMachine = ({
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
-      context: {
+      context: validateMachineArgs({
+        bootstrapData,
+        initialAuthToken,
         obConfigAuth,
-        bootstrapData: bootstrapData ?? {},
-        identify: {},
-        challenge: {},
         showLogo,
-      },
+      }),
       states: {
         init: {
           on: {
@@ -63,17 +90,24 @@ const createIdentifyMachine = ({
               cond: shouldSelectSandboxOutcome,
             },
             {
+              target: 'initAuthToken',
+              cond: context => !!context.initialAuthToken,
+            },
+            {
               target: 'initBootstrap',
               cond: shouldBootstrap,
             },
-            {
-              target: 'emailIdentification',
-            },
+            { target: 'emailIdentification' },
           ],
         },
         sandboxOutcome: {
           on: {
             sandboxOutcomeSubmitted: [
+              {
+                target: 'initAuthToken',
+                actions: ['assignSandboxOutcome'],
+                cond: context => !!context.initialAuthToken,
+              },
               {
                 target: 'initBootstrap',
                 actions: ['assignSandboxOutcome'],
@@ -86,7 +120,36 @@ const createIdentifyMachine = ({
             ],
           },
         },
-        // New bootstrap transitions (not used in this machine for now)
+        initAuthToken: {
+          on: {
+            hasSufficientScopes: {
+              target: 'success',
+              actions: ['assignAuthToken'],
+            },
+            authTokenInvalid: {
+              target: 'authTokenInvalid',
+            },
+            identified: [
+              {
+                target: 'biometricChallenge',
+                actions: ['assignIdentifySuccessResult'],
+                cond: (context, event) =>
+                  !!getCanChallengeBiometrics(
+                    {
+                      hasSyncablePassKey: event.payload.hasSyncablePassKey,
+                      availableChallengeKinds:
+                        event.payload.availableChallengeKinds,
+                    },
+                    context.device,
+                  ),
+              },
+              {
+                target: 'smsChallenge',
+                actions: ['assignIdentifySuccessResult'],
+              },
+            ],
+          },
+        },
         initBootstrap: {
           on: {
             bootstrapDataInvalid: {
@@ -290,6 +353,9 @@ const createIdentifyMachine = ({
               target: 'emailIdentification',
             },
           },
+        },
+        authTokenInvalid: {
+          type: 'final',
         },
         configInvalid: {
           type: 'final',

@@ -20,16 +20,18 @@ const SmsChallenge = () => {
   const [challengeData, setChallengeData] = useState<ChallengeData>();
   const {
     config,
+    initialAuthToken,
     bootstrapData,
     challenge,
     device,
     identify: { phoneNumber = '', successfulIdentifier, userFound },
   } = state.context;
-  const isBootstrap = bootstrapData?.email || bootstrapData?.phoneNumber;
+  const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
+  const hasInitialAuthToken = !!initialAuthToken;
   const title = userFound ? t('welcome-back-title') : t('title');
   const subtitle =
-    isBootstrap && userFound
-      ? t('bootstrap-subtitle', { tenantName: config?.orgName })
+    isBootstrap && userFound && config
+      ? t('bootstrap-subtitle', { tenantName: config.orgName })
       : t('subtitle');
 
   // Either scrub the phone number collected from the previous steps, or use the
@@ -63,7 +65,8 @@ const SmsChallenge = () => {
   };
 
   const shouldShowBack =
-    !isBootstrap || getCanChallengeBiometrics(challenge, device);
+    (!isBootstrap && !hasInitialAuthToken) ||
+    getCanChallengeBiometrics(challenge, device);
 
   return (
     <Container>

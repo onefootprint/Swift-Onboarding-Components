@@ -15,6 +15,7 @@ type IdentifyProps = IdentifyMachineArgs & {
 
 const Identify = ({
   bootstrapData,
+  initialAuthToken,
   obConfigAuth,
   onDone,
   showLogo,
@@ -25,6 +26,7 @@ const Identify = ({
         bootstrapData={bootstrapData}
         obConfigAuth={obConfigAuth}
         showLogo={showLogo}
+        initialAuthToken={initialAuthToken}
       >
         <Router onDone={onDone} />
       </IdentifyMachineProvider>

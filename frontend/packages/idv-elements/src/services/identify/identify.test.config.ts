@@ -4,6 +4,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
+import { UserTokenScope } from '@onefootprint/types';
 import { useEffectOnce } from 'usehooks-ts';
 
 import * as useDeviceInfo from '../../hooks/ui/use-device-info';
@@ -118,6 +119,24 @@ export const withIdentifyVerify = () =>
     path: '/hosted/identify/verify',
     response: {
       authToken: 'new-token',
+    },
+  });
+
+export const withUserTokenSufficientScopes = () =>
+  mockRequest({
+    method: 'get',
+    path: '/hosted/user/token',
+    response: {
+      scopes: [UserTokenScope.signup],
+    },
+  });
+
+export const withUserTokenInsufficientScopes = () =>
+  mockRequest({
+    method: 'get',
+    path: '/hosted/user/token',
+    response: {
+      scopes: [],
     },
   });
 

@@ -30,6 +30,8 @@ import {
   withLoginChallenge,
   withOnboardingConfig,
   withSignupChallenge,
+  withUserTokenInsufficientScopes,
+  withUserTokenSufficientScopes,
   withUserVault,
 } from './identify.test.config';
 
@@ -44,6 +46,7 @@ jest.mock('./utils/biometrics/get-biometric-challenge-response', () => ({
 }));
 
 const useRouterSpy = createUseRouterSpy();
+const defaultObConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: 'pk' };
 
 describe('<Identify />', () => {
   beforeEach(() => {
@@ -53,14 +56,24 @@ describe('<Identify />', () => {
     });
   });
 
-  const renderIdentify = (bootstrapData?: any, onDone?: () => {}) => {
-    const obConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: 'pk' };
+  const renderIdentify = ({
+    bootstrapData,
+    obConfigAuth,
+    initialAuthToken,
+    onDone,
+  }: {
+    bootstrapData?: any;
+    initialAuthToken?: string;
+    obConfigAuth?: any;
+    onDone?: () => void;
+  }) => {
     customRender(
       <ObserveCollectorProvider appName="bifrost">
         <Layout onClose={() => {}}>
           <Identify
             obConfigAuth={obConfigAuth}
             bootstrapData={bootstrapData ?? {}}
+            initialAuthToken={initialAuthToken}
             onDone={onDone ?? (() => {})}
           />
         </Layout>
@@ -75,7 +88,7 @@ describe('<Identify />', () => {
     });
 
     it('proceeds to email identification when sandbox outcome was successful', async () => {
-      renderIdentify();
+      renderIdentify({ obConfigAuth: defaultObConfigAuth });
 
       await expectShimmer();
       await fillSandboxOutcome();
@@ -103,13 +116,14 @@ describe('<Identify />', () => {
           const phoneNumber = '+1 234 567 8999';
           const onDone = jest.fn();
 
-          renderIdentify(
-            {
+          renderIdentify({
+            bootstrapData: {
               email,
               phoneNumber,
             },
+            obConfigAuth: defaultObConfigAuth,
             onDone,
-          );
+          });
 
           await expectShimmer();
           await fillSandboxOutcome();
@@ -134,16 +148,88 @@ describe('<Identify />', () => {
           const phoneNumber = '+1 234 567 8999';
           const onDone = jest.fn();
 
-          renderIdentify(
-            {
+          renderIdentify({
+            bootstrapData: {
               email,
               phoneNumber,
             },
+            obConfigAuth: defaultObConfigAuth,
             onDone,
-          );
+          });
 
           await expectShimmer();
           await fillSandboxOutcome();
+          await bootstrapExistingUserWithPasskey();
+
+          await waitFor(() => {
+            expect(onDone).toHaveBeenCalled();
+          });
+        });
+      });
+    });
+  });
+
+  describe('When there is an initial auth token', () => {
+    describe('When sufficient scopes', () => {
+      beforeEach(() => {
+        mockUseDeviceInfo();
+        withUserTokenSufficientScopes();
+      });
+
+      it('identify machine finishes without challenge', async () => {
+        const onDone = jest.fn();
+        renderIdentify({
+          initialAuthToken: 'token',
+          onDone,
+        });
+
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe('When insufficient scopes', () => {
+      beforeEach(() => {
+        withUserTokenInsufficientScopes();
+      });
+
+      describe('When user not found', () => {
+        beforeEach(() => {
+          mockUseDeviceInfo();
+          withIdentify(false);
+        });
+
+        it('takes user to invalid auth token page', async () => {
+          renderIdentify({
+            initialAuthToken: 'token',
+          });
+
+          await waitFor(() => {
+            expect(
+              screen.getByText('The link you opened is invalid'),
+            ).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('When user found', () => {
+        beforeEach(() => {
+          mockUseDeviceInfo();
+          mockGetBiometricChallengeResponse();
+          withIdentify(true);
+          withIdentifyVerify();
+          withLoginChallenge(ChallengeKind.biometric);
+        });
+
+        it('takes user to challenge', async () => {
+          const onDone = jest.fn();
+
+          renderIdentify({
+            initialAuthToken: 'token',
+            onDone,
+          });
+
           await bootstrapExistingUserWithPasskey();
 
           await waitFor(() => {
@@ -171,12 +257,13 @@ describe('<Identify />', () => {
           const email = 'piip@onefootprint.com';
           const onDone = jest.fn();
 
-          renderIdentify(
-            {
+          renderIdentify({
+            bootstrapData: {
               email,
             },
+            obConfigAuth: defaultObConfigAuth,
             onDone,
-          );
+          });
 
           await expectShimmer();
           await bootstrapExistingUser();
@@ -198,12 +285,13 @@ describe('<Identify />', () => {
           const email = 'piip@onefootprint.com';
           const onDone = jest.fn();
 
-          renderIdentify(
-            {
+          renderIdentify({
+            bootstrapData: {
               email,
             },
+            obConfigAuth: defaultObConfigAuth,
             onDone,
-          );
+          });
 
           await expectShimmer();
           await waitFor(() => {
@@ -239,12 +327,13 @@ describe('<Identify />', () => {
           const phoneNumber = '+1 234 567 8999';
           const onDone = jest.fn();
 
-          renderIdentify(
-            {
+          renderIdentify({
+            bootstrapData: {
               phoneNumber,
             },
+            obConfigAuth: defaultObConfigAuth,
             onDone,
-          );
+          });
 
           await expectShimmer();
           await bootstrapExistingUser();
@@ -266,12 +355,13 @@ describe('<Identify />', () => {
           const phoneNumber = '+1 (234) 567-8999';
           const onDone = jest.fn();
 
-          renderIdentify(
-            {
+          renderIdentify({
+            bootstrapData: {
               phoneNumber,
             },
+            obConfigAuth: defaultObConfigAuth,
             onDone,
-          );
+          });
 
           await expectShimmer();
           await waitFor(() => {
@@ -313,13 +403,14 @@ describe('<Identify />', () => {
           const phoneNumber = '+1 234 567 8999';
           const onDone = jest.fn();
 
-          renderIdentify(
-            {
+          renderIdentify({
+            bootstrapData: {
               email,
               phoneNumber,
             },
+            obConfigAuth: defaultObConfigAuth,
             onDone,
-          );
+          });
 
           await expectShimmer();
           await bootstrapExistingUserWithPasskey();
@@ -342,13 +433,14 @@ describe('<Identify />', () => {
           const phoneNumber = '+1 234 567 8999';
           const onDone = jest.fn();
 
-          renderIdentify(
-            {
+          renderIdentify({
+            bootstrapData: {
               email,
               phoneNumber,
             },
+            obConfigAuth: defaultObConfigAuth,
             onDone,
-          );
+          });
 
           await expectShimmer();
           await bootstrapNewUser();
@@ -375,7 +467,10 @@ describe('<Identify />', () => {
 
         it('shows email challenge page', async () => {
           const onDone = jest.fn();
-          renderIdentify({}, onDone);
+          renderIdentify({
+            obConfigAuth: defaultObConfigAuth,
+            onDone,
+          });
 
           await expectShimmer();
           await fillIdentifyEmail();
@@ -391,7 +486,11 @@ describe('<Identify />', () => {
         it('can bootstrap', async () => {
           const onDone = jest.fn();
           const email = 'piip@onefootprint.com';
-          renderIdentify({ email }, onDone);
+          renderIdentify({
+            bootstrapData: { email },
+            obConfigAuth: defaultObConfigAuth,
+            onDone,
+          });
 
           await expectShimmer();
           await bootstrapExistingUser();
@@ -402,7 +501,10 @@ describe('<Identify />', () => {
 
         it('can resend email challenge', async () => {
           const onDone = jest.fn();
-          renderIdentify({}, onDone);
+          renderIdentify({
+            obConfigAuth: defaultObConfigAuth,
+            onDone,
+          });
 
           await expectShimmer();
           await fillIdentifyEmail();
@@ -431,7 +533,10 @@ describe('<Identify />', () => {
 
         it('shows sms challenge page', async () => {
           const onDone = jest.fn();
-          renderIdentify({}, onDone);
+          renderIdentify({
+            obConfigAuth: defaultObConfigAuth,
+            onDone,
+          });
 
           await expectShimmer();
           await fillIdentifyEmail();
@@ -447,7 +552,11 @@ describe('<Identify />', () => {
         it('can bootstrap', async () => {
           const onDone = jest.fn();
           const email = 'piip@onefootprint.com';
-          renderIdentify({ email }, onDone);
+          renderIdentify({
+            bootstrapData: { email },
+            obConfigAuth: defaultObConfigAuth,
+            onDone,
+          });
 
           await expectShimmer();
           await bootstrapExistingUser();
@@ -458,7 +567,10 @@ describe('<Identify />', () => {
 
         it('can resend sms challenge', async () => {
           const onDone = jest.fn();
-          renderIdentify({}, onDone);
+          renderIdentify({
+            obConfigAuth: defaultObConfigAuth,
+            onDone,
+          });
 
           await expectShimmer();
           await fillIdentifyEmail();
@@ -490,7 +602,10 @@ describe('<Identify />', () => {
 
       it('shows email challenge page', async () => {
         const onDone = jest.fn();
-        renderIdentify({}, onDone);
+        renderIdentify({
+          obConfigAuth: defaultObConfigAuth,
+          onDone,
+        });
 
         await expectShimmer();
         await fillIdentifyEmail();
@@ -506,7 +621,11 @@ describe('<Identify />', () => {
       it('can bootstrap', async () => {
         const onDone = jest.fn();
         const email = 'piip@onefootprint.com';
-        renderIdentify({ email }, onDone);
+        renderIdentify({
+          bootstrapData: { email },
+          obConfigAuth: defaultObConfigAuth,
+          onDone,
+        });
 
         await expectShimmer();
         await bootstrapNewUser(true);
@@ -517,7 +636,10 @@ describe('<Identify />', () => {
 
       it('can resend email challenge', async () => {
         const onDone = jest.fn();
-        renderIdentify({}, onDone);
+        renderIdentify({
+          obConfigAuth: defaultObConfigAuth,
+          onDone,
+        });
 
         await expectShimmer();
         await fillIdentifyEmail();

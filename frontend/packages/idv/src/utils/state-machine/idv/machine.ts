@@ -6,7 +6,6 @@ import type {
 import { IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
 
 export type IdvMachineArgs = {
@@ -30,7 +29,8 @@ const createIdvMachine = (args: IdvMachineArgs) =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
         ...args,
@@ -46,10 +46,6 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           always: [
             {
               target: 'identify',
-              cond: context => !context.authToken,
-            },
-            {
-              target: 'onboarding',
             },
           ],
         },
@@ -118,12 +114,16 @@ const createIdvMachine = (args: IdvMachineArgs) =>
         })),
         assignEmail: assign((context, event) => {
           context.bootstrapData = context.bootstrapData || {};
-          context.bootstrapData[IdDI.email] = event.payload.email;
+          if (event.payload.email) {
+            context.bootstrapData[IdDI.email] = event.payload.email;
+          }
           return context;
         }),
         assignPhoneNumber: assign((context, event) => {
           context.bootstrapData = context.bootstrapData || {};
-          context.bootstrapData[IdDI.phoneNumber] = event.payload.phoneNumber;
+          if (event.payload.phoneNumber) {
+            context.bootstrapData[IdDI.phoneNumber] = event.payload.phoneNumber;
+          }
           return context;
         }),
         assignAuthToken: assign((context, event) => {

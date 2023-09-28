@@ -3,7 +3,7 @@ import type {
   LoginChallengeRequest,
   LoginChallengeResponse,
 } from '@onefootprint/types';
-import { SANDBOX_ID_HEADER } from '@onefootprint/types';
+import { AUTH_HEADER, SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import getRetryDisabledUntil from './utils/get-retry-disabled-until';
@@ -17,13 +17,16 @@ const loginChallenge = async (payload: LoginChallengeRequest) => {
   if (sandboxId) {
     headers[SANDBOX_ID_HEADER] = sandboxId;
   }
+  const data: any = { preferredChallengeKind };
+  if ('authToken' in identifier) {
+    headers[AUTH_HEADER] = identifier.authToken;
+  } else {
+    data.identifier = identifier;
+  }
   const response = await request<LoginChallengeResponse>({
     method: 'POST',
     url: '/hosted/identify/login_challenge',
-    data: {
-      identifier,
-      preferredChallengeKind,
-    },
+    data,
     headers,
   });
   const { challengeData } = { ...response.data };

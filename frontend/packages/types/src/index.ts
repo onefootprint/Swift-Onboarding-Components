@@ -159,6 +159,7 @@ export type {
   ValidateSessionRequest,
 } from './api';
 export {
+  AUTH_HEADER,
   getRequirement,
   OnboardingRequirementKind,
   SANDBOX_ID_HEADER,

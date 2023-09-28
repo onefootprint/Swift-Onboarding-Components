@@ -1,7 +1,7 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoFaceid24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
-import type { LoginChallengeResponse } from '@onefootprint/types';
+import type { Identifier, LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -43,7 +43,9 @@ const Biometric = () => {
         sandboxId,
       },
       {
-        onSuccess: handleRequestChallengeSuccess,
+        onSuccess: payload => {
+          handleRequestChallengeSuccess(payload, successfulIdentifier);
+        },
         onError: (error: unknown) => {
           console.error(
             'Error while requesting login biometric challenge',
@@ -57,6 +59,7 @@ const Biometric = () => {
 
   const handleRequestChallengeSuccess = async (
     payload: LoginChallengeResponse,
+    identifier: Identifier,
   ) => {
     const { biometricChallengeJson, challengeToken, challengeKind } =
       payload.challengeData || {};
@@ -92,6 +95,7 @@ const Biometric = () => {
         challengeToken,
         obConfigAuth,
         sandboxId,
+        identifier,
       },
       {
         onSuccess: ({ authToken }) => {

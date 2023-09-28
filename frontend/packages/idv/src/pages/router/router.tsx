@@ -82,10 +82,11 @@ const Router = () => {
         send({ type: 'reset' });
       }}
     >
-      {state.matches('identify') && obConfigAuth && (
+      {state.matches('identify') && (
         <Identify
           obConfigAuth={obConfigAuth}
           bootstrapData={identifyBootstrapData}
+          initialAuthToken={authToken}
           onDone={payload => {
             send({ type: 'identifyCompleted', payload });
           }}

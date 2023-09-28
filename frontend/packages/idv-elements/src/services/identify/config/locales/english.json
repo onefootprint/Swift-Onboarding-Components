@@ -28,6 +28,10 @@
       "title": "Integration incorrectly configured",
       "subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this product."
     },
+    "auth-token-invalid": {
+      "title": "The link you opened is invalid",
+      "subtitle": "Please contact the business that sent you this link."
+    },
     "sandbox-outcome": {
       "title": "Test outcomes",
       "subtitle": "Select what result you want this user to have after they complete their onboarding",

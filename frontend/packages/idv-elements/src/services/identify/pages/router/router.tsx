@@ -3,11 +3,13 @@ import type { IdDocOutcomes } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';
+import AuthTokenInvalid from '../auth-token-invalid';
 import BiometricChallenge from '../biometric-challenge';
 import ConfigInvalid from '../config-invalid';
 import EmailChallenge from '../email-challenge';
 import EmailIdentification from '../email-identification';
 import Init from '../init';
+import InitAuthToken from '../init-auth-token';
 import InitBootstrap from '../init-bootstrap';
 import PhoneIdentification from '../phone-identification';
 import SandboxOutcome from '../sandbox-outcome';
@@ -29,6 +31,7 @@ const Router = ({ onDone }: RouterProps) => {
   const [state] = useIdentifyMachine();
   const isDone = state.matches('success');
   const {
+    initialAuthToken,
     challenge: { authToken },
     identify: { userFound, email, phoneNumber },
     idDocOutcome,
@@ -56,7 +59,11 @@ const Router = ({ onDone }: RouterProps) => {
       {state.matches('init') && <Init />}
       {state.matches('configInvalid') && <ConfigInvalid />}
       {state.matches('sandboxOutcome') && <SandboxOutcome />}
+      {state.matches('initAuthToken') && initialAuthToken && (
+        <InitAuthToken authToken={initialAuthToken} />
+      )}
       {state.matches('initBootstrap') && <InitBootstrap />}
+      {state.matches('authTokenInvalid') && <AuthTokenInvalid />}
       {state.matches('emailIdentification') && <EmailIdentification />}
       {state.matches('phoneIdentification') && <PhoneIdentification />}
       {state.matches('smsChallenge') && <SmsChallenge />}

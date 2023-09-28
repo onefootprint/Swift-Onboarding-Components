@@ -2,7 +2,7 @@ import {
   mockRequest,
   screen,
   userEvent,
-  waitFor,
+  waitFor as waitForOriginal,
 } from '@onefootprint/test-utils';
 import type {
   D2PStatus,
@@ -16,6 +16,11 @@ import {
   SessionStatus,
   UserTokenScope,
 } from '@onefootprint/types';
+
+// These tests take so long that a lot of them time out - this does a blanket replace on waitFor
+// to allow each step of the tests to run for a little longer
+export const waitFor = <T>(callback: () => Promise<T> | T) =>
+  waitForOriginal(callback, { timeout: 2000 });
 
 export const TestAuthorizeRequirement: OnboardingRequirement = {
   kind: OnboardingRequirementKind.authorize,
@@ -115,7 +120,16 @@ export const withUserToken = () =>
     method: 'get',
     path: '/hosted/user/token',
     response: {
-      scopes: [UserTokenScope.sensitiveProfile],
+      scopes: [UserTokenScope.signup, UserTokenScope.sensitiveProfile],
+    },
+  });
+
+export const withUserTokenInsufficientScopes = () =>
+  mockRequest({
+    method: 'get',
+    path: '/hosted/user/token',
+    response: {
+      scopes: [],
     },
   });
 

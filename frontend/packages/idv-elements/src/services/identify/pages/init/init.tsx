@@ -15,9 +15,7 @@ const Init = () => {
   const observeCollector = useObserveCollector();
 
   useDeviceInfo((device: DeviceInfo) => {
-    observeCollector.setAppContext({
-      device,
-    });
+    observeCollector.setAppContext({ device });
     send({
       type: 'initContextUpdated',
       payload: {

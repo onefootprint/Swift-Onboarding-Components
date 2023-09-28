@@ -13,7 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignAuthToken: 'challengeSucceeded';
+    assignAuthToken: 'challengeSucceeded' | 'hasSufficientScopes';
     assignEmail: 'identifyFailed';
     assignIdentifySuccessResult: 'identified';
     assignInitContext: 'initContextUpdated';
@@ -25,11 +25,13 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
+    | 'authTokenInvalid'
     | 'biometricChallenge'
     | 'configInvalid'
     | 'emailChallenge'
     | 'emailIdentification'
     | 'init'
+    | 'initAuthToken'
     | 'initBootstrap'
     | 'initialized'
     | 'phoneIdentification'
