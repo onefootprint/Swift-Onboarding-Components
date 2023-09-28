@@ -61,6 +61,7 @@ webauthn-rs-proto = { workspace = true }
 url = "2.2.2"
 newtypes = { path = "../../newtypes" }
 reqwest = { workspace = true }
+reqwest-middleware = { workspace = true }
 
 itertools = { workspace = true }
 lazy_static = { workspace = true }

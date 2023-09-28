@@ -548,6 +548,7 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "reqwest",
+ "reqwest-middleware",
  "sentry-tracing",
  "serde",
  "serde_cbor",
@@ -8007,6 +8008,8 @@ version = "0.1.0"
 dependencies = [
  "newtypes",
  "reqwest",
+ "reqwest-middleware",
+ "reqwest-tracing",
  "serde",
  "serde_json",
  "thiserror",

@@ -11,6 +11,8 @@ doctest = false
 
 [dependencies]
 reqwest = { workspace = true }
+reqwest-tracing = { workspace = true }
+reqwest-middleware = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }

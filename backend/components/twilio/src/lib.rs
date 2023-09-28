@@ -2,7 +2,10 @@ use std::time::Duration;
 
 use newtypes::PiiString;
 use request::send_message::SendMessage;
-use reqwest::{RequestBuilder, Method, IntoUrl};
+use reqwest_tracing::TracingMiddleware;
+use reqwest::{Method, IntoUrl};
+use reqwest_middleware::ClientWithMiddleware;
+use reqwest_middleware::RequestBuilder;
 use response::{decode_response, lookup::LookupResponse, message::Message};
 
 pub mod error;
@@ -21,7 +24,7 @@ pub struct Client {
     pub from_number: String,
     api_key: String,
     api_secret: String,
-    client: reqwest::Client,
+    client: ClientWithMiddleware,
 }
 
 impl std::fmt::Debug for Client {
@@ -38,6 +41,9 @@ impl Client {
         source_phone_number: String,
     ) -> Self {
         let client = reqwest::Client::new();
+        let client = reqwest_middleware::ClientBuilder::new(client)
+            .with(TracingMiddleware::default())
+            .build();
 
         Self {
             account_sid,

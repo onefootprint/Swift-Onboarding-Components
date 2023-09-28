@@ -4,15 +4,17 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("request error: {0}")]
+    #[error("{0}")]
+    ReqwestMiddleware(#[from] reqwest_middleware::Error),
+    #[error("{0}")]
     Request(#[from] reqwest::Error),
-    #[error("delivery failed")]
+    #[error("Delivery failed")]
     DeliveryFailed,
-    #[error("not delivered")]
+    #[error("Not delivered")]
     NotDelivered,
-    #[error("api error: {0}")]
+    #[error("{0}")]
     Api(ApiErrorResponse),
-    #[error("Json error: {0}")]
+    #[error("{0}")]
     SerdeJson(#[from] serde_json::Error),
 }
 

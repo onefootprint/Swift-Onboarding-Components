@@ -23,6 +23,8 @@ pub type SecondsBeforeRetry = Duration;
 pub enum TwilioError {
     #[error("{0}")]
     Request(reqwest::Error),
+    #[error("{0}")]
+    RequestMiddleware(reqwest_middleware::Error),
     #[error("Delivery failed")]
     DeliveryFailed,
     #[error("Not delivered")]
@@ -37,6 +39,7 @@ impl From<twilio::error::Error> for TwilioError {
     fn from(value: twilio::error::Error) -> Self {
         match value {
             twilio::error::Error::Request(e) => Self::Request(e),
+            twilio::error::Error::ReqwestMiddleware(e) => Self::RequestMiddleware(e),
             twilio::error::Error::DeliveryFailed => Self::DeliveryFailed,
             twilio::error::Error::NotDelivered => Self::NotDelivered,
             twilio::error::Error::Api(e) => Self::Api(e),
@@ -49,6 +52,7 @@ impl TwilioError {
     pub fn status_code(&self) -> StatusCode {
         match self {
             Self::Request(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::RequestMiddleware(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::DeliveryFailed => StatusCode::INTERNAL_SERVER_ERROR,
             Self::NotDelivered => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Api(e) => match e.status {
@@ -181,9 +185,8 @@ impl SmsClient {
         Ok(())
     }
 
+    #[tracing::instrument("SmsClient::_send_twilio", skip_all)]
     async fn _send_twilio(&self, message_body: &PiiString, destination: &PiiString) -> ApiResult<()> {
-        // TODO this doesn't currently catch errors - i think we have to poll twilio to see if the
-        // message was sent
         self.twilio_client
             .send_message(destination.clone(), message_body.clone())
             .await
@@ -191,6 +194,7 @@ impl SmsClient {
         Ok(())
     }
 
+    #[tracing::instrument("SmsClient::_send_pinpoint", skip_all)]
     async fn _send_pinpoint(&self, message_body: &PiiString, destination: &PiiString) -> ApiResult<()> {
         self
             .pinpoint_client
