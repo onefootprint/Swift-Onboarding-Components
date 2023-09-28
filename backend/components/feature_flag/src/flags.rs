@@ -57,6 +57,9 @@ pub enum BoolFlag<'a> {
     DisallowDriverLicensePermits(&'a TenantId),
     #[strum(to_string = "EnableIncodeWatchlistCheckInNonProd")]
     EnableIncodeWatchlistCheckInNonProd(&'a ObConfigurationKey),
+    // This should probably be a StringFlag, but just doing this for now to be easy
+    #[strum(to_string = "TwilioIsPreferredSmsVendor")]
+    TwilioIsPreferredSmsVendor,
 }
 
 impl<'a> BoolFlag<'a> {
@@ -93,6 +96,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisableConservativeSharpnessForDocument(k) => Some(k.to_string()),
             Self::DisallowDriverLicensePermits(k) => Some(k.to_string()),
             Self::EnableIncodeWatchlistCheckInNonProd(k) => Some(k.to_string()),
+            Self::TwilioIsPreferredSmsVendor => None,
         }
     }
 
@@ -125,6 +129,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisableConservativeSharpnessForDocument(_) => false,
             Self::DisallowDriverLicensePermits(_) => false,
             Self::EnableIncodeWatchlistCheckInNonProd(_) => false,
+            Self::TwilioIsPreferredSmsVendor => true,
         }
     }
 }

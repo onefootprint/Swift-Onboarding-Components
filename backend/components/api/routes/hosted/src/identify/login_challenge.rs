@@ -70,7 +70,7 @@ pub async fn post(
     };
 
     // Fall back to SMS if the user requested webauthn but doesn't have any creds
-    let twilio_client = &state.twilio_client;
+    let twilio_client = &state.sms_client;
 
     // Look up existing user vault by identifier
     let t_id = tenant.map(|t| &t.id);

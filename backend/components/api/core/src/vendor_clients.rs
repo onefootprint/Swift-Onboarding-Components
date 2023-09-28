@@ -31,7 +31,7 @@ use idv::{
     twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
 };
 
-use crate::{decision::vendor::vendor_trait::VendorAPICall, utils::twilio::TwilioClient};
+use crate::{decision::vendor::vendor_trait::VendorAPICall, utils::sms::SmsClient};
 
 pub type VendorClient<Req, Resp, E> = Arc<dyn VendorAPICall<Req, Resp, E>>;
 
@@ -190,7 +190,7 @@ pub struct VendorClients {
 impl VendorClients {
     pub fn new(
         socure_client: SocureClient,
-        twilio_client: TwilioClient,
+        twilio_client: SmsClient,
         footprint_client: FootprintVendorHttpClient,
         middesk_client: MiddeskClient,
         stytch_client: StytchClient,
@@ -200,7 +200,7 @@ impl VendorClients {
 
         Self {
             socure_id_plus: Arc::new(socure_client),
-            twilio_lookup_v2: Arc::new(twilio_client.client),
+            twilio_lookup_v2: Arc::new(twilio_client.twilio_client),
             experian_cross_core: footprint_client.clone(),
             middesk_create_business: middesk_client.clone(),
             middesk_get_business: middesk_client,

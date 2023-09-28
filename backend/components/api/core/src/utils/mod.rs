@@ -13,7 +13,7 @@ pub mod magic_link;
 pub mod onboarding;
 pub mod paperclip;
 pub mod session;
-pub mod twilio;
+pub mod sms;
 pub mod vault_wrapper;
 pub mod webhook_app;
 

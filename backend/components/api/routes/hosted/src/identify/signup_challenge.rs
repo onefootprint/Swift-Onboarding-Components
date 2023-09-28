@@ -52,7 +52,7 @@ pub async fn post(
         SignupChallengeRequest::Phone(req) => {
             let tenant_name = ob_context.as_ref().map(|obc| obc.tenant().name.clone());
             let (challenge_state_data, time_before_retry_s) = state
-                .twilio_client
+                .sms_client
                 .send_challenge_non_blocking(&state, tenant_name, &req.phone_number, sandbox_id.0)
                 .await?;
 

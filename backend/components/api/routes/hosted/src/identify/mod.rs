@@ -4,7 +4,7 @@ pub mod login_challenge;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::errors::ApiResult;
 use api_core::fingerprinter::VaultIdentifier;
-use api_core::utils::twilio::PhoneChallengeState;
+use api_core::utils::sms::PhoneChallengeState;
 use db::models::tenant::Tenant;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::email::Email;

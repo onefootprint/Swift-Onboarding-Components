@@ -36,7 +36,7 @@ where
     if let Some(phone) = phone {
         let sms_message = sms_message.into();
         state
-            .twilio_client
+            .sms_client
             .send_message(
                 state,
                 sms_message.message_body,

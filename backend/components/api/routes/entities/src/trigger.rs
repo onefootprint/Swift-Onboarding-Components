@@ -224,7 +224,7 @@ impl<'a> From<TriggerMessage> for SmsMessage<'a> {
     fn from(value: TriggerMessage) -> Self {
         SmsMessage {
             message_body: value.message_body(),
-            rate_limit_scope: api_core::utils::twilio::rate_limit::DASHBOARD_TRIGGER,
+            rate_limit_scope: api_core::utils::sms::rate_limit::DASHBOARD_TRIGGER,
         }
     }
 }

@@ -59,7 +59,7 @@ pub async fn handler(
     };
 
     let time_before_retry_s = state
-        .twilio_client
+        .sms_client
         .send_d2p(&state, &phone_number, request.url.clone())
         .await?;
 

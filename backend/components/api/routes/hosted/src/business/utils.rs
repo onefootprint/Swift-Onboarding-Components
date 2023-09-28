@@ -8,7 +8,7 @@ use api_core::errors::business::BusinessError;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::utils::email::BoInviteEmailInfo;
 use api_core::utils::session::AuthSession;
-use api_core::utils::twilio::BoSessionSmsInfo;
+use api_core::utils::sms::BoSessionSmsInfo;
 use api_core::utils::vault_wrapper::{Business, DecryptedBusinessOwners, TenantVw, VaultWrapper};
 use db::models::business_owner::BusinessOwner;
 use db::models::tenant::Tenant;
@@ -92,7 +92,7 @@ pub async fn send_secondary_bo_links(
         .collect::<ApiResult<Vec<_>>>()?;
 
     let futs = bo_sms_info.into_iter().flat_map(|(sms, email)| {
-        let sms = state.twilio_client.send_bo_session(state, sms);
+        let sms = state.sms_client.send_bo_session(state, sms);
         let email = state.sendgrid_client.send_business_owner_invite(email);
         let v: Vec<Pin<Box<dyn futures::Future<Output = ApiResult<()>>>>> =
             vec![Box::pin(sms), Box::pin(email)];

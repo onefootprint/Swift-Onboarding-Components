@@ -3,6 +3,7 @@ use actix_web::{
     http::StatusCode,
 };
 
+use aws_sdk_pinpointsmsvoicev2::{error::SendTextMessageError, types::SdkError as SmsSdkError};
 use db::errors::DbError;
 use newtypes::{output::Csv, ContactInfoKind, DataIdentifier, ErrorMessage, Uuid};
 use paperclip::actix::api_v2_errors;
@@ -27,7 +28,7 @@ pub use assertion::*;
 use crate::{
     decision::vendor::{middesk, VendorAPIError},
     types::error::{ApiResponseError, FpResponseErrorInfo},
-    utils::{body_bytes::InvalidBodyError, twilio::TwilioError},
+    utils::{body_bytes::InvalidBodyError, sms::TwilioError},
 };
 
 use self::{challenge::ChallengeError, handoff::HandoffError};
@@ -124,6 +125,8 @@ pub enum ApiErrorKind {
     SerdeCbor(#[from] serde_cbor::Error),
     #[error("{0}")]
     Twilio(#[from] TwilioError),
+    #[error("{0}")]
+    PinpointSms(#[from] SmsSdkError<SendTextMessageError>),
     #[error("Endpoint not found")]
     EndpointNotFound,
     #[error("Resource not found")]
@@ -182,7 +185,7 @@ pub enum ApiErrorKind {
     Base64Error(#[from] crypto::base64::DecodeError),
 
     #[error("Attestation error")]
-    AttestError(#[from] app_attest::error::AttestationError)
+    AttestError(#[from] app_attest::error::AttestationError),
 }
 
 impl From<std::convert::Infallible> for ApiError {
@@ -295,6 +298,7 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::HandoffError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::Twilio(e) => e.status_code(),
+            ApiErrorKind::PinpointSms(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::NewtypeError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::BillingError(_) => StatusCode::INTERNAL_SERVER_ERROR,

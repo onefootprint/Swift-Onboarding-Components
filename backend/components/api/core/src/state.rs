@@ -7,7 +7,7 @@ use crate::{
     fingerprinter::AwsHmacClient,
     metrics::Metrics,
     s3,
-    utils::{email::SendgridClient, twilio::TwilioClient},
+    utils::{email::SendgridClient, sms::SmsClient},
     vendor_clients::VendorClients,
     GIT_HASH,
 };
@@ -58,7 +58,7 @@ pub struct State {
     pub config: Config,
     pub aws_hmac_client: AwsHmacClient,
     pub workos_client: Arc<WorkOs>,
-    pub twilio_client: TwilioClient,
+    pub sms_client: SmsClient,
     pub sendgrid_client: SendgridClient,
     pub db_pool: DbPool,
     pub enclave_client: EnclaveClient,
@@ -116,8 +116,7 @@ impl State {
                 client
             }
             Err(err) => {
-                tracing::warn!(
-                    error=?err,
+                tracing::warn!( error=?err,
                     "FeatureFlagClient failed to initialize"
                 );
                 feature_flag_client
@@ -138,13 +137,13 @@ impl State {
 
         let workos_client = WorkOs::new(&ApiKey::from(config.workos_api_key.as_str()));
 
-        let twilio_client = TwilioClient::new(
+        let twilio_client = SmsClient::new(
             config.twilio_acount_sid.clone(),
             config.twilio_api_key.clone(),
             config.twilio_api_key_secret.clone(),
             config.twilio_phone_number.clone(),
             config.time_s_between_sms_challenges,
-            config.rp_id.clone(),
+            feature_flag_client.clone(),
         );
 
         let sendgrid_client = SendgridClient::new(config.sendgrid_api_key.clone());
@@ -239,7 +238,7 @@ impl State {
             enclave_client,
             aws_hmac_client: hmac_client,
             workos_client: Arc::new(workos_client),
-            twilio_client,
+            sms_client: twilio_client,
             sendgrid_client,
             db_pool,
             challenge_sealing_key,

@@ -7,6 +7,7 @@ use crate::{
 use actix_web::http::StatusCode;
 use chrono::{Duration, Utc};
 use crypto::sha256;
+use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use newtypes::SandboxId;
 use newtypes::{PhoneNumber, PiiString};
 use thiserror::Error;
@@ -59,27 +60,46 @@ impl TwilioError {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct TwilioClient {
-    pub duration_between_challenges: Duration,
-    pub rp_id: String,
-    pub client: twilio::Client,
+#[derive(Clone)]
+pub struct SmsClient {
+    duration_between_challenges: Duration,
+    /// Twilio client
+    pub twilio_client: twilio::Client,
+    /// AWS pinpoint SMS client
+    pinpoint_client: aws_sdk_pinpointsmsvoicev2::Client,
+    ff_client: LaunchDarklyFeatureFlagClient,
 }
 
-impl TwilioClient {
+impl SmsClient {
     pub fn new(
         account_sid: String,
         api_key: String,
         api_secret: String,
         source_phone_number: String,
         time_s_between_challenges: i64,
-        rp_id: String,
+        ff_client: LaunchDarklyFeatureFlagClient,
     ) -> Self {
         let client = twilio::Client::new(account_sid, api_key, api_secret, source_phone_number);
+        // TODO stop hardcoding this
+        // TODO also change the sending number based on environment
+        let pinpoint_config = aws_config::SdkConfig::builder()
+            .region(aws_sdk_kms::Region::new("us-east-1"))
+            .credentials_provider(aws_types::credentials::SharedCredentialsProvider::new(
+                aws_sdk_kms::Credentials::new(
+                    "AKIA3U5XRCZONUEXET7L",
+                    "RviyM0Yn3rYHnQK/mhC5Wb9DxWubx5rr1efqzB1p",
+                    None,
+                    None,
+                    "pinpoint_static",
+                ),
+            ))
+            .build();
+        let pinpoint_client = aws_sdk_pinpointsmsvoicev2::Client::new(&pinpoint_config);
         Self {
             duration_between_challenges: Duration::seconds(time_s_between_challenges),
-            rp_id,
-            client,
+            twilio_client: client,
+            pinpoint_client,
+            ff_client,
         }
     }
 
@@ -106,10 +126,7 @@ impl TwilioClient {
         .enforce_and_update()
         .await?;
         let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
-        self.client
-            .send_message(destination.e164(), message_body)
-            .await
-            .map_err(TwilioError::from)?;
+        self._send_message(message_body, destination.e164()).await?;
         Ok(())
     }
 
@@ -133,16 +150,62 @@ impl TwilioClient {
         .enforce_and_update()
         .await?;
         let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
-        let client = self.client.clone();
         let e164 = destination.e164();
+        let client = self.clone();
         tokio::spawn(async move {
-            let _ = client.send_message(e164, message_body).await.map_err(|err| {
+            let _ = client._send_message(message_body, e164).await.map_err(|err| {
                 tracing::error!(error=?err, "Failed to send SMS message");
             });
         });
         Ok(())
     }
 
+    /// Sends the message_body to the provided destination, choosing which vendor to use if any
+    async fn _send_message(&self, message_body: PiiString, destination: PiiString) -> ApiResult<()> {
+        // TODO can clean this up a lot in the future
+        let prefer_twilio = self.ff_client.flag(BoolFlag::TwilioIsPreferredSmsVendor);
+        let res = if prefer_twilio {
+            self._send_twilio(&message_body, &destination).await
+        } else {
+            self._send_pinpoint(&message_body, &destination).await
+        };
+        if let Err(e) = res {
+            tracing::error!(prefer_twilio = prefer_twilio, e=%e, "Moving on to fallback SMS vendor");
+            // If there was an error, waterfall to the secondary vendor
+            if prefer_twilio {
+                self._send_pinpoint(&message_body, &destination).await?;
+            } else {
+                self._send_twilio(&message_body, &destination).await?;
+            };
+        }
+        Ok(())
+    }
+
+    async fn _send_twilio(&self, message_body: &PiiString, destination: &PiiString) -> ApiResult<()> {
+        // TODO this doesn't currently catch errors - i think we have to poll twilio to see if the
+        // message was sent
+        self.twilio_client
+            .send_message(destination.clone(), message_body.clone())
+            .await
+            .map_err(TwilioError::from)?;
+        Ok(())
+    }
+
+    async fn _send_pinpoint(&self, message_body: &PiiString, destination: &PiiString) -> ApiResult<()> {
+        self
+            .pinpoint_client
+            .send_text_message()
+            // TODO change number based on environment
+            .origination_identity("+17655634600".to_owned())
+            .destination_phone_number(destination.leak_to_string())
+            .message_body(message_body.leak_to_string())
+            .send()
+            .await?;
+        Ok(())
+    }
+}
+
+impl SmsClient {
     #[tracing::instrument(skip_all)]
     pub async fn send_challenge_non_blocking(
         &self,
