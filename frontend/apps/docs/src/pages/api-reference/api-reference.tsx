@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, media } from '@onefootprint/ui';
-import Head from 'next/head';
 import React from 'react';
+import Seo from 'src/components/seo/seo';
 
 import staticAPIData from './assets/api-docs.json';
 import staticPreviewAPIData from './assets/api-preview-docs.json';
@@ -21,9 +21,7 @@ const ApiReference = () => {
 
   return (
     <Box>
-      <Head>
-        <title>{t('html-title')}</title>
-      </Head>
+      <Seo title={t('html-title')} slug="/api-reference" />
       <Layout>
         <PageNav
           navigation={staticNavigation}

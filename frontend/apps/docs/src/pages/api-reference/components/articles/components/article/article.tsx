@@ -1,14 +1,19 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { media, Typography } from '@onefootprint/ui';
+import { Box, media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Element } from 'react-scroll';
 
-import type { ArticleProps, SecurityTypes } from '../../articles.types';
+import type {
+  ArticleProps,
+  SecurityTypes,
+} from '@/api-reference/api-reference.types';
+
 import DemoCode from './components/demo-code';
 import Description from './components/description';
 import Parameters from './components/parameters';
 import Path from './components/path';
+import RequestBody from './components/request-body';
 import Responses from './components/responses';
 import Security from './components/security';
 
@@ -20,7 +25,7 @@ const Article = ({
   path,
   security,
   responses,
-  requestBody: requests,
+  requestBody,
 }: ArticleProps) => {
   const { t } = useTranslation('pages.api-reference');
   const encodedId = encodeURIComponent(id);
@@ -30,7 +35,7 @@ const Article = ({
       <ContentColumn>
         <Container>
           {method && path && <Path type={method} url={path} />}
-          {description && <Description description={description} />}
+          {description && <Description>{description}</Description>}
         </Container>
         {security && (
           <Requests>
@@ -42,13 +47,19 @@ const Article = ({
                 <Security key={type} type={type as SecurityTypes} />
               )),
             )}
-            {parameters && <Parameters parameters={parameters} />}
-            {responses && <Responses responses={responses} />}
+            <Box sx={{ marginY: 2 }} />
+            <Schema>
+              {parameters && <Parameters parameters={parameters} />}
+              {requestBody && <RequestBody requestBody={requestBody} />}
+              {responses && <Responses responses={responses} />}
+            </Schema>
           </Requests>
         )}
       </ContentColumn>
       <CodeColumn>
-        {responses && <DemoCode responses={responses} requests={requests} />}
+        {responses && (
+          <DemoCode requestBody={requestBody} responses={responses} />
+        )}
       </CodeColumn>
     </ArticleContainer>
   );
@@ -88,6 +99,14 @@ const Requests = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[4]};
+  `}
+`;
+
+const Schema = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
   `}
 `;
 

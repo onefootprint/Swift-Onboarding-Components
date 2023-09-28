@@ -1,7 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import type { ArticlesProps } from './articles.types';
+import type { ArticlesProps } from '../../api-reference.types';
 import Article from './components/article';
 
 const Articles = ({ staticArticles, staticPreviewArticles }: ArticlesProps) => (

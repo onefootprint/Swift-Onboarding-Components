@@ -4,8 +4,8 @@ import styled, { css } from '@onefootprint/styled';
 import { Box, CodeInline, createFontStyles, Divider } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import staticData from '../../../../../../assets/api-docs.json';
-import type { SecurityProps } from '../../../../articles.types';
+import type { SecurityProps } from '@/api-reference/api-reference.types';
+import staticData from '@/api-reference/assets/api-docs.json';
 
 const securityComponentContent = staticData?.components?.securitySchemes;
 

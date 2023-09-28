@@ -2,7 +2,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Badge, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 
-import type { PathProps } from '../../../../articles.types';
+import type { PathProps } from '@/api-reference/api-reference.types';
 
 const API_BASE_URL = 'api.onefootprint.com';
 

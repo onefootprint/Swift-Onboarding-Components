@@ -3,38 +3,29 @@ import styled, { css } from '@onefootprint/styled';
 import { Badge, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 
-import type {
-  ResponseContentProps,
-  ResponseProps,
-} from '../../../../articles.types';
-import Schema from './components/schema';
+import type { Content } from '@/api-reference/api-reference.types';
+import { getSchemaFromComponent } from '@/api-reference/utils/get-schemas';
+
+import Schema from '../schema';
 
 export type ResponsesProps = {
-  responses: ResponseProps;
+  responses: Record<string, Content>;
 };
 
-const Responses = ({ responses }: { responses: ResponseProps }) => {
+const Responses = ({ responses }: ResponsesProps) => {
   const { t } = useTranslation('pages.api-reference');
-  const isEmpty = Object.keys(responses).length === 0;
 
-  return isEmpty ? null : (
+  return Object.keys(responses).length === 0 ? null : (
     <Container>
       <ResponsesTitle>{t('responses')}</ResponsesTitle>
-      {Object.keys(responses).map(code => {
-        const response = responses[
-          code as keyof typeof responses
-        ] as ResponseContentProps;
-        const regex = /#\/components\/schemas\/(.+)/;
-        const keys = response.content['application/json'].schema.$ref;
-        const match = keys && keys.match(regex);
-        const schema = match ? match[1] : null;
-
+      {Object.entries(responses).map(([code, response]) => {
+        const schema = getSchemaFromComponent(response as Content);
         return (
           <ResponseContainer key={code}>
             <Badge variant={code === '200' ? 'success' : 'neutral'}>
               {code}
             </Badge>
-            {schema && <Schema schema={schema} />}
+            {schema && schema.properties && <Schema schema={schema} />}
           </ResponseContainer>
         );
       })}
@@ -45,7 +36,7 @@ const Responses = ({ responses }: { responses: ResponseProps }) => {
 const Container = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[4]} 0;
-    gap: ${theme.spacing[4]};
+    gap: ${theme.spacing[5]};
   `}
 `;
 

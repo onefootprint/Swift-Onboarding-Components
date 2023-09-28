@@ -1,18 +1,58 @@
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles } from '@onefootprint/ui';
+import { CodeInline, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 
-import type { DescriptionProps } from '../../../../articles.types';
+type DescriptionProps = {
+  children: string;
+};
 
-const Description = ({ description }: DescriptionProps) => (
-  <Container>{description}</Container>
-);
+const Description = ({ children }: DescriptionProps) => {
+  const elements = [];
+  let startIndex = 0;
 
-const Container = styled.div`
+  while (startIndex < children.length) {
+    const startMarkerIndex = children.indexOf('`', startIndex);
+
+    if (startMarkerIndex === -1) {
+      elements.push(children.substring(startIndex));
+      break;
+    } else {
+      elements.push(children.substring(startIndex, startMarkerIndex));
+
+      const endMarkerIndex = children.indexOf('`', startMarkerIndex + 1);
+      if (endMarkerIndex === -1) {
+        console.error('Mismatched backticks in text');
+        elements.push(children.substring(startMarkerIndex));
+        break;
+      } else {
+        const codeText = children.substring(
+          startMarkerIndex + 1,
+          endMarkerIndex,
+        );
+        elements.push(
+          <CodeInline disabled size="compact" key={endMarkerIndex}>
+            {codeText}
+          </CodeInline>,
+        );
+        startIndex = endMarkerIndex + 1;
+      }
+    }
+  }
+
+  return <Content>{elements}</Content>;
+};
+
+const Content = styled.p`
   ${({ theme }) => css`
     ${createFontStyles('body-4')}
+    align-items: center;
     color: ${theme.color.secondary};
-    padding: ${theme.spacing[3]} 0 ${theme.spacing[4]} 0;
+    display: inline;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-right: ${theme.spacing[2]};
+    margin-left: ${theme.spacing[4]};
   `}
 `;
 

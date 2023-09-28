@@ -6,7 +6,8 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "src/*": ["./src/*"]
+      "src/*": ["./src/*"],
+      "@/api-reference/*": ["./src/pages/api-reference/*"]
     }
   },
   "include": ["src", "next-env.d.ts"]

@@ -54,6 +54,9 @@
     "typescript": "4.9.5"
   },
   "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
+    "preset": "@onefootprint/jest-presets/jest/web",
+    "moduleNameMapper": {
+      "@/api-reference/(.*)": "<rootDir>/@/api-reference/$1"
+    }
   }
 }

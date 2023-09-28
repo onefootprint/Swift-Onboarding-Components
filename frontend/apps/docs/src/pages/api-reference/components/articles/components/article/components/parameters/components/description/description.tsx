@@ -2,11 +2,11 @@ import styled, { css } from '@onefootprint/styled';
 import { CodeInline, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 
-type ParameterProps = {
+type DescriptionProps = {
   children: string;
 };
 
-const Description = ({ children }: ParameterProps) => {
+const Description = ({ children }: DescriptionProps) => {
   const elements = [];
   let startIndex = 0;
 

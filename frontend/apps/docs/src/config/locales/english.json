@@ -214,11 +214,15 @@
       "path-parameters": "Path parameters",
       "query-parameters": "Query parameters",
       "header-parameters": "Headers",
+      "request-body": "Body",
       "responses": "Responses",
       "examples": "Examples",
       "response-example": "Response example",
       "request-example": "Request example",
-      "allowed-values": "Allowed values:"
+      "allowed-values": "Allowed values:",
+      "required": "Required",
+      "show-all": "Show all",
+      "show-less": "Show less"
     },
     "404": {
       "title": "Oops! Page couldn't be found.",

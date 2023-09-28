@@ -1,11 +1,11 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
-import type { Schemas } from 'src/pages/api-reference/components/articles/articles.types';
+
+import getSchema from '@/api-reference/utils/get-schemas';
 
 import Properties from '../components/properties';
-import getSchema from './utils/get-schemas';
 
-const Schema = ({ schema }: { schema: Schemas }) => {
+const Schema = ({ schema }: { schema: string }) => {
   const schemaDetails = getSchema(schema);
   const { properties } = schemaDetails as Record<string, any>;
 
