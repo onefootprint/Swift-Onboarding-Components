@@ -171,6 +171,8 @@ impl ObConfiguration {
     fn get_supported_country_struct(&self) -> Box<dyn SupportedCountriesForDocType> {
         if self.tenant_id.is_findigs() {
             Box::new(Findigs)
+        } else if self.tenant_id.is_coba() {
+            Box::new(Coba)
         } else {
             Box::new(Default)
         }
@@ -205,6 +207,23 @@ impl SupportedCountriesForDocType for Findigs {
             IdDocKind::Visa => Iso3166TwoDigitCountryCode::iter().collect(),
             IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
             IdDocKind::VoterIdentification => vec![],
+        }
+    }
+    fn is_override(&self) -> bool {
+        true
+    }
+}
+struct Coba;
+impl SupportedCountriesForDocType for Coba {
+    fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
+        match doc_type {
+            IdDocKind::IdCard => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::DriversLicense => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::Passport => Iso3166TwoDigitCountryCode::iter().collect(),
+            IdDocKind::Permit => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::Visa => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::VoterIdentification => vec![Iso3166TwoDigitCountryCode::MX],
         }
     }
     fn is_override(&self) -> bool {
@@ -568,12 +587,13 @@ mod tests {
         allow_international: bool,
         international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
         doc_cdo: &str,
+        tenant_id: Option<&str>,
     ) -> ObConfiguration {
         ObConfiguration {
             id: ObConfigurationId::from_str("1234").unwrap(),
             key: ObConfigurationKey::from_str("obk1").unwrap(),
             name: "obc".into(),
-            tenant_id: TenantId::from_str("t_1234").unwrap(),
+            tenant_id: TenantId::from_str(tenant_id.unwrap_or("t_1234")).unwrap(),
             _created_at: Utc::now(),
             _updated_at: Utc::now(),
             is_live: true,
@@ -610,6 +630,7 @@ mod tests {
             false,
             None,
             "document.drivers_license,passport,id_card.none.require_selfie",
+            None,
         );
 
         let mapping = obc.supported_country_mapping_for_document(residential_country);
@@ -623,6 +644,33 @@ mod tests {
         Iso3166TwoDigitCountryCode::iter()
             .filter(|c| !c.is_us_including_territories())
             .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
+    }
+
+    #[test]
+    fn test_supported_country_mapping_override_for_coba() {
+        let obc = obc_with_doc_cdo(
+            false,
+            None,
+            "document.drivers_license,passport,voter_identification.none.require_selfie",
+            Some("org_5lwSs95mU5v3gOU9xdSaml"),
+        );
+
+        Iso3166TwoDigitCountryCode::iter()
+            .filter(|c| *c != Iso3166TwoDigitCountryCode::MX)
+            .for_each(|c| {
+                let supported = obc.supported_country_mapping_for_document(Some(c));
+                assert_eq!(supported.get(&c).cloned().unwrap(), vec![IdDocKind::Passport])
+            });
+
+        let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
+        assert_have_same_elements(
+            supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
+            vec![
+                IdDocKind::Passport,
+                IdDocKind::DriversLicense,
+                IdDocKind::VoterIdentification,
+            ],
+        )
     }
 
     #[test_case(None, None)]
@@ -663,6 +711,7 @@ mod tests {
             true,
             international_country_restrictions,
             "document.drivers_license,passport.none.require_selfie",
+            None,
         );
 
         let mapping = obc.supported_country_mapping_for_document(residential_country);
