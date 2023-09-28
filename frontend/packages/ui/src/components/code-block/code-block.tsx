@@ -1,5 +1,5 @@
 import styled, { css, useTheme } from '@onefootprint/styled';
-import React, { memo } from 'react';
+import React from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 
 import { createFontStyles } from '../../utils/mixins';
