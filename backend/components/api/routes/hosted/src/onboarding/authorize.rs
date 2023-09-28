@@ -6,9 +6,6 @@ use crate::onboarding::GetRequirementsArgs;
 use crate::types::response::ResponseData;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::decision::state::actions::WorkflowActions;
-use api_core::decision::state::Authorize;
-use api_core::decision::state::WorkflowWrapper;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use db::models::workflow::Workflow;
@@ -47,7 +44,7 @@ pub async fn post(user_auth: UserWfAuthContext, state: web::Data<State>) -> Json
 
     // mark person and business wf as authorized
     let wf_id = user_auth.workflow().id.clone();
-    let (biz_wf, set_biz_is_authorized) = state
+    state
         .db_pool
         .db_transaction(move |c| -> ApiResult<_> {
             let wf = Workflow::lock(c, &wf_id)?;
@@ -56,30 +53,15 @@ pub async fn post(user_auth: UserWfAuthContext, state: web::Data<State>) -> Json
             }
 
             let biz_wf = user_auth.business_workflow(c)?;
-            let (set_biz_is_authorized, biz_wf) = if let Some(biz_wf) = biz_wf {
+            if let Some(biz_wf) = biz_wf {
                 let biz_wf = Workflow::lock(c, &biz_wf.id)?;
-                let (set_biz_is_authorized, biz_wf) = if biz_wf.authorized_at.is_none() {
-                    let biz_wf = Workflow::update(biz_wf, c, WorkflowUpdate::is_authorized())?;
-                    (true, biz_wf)
-                } else {
-                    (false, biz_wf.into_inner())
-                };
-                (set_biz_is_authorized, Some(biz_wf))
-            } else {
-                (false, None)
-            };
-
-            Ok((biz_wf, set_biz_is_authorized))
+                if biz_wf.authorized_at.is_none() {
+                    Workflow::update(biz_wf, c, WorkflowUpdate::is_authorized())?;
+                }
+            }
+            Ok(())
         })
         .await?;
-
-    // TODO why do we do this here? Should we just rely on POST /process?
-    if let Some(biz_wf) = biz_wf {
-        if set_biz_is_authorized {
-            let ww = WorkflowWrapper::init(&state, biz_wf.clone()).await?;
-            let _res = ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
-        }
-    }
 
     ResponseData::ok(EmptyResponse {}).json()
 }

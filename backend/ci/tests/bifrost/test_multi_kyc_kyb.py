@@ -36,6 +36,8 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
 def primary_bo(kyb_sandbox_ob_config, twilio):
     bifrost = BifrostClient.new(kyb_sandbox_ob_config, twilio)
     user = bifrost.run()
+    assert bifrost.validate_response["user"]["status"] == "pass"
+    assert bifrost.validate_response["business"]["status"] == "incomplete"
     assert user.fp_id
     assert user.fp_bid
     return user
@@ -68,6 +70,8 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
         kyb_sandbox_ob_config, twilio, override_ob_config_auth=secondary_bo_token
     )
     secondary_bo = bifrost.run()
+    assert bifrost.validate_response["user"]["status"] == "pass"
+    assert bifrost.validate_response["business"]["status"] == "pass"
 
     # Shouldn't have collected business data from the secondary owner
     assert not any(
@@ -143,6 +147,8 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
         primary_bo = bifrost.run()
     assert primary_bo.fp_id
     assert primary_bo.fp_bid
+    assert bifrost.validate_response["user"]["status"] == "pass"
+    assert bifrost.validate_response["business"]["status"] == "incomplete"
     # Assert we only had business requirements to satisfy - identity data filled out in previous
     # onboarding
     assert [r["kind"] for r in primary_bo.client.handled_requirements] == [
@@ -183,6 +189,8 @@ def test_one_click_bos(sandbox_tenant, kyb_sandbox_ob_config, twilio):
 
     # fp_bid should be the same for each business owner
     assert primary_bo.fp_bid == secondary_bo.fp_bid
+    assert bifrost.validate_response["user"]["status"] == "pass"
+    assert bifrost.validate_response["business"]["status"] == "pass"
 
 
 def extract_bo_session_sms(twilio, phone_number, business_name):
