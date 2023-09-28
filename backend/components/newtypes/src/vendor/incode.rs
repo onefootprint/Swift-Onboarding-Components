@@ -272,13 +272,13 @@ impl IncodeTest {
             | IncodeTest::UnderageCheck
             | IncodeTest::IliterationCheck
             | IncodeTest::FirstNameMatch
-            | IncodeTest::LastNameMatch => false,
-            
-            // Tests relating to checking MRZ/Barcode against OCR
-            IncodeTest::DocumentNumberCheckDigit
+            | IncodeTest::DocumentNumberCheckDigit
             | IncodeTest::BirthDateCheckDigit
             | IncodeTest::ExpirationDateCheckDigit
             | IncodeTest::CompositeCheckDigit
+            | IncodeTest::LastNameMatch => false,
+            
+            // Tests relating to checking MRZ/Barcode against OCR
             | IncodeTest::BirthDateCrosscheck
             | IncodeTest::ExpirationDateCrosscheck
             | IncodeTest::SexCrosscheck
