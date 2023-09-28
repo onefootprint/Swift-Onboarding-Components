@@ -134,6 +134,7 @@ impl SmsClient {
         Ok(())
     }
 
+    #[tracing::instrument(skip_all)]
     async fn send_message_non_blocking(
         &self,
         state: &State,
