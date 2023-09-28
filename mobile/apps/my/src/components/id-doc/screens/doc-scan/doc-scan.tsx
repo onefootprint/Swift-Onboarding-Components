@@ -125,6 +125,10 @@ const DocScan = ({
     [authToken, country, errors, uploadMutation],
   );
 
+  const isPassport = type === SupportedIdDocTypes.passport;
+  const isDriversLicense = type === SupportedIdDocTypes.driversLicense;
+  const isDefaultDocument = !isPassport && !isDriversLicense;
+
   return (
     <Context.Provider value={contextValues}>
       {showConsent && (
@@ -134,11 +138,9 @@ const DocScan = ({
         <Selfie />
       ) : (
         <>
-          {type === SupportedIdDocTypes.driversLicense && (
-            <DriversLicense side={side} />
-          )}
-          {type === SupportedIdDocTypes.passport && <Passport side={side} />}
-          <DefaultDocument type={type} side={side} />
+          {isPassport && <Passport side={side} />}
+          {isDriversLicense && <DriversLicense side={side} />}
+          {isDefaultDocument && <DefaultDocument type={type} side={side} />}
         </>
       )}
     </Context.Provider>
