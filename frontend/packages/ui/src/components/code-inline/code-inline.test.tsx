@@ -17,13 +17,13 @@ describe('<CodeInline />', () => {
     children = 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
     tooltipText = 'Copy to clipboard',
     tooltipTextConfirmation = 'Copied!',
-    disable = false,
+    disabled = false,
   }: Partial<CodeInlineProps>) =>
     customRender(
       <ToastProvider>
         <CodeInline
           ariaLabel={ariaLabel}
-          disable={disable}
+          disabled={disabled}
           tooltipText={tooltipText}
           tooltipTextConfirmation={tooltipTextConfirmation}
         >
@@ -85,13 +85,13 @@ describe('<CodeInline />', () => {
     });
   });
 
-  describe('when disabled', () => {
+  describe('when disabledd', () => {
     it('should not show the button', async () => {
       renderCodeInline({
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
         tooltipText: 'Copy to clipboard',
         ariaLabel: 'Copy to clipboard',
-        disable: true,
+        disabled: true,
       });
       const code = screen.queryByRole('button', { name: 'Copy to clipboard' });
       expect(code).not.toBeInTheDocument();
@@ -102,7 +102,7 @@ describe('<CodeInline />', () => {
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
         tooltipText: 'Copy to clipboard',
         ariaLabel: 'Copy to clipboard',
-        disable: true,
+        disabled: true,
       });
       const code = screen.getByText('fp_xm7T6MqhfRBkxL0DPOpfwM4');
       await userEvent.click(code);

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CodeBlock, media } from '@onefootprint/ui';
-import _ from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import React, { Fragment } from 'react';
 
 import type {
@@ -74,7 +74,7 @@ const DemoCode = ({ responses, requests }: DemoCodeProps) => {
           buildRequestExample(requestSchemaProperties);
 
         return (
-          <Fragment key={_.uniqueId()}>
+          <Fragment key={uniqueId()}>
             {requestSchemaExample && (
               <Request language={t('request-example')}>
                 {JSON.stringify(requestSchemaExample, null, 2)}

@@ -1,53 +1,57 @@
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles, Typography } from '@onefootprint/ui';
-import _ from 'lodash';
+import { CodeInline, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 
 type ParameterProps = {
   children: string;
 };
-const Description = ({ children }: ParameterProps) => {
-  const renderDescription = () => {
-    const descriptionArray = children.split('`');
-    return descriptionArray.map((description, index) => {
-      if (index % 2 === 0) {
-        const descriptionWords = description.split(' ');
 
-        return descriptionWords.map(word => (
-          <Typography
-            variant="body-4"
-            key={_.uniqueId()}
-            as="span"
-            sx={{ display: 'inline-block', marginRight: 2 }}
-          >
-            {word}
-          </Typography>
-        ));
+const Description = ({ children }: ParameterProps) => {
+  const elements = [];
+  let startIndex = 0;
+
+  while (startIndex < children.length) {
+    const startMarkerIndex = children.indexOf('`', startIndex);
+
+    if (startMarkerIndex === -1) {
+      elements.push(children.substring(startIndex));
+      break;
+    } else {
+      elements.push(children.substring(startIndex, startMarkerIndex));
+
+      const endMarkerIndex = children.indexOf('`', startMarkerIndex + 1);
+      if (endMarkerIndex === -1) {
+        console.error('Mismatched backticks in text');
+        elements.push(children.substring(startMarkerIndex));
+        break;
+      } else {
+        const codeText = children.substring(
+          startMarkerIndex + 1,
+          endMarkerIndex,
+        );
+        elements.push(
+          <CodeInline disabled key={endMarkerIndex}>
+            {codeText}
+          </CodeInline>,
+        );
+        startIndex = endMarkerIndex + 1;
       }
-      return <CodeStyle key={_.uniqueId()}>{description}</CodeStyle>;
-    });
-  };
-  return <Container>{renderDescription()}</Container>;
+    }
+  }
+
+  return <Content>{elements}</Content>;
 };
 
-const Container = styled.div`
+const Content = styled.p`
   ${({ theme }) => css`
     ${createFontStyles('body-4')}
+    align-items: center;
+    color: ${theme.color.secondary};
     display: inline;
     flex-direction: row;
     flex-wrap: wrap;
-    align-items: center;
     justify-content: flex-start;
-    color: ${theme.color.secondary};
-  `}
-`;
-
-const CodeStyle = styled.code`
-  ${({ theme }) => css`
-    ${createFontStyles('snippet-2', 'code')};
-    background-color: ${theme.backgroundColor.secondary};
-    padding: 0 ${theme.spacing[2]};
-    border-radius: ${theme.borderRadius.compact};
+    margin-right: ${theme.spacing[2]};
   `}
 `;
 

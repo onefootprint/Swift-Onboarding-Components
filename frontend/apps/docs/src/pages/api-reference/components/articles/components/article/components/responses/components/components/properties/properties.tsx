@@ -1,5 +1,6 @@
+import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { CodeInline, createFontStyles } from '@onefootprint/ui';
+import { CodeInline, createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 type PropertiesProps = {
@@ -7,32 +8,53 @@ type PropertiesProps = {
   title: string;
 };
 
-const Properties = ({ properties, title }: PropertiesProps) => (
-  <Container>
-    <Title>
-      <CodeInline disable>{title}</CodeInline>
-      {properties.type && (
-        <>
-          <Separator>·</Separator>
-          <Type>{properties.type}</Type>
-        </>
+const Properties = ({ properties, title }: PropertiesProps) => {
+  const { t } = useTranslation('pages.api-reference');
+  return (
+    <Container>
+      <Title>
+        <CodeInline disabled>{title}</CodeInline>
+        {properties.type && (
+          <>
+            <Separator>·</Separator>
+            <Type>{properties.type}</Type>
+          </>
+        )}
+      </Title>
+      {properties.description && (
+        <Description>
+          {properties.description.charAt(0).toUpperCase() +
+            properties.description.slice(1)}
+        </Description>
       )}
-    </Title>
-    {properties.description && (
-      <Description>
-        {properties.description.charAt(0).toUpperCase() +
-          properties.description.slice(1)}
-      </Description>
-    )}
-    {properties.enum && (
-      <List>
-        {properties.enum.map((enumValue: string) => (
-          <Value key={enumValue}>{enumValue}</Value>
-        ))}
-      </List>
-    )}
-  </Container>
-);
+      {properties.enum && (
+        <AllowedValues>
+          <Typography variant="body-4" color="secondary">
+            {t('allowed-values')}
+          </Typography>
+          <List>
+            {properties.enum.map((enumValue: string) => (
+              <CodeInline size="compact" key={enumValue} disabled>
+                {enumValue}
+              </CodeInline>
+            ))}
+          </List>
+        </AllowedValues>
+      )}
+    </Container>
+  );
+};
+
+const AllowedValues = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: ${theme.spacing[2]};
+  `}
+`;
 
 const Container = styled.div`
   ${({ theme }) => css`
@@ -54,16 +76,6 @@ const Type = styled.p`
   ${({ theme }) => css`
     ${createFontStyles('body-3')}
     color: ${theme.color.secondary};
-  `}
-`;
-
-const Value = styled.span`
-  ${({ theme }) => css`
-    ${createFontStyles('snippet-2')}
-    color: ${theme.color.secondary};
-    padding: ${theme.spacing[1]} ${theme.spacing[3]};
-    border-radius: ${theme.borderRadius.default};
-    background-color: ${theme.backgroundColor.secondary};
   `}
 `;
 

@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Badge, createFontStyles } from '@onefootprint/ui';
-import _ from 'lodash';
 import React from 'react';
 
 import type {
@@ -10,10 +9,15 @@ import type {
 } from '../../../../articles.types';
 import Schema from './components/schema';
 
+export type ResponsesProps = {
+  responses: ResponseProps;
+};
+
 const Responses = ({ responses }: { responses: ResponseProps }) => {
   const { t } = useTranslation('pages.api-reference');
+  const isEmpty = Object.keys(responses).length === 0;
 
-  return (
+  return isEmpty ? null : (
     <Container>
       <ResponsesTitle>{t('responses')}</ResponsesTitle>
       {Object.keys(responses).map(code => {
@@ -26,8 +30,8 @@ const Responses = ({ responses }: { responses: ResponseProps }) => {
         const schema = match ? match[1] : null;
 
         return (
-          <ResponseContainer key={_.uniqueId()}>
-            <Badge variant={code === '200' ? 'success' : 'neutral'} key={code}>
+          <ResponseContainer key={code}>
+            <Badge variant={code === '200' ? 'success' : 'neutral'}>
               {code}
             </Badge>
             {schema && <Schema schema={schema} />}

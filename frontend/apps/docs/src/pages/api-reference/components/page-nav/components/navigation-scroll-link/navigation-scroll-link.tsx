@@ -11,10 +11,10 @@ type NavigationScrollLinkProps = {
 const NavigationScrollLink = ({ id, children }: NavigationScrollLinkProps) => (
   <ScrollLink
     activeClass="active"
-    to={id}
-    spy
-    hashSpy
     containerId="articles-container"
+    hashSpy
+    spy
+    to={encodeURIComponent(id)}
   >
     {children}
   </ScrollLink>

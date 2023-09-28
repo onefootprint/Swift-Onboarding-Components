@@ -4,10 +4,10 @@ import { Box, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 
+import staticAPIData from './assets/api-docs.json';
+import staticPreviewAPIData from './assets/api-preview-docs.json';
 import Articles from './components/articles/articles';
 import PageNav from './components/page-nav';
-import staticAPIData from './server/api-docs.json';
-import staticPreviewAPIData from './server/api-preview-docs.json';
 import getArticles from './utils/get-articles';
 import getNavigation from './utils/get-navigation/get-navigation';
 

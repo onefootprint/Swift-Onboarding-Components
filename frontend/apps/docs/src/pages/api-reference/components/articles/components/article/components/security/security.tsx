@@ -4,7 +4,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Box, CodeInline, createFontStyles, Divider } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import staticData from '../../../../../../server/api-docs.json';
+import staticData from '../../../../../../assets/api-docs.json';
 import type { SecurityProps } from '../../../../articles.types';
 
 const securityComponentContent = staticData?.components?.securitySchemes;
@@ -31,13 +31,13 @@ const Security = ({ type }: SecurityProps) => {
             <br />
             <Box as="span" sx={{ display: 'inline-block' }}>
               {t('what-is-api-key')}{' '}
-              <CodeInline disable>
+              <CodeInline disabled>
                 {securityComponentContent[type].name}
               </CodeInline>
             </Box>
             <Example>
               {t('example')}:{' '}
-              <CodeInline disable>
+              <CodeInline disabled>
                 {`${securityComponentContent[type].name} : 1234`}
               </CodeInline>
             </Example>

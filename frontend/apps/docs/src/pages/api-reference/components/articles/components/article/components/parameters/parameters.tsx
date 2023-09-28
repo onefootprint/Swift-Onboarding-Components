@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CodeInline, createFontStyles } from '@onefootprint/ui';
-import React, { Fragment } from 'react';
+import React from 'react';
 
 import type { ParameterProps } from '../../../../articles.types';
 import Description from './components/description';
@@ -41,21 +41,21 @@ const Parameters = ({ parameters }: { parameters: ParameterProps[] }) => {
       {sections.map(section => {
         if (section.parameters?.length > 0) {
           return (
-            <ParameterGroup key={section.title}>
+            <ParameterContainer key={section.title}>
               <ParameterTitle>{t(section.title)}</ParameterTitle>
               {section.parameters?.map((parameter: ParameterProps) => (
-                <Fragment key={parameter.name}>
+                <Parameter key={parameter.name}>
                   <Title>
-                    <CodeInline disable>{parameter.name}</CodeInline>
+                    <CodeInline disabled>{parameter.name}</CodeInline>
                     <Separator>·</Separator>
                     <Type>{parameter.schema.type}</Type>
                   </Title>
                   {parameter.description && (
                     <Description>{parameter.description}</Description>
                   )}
-                </Fragment>
+                </Parameter>
               ))}
-            </ParameterGroup>
+            </ParameterContainer>
           );
         }
         return null;
@@ -63,6 +63,15 @@ const Parameters = ({ parameters }: { parameters: ParameterProps[] }) => {
     </Container>
   );
 };
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[4]};
+    margin-top: ${theme.spacing[4]};
+  `}
+`;
 
 const Title = styled.div`
   ${({ theme }) => css`
@@ -80,16 +89,15 @@ const Type = styled.p`
   `}
 `;
 
-const Container = styled.div`
+const ParameterContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[4]};
-    margin-top: ${theme.spacing[4]};
+    gap: ${theme.spacing[5]};
   `}
 `;
 
-const ParameterGroup = styled.div`
+const Parameter = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
@@ -115,4 +123,5 @@ const Separator = styled.span`
     justify-content: center;
   `}
 `;
+
 export default Parameters;

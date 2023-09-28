@@ -7,8 +7,7 @@ import React from 'react';
 
 import SupportList from '../support-list';
 
-const API_REFERENCE_URL =
-  'https://api-docs.onefootprint.com/docs/footprint-public-docs/9609ff8a78f56-footprint-api';
+const API_REFERENCE_URL = '/api-reference';
 
 type NavigationFooterProps = {
   linkTo: 'api-reference' | 'docs';

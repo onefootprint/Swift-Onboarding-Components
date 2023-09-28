@@ -45,7 +45,7 @@ const CustomDataFields = ({
   const renderField = (field: DiField) => (
     <Field
       key={field.di}
-      renderLabel={() => <CodeInline disable>{field.di}</CodeInline>}
+      renderLabel={() => <CodeInline disabled>{field.di}</CodeInline>}
       di={field.di}
       entity={entity}
     />

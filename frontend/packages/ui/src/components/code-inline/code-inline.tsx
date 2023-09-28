@@ -7,7 +7,7 @@ import CopyButton from '../copy-button';
 export type CodeInlineProps = {
   ariaLabel?: string;
   children: string;
-  disable?: boolean;
+  disabled?: boolean;
   tooltipText?: string;
   tooltipTextConfirmation?: string;
   truncate?: boolean;
@@ -18,16 +18,20 @@ export type CodeInlineProps = {
 const CodeInline = ({
   ariaLabel = 'Copy to clipboard',
   children,
-  disable,
+  disabled,
   tooltipText = 'Copy to clipboard',
   tooltipTextConfirmation = 'Copied!',
   truncate,
   isPrivate,
   size = 'default',
 }: CodeInlineProps) => {
-  if (disable) {
+  if (disabled) {
     return (
-      <CodeContent data-truncate={truncate} data-private={isPrivate}>
+      <CodeContent
+        data-truncate={truncate}
+        data-private={isPrivate}
+        size={size}
+      >
         {children}
       </CodeContent>
     );
@@ -52,34 +56,21 @@ const CodeInline = ({
 };
 
 const CodeContent = styled.code<{ size?: 'default' | 'compact' }>`
-  ${({ theme, size = 'default' }) => css`
+  ${({ theme, size }) => css`
+    ${size === 'compact'
+      ? createFontStyles('snippet-3', 'code')
+      : createFontStyles('snippet-2', 'code')};
     text-align: left;
     white-space: break-spaces;
     word-break: break-word;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: inline-block;
-
-    ${size === 'default' &&
-    css`
-      ${createFontStyles('snippet-2', 'code')};
-      background: ${theme.backgroundColor.secondary};
-      border-radius: ${theme.borderRadius.compact};
-      color: ${theme.color.error};
-      flex-flow: wrap;
-      height: 24px;
-      height: auto;
-      padding: ${theme.spacing[1]} ${theme.spacing[2]};
-    `}
-
-    ${size === 'compact' &&
-    css`
-      ${createFontStyles('snippet-3', 'code')};
-      background: ${theme.backgroundColor.secondary};
-      border-radius: ${theme.borderRadius.compact};
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-      color: ${theme.color.secondary};
-      padding: ${theme.spacing[1]} ${theme.spacing[2]};
-    `}
+    background: ${theme.backgroundColor.secondary};
+    border-radius: ${theme.borderRadius.compact};
+    color: ${size === 'compact' ? theme.color.secondary : theme.color.error};
+    flex-flow: wrap;
+    height: ${size === 'compact' ? 'auto' : ''};
+    padding: ${theme.spacing[1]} ${theme.spacing[2]};
 
     &[data-truncate='true'] {
       overflow: hidden;

@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { media, Typography } from '@onefootprint/ui';
-import _ from 'lodash';
 import React from 'react';
 import { Element } from 'react-scroll';
 
@@ -24,9 +23,10 @@ const Article = ({
   requestBody: requests,
 }: ArticleProps) => {
   const { t } = useTranslation('pages.api-reference');
+  const encodedId = encodeURIComponent(id);
 
   return (
-    <ArticleContainer id={id} name={id}>
+    <ArticleContainer id={encodedId} name={encodedId}>
       <ContentColumn>
         <Container>
           {method && path && <Path type={method} url={path} />}
@@ -39,11 +39,11 @@ const Article = ({
             </Typography>
             {security?.map((element: SecurityTypes) =>
               Object.keys(element).map(type => (
-                <Security key={_.uniqueId()} type={type as SecurityTypes} />
+                <Security key={type} type={type as SecurityTypes} />
               )),
             )}
             {parameters && <Parameters parameters={parameters} />}
-            {responses && requests && <Responses responses={responses} />}
+            {responses && <Responses responses={responses} />}
           </Requests>
         )}
       </ContentColumn>

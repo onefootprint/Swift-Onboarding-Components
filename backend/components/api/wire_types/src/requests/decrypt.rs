@@ -5,7 +5,7 @@ use newtypes::{flat_api_object_map_type, DataIdentifier, PiiJsonValue, Versioned
 flat_api_object_map_type!(
     DecryptResponse<VersionedDataIdentifier, Option<PiiJsonValue>>,
     description="A key-value map with the corresponding decrypted values",
-    example=r#"{ "id.last_name": "smith", "id.ssn9": "121121212", "custom.credit_card": "1234 1234 1234 1234" }"#
+    example=r#"{ "id.last_name": "doe", "id.ssn9": "121121212", "custom.credit_card": "4242424242424242" }"#
 );
 
 impl From<HashMap<DataIdentifier, Option<PiiJsonValue>>> for DecryptResponse {

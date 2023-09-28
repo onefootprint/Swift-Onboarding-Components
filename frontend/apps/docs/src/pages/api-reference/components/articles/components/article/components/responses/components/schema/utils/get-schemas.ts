@@ -1,6 +1,6 @@
+import staticAPIData from 'src/pages/api-reference/assets/api-docs.json';
+import staticPreviewData from 'src/pages/api-reference/assets/api-preview-docs.json';
 import type { Schemas } from 'src/pages/api-reference/components/articles/articles.types';
-import staticAPIData from 'src/pages/api-reference/server/api-docs.json';
-import staticPreviewData from 'src/pages/api-reference/server/api-preview-docs.json';
 
 const getSchema = (schemaKey: Schemas) => {
   const schema =

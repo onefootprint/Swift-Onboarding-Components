@@ -18,9 +18,9 @@ export default {
       description: 'Content to be rendered',
       required: true,
     },
-    disable: {
+    disabled: {
       control: 'boolean',
-      description: 'Disable copy',
+      description: 'Disabled copy',
       required: false,
     },
     truncate: {
@@ -56,7 +56,7 @@ export default {
 const Template: Story<CodeInlineProps> = ({
   ariaLabel,
   children,
-  disable,
+  disabled,
   tooltipText,
   tooltipTextConfirmation,
   truncate,
@@ -64,7 +64,7 @@ const Template: Story<CodeInlineProps> = ({
 }: CodeInlineProps) => (
   <CodeInline
     ariaLabel={ariaLabel}
-    disable={disable}
+    disabled={disabled}
     tooltipText={tooltipText}
     tooltipTextConfirmation={tooltipTextConfirmation}
     truncate={truncate}
@@ -78,7 +78,7 @@ export const Base = Template.bind({});
 Base.args = {
   ariaLabel: 'Copy',
   children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
-  disable: false,
+  disabled: false,
   tooltipText: 'Copy to clipboard',
   tooltipTextConfirmation: 'Copied!',
   truncate: false,
