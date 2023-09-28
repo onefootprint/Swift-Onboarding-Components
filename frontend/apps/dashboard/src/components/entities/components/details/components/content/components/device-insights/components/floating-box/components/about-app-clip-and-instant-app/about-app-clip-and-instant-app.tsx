@@ -34,7 +34,7 @@ const AboutAppClipAndInstantApp = ({
           <Typography variant="body-2">{t('dialog.demo')}</Typography>
           <Box sx={{ marginY: 5 }}>
             <QRCode
-              value="https://handoff.onefootprint.com/appclip?demo=true#12345"
+              value="https://handoff.onefootprint.com/appclip?demo=true#1234512345"
               size={128}
             />
           </Box>
