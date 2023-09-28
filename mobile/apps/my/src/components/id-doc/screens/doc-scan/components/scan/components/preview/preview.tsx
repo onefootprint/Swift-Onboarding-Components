@@ -15,7 +15,6 @@ import ScrollLayout from '@/components/scroll-layout';
 import useTranslation from '@/hooks/use-translation';
 
 import { useScanContext } from '../../../scan-context';
-import Stepper, { StepperProps } from '../../../stepper';
 import type { ScanPicture, ScanSize } from '../../scan.types';
 import Errors from './components/errors';
 import { DEFAULT_HEIGHT, LARGE_HEIGHT } from './preview.constants';
@@ -27,7 +26,6 @@ type PreviewProps = {
   onReset: () => void;
   picture: ScanPicture;
   size?: ScanSize;
-  stepperValues: StepperProps;
   subtitle?: string;
   title: string;
 };
@@ -37,12 +35,10 @@ const Preview = ({
   onReset,
   picture,
   size,
-  stepperValues,
   subtitle,
   title,
 }: PreviewProps) => {
   const { t } = useTranslation('components.scan.preview');
-  const { value, max } = stepperValues;
   const { isLoading, isError, errors, isSuccess, onSubmit, onResetErrors } =
     useScanContext();
   const showActionButtons = !isError && !isSuccess;
@@ -99,13 +95,7 @@ const Preview = ({
           </Box>
         }
       >
-        <Header headerLeft={<BackButton onPress={onBack} />}>
-          {max > 1 && (
-            <Box center>
-              <Stepper value={value} max={max} />
-            </Box>
-          )}
-        </Header>
+        <Header headerLeft={<BackButton onPress={onBack} />} />
         <Box marginTop={5} marginBottom={1}>
           <Typography variant="heading-3" center>
             {title}

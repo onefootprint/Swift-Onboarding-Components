@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { StepperProps } from '../stepper';
 import Camera from './components/camera';
 import Preview from './components/preview';
 import type { ScanObject, ScanPicture, ScanSize, ScanType } from './scan.types';
@@ -12,7 +11,6 @@ type ScanProps = {
   object: ScanObject;
   onBack?: () => void;
   size?: ScanSize;
-  stepperValues: StepperProps;
   subtitle?: string;
   title: string;
   type?: ScanType;
@@ -30,7 +28,6 @@ const Scan = ({
   object,
   onBack,
   size = 'default',
-  stepperValues,
   subtitle,
   title,
   type = 'back',
@@ -52,7 +49,6 @@ const Scan = ({
       onReset={handleResetPhoto}
       picture={picture}
       size={size}
-      stepperValues={stepperValues}
       subtitle={subtitle}
       title={title}
     />

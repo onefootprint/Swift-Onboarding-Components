@@ -12,17 +12,15 @@ import Instructions from '../default-instructions';
 import Scan from '../scan';
 import type { ScanObject } from '../scan/scan.types';
 import ScanContext from '../scan-context';
-import { StepperProps } from '../stepper';
 
 export type DriversLicenseProps = {
   side: UploadDocumentSide;
-  stepperValues: StepperProps;
 };
 
 const DEFAULT_ASPECT_RATIO = 1.586;
 const DEFAULT_BARCODE_RESULT = { barcodes: [] };
 
-const DriversLicense = ({ side, stepperValues }: DriversLicenseProps) => {
+const DriversLicense = ({ side }: DriversLicenseProps) => {
   const { t, allT } = useTranslation('components.scan.drivers-license');
   const { country } = useContext(ScanContext);
   const detector = useSharedValue(false);
@@ -62,13 +60,12 @@ const DriversLicense = ({ side, stepperValues }: DriversLicenseProps) => {
 
   return (
     <Instructions
+      side={side}
       title={t(`instructions.${side}`, { country: country.value3 })}
-      stepperValues={stepperValues}
     >
       <Scan
         frameProcessor={frameProcessor}
         object={object}
-        stepperValues={stepperValues}
         subtitle={allT(`doc-side.${side}`)}
         title={t('title')}
       >

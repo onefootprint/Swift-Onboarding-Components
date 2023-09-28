@@ -8,15 +8,10 @@ import useTranslation from '@/hooks/use-translation';
 
 import Camera from '../scan';
 import type { ScanObject } from '../scan/scan.types';
-import { StepperProps } from '../stepper';
 import Frame from './components/frame';
 import Instructions from './components/instructions';
 
-export type SelfieProps = {
-  stepperValues: StepperProps;
-};
-
-const Selfie = ({ stepperValues }: SelfieProps) => {
+const Selfie = () => {
   const { width, height } = Dimensions.get('window');
   const { t } = useTranslation('components.scan.selfie');
   const detector = useSharedValue(false);
@@ -76,12 +71,11 @@ const Selfie = ({ stepperValues }: SelfieProps) => {
   );
 
   return (
-    <Instructions stepperValues={stepperValues}>
+    <Instructions>
       <Camera
         frameProcessor={frameProcessor}
         object={object}
         size="large"
-        stepperValues={stepperValues}
         title={t('title')}
         type="front"
       >

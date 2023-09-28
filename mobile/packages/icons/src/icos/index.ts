@@ -42,6 +42,8 @@ export { default as IcoSun24 } from './ico-sun-24';
 export { default as IcoUser16 } from './ico-user-16';
 export { default as IcoUserCircle24 } from './ico-user-circle-24';
 export { default as IcoVisaPassport24 } from './ico-visa-passport-24';
+export { default as IcoVoter16 } from './ico-voter-16';
+export { default as IcoVoter24 } from './ico-voter-24';
 export { default as IcoWarning16 } from './ico-warning-16';
 export { default as IcoWarning24 } from './ico-warning-24';
 export { default as IcoWork24 } from './ico-work-24';

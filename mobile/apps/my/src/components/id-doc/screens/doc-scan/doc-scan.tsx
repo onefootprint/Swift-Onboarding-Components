@@ -10,16 +10,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
 import useTranslation from '@/hooks/use-translation';
 
+import DefaultDocument from './components/default-document';
 import DriversLicense from './components/drivers-license';
-import IdCard from './components/id-card';
 import Passport from './components/passport';
-import ResidenceDocument from './components/residence-document';
 import Context from './components/scan-context';
 import Selfie from './components/selfie';
 import ConsentDialog from './components/selfie/components/consent-dialog';
-import { StepperProps } from './components/stepper';
-import Visa from './components/visa';
-import WorkPermit from './components/work-permit';
 import useUploadDoc from './hooks/use-upload-doc';
 import getPreviewNextSide from './utils/get-preview-next-side';
 
@@ -33,7 +29,6 @@ export type DocScanProps = {
   onRetryLimitExceeded: () => void;
   requirement: IdDocRequirement;
   side: UploadDocumentSide;
-  stepperValues: StepperProps;
   type: SupportedIdDocTypes;
 };
 
@@ -49,7 +44,6 @@ const DocScan = ({
   onRetryLimitExceeded,
   requirement,
   side,
-  stepperValues,
   type,
 }: DocScanProps) => {
   const { t, allT } = useTranslation('components.scan.preview.errors');
@@ -137,27 +131,14 @@ const DocScan = ({
         <ConsentDialog authToken={authToken} onCompleted={onConsentCompleted} />
       )}
       {side === UploadDocumentSide.Selfie ? (
-        <Selfie stepperValues={stepperValues} />
+        <Selfie />
       ) : (
         <>
-          {type === SupportedIdDocTypes.passport && (
-            <Passport stepperValues={stepperValues} />
-          )}
           {type === SupportedIdDocTypes.driversLicense && (
-            <DriversLicense side={side} stepperValues={stepperValues} />
+            <DriversLicense side={side} />
           )}
-          {type === SupportedIdDocTypes.idCard && (
-            <IdCard side={side} stepperValues={stepperValues} />
-          )}
-          {type === SupportedIdDocTypes.residenceDocument && (
-            <ResidenceDocument side={side} stepperValues={stepperValues} />
-          )}
-          {type === SupportedIdDocTypes.workPermit && (
-            <WorkPermit side={side} stepperValues={stepperValues} />
-          )}
-          {type === SupportedIdDocTypes.visa && (
-            <Visa stepperValues={stepperValues} />
-          )}
+          {type === SupportedIdDocTypes.passport && <Passport side={side} />}
+          <DefaultDocument type={type} side={side} />
         </>
       )}
     </Context.Provider>

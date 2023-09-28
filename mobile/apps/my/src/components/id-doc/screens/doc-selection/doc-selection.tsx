@@ -119,7 +119,7 @@ const DocSelection = ({
           />
           <Divider marginVertical={7} />
           <RadioSelect<SupportedIdDocTypes>
-            marginBottom={7}
+            marginBottom={10}
             onChange={setDocType}
             options={docTypeOptions}
             value={docType}

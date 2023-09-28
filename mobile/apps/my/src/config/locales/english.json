@@ -95,7 +95,11 @@
             "title": "Residence card / Green card",
             "description": "Front & Back"
           },
-          "work-permit": {
+          "voter-identification": {
+            "title": "Voter Identification",
+            "description": "Front"
+          },
+          "permit": {
             "title": "Work permit / EAD card",
             "description": "Front & Back"
           },
@@ -175,6 +179,10 @@
           "back": "Scan the back side of your driver's license ({{country}})"
         }
       },
+      "passport": {
+        "title": "Passport",
+        "instructions": "Scan the photo page of your passport ({{country}})"
+      },
       "id-card": {
         "title": "ID card",
         "instructions": {
@@ -182,9 +190,12 @@
           "back": "Scan the back side of your id card ({{country}})"
         }
       },
-      "passport": {
-        "title": "Passport",
-        "instructions": "Scan the photo page of your passport ({{country}})"
+      "voter-identification": {
+        "title": "Voter Identification",
+        "instructions": {
+          "front": "Scan the front side of your voter identification ({{country}})",
+          "back": "Scan the back side of your voter identification ({{country}})"
+        }
       },
       "residence-document": {
         "title": "Residence card",
@@ -193,7 +204,7 @@
           "back": "Scan the back side of your residence card / Green card ({{country}})"
         }
       },
-      "work-permit": {
+      "permit": {
         "title": "EAD card",
         "instructions": {
           "front": "Scan the front side of your work permit / EAD card ({{country}})",
@@ -202,7 +213,10 @@
       },
       "visa": {
         "title": "Visa",
-        "instructions": "Scan the photo page of your Visa ({{country}})"
+        "instructions": {
+          "front": "Scan the photo page of your Visa ({{country}})",
+          "back": "Scan the back side of your Visa ({{country}})"
+        }
       },
       "selfie": {
         "title": "Selfie",

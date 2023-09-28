@@ -1,3 +1,4 @@
+import { UploadDocumentSide } from '@onefootprint/types';
 import React, { useContext, useState } from 'react';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor } from 'react-native-vision-camera';
@@ -10,15 +11,14 @@ import Instructions from '../default-instructions';
 import Scan from '../scan';
 import type { ScanObject } from '../scan/scan.types';
 import ScanContext from '../scan-context';
-import { StepperProps } from '../stepper';
 
 const DEFAULT_ASPECT_RATIO = 1.42;
 
-type PassportProps = {
-  stepperValues: StepperProps;
+export type PassportProps = {
+  side: UploadDocumentSide;
 };
 
-const Passport = ({ stepperValues }: PassportProps) => {
+const Passport = ({ side }: PassportProps) => {
   const { t } = useTranslation('components.scan.passport');
   const { country } = useContext(ScanContext);
   const detector = useSharedValue(false);
@@ -55,15 +55,10 @@ const Passport = ({ stepperValues }: PassportProps) => {
 
   return (
     <Instructions
+      side={side}
       title={t('instructions', { country: country.value3 })}
-      stepperValues={stepperValues}
     >
-      <Scan
-        object={object}
-        frameProcessor={frameProcessor}
-        title={t('title')}
-        stepperValues={stepperValues}
-      >
+      <Scan object={object} frameProcessor={frameProcessor} title={t('title')}>
         <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
       </Scan>
     </Instructions>

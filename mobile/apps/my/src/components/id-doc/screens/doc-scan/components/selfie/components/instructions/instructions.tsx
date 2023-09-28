@@ -12,18 +12,15 @@ import ScrollLayout from '@/components/scroll-layout';
 import useTranslation from '@/hooks/use-translation';
 
 import { useScanContext } from '../../../scan-context';
-import Stepper, { type StepperProps } from '../../../stepper';
 
 type InstructionsProps = {
   children: JSX.Element;
-  stepperValues: StepperProps;
 };
 
-const Instructions = ({ children, stepperValues }: InstructionsProps) => {
+const Instructions = ({ children }: InstructionsProps) => {
   const { t } = useTranslation('components.scan.instructions.selfie');
   const [show, setShow] = useState(false);
   const { onBack } = useScanContext();
-  const { value, max } = stepperValues;
   const options = [
     {
       label: t('frame'),
@@ -59,14 +56,8 @@ const Instructions = ({ children, stepperValues }: InstructionsProps) => {
         <Box>
           <Box center>
             <Header
-              headerLeft={value === 0 ? <BackButton onPress={onBack} /> : null}
-            >
-              {max > 1 && (
-                <Box>
-                  <Stepper value={value} max={max} />
-                </Box>
-              )}
-            </Header>
+              headerLeft={0 === 0 ? <BackButton onPress={onBack} /> : null}
+            />
             <Typography variant="heading-3" marginVertical={7} center>
               {t('title')}
             </Typography>

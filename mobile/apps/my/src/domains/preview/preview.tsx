@@ -21,8 +21,8 @@ type PreviewProps = {
 };
 
 const Preview = ({ isDemo, isDebug }: PreviewProps) => {
-  const [showPasskey, setShowPasskey] = useState(true);
-  const [showIdDoc, setShowIdDoc] = useState(false);
+  const [showPasskey, setShowPasskey] = useState(false);
+  const [showIdDoc, setShowIdDoc] = useState(true);
   const [showComplete, setShowComplete] = useState(false);
 
   useEffect(() => {
@@ -243,6 +243,7 @@ const Preview = ({ isDemo, isDebug }: PreviewProps) => {
                     SupportedIdDocTypes.workPermit,
                     SupportedIdDocTypes.visa,
                     SupportedIdDocTypes.residenceDocument,
+                    SupportedIdDocTypes.voterIdentification,
                   ],
                   UM: [
                     SupportedIdDocTypes.idCard,

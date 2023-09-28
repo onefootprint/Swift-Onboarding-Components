@@ -4,6 +4,7 @@ import {
   IcoSparkles24,
   IcoSquareFrame24,
 } from '@onefootprint/icons';
+import { UploadDocumentSide } from '@onefootprint/types';
 import { Box, Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
@@ -13,23 +14,21 @@ import ScrollLayout from '@/components/scroll-layout';
 import useTranslation from '@/hooks/use-translation';
 
 import { useScanContext } from '../scan-context';
-import Stepper, { StepperProps } from '../stepper';
 
 type DefaultInstructionsProps = {
-  title: string;
   children: JSX.Element;
-  stepperValues: StepperProps;
+  side: UploadDocumentSide;
+  title: string;
 };
 
 const DefaultInstructions = ({
-  title,
   children,
-  stepperValues,
+  side,
+  title,
 }: DefaultInstructionsProps) => {
   const { t } = useTranslation('components.scan.instructions.document');
   const [show, setShow] = useState(false);
   const { onBack } = useScanContext();
-  const { value, max } = stepperValues;
   const options = [
     {
       label: t('contrast'),
@@ -68,14 +67,12 @@ const DefaultInstructions = ({
       <Box flex={1} justifyContent="space-between">
         <Box>
           <Header
-            headerLeft={value === 0 ? <BackButton onPress={onBack} /> : null}
-          >
-            {max > 1 && (
-              <Box>
-                <Stepper value={value} max={max} />
-              </Box>
-            )}
-          </Header>
+            headerLeft={
+              side === UploadDocumentSide.Front ? (
+                <BackButton onPress={onBack} />
+              ) : null
+            }
+          />
           <Box center>
             <Typography variant="heading-3" marginVertical={7} center>
               {title}

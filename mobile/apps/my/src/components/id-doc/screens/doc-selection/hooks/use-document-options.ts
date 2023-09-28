@@ -5,6 +5,7 @@ import {
   IcoIdCard24,
   IcoPassport24,
   IcoVisaPassport24,
+  IcoVoter24,
   IcoWork24,
 } from '@onefootprint/icons';
 import {
@@ -50,8 +51,8 @@ const useDocumentOptions = (
       IconComponent: IcoVisaPassport24,
     },
     [SupportedIdDocTypes.workPermit]: {
-      title: t('options.work-permit.title'),
-      description: t('options.work-permit.description'),
+      title: t('options.permit.title'),
+      description: t('options.permit.description'),
       value: SupportedIdDocTypes.workPermit,
       IconComponent: IcoWork24,
     },
@@ -61,8 +62,14 @@ const useDocumentOptions = (
       value: SupportedIdDocTypes.residenceDocument,
       IconComponent: IcoGreenCard24,
     },
+    [SupportedIdDocTypes.voterIdentification]: {
+      title: t('options.voter-identification.title'),
+      description: t('options.voter-identification.description'),
+      value: SupportedIdDocTypes.voterIdentification,
+      IconComponent: IcoVoter24,
+    },
   };
-  return availableDocTypes.map(type => options[type]);
+  return availableDocTypes.map(type => options[type]).filter(option => option);
 };
 
 export default useDocumentOptions;
