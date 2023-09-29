@@ -1,7 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Grid, TextInput } from '@onefootprint/ui';
+import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import styled, { css } from 'styled-components';
 
 import validateName, { NameValidationError } from './validate-name';
 
@@ -47,51 +48,51 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
 
   return (
     <>
-      <Grid.Row>
-        <Grid.Column col={12}>
-          <TextInput
-            data-private
-            disabled={disabled}
-            hasError={!!errors.firstName}
-            hint={getFirstNameHint()}
-            label={t('first-name.label')}
-            placeholder={t('first-name.placeholder')}
-            {...register('firstName', {
-              required: true,
-              validate: (value: string) => validateName(value) === undefined,
-            })}
-          />
-        </Grid.Column>
-      </Grid.Row>
-      <Grid.Row>
-        <Grid.Column col={12}>
-          <TextInput
-            data-private
-            disabled={disabled}
-            label={t('middle-name.label')}
-            placeholder={t('middle-name.placeholder')}
-            {...register('middleName')}
-          />
-        </Grid.Column>
-      </Grid.Row>
-      <Grid.Row>
-        <Grid.Column col={12}>
-          <TextInput
-            data-private
-            disabled={disabled}
-            hasError={!!errors.lastName}
-            hint={getLastNameHint()}
-            label={t('last-name.label')}
-            placeholder={t('last-name.placeholder')}
-            {...register('lastName', {
-              required: true,
-              validate: (value: string) => validateName(value) === undefined,
-            })}
-          />
-        </Grid.Column>
-      </Grid.Row>
+      <Row columns={2}>
+        <TextInput
+          data-private
+          disabled={disabled}
+          hasError={!!errors.firstName}
+          hint={getFirstNameHint()}
+          label={t('first-name.label')}
+          placeholder={t('first-name.placeholder')}
+          {...register('firstName', {
+            required: true,
+            validate: (value: string) => validateName(value) === undefined,
+          })}
+        />
+        <TextInput
+          data-private
+          disabled={disabled}
+          label={t('middle-name.label')}
+          placeholder={t('middle-name.placeholder')}
+          {...register('middleName')}
+        />
+      </Row>
+      <Row columns={1}>
+        <TextInput
+          data-private
+          disabled={disabled}
+          hasError={!!errors.lastName}
+          hint={getLastNameHint()}
+          label={t('last-name.label')}
+          placeholder={t('last-name.placeholder')}
+          {...register('lastName', {
+            required: true,
+            validate: (value: string) => validateName(value) === undefined,
+          })}
+        />
+      </Row>
     </>
   );
 };
+
+const Row = styled.div<{ columns: number }>`
+  ${({ columns, theme }) => css`
+    display: grid;
+    grid-template-columns: repeat(${columns}, 1fr);
+    gap: ${theme.spacing[4]};
+  `}
+`;
 
 export default NameFields;
