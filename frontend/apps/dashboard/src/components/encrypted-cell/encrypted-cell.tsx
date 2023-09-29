@@ -3,7 +3,7 @@ import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const EncryptedCell = () => (
-  <Stack align="center">
+  <Stack align="center" justify="flex-start">
     <Stack align="center" sx={{ marginRight: 2 }}>
       <IcoLock16 />
     </Stack>
