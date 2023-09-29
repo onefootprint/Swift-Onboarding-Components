@@ -9,6 +9,7 @@ import shouldChallengeEmail from './utils/should-challenge-email';
 import shouldSelectSandboxOutcome from './utils/should-select-sandbox-outcome';
 
 export type IdentifyMachineArgs = {
+  isTransfer?: boolean;
   bootstrapData?: IdentifyBootstrapData;
   // When provided, acts as the sole identifier for a user.
   // We will skip requesting email and phone, and we will optionally step up if the provded auth
@@ -25,6 +26,7 @@ const validateMachineArgs = ({
   initialAuthToken,
   obConfigAuth,
   showLogo,
+  isTransfer,
 }: IdentifyMachineArgs): MachineContext => {
   if (!obConfigAuth && !initialAuthToken) {
     console.error(
@@ -38,6 +40,7 @@ const validateMachineArgs = ({
     challenge: {},
     showLogo,
     initialAuthToken,
+    isTransfer,
   };
 };
 
@@ -46,6 +49,7 @@ const createIdentifyMachine = ({
   initialAuthToken,
   obConfigAuth,
   showLogo,
+  isTransfer,
 }: IdentifyMachineArgs) =>
   createMachine(
     {
@@ -63,6 +67,7 @@ const createIdentifyMachine = ({
         initialAuthToken,
         obConfigAuth,
         showLogo,
+        isTransfer,
       }),
       states: {
         init: {

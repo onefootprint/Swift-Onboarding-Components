@@ -1,7 +1,4 @@
-import type {
-  IdentifyBootstrapData,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import {
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
@@ -11,6 +8,7 @@ import {
 import { interpret } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { IdentifyMachineArgs } from './machine';
 import createIdentifyMachine from './machine';
 
 describe('Identify Machine Tests', () => {
@@ -36,11 +34,15 @@ describe('Identify Machine Tests', () => {
     hasSupportForWebauthn: true,
   });
 
-  const createMachine = (bootstrapData?: IdentifyBootstrapData) => {
+  const createMachine = ({
+    bootstrapData,
+    isTransfer,
+  }: IdentifyMachineArgs = {}) => {
     const machine = interpret(
       createIdentifyMachine({
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
         bootstrapData,
+        isTransfer,
       }),
     );
     machine.start();
@@ -466,6 +468,23 @@ describe('Identify Machine Tests', () => {
   });
 
   describe('in sandbox mode', () => {
+    it('skips sandbox outcome picker if in transfer app', () => {
+      const machine = createMachine({
+        isTransfer: true,
+      });
+      let { state } = machine;
+      expect(state.value).toEqual('init');
+
+      state = machine.send({
+        type: 'initContextUpdated',
+        payload: {
+          device: getDevice(),
+          config: getOnboardingConfig(false),
+        },
+      });
+      expect(state.value).toEqual('emailIdentification');
+    });
+
     it('without bootstrap data', () => {
       const machine = createMachine();
       let { state } = machine;
@@ -495,7 +514,7 @@ describe('Identify Machine Tests', () => {
 
     it('with bootstrap data', () => {
       const machine = createMachine({
-        email: 'piip@onefootprint.com',
+        bootstrapData: { email: 'piip@onefootprint.com' },
       });
       let { state } = machine;
       expect(state.value).toEqual('init');

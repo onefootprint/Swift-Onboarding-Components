@@ -14,14 +14,15 @@ export type MachineContext = {
   obConfigAuth?: ObConfigAuth;
   config?: PublicOnboardingConfig;
   device?: DeviceInfo;
-  identify: MachineIdentifyContext;
+  identify: IdentifyResult;
   challenge: MachineChallengeContext;
   showLogo?: boolean;
   idDocOutcome?: IdDocOutcomes;
   initialAuthToken?: string;
+  isTransfer?: boolean;
 };
 
-export type MachineIdentifyContext = {
+export type IdentifyResult = {
   phoneNumber?: string;
   email?: string;
   userFound?: boolean;

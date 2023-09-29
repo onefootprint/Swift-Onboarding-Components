@@ -84,6 +84,7 @@ const Router = () => {
     >
       {state.matches('identify') && (
         <Identify
+          isTransfer={isTransfer}
           obConfigAuth={obConfigAuth}
           bootstrapData={identifyBootstrapData}
           initialAuthToken={authToken}
