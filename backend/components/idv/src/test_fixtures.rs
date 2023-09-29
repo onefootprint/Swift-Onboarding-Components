@@ -4010,9 +4010,9 @@ fn dob_to_incode_timestamp(dob: &str) -> i64 {
 pub fn incode_fetch_ocr_response(opts: Option<OcrTestOpts>) -> serde_json::Value {
     serde_json::json!({
       "name": {
-        "fullName": "ALEX GINMAN",
+        "fullName": opts.as_ref().map(|o| format!("{} {}", o.first_name.clone(), o.paternal_last_name.clone())).unwrap_or("ALEX GINMAN".into()),
         "firstName": opts.as_ref().map(|o| o.first_name.clone()).unwrap_or("ALEX".into()),
-        "givenName": "ALEX",
+        "givenName": opts.as_ref().map(|o| o.first_name.clone()).unwrap_or("ALEX".into()),
         "paternalLastName": opts.as_ref().map(|o| o.paternal_last_name.clone()).unwrap_or("GINMAN".into()),
       },
       "address": "76 PARKER HILL AVE 1\nBOSTON, MA 02120",

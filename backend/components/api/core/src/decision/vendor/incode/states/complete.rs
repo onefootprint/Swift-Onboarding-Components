@@ -2,6 +2,7 @@ use super::IncodeStateTransition;
 use super::VerificationSession;
 use crate::decision::features::incode_docv;
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
+use crate::decision::features::incode_docv::ParsedIncodeNames;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
@@ -85,6 +86,7 @@ fn ocr_data(r: FetchOCRResponse, dk: IdDocKind) -> Vec<(DataIdentifier, PiiStrin
     let di = |ocr_dk: ODK, pii: Option<ScrubbedPiiString>| -> Option<(DataIdentifier, PiiString)> {
         pii.map(|x| (DataIdentifier::from(DocumentKind::OcrData(dk, ocr_dk)), x.into()))
     };
+    let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(&r);
     vec![
         di(ODK::Dob, r.dob().ok()),
         di(ODK::ExpiresAt, r.expiration_date().ok()),
@@ -99,7 +101,7 @@ fn ocr_data(r: FetchOCRResponse, dk: IdDocKind) -> Vec<(DataIdentifier, PiiStrin
         di(
             ODK::FullName,
             // prefer MRZ decoded name to OCR, since OCR has a higher rate of whoopsies
-            r.name.and_then(|n| n.machine_readable_full_name.or(n.full_name)),
+            parsed_names.full_name.map(ScrubbedPiiString::from),
         ),
         di(ODK::Curp, r.curp),
         di(
@@ -113,17 +115,21 @@ fn ocr_data(r: FetchOCRResponse, dk: IdDocKind) -> Vec<(DataIdentifier, PiiStrin
 }
 
 fn doc_first_id_data(r: &FetchOCRResponse, validate_args: ValidateArgs) -> Vec<(DataIdentifier, PiiString)> {
-    let name = r.name.as_ref();
+    let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(r);
+
     let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
     vec![
         (
             IDK::FirstName,
-            // TODO given name seems to include middle name and be all uppercase
-            name.and_then(|n| n.given_name_mrz.as_ref().or(n.given_name.as_ref())),
+            parsed_names.first_name.map(ScrubbedPiiString::from).as_ref(),
+        ),
+        (
+            IDK::MiddleName,
+            parsed_names.middle_name.map(ScrubbedPiiString::from).as_ref(),
         ),
         (
             IDK::LastName,
-            name.and_then(|n| n.last_name_mrz.as_ref().or(n.paternal_last_name.as_ref())),
+            parsed_names.last_name.map(ScrubbedPiiString::from).as_ref(),
         ),
         (IDK::AddressLine1, address.and_then(|n| n.street.as_ref())),
         (IDK::City, address.and_then(|n| n.city.as_ref())),
@@ -178,42 +184,6 @@ impl Complete {
         let seqno = DataLifetime::get_next_seqno(conn)?;
         DataLifetime::bulk_deactivate_speculative(conn, sv_id, odks_to_clear, seqno)?;
 
-        // Then add some extracted OCR data to the vault.
-        let ocr_data = ocr_data(fetch_ocr_response.clone(), dk);
-
-        let mut validate_args = ValidateArgs::for_bifrost(vault.is_live);
-        validate_args.allow_dangling_keys = true;
-        // For doc-first onboardings, populate identity data
-        let id_data: Vec<(DataIdentifier, PiiString)> = if obc.is_doc_first && !wf.config.is_redo() {
-            doc_first_id_data(&fetch_ocr_response, validate_args)
-                .into_iter()
-                // Don't add OCR data to the vault that already exists
-                .filter(|(k, _)| !uvw.has_field(k.clone()))
-                .collect()
-        } else {
-            vec![]
-        };
-
-        let data = HashMap::from_iter(ocr_data.into_iter().chain(id_data.into_iter()));
-        let data = DataRequest::clean_and_validate_str(data, validate_args)?;
-        let data = data.no_fingerprints();
-        let source = DataLifetimeSource::Ocr;
-        let seqno = uvw.patch_data(conn, data, source)?.seqno;
-
-        let (document_score, _) = score_response.document_score();
-        let (ocr_confidence_score, _) = score_response.id_ocr_confidence();
-        let selfie_score = score_response.selfie_match().0;
-
-        let update = IdentityDocumentUpdate {
-            completed_seqno: Some(seqno),
-            document_score,
-            selfie_score,
-            ocr_confidence_score,
-            status: Some(IdentityDocumentStatus::Complete),
-            vaulted_document_type: Some(dk),
-        };
-        IdentityDocument::update(conn, id_doc_id, update)?;
-
         // ////////////
         // Save Risk Signals
         // ////////////
@@ -226,20 +196,21 @@ impl Complete {
             })
             .ok();
 
-        let score_reason_codes = incode_docv::reason_codes_from_score_response(score_response, expect_selfie)
-            .into_iter()
-            .map(|r| {
-                (
-                    r,
-                    VendorAPI::IncodeFetchScores,
-                    score_verification_result_id.clone(),
-                )
-            });
+        let score_reason_codes =
+            incode_docv::reason_codes_from_score_response(&score_response, expect_selfie)
+                .into_iter()
+                .map(|r| {
+                    (
+                        r,
+                        VendorAPI::IncodeFetchScores,
+                        score_verification_result_id.clone(),
+                    )
+                });
 
         let ocr_reason_codes = if !obc.is_doc_first {
             // Only calculate OCR reason codes if we have already collected ID data
             let vault_data = vault_data.ok_or(AssertionError("Vault data not provided"))?;
-            incode_docv::reason_codes_from_ocr_response(fetch_ocr_response, vault_data)
+            incode_docv::reason_codes_from_ocr_response(&fetch_ocr_response, vault_data)
                 .into_iter()
                 .map(|r| (r, VendorAPI::IncodeFetchOCR, ocr_verification_result_id.clone()))
                 .collect_vec()
@@ -277,7 +248,7 @@ impl Complete {
             })
             .unique();
 
-        RiskSignal::bulk_create(
+        let rs = RiskSignal::bulk_create(
             conn,
             sv_id,
             score_reason_codes
@@ -288,6 +259,53 @@ impl Complete {
             newtypes::RiskSignalGroupKind::Doc,
             false,
         )?;
+        let barcode_read_successfully = rs
+            .iter()
+            .any(|r| r.reason_code == FootprintReasonCode::DocumentBarcodeCouldBeRead);
+
+        let mut validate_args = ValidateArgs::for_bifrost(vault.is_live);
+        validate_args.allow_dangling_keys = true;
+        // For doc-first onboardings, populate identity data
+        let id_data: Vec<(DataIdentifier, PiiString)> = if obc.is_doc_first && !wf.config.is_redo() {
+            if barcode_read_successfully {
+                doc_first_id_data(&fetch_ocr_response, validate_args)
+                        .into_iter()
+                        // Don't add OCR data to the vault that already exists
+                        .filter(|(k, _)| !uvw.has_field(k.clone()))
+                        .collect()
+            } else {
+                tracing::warn!(
+                    %sv_id,
+                    %id_doc_id,
+                    "Skipping prefilling IDK data from doc because !barcode_read_successfully"
+                );
+                vec![]
+            }
+        } else {
+            vec![]
+        };
+
+        // Then add some extracted OCR data to the vault.
+        let ocr_data = ocr_data(fetch_ocr_response, dk);
+        let data = HashMap::from_iter(ocr_data.into_iter().chain(id_data.into_iter()));
+        let data = DataRequest::clean_and_validate_str(data, validate_args)?;
+        let data = data.no_fingerprints();
+        let source = DataLifetimeSource::Ocr;
+        let seqno = uvw.patch_data(conn, data, source)?.seqno;
+
+        let (document_score, _) = score_response.document_score();
+        let (ocr_confidence_score, _) = score_response.id_ocr_confidence();
+        let selfie_score = score_response.selfie_match().0;
+
+        let update = IdentityDocumentUpdate {
+            completed_seqno: Some(seqno),
+            document_score,
+            selfie_score,
+            ocr_confidence_score,
+            status: Some(IdentityDocumentStatus::Complete),
+            vaulted_document_type: Some(dk),
+        };
+        IdentityDocument::update(conn, id_doc_id, update)?;
 
         // TODO: still need to fingerprint data afterwards!
 
