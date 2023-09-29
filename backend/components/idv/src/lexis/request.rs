@@ -42,6 +42,7 @@ pub(crate) struct SearchBy {
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct Name {
     pub first: Option<PiiString>,
+    pub middle: Option<PiiString>,
     pub last: Option<PiiString>,
 }
 
@@ -58,6 +59,7 @@ impl LexisRequest {
     pub fn new(idv_data: IdvData) -> Result<Self, crate::lexis::Error> {
         let IdvData {
             first_name,
+            middle_name,
             last_name,
             address_line1,
             address_line2: _,
@@ -83,6 +85,7 @@ impl LexisRequest {
                 search_by: SearchBy {
                     name: Name {
                         first: first_name,
+                        middle: middle_name,
                         last: last_name,
                     },
                     address: Address {

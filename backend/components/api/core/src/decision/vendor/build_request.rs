@@ -43,6 +43,7 @@ pub async fn build_idv_data_from_verification_request(
         .transpose()?;
     let request = IdvData {
         first_name: decrypted_values.remove(&IDK::FirstName.into()),
+        middle_name: decrypted_values.remove(&IDK::MiddleName.into()),
         last_name: decrypted_values.remove(&IDK::LastName.into()),
         address_line1: decrypted_values.remove(&IDK::AddressLine1.into()),
         address_line2: decrypted_values.remove(&IDK::AddressLine2.into()),

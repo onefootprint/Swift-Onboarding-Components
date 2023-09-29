@@ -22,6 +22,7 @@ impl RequestData {
     pub fn try_from(d: IdvData, tenant_identifier: String) -> Result<Self, IdologyError::ConversionError> {
         let IdvData {
             first_name,
+            middle_name: _, // Idology doesn't utilize middle names
             last_name,
             address_line1,
             address_line2: _,

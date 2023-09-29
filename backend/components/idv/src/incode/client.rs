@@ -376,10 +376,19 @@ impl AuthenticatedIncodeClientAdapter {
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
         first_name: Option<PiiString>,
+        middle_name: Option<PiiString>,
         last_name: Option<PiiString>,
         dob_year: Option<PiiString>,
     ) -> Result<serde_json::Value, IncodeError> {
         let url = self.client_adapter.api_url("omni/watchlist-result")?;
+
+        let first_name = match (first_name, middle_name) {
+            (None, None) => None,
+            (None, Some(m)) => Some(m),
+            (Some(f), None) => Some(f),
+            (Some(f), Some(m)) => Some(format!("{} {}", f.leak(), m.leak()).into()),
+        };
+
         let request = WatchlistResultRequest {
             first_name,
             sur_name: last_name,
@@ -652,6 +661,7 @@ mod tests {
             .watchlist_result(
                 &fp_client,
                 Some(PiiString::from("Bob")),
+                Some(PiiString::from("Billy")),
                 Some(PiiString::from("Boberto")),
                 None,
             )
@@ -664,5 +674,9 @@ mod tests {
             .unwrap();
 
         assert_eq!("success", parsed.status.unwrap());
+        assert_eq!(
+            "Bob Billy Boberto",
+            parsed.content.unwrap().data.unwrap().search_term.unwrap().leak()
+        );
     }
 }

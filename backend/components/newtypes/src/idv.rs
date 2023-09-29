@@ -6,7 +6,7 @@ use strum::IntoEnumIterator;
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IdvData {
     pub first_name: Option<PiiString>,
-    // TODO: add middle_name
+    pub middle_name: Option<PiiString>,
     pub last_name: Option<PiiString>,
     pub address_line1: Option<PiiString>,
     pub address_line2: Option<PiiString>,
@@ -43,6 +43,7 @@ impl IdvData {
     pub fn get(&self, idk: IdentityDataKind) -> Option<&PiiString> {
         match idk {
             IdentityDataKind::FirstName => self.first_name.as_ref(),
+            IdentityDataKind::MiddleName => self.middle_name.as_ref(),
             IdentityDataKind::LastName => self.last_name.as_ref(),
             IdentityDataKind::Dob => self.dob.as_ref(),
             IdentityDataKind::Ssn4 => self.ssn4.as_ref(),
@@ -59,8 +60,7 @@ impl IdvData {
             | IdentityDataKind::UsLegalStatus
             | IdentityDataKind::VisaKind
             | IdentityDataKind::VisaExpirationDate
-            | IdentityDataKind::Citizenships
-            | IdentityDataKind::MiddleName => None,
+            | IdentityDataKind::Citizenships => None,
         }
     }
 

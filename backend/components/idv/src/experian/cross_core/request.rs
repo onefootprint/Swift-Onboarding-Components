@@ -114,6 +114,7 @@ impl Contact {
     pub fn try_from(d: IdvData, is_production: bool) -> Result<Contact, ConversionError> {
         let IdvData {
             first_name,
+            middle_name: _,
             last_name,
             address_line1,
             address_line2,

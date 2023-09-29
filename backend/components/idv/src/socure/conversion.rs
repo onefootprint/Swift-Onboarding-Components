@@ -33,6 +33,7 @@ impl SocureRequest {
     ) -> Result<Self, crate::socure::Error> {
         let IdvData {
             first_name,
+            middle_name: _, // Socure does not utilize middle names
             last_name,
             address_line1,
             address_line2,

@@ -393,6 +393,7 @@ impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultRe
             .watchlist_result(
                 self,
                 request.idv_data.first_name,
+                request.idv_data.middle_name,
                 request.idv_data.last_name,
                 dob_year,
             )
