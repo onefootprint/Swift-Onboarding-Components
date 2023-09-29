@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "93703170f0c6186e71d0d133164157e5569ee2c3"
+        "version": "0b5ea6af71b0fec3f532c06869052d31da5dcc8a"
     },
     "servers": [
         {
@@ -544,12 +544,9 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Raw body",
                     "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object"
-                            }
-                        }
+                        "application/json": {}
                     },
                     "required": true
                 },

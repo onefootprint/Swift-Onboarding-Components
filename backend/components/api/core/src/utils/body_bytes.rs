@@ -3,6 +3,7 @@ use actix_web::FromRequest;
 use actix_web::HttpRequest;
 use futures::Future;
 use paperclip::actix::web;
+use paperclip::v2::models::DataTypeFormat;
 use paperclip::v2::schema::Apiv2Schema;
 use std::{
     pin::Pin,
@@ -172,16 +173,12 @@ impl<const L: usize> paperclip::actix::OperationModifier for BodyBytes<L> {
     fn update_parameter(op: &mut paperclip::v2::models::DefaultOperationRaw) {
         op.parameters.push(paperclip::v2::models::Either::Right(
             paperclip::v2::models::Parameter {
-                description: None,
+                description: Some("Raw body".to_owned()),
                 in_: paperclip::v2::models::ParameterIn::Body,
                 name: "body".into(),
                 required: true,
                 max_length: Some(L as u32),
-                schema: Some({
-                    let mut def = Bytes::schema_with_ref();
-                    def.retain_ref();
-                    def
-                }),
+                format: Some(DataTypeFormat::Other),
                 ..Default::default()
             },
         ));
