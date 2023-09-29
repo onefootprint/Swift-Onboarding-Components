@@ -28,8 +28,9 @@ pub use assertion::*;
 use crate::{
     decision::vendor::{middesk, VendorAPIError},
     types::error::{ApiResponseError, FpResponseErrorInfo},
-    utils::{body_bytes::InvalidBodyError, sms::TwilioError},
+    utils::body_bytes::InvalidBodyError,
 };
+use twilio::error::Error as TwilioError;
 
 use self::{challenge::ChallengeError, handoff::HandoffError};
 
@@ -297,7 +298,17 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::ContactInfoKindNotInVault(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::HandoffError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiErrorKind::Twilio(e) => e.status_code(),
+            ApiErrorKind::Twilio(e) => match e {
+                TwilioError::Request(_)
+                | TwilioError::ReqwestMiddleware(_)
+                | TwilioError::DeliveryFailed(_, _)
+                | TwilioError::NotDelivered(_, _)
+                | TwilioError::SerdeJson(_) => StatusCode::INTERNAL_SERVER_ERROR,
+                TwilioError::Api(e) => match e.status {
+                    400 => StatusCode::BAD_REQUEST,
+                    _ => StatusCode::INTERNAL_SERVER_ERROR,
+                },
+            },
             ApiErrorKind::PinpointSms(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::NewtypeError(_) => StatusCode::BAD_REQUEST,

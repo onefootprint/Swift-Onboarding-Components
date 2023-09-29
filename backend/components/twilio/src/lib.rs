@@ -132,14 +132,14 @@ impl Client {
 
         // fatal delivery here, abort
         if matches!(message.status, Status::Undelivered | Status::Failed) {
-            return Err(Error::DeliveryFailed)
+            return Err(Error::DeliveryFailed(message.status, message.error_code));
         }
 
-        // Wait for 15s for the message to be delivered. If it doesn't deliver, error
+        // Wait for 5s for the message to be delivered. If it doesn't deliver, error
         let message_uri = message.uri.clone();
         let retry_strategy = FixedInterval::from_millis(1000)
             .map(jitter)
-            .take(VALIDITY_PERIOD_SECS);
+            .take(5000);
         Retry::spawn(retry_strategy, move || {
             self.check_status(message_uri.clone())
         })
@@ -157,10 +157,10 @@ impl Client {
 
         let message: Message = decode_response(response).await?;
         if matches!(message.status, Status::Undelivered | Status::Failed) {
-            return Err(Error::DeliveryFailed)
+            return Err(Error::DeliveryFailed(message.status, message.error_code));
         }
         if !matches!(message.status, Status::Delivered) {
-            return Err(Error::NotDelivered)
+            return Err(Error::NotDelivered(message.status, message.error_code));
         }
 
         Ok(message)

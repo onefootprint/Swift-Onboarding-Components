@@ -1,3 +1,5 @@
+use strum_macros::Display;
+
 #[derive(Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct Message {
     pub account_sid: String,
@@ -31,7 +33,7 @@ impl std::fmt::Debug for Message {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Copy)]
+#[derive(Debug, Display, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum Status {
     Accepted,

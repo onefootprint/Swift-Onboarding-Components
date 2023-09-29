@@ -18,5 +18,6 @@ serde_json = { workspace = true }
 tokio = { workspace = true }
 thiserror = { workspace = true }
 tokio-retry = "0.3"
+strum_macros = { workspace = true }
 
 newtypes = { path = "../newtypes" }

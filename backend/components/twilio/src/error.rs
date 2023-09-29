@@ -1,5 +1,5 @@
+use crate::response::message::Status;
 use std::fmt::Display;
-
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -8,10 +8,10 @@ pub enum Error {
     ReqwestMiddleware(#[from] reqwest_middleware::Error),
     #[error("{0}")]
     Request(#[from] reqwest::Error),
-    #[error("Delivery failed")]
-    DeliveryFailed,
-    #[error("Not delivered")]
-    NotDelivered,
+    #[error("Delivery failed: {0}. Error: {1:?}")]
+    DeliveryFailed(Status, Option<i64>),
+    #[error("Not delivered: {0}: Error: {1:?}")]
+    NotDelivered(Status, Option<i64>),
     #[error("{0}")]
     Api(ApiErrorResponse),
     #[error("{0}")]

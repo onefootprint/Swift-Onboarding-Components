@@ -4,65 +4,17 @@ use crate::{
     errors::{challenge::ChallengeError, user::UserError, ApiError, ApiResult},
     State,
 };
-use actix_web::http::StatusCode;
 use chrono::{Duration, Utc};
 use crypto::sha256;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use newtypes::SandboxId;
 use newtypes::{PhoneNumber, PiiString};
-use thiserror::Error;
 
 use self::rate_limit::RateLimit;
 
 use super::session::{JsonSession, RateLimitRecord};
 
 pub type SecondsBeforeRetry = Duration;
-
-#[derive(Debug, Error)]
-/// Our own wrapper around twilio errors to better display them
-pub enum TwilioError {
-    #[error("{0}")]
-    Request(reqwest::Error),
-    #[error("{0}")]
-    RequestMiddleware(reqwest_middleware::Error),
-    #[error("Delivery failed")]
-    DeliveryFailed,
-    #[error("Not delivered")]
-    NotDelivered,
-    #[error("{0}")]
-    Api(twilio::error::ApiErrorResponse),
-    #[error("{0}")]
-    SerdeJson(serde_json::Error),
-}
-
-impl From<twilio::error::Error> for TwilioError {
-    fn from(value: twilio::error::Error) -> Self {
-        match value {
-            twilio::error::Error::Request(e) => Self::Request(e),
-            twilio::error::Error::ReqwestMiddleware(e) => Self::RequestMiddleware(e),
-            twilio::error::Error::DeliveryFailed => Self::DeliveryFailed,
-            twilio::error::Error::NotDelivered => Self::NotDelivered,
-            twilio::error::Error::Api(e) => Self::Api(e),
-            twilio::error::Error::SerdeJson(e) => Self::SerdeJson(e),
-        }
-    }
-}
-
-impl TwilioError {
-    pub fn status_code(&self) -> StatusCode {
-        match self {
-            Self::Request(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::RequestMiddleware(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::DeliveryFailed => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::NotDelivered => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::Api(e) => match e.status {
-                400 => StatusCode::BAD_REQUEST,
-                _ => StatusCode::INTERNAL_SERVER_ERROR,
-            },
-            Self::SerdeJson(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        }
-    }
-}
 
 #[derive(Clone)]
 pub struct SmsClient {
@@ -191,8 +143,7 @@ impl SmsClient {
     async fn _send_twilio(&self, message_body: &PiiString, destination: &PiiString) -> ApiResult<()> {
         self.twilio_client
             .send_message(destination.clone(), message_body.clone())
-            .await
-            .map_err(TwilioError::from)?;
+            .await?;
         Ok(())
     }
 
