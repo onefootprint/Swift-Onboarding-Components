@@ -7,7 +7,7 @@ pub struct Message {
     pub api_version: String,
     pub body: String,
     pub direction: String,
-    pub error_code: Option<String>,
+    pub error_code: Option<i64>,
     pub error_message: Option<String>,
     pub from: String,
     pub messaging_service_sid: Option<String>,

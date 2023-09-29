@@ -12,6 +12,7 @@ pub mod error;
 pub mod request;
 pub mod response;
 
+use tokio_retry::strategy::FixedInterval;
 use tokio_retry::strategy::{jitter, ExponentialBackoff};
 use tokio_retry::Retry;
 
@@ -92,7 +93,7 @@ impl Client {
     pub async fn send_message(&self, destination: PiiString, body: PiiString) -> crate::response::Result<Message> {
         let retry_strategy = ExponentialBackoff::from_millis(10)        
         .map(jitter) // add jitter
-        .take(3); // limit to 3 retries
+        .take(2); // limit to 2 retries
 
         let result = Retry::spawn(retry_strategy, move || {
             self.send_message_internal(destination.clone(), body.clone())
@@ -109,7 +110,7 @@ impl Client {
     ) -> crate::response::Result<Message> {
         /// if a message wasnt delivered in 15s it should be useless to us
         /// so tell twilio to drop it
-        const VALIDITY_PERIOD_SECS:u64 = 15;
+        const VALIDITY_PERIOD_SECS: usize = 15;
 
         let account_sid = self.account_sid.clone();
         let url = format!("https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json");
@@ -118,7 +119,7 @@ impl Client {
             body: body.leak_to_string(),
             to: destination.leak_to_string(),
             from: self.from_number.to_string(),
-            validity_period: VALIDITY_PERIOD_SECS // dont send the message after TTL
+            validity_period: VALIDITY_PERIOD_SECS as u64 // dont send the message after TTL
         };
 
         let response = self
@@ -132,6 +133,34 @@ impl Client {
         // fatal delivery here, abort
         if matches!(message.status, Status::Undelivered | Status::Failed) {
             return Err(Error::DeliveryFailed)
+        }
+
+        // Wait for 15s for the message to be delivered. If it doesn't deliver, error
+        let message_uri = message.uri.clone();
+        let retry_strategy = FixedInterval::from_millis(1000)
+            .map(jitter)
+            .take(VALIDITY_PERIOD_SECS);
+        Retry::spawn(retry_strategy, move || {
+            self.check_status(message_uri.clone())
+        })
+        .await?;
+        Ok(message)
+    }
+
+    async fn check_status(&self, message_uri: String) -> crate::response::Result<Message> {
+        let url = format!("https://api.twilio.com{}", message_uri);
+
+        let response = self
+            .request_builder(Method::GET, url)
+            .send()
+            .await?;
+
+        let message: Message = decode_response(response).await?;
+        if matches!(message.status, Status::Undelivered | Status::Failed) {
+            return Err(Error::DeliveryFailed)
+        }
+        if !matches!(message.status, Status::Delivered) {
+            return Err(Error::NotDelivered)
         }
 
         Ok(message)
