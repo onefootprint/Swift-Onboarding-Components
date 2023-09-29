@@ -20,7 +20,9 @@ const IdvApp = () => {
   }, []);
 
   return isPreview ? (
-    <Preview isDemo={isDemo} isDebug={isDebug} />
+    <QueryClientProvider client={queryClient}>
+      <Preview isDemo={isDemo} isDebug={isDebug} />
+    </QueryClientProvider>
   ) : (
     <QueryClientProvider client={queryClient}>
       <Idv onLoad={handleLoad} linkingUrl={linkingUrl} />
