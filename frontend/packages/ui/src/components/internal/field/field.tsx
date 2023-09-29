@@ -96,6 +96,10 @@ const Field = styled(Cleave)<FieldInternalProps>`
         background: ${input.state.disabled.bg};
         border-color: ${input.state.disabled.border};
         color: ${input.state.disabled.color};
+
+        ::placeholder {
+          color: ${input.state.disabled.placeholderColor};
+        }
       }
     `;
   }}

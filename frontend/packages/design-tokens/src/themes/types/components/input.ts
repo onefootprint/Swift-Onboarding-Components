@@ -48,6 +48,7 @@ export type Input = {
       bg: CSS.Property.Background;
       border: CSS.Property.BorderColor;
       color: CSS.Property.Color;
+      placeholderColor: CSS.Property.Color;
     };
   };
   size: {

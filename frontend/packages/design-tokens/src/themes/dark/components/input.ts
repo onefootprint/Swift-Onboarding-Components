@@ -55,6 +55,7 @@ const input: Input = {
       bg: backgroundColor.secondary,
       border: borderColor.primary,
       color: textColor.quaternary,
+      placeholderColor: textColor.quaternary,
     },
   },
   size: {

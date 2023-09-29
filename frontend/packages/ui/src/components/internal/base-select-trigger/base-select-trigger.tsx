@@ -3,6 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef } from 'react';
 
 import { createFontStyles } from '../../../utils/mixins';
+import Stack from '../../stack';
 
 type BaseSelectTriggerProps = {
   children: React.ReactNode;
@@ -42,17 +43,12 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       <Content data-private={isPrivate} data-testid={testID}>
         {children}
       </Content>
-      <IcoDown />
+      <Stack align="center" justify="center" sx={{ marginLeft: 4 }}>
+        <IcoChevronDown16 color={disabled ? 'tertiary' : 'primary'} />
+      </Stack>
     </BaseSelectTriggerContainer>
   ),
 );
-
-const IcoDown = styled(IcoChevronDown16)`
-  ${({ theme }) => css`
-    min-width: 16px;
-    margin-left: ${theme.spacing[4]};
-  `};
-`;
 
 const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
   ${({ theme }) => {
