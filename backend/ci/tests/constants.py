@@ -34,7 +34,7 @@ FIXTURE_PHONE_NUMBER = "+15555550100"
 # This is a real phone number - we send real SMSes to this phone number
 LIVE_PHONE_NUMBER = get_secret("INTEGRATION_TEST_PHONE_NUMBER")
 
-EMAIL = "footprint.user.dev2@gmail.com"
+EMAIL = "footprint.user.dev3@gmail.com"
 CUSTODIAN_KEY = get_secret("CUSTODIAN_KEY") or "onefootprint"
 
 CUSTODIAN_AUTH = CustodianAuth(CUSTODIAN_KEY)
