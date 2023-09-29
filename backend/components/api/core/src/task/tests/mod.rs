@@ -4,6 +4,7 @@ use crate::task::ExecuteTask;
 use crate::task::TaskError;
 use crate::State;
 use db::models::decision_intent::DecisionIntent;
+use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::task::Task;
 use db::models::user_timeline::UserTimeline;
@@ -13,6 +14,7 @@ use db::tests::fixtures;
 use db::DbPool;
 use db::DbResult;
 use idv::idology::pa::{IdologyPaAPIResponse, IdologyPaRequest};
+use newtypes::RiskSignalGroupKind;
 use newtypes::TaskId;
 use newtypes::WatchlistCheckError;
 use newtypes::{
@@ -78,6 +80,7 @@ async fn get_data(
     Option<DecisionIntent>,
     Vec<RequestAndMaybeResult>,
     Option<UserTimeline>,
+    Vec<RiskSignal>,
 ) {
     db_pool
         .db_query(move |conn| {
@@ -92,7 +95,10 @@ async fn get_data(
                 (None, vec![])
             };
 
-            (wc, di, vreqs, ut)
+            let aml_rs =
+                RiskSignal::latest_by_risk_signal_group_kind(conn, &svid, RiskSignalGroupKind::Aml).unwrap();
+
+            (wc, di, vreqs, ut, aml_rs)
         })
         .await
         .unwrap()

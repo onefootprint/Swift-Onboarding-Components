@@ -52,16 +52,10 @@ impl RiskSignalGroup {
         scoped_vault_id: &ScopedVaultId,
         kind: RiskSignalGroupKind,
     ) -> DbResult<Self> {
-        let existing = Self::latest_by_kind(conn, scoped_vault_id, kind);
+        let existing = Self::latest_by_kind(conn, scoped_vault_id, kind)?;
         match existing {
-            Ok(e) => Ok(e),
-            Err(e) => {
-                if e.is_not_found() {
-                    Self::create(conn, scoped_vault_id, kind)
-                } else {
-                    Err(e)
-                }
-            }
+            Some(e) => Ok(e),
+            None => Self::create(conn, scoped_vault_id, kind),
         }
     }
 
@@ -70,12 +64,13 @@ impl RiskSignalGroup {
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
         kind: RiskSignalGroupKind,
-    ) -> DbResult<Self> {
+    ) -> DbResult<Option<Self>> {
         let res = risk_signal_group::table
             .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))
             .filter(risk_signal_group::kind.eq(kind))
             .order_by(risk_signal_group::created_at.desc())
-            .first(conn)?;
+            .first(conn)
+            .optional()?;
 
         Ok(res)
     }

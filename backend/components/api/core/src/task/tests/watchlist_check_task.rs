@@ -2,6 +2,7 @@ use crate::task::tests::*;
 
 use crate::task::TaskError;
 use crate::State;
+use db::test_helpers::assert_have_same_elements;
 use db::tests::test_db_pool::TestDbPool;
 use macros::test_state;
 use macros::test_state_case;
@@ -45,7 +46,7 @@ async fn sandbox_and_inactive_users(
     run_task(state, &sv.id, &task.id).await.unwrap();
 
     // ASSERTIONS
-    let (wc, di, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
+    let (wc, di, vreqs, ut, rs) = get_data(&state.db_pool, sv.id).await;
 
     assert_eq!(WatchlistCheckStatusKind::NotNeeded, wc.status);
     assert_eq!(
@@ -56,6 +57,7 @@ async fn sandbox_and_inactive_users(
 
     assert!(di.is_none());
     assert!(vreqs.is_empty());
+    assert!(rs.is_empty());
 }
 
 #[test_state_case(true)]
@@ -77,13 +79,14 @@ async fn insufficient_data_in_vault(state: &mut State, is_portable: bool) {
     run_task(state, &sv.id, &task.id).await.unwrap();
 
     // ASSERTIONS
-    let (wc, di, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
+    let (wc, di, vreqs, ut, rs) = get_data(&state.db_pool, sv.id).await;
 
     assert_eq!(WatchlistCheckStatusKind::Error, wc.status);
     assert!(ut.is_some());
 
     assert!(di.is_some());
     assert!(vreqs.is_empty());
+    assert!(rs.is_empty());
 }
 
 #[test_state]
@@ -99,7 +102,7 @@ async fn vendor_error(state: &mut State) {
     let res = run_task(state, &sv.id, &task.id).await;
 
     // ASSERTIONS
-    let (wc, di, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
+    let (wc, di, vreqs, ut, rs) = get_data(&state.db_pool, sv.id).await;
 
     let TaskError::ApiError(e) = res.err().unwrap() else {
         panic!();
@@ -115,6 +118,7 @@ async fn vendor_error(state: &mut State) {
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_some());
     assert!(vreqs[0].1.as_ref().unwrap().is_error);
+    assert!(rs.is_empty());
 }
 
 #[test_state_case(true, OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
@@ -145,10 +149,10 @@ async fn active_users(
     let _ = run_task(state, &sv.id, &task.id).await;
 
     // ASSERTIONS
-    let (wc, di, vreqs, ut) = get_data(&state.db_pool, sv.id).await;
+    let (wc, di, vreqs, ut, rs) = get_data(&state.db_pool, sv.id).await;
 
     assert_eq!(expected_status, wc.status);
-    assert_eq!(Some(expected_reason_codes), wc.reason_codes);
+    assert_eq!(Some(expected_reason_codes.clone()), wc.reason_codes);
     assert!(ut.is_some());
 
     assert!(di.is_some());
@@ -156,4 +160,8 @@ async fn active_users(
     assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
     assert!(vreqs[0].1.is_some());
     assert!(!vreqs[0].1.as_ref().unwrap().is_error);
+    assert_have_same_elements(
+        expected_reason_codes,
+        rs.into_iter().map(|r| r.reason_code).collect(),
+    );
 }

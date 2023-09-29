@@ -1,5 +1,7 @@
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::decision::vendor::vendor_api::vendor_api_response::VendorAPIResponseMap;
+use crate::decision::vendor::vendor_api::vendor_api_response::{
+    VendorAPIResponseIdentifiersMap, VendorAPIResponseMap,
+};
 use crate::decision::vendor::vendor_api::vendor_api_struct::IdologyPa;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::vendor::vendor_trait::VendorAPIResponse;
@@ -13,10 +15,12 @@ use crate::{
 use crate::{task, ApiError, State};
 use async_trait::async_trait;
 use chrono::Utc;
+use db::models::risk_signal::{NewRiskSignalInfo, RiskSignal};
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
+use db::models::verification_result::VerificationResult;
 use db::models::{
     decision_intent::DecisionIntent, task::Task, verification_request::VerificationRequest,
     watchlist_check::WatchlistCheck,
@@ -27,9 +31,9 @@ use idv::idology::pa::response::PaResponse;
 use idv::{idology::pa::IdologyPaAPIResponse, VendorResponse};
 use newtypes::{
     DecisionIntentId, DecisionIntentKind, FireWebhookArgs, FootprintReasonCode, OnboardingStatus,
-    ScopedVaultId, TaskData, TaskId, TenantId, VendorAPI, WatchlistCheckArgs, WatchlistCheckCompletedPayload,
-    WatchlistCheckError, WatchlistCheckInfo, WatchlistCheckNotNeededReason, WatchlistCheckStatus,
-    WatchlistCheckStatusKind, WebhookEvent,
+    RiskSignalGroupKind, ScopedVaultId, TaskData, TaskId, TenantId, VendorAPI, WatchlistCheckArgs,
+    WatchlistCheckCompletedPayload, WatchlistCheckError, WatchlistCheckInfo, WatchlistCheckNotNeededReason,
+    WatchlistCheckStatus, WatchlistCheckStatusKind, WebhookEvent,
 };
 
 pub(crate) struct WatchlistCheckTask {
@@ -44,7 +48,7 @@ impl WatchlistCheckTask {
 }
 
 enum WatchlistVendorResult {
-    Completed(Vec<FootprintReasonCode>),
+    Completed(Vec<NewRiskSignalInfo>),
     InsufficientData,
 }
 
@@ -64,7 +68,7 @@ impl WatchlistVendorResult {
         }
     }
 
-    pub fn reason_codes(&self) -> Option<Vec<FootprintReasonCode>> {
+    pub fn reason_codes(&self) -> Option<Vec<NewRiskSignalInfo>> {
         match self {
             WatchlistVendorResult::Completed(rs) => Some(rs.clone()),
             WatchlistVendorResult::InsufficientData => None,
@@ -122,7 +126,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             .flat_map(|r| r.into_vendor_result())
             .collect();
 
-        let (existing_vres_map, _) =
+        let existing_vres_map =
             vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results(
                 &vendor_results,
             )?;
@@ -143,7 +147,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             uvw.populated().as_slice(),
         );
         let watchlist_result = if has_sufficient_data_for_vendor {
-            let reason_codes: Vec<FootprintReasonCode> = Self::complete_vendor_call_idology(
+            let reason_codes = Self::complete_vendor_call_idology(
                 &self.state,
                 &sv.id,
                 &di_id,
@@ -172,9 +176,19 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     wc,
                     conn,
                     watchlist_result.status(),
-                    watchlist_result.reason_codes(),
+                    watchlist_result
+                        .reason_codes()
+                        .map(|rs| rs.iter().map(|(r, _, _)| r.clone()).collect()),
                     Some(Utc::now()),
                     Some(crate::GIT_HASH.to_string()),
+                )?;
+
+                RiskSignal::bulk_create(
+                    conn,
+                    &sv.id,
+                    watchlist_result.reason_codes().unwrap_or(vec![]),
+                    RiskSignalGroupKind::Aml,
+                    false,
                 )?;
 
                 UserTimeline::create(conn, WatchlistCheckInfo { id: wc.id }, vault_id, sv.id.clone())?;
@@ -241,16 +255,26 @@ impl WatchlistCheckTask {
         sv_id: &ScopedVaultId,
         di_id: &DecisionIntentId,
         tenant_id: &TenantId,
-        existing_vendor_results: VendorAPIResponseMap,
-    ) -> ApiResult<Vec<FootprintReasonCode>> {
-        if let Some(res) = existing_vendor_results.get(&IdologyPa) {
-            // we already successfully completed a IdologyPa call for this watchlist task, so just return reason codes from it
-            Self::parse_reason_codes(res.clone())
-        } else {
-            let res = Self::make_vendor_call(state, sv_id, di_id, tenant_id).await?;
-            let pa_res = PaResponse::try_from(res.response)?;
-            Self::parse_reason_codes(pa_res)
-        }
+        existing_vendor_results: (VendorAPIResponseMap, VendorAPIResponseIdentifiersMap),
+    ) -> ApiResult<Vec<NewRiskSignalInfo>> {
+        let (res_map, ids_map) = existing_vendor_results;
+        let (reason_codes, vres_id) =
+            if let (Some(res), Some(ids)) = (res_map.get(&IdologyPa), ids_map.get(&IdologyPa)) {
+                // we already successfully completed a IdologyPa call for this watchlist task, so just return reason codes from it
+                (
+                    Self::parse_reason_codes(res.clone())?,
+                    ids.verification_result_id.clone(),
+                )
+            } else {
+                let (res, vres) = Self::make_vendor_call(state, sv_id, di_id, tenant_id).await?;
+                let pa_res = PaResponse::try_from(res.response)?;
+                (Self::parse_reason_codes(pa_res)?, vres.id)
+            };
+
+        Ok(reason_codes
+            .into_iter()
+            .map(|r| (r, VendorAPI::IdologyPa, vres_id.clone()))
+            .collect())
     }
 
     async fn make_vendor_call(
@@ -258,7 +282,7 @@ impl WatchlistCheckTask {
         sv_id: &ScopedVaultId,
         di_id: &DecisionIntentId,
         tenant_id: &TenantId,
-    ) -> ApiResult<VendorResponse> {
+    ) -> ApiResult<(VendorResponse, VerificationResult)> {
         // TODO: consolidate this with make_idv_vendor_call_save_vreq_vres
         let vendor_api = VendorAPI::IdologyPa;
         let svid = sv_id.clone();
@@ -301,16 +325,16 @@ impl WatchlistCheckTask {
             .map_err(|e| VendorAPIError { vendor_api, error: e });
 
         let svid = sv_id.clone();
-        let res = state
+        let (res, vres) = state
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
                 let uv = Vault::get(conn, &svid)?;
-                let _vres = verification_result::save_vres(conn, &uv.public_key, &res, &vreq)?;
-                Ok(res)
+                let vres = verification_result::save_vres(conn, &uv.public_key, &res, &vreq)?;
+                Ok((res, vres))
             })
             .await??;
 
-        Ok(res?)
+        Ok((res?, vres))
     }
 
     fn parse_reason_codes(res: PaResponse) -> ApiResult<Vec<FootprintReasonCode>> {

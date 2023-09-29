@@ -156,11 +156,15 @@ impl RiskSignal {
         kind: RiskSignalGroupKind,
     ) -> DbResult<Vec<Self>> {
         let rsg = RiskSignalGroup::latest_by_kind(conn, scoped_vault_id, kind)?;
-        // hmm, we need unhidden as well i guess here bc we are decisioning before we decide which ones to unhide
-        let res = risk_signal::table
-            .filter(risk_signal::risk_signal_group_id.eq(rsg.id))
-            .get_results(conn)?;
-        Ok(res)
+        if let Some(rsg) = rsg {
+            // hmm, we need unhidden as well i guess here bc we are decisioning before we decide which ones to unhide
+            let res = risk_signal::table
+                .filter(risk_signal::risk_signal_group_id.eq(rsg.id))
+                .get_results(conn)?;
+            Ok(res)
+        } else {
+            Ok(vec![])
+        }
     }
 
     #[tracing::instrument("RiskSignal::latest_by_risk_signal_group_kinds", skip_all)]
