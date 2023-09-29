@@ -31,6 +31,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
       iconComponent: IcoFileText224,
       fields: [
         { di: IdDI.firstName },
+        { di: IdDI.middleName },
         { di: IdDI.lastName },
         { di: IdDI.email },
         { di: IdDI.phoneNumber },

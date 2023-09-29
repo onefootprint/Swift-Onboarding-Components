@@ -1,10 +1,16 @@
 import { useTranslation } from '@onefootprint/hooks';
-import type { Entity } from '@onefootprint/types';
+import type {
+  Entity,
+  VaultEmptyData,
+  VaultEncryptedData,
+  VaultTextData,
+} from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FieldOrPlaceholder, StatusBadge } from 'src/components';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
+import getFullName from 'src/utils/get-full-name';
 
 type RowProps = {
   entity: Entity;
@@ -13,9 +19,12 @@ type RowProps = {
 const Row = ({ entity }: RowProps) => {
   const { t } = useTranslation('pages.users.table.row');
   const { data: vault } = useEntityVault(entity.id, entity);
-  const fullName = vault?.[IdDI.firstName]
-    ? `${vault?.[IdDI.firstName]} ${vault?.[IdDI.lastName]}`
-    : vault?.[IdDI.firstName];
+  const [firstName, middleName, lastName] = [
+    vault?.[IdDI.firstName],
+    vault?.[IdDI.middleName],
+    vault?.[IdDI.lastName],
+  ] as (VaultTextData | VaultEncryptedData | VaultEmptyData)[];
+  const fullName = getFullName(firstName, middleName, lastName);
 
   return (
     <>

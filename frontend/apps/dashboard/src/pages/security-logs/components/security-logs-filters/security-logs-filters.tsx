@@ -25,6 +25,10 @@ const SecurityLogsFilters = () => {
                   value: IdDI.firstName,
                 },
                 {
+                  label: allT(`di.${IdDI.middleName}`),
+                  value: IdDI.middleName,
+                },
+                {
                   label: allT(`di.${IdDI.lastName}`),
                   value: IdDI.lastName,
                 },

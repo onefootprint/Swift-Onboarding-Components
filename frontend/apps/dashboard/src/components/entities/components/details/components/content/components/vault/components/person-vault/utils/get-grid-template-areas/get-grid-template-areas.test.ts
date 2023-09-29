@@ -24,7 +24,11 @@ describe('getGridTemplateAreas', () => {
   });
 
   it('should generate grid template areas for basic, address and identity', () => {
-    const entity = createEntity([IdDI.firstName, IdDI.lastName]);
+    const entity = createEntity([
+      IdDI.firstName,
+      IdDI.middleName,
+      IdDI.lastName,
+    ]);
     const result = getGridTemplateAreas(entity);
     expect(result).toEqual(3);
   });

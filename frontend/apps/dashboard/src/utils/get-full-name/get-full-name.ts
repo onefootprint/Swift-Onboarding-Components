@@ -1,8 +1,17 @@
-const getFullName = (firstName?: string | null, lastName?: string | null) => {
-  if (firstName === undefined && lastName === undefined) {
+const getFullName = (
+  firstName?: string | null,
+  middleName?: string | null,
+  lastName?: string | null,
+) => {
+  if (
+    firstName === undefined &&
+    middleName === undefined &&
+    lastName === undefined
+  ) {
     return undefined;
   }
-  const names = [firstName, lastName].filter(name => name?.length);
+
+  const names = [firstName, middleName, lastName].filter(name => name?.length);
   return names.length ? names.join(' ') : null;
 };
 

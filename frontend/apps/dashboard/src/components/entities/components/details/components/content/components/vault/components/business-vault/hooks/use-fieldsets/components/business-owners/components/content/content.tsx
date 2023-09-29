@@ -48,7 +48,9 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
     if (isVaultDataBusinessOwner(value)) {
       const bo = value[index];
       return (
-        <FieldOrPlaceholder data={getFullName(bo.first_name, bo.last_name)} />
+        <FieldOrPlaceholder
+          data={getFullName(bo.first_name, bo.middle_name, bo.last_name)}
+        />
       );
     }
 
