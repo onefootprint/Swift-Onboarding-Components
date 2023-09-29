@@ -57,9 +57,11 @@ const Form = ({ html, onSuccess }: FormProps) => {
 
     const names = getValues('name')?.split(' ') || [];
     if (names.length >= 2) {
+      const firstName = names.splice(0, 1)[0];
       const lastName = names.pop();
-      const firstName = names.join(' ');
+      const middleName = names.join(' ');
       userData['id.first_name'] = firstName;
+      userData['id.middle_name'] = middleName;
       userData['id.last_name'] = lastName;
     }
 
@@ -112,7 +114,7 @@ const Form = ({ html, onSuccess }: FormProps) => {
         <InputsContainer>
           <TextInput
             label="Full Name"
-            placeholder="Jane Foe"
+            placeholder="Jane Doe"
             type="text"
             {...register('name')}
           />
