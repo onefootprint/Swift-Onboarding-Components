@@ -512,6 +512,7 @@ dependencies = [
  "crypto",
  "db",
  "derive_more",
+ "deunicode",
  "dotenv",
  "either",
  "enclave",

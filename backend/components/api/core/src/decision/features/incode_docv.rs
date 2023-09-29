@@ -171,19 +171,19 @@ fn first_name_matches(parsed: &ParsedIncodeNames, vault: &IncodeOcrComparisonDat
     let parsed_first_middle: Option<PiiString> = merge(parsed.first_name.as_ref(), parsed.middle_name.as_ref()).map(|(f,m)| format!("{} {}", f.leak(), m.leak()).into());
     let vault_first_middle: Option<PiiString> = merge(vault.first_name.as_ref(), vault.middle_name.as_ref()).map(|(f,m)| format!("{} {}", f.leak(), m.leak()).into());
 
-    let first_matches_first = merge(parsed.first_name.as_ref(), vault.first_name.as_ref()).map(|(a, b)| pii_strings_match(a, b));
-    let first_matches_first_middle = merge(parsed.first_name.as_ref(), vault_first_middle.as_ref()).map(|(a, b)| pii_strings_match(a, b));
+    let first_matches_first = merge(parsed.first_name.as_ref(), vault.first_name.as_ref()).map(|(a, b)| pii_strings_match_deunicode(a, b));
+    let first_matches_first_middle = merge(parsed.first_name.as_ref(), vault_first_middle.as_ref()).map(|(a, b)| pii_strings_match_deunicode(a, b));
     // for eg: if a MEX user entered both their given names into first_name and left middle_name blank
-    let first_middle_matches_first = merge(parsed_first_middle.as_ref(), vault.first_name.as_ref()).map(|(a, b)| pii_strings_match(a, b));
+    let first_middle_matches_first = merge(parsed_first_middle.as_ref(), vault.first_name.as_ref()).map(|(a, b)| pii_strings_match_deunicode(a, b));
     // for eg: if you have many given names and split them across first_name/middle_name differently than our/Incode's parsing logic
-    let first_middle_matches_first_middle = merge(parsed_first_middle.as_ref(), vault_first_middle.as_ref()).map(|(a, b)| pii_strings_match(a, b));
+    let first_middle_matches_first_middle = merge(parsed_first_middle.as_ref(), vault_first_middle.as_ref()).map(|(a, b)| pii_strings_match_deunicode(a, b));
 
     [first_matches_first, first_matches_first_middle, first_middle_matches_first, first_middle_matches_first_middle].into_iter().flatten().max()
 }
 
 fn last_name_matches(parsed: &ParsedIncodeNames, vault_data: &IncodeOcrComparisonDataFields) -> Option<bool> {
     // surnames seem to be less ambiguous so let's just directly compare for now
-    merge(parsed.last_name.as_ref(), vault_data.last_name.as_ref()).map(|(a, b)| pii_strings_match(a, b))
+    merge(parsed.last_name.as_ref(), vault_data.last_name.as_ref()).map(|(a, b)| pii_strings_match_deunicode(a, b))
 }
 
 fn dob_matches(ocr: &FetchOCRResponse, vault_data: &IncodeOcrComparisonDataFields) -> Option<bool> {
@@ -207,11 +207,17 @@ fn reason_codes_from_matching(first_name_matches: Option<bool>, last_name_matche
     .collect()
 }
 
+
+fn pii_strings_match_deunicode(p1: &PiiString, p2: &PiiString) -> bool {
+    pii_strings_match(p1, p2) || pii_strings_match(&deunicode::deunicode(p1.leak()).into(),&deunicode::deunicode(p2.leak()).into())
+}
+
 fn pii_strings_match(p1: &PiiString, p2: &PiiString) -> bool {
     let normalized_p1 = normalize_pii(p1);
     let normalized_p2 = normalize_pii(p2);
     (normalized_p1.leak() == normalized_p2.leak()) && !(normalized_p1.leak().is_empty() || normalized_p2.leak().is_empty())
 }
+
 
 fn normalize_pii(p: &PiiString) -> PiiString {
     p.leak().trim().to_lowercase().into()
@@ -586,7 +592,16 @@ mod tests {
         (None, Some("Roberto".into()), Some("1990-01-01".into())),
         vec![DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "first name missing"
     )]
-
+    #[test_case(
+        ("Rob", "Robèrto", "1990-01-01"), 
+        (Some("Rob".into()),Some("Roberto".into()),Some("1990-01-01".into())),
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "unicode"
+    )]
+    #[test_case(
+        ("RöbÀÑ", "RÓbèrtõ", "1990-01-01"), 
+        (Some("Roban".into()),Some("ROBERTO".into()),Some("1990-01-01".into())),
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "more unicode"
+    )]
     fn test_reason_codes_from_ocr_response(raw_ocr: (&str, &str, &str), raw_vault_data: (Option<PiiString>, Option<PiiString>, Option<PiiString>), expected: Vec<FootprintReasonCode>) {
         let (first_ocr, last_ocr, dob_ocr) = raw_ocr;
         let ocr_opts = OcrTestOpts {
