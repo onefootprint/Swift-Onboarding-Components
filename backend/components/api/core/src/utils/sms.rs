@@ -107,7 +107,7 @@ impl SmsClient {
         }
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("SmsClient::send_message", skip_all)]
     /// Rate limits sending messages to the destination phone number and then spawns an async task
     /// to send the message_body
     pub async fn send_message(
@@ -134,7 +134,7 @@ impl SmsClient {
         Ok(())
     }
 
-    #[tracing::instrument(skip_all)]
+    #[tracing::instrument("SmsClient::send_message_non_blocking", skip_all)]
     async fn send_message_non_blocking(
         &self,
         state: &State,
@@ -166,6 +166,7 @@ impl SmsClient {
     }
 
     /// Sends the message_body to the provided destination, choosing which vendor to use if any
+    #[tracing::instrument("SmsClient::_send_message", skip_all)]
     async fn _send_message(&self, message_body: PiiString, destination: PiiString) -> ApiResult<()> {
         // TODO can clean this up a lot in the future
         let prefer_twilio = self.ff_client.flag(BoolFlag::TwilioIsPreferredSmsVendor);
