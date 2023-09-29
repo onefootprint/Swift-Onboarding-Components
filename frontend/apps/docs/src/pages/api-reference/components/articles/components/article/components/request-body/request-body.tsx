@@ -19,7 +19,7 @@ const RequestBody = ({ requestBody }: RequestBodyProps) => {
   return schema ? (
     <Box>
       <Title>{t('request-body')}</Title>
-      <Schema schema={schema} />
+      <Schema schema={schema} isInBrackets />
     </Box>
   ) : null;
 };

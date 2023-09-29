@@ -25,9 +25,7 @@ const Responses = ({ responses }: ResponsesProps) => {
             <Badge variant={code === '200' ? 'success' : 'neutral'}>
               {code}
             </Badge>
-            {schema && schema.properties && (
-              <Schema schema={schema} isInBrackets />
-            )}
+            {schema && <Schema schema={schema} isInBrackets />}
           </ResponseContainer>
         );
       })}
