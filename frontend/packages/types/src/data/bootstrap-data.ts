@@ -12,6 +12,7 @@ export type IdvOptions = {
 
 export type KycBootstrapData = Partial<{
   [IdDI.firstName]: string;
+  [IdDI.middleName]: string;
   [IdDI.lastName]: string;
   [IdDI.email]: string;
   [IdDI.phoneNumber]: string;

@@ -287,7 +287,8 @@ describe('getCurrentStepFromMissingAttributes', () => {
         },
         {
           [IdDI.firstName]: { value: 'John' },
-          [IdDI.lastName]: { value: 'John' },
+          [IdDI.middleName]: { value: 'M.' },
+          [IdDI.lastName]: { value: 'LastName' },
           [IdDI.dob]: { value: '1990-01-01' },
           [IdDI.addressLine1]: { value: '123 Main St' },
           [IdDI.city]: { value: 'New York' },
@@ -313,7 +314,8 @@ describe('getCurrentStepFromMissingAttributes', () => {
         },
         {
           [IdDI.firstName]: { value: 'John' },
-          [IdDI.lastName]: { value: 'John' },
+          [IdDI.middleName]: { value: 'M.' },
+          [IdDI.lastName]: { value: 'LastName' },
           [IdDI.dob]: { value: '1990-01-01' },
           [IdDI.addressLine1]: { value: '123 Main St' },
           [IdDI.city]: { value: 'New York' },

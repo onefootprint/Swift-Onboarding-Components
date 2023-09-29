@@ -32,7 +32,7 @@
     "basic-information": {
       "title": "Basic Data",
       "subtitle": "We're legally required to collect this information.",
-      "hint": "Data should match the details on your ID",
+      "hint": "Spell your first, middle and last names exactly as shown on your government-issued ID",
       "form": {
         "first-name": {
           "label": "First name",
@@ -42,6 +42,10 @@
             "invalid": "First name is invalid",
             "special-chars": "Only alphanumeric characters, dashes, spaces or commas are allowed."
           }
+        },
+        "middle-name": {
+          "label": "Middle name (optional)",
+          "placeholder": "Sue"
         },
         "last-name": {
           "label": "Last name",
@@ -225,6 +229,7 @@
       "basic-info": {
         "title": "Basic data",
         "first-name": "First name",
+        "middle-name": "Middle name",
         "last-name": "Last name",
         "dob": "Date of birth",
         "nationality": "Nationality"

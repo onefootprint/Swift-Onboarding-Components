@@ -1,12 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedKycDataOption,
   IdDI,
   isCountryCode,
 } from '@onefootprint/types';
-import { Banner, createFontStyles, media } from '@onefootprint/ui';
+import { InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -47,8 +46,8 @@ const BasicInformation = ({
     CollectedKycDataOption.nationality,
   );
   const convertFormData = useConvertFormData();
-  const isFirstNameDisabled = data?.[IdDI.firstName]?.disabled;
-  const isLastNameDisabled = data?.[IdDI.lastName]?.disabled;
+  const isNameDisabled =
+    data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
   const isNationalityDisabled = data?.[IdDI.nationality]?.disabled;
   const isDobDisabled = data?.[IdDI.dob]?.disabled;
   const nationalityValue = data?.[IdDI.nationality]?.value;
@@ -60,6 +59,7 @@ const BasicInformation = ({
   const methods = useForm<FormData>({
     defaultValues: {
       firstName: data[IdDI.firstName]?.value,
+      middleName: data[IdDI.middleName]?.value,
       lastName: data[IdDI.lastName]?.value,
       dob: data[IdDI.dob]?.value,
       nationality: getInitialCountry(defaultNationality),
@@ -98,22 +98,14 @@ const BasicInformation = ({
           />
         </>
       )}
-      <HintBannerContainer>
-        <Banner variant="info">
-          <BannerChildrenContainer>
-            <IcoInfo16 color="info" />
-            {t('hint')}
-          </BannerChildrenContainer>
-        </Banner>
-      </HintBannerContainer>
       <FormProvider {...methods}>
         <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
-          {requiresName && (
-            <NameFields
-              isFirstNameDisabled={isFirstNameDisabled}
-              isLastNameDisabled={isLastNameDisabled}
-            />
-          )}
+          <InlineAlert variant="info">
+            <Typography variant="body-2" color="info">
+              {t('hint')}
+            </Typography>
+          </InlineAlert>
+          {requiresName && <NameFields disabled={isNameDisabled} />}
           {requiresDob && <DobField disabled={isDobDisabled} />}
           {requiresNationality && (
             <NationalityField disabled={isNationalityDisabled} />
@@ -128,27 +120,6 @@ const BasicInformation = ({
     </>
   );
 };
-
-const BannerChildrenContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-    ${createFontStyles('body-2')};
-
-    ${media.lessThan('sm')`
-      ${createFontStyles('body-3')};
-    `}
-  `};
-`;
-
-const HintBannerContainer = styled.div`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]};
-    border-radius: ${theme.borderRadius.default};
-    overflow: hidden;
-  `};
-`;
 
 const Form = styled.form`
   ${({ theme }) => css`

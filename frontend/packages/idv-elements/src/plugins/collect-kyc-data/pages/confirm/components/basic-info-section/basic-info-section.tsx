@@ -37,6 +37,14 @@ const BasicInfoSection = () => {
     });
   }
 
+  const middleName = data[IdDI.middleName]?.value;
+  if (middleName) {
+    basicInfo.push({
+      text: t('basic-info.middle-name'),
+      subtext: middleName,
+    });
+  }
+
   const lastName = data[IdDI.lastName]?.value;
   if (lastName) {
     basicInfo.push({

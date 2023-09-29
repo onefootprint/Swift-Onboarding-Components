@@ -19,6 +19,10 @@ describe('getRequestData', () => {
           [IdDI.dob]: {
             value: '01/02/2003',
           },
+          [IdDI.middleName]: {
+            value: 'M.',
+            decrypted: true,
+          },
           [IdDI.firstName]: {
             value: 'Piip',
             decrypted: true,
@@ -81,6 +85,9 @@ describe('getRequestData', () => {
           },
           [IdDI.firstName]: {
             value: '',
+          },
+          [IdDI.middleName]: {
+            value: undefined,
           },
           [IdDI.lastName]: {
             value: 'Foot',
@@ -207,6 +214,36 @@ describe('getRequestData', () => {
       [IdDI.zip]: '10001',
       [IdDI.country]: 'US',
     });
+
+    expect(
+      getRequestData(
+        {
+          [IdDI.firstName]: {
+            value: 'Piip',
+            decrypted: true,
+          },
+          [IdDI.middleName]: {
+            value: 'Middle',
+          },
+          [IdDI.lastName]: {
+            value: 'Foot',
+            decrypted: true,
+          },
+        },
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [CollectedKycDataOption.name],
+          populatedAttributes: [],
+          optionalAttributes: [],
+          isMet: false,
+        },
+        true,
+      ),
+    ).toEqual({
+      [IdDI.firstName]: 'Piip',
+      [IdDI.middleName]: 'Middle',
+      [IdDI.lastName]: 'Foot',
+    });
   });
 
   it('if it cannot match cdos because data collection is incomplete, throws errors', () => {
@@ -241,6 +278,28 @@ describe('getRequestData', () => {
           ],
           populatedAttributes: [],
           optionalAttributes: [CollectedKycDataOption.ssn4],
+          isMet: false,
+        },
+        true,
+      ),
+    ).toThrowError();
+
+    expect(() =>
+      getRequestData(
+        {
+          [IdDI.middleName]: {
+            value: 'Middle',
+          },
+          [IdDI.lastName]: {
+            value: 'Foot',
+            decrypted: true,
+          },
+        },
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [CollectedKycDataOption.name],
+          populatedAttributes: [],
+          optionalAttributes: [],
           isMet: false,
         },
         true,
@@ -346,7 +405,7 @@ describe('getRequestData', () => {
     ).not.toThrowError();
   });
 
-  it('removes decrypted values', () => {
+  it('removes decrypted values if they form full cdos', () => {
     expect(
       getRequestData(
         {
@@ -415,6 +474,39 @@ describe('getRequestData', () => {
       ),
     ).toEqual({
       [IdDI.email]: 'piip@onefootprint.com',
+      [IdDI.firstName]: 'Piip',
+      [IdDI.lastName]: 'Foot',
+    });
+  });
+
+  it('omits populated but not decrypted requirements', () => {
+    expect(
+      getRequestData(
+        {
+          [IdDI.firstName]: {
+            value: 'Piip',
+          },
+          [IdDI.lastName]: {
+            value: 'Foot',
+          },
+          [IdDI.ssn4]: {
+            value: undefined,
+            decrypted: true,
+          },
+        },
+        {
+          kind: OnboardingRequirementKind.collectKycData,
+          missingAttributes: [],
+          populatedAttributes: [
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.ssn4,
+          ],
+          optionalAttributes: [],
+          isMet: true,
+        },
+        true,
+      ),
+    ).toEqual({
       [IdDI.firstName]: 'Piip',
       [IdDI.lastName]: 'Foot',
     });

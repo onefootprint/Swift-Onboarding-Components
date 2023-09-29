@@ -1,5 +1,7 @@
+import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import Email from './components/email';
@@ -15,6 +17,8 @@ export type FieldsProps = {
 };
 
 const Fields = ({ index, onRemove, config }: FieldsProps) => {
+  const { t } = useTranslation('pages.beneficial-owners.form.fields');
+
   const handleRemove = () => {
     onRemove(index);
   };
@@ -22,6 +26,13 @@ const Fields = ({ index, onRemove, config }: FieldsProps) => {
   return (
     <Container>
       <Header shouldShowRemove={index > 0} onRemove={handleRemove} />
+      {index === 0 && (
+        <InlineAlert variant="info">
+          <Typography variant="body-2" color="info">
+            {t('primary-bo-name-hint')}
+          </Typography>
+        </InlineAlert>
+      )}
       <Name index={index} />
       <Email index={index} />
       <Phone index={index} config={config} />

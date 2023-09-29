@@ -102,6 +102,10 @@ describe('<Form />', () => {
     await userEvent.type(firstNameFields[0], 'John');
     await userEvent.type(firstNameFields[1], 'Lily');
 
+    const middleNameFields = screen.getAllByLabelText('Middle name (optional)');
+    expect(middleNameFields).toHaveLength(2);
+    await userEvent.type(middleNameFields[0], 'Middle');
+
     const lastNameFields = screen.getAllByLabelText('Last name');
     expect(lastNameFields).toHaveLength(2);
     await userEvent.type(lastNameFields[0], 'Doe');
@@ -133,6 +137,7 @@ describe('<Form />', () => {
       expect(onSubmit).toBeCalledWith([
         {
           [BeneficialOwnerDataAttribute.firstName]: 'John',
+          [BeneficialOwnerDataAttribute.middleName]: 'Middle',
           [BeneficialOwnerDataAttribute.lastName]: 'Doe',
           [BeneficialOwnerDataAttribute.ownershipStake]: 50,
           [BeneficialOwnerDataAttribute.email]: undefined,
@@ -140,6 +145,7 @@ describe('<Form />', () => {
         },
         {
           [BeneficialOwnerDataAttribute.firstName]: 'Lily',
+          [BeneficialOwnerDataAttribute.middleName]: undefined,
           [BeneficialOwnerDataAttribute.lastName]: 'Smith',
           [BeneficialOwnerDataAttribute.ownershipStake]: 50,
           [BeneficialOwnerDataAttribute.email]: 'Lily@smith.com',
@@ -156,6 +162,10 @@ describe('<Form />', () => {
     expect(firstNameField).toHaveLength(1);
     expect(firstNameField[0]).toHaveValue('John');
 
+    const middleNameField = screen.getAllByLabelText('Middle name (optional)');
+    expect(middleNameField).toHaveLength(1);
+    expect(middleNameField[0]).toHaveValue('Middle');
+
     const lastNameField = screen.getAllByLabelText('Last name');
     expect(lastNameField).toHaveLength(1);
     expect(lastNameField[0]).toHaveValue('Doe');
@@ -171,6 +181,7 @@ describe('<Form />', () => {
       expect(onSubmit).toBeCalledWith([
         {
           [BeneficialOwnerDataAttribute.firstName]: 'John',
+          [BeneficialOwnerDataAttribute.middleName]: 'Middle',
           [BeneficialOwnerDataAttribute.lastName]: 'Doe',
           [BeneficialOwnerDataAttribute.ownershipStake]: 50,
           [BeneficialOwnerDataAttribute.email]: undefined,
@@ -332,6 +343,7 @@ describe('<Form />', () => {
           expect(onSubmit).toBeCalledWith([
             {
               [BeneficialOwnerDataAttribute.firstName]: 'John',
+              [BeneficialOwnerDataAttribute.middleName]: undefined,
               [BeneficialOwnerDataAttribute.lastName]: 'Doe',
               [BeneficialOwnerDataAttribute.ownershipStake]: 50,
               [BeneficialOwnerDataAttribute.email]: undefined,

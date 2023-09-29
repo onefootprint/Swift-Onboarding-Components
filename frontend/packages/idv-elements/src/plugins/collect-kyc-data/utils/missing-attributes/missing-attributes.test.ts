@@ -27,6 +27,7 @@ describe('MissingAttributesUtils', () => {
           [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce', disabled: true },
+            [IdDI.middleName]: { value: 'C.', disabled: true },
             [IdDI.lastName]: { value: 'Dogru', disabled: true },
             [IdDI.city]: { value: 'Enclave', disabled: true },
           },
@@ -36,6 +37,7 @@ describe('MissingAttributesUtils', () => {
       expect(
         isMissingBasicAttribute([CollectedKycDataOption.name], {
           [IdDI.firstName]: { value: 'Belce', disabled: true },
+          [IdDI.middleName]: { value: 'C.', disabled: true },
           [IdDI.lastName]: { value: 'Dogru', disabled: true },
         }),
       ).toEqual(false);
@@ -93,6 +95,7 @@ describe('MissingAttributesUtils', () => {
           [CollectedKycDataOption.name, CollectedKycDataOption.address],
           {
             [IdDI.firstName]: { value: 'Belce', bootstrap: true },
+            [IdDI.middleName]: { value: 'M.', bootstrap: true },
             [IdDI.lastName]: { value: 'Dogru' },
             [IdDI.city]: { value: 'Enclave', bootstrap: true },
           },
@@ -102,6 +105,12 @@ describe('MissingAttributesUtils', () => {
       expect(
         isMissingBasicAttribute([CollectedKycDataOption.name], {
           [IdDI.lastName]: { value: 'Dogru', bootstrap: true },
+        }),
+      ).toEqual(true);
+
+      expect(
+        isMissingBasicAttribute([CollectedKycDataOption.name], {
+          [IdDI.middleName]: { value: 'Dogru', bootstrap: true },
         }),
       ).toEqual(true);
 

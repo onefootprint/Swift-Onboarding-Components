@@ -11,7 +11,11 @@ import { BusinessDI, DocumentDI, IdDI, InvestorProfileDI } from './di';
 // Used as a comprehensive list of CDOs to all associated DIs
 const CdoToAllDisMap: Record<CollectedDataOption, DataIdentifier[]> = {
   // Id
-  [CollectedKycDataOption.name]: [IdDI.firstName, IdDI.lastName],
+  [CollectedKycDataOption.name]: [
+    IdDI.firstName,
+    IdDI.middleName,
+    IdDI.lastName,
+  ],
   [CollectedKycDataOption.dob]: [IdDI.dob],
   [CollectedKycDataOption.ssn4]: [IdDI.ssn4],
   [CollectedKycDataOption.ssn9]: [IdDI.ssn9],

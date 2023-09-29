@@ -1,12 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoInfo16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   BusinessDI,
   CollectedKybDataOption,
   CollectedKybDataOptionToRequiredAttributes,
 } from '@onefootprint/types';
-import { Banner, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -92,14 +89,6 @@ const BasicData = ({
           />
         </>
       )}
-      <HintBannerContainer>
-        <Banner variant="info">
-          <BannerChildrenContainer>
-            <IcoInfo16 color="info" />
-            {t('hint')}
-          </BannerChildrenContainer>
-        </Banner>
-      </HintBannerContainer>
       <BasicDataForm
         defaultValues={defaultValues}
         optionalFields={optionalFields}
@@ -112,26 +101,5 @@ const BasicData = ({
     </>
   );
 };
-
-const BannerChildrenContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-    ${createFontStyles('body-2')};
-
-    ${media.lessThan('sm')`
-      ${createFontStyles('body-3')};
-    `}
-  `};
-`;
-
-const HintBannerContainer = styled.div`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]};
-    border-radius: ${theme.borderRadius.default};
-    overflow: hidden;
-  `};
-`;
 
 export default BasicData;

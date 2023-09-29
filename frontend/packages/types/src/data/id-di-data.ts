@@ -11,6 +11,8 @@ export type ValueTypeForIdDI<K> = K extends IdDI.email
   ? string
   : K extends IdDI.firstName
   ? string
+  : K extends IdDI.middleName
+  ? string
   : K extends IdDI.lastName
   ? string
   : K extends IdDI.dob

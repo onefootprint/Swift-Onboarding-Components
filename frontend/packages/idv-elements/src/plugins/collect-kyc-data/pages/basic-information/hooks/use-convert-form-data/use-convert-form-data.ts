@@ -8,8 +8,8 @@ import type { FormData } from '../../types';
 const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
-  const isFirstNameDisabled = data?.[IdDI.firstName]?.disabled;
-  const isLastNameDisabled = data?.[IdDI.lastName]?.disabled;
+  const isNameDisabled =
+    data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
   const isDobDisabled = data?.[IdDI.dob]?.disabled;
   const isNationalityDisabled = data?.[IdDI.nationality]?.disabled;
   const attributes = allAttributes(requirement);
@@ -21,15 +21,18 @@ const useConvertFormData = () => {
 
   return (formData: FormData) => {
     const convertedData: KycData = {};
-    const { firstName, lastName, dob, nationality } = formData;
+    const { firstName, middleName, lastName, dob, nationality } = formData;
+    const hasName = firstName && lastName;
 
-    if (requiresName && firstName && !isFirstNameDisabled) {
+    if (requiresName && hasName && !isNameDisabled) {
       convertedData[IdDI.firstName] = {
         value: firstName,
       };
-    }
 
-    if (requiresName && lastName && !isLastNameDisabled) {
+      convertedData[IdDI.middleName] = {
+        value: middleName,
+      };
+
       convertedData[IdDI.lastName] = {
         value: lastName,
       };

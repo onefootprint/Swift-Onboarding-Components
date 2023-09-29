@@ -1,5 +1,6 @@
 export enum BeneficialOwnerDataAttribute {
   firstName = 'first_name',
+  middleName = 'middle_name',
   lastName = 'last_name',
   ownershipStake = 'ownership_stake',
   email = 'email',
@@ -8,6 +9,7 @@ export enum BeneficialOwnerDataAttribute {
 
 export type BeneficialOwner = {
   [BeneficialOwnerDataAttribute.firstName]: string;
+  [BeneficialOwnerDataAttribute.middleName]?: string;
   [BeneficialOwnerDataAttribute.lastName]: string;
   [BeneficialOwnerDataAttribute.ownershipStake]: number;
   [BeneficialOwnerDataAttribute.email]?: string;

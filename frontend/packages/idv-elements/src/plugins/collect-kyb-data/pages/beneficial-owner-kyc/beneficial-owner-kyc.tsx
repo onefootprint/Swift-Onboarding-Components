@@ -44,6 +44,8 @@ const BeneficialOwnerKyc = () => {
   if (primaryBeneficialOwner) {
     bootstrapData[IdDI.firstName] =
       primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName];
+    bootstrapData[IdDI.middleName] =
+      primaryBeneficialOwner[BeneficialOwnerDataAttribute.middleName];
     bootstrapData[IdDI.lastName] =
       primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName];
   }
@@ -54,7 +56,7 @@ const BeneficialOwnerKyc = () => {
         authToken,
         device,
         customData: {
-          disabledFields: [IdDI.firstName, IdDI.lastName],
+          disabledFields: [IdDI.firstName, IdDI.middleName, IdDI.lastName],
           bootstrapData,
           requirement: kycRequirement,
           userFound: !!userFound,

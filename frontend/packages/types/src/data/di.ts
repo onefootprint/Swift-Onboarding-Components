@@ -32,6 +32,7 @@ export enum InvestorProfileDI {
 
 export enum IdDI {
   firstName = 'id.first_name',
+  middleName = 'id.middle_name',
   lastName = 'id.last_name',
   email = 'id.email',
   phoneNumber = 'id.phone_number',

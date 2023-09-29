@@ -90,6 +90,7 @@ describe('Collect KYC Data Machine Tests', () => {
         type: 'dataSubmitted',
         payload: {
           [IdDI.firstName]: { value: 'Otto' },
+          [IdDI.middleName]: { value: 'M.' },
           [IdDI.lastName]: { value: 'Footprint' },
         },
       });

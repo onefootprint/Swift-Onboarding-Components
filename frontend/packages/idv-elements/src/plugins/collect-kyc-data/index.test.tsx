@@ -153,6 +153,11 @@ describe('<CollectKycData />', () => {
       await userEvent.type(firstName, 'Piip');
       expect(firstName).toHaveValue('Piip');
 
+      let middleName = screen.getByLabelText('Middle name (optional)');
+      expect(middleName).toBeInTheDocument();
+      await userEvent.type(middleName, 'Middle');
+      expect(middleName).toHaveValue('Middle');
+
       let lastName = screen.getByLabelText('Last name');
       expect(lastName).toBeInTheDocument();
       await userEvent.type(lastName, 'Test');
@@ -191,6 +196,9 @@ describe('<CollectKycData />', () => {
 
       firstName = screen.getByText('Piip');
       expect(firstName).toBeInTheDocument();
+
+      middleName = screen.getByText('Middle');
+      expect(middleName).toBeInTheDocument();
 
       lastName = screen.getByText('Test');
       expect(lastName).toBeInTheDocument();

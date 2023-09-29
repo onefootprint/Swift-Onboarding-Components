@@ -41,6 +41,7 @@ const Form = ({
   const defaultBeneficialOwnersData = defaultValues ?? [
     {
       [BeneficialOwnerDataAttribute.firstName]: '',
+      [BeneficialOwnerDataAttribute.middleName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
       [BeneficialOwnerDataAttribute.email]: '',
       [BeneficialOwnerDataAttribute.phoneNumber]: '',
@@ -70,6 +71,7 @@ const Form = ({
   const handleAddMore = () => {
     append({
       [BeneficialOwnerDataAttribute.firstName]: '',
+      [BeneficialOwnerDataAttribute.middleName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
       [BeneficialOwnerDataAttribute.email]: '',
       [BeneficialOwnerDataAttribute.phoneNumber]: '',
@@ -109,6 +111,9 @@ const Form = ({
       )
       .map(bo => ({
         ...bo,
+        // Send undefined instead of empty string for unknown middle name
+        [BeneficialOwnerDataAttribute.middleName]:
+          bo[BeneficialOwnerDataAttribute.middleName] || undefined,
         // Send undefined instead of empty string for unknown phone/email. The primary BO is allowed
         // to have no phone / email
         [BeneficialOwnerDataAttribute.phoneNumber]:

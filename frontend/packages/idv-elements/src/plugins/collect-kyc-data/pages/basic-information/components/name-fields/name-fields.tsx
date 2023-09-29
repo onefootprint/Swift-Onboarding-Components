@@ -6,14 +6,10 @@ import { useFormContext } from 'react-hook-form';
 import validateName, { NameValidationError } from './validate-name';
 
 type NameFieldsProps = {
-  isFirstNameDisabled?: boolean;
-  isLastNameDisabled?: boolean;
+  disabled?: boolean;
 };
 
-const NameFields = ({
-  isFirstNameDisabled,
-  isLastNameDisabled,
-}: NameFieldsProps) => {
+const NameFields = ({ disabled }: NameFieldsProps) => {
   const { t } = useTranslation('pages.basic-information.form');
   const {
     register,
@@ -50,36 +46,51 @@ const NameFields = ({
   };
 
   return (
-    <Grid.Row>
-      <Grid.Column col={6}>
-        <TextInput
-          data-private
-          disabled={isFirstNameDisabled}
-          hasError={!!errors.firstName}
-          hint={getFirstNameHint()}
-          label={t('first-name.label')}
-          placeholder={t('first-name.placeholder')}
-          {...register('firstName', {
-            required: true,
-            validate: (value: string) => validateName(value) === undefined,
-          })}
-        />
-      </Grid.Column>
-      <Grid.Column col={6}>
-        <TextInput
-          data-private
-          disabled={isLastNameDisabled}
-          hasError={!!errors.lastName}
-          hint={getLastNameHint()}
-          label={t('last-name.label')}
-          placeholder={t('last-name.placeholder')}
-          {...register('lastName', {
-            required: true,
-            validate: (value: string) => validateName(value) === undefined,
-          })}
-        />
-      </Grid.Column>
-    </Grid.Row>
+    <>
+      <Grid.Row>
+        <Grid.Column col={12}>
+          <TextInput
+            data-private
+            disabled={disabled}
+            hasError={!!errors.firstName}
+            hint={getFirstNameHint()}
+            label={t('first-name.label')}
+            placeholder={t('first-name.placeholder')}
+            {...register('firstName', {
+              required: true,
+              validate: (value: string) => validateName(value) === undefined,
+            })}
+          />
+        </Grid.Column>
+      </Grid.Row>
+      <Grid.Row>
+        <Grid.Column col={12}>
+          <TextInput
+            data-private
+            disabled={disabled}
+            label={t('middle-name.label')}
+            placeholder={t('middle-name.placeholder')}
+            {...register('middleName')}
+          />
+        </Grid.Column>
+      </Grid.Row>
+      <Grid.Row>
+        <Grid.Column col={12}>
+          <TextInput
+            data-private
+            disabled={disabled}
+            hasError={!!errors.lastName}
+            hint={getLastNameHint()}
+            label={t('last-name.label')}
+            placeholder={t('last-name.placeholder')}
+            {...register('lastName', {
+              required: true,
+              validate: (value: string) => validateName(value) === undefined,
+            })}
+          />
+        </Grid.Column>
+      </Grid.Row>
+    </>
   );
 };
 

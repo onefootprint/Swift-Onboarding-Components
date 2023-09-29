@@ -29,7 +29,6 @@
     "basic-data": {
       "title": "Basic data",
       "subtitle": "We need some information about your business.",
-      "hint": "Data should match the details on your ID",
       "form": {
         "business-name": {
           "label": "Business name",
@@ -111,10 +110,15 @@
           "remove": "Remove"
         },
         "fields": {
+          "primary-bo-name-hint": "Spell your first, middle and last names exactly as shown on your government-issued ID",
           "first-name": {
             "label": "First name",
             "placeholder": "Jane",
             "error": "First name cannot be empty or is invalid"
+          },
+          "middle-name": {
+            "label": "Middle name (optional)",
+            "placeholder": "Sue"
           },
           "last-name": {
             "label": "Last name",
@@ -191,6 +195,7 @@
         "beneficial-owner-you": "Beneficial owner (You)",
         "beneficial-owner-other": "Beneficial owner (Other)",
         "first-name": "First name",
+        "middle-name": "Middle name",
         "last-name": "Last name",
         "email": "Email",
         "ownership-stake": "Ownership stake"

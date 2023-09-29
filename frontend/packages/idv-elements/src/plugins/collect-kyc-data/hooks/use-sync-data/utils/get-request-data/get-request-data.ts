@@ -3,6 +3,7 @@ import type {
   CollectKycDataRequirement,
 } from '@onefootprint/types';
 import {
+  CdoToAllDisMap,
   CollectedKycDataOptionToRequiredAttributes,
   IdDI,
 } from '@onefootprint/types';
@@ -56,21 +57,24 @@ const getRequestData = (
   // decrypted directly from backend), otherwise the backend will error
   Object.keys(CollectedKycDataOptionToRequiredAttributes).forEach(
     (cdoKey: string) => {
-      const cdo = cdoKey as CollectedKycDataOption;
-      const requiredDis = CollectedKycDataOptionToRequiredAttributes[cdo];
-
       // Detect whether any part of the cdo is in request data
-      const requestDataHasCdoEntry =
-        cdos.indexOf(cdo) > -1 && requiredDis.some(di => requestData[di]);
-      if (!requestDataHasCdoEntry) {
+      const cdo = cdoKey as CollectedKycDataOption;
+      const allDisForCdo = CdoToAllDisMap[cdo] as IdDI[];
+      if (
+        cdos.indexOf(cdo) === -1 ||
+        !allDisForCdo.some(di => requestData[di])
+      ) {
         return;
       }
 
-      let danglingDis: string[] = [];
-      requiredDis.forEach(di => {
+      // For each required DI, either try to add the decrypted value to the request data
+      // Or mark it as missing
+      const requiredDisForCdo = CollectedKycDataOptionToRequiredAttributes[cdo];
+      const missingDis = new Set<string>();
+      requiredDisForCdo.forEach(di => {
         const value = data[di]?.value;
         if (typeof value === 'undefined') {
-          danglingDis.push(di);
+          missingDis.add(di);
         } else if (!requestData[di]) {
           requestData[di] = value;
         }
@@ -79,13 +83,23 @@ const getRequestData = (
       // Ignore missing state & zip DIs if address is international
       const isInternational = requestData[IdDI.country] !== 'US';
       if (isInternational) {
-        danglingDis = danglingDis.filter(
-          di => di !== IdDI.state && di !== IdDI.zip,
-        );
+        missingDis.delete(IdDI.state);
+        missingDis.delete(IdDI.zip);
       }
 
-      if (danglingDis.length > 0) {
-        throw new Error(`Dangling DIs: ${danglingDis.join(', ')}`);
+      // If the missing DIs form cdo groups that are all already populated in the backend, ignore
+      requirement.populatedAttributes.forEach(populatedCdo => {
+        const populatedDis = CdoToAllDisMap[populatedCdo];
+        const allInMissingDis = populatedDis.every(di => missingDis.has(di));
+        if (allInMissingDis) {
+          populatedDis.forEach(di => missingDis.delete(di));
+        }
+      });
+
+      if (missingDis.size > 0) {
+        throw new Error(
+          `Missing required DIs: ${Array.from(missingDis).join(', ')}`,
+        );
       }
     },
   );

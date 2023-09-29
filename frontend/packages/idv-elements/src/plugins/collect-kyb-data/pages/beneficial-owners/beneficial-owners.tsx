@@ -87,6 +87,7 @@ const BeneficialOwners = ({
   const defaultValues = defaultData ?? [
     {
       [BeneficialOwnerDataAttribute.firstName]: '',
+      [BeneficialOwnerDataAttribute.middleName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
       [BeneficialOwnerDataAttribute.email]:
         kycBootstrapData?.[IdDI.email] ?? '',
