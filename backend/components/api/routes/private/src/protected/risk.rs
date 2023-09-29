@@ -29,14 +29,15 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
 use db::models::workflow::Workflow;
 use newtypes::{
-    DecisionIntentId, DecisionStatus, FpId, TenantId, Vendor, VerificationRequestId, VerificationResultId,
-    WorkflowId,
+    DecisionIntentId, DecisionStatus, FpId, TenantId, Vendor, VendorAPI, VerificationRequestId,
+    VerificationResultId, WorkflowId,
 };
 use std::str::FromStr;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct MakeVendorCallsRequest {
     pub wf_id: WorkflowId,
+    pub vendor_api: VendorAPI,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -83,7 +84,7 @@ async fn make_vendor_calls(
     _: ProtectedCustodianAuthContext,
     request: Json<MakeVendorCallsRequest>,
 ) -> actix_web::Result<Json<ResponseData<MakeVendorCallsResponse>>, ApiError> {
-    let MakeVendorCallsRequest { wf_id } = request.into_inner();
+    let MakeVendorCallsRequest { wf_id, vendor_api } = request.into_inner();
     let (wf, sv) = state
         .db_pool
         .db_query(move |conn| Workflow::get_all(conn, &wf_id))
@@ -105,6 +106,7 @@ async fn make_vendor_calls(
                 &sv.id,
                 &decision_intent.id,
                 &tvc2,
+                vec![vendor_api],
             )?;
 
             let (obc, _) = ObConfiguration::get(conn, &wfid)?;
@@ -238,6 +240,7 @@ async fn make_decision(
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct ShadowRunRequest {
     pub wf_id: WorkflowId,
+    pub vendor_api: VendorAPI,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -251,14 +254,14 @@ async fn shadow_run(
     _: ProtectedCustodianAuthContext,
     request: Json<ShadowRunRequest>,
 ) -> actix_web::Result<Json<ResponseData<ShadowRunResult>>, ApiError> {
-    let ShadowRunRequest { wf_id } = request.into_inner();
+    let ShadowRunRequest { wf_id, vendor_api } = request.into_inner();
+    let vendor_apis = vec![vendor_api];
     let (wf, sv) = state
         .db_pool
         .db_query(move |conn| Workflow::get_all(conn, &wf_id))
         .await??;
     let tid = sv.tenant_id.clone();
     let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
-    let tvc2 = tvc.clone();
 
     let wfid = wf.id.clone();
     let (requests, vw, obc) = state
@@ -267,8 +270,6 @@ async fn shadow_run(
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
-            let vendor_apis =
-                vendor::get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), &tvc2)?;
             #[allow(clippy::unwrap_used)]
             let memory_only_requests = vendor_apis
                 .into_iter()

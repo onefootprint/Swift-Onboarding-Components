@@ -19,12 +19,14 @@ export default airplane.task(
       [
         {
           wf_id: 'wf_OmtQqCeYNbf94oYS3PNUZ',
+          vendor_api: 'idology_expect_id',
         },
         'pass',
       ],
       [
         {
           wf_id: 'wf_AEhn9GSvpKqL1Uyt66QrBC',
+          vendor_api: 'idology_expect_id',
         },
         'fail',
       ],

@@ -11,6 +11,12 @@ export default airplane.task(
         required: true,
         type: 'shorttext',
       },
+      vendor_api: {
+        name: 'vendor_api',
+        required: true,
+        type: 'shorttext',
+        default: 'idology_expect_id',
+      },
     },
     envVars: {
       FPC_PRIVATE_PROECTED_TOKEN: { config: 'FPC_PRIVATE_PROECTED_TOKEN' },

@@ -32,12 +32,14 @@ pub fn build_verification_requests_and_checkpoint(
     su_id: &ScopedVaultId,
     decision_intent_id: &DecisionIntentId,
     tenant_vendor_control: &TenantVendorControl,
+    vendor_apis: Vec<VendorAPI>,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
-    let vendor_apis =
+    let mut available_vendor_apis =
         get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), tenant_vendor_control)?;
+    available_vendor_apis.retain(|v| vendor_apis.contains(v));
 
     let requests_to_initiate =
-        VerificationRequest::bulk_create(conn, su_id.clone(), vendor_apis, decision_intent_id)?;
+        VerificationRequest::bulk_create(conn, su_id.clone(), available_vendor_apis, decision_intent_id)?;
 
     Ok(requests_to_initiate)
 }
