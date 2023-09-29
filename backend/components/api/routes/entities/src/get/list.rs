@@ -11,6 +11,7 @@ use crate::types::CursorPaginationRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::errors::AssertionError;
+use api_core::types::CursorPaginatedResponseInner;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_wire_types::ListEntitiesRequest;
@@ -23,7 +24,7 @@ use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::{BusinessDataKind as BDK, Fingerprint, Fingerprinter, IdentityDataKind as IDK};
-use paperclip::actix::{api_v2_operation, get, web, web::Json};
+use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
     description = "View list of entities (business or user) that have started onboarding to the tenant.",
@@ -35,7 +36,7 @@ pub async fn get(
     filters: web::Query<ListEntitiesRequest>,
     pagination: web::Query<CursorPaginationRequest<i64>>,
     auth: TenantSessionAuth,
-) -> ApiResult<Json<CursorPaginatedResponse<EntityListResponse, i64>>> {
+) -> CursorPaginatedResponse<EntityListResponse, i64> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
@@ -101,7 +102,7 @@ pub async fn get(
         .into_iter()
         .map(|(vw, entity)| api_wire_types::Entity::from_db((entity, vw, &auth)))
         .collect();
-    Ok(Json(CursorPaginatedResponse::ok(entities, cursor, Some(count))))
+    CursorPaginatedResponseInner::ok(entities, cursor, Some(count))
 }
 
 /// Given a search string and fp_id, parse into the list of fingerprints and fp_id by which to query

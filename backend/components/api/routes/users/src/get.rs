@@ -4,6 +4,7 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::CursorPaginatedResponse;
+use api_core::types::CursorPaginatedResponseInner;
 use api_core::types::CursorPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_route_entities::parse_search;
@@ -22,7 +23,7 @@ pub async fn get(
     pagination: web::Query<CursorPaginationRequest<i64>>,
     request: web::Query<SearchUsersRequest>,
     auth: SecretTenantAuthContext,
-) -> ApiResult<CursorPaginatedResponse<Vec<api_wire_types::UserId>, i64>> {
+) -> CursorPaginatedResponse<Vec<api_wire_types::UserId>, i64> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let SearchUsersRequest { search } = request.into_inner();
@@ -55,5 +56,5 @@ pub async fn get(
         .into_iter()
         .map(|(sv, _)| api_wire_types::UserId::from_db(sv))
         .collect();
-    Ok(CursorPaginatedResponse::ok(results, cursor, Some(count)))
+    CursorPaginatedResponseInner::ok(results, cursor, Some(count))
 }

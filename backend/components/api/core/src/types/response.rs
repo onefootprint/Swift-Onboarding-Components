@@ -87,25 +87,30 @@ pub struct CursorPaginatedResponseMeta<C> {
     pub count: Option<i64>,
 }
 
+pub type CursorPaginatedResponse<T, C> = ApiResult<Json<CursorPaginatedResponseInner<T, C>>>;
+
 #[derive(Debug, Clone, serde::Serialize)]
 /// Wraps the response data with metadata needed for a cursor-paginated result.
 /// Cursor pagination requests take in a cursor that identifies the start of the page (and is
 /// delivered by the last pagination request) using an ordered field.
-pub struct CursorPaginatedResponse<T, C> {
+/// TODO need to wrap this in Json.
+/// make an alias that is ApiResult<Json<CursorPaginatedResponseInner>>
+pub struct CursorPaginatedResponseInner<T, C> {
     pub data: T,
     pub meta: CursorPaginatedResponseMeta<C>,
 }
 
-impl<T, C: Clone> CursorPaginatedResponse<T, C> {
-    pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> Self {
-        Self {
+impl<T, C: Clone> CursorPaginatedResponseInner<T, C> {
+    pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> ApiResult<Json<Self>> {
+        Ok(Json(Self {
             data,
             meta: CursorPaginatedResponseMeta { next, count },
-        }
+        }))
     }
 }
 
-impl<T, C> Responder for CursorPaginatedResponse<T, C>
+/*
+impl<T, C> Responder for CursorPaginatedResponseInner<T, C>
 where
     T: Serialize,
     C: Serialize,
@@ -116,8 +121,9 @@ where
         actix_web::HttpResponse::build(actix_web::http::StatusCode::OK).json(self)
     }
 }
+*/
 
-impl<T, C> paperclip::v2::schema::Apiv2Schema for CursorPaginatedResponse<T, C>
+impl<T, C> paperclip::v2::schema::Apiv2Schema for CursorPaginatedResponseInner<T, C>
 where
     T: paperclip::v2::schema::Apiv2Schema,
     C: TypedData,
@@ -153,7 +159,7 @@ where
     }
 }
 
-impl<T, C> paperclip::actix::OperationModifier for CursorPaginatedResponse<T, C>
+impl<T, C> paperclip::actix::OperationModifier for CursorPaginatedResponseInner<T, C>
 where
     T: paperclip::v2::schema::Apiv2Schema,
     C: TypedData,

@@ -1,6 +1,5 @@
 use crate::*;
 
-/// Id of user
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 pub struct UserId {
     pub id: FpId,

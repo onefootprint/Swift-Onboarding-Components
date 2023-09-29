@@ -1,17 +1,17 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::errors::ApiError;
 use crate::types::request::CursorPaginationRequest;
 use crate::types::response::CursorPaginatedResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::types::CursorPaginatedResponseInner;
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams};
 use newtypes::input::deserialize_stringified_list;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
-use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -37,7 +37,7 @@ async fn get(
     filters: web::Query<AccessEventRequest>,
     pagination: web::Query<CursorPaginationRequest<i64>>,
     auth: TenantSessionAuth,
-) -> actix_web::Result<Json<CursorPaginatedResponse<AccessEventResponse, i64>>, ApiError> {
+) -> CursorPaginatedResponse<AccessEventResponse, i64> {
     let auth = auth.check_guard(TenantGuard::Read)?;
 
     let page_size = pagination.page_size(&state);
@@ -72,5 +72,5 @@ async fn get(
         .take(page_size)
         .map(api_wire_types::AccessEvent::from_db)
         .collect::<Vec<api_wire_types::AccessEvent>>();
-    Ok(Json(CursorPaginatedResponse::ok(response, cursor, None)))
+    CursorPaginatedResponseInner::ok(response, cursor, None)
 }
