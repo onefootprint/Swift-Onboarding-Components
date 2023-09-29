@@ -117,12 +117,13 @@ def get_apis(open_api_spec, tag):
     # Create the final list of all schemas used by the matching endpoints
     used_entity_names = [schema_ref.split("/")[-1] for schema_ref in used_entity_refs]
     used_schemas = {
-        name: open_api_spec["components"]["schemas"][name] for name in used_entity_names
+        name: open_api_spec["components"]["schemas"][name]
+        for name in sorted(used_entity_names)
     }
     # Create final list of securitySchemes used by the matching endpoints
     used_security_schemes = {
         name: open_api_spec["components"]["securitySchemes"][name]
-        for name in used_security_schemes
+        for name in sorted(used_security_schemes)
     }
     return {
         **open_api_spec,

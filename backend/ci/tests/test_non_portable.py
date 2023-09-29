@@ -338,7 +338,7 @@ def test_data_integrity_check(sandbox_tenant):
         {
             "fields": list(data.keys()),
             "reason": "hmac",
-            "filters": [{"hmac_sha256": {"key": signing_key}}],
+            "transforms": [f'hmac_sha256("{signing_key}")'],
         },
         sandbox_tenant.sk.key,
     )
@@ -534,9 +534,7 @@ def test_decrypt_rsa_encrypt(sandbox_tenant):
         {
             "fields": fields,
             "reason": "i want to",
-            "filters": [
-                {"encrypt": {"algorithm": "rsa_pkcs1v15", "public_key": pk_der}}
-            ],
+            "transforms": [f"encrypt('rsa_pkcs1v15','{pk_der}')"],
         },
         sandbox_tenant.sk.key,
     )

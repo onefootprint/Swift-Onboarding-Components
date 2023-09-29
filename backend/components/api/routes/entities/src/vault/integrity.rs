@@ -52,12 +52,14 @@ pub async fn post(
 
     let IntegrityRequest { fields, signing_key } = request.into_inner();
 
+    let transform = FilterFunction::HmacSha256(HmacSha256Args {
+        key: PiiBytes::new(signing_key.leak()),
+    });
     let req = super::decrypt::DecryptRequest {
         reason: "Compute Integrity HMAC-SHA256".to_string(),
         fields,
-        filters: Some(vec![FilterFunction::HmacSha256(HmacSha256Args {
-            key: PiiBytes::new(signing_key.leak()),
-        })]),
+        filters: None,
+        transforms: Some(vec![transform.into()]),
     };
 
     let fp_id = path.into_inner();

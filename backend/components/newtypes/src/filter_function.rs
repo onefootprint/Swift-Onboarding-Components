@@ -21,8 +21,6 @@ use crate::PiiBytes;
 #[strum_discriminants(vis(pub))]
 #[strum_discriminants(strum(serialize_all = "snake_case"))]
 #[serde(rename_all = "snake_case")]
-// TODO this is a really unconventional format for filters... we should change the serde serialization
-// to tagged, with {"kind": "date_format", "args": {}}
 pub enum FilterFunction {
     ToLowercase,
     ToUppercase,
@@ -33,6 +31,56 @@ pub enum FilterFunction {
     DateFormat(DateFormatArgs),
     HmacSha256(HmacSha256Args),
     Encrypt(EncryptArgs),
+}
+
+impl From<FilterFunction> for FilterFunctionStr {
+    fn from(value: FilterFunction) -> Self {
+        Self(value)
+    }
+}
+
+impl FilterFunctionName {
+    fn example(&self) -> &'static str {
+        match self {
+            Self::ToLowercase => "to_lowercase",
+            Self::ToUppercase => "to_uppercase",
+            Self::ToAscii => "to_ascii",
+            Self::Prefix => "prefix(<n>)",
+            Self::Suffix => "suffix(<n>)",
+            Self::Replace => "replace('<from>','<to>')",
+            Self::DateFormat => "date_format('<from_format>','<to_format>')",
+            Self::HmacSha256 => "hmac_sha256('<key>')",
+            Self::Encrypt => "encrypt('<algorithm>','<public_key>')",
+        }
+    }
+}
+
+impl<'a> From<&'a FilterFunctionStr> for FilterFunctionName {
+    fn from(value: &'a FilterFunctionStr) -> Self {
+        Self::from(&value.0)
+    }
+}
+
+/// Represents a data transform to apply to underlying plaintext behind a data identifier
+/// For example, `to_lower_case` or `replace('Piip','Penguin')`
+#[derive(Debug)]
+pub struct FilterFunctionStr(FilterFunction);
+
+impl<'de> serde::Deserialize<'de> for FilterFunctionStr {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        let value = FilterFunction::parse(&s).map_err(serde::de::Error::custom)?;
+        Ok(Self(value))
+    }
+}
+
+impl FilterFunctionStr {
+    pub fn into_inner(self) -> FilterFunction {
+        self.0
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, Apiv2Schema)]
@@ -81,6 +129,7 @@ pub enum EncryptFilterAlgorithmName {
 mod json_schema {
     use super::*;
     use strum::IntoEnumIterator;
+
     impl paperclip::v2::schema::Apiv2Schema for FilterFunction {
         fn name() -> Option<String> {
             Some("FilterFunction".to_string())
@@ -117,6 +166,29 @@ mod json_schema {
         }
     }
     impl paperclip::actix::OperationModifier for FilterFunction {}
+
+    impl paperclip::v2::schema::Apiv2Schema for FilterFunctionStr {
+        fn name() -> Option<String> {
+            Some("FilterFunction".to_string())
+        }
+        fn description() -> &'static str {
+            "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/vault/proxy#filter-functions"
+        }
+        fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
+            use paperclip::v2::models::{DataType, DefaultSchemaRaw};
+            DefaultSchemaRaw {
+                name: Some("FilterFunction".into()),
+                example: None,
+                data_type: Some(DataType::String),
+                enum_: FilterFunctionName::iter()
+                    .map(|k| k.example())
+                    .map(|k| serde_json::Value::String(k.to_owned()))
+                    .collect_vec(),
+                ..Default::default()
+            }
+        }
+    }
+    impl paperclip::actix::OperationModifier for FilterFunctionStr {}
 }
 
 #[derive(thiserror::Error, Debug, PartialEq)]
@@ -331,6 +403,7 @@ mod tests {
     use super::FilterFunction as FF;
     use super::FilterFunctionParsingError::*;
     use super::*;
+    use strum::IntoEnumIterator;
     use test_case::test_case;
 
     #[test_case("to_ascii" => Ok(FF::ToAscii))]

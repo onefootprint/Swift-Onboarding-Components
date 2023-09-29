@@ -1,6 +1,6 @@
 use crate::*;
 
-/// Public RiskSignal serialization
+/// RiskSignal information, including severity, impacted scopes, and more.
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, JsonSchema)]
 pub struct RiskSignal {
     // TODO: rename PublicRiskSignal ? might be a nice pattern to start adopting for stuff thats public facing?
