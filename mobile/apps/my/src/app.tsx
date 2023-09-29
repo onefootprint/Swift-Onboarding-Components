@@ -1,4 +1,5 @@
 import 'react-native-reanimated';
+import 'react-native-worklets-core';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import React, { useCallback } from 'react';

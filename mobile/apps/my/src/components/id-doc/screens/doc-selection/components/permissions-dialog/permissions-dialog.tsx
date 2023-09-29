@@ -38,7 +38,7 @@ const PermissionsDialog = ({
   const handleAskPermission = async () => {
     try {
       const response = await Camera.requestCameraPermission();
-      if (response === 'authorized') {
+      if (response === 'granted') {
         onContinue();
       }
 
@@ -58,7 +58,7 @@ const PermissionsDialog = ({
     setOpen(true);
   };
 
-  return permissions == null || permissions === 'authorized' ? (
+  return permissions == null || permissions === 'granted' ? (
     <Box>{children}</Box>
   ) : (
     <>

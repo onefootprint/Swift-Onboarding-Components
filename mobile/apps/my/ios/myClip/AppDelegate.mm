@@ -5,6 +5,9 @@
 
 #import "RNSplashScreen.h"
 
+#import <VisionCamera/FrameProcessorPlugin.h>
+#import <VisionCamera/FrameProcessorPluginRegistry.h>
+
 #import <React/RCTRootView.h>
 
 @interface AppDelegate ()

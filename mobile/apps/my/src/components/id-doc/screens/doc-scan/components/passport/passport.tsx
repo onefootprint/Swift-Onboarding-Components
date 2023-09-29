@@ -1,10 +1,10 @@
 import { UploadDocumentSide } from '@onefootprint/types';
 import React, { useContext, useState } from 'react';
-import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor } from 'react-native-vision-camera';
-import { detectDocument } from 'vision-camera-plugin-document';
 
 import useTranslation from '@/hooks/use-translation';
+import { detectDocument } from '@/utils/vision-camera';
 
 import Frame from '../default-frame';
 import Instructions from '../default-instructions';
@@ -27,23 +27,22 @@ const Passport = ({ side }: PassportProps) => {
     feedback: '',
     data: {},
   });
-
+  const setObjectJs = Worklets.createRunInJsFn(setObject);
   const frameProcessor = useFrameProcessor(
     frame => {
       'worklet';
 
-      const options = {};
-      const result = detectDocument(frame, options);
+      const result = detectDocument(frame);
       if (result.isDocument) {
         detector.value = true;
-        runOnJS(setObject)({
+        setObjectJs({
           isDetected: true,
           feedback: 'Hold still..',
           data: {},
         });
       } else {
         detector.value = false;
-        runOnJS(setObject)({
+        setObjectJs({
           isDetected: false,
           feedback: 'Position the document in view',
           data: {},

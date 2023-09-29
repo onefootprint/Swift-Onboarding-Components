@@ -26,12 +26,8 @@ module.exports = function (api) {
           },
         },
       ],
-      [
-        'react-native-reanimated/plugin',
-        {
-          globals: ['__detectDocument', '__detectFace', '__detectBarcode'],
-        },
-      ],
+      ['react-native-reanimated/plugin'],
+      ['react-native-worklets-core/plugin'],
     ],
   };
 };

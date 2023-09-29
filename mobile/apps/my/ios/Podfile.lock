@@ -278,6 +278,10 @@ PODS:
     - ReactCommon/turbomodule/core
   - react-native-splash-screen (3.3.0):
     - React-Core
+  - react-native-worklets-core (0.2.0):
+    - React
+    - React-callinvoker
+    - React-Core
   - React-perflogger (0.71.13)
   - React-RCTActionSheet (0.71.13):
     - React-Core/RCTActionSheetHeaders (= 0.71.13)
@@ -402,17 +406,11 @@ PODS:
     - React-RCTImage
   - RNSVG (13.14.0):
     - React-Core
-  - vision-camera-plugin-barcode-detection (1.0.0):
-    - RCT-Folly (= 2021.07.22.00)
-    - React-Core
-  - vision-camera-plugin-document (0.8.0):
-    - React-Core
-  - vision-camera-plugin-face-detection (0.10.1):
-    - React-Core
-  - VisionCamera (2.15.6):
+  - VisionCamera (3.1.0):
     - React
     - React-callinvoker
     - React-Core
+    - react-native-worklets-core
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -442,6 +440,7 @@ DEPENDENCIES:
   - react-native-passkey (from `../../../node_modules/react-native-passkey`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../../../node_modules/react-native-splash-screen`)
+  - react-native-worklets-core (from `../../../node_modules/react-native-worklets-core`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../../../node_modules/react-native/Libraries/NativeAnimation`)
@@ -462,9 +461,6 @@ DEPENDENCIES:
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
-  - vision-camera-plugin-barcode-detection (from `../../../node_modules/vision-camera-plugin-barcode-detection`)
-  - vision-camera-plugin-document (from `../../../node_modules/vision-camera-plugin-document`)
-  - vision-camera-plugin-face-detection (from `../../../node_modules/vision-camera-plugin-face-detection`)
   - VisionCamera (from `../../../node_modules/react-native-vision-camera`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
@@ -522,6 +518,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../../../node_modules/react-native-splash-screen"
+  react-native-worklets-core:
+    :path: "../../../node_modules/react-native-worklets-core"
   React-perflogger:
     :path: "../../../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -562,12 +560,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
-  vision-camera-plugin-barcode-detection:
-    :path: "../../../node_modules/vision-camera-plugin-barcode-detection"
-  vision-camera-plugin-document:
-    :path: "../../../node_modules/vision-camera-plugin-document"
-  vision-camera-plugin-face-detection:
-    :path: "../../../node_modules/vision-camera-plugin-face-detection"
   VisionCamera:
     :path: "../../../node_modules/react-native-vision-camera"
   Yoga:
@@ -600,6 +592,7 @@ SPEC CHECKSUMS:
   react-native-passkey: 29ff814a83dfd4311478498e71a801dce68043ac
   react-native-safe-area-context: 39c2d8be3328df5d437ac1700f4f3a4f75716acc
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
+  react-native-worklets-core: 7ad416a8965086b98b07964f7f6932560a54a14c
   React-perflogger: 431a655960a02f01257d631b2a9bfbb02fd21064
   React-RCTActionSheet: 38c8d496d0faa63013d16f709e10a3acf6b5f100
   React-RCTAnimation: 6da4d599f3262ed8021433ddd96de45ac9e731b1
@@ -620,10 +613,7 @@ SPEC CHECKSUMS:
   RNReanimated: addc4900bf47882118d0a1b21747fa6705fa8cff
   RNScreens: 85d3880b52d34db7b8eeebe2f1a0e807c05e69fa
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
-  vision-camera-plugin-barcode-detection: cd822b10ed013c66e9dcc9d64c86ff87229cf03e
-  vision-camera-plugin-document: c1e9f75b9f952d8988222404382667464764580d
-  vision-camera-plugin-face-detection: c87118a81b54479c55c281086f2589127aa44188
-  VisionCamera: 523b49054bee9dace64189ab6631cb41e8b83fe0
+  VisionCamera: 5716d5c3f2e5cbcf0e58e30e91b09b2fbb1f12ef
   Yoga: 135109c9b8c5d1a8af3a58d21cd4c7aa7f3bf555
 
 PODFILE CHECKSUM: 3d8feaf910a4db56fb30d6b77d9c0b7f427f38f6

@@ -3,7 +3,7 @@ import { StatusBar } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Camera as VisionCamera,
-  useCameraDevices,
+  useCameraDevice,
 } from 'react-native-vision-camera';
 
 import type { ScanObject, ScanPicture, ScanType } from '../../scan.types';
@@ -42,8 +42,14 @@ const Camera = ({
   const [isFlashing, setIsFlashing] = useState(false);
   const camera = useRef<VisionCamera>(null);
   const [showFeedback, setShowFeedback] = useState(true);
-  const devices = useCameraDevices('wide-angle-camera');
-  const device = devices[type];
+  const device = useCameraDevice(
+    type,
+    type === 'back'
+      ? {
+          physicalDevices: ['wide-angle-camera', 'telephoto-camera'],
+        }
+      : undefined,
+  );
 
   useEffect(() => {
     if (object.isDetected) {

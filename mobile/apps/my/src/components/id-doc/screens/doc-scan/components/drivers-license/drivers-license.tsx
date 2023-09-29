@@ -1,11 +1,10 @@
 import { UploadDocumentSide } from '@onefootprint/types';
 import React, { useContext, useState } from 'react';
-import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor } from 'react-native-vision-camera';
-import { detectBarcode } from 'vision-camera-plugin-barcode-detection';
-import { detectDocument } from 'vision-camera-plugin-document';
 
 import useTranslation from '@/hooks/use-translation';
+import { detectBarcodes, detectDocument } from '@/utils/vision-camera';
 
 import Frame from '../default-frame';
 import Instructions from '../default-instructions';
@@ -31,32 +30,29 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
   });
   const requiresCode =
     side === UploadDocumentSide.Back && country.value === 'US';
+  const setObjectJs = Worklets.createRunInJsFn(setObject);
+  const frameProcessor = useFrameProcessor(frame => {
+    'worklet';
 
-  const frameProcessor = useFrameProcessor(
-    frame => {
-      'worklet';
+    const documentResult = detectDocument(frame);
+    const barcodeResult = requiresCode
+      ? detectBarcodes(frame)
+      : DEFAULT_BARCODE_RESULT;
 
-      const documentResult = detectDocument(frame, {});
-      const barcodeResult = requiresCode
-        ? detectBarcode(frame, {})
-        : DEFAULT_BARCODE_RESULT;
+    const hasBarcode = barcodeResult.barcodes.length > 0;
+    const isDetected =
+      documentResult.isDocument && (requiresCode ? hasBarcode : true);
 
-      const hasBarcode = barcodeResult.barcodes.length > 0;
-      const isDetected =
-        documentResult.isDocument && (requiresCode ? hasBarcode : true);
-      runOnJS(setObject)({
-        isDetected,
-        feedback: isDetected
-          ? 'Hold still...'
-          : 'Position the document in view',
-        data: {
-          barcodes: barcodeResult.barcodes,
-        },
-      });
-      detector.value = isDetected;
-    },
-    [detector],
-  );
+    setObjectJs({
+      isDetected,
+      feedback: isDetected ? 'Hold still...' : 'Position the document in view',
+      data: {
+        barcodes: barcodeResult.barcodes,
+      },
+    });
+
+    detector.value = isDetected;
+  }, []);
 
   return (
     <Instructions

@@ -14609,10 +14609,12 @@ react-native-swipe-gestures@^1.0.5:
   resolved "https://registry.yarnpkg.com/react-native-swipe-gestures/-/react-native-swipe-gestures-1.0.5.tgz#a172cb0f3e7478ccd681fd36b8bfbcdd098bde7c"
   integrity sha512-Ns7Bn9H/Tyw278+5SQx9oAblDZ7JixyzeOczcBK8dipQk2pD7Djkcfnf1nB/8RErAmMLL9iXgW0QHqiII8AhKw==
 
-react-native-vision-camera@^2.15.4:
-  version "2.15.6"
-  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-2.15.6.tgz#50fe9b47117a257f2c8bf7c33994fdadb897d091"
-  integrity sha512-TEdriQ2SQAhF7byw7iDaOh8cJm/IECOUofBhcdswtAK9LSqCkVEIhX3pna2L3Obt6evc8zaFnYCVqhvC3UtKRg==
+react-native-vision-camera@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-3.1.0.tgz#c98d1c87580fa17f6dab9e03de1394bc9ba9e473"
+  integrity sha512-Aq7xmqZxw7JXxB49bthhSVuy9SxwOMxageOmFfw6cbF5aSAAFuDx7FwuI5eqeOelz+5VYnge2ehVu4Al9Pjc6A==
+  dependencies:
+    string-hash-64 "^1.0.3"
 
 react-native-web@^0.18.10:
   version "0.18.12"
@@ -14626,6 +14628,11 @@ react-native-web@^0.18.10:
     normalize-css-color "^1.0.2"
     postcss-value-parser "^4.2.0"
     styleq "^0.1.2"
+
+react-native-worklets-core@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-worklets-core/-/react-native-worklets-core-0.2.0.tgz#6dae14c40fdaf709d5d54851cc24d5deaecfd4a1"
+  integrity sha512-gxpfl3KnoRmDtBBVs08K7Ru3xaOrBTGXKQtcjwDzgIcaiNhPfKiJdUz1AIa3SX+M2I/f/7fgWK2W9OFYae/AzA==
 
 react-native@0.71.11, react-native@0.71.13, react-native@^0.71.10, react-native@^0.71.11, react-native@^0.71.7:
   version "0.71.13"
@@ -17328,21 +17335,6 @@ vfile@^4.0.0:
     is-buffer "^2.0.0"
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
-
-vision-camera-plugin-barcode-detection@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/vision-camera-plugin-barcode-detection/-/vision-camera-plugin-barcode-detection-1.0.0.tgz#dfd1181df183eff08fe8ed4412d679db25bf80dd"
-  integrity sha512-n/HHYKXQy+9g6hwlhimRZMIppH6mwotLd68zwGpotTc/6TGcM9w9wlXjZsoZIRXDECw7Ssbv8QlcOOhRcA130A==
-
-vision-camera-plugin-document@0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/vision-camera-plugin-document/-/vision-camera-plugin-document-0.8.0.tgz#7bff3229b5c25f31ca25c3146cf8972b59bdfb1b"
-  integrity sha512-Dx6bXORNX+jeP/OZsYZLoA3Dk+dwapEzPJwhTjRwAumAouY9PGNG5fomTROkZmdQXghPYfw39C5lr+u49oY1eA==
-
-vision-camera-plugin-face-detection@0.10.1:
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/vision-camera-plugin-face-detection/-/vision-camera-plugin-face-detection-0.10.1.tgz#fc83ea478950cad70c2a9cda27ae8f6cbd5f26dc"
-  integrity sha512-KbPT9DNma3Qp75mIyeXH6fxAlA6CQba12PFlxGh3IMY275LEtsPCajOGNEpNE/2WmKuH8ozXdAMzdC1a7+lAnw==
 
 vlq@^1.0.0:
   version "1.0.1"

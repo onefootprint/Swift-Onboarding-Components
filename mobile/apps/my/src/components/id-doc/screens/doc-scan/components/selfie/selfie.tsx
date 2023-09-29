@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Dimensions } from 'react-native';
-import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor } from 'react-native-vision-camera';
-import { detectFace } from 'vision-camera-plugin-face-detection';
 
 import useTranslation from '@/hooks/use-translation';
+import { detectFace } from '@/utils/vision-camera';
 
 import Camera from '../scan';
 import type { ScanObject } from '../scan/scan.types';
@@ -20,7 +20,7 @@ const Selfie = () => {
     feedback: '',
     data: {},
   });
-
+  const setObjectJs = Worklets.createRunInJsFn(setObject);
   const frameProcessor = useFrameProcessor(
     frame => {
       'worklet';
@@ -34,7 +34,7 @@ const Selfie = () => {
         result.isStable
       ) {
         detector.value = true;
-        runOnJS(setObject)({
+        setObjectJs({
           isDetected: true,
           feedback: 'Hold still..',
           data: {},
@@ -43,7 +43,7 @@ const Selfie = () => {
         detector.value = false;
 
         if (!result.hasFace) {
-          runOnJS(setObject)({
+          setObjectJs({
             isDetected: false,
             feedback: 'Position face, stay steady',
             data: {},
@@ -51,7 +51,7 @@ const Selfie = () => {
           return;
         }
         if (!result.isFaceInCenter) {
-          runOnJS(setObject)({
+          setObjectJs({
             isDetected: false,
             feedback: 'Face is outside the frame outline',
             data: {},
@@ -59,7 +59,7 @@ const Selfie = () => {
           return;
         }
         if (!result.isFaceStraight) {
-          runOnJS(setObject)({
+          setObjectJs({
             isDetected: false,
             feedback: 'Face is tilted or looking other way',
             data: {},
