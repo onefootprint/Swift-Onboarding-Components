@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.4.0
+
+### Minor Changes
+
+- 775935375: Add support for bootstrapping middle name data
+
 ## 3.3.0
 
 ### Minor Changes
