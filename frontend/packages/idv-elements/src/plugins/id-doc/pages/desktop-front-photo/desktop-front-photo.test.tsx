@@ -11,6 +11,7 @@ import {
   initialContextIdCard,
   initialContextPassport,
   initialContextVisa,
+  initialContextVoterId,
   initialContextWorkPermit,
 } from './desktop-front-photo.test.config';
 
@@ -81,6 +82,12 @@ describe('<DesktopFrontPhoto />', () => {
     it('ID card', () => {
       renderDesktopFrontPhoto(initialContextIdCard);
       const title = screen.getByText('ID card · Front side');
+      expect(title).toBeInTheDocument();
+    });
+
+    it('Voter id', () => {
+      renderDesktopFrontPhoto(initialContextVoterId);
+      const title = screen.getByText('Voter identification · Front side');
       expect(title).toBeInTheDocument();
     });
   });

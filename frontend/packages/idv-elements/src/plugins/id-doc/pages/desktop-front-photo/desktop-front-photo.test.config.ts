@@ -26,6 +26,7 @@ export const initialContextDL: MachineContext = {
       SupportedIdDocTypes.residenceDocument,
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
+      SupportedIdDocTypes.voterIdentification,
     ],
     supportedCountries: ['US', 'CA'],
     supportedCountryAndDocTypes: {
@@ -36,6 +37,7 @@ export const initialContextDL: MachineContext = {
         SupportedIdDocTypes.residenceDocument,
         SupportedIdDocTypes.visa,
         SupportedIdDocTypes.workPermit,
+        SupportedIdDocTypes.voterIdentification,
       ],
       ca: [
         SupportedIdDocTypes.driversLicense,
@@ -56,6 +58,7 @@ export const initialContextDL: MachineContext = {
       SupportedIdDocTypes.residenceDocument,
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
+      SupportedIdDocTypes.voterIdentification,
     ],
     CA: [
       SupportedIdDocTypes.driversLicense,
@@ -110,5 +113,13 @@ export const initialContextGreenCard: MachineContext = {
   idDoc: {
     country: 'US',
     type: SupportedIdDocTypes.residenceDocument,
+  },
+};
+
+export const initialContextVoterId: MachineContext = {
+  ...initialContextDL,
+  idDoc: {
+    country: 'US',
+    type: SupportedIdDocTypes.voterIdentification,
   },
 };

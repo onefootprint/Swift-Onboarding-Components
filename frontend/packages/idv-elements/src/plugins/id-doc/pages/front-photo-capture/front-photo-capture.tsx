@@ -17,6 +17,7 @@ const translationIndex: { [key in SupportedIdDocTypes]: string } = {
   [SupportedIdDocTypes.visa]: 'visa',
   [SupportedIdDocTypes.workPermit]: 'workPermit',
   [SupportedIdDocTypes.residenceDocument]: 'residenceDocument',
+  [SupportedIdDocTypes.voterIdentification]: 'voterIdentification',
 };
 
 const FrontPhotoCapture = () => {

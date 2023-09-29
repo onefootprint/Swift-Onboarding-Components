@@ -5,6 +5,7 @@ import {
   IcoIdCard24,
   IcoPassport24,
   IcoVisaPassport24,
+  IcoVoter24,
   IcoWork24,
 } from '@onefootprint/icons';
 import { SupportedIdDocTypes } from '@onefootprint/types';
@@ -62,6 +63,16 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
       description: t('form.type.residenceDocument.description'),
       IconComponent: IcoGreenCard24,
       value: SupportedIdDocTypes.residenceDocument,
+    };
+  }
+  if (
+    supportedDocumentTypes?.includes(SupportedIdDocTypes.voterIdentification)
+  ) {
+    optionsByDocType[SupportedIdDocTypes.voterIdentification] = {
+      title: t('form.type.voterIdentification.title'),
+      description: t('form.type.voterIdentification.description'),
+      IconComponent: IcoVoter24,
+      value: SupportedIdDocTypes.voterIdentification,
     };
   }
 

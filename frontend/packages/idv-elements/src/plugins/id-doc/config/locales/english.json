@@ -230,6 +230,10 @@
           "residenceDocument": {
             "title": "Residence card / Green card",
             "description": "Front & back"
+          },
+          "voterIdentification": {
+            "title": "Voter identification",
+            "description": "Front"
           }
         },
         "not-supported": "Sorry, we don't support IDs for your country yet.",
@@ -243,7 +247,8 @@
         "passport": "Passport · Photo page",
         "visa": "Visa · Photo page",
         "workPermit": "EAD card · Front side",
-        "residenceDocument": "Green card · Front side"
+        "residenceDocument": "Green card · Front side",
+        "voterIdentification": "Voter identification · Front side"
       }
     },
     "back-photo-capture": {
@@ -253,7 +258,8 @@
         "passport": "Passport · Photo page",
         "visa": "Visa · Photo page",
         "workPermit": "EAD card · Back side",
-        "residenceDocument": "Green card · Back side"
+        "residenceDocument": "Green card · Back side",
+        "voterIdentification": "Voter identification · Back side"
       }
     },
     "selfie-photo-prompt": {

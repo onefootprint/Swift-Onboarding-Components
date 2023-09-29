@@ -4,6 +4,7 @@ import {
   IcoHome16,
   IcoIdCard16,
   IcoPassport16,
+  IcoVoter16,
   IcoWriting16,
 } from '@onefootprint/icons';
 import type { IdDocUploadedEventData } from '@onefootprint/types';
@@ -18,6 +19,7 @@ const IconByIdDocType: Record<SupportedIdDocTypes, JSX.Element> = {
   [SupportedIdDocTypes.workPermit]: <IcoClipboard16 />,
   [SupportedIdDocTypes.residenceDocument]: <IcoHome16 />,
   [SupportedIdDocTypes.visa]: <IcoWriting16 />,
+  [SupportedIdDocTypes.voterIdentification]: <IcoVoter16 />,
 };
 
 type IdDocUploadedEventIconProps = {

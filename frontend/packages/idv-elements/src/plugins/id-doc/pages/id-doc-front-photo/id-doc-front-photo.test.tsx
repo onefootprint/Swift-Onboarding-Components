@@ -12,6 +12,7 @@ import {
   initialContextNoConsent,
   initialContextPassport,
   initialContextVisa,
+  initialContextVoterId,
   initialContextWorkPermit,
 } from './id-doc-front-photo.test.config';
 
@@ -94,6 +95,14 @@ describe('<IdDocFrontPhoto />', () => {
       renderFrontPhotoPrompt(initialContextIdCard);
       const title = screen.getByText(
         'Scan or upload the front side of your ID card (USA)',
+      );
+      expect(title).toBeInTheDocument();
+    });
+
+    it('Voter ID', () => {
+      renderFrontPhotoPrompt(initialContextVoterId);
+      const title = screen.getByText(
+        'Scan or upload the front side of your voter identification (USA)',
       );
       expect(title).toBeInTheDocument();
     });

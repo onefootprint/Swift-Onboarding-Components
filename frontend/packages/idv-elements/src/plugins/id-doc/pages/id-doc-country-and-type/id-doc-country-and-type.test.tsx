@@ -89,6 +89,9 @@ describe('<IdDocCountryAndType/>', () => {
 
       const workPermit = screen.getByText('Work permit / EAD card');
       expect(workPermit).toBeInTheDocument();
+
+      const voterId = screen.getByText('Voter identification');
+      expect(voterId).toBeInTheDocument();
     });
 
     it('US, some doc types', () => {
@@ -113,6 +116,9 @@ describe('<IdDocCountryAndType/>', () => {
 
       const workPermit = screen.queryAllByText('Work permit / EAD card');
       expect(workPermit).toHaveLength(0);
+
+      const voterId = screen.queryAllByText('Voter identification');
+      expect(voterId).toHaveLength(0);
     });
 
     it('Non US', () => {
