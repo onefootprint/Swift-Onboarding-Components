@@ -433,11 +433,11 @@ vendor_reason_code_enum! {
         InvalidPhoneNumber,
 
         #[ser = "idphone.match", description = "The phone number submitted matches the phone number for the consumer."]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(FootprintReasonCode::PhoneLocatedMatches)]
         PhoneNumberMatch,
 
         #[ser = "idphone.does.not.match", description = "The phone number submitted does not match the consumer's phone number."]
-        #[footprint_reason_code = Some(FootprintReasonCode::PhoneNumberDoesNotMatch)]
+        #[footprint_reason_code = Some(FootprintReasonCode::PhoneLocatedDoesNotMatch)]
         PhoneNumberDoesNotMatch,
 
         #[ser = "idphone.not.available", description = "The consumer's phone number is not available because it is unpublished, a mobile number, or is not on file."]

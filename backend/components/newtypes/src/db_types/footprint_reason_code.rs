@@ -511,10 +511,6 @@ footprint_reason_code_enum! {
 
         // ~~~~~~~~~~~~ Phone Number ~~~~~~~~~~~~
 
-        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
-        #[note = "Phone number does not match", severity = SignalSeverity::Medium,  description = "The phone number input does not match the located phone number."]
-        PhoneNumberDoesNotMatch,
-
         #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = None]
         #[note = "Phone number invalid", severity = SignalSeverity::Low,  description = "The phone number input was not a valid phone number."]
         PhoneNumberInputInvalid,
