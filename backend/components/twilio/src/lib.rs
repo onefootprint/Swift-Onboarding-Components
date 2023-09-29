@@ -139,7 +139,7 @@ impl Client {
         let message_uri = message.uri.clone();
         let retry_strategy = FixedInterval::from_millis(1000)
             .map(jitter)
-            .take(5000);
+            .take(5);
         Retry::spawn(retry_strategy, move || {
             self.check_status(message_uri.clone())
         })
