@@ -1,5 +1,5 @@
 use envconfig::Envconfig;
-use newtypes::{PhoneNumber, PiiString, SessionAuthToken};
+use newtypes::{PiiString, SessionAuthToken};
 use rand::Rng;
 
 #[derive(Envconfig, Clone)]
@@ -51,9 +51,6 @@ pub struct Config {
 
     #[envconfig(from = "TIME_S_BETWEEN_SMS_CHALLENGES", default = "8")]
     pub time_s_between_sms_challenges: i64,
-
-    #[envconfig(from = "INTEGRATION_TEST_PHONE_NUMBER", default = "+1 231 377 3668")]
-    pub integration_test_phone_number: PhoneNumber,
 
     #[envconfig(from = "TWILIO_API_KEY")]
     pub twilio_api_key: String,

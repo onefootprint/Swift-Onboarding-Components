@@ -36,13 +36,13 @@ async fn post(
     // When provided, identifies only sandbox users with the suffix
     sandbox_id: SandboxId,
 ) -> actix_web::Result<Json<ResponseData<CleanupResponse>>, ApiError> {
-    let (uv, is_allowlisted_real_vault) = match request.into_inner() {
+    let uv = match request.into_inner() {
         Request::PhoneNumber(phone_number) => {
-            let is_allowlisted_real_vault = ensure_phone_number_allowed(&state, &phone_number)?;
+            ensure_phone_number_allowed(&state, &phone_number)?;
 
             // Use e164 with suffix to compute fingerprint
             let id = VaultIdentifier::IdentifyId(IdentifyId::PhoneNumber(phone_number), sandbox_id.0);
-            (state.find_vault(id, None).await?, is_allowlisted_real_vault)
+            state.find_vault(id, None).await?
         }
         Request::Email(email) => {
             // only allow footprint emails to be cleanable
@@ -77,15 +77,13 @@ async fn post(
                         .into());
                     }
 
-                    (
-                        Some(uvw.vault),
-                        ensure_phone_number_allowed(&state, &PhoneNumber::parse(phone.0)?)?,
-                    )
+                    ensure_phone_number_allowed(&state, &PhoneNumber::parse(phone.0)?)?;
+                    Some(uvw.vault)
                 } else {
-                    (Some(uvw.vault), true)
+                    Some(uvw.vault)
                 }
             } else {
-                (None, true)
+                None
             }
         }
     };
@@ -104,7 +102,7 @@ async fn post(
         .db_transaction(move |conn| -> Result<usize, ApiError> {
             Vault::lock(conn, &user_vault_id)?;
 
-            if is_production && is_allowlisted_real_vault {
+            if is_production {
                 let impacted_tenants: Vec<Tenant> = Tenant::list_by_user_vault_id(conn, &user_vault_id)?;
 
                 let unallowed_affected_tenants: Vec<String> = impacted_tenants
@@ -131,16 +129,14 @@ async fn post(
 
 /// check that this phone number can be used to clean a vault
 fn ensure_phone_number_allowed(state: &State, phone_number: &PhoneNumber) -> ApiResult<bool> {
-    // Use e164 without suffix to see if cleanup is allowed for this phone number
-    let is_integration_test_phone_number =
-        phone_number.e164() == state.config.integration_test_phone_number.e164();
-    let is_allowlisted_real_vault = state
+    // Use e164 to see if cleanup is allowed for this phone number
+    let can_clean_up_number = state
         .feature_flag_client
         .flag(BoolFlag::CanCleanUpPhoneNumber(&phone_number.e164()));
 
-    if !(is_integration_test_phone_number || is_allowlisted_real_vault) {
+    if !can_clean_up_number {
         return Err(AssertionError("Cannot clean up provided number").into());
     }
 
-    Ok(is_allowlisted_real_vault)
+    Ok(can_clean_up_number)
 }
