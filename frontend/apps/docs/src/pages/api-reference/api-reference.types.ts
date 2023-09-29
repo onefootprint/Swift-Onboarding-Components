@@ -5,6 +5,7 @@ export type Content = {
       schema: ContentSchema;
     };
   };
+  required?: boolean;
 };
 
 export type PathProps = {

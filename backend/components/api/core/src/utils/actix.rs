@@ -3,6 +3,13 @@ use std::pin::Pin;
 use actix_web::{dev::Payload, web::Json, FromRequest, HttpRequest};
 use derive_more::{Deref, DerefMut};
 use futures_util::Future;
+use paperclip::{
+    actix::OperationModifier,
+    v2::{
+        models::{DefaultOperationRaw, Either, Parameter, ParameterIn},
+        schema::Apiv2Schema,
+    },
+};
 use serde::de::DeserializeOwned;
 
 #[derive(Debug, Deref, DerefMut)]
@@ -45,9 +52,9 @@ impl<T: DeserializeOwned + 'static> FromRequest for OptionalJson<T> {
     }
 }
 
-impl<T> paperclip::v2::schema::Apiv2Schema for OptionalJson<T>
+impl<T> Apiv2Schema for OptionalJson<T>
 where
-    T: paperclip::v2::schema::Apiv2Schema,
+    T: Apiv2Schema,
 {
     fn name() -> Option<String> {
         T::name()
@@ -79,4 +86,22 @@ where
     }
 }
 
-impl<T: paperclip::v2::schema::Apiv2Schema> paperclip::actix::OperationModifier for OptionalJson<T> {}
+impl<T: Apiv2Schema> OperationModifier for OptionalJson<T> {
+    fn update_parameter(op: &mut DefaultOperationRaw) {
+        // Mostly replicates <Json::<T> as OperationModifier>::update_parameter, but we override to
+        // set required = false since the body is optional
+        // <Json::<T> as OperationModifier>::update_parameter
+        op.parameters.push(Either::Right(Parameter {
+            description: Some(T::description().to_owned()),
+            in_: ParameterIn::Body,
+            name: "body".into(),
+            required: false,
+            schema: Some({
+                let mut def = Json::<T>::schema_with_ref();
+                def.retain_ref();
+                def
+            }),
+            ..Default::default()
+        }))
+    }
+}

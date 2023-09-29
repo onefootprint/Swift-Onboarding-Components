@@ -222,7 +222,8 @@
       "allowed-values": "Allowed values:",
       "required": "Required",
       "show-all": "Show all",
-      "show-less": "Show less"
+      "show-less": "Show less",
+      "optional": "Optional"
     },
     "404": {
       "title": "Oops! Page couldn't be found.",

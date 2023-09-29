@@ -15,6 +15,8 @@ type RequestBodyProps = {
 const RequestBody = ({ requestBody }: RequestBodyProps) => {
   const { t } = useTranslation('pages.api-reference');
   const schema = getSchemaFromComponent(requestBody);
+  // TODO we should show when the body is optional
+  // const isRequired = !!requestBody?.required;
 
   return schema ? (
     <Box>

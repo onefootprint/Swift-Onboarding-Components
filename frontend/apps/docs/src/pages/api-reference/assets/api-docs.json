@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "8ca6644e8f8b7456c17380f941889d2a79a06eba"
+        "version": "93703170f0c6186e71d0d133164157e5569ee2c3"
     },
     "servers": [
         {
@@ -29,6 +29,16 @@
                         "style": "simple"
                     }
                 ],
+                "requestBody": {
+                    "description": "Key-value map of data to add to the vault",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RawDataRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {},
                 "security": [
                     {
@@ -627,6 +637,16 @@
                         "style": "simple"
                     }
                 ],
+                "requestBody": {
+                    "description": "Key-value map of data to add to the vault",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RawDataRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {},
                 "security": [
                     {
