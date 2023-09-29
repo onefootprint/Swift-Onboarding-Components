@@ -85,7 +85,7 @@ const StyledDropdownContent = styled(RadixDropdown.Content)`
     border: 1px solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[2]};
     min-width: 200px;
-    padding: ${theme.spacing[3]} 0 ${theme.spacing[2]};
+    padding: ${theme.spacing[2]};
     z-index: ${theme.zIndex.dropdown};
   `}
 `;
@@ -99,6 +99,7 @@ const StyledDropdownItem = styled(RadixDropdown.Item)<{
     color: ${theme.color[variant === 'destructive' ? 'error' : 'primary']};
     padding: ${theme.spacing[2]} ${theme.spacing[5]};
     outline: none;
+    border-radius: calc(${theme.borderRadius.default} - ${theme.spacing[2]});
 
     @media (hover: hover) {
       :hover {

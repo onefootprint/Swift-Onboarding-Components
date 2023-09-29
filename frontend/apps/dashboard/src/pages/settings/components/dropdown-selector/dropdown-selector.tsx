@@ -98,6 +98,7 @@ const Content = styled(Select.Content)`
       overflow: hidden;
       width: 360px;
       z-index: ${theme.zIndex.dropdown};
+      padding: ${theme.spacing[2]};
     `;
   }}
 `;
@@ -113,6 +114,7 @@ export const Item = styled(Select.Item)`
       justify-content: space-between;
       outline: none;
       padding: ${theme.spacing[3]} ${theme.spacing[5]};
+      border-radius: calc(${theme.borderRadius.default} - ${theme.spacing[1]});
 
       &[data-highlighted] {
         background: ${dropdown.hover.bg};
