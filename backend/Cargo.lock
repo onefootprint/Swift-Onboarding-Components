@@ -789,6 +789,7 @@ dependencies = [
  "api_wire_types",
  "chrono",
  "db",
+ "deunicode",
  "either",
  "futures",
  "futures-util",

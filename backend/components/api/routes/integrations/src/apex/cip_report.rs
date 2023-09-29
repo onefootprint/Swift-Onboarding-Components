@@ -5,6 +5,7 @@ use api_core::{
 };
 use api_wire_types::{ApexCheckedKycData, ApexCipReportRequest, ApexCipSummaryResults, ApexSelfReportedData};
 
+use newtypes::PiiString;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use strum::IntoEnumIterator;
 
@@ -67,8 +68,8 @@ pub async fn post(
         user_id: cip.kyc.id,
         checked_data: ApexCheckedKycData {
             tax_id: vd.remove(&Id(Ssn9)),
-            customer_name: cip.kyc.applicant_name,
-            address: cip.kyc.address,
+            customer_name: to_ascii(cip.kyc.applicant_name),
+            address: to_ascii(cip.kyc.address),
             date_of_birth: cip.kyc.date_of_birth.clone(),
         },
         self_reported,
@@ -90,4 +91,8 @@ pub async fn post(
     };
 
     ResponseData::ok(summary).json()
+}
+
+fn to_ascii(p: PiiString) -> PiiString {
+    deunicode::deunicode(p.leak()).into()
 }
