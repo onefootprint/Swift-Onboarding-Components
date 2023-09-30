@@ -128,10 +128,7 @@ impl SmsClient {
             self._send_pinpoint(&message_body, &destination).await
         };
         if let Err(e) = res {
-            // TODO rm this hardcoded case for the integration testing phone number
-            if destination != PiiString::from("+14255376958") {
-                tracing::error!(prefer_twilio = prefer_twilio, e=%e, "Moving on to fallback SMS vendor");
-            }
+            tracing::error!(prefer_twilio = prefer_twilio, e=%e, "Moving on to fallback SMS vendor");
             // If there was an error, waterfall to the secondary vendor
             if prefer_twilio {
                 self._send_pinpoint(&message_body, &destination).await?;
@@ -187,9 +184,9 @@ impl SmsClient {
             crypto::random::gen_rand_n_digit_code(6)
         };
         let message_body = if let Some(tenant_name) = tenant_name {
-            PiiString::from(format!("Your {} verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", tenant_name, &code))
+            PiiString::from(format!("Your verification code for {} is: {}. Don't share your code with anyone, we will never contact you to request this code.", tenant_name, &code))
         } else {
-            PiiString::from(format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
+            PiiString::from(format!("Your verification code for Footprint is: {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
         };
 
         self.send_message_non_blocking(state, message_body, destination, rate_limit::SMS_CHALLENGE)

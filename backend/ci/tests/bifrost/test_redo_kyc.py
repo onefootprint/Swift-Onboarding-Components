@@ -110,4 +110,4 @@ def test_redo_kyc(sandbox_tenant, twilio, with_document, doc_first_obc):
         users_docs = get(f"users/{fp_id}/documents", None, *tenant.db_auths)
         assert len(users_docs) == 2
         assert all(map(lambda x: x["document_type"] == "drivers_license", users_docs))
-        assert users_docs[1]["created_at"] >  users_docs[0]["created_at"]
+        assert users_docs[1]["created_at"] > users_docs[0]["created_at"]

@@ -24,15 +24,16 @@ TEST_URL = os.environ.get("TEST_URL") or "http://localhost:8000"
 WORKOS_ORG_ID = "org_01G39KR1V1E52JEZV6BYNG590J"
 url = lambda path: "{}/{}".format(TEST_URL, path)
 
-TWILIO_API_KEY = get_secret("TWILIO_API_KEY")
-TWILIO_ACCOUNT_SID = get_secret("TWILIO_ACCOUNT_SID")
-TWILIO_API_KEY_SECRET = get_secret("TWILIO_API_KEY_SECRET")
+# We use different twilio credentials in integration tests than on the API servers
+IT_TWILIO_ACCOUNT_SID = get_secret("IT_TWILIO_ACCOUNT_SID")
+IT_TWILIO_SECRET_AUTH_TOKEN = get_secret("IT_TWILIO_SECRET_AUTH_TOKEN")
+# This is a real phone number - we send real SMSes to this phone number.
+# This phone number exists on the twilio account defined by the credentials above
+LIVE_PHONE_NUMBER = get_secret("INTEGRATION_TEST_PHONE_NUMBER")
 
 # This phone number can only be used in sandbox. It will always yield a PIN code of 000000 in the identify flow and we never send SMS messages to it.
 # However, users created with this phone number can never be identified at another tenant.
 FIXTURE_PHONE_NUMBER = "+15555550100"
-# This is a real phone number - we send real SMSes to this phone number
-LIVE_PHONE_NUMBER = get_secret("INTEGRATION_TEST_PHONE_NUMBER")
 
 EMAIL = "footprint.user.dev3@gmail.com"
 CUSTODIAN_KEY = get_secret("CUSTODIAN_KEY") or "onefootprint"

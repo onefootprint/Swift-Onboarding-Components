@@ -4,9 +4,8 @@ import time
 import pytest
 from twilio.rest import Client
 from tests.constants import (
-    TWILIO_ACCOUNT_SID,
-    TWILIO_API_KEY,
-    TWILIO_API_KEY_SECRET,
+    IT_TWILIO_ACCOUNT_SID,
+    IT_TWILIO_SECRET_AUTH_TOKEN,
     TENANT_ID2,
     TENANT_ID1,
     LIVE_PHONE_NUMBER,
@@ -165,7 +164,8 @@ def investor_profile_ob_config(sandbox_tenant, must_collect_data, can_access_dat
 
 @pytest.fixture(scope="session")
 def twilio():
-    return Client(TWILIO_API_KEY, TWILIO_API_KEY_SECRET, TWILIO_ACCOUNT_SID)
+    # This twilio client is used to see what SMS messages were sent to LIVE_PHONE_NUMBER
+    return Client(IT_TWILIO_ACCOUNT_SID, IT_TWILIO_SECRET_AUTH_TOKEN)
 
 
 @pytest.fixture(scope="module")

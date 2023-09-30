@@ -360,8 +360,7 @@ def identify_verify(
         assert body["kind"] == expected_kind
         return FpAuth(body["auth_token"])
 
-    real_phone_number = phone_number.split("#")[0]
-    if real_phone_number == FIXTURE_PHONE_NUMBER:
+    if phone_number == FIXTURE_PHONE_NUMBER:
         # The code for the fixture number in sandbox is fixed
         try:
             return verify("000000")
@@ -377,7 +376,7 @@ def identify_verify(
         sent_after = datetime.now() - timedelta(minutes=2)
 
         messages = twilio.messages.list(
-            to=real_phone_number, limit=25, date_sent_after=sent_after
+            to=phone_number, limit=25, date_sent_after=sent_after
         )
         last_error = None
         for message in messages:
@@ -401,7 +400,8 @@ def identify_verify(
         if last_error:
             raise last_error
         else:
-            raise Exception("SMS 2fac code is not present")
+            bodies = ([i.body for i in messages],)
+            raise Exception(f"SMS 2fac code is not present. {phone_number}", bodies)
 
     return try_until_success(inner, 60)
 
