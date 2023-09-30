@@ -18,7 +18,7 @@ use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReview;
 use super::ob_configuration::ObConfiguration;
 use super::onboarding_decision::{NewDecisionArgs, OnboardingDecision};
-use super::scoped_vault::ScopedVault;
+use super::scoped_vault::{ScopedVault, ScopedVaultUpdate};
 use super::task::Task;
 use super::tenant::Tenant;
 use super::workflow_event::WorkflowEvent;
@@ -255,9 +255,13 @@ impl Workflow {
         let wf = Self::create(conn, args)?;
 
         // In locked transaction, update scoped vault status to Incomplete if it's null
-        if sv.status.is_none() {
-            ScopedVault::update_status(conn, &sv.id, OnboardingStatus::Incomplete)?;
-        }
+        let new_status = sv.status.is_none().then_some(OnboardingStatus::Incomplete);
+        let is_billable = authorized.then_some(true);
+        let update = ScopedVaultUpdate {
+            status: new_status,
+            is_billable,
+        };
+        ScopedVault::update(conn, &sv.id, update)?;
 
         Ok((wf, true))
     }
@@ -432,6 +436,13 @@ impl Workflow {
 
     #[tracing::instrument("Workflow::update", skip_all)]
     pub fn update(wf: Locked<Self>, conn: &mut TxnPgConn, update: WorkflowUpdate) -> DbResult<Self> {
+        if update.update.authorized_at.is_some() {
+            let update = ScopedVaultUpdate {
+                is_billable: Some(true),
+                ..Default::default()
+            };
+            ScopedVault::update(conn, &wf.scoped_vault_id, update)?;
+        }
         let new_status = update.update.status;
         // TODO short circuit if nothing changed? like status is the same?
         let result = diesel::update(workflow::table)
@@ -501,7 +512,11 @@ impl Workflow {
                 if !old_sv_status_has_decision || new_status.has_decision() {
                     // Only set to non-decision status if the current status is a non-decision status
                     // This has the effect of never letting the scoped vault status go from a decision to a non-decision status
-                    ScopedVault::update_status(conn, &sv.id, new_status)?;
+                    let update = ScopedVaultUpdate {
+                        status: Some(new_status),
+                        ..Default::default()
+                    };
+                    ScopedVault::update(conn, &sv.id, update)?;
 
                     // Only fire a OnboardingStatusChanged webhook if the scoped vault staus changes
                     let webhook_event =

@@ -12,7 +12,7 @@ use super::workflow::Workflow;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::scoped_vault;
+use db_schema::schema::scoped_vault::{self};
 use diesel::dsl::{count_distinct, not};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -21,12 +21,11 @@ use newtypes::{
     DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus, ScopedVaultId, SessionId,
     TenantId, VaultCreatedInfo, VaultId, WorkflowId,
 };
-use serde::{Deserialize, Serialize};
 
 /// Creates a unique identifier specific to each onboarding configuration.
 /// This allows one user to onboard onto multiple onboarding configurations at the same tenant
 /// while keeping information for each onboarding separate.
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = scoped_vault)]
 pub struct ScopedVault {
     pub id: ScopedVaultId,
@@ -44,9 +43,10 @@ pub struct ScopedVault {
     /// requests in the same session have the same ID. This is useful to search logs for this
     /// scoped vault
     pub session_id: Option<SessionId>,
+    pub is_billable: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = scoped_vault)]
 struct NewScopedVault {
     id: ScopedVaultId,
@@ -56,6 +56,14 @@ struct NewScopedVault {
     start_timestamp: DateTime<Utc>,
     is_live: bool,
     session_id: Option<SessionId>,
+    is_billable: bool,
+}
+
+#[derive(Debug, Clone, Default, AsChangeset)]
+#[diesel(table_name = scoped_vault)]
+pub struct ScopedVaultUpdate {
+    pub status: Option<OnboardingStatus>,
+    pub is_billable: Option<bool>,
 }
 
 pub enum ScopedVaultIdentifier<'a> {
@@ -150,6 +158,9 @@ impl ScopedVault {
             tenant_id: ob_config.tenant_id,
             is_live: ob_config.is_live,
             session_id,
+            // All vaults created via bifrost start as non-billable. They are marked billable as
+            // soon as they have an authorized workflow
+            is_billable: false,
         };
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
@@ -182,6 +193,8 @@ impl ScopedVault {
                 is_live: uv.is_live,
                 vault_id: uv.id.clone(),
                 session_id: None,
+                // All vaults created via API are billable
+                is_billable: true,
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)
@@ -299,13 +312,16 @@ impl ScopedVault {
         Ok(result)
     }
 
-    #[tracing::instrument("ScopedVault::update_status", skip_all)]
-    pub fn update_status(conn: &mut PgConn, id: &ScopedVaultId, status: OnboardingStatus) -> DbResult<Self> {
-        let result = diesel::update(scoped_vault::table)
+    #[tracing::instrument("ScopedVault::update", skip_all)]
+    pub fn update(conn: &mut PgConn, id: &ScopedVaultId, update: ScopedVaultUpdate) -> DbResult<()> {
+        if update.is_billable.is_none() && update.status.is_none() {
+            return Ok(());
+        }
+        diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(id))
-            .set(scoped_vault::status.eq(status))
-            .get_result(conn)?;
-        Ok(result)
+            .set(update)
+            .execute(conn)?;
+        Ok(())
     }
 }
 

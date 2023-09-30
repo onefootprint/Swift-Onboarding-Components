@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault ADD COLUMN is_billable BOOLEAN NOT NULL DEFAULT false;
