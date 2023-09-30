@@ -1,4 +1,4 @@
-use crate::task::tests::*;
+use crate::task::tasks::watchlist_check::tests::*;
 
 use crate::task::TaskError;
 use crate::State;

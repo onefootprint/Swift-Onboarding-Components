@@ -16,13 +16,11 @@ use crate::{errors::ApiError, State};
 use self::tasks::{
     fire_webhook_task::FireWebhookTask, log_message_task::LogMessageTask,
     log_num_tenant_api_keys_task::LogNumTenantApiKeysTask,
-    run_incode_stuck_workflow_task::RunIncodeStuckWorkflowTask, watchlist_check_task::WatchlistCheckTask,
+    run_incode_stuck_workflow_task::RunIncodeStuckWorkflowTask,
+    watchlist_check::watchlist_check_task::WatchlistCheckTask,
 };
 
 mod tasks;
-#[allow(clippy::unwrap_used)]
-#[cfg(test)]
-mod tests;
 
 #[derive(Debug, Error)]
 pub enum TaskError {

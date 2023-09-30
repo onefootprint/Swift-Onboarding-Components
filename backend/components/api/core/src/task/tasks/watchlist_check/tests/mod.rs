@@ -1,5 +1,5 @@
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
-use crate::task::tasks::watchlist_check_task::WatchlistCheckTask;
+use crate::task::tasks::watchlist_check::watchlist_check_task::WatchlistCheckTask;
 use crate::task::ExecuteTask;
 use crate::task::TaskError;
 use crate::State;

@@ -1,17 +1,8 @@
-use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::decision::vendor::vendor_api::vendor_api_response::{
-    VendorAPIResponseIdentifiersMap, VendorAPIResponseMap,
-};
-use crate::decision::vendor::vendor_api::vendor_api_struct::IdologyPa;
+use crate::decision::vendor;
 use crate::decision::vendor::vendor_result::VendorResult;
-use crate::decision::vendor::vendor_trait::VendorAPIResponse;
-use crate::decision::vendor::{self, verification_result, VendorAPIError};
-use crate::errors::{ApiResult, AssertionError};
+use crate::errors::AssertionError;
+use crate::task::{ExecuteTask, TaskError};
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
-use crate::{
-    decision::{self},
-    task::{ExecuteTask, TaskError},
-};
 use crate::{task, ApiError, State};
 use async_trait::async_trait;
 use chrono::Utc;
@@ -19,22 +10,19 @@ use db::models::risk_signal::{NewRiskSignalInfo, RiskSignal};
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
-use db::models::vault::Vault;
-use db::models::verification_result::VerificationResult;
 use db::models::{
     decision_intent::DecisionIntent, task::Task, verification_request::VerificationRequest,
     watchlist_check::WatchlistCheck,
 };
 use db::{DbResult, TxnPgConn};
-use idv::idology::expectid::response::PaWatchlistHit;
-use idv::idology::pa::response::PaResponse;
-use idv::{idology::pa::IdologyPaAPIResponse, VendorResponse};
 use newtypes::{
-    DecisionIntentId, DecisionIntentKind, FireWebhookArgs, FootprintReasonCode, OnboardingStatus,
-    RiskSignalGroupKind, ScopedVaultId, TaskData, TaskId, TenantId, VendorAPI, WatchlistCheckArgs,
-    WatchlistCheckCompletedPayload, WatchlistCheckError, WatchlistCheckInfo, WatchlistCheckNotNeededReason,
-    WatchlistCheckStatus, WatchlistCheckStatusKind, WebhookEvent,
+    DecisionIntentKind, FireWebhookArgs, OnboardingStatus, RiskSignalGroupKind, ScopedVaultId, TaskData,
+    TaskId, VendorAPI, WatchlistCheckArgs, WatchlistCheckCompletedPayload, WatchlistCheckError,
+    WatchlistCheckInfo, WatchlistCheckNotNeededReason, WatchlistCheckStatus, WatchlistCheckStatusKind,
+    WebhookEvent,
 };
+
+use super::idology;
 
 pub(crate) struct WatchlistCheckTask {
     state: State,
@@ -147,14 +135,9 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             uvw.populated().as_slice(),
         );
         let watchlist_result = if has_sufficient_data_for_vendor {
-            let reason_codes = Self::complete_vendor_call_idology(
-                &self.state,
-                &sv.id,
-                &di_id,
-                &tenant.id,
-                existing_vres_map,
-            )
-            .await?;
+            let reason_codes =
+                idology::complete_vendor_call(&self.state, &sv.id, &di_id, &tenant.id, existing_vres_map)
+                    .await?;
             WatchlistVendorResult::Completed(reason_codes)
         } else {
             WatchlistVendorResult::InsufficientData
@@ -248,105 +231,5 @@ impl WatchlistCheckTask {
             None
         };
         WatchlistCheck::create(conn, sv_id.clone(), task_id.clone(), di_id, status)
-    }
-
-    async fn complete_vendor_call_idology(
-        state: &State,
-        sv_id: &ScopedVaultId,
-        di_id: &DecisionIntentId,
-        tenant_id: &TenantId,
-        existing_vendor_results: (VendorAPIResponseMap, VendorAPIResponseIdentifiersMap),
-    ) -> ApiResult<Vec<NewRiskSignalInfo>> {
-        let (res_map, ids_map) = existing_vendor_results;
-        let (reason_codes, vres_id) =
-            if let (Some(res), Some(ids)) = (res_map.get(&IdologyPa), ids_map.get(&IdologyPa)) {
-                // we already successfully completed a IdologyPa call for this watchlist task, so just return reason codes from it
-                (
-                    Self::parse_reason_codes(res.clone())?,
-                    ids.verification_result_id.clone(),
-                )
-            } else {
-                let (res, vres) = Self::make_vendor_call(state, sv_id, di_id, tenant_id).await?;
-                let pa_res = PaResponse::try_from(res.response)?;
-                (Self::parse_reason_codes(pa_res)?, vres.id)
-            };
-
-        Ok(reason_codes
-            .into_iter()
-            .map(|r| (r, VendorAPI::IdologyPa, vres_id.clone()))
-            .collect())
-    }
-
-    async fn make_vendor_call(
-        state: &State,
-        sv_id: &ScopedVaultId,
-        di_id: &DecisionIntentId,
-        tenant_id: &TenantId,
-    ) -> ApiResult<(VendorResponse, VerificationResult)> {
-        // TODO: consolidate this with make_idv_vendor_call_save_vreq_vres
-        let vendor_api = VendorAPI::IdologyPa;
-        let svid = sv_id.clone();
-        let diid = di_id.clone();
-        let vreq = state
-            .db_pool
-            .db_query(move |conn| VerificationRequest::create(conn, &svid, &diid, vendor_api))
-            .await??;
-        let idv_data = decision::vendor::build_request::build_idv_data_from_verification_request(
-            &state.db_pool,
-            &state.enclave_client,
-            vreq.clone(),
-        )
-        .await?;
-
-        let tvc = TenantVendorControl::new(
-            tenant_id.clone(),
-            &state.db_pool,
-            &state.config,
-            &state.enclave_client,
-        )
-        .await?;
-
-        let res: Result<IdologyPaAPIResponse, idv::idology::error::Error> = state
-            .vendor_clients
-            .idology_pa
-            .make_request(tvc.build_idology_pa_request(idv_data))
-            .await;
-
-        let res = res
-            .map(|r| {
-                let parsed_response = r.parsed_response();
-                let raw_response = r.raw_response();
-                VendorResponse {
-                    response: parsed_response,
-                    raw_response,
-                }
-            })
-            .map_err(|e| e.into())
-            .map_err(|e| VendorAPIError { vendor_api, error: e });
-
-        let svid = sv_id.clone();
-        let (res, vres) = state
-            .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
-                let uv = Vault::get(conn, &svid)?;
-                let vres = verification_result::save_vres(conn, &uv.public_key, &res, &vreq)?;
-                Ok((res, vres))
-            })
-            .await??;
-
-        Ok((res?, vres))
-    }
-
-    fn parse_reason_codes(res: PaResponse) -> ApiResult<Vec<FootprintReasonCode>> {
-        if let Some(restriction) = res.response.restriction {
-            Ok(PaWatchlistHit::to_footprint_reason_codes(
-                restriction.watchlists(),
-            ))
-        } else {
-            // TODO: we really should have .validate() on the raw response validate stuff like this and transform it into a struct without Option's
-            Err(ApiError::from(idv::Error::from(
-                idv::idology::error::Error::MissingRestrictionField,
-            )))
-        }
     }
 }
