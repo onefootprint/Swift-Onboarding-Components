@@ -128,7 +128,10 @@ impl SmsClient {
             self._send_pinpoint(&message_body, &destination).await
         };
         if let Err(e) = res {
-            tracing::error!(prefer_twilio = prefer_twilio, e=%e, "Moving on to fallback SMS vendor");
+            // TODO rm this hardcoded case for the integration testing phone number
+            if destination != PiiString::from("+14255376958") {
+                tracing::error!(prefer_twilio = prefer_twilio, e=%e, "Moving on to fallback SMS vendor");
+            }
             // If there was an error, waterfall to the secondary vendor
             if prefer_twilio {
                 self._send_pinpoint(&message_body, &destination).await?;
