@@ -13,7 +13,7 @@ use newtypes::{
     vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, IncodeSessionId,
     PiiString,
 };
-use newtypes::{IncodeVerificationSessionId, IncodeVerificationSessionKind};
+use newtypes::{IncodeVerificationSessionId, IncodeVerificationSessionKind, IncodeWatchlistResultRef};
 use reqwest::header;
 
 use tokio_retry::strategy::FixedInterval;
@@ -410,6 +410,28 @@ impl AuthenticatedIncodeClientAdapter {
         Ok(response)
     }
 
+    pub async fn updated_watchlist_result(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        watchlist_result_ref: &IncodeWatchlistResultRef,
+    ) -> Result<serde_json::Value, IncodeError> {
+        let url = self.client_adapter.api_url("omni/updated-watchlist-result")?;
+        let url = format!("{}?ref={}", url, watchlist_result_ref);
+        tracing::info!(url=?url, "updated_watchlist_result");
+
+        let res = footprint_http_client
+            .client
+            .get(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .send()
+            .await
+            .map_err(|e| IncodeError::SendError(e.to_string()))?
+            .json()
+            .await?;
+
+        Ok(res)
+    }
+
     /// Update authentication token by requesting a new one w/ the verification session id
     pub async fn update_authentication_token(
         &mut self,
@@ -468,7 +490,7 @@ mod tests {
                 ProcessIdResponse,
             },
             response::OnboardingStartResponse,
-            watchlist::response::WatchlistResultResponse,
+            watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
             IncodeAPIResult,
         },
         tests::fixtures::images::load_image_and_encode_as_b64,
@@ -676,7 +698,44 @@ mod tests {
         assert_eq!("success", parsed.status.unwrap());
         assert_eq!(
             "Bob Billy Boberto",
-            parsed.content.unwrap().data.unwrap().search_term.unwrap().leak()
+            parsed
+                .content
+                .as_ref()
+                .unwrap()
+                .data
+                .as_ref()
+                .unwrap()
+                .search_term
+                .as_ref()
+                .unwrap()
+                .leak()
+        );
+
+        // test updated-watchlist-result
+        let ref_ = parsed.content.unwrap().data.unwrap().ref_.unwrap();
+        let res = authenticated_client
+            .updated_watchlist_result(&fp_client, &ref_)
+            .await
+            .unwrap();
+
+        let parsed = IncodeAPIResult::<UpdatedWatchlistResultResponse>::try_from(res)
+            .unwrap()
+            .into_success()
+            .unwrap();
+        assert_eq!("success", parsed.status.as_ref().unwrap());
+        assert_eq!(
+            ref_,
+            parsed
+                .content
+                .as_ref()
+                .unwrap()
+                .data
+                .as_ref()
+                .unwrap()
+                .ref_
+                .as_ref()
+                .unwrap()
+                .clone()
         );
     }
 }

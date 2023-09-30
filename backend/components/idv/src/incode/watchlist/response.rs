@@ -1,7 +1,10 @@
-use chrono::{DateTime, Utc};
-use newtypes::{scrub_pii_value, IncodeFailureReason, PiiJsonValue, PiiString, ScrubbedPiiString};
-
 use crate::incode::{response::Error, APIResponseToIncodeError};
+use chrono::{DateTime, Utc};
+use derive_more::Deref;
+use newtypes::{
+    scrub_pii_value, IncodeFailureReason, IncodeWatchlistResultRef, PiiJsonValue, PiiString,
+    ScrubbedPiiString,
+};
 
 impl APIResponseToIncodeError for WatchlistResultResponse {
     fn to_error(&self) -> Option<Error> {
@@ -12,6 +15,19 @@ impl APIResponseToIncodeError for WatchlistResultResponse {
         None
     }
 }
+
+impl APIResponseToIncodeError for UpdatedWatchlistResultResponse {
+    fn to_error(&self) -> Option<Error> {
+        self.0.error.clone()
+    }
+
+    fn custom_failure_reasons(_error: Error) -> Option<Vec<IncodeFailureReason>> {
+        None
+    }
+}
+
+#[derive(Clone, serde::Deserialize, serde::Serialize, Deref)]
+pub struct UpdatedWatchlistResultResponse(pub WatchlistResultResponse);
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct WatchlistResultResponse {
@@ -31,7 +47,7 @@ pub struct Content {
 pub struct Data {
     pub id: Option<i32>,
     #[serde(rename = "ref")]
-    pub ref_: Option<ScrubbedPiiString>,
+    pub ref_: Option<IncodeWatchlistResultRef>,
     pub filters: Option<Filters>,
     pub hits: Option<Vec<Hit>>,
     pub searcher_id: Option<i32>,

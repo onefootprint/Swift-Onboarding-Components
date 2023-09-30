@@ -88,6 +88,7 @@ pub enum VendorAPI {
     IncodeFetchOCR,
     IncodeAddSelfie,
     IncodeWatchlistCheck,
+    IncodeUpdatedWatchlistResult,
     IncodeGetOnboardingStatus,
     IncodeProcessFace,
     StytchLookup,
@@ -120,6 +121,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IncodeFetchOCR => Self::Incode,
             VendorAPI::IncodeAddSelfie => Self::Incode,
             VendorAPI::IncodeWatchlistCheck => Self::Incode,
+            VendorAPI::IncodeUpdatedWatchlistResult => Self::Incode,
             VendorAPI::IncodeGetOnboardingStatus => Self::Incode,
             VendorAPI::IncodeProcessFace => Self::Incode,
             VendorAPI::StytchLookup => Self::Stytch,
@@ -158,6 +160,7 @@ impl VendorAPI {
             | VendorAPI::IncodeFetchOCR
             | VendorAPI::IncodeAddSelfie
             | VendorAPI::IncodeWatchlistCheck
+            | VendorAPI::IncodeUpdatedWatchlistResult
             | VendorAPI::IncodeGetOnboardingStatus
             | VendorAPI::IncodeProcessFace
             | VendorAPI::SocureIDPlus
@@ -179,6 +182,7 @@ impl VendorAPI {
             | VendorAPI::IncodeGetOnboardingStatus
             | VendorAPI::IncodeProcessFace => true,
             VendorAPI::IncodeWatchlistCheck
+            | VendorAPI::IncodeUpdatedWatchlistResult
             | VendorAPI::IncodeStartOnboarding
             | VendorAPI::IdologyScanVerifySubmission
             | VendorAPI::IdologyScanVerifyResults

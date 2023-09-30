@@ -403,7 +403,6 @@ mod tests {
     use super::FilterFunction as FF;
     use super::FilterFunctionParsingError::*;
     use super::*;
-    use strum::IntoEnumIterator;
     use test_case::test_case;
 
     #[test_case("to_ascii" => Ok(FF::ToAscii))]

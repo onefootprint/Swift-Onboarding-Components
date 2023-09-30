@@ -19,7 +19,7 @@ use idv::incode::doc::response::{
     GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
 };
 use idv::incode::response::OnboardingStartResponse;
-use idv::incode::watchlist::response::WatchlistResultResponse;
+use idv::incode::watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse};
 use idv::middesk::response::business::BusinessResponse;
 use idv::middesk::response::webhook::{
     MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse,
@@ -111,6 +111,9 @@ pub fn scrub_raw_error_vendor_response(
         VendorAPI::IncodeFetchOCR => scrub_response::<IncodeFetchOCR>(raw_response),
         VendorAPI::IncodeAddSelfie => scrub_response::<IncodeAddSelfie>(raw_response),
         VendorAPI::IncodeWatchlistCheck => scrub_response::<IncodeWatchlistCheck>(raw_response),
+        VendorAPI::IncodeUpdatedWatchlistResult => {
+            scrub_response::<IncodeUpdatedWatchlistResult>(raw_response)
+        }
         VendorAPI::IncodeGetOnboardingStatus => scrub_response::<IncodeGetOnboardingStatus>(raw_response),
         VendorAPI::IncodeProcessFace => scrub_response::<IncodeProcessFace>(raw_response),
         VendorAPI::StytchLookup => scrub_response::<StytchLookup>(raw_response),
@@ -166,6 +169,9 @@ fn build_parsed_vendor_response_map_entry(
         VendorAPI::IncodeFetchOCR => insert_map_entry(map, IncodeFetchOCR, raw_response)?,
         VendorAPI::IncodeAddSelfie => insert_map_entry(map, IncodeAddSelfie, raw_response)?,
         VendorAPI::IncodeWatchlistCheck => insert_map_entry(map, IncodeWatchlistCheck, raw_response)?,
+        VendorAPI::IncodeUpdatedWatchlistResult => {
+            insert_map_entry(map, IncodeUpdatedWatchlistResult, raw_response)?
+        }
         VendorAPI::IncodeGetOnboardingStatus => {
             insert_map_entry(map, IncodeGetOnboardingStatus, raw_response)?
         }
@@ -209,6 +215,9 @@ fn build_verification_identifier_map_entry(
         VendorAPI::IncodeFetchOCR => map.insert(IncodeFetchOCR, request_and_result),
         VendorAPI::IncodeAddSelfie => map.insert(IncodeAddSelfie, request_and_result),
         VendorAPI::IncodeWatchlistCheck => map.insert(IncodeWatchlistCheck, request_and_result),
+        VendorAPI::IncodeUpdatedWatchlistResult => {
+            map.insert(IncodeUpdatedWatchlistResult, request_and_result)
+        }
         VendorAPI::IncodeGetOnboardingStatus => map.insert(IncodeGetOnboardingStatus, request_and_result),
         VendorAPI::IncodeProcessFace => map.insert(IncodeProcessFace, request_and_result),
         VendorAPI::StytchLookup => map.insert(StytchLookup, request_and_result),
@@ -358,6 +367,9 @@ impl TypedMapKey<VendorAPIResponseMarker> for IncodeAddSelfie {
 impl TypedMapKey<VendorAPIResponseMarker> for IncodeWatchlistCheck {
     type Value = WatchlistResultResponse;
 }
+impl TypedMapKey<VendorAPIResponseMarker> for IncodeUpdatedWatchlistResult {
+    type Value = UpdatedWatchlistResultResponse;
+}
 impl TypedMapKey<VendorAPIResponseMarker> for IncodeGetOnboardingStatus {
     type Value = GetOnboardingStatusResponse;
 }
@@ -436,6 +448,9 @@ impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeAddSelfie {
     type Value = VerificationRequestAndResult;
 }
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeWatchlistCheck {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeUpdatedWatchlistResult {
     type Value = VerificationRequestAndResult;
 }
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IncodeGetOnboardingStatus {

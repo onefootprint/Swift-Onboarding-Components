@@ -11,7 +11,7 @@ use incode::doc::response::{
     GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
 };
 use incode::response::OnboardingStartResponse;
-use incode::watchlist::response::WatchlistResultResponse;
+use incode::watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse};
 use middesk::response::business::BusinessResponse;
 use middesk::response::webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse};
 
@@ -64,6 +64,7 @@ pub enum ParsedResponse {
     IncodeFetchOCR(FetchOCRResponse),
     IncodeAddSelfie(AddSelfieResponse),
     IncodeWatchlistCheck(WatchlistResultResponse),
+    IncodeUpdatedWatchlistResult(UpdatedWatchlistResultResponse),
     IncodeRawResponse(PiiJsonValue),
     IncodeGetOnboardingStatus(GetOnboardingStatusResponse),
     IncodeProcessFace(ProcessFaceResponse),
@@ -205,6 +206,14 @@ impl ParsedResponse {
         let parsed: WatchlistResultResponse = serde_json::value::from_value(raw_response)?;
         Ok(Self::IncodeWatchlistCheck(parsed))
     }
+
+    pub fn from_incode_updated_watchlist_result(
+        raw_response: serde_json::Value,
+    ) -> Result<Self, crate::Error> {
+        let parsed: UpdatedWatchlistResultResponse = serde_json::value::from_value(raw_response)?;
+        Ok(Self::IncodeUpdatedWatchlistResult(parsed))
+    }
+
     // We should never need this
     pub fn from_incode_get_onboarding_status(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
         let parsed: GetOnboardingStatusResponse = serde_json::value::from_value(raw_response)?;
@@ -284,6 +293,7 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::IncodeFetchOCR(_) => VendorAPI::IncodeFetchOCR,
             ParsedResponse::IncodeAddSelfie(_) => VendorAPI::IncodeAddSelfie,
             ParsedResponse::IncodeWatchlistCheck(_) => VendorAPI::IncodeWatchlistCheck,
+            ParsedResponse::IncodeUpdatedWatchlistResult(_) => VendorAPI::IncodeUpdatedWatchlistResult,
             ParsedResponse::IncodeRawResponse(_) => VendorAPI::IncodeGetOnboardingStatus, // TODO: i think we decided we'd remove IncodeRawResponse
             ParsedResponse::IncodeGetOnboardingStatus(_) => VendorAPI::IncodeGetOnboardingStatus,
             ParsedResponse::IncodeProcessFace(_) => VendorAPI::IncodeProcessFace,

@@ -96,6 +96,7 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::IncodeWatchlistCheck => {
             incode_watchlist_requirements.are_satisfied(present_data_lifetime_kinds)
         }
+        VendorAPI::IncodeUpdatedWatchlistResult => false,
         VendorAPI::IncodeGetOnboardingStatus => false,
         VendorAPI::IncodeProcessFace => false,
         VendorAPI::StytchLookup => false,
@@ -136,6 +137,7 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         VendorAPI::IncodeFetchOCR => false,
         VendorAPI::IncodeAddSelfie => false,
         VendorAPI::IncodeWatchlistCheck => false,
+        VendorAPI::IncodeUpdatedWatchlistResult => false,
         VendorAPI::IncodeGetOnboardingStatus => false,
         VendorAPI::IncodeProcessFace => false,
         VendorAPI::StytchLookup => false,

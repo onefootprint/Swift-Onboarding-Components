@@ -223,3 +223,8 @@ define_newtype_id!(
     String,
     "Client-generated identifier sent for all HTTP requests in the same session"
 );
+define_newtype_id!(
+    IncodeWatchlistResultRef,
+    String,
+    "`ref` from an Incode watchlist-result reponse"
+);

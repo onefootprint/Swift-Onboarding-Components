@@ -19,7 +19,10 @@ use idv::{
         },
         error::Error as IncodeError,
         response::OnboardingStartResponse,
-        watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
+        watchlist::{
+            response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
+            IncodeUpdatedWatchlistResultRequest, IncodeWatchlistCheckRequest,
+        },
         IncodeAPIResult, IncodeResponse, IncodeStartOnboardingRequest,
     },
     ParsedResponse,
@@ -371,59 +374,6 @@ impl VendorAPIResponse for IncodeResponse<AddSelfieResponse> {
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultResponse>, IncodeError>
-    for FootprintVendorHttpClient
-{
-    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeWatchlistCheckRequest"))]
-    async fn make_request(
-        &self,
-        request: IncodeWatchlistCheckRequest,
-    ) -> Result<IncodeResponse<WatchlistResultResponse>, IncodeError> {
-        // derive is_prod from creds
-        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
-        let authenticated_client =
-            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
-
-        let dob_year = request
-            .idv_data
-            .dob()?
-            .map(|d| PiiString::new(d.year().to_string()));
-
-        let raw_response = authenticated_client
-            .watchlist_result(
-                self,
-                request.idv_data.first_name,
-                request.idv_data.middle_name,
-                request.idv_data.last_name,
-                dob_year,
-            )
-            .await?;
-
-        let result = IncodeResponse::<WatchlistResultResponse> {
-            result: IncodeAPIResult::<WatchlistResultResponse>::try_from(raw_response.clone())?,
-            raw_response: raw_response.into(),
-        };
-
-        Ok(result)
-    }
-}
-
-impl VendorAPIResponse for IncodeResponse<WatchlistResultResponse> {
-    fn vendor_api(&self) -> newtypes::VendorAPI {
-        VendorAPI::IncodeWatchlistCheck
-    }
-
-    fn raw_response(&self) -> newtypes::PiiJsonValue {
-        self.raw_response.clone()
-    }
-
-    // we don't use incode in this way
-    fn parsed_response(&self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
-    }
-}
-
-#[async_trait]
 impl VendorAPICall<IncodeProcessFaceRequest, IncodeResponse<ProcessFaceResponse>, IncodeError>
     for FootprintVendorHttpClient
 {
@@ -506,5 +456,112 @@ impl VendorAPIResponse for IncodeResponse<GetOnboardingStatusResponse> {
     // we don't use incode in this way
     fn parsed_response(&self) -> ParsedResponse {
         ParsedResponse::IncodeRawResponse(self.raw_response.clone())
+    }
+}
+
+//////////////////////
+/// Watchlist
+/// /////////////////
+
+#[async_trait]
+impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultResponse>, IncodeError>
+    for FootprintVendorHttpClient
+{
+    #[tracing::instrument("make_request", skip_all, fields(request = "IncodeWatchlistCheckRequest"))]
+    async fn make_request(
+        &self,
+        request: IncodeWatchlistCheckRequest,
+    ) -> Result<IncodeResponse<WatchlistResultResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let dob_year = request
+            .idv_data
+            .dob()?
+            .map(|d| PiiString::new(d.year().to_string()));
+
+        let raw_response = authenticated_client
+            .watchlist_result(
+                self,
+                request.idv_data.first_name,
+                request.idv_data.middle_name,
+                request.idv_data.last_name,
+                dob_year,
+            )
+            .await?;
+
+        let result = IncodeResponse::<WatchlistResultResponse> {
+            result: IncodeAPIResult::<WatchlistResultResponse>::try_from(raw_response.clone())?,
+            raw_response: raw_response.into(),
+        };
+
+        Ok(result)
+    }
+}
+
+impl VendorAPIResponse for IncodeResponse<WatchlistResultResponse> {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
+        VendorAPI::IncodeWatchlistCheck
+    }
+
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
+    }
+
+    // we don't use incode in this way
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone())
+    }
+}
+
+#[async_trait]
+impl
+    VendorAPICall<
+        IncodeUpdatedWatchlistResultRequest,
+        IncodeResponse<UpdatedWatchlistResultResponse>,
+        IncodeError,
+    > for FootprintVendorHttpClient
+{
+    #[tracing::instrument(
+        "make_request",
+        skip_all,
+        fields(request = "IncodeUpdatedWatchlistResultRequest")
+    )]
+    async fn make_request(
+        &self,
+        request: IncodeUpdatedWatchlistResultRequest,
+    ) -> Result<IncodeResponse<UpdatedWatchlistResultResponse>, IncodeError> {
+        // derive is_prod from creds
+        let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
+        let authenticated_client =
+            AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
+
+        let raw_response = authenticated_client
+            .updated_watchlist_result(self, &request.ref_)
+            .await?;
+
+        let result = IncodeResponse::<UpdatedWatchlistResultResponse> {
+            result: IncodeAPIResult::<UpdatedWatchlistResultResponse>::try_from(raw_response.clone())?,
+            raw_response: raw_response.into(),
+        };
+
+        Ok(result)
+    }
+}
+
+impl VendorAPIResponse for IncodeResponse<UpdatedWatchlistResultResponse> {
+    fn vendor_api(&self) -> newtypes::VendorAPI {
+        VendorAPI::IncodeUpdatedWatchlistResult
+    }
+
+    fn raw_response(&self) -> newtypes::PiiJsonValue {
+        self.raw_response.clone()
+    }
+
+    // we don't use incode in this way
+    fn parsed_response(&self) -> ParsedResponse {
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone()) // TODO: why do have a IncodeRawResponse again ??
     }
 }

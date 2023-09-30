@@ -213,6 +213,9 @@ fn deserialize_from_vendor_api(
         VendorAPI::IncodeFetchOCR => ParsedResponse::from_incode_fetch_ocr(raw_response)?,
         VendorAPI::IncodeAddSelfie => ParsedResponse::from_incode_add_selfie(raw_response)?,
         VendorAPI::IncodeWatchlistCheck => ParsedResponse::from_incode_watchlist_check(raw_response)?,
+        VendorAPI::IncodeUpdatedWatchlistResult => {
+            ParsedResponse::from_incode_updated_watchlist_result(raw_response)?
+        }
         VendorAPI::IncodeGetOnboardingStatus => {
             ParsedResponse::from_incode_get_onboarding_status(raw_response)?
         }
