@@ -97,7 +97,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             id={id}
             onChange={handleChange}
             options={mask}
-            placeholder={placeholder}
+            placeholder={!disabled ? placeholder : undefined}
             required={required}
             tabIndex={0}
             // We use Cleave.js for mask, and cleave uses htmlRef instead of ref
