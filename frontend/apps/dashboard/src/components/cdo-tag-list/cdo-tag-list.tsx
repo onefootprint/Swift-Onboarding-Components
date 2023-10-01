@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import type { CollectedDataOption } from '@onefootprint/types';
 import {
   CollectedDocumentDataOption,
@@ -9,7 +8,7 @@ import {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Tag, Typography } from '@onefootprint/ui';
-import React from 'react';
+import React, { Fragment } from 'react';
 
 import getCdos from './utils/get-cdos';
 
@@ -74,31 +73,24 @@ const CdoTagList = ({
     );
 
   return (
-    <Container data-testid={testID}>
+    <>
       {label && (
         <Typography
           variant="label-4"
           color="secondary"
           sx={{ marginRight: 2, alignItems: 'center', display: 'flex' }}
+          data-testid={testID}
         >
           {label}
         </Typography>
       )}
       {tagLabels.map((tag: string) => (
-        <Tag role="listitem" aria-label={tag} key={tag}>
+        <Tag role="listitem" aria-label={tag} key={tag} data-testid={testID}>
           {tag}
         </Tag>
       ))}
-    </Container>
+    </>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-wrap: wrap;
-    gap: ${theme.spacing[2]};
-  `}
-`;
 
 export default CdoTagList;

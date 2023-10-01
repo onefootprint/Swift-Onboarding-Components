@@ -2,7 +2,7 @@ import type { Color } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import { IcoCheck16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles } from '@onefootprint/ui';
+import { Stack } from '@onefootprint/ui';
 import React from 'react';
 
 type EventBodyEntryProps = {
@@ -20,21 +20,15 @@ const EventBodyEntry = ({
   iconColor = 'neutral',
   lineHeight = 'large',
 }: EventBodyEntryProps) => (
-  <Container data-testid={testID}>
+  <Stack align="flex-start" justify="flex-start">
     <IconBounds data-height={lineHeight}>
       <IconComponent color={iconColor} />
     </IconBounds>
-    <Content data-height={lineHeight}>{content}</Content>
-  </Container>
+    <Content data-testid={testID} data-height={lineHeight}>
+      {content}
+    </Content>
+  </Stack>
 );
-
-const Container = styled.div`
-  ${createFontStyles('body-3')};
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-`;
 
 const IconBounds = styled.div`
   ${({ theme }) => css`

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { Box, Drawer, LinkButton, Typography } from '@onefootprint/ui';
+import { Drawer, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import ValidationItems from './components/validation-items';
@@ -13,16 +13,14 @@ const FieldValidationDetails = () => {
 
   return (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          alignContent: 'center',
-          alignItems: 'flex-end',
-          justifyContent: 'center',
-          gap: 2,
-        }}
-      >
-        <Typography variant="label-3">·</Typography>
+      <Stack align="center" justify="center" gap={2}>
+        <Stack
+          align="center"
+          justify="center"
+          sx={{ marginLeft: 2, marginRight: 2 }}
+        >
+          ·
+        </Stack>
         <LinkButton
           onClick={() => {
             setDrawerOpen(true);
@@ -31,7 +29,7 @@ const FieldValidationDetails = () => {
         >
           {t('view-details')}
         </LinkButton>
-      </Box>
+      </Stack>
       <Drawer
         open={isDrawerOpen}
         title={t('drawer.title')}
