@@ -45,7 +45,7 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
 
     setObjectJs({
       isDetected,
-      feedback: isDetected ? 'Hold still...' : 'Position the document in view',
+      feedback: isDetected ? '' : 'Position the document in view',
       data: {
         barcodes: barcodeResult.barcodes,
       },

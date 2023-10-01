@@ -1,18 +1,19 @@
 import styled, { css } from '@onefootprint/styled';
-import { StatusBar } from '@onefootprint/ui';
+import { StatusBar, Typography } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Camera as VisionCamera,
   useCameraDevice,
 } from 'react-native-vision-camera';
 
+import haptic from '@/utils/haptic';
+
 import type { ScanObject, ScanPicture, ScanType } from '../../scan.types';
 import CaptureButton from './components/capture-button';
 import Feedback from './components/feedback';
 import Flash from './components/flash';
 import Header from './components/header';
-
-let timerId: NodeJS.Timeout | null = null;
+import useCameraCountdown from './hooks/use-camera-countdown';
 
 type CameraProps = {
   children?: React.ReactNode;
@@ -25,8 +26,6 @@ type CameraProps = {
   title: string;
   type?: ScanType;
 };
-
-const AUTO_CAPTURE_DELAY = 900;
 
 const Camera = ({
   children,
@@ -50,33 +49,24 @@ const Camera = ({
         }
       : undefined,
   );
+  const cameraDetection = useCameraCountdown(object, () => {
+    takePhoto({ manual: false });
+  });
 
   useEffect(() => {
-    if (object.isDetected) {
-      timerId = setTimeout(() => {
-        takePhoto({ manual: false });
-      }, AUTO_CAPTURE_DELAY);
-      return () => clearTimeout(timerId);
-    } else {
-      resetAutoCapture();
-    }
-  }, [object.isDetected]);
-
-  const resetAutoCapture = () => {
-    if (timerId) {
-      clearTimeout(timerId);
-      timerId = null;
-    }
-  };
+    return () => cameraDetection.reset();
+  }, []);
 
   const takePhoto = async (meta: Record<string, boolean>) => {
-    if (!camera.current) return;
+    if (!camera.current) {
+      return;
+    }
+
     setIsFlashing(true);
     setShowFeedback(false);
     const newPhoto = await camera.current.takePhoto({
       qualityPrioritization: 'balanced',
     });
-    resetAutoCapture();
     onPhotoTaken({
       photo: newPhoto,
       meta: {
@@ -85,6 +75,11 @@ const Camera = ({
       },
     });
     setIsFlashing(false);
+  };
+
+  const handleTakePhotoManually = () => {
+    haptic.trigger('impactHeavy');
+    takePhoto({ manual: true });
   };
 
   return (
@@ -110,14 +105,28 @@ const Camera = ({
         {children}
         {isFlashing ? <Flash /> : null}
         <Buttons>
-          {showFeedback && object.feedback && (
-            <Feedback>{object.feedback}</Feedback>
+          {showFeedback && (
+            <>
+              {cameraDetection.countdown ? (
+                <Countdown>
+                  {cameraDetection.countdown === 5 ||
+                  cameraDetection.countdown === 4 ? (
+                    <Typography variant="label-4" color="quinary">
+                      Hold still...
+                    </Typography>
+                  ) : (
+                    <Typography variant="display-3" color="quinary">
+                      {cameraDetection.countdown}
+                    </Typography>
+                  )}
+                </Countdown>
+              ) : null}
+              {object.feedback && !cameraDetection.countdown && (
+                <Feedback>{object.feedback}</Feedback>
+              )}
+            </>
           )}
-          <CaptureButton
-            onPress={() => {
-              takePhoto({ manual: true });
-            }}
-          />
+          <CaptureButton onPress={handleTakePhotoManually} />
         </Buttons>
       </CameraContainer>
     </>
@@ -145,6 +154,14 @@ const Buttons = styled.View`
     gap: ${theme.spacing[7]};
     margin-bottom: ${theme.spacing[8]};
     position: absolute;
+  `}
+`;
+
+const Countdown = styled.View`
+  ${({ theme }) => css`
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[3]} ${theme.spacing[4]};
   `}
 `;
 

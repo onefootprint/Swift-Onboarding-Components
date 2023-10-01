@@ -11,6 +11,12 @@ import type { ScanObject } from '../scan/scan.types';
 import Frame from './components/frame';
 import Instructions from './components/instructions';
 
+const detected = {
+  isDetected: true,
+  feedback: '',
+  data: {},
+};
+
 const Selfie = () => {
   const { width, height } = Dimensions.get('window');
   const { t } = useTranslation('components.scan.selfie');
@@ -27,26 +33,21 @@ const Selfie = () => {
 
       const options = { width, height };
       const result = detectFace(frame, options);
-      if (
-        result.hasFace &&
-        result.isFaceInCenter &&
-        result.isFaceStraight &&
-        result.isStable
-      ) {
+      if (result.hasFace && result.isFaceInCenter && result.isFaceStraight) {
         detector.value = true;
-        setObjectJs({
-          isDetected: true,
-          feedback: 'Hold still..',
-          data: {},
-        });
+        setObjectJs(detected);
       } else {
         detector.value = false;
-
+        const data = {
+          hasFace: result.hasFace,
+          isFaceInCenter: result.hasFace,
+          isFaceStraight: result.isFaceInCenter,
+        };
         if (!result.hasFace) {
           setObjectJs({
             isDetected: false,
             feedback: 'Position face, stay steady',
-            data: {},
+            data,
           });
           return;
         }
@@ -54,7 +55,7 @@ const Selfie = () => {
           setObjectJs({
             isDetected: false,
             feedback: 'Face is outside the frame outline',
-            data: {},
+            data,
           });
           return;
         }
@@ -62,7 +63,7 @@ const Selfie = () => {
           setObjectJs({
             isDetected: false,
             feedback: 'Face is tilted or looking other way',
-            data: {},
+            data,
           });
         }
       }

@@ -18,6 +18,12 @@ export type PassportProps = {
   side: UploadDocumentSide;
 };
 
+const detected = {
+  isDetected: true,
+  feedback: '',
+  data: {},
+};
+
 const Passport = ({ side }: PassportProps) => {
   const { t } = useTranslation('components.scan.passport');
   const { country } = useContext(ScanContext);
@@ -35,11 +41,7 @@ const Passport = ({ side }: PassportProps) => {
       const result = detectDocument(frame);
       if (result.isDocument) {
         detector.value = true;
-        setObjectJs({
-          isDetected: true,
-          feedback: 'Hold still..',
-          data: {},
-        });
+        setObjectJs(detected);
       } else {
         detector.value = false;
         setObjectJs({

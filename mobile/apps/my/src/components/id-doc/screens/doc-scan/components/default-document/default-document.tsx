@@ -20,6 +20,12 @@ export type DefaultDocumentProps = {
   type: SupportedIdDocTypes;
 };
 
+const detected = {
+  isDetected: true,
+  feedback: '',
+  data: {},
+};
+
 const DefaultDocument = ({ side, type }: DefaultDocumentProps) => {
   const { t, allT } = useTranslation(`components.scan.${kebabCase(type)}`);
   const { country } = useContext(ScanContext);
@@ -37,11 +43,7 @@ const DefaultDocument = ({ side, type }: DefaultDocumentProps) => {
       const result = detectDocument(frame);
       if (result.isDocument) {
         detector.value = true;
-        setObjectJs({
-          isDetected: true,
-          feedback: 'Hold still..',
-          data: {},
-        });
+        setObjectJs(detected);
       } else {
         detector.value = false;
         setObjectJs({
