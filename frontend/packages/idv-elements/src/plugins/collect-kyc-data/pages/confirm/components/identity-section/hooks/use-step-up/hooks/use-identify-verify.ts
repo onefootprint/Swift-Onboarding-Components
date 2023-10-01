@@ -1,7 +1,6 @@
 import request from '@onefootprint/request';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-
-import { AUTH_HEADER } from '../../../../../../../../../config/constants';
 
 export type IdentifyVerifyRequest = {
   challengeResponse: string; // either biometric response or the 6 code digit sent via sms

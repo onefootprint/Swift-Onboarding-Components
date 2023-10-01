@@ -10,16 +10,15 @@ import type {
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type MachineContext = {
+  config: PublicOnboardingConfig;
+  device: DeviceInfo;
   bootstrapData: IdentifyBootstrapData;
   obConfigAuth?: ObConfigAuth;
-  config?: PublicOnboardingConfig;
-  device?: DeviceInfo;
   identify: IdentifyResult;
   challenge: MachineChallengeContext;
   showLogo?: boolean;
   idDocOutcome?: IdDocOutcomes;
   initialAuthToken?: string;
-  isTransfer?: boolean;
 };
 
 export type IdentifyResult = {
@@ -37,23 +36,6 @@ export type MachineChallengeContext = {
 };
 
 export type MachineEvents =
-  | {
-      type: 'configRequestFailed';
-    }
-  | {
-      type: 'initContextUpdated';
-      payload: {
-        config?: PublicOnboardingConfig;
-        device?: DeviceInfo;
-      };
-    }
-  | {
-      type: 'sandboxOutcomeSubmitted';
-      payload: {
-        sandboxId: string;
-        idDocOutcome: IdDocOutcomes;
-      };
-    }
   | {
       type: 'bootstrapDataInvalid';
     }

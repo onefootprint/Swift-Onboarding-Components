@@ -1,5 +1,7 @@
 import type { IdDI, InvestorProfileDI, VaultValue } from '../data';
 
+export const ALLOW_EXTRA_FIELDS_HEADER = 'x-fp-allow-extra-fields';
+
 export type UserDataRequest = {
   data: Partial<Record<IdDI | InvestorProfileDI, VaultValue>>;
   authToken: string;

@@ -4,7 +4,7 @@ import type { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
-import { useIdentifyMachine } from '../../components/identify-machine-provider';
+import { useIdentifyMachine } from '../../components/machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
 import EmailPreview from './components/email-preview';
 import Form from './components/form';
@@ -21,16 +21,13 @@ const PhoneIdentification = () => {
     identify: { phoneNumber, email, sandboxId },
     obConfigAuth,
     showLogo,
-    config,
+    config: { logoUrl, orgName, isLive },
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
-  const logoUrl = config?.logoUrl;
-  const orgName = config?.orgName;
   const showRequestErrorToast = useRequestErrorToast();
 
-  const validatePhone = (phone: string) =>
-    checkIsPhoneValid(phone, !config?.isLive);
+  const validatePhone = (phone: string) => checkIsPhoneValid(phone, !isLive);
 
   const handleSubmit = (formData: FormData) => {
     const phoneFromForm = formData.phoneNumber;

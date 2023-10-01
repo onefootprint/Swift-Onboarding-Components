@@ -3,16 +3,14 @@ import type { IdDocOutcomes } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';
+import type { IdentifyProps } from '../../types';
 import AuthTokenInvalid from '../auth-token-invalid';
 import BiometricChallenge from '../biometric-challenge';
-import ConfigInvalid from '../config-invalid';
 import EmailChallenge from '../email-challenge';
 import EmailIdentification from '../email-identification';
-import Init from '../init';
 import InitAuthToken from '../init-auth-token';
 import InitBootstrap from '../init-bootstrap';
 import PhoneIdentification from '../phone-identification';
-import SandboxOutcome from '../sandbox-outcome';
 import SmsChallenge from '../sms-challenge';
 
 export type DonePayload = {
@@ -23,9 +21,7 @@ export type DonePayload = {
   idDocOutcome?: IdDocOutcomes;
 };
 
-type RouterProps = {
-  onDone: (payload: DonePayload) => void;
-};
+type RouterProps = Pick<IdentifyProps, 'onDone'>;
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useIdentifyMachine();
@@ -56,9 +52,6 @@ const Router = ({ onDone }: RouterProps) => {
 
   return (
     <>
-      {state.matches('init') && <Init />}
-      {state.matches('configInvalid') && <ConfigInvalid />}
-      {state.matches('sandboxOutcome') && <SandboxOutcome />}
       {state.matches('initAuthToken') && initialAuthToken && (
         <InitAuthToken authToken={initialAuthToken} />
       )}

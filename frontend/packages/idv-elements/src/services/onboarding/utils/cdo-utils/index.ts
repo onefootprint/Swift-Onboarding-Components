@@ -1,1 +1,6 @@
-export * from './cdo-utils';
+export {
+  isDocCdo,
+  isInvestorProfileCdo,
+  isKybCdo,
+  isKycCdo,
+} from './cdo-utils';

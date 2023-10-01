@@ -3,8 +3,8 @@ import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
-import { useIdentifyMachine } from '../identify-machine-provider';
 import Logo from '../logo';
+import { useIdentifyMachine } from '../machine-provider';
 
 type ChallengeHeaderProps = {
   title: string;
@@ -18,9 +18,10 @@ const ChallengeHeader = ({
   shouldShowBack,
 }: ChallengeHeaderProps) => {
   const [state, send] = useIdentifyMachine();
-  const { config, showLogo } = state.context;
-  const logoUrl = config?.logoUrl;
-  const orgName = config?.orgName;
+  const {
+    config: { logoUrl, orgName },
+    showLogo,
+  } = state.context;
 
   const handleBack = () => {
     send({

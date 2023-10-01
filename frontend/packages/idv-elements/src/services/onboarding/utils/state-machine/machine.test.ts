@@ -37,12 +37,14 @@ describe('Onboarding Machine Tests', () => {
     userFound = true,
     authToken = 'token',
     bootstrapData = defaultBootstrapData,
-  }: Partial<OnboardingMachineArgs>) => {
+  }: Partial<OnboardingMachineArgs> = {}) => {
     const machine = interpret(
       createOnboardingMachine({
         userFound,
         bootstrapData,
         authToken,
+        device: testDevice,
+        config: testOnboardingConfig,
       }),
     );
     machine.start();
@@ -50,17 +52,8 @@ describe('Onboarding Machine Tests', () => {
   };
 
   it('completes the onboarding flow from scratch', () => {
-    const machine = createMachine({});
+    const machine = createMachine();
     let { state } = machine;
-    expect(state.value).toBe('init');
-
-    state = machine.send({
-      type: 'initContextUpdated',
-      payload: {
-        device: testDevice,
-        config: testOnboardingConfig,
-      },
-    });
     expect(state.value).toEqual('requirements');
     expect(state.context).toEqual({
       userFound: true,

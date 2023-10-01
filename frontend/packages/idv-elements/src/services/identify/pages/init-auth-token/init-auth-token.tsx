@@ -16,7 +16,6 @@ const InitAuthToken = ({ authToken }: InitAuthTokenProps) => {
     obConfigAuth,
     identify: { sandboxId },
   } = state.context;
-
   const identifyMutation = useIdentify();
 
   const verifyToken = async () => {

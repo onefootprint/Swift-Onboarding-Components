@@ -5,7 +5,7 @@ import React from 'react';
 import { NAVIGATION_HEADER_PORTAL_SELECTOR } from '../layout';
 
 const InitShimmer = () => (
-  <Box>
+  <Box testID="init-shimmer">
     <Portal selector={NAVIGATION_HEADER_PORTAL_SELECTOR} removeContent>
       <HeaderContainer>
         <CloseButton />

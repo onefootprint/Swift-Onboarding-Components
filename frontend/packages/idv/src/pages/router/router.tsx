@@ -12,26 +12,34 @@ import React, { useEffect } from 'react';
 import useIdvMachine from '../../hooks/use-idv-machine';
 import useValidateSession from '../../hooks/use-validate-session';
 import Complete from '../complete';
+import Init from '../init';
+import SandboxOutcome from '../sandbox-outcome';
 import getIdentifyBootstrapData from './utils/get-identify-bootstrap-data';
 
 const AUTO_CLOSE_DELAY = 6000;
 
 const Router = () => {
   const [state, send] = useIdvMachine();
+  useLogStateMachine('idv', state);
   const {
-    bootstrapData,
+    config,
+    device,
     authToken,
+    bootstrapData,
     userFound,
     isTransfer,
     showCompletionPage,
+    showLogo,
     validationToken,
     obConfigAuth,
+    idDocOutcome,
+    sandboxId,
     onClose,
     onComplete,
-    showLogo,
-    idDocOutcome,
   } = state.context;
-  useLogStateMachine('idv', state);
+  const isDone = state.matches('complete');
+  const shouldShowComplete =
+    state.matches('complete') && !isTransfer && showCompletionPage;
 
   useValidateSession(
     { authToken },
@@ -51,11 +59,6 @@ const Router = () => {
       },
     },
   );
-
-  const isDone = state.matches('complete');
-  const identifyBootstrapData = getIdentifyBootstrapData(bootstrapData);
-  const shouldShowComplete =
-    state.matches('complete') && !isTransfer && showCompletionPage;
 
   useEffect(() => {
     if (!isDone) {
@@ -82,20 +85,26 @@ const Router = () => {
         send({ type: 'reset' });
       }}
     >
-      {state.matches('identify') && (
+      {state.matches('init') && <Init />}
+      {state.matches('sandboxOutcome') && <SandboxOutcome />}
+      {state.matches('identify') && config && device && (
         <Identify
-          isTransfer={isTransfer}
-          obConfigAuth={obConfigAuth}
-          bootstrapData={identifyBootstrapData}
+          config={config}
+          device={device}
+          sandboxId={sandboxId}
           initialAuthToken={authToken}
+          obConfigAuth={obConfigAuth}
+          bootstrapData={getIdentifyBootstrapData(bootstrapData)}
+          showLogo={showLogo}
           onDone={payload => {
             send({ type: 'identifyCompleted', payload });
           }}
-          showLogo={showLogo}
         />
       )}
-      {state.matches('onboarding') && authToken && (
+      {state.matches('onboarding') && authToken && config && device && (
         <Onboarding
+          config={config}
+          device={device}
           authToken={authToken}
           userFound={userFound}
           bootstrapData={bootstrapData}

@@ -4,8 +4,8 @@ import { ChallengeKind } from '@onefootprint/types';
 import React from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
-import { useIdentifyMachine } from '../../components/identify-machine-provider';
 import LegalFooter from '../../components/legal-footer';
+import { useIdentifyMachine } from '../../components/machine-provider';
 import PinVerification from '../../components/pin-verification';
 
 const IS_TEST = typeof jest !== 'undefined';
@@ -15,7 +15,7 @@ const EmailChallenge = () => {
   const { t } = useTranslation('pages.email-challenge');
   const [state, send] = useIdentifyMachine();
   const {
-    config,
+    config: { orgName: tenantName },
     bootstrapData,
     identify: { userFound, email = '' },
   } = state.context;
@@ -23,7 +23,7 @@ const EmailChallenge = () => {
   const title = userFound ? t('welcome-back-title') : t('title');
   const subtitle =
     isBootstrap && userFound
-      ? t('bootstrap-subtitle', { tenantName: config?.orgName })
+      ? t('bootstrap-subtitle', { tenantName })
       : t('subtitle');
 
   const handleChallengeSuceed = (authToken: string) => {

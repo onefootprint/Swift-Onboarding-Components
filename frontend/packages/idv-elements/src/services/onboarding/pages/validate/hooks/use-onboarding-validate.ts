@@ -1,11 +1,10 @@
 import request from '@onefootprint/request';
+import { AUTH_HEADER } from '@onefootprint/types';
 import type {
   OnboardingValidateRequest,
   OnboardingValidateResponse,
 } from '@onefootprint/types/src/api/onboarding-validate';
 import { useMutation } from '@tanstack/react-query';
-
-import { AUTH_HEADER } from '../../../../../config/constants';
 
 const onboardingValidateRequest = async (
   payload: OnboardingValidateRequest,

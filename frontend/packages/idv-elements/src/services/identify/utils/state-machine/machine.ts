@@ -1,15 +1,21 @@
-import type { IdentifyBootstrapData, ObConfigAuth } from '@onefootprint/types';
+import type {
+  IdentifyBootstrapData,
+  ObConfigAuth,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import { getCanChallengeBiometrics } from '../biometrics';
 import type { MachineContext, MachineEvents } from './types';
-import isContextReady from './utils/is-context-ready';
+import validateMachineArgs from './utils/get-sanitized-args';
 import shouldBootstrap from './utils/should-bootstrap';
 import shouldChallengeEmail from './utils/should-challenge-email';
-import shouldSelectSandboxOutcome from './utils/should-select-sandbox-outcome';
 
 export type IdentifyMachineArgs = {
-  isTransfer?: boolean;
+  config: PublicOnboardingConfig;
+  device: DeviceInfo;
+  sandboxId?: string;
   bootstrapData?: IdentifyBootstrapData;
   // When provided, acts as the sole identifier for a user.
   // We will skip requesting email and phone, and we will optionally step up if the provded auth
@@ -21,36 +27,7 @@ export type IdentifyMachineArgs = {
   showLogo?: boolean;
 };
 
-const validateMachineArgs = ({
-  bootstrapData,
-  initialAuthToken,
-  obConfigAuth,
-  showLogo,
-  isTransfer,
-}: IdentifyMachineArgs): MachineContext => {
-  if (!obConfigAuth && !initialAuthToken) {
-    console.error(
-      'Error initializing Identify machine: obConfigAuth must be provided if initialAuthToken is absent',
-    );
-  }
-  return {
-    obConfigAuth,
-    bootstrapData: bootstrapData ?? {},
-    identify: {},
-    challenge: {},
-    showLogo,
-    initialAuthToken,
-    isTransfer,
-  };
-};
-
-const createIdentifyMachine = ({
-  bootstrapData,
-  initialAuthToken,
-  obConfigAuth,
-  showLogo,
-  isTransfer,
-}: IdentifyMachineArgs) =>
+const createIdentifyMachine = (args: IdentifyMachineArgs) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -62,38 +39,10 @@ const createIdentifyMachine = ({
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
-      context: validateMachineArgs({
-        bootstrapData,
-        initialAuthToken,
-        obConfigAuth,
-        showLogo,
-        isTransfer,
-      }),
+      context: validateMachineArgs(args),
       states: {
         init: {
-          on: {
-            configRequestFailed: {
-              target: 'configInvalid',
-            },
-            initContextUpdated: [
-              {
-                target: 'initialized',
-                actions: ['assignInitContext'],
-                cond: (context, event) => isContextReady(context, event),
-              },
-              {
-                target: 'init',
-                actions: ['assignInitContext'],
-              },
-            ],
-          },
-        },
-        initialized: {
           always: [
-            {
-              target: 'sandboxOutcome',
-              cond: shouldSelectSandboxOutcome,
-            },
             {
               target: 'initAuthToken',
               cond: context => !!context.initialAuthToken,
@@ -104,26 +53,6 @@ const createIdentifyMachine = ({
             },
             { target: 'emailIdentification' },
           ],
-        },
-        sandboxOutcome: {
-          on: {
-            sandboxOutcomeSubmitted: [
-              {
-                target: 'initAuthToken',
-                actions: ['assignSandboxOutcome'],
-                cond: context => !!context.initialAuthToken,
-              },
-              {
-                target: 'initBootstrap',
-                actions: ['assignSandboxOutcome'],
-                cond: shouldBootstrap,
-              },
-              {
-                target: 'emailIdentification',
-                actions: ['assignSandboxOutcome'],
-              },
-            ],
-          },
         },
         initAuthToken: {
           on: {
@@ -167,7 +96,7 @@ const createIdentifyMachine = ({
                 actions: ['assignEmail', 'assignPhone'],
                 description:
                   'Initiate a signup challenge for the email in no-phone flows',
-                cond: context => !!context.config?.isNoPhoneFlow,
+                cond: context => !!context.config.isNoPhoneFlow,
               },
               {
                 target: 'smsChallenge',
@@ -199,7 +128,7 @@ const createIdentifyMachine = ({
                   'Initiate a signup challenge for the email in no-phone flows',
                 cond: (context, event) =>
                   shouldChallengeEmail(
-                    !!context.config?.isNoPhoneFlow,
+                    !!context.config.isNoPhoneFlow,
                     event.payload.availableChallengeKinds,
                   ),
               },
@@ -233,7 +162,7 @@ const createIdentifyMachine = ({
                   'Do not collect phone number and just initiate email OTP',
                 cond: (context, event) =>
                   shouldChallengeEmail(
-                    !!context.config?.isNoPhoneFlow,
+                    !!context.config.isNoPhoneFlow,
                     event.payload.availableChallengeKinds,
                   ),
               },
@@ -362,9 +291,6 @@ const createIdentifyMachine = ({
         authTokenInvalid: {
           type: 'final',
         },
-        configInvalid: {
-          type: 'final',
-        },
         success: {
           type: 'final',
         },
@@ -372,17 +298,6 @@ const createIdentifyMachine = ({
     },
     {
       actions: {
-        assignInitContext: assign((context, event) => {
-          const { device, config } = event.payload;
-          context.device = device !== undefined ? device : context.device;
-          context.config = config !== undefined ? config : context.config;
-          return context;
-        }),
-        assignSandboxOutcome: assign((context, event) => {
-          context.identify.sandboxId = event.payload.sandboxId;
-          context.idDocOutcome = event.payload.idDocOutcome;
-          return context;
-        }),
         assignEmail: assign((context, event) => {
           const { email } = event.payload;
           if (!email) {

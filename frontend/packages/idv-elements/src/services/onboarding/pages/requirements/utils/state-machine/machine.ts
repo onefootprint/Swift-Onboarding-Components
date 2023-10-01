@@ -6,14 +6,13 @@ import type {
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
-import type { Typegen0 } from './machine.typegen';
 import { RequirementTargets, requiresAdditionalInfo } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
 export type OnboardingRequirementsMachineArgs = {
   userFound: boolean;
-  device: DeviceInfo;
   config: PublicOnboardingConfig;
+  device: DeviceInfo;
   authToken: string;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
@@ -24,10 +23,10 @@ const createOnboardingRequirementsMachine = ({
   userFound,
   device,
   authToken,
-  config,
   bootstrapData,
   isTransfer,
   idDocOutcome,
+  config,
 }: OnboardingRequirementsMachineArgs) =>
   createMachine(
     {
@@ -37,7 +36,8 @@ const createOnboardingRequirementsMachine = ({
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'checkRequirements',
       context: {
         onboardingContext: {

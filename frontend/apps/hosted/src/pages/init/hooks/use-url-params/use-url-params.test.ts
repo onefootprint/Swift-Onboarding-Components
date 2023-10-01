@@ -1,6 +1,6 @@
 import {
   createUseRouterSpy,
-  customRenderHook,
+  renderHook,
   waitFor,
 } from '@onefootprint/test-utils';
 import {
@@ -17,7 +17,7 @@ describe('useUrlParams', () => {
   const token = 'tok_123456';
 
   const renderUseParseUrl = (options: UseParseUrlParamOptions) =>
-    customRenderHook(() => useParseUrl(options));
+    renderHook(() => useParseUrl(options));
 
   it('parses ob pk token correctly', async () => {
     useRouterSpy({
@@ -93,6 +93,7 @@ describe('useUrlParams', () => {
 
   it('handles missing kinds correctly', async () => {
     useRouterSpy({
+      query: {},
       asPath: `#${token}`,
     });
     const onSuccess = jest.fn();
@@ -105,6 +106,7 @@ describe('useUrlParams', () => {
 
   it('handles missing token correctly', async () => {
     useRouterSpy({
+      query: {},
       asPath: '',
     });
     const onSuccess = jest.fn();

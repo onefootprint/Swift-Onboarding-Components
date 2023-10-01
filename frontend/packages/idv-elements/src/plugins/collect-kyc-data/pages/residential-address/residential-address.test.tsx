@@ -10,7 +10,7 @@ import {
 import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
-import type { KycData } from '../../utils';
+import type { KycData } from '../../utils/data-types';
 import type { MachineContext } from '../../utils/state-machine';
 import TestWrapper from '../../utils/test-wrapper';
 import ResidentialAddress from './residential-address';

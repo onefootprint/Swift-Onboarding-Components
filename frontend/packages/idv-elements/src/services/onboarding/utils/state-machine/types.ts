@@ -7,10 +7,10 @@ import type {
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type MachineContext = {
+  config: PublicOnboardingConfig;
+  device: DeviceInfo;
   authToken: string;
   bootstrapData: IdDIData; // TODO: generalize this more in the next iteration
-  config?: PublicOnboardingConfig;
-  device?: DeviceInfo;
   userFound?: boolean;
   isTransfer?: boolean;
   validationToken?: string;
@@ -20,16 +20,6 @@ export type MachineContext = {
 };
 
 export type MachineEvents =
-  | {
-      type: 'initContextUpdated';
-      payload: {
-        config?: PublicOnboardingConfig;
-        device?: DeviceInfo;
-      };
-    }
-  | {
-      type: 'configRequestFailed';
-    }
   | {
       type: 'requirementsCompleted';
     }

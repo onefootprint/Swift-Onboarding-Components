@@ -19,7 +19,7 @@ const SmsChallenge = () => {
   const [state, send] = useIdentifyMachine();
   const [challengeData, setChallengeData] = useState<ChallengeData>();
   const {
-    config,
+    config: { orgName: tenantName },
     initialAuthToken,
     bootstrapData,
     challenge,
@@ -30,8 +30,8 @@ const SmsChallenge = () => {
   const hasInitialAuthToken = !!initialAuthToken;
   const title = userFound ? t('welcome-back-title') : t('title');
   const subtitle =
-    isBootstrap && userFound && config
-      ? t('bootstrap-subtitle', { tenantName: config.orgName })
+    isBootstrap && userFound
+      ? t('bootstrap-subtitle', { tenantName })
       : t('subtitle');
 
   // Either scrub the phone number collected from the previous steps, or use the

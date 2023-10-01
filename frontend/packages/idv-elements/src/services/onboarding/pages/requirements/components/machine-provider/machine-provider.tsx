@@ -4,9 +4,14 @@ import constate from 'constate';
 import type { OnboardingRequirementsMachineArgs } from '../../utils/state-machine/machine';
 import createOnboardingRequirementsMachine from '../../utils/state-machine/machine';
 
-const useLocalOnboardingRequirementsMachine = (
-  args: OnboardingRequirementsMachineArgs,
-) => useMachine(() => createOnboardingRequirementsMachine(args));
+type OnboardingRequirementsMachineProviderArgs = {
+  args: OnboardingRequirementsMachineArgs;
+};
+
+const useLocalOnboardingRequirementsMachine = ({
+  args,
+}: OnboardingRequirementsMachineProviderArgs) =>
+  useMachine(() => createOnboardingRequirementsMachine(args));
 
 export const [
   OnboardingRequirementsMachineProvider,

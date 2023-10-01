@@ -2,9 +2,9 @@ import { getSessionId, useObserveCollector } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { useGetOnboardingConfig } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
-import styled from '@onefootprint/styled';
+import styled, { css } from '@onefootprint/styled';
 import type { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
-import { LoadingIndicator, media } from '@onefootprint/ui';
+import { Shimmer } from '@onefootprint/ui';
 import * as LogRocket from 'logrocket';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
@@ -32,7 +32,8 @@ const Init = () => {
         },
       });
     },
-    onError: () => {
+    onError: (error: string) => {
+      console.error(error);
       send({
         type: 'invalidUrlReceived',
       });
@@ -100,20 +101,60 @@ const Init = () => {
 
   return (
     <Container>
-      <LoadingIndicator />
+      <HeaderContainer>
+        <Avatar />
+        <HeaderTitle>
+          <Title />
+          <Subtitle />
+        </HeaderTitle>
+      </HeaderContainer>
+      <Button />
     </Container>
   );
 };
 
-const Container = styled.div`
-  align-items: center;
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  min-height: var(--loading-container-min-height);
+const Title = () => (
+  <Shimmer sx={{ width: '300px', height: '28px', maxWidth: '100%' }} />
+);
 
-  ${media.greaterThan('md')`
-    min-width: var(--loading-container-min-width);
+const Subtitle = () => (
+  <Shimmer sx={{ width: '350px', height: '24px', maxWidth: '100%' }} />
+);
+
+const Button = () => <Shimmer sx={{ width: '100%', height: '48px' }} />;
+
+const Avatar = () => (
+  <Shimmer sx={{ width: '72px', height: '72px', borderRadius: 'full' }} />
+);
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[7]};
+    justify-content: center;
+    align-items: center;
+  `}
+`;
+
+const HeaderTitle = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[3]};
+    justify-content: center;
+    align-items: center;
+    margin-top: ${theme.spacing[5]};
+  `}
+`;
+
+const HeaderContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[5]};
+    justify-content: center;
+    align-items: center;
   `}
 `;
 

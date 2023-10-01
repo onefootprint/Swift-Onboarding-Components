@@ -1,7 +1,7 @@
-import { AUTH_HEADER } from '@onefootprint/idv-elements/src/config/constants';
 import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
 import type { ValidateSessionRequest } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 const validateSession = async (payload: ValidateSessionRequest) => {

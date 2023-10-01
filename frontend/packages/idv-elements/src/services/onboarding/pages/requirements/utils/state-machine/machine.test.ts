@@ -97,7 +97,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           },
           userFound: true,
           authToken: 'token',
-          config: { ...TestOnboardingConfig },
+          config: TestOnboardingConfig,
           bootstrapData: {
             [IdDI.email]: 'piip@onefootprint.com',
           },
@@ -118,7 +118,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         },
         userFound: true,
         authToken: 'token',
-        config: { ...TestOnboardingConfig },
+        config: TestOnboardingConfig,
         bootstrapData: {
           [IdDI.email]: 'piip@onefootprint.com',
         },
@@ -140,13 +140,12 @@ describe('Onboarding Requirements Machine Tests', () => {
           },
           userFound: true,
           authToken: 'token',
-          config: { ...TestOnboardingConfig },
+          config: TestOnboardingConfig,
         }),
       );
 
       machine.start();
       let { state } = machine;
-
       expect(state.context.startedDataCollection).toBe(false);
       state = machine.send({
         type: 'onboardingRequirementsReceived',
@@ -219,7 +218,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           },
           userFound: false,
           authToken: 'token',
-          config: { ...TestOnboardingConfig },
+          config: TestOnboardingConfig,
         }),
       );
 
@@ -290,12 +289,13 @@ describe('Onboarding Requirements Machine Tests', () => {
           },
           userFound: false,
           authToken: 'token',
-          config: { ...NoPhoneOnboardingConfig },
+          config: NoPhoneOnboardingConfig,
         }),
       );
 
       machine.start();
       let { state } = machine;
+
       state = machine.send({
         type: 'onboardingRequirementsReceived',
         payload: [kycRequirement, livenessRequirement, authorizeRequirement],

@@ -4,8 +4,8 @@ import type { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
-import { useIdentifyMachine } from '../../components/identify-machine-provider';
 import LegalFooter from '../../components/legal-footer';
+import { useIdentifyMachine } from '../../components/machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
 import EmailIdentificationForm from './components/form';
 import EmailIdentificationHeader from './components/header';
@@ -19,13 +19,11 @@ const EmailIdentification = () => {
   const {
     identify: { email, sandboxId },
     obConfigAuth,
-    config,
+    config: { logoUrl, orgName },
     showLogo,
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
-  const logoUrl = config?.logoUrl;
-  const orgName = config?.orgName;
   const showRequestErrorToast = useRequestErrorToast();
 
   const handleSubmit = (formData: FormData) => {

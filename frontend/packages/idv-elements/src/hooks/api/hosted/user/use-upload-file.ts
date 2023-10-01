@@ -3,9 +3,8 @@ import type {
   UploadFileRequest,
   UploadFileResponse,
 } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-
-import { AUTH_HEADER } from '../../../../config/constants';
 
 const uploadFileRequest = async (payload: UploadFileRequest) => {
   const { file, authToken, documentKind } = payload;

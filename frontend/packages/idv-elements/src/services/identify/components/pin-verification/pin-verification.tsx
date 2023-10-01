@@ -15,7 +15,7 @@ import useIdentifyVerify from '../../../../hooks/api/hosted/identify/use-identif
 import useLoginChallenge from '../../../../hooks/api/hosted/identify/use-login-challenge';
 import useSignupChallenge from '../../../../hooks/api/hosted/identify/use-signup-challenge';
 import useUserEmail from '../../../../hooks/api/hosted/user/use-user-email';
-import { useIdentifyMachine } from '../identify-machine-provider';
+import { useIdentifyMachine } from '../machine-provider';
 import Form from './components/form';
 
 type PinVerificationProps = {

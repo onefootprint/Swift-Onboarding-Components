@@ -4,10 +4,9 @@ import type {
   BiometricRegisterRequest,
   BiometricRegisterResponse,
 } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
-
-import AUTH_HEADER from '../config/constants';
 
 const generateDeviceResponse = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;

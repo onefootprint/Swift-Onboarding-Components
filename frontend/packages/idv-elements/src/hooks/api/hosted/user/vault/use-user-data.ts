@@ -1,12 +1,11 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
 import type { UserDataRequest, UserDataResponse } from '@onefootprint/types';
-import { IdDI } from '@onefootprint/types';
-import { useMutation } from '@tanstack/react-query';
-
 import {
   ALLOW_EXTRA_FIELDS_HEADER,
   AUTH_HEADER,
-} from '../../../../../config/constants';
+  IdDI,
+} from '@onefootprint/types';
+import { useMutation } from '@tanstack/react-query';
 
 const userDataRequest = async (payload: UserDataRequest) => {
   let method;

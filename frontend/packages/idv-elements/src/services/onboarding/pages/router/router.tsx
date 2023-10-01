@@ -2,8 +2,6 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
 import { useOnboardingMachine } from '../../components/machine-provider';
-import ConfigInvalid from '../config-invalid';
-import Init from '../init';
 import Requirements from '../requirements';
 import Validate from '../validate';
 
@@ -17,6 +15,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingMachine();
+  useLogStateMachine('onboarding', state);
   const {
     userFound,
     device,
@@ -27,7 +26,6 @@ const Router = ({ onDone }: RouterProps) => {
     validationToken,
     idDocOutcome,
   } = state.context;
-  useLogStateMachine('onboarding', state);
 
   const isDone = state.matches('complete');
   useEffect(() => {
@@ -40,8 +38,6 @@ const Router = ({ onDone }: RouterProps) => {
 
   return (
     <>
-      {state.matches('init') && <Init />}
-      {state.matches('configInvalid') && <ConfigInvalid />}
       {state.matches('requirements') && (
         <Requirements
           userFound={!!userFound}

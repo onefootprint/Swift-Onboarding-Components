@@ -19,26 +19,18 @@ import {
   fillChallengePin,
   fillIdentifyEmail,
   fillIdentifyPhone,
-  fillSandboxOutcome,
   liveOnboardingConfigFixture,
   mockGetBiometricChallengeResponse,
-  mockUseDeviceInfo,
   noPhoneOnboardingConfigFixture,
   sandboxOnboardingConfigFixture,
   withIdentify,
   withIdentifyVerify,
   withLoginChallenge,
-  withOnboardingConfig,
   withSignupChallenge,
   withUserTokenInsufficientScopes,
   withUserTokenSufficientScopes,
   withUserVault,
 } from './identify.test.config';
-
-jest.mock('../../hooks/ui/use-device-info', () => ({
-  __esModule: true,
-  ...jest.requireActual('../../hooks/ui/use-device-info'),
-}));
 
 jest.mock('./utils/biometrics/get-biometric-challenge-response', () => ({
   __esModule: true,
@@ -46,7 +38,6 @@ jest.mock('./utils/biometrics/get-biometric-challenge-response', () => ({
 }));
 
 const useRouterSpy = createUseRouterSpy();
-const defaultObConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: 'pk' };
 
 describe('<Identify />', () => {
   beforeEach(() => {
@@ -58,20 +49,26 @@ describe('<Identify />', () => {
 
   const renderIdentify = ({
     bootstrapData,
-    obConfigAuth,
     initialAuthToken,
+    config,
     onDone,
   }: {
     bootstrapData?: any;
     initialAuthToken?: string;
     obConfigAuth?: any;
+    config: any;
     onDone?: () => void;
   }) => {
     customRender(
       <ObserveCollectorProvider appName="bifrost">
         <Layout onClose={() => {}}>
           <Identify
-            obConfigAuth={obConfigAuth}
+            config={config}
+            device={{
+              type: 'mobile',
+              hasSupportForWebauthn: true,
+            }}
+            obConfigAuth={{ [CLIENT_PUBLIC_KEY_HEADER]: 'pk' }}
             bootstrapData={bootstrapData ?? {}}
             initialAuthToken={initialAuthToken}
             onDone={onDone ?? (() => {})}
@@ -83,15 +80,13 @@ describe('<Identify />', () => {
 
   describe('when running a sandbox onboarding config', () => {
     beforeEach(() => {
-      withOnboardingConfig(sandboxOnboardingConfigFixture);
       withIdentify(false);
     });
 
     it('proceeds to email identification when sandbox outcome was successful', async () => {
-      renderIdentify({ obConfigAuth: defaultObConfigAuth });
-
-      await expectShimmer();
-      await fillSandboxOutcome();
+      renderIdentify({
+        config: sandboxOnboardingConfigFixture,
+      });
 
       await waitFor(() => {
         expect(
@@ -101,78 +96,11 @@ describe('<Identify />', () => {
 
       await fillIdentifyEmail();
     });
-
-    describe('When there is bootstrap email + phone data', () => {
-      describe('When user not found', () => {
-        beforeEach(() => {
-          withIdentify(false, []);
-          withIdentifyVerify();
-          withSignupChallenge();
-          withUserVault();
-        });
-
-        it('takes new user to sandbox page', async () => {
-          const email = 'piip@onefootprint.com';
-          const phoneNumber = '+1 234 567 8999';
-          const onDone = jest.fn();
-
-          renderIdentify({
-            bootstrapData: {
-              email,
-              phoneNumber,
-            },
-            obConfigAuth: defaultObConfigAuth,
-            onDone,
-          });
-
-          await expectShimmer();
-          await fillSandboxOutcome();
-          await bootstrapNewUser();
-          await waitFor(() => {
-            expect(onDone).toHaveBeenCalled();
-          });
-        });
-      });
-
-      describe('When user found', () => {
-        beforeEach(() => {
-          mockUseDeviceInfo();
-          mockGetBiometricChallengeResponse();
-          withIdentify(true);
-          withIdentifyVerify();
-          withLoginChallenge(ChallengeKind.biometric);
-        });
-
-        it('takes user to sandbox then challenge', async () => {
-          const email = 'piip@onefootprint.com';
-          const phoneNumber = '+1 234 567 8999';
-          const onDone = jest.fn();
-
-          renderIdentify({
-            bootstrapData: {
-              email,
-              phoneNumber,
-            },
-            obConfigAuth: defaultObConfigAuth,
-            onDone,
-          });
-
-          await expectShimmer();
-          await fillSandboxOutcome();
-          await bootstrapExistingUserWithPasskey();
-
-          await waitFor(() => {
-            expect(onDone).toHaveBeenCalled();
-          });
-        });
-      });
-    });
   });
 
   describe('When there is an initial auth token', () => {
     describe('When sufficient scopes', () => {
       beforeEach(() => {
-        mockUseDeviceInfo();
         withUserTokenSufficientScopes();
       });
 
@@ -181,6 +109,7 @@ describe('<Identify />', () => {
         renderIdentify({
           initialAuthToken: 'token',
           onDone,
+          config: sandboxOnboardingConfigFixture,
         });
 
         await waitFor(() => {
@@ -196,13 +125,13 @@ describe('<Identify />', () => {
 
       describe('When user not found', () => {
         beforeEach(() => {
-          mockUseDeviceInfo();
           withIdentify(false);
         });
 
         it('takes user to invalid auth token page', async () => {
           renderIdentify({
             initialAuthToken: 'token',
+            config: sandboxOnboardingConfigFixture,
           });
 
           await waitFor(() => {
@@ -215,7 +144,6 @@ describe('<Identify />', () => {
 
       describe('When user found', () => {
         beforeEach(() => {
-          mockUseDeviceInfo();
           mockGetBiometricChallengeResponse();
           withIdentify(true);
           withIdentifyVerify();
@@ -227,6 +155,7 @@ describe('<Identify />', () => {
 
           renderIdentify({
             initialAuthToken: 'token',
+            config: sandboxOnboardingConfigFixture,
             onDone,
           });
 
@@ -241,10 +170,6 @@ describe('<Identify />', () => {
   });
 
   describe('When running a live onboarding config', () => {
-    beforeEach(() => {
-      withOnboardingConfig(liveOnboardingConfigFixture);
-    });
-
     describe('When there is bootstrap email', () => {
       describe('When user found', () => {
         beforeEach(() => {
@@ -261,7 +186,7 @@ describe('<Identify />', () => {
             bootstrapData: {
               email,
             },
-            obConfigAuth: defaultObConfigAuth,
+            config: liveOnboardingConfigFixture,
             onDone,
           });
 
@@ -289,7 +214,7 @@ describe('<Identify />', () => {
             bootstrapData: {
               email,
             },
-            obConfigAuth: defaultObConfigAuth,
+            config: liveOnboardingConfigFixture,
             onDone,
           });
 
@@ -331,7 +256,7 @@ describe('<Identify />', () => {
             bootstrapData: {
               phoneNumber,
             },
-            obConfigAuth: defaultObConfigAuth,
+            config: liveOnboardingConfigFixture,
             onDone,
           });
 
@@ -359,7 +284,7 @@ describe('<Identify />', () => {
             bootstrapData: {
               phoneNumber,
             },
-            obConfigAuth: defaultObConfigAuth,
+            config: liveOnboardingConfigFixture,
             onDone,
           });
 
@@ -391,7 +316,6 @@ describe('<Identify />', () => {
     describe('When there is bootstrap email and phone', () => {
       describe('When user found', () => {
         beforeEach(() => {
-          mockUseDeviceInfo();
           mockGetBiometricChallengeResponse();
           withIdentify(true);
           withIdentifyVerify();
@@ -408,7 +332,7 @@ describe('<Identify />', () => {
               email,
               phoneNumber,
             },
-            obConfigAuth: defaultObConfigAuth,
+            config: liveOnboardingConfigFixture,
             onDone,
           });
 
@@ -438,7 +362,7 @@ describe('<Identify />', () => {
               email,
               phoneNumber,
             },
-            obConfigAuth: defaultObConfigAuth,
+            config: liveOnboardingConfigFixture,
             onDone,
           });
 
@@ -455,7 +379,6 @@ describe('<Identify />', () => {
   describe('when running a no phone onboarding config', () => {
     describe('when there is an existing user vault', () => {
       beforeEach(() => {
-        withOnboardingConfig(noPhoneOnboardingConfigFixture);
         withIdentifyVerify();
       });
 
@@ -468,11 +391,10 @@ describe('<Identify />', () => {
         it('shows email challenge page', async () => {
           const onDone = jest.fn();
           renderIdentify({
-            obConfigAuth: defaultObConfigAuth,
+            config: noPhoneOnboardingConfigFixture,
             onDone,
           });
 
-          await expectShimmer();
           await fillIdentifyEmail();
           await fillChallengePin();
           await waitFor(() => {
@@ -488,11 +410,10 @@ describe('<Identify />', () => {
           const email = 'piip@onefootprint.com';
           renderIdentify({
             bootstrapData: { email },
-            obConfigAuth: defaultObConfigAuth,
+            config: noPhoneOnboardingConfigFixture,
             onDone,
           });
 
-          await expectShimmer();
           await bootstrapExistingUser();
           await waitFor(() => {
             expect(onDone).toHaveBeenCalled();
@@ -502,11 +423,10 @@ describe('<Identify />', () => {
         it('can resend email challenge', async () => {
           const onDone = jest.fn();
           renderIdentify({
-            obConfigAuth: defaultObConfigAuth,
+            config: noPhoneOnboardingConfigFixture,
             onDone,
           });
 
-          await expectShimmer();
           await fillIdentifyEmail();
 
           // Wait until the login challenge request succeeds
@@ -534,11 +454,10 @@ describe('<Identify />', () => {
         it('shows sms challenge page', async () => {
           const onDone = jest.fn();
           renderIdentify({
-            obConfigAuth: defaultObConfigAuth,
+            config: noPhoneOnboardingConfigFixture,
             onDone,
           });
 
-          await expectShimmer();
           await fillIdentifyEmail();
           await fillChallengePin();
           await waitFor(() => {
@@ -554,11 +473,10 @@ describe('<Identify />', () => {
           const email = 'piip@onefootprint.com';
           renderIdentify({
             bootstrapData: { email },
-            obConfigAuth: defaultObConfigAuth,
+            config: noPhoneOnboardingConfigFixture,
             onDone,
           });
 
-          await expectShimmer();
           await bootstrapExistingUser();
           await waitFor(() => {
             expect(onDone).toHaveBeenCalled();
@@ -568,11 +486,10 @@ describe('<Identify />', () => {
         it('can resend sms challenge', async () => {
           const onDone = jest.fn();
           renderIdentify({
-            obConfigAuth: defaultObConfigAuth,
+            config: noPhoneOnboardingConfigFixture,
             onDone,
           });
 
-          await expectShimmer();
           await fillIdentifyEmail();
 
           // Wait until the login challenge request succeeds
@@ -594,7 +511,6 @@ describe('<Identify />', () => {
 
     describe('when the user vault is new', () => {
       beforeEach(() => {
-        withOnboardingConfig(noPhoneOnboardingConfigFixture);
         withIdentify(false, []);
         withSignupChallenge(ChallengeKind.email);
         withIdentifyVerify();
@@ -603,11 +519,10 @@ describe('<Identify />', () => {
       it('shows email challenge page', async () => {
         const onDone = jest.fn();
         renderIdentify({
-          obConfigAuth: defaultObConfigAuth,
+          config: noPhoneOnboardingConfigFixture,
           onDone,
         });
 
-        await expectShimmer();
         await fillIdentifyEmail();
         await fillChallengePin();
         await waitFor(() => {
@@ -623,11 +538,10 @@ describe('<Identify />', () => {
         const email = 'piip@onefootprint.com';
         renderIdentify({
           bootstrapData: { email },
-          obConfigAuth: defaultObConfigAuth,
+          config: noPhoneOnboardingConfigFixture,
           onDone,
         });
 
-        await expectShimmer();
         await bootstrapNewUser(true);
         await waitFor(() => {
           expect(onDone).toHaveBeenCalled();
@@ -637,11 +551,10 @@ describe('<Identify />', () => {
       it('can resend email challenge', async () => {
         const onDone = jest.fn();
         renderIdentify({
-          obConfigAuth: defaultObConfigAuth,
+          config: noPhoneOnboardingConfigFixture,
           onDone,
         });
 
-        await expectShimmer();
         await fillIdentifyEmail();
 
         // Wait until the login challenge request succeeds

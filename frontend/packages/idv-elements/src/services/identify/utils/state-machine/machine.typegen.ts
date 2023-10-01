@@ -16,9 +16,7 @@ export interface Typegen0 {
     assignAuthToken: 'challengeSucceeded' | 'hasSufficientScopes';
     assignEmail: 'identifyFailed';
     assignIdentifySuccessResult: 'identified';
-    assignInitContext: 'initContextUpdated';
     assignPhone: 'identifyFailed';
-    assignSandboxOutcome: 'sandboxOutcomeSubmitted';
     reset: 'bootstrapDataInvalid' | 'identifyReset';
   };
   eventsCausingDelays: {};
@@ -27,15 +25,12 @@ export interface Typegen0 {
   matchesStates:
     | 'authTokenInvalid'
     | 'biometricChallenge'
-    | 'configInvalid'
     | 'emailChallenge'
     | 'emailIdentification'
     | 'init'
     | 'initAuthToken'
     | 'initBootstrap'
-    | 'initialized'
     | 'phoneIdentification'
-    | 'sandboxOutcome'
     | 'smsChallenge'
     | 'success';
   tags: never;

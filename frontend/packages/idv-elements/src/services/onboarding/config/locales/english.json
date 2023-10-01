@@ -6,10 +6,6 @@
     }
   },
   "pages": {
-    "config-invalid": {
-      "title": "Integration incorrectly configured",
-      "subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this product."
-    },
     "additional-info-required": {
       "title": "Additional data is required",
       "subtitle": "In addition to the data we already have on you, {{tenantName}} requires some more information to verify your identity.",

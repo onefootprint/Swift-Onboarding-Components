@@ -1,3 +1,3 @@
+export type { OnboardingMachineArgs } from './machine';
 export { default } from './machine';
-export * from './machine';
-export * from './types';
+export type { MachineContext, MachineEvents } from './types';

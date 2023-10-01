@@ -4,9 +4,17 @@ import type {
   OnboardingStatusRequest,
   OnboardingStatusResponse,
 } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import { AUTH_HEADER } from '../../../../config/constants';
+type GetOnboardingStatusArgs = {
+  enabled?: boolean;
+  authToken: string;
+  options?: {
+    onSuccess?: (data: OnboardingStatusResponse) => void;
+    onError?: (error: RequestError) => void;
+  };
+};
 
 const getOnboardingStatus = async (payload: OnboardingStatusRequest) => {
   const response = await request<OnboardingStatusResponse>({
@@ -19,18 +27,16 @@ const getOnboardingStatus = async (payload: OnboardingStatusRequest) => {
   return response.data;
 };
 
-const useGetOnboardingStatus = (
-  authToken: string,
-  options: {
-    onSuccess?: (data: OnboardingStatusResponse) => void;
-    onError?: (error: RequestError) => void;
-  } = {},
-) =>
+const useGetOnboardingStatus = ({
+  authToken,
+  enabled = true,
+  options = {},
+}: GetOnboardingStatusArgs) =>
   useQuery<OnboardingStatusResponse, RequestError>(
     ['onboarding-status', authToken],
     () => getOnboardingStatus({ authToken }),
     {
-      enabled: !!authToken,
+      enabled: !!authToken && !!enabled,
       onSuccess: options.onSuccess,
       onError: options.onError,
     },

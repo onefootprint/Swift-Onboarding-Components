@@ -1,3 +1,3 @@
-import { useIdentifyMachine } from '../../components/identify-machine-provider';
+import { useIdentifyMachine } from '../../components/machine-provider';
 
 export default useIdentifyMachine;

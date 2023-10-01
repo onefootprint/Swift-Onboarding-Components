@@ -1,1 +1,1 @@
-export * from './ssn-utils';
+export { getSsnKind, getSsnValue, ssnFormatter } from './ssn-utils';

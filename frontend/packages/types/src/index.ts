@@ -159,6 +159,7 @@ export type {
   ValidateSessionRequest,
 } from './api';
 export {
+  ALLOW_EXTRA_FIELDS_HEADER,
   AUTH_HEADER,
   getRequirement,
   OnboardingRequirementKind,

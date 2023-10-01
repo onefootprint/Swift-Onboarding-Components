@@ -1,2 +1,2 @@
 export { default } from './idv';
-export * from './types';
+export type { IdvProps } from './types';

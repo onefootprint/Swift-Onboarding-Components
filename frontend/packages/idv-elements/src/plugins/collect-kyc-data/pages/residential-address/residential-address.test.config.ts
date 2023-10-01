@@ -8,7 +8,7 @@ import {
   OnboardingConfigStatus,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
-import type { KycData } from 'src/plugins/collect-kyc-data/utils';
+import type { KycData } from 'src/plugins/collect-kyc-data/utils/data-types';
 import type { MachineContext } from 'src/plugins/collect-kyc-data/utils/state-machine';
 
 type GetInitialContextArgs = {

@@ -4,9 +4,8 @@ import type {
   GetOnboardingConfigRequest,
   GetPublicOnboardingConfigResponse,
 } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-
-import { AUTH_HEADER } from '../../../config/constants';
 
 const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
   const { obConfigAuth, authToken } = payload;

@@ -1,0 +1,66 @@
+import type { DeviceInfo } from '@onefootprint/idv-elements';
+import type {
+  IdDocOutcomes,
+  IdvBootstrapData,
+  ObConfigAuth,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
+
+export type MachineContext = {
+  // Inputs
+  config?: PublicOnboardingConfig;
+  device?: DeviceInfo;
+  authToken?: string;
+  bootstrapData?: IdvBootstrapData;
+  isTransfer?: boolean;
+  obConfigAuth?: ObConfigAuth;
+  validationToken?: string;
+  userFound?: boolean;
+  showCompletionPage?: boolean;
+  showLogo?: boolean;
+  idDocOutcome?: IdDocOutcomes;
+  sandboxId?: string;
+  onClose?: () => void;
+  onComplete?: (validationToken?: string, delay?: number) => void; // Generated
+};
+
+export type MachineEvents =
+  | {
+      type: 'initContextUpdated';
+      payload: {
+        config?: PublicOnboardingConfig;
+        device?: DeviceInfo;
+      };
+    }
+  | {
+      type: 'configRequestFailed';
+    }
+  | {
+      type: 'sandboxOutcomeSubmitted';
+      payload: {
+        idDocOutcome?: IdDocOutcomes;
+        sandboxId?: string;
+      };
+    }
+  | {
+      type: 'identifyCompleted';
+      payload: {
+        authToken: string;
+        userFound: boolean;
+        email?: string;
+        phoneNumber?: string;
+        idDocOutcome?: IdDocOutcomes;
+      };
+    }
+  | {
+      type: 'onboardingCompleted';
+      payload: {
+        validationToken?: string;
+      };
+    }
+  | {
+      type: 'reset';
+    }
+  | {
+      type: 'expireSession';
+    };

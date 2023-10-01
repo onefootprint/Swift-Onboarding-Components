@@ -462,15 +462,16 @@ describe('<Idv />', () => {
         withOnboardingConfig(sandboxConfig);
       });
 
-      it.skip('starts flow on sandbox outcome page', async () => {
+      it('starts flow on sandbox outcome page', async () => {
         renderIdv({
           obConfigAuth: defaultObConfigAuth,
           showCompletionPage: true,
         });
 
         await waitFor(() => {
-          expect(screen.getByText('Select test outcome')).toBeInTheDocument();
+          expect(screen.getByText('Test outcomes')).toBeInTheDocument();
         });
+        await userEvent.click(screen.getByText('Continue'));
       });
     });
   });
@@ -480,13 +481,14 @@ describe('<Idv />', () => {
       withUserVaultValidate();
       withUserVault();
       withAuthorize();
+      const config = getKycOnboardingConfig(true);
+      withOnboarding(config);
+      withOnboardingConfig(config);
     });
 
     it('skips identify flow when provided an auth token with proper scope', async () => {
       withUserToken();
       withRequirements();
-      const sandboxConfig = getKycOnboardingConfig();
-      withOnboarding(sandboxConfig);
 
       renderIdv({
         authToken: 'token',

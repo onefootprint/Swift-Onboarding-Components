@@ -1,9 +1,7 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
 import type { UserEmailRequest, UserEmailResponse } from '@onefootprint/types';
-import { IdDI } from '@onefootprint/types';
+import { AUTH_HEADER, IdDI } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-
-import { AUTH_HEADER } from '../../../../config/constants';
 
 const userEmailRequest = async (payload: UserEmailRequest) => {
   let method;

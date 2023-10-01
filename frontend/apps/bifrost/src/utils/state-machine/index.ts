@@ -1,3 +1,3 @@
 export { default as BifrostMachine } from './machine';
-export * from './machine';
-export * from './types';
+export { createBifrostMachine } from './machine';
+export type { MachineContext, MachineEvents } from './types';

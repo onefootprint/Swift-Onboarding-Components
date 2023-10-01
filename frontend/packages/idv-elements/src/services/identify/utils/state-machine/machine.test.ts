@@ -1,14 +1,15 @@
-import type { PublicOnboardingConfig } from '@onefootprint/types';
+import type {
+  IdentifyBootstrapData,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 import {
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
-  IdDocOutcomes,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
-import type { IdentifyMachineArgs } from './machine';
 import createIdentifyMachine from './machine';
 
 describe('Identify Machine Tests', () => {
@@ -34,15 +35,13 @@ describe('Identify Machine Tests', () => {
     hasSupportForWebauthn: true,
   });
 
-  const createMachine = ({
-    bootstrapData,
-    isTransfer,
-  }: IdentifyMachineArgs = {}) => {
+  const createMachine = (bootstrapData?: IdentifyBootstrapData) => {
     const machine = interpret(
       createIdentifyMachine({
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
         bootstrapData,
-        isTransfer,
+        device: getDevice(),
+        config: getOnboardingConfig(),
       }),
     );
     machine.start();
@@ -54,15 +53,6 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine();
 
       let { state } = machine;
-      expect(state.value).toEqual('init');
-
-      state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(),
-        },
-      });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
@@ -95,15 +85,6 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine();
 
       let { state } = machine;
-      expect(state.value).toEqual('init');
-
-      state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(),
-        },
-      });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
@@ -151,15 +132,6 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine();
 
       let { state } = machine;
-      expect(state.value).toEqual('init');
-
-      state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(),
-        },
-      });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
@@ -222,15 +194,6 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine();
 
       let { state } = machine;
-      expect(state.value).toEqual('init');
-
-      state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(),
-        },
-      });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
@@ -286,15 +249,6 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine();
 
       let { state } = machine;
-      expect(state.value).toEqual('init');
-
-      state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(),
-        },
-      });
       expect(state.value).toEqual('emailIdentification');
       expect(state.context.device).toEqual({
         type: 'mobile',
@@ -329,14 +283,6 @@ describe('Identify Machine Tests', () => {
     it('successfully completes', () => {
       const machine = createMachine();
       let state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(),
-        },
-      });
-
-      state = machine.send({
         type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
@@ -374,13 +320,6 @@ describe('Identify Machine Tests', () => {
     it('falls back to sms challenge', () => {
       const machine = createMachine();
       let state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(),
-        },
-      });
-      state = machine.send({
         type: 'identified',
         payload: {
           email: 'belce@onefootprint.com',
@@ -421,16 +360,6 @@ describe('Identify Machine Tests', () => {
     it('successfully completes after resending the code', () => {
       const machine = createMachine();
       let { state } = machine;
-      expect(state.value).toEqual('init');
-
-      state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(),
-        },
-      });
-
       state = machine.send({
         type: 'identified',
         payload: {
@@ -464,92 +393,6 @@ describe('Identify Machine Tests', () => {
         authToken: 'authToken',
       });
       expect(state.value).toEqual('success');
-    });
-  });
-
-  describe('in sandbox mode', () => {
-    it('skips sandbox outcome picker if in transfer app', () => {
-      const machine = createMachine({
-        isTransfer: true,
-      });
-      let { state } = machine;
-      expect(state.value).toEqual('init');
-
-      state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(false),
-        },
-      });
-      expect(state.value).toEqual('emailIdentification');
-    });
-
-    it('without bootstrap data', () => {
-      const machine = createMachine();
-      let { state } = machine;
-      expect(state.value).toEqual('init');
-
-      state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(false),
-        },
-      });
-      expect(state.value).toEqual('sandboxOutcome');
-
-      state = machine.send({
-        type: 'sandboxOutcomeSubmitted',
-        payload: {
-          sandboxId: 'suffix',
-          idDocOutcome: IdDocOutcomes.success,
-        },
-      });
-      expect(state.value).toEqual('emailIdentification');
-      expect(state.context.identify).toEqual({
-        sandboxId: 'suffix',
-      });
-    });
-
-    it('with bootstrap data', () => {
-      const machine = createMachine({
-        bootstrapData: { email: 'piip@onefootprint.com' },
-      });
-      let { state } = machine;
-      expect(state.value).toEqual('init');
-
-      state = machine.send({
-        type: 'initContextUpdated',
-        payload: {
-          device: getDevice(),
-          config: getOnboardingConfig(false),
-        },
-      });
-      expect(state.value).toEqual('sandboxOutcome');
-
-      state = machine.send({
-        type: 'sandboxOutcomeSubmitted',
-        payload: {
-          sandboxId: 'suffix',
-          idDocOutcome: IdDocOutcomes.success,
-        },
-      });
-
-      expect(state.value).toEqual('initBootstrap');
-      expect(state.context.bootstrapData).toEqual({
-        email: 'piip@onefootprint.com',
-      });
-      expect(state.context.identify).toEqual({
-        sandboxId: 'suffix',
-      });
-
-      state = machine.send({
-        type: 'identifyReset',
-      });
-      expect(state.context.identify).toEqual({
-        sandboxId: 'suffix',
-      });
     });
   });
 });

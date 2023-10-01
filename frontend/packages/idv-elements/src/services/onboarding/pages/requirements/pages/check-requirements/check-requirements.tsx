@@ -4,10 +4,12 @@ import type { OnboardingStatusResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import * as LogRocket from 'logrocket';
 import React, { useState } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
+import { useGetOnboardingStatus } from '../../../../../../hooks/api';
 import Error from '../../../../components/error';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
-import useGetOnboardingStatus from '../authorize/hooks/use-get-onboarding-status';
+import useOnboarding from './hooks/use-onboarding';
 import computeRequirementsToShow from './utils/compute-requirements-to-show';
 
 const CheckRequirements = () => {
@@ -18,8 +20,30 @@ const CheckRequirements = () => {
     collectedKycData,
   } = state.context;
   const [error, setError] = useState(false);
+  const onboardingMutation = useOnboarding();
+  const onboardingInitialized =
+    startedDataCollection || onboardingMutation.isSuccess;
 
-  const handleSuccess = (response: OnboardingStatusResponse) => {
+  useEffectOnce(() => {
+    // Only initialize the onboarding once at the start (before fetching the requirements)
+    if (onboardingInitialized) {
+      return;
+    }
+    onboardingMutation.mutate(
+      { authToken },
+      {
+        onError: (err: unknown) => {
+          console.error(
+            'Error while initiating onboarding.',
+            getErrorMessage(err),
+          );
+          setError(true);
+        },
+      },
+    );
+  });
+
+  const handleOnboardingStatus = (response: OnboardingStatusResponse) => {
     LogRocket.log('checkRequirements', response);
 
     const payload = computeRequirementsToShow(
@@ -34,7 +58,7 @@ const CheckRequirements = () => {
     });
   };
 
-  const handleError = (err: unknown) => {
+  const handleOnboardingStatusError = (err: unknown) => {
     console.error(
       'Error while checking requirements from onboarding status',
       getErrorMessage(err),
@@ -42,9 +66,13 @@ const CheckRequirements = () => {
     setError(true);
   };
 
-  useGetOnboardingStatus(authToken, {
-    onSuccess: handleSuccess,
-    onError: handleError,
+  useGetOnboardingStatus({
+    authToken,
+    enabled: onboardingInitialized,
+    options: {
+      onSuccess: handleOnboardingStatus,
+      onError: handleOnboardingStatusError,
+    },
   });
 
   return error ? (

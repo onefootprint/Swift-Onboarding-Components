@@ -90,29 +90,32 @@ const Init = () => {
     },
   });
 
-  useGetOnboardingStatus(authToken, {
-    onSuccess: ({ obConfiguration }) => {
-      observeCollector.setAppContext({
-        config: obConfiguration,
-      });
-      const { orgName, key } = obConfiguration;
-      LogRocket.identify(sessionId, {
-        orgName,
-        publicKey: key,
-      });
+  useGetOnboardingStatus({
+    authToken,
+    options: {
+      onSuccess: ({ obConfiguration }) => {
+        observeCollector.setAppContext({
+          config: obConfiguration,
+        });
+        const { orgName, key } = obConfiguration;
+        LogRocket.identify(sessionId, {
+          orgName,
+          publicKey: key,
+        });
 
-      send({
-        type: 'initContextUpdated',
-        payload: {
-          onboardingConfig: obConfiguration,
-        },
-      });
-    },
-    onError: (error: unknown) => {
-      console.error(
-        'Fetching onboarding status failed on handoff init page:',
-        getErrorMessage(error),
-      );
+        send({
+          type: 'initContextUpdated',
+          payload: {
+            onboardingConfig: obConfiguration,
+          },
+        });
+      },
+      onError: (error: unknown) => {
+        console.error(
+          'Fetching onboarding status failed on handoff init page:',
+          getErrorMessage(error),
+        );
+      },
     },
   });
 

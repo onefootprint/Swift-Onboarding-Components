@@ -16,6 +16,70 @@
     }
   },
   "pages": {
+    "config-invalid": {
+      "title": "Integration incorrectly configured",
+      "subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this product."
+    },
+    "sandbox-outcome": {
+      "title": "Test outcomes",
+      "subtitle": "Select what result you want this user to have after they complete their onboarding",
+      "overall-outcome": {
+        "title": "General outcome",
+        "outcome": {
+          "options": {
+            "success": {
+              "title": "Success"
+            },
+            "manual-review": {
+              "title": "Manual review"
+            },
+            "fail": {
+              "title": "Fail"
+            }
+          }
+        },
+        "hint": {
+          "id-doc-fail": "Failing Photo ID verification will force this outcome to fail as well.",
+          "id-doc-real": "Outcome will be determined based on the the Photo ID decision."
+        }
+      },
+      "id-doc-outcome": {
+        "title": "Photo ID",
+        "simulated-outcome": {
+          "title": "Simulated outcome",
+          "options": {
+            "success": {
+              "title": "Success"
+            },
+            "fail": {
+              "title": "Fail"
+            }
+          }
+        },
+        "real-outcome": {
+          "title": "Real outcome",
+          "description": "The result will be the one our provider, Incode, responds with after submitting the images."
+        }
+      },
+      "test-id": {
+        "label": "Test ID",
+        "description": "You can log into a previously created sandbox user by using the Test ID from that corresponding session.",
+        "placeholder": "Enter test ID",
+        "hint": "Do not use special characters or spaces.",
+        "errors": {
+          "required": "Test ID is required",
+          "invalid": "Test ID is invalid. Please remove spaces and special characters."
+        },
+        "button": {
+          "edit": "Edit",
+          "save": "Save",
+          "copy": "Copy",
+          "copy-confirmation": "Copied",
+          "reset": "Reset"
+        }
+      },
+      "cta": "Continue"
+    },
     "complete": {
       "title": "Submission completed!",
       "subtitle-with-kyb": "Thanks for using Footprint to verify your business and your identity.",

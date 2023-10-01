@@ -1,1 +1,6 @@
-export * from './missing-attributes';
+export {
+  hasMissingAttributes,
+  isMissingBasicDataAttribute,
+  isMissingBeneficialOwnerAttribute,
+  isMissingBusinessAddressAttribute,
+} from './missing-attributes';

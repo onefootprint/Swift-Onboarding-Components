@@ -1,2 +1,2 @@
 export { default } from './machine';
-export * from './types';
+export type { MachineContext, MachineEvents } from './types';

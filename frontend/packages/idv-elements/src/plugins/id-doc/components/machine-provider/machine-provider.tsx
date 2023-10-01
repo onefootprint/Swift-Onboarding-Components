@@ -8,6 +8,7 @@ export type IdDocMachineArgs = {
   args: MachineContext;
   initState?: string;
 };
+
 const useLocalIdDocMachine = ({ args, initState }: IdDocMachineArgs) =>
   useMachine(() => createIdDocMachine(args, initState));
 

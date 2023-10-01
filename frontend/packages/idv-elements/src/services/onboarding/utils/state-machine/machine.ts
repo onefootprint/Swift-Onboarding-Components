@@ -1,11 +1,16 @@
-import type { IdDIData, IdDocOutcomes } from '@onefootprint/types';
+import type {
+  IdDIData,
+  IdDocOutcomes,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
+import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import type { MachineContext, MachineEvents } from './types';
-import isContextReady from './utils/is-context-ready';
 
 export type OnboardingMachineArgs = {
+  config: PublicOnboardingConfig;
+  device: DeviceInfo;
   authToken: string;
   bootstrapData?: IdDIData; // TODO: generalize this more in the next iteration
   userFound?: boolean;
@@ -16,6 +21,8 @@ export type OnboardingMachineArgs = {
 };
 
 const createOnboardingMachine = ({
+  config,
+  device,
   authToken,
   bootstrapData = {},
   userFound,
@@ -32,9 +39,12 @@ const createOnboardingMachine = ({
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
-      initial: 'init',
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      tsTypes: {} as import('./machine.typegen').Typegen0,
+      initial: 'requirements',
       context: {
+        config,
+        device,
         authToken,
         bootstrapData,
         userFound,
@@ -44,23 +54,6 @@ const createOnboardingMachine = ({
         onComplete,
       },
       states: {
-        init: {
-          on: {
-            configRequestFailed: {
-              target: 'configInvalid',
-            },
-            initContextUpdated: [
-              {
-                target: 'requirements',
-                cond: (context, event) => isContextReady(context, event),
-                actions: ['assignInitContext'],
-              },
-              {
-                actions: ['assignInitContext'],
-              },
-            ],
-          },
-        },
         requirements: {
           on: {
             requirementsCompleted: [
@@ -85,9 +78,6 @@ const createOnboardingMachine = ({
             ],
           },
         },
-        configInvalid: {
-          type: 'final',
-        },
         complete: {
           type: 'final',
         },
@@ -95,12 +85,6 @@ const createOnboardingMachine = ({
     },
     {
       actions: {
-        assignInitContext: assign((context, event) => {
-          const { device, config } = event.payload;
-          context.device = device !== undefined ? device : context.device;
-          context.config = config !== undefined ? config : context.config;
-          return context;
-        }),
         assignValidationToken: assign((context, event) => ({
           ...context,
           validationToken: event.payload.validationToken,

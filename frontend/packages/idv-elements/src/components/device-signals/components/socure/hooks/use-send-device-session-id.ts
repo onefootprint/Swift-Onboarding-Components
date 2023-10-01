@@ -3,9 +3,8 @@ import type {
   SendSocureDeviceSessionIdRequest,
   SendSocureDeviceSessionIdResponse,
 } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-
-import { AUTH_HEADER } from '../../../../../config/constants';
 
 const sendDeviceSessionIdRequest = async (
   data: SendSocureDeviceSessionIdRequest,

@@ -13,7 +13,7 @@ const BiometricChallenge = () => {
   const { t } = useTranslation('pages.biometric-challenge');
   const [state, send] = useIdentifyMachine();
   const {
-    config,
+    config: { orgName: tenantName },
     initialAuthToken,
     bootstrapData,
     identify: { userFound },
@@ -21,8 +21,8 @@ const BiometricChallenge = () => {
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
   const title = t('title');
   const subtitle =
-    isBootstrap && userFound && config
-      ? t('bootstrap-subtitle', { tenantName: config.orgName })
+    isBootstrap && userFound
+      ? t('bootstrap-subtitle', { tenantName })
       : t('subtitle');
   const hasInitialAuthToken = !!initialAuthToken;
 

@@ -5,9 +5,7 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import { UserTokenScope } from '@onefootprint/types';
-import { useEffectOnce } from 'usehooks-ts';
 
-import * as useDeviceInfo from '../../hooks/ui/use-device-info';
 import * as getBiometricChallengeResponse from './utils/biometrics/get-biometric-challenge-response';
 
 // This needs to be mocked here and in the test itself as it is a esModule
@@ -28,37 +26,17 @@ export const mockGetBiometricChallengeResponse = () =>
     .spyOn(getBiometricChallengeResponse, 'default')
     .mockImplementation(mockGenerateBiometricResponse);
 
-// This needs to be mocked here and in the test itself as it is a esModule
-jest.mock('../../hooks/ui/use-device-info', () => ({
-  __esModule: true,
-  ...jest.requireActual('../../hooks/ui/use-device-info'),
-}));
-
-const useDeviceInfoImpl = (onComplete: (deviceInfo: any) => void) => {
-  useEffectOnce(() => {
-    onComplete({
-      type: 'mobile',
-      hasSupportForWebauthn: true,
-    });
-  });
-};
-
-export const mockUseDeviceInfo = () =>
-  jest
-    .spyOn(useDeviceInfo, 'useDeviceInfo')
-    .mockImplementation(useDeviceInfoImpl);
-
 export const getOnboardingConfig = (isLive?: boolean, noPhone?: boolean) => ({
   key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
   name: 'Acme Bank',
-  org_name: 'Acme Bank',
-  logo_url: null,
-  is_live: !!isLive,
+  orgName: 'Acme Bank',
+  logoUrl: null,
+  isLive: !!isLive,
   status: 'enabled',
-  is_no_phone_flow: !!noPhone,
-  requires_id_doc: false,
-  is_kyb: false,
-  allow_international_residents: false,
+  isNoPhoneFlow: !!noPhone,
+  requiresIdDoc: false,
+  isKyb: false,
+  allowInternationalResidents: false,
 });
 
 export const liveOnboardingConfigFixture = getOnboardingConfig(true);
@@ -151,13 +129,6 @@ export const withUserVault = () =>
     },
   });
 
-export const fillSandboxOutcome = async () => {
-  await waitFor(() => {
-    expect(screen.getByText('Test outcomes')).toBeInTheDocument();
-  });
-  await userEvent.click(screen.getByText('Continue'));
-};
-
 export const fillIdentifyEmail = async () => {
   await waitFor(() => {
     expect(screen.getByLabelText('Email')).toBeInTheDocument();
@@ -238,6 +209,6 @@ export const bootstrapExistingUserWithPasskey = async () => {
 
 export const expectShimmer = async () => {
   await waitFor(() => {
-    expect(screen.getAllByRole('progressbar').length).toBeGreaterThan(0);
+    expect(screen.getByTestId('init-shimmer')).toBeInTheDocument();
   });
 };

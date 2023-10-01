@@ -1,8 +1,7 @@
 import request from '@onefootprint/request';
 import type { ChallengeKind } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-
-import { AUTH_HEADER } from '../../../../../../../../../config/constants';
 
 export type IdentifyRequest = {
   authToken: string;

@@ -1,8 +1,7 @@
 import request from '@onefootprint/request';
 import type { UserTokenRequest, UserTokenResponse } from '@onefootprint/types';
+import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-
-import { AUTH_HEADER } from '../../../../config/constants';
 
 const userToken = async (payload: UserTokenRequest) => {
   const { authToken } = payload;

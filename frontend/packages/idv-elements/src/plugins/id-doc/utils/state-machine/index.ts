@@ -1,2 +1,8 @@
 export { default as createIdDocMachine } from './machine';
-export * from './types';
+export type {
+  CaptureKind,
+  IdDocImageErrorType,
+  MachineContext,
+  MachineEvents,
+  ProccessingSucceededEvent,
+} from './types';
