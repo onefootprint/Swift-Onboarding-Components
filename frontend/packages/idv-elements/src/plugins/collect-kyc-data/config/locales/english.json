@@ -32,7 +32,7 @@
     "basic-information": {
       "title": "Basic Data",
       "subtitle": "We're legally required to collect this information.",
-      "hint": "Spell your first, middle and last names exactly as shown on your government-issued ID",
+      "hint": "Spell your full legal first, middle and last names exactly as shown on your government-issued ID",
       "form": {
         "first-name": {
           "label": "First name",
