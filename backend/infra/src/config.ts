@@ -57,7 +57,6 @@ export interface Workos {
 export interface Twilio {
   accountSid: string;
   phoneNumber: string;
-  integrationTestPhoneNumber: string;
 }
 
 export interface S3 {

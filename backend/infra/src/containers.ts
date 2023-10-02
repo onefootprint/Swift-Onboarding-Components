@@ -455,10 +455,6 @@ export abstract class ServiceContainers {
                 value: constants.sendgrid.fromEmail,
               },
               {
-                name: 'INTEGRATION_TEST_PHONE_NUMBER',
-                value: constants.twilio.integrationTestPhoneNumber,
-              },
-              {
                 name: 'DOCUMENT_S3_BUCKET',
                 value: s3Buckets.documentImages.bucketName,
               },
