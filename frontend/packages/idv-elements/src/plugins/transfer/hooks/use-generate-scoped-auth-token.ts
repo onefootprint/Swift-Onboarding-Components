@@ -13,8 +13,8 @@ import type { DeviceInfo } from '../../../hooks/ui/use-device-info';
 import Logger from '../../../utils/logger';
 
 type GenerateScopedAuthTokenArgs = {
-  authToken?: string;
-  device?: DeviceInfo;
+  authToken: string;
+  device: DeviceInfo;
   config?: PublicOnboardingConfig;
   onSuccess?: (data: D2PGenerateResponse) => void;
   idDocOutcome?: IdDocOutcome;
@@ -27,13 +27,12 @@ const useGenerateScopedAuthToken = ({
   idDocOutcome,
 }: GenerateScopedAuthTokenArgs) => {
   const d2pGenerateMutation = useD2PGenerate();
-  const opener = device?.type ?? 'unknown';
   const sessionId = getSessionId();
   const appearance = useAppearance();
   const styleParams = appearance ? JSON.stringify(appearance) : undefined;
 
   const generateScopedAuthToken = () => {
-    const isMobile = device?.type === 'mobile';
+    const isMobile = device.type === 'mobile';
     const redirectUrl = isMobile ? window.location.href : undefined;
 
     if (!authToken || d2pGenerateMutation.isLoading) {
@@ -43,7 +42,7 @@ const useGenerateScopedAuthToken = ({
       {
         authToken,
         meta: {
-          opener,
+          opener: device.type,
           sessionId,
           styleParams,
           sandboxIdDocOutcome: idDocOutcome,
@@ -73,7 +72,6 @@ const useGenerateScopedAuthToken = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     authToken,
-    opener,
     styleParams,
     sessionId,
     d2pGenerateMutation.isLoading,

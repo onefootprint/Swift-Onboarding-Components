@@ -2,7 +2,7 @@ import { assign, createMachine } from 'xstate';
 
 import type { MachineContext, MachineEvents } from './types';
 
-const createDesktopMachine = () =>
+const createDesktopMachine = (initialContext: MachineContext) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -14,36 +14,16 @@ const createDesktopMachine = () =>
       // eslint-disable-next-line
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
-      context: {
-        missingRequirements: {},
-      },
+      context: { ...initialContext },
       states: {
         init: {
-          on: {
-            receivedContext: [
-              {
-                target: 'success',
-                actions: 'assignContext',
-                cond: (context, event) =>
-                  Object.keys(event.payload.missingRequirements).length === 0,
-              },
-              {
-                target: 'deviceSupport',
-                actions: 'assignContext',
-              },
-            ],
-          },
-        },
-        deviceSupport: {
           always: [
             {
               target: 'qrRegister',
-              cond: context =>
-                context.device?.type !== 'mobile' ||
-                !context.device?.hasSupportForWebauthn,
+              cond: context => context.device.type !== 'mobile',
             },
             {
-              target: 'success',
+              target: 'complete',
             },
           ],
         },
@@ -52,23 +32,23 @@ const createDesktopMachine = () =>
             scopedAuthTokenGenerated: {
               actions: ['assignScopedAuthToken'],
             },
-            qrCodeLinkSentViaSms: {
-              target: 'qrCodeSent',
+            d2pSessionStarted: {
+              target: 'processing',
             },
-            qrCodeScanned: {
-              target: 'qrCodeScanned',
+            d2pSessionCompleted: {
+              target: 'complete',
             },
-            qrRegisterSucceeded: {
-              target: 'success',
+            d2pSessionFailed: {
+              target: 'complete',
             },
-            qrRegisterFailed: {
-              target: 'failure',
+            d2pSessionCanceled: {
+              actions: ['clearScopedAuthToken'],
             },
             d2pSessionExpired: {
               actions: ['clearScopedAuthToken'],
             },
             continueOnDesktop: {
-              target: 'success',
+              target: 'complete',
             },
             confirmationRequired: {
               target: 'confirmContinueOnDesktop',
@@ -78,24 +58,24 @@ const createDesktopMachine = () =>
         confirmContinueOnDesktop: {
           on: {
             continueOnDesktop: {
-              target: 'success',
+              target: 'complete',
             },
             continueOnMobile: {
               target: 'qrRegister',
             },
           },
         },
-        qrCodeScanned: {
+        processing: {
           on: {
-            qrCodeCanceled: {
+            d2pSessionCanceled: {
               target: 'qrRegister',
               actions: ['clearScopedAuthToken'],
             },
-            qrRegisterSucceeded: {
-              target: 'success',
+            d2pSessionCompleted: {
+              target: 'complete',
             },
-            qrRegisterFailed: {
-              target: 'failure',
+            d2pSessionFailed: {
+              target: 'complete',
             },
             d2pSessionExpired: {
               target: 'qrRegister',
@@ -103,42 +83,13 @@ const createDesktopMachine = () =>
             },
           },
         },
-        qrCodeSent: {
-          on: {
-            qrCodeCanceled: {
-              target: 'qrRegister',
-              actions: ['clearScopedAuthToken'],
-            },
-            qrRegisterSucceeded: {
-              target: 'success',
-            },
-            qrRegisterFailed: {
-              target: 'failure',
-            },
-            d2pSessionExpired: {
-              target: 'qrRegister',
-              actions: ['clearScopedAuthToken'],
-            },
-          },
-        },
-        success: {
-          type: 'final',
-        },
-        failure: {
+        complete: {
           type: 'final',
         },
       },
     },
     {
       actions: {
-        assignContext: assign((context, event) => ({
-          ...context,
-          authToken: event.payload.authToken,
-          device: event.payload.device,
-          config: event.payload.config,
-          missingRequirements: { ...event.payload.missingRequirements },
-          idDocOutcome: event.payload.idDocOutcome,
-        })),
         assignScopedAuthToken: assign((context, event) => ({
           ...context,
           scopedAuthToken: event.payload.scopedAuthToken,

@@ -3,8 +3,7 @@ import React, { useEffect } from 'react';
 import useLogStateMachine from '../../../../../hooks/ui/use-log-state-machine';
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 import ConfirmContinueOnDesktop from '../confirm-continue-on-desktop';
-import QRCodeScanned from '../qr-code-scanned';
-import QRCodeSent from '../qr-code-sent';
+import Processing from '../processing';
 import QRRegister from '../qr-register';
 
 type RouterProps = {
@@ -13,7 +12,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useDesktopMachine();
-  const isDone = state.matches('success') || state.matches('failure');
+  const isDone = state.matches('complete');
   useLogStateMachine('transfer-desktop', state);
 
   useEffect(() => {
@@ -24,12 +23,11 @@ const Router = ({ onDone }: RouterProps) => {
 
   return (
     <>
-      {state.matches('qrCodeScanned') && <QRCodeScanned />}
-      {state.matches('qrCodeSent') && <QRCodeSent />}
       {state.matches('qrRegister') && <QRRegister />}
       {state.matches('confirmContinueOnDesktop') && (
         <ConfirmContinueOnDesktop />
       )}
+      {state.matches('processing') && <Processing />}
     </>
   );
 };

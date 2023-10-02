@@ -13,21 +13,20 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignContext: 'receivedContext';
     assignScopedAuthToken: 'scopedAuthTokenGenerated';
     assignTab: 'newTabOpened';
-    clearScopedAuthToken: 'd2pSessionExpired';
+    clearScopedAuthToken: 'd2pSessionCanceled' | 'd2pSessionExpired';
+    clearTab: 'tabClosed';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'deviceSupport'
-    | 'failure'
+    | 'complete'
     | 'init'
     | 'newTabProcessing'
     | 'newTabRequest'
-    | 'skipLiveness'
-    | 'success';
+    | 'sms'
+    | 'smsProcessing';
   tags: never;
 }

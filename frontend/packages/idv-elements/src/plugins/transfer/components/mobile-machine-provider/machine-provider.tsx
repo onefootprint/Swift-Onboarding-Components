@@ -1,9 +1,15 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import MobileMachine from '../../utils/mobile-state-machine';
+import type { MachineContext } from '../../utils/mobile-state-machine';
+import createMobileMachine from '../../utils/mobile-state-machine';
 
-const useLocalMobileMachine = () => useMachine(MobileMachine);
+type MobileMachineArgs = {
+  initialContext: MachineContext;
+};
+
+const useLocalMobileMachine = ({ initialContext }: MobileMachineArgs) =>
+  useMachine(() => createMobileMachine(initialContext));
 
 export const [MobileMachineProvider, useMobileMachine] = constate(
   useLocalMobileMachine,

@@ -3,10 +3,10 @@ import type { GetD2PResponse } from '@onefootprint/types';
 import { D2PStatus } from '@onefootprint/types';
 
 import Logger from '../../../../utils/logger';
-import useDesktopMachine from './use-desktop-machine';
+import useMobileMachine from './use-mobile-machine';
 
 const useHandleD2PStatusUpdate = () => {
-  const [, send] = useDesktopMachine();
+  const [, send] = useMobileMachine();
 
   const handleSuccess = (response: GetD2PResponse) => {
     const { status } = response;
@@ -21,12 +21,12 @@ const useHandleD2PStatusUpdate = () => {
     }
   };
 
-  const handleError = (error?: unknown) => {
+  const handleError = (error: unknown) => {
     Logger.warn(
-      `Encountered error while polling for status on transfer plugin on desktop, likely indicating expired session. ${getErrorMessage(
+      `Encountered error while polling for status on transfer plugin on mobile, likely indicating expired session. ${getErrorMessage(
         error,
       )}`,
-      'transfer-desktop',
+      'transfer-mobile',
     );
     send({ type: 'd2pSessionExpired' });
   };

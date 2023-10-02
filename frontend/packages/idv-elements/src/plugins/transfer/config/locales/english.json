@@ -2,16 +2,42 @@
   "global": {
     "errors": {}
   },
-  "components": {},
+  "components": {
+    "sms-button-with-countdown": {
+      "cta": "Resend link",
+      "subtitleWithCount_one": "Please wait {{count}} second...",
+      "subtitleWithCount_other": "Please wait {{count}} seconds...",
+      "error": {
+        "title": "Sorry, something went wrong!",
+        "description": "Please try resending the link to your phone number."
+      },
+      "resend-success": {
+        "title": "Success",
+        "description": "We sent you a new code."
+      }
+    },
+    "requirements-title": {
+      "liveness": "Liveness check",
+      "id-doc": "Scan or upload your ID",
+      "liveness-with-id-doc": "Liveness check & ID document"
+    }
+  },
   "pages": {
     "mobile": {
+      "sms": {
+        "title": "Check your messages",
+        "subtitle": "We've sent you a link to your phone number. Please open it and follow the prompts."
+      },
+      "sms-processing": {
+        "subtitle": "Link sent to phone. Please continue from there.",
+        "cancel": "Cancel"
+      },
       "new-tab-requested": {
         "title": "New browser window",
         "subtitle": "To continue, we need to open a new browser window. Please tap the button below.",
         "cta": "Open new browser tab"
       },
       "new-tab-processing": {
-        "title": "Liveness check pending",
         "subtitle": "We opened a new browser tab on this device. Please complete your liveness check in there.",
         "cancel": "Cancel"
       }
@@ -19,24 +45,6 @@
     "desktop": {
       "qr-register": {
         "subtitle": "We've sent you a link to your phone number. Please open it and follow the prompts.",
-        "liveness": {
-          "title": "Liveness check"
-        },
-        "id-doc": {
-          "title": "Scan or upload your ID"
-        },
-        "liveness-with-id-doc": {
-          "title": "Liveness check & ID document"
-        },
-        "sms": {
-          "cta": "Resend link",
-          "subtitleWithCount_one": "Please wait {{count}} second...",
-          "subtitleWithCount_other": "Please wait {{count}} seconds...",
-          "error": {
-            "title": "Sorry, something went wrong!",
-            "description": "Please try resending the link to your phone number."
-          }
-        },
         "qr-code": {
           "instructions": "Alternatively, you can also scan this QR code with your phone to continue."
         },
@@ -45,30 +53,8 @@
           "cta": "Continue on desktop"
         }
       },
-      "qr-code-scanned": {
-        "liveness": {
-          "title": "Liveness check"
-        },
-        "id-doc": {
-          "title": "Scan or upload your ID"
-        },
-        "liveness-with-id-doc": {
-          "title": "Liveness check & ID document"
-        },
-        "subtitle": "QR code scanned. Please continue on your phone.",
-        "cancel": "Cancel"
-      },
-      "qr-code-sent": {
-        "liveness": {
-          "title": "Liveness check"
-        },
-        "id-doc": {
-          "title": "Scan or upload your ID"
-        },
-        "liveness-with-id-doc": {
-          "title": "Liveness check & ID document"
-        },
-        "subtitle": "Link sent to phone. Please continue from there.",
+      "processing": {
+        "subtitle": "Mobile session started. Please continue on your there.",
         "cancel": "Cancel"
       },
       "confirm-continue-on-desktop": {

@@ -5,9 +5,9 @@ import type { TransferRequirements } from '../../types';
 
 export type MachineContext = {
   // Plugin context
-  authToken?: string;
-  scopedAuthToken?: string;
-  device?: DeviceInfo;
+  authToken: string;
+  scopedAuthToken: string;
+  device: DeviceInfo;
   missingRequirements: TransferRequirements;
   config?: PublicOnboardingConfig;
   idDocOutcome?: IdDocOutcome;
@@ -15,27 +15,16 @@ export type MachineContext = {
 
 export type MachineEvents =
   | {
-      type: 'receivedContext';
-      payload: {
-        authToken: string;
-        device: DeviceInfo;
-        config: PublicOnboardingConfig;
-        missingRequirements: TransferRequirements;
-        idDocOutcome?: IdDocOutcome;
-      };
-    }
-  | {
       type: 'scopedAuthTokenGenerated';
       payload: {
         scopedAuthToken: string;
       };
     }
-  | { type: 'qrCodeCanceled' }
-  | { type: 'qrCodeLinkSentViaSms' }
-  | { type: 'qrCodeScanned' }
+  | { type: 'd2pSessionStarted' }
+  | { type: 'd2pSessionCanceled' }
+  | { type: 'd2pSessionFailed' }
+  | { type: 'd2pSessionCompleted' }
+  | { type: 'd2pSessionExpired' }
   | { type: 'confirmationRequired' }
   | { type: 'continueOnDesktop' }
-  | { type: 'continueOnMobile' }
-  | { type: 'qrRegisterSucceeded' }
-  | { type: 'qrRegisterFailed' }
-  | { type: 'd2pSessionExpired' };
+  | { type: 'continueOnMobile' };

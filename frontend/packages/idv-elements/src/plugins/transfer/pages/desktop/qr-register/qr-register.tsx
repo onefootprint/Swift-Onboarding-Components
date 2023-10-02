@@ -1,88 +1,38 @@
-import { useCountdown, useTranslation } from '@onefootprint/hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone224 } from '@onefootprint/icons';
 import type { D2PGenerateResponse } from '@onefootprint/types';
-import {
-  Button,
-  Divider,
-  Grid,
-  Shimmer,
-  Stack,
-  Typography,
-  useToast,
-} from '@onefootprint/ui';
-import React, { useEffect, useState } from 'react';
+import { Divider, Grid, Shimmer, Stack, Typography } from '@onefootprint/ui';
+import React from 'react';
 import QRCode from 'react-qr-code';
-import { useEffectOnce } from 'usehooks-ts';
 
-import HeaderTitle from '../../../../../components/layout/components/header-title';
-import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import {
-  useCreateHandoffUrl,
-  useD2PSms,
-  useGetD2PStatus,
-} from '../../../../../hooks';
+import { HeaderTitle, NavigationHeader } from '../../../../../components';
+import { useCreateHandoffUrl, useGetD2PStatus } from '../../../../../hooks';
+import SmsButtonWithCountdown from '../../../components/sms-button-with-countdown';
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
-import useTranslationSourceForRequirements from '../../../hooks/desktop/use-translation-source-for-requirements';
 import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-token';
+import getRequirementsTitleTranslationKey from '../../../utils/get-requirements-title-translation-key';
 import ContinueOnDesktop from './components/continue-on-desktop';
 
-const COUNTER_SECONDS = 10;
 const QR_CODE_SIZE = 130;
 
 const QRRegister = () => {
-  const { t } = useTranslation('pages.desktop.qr-register');
-  const translationSource = useTranslationSourceForRequirements();
-  const toast = useToast();
-
+  const { t, allT } = useTranslation('pages.desktop.qr-register');
   const [state, send] = useDesktopMachine();
-  const { authToken, device, config, scopedAuthToken, idDocOutcome } =
-    state.context;
+  const {
+    authToken,
+    missingRequirements,
+    device,
+    config,
+    scopedAuthToken,
+    idDocOutcome,
+  } = state.context;
+  const allTKey = getRequirementsTitleTranslationKey(missingRequirements);
+
   const url = useCreateHandoffUrl({
     authToken: scopedAuthToken,
     onboardingConfig: config,
   });
-
-  const [isDisabled, setIsDisabled] = useState(false);
-  const { countdown, setSeconds } = useCountdown({
-    onCompleted: () => setIsDisabled(false),
-  });
-  const disableAndCountdown = () => {
-    setIsDisabled(true);
-    setSeconds(COUNTER_SECONDS);
-  };
-
-  const d2pSmsMutation = useD2PSms();
-  const handleSendLinkToPhone = () => {
-    if (!scopedAuthToken || !url || d2pSmsMutation.isLoading) {
-      return;
-    }
-    d2pSmsMutation.mutate(
-      { authToken: scopedAuthToken, url },
-      {
-        onSuccess() {
-          disableAndCountdown();
-        },
-        onError() {
-          setIsDisabled(false);
-          setSeconds(0);
-          toast.show({
-            title: t('sms.error.title'),
-            description: t('sms.error.description'),
-            variant: 'error',
-          });
-        },
-      },
-    );
-  };
-
-  useEffectOnce(() => {
-    disableAndCountdown();
-  });
-  useEffect(() => {
-    handleSendLinkToPhone();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url]);
 
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
     authToken,
@@ -98,7 +48,8 @@ const QRRegister = () => {
       });
     },
   });
-  const isLoading = mutation.isLoading || !scopedAuthToken || !url;
+
+  const isLoading = mutation.isLoading || !url || !scopedAuthToken;
 
   const { handleSuccess, handleError } = useHandleD2PStatusUpdate();
   useGetD2PStatus({
@@ -117,28 +68,11 @@ const QRRegister = () => {
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <Grid.Container gap={7} textAlign="center">
         <HeaderTitle
-          title={t(`${translationSource}.title`)}
+          title={allT(allTKey)}
           subtitle={t('subtitle')}
           icon={IcoSmartphone224}
         />
-        <Stack direction="column" align="center" gap={3}>
-          <Button
-            variant="secondary"
-            fullWidth
-            disabled={isDisabled}
-            onClick={handleSendLinkToPhone}
-            sx={{ marginTop: 2 }}
-          >
-            {t('sms.cta')}
-          </Button>
-          {isDisabled && (
-            <Typography variant="body-4" color="quaternary">
-              {t('sms.subtitleWithCount', {
-                count: countdown,
-              })}
-            </Typography>
-          )}
-        </Stack>
+        <SmsButtonWithCountdown authToken={scopedAuthToken} url={url} />
         <Divider variant="secondary" />
         <Stack direction="column" align="center" gap={5}>
           <Typography variant="body-2" color="secondary">

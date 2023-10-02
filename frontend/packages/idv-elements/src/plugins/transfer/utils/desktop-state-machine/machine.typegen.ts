@@ -13,21 +13,17 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignContext: 'receivedContext';
     assignScopedAuthToken: 'scopedAuthTokenGenerated';
-    clearScopedAuthToken: 'd2pSessionExpired' | 'qrCodeCanceled';
+    clearScopedAuthToken: 'd2pSessionCanceled' | 'd2pSessionExpired';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
+    | 'complete'
     | 'confirmContinueOnDesktop'
-    | 'deviceSupport'
-    | 'failure'
     | 'init'
-    | 'qrCodeScanned'
-    | 'qrCodeSent'
-    | 'qrRegister'
-    | 'success';
+    | 'processing'
+    | 'qrRegister';
   tags: never;
 }

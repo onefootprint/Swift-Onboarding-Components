@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 
 import useLogStateMachine from '../../../../../hooks/ui/use-log-state-machine';
+import MobileProcessing from '../../../components/mobile-processing';
 import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
-import NewTabProcessing from '../new-tab-processing';
 import NewTabRequest from '../new-tab-request';
-import SkipLiveness from '../skip-liveness';
+import Sms from '../sms';
 
 type RouterProps = {
   onDone: () => void;
@@ -12,7 +12,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useMobileMachine();
-  const isDone = state.matches('success') || state.matches('failure');
+  const isDone = state.matches('complete');
   useLogStateMachine('transfer-mobile', state);
 
   useEffect(() => {
@@ -21,19 +21,18 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches('newTabProcessing')) {
-    return <NewTabProcessing />;
-  }
-
-  if (state.matches('newTabRequest')) {
-    return <NewTabRequest />;
-  }
-
-  if (state.matches('skipLiveness')) {
-    return <SkipLiveness />;
-  }
-
-  return null;
+  return (
+    <>
+      {state.matches('newTabRequest') && <NewTabRequest />}
+      {state.matches('newTabProcessing') && (
+        <MobileProcessing translationKey="pages.mobile.new-tab-processing" />
+      )}
+      {state.matches('sms') && <Sms />}
+      {state.matches('smsProcessing') && (
+        <MobileProcessing translationKey="pages.mobile.sms-processing" />
+      )}
+    </>
+  );
 };
 
 export default Router;

@@ -79,6 +79,7 @@ export {
   checkIsInIframe,
   checkIsInWebView,
   checkIsPhoneValid,
+  checkIsSocialMediaBrowser,
   DesignSystemProvider,
   getBiometricChallengeResponse,
   getCanChallengeBiometrics,

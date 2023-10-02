@@ -16,7 +16,7 @@ export const checkIsUserAgentWebView = (ua: string) =>
   !!ua.match(WebViewRegExp);
 
 const checkIsInWebView = () => {
-  if (typeof window === 'undefined' || !navigator) {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
     return false;
   }
   const ua = navigator.userAgent;

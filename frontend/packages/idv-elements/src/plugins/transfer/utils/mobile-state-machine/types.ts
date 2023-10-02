@@ -1,40 +1,35 @@
 import type { IdDocOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { TransferRequirements } from '../../types';
 
 export type MachineContext = {
   device: DeviceInfo;
   authToken: string;
   scopedAuthToken: string;
-  tab?: Window;
+  missingRequirements: TransferRequirements;
   config?: PublicOnboardingConfig;
+  tab?: Window;
   idDocOutcome?: IdDocOutcome;
+  isSocialMediaBrowser?: boolean;
 };
 
 export type MachineEvents =
-  | {
-      type: 'receivedContext';
-      payload: {
-        device: DeviceInfo;
-        authToken: string;
-        idDocOutcome?: IdDocOutcome;
-        config: PublicOnboardingConfig;
-      };
-    }
   | {
       type: 'scopedAuthTokenGenerated';
       payload: {
         scopedAuthToken: string;
       };
     }
-  | { type: 'd2pSessionExpired' }
   | {
       type: 'newTabOpened';
       payload: {
         tab: Window;
       };
     }
-  | { type: 'newTabRegisterFailed' }
-  | { type: 'livenessSkipped' }
-  | { type: 'newTabRegisterSucceeded' }
-  | { type: 'newTabRegisterCanceled' };
+  | { type: 'tabClosed' }
+  | { type: 'd2pSessionStarted' }
+  | { type: 'd2pSessionCanceled' }
+  | { type: 'd2pSessionFailed' }
+  | { type: 'd2pSessionCompleted' }
+  | { type: 'd2pSessionExpired' };

@@ -1,8 +1,9 @@
 import { assign, createMachine } from 'xstate';
 
+import { shouldOpenNewTab, shouldSendSms } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
-const createMobileMachine = () =>
+const createMobileMachine = (initialContext: MachineContext) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -14,35 +15,47 @@ const createMobileMachine = () =>
       // eslint-disable-next-line
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
-      context: {
-        authToken: '',
-        scopedAuthToken: '',
-        device: {
-          type: 'mobile',
-          hasSupportForWebauthn: false,
-        },
-      },
+      context: { ...initialContext },
       states: {
         init: {
-          on: {
-            receivedContext: {
-              target: 'deviceSupport',
-              actions: 'assignContext',
-            },
-          },
-        },
-        deviceSupport: {
           always: [
             {
-              target: 'newTabRequest',
+              target: 'complete',
               cond: context =>
-                context.device.type === 'mobile' &&
-                context.device.hasSupportForWebauthn,
+                context.device.type !== 'mobile' ||
+                !context.device.hasSupportForWebauthn,
             },
             {
-              target: 'skipLiveness',
+              target: 'sms',
+              cond: context => shouldSendSms(context),
+            },
+            {
+              target: 'newTabRequest',
+              cond: context => shouldOpenNewTab(context),
+            },
+            {
+              target: 'complete',
             },
           ],
+        },
+        sms: {
+          on: {
+            scopedAuthTokenGenerated: {
+              actions: ['assignScopedAuthToken'],
+            },
+            d2pSessionStarted: {
+              target: 'smsProcessing',
+            },
+            d2pSessionCompleted: {
+              target: 'complete',
+            },
+            d2pSessionFailed: {
+              target: 'complete',
+            },
+            d2pSessionExpired: {
+              actions: ['clearScopedAuthToken'],
+            },
+          },
         },
         newTabRequest: {
           on: {
@@ -55,16 +68,38 @@ const createMobileMachine = () =>
             },
           },
         },
+        smsProcessing: {
+          on: {
+            d2pSessionCanceled: {
+              target: 'sms',
+              actions: ['clearScopedAuthToken'],
+            },
+            d2pSessionCompleted: {
+              target: 'complete',
+            },
+            d2pSessionFailed: {
+              target: 'complete',
+            },
+            d2pSessionExpired: {
+              target: 'sms',
+              actions: ['clearScopedAuthToken'],
+            },
+          },
+        },
         newTabProcessing: {
           on: {
-            newTabRegisterCanceled: {
+            tabClosed: {
+              actions: ['clearTab'],
+            },
+            d2pSessionCanceled: {
               target: 'newTabRequest',
+              actions: ['clearScopedAuthToken'],
             },
-            newTabRegisterSucceeded: {
-              target: 'success',
+            d2pSessionCompleted: {
+              target: 'complete',
             },
-            newTabRegisterFailed: {
-              target: 'skipLiveness',
+            d2pSessionFailed: {
+              target: 'complete',
             },
             d2pSessionExpired: {
               target: 'newTabRequest',
@@ -72,30 +107,13 @@ const createMobileMachine = () =>
             },
           },
         },
-        skipLiveness: {
-          on: {
-            livenessSkipped: {
-              target: 'failure',
-            },
-          },
-        },
-        success: {
-          type: 'final',
-        },
-        failure: {
+        complete: {
           type: 'final',
         },
       },
     },
     {
       actions: {
-        assignContext: assign((context, event) => ({
-          ...context,
-          device: event.payload.device,
-          authToken: event.payload.authToken,
-          idDocOutcome: event.payload.idDocOutcome,
-          config: event.payload.config,
-        })),
         assignScopedAuthToken: assign((context, event) => ({
           ...context,
           scopedAuthToken: event.payload.scopedAuthToken,
@@ -107,6 +125,10 @@ const createMobileMachine = () =>
         clearScopedAuthToken: assign(context => ({
           ...context,
           scopedAuthToken: undefined,
+        })),
+        clearTab: assign(context => ({
+          ...context,
+          tab: undefined,
         })),
       },
     },

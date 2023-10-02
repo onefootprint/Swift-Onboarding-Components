@@ -52,19 +52,17 @@ const NewTabRequest = () => {
   };
 
   return (
-    <>
+    <Container>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
-      <Container>
-        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        <Button
-          onClick={handleClick}
-          fullWidth
-          disabled={mutation.isLoading || !scopedAuthToken}
-        >
-          {t('cta')}
-        </Button>
-      </Container>
-    </>
+      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+      <Button
+        onClick={handleClick}
+        fullWidth
+        disabled={mutation.isLoading || !scopedAuthToken}
+      >
+        {t('cta')}
+      </Button>
+    </Container>
   );
 };
 
