@@ -62,6 +62,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             name,
             key,
             org_name,
+            org_id: tenant_id,
             logo_url,
             privacy_policy_url,
             is_live,

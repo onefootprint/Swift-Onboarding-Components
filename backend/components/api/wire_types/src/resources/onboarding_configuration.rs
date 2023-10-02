@@ -35,6 +35,7 @@ export_schema!(OnboardingConfiguration);
 pub struct PublicOnboardingConfiguration {
     pub name: String,
     pub key: ObConfigurationKey,
+    pub org_id: TenantId,
     pub org_name: String,
     pub logo_url: Option<String>,
     pub privacy_policy_url: Option<String>,
