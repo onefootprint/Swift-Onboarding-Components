@@ -1,12 +1,12 @@
 use crate::*;
 
-#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 pub struct UserId {
     pub id: FpId,
 }
 
 /// Basic information about a user
-#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 pub struct User {
     pub id: FpId,
     pub requires_manual_review: bool,

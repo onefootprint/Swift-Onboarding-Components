@@ -58,7 +58,7 @@ pub struct ProxyConfigDetailed {
 }
 
 /// a secret header to forward to the proxy
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, JsonSchema)]
 pub struct OmittedSecretCustomHeader {
     /// identifier for the secret header
     pub id: ProxyConfigSecretHeaderId,

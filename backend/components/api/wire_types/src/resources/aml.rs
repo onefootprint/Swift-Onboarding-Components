@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 pub struct AmlDetail {
     pub share_url: Option<String>,
@@ -9,7 +9,7 @@ pub struct AmlDetail {
 
 export_schema!(AmlDetail);
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 pub struct AmlHit {
     pub name: Option<PiiString>,
@@ -20,7 +20,7 @@ pub struct AmlHit {
 
 export_schema!(AmlHit);
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 pub struct AmlHitMedia {
     pub date: Option<DateTime<Utc>>,

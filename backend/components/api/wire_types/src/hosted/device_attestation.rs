@@ -1,18 +1,18 @@
 use crate::*;
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema, JsonSchema)]
 pub struct GetDeviceAttestationChallengeRequest {
     pub device_type: DeviceAttestationType,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum DeviceAttestationType {
     Ios,
     Android,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, JsonSchema)]
 pub struct DeviceAttestationChallengeResponse {
     /// state token to send back along with attestation
     pub state: String,
@@ -20,7 +20,7 @@ pub struct DeviceAttestationChallengeResponse {
     pub attestation_challenge: String,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema, JsonSchema)]
 pub struct CreateDeviceAttestationRequest {
     /// state from `DeviceAttestationChallengeResponse`
     pub state: String,

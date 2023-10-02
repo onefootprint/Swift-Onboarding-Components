@@ -7,7 +7,7 @@ pub struct GetProxyConfigRequest {
 }
 
 /// Create a new proxy configuration
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
 pub struct CreateProxyConfigRequest {
     /// a friendly name for this proxy config
     pub name: String,
@@ -93,7 +93,7 @@ pub struct ProxyIngressRule {
 }
 
 /// Patch a new proxy configuration
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
 pub struct PatchProxyConfigRequest {
     /// enable or disable the config
     pub status: Option<ApiKeyStatus>,

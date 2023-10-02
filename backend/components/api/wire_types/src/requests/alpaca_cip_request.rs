@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, Apiv2Schema, JsonSchema, Deserialize, Serialize)]
+#[derive(Debug, Clone, Apiv2Schema, JsonSchema, Deserialize)]
 pub struct AlpacaCipRequest {
     /// the footprint user id on behalf of which to send the request
     pub fp_user_id: FpId,
