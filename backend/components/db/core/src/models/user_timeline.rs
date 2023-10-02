@@ -14,7 +14,6 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::DbUserTimelineEventKind;
 use newtypes::{DbUserTimelineEvent, ScopedVaultId, UserTimelineId, VaultId};
-use serde::{Deserialize, Serialize};
 
 use super::annotation::AnnotationInfo;
 use super::document_request::DocumentRequest;
@@ -25,7 +24,7 @@ use super::scoped_vault::ScopedVaultIdentifier;
 use super::watchlist_check::WatchlistCheck;
 use super::workflow::Workflow;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = user_timeline)]
 pub struct UserTimeline {
     pub id: UserTimelineId,
@@ -40,7 +39,7 @@ pub struct UserTimeline {
     pub event_kind: DbUserTimelineEventKind,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = user_timeline)]
 pub struct NewUserTimeline {
     pub vault_id: VaultId,

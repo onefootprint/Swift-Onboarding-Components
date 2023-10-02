@@ -18,7 +18,7 @@ use newtypes::VaultId;
 use newtypes::WebauthnCredentialId;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Serialize, Clone, Queryable)]
 #[diesel(table_name = google_device_attestation)]
 pub struct GoogleDeviceAttestation {
     pub id: GoogleDeviceAttestationId,
@@ -58,7 +58,7 @@ pub struct GoogleDeviceMetadata {
     pub os: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = google_device_attestation)]
 pub struct NewGoogleDeviceAttestation {
     pub vault_id: VaultId,

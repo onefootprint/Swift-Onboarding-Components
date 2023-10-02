@@ -1,12 +1,11 @@
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::{WorkflowEventId, WorkflowId, WorkflowState};
-use serde::{Deserialize, Serialize};
 
 use crate::{DbResult, PgConn, TxnPgConn};
 use db_schema::schema::workflow_event;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = workflow_event)]
 pub struct WorkflowEvent {
     pub id: WorkflowEventId,
@@ -18,7 +17,7 @@ pub struct WorkflowEvent {
     pub to_state: WorkflowState,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = workflow_event)]
 pub struct NewWorkflowEvent {
     pub created_at: DateTime<Utc>,

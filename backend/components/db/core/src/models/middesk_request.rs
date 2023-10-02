@@ -3,9 +3,8 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::middesk_request;
 use diesel::prelude::*;
 use newtypes::{DecisionIntentId, MiddeskRequestId, MiddeskRequestState, WorkflowId};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = middesk_request)]
 pub struct MiddeskRequest {
     pub id: MiddeskRequestId,
@@ -19,7 +18,7 @@ pub struct MiddeskRequest {
     pub workflow_id: WorkflowId,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = middesk_request)]
 struct NewMiddeskRequest {
     created_at: DateTime<Utc>,

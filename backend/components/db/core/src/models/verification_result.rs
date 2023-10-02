@@ -7,12 +7,11 @@ use diesel::Insertable;
 use newtypes::{
     ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI, VerificationRequestId, VerificationResultId,
 };
-use serde::{Deserialize, Serialize};
 
 use super::decision_intent::DecisionIntent;
 use super::verification_request::{RequestAndResult, VerificationRequest};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
+#[derive(Debug, Clone, Queryable, Identifiable)]
 #[diesel(table_name = verification_result)]
 pub struct VerificationResult {
     pub id: VerificationResultId,
@@ -32,7 +31,7 @@ impl VerificationResult {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = verification_result)]
 pub struct NewVerificationResult {
     pub request_id: VerificationRequestId,

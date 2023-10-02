@@ -5,9 +5,8 @@ use db_schema::schema::tenant_user;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{Locked, OrgMemberEmail, TenantUserId, INTEGRATION_TEST_USER_EMAIL};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = tenant_user)]
 pub struct TenantUser {
     pub id: TenantUserId,
@@ -113,7 +112,7 @@ impl TenantUser {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = tenant_user)]
 struct NewTenantUser {
     email: OrgMemberEmail,

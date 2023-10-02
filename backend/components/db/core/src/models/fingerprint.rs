@@ -10,12 +10,11 @@ use newtypes::FingerprintScopeKind;
 use newtypes::FingerprintVersion;
 use newtypes::ScopedVaultId;
 use newtypes::{DataIdentifier, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId};
-use serde::{Deserialize, Serialize};
 
 use crate::{DbResult, TxnPgConn};
 
 // TODO eventually, we'll need to mandate that certain pieces of data have unique fingerprints per user vault (like phone numbers)
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = fingerprint)]
 pub struct Fingerprint {
     pub id: FingerprintId,
@@ -34,7 +33,7 @@ pub struct Fingerprint {
     pub scope: FingerprintScopeKind,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = fingerprint)]
 pub struct NewFingerprint {
     pub sh_data: FingerprintData,

@@ -7,9 +7,8 @@ use db_schema::schema::workflow;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable, RunQueryDsl};
 use newtypes::{InsightEventId, WorkflowId};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = insight_event)]
 pub struct InsightEvent {
     pub id: InsightEventId,
@@ -40,7 +39,7 @@ pub struct InsightEvent {
     pub tls: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Default)]
+#[derive(Debug, Clone, Queryable, Insertable, Default)]
 #[diesel(table_name = insight_event)]
 pub struct CreateInsightEvent {
     pub timestamp: DateTime<Utc>,

@@ -3,11 +3,10 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::decision_intent;
 use diesel::prelude::*;
 use newtypes::{DecisionIntentId, DecisionIntentKind, ScopedVaultId, WorkflowId};
-use serde::{Deserialize, Serialize};
 
 use super::workflow::Workflow;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = decision_intent)]
 pub struct DecisionIntent {
     pub id: DecisionIntentId,
@@ -19,7 +18,7 @@ pub struct DecisionIntent {
     pub workflow_id: Option<WorkflowId>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = decision_intent)]
 struct NewDecisionIntent {
     pub created_at: DateTime<Utc>,

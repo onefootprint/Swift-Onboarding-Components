@@ -10,9 +10,8 @@ use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::{TenantId, TenantRoleId, TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = tenant_rolebinding)]
 pub struct TenantRolebinding {
     pub id: TenantRolebindingId,
@@ -272,7 +271,7 @@ impl TenantRolebinding {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = tenant_rolebinding)]
 struct NewTenantRolebinding {
     tenant_user_id: TenantUserId,

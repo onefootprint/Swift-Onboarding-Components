@@ -4,9 +4,8 @@ use db_schema::schema::tenant_client_config;
 use diesel::ExpressionMethods;
 use diesel::{Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{TenantClientConfigId, TenantId};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, PartialEq, Eq)]
+#[derive(Debug, Clone, Queryable, PartialEq, Eq)]
 #[diesel(table_name = tenant_client_config)]
 pub struct TenantClientConfig {
     pub id: TenantClientConfigId,
@@ -16,7 +15,7 @@ pub struct TenantClientConfig {
     pub allowed_origins: Vec<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = tenant_client_config)]
 pub struct UpdateTenantClientConfig {
     pub tenant_id: TenantId,

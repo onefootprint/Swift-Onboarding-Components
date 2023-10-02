@@ -10,11 +10,10 @@ use newtypes::{
     IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
     IncodeVerificationSessionState, WorkflowId,
 };
-use serde::{Deserialize, Serialize};
 
 use super::incode_verification_session_event::IncodeVerificationSessionEvent;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = incode_verification_session)]
 pub struct IncodeVerificationSession {
     pub id: IncodeVerificationSessionId,
@@ -37,7 +36,7 @@ pub struct IncodeVerificationSession {
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = incode_verification_session)]
 struct NewIncodeVerificationSession {
     created_at: DateTime<Utc>,

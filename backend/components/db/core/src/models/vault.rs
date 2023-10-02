@@ -13,13 +13,12 @@ use newtypes::{
     EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, SandboxId, ScopedVaultId, TenantId,
     VaultId, VaultKind, VaultPublicKey,
 };
-use serde::{Deserialize, Serialize};
 
 use super::ob_configuration::IsLive;
 pub type IsFixture = bool;
 pub type IsNew = bool;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable, PartialEq)]
+#[derive(Debug, Clone, Queryable, Insertable, Identifiable, PartialEq)]
 #[diesel(table_name = vault)]
 pub struct Vault {
     pub id: VaultId,

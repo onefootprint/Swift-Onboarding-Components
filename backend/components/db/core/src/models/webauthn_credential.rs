@@ -5,12 +5,11 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::{self, webauthn_credential};
 use diesel::{Insertable, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{AttestationType, InsightEventId, VaultId, WebauthnCredentialId};
-use serde::{Deserialize, Serialize};
 
 use super::insight_event::InsightEvent;
 
 // TODO handle when a user tries to add a second webauthn credential
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
+#[derive(Debug, Clone, Queryable, Identifiable)]
 #[diesel(table_name = webauthn_credential)]
 pub struct WebauthnCredential {
     pub id: WebauthnCredentialId,
@@ -77,7 +76,7 @@ impl WebauthnCredential {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = webauthn_credential)]
 pub struct NewWebauthnCredential {
     pub vault_id: VaultId,

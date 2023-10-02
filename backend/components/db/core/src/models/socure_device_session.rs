@@ -5,9 +5,8 @@ use db_schema::schema::socure_device_session;
 use diesel::prelude::*;
 use diesel::Insertable;
 use newtypes::{SocureDeviceSessionId, WorkflowId};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = socure_device_session)]
 pub struct SocureDeviceSession {
     pub id: SocureDeviceSessionId,
@@ -18,7 +17,7 @@ pub struct SocureDeviceSession {
     pub workflow_id: WorkflowId,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = socure_device_session)]
 struct NewSocureDeviceSession {
     pub device_session_id: String,

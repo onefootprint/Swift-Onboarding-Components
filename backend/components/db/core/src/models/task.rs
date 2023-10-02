@@ -9,11 +9,10 @@ use diesel::{
     sql_types::{BigInt, Text, Timestamptz},
 };
 use newtypes::{Locked, TaskData, TaskExecutionId, TaskId, TaskKind, TaskStatus};
-use serde::{Deserialize, Serialize};
 
 use super::task_execution::{TaskExecution, TaskExecutionCreateArgs, TaskExecutionUpdate};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName)]
 #[diesel(table_name = task)]
 pub struct Task {
     pub id: TaskId,
@@ -26,7 +25,7 @@ pub struct Task {
     pub num_attempts: i32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = task)]
 pub struct NewTask {
     pub created_at: DateTime<Utc>,

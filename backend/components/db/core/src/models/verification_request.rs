@@ -8,13 +8,12 @@ use newtypes::{
     DataLifetimeSeqno, DecisionIntentId, IdentityDocumentId, ScopedVaultId, Vendor, VendorAPI,
     VerificationRequestId,
 };
-use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
 use super::vault::Vault;
 use super::verification_result::VerificationResult;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
+#[derive(Debug, Clone, Queryable, Identifiable)]
 #[diesel(table_name = verification_request)]
 pub struct VerificationRequest {
     pub id: VerificationRequestId,
@@ -33,7 +32,7 @@ pub struct VerificationRequest {
     pub decision_intent_id: DecisionIntentId,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = verification_request)]
 struct NewVerificationRequestRow {
     vendor: Vendor,

@@ -16,7 +16,6 @@ use newtypes::{
     AppClipExperienceId, CompanySize, EncryptedVaultPrivateKey, ScopedVaultId, StripeCustomerId, TenantId,
     TenantRoleKind, TenantRoleKindDiscriminant, VaultId, VaultPublicKey, WorkosAuthMethod,
 };
-use serde::{Deserialize, Serialize};
 
 use super::tenant_role::{ImmutableRoleKind, NewTenantRoleRow};
 
@@ -248,7 +247,7 @@ impl Tenant {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, AsChangeset, Default)]
+#[derive(Debug, Clone, AsChangeset, Default)]
 #[diesel(table_name = tenant)]
 pub struct UpdateTenant {
     pub name: Option<String>,

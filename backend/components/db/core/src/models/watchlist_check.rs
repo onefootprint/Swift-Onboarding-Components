@@ -11,9 +11,8 @@ use newtypes::{
     DecisionIntentId, FootprintReasonCode, Locked, ScopedVaultId, TaskId, TenantId, VaultKind,
     WatchlistCheckId, WatchlistCheckStatus, WatchlistCheckStatusKind, WorkflowKind,
 };
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = watchlist_check)]
 pub struct WatchlistCheck {
     pub id: WatchlistCheckId,
@@ -32,7 +31,7 @@ pub struct WatchlistCheck {
     pub deactivated_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = watchlist_check)]
 pub struct NewWatchlistCheck {
     pub created_at: DateTime<Utc>,
@@ -44,7 +43,7 @@ pub struct NewWatchlistCheck {
     pub status_details: WatchlistCheckStatus,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, AsChangeset)]
+#[derive(Debug, Clone, AsChangeset)]
 #[diesel(table_name = watchlist_check)]
 struct UpdateWatchlistCheck {
     pub status: WatchlistCheckStatusKind,

@@ -4,9 +4,8 @@ use db_schema::schema::tenant_vendor_control;
 use diesel::ExpressionMethods;
 use diesel::{Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{SealedVaultBytes, TenantId, TenantVendorControlId};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, PartialEq, Eq)]
+#[derive(Debug, Clone, Queryable, PartialEq, Eq)]
 #[diesel(table_name = tenant_vendor_control)]
 pub struct TenantVendorControl {
     pub id: TenantVendorControlId,
@@ -24,7 +23,7 @@ pub struct TenantVendorControl {
     pub middesk_api_key: Option<SealedVaultBytes>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = tenant_vendor_control)]
 struct NewTenantVendorControl {
     tenant_id: TenantId,

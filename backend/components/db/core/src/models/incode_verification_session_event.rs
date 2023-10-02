@@ -6,9 +6,8 @@ use newtypes::{
     IdentityDocumentId, IncodeFailureReason, IncodeVerificationSessionEventId, IncodeVerificationSessionId,
     IncodeVerificationSessionKind, IncodeVerificationSessionState,
 };
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = incode_verification_session_event)]
 pub struct IncodeVerificationSessionEvent {
     pub id: IncodeVerificationSessionEventId,
@@ -23,7 +22,7 @@ pub struct IncodeVerificationSessionEvent {
     pub latest_failure_reasons: Vec<IncodeFailureReason>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = incode_verification_session_event)]
 pub struct NewIncodeVerificationSessionEvent {
     pub created_at: DateTime<Utc>,

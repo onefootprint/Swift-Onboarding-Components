@@ -18,11 +18,10 @@ use newtypes::S3Url;
 use newtypes::ScopedVaultId;
 use newtypes::SealedVaultDataKey;
 use newtypes::VaultId;
-use serde::{Deserialize, Serialize};
 
 use super::data_lifetime::DataLifetime;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = document_data)]
 pub struct DocumentData {
     pub id: DocumentDataId,
@@ -37,7 +36,7 @@ pub struct DocumentData {
     pub e_data_key: SealedVaultDataKey,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = document_data)]
 pub struct NewDocumentData {
     pub lifetime_id: DataLifetimeId,

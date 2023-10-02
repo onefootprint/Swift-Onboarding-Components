@@ -14,14 +14,13 @@ use newtypes::ScopedVaultId;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
 use newtypes::{FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalId, TenantId};
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 #[cfg(test)]
 use std::str::FromStr;
 
 use super::risk_signal_group::RiskSignalGroup;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = risk_signal)]
 pub struct RiskSignal {
     pub id: RiskSignalId,
@@ -37,7 +36,7 @@ pub struct RiskSignal {
     pub risk_signal_group_id: RiskSignalGroupId,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = risk_signal)]
 pub struct NewRiskSignal {
     pub onboarding_decision_id: Option<OnboardingDecisionId>,

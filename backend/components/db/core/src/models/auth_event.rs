@@ -21,13 +21,11 @@ use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::VaultId;
 
-use serde::{Deserialize, Serialize};
-
 use super::apple_device_attest::AppleDeviceAttestation;
 use super::google_device_attest::GoogleDeviceAttestation;
 use super::insight_event::InsightEvent;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = auth_event)]
 pub struct AuthEvent {
     pub id: AuthEventId,
@@ -41,7 +39,7 @@ pub struct AuthEvent {
     pub _updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = auth_event)]
 pub struct NewAuthEvent {
     pub vault_id: VaultId,

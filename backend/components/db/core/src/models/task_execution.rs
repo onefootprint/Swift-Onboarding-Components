@@ -3,9 +3,8 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::task_execution;
 use diesel::prelude::*;
 use newtypes::{TaskExecutionId, TaskId, TaskStatus};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, QueryableByName)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName)]
 #[diesel(table_name = task_execution)]
 pub struct TaskExecution {
     pub id: TaskExecutionId,
@@ -19,7 +18,7 @@ pub struct TaskExecution {
     pub new_status: Option<TaskStatus>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = task_execution)]
 pub struct NewTaskExecution {
     pub created_at: DateTime<Utc>,

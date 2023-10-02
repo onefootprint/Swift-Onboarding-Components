@@ -7,9 +7,8 @@ use diesel::{Insertable, Queryable};
 use newtypes::RiskSignalGroupId;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = risk_signal_group)]
 pub struct RiskSignalGroup {
     pub id: RiskSignalGroupId,
@@ -20,7 +19,7 @@ pub struct RiskSignalGroup {
     pub kind: RiskSignalGroupKind,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = risk_signal_group)]
 pub struct NewRiskSignalGroup {
     pub created_at: DateTime<Utc>,

@@ -11,7 +11,6 @@ use newtypes::DataLifetimeSource;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::{DataLifetimeId, VaultId};
-use serde::{Deserialize, Serialize};
 
 use crate::nextval;
 use crate::PgConn;
@@ -19,7 +18,7 @@ use crate::TxnPgConn;
 use crate::{DbError, DbResult};
 use db_schema::schema::data_lifetime;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = data_lifetime)]
 /// DataLifetime is a generic model that allows us to represent the lifecycle of a piece of data
 /// that belongs to a user. All pieces of data "belonging" to a user vault share some attributes,

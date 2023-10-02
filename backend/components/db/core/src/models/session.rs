@@ -4,9 +4,8 @@ use db_schema::schema::session;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{AuthTokenHash, SessionKind};
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = session)]
 pub struct Session {
     pub key: AuthTokenHash,
@@ -17,7 +16,7 @@ pub struct Session {
     pub kind: Option<SessionKind>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = session)]
 pub struct UpdateSession {
     pub key: AuthTokenHash,

@@ -10,11 +10,10 @@ use newtypes::AccessEventPurpose;
 use newtypes::{
     AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedVaultId, TenantId,
 };
-use serde::{Deserialize, Serialize};
 
 use super::insight_event::CreateInsightEvent;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = access_event)]
 pub struct AccessEvent {
     pub id: AccessEventId,
@@ -50,7 +49,7 @@ pub struct NewAccessEvent {
     pub purpose: AccessEventPurpose,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = access_event)]
 pub struct NewAccessEventRow {
     pub scoped_vault_id: ScopedVaultId,

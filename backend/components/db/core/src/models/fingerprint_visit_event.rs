@@ -7,10 +7,9 @@ use diesel::{Insertable, Queryable};
 use newtypes::{
     FingerprintRequestId, FingerprintVisitEventId, FingerprintVisitorId, ScopedVaultId, SessionId, VaultId,
 };
-use serde::{Deserialize, Serialize};
 
 /// Represents a single visit from a FootprintVisitorId
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = fingerprint_visit_event)]
 pub struct FingerprintVisitEvent {
     pub id: FingerprintVisitEventId,
@@ -26,7 +25,7 @@ pub struct FingerprintVisitEvent {
     pub response: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = fingerprint_visit_event)]
 pub struct NewFingerprintVisit {
     pub visitor_id: FingerprintVisitorId,

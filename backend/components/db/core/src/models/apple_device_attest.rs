@@ -16,7 +16,7 @@ use newtypes::VaultId;
 use newtypes::WebauthnCredentialId;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Serialize, Clone, Queryable)]
 #[diesel(table_name = apple_device_attestation)]
 pub struct AppleDeviceAttestation {
     pub id: AppleDeviceAttestationId,
@@ -47,14 +47,14 @@ pub struct AppleDeviceAttestation {
 }
 
 /// This is a custom metadata object that comes from the device
-#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, Eq, PartialEq, Hash, Default)]
+#[derive(Debug, Serialize, Deserialize, Clone, AsJsonb, Eq, PartialEq, Hash, Default)]
 #[serde(rename_all = "snake_case")]
 pub struct AppleDeviceMetadata {
     pub model: Option<String>,
     pub os: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = apple_device_attestation)]
 pub struct NewAppleDeviceAttestation {
     pub vault_id: VaultId,

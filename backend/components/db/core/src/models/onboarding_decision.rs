@@ -19,13 +19,12 @@ use newtypes::{
     AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo,
     VaultId, VerificationResultId,
 };
-use serde::{Deserialize, Serialize};
 
 use super::manual_review::ManualReview;
 use super::ob_configuration::ObConfiguration;
 use super::user_timeline::UserTimeline;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = onboarding_decision)]
 pub struct OnboardingDecision {
     pub id: OnboardingDecisionId,
@@ -41,7 +40,7 @@ pub struct OnboardingDecision {
     pub workflow_id: WorkflowId,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = onboarding_decision)]
 struct NewOnboardingDecisionRow {
     logic_git_hash: String,
@@ -52,7 +51,7 @@ struct NewOnboardingDecisionRow {
     workflow_id: WorkflowId,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = onboarding_decision_verification_result_junction)]
 pub struct OnboardingDecisionJunction {
     pub verification_result_id: VerificationResultId,
