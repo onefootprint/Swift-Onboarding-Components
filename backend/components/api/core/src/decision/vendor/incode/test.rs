@@ -190,7 +190,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 .collect();
 
             let selfie_aps = vec![
-                VendorAPI::IncodeAddMLConsent,
+                VendorAPI::IncodeAddMlConsent,
                 VendorAPI::IncodeAddPrivacyConsent,
                 VendorAPI::IncodeAddSelfie,
                 VendorAPI::IncodeProcessFace,
@@ -202,7 +202,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                 VendorAPI::IncodeProcessId,
                 VendorAPI::IncodeGetOnboardingStatus,
                 VendorAPI::IncodeFetchScores,
-                VendorAPI::IncodeFetchOCR,
+                VendorAPI::IncodeFetchOcr,
             ]
             .into_iter()
             .chain(if is_selfie { selfie_aps } else { vec![] })

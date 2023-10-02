@@ -66,14 +66,14 @@ impl_enum_str_diesel!(Vendor);
 #[diesel(sql_type = Text)]
 /// Represents the API for the request we'll make
 pub enum VendorAPI {
-    IdologyExpectID,
+    IdologyExpectId,
     IdologyScanVerifySubmission,
     IdologyScanVerifyResults,
     IdologyScanOnboarding,
     IdologyPa,
     TwilioLookupV2,
-    SocureIDPlus,
-    ExperianPreciseID,
+    SocureIdPlus,
+    ExperianPreciseId,
     MiddeskCreateBusiness,
     MiddeskGetBusiness,
     MiddeskBusinessUpdateWebhook,
@@ -84,8 +84,8 @@ pub enum VendorAPI {
     IncodeProcessId,
     IncodeFetchScores,
     IncodeAddPrivacyConsent,
-    IncodeAddMLConsent,
-    IncodeFetchOCR,
+    IncodeAddMlConsent,
+    IncodeFetchOcr,
     IncodeAddSelfie,
     IncodeWatchlistCheck,
     IncodeUpdatedWatchlistResult,
@@ -99,14 +99,14 @@ impl_enum_str_diesel!(VendorAPI);
 impl From<VendorAPI> for Vendor {
     fn from(api: VendorAPI) -> Self {
         match api {
-            VendorAPI::IdologyExpectID => Self::Idology,
+            VendorAPI::IdologyExpectId => Self::Idology,
             VendorAPI::IdologyScanVerifySubmission => Self::Idology,
             VendorAPI::IdologyScanVerifyResults => Self::Idology,
             VendorAPI::IdologyScanOnboarding => Self::Idology,
             VendorAPI::TwilioLookupV2 => Self::Twilio,
-            VendorAPI::SocureIDPlus => Self::Socure,
+            VendorAPI::SocureIdPlus => Self::Socure,
             VendorAPI::IdologyPa => Self::Idology,
-            VendorAPI::ExperianPreciseID => Self::Experian,
+            VendorAPI::ExperianPreciseId => Self::Experian,
             VendorAPI::MiddeskCreateBusiness => Self::Middesk,
             VendorAPI::MiddeskBusinessUpdateWebhook => Self::Middesk,
             VendorAPI::MiddeskTinRetriedWebhook => Self::Middesk,
@@ -117,8 +117,8 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IncodeProcessId => Self::Incode,
             VendorAPI::IncodeFetchScores => Self::Incode,
             VendorAPI::IncodeAddPrivacyConsent => Self::Incode,
-            VendorAPI::IncodeAddMLConsent => Self::Incode,
-            VendorAPI::IncodeFetchOCR => Self::Incode,
+            VendorAPI::IncodeAddMlConsent => Self::Incode,
+            VendorAPI::IncodeFetchOcr => Self::Incode,
             VendorAPI::IncodeAddSelfie => Self::Incode,
             VendorAPI::IncodeWatchlistCheck => Self::Incode,
             VendorAPI::IncodeUpdatedWatchlistResult => Self::Incode,
@@ -141,7 +141,7 @@ impl VendorAPI {
     // temporary hack to allow us to filter to just vendor calls that are made in a batch of KYC vendor calls
     pub fn is_kyc_call(&self) -> bool {
         match self {
-            VendorAPI::IdologyExpectID | VendorAPI::TwilioLookupV2 | VendorAPI::ExperianPreciseID => true,
+            VendorAPI::IdologyExpectId | VendorAPI::TwilioLookupV2 | VendorAPI::ExperianPreciseId => true,
             VendorAPI::IdologyScanVerifySubmission
             | VendorAPI::IdologyScanVerifyResults
             | VendorAPI::IdologyScanOnboarding
@@ -156,14 +156,14 @@ impl VendorAPI {
             | VendorAPI::IncodeProcessId
             | VendorAPI::IncodeFetchScores
             | VendorAPI::IncodeAddPrivacyConsent
-            | VendorAPI::IncodeAddMLConsent
-            | VendorAPI::IncodeFetchOCR
+            | VendorAPI::IncodeAddMlConsent
+            | VendorAPI::IncodeFetchOcr
             | VendorAPI::IncodeAddSelfie
             | VendorAPI::IncodeWatchlistCheck
             | VendorAPI::IncodeUpdatedWatchlistResult
             | VendorAPI::IncodeGetOnboardingStatus
             | VendorAPI::IncodeProcessFace
-            | VendorAPI::SocureIDPlus
+            | VendorAPI::SocureIdPlus
             | VendorAPI::StytchLookup
             | VendorAPI::FootprintDeviceAttestation => false,
         }
@@ -176,8 +176,8 @@ impl VendorAPI {
             | VendorAPI::IncodeProcessId
             | VendorAPI::IncodeFetchScores
             | VendorAPI::IncodeAddPrivacyConsent
-            | VendorAPI::IncodeAddMLConsent
-            | VendorAPI::IncodeFetchOCR
+            | VendorAPI::IncodeAddMlConsent
+            | VendorAPI::IncodeFetchOcr
             | VendorAPI::IncodeAddSelfie
             | VendorAPI::IncodeGetOnboardingStatus
             | VendorAPI::IncodeProcessFace => true,
@@ -192,12 +192,48 @@ impl VendorAPI {
             | VendorAPI::MiddeskGetBusiness
             | VendorAPI::MiddeskBusinessUpdateWebhook
             | VendorAPI::MiddeskTinRetriedWebhook
-            | VendorAPI::IdologyExpectID
+            | VendorAPI::IdologyExpectId
             | VendorAPI::TwilioLookupV2
-            | VendorAPI::SocureIDPlus
-            | VendorAPI::ExperianPreciseID
+            | VendorAPI::SocureIdPlus
+            | VendorAPI::ExperianPreciseId
             | VendorAPI::StytchLookup
             | VendorAPI::FootprintDeviceAttestation => false,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use super::*;
+
+    #[derive(serde::Serialize, serde::Deserialize)]
+    pub struct SomeStruct {
+        pub vendor_api: VendorAPI,
+    }
+
+    #[test]
+    fn test_vendor_api_deser() {
+        assert_eq!(
+            VendorAPI::IdologyExpectId,
+            VendorAPI::from_str("idology_expect_id").unwrap()
+        );
+
+        let json = serde_json::json!({
+            "vendor_api": "idology_expect_id"
+        });
+        assert_eq!(
+            VendorAPI::IdologyExpectId,
+            serde_json::from_value::<SomeStruct>(json).unwrap().vendor_api
+        );
+
+        assert_eq!(
+            serde_json::json!({"vendor_api": "idology_expect_id"}),
+            serde_json::to_value(SomeStruct {
+                vendor_api: VendorAPI::IdologyExpectId,
+            })
+            .unwrap()
+        );
     }
 }

@@ -33,8 +33,8 @@ pub enum KycVendorApiOrder {
 impl From<KycVendorApiOrder> for VendorAPI {
     fn from(value: KycVendorApiOrder) -> Self {
         match value {
-            KycVendorApiOrder::Experian => VendorAPI::ExperianPreciseID,
-            KycVendorApiOrder::Idology => VendorAPI::IdologyExpectID,
+            KycVendorApiOrder::Experian => VendorAPI::ExperianPreciseId,
+            KycVendorApiOrder::Idology => VendorAPI::IdologyExpectId,
         }
     }
 }

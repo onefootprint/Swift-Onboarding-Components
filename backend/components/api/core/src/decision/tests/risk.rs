@@ -25,7 +25,7 @@ fn create_onboarding_rules_decision_output(
             decision_status: expected_decision_status,
             should_commit: expected_should_commit,
             create_manual_review: expected_create_manual_review,
-            vendor_apis: vec![newtypes::VendorAPI::IdologyExpectID],
+            vendor_apis: vec![newtypes::VendorAPI::IdologyExpectId],
         },
         rules_triggered: expected_triggered_rules,
         rules_not_triggered: all_non_triggering_rules,
@@ -49,7 +49,7 @@ fn test_evaluate_onboarding_rules(
         .map(|f| {
             (
                 f,
-                VendorAPI::IdologyExpectID,
+                VendorAPI::IdologyExpectId,
                 VerificationResultId::from_str("vres123").unwrap(),
             )
         })

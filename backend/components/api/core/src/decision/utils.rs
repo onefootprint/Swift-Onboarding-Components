@@ -147,7 +147,7 @@ pub fn create_document_verification_request(
 // If socure fails, we shouldn't fail the DE run
 pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &VendorAPI) -> bool {
     // Socure plus and Experian isn't used by anyone except Footprint (at this time)
-    !matches!(vendor_api, VendorAPI::SocureIDPlus | VendorAPI::TwilioLookupV2)
+    !matches!(vendor_api, VendorAPI::SocureIdPlus | VendorAPI::TwilioLookupV2)
 }
 
 pub fn decision_status(fixture_result: WorkflowFixtureResult) -> FixtureDecision {

@@ -71,15 +71,15 @@ pub fn vendor_api_requirements_are_satisfied(
     };
 
     match vendor_api {
-        VendorAPI::IdologyExpectID => expectid_requirements.are_satisfied(present_data_lifetime_kinds),
+        VendorAPI::IdologyExpectId => expectid_requirements.are_satisfied(present_data_lifetime_kinds),
         // These document related vendors are a no op, since they are handled separately from KYC requests
         VendorAPI::IdologyScanVerifyResults => false,
         VendorAPI::IdologyScanVerifySubmission => false,
         VendorAPI::IdologyScanOnboarding => false,
         VendorAPI::TwilioLookupV2 => twilio_requirements.are_satisfied(present_data_lifetime_kinds),
-        VendorAPI::SocureIDPlus => meets_requirements_for_idplus_request(present_data_lifetime_kinds),
+        VendorAPI::SocureIdPlus => meets_requirements_for_idplus_request(present_data_lifetime_kinds),
         VendorAPI::IdologyPa => idology_pa_requirements.are_satisfied(present_data_lifetime_kinds),
-        VendorAPI::ExperianPreciseID => experian_requirements.are_satisfied(present_data_lifetime_kinds),
+        VendorAPI::ExperianPreciseId => experian_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::MiddeskCreateBusiness => false,
         VendorAPI::MiddeskBusinessUpdateWebhook => false,
         VendorAPI::MiddeskTinRetriedWebhook => false,
@@ -90,8 +90,8 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::IncodeProcessId => false,
         VendorAPI::IncodeFetchScores => false,
         VendorAPI::IncodeAddPrivacyConsent => false,
-        VendorAPI::IncodeAddMLConsent => false,
-        VendorAPI::IncodeFetchOCR => false,
+        VendorAPI::IncodeAddMlConsent => false,
+        VendorAPI::IncodeFetchOcr => false,
         VendorAPI::IncodeAddSelfie => false,
         VendorAPI::IncodeWatchlistCheck => {
             incode_watchlist_requirements.are_satisfied(present_data_lifetime_kinds)
@@ -115,14 +115,14 @@ pub fn available_vendor_apis(present_data_lifetime_kinds: &[IdentityDataKind]) -
 /// Is the API one we want to call for our onboarding KYC verificaiton
 fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
     match vendor_api {
-        VendorAPI::IdologyExpectID => true,
+        VendorAPI::IdologyExpectId => true,
         VendorAPI::IdologyScanVerifySubmission => false,
         VendorAPI::IdologyScanVerifyResults => false,
         VendorAPI::IdologyScanOnboarding => false,
         VendorAPI::IdologyPa => false,
         VendorAPI::TwilioLookupV2 => true,
-        VendorAPI::SocureIDPlus => true,
-        VendorAPI::ExperianPreciseID => true,
+        VendorAPI::SocureIdPlus => true,
+        VendorAPI::ExperianPreciseId => true,
         VendorAPI::MiddeskCreateBusiness => false,
         VendorAPI::MiddeskBusinessUpdateWebhook => false,
         VendorAPI::MiddeskTinRetriedWebhook => false,
@@ -133,8 +133,8 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         VendorAPI::IncodeProcessId => false,
         VendorAPI::IncodeFetchScores => false,
         VendorAPI::IncodeAddPrivacyConsent => false,
-        VendorAPI::IncodeAddMLConsent => false,
-        VendorAPI::IncodeFetchOCR => false,
+        VendorAPI::IncodeAddMlConsent => false,
+        VendorAPI::IncodeFetchOcr => false,
         VendorAPI::IncodeAddSelfie => false,
         VendorAPI::IncodeWatchlistCheck => false,
         VendorAPI::IncodeUpdatedWatchlistResult => false,
@@ -152,9 +152,9 @@ mod tests {
     use test_case::test_case;
 
     // Socure requirements are tested in socure/requirements.rs
-    #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName] => vec![VendorAPI::SocureIDPlus])]
-    #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName, IdentityDataKind::AddressLine1] => vec![VendorAPI::IdologyExpectID, VendorAPI::SocureIDPlus])]
-    #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName, IdentityDataKind::AddressLine1, IdentityDataKind::PhoneNumber] => vec![VendorAPI::IdologyExpectID, VendorAPI::TwilioLookupV2, VendorAPI::SocureIDPlus])]
+    #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName] => vec![VendorAPI::SocureIdPlus])]
+    #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName, IdentityDataKind::AddressLine1] => vec![VendorAPI::IdologyExpectId, VendorAPI::SocureIdPlus])]
+    #[test_case(&[IdentityDataKind::FirstName, IdentityDataKind::LastName, IdentityDataKind::AddressLine1, IdentityDataKind::PhoneNumber] => vec![VendorAPI::IdologyExpectId, VendorAPI::TwilioLookupV2, VendorAPI::SocureIdPlus])]
     #[test_case(&[
         IdentityDataKind::FirstName,
         IdentityDataKind::LastName,
@@ -163,7 +163,7 @@ mod tests {
         IdentityDataKind::State,
         IdentityDataKind::Country,
         IdentityDataKind::City,
-    ] => vec![VendorAPI::IdologyExpectID, VendorAPI::SocureIDPlus, VendorAPI::ExperianPreciseID])]
+    ] => vec![VendorAPI::IdologyExpectId, VendorAPI::SocureIdPlus, VendorAPI::ExperianPreciseId])]
     fn test_available_vendor_apis(present_data_lifetime_kinds: &[IdentityDataKind]) -> Vec<VendorAPI> {
         available_vendor_apis(present_data_lifetime_kinds)
     }

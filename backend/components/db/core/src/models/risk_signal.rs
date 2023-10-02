@@ -373,37 +373,37 @@ mod tests {
 
     #[db_test_case(vec![
         vec![(
-            VendorAPI::IdologyExpectID,
+            VendorAPI::IdologyExpectId,
             vec![FootprintReasonCode::SsnInputTiedToMultipleNames],
             KeyType::Obd,
         )],
         vec![(
-            VendorAPI::IdologyExpectID,
+            VendorAPI::IdologyExpectId,
             vec![FootprintReasonCode::SubjectDeceased],
             KeyType::Obd,
-        )]], vec![(VendorAPI::IdologyExpectID, FootprintReasonCode::SubjectDeceased)]; "legacy OBD FK")]
+        )]], vec![(VendorAPI::IdologyExpectId, FootprintReasonCode::SubjectDeceased)]; "legacy OBD FK")]
     #[db_test_case(vec![
         vec![(
-            VendorAPI::IdologyExpectID,
+            VendorAPI::IdologyExpectId,
             vec![FootprintReasonCode::SsnInputTiedToMultipleNames],
             KeyType::Vres,
         )],
         vec![(
-            VendorAPI::IdologyExpectID,
+            VendorAPI::IdologyExpectId,
             vec![FootprintReasonCode::SubjectDeceased],
             KeyType::Vres,
-        )]], vec![(VendorAPI::IdologyExpectID, FootprintReasonCode::SubjectDeceased)]; "New Vres FK")]
+        )]], vec![(VendorAPI::IdologyExpectId, FootprintReasonCode::SubjectDeceased)]; "New Vres FK")]
     #[db_test_case(vec![
         vec![(
-            VendorAPI::IdologyExpectID,
+            VendorAPI::IdologyExpectId,
             vec![FootprintReasonCode::SsnInputTiedToMultipleNames],
             KeyType::Obd,
         )],
         vec![(
-            VendorAPI::IdologyExpectID,
+            VendorAPI::IdologyExpectId,
             vec![FootprintReasonCode::SubjectDeceased],
             KeyType::Vres,
-        )]], vec![(VendorAPI::IdologyExpectID, FootprintReasonCode::SubjectDeceased)]; "legacy OBD FK and new Vres FK")]
+        )]], vec![(VendorAPI::IdologyExpectId, FootprintReasonCode::SubjectDeceased)]; "legacy OBD FK and new Vres FK")]
     fn test_list_by_onboarding_id(
         conn: &mut TestPgConn,
         input_risk_signal_groups: Vec<Vec<(VendorAPI, Vec<FootprintReasonCode>, KeyType)>>,
@@ -486,16 +486,16 @@ mod tests {
     }
     #[db_test_case(vec![] => false)]
     #[db_test_case(vec![
-        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID, vres_id("vres1")),
-        (FootprintReasonCode::SubjectDeceased, VendorAPI::ExperianPreciseID, vres_id("vres2")),
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectId, vres_id("vres1")),
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::ExperianPreciseId, vres_id("vres2")),
     ] => false)]
     #[db_test_case(vec![
-        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID, vres_id("vres1")),
-        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID, vres_id("vres2")),
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectId, vres_id("vres1")),
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectId, vres_id("vres2")),
     ] => false)]
     #[db_test_case(vec![
-        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID, vres_id("vres1")),
-        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectID, vres_id("vres1")),
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectId, vres_id("vres1")),
+        (FootprintReasonCode::SubjectDeceased, VendorAPI::IdologyExpectId, vres_id("vres1")),
     ] => true)]
     fn test_generate_duplicate_frc_by_reason_code_and_vendor_api(
         _conn: &mut TestPgConn,

@@ -87,14 +87,14 @@ pub fn scrub_raw_error_vendor_response(
     raw_response: &PiiJsonValue,
 ) -> Result<ScrubbedPiiJsonValue, serde_json::Error> {
     match vendor_api {
-        VendorAPI::IdologyExpectID => scrub_response::<IdologyExpectID>(raw_response),
+        VendorAPI::IdologyExpectId => scrub_response::<IdologyExpectID>(raw_response),
         VendorAPI::IdologyScanVerifySubmission => scrub_response::<IdologyScanVerifySubmission>(raw_response),
         VendorAPI::IdologyScanVerifyResults => scrub_response::<IdologyScanVerifyResults>(raw_response),
         VendorAPI::IdologyScanOnboarding => scrub_response::<IdologyScanOnboarding>(raw_response),
         VendorAPI::IdologyPa => scrub_response::<IdologyPa>(raw_response),
         VendorAPI::TwilioLookupV2 => scrub_response::<TwilioLookupV2>(raw_response),
-        VendorAPI::SocureIDPlus => scrub_response::<SocureIDPlus>(raw_response),
-        VendorAPI::ExperianPreciseID => scrub_response::<ExperianPreciseID>(raw_response),
+        VendorAPI::SocureIdPlus => scrub_response::<SocureIDPlus>(raw_response),
+        VendorAPI::ExperianPreciseId => scrub_response::<ExperianPreciseID>(raw_response),
         VendorAPI::MiddeskCreateBusiness => scrub_response::<MiddeskCreateBusiness>(raw_response),
         VendorAPI::MiddeskGetBusiness => scrub_response::<MiddeskGetBusiness>(raw_response),
         VendorAPI::MiddeskBusinessUpdateWebhook => {
@@ -107,8 +107,8 @@ pub fn scrub_raw_error_vendor_response(
         VendorAPI::IncodeProcessId => scrub_response::<IncodeProcessId>(raw_response),
         VendorAPI::IncodeFetchScores => scrub_response::<IncodeFetchScores>(raw_response),
         VendorAPI::IncodeAddPrivacyConsent => scrub_response::<IncodeAddPrivacyConsent>(raw_response),
-        VendorAPI::IncodeAddMLConsent => scrub_response::<IncodeAddMLConsent>(raw_response),
-        VendorAPI::IncodeFetchOCR => scrub_response::<IncodeFetchOCR>(raw_response),
+        VendorAPI::IncodeAddMlConsent => scrub_response::<IncodeAddMLConsent>(raw_response),
+        VendorAPI::IncodeFetchOcr => scrub_response::<IncodeFetchOCR>(raw_response),
         VendorAPI::IncodeAddSelfie => scrub_response::<IncodeAddSelfie>(raw_response),
         VendorAPI::IncodeWatchlistCheck => scrub_response::<IncodeWatchlistCheck>(raw_response),
         VendorAPI::IncodeUpdatedWatchlistResult => {
@@ -143,7 +143,7 @@ fn build_parsed_vendor_response_map_entry(
     vendor_api: VendorAPI,
 ) -> Result<(), serde_json::Error> {
     match vendor_api {
-        VendorAPI::IdologyExpectID => insert_map_entry(map, IdologyExpectID, raw_response)?,
+        VendorAPI::IdologyExpectId => insert_map_entry(map, IdologyExpectID, raw_response)?,
         VendorAPI::IdologyScanVerifySubmission => {
             insert_map_entry(map, IdologyScanVerifySubmission, raw_response)?
         }
@@ -151,8 +151,8 @@ fn build_parsed_vendor_response_map_entry(
         VendorAPI::IdologyScanOnboarding => insert_map_entry(map, IdologyScanOnboarding, raw_response)?,
         VendorAPI::IdologyPa => insert_map_entry(map, IdologyPa, raw_response)?,
         VendorAPI::TwilioLookupV2 => insert_map_entry(map, TwilioLookupV2, raw_response)?,
-        VendorAPI::SocureIDPlus => insert_map_entry(map, SocureIDPlus, raw_response)?,
-        VendorAPI::ExperianPreciseID => insert_map_entry(map, ExperianPreciseID, raw_response)?,
+        VendorAPI::SocureIdPlus => insert_map_entry(map, SocureIDPlus, raw_response)?,
+        VendorAPI::ExperianPreciseId => insert_map_entry(map, ExperianPreciseID, raw_response)?,
         VendorAPI::MiddeskCreateBusiness => insert_map_entry(map, MiddeskCreateBusiness, raw_response)?,
         VendorAPI::MiddeskGetBusiness => insert_map_entry(map, MiddeskGetBusiness, raw_response)?,
         VendorAPI::MiddeskBusinessUpdateWebhook => {
@@ -165,8 +165,8 @@ fn build_parsed_vendor_response_map_entry(
         VendorAPI::IncodeProcessId => insert_map_entry(map, IncodeProcessId, raw_response)?,
         VendorAPI::IncodeFetchScores => insert_map_entry(map, IncodeFetchScores, raw_response)?,
         VendorAPI::IncodeAddPrivacyConsent => insert_map_entry(map, IncodeAddPrivacyConsent, raw_response)?,
-        VendorAPI::IncodeAddMLConsent => insert_map_entry(map, IncodeAddMLConsent, raw_response)?,
-        VendorAPI::IncodeFetchOCR => insert_map_entry(map, IncodeFetchOCR, raw_response)?,
+        VendorAPI::IncodeAddMlConsent => insert_map_entry(map, IncodeAddMLConsent, raw_response)?,
+        VendorAPI::IncodeFetchOcr => insert_map_entry(map, IncodeFetchOCR, raw_response)?,
         VendorAPI::IncodeAddSelfie => insert_map_entry(map, IncodeAddSelfie, raw_response)?,
         VendorAPI::IncodeWatchlistCheck => insert_map_entry(map, IncodeWatchlistCheck, raw_response)?,
         VendorAPI::IncodeUpdatedWatchlistResult => {
@@ -191,14 +191,14 @@ fn build_verification_identifier_map_entry(
     vendor_api: VendorAPI,
 ) {
     match vendor_api {
-        VendorAPI::IdologyExpectID => map.insert(IdologyExpectID, request_and_result),
+        VendorAPI::IdologyExpectId => map.insert(IdologyExpectID, request_and_result),
         VendorAPI::IdologyScanVerifySubmission => map.insert(IdologyScanVerifySubmission, request_and_result),
         VendorAPI::IdologyScanVerifyResults => map.insert(IdologyScanVerifyResults, request_and_result),
         VendorAPI::IdologyScanOnboarding => map.insert(IdologyScanOnboarding, request_and_result),
         VendorAPI::IdologyPa => map.insert(IdologyPa, request_and_result),
         VendorAPI::TwilioLookupV2 => map.insert(TwilioLookupV2, request_and_result),
-        VendorAPI::SocureIDPlus => map.insert(SocureIDPlus, request_and_result),
-        VendorAPI::ExperianPreciseID => map.insert(ExperianPreciseID, request_and_result),
+        VendorAPI::SocureIdPlus => map.insert(SocureIDPlus, request_and_result),
+        VendorAPI::ExperianPreciseId => map.insert(ExperianPreciseID, request_and_result),
         VendorAPI::MiddeskCreateBusiness => map.insert(MiddeskCreateBusiness, request_and_result),
         VendorAPI::MiddeskGetBusiness => map.insert(MiddeskGetBusiness, request_and_result),
         VendorAPI::MiddeskBusinessUpdateWebhook => {
@@ -211,8 +211,8 @@ fn build_verification_identifier_map_entry(
         VendorAPI::IncodeProcessId => map.insert(IncodeProcessId, request_and_result),
         VendorAPI::IncodeFetchScores => map.insert(IncodeFetchScores, request_and_result),
         VendorAPI::IncodeAddPrivacyConsent => map.insert(IncodeAddPrivacyConsent, request_and_result),
-        VendorAPI::IncodeAddMLConsent => map.insert(IncodeAddMLConsent, request_and_result),
-        VendorAPI::IncodeFetchOCR => map.insert(IncodeFetchOCR, request_and_result),
+        VendorAPI::IncodeAddMlConsent => map.insert(IncodeAddMLConsent, request_and_result),
+        VendorAPI::IncodeFetchOcr => map.insert(IncodeFetchOCR, request_and_result),
         VendorAPI::IncodeAddSelfie => map.insert(IncodeAddSelfie, request_and_result),
         VendorAPI::IncodeWatchlistCheck => map.insert(IncodeWatchlistCheck, request_and_result),
         VendorAPI::IncodeUpdatedWatchlistResult => {
@@ -480,11 +480,11 @@ mod tests {
     fn test_build_parsed_vendor_response_map() {
         let responses = vec![
             (
-                VendorAPI::IdologyExpectID,
+                VendorAPI::IdologyExpectId,
                 idv::test_fixtures::test_idology_expectid_response(),
             ),
             (
-                VendorAPI::ExperianPreciseID,
+                VendorAPI::ExperianPreciseId,
                 idv::test_fixtures::experian_cross_core_response(),
             ),
         ];

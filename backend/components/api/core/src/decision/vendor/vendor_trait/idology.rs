@@ -41,7 +41,7 @@ impl VendorAPICall<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idol
 
 impl VendorAPIResponse for IdologyExpectIDAPIResponse {
     fn vendor_api(&self) -> newtypes::VendorAPI {
-        VendorAPI::IdologyExpectID
+        VendorAPI::IdologyExpectId
     }
 
     fn raw_response(&self) -> newtypes::PiiJsonValue {

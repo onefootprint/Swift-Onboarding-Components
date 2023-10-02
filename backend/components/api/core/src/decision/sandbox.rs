@@ -30,7 +30,7 @@ use super::{
 // But its a little tricky because if the sandbox selection is "Review" or "Stepup" thats a function of rules not just the individual vendor responses
 fn fixture_response_for_vendor_api(vendor_api: VendorAPI) -> ApiResult<VendorResponse> {
     match vendor_api {
-        VendorAPI::IdologyExpectID => {
+        VendorAPI::IdologyExpectId => {
             let v = idv::test_fixtures::test_idology_expectid_response();
             Ok(VendorResponse {
                 response: ParsedResponse::IDologyExpectID(serde_json::value::from_value(v.clone())?),
@@ -44,14 +44,14 @@ fn fixture_response_for_vendor_api(vendor_api: VendorAPI) -> ApiResult<VendorRes
                 raw_response: v.into(),
             })
         }
-        VendorAPI::SocureIDPlus => {
+        VendorAPI::SocureIdPlus => {
             let v = idv::test_fixtures::socure_idplus_fake_passing_response();
             Ok(VendorResponse {
                 response: ParsedResponse::SocureIDPlus(serde_json::value::from_value(v.clone())?),
                 raw_response: v.into(),
             })
         }
-        VendorAPI::ExperianPreciseID => {
+        VendorAPI::ExperianPreciseId => {
             let v = idv::test_fixtures::experian_cross_core_response();
             Ok(VendorResponse {
                 response: ParsedResponse::ExperianPreciseID(serde_json::value::from_value(v.clone())?),
@@ -72,7 +72,7 @@ pub async fn save_fixture_vendor_result(
     db_pool
         .db_query(move |conn| {
             let uv = Vault::get(conn, &sv_id)?;
-            let vr = fixture_response_for_vendor_api(VendorAPI::IdologyExpectID)?;
+            let vr = fixture_response_for_vendor_api(VendorAPI::IdologyExpectId)?;
             let (vreq, vres) = vendor::verification_result::save_vreq_and_vres(
                 conn,
                 &uv.public_key,
@@ -99,7 +99,7 @@ pub fn get_fixture_reason_codes(
     let (decision_status, create_manual_review) = fixture_decision;
 
     let vendor_api = match vault_kind {
-        VaultKind::Person => VendorAPI::IdologyExpectID,
+        VaultKind::Person => VendorAPI::IdologyExpectId,
         VaultKind::Business => VendorAPI::MiddeskBusinessUpdateWebhook,
     };
 
@@ -176,7 +176,7 @@ pub fn get_fixture_reason_codes_alpaca(
     reason_codes
         .into_iter()
         .chain(user_input_risk_signals.into_iter())
-        .map(|r| (r, VendorAPI::IdologyExpectID))
+        .map(|r| (r, VendorAPI::IdologyExpectId))
         .collect()
 }
 
@@ -224,7 +224,7 @@ impl From<FixtureDecision> for OnboardingRulesDecisionOutput {
                 should_commit: decision_status == DecisionStatus::Pass,
                 create_manual_review,
                 // not used
-                vendor_apis: vec![VendorAPI::IdologyExpectID],
+                vendor_apis: vec![VendorAPI::IdologyExpectId],
             },
             rules_triggered: vec![],
             rules_not_triggered: vec![],

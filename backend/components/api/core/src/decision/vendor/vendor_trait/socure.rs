@@ -35,7 +35,7 @@ impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Er
 
 impl VendorAPIResponse for SocureIDPlusAPIResponse {
     fn vendor_api(&self) -> newtypes::VendorAPI {
-        VendorAPI::SocureIDPlus
+        VendorAPI::SocureIdPlus
     }
 
     fn raw_response(&self) -> newtypes::PiiJsonValue {

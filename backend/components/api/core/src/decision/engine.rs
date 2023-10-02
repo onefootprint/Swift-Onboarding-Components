@@ -161,7 +161,7 @@ impl VendorResults {
         self.successful.iter().any(|(vreq, _)| {
             matches!(
                 vreq.vendor_api,
-                VendorAPI::IdologyExpectID | VendorAPI::ExperianPreciseID
+                VendorAPI::IdologyExpectId | VendorAPI::ExperianPreciseId
             )
         })
     }

@@ -212,7 +212,7 @@ impl Complete {
             let vault_data = vault_data.ok_or(AssertionError("Vault data not provided"))?;
             incode_docv::reason_codes_from_ocr_response(&fetch_ocr_response, vault_data)
                 .into_iter()
-                .map(|r| (r, VendorAPI::IncodeFetchOCR, ocr_verification_result_id.clone()))
+                .map(|r| (r, VendorAPI::IncodeFetchOcr, ocr_verification_result_id.clone()))
                 .collect_vec()
         } else {
             vec![]

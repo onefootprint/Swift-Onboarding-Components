@@ -162,10 +162,10 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches)),
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches)),
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches)),
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches)),
                     // TODO: assert doc upload failed RS when we have it
                     (!doc_upload_failed).then_some((
                         VendorAPI::IncodeFetchScores,
@@ -309,10 +309,10 @@ async fn redo_document_and_pass(
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
                     (
                         VendorAPI::IncodeFetchScores,
                         FootprintReasonCode::DocumentVerified,

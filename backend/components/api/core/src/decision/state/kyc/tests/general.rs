@@ -266,16 +266,16 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 
             assert!(rs.iter().all(|rs| matches!(
                 rs.vendor_api,
-                VendorAPI::IdologyExpectID | VendorAPI::IncodeFetchScores
+                VendorAPI::IdologyExpectId | VendorAPI::IncodeFetchScores
             )));
         }
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches)),
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches)),
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches)),
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches)),
                     document_requested.map(|_| {
                         (
                             VendorAPI::IncodeFetchScores,
@@ -456,7 +456,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
             };
             assert!(rs.iter().all(|rs| matches!(
                 rs.vendor_api,
-                VendorAPI::IdologyExpectID | VendorAPI::IncodeFetchScores
+                VendorAPI::IdologyExpectId | VendorAPI::IncodeFetchScores
             )));
             assert!(rs
                 .iter()
@@ -472,10 +472,10 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
 
             assert_have_same_elements(
                 vec![
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::SsnDoesNotMatch)),
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches)),
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches)),
-                    Some((VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::SsnDoesNotMatch)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches)),
+                    Some((VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches)),
                     doc_reason_code,
                 ]
                 .into_iter()
@@ -615,10 +615,10 @@ async fn redo_and_pass(
 
     assert_have_same_elements(
         vec![
-            Some((VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches)),
-            Some((VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches)),
-            Some((VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches)),
-            Some((VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches)),
+            Some((VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches)),
+            Some((VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches)),
+            Some((VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches)),
+            Some((VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches)),
             doc_requested.then_some((
                 VendorAPI::IncodeFetchScores,
                 FootprintReasonCode::DocumentVerified,

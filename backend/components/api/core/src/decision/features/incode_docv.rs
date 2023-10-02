@@ -60,7 +60,7 @@ impl FeatureSet for IncodeDocumentFeatures {
     fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
         // TODO: Not quite right, but that's fine since this won't be used. 
         // eventually should move this to some sort of vendor api struct
-        vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOCR]
+        vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOcr]
     }
 }
 

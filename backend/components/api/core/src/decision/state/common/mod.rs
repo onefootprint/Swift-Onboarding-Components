@@ -198,7 +198,7 @@ pub fn alpaca_kyc_decision_from_fixture(
             should_commit: false,
             create_manual_review: false,
             // not used
-            vendor_apis: vec![VendorAPI::IdologyExpectID],
+            vendor_apis: vec![VendorAPI::IdologyExpectId],
         },
         rules_triggered: vec![],
         rules_not_triggered: vec![],
@@ -312,7 +312,7 @@ pub async fn maybe_generate_ocr_reason_codes(
 
     let ocr_reason_codes = incode_docv::reason_codes_from_ocr_response(fetch_ocr, ocr_comparison_data)
         .into_iter()
-        .map(|r| (r, VendorAPI::IncodeFetchOCR, vres.verification_result_id.clone()))
+        .map(|r| (r, VendorAPI::IncodeFetchOcr, vres.verification_result_id.clone()))
         .collect();
 
     Ok(Some(ocr_reason_codes))

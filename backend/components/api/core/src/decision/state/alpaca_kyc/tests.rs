@@ -157,10 +157,10 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         UserKind::Demo | UserKind::Sandbox(_) => {
             assert_have_same_elements(
                 vec![
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
                 ],
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
@@ -170,10 +170,10 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
                 ],
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
@@ -330,10 +330,10 @@ async fn pass_then_watchlist_hit(
                 VendorAPI::IncodeWatchlistCheck,
                 FootprintReasonCode::AdverseMediaHit,
             ),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+            (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
+            (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
+            (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
+            (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
         ],
         rs.into_iter()
             .map(|rs| (rs.vendor_api, rs.reason_code))
@@ -507,7 +507,7 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         UserKind::Demo | UserKind::Sandbox(_) => {
             assert!(rs.iter().all(|rs| matches!(
                 rs.vendor_api,
-                VendorAPI::IdologyExpectID | VendorAPI::IncodeFetchScores
+                VendorAPI::IdologyExpectId | VendorAPI::IncodeFetchScores
             )));
             assert!(rs
                 .iter()
@@ -517,16 +517,16 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
             assert_have_same_elements(
                 vec![
                     (
-                        VendorAPI::IdologyExpectID,
+                        VendorAPI::IdologyExpectId,
                         FootprintReasonCode::NamePartiallyMatches,
                     ),
                     (
-                        VendorAPI::IdologyExpectID,
+                        VendorAPI::IdologyExpectId,
                         FootprintReasonCode::NameFirstDoesNotMatch,
                     ),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
                     (
                         VendorAPI::IncodeFetchScores,
                         FootprintReasonCode::DocumentVerified,
@@ -689,7 +689,7 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
             assert_have_same_elements(
-                vec![(VendorAPI::IdologyExpectID, FootprintReasonCode::SsnDoesNotMatch)],
+                vec![(VendorAPI::IdologyExpectId, FootprintReasonCode::SsnDoesNotMatch)],
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
                     .collect_vec(),
@@ -698,10 +698,10 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnDoesNotMatch), // does not match
-                    (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnDoesNotMatch), // does not match
+                    (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
                 ],
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
@@ -809,10 +809,10 @@ async fn redo_and_pass(
 
     assert_have_same_elements(
         vec![
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::AddressMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::SsnMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::NameMatches),
-            (VendorAPI::IdologyExpectID, FootprintReasonCode::DobMatches),
+            (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
+            (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
+            (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
+            (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
         ],
         rs.into_iter()
             .map(|rs| (rs.vendor_api, rs.reason_code))

@@ -33,7 +33,7 @@ impl FeatureSet for ExperianFeatures {
         self.footprint_reason_codes.clone()
     }
     fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
-        vec![VendorAPI::ExperianPreciseID]
+        vec![VendorAPI::ExperianPreciseId]
     }
 }
 

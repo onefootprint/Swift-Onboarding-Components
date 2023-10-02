@@ -109,7 +109,7 @@ impl KycRuleGroup {
                     rules_triggered: vec![RuleName::DocumentUploadFailed],
                     rules_not_triggered: vec![],
                     triggered_action: Some(Action::ManualReview),
-                    vendor_apis: vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOCR],
+                    vendor_apis: vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOcr],
                 }
                 .into()
             }

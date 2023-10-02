@@ -184,7 +184,7 @@ impl TenantVendorControl {
             }
 
             if tvc.experian_enabled && tvc.experian_subscriber_code.is_some() {
-                apis.push(VendorAPI::ExperianPreciseID);
+                apis.push(VendorAPI::ExperianPreciseId);
             }
         } else {
             // If we do not, we enable Idology APIs by default

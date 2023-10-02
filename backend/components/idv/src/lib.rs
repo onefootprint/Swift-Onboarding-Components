@@ -271,14 +271,14 @@ pub enum Error {
 impl From<&ParsedResponse> for VendorAPI {
     fn from(value: &ParsedResponse) -> Self {
         match value {
-            ParsedResponse::IDologyExpectID(_) => VendorAPI::IdologyExpectID,
+            ParsedResponse::IDologyExpectID(_) => VendorAPI::IdologyExpectId,
             ParsedResponse::IDologyScanVerifyResult(_) => VendorAPI::IdologyScanVerifyResults,
             ParsedResponse::IDologyScanVerifySubmission(_) => VendorAPI::IdologyScanVerifySubmission,
             ParsedResponse::IDologyScanOnboarding(_) => VendorAPI::IdologyScanOnboarding,
             ParsedResponse::IDologyPa(_) => VendorAPI::IdologyPa,
             ParsedResponse::TwilioLookupV2(_) => VendorAPI::TwilioLookupV2,
-            ParsedResponse::SocureIDPlus(_) => VendorAPI::SocureIDPlus,
-            ParsedResponse::ExperianPreciseID(_) => VendorAPI::ExperianPreciseID,
+            ParsedResponse::SocureIDPlus(_) => VendorAPI::SocureIdPlus,
+            ParsedResponse::ExperianPreciseID(_) => VendorAPI::ExperianPreciseId,
             ParsedResponse::MiddeskCreateBusiness(_) => VendorAPI::MiddeskCreateBusiness,
             ParsedResponse::MiddeskGetBusiness(_) => VendorAPI::MiddeskGetBusiness,
             ParsedResponse::MiddeskBusinessUpdateWebhook(_) => VendorAPI::MiddeskBusinessUpdateWebhook,
@@ -289,8 +289,8 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::IncodeFetchScores(_) => VendorAPI::IncodeFetchScores,
             ParsedResponse::IncodeProcessId(_) => VendorAPI::IncodeProcessId,
             ParsedResponse::IncodeAddPrivacyConsent(_) => VendorAPI::IncodeAddPrivacyConsent,
-            ParsedResponse::IncodeAddMLConsent(_) => VendorAPI::IncodeAddMLConsent,
-            ParsedResponse::IncodeFetchOCR(_) => VendorAPI::IncodeFetchOCR,
+            ParsedResponse::IncodeAddMLConsent(_) => VendorAPI::IncodeAddMlConsent,
+            ParsedResponse::IncodeFetchOCR(_) => VendorAPI::IncodeFetchOcr,
             ParsedResponse::IncodeAddSelfie(_) => VendorAPI::IncodeAddSelfie,
             ParsedResponse::IncodeWatchlistCheck(_) => VendorAPI::IncodeWatchlistCheck,
             ParsedResponse::IncodeUpdatedWatchlistResult(_) => VendorAPI::IncodeUpdatedWatchlistResult,

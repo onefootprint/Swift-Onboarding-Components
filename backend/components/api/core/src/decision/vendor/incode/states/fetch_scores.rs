@@ -60,7 +60,7 @@ impl IncodeStateTransition for FetchScores {
         let ocr_res = clients.incode_fetch_ocr.make_request(ocr_request).await;
 
         // Save our result
-        let ocr_args = SaveVerificationResultArgs::from(&ocr_res, VendorAPI::IncodeFetchOCR, ctx);
+        let ocr_args = SaveVerificationResultArgs::from(&ocr_res, VendorAPI::IncodeFetchOcr, ctx);
         let ocr_vres = save_incode_verification_result(db_pool, ocr_args).await?;
 
         // Now ensure we don't have an error

@@ -181,7 +181,7 @@ pub async fn save_incode_fixtures(
             let requests = VerificationRequest::bulk_create(
                 conn,
                 suid2.clone(),
-                vec![VendorAPI::IncodeFetchOCR, VendorAPI::IncodeFetchScores],
+                vec![VendorAPI::IncodeFetchOcr, VendorAPI::IncodeFetchScores],
                 &decision_intent.id,
             )?;
 
@@ -203,7 +203,7 @@ pub async fn save_incode_fixtures(
             let new_vres = requests
                 .into_iter()
                 .map(move |r| {
-                    if r.vendor_api == VendorAPI::IncodeFetchOCR {
+                    if r.vendor_api == VendorAPI::IncodeFetchOcr {
                         NewVerificationResult {
                             request_id: r.id,
                             response: raw_ocr_response.clone().into(),

@@ -321,7 +321,7 @@ impl VendorAPICall<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>, Inco
 
 impl VendorAPIResponse for IncodeResponse<FetchOCRResponse> {
     fn vendor_api(&self) -> newtypes::VendorAPI {
-        VendorAPI::IncodeFetchOCR
+        VendorAPI::IncodeFetchOcr
     }
 
     fn raw_response(&self) -> newtypes::PiiJsonValue {

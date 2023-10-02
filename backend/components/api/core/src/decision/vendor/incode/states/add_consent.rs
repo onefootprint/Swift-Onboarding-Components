@@ -54,7 +54,7 @@ impl IncodeStateTransition for AddConsent {
         // Save our result
         let privacy_args =
             SaveVerificationResultArgs::from(&privacy_res, VendorAPI::IncodeAddPrivacyConsent, ctx);
-        let ml_args = SaveVerificationResultArgs::from(&ml_res, VendorAPI::IncodeAddMLConsent, ctx);
+        let ml_args = SaveVerificationResultArgs::from(&ml_res, VendorAPI::IncodeAddMlConsent, ctx);
 
         save_incode_verification_result(db_pool, privacy_args).await?;
         save_incode_verification_result(db_pool, ml_args).await?;

@@ -183,7 +183,7 @@ fn deserialize_from_vendor_api(
     vendor_api: VendorAPI,
 ) -> Result<ParsedResponse, ApiError> {
     let res = match vendor_api {
-        VendorAPI::IdologyExpectID => ParsedResponse::from_idology_expectid_response(raw_response)?,
+        VendorAPI::IdologyExpectId => ParsedResponse::from_idology_expectid_response(raw_response)?,
         VendorAPI::IdologyScanVerifySubmission => {
             ParsedResponse::from_idology_scan_verify_submission(raw_response)?
         }
@@ -191,10 +191,10 @@ fn deserialize_from_vendor_api(
             ParsedResponse::from_idology_scan_verify_results(raw_response)?
         }
         VendorAPI::TwilioLookupV2 => ParsedResponse::from_twilio_lookupv2_response(raw_response)?,
-        VendorAPI::SocureIDPlus => ParsedResponse::from_socure_idplus_response(raw_response)?,
+        VendorAPI::SocureIdPlus => ParsedResponse::from_socure_idplus_response(raw_response)?,
         VendorAPI::IdologyScanOnboarding => ParsedResponse::from_idology_scan_onboarding(raw_response)?,
         VendorAPI::IdologyPa => ParsedResponse::from_idology_pa(raw_response)?,
-        VendorAPI::ExperianPreciseID => ParsedResponse::from_experian_cross_core(raw_response)?,
+        VendorAPI::ExperianPreciseId => ParsedResponse::from_experian_cross_core(raw_response)?,
         VendorAPI::MiddeskCreateBusiness => ParsedResponse::from_middesk_create_business(raw_response)?,
         VendorAPI::MiddeskBusinessUpdateWebhook => {
             ParsedResponse::from_middesk_business_update_webhook(raw_response)?
@@ -209,8 +209,8 @@ fn deserialize_from_vendor_api(
         VendorAPI::IncodeProcessId => ParsedResponse::from_incode_process_id(raw_response)?,
         VendorAPI::IncodeFetchScores => ParsedResponse::from_incode_fetch_scores(raw_response)?,
         VendorAPI::IncodeAddPrivacyConsent => ParsedResponse::from_incode_add_privacy_consent(raw_response)?,
-        VendorAPI::IncodeAddMLConsent => ParsedResponse::from_incode_add_ml_consent(raw_response)?,
-        VendorAPI::IncodeFetchOCR => ParsedResponse::from_incode_fetch_ocr(raw_response)?,
+        VendorAPI::IncodeAddMlConsent => ParsedResponse::from_incode_add_ml_consent(raw_response)?,
+        VendorAPI::IncodeFetchOcr => ParsedResponse::from_incode_fetch_ocr(raw_response)?,
         VendorAPI::IncodeAddSelfie => ParsedResponse::from_incode_add_selfie(raw_response)?,
         VendorAPI::IncodeWatchlistCheck => ParsedResponse::from_incode_watchlist_check(raw_response)?,
         VendorAPI::IncodeUpdatedWatchlistResult => {

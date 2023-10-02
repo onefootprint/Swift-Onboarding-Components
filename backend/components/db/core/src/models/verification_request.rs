@@ -216,21 +216,21 @@ mod tests {
     }
 
     #[db_test_case(vec![
-        (VendorAPI::IdologyExpectID, vec![VresType::Success])
+        (VendorAPI::IdologyExpectId, vec![VresType::Success])
     ])]
     #[db_test_case(vec![
-        (VendorAPI::IdologyExpectID, vec![VresType::Success, VresType::None])
+        (VendorAPI::IdologyExpectId, vec![VresType::Success, VresType::None])
     ])]
     #[db_test_case(vec![
-        (VendorAPI::IdologyExpectID, vec![VresType::Error, VresType::Success])
+        (VendorAPI::IdologyExpectId, vec![VresType::Error, VresType::Success])
     ])]
     #[db_test_case(vec![
-        (VendorAPI::IdologyExpectID, vec![VresType::Error, VresType::Success]),
-        (VendorAPI::ExperianPreciseID, vec![VresType::Success])
+        (VendorAPI::IdologyExpectId, vec![VresType::Error, VresType::Success]),
+        (VendorAPI::ExperianPreciseId, vec![VresType::Success])
     ])]
     #[db_test_case(vec![
-        (VendorAPI::IdologyExpectID, vec![VresType::Error, VresType::Success]),
-        (VendorAPI::ExperianPreciseID, vec![VresType::Error, VresType::None, VresType::Success])
+        (VendorAPI::IdologyExpectId, vec![VresType::Error, VresType::Success]),
+        (VendorAPI::ExperianPreciseId, vec![VresType::Error, VresType::None, VresType::Success])
     ])]
     fn test_get_latest_by_vendor_api_for_decision_intent(
         conn: &mut TestPgConn,

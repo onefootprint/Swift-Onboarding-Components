@@ -15,15 +15,15 @@ use newtypes::VerificationResultId;
 use serde_json::json;
 use std::str::FromStr;
 
-#[db_test_case(vec![vec![VendorAPI::IdologyExpectID, newtypes::VendorAPI::TwilioLookupV2]], VendorAPI::ExperianPreciseID; "basic case with just 1 set of requests for an onboarding")]
+#[db_test_case(vec![vec![VendorAPI::IdologyExpectId, newtypes::VendorAPI::TwilioLookupV2]], VendorAPI::ExperianPreciseId; "basic case with just 1 set of requests for an onboarding")]
 #[db_test_case(vec![
-    vec![VendorAPI::IdologyExpectID, newtypes::VendorAPI::TwilioLookupV2],
-    vec![VendorAPI::IdologyExpectID, newtypes::VendorAPI::TwilioLookupV2],
-], VendorAPI::ExperianPreciseID; "when multiple requests exist for an onboarding, the latest ones are retrieved")]
+    vec![VendorAPI::IdologyExpectId, newtypes::VendorAPI::TwilioLookupV2],
+    vec![VendorAPI::IdologyExpectId, newtypes::VendorAPI::TwilioLookupV2],
+], VendorAPI::ExperianPreciseId; "when multiple requests exist for an onboarding, the latest ones are retrieved")]
 #[db_test_case(vec![
-    vec![VendorAPI::IdologyExpectID, newtypes::VendorAPI::TwilioLookupV2],
-    vec![VendorAPI::IdologyExpectID, newtypes::VendorAPI::TwilioLookupV2, VendorAPI::SocureIDPlus],
-], VendorAPI::ExperianPreciseID; "multiple requests and addition of new vendor call")]
+    vec![VendorAPI::IdologyExpectId, newtypes::VendorAPI::TwilioLookupV2],
+    vec![VendorAPI::IdologyExpectId, newtypes::VendorAPI::TwilioLookupV2, VendorAPI::SocureIdPlus],
+], VendorAPI::ExperianPreciseId; "multiple requests and addition of new vendor call")]
 fn test_get_requests_and_results_for_onboarding(
     conn: &mut TestPgConn,
     input_req_res: Vec<Vec<VendorAPI>>,

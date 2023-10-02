@@ -276,7 +276,7 @@ mod test {
             tenant_identifier: "yo".to_owned(),
         };
 
-        test_save_vreq_and_vres(state, req, res, VendorAPI::IdologyExpectID, json).await;
+        test_save_vreq_and_vres(state, req, res, VendorAPI::IdologyExpectId, json).await;
     }
 
     #[test_state]
@@ -303,7 +303,7 @@ mod test {
             tenant_identifier: "yo".to_owned(),
         };
 
-        test_save_vreq_and_vres(state, req, res, VendorAPI::IdologyExpectID, json).await;
+        test_save_vreq_and_vres(state, req, res, VendorAPI::IdologyExpectId, json).await;
     }
 
     #[test_state]

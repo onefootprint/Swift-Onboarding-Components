@@ -120,7 +120,7 @@ pub async fn send_idv_request(
     let is_production = state.config.service_config.is_production();
     // still TODO: traitfy the ff logic shared by these requests
     match vendor_api {
-        VendorAPI::IdologyExpectID => {
+        VendorAPI::IdologyExpectId => {
             let request = tvc.build_idology_request(idv_data);
             send_idology_idv_request(
                 request,
@@ -132,7 +132,7 @@ pub async fn send_idv_request(
             .await
         }
         VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(idv_data, state.vendor_clients.twilio_lookup_v2.clone()).await,
-        VendorAPI::SocureIDPlus => {
+        VendorAPI::SocureIdPlus => {
             send_socure_idv_request(
                 idv_data,
                 socure_data,
@@ -143,7 +143,7 @@ pub async fn send_idv_request(
             )
             .await
         }
-        VendorAPI::ExperianPreciseID => {
+        VendorAPI::ExperianPreciseId => {
             let request = tvc.build_experian_request(idv_data);
             send_experian_idv_request(
                 request,

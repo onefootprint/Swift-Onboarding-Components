@@ -14,7 +14,7 @@ use macros::test_state_case;
 use newtypes::VendorAPI;
 use newtypes::{
     DecisionStatus, EnhancedAmlOption, KycState, OnboardingStatus,
-    VendorAPI::{IdologyExpectID, IncodeWatchlistCheck},
+    VendorAPI::{IdologyExpectId, IncodeWatchlistCheck},
     WorkflowState,
 };
 use strum::IntoEnumIterator;
@@ -30,8 +30,8 @@ enum RS {
 }
 
 #[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![]), VR::NotExpected, (OnboardingStatus::Pass, RS::None))]
-#[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![AmlKind::Ofac]), VR::NotExpected, (OnboardingStatus::Fail, RS::Some(IdologyExpectID, vec![AmlKind::Ofac])))]
-#[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![AmlKind::Pep]), VR::NotExpected, (OnboardingStatus::Fail, RS::Some(IdologyExpectID, vec![AmlKind::Pep])))]
+#[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![AmlKind::Ofac]), VR::NotExpected, (OnboardingStatus::Fail, RS::Some(IdologyExpectId, vec![AmlKind::Ofac])))]
+#[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![AmlKind::Pep]), VR::NotExpected, (OnboardingStatus::Fail, RS::Some(IdologyExpectId, vec![AmlKind::Pep])))]
 #[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true}, VR::Hits(vec![]), VR::Hits(vec![]), (OnboardingStatus::Pass, RS::None))]
 #[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Ofac]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac])))]
 #[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Ofac, AmlKind::Pep]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac, AmlKind::Pep])))]

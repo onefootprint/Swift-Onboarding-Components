@@ -175,7 +175,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Kyc> {
                     .into_iter()
                     .chain(user_input_risk_signals.clone().into_iter())
                     .filter(|r| !r.is_aml()) // Filter out AML reason codes!
-                    .map(|r| (r, VendorAPI::IdologyExpectID, vres.to_owned()))
+                    .map(|r| (r, VendorAPI::IdologyExpectId, vres.to_owned()))
                     .collect()
             })
             .unwrap_or(vec![]);
@@ -188,7 +188,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Kyc> {
                     .into_iter()
                     .chain(user_input_risk_signals.clone().into_iter())
                     .filter(|r| !r.is_aml()) // Filter out AML reason codes!
-                    .map(|r| (r, VendorAPI::ExperianPreciseID, vres.to_owned()))
+                    .map(|r| (r, VendorAPI::ExperianPreciseId, vres.to_owned()))
                     .collect()
             })
             .unwrap_or(vec![]);
@@ -221,7 +221,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Aml> {
                 f.footprint_reason_codes
                     .into_iter()
                     .filter(|r| r.is_aml())  // Filter to only AML risk signals!
-                    .map(|r| (r, VendorAPI::IdologyExpectID, vres.to_owned()))
+                    .map(|r| (r, VendorAPI::IdologyExpectId, vres.to_owned()))
                     .collect()
             })
             .unwrap_or(vec![]);
@@ -233,7 +233,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Aml> {
                 f.footprint_reason_codes
                     .into_iter()
                     .filter(|r| r.is_aml()) // Filter to only AML risk signals!
-                    .map(|r| (r, VendorAPI::ExperianPreciseID, vres.to_owned()))
+                    .map(|r| (r, VendorAPI::ExperianPreciseId, vres.to_owned()))
                     .collect()
             })
             .unwrap_or(vec![]);
@@ -367,7 +367,7 @@ impl TryFrom<RiskSignalsForDecision> for IDologyFeatures {
             .into_iter()
             .chain(aml_reason_codes)
             .filter_map(|(frc, vendor_api, verification_result_id)| {
-                if vendor_api == VendorAPI::IdologyExpectID {
+                if vendor_api == VendorAPI::IdologyExpectId {
                     Some((frc, verification_result_id))
                 } else {
                     None
@@ -377,13 +377,13 @@ impl TryFrom<RiskSignalsForDecision> for IDologyFeatures {
 
         if footprint_reason_codes.is_empty() {
             Err(crate::decision::Error::FeatureVectorConversionError(
-                VendorAPI::IdologyExpectID,
+                VendorAPI::IdologyExpectId,
             ))
         } else {
             Ok(Self {
                 footprint_reason_codes,
                 verification_result_id: verification_result_ids.pop().ok_or(
-                    crate::decision::Error::FeatureVectorConversionError(VendorAPI::IdologyExpectID),
+                    crate::decision::Error::FeatureVectorConversionError(VendorAPI::IdologyExpectId),
                 )?,
             })
         }
@@ -401,7 +401,7 @@ impl TryFrom<RiskSignalsForDecision> for ExperianFeatures {
             .into_iter()
             .chain(aml_reason_codes.into_iter())
             .filter_map(|(frc, vendor_api, verification_result_id)| {
-                if vendor_api == VendorAPI::ExperianPreciseID {
+                if vendor_api == VendorAPI::ExperianPreciseId {
                     Some((frc, verification_result_id))
                 } else {
                     None
@@ -411,13 +411,13 @@ impl TryFrom<RiskSignalsForDecision> for ExperianFeatures {
 
         if footprint_reason_codes.is_empty() {
             Err(crate::decision::Error::FeatureVectorConversionError(
-                VendorAPI::ExperianPreciseID,
+                VendorAPI::ExperianPreciseId,
             ))
         } else {
             Ok(Self {
                 footprint_reason_codes,
                 verification_result_id: verification_result_ids.pop().ok_or(
-                    crate::decision::Error::FeatureVectorConversionError(VendorAPI::ExperianPreciseID),
+                    crate::decision::Error::FeatureVectorConversionError(VendorAPI::ExperianPreciseId),
                 )?,
             })
         }
@@ -429,7 +429,7 @@ impl TryFrom<RiskSignalsForDecision> for IncodeDocumentFeatures {
 
     fn try_from(signals: RiskSignalsForDecision) -> Result<Self, Self::Error> {
         let doc_reason_codes = signals.doc.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
-        let apis = vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOCR];
+        let apis = vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOcr];
 
         let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = doc_reason_codes
             .into_iter()
