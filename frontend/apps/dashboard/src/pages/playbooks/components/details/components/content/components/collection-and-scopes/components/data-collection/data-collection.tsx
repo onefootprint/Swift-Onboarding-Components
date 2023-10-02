@@ -87,9 +87,7 @@ const DataCollection = ({
         />
       )}
       {isDocFirstFlow && (
-        <InlineAlert variant="info">
-          {t('data-collection.id-doc-first')}
-        </InlineAlert>
+        <InlineAlert variant="info">{t('id-doc-first')}</InlineAlert>
       )}
     </Container>
   );
