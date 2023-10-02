@@ -4,7 +4,7 @@ import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
 import { BusinessDI } from '@onefootprint/types';
 import type { CountrySelectOption, SelectOption } from '@onefootprint/ui';
-import { AddressInput, Grid, TextInput } from '@onefootprint/ui';
+import { AddressInput, Grid, Stack, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -143,33 +143,35 @@ const BusinessAddressForm = ({
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(onSubmitFormData)}>
-        <CountryField onChange={handleCountryChange} data-private />
-        <AddressInput
-          data-private
-          country={country.value}
-          hasError={!!errors.addressLine1}
-          hint={errors.addressLine1 && t('address-line-1.error')}
-          label={t('address-line-1.label')}
-          onSelect={handleAddressSelect}
-          placeholder={t('address-line-1.placeholder')}
-          {...register('addressLine1', { required: true })}
-        />
-        <TextInput
-          data-private
-          autoComplete="address-line2"
-          label={t('address-line-2.label')}
-          placeholder={t('address-line-2.placeholder')}
-          {...register('addressLine2')}
-        />
-        <Grid.Row>
-          <Grid.Column col={6}>
-            <CityField />
-          </Grid.Column>
-          <Grid.Column col={6}>
-            <ZipField countryCode={country.value} />
-          </Grid.Column>
-        </Grid.Row>
-        <StateField countryCode={country.value} />
+        <Stack gap={5} direction="column">
+          <CountryField onChange={handleCountryChange} data-private />
+          <AddressInput
+            data-private
+            country={country.value}
+            hasError={!!errors.addressLine1}
+            hint={errors.addressLine1 && t('address-line-1.error')}
+            label={t('address-line-1.label')}
+            onSelect={handleAddressSelect}
+            placeholder={t('address-line-1.placeholder')}
+            {...register('addressLine1', { required: true })}
+          />
+          <TextInput
+            data-private
+            autoComplete="address-line2"
+            label={t('address-line-2.label')}
+            placeholder={t('address-line-2.placeholder')}
+            {...register('addressLine2')}
+          />
+          <Grid.Row>
+            <Grid.Column col={6}>
+              <CityField />
+            </Grid.Column>
+            <Grid.Column col={6}>
+              <ZipField countryCode={country.value} />
+            </Grid.Column>
+          </Grid.Row>
+          <StateField countryCode={country.value} />
+        </Stack>
         <EditableFormButtonContainer
           onCancel={onCancel}
           isLoading={isLoading}

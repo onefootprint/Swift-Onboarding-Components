@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { TextInput } from '@onefootprint/ui';
+import { media, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -105,9 +105,15 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
 
 const Row = styled.div<{ columns: number }>`
   ${({ columns, theme }) => css`
-    display: grid;
-    grid-template-columns: repeat(${columns}, 1fr);
-    gap: ${theme.spacing[4]};
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
+
+    ${media.greaterThan('md')`
+      display: grid;
+      grid-template-columns: repeat(${columns}, 1fr);
+      gap: ${theme.spacing[4]};
+    `}
   `}
 `;
 

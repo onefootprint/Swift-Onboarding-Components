@@ -2,7 +2,7 @@ import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { BusinessDI } from '@onefootprint/types';
-import { PhoneInput, TextInput } from '@onefootprint/ui';
+import { PhoneInput, Stack, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import type { UseFormSetError } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
@@ -114,86 +114,88 @@ const BasicDataForm = ({
 
   return (
     <Form onSubmit={handleSubmit(onSubmitFormData)}>
-      <TextInput
-        data-private
-        hasError={!!errors.name}
-        hint={errors.name ? t('business-name.error') : undefined}
-        label={t('business-name.label')}
-        placeholder={t('business-name.placeholder')}
-        {...register('name', { required: true })}
-      />
-      <TextInput
-        data-private
-        label={t('doing-business-as.label')}
-        placeholder={t('doing-business-as.placeholder')}
-        {...register('doingBusinessAs')}
-      />
-      <TextInput
-        data-private
-        hasError={!!tinHint}
-        hint={tinHint}
-        mask={inputMasks.tin}
-        value={getValues('tin')}
-        label={t('tin.label')}
-        placeholder={t('tin.placeholder')}
-        {...register('tin', {
-          required: {
-            value: true,
-            message: t('tin.errors.required'),
-          },
-          pattern: {
-            value: /^\d{2}-\d{7}$/,
-            message: t('tin.errors.pattern'),
-          },
-        })}
-      />
-      {optionalFields?.includes(BusinessDI.website) && (
+      <Stack gap={5} direction="column">
         <TextInput
           data-private
-          hasError={!!websiteHint}
-          hint={websiteHint}
-          label={t('website.label')}
-          placeholder={t('website.placeholder')}
-          type="url"
-          defaultValue={getValues('website')}
-          {...register('website', {
+          hasError={!!errors.name}
+          hint={errors.name ? t('business-name.error') : undefined}
+          label={t('business-name.label')}
+          placeholder={t('business-name.placeholder')}
+          {...register('name', { required: true })}
+        />
+        <TextInput
+          data-private
+          label={t('doing-business-as.label')}
+          placeholder={t('doing-business-as.placeholder')}
+          {...register('doingBusinessAs')}
+        />
+        <TextInput
+          data-private
+          hasError={!!tinHint}
+          hint={tinHint}
+          mask={inputMasks.tin}
+          value={getValues('tin')}
+          label={t('tin.label')}
+          placeholder={t('tin.placeholder')}
+          {...register('tin', {
             required: {
               value: true,
-              message: t('website.errors.required'),
+              message: t('tin.errors.required'),
+            },
+            pattern: {
+              value: /^\d{2}-\d{7}$/,
+              message: t('tin.errors.pattern'),
             },
           })}
         />
-      )}
-      {optionalFields?.includes(BusinessDI.phoneNumber) && (
-        <Controller
-          control={control}
-          name="phoneNumber"
-          rules={{
-            required: {
-              value: true,
-              message: t('phone-number.errors.required'),
-            },
-          }}
-          render={({
-            field: { onChange, onBlur, value, name },
-            fieldState: { error },
-          }) => (
-            <PhoneInput
-              data-private
-              hasError={!!error && !!phoneNumberHint}
-              hint={phoneNumberHint}
-              label={t('phone-number.label')}
-              name={name}
-              onBlur={onBlur}
-              onChange={onChange}
-              onReset={() => {
-                setValue('phoneNumber', undefined);
-              }}
-              value={value}
-            />
-          )}
-        />
-      )}
+        {optionalFields?.includes(BusinessDI.website) && (
+          <TextInput
+            data-private
+            hasError={!!websiteHint}
+            hint={websiteHint}
+            label={t('website.label')}
+            placeholder={t('website.placeholder')}
+            type="url"
+            defaultValue={getValues('website')}
+            {...register('website', {
+              required: {
+                value: true,
+                message: t('website.errors.required'),
+              },
+            })}
+          />
+        )}
+        {optionalFields?.includes(BusinessDI.phoneNumber) && (
+          <Controller
+            control={control}
+            name="phoneNumber"
+            rules={{
+              required: {
+                value: true,
+                message: t('phone-number.errors.required'),
+              },
+            }}
+            render={({
+              field: { onChange, onBlur, value, name },
+              fieldState: { error },
+            }) => (
+              <PhoneInput
+                data-private
+                hasError={!!error && !!phoneNumberHint}
+                hint={phoneNumberHint}
+                label={t('phone-number.label')}
+                name={name}
+                onBlur={onBlur}
+                onChange={onChange}
+                onReset={() => {
+                  setValue('phoneNumber', undefined);
+                }}
+                value={value}
+              />
+            )}
+          />
+        )}
+      </Stack>
       <EditableFormButtonContainer
         onCancel={onCancel}
         isLoading={isLoading}

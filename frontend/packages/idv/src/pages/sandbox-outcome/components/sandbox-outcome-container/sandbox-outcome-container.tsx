@@ -65,7 +65,7 @@ const Form = styled.form`
   ${({ theme }) => css`
     margin-top: ${theme.spacing[7]};
     display: grid;
-    gap: ${theme.spacing[7]};
+    gap: ${theme.spacing[5]};
   `}
 `;
 

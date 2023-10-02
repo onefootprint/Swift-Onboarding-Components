@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
 import { IdDI, isCountryCode } from '@onefootprint/types';
-import { Grid } from '@onefootprint/ui';
+import { Grid, Stack } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -105,20 +105,22 @@ const ResidentialAddress = ({
           {!hideHeader && (
             <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
           )}
-          <CountryField
-            disabled={disableCountry}
-            onChange={handleCountryChange}
-          />
-          <AddressLines />
-          <Grid.Row>
-            <Grid.Column col={6}>
-              <CityField />
-            </Grid.Column>
-            <Grid.Column col={6}>
-              <ZipField />
-            </Grid.Column>
-          </Grid.Row>
-          <StateField />
+          <Stack gap={5} direction="column">
+            <CountryField
+              disabled={disableCountry}
+              onChange={handleCountryChange}
+            />
+            <AddressLines />
+            <Grid.Row>
+              <Grid.Column col={6}>
+                <CityField />
+              </Grid.Column>
+              <Grid.Column col={6}>
+                <ZipField />
+              </Grid.Column>
+            </Grid.Row>
+            <StateField />
+          </Stack>
           <EditableFormButtonContainer
             isLoading={mutation.isLoading}
             onCancel={onCancel}

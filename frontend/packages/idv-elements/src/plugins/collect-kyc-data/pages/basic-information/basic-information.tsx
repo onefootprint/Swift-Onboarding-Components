@@ -5,7 +5,7 @@ import {
   IdDI,
   isCountryCode,
 } from '@onefootprint/types';
-import { InlineAlert, Typography } from '@onefootprint/ui';
+import { InlineAlert, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -105,11 +105,13 @@ const BasicInformation = ({
               {t('hint')}
             </Typography>
           </InlineAlert>
-          {requiresName && <NameFields disabled={isNameDisabled} />}
-          {requiresDob && <DobField disabled={isDobDisabled} />}
-          {requiresNationality && (
-            <NationalityField disabled={isNationalityDisabled} />
-          )}
+          <Stack direction="column" gap={5}>
+            {requiresName && <NameFields disabled={isNameDisabled} />}
+            {requiresDob && <DobField disabled={isDobDisabled} />}
+            {requiresNationality && (
+              <NationalityField disabled={isNationalityDisabled} />
+            )}
+          </Stack>
           <EditableFormButtonContainer
             isLoading={mutation.isLoading}
             onCancel={onCancel}

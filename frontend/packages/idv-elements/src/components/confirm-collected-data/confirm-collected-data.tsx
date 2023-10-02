@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { Button } from '@onefootprint/ui';
+import { Button, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../layout/components/header-title';
@@ -30,26 +30,15 @@ const ConfirmCollectedData = ({
     <NavigationHeader
       button={{ variant: headerVariant, onBack: onClickPrev }}
     />
-    <Container>
+    <Stack gap={7} direction="column">
       <HeaderTitle title={title} subtitle={subtitle} />
       <SectionsContainer>{children}</SectionsContainer>
       <Button fullWidth onClick={onClickConfirm} loading={isLoading}>
         {cta}
       </Button>
-    </Container>
+    </Stack>
   </>
 );
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    row-gap: ${theme.spacing[8]};
-  `}
-`;
 
 const SectionsContainer = styled.div`
   ${({ theme }) => css`

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
-import { useConfirmationDialog } from '@onefootprint/ui';
+import { Stack, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -109,11 +109,13 @@ const SSN = ({
       <FormProvider {...methods}>
         <Form onSubmit={methods.handleSubmit(onSubmitForm)}>
           {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
-          {ssnKind === 'ssn9' ? (
-            <SSN9 hideDisclaimer={hideDisclaimer} disabled={isSsn9Disabled} />
-          ) : (
-            <SSN4 disabled={isSsn4Disabled} />
-          )}
+          <Stack gap={5} direction="column">
+            {ssnKind === 'ssn9' ? (
+              <SSN9 hideDisclaimer={hideDisclaimer} disabled={isSsn9Disabled} />
+            ) : (
+              <SSN4 disabled={isSsn4Disabled} />
+            )}
+          </Stack>
           <EditableFormButtonContainer
             isLoading={mutation.isLoading}
             onCancel={onCancel}
