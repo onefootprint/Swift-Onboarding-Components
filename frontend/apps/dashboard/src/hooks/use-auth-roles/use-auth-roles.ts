@@ -6,7 +6,7 @@ import type {
 import { useQuery } from '@tanstack/react-query';
 import { DASHBOARD_AUTHORIZATION_HEADER } from 'src/config/constants';
 
-const getRolesRequest = async ({ authToken }: GetAuthRolesRequest) => {
+const getAuthRoles = async ({ authToken }: GetAuthRolesRequest) => {
   const { data } = await request<GetAuthRoleResponse>({
     method: 'GET',
     url: '/org/auth/roles',
@@ -18,9 +18,9 @@ const getRolesRequest = async ({ authToken }: GetAuthRolesRequest) => {
   return data;
 };
 
-const useGetRoles = (authToken: string) =>
-  useQuery(['get-roles', authToken], () => getRolesRequest({ authToken }), {
+const useAuthRoles = (authToken: string) =>
+  useQuery(['get-roles', authToken], () => getAuthRoles({ authToken }), {
     enabled: !!authToken,
   });
 
-export default useGetRoles;
+export default useAuthRoles;

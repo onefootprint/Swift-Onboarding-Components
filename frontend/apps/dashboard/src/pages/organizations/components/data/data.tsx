@@ -4,10 +4,10 @@ import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
+import useAssumeAuthRole from 'src/hooks/use-assume-auth-role';
 import useSession from 'src/hooks/use-session';
 
 import ButtonGroup from '../button-group';
-import useAssumeRole from './hooks/use-assume-role';
 
 type DataProps = {
   authToken: string;
@@ -18,7 +18,7 @@ const Data = ({ authToken, organizations }: DataProps) => {
   const { t } = useTranslation('pages.organizations');
   const { logIn } = useSession();
   const router = useRouter();
-  const assumeRoleMutation = useAssumeRole();
+  const assumeRoleMutation = useAssumeAuthRole();
   const showErrorToast = useRequestErrorToast();
 
   const handleClick = (tenantId: string) => () => {

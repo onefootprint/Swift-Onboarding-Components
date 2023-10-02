@@ -1,7 +1,6 @@
 import {
   createUseRouterSpy,
   customRender,
-  mockRequest,
   screen,
   userEvent,
   waitFor,
@@ -14,6 +13,7 @@ import {
 } from 'src/config/tests';
 
 import DefaultLayout from './default-layout';
+import { withEntities, withOrgAuthRoles } from './default-layout.test.config';
 
 const renderDefaultLayout = () =>
   customRender(
@@ -30,11 +30,8 @@ describe('<DefaultLayout />', () => {
     useRouterSpy({
       pathname: '/users',
     });
-    mockRequest({
-      method: 'get',
-      path: '/entities',
-      response: { data: [] },
-    });
+    withEntities();
+    withOrgAuthRoles();
   });
 
   describe('when its restricted to use only the sandbox mode', () => {

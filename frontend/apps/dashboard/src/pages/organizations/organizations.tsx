@@ -6,18 +6,18 @@ import { Box } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import useAuthRoles from 'src/hooks/use-auth-roles';
 
 import Data from './components/data';
 import Error from './components/error';
 import Loading from './components/loading';
-import useGetRoles from './hooks/use-get-roles';
 
 const Organizations = () => {
   const { t } = useTranslation('pages.organizations');
   const { query, isReady } = useRouter();
   const authToken = isReady ? (query.token as string) : '';
   const hasToken = isReady && authToken;
-  const { isLoading, error, data } = useGetRoles(authToken);
+  const { isLoading, error, data } = useAuthRoles(authToken);
 
   return (
     <>

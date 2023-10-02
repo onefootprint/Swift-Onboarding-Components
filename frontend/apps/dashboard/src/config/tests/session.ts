@@ -1,6 +1,6 @@
 import type { BasicRoleScopeKind } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import type { UserSession } from 'src/hooks/use-session';
+import type { OrgSession, UserSession } from 'src/hooks/use-session';
 import { useStore } from 'src/hooks/use-session';
 
 const originalState = useStore.getState();
@@ -14,7 +14,8 @@ const baseUser: UserSession = {
   isAssumedSession: false,
 };
 
-const baseOrg = {
+const baseOrg: OrgSession = {
+  id: '"org_hyZP3ksCvsT0AlLqMZsgrI"',
   name: 'Acme',
   logoUrl: null,
   isSandboxRestricted: false,

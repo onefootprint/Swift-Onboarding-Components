@@ -219,7 +219,9 @@ const DialogContainer = styled(Fade)<{
     isolation: isolate;
     justify-content: stretch;
     position: fixed;
-    z-index: ${theme.zIndex.dialog};
+    z-index: ${isConfirmation
+      ? theme.zIndex.confirmationDialog
+      : theme.zIndex.dialog};
     width: ${getSize(size, isConfirmation)};
     max-width: ${size !== 'full-screen' ? '90%' : '100%'};
     height: ${size === 'full-screen' ? '100vh' : 'inherit'};

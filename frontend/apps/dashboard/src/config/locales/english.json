@@ -375,6 +375,19 @@
             "live": "By turning this on, you’ll see test data and will be redirected to a different page"
           },
           "tooltip-disabled": "To access live data you have to activate your account first. Please contact us to do so."
+        },
+        "tenants": {
+          "title": "Tenants",
+          "show-all": "Show all",
+          "show-less": "Show less",
+          "dialog": {
+            "title": "All tenants",
+            "cancel": "Cancel",
+            "select": "Select"
+          },
+          "errors": {
+            "auth-method-not-supported": "{{tenantName}} has disabled the ability to log in using this auth method. Please retry using another method."
+          }
         }
       },
       "mode-switcher": {

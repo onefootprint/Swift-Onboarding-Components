@@ -1,14 +1,32 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoLogOut24, IcoUser24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Dropdown, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
-import useSession from 'src/hooks/use-session';
+import type { UserSession } from 'src/hooks/use-session';
 
-const NavDropdown = () => {
+import TenantsList from './components/tenants-list';
+
+type NavDropdownProps = {
+  isLoading: boolean;
+  tenants: GetAuthRolesOrg[];
+  currTenantId: string;
+  onAssumeTenant: (tenantId: string) => void;
+  user: UserSession;
+  tenantsError?: unknown;
+};
+
+const NavDropdown = ({
+  isLoading,
+  tenants,
+  currTenantId,
+  onAssumeTenant,
+  user,
+  tenantsError,
+}: NavDropdownProps) => {
   const { t } = useTranslation('components.private-layout.nav');
-  const { dangerouslyCastedData } = useSession();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -19,19 +37,35 @@ const NavDropdown = () => {
     <Container>
       <Dropdown.Root>
         <Dropdown.Trigger aria-label="Account">
-          <IcoUser24 />
+          <IcoUser24 testID="nav-dropdown-button" />
         </Dropdown.Trigger>
         <Dropdown.Portal>
           <NavDropdownContent align="end">
             <UserDropdownItem>
               <Typography variant="label-3" as="div">
-                {dangerouslyCastedData.user.firstName}{' '}
-                {dangerouslyCastedData.user.lastName}
+                {`${user.firstName} ${user.lastName}`}
               </Typography>
               <Typography variant="body-3" color="secondary" as="div">
-                {dangerouslyCastedData.user.email}
+                {user.email}
               </Typography>
             </UserDropdownItem>
+            {!isLoading && !tenantsError && tenants && (
+              <>
+                <Dropdown.Divider />
+                <Typography
+                  variant="label-3"
+                  color="tertiary"
+                  sx={{ paddingLeft: 5, paddingTop: 3 }}
+                >
+                  {t('tenants.title')}
+                </Typography>
+                <TenantsList
+                  tenants={tenants}
+                  currTenantId={currTenantId}
+                  onClick={tenantId => onAssumeTenant(tenantId)}
+                />
+              </>
+            )}
             <Dropdown.Divider />
             <LogoutDropdownItem onSelect={handleLogout}>
               <IcoLogOut24 />

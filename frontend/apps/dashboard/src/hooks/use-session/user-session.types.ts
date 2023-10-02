@@ -16,6 +16,7 @@ export type UserSession = {
 };
 
 export type OrgSession = {
+  id: string;
   name: Organization['name'];
   logoUrl: Organization['logoUrl'];
   isSandboxRestricted: Organization['isSandboxRestricted'];

@@ -9,7 +9,7 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 import { useStore } from '../../hooks/use-session';
 import type { LayoutProps } from './layout';
 import Layout from './layout';
-import { withEntities } from './layout.test.config';
+import { withEntities, withOrgAuthRoles } from './layout.test.config';
 
 const originalState = useStore.getState();
 
@@ -39,6 +39,7 @@ describe('<Layout />', () => {
     beforeEach(() => {
       useRouterSpy({ pathname: '/users' });
       asAdminUser();
+      withOrgAuthRoles();
     });
 
     afterAll(() => {

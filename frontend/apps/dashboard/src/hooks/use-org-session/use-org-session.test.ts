@@ -16,6 +16,7 @@ describe('useOrgSession', () => {
     const { result } = customRenderHook(() => useOrgSession());
 
     expect(result.current.dangerouslyCastedData).toEqual({
+      id: '"org_hyZP3ksCvsT0AlLqMZsgrI"',
       isLive: false,
       isSandboxRestricted: false,
       logoUrl: null,
