@@ -74,6 +74,7 @@ describe.skip('<CollectKybData />', () => {
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
+    orgId: 'orgId',
     status: OnboardingConfigStatus.enabled,
     isAppClipEnabled: false,
     isInstantAppEnabled: false,

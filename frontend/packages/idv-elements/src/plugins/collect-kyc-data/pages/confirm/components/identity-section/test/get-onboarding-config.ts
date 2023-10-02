@@ -4,6 +4,7 @@ import { OnboardingConfigStatus } from '@onefootprint/types';
 const getOnboardingConfig = (): PublicOnboardingConfig => ({
   name: 'Acme Bank',
   orgName: 'Acme Bank',
+  orgId: 'orgId',
   logoUrl: null,
   isLive: true,
   status: OnboardingConfigStatus.enabled,

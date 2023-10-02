@@ -97,9 +97,10 @@ const Init = () => {
         observeCollector.setAppContext({
           config: obConfiguration,
         });
-        const { orgName, key } = obConfiguration;
+        const { orgName, orgId, key } = obConfiguration;
         LogRocket.identify(sessionId, {
           orgName,
+          orgId,
           publicKey: key,
         });
 

@@ -15,6 +15,7 @@ const onboardingConfig: PublicOnboardingConfig = {
   logoUrl: 'url',
   name: 'tenant',
   orgName: 'tenantOrg',
+  orgId: 'orgId',
   privacyPolicyUrl: 'url',
   status: OnboardingConfigStatus.enabled,
   requiresIdDoc: false,

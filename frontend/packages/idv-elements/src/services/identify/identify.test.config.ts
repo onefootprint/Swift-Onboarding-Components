@@ -30,6 +30,7 @@ export const getOnboardingConfig = (isLive?: boolean, noPhone?: boolean) => ({
   key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
   name: 'Acme Bank',
   orgName: 'Acme Bank',
+  orgId: 'orgId',
   logoUrl: null,
   isLive: !!isLive,
   status: 'enabled',

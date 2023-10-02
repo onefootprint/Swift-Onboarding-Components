@@ -30,9 +30,10 @@ const Init = () => {
     { obConfigAuth },
     {
       onSuccess: (config: PublicOnboardingConfig) => {
-        const { orgName, key } = config;
+        const { orgName, orgId, key } = config;
         LogRocket.identify(sessionId, {
           orgName,
+          orgId,
           publicKey: key,
         });
         observeCollector.setAppContext({

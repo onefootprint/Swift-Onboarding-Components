@@ -72,9 +72,10 @@ const Init = () => {
         observeCollector.setAppContext({
           config: onboardingConfig,
         });
-        const { orgName, key } = onboardingConfig;
+        const { orgName, orgId, key } = onboardingConfig;
         LogRocket.identify(sessionId, {
           orgName,
+          orgId,
           key,
         });
 

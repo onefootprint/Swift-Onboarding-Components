@@ -71,6 +71,7 @@ describe('Onboarding Requirements Machine Tests', () => {
     privacyPolicyUrl: 'url',
     name: 'tenant',
     orgName: 'tenantOrg',
+    orgId: 'orgId',
     status: OnboardingConfigStatus.enabled,
     isAppClipEnabled: false,
     isInstantAppEnabled: false,

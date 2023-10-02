@@ -13,6 +13,7 @@ export type PublicOnboardingConfig = {
   name: string;
   key: string;
   orgName: string;
+  orgId: string;
   logoUrl: string | null;
   privacyPolicyUrl: string | null;
   isLive: boolean;
