@@ -20,7 +20,7 @@ use strum::IntoEnumIterator;
 #[derive(Debug, serde::Deserialize)]
 struct CreateInvoiceRequest {
     tenant_id: TenantId,
-    /// When provided,
+    /// When provided, we'll generate the invoice as if this ran in the billing period containing this date
     billing_date: Option<NaiveDate>,
 }
 
@@ -50,9 +50,16 @@ async fn post(
     EmptyResponse::ok().json()
 }
 
+#[derive(Debug, serde::Deserialize)]
+struct CreateInvoicesRequest {
+    /// When provided, we'll generate the invoice as if this ran in the billing period containing this date
+    billing_date: Option<NaiveDate>,
+}
+
 #[post("/private/invoices")]
 async fn post_all(
     state: web::Data<State>,
+    request: Option<web::Json<CreateInvoicesRequest>>,
     auth: Either<TenantRbAuthContext, ProtectedCustodianAuthContext>,
 ) -> JsonApiResponse<EmptyResponse> {
     if let Either::Left(tenant_rb) = auth {
@@ -63,7 +70,9 @@ async fn post_all(
     let tenants = state.db_pool.db_query(Tenant::list_billable).await??;
 
     // Subtract 8 hours so we always generate the invoice for last month
-    let billing_date = (Utc::now() - Duration::hours(8)).date_naive();
+    let billing_date = request
+        .and_then(|b| b.billing_date)
+        .unwrap_or((Utc::now() - Duration::hours(8)).date_naive());
     for t in tenants {
         create_bill_for_tenant(&state, t, billing_date).await?;
     }
