@@ -29,7 +29,18 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
     if (validationError === NameValidationError.SPECIAL_CHARS) {
       return t('first-name.error.special-chars');
     }
-    return t('first-name.error.invalid');
+    return undefined;
+  };
+
+  const getMiddleNameHint = () => {
+    if (!errors.middleName) {
+      return undefined;
+    }
+    const validationError = validateName(getValues('middleName'));
+    if (validationError === NameValidationError.SPECIAL_CHARS) {
+      return t('middle-name.error.special-chars');
+    }
+    return undefined;
   };
 
   const getLastNameHint = () => {
@@ -43,7 +54,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
     if (validationError === NameValidationError.SPECIAL_CHARS) {
       return t('last-name.error.special-chars');
     }
-    return t('last-name.error.invalid');
+    return undefined;
   };
 
   return (
@@ -64,9 +75,14 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
         <TextInput
           data-private
           disabled={disabled}
+          hasError={!!errors.middleName}
+          hint={getMiddleNameHint()}
           label={t('middle-name.label')}
           placeholder={t('middle-name.placeholder')}
-          {...register('middleName')}
+          {...register('middleName', {
+            validate: (value: string) =>
+              validateName(value) !== NameValidationError.SPECIAL_CHARS,
+          })}
         />
       </Row>
       <Row columns={1}>

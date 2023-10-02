@@ -1,16 +1,16 @@
 export enum NameValidationError {
   SPECIAL_CHARS,
   EMPTY,
-  INVALID,
 }
 
 const validateName = (name?: string): NameValidationError | undefined => {
-  if (!name?.length) {
+  const trimmedName = name?.trim();
+  if (!trimmedName?.length) {
     return NameValidationError.EMPTY;
   }
 
-  const allowedChars = /^([A-Za-z0-9-\s,]+)$/;
-  const isValid = allowedChars.test(name);
+  const allowedChars = /^([^@#$%^*()_+=~/\\<>~`[\]{}!?;:]+)$/;
+  const isValid = allowedChars.test(trimmedName);
   if (!isValid) {
     return NameValidationError.SPECIAL_CHARS;
   }

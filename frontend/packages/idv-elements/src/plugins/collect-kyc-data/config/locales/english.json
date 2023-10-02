@@ -39,21 +39,22 @@
           "placeholder": "Jane",
           "error": {
             "empty": "First name cannot be empty",
-            "invalid": "First name is invalid",
-            "special-chars": "Only alphanumeric characters, dashes, spaces or commas are allowed."
+            "special-chars": "First name contains invalid characters."
           }
         },
         "middle-name": {
           "label": "Middle name (optional)",
-          "placeholder": "Sue"
+          "placeholder": "Sue",
+          "error": {
+            "special-chars": "Middle name contains invalid characters."
+          }
         },
         "last-name": {
           "label": "Last name",
           "placeholder": "Doe",
           "error": {
             "empty": "Last name cannot be empty",
-            "invalid": "Last name is invalid",
-            "special-chars": "Only alphanumeric characters, dashes, spaces or commas are allowed."
+            "special-chars": "First name contains invalid characters."
           }
         },
         "dob": {
