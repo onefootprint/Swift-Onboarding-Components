@@ -24,6 +24,8 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
           .replaceAll('</privacy>', '')
           .replaceAll('<toc>', '')
           .replaceAll('</toc>', '')
+          .replaceAll('<incode_privacy>', '')
+          .replaceAll('</incode_privacy>', '')
           .replaceAll('<br/>', '');
         const consentLanguages = [t('subtitle'), descriptionWithoutHyperlinks];
 
@@ -68,6 +70,14 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
             toc: (
               <Link
                 href="https://www.onefootprint.com/terms-of-service"
+                rel="noopener noreferrer"
+                target="_blank"
+                style={linkStyle}
+              />
+            ),
+            incode_privacy: (
+              <Link
+                href="https://incode.com/privacy-policy/"
                 rel="noopener noreferrer"
                 target="_blank"
                 style={linkStyle}
