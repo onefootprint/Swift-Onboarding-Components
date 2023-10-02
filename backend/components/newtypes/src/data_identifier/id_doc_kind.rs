@@ -28,6 +28,7 @@ use crate::DocumentSide;
     FromSqlRow,
 )]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum IdDocKind {
     IdCard,
