@@ -159,7 +159,7 @@ impl Client {
         if matches!(message.status, Status::Undelivered | Status::Failed) {
             return Err(Error::DeliveryFailed(message.status, message.error_code));
         }
-        if !matches!(message.status, Status::Delivered) {
+        if !matches!(message.status, Status::Delivered | Status::Sent) {
             return Err(Error::NotDelivered(message.status, message.error_code));
         }
 
