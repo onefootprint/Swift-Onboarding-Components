@@ -6,12 +6,14 @@ import React, { useCallback } from 'react';
 import SplashScreen from 'react-native-splash-screen';
 
 import configureReactI18next from './config/initializers/react-i18next';
+import configureSentry from './config/initializers/sentry'
 import queryClient from './config/initializers/react-query';
 import Idv from './domains/idv';
 import Preview from './domains/preview';
 import useShouldOpenIdv from './hooks/use-should-open-idv';
 
 configureReactI18next();
+configureSentry();
 
 const IdvApp = () => {
   const { linkingUrl, isPreview, isDemo, isDebug } = useShouldOpenIdv();

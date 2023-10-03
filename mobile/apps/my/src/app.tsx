@@ -6,10 +6,13 @@ import React, { useCallback } from 'react';
 import SplashScreen from 'react-native-splash-screen';
 
 import queryClient from './config/initializers/react-query';
+import configureSentry from './config/initializers/sentry';
 import Idv from './domains/idv';
 import Preview from './domains/preview';
 import Wallet from './domains/wallet';
 import useShouldOpenIdv from './hooks/use-should-open-idv';
+
+configureSentry();
 
 const App = () => {
   const { linkingUrl, shouldOpen, isPreview, isDemo, isDebug } =
