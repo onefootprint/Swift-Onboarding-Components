@@ -29,6 +29,7 @@ env:
 
 jobs:
   e2e:
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'e2e-on') }}
     name: 'End-to-End test'
     runs-on: ubuntu-latest
     timeout-minutes: 30
