@@ -11,6 +11,7 @@ import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
+import { useL10nContext } from '../../../../../../components/l10n-provider';
 import AddButton from './components/add-button';
 import FormInvalidError from './components/error';
 import Fields from './components/fields';
@@ -38,6 +39,7 @@ const Form = ({
   const [animate] = useAutoAnimate<HTMLFormElement>();
   const { t } = useTranslation('pages.beneficial-owners.form');
   const toast = useToast();
+  const l10n = useL10nContext();
   const defaultBeneficialOwnersData = defaultValues ?? [
     {
       [BeneficialOwnerDataAttribute.firstName]: '',
@@ -134,7 +136,12 @@ const Form = ({
       <StyledForm onSubmit={handleSubmit(onSubmitFormData)} ref={animate}>
         {fields.map((field, index) => (
           <React.Fragment key={field.id}>
-            <Fields index={index} onRemove={removeIndex} config={config} />
+            <Fields
+              index={index}
+              onRemove={removeIndex}
+              config={config}
+              l10n={l10n}
+            />
             {index === 0 && fields.length > 1 && <Divider />}
           </React.Fragment>
         ))}

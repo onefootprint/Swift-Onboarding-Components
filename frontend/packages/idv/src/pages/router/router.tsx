@@ -1,4 +1,5 @@
 import { useLogStateMachine } from '@onefootprint/dev-tools';
+import type { L10n } from '@onefootprint/footprint-js';
 import {
   AppErrorBoundary,
   Identify,
@@ -19,7 +20,7 @@ import getIdentifyBootstrapData from './utils/get-identify-bootstrap-data';
 
 const AUTO_CLOSE_DELAY = 6000;
 
-const Router = () => {
+const Router = ({ l10n }: { l10n?: L10n }) => {
   const [state, send] = useIdvMachine();
   useLogStateMachine('idv', state);
   const {
@@ -81,11 +82,7 @@ const Router = () => {
   }, [isDone]);
 
   return (
-    <AppErrorBoundary
-      onReset={() => {
-        send({ type: 'reset' });
-      }}
-    >
+    <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
       {state.matches('init') && <Init />}
       {state.matches('sandboxOutcome') && <SandboxOutcome />}
       {state.matches('identify') && config && device && (
@@ -97,9 +94,8 @@ const Router = () => {
           obConfigAuth={obConfigAuth}
           bootstrapData={getIdentifyBootstrapData(bootstrapData)}
           showLogo={showLogo}
-          onDone={payload => {
-            send({ type: 'identifyCompleted', payload });
-          }}
+          onDone={payload => send({ type: 'identifyCompleted', payload })}
+          l10n={l10n}
         />
       )}
       {state.matches('onboarding') && authToken && config && device && (
@@ -113,9 +109,8 @@ const Router = () => {
           idDocOutcome={idDocOutcome}
           onClose={onClose}
           onComplete={onComplete}
-          onDone={payload => {
-            send({ type: 'onboardingCompleted', payload });
-          }}
+          onDone={payload => send({ type: 'onboardingCompleted', payload })}
+          l10n={l10n}
         />
       )}
       {state.matches('sessionExpired') && (

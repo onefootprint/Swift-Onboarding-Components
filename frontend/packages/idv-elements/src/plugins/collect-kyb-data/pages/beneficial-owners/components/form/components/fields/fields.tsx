@@ -1,3 +1,4 @@
+import type { L10n } from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
@@ -14,9 +15,10 @@ export type FieldsProps = {
   index: number;
   onRemove: (index: number) => void;
   config?: PublicOnboardingConfig;
+  l10n?: L10n;
 };
 
-const Fields = ({ index, onRemove, config }: FieldsProps) => {
+const Fields = ({ index, onRemove, config, l10n }: FieldsProps) => {
   const { t } = useTranslation('pages.beneficial-owners.form.fields');
 
   const handleRemove = () => {
@@ -35,7 +37,7 @@ const Fields = ({ index, onRemove, config }: FieldsProps) => {
       )}
       <Name index={index} />
       <Email index={index} />
-      <Phone index={index} config={config} />
+      <Phone index={index} config={config} locale={l10n?.locale} />
       <OwnershipStake index={index} />
     </Container>
   );

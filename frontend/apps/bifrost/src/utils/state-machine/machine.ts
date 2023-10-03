@@ -4,6 +4,8 @@ import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 
+const isUndefined = (x: unknown): x is undefined => x === undefined;
+
 export const createBifrostMachine = () =>
   createMachine(
     {
@@ -47,21 +49,28 @@ export const createBifrostMachine = () =>
     },
     {
       actions: {
-        assignInitContext: assign((context, event) => {
-          const { config, bootstrapData, showCompletionPage, showLogo } =
+        resetContext: assign(() => ({})),
+        assignInitContext: assign((context: MachineContext, event) => {
+          const { bootstrapData, config, l10n, showCompletionPage, showLogo } =
             event.payload;
-          context.config = config !== undefined ? config : context.config;
-          context.bootstrapData =
-            bootstrapData !== undefined ? bootstrapData : context.bootstrapData;
-          context.showCompletionPage =
-            showCompletionPage !== undefined
-              ? showCompletionPage
-              : context.showCompletionPage;
-          context.showLogo =
-            showLogo !== undefined ? showLogo : context.showLogo;
+
+          context.config = isUndefined(config) ? context.config : config;
+          context.l10n = isUndefined(l10n) ? context.l10n : l10n;
+
+          context.bootstrapData = isUndefined(bootstrapData)
+            ? context.bootstrapData
+            : bootstrapData;
+
+          context.showCompletionPage = isUndefined(showCompletionPage)
+            ? context.showCompletionPage
+            : showCompletionPage;
+
+          context.showLogo = isUndefined(showLogo)
+            ? context.showLogo
+            : showLogo;
+
           return context;
         }),
-        resetContext: assign(() => ({})),
       },
     },
   );

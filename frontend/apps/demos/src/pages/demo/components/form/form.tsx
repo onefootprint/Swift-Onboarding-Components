@@ -79,6 +79,7 @@ const Form = ({ html, onSuccess }: FormProps) => {
       options: {
         showCompletionPage: true,
       },
+      l10n: { locale: 'en-US' },
     });
 
     component.render();

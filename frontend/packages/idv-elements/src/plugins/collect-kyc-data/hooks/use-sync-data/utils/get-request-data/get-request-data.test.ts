@@ -12,6 +12,7 @@ describe('getRequestData', () => {
   it('does not try to complete cdos if speculative', () => {
     expect(
       getRequestData(
+        'en-US',
         {
           [IdDI.email]: {
             value: 'piip@onefootprint.com',
@@ -79,6 +80,7 @@ describe('getRequestData', () => {
   it('removes entries with undefined values', () => {
     expect(
       getRequestData(
+        'en-US',
         {
           [IdDI.email]: {
             value: undefined,
@@ -111,6 +113,7 @@ describe('getRequestData', () => {
   it('formats dob and visa expiration data correctly', () => {
     expect(
       getRequestData(
+        'en-US',
         {
           [IdDI.dob]: {
             value: '01/02/2003',
@@ -156,6 +159,7 @@ describe('getRequestData', () => {
   it('matches cdos if there are any dangling dis', () => {
     expect(
       getRequestData(
+        'en-US',
         {
           [IdDI.email]: {
             value: 'piip@onefootprint.com',
@@ -217,6 +221,7 @@ describe('getRequestData', () => {
 
     expect(
       getRequestData(
+        'en-US',
         {
           [IdDI.firstName]: {
             value: 'Piip',
@@ -249,6 +254,7 @@ describe('getRequestData', () => {
   it('if it cannot match cdos because data collection is incomplete, throws errors', () => {
     expect(() =>
       getRequestData(
+        'en-US',
         {
           [IdDI.email]: {
             value: 'piip@onefootprint.com',
@@ -286,6 +292,7 @@ describe('getRequestData', () => {
 
     expect(() =>
       getRequestData(
+        'en-US',
         {
           [IdDI.middleName]: {
             value: 'Middle',
@@ -311,6 +318,7 @@ describe('getRequestData', () => {
     // Missing required city field
     expect(() =>
       getRequestData(
+        'en-US',
         {
           [IdDI.addressLine1]: {
             value: '1234 main st',
@@ -343,6 +351,7 @@ describe('getRequestData', () => {
     // Missing state / zip fields
     expect(() =>
       getRequestData(
+        'en-US',
         {
           [IdDI.addressLine1]: {
             value: '1234 main st',
@@ -375,6 +384,7 @@ describe('getRequestData', () => {
     // Missing state / zip fields
     expect(() =>
       getRequestData(
+        'en-US',
         {
           [IdDI.addressLine1]: {
             value: '1234 main st',
@@ -408,6 +418,7 @@ describe('getRequestData', () => {
   it('removes decrypted values if they form full cdos', () => {
     expect(
       getRequestData(
+        'en-US',
         {
           [IdDI.email]: {
             value: 'piip@onefootprint.com',
@@ -445,6 +456,7 @@ describe('getRequestData', () => {
   it('removes scrubbed values', () => {
     expect(
       getRequestData(
+        'en-US',
         {
           [IdDI.email]: {
             value: 'piip@onefootprint.com',
@@ -482,6 +494,7 @@ describe('getRequestData', () => {
   it('omits populated but not decrypted requirements', () => {
     expect(
       getRequestData(
+        'en-US',
         {
           [IdDI.firstName]: {
             value: 'Piip',

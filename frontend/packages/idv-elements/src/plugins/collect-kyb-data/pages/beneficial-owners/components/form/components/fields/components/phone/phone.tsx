@@ -1,3 +1,4 @@
+import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
@@ -8,11 +9,15 @@ import { Controller, useFormContext } from 'react-hook-form';
 import checkIsPhoneValid from '../../../../../../../../../../services/identify/pages/phone-identification/components/form/utils/check-is-phone-valid/check-is-phone-valid';
 import type { FormData } from '../../../../types';
 
-type PhoneProps = { index: number; config?: PublicOnboardingConfig };
+type PhoneProps = {
+  index: number;
+  config?: PublicOnboardingConfig;
+  locale?: SupportedLocale;
+};
 
 const PhoneFieldName = BeneficialOwnerDataAttribute.phoneNumber;
 
-const Phone = ({ index, config }: PhoneProps) => {
+const Phone = ({ index, config, locale }: PhoneProps) => {
   const { t } = useTranslation('pages.beneficial-owners.form.fields.phone');
   const {
     control,
@@ -49,6 +54,7 @@ const Phone = ({ index, config }: PhoneProps) => {
           onBlur={onBlur}
           onChange={onChange}
           value={value}
+          locale={locale}
         />
       )}
     />

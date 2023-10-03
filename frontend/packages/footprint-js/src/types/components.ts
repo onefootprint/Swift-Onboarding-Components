@@ -10,6 +10,8 @@ export interface Component {
   destroy: () => void;
 }
 
+export type SupportedLocale = 'en-US' | 'es-MX';
+export type L10n = { locale?: SupportedLocale };
 export type Props = FormProps | VerifyProps | VerifyButtonProps | RenderProps;
 
 export enum ComponentKind {
@@ -26,6 +28,7 @@ export interface PropsBase {
   appearance?: Appearance;
   variant?: Variant;
   containerId?: string;
+  l10n?: L10n;
 }
 
 export type VerifyOptions = {

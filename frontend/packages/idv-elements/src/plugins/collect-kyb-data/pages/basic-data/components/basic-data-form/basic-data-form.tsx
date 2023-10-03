@@ -8,6 +8,7 @@ import type { UseFormSetError } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
+import { useL10nContext } from '../../../../../../components/l10n-provider';
 import checkIsPhoneValid from '../../../../../../services/identify/pages/phone-identification/components/form/utils/check-is-phone-valid';
 import type { BasicData } from '../../../../utils/state-machine/types';
 
@@ -72,7 +73,8 @@ const BasicDataForm = ({
   config,
 }: BasicDataFormProps) => {
   const { t } = useTranslation('pages.basic-data.form');
-  const inputMasks = useInputMask('en-US');
+  const l10n = useL10nContext();
+  const inputMasks = useInputMask(l10n?.locale);
   const {
     control,
     register,
@@ -81,9 +83,7 @@ const BasicDataForm = ({
     setError,
     setValue,
     formState: { errors },
-  } = useForm<FormData>({
-    defaultValues,
-  });
+  } = useForm<FormData>({ defaultValues });
 
   const {
     phoneNumber: phoneNumberHint = undefined,

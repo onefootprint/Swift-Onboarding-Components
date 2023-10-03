@@ -1,24 +1,22 @@
-import type {
-  FootprintAppearance,
-  FootprintOptions,
-  FootprintUserData,
-} from '../footprint.types';
+import type { OpenFootprint } from '../footprint.types';
+import addFragmentAt from './add-fragment-at';
+import encode from './encode';
 import getAppearance from './get-appearance';
-import getOptions from './get-options';
-import getUserData from './get-user-data';
 
 const getURL = (params: {
-  appearance?: FootprintAppearance;
+  appearance?: OpenFootprint['appearance'];
   publicKey?: string;
-  userData?: FootprintUserData;
-  options?: FootprintOptions;
+  userData?: OpenFootprint['userData'];
+  options?: OpenFootprint['options'];
   redirectUrl?: string;
+  l10n?: OpenFootprint['l10n'];
 }) => {
   const url = 'http://id.onefootprint.com';
   const { redirectUrl, publicKey } = params;
   const { fontSrc, rules, variables } = getAppearance(params.appearance);
-  const userData = getUserData(params.userData);
-  const options = getOptions(params.options);
+  const userData = encode(params.userData);
+  const options = encode(params.options);
+  const l10n = encode(params.l10n);
   const searchParams = new URLSearchParams();
   if (publicKey) {
     searchParams.append('public_key', publicKey);
@@ -41,7 +39,10 @@ const getURL = (params: {
     urlFragment = `${userData}`;
   }
   if (options) {
-    urlFragment = `${urlFragment}__${options}`;
+    urlFragment = addFragmentAt(2, urlFragment, options);
+  }
+  if (l10n) {
+    urlFragment = addFragmentAt(3, urlFragment, l10n);
   }
 
   if (urlFragment) {

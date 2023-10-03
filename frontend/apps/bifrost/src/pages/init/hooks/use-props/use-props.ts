@@ -23,7 +23,7 @@ The args are passed in the URL fragment: <URL_BASE>#<ENCODED_USER_DATA>
 where ENCODED_USER_DATA keys are IdDIs
 
 2. For versions > 2.0.0
-The args are passed in the URL fragment: <URL_BASE>#<ENCODED_USER_DATA>__<ENCODED_OPTIONS>
+The args are passed in the URL fragment: <URL_BASE>#<ENCODED_USER_DATA>__<ENCODED_OPTIONS>__<ENCODED_LOCALE>
 where ENCODED_USER_DATA keys are IdDIs
 */
 
@@ -53,6 +53,7 @@ const useProps = (onSuccess: (props: BifrostProps) => void) => {
     setProviderProps({
       userData: {},
       options: {},
+      l10n: {},
     });
   };
   usePropsFromParent(handlePropsFromParent, handleTimeout);
@@ -70,9 +71,8 @@ const useProps = (onSuccess: (props: BifrostProps) => void) => {
       onSuccess(providerProps);
       return;
     }
-    onSuccess({});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlProps, providerProps]);
+    onSuccess({} as BifrostProps);
+  }, [urlProps, providerProps]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return providerProps;
 };

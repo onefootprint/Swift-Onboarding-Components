@@ -73,13 +73,13 @@ const usePropsFromParent = (
     }
     if (props || legacyUserData || legacyOptions) {
       unsubscribe();
-      const data = {
+      onSuccess?.({
         userData: legacyUserData || props?.userData,
         options: legacyOptions || props?.options,
-      };
-      onSuccess?.(data);
+        l10n: props?.l10n,
+      });
     }
-  }, [legacyUserData, legacyOptions, props, isLoaded]);
+  }, [legacyUserData, legacyOptions, props, isLoaded]); // eslint-disable-line react-hooks/exhaustive-deps
 };
 
 export default usePropsFromParent;

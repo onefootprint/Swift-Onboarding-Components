@@ -45,5 +45,6 @@ describe('ValidateDob', () => {
     expect(validateDob('01/01/1996')).toBe(undefined);
     expect(validateDob('05 06 1992')).toBe(undefined);
     expect(validateDob('Jun 7 1992')).toBe(undefined);
+    expect(validateDob('7 Jun 1992')).toBe(undefined);
   });
 });

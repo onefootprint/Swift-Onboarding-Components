@@ -47,11 +47,7 @@ const Router = ({ onDone }: RouterProps) => {
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}
           idDocOutcome={idDocOutcome}
-          onDone={() => {
-            send({
-              type: 'requirementsCompleted',
-            });
-          }}
+          onDone={() => send({ type: 'requirementsCompleted' })}
         />
       )}
       {state.matches('validate') && <Validate />}

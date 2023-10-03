@@ -1,3 +1,4 @@
+import type { SupportedLocale } from '@onefootprint/footprint-js';
 import type {
   CollectedKycDataOption,
   CollectKycDataRequirement,
@@ -9,21 +10,19 @@ import {
 } from '@onefootprint/types';
 import { pickBy } from 'lodash';
 
+import {
+  fromUSDateToISO8601Format,
+  strInputToUSDate,
+} from '../../../../../../utils/string';
 import allAttributes from '../../../../utils/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
 
+const isString = (x: unknown): x is string => typeof x === 'string';
 const isDate = (di: string) =>
   di === IdDI.dob || di === IdDI.visaExpirationDate;
 
-const formatDate = (date?: string | string[]) => {
-  if (!date || Array.isArray(date)) {
-    return undefined;
-  }
-  const [month, day, year] = date.split('/');
-  return `${year}-${month}-${day}`;
-};
-
 const getRequestData = (
+  locale: SupportedLocale,
   data: KycData,
   requirement: CollectKycDataRequirement,
   requireCompleteCdos?: boolean,
@@ -39,7 +38,11 @@ const getRequestData = (
   Object.entries(filteredData).forEach(([key, value]) => {
     const di = key as IdDI;
     if (isDate(di)) {
-      requestData[di] = formatDate(value.value);
+      const dateInputValue = isString(value.value)
+        ? strInputToUSDate(locale, value.value)
+        : undefined;
+
+      requestData[di] = fromUSDateToISO8601Format(dateInputValue);
     } else {
       requestData[di] = value.value;
     }

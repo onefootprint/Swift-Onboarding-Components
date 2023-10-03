@@ -38,16 +38,12 @@ const useConvertFormData = () => {
       };
     }
 
-    if (requiresDob && dob && !isDobDisabled) {
-      convertedData[IdDI.dob] = {
-        value: dob,
-      };
+    if (requiresDob && !isDobDisabled && dob) {
+      convertedData[IdDI.dob] = { value: dob };
     }
 
-    if (requiresNationality && nationality && !isNationalityDisabled) {
-      convertedData[IdDI.nationality] = {
-        value: nationality.value,
-      };
+    if (requiresNationality && !isNationalityDisabled && nationality) {
+      convertedData[IdDI.nationality] = { value: nationality.value };
     }
 
     return convertedData;

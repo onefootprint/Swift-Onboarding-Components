@@ -1,3 +1,4 @@
+import type { L10n } from '@onefootprint/footprint-js';
 import { createGlobalStyle } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import Script from 'next/script';
@@ -10,12 +11,14 @@ import configureI18next from './config/initializers/react-i18next';
 import Router from './pages/router';
 import type { IdvProps } from './types';
 
-const App = (props: IdvProps) => (
+type AppProps = IdvProps & { l10n?: L10n };
+
+const App = ({ l10n, ...props }: AppProps) => (
   <>
     <I18nextProvider i18n={configureI18next()}>
       <MachineProvider args={props}>
         <GlobalStyle />
-        <Router />
+        <Router l10n={l10n} />
       </MachineProvider>
     </I18nextProvider>
     <Script

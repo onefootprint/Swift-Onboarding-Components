@@ -60,7 +60,7 @@ const Init = () => {
   );
 
   useProps((props: BifrostProps) => {
-    const { userData, options } = props;
+    const { userData, options, l10n } = props;
     const { showCompletionPage, showLogo } = options || {};
     send({
       type: 'initContextUpdated',
@@ -68,6 +68,7 @@ const Init = () => {
         bootstrapData: userData as IdvBootstrapData,
         showCompletionPage,
         showLogo,
+        l10n,
       },
     });
   });

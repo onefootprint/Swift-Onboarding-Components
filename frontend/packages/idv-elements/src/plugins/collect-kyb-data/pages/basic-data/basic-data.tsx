@@ -27,7 +27,7 @@ const BasicData = ({
   onCancel,
 }: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
-  const { authToken, data, kybRequirement, config } = state.context;
+  const { authToken, config, data, kybRequirement } = state.context;
   const { missingAttributes } = kybRequirement || {};
   const { mutation, syncData } = useSyncData();
   const { t } = useTranslation('pages.basic-data');

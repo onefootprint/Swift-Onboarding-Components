@@ -1,8 +1,8 @@
-const arePropsValid = (props: any) => {
+const isValidObject = (props: any) => {
   if (!props || typeof props !== 'object') {
     return false;
   }
   return true;
 };
 
-export default arePropsValid;
+export default isValidObject;

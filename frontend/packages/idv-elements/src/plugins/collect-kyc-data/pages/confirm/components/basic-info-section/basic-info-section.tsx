@@ -27,7 +27,7 @@ const BasicInfoSection = () => {
   const [editing, setEditing] = useState(false);
   const attributes = allAttributes(requirement);
 
-  const basicInfo = [];
+  const basicInfo: SectionItemProps[] = [];
 
   const firstName = data[IdDI.firstName]?.value;
   if (firstName) {
@@ -84,29 +84,23 @@ const BasicInfoSection = () => {
     setEditing(false);
   };
 
-  const basicInfoItem = basicInfo.map(
-    ({ text, subtext, textColor }: SectionItemProps) => (
-      <SectionItem
-        key={text}
-        text={text}
-        subtext={subtext}
-        textColor={textColor}
-      />
-    ),
-  );
-
-  const getSectionContent = () => {
-    if (!editing) {
-      return basicInfoItem;
-    }
-    return (
+  const getSectionContent = (list: SectionItemProps[]) =>
+    !editing ? (
+      list.map(({ text, subtext, textColor }) => (
+        <SectionItem
+          key={text}
+          text={text}
+          subtext={subtext}
+          textColor={textColor}
+        />
+      ))
+    ) : (
       <BasicInformation
         onComplete={stopEditing}
         onCancel={stopEditing}
         hideHeader
       />
     );
-  };
 
   const actions: SectionAction[] = [];
   if (!editing) {
@@ -121,7 +115,7 @@ const BasicInfoSection = () => {
       title={t('basic-info.title')}
       actions={actions}
       IconComponent={IcoFileText24}
-      content={getSectionContent()}
+      content={getSectionContent(basicInfo)}
       testID="basic-info-section"
     />
   );

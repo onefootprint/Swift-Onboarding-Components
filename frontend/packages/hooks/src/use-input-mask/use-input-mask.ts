@@ -1,16 +1,40 @@
-const masks = {
+import type { SupportedLocale } from '@onefootprint/footprint-js';
+
+type Mask = {
+  dob: {
+    date: boolean;
+    datePattern: ['m', 'd', 'Y'] | ['d', 'm', 'Y'];
+    delimiter: '/';
+    numericOnly: boolean;
+    placeholder: 'MM/DD/YYYY' | 'DD/MM/YYYY';
+  };
+  visaExpiration: {
+    date: boolean;
+    datePattern: ['m', 'd', 'Y'] | ['d', 'm', 'Y'];
+    delimiter: '/';
+    numericOnly: boolean;
+    placeholder: 'MM/DD/YYYY' | 'DD/MM/YYYY';
+  };
+  ssn?: { numericOnly: boolean; delimiters: string[]; blocks: number[] };
+  lastFourSsn?: { numericOnly: boolean; blocks: number[] };
+  tin?: { numericOnly: boolean; delimiters: string[]; blocks: number[] };
+};
+
+const masks: Record<SupportedLocale, Mask> = {
   'en-US': {
     dob: {
       date: true,
       numericOnly: true,
       delimiter: '/',
       datePattern: ['m', 'd', 'Y'],
+      placeholder: 'MM/DD/YYYY',
     },
     visaExpiration: {
       date: true,
       numericOnly: true,
       delimiter: '/',
       datePattern: ['m', 'd', 'Y'],
+      placeholder: 'MM/DD/YYYY',
     },
     ssn: {
       numericOnly: true,
@@ -27,8 +51,25 @@ const masks = {
       blocks: [2, 7],
     },
   },
+  'es-MX': {
+    dob: {
+      date: true,
+      numericOnly: true,
+      delimiter: '/',
+      datePattern: ['d', 'm', 'Y'],
+      placeholder: 'DD/MM/YYYY',
+    },
+    visaExpiration: {
+      date: true,
+      numericOnly: true,
+      delimiter: '/',
+      datePattern: ['d', 'm', 'Y'],
+      placeholder: 'DD/MM/YYYY',
+    },
+  },
 };
 
-const useInputMask = (bcp47Code: 'en-US') => masks[bcp47Code];
+export const useInputMask = (bcp47Code: SupportedLocale = 'en-US'): Mask =>
+  masks[bcp47Code];
 
 export default useInputMask;

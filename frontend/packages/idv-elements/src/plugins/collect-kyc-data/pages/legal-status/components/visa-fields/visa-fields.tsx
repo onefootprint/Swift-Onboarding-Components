@@ -5,6 +5,7 @@ import { isValid } from 'date-fns';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import { useL10nContext } from '../../../../../../components/l10n-provider';
 import type { FormData } from '../../types';
 
 const VisaFields = () => {
@@ -15,7 +16,8 @@ const VisaFields = () => {
     register,
     getValues,
   } = useFormContext<FormData>();
-  const inputMasks = useInputMask('en-US');
+  const l10n = useL10nContext();
+  const inputMasks = useInputMask(l10n?.locale);
 
   const errorType = errors.visa?.expirationDate?.type;
   const errorMessage = errorType ? t(`visa-expiration.error.${errorType}`) : '';
@@ -55,7 +57,7 @@ const VisaFields = () => {
         hint={errorMessage}
         label={t('visa-expiration.label')}
         mask={inputMasks.visaExpiration}
-        placeholder={t('visa-expiration.placeholder')}
+        placeholder={inputMasks.visaExpiration.placeholder}
         value={getValues('visa.expirationDate')}
         {...register('visa.expirationDate', {
           required: true,

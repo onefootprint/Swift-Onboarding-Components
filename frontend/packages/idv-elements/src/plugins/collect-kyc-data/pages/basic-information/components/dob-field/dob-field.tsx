@@ -3,11 +3,10 @@ import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import { useL10nContext } from '../../../../../../components/l10n-provider';
 import validateDob, { DobValidationError } from './utils/validate-dob';
 
-type DobFieldProps = {
-  disabled?: boolean;
-};
+type DobFieldProps = { disabled?: boolean };
 
 const DobField = ({ disabled }: DobFieldProps) => {
   const { t } = useTranslation('pages.basic-information.form.dob');
@@ -16,7 +15,8 @@ const DobField = ({ disabled }: DobFieldProps) => {
     getValues,
     formState: { errors },
   } = useFormContext();
-  const inputMasks = useInputMask('en-US');
+  const l10n = useL10nContext();
+  const inputMasks = useInputMask(l10n?.locale);
 
   const errorByValidationError: Record<DobValidationError, string> = {
     [DobValidationError.INVALID]: t('error.invalid'),
@@ -43,7 +43,7 @@ const DobField = ({ disabled }: DobFieldProps) => {
       hint={getErrorMessage()}
       label={t('label')}
       mask={inputMasks.dob}
-      placeholder={t('placeholder')}
+      placeholder={inputMasks.dob.placeholder}
       value={getValues('dob')}
       {...register('dob', {
         required: true,

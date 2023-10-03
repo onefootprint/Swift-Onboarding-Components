@@ -9,7 +9,7 @@ import BaseSelect from '../internal/base-select';
 import Input from './components/input';
 import Option from './components/option';
 import type { PhoneInputProps, PhoneSelectOption } from './phone-input.types';
-import { detectCountry } from './phone-input.utils';
+import { getCountryCode, getCountryFromPhoneNumber } from './phone-input.utils';
 
 const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   (
@@ -20,16 +20,17 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       searchPlaceholder,
       selectEmptyStateText,
       value,
+      locale,
       ...props
     }: PhoneInputProps,
     ref,
   ) => {
     const localRef = useRef<HTMLInputElement>(null);
     const [selectedCountry, setCountry] = useState<PhoneSelectOption>(() =>
-      detectCountry(value),
+      getCountryFromPhoneNumber(value, getCountryCode(locale)),
     );
-    const countryCode = selectedCountry.value;
 
+    const countryCode = selectedCountry.value;
     const handleCountryChange = (newOption: PhoneSelectOption) => {
       setCountry(newOption);
       onReset?.();

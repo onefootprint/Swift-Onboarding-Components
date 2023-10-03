@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
 
+import { useL10nContext } from '../../../../components/l10n-provider';
 import useUserData from '../../../../hooks/api/hosted/user/vault/use-user-data';
 import type { KycData } from '../../utils/data-types';
 import useCollectKycDataMachine from '../use-collect-kyc-data-machine';
@@ -18,6 +19,8 @@ const useSyncData = () => {
   const { t } = useTranslation('components.sync-data-error');
   const [state] = useCollectKycDataMachine();
   const { authToken, requirement } = state.context;
+  const l10n = useL10nContext();
+  const locale = l10n?.locale || 'en-US';
   const userDataMutation = useUserData();
   const toast = useToast();
 
@@ -38,7 +41,7 @@ const useSyncData = () => {
     }
 
     try {
-      const data = getRequestData(rawData, requirement, !speculative);
+      const data = getRequestData(locale, rawData, requirement, !speculative);
       userDataMutation.mutate(
         {
           data,

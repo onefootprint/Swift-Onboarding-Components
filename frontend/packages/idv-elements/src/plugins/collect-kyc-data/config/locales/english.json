@@ -59,7 +59,6 @@
         },
         "dob": {
           "label": "Date of Birth",
-          "placeholder": "MM/DD/YYYY",
           "error": {
             "invalid": "Date of birth cannot be empty or is invalid",
             "future-date": "Date of birth cannot be in the future",
@@ -156,7 +155,6 @@
         },
         "visa-expiration": {
           "label": "Visa expiration date",
-          "placeholder": "MM/DD/YYYY",
           "error": {
             "required": "Visa expiration date cannot be empty",
             "invalid": "Visa expiration date is invalid",

@@ -150,6 +150,7 @@ export type OpenFootprint = {
   publicKey?: string;
   userData?: FootprintUserData;
   options?: FootprintOptions;
+  l10n?: { locale?: 'en-US' | 'es-MX' };
 };
 
 export type Footprint = {

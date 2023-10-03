@@ -9,5 +9,5 @@ const [Provider, useBareFootprintProvider] = constate(
 export const useFootprintProvider = () => useBareFootprintProvider();
 
 export default Provider;
-
-export * from './types';
+export type { CompletePayload, FootprintClient } from './types';
+export { LegacyFootprintInternalEvent } from './types';

@@ -1,3 +1,4 @@
+import type { L10n } from '@onefootprint/footprint-js';
 import type {
   IdvBootstrapData,
   PublicOnboardingConfig,
@@ -10,6 +11,7 @@ export type MachineContext = {
   bootstrapData?: IdvBootstrapData;
   showCompletionPage?: boolean;
   showLogo?: boolean;
+  l10n?: L10n;
 };
 
 export type MachineEvents =
@@ -20,6 +22,7 @@ export type MachineEvents =
         bootstrapData?: IdvBootstrapData;
         showCompletionPage?: boolean;
         showLogo?: boolean;
+        l10n?: L10n;
       };
     }
   | {

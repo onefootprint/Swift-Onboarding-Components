@@ -28,7 +28,7 @@ const Root = ({ variant }: RootProps) => {
   const footprint = useFootprintProvider();
   const [state, send] = useBifrostMachine();
   const tenantPk = useTenantPublicKey();
-  const { bootstrapData, showCompletionPage, showLogo } = state.context;
+  const { bootstrapData, l10n, showCompletionPage, showLogo } = state.context;
 
   const observeCollector = useObserveCollector();
   useLogStateMachine('bifrost', state);
@@ -58,11 +58,7 @@ const Root = ({ variant }: RootProps) => {
 
   return (
     <Layout variant={variant}>
-      <AppErrorBoundary
-        onReset={() => {
-          send({ type: 'reset' });
-        }}
-      >
+      <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
         {state.matches('init') && <Init />}
         {state.matches('idv') && (
           <Idv
@@ -72,6 +68,7 @@ const Root = ({ variant }: RootProps) => {
             onClose={handleClose}
             showCompletionPage={showCompletionPage}
             showLogo={showLogo}
+            l10n={l10n}
           />
         )}
       </AppErrorBoundary>

@@ -166,8 +166,7 @@ const initIframe = (rawProps: Props): Iframe => {
   ) => {
     if (event === 'renderSecondary') {
       onRenderSecondary = callback;
-    }
-    if (event === 'destroy') {
+    } else if (event === 'destroy') {
       onDestroy = callback;
     }
   };

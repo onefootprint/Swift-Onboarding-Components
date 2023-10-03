@@ -1,17 +1,20 @@
+import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
+import type { CountryCode } from '@onefootprint/types';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 
 const phoneNumberUtil = PhoneNumberUtil.getInstance();
 
-export const detectCountry = (value = '') => {
-  if (!value) return DEFAULT_COUNTRY;
+export const getCountryFromPhoneNumber = (phone = '', code?: CountryCode) => {
+  if (!phone && !code) return DEFAULT_COUNTRY;
   try {
-    const number = phoneNumberUtil.parseAndKeepRawInput(value);
+    if (code) {
+      return COUNTRIES.find(c => c.value === code) || DEFAULT_COUNTRY;
+    }
+
+    const number = phoneNumberUtil.parseAndKeepRawInput(phone);
     const countryCode = phoneNumberUtil.getRegionCodeForNumber(number);
-    const possibleCountry = COUNTRIES.find(
-      country => country.value === countryCode,
-    );
-    return possibleCountry || DEFAULT_COUNTRY;
+    return COUNTRIES.find(c => c.value === countryCode) || DEFAULT_COUNTRY;
   } catch (_) {
     return DEFAULT_COUNTRY;
   }
@@ -21,3 +24,6 @@ export const getNationalNumber = (prefix: string, value = '') => {
   if (!value) return value;
   return value.replace(prefix, '');
 };
+
+export const getCountryCode = (l?: SupportedLocale) =>
+  l ? (l.slice(-2).toUpperCase() as CountryCode) : undefined;

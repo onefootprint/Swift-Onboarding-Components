@@ -4,9 +4,9 @@ import { Button, PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-type FormData = {
-  phoneNumber: string;
-};
+import { useL10nContext } from '../../../../../../components/l10n-provider';
+
+type FormData = { phoneNumber: string };
 
 export type FormProps = {
   defaultPhone?: string;
@@ -15,7 +15,7 @@ export type FormProps = {
   validator?: (phone: string) => boolean;
 };
 
-const Form = ({ isLoading, defaultPhone, onSubmit, validator }: FormProps) => {
+const Form = ({ defaultPhone, isLoading, onSubmit, validator }: FormProps) => {
   const { t } = useTranslation('pages.phone-identification.form');
   const {
     control,
@@ -23,11 +23,8 @@ const Form = ({ isLoading, defaultPhone, onSubmit, validator }: FormProps) => {
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm<FormData>({
-    defaultValues: {
-      phoneNumber: defaultPhone,
-    },
-  });
+  } = useForm<FormData>({ defaultValues: { phoneNumber: defaultPhone } });
+  const l10n = useL10nContext();
   const hasError = !!errors.phoneNumber;
   const hint = hasError ? errors.phoneNumber?.message : undefined;
 
@@ -64,6 +61,7 @@ const Form = ({ isLoading, defaultPhone, onSubmit, validator }: FormProps) => {
             hasError={!!error}
             hint={hint}
             label={t('phone.label')}
+            locale={l10n?.locale}
             onReset={() => {
               setValue('phoneNumber', '');
             }}

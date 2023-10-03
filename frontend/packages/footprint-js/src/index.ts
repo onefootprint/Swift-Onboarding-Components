@@ -23,6 +23,8 @@ export type {
   VerifyButtonProps as FootprintVerifyButtonProps,
   VerifyOptions as FootprintVerifyOptions,
   VerifyProps as FootprintVerifyProps,
+  L10n,
+  SupportedLocale,
 } from './types/components';
 export {
   ComponentKind as FootprintComponentKind,
