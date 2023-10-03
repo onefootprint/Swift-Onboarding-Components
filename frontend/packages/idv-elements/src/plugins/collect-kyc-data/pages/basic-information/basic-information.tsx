@@ -100,11 +100,13 @@ const BasicInformation = ({
       )}
       <FormProvider {...methods}>
         <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
-          <InlineAlert variant="info">
-            <Typography variant="body-2" color="info">
-              {t('hint')}
-            </Typography>
-          </InlineAlert>
+          {!isNameDisabled && (
+            <InlineAlert variant="info">
+              <Typography variant="body-2" color="info">
+                {t('hint')}
+              </Typography>
+            </InlineAlert>
+          )}
           <Stack direction="column" gap={5}>
             {requiresName && <NameFields disabled={isNameDisabled} />}
             {requiresDob && <DobField disabled={isDobDisabled} />}
