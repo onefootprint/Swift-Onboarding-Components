@@ -46,7 +46,7 @@ export type FilterOp =
 export interface Filter {
   column: string;
   op: FilterOp;
-  value?: string | string[] | number | number[];
+  value?: string | string[] | number | number[] | boolean;
 }
 
 export interface Order {

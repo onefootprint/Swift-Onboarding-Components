@@ -62,6 +62,60 @@ const staticAlerts: Alert[] = [
     },
   },
   {
+    name: 'Hosted API with invalid request',
+    description:
+      'Errors to a /hosted API (used entirely by our clients) with an invalid request.',
+    datasetName: 'fpc-api',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#f078e5125efa4da187c90dfa8d2ec61a',
+    query: {
+      time_range: 240,
+      breakdowns: ['http.route'],
+      calculations: [
+        {
+          op: 'COUNT',
+        },
+      ],
+      filters: [
+        {
+          column: 'http.status_code',
+          op: '>',
+          value: 299,
+        },
+        {
+          column: 'is_integration_test_req',
+          op: '!=',
+          value: true,
+        },
+        {
+          column: 'exception.details',
+          op: 'contains',
+          value: 'InvalidJsonBody',
+        },
+        {
+          column: 'http.route',
+          op: 'contains',
+          value: 'hosted',
+        },
+        // Identify regularly sees these errors for providing an invalid email address.
+        {
+          column: 'http.route',
+          op: '!=',
+          value: '/hosted/identify',
+        },
+      ],
+      filter_combination: 'AND',
+    },
+    slackThreshold: {
+      op: '>',
+      value: 0,
+    },
+    pageThreshold: {
+      op: '>',
+      value: 5,
+    },
+  },
+  {
     name: 'Latent HTTP request',
     description: 'HTTP request took longer than 15s',
     datasetName: 'fpc-api',
