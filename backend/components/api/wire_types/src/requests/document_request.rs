@@ -2,7 +2,7 @@ use crate::export_schema;
 use newtypes::{
     idology::IdologyImageCaptureErrors, DocumentScanDeviceType, DocumentSide, IdDocKind,
     IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason,
-    Iso3166TwoDigitCountryCode, PiiString,
+    Iso3166TwoDigitCountryCode, PiiJsonValue, PiiString,
 };
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
@@ -22,6 +22,7 @@ pub struct UploadMeta {
     pub is_app_clip: Option<bool>,
     /// When true, photo was taken manually
     pub manual: Option<bool>,
+    pub barcodes: PiiJsonValue,
 }
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]

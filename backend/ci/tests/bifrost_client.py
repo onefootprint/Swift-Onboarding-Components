@@ -262,10 +262,21 @@ class BifrostClient:
 
         # Upload the documents consecutively in separate requests
         for i, side in enumerate(sides):
+            meta = None
+            if side == "back":
+                meta = dict(
+                    barcodes=[
+                        dict(
+                            kind="pdf417",
+                            content="@ANSI 6360050101DL00300201DLDAQ102245737DAASAMPLE,DRIVER,CREDENTIAL,DAG 1500 PARK STDAICOLUMBIADAJSCDAK292012731 DARD DAS DAT DAU600DAW200DAY DAZ DBA20190928DBB19780928DBC1DBD20091026DBG2DBH1",
+                        )
+                    ]
+                )
             data = dict(
                 image=self.data[f"document.drivers_license.{side}.image"],
                 side=side,
                 mime_type="image/png",
+                meta=meta,
             )
             body = post(f"hosted/user/documents/{doc_id}/upload", data, self.auth_token)
             next_side = sides[i + 1] if i + 1 < len(sides) else None
