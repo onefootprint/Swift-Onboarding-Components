@@ -12,6 +12,7 @@ import React, { useEffect } from 'react';
 import useIdvMachine from '../../hooks/use-idv-machine';
 import useValidateSession from '../../hooks/use-validate-session';
 import Complete from '../complete';
+import ConfigInvalid from '../config-invalid';
 import Init from '../init';
 import SandboxOutcome from '../sandbox-outcome';
 import getIdentifyBootstrapData from './utils/get-identify-bootstrap-data';
@@ -124,6 +125,7 @@ const Router = () => {
           }}
         />
       )}
+      {state.matches('configInvalid') && <ConfigInvalid />}
       {shouldShowComplete && <Complete />}
     </AppErrorBoundary>
   );
