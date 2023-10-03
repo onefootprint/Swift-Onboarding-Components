@@ -9,7 +9,7 @@ import {
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import type { GetD2PResponse } from '@onefootprint/types';
-import { D2PStatusUpdate } from '@onefootprint/types';
+import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import * as LogRocket from 'logrocket';
 import React from 'react';
@@ -24,62 +24,102 @@ const Init = () => {
 
   useParseHandoffUrl({
     onSuccess: (authTokenFromUrl: string) => {
-      // Tell the api that d2p is in progress now
-      updateD2PStatusMutation.mutate(
-        {
-          authToken: authTokenFromUrl,
-          status: D2PStatusUpdate.inProgress,
-        },
-        {
-          onError() {
-            // If the handoff was already completed, we will get an error about
-            // trying to transition the status backwards
-            console.warn('Updating the d2p status to in progress failed');
-            send({
-              type: 'd2pAlreadyCompleted',
-            });
+      if (!state.done) {
+        send({
+          type: 'initContextUpdated',
+          payload: {
+            authToken: authTokenFromUrl,
           },
-          onSettled() {
-            send({
-              type: 'initContextUpdated',
-              payload: {
-                authToken: authTokenFromUrl,
-              },
-            });
-          },
-        },
-      );
+        });
+      }
     },
     onError: () => {
       console.error('Parsing handoff URL failed on init page');
     },
   });
 
+  const logContext = (data: GetD2PResponse) => {
+    const { meta } = data;
+    const opener = meta?.opener ?? 'unknown';
+    const bifrostSessionId = meta?.sessionId ?? '';
+    observeCollector.setAppContext({
+      opener,
+      bifrostSessionId,
+    });
+    LogRocket.identify(sessionId, {
+      bifrostSessionId,
+    });
+  };
+
+  const updateD2PStatus = () => {
+    if (!authToken) {
+      console.error('Found empty auth token while updating d2p');
+      return;
+    }
+
+    // Tell the api that d2p is in progress now
+    updateD2PStatusMutation.mutate(
+      {
+        authToken,
+        status: D2PStatusUpdate.inProgress,
+      },
+      {
+        onSuccess() {
+          if (!state.done) {
+            send({
+              type: 'initContextUpdated',
+              payload: {
+                updatedStatus: true,
+              },
+            });
+          }
+        },
+        onError(error: unknown) {
+          console.warn(
+            'Updating the d2p status to in progress failed: ',
+            getErrorMessage(error),
+          );
+        },
+      },
+    );
+  };
+
   // Fetch the status only once when the authToken has been parsed from url
   useGetD2PStatus({
+    enabled: !state.done,
     refetchInterval: false,
     authToken,
     options: {
       onSuccess: (data: GetD2PResponse) => {
-        const { meta } = data;
-        const opener = meta?.opener ?? 'unknown';
-        const bifrostSessionId = meta?.sessionId ?? '';
-        const { sandboxIdDocOutcome: idDocOutcome } = meta;
-        observeCollector.setAppContext({
-          opener,
-          bifrostSessionId,
-        });
-        LogRocket.identify(sessionId, {
-          bifrostSessionId,
-        });
+        logContext(data);
 
-        send({
-          type: 'initContextUpdated',
-          payload: {
-            opener,
-            idDocOutcome,
-          },
-        });
+        if (!state.done) {
+          const { meta, status } = data;
+          const opener = meta?.opener ?? 'unknown';
+          const { sandboxIdDocOutcome: idDocOutcome } = meta;
+          send({
+            type: 'initContextUpdated',
+            payload: {
+              opener,
+              idDocOutcome,
+            },
+          });
+
+          if (status === D2PStatus.waiting) {
+            updateD2PStatus();
+          } else if (
+            status === D2PStatus.completed ||
+            status === D2PStatus.failed
+          ) {
+            send({
+              type: 'd2pAlreadyCompleted',
+            });
+          } else if (status === D2PStatus.canceled) {
+            send({
+              type: 'd2pCanceled',
+            });
+          }
+        }
       },
       onError: (error: unknown) => {
         console.error(
@@ -91,6 +131,7 @@ const Init = () => {
   });
 
   useGetOnboardingStatus({
+    enabled: !state.done,
     authToken,
     options: {
       onSuccess: ({ obConfiguration }) => {
@@ -104,12 +145,14 @@ const Init = () => {
           publicKey: key,
         });
 
-        send({
-          type: 'initContextUpdated',
-          payload: {
-            onboardingConfig: obConfiguration,
-          },
-        });
+        if (!state.done) {
+          send({
+            type: 'initContextUpdated',
+            payload: {
+              onboardingConfig: obConfiguration,
+            },
+          });
+        }
       },
       onError: (error: unknown) => {
         console.error(

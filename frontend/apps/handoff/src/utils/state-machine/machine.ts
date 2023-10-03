@@ -60,6 +60,11 @@ export const createHandoffMachine = () =>
                 target: 'complete',
               },
             ],
+            d2pCanceled: [
+              {
+                target: 'canceled',
+              },
+            ],
           },
         },
         idv: {
@@ -83,8 +88,13 @@ export const createHandoffMachine = () =>
     {
       actions: {
         assignInitContext: assign((context, event) => {
-          const { authToken, opener, onboardingConfig, idDocOutcome } =
-            event.payload;
+          const {
+            authToken,
+            opener,
+            onboardingConfig,
+            idDocOutcome,
+            updatedStatus,
+          } = event.payload;
           context.opener = opener !== undefined ? opener : context.opener;
           context.authToken =
             authToken !== undefined ? authToken : context.authToken;
@@ -96,6 +106,8 @@ export const createHandoffMachine = () =>
             idDocOutcome !== undefined
               ? event.payload.idDocOutcome
               : context.idDocOutcome;
+          context.updatedStatus =
+            updatedStatus !== undefined ? updatedStatus : context.updatedStatus;
           return context;
         }),
         resetContext: assign(() => ({})),

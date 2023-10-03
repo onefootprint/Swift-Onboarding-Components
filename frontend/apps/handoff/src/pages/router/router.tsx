@@ -46,24 +46,28 @@ const Router = ({ variant }: RouterProps) => {
     authToken: authToken ?? '',
     options: {
       onSuccess: (data: GetD2PResponse) => {
-        send({
-          type: 'statusReceived',
-          payload: {
-            status: data.status,
-          },
-        });
+        if (!state.done) {
+          send({
+            type: 'statusReceived',
+            payload: {
+              status: data.status,
+            },
+          });
+        }
       },
       onError: error => {
         console.warn(
           'Fetching d2p status failed with error, likely indicating expired session:',
           error,
         );
-        send({
-          type: 'statusReceived',
-          payload: {
-            isError: true,
-          },
-        });
+        if (!state.done) {
+          send({
+            type: 'statusReceived',
+            payload: {
+              isError: true,
+            },
+          });
+        }
       },
     },
   });

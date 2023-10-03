@@ -29,6 +29,7 @@ describe('initContextComplete', () => {
         authToken: 'token',
         opener: 'mobile',
         onboardingConfig: TestOnboardingConfig,
+        updatedStatus: true,
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -42,11 +43,13 @@ describe('initContextComplete', () => {
         authToken: 'token',
         opener: 'mobile',
         onboardingConfig: TestOnboardingConfig,
+        updatedStatus: true,
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
         payload: {
           onboardingConfig: TestOnboardingConfig,
+          updatedStatus: true,
         },
       };
       expect(initContextComplete(context, event)).toEqual(true);

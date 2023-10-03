@@ -56,6 +56,15 @@ describe('handoff state machine', () => {
       },
     });
     expect(state.context.onboardingConfig).toEqual(TestOnboardingConfig);
+    expect(state.value).toBe('init');
+
+    state = machine.send({
+      type: 'initContextUpdated',
+      payload: {
+        updatedStatus: true,
+      },
+    });
+    expect(state.context.updatedStatus).toEqual(true);
     expect(state.value).toBe('idv');
   });
 
@@ -71,6 +80,7 @@ describe('handoff state machine', () => {
         authToken: 'token',
         opener: 'mobile',
         onboardingConfig: TestOnboardingConfig,
+        updatedStatus: true,
       },
     });
     expect(state.value).toBe('idv');
@@ -96,6 +106,7 @@ describe('handoff state machine', () => {
         authToken: 'token',
         opener: 'mobile',
         onboardingConfig: TestOnboardingConfig,
+        updatedStatus: true,
       },
     });
     expect(state.value).toBe('idv');
@@ -121,6 +132,7 @@ describe('handoff state machine', () => {
         authToken: 'token',
         opener: 'mobile',
         onboardingConfig: TestOnboardingConfig,
+        updatedStatus: true,
       },
     });
     expect(state.value).toBe('idv');

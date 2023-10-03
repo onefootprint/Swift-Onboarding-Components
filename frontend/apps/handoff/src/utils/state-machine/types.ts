@@ -9,12 +9,16 @@ export type MachineContext = {
   authToken?: string;
   onboardingConfig?: PublicOnboardingConfig;
   idDocOutcome?: IdDocOutcomes;
+  updatedStatus?: boolean;
 };
 
 export type MachineEvents =
   | InitContextUpdatedEvent
   | {
       type: 'd2pAlreadyCompleted';
+    }
+  | {
+      type: 'd2pCanceled';
     }
   | {
       type: 'statusReceived';
@@ -37,5 +41,6 @@ export type InitContextUpdatedEvent = {
     opener?: string;
     onboardingConfig?: PublicOnboardingConfig;
     idDocOutcome?: IdDocOutcomes;
+    updatedStatus?: boolean;
   };
 };
