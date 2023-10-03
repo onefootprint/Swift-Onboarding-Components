@@ -1,5 +1,5 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
-import { IcoFileText24, IcoLock24, IcoShield24 } from '@onefootprint/icons';
+import { IcoShield24 } from '@onefootprint/icons';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -47,16 +47,6 @@ const SSN9 = ({ hideDisclaimer, disabled }: SSN9Props) => {
               title: t('disclaimer.security.title'),
               description: t('disclaimer.security.description'),
               Icon: IcoShield24,
-            },
-            {
-              title: t('disclaimer.privacy.title'),
-              description: t('disclaimer.privacy.description'),
-              Icon: IcoLock24,
-            },
-            {
-              title: t('disclaimer.credit-score.title'),
-              description: t('disclaimer.credit-score.description'),
-              Icon: IcoFileText24,
             },
           ]}
           variant="default"

@@ -168,16 +168,8 @@
         "subtitle": "We need to collect this information to verify your identity.",
         "disclaimer": {
           "security": {
-            "title": "Military-grade security",
-            "description": "Your SSN is encrypted & stored in a secure environment."
-          },
-          "privacy": {
-            "title": "Even we can’t see your data",
-            "description": "Your SSN will only be accessed if required by law."
-          },
-          "credit-score": {
-            "title": "Your credit score won't change",
-            "description": "We use your SSN to verify your identity, not to run a credit check."
+            "title": "Your data is safe",
+            "description": "Your SSN is encrypted and protected by a state-of-the-art secure environment."
           }
         },
         "form": {
