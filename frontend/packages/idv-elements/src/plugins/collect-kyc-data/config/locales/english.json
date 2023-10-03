@@ -31,8 +31,7 @@
     },
     "basic-information": {
       "title": "Basic Data",
-      "subtitle": "We're legally required to collect this information.",
-      "hint": "Spell your full legal first, middle and last names exactly as shown on your government-issued ID",
+      "subtitle": "Spell your full legal first, middle and last names exactly as shown on your government-issued ID.",
       "form": {
         "first-name": {
           "label": "First name",
@@ -111,11 +110,11 @@
         }
       },
       "title": "What's your residential address?",
-      "subtitle": "We're legally required to collect this information."
+      "subtitle": "Make sure to provide your updated residential address (no P.O. Boxes)."
     },
     "legal-status": {
       "title": "What's your legal status in the U.S.?",
-      "subtitle": "We're legally required to collect this information.",
+      "subtitle": "We need to collect this information to complete your profile.",
       "statuses": {
         "citizen": "I'm a citizen",
         "permanent-resident": "I have a Green Card/I'm a permanent resident",
@@ -166,7 +165,7 @@
     "ssn": {
       "full": {
         "title": "What's your Social Security Number?",
-        "subtitle": "We're legally required to collect this information.",
+        "subtitle": "We need to collect this information to verify your identity.",
         "disclaimer": {
           "security": {
             "title": "Military-grade security",
@@ -189,7 +188,7 @@
       },
       "last-four": {
         "title": "What are the last 4 digits of your Social Security Number?",
-        "subtitle": "We're legally required to collect this information.",
+        "subtitle": "We need to collect this information to verify your identity.",
         "form": {
           "label": "SSN (last 4)",
           "placeholder": "XXXX",

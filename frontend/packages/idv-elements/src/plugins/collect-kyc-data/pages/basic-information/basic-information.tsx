@@ -5,7 +5,7 @@ import {
   IdDI,
   isCountryCode,
 } from '@onefootprint/types';
-import { InlineAlert, Stack, Typography } from '@onefootprint/ui';
+import { Stack } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -100,13 +100,6 @@ const BasicInformation = ({
       )}
       <FormProvider {...methods}>
         <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
-          {!isNameDisabled && (
-            <InlineAlert variant="info">
-              <Typography variant="body-2" color="info">
-                {t('hint')}
-              </Typography>
-            </InlineAlert>
-          )}
           <Stack direction="column" gap={5}>
             {requiresName && <NameFields disabled={isNameDisabled} />}
             {requiresDob && <DobField disabled={isDobDisabled} />}
