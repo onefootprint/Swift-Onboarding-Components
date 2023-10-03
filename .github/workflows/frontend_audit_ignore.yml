@@ -1,15 +1,15 @@
-name: Frontend CI Audit
+name: Frontend CI Audit (skip)
 
 on:
   push:
     branches:
       - master
-    paths:
+    paths-ignore:
       - 'frontend/**'
   pull_request:
-    paths:
+    paths-ignore:
       - 'frontend/**'
-      - '.github/workflows/frontend_audit.yml'
+      - '.github/workflows/frontend_audit_ignore.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,16 +17,10 @@ concurrency:
 
 jobs:
   audit:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         node-version: [18.x]
         os: [ubuntu-latest]
-    name: 'Audit'
-    runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Audit for vulnerabilities
-        working-directory: ./frontend
-        run: npx audit-ci@^6 --config ./audit-ci.jsonc
+      - run: echo "Not required"

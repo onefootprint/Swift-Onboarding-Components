@@ -1,0 +1,26 @@
+name: mobile CI Audit (skip)
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'mobile/**'
+  pull_request:
+    paths-ignore:
+      - 'mobile/**'
+      - '.github/workflows/mobile_audit_ignore.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  audit:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    steps:
+      - run: echo "Not required"

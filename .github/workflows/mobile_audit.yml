@@ -1,15 +1,15 @@
-name: Frontend CI Audit
+name: Mobile CI Audit
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'frontend/**'
+      - 'mobile/**'
   pull_request:
     paths:
-      - 'frontend/**'
-      - '.github/workflows/frontend_audit.yml'
+      - 'mobile/**'
+      - '.github/workflows/mobile_audit.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,5 +28,5 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Audit for vulnerabilities
-        working-directory: ./frontend
+        working-directory: ./mobile
         run: npx audit-ci@^6 --config ./audit-ci.jsonc
