@@ -1,11 +1,10 @@
 pub use super::*;
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
-use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
 // TODO: probs consolidate this into WorkflowState somehow
-#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, PartialEq, Eq, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum WorkflowConfig {

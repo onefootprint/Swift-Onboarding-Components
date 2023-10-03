@@ -25,6 +25,7 @@ use strum_macros::{AsRefStr, EnumString};
     JsonSchema,
 )]
 #[strum(serialize_all = "snake_case")]
+#[serde(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum BusinessOwnerKind {
     /// The BusinessOwner filled out the initial KYB form for this business

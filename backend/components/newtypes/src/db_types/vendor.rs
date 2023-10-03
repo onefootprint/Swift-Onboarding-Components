@@ -51,7 +51,6 @@ impl_enum_str_diesel!(Vendor);
     Deserialize,
     Hash,
     Serialize,
-    Apiv2Schema,
     PartialEq,
     Eq,
     AsExpression,

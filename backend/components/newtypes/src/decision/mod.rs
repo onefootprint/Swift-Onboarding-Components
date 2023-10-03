@@ -25,14 +25,14 @@ pub enum RuleSetName {
     Eq,
     PartialEq,
     Hash,
-    serde::Serialize,
-    serde::Deserialize,
+    serde_with::SerializeDisplay,
     Display,
     Apiv2Schema,
     Ord,
     PartialOrd,
     JsonSchema,
 )]
+#[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum MatchLevel {
     //

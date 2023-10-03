@@ -1,6 +1,6 @@
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
-use strum::Display;
+use strum_macros::{Display, EnumString};
 
 #[derive(
     Debug,
@@ -9,12 +9,14 @@ use strum::Display;
     Eq,
     PartialEq,
     Hash,
-    serde::Serialize,
-    serde::Deserialize,
+    serde_with::SerializeDisplay,
+    serde_with::DeserializeFromStr,
     Apiv2Schema,
     JsonSchema,
+    EnumString,
     Display,
 )]
+#[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 /// Represents the granularity of data attributes that could be alerted on by a data vendor
 /// NOTE: this is not the same as "data attributes we can collect from a user". Please see `DataAttribute` for that

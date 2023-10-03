@@ -14,14 +14,11 @@ use crate::FootprintReasonCode;
     Copy,
     Eq,
     PartialEq,
-    Deserialize,
-    Serialize,
     AsExpression,
     FromSqlRow,
     EnumString,
     EnumIter,
     AsRefStr,
-    Apiv2Schema,
     JsonSchema,
 )]
 #[strum(serialize_all = "snake_case")]
@@ -151,20 +148,7 @@ impl IncodeFailureReason {
 }
 
 #[derive(
-    Debug,
-    Display,
-    Clone,
-    Eq,
-    PartialEq,
-    Deserialize,
-    Serialize,
-    AsExpression,
-    FromSqlRow,
-    EnumString,
-    EnumIter,
-    AsRefStr,
-    Apiv2Schema,
-    JsonSchema,
+    Debug, Display, Clone, Eq, PartialEq, AsExpression, FromSqlRow, EnumString, EnumIter, AsRefStr, JsonSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]

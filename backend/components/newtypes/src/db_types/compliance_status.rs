@@ -1,7 +1,5 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
 /// The type of requirement
@@ -15,9 +13,6 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
     Hash,
     Clone,
     Copy,
-    Deserialize,
-    Serialize,
-    Apiv2Schema,
     EnumIter,
     EnumString,
     AsExpression,

@@ -4,7 +4,6 @@ mod experian_phone_codes;
 mod experian_reason_code_helpers;
 mod experian_ssn_codes;
 mod idology;
-mod signal;
 mod signal_attribute;
 mod socure;
 
@@ -15,7 +14,6 @@ pub use experian_address_codes::*;
 pub use experian_phone_codes::*;
 pub use experian_ssn_codes::*;
 pub use idology::*;
-pub use signal::*;
 pub use signal_attribute::*;
 pub use socure::*;
 
@@ -109,19 +107,6 @@ impl ToString for ReasonCode {
         match self {
             ReasonCode::IDology(idology) => idology.to_string(),
             ReasonCode::Other(s) => s.to_owned(),
-        }
-    }
-}
-
-impl ReasonCode {
-    pub fn signal(self) -> Signal {
-        match self {
-            ReasonCode::IDology(idology) => idology.signal(),
-            ReasonCode::Other(_) => Signal {
-                kind: OldSignalSeverity::TODO,
-                scopes: vec![],
-                note: "Unknown reason code".to_owned(),
-            },
         }
     }
 }

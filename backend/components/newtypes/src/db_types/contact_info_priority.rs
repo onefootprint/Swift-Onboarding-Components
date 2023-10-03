@@ -1,6 +1,5 @@
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use paperclip::actix::Apiv2Schema;
 use strum_macros::{AsRefStr, EnumString};
 
 /// The type of data attribute
@@ -14,7 +13,6 @@ use strum_macros::{AsRefStr, EnumString};
     Hash,
     Clone,
     Copy,
-    Apiv2Schema,
     AsExpression,
     FromSqlRow,
     EnumString,

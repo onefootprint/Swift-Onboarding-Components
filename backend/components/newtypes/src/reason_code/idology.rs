@@ -1,6 +1,5 @@
 use crate::{vendor_reason_code_enum, FootprintReasonCode};
 
-use super::{OldSignalSeverity, Signal};
 use strum::EnumIter;
 use strum_macros::EnumString;
 
@@ -524,41 +523,6 @@ impl serde::Serialize for IDologyReasonCode {
         S: serde::Serializer,
     {
         serializer.collect_str(self)
-    }
-}
-
-// Tries to assign some gauge of risk to each reason code. Some are purely info that have no risk,
-// others are high fraud signals.
-// You could imagine a simple risk algorithm starts from a score of 100 and subtracts out for risky reason codes.
-// Perhaps we take the max risk score (ie Alert(3) > Alert(2) per field/signal attribute, sum them up, and subtract from 100.
-impl IDologyReasonCode {
-    pub fn signal(self) -> Signal {
-        // TODO: remove this? Not currently used anywhere and FootprintReasonCode's SignalSeverity + SignalScope subsumes this
-
-        use OldSignalSeverity::*;
-
-        // These are frequent signal kinds and signal attributes that we may need to create
-        // let _enterprise_blocked = Alert(5);
-        // let _network_alert = Alert(10);
-
-        #[allow(clippy::match_single_binding)]
-        let (kind, attributes) = match self {
-            // CoppaAlert => (Alert(10), vec![Dob]),
-            // AddressDoesNotMatch => (Alert(3), vec![StreetAddress]),
-            // StreetNameDoesNotMatch => (Alert(2), vec![StreetAddress]),
-            // StreetNumberDoesNotMatch => (Alert(2), vec![StreetAddress]),
-            // AgeBelowMinimum => (enterprise_blocked, vec![Dob]),
-            // AgeAboveMaximum => (enterprise_blocked, vec![Dob]),
-            // AlertListAlertSsn => (enterprise_blocked, vec![Ssn]),
-            // AlertListAlertAddress => (enterprise_blocked, vec![Address]),
-            // AlertListAlertAddressAndZip => (enterprise_blocked, vec![Address]),
-            _ => (TODO, vec![]),
-        };
-        Signal {
-            kind,
-            scopes: attributes,
-            note: self.to_string(),
-        }
     }
 }
 

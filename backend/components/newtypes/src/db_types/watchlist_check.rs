@@ -1,10 +1,10 @@
-pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use strum_macros::{AsRefStr, EnumString};
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum_macros::{AsRefStr, Display, EnumString};
 
 #[derive(
     Debug,
@@ -43,8 +43,8 @@ pub enum WatchlistCheckStatus {
     PartialEq,
     Ord,
     PartialOrd,
-    Deserialize,
-    Serialize,
+    DeserializeFromStr,
+    SerializeDisplay,
     AsExpression,
     FromSqlRow,
     EnumString,
@@ -92,8 +92,8 @@ impl Default for WatchlistCheckStatusKind {
     PartialEq,
     Ord,
     PartialOrd,
-    Deserialize,
-    Serialize,
+    DeserializeFromStr,
+    SerializeDisplay,
     AsExpression,
     FromSqlRow,
     EnumString,
@@ -119,8 +119,8 @@ crate::util::impl_enum_str_diesel!(WatchlistCheckError);
     PartialEq,
     Ord,
     PartialOrd,
-    Deserialize,
-    Serialize,
+    DeserializeFromStr,
+    SerializeDisplay,
     AsExpression,
     FromSqlRow,
     EnumString,

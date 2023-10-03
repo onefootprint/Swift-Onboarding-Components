@@ -18,7 +18,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateOnboardingConfigurationRequest {
     name: String,

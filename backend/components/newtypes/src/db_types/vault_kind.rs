@@ -1,16 +1,17 @@
 use crate::util::impl_enum_str_diesel;
-pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
 use serde_json;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::AsRefStr;
+use strum_macros::Display;
 use strum_macros::EnumString;
 
 #[derive(
-    Serialize,
-    Deserialize,
+    Display,
+    SerializeDisplay,
+    DeserializeFromStr,
     Debug,
     Clone,
     Copy,

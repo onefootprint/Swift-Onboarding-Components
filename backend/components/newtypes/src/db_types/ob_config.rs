@@ -38,18 +38,17 @@ impl_enum_str_diesel!(ApiKeyStatus);
 #[derive(
     Eq,
     PartialEq,
-    Serialize,
-    Deserialize,
     Debug,
     Display,
     Clone,
     Copy,
-    Apiv2Schema,
     AsExpression,
     FromSqlRow,
     EnumString,
     AsRefStr,
     JsonSchema,
+    serde_with::DeserializeFromStr,
+    Apiv2Schema,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]

@@ -1,7 +1,5 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
 #[derive(
@@ -11,12 +9,10 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
     Ord,
     PartialOrd,
     Display,
+    serde_with::SerializeDisplay,
     Hash,
     Clone,
     Copy,
-    Deserialize,
-    Serialize,
-    Apiv2Schema,
     EnumIter,
     EnumString,
     AsExpression,
@@ -26,7 +22,6 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
     Default,
 )]
 #[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum AndroidAppRecognition {
     Recognized,
@@ -44,12 +39,10 @@ crate::util::impl_enum_str_diesel!(AndroidAppRecognition);
     Ord,
     PartialOrd,
     Display,
+    serde_with::SerializeDisplay,
     Hash,
     Clone,
     Copy,
-    Deserialize,
-    Serialize,
-    Apiv2Schema,
     EnumIter,
     EnumString,
     AsExpression,
@@ -59,7 +52,6 @@ crate::util::impl_enum_str_diesel!(AndroidAppRecognition);
     Default,
 )]
 #[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum AndroidAppLicense {
     #[default]
@@ -77,12 +69,10 @@ crate::util::impl_enum_str_diesel!(AndroidAppLicense);
     Ord,
     PartialOrd,
     Display,
+    serde_with::SerializeDisplay,
     Hash,
     Clone,
     Copy,
-    Deserialize,
-    Serialize,
-    Apiv2Schema,
     EnumIter,
     EnumString,
     AsExpression,
@@ -92,7 +82,6 @@ crate::util::impl_enum_str_diesel!(AndroidAppLicense);
     Default,
 )]
 #[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum AndroidDeviceIntegrityLevel {
     #[default]
