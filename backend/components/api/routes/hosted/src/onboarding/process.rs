@@ -131,7 +131,8 @@ async fn enqueue_run_incode_stuck_workflow_task(db_pool: &DbPool, workflow_id: &
 
 #[tracing::instrument(skip_all)]
 async fn run_kyb_if_needed(state: &State, user_auth: CheckUserWfAuthContext) -> ApiResult<()> {
-    let tenant = user_auth.tenant()?.clone();
+    // Run KYB
+    let tenant = user_auth.tenant().clone();
     let biz_wf = state
         .db_pool
         .db_query(move |conn| user_auth.business_workflow(conn))

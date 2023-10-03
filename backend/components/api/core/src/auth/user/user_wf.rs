@@ -34,7 +34,7 @@ pub struct UserWfSession {
     user_session: UserSessionContext,
     pub scoped_user: ScopedVault,
     ob_config: Option<ObConfiguration>,
-    tenant: Option<Tenant>,
+    tenant: Tenant,
     workflow: Workflow,
 }
 
@@ -73,19 +73,15 @@ impl ExtractableAuthSession for ParsedUserWfSession {
             return Err(AuthError::MissingScope(vec![UserAuthGuard::Workflow].into()))?;
         };
         let workflow = Workflow::get(conn, &workflow_id)?;
+        let tenant = Tenant::get(conn, &scoped_user.tenant_id)?;
 
-        // Get the obc ID first from the workflow, the real source of truth.
-        // Otherwise, get from OrgOnboarding scope.
+        // Get the obc and confirm it is active
         let scope_obc_id = user_session.ob_configuration_id();
         let obc_id = workflow.ob_configuration_id.as_ref().or(scope_obc_id.as_ref());
-
-        let (ob_config, tenant) = if let Some(obc_id) = obc_id {
-            // Confirm that the ob config is active
-            let (ob_config, tenant) = ObConfiguration::get_enabled(conn, obc_id)?;
-            (Some(ob_config), Some(tenant))
-        } else {
-            (None, None)
-        };
+        let ob_config = obc_id
+            .map(|obc_id| ObConfiguration::get_enabled(conn, obc_id))
+            .transpose()?
+            .map(|(obc, _)| obc);
 
         let onboarding_session = UserWfSession {
             user_session,
@@ -98,7 +94,7 @@ impl ExtractableAuthSession for ParsedUserWfSession {
     }
 
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
-        root_span.record("tenant_id", &self.0.tenant.as_ref().map(|t| t.id.to_string()));
+        root_span.record("tenant_id", &self.0.tenant.id.to_string());
         root_span.record("vault_id", &self.0.user_vault_id().to_string());
     }
 }
@@ -162,9 +158,8 @@ impl UserWfSession {
         Ok(obc)
     }
 
-    pub fn tenant(&self) -> ApiResult<&Tenant> {
-        let tenant = self.tenant.as_ref().ok_or(OnboardingError::NoOnboarding)?;
-        Ok(tenant)
+    pub fn tenant(&self) -> &Tenant {
+        &self.tenant
     }
 
     pub fn workflow(&self) -> &Workflow {

@@ -39,7 +39,7 @@ pub fn get(
             // config
             let user_ob_auth = user_ob_auth.check_guard(Any)?;
             let ob_config = user_ob_auth.data.ob_config()?.clone();
-            let tenant = user_ob_auth.data.tenant()?.clone();
+            let tenant = user_ob_auth.data.tenant().clone();
             (tenant, ob_config)
         }
     };

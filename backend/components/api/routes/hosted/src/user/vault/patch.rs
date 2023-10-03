@@ -36,7 +36,7 @@ async fn parse_auth(
         user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
         let user = user_auth.user().clone();
         let su_id = user_auth.scoped_user.id.clone();
-        let tenant = user_auth.tenant()?.clone();
+        let tenant = user_auth.tenant().clone();
         let wf_info = Some((user_auth.ob_config()?.clone(), user_auth.workflow().clone()));
         (user, su_id, tenant, wf_info)
     } else {
