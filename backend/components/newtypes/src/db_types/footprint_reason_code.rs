@@ -552,11 +552,11 @@ footprint_reason_code_enum! {
         PhoneLocatedMatches,
 
         #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "Phone located partially matches phone number provided", severity = SignalSeverity::Info,  description = "The phone number provided partially matches the phone number on file."]
+        #[note = "Phone located partially matches phone number provided", severity = SignalSeverity::Low,  description = "The phone number provided partially matches the phone number on file."]
         PhoneLocatedPartiallyMatches,
 
         #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "Phone located does not match phone number provided", severity = SignalSeverity::Info,  description = "The phone number provided does not match the phone number on file."]
+        #[note = "Phone located does not match phone number provided", severity = SignalSeverity::Low,  description = "The phone number provided does not match the phone number on file."]
         PhoneLocatedDoesNotMatch,
 
         #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
@@ -564,7 +564,7 @@ footprint_reason_code_enum! {
         PhoneLocatedNameMatches,
 
         #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
-        #[note = "Name associated with the phone number partially matches input name", severity = SignalSeverity::Info,  description = "The name associated with the phone number partially matches the name provided"]
+        #[note = "Name associated with the phone number partially matches input name", severity = SignalSeverity::Low,  description = "The name associated with the phone number partially matches the name provided"]
         PhoneLocatedNamePartiallyMatches,
 
         #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
@@ -805,7 +805,7 @@ footprint_reason_code_enum! {
         DocumentSelfieDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Unexpected document type provided", severity = SignalSeverity::High,  description = "The document uploaded was classified as a different type of document than was selected to be uploaded by the user."]
+        #[note = "Unexpected document type provided", severity = SignalSeverity::Low,  description = "The document uploaded was classified as a different type of document than was selected to be uploaded by the user."]
         DocumentTypeMismatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
@@ -813,7 +813,7 @@ footprint_reason_code_enum! {
         DocumentUnknownCountryCode,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Unexpected document country code", severity = SignalSeverity::High,  description = "The country issuing the uploaded document does not match the selected country."]
+        #[note = "Unexpected document country code", severity = SignalSeverity::Low,  description = "The country issuing the uploaded document does not match the selected country."]
         DocumentCountryCodeMismatch,
 
         #[scope = SignalScope::Selfie, additional_scopes = vec![], match_level = None]
