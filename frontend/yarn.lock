@@ -5197,15 +5197,15 @@
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.29.25.tgz#605d357968a740544af6754004eed1dfd4587cb8"
   integrity sha512-DI4y4VC6Uw4wlTpOocEXDky69xeOScME1ezLKsj+hOk7DguC9fkqXtp6Hn39BVb9y0b5IBrY67q6kIX623Zj4Q==
 
-"@tanstack/query-core@4.32.5":
-  version "4.32.5"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.32.5.tgz#1c9da404ba4906c35b3998ba03ea4ab44019750c"
-  integrity sha512-UOxiDYmzYWD21ASIUnW3w+Nq3LcW1BPFFfIyZOor6UsRl76KGLlvUhJ402/dof1JxcQFPK7nZ5iUGPVqLiT8zg==
+"@tanstack/query-core@4.35.7":
+  version "4.35.7"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.35.7.tgz#31d6f520ab8abedb6024d2d870af8afca764d048"
+  integrity sha512-PgDJtX75ubFS0WCYFM7DqEoJ4QbxU3S5OH3gJSI40xr7UVVax3/J4CM3XUMOTs+EOT5YGEfssi3tfRVGte4DEw==
 
-"@tanstack/react-query-devtools@^4.20.4":
-  version "4.29.6"
-  resolved "https://registry.npmjs.org/@tanstack/react-query-devtools/-/react-query-devtools-4.29.6.tgz"
-  integrity sha512-qpYI41a69MWmrllcGiSE1KlpmnwJY/w0yKMnmp6VXn7nVy0i5TMMAT4u8D48F1Ipv/BKIDI1lqxPAvB4MqryBg==
+"@tanstack/react-query-devtools@^4.35.7":
+  version "4.35.7"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-devtools/-/react-query-devtools-4.35.7.tgz#782a09b4ebf29fda445b018b462aacc96e864c2f"
+  integrity sha512-oe3reHNvXBTUvNb9jwLY8EYOXyp8Oq8/c40iwpXBnEkAtJI+RryrCXaGKFTivg72roPcYHzKILQHR9jbX8sn1Q==
   dependencies:
     "@tanstack/match-sorter-utils" "^8.7.0"
     superjson "^1.10.0"
@@ -5219,12 +5219,12 @@
     "@tanstack/query-core" "4.29.25"
     use-sync-external-store "^1.2.0"
 
-"@tanstack/react-query@^4.32.5":
-  version "4.32.5"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.32.5.tgz#666abcf6cbeb8475e44f91a4279302f69b2f4ee9"
-  integrity sha512-4tR0GxyyKhLpYvbglOGpWVqHS+t3bs7yy89DuTgJvnKLnaS5UW2sbfAzlV9JtwL7s5Z8eW2q2EDMcAtutb0lAw==
+"@tanstack/react-query@^4.35.7":
+  version "4.35.7"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.35.7.tgz#35a1db50156411b2a9eb68a020bae416948939db"
+  integrity sha512-0MankquP/6EOM2ATfEov6ViiKemey5uTbjGlFMX1xGotwNaqC76YKDMJdHumZupPbZcZPWAeoPGEHQmVKIKoOQ==
   dependencies:
-    "@tanstack/query-core" "4.32.5"
+    "@tanstack/query-core" "4.35.7"
     use-sync-external-store "^1.2.0"
 
 "@tensorflow/tfjs-core@1.7.0":
@@ -8735,7 +8735,7 @@ cssstyle@^2.3.0:
   dependencies:
     cssom "~0.3.6"
 
-csstype@^3.0.2, csstype@^3.1.0, csstype@^3.1.1:
+csstype@^3.0.2, csstype@^3.1.2:
   version "3.1.2"
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.2.tgz"
   integrity sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==
@@ -16321,10 +16321,10 @@ react-highlight-words@^0.18.0:
     memoize-one "^4.0.0"
     prop-types "^15.5.8"
 
-react-hook-form@^7.45.2:
-  version "7.45.2"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.45.2.tgz#c757f3d5e633ccb186443d57c10fc511df35721a"
-  integrity sha512-9s45OdTaKN+4NSTbXVqeDITd/nwIg++nxJGL8+OD5uf1DxvhsXQ641kaYHk5K28cpIOTYm71O/fYk7rFaygb3A==
+react-hook-form@^7.47.0:
+  version "7.47.0"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.47.0.tgz#a42f07266bd297ddf1f914f08f4b5f9783262f31"
+  integrity sha512-F/TroLjTICipmHeFlMrLtNLceO2xr1jU3CyiNla5zdwsGUGu2UOxxR4UyJgLlhMwLW/Wzp4cpJ7CPfgJIeKdSg==
 
 react-i18next@^12.3.1:
   version "12.3.1"

@@ -32,7 +32,7 @@
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
     "@onefootprint/postmate": "2.1.0",
-    "csstype": "^3.1.1",
+    "csstype": "^3.1.2",
     "eslint-config-footprint": "*",
     "jest-fetch-mock": "^3.0.3",
     "tsconfig": "*",

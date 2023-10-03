@@ -31,7 +31,7 @@
   "devDependencies": {
     "@types/color": "^3.0.3",
     "color": "^4.2.3",
-    "csstype": "^3.1.1",
+    "csstype": "^3.1.2",
     "eslint-config-footprint": "*",
     "polished": "^4.2.2",
     "style-dictionary": "^3.7.1",
