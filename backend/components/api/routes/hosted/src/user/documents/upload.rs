@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::sync::Arc;
 
 use crate::auth::user::UserAuthGuard;
@@ -32,9 +31,8 @@ use db::TxnPgConn;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, DataRequest, DecisionIntentId, DecisionIntentKind, DocumentKind,
-    DocumentSide, IdentityDocumentId, IdentityDocumentStatus, IncodeVerificationSessionState, TenantId,
-    ValidateArgs, WorkflowId,
+    DataIdentifier, DataLifetimeSource, DecisionIntentId, DecisionIntentKind, DocumentKind, DocumentSide,
+    IdentityDocumentId, IdentityDocumentStatus, IncodeVerificationSessionState, TenantId, WorkflowId,
 };
 use newtypes::{ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
@@ -61,6 +59,7 @@ pub async fn post(
         image,
         side,
         mime_type,
+        // TODO vault the barcode
         meta,
     } = request.0;
     tracing::info!("After unpacking request");
@@ -128,22 +127,6 @@ pub async fn post(
                 is_manual: meta.as_ref().and_then(|m| m.manual),
             };
             DocumentUpload::create(conn, args)?;
-
-            // Vault the barcode if provided
-            if let Some(barcodes) = meta.map(|m| m.barcodes) {
-                if !barcodes.leak().is_null() {
-                    let validate_args = ValidateArgs::for_bifrost(vault.is_live);
-                    let data = HashMap::from_iter([(
-                        DocumentKind::Barcodes(id_doc.document_type, side).into(),
-                        barcodes,
-                    )]);
-                    let data = DataRequest::clean_and_validate(data, validate_args)?;
-                    let data = data.no_fingerprints();
-                    let source = DataLifetimeSource::Hosted; // Kind of?
-                    uvw.patch_data(conn, data, source)?;
-                }
-            }
-
             let existing_sides = id_doc
                 .images(conn, true)?
                 .into_iter()

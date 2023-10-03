@@ -1,5 +1,6 @@
 use crate::{
-    CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant, StorageType,
+    AllData, CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant, NtResult,
+    PiiJsonValue, PiiString, StorageType, Validate, ValidateArgs,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
@@ -39,11 +40,6 @@ pub enum DocumentKind {
     /// document.[doc_kind].[side].latest_upload - TODO one day latest_upload_mime_type?
     #[strum_discriminants(strum(to_string = "latest_upload"))]
     LatestUpload(IdDocKind, DocumentSide),
-
-    /// represents barcodes capture on this side of the document
-    /// document.[doc_kind].[side].barcodes
-    #[strum_discriminants(strum(to_string = "barcodes"))]
-    Barcodes(IdDocKind, DocumentSide),
 
     /// Letter signed by a compliance officer granting permission to carry an account, required by FINFRA rules in certain cases
     #[strum_discriminants(strum(to_string = "finra_compliance_letter"))]
@@ -90,15 +86,25 @@ impl TryFrom<DataIdentifier> for DocumentKind {
     }
 }
 
+impl Validate for DocumentKind {
+    fn validate(
+        self,
+        value: PiiJsonValue,
+        _: ValidateArgs,
+        _: &AllData,
+    ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
+        Ok(vec![(self.into(), value.as_string()?)])
+    }
+}
+
 impl IsDataIdentifierDiscriminant for DocumentKind {
     fn parent(&self) -> Option<CollectedData> {
         match self {
             DocumentKind::Image(_, _) => Some(CollectedData::Document),
             // allow storing this data independently
-            DocumentKind::Barcodes(_, _)
-            | DocumentKind::OcrData(_, _)
-            | DocumentKind::MimeType(_, _)
-            | DocumentKind::LatestUpload(_, _) => None,
+            DocumentKind::OcrData(_, _) | DocumentKind::MimeType(_, _) | DocumentKind::LatestUpload(_, _) => {
+                None
+            }
             DocumentKind::FinraComplianceLetter => Some(CollectedData::InvestorProfile),
         }
     }
@@ -114,10 +120,7 @@ impl DocumentKind {
                 DocumentSide::Selfie => vec![mime::IMAGE_JPEG, mime::IMAGE_PNG],
             },
             DocumentKind::FinraComplianceLetter => vec![mime::APPLICATION_PDF],
-            DocumentKind::Barcodes(_, _)
-            | DocumentKind::OcrData(_, _)
-            | DocumentKind::MimeType(_, _)
-            | DocumentKind::LatestUpload(_, _) => {
+            DocumentKind::OcrData(_, _) | DocumentKind::MimeType(_, _) | DocumentKind::LatestUpload(_, _) => {
                 vec![]
             }
         }
@@ -136,7 +139,7 @@ impl DocumentKind {
             | DocumentKind::FinraComplianceLetter
             | DocumentKind::LatestUpload(_, _) => StorageType::DocumentData,
             DocumentKind::MimeType(_, _) => StorageType::DocumentMetadata,
-            DocumentKind::OcrData(_, _) | DocumentKind::Barcodes(_, _) => StorageType::VaultData,
+            DocumentKind::OcrData(_, _) => StorageType::VaultData,
         }
     }
 }
@@ -154,8 +157,7 @@ impl TryFrom<DocumentKindDiscriminant> for DocumentKind {
     fn try_from(value: DocumentKindDiscriminant) -> Result<Self, Self::Error> {
         let v = match value {
             DocumentKindDiscriminant::FinraComplianceLetter => DocumentKind::FinraComplianceLetter,
-            DocumentKindDiscriminant::Barcodes
-            | DocumentKindDiscriminant::OcrData
+            DocumentKindDiscriminant::OcrData
             | DocumentKindDiscriminant::Image
             | DocumentKindDiscriminant::MimeType
             | DocumentKindDiscriminant::LatestUpload => return Err(strum::ParseError::VariantNotFound),
@@ -196,10 +198,6 @@ impl std::str::FromStr for DocumentKind {
                 let (prefix, suffix) = get_parts()?;
                 DocumentKind::Image(prefix, suffix)
             }
-            Ok(DocumentKindDiscriminant::Barcodes) => {
-                let (prefix, suffix) = get_parts()?;
-                DocumentKind::Barcodes(prefix, suffix)
-            }
             // Otherwise, try parsing as other variants
             _ => {
                 if let Ok(variant) = DocumentKindDiscriminant::from_str(s)
@@ -227,8 +225,7 @@ impl std::fmt::Display for DocumentKind {
         match *self {
             DocumentKind::LatestUpload(id_doc_kind, side)
             | DocumentKind::MimeType(id_doc_kind, side)
-            | DocumentKind::Image(id_doc_kind, side)
-            | DocumentKind::Barcodes(id_doc_kind, side) => {
+            | DocumentKind::Image(id_doc_kind, side) => {
                 write!(
                     f,
                     "{}.{}.{}",

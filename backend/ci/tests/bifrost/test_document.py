@@ -49,11 +49,6 @@ def test_upload_documents(doc_request_sandbox_ob_config, twilio):
     assert any(r["kind"] == "collect_document" for r in bifrost.handled_requirements)
 
     tenant = bifrost.ob_config.tenant
-    body = get(f"entities/{fp_id}", None, *tenant.db_auths)
-    assert set(body["decryptable_attributes"]) > {
-        "document.drivers_license.back.barcodes"
-    }
-
     body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
     assert len([i for i in body if i["kind"] == "id_card"]) == 1
     assert len([i for i in body if i["kind"] == "drivers_license"]) == 2
