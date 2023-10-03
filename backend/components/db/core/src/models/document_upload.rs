@@ -29,18 +29,30 @@ pub struct DocumentUpload {
     pub created_seqno: DataLifetimeSeqno,
     /// When non-empty, the reasons why the image could not be verified
     pub failure_reasons: Vec<IncodeFailureReason>,
+    /// Client-provided (so cannot always be trusted) flag that tells if the upload was captured
+    /// via Android instant app
+    pub is_instant_app: Option<bool>,
+    /// Client-provided (so cannot always be trusted) flag that tells if the upload was captured
+    /// via Apple app clip
+    pub is_app_clip: Option<bool>,
+    /// Client-provided (so cannot always be trusted) flag that tells if the upload was captured
+    /// manually
+    pub is_manual: Option<bool>,
 }
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = document_upload)]
 struct NewDocumentUploadRow {
-    pub document_id: IdentityDocumentId,
-    pub side: DocumentSide,
-    pub s3_url: S3Url,
-    pub e_data_key: SealedVaultDataKey,
-    pub created_at: DateTime<Utc>,
-    pub created_seqno: DataLifetimeSeqno,
-    pub failure_reasons: Vec<IncodeFailureReason>,
+    document_id: IdentityDocumentId,
+    side: DocumentSide,
+    s3_url: S3Url,
+    e_data_key: SealedVaultDataKey,
+    created_at: DateTime<Utc>,
+    created_seqno: DataLifetimeSeqno,
+    failure_reasons: Vec<IncodeFailureReason>,
+    is_instant_app: Option<bool>,
+    is_app_clip: Option<bool>,
+    is_manual: Option<bool>,
 }
 
 #[derive(Debug, AsChangeset)]
@@ -50,20 +62,35 @@ pub struct IdentityDocumentUpdate {
     pub failure_reasons: Option<Vec<IncodeFailureReason>>,
 }
 
+#[derive(Debug)]
+pub struct NewDocumentUploadArgs {
+    pub document_id: IdentityDocumentId,
+    pub side: DocumentSide,
+    pub s3_url: S3Url,
+    pub e_data_key: SealedVaultDataKey,
+    pub created_seqno: DataLifetimeSeqno,
+    pub is_instant_app: Option<bool>,
+    pub is_app_clip: Option<bool>,
+    pub is_manual: Option<bool>,
+}
+
 impl DocumentUpload {
     /// Max number attempts to upload a given side before we fail the document request
     pub const MAX_ATTEMPTS_PER_SIDE: i64 = 3;
     pub const MAX_ATTEMPTS_BEFORE_DROPPING_GLARE_CHECK: i64 = 2;
 
     #[tracing::instrument("DocumentUpload::create", skip_all)]
-    pub fn create(
-        conn: &mut TxnPgConn,
-        document_id: IdentityDocumentId,
-        side: DocumentSide,
-        s3_url: S3Url,
-        e_data_key: SealedVaultDataKey,
-        created_seqno: DataLifetimeSeqno,
-    ) -> DbResult<Self> {
+    pub fn create(conn: &mut TxnPgConn, args: NewDocumentUploadArgs) -> DbResult<Self> {
+        let NewDocumentUploadArgs {
+            document_id,
+            side,
+            s3_url,
+            e_data_key,
+            created_seqno,
+            is_instant_app,
+            is_app_clip,
+            is_manual,
+        } = args;
         // Deactivate existing upload, if any
         // TODO this kind of silently replaces an old image, but maybe we don't want to allow this...
         // only allow re-uploading an image if the last image explicitly failed.
@@ -78,6 +105,9 @@ impl DocumentUpload {
             created_at: Utc::now(),
             created_seqno,
             failure_reasons: vec![],
+            is_instant_app,
+            is_app_clip,
+            is_manual,
         };
         let result = diesel::insert_into(document_upload::table)
             .values(new)

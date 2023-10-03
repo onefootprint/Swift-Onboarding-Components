@@ -1,11 +1,17 @@
 use chrono::Utc;
 use db::{
     models::{
-        data_lifetime::DataLifetime, decision_intent::DecisionIntent, document_request::DocumentRequest,
-        document_upload::DocumentUpload, identity_document::IdentityDocument,
+        data_lifetime::DataLifetime,
+        decision_intent::DecisionIntent,
+        document_request::DocumentRequest,
+        document_upload::{DocumentUpload, NewDocumentUploadArgs},
+        identity_document::IdentityDocument,
         incode_verification_session::IncodeVerificationSession,
-        incode_verification_session_event::IncodeVerificationSessionEvent, insight_event::InsightEvent,
-        risk_signal::RiskSignal, user_consent::UserConsent, verification_request::VerificationRequest,
+        incode_verification_session_event::IncodeVerificationSessionEvent,
+        insight_event::InsightEvent,
+        risk_signal::RiskSignal,
+        user_consent::UserConsent,
+        verification_request::VerificationRequest,
     },
     test_helpers::assert_have_same_elements,
     tests::fixtures::ob_configuration::ObConfigurationOpts,
@@ -398,16 +404,28 @@ async fn test_fail(state: &State, is_selfie: bool) {
             let s3_url = S3Url::test_data("".into());
             let key = SealedVaultDataKey(vec![]);
             let seqno = DataLifetime::get_next_seqno(conn)?;
-            DocumentUpload::create(
-                conn,
-                doc.id.clone(),
-                DocumentSide::Front,
-                s3_url.clone(),
-                key.clone(),
-                seqno,
-            )
-            .unwrap();
-            DocumentUpload::create(conn, doc.id, DocumentSide::Back, s3_url, key, seqno).unwrap();
+            let front_args = NewDocumentUploadArgs {
+                document_id: doc.id.clone(),
+                side: DocumentSide::Front,
+                s3_url: s3_url.clone(),
+                e_data_key: key.clone(),
+                created_seqno: seqno,
+                is_instant_app: None,
+                is_app_clip: None,
+                is_manual: None,
+            };
+            let back_args = NewDocumentUploadArgs {
+                document_id: doc.id,
+                side: DocumentSide::Front,
+                s3_url,
+                e_data_key: key,
+                created_seqno: seqno,
+                is_instant_app: None,
+                is_app_clip: None,
+                is_manual: None,
+            };
+            DocumentUpload::create(conn, front_args).unwrap();
+            DocumentUpload::create(conn, back_args).unwrap();
 
             Ok(())
         })

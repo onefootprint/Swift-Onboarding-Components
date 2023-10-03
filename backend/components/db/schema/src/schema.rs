@@ -229,6 +229,9 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         created_seqno -> Int8,
         failure_reasons -> Array<Text>,
+        is_instant_app -> Nullable<Bool>,
+        is_app_clip -> Nullable<Bool>,
+        is_manual -> Nullable<Bool>,
     }
 }
 

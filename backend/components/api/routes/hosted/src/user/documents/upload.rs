@@ -20,7 +20,7 @@ use api_core::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VwArgs}
 use api_wire_types::{CreateIdentityDocumentUploadRequest, DocumentImageError, DocumentResponse};
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
-use db::models::document_upload::DocumentUpload;
+use db::models::document_upload::{DocumentUpload, NewDocumentUploadArgs};
 use db::models::identity_document::IdentityDocument;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::user_consent::UserConsent;
@@ -59,6 +59,8 @@ pub async fn post(
         image,
         side,
         mime_type,
+        // TODO vault the barcode
+        meta,
     } = request.0;
     tracing::info!("After unpacking request");
 
@@ -114,7 +116,17 @@ pub async fn post(
             let source = DataLifetimeSource::Hosted;
             let (d, seqno) =
                 uvw.put_document_unsafe(conn, di, mime_type, file.filename, e_data_key, s3_url, source)?;
-            DocumentUpload::create(conn, id_doc.id.clone(), side, d.s3_url, d.e_data_key, seqno)?;
+            let args = NewDocumentUploadArgs {
+                document_id: id_doc.id.clone(),
+                side,
+                s3_url: d.s3_url,
+                e_data_key: d.e_data_key,
+                created_seqno: seqno,
+                is_instant_app: meta.as_ref().and_then(|m| m.is_instant_app),
+                is_app_clip: meta.as_ref().and_then(|m| m.is_app_clip),
+                is_manual: meta.as_ref().and_then(|m| m.manual),
+            };
+            DocumentUpload::create(conn, args)?;
             let existing_sides = id_doc
                 .images(conn, true)?
                 .into_iter()
