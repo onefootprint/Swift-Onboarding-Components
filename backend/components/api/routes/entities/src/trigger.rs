@@ -231,11 +231,17 @@ impl<'a> From<TriggerMessage> for SmsMessage<'a> {
 
 impl<'a> From<TriggerMessage> for EmailMessage<'a> {
     fn from(value: TriggerMessage) -> Self {
-        // TODO: later we'll have a real sendgrid template here and need more fields
+        let TriggerMessage {
+            org_name, note, link, ..
+        } = value;
         let template_data = HashMap::from_iter(
-            vec![Some(("message_body".to_string(), value.message_body()))]
-                .into_iter()
-                .flatten(),
+            vec![
+                Some(("org_name".to_string(), PiiString::from(org_name))),
+                note.map(|n| ("note".to_string(), PiiString::from(n))),
+                Some(("link".to_string(), link)),
+            ]
+            .into_iter()
+            .flatten(),
         );
 
         EmailMessage {

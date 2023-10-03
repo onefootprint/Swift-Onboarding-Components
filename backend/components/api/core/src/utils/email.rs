@@ -78,7 +78,7 @@ impl SendgridClient {
     const EMAIL_VERIFY_TEMPLATE_ID: &str = "d-c558e640dad04726a31e6710c7ffc57c";
     const MAGIC_LINK_TEMPLATE_ID: &str = "d-a631e0eb72984e28a39940aa8f3bbe60";
     const KYC_BUSINESS_OWNER_TEMPLATE_ID: &str = "d-104270bd3b7c4c62a6ed95e295c7822b";
-    pub const TRIGGER_TEMPLATE_ID: &str = "d-93e21bd5b4a54aa187755f23fefa9fb7";
+    pub const TRIGGER_TEMPLATE_ID: &str = "d-d1319538747c4a86a9ad28ff35767896";
     const OTP_VERIFY_TEMPLATE_ID: &str = "d-d4707e4a976449e1af1753de5f05289d";
 
     const FROM_EMAIL: &str = "noreply@noreply.onefootprint.com";
