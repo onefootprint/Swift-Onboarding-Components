@@ -9,15 +9,14 @@ use crate::State;
 use api_core::auth::session::ob_config::OnboardingSession;
 use api_core::auth::tenant::TenantGuard;
 use db::models::ob_configuration::ObConfiguration;
-use newtypes::ObConfigurationId;
+use newtypes::ObConfigurationKey;
 use newtypes::SessionAuthToken;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateOnboardingSessionRequest {
-    // TODO this should be a key
-    pub onboarding_config_id: ObConfigurationId,
+    pub key: ObConfigurationKey,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -43,8 +42,7 @@ pub async fn post(
     let (ob_config, tenant) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let result =
-                ObConfiguration::get_enabled(conn, (&request.onboarding_config_id, &tenant.id, is_live))?;
+            let result = ObConfiguration::get_enabled(conn, (&request.key, &tenant.id, is_live))?;
             Ok(result)
         })
         .await?;

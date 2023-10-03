@@ -31,6 +31,7 @@ const DefaultFieldValues: Record<string, string> = {
   session_token: 'tok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH',
   validation_token: 'tok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH',
   onboarding_config_key: 'ob_live_fZvYlX3JpanlQ3MAwE45g0',
+  key: 'ob_live_fZvYlX3JpanlQ3MAwE45g0',
   fp_id: 'fp_id_7p793EF07xKXHqAeg5VGPj',
   fp_user_id: 'fp_id_7p793EF07xKXHqAeg5VGPj',
   ip_address: '192.168.1.1',

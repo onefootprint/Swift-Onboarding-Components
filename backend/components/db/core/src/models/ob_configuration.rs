@@ -284,6 +284,11 @@ pub enum ObConfigIdentifier<'a> {
         tenant_id: &'a TenantId,
         is_live: bool,
     },
+    TenantKey {
+        key: &'a ObConfigurationKey,
+        tenant_id: &'a TenantId,
+        is_live: bool,
+    },
     Workflow(&'a WorkflowId),
 }
 
@@ -303,6 +308,16 @@ impl<'a> From<(&'a ObConfigurationId, &'a TenantId, bool)> for ObConfigIdentifie
     fn from((id, tenant_id, is_live): (&'a ObConfigurationId, &'a TenantId, bool)) -> Self {
         Self::Tenant {
             id,
+            tenant_id,
+            is_live,
+        }
+    }
+}
+
+impl<'a> From<(&'a ObConfigurationKey, &'a TenantId, bool)> for ObConfigIdentifier<'a> {
+    fn from((key, tenant_id, is_live): (&'a ObConfigurationKey, &'a TenantId, bool)) -> Self {
+        Self::TenantKey {
+            key,
             tenant_id,
             is_live,
         }
@@ -388,6 +403,16 @@ impl ObConfiguration {
             } => {
                 query = query
                     .filter(ob_configuration::id.eq(id))
+                    .filter(ob_configuration::tenant_id.eq(tenant_id))
+                    .filter(ob_configuration::is_live.eq(is_live))
+            }
+            ObConfigIdentifier::TenantKey {
+                key,
+                tenant_id,
+                is_live,
+            } => {
+                query = query
+                    .filter(ob_configuration::key.eq(key))
                     .filter(ob_configuration::tenant_id.eq(tenant_id))
                     .filter(ob_configuration::is_live.eq(is_live))
             }
