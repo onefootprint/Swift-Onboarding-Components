@@ -950,7 +950,8 @@
             "error": "You need to select an option before requesting more information from a user."
           },
           "success-toast": {
-            "description": "User will receive an SMS detailing the next steps shortly",
+            "description-phone": "User will receive an SMS detailing the next steps shortly",
+            "description-email": "User will receive an email detailing the next steps shortly",
             "title": "Request sent"
           }
         },

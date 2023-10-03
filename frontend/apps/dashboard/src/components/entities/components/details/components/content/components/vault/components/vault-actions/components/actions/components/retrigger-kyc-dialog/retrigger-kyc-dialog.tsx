@@ -1,8 +1,9 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { TriggerKind } from '@onefootprint/types';
+import { IdDI, TriggerKind } from '@onefootprint/types';
 import { Dialog, useToast } from '@onefootprint/ui';
 import React from 'react';
 
+import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
 import useRetriggerKYC from '../hooks/use-retrigger-kyc';
@@ -20,6 +21,9 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
   const showRequestErrorToast = useRequestErrorToast();
   const toast = useToast();
   const entityId = useEntityId();
+  const userHasPhone = useEntity(entityId).data?.attributes?.includes(
+    IdDI.phoneNumber,
+  );
 
   const handleSubmit = (data: RetriggerKYCFormData) => {
     const { kind, collectSelfie, note } = data;
@@ -40,7 +44,9 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
       {
         onSuccess: () => {
           toast.show({
-            description: t('success-toast.description'),
+            description: userHasPhone
+              ? t('success-toast.description-phone')
+              : t('success-toast.description-email'),
             title: t('success-toast.title'),
             variant: 'default',
           });

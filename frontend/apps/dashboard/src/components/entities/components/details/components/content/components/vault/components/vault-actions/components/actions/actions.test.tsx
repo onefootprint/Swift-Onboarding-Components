@@ -10,7 +10,9 @@ import React from 'react';
 
 import Actions from './actions';
 import {
-  entityFixture,
+  entityId,
+  entityWithoutPhoneFixture,
+  entityWithPhoneFixture,
   withEntity,
   withTrigger,
   withTriggerError,
@@ -18,17 +20,20 @@ import {
 
 const useRouterSpy = createUseRouterSpy();
 
-const renderActions = async () =>
-  customRender(<Actions entity={entityFixture} />);
+const renderActions = async (isNoPhone?: boolean) =>
+  customRender(
+    <Actions
+      entity={isNoPhone ? entityWithoutPhoneFixture : entityWithPhoneFixture}
+    />,
+  );
 
 describe('<Actions />', () => {
   beforeEach(() => {
-    withEntity(entityFixture.id);
     useRouterSpy({
-      asPath: `/entities/${entityFixture.id}&mode=sandbox`,
+      asPath: `/entities/${entityId}&mode=sandbox`,
       pathname: '/users/[id]',
       query: {
-        id: entityFixture.id,
+        id: entityId,
       },
     });
   });
@@ -36,52 +41,116 @@ describe('<Actions />', () => {
   describe('when retriggering a KYC', () => {
     describe('when the request to trigger request succeeds', () => {
       beforeEach(() => {
-        withTrigger(entityFixture.id);
+        withTrigger();
       });
 
-      it('should close the dialog and show a confirmation message', async () => {
-        renderActions();
-
-        const button = screen.getByRole('button', {
-          name: 'Open actions',
+      describe('when user does not have phone', () => {
+        beforeEach(() => {
+          withEntity(entityWithoutPhoneFixture);
         });
-        await userEvent.click(button);
 
-        const dropdownItem = screen.getByText('Request more information');
-        await userEvent.click(dropdownItem);
+        it('should close the dialog and show a confirmation message for email sent', async () => {
+          renderActions(true);
 
-        const dialog = screen.getByRole('dialog', {
-          name: 'Request more information',
+          const button = screen.getByRole('button', {
+            name: 'Open actions',
+          });
+          await userEvent.click(button);
+
+          const dropdownItem = screen.getByText('Request more information');
+          await userEvent.click(dropdownItem);
+
+          const dialog = screen.getByRole('dialog', {
+            name: 'Request more information',
+          });
+          const reuploadPhotoRadio = screen.getByRole('radio', {
+            name: 'Re-upload ID photo',
+          });
+          await userEvent.click(reuploadPhotoRadio);
+
+          const noteTextArea = screen.getByRole('textbox', {
+            name: 'Note for user (optional)',
+          });
+          await userEvent.type(noteTextArea, 'Lorem ipsum');
+
+          expect(
+            screen.getByText(
+              "We'll send an email with a link with your request to the user's email address on file.",
+            ),
+          ).toBeInTheDocument();
+
+          const submitButton = screen.getByRole('button', {
+            name: 'Send request',
+          });
+          await userEvent.click(submitButton);
+
+          await waitForElementToBeRemoved(dialog);
+
+          await waitFor(() => {
+            const successConfirmation = screen.getByText(
+              'User will receive an email detailing the next steps shortly',
+            );
+            expect(successConfirmation).toBeInTheDocument();
+          });
         });
-        const reuploadPhotoRadio = screen.getByRole('radio', {
-          name: 'Re-upload ID photo',
+      });
+
+      describe('when user has phone', () => {
+        beforeEach(() => {
+          withEntity(entityWithPhoneFixture);
         });
-        await userEvent.click(reuploadPhotoRadio);
 
-        const noteTextArea = screen.getByRole('textbox', {
-          name: 'Note for user (optional)',
-        });
-        await userEvent.type(noteTextArea, 'Lorem ipsum');
+        it('should close the dialog and show a confirmation message for SMS sent', async () => {
+          renderActions();
 
-        const submitButton = screen.getByRole('button', {
-          name: 'Send request',
-        });
-        await userEvent.click(submitButton);
+          const button = screen.getByRole('button', {
+            name: 'Open actions',
+          });
+          await userEvent.click(button);
 
-        await waitForElementToBeRemoved(dialog);
+          const dropdownItem = screen.getByText('Request more information');
+          await userEvent.click(dropdownItem);
 
-        await waitFor(() => {
-          const successConfirmation = screen.getByText(
-            'User will receive an SMS detailing the next steps shortly',
-          );
-          expect(successConfirmation).toBeInTheDocument();
+          const dialog = screen.getByRole('dialog', {
+            name: 'Request more information',
+          });
+          const reuploadPhotoRadio = screen.getByRole('radio', {
+            name: 'Re-upload ID photo',
+          });
+          await userEvent.click(reuploadPhotoRadio);
+
+          const noteTextArea = screen.getByRole('textbox', {
+            name: 'Note for user (optional)',
+          });
+          await userEvent.type(noteTextArea, 'Lorem ipsum');
+
+          expect(
+            screen.getByText(
+              "We'll send an SMS with a link with your request to the user's phone number on file.",
+            ),
+          ).toBeInTheDocument();
+
+          const submitButton = screen.getByRole('button', {
+            name: 'Send request',
+          });
+          await userEvent.click(submitButton);
+
+          await waitForElementToBeRemoved(dialog);
+
+          await waitFor(() => {
+            const successConfirmation = screen.getByText(
+              'User will receive an SMS detailing the next steps shortly',
+            );
+            expect(successConfirmation).toBeInTheDocument();
+          });
         });
       });
     });
 
     describe('when the request to trigger request fails', () => {
       beforeEach(() => {
-        withTriggerError(entityFixture.id);
+        withEntity(entityWithPhoneFixture);
+        withTriggerError();
       });
 
       it('should show an error message', async () => {
