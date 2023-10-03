@@ -50,10 +50,10 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
     let challenge_data: ApiResult<UserChallengeData> = match request.into_inner() {
         SignupChallengeRequest::Phone(req) => {
-            let tenant_name = ob_context.as_ref().map(|obc| obc.tenant().name.clone());
+            let tenant = ob_context.as_ref().map(|obc| obc.tenant());
             let (challenge_state_data, time_before_retry_s) = state
                 .sms_client
-                .send_challenge_non_blocking(&state, tenant_name, &req.phone_number, sandbox_id.0)
+                .send_challenge_non_blocking(&state, tenant, &req.phone_number, sandbox_id.0)
                 .await?;
 
             let challenge_state = ChallengeState {

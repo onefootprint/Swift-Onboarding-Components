@@ -108,9 +108,8 @@ pub async fn post(
             }
             ChallengeKind::Sms => {
                 let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
-                let tenant_name = tenant.map(|t| t.name.clone());
                 let (challenge_state, time_before_retry_s) = twilio_client
-                    .send_challenge_non_blocking(&state, tenant_name, &phone_number, sandbox_id)
+                    .send_challenge_non_blocking(&state, tenant, &phone_number, sandbox_id)
                     .await?;
                 let challenge_data = ChallengeData::Sms(challenge_state);
                 (

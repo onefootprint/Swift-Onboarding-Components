@@ -6,6 +6,7 @@ use crate::{
 };
 use chrono::{Duration, Utc};
 use crypto::sha256;
+use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use newtypes::SandboxId;
 use newtypes::{PhoneNumber, PiiString};
@@ -167,7 +168,7 @@ impl SmsClient {
     pub async fn send_challenge_non_blocking(
         &self,
         state: &State,
-        tenant_name: Option<String>,
+        tenant: Option<&Tenant>,
         destination: &PhoneNumber,
         sandbox_id: Option<SandboxId>,
     ) -> ApiResult<(PhoneChallengeState, SecondsBeforeRetry)> {
@@ -183,10 +184,20 @@ impl SmsClient {
         } else {
             crypto::random::gen_rand_n_digit_code(6)
         };
-        let message_body = if let Some(tenant_name) = tenant_name {
-            PiiString::from(format!("Your verification code for {} is: {}. Don't share your code with anyone, we will never contact you to request this code.", tenant_name, &code))
+        let message_body = if let Some(tenant) = tenant {
+            if tenant.id.is_integration_test_tenant() {
+                // Twilio seems to have blocked the below copy from being received by its own numbers...
+                // So for integration tests, we use a slightly different copy to get past twilio's
+                // blocking.
+                PiiString::from(format!("Your integration testing verification code for {} is {}. Don't share your code with anyone, we will never contact you to request this code.", tenant.name, &code))
+            } else {
+                // Sadly, safari's auto-fill OTP code feature is pretty sensitive to copy.
+                // Check it works if you change this copy
+                PiiString::from(format!("Your {} verification code is {}. Don't share your code with anyone, we will never contact you to request this code.", tenant.name, &code))
+            }
         } else {
-            PiiString::from(format!("Your verification code for Footprint is: {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
+            // This copy likely won't work for safari's autofill, but the other one is being blocked by twilio
+            PiiString::from(format!("Your verification code for Footprint is {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
         };
 
         self.send_message_non_blocking(state, message_body, destination, rate_limit::SMS_CHALLENGE)

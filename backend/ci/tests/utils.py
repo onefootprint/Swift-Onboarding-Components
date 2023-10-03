@@ -400,8 +400,7 @@ def identify_verify(
         if last_error:
             raise last_error
         else:
-            bodies = ([i.body for i in messages],)
-            raise Exception(f"SMS 2fac code is not present. {phone_number}", bodies)
+            raise Exception(f"SMS 2fac code is not present", [i.body for i in messages])
 
     return try_until_success(inner, 60)
 
