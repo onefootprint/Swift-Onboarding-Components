@@ -1,0 +1,12 @@
+{
+  "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  "moderate": false,
+  "high": true,
+  "report-type": "summary",
+  "package-manager": "yarn",
+  "allowlist": [
+    "GHSA-r683-j2x4-v87g|@onefootprint/idv-elements>face-api.js>@tensorflow/tfjs-core>node-fetch",
+    "GHSA-r683-j2x4-v87g|@onefootprint/idv>@onefootprint/idv-elements>face-api.js>@tensorflow/tfjs-core>node-fetch",
+    "GHSA-r683-j2x4-v87g|bifrost>@onefootprint/idv>@onefootprint/idv-elements>face-api.js>@tensorflow/tfjs-core>node-fetch"
+  ]
+}

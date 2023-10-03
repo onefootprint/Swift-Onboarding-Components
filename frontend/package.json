@@ -45,6 +45,9 @@
     "turbo": "^1.10.14",
     "webpack": "^5.76.0"
   },
+  "resolutions": {
+    "@onefootprint/e2e/jimp/@jimp/plugins/@jimp/plugin-print/load-bmfont/parse-bmfont-xml/xml2js": "0.6.0"
+  },
   "lint-staged": {
     "*.{jsx,js,ts,tsx}": [
       "yarn format:fix"

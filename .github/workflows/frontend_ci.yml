@@ -21,6 +21,9 @@ env:
 
 jobs:
   install-dependencies:
+    strategy:
+      matrix:
+        node-version: [18.x]
     runs-on: frontend_runner
     steps:
       - uses: actions/checkout@v3
@@ -42,6 +45,9 @@ jobs:
         run: yarn install --frozen-lockfile
 
   lint:
+    strategy:
+      matrix:
+        node-version: [18.x]
     runs-on: frontend_runner
     needs: install-dependencies
     steps:
@@ -49,7 +55,6 @@ jobs:
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
-
 
       - name: Restore yarn dependencies
         uses: actions/cache@v3
@@ -64,6 +69,9 @@ jobs:
         run: yarn lint:ci
 
   format:
+    strategy:
+      matrix:
+        node-version: [18.x]
     runs-on: frontend_runner
     needs: install-dependencies
     steps:
@@ -84,6 +92,9 @@ jobs:
         run: yarn format
 
   test:
+    strategy:
+      matrix:
+        node-version: [18.x]
     runs-on: frontend_runner
     needs: install-dependencies
     steps:
@@ -104,6 +115,9 @@ jobs:
         run: yarn test:ci
 
   typecheck:
+    strategy:
+      matrix:
+        node-version: [18.x]
     runs-on: frontend_runner
     needs: install-dependencies
     steps:
