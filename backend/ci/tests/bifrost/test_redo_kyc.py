@@ -15,13 +15,14 @@ def extract_trigger_sms(twilio, phone_number, id):
     def inner():
         real_phone_number = phone_number.split("#")[0]
         messages = twilio.messages.list(to=real_phone_number, limit=10)
+        print(f"Searching for message with id {id}")
         message = next(
             m for m in messages if f"{id}\n\nRe-verify your identity for" in m.body
         )
         token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
         return token
 
-    return try_until_success(inner, 5)
+    return try_until_success(inner, 15)
 
 
 @pytest.mark.parametrize("with_document", [True, False])
