@@ -7,21 +7,21 @@
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
     "postinstall": "npx playwright install",
-    "test:e2e": "E2E_BASE_URL=http://localhost:3002 IS_E2E=true npx playwright test --ui",
-    "test:e2e:ci": "npx playwright test --workers=1",
+    "test:e2e": "npx playwright test --ui",
+    "test:e2e:ci": "npx playwright test",
+    "test:e2e:debug": "E2E_BASE_URL=https://demos-dx3dtxvb8.preview.onefootprint.com IS_E2E=true CI=true npx playwright test --debug -g \"KYB\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@playwright/test": "^1.36.0",
+    "@playwright/test": "^1.38.1",
     "dotenv": "^16.3.1",
     "jimp": "^0.22.8",
     "qrcode-reader": "^1.0.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.38.0",
     "@types/node": "^20.4.4",
     "eslint-config-footprint": "*",
     "typescript": "4.9.5"

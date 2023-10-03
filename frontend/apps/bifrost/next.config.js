@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
+const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
 
 const ContentSecurityPolicy = `
   child-src 'self' blob: onefootprint.com;
@@ -80,6 +81,10 @@ const nextConfig = {
     IS_E2E: process.env.IS_E2E,
   },
 };
+
+if (IS_OUTPUT_STANDALONE) {
+  nextConfig.output = 'standalone';
+}
 
 module.exports = IS_ANALYZE_ACTIVE
   ? require('@next/bundle-analyzer')({ enabled: true })(nextConfig)

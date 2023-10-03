@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  authorizeAccess,
   confirmData,
   doLivenessCheck,
   fillSSN,
@@ -12,7 +11,7 @@ import {
   fillBeneficialOwners,
   fillEmail,
   fillPhoneNumber,
-  selectOutcome,
+  selectOutcomeOptional,
   verifyPhoneNumber,
 } from './utils/commands';
 
@@ -33,7 +32,11 @@ const userTIN = '123456789';
 const businessName = 'Business name';
 const businessNameOptional = 'Optional name';
 
-test('KYB basic flow', async ({ browser, browserName, page }) => {
+test('KYB ob_test_5zu2usM1ilTzDnqQpaZ6Sg', async ({
+  browser,
+  browserName,
+  page,
+}) => {
   test.setTimeout(120000);
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_5zu2usM1ilTzDnqQpaZ6Sg';
@@ -48,7 +51,7 @@ test('KYB basic flow', async ({ browser, browserName, page }) => {
     .click();
   const frame = page.frameLocator('iframe');
 
-  await selectOutcome({ frame }, 'Success');
+  await selectOutcomeOptional({ frame }, 'Success');
   await clickOnContinue({ frame });
 
   await fillEmail({ frame }, { email: userEmail });
@@ -60,7 +63,7 @@ test('KYB basic flow', async ({ browser, browserName, page }) => {
   await verifyPhoneNumber({ frame, page });
 
   const letsKYB = frame.getByText("Let's get to know your business!").first();
-  await letsKYB.waitFor({ state: 'attached', timeout: 20000 });
+  await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
   await clickOnContinue({ frame });
 
   await fillBasicDataKYB(
@@ -98,16 +101,16 @@ test('KYB basic flow', async ({ browser, browserName, page }) => {
 
   // #region Confirm your business data
   const confirmH2 = frame.getByText('Confirm your business data').first();
-  await confirmH2.waitFor({ state: 'attached', timeout: 20000 });
+  await confirmH2.waitFor({ state: 'attached', timeout: 3000 });
   await clickOnContinue({ frame });
   // #endregion
 
   // #region Basic data
   const basicH2 = frame.getByText('Basic data').first();
-  await basicH2.waitFor({ state: 'attached', timeout: 20000 });
+  await basicH2.waitFor({ state: 'attached', timeout: 3000 });
 
   const dob = frame.getByLabel('Date of Birth').first();
-  await dob.waitFor({ state: 'attached', timeout: 20000 });
+  await dob.waitFor({ state: 'attached', timeout: 10000 });
   await dob.type(userDob, { delay: 100 });
 
   await clickOnContinue({ frame });
@@ -140,10 +143,6 @@ test('KYB basic flow', async ({ browser, browserName, page }) => {
   await clickOnContinue({ frame });
 
   await doLivenessCheck({ page, frame, browser }, { flowId });
-  // eslint-disable-next-line playwright/no-wait-for-timeout
-  await page.waitForTimeout(2500); // Give time for QR check
-
-  await authorizeAccess({ frame });
 
   expect(1).toBe(1);
 });

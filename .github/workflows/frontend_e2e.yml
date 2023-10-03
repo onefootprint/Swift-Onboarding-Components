@@ -3,111 +3,127 @@ name: Frontend E2E
 on:
   pull_request:
     paths:
-      - '.github/workflows/frontend_e2e.yml'
       - 'frontend/apps/bifrost/**'
+      - 'frontend/apps/demos/**'
       - 'frontend/apps/handoff/**'
       - 'frontend/packages/**'
+      - '.github/workflows/frontend_e2e.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 env:
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   CI: true
   IS_E2E: true
-  API_BASE_URL: https://api.dev.onefootprint.com
   E2E_BASE_URL: http://localhost:3002
-  GHOST_API_URL: 'https://footprint-blog.ghost.io' # Required by demos project
-  GHOST_CONTENT_API_KEY: ${{ secrets.GHOST_CONTENT_API_KEY }} # Required by demos project
-  NEXT_PUBLIC_API_BASE_URL: https://api.dev.onefootprint.com
-  NEXT_PUBLIC_E2E_TENANT_PK: ob_test_Gw8TsnS2xWOYazI0pugdxu
-  NEXT_PUBLIC_GOOGLE_MAPS_KEY: AIzaSyCgSmhug-DYfU5ozUNCyTfKyVX3VvPTSUs
-  REVALIDATE_SECRET_TOKEN: ECgdRpW1ZO54LORCul3r
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_TEAM_ID: 'footprint'
+  VERCEL_PROJECT_ID_DEMOS: 'prj_LBgEpZnmdIAi10IeHtVD0RKTbQmW'
+  VERCEL_PROJECT_ID_HANDOFF: 'prj_UWCk5C2ed14AnfXDfkF9H5YQHRic'
+  VERCEL_PROJECT_ID_BIFROST: 'prj_SZgnz3EnBvwxaY7sH7LPew7KaEPG'
+  VERCEL_AWAIT_TIMEOUT_SEC: 240
+  VERCEL_AWAIT_POLL_INTERVAL_SEC: 5
 
 jobs:
-  install-dependencies:
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'e2e-on') }}
-    name: 'Install dependencies'
-    runs-on: frontend_runner
-    steps:
-      - name: Checkout the project depth 0
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Install + Cache for frontend/node_modules
-        uses: ./.github/actions/install_npm_dependencies
-        with:
-          node-version: 18
-
-  build-apps:
-    name: Build bifrost, handoff, demos with cache
-    runs-on: frontend_runner
-    needs: install-dependencies
-    steps:
-      - name: Checkout the project depth 0
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Install + Cache for bifrost, handoff, demos
-        uses: ./.github/actions/build_e2e_apps
-        with:
-          node-version: 18
-
   e2e:
     name: 'End-to-End test'
+    runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: build-apps
-    runs-on: frontend_runner
     steps:
-      - name: Checkout the project
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup node
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
-        with:
-          node-version: 18
 
-      - name: Fetching "frontend/node_modules"
+      - name: Restore node modules cache
         uses: actions/cache@v3
         id: cache-dependencies
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           path: frontend/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+      - name: Install node_modules if not cached
+        working-directory: ./frontend
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
 
-      - name: Fetching "bifrost,handoff,demos" apps
-        uses: actions/cache@v3
-        id: cache-build-bhd
-        with:
-          key: ${{ runner.os }}-e2e-apps-${{ hashFiles('**/yarn.lock') }}
-          path: |
-            frontend/apps/bifrost/.next
-            frontend/apps/handoff/.next
-            frontend/apps/demos/.next
-            frontend/packages/e2e
-          restore-keys: |
-            ${{ runner.os }}-e2e-apps-
-
-      - name: Install Playwright Browsers
+      - name: Install Playwright dependencies [chromium]
         working-directory: ./frontend
         run: npx playwright install --with-deps chromium
 
-      - name: Run apps locally, using production mode
-        working-directory: ./frontend
-        run: yarn start --filter=bifrost --filter=handoff --filter=demos &
+      - name: Get Vercel bifrost preview_url
+        uses: zentered/vercel-preview-url@v1.1.9
+        id: vercel_bifrost_url
+        with:
+          vercel_team_id: ${{ env.VERCEL_TEAM_ID }}
+          vercel_project_id: ${{ env.VERCEL_PROJECT_ID_BIFROST }}
 
+      - name: Get Vercel handoff preview_url
+        uses: zentered/vercel-preview-url@v1.1.9
+        id: vercel_handoff_url
+        with:
+          vercel_team_id: ${{ env.VERCEL_TEAM_ID }}
+          vercel_project_id: ${{ env.VERCEL_PROJECT_ID_HANDOFF }}
+
+      - name: Get Vercel demos preview_url
+        uses: zentered/vercel-preview-url@v1.1.9
+        id: vercel_demos_url
+        with:
+          vercel_team_id: ${{ env.VERCEL_TEAM_ID }}
+          vercel_project_id: ${{ env.VERCEL_PROJECT_ID_DEMOS }}
+
+      - name: Wait for bifrost preview_url to be ready
+        uses: UnlyEd/github-action-await-vercel@v1
+        id: await-vercel-bifrost
+        if: steps.vercel_bifrost_url.outputs.deployment_state != 'CANCELED'
+        continue-on-error: true
+        with:
+          deployment-url: ${{ steps.vercel_bifrost_url.outputs.preview_url }}
+          timeout: ${{ env.VERCEL_AWAIT_TIMEOUT_SEC }}
+          poll-interval: ${{ env.VERCEL_AWAIT_POLL_INTERVAL_SEC }}
+
+      - name: Wait for handoff preview_url to be ready
+        uses: UnlyEd/github-action-await-vercel@v1
+        id: await-vercel-handoff
+        if: steps.vercel_handoff_url.outputs.deployment_state != 'CANCELED'
+        continue-on-error: true
+        with:
+          deployment-url: ${{ steps.vercel_handoff_url.outputs.preview_url }}
+          timeout: ${{ env.VERCEL_AWAIT_TIMEOUT_SEC }}
+          poll-interval: ${{ env.VERCEL_AWAIT_POLL_INTERVAL_SEC }}
+
+      - name: Wait for demos preview_url to be ready
+        uses: UnlyEd/github-action-await-vercel@v1
+        id: await-vercel-demos
+        if: steps.vercel_demos_url.outputs.deployment_state != 'CANCELED'
+        continue-on-error: true
+        with:
+          deployment-url: ${{ steps.vercel_demos_url.outputs.preview_url }}
+          timeout: ${{ env.VERCEL_AWAIT_TIMEOUT_SEC }}
+          poll-interval: ${{ env.VERCEL_AWAIT_POLL_INTERVAL_SEC }}
+
+      - name: Set E2E_BASE_URL
+        run: |
+          if [[ "${{ steps.vercel_demos_url.outputs.deployment_state }}" == "CANCELED" ]]; then
+            branch_name="${{ github.head_ref }}"
+            branch_name="${branch_name//\//-}"
+            export E2E_BASE_URL="https://demos-git-${branch_name}.preview.onefootprint.com"
+          else
+            export E2E_BASE_URL="https://${{ steps.vercel_demos_url.outputs.preview_url }}"
+          fi
+          echo "E2E_BASE_URL=${E2E_BASE_URL}" >> $GITHUB_ENV
+
+      - run: sleep 10
       - name: Run Playwright tests
         working-directory: ./frontend
-        run: yarn test:e2e:ci
-
-      - name: Stop web servers
-        working-directory: ./frontend
-        run: npx kill-port 3000 3002 3005
+        env:
+          E2E_BASE_URL: ${{ env.E2E_BASE_URL }}
+        run: yarn workspace @onefootprint/e2e test:e2e:ci
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

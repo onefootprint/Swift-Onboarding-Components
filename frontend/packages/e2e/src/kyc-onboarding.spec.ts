@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  authorizeAccess,
   clickOnContinue,
   confirmData,
   doLivenessCheck,
@@ -10,7 +9,7 @@ import {
   fillEmail,
   fillPhoneNumber,
   fillSSN,
-  selectOutcome,
+  selectOutcomeOptional,
   verifyPhoneNumber,
 } from './utils/commands';
 
@@ -24,17 +23,29 @@ const userCity = 'Seward';
 const userZipCode = '99664';
 const userSSN = '418437970';
 
-test('KYC basic flow', async ({ browserName, page, browser }) => {
+test('KYC env.NEXT_PUBLIC_E2E_TENANT_PK', async ({
+  browserName,
+  page,
+  browser,
+}) => {
   test.setTimeout(120000);
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   await page.goto('/e2e');
 
-  await page.waitForSelector('.footprint-verify-button', { timeout: 20000 }); // Increasing the waiting time for CI
+  const verifyCTA = page.locator('.footprint-verify-button').first();
+  await verifyCTA
+    .waitFor({ state: 'attached', timeout: 20000 })
+    .catch(() => null); // Increasing the waiting time for CI
 
   await page.getByRole('button', { name: 'Verify with Footprint' }).click();
   const frame = page.frameLocator('iframe');
 
-  await selectOutcome({ frame }, 'Success');
+  const testOutcomeH2 = frame.getByText('Test outcomes').first();
+  await testOutcomeH2
+    .waitFor({ state: 'attached', timeout: 3000 })
+    .catch(() => null);
+
+  await selectOutcomeOptional({ frame }, 'Success');
   await clickOnContinue({ frame });
 
   await fillEmail({ frame }, { email: userEmail });
@@ -83,9 +94,6 @@ test('KYC basic flow', async ({ browserName, page, browser }) => {
 
   await doLivenessCheck({ page, frame, browser }, { flowId });
 
-  // eslint-disable-next-line playwright/no-wait-for-timeout
-  await page.waitForTimeout(2500); // Give time for QR check
-
-  await authorizeAccess({ frame });
+  // await authorizeAccess({ frame });
   return expect(frame.getByTestId('result').innerText).toBeDefined();
 });

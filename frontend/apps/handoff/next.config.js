@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 
+const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
+
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
   connect-src 'self' localhost:8000 vitals.vercel-insights.com vercel.live *.ingest.sentry.io *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com 189225732777.collect.observeinc.com maps.googleapis.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com https://*.logrocket.io https://*.lr-ingest.io https://*.logrocket.com https://*.lr-in.com https://*.lr-in-prod.com https://*.lr-ingest.com https://*.lr-ingest.com https://*.ingest-lr.com; 
@@ -82,5 +84,9 @@ const nextConfig = {
     IS_E2E: process.env.IS_E2E,
   },
 };
+
+if (IS_OUTPUT_STANDALONE) {
+  nextConfig.output = 'standalone';
+}
 
 module.exports = nextConfig;
