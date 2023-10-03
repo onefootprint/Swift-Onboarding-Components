@@ -1,5 +1,5 @@
 use crypto::{random::gen_random_alphanumeric_code, sha256};
-pub use derive_more::{Add, Display, Into};
+use derive_more::{Display, Into};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};

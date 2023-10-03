@@ -1,5 +1,5 @@
 use crypto::seal::EciesP256Sha256AesGcmSealed;
-pub use derive_more::{Add, Display, From, Into};
+use derive_more::{From, Into};
 use serde::{Deserialize, Serialize};
 
 use crate::{PiiString, SealedVaultBytes};

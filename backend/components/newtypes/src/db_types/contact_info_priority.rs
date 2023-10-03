@@ -1,4 +1,4 @@
-pub use derive_more::Display;
+use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use strum_macros::{AsRefStr, EnumString};
 

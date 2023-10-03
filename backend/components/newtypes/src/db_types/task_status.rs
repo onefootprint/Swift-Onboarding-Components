@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-pub use derive_more::Display;
+use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;

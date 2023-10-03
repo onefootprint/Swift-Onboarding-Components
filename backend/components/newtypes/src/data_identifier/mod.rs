@@ -36,7 +36,6 @@ use crate::{
     util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, NtResult, PiiJsonValue,
     PiiString, ValidateArgs, VaultKind,
 };
-pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
 use paperclip::v2::models::DataType;

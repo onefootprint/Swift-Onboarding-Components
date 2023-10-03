@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-pub use derive_more::{From, FromStr, Into};
+use derive_more::{From, Into};
 use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize};
 

@@ -5,7 +5,6 @@ use thiserror::Error;
 pub mod client;
 pub mod request;
 pub mod response;
-pub use derive_more::Display;
 
 use self::response::{business::BusinessResponse, MiddeskApiErrorResponse};
 
