@@ -27,44 +27,37 @@ const useDocumentOptions = (
   );
   const options = {
     [SupportedIdDocTypes.driversLicense]: {
-      title: t('options.dl.title'),
-      description: t('options.dl.description'),
+      title: t('options.dl'),
       value: SupportedIdDocTypes.driversLicense,
       IconComponent: IcoCar24,
     },
     [SupportedIdDocTypes.idCard]: {
-      title: t('options.id.title'),
-      description: t('options.id.description'),
+      title: t('options.id'),
       value: SupportedIdDocTypes.idCard,
       IconComponent: IcoIdCard24,
     },
     [SupportedIdDocTypes.passport]: {
-      title: t('options.passport.title'),
-      description: t('options.passport.description'),
+      title: t('options.passport'),
       value: SupportedIdDocTypes.passport,
       IconComponent: IcoPassport24,
     },
     [SupportedIdDocTypes.visa]: {
-      title: t('options.visa.title'),
-      description: t('options.visa.description'),
+      title: t('options.visa'),
       value: SupportedIdDocTypes.visa,
       IconComponent: IcoVisaPassport24,
     },
     [SupportedIdDocTypes.workPermit]: {
-      title: t('options.permit.title'),
-      description: t('options.permit.description'),
+      title: t('options.permit'),
       value: SupportedIdDocTypes.workPermit,
       IconComponent: IcoWork24,
     },
     [SupportedIdDocTypes.residenceDocument]: {
-      title: t('options.residence-document.title'),
-      description: t('options.residence-document.description'),
+      title: t('options.residence-document'),
       value: SupportedIdDocTypes.residenceDocument,
       IconComponent: IcoGreenCard24,
     },
     [SupportedIdDocTypes.voterIdentification]: {
-      title: t('options.voter-identification.title'),
-      description: t('options.voter-identification.description'),
+      title: t('options.voter-identification'),
       value: SupportedIdDocTypes.voterIdentification,
       IconComponent: IcoVoter24,
     },

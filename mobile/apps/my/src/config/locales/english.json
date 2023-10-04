@@ -79,34 +79,13 @@
           "hint": "Only documents issued by {{country}} are accepted"
         },
         "options": {
-          "dl": {
-            "title": "Driver's license",
-            "description": "Front & Back"
-          },
-          "id": {
-            "title": "Identity card",
-            "description": "Front & Back"
-          },
-          "passport": {
-            "title": "Passport",
-            "description": "Photo page"
-          },
-          "residence-document": {
-            "title": "Residence card / Green card",
-            "description": "Front & Back"
-          },
-          "voter-identification": {
-            "title": "Voter Identification",
-            "description": "Front"
-          },
-          "permit": {
-            "title": "Work permit / EAD card",
-            "description": "Front & Back"
-          },
-          "visa": {
-            "title": "Visa",
-            "description": "Photo page"
-          }
+          "dl": "Driver's license",
+          "id": "Identity card",
+          "passport": "Passport",
+          "residence-document": "Residence card / Green card",
+          "voter-identification": "Voter Identification",
+          "permit": "Work permit / EAD card",
+          "visa": "Visa"
         },
         "permissions-dialog": {
           "title": "Allow access to your camera",

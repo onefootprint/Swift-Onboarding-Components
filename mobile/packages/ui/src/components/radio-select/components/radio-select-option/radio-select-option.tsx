@@ -18,7 +18,6 @@ export type RadioSelectOptionProps<T extends StringOrNumber = string> =
 const Option = <T extends StringOrNumber = string>({
   value,
   title,
-  description,
   selected,
   onPress,
   IconComponent,
@@ -40,12 +39,9 @@ const Option = <T extends StringOrNumber = string>({
       <IconContainer selected={selected} active={active}>
         <IconComponent color={selected ? 'quinary' : undefined} />
       </IconContainer>
-      <Box>
+      <Box justifyContent="center">
         <Typography variant="label-2" color={selected ? 'accent' : 'primary'}>
           {title}
-        </Typography>
-        <Typography variant="body-4" color="secondary">
-          {description}
         </Typography>
       </Box>
     </OptionContainer>
@@ -66,7 +62,7 @@ const OptionContainer = styled(Pressable)<{
       border: ${radioSelect.borderWidth} solid ${radioSelect.borderColor};
       flex-direction: row;
       gap: ${theme.spacing[4]};
-      padding: ${theme.spacing[5]};
+      padding: ${theme.spacing[4]};
 
       ${selected &&
       css`
