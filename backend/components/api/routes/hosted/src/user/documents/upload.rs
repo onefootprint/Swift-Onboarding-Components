@@ -273,9 +273,9 @@ pub async fn handle_incode_request(
     };
     let machine = IncodeStateMachine::init(
         state,
-        tenant_id,
+        tenant_id.clone(),
         // TODO: upstream this somewhere based on OBC
-        get_config_id(&state.config, should_collect_selfie, is_sandbox),
+        get_config_id(state, should_collect_selfie, is_sandbox, &tenant_id),
         ctx,
         is_sandbox,
     )

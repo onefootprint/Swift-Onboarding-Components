@@ -62,6 +62,8 @@ pub enum BoolFlag<'a> {
     // This should probably be a StringFlag, but just doing this for now to be easy
     #[strum(to_string = "TwilioIsPreferredSmsVendor")]
     TwilioIsPreferredSmsVendor,
+    #[strum(to_string = "UseIncodeDemoCredentialsInLivemode")]
+    UseIncodeDemoCredentialsInLivemode(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -100,6 +102,7 @@ impl<'a> BoolFlag<'a> {
             Self::EnableIncodeWatchlistCheckInNonProd(k) => Some(k.to_string()),
             Self::TwilioIsPreferredSmsVendor => None,
             Self::DisableSelfieChecking(k) => Some(k.to_string()),
+            Self::UseIncodeDemoCredentialsInLivemode(k) => Some(k.to_string()),
         }
     }
 
@@ -134,6 +137,7 @@ impl<'a> BoolFlag<'a> {
             Self::EnableIncodeWatchlistCheckInNonProd(_) => false,
             Self::TwilioIsPreferredSmsVendor => true,
             Self::DisableSelfieChecking(_) => false,
+            Self::UseIncodeDemoCredentialsInLivemode(_) => false,
         }
     }
 }

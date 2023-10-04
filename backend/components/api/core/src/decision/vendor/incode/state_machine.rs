@@ -93,6 +93,14 @@ impl IncodeStateMachine {
         ctx: IncodeContext,
         is_sandbox: bool,
     ) -> ApiResult<Self> {
+        let use_demo_creds_in_livemode =
+            state
+                .feature_flag_client
+                .flag(feature_flag::BoolFlag::UseIncodeDemoCredentialsInLivemode(
+                    &tenant_id,
+                ));
+        let use_demo_credentials = is_sandbox || use_demo_creds_in_livemode;
+
         // get incode credentials from TVC
         let tenant_vendor_control =
             TenantVendorControl::new(tenant_id, &state.db_pool, &state.config, &state.enclave_client).await?;
@@ -124,7 +132,7 @@ impl IncodeStateMachine {
 
         // Run StartOnboarding immediately - it sets up some data that all other states need
         if matches!(session.state, IncodeVerificationSessionState::StartOnboarding) {
-            let credentials = tenant_vendor_control.incode_credentials(is_sandbox);
+            let credentials = tenant_vendor_control.incode_credentials(use_demo_credentials);
 
             if is_sandbox {
                 tracing::info!(tenant_name=%tenant_vendor_control.tenant_identifier(), sv_id=%ctx.sv_id.clone(), "sandbox incode request");
@@ -147,7 +155,7 @@ impl IncodeStateMachine {
                 id: session.id,
                 kind: session.kind,
                 credentials: IncodeCredentialsWithToken {
-                    credentials: tenant_vendor_control.incode_credentials(is_sandbox),
+                    credentials: tenant_vendor_control.incode_credentials(use_demo_credentials),
                     authentication_token: token.into(),
                 },
                 ignored_failure_reasons: session.ignored_failure_reasons,
@@ -251,8 +259,8 @@ impl IncodeStateMachine {
         let should_collect_selfie = doc_req.should_collect_selfie && !id_doc.should_skip_selfie();
         Self::init(
             state,
-            obc.tenant_id,
-            get_config_id(&state.config, should_collect_selfie, is_sandbox),
+            obc.tenant_id.clone(),
+            get_config_id(state, should_collect_selfie, is_sandbox, &obc.tenant_id),
             ctx,
             is_sandbox,
         )
