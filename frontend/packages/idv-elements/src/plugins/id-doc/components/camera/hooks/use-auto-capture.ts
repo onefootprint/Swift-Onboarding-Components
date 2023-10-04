@@ -41,7 +41,7 @@ type AutoCaptureProps = {
   mediaStream: MediaStream | null;
   outlineWidth: number;
   outlineHeight: number;
-  onCapture: () => void;
+  onComplete: () => void;
   shouldDetect: boolean;
   shouldShowInstructions: boolean;
   onStatusChange: (currStatus: string | undefined) => void;
@@ -54,7 +54,7 @@ const useAutoCapture = ({
   mediaStream,
   outlineWidth,
   outlineHeight,
-  onCapture,
+  onComplete,
   onStatusChange,
   autocaptureKind,
   shouldShowInstructions,
@@ -200,7 +200,7 @@ const useAutoCapture = ({
       async () => {
         if (shouldAutocapture) detectAndCapture();
         if (successCount.current >= REQUIRED_SUCCESSES) {
-          onCapture();
+          onComplete();
           clearInterval(id);
           setIsCaptured(true);
         }
@@ -216,7 +216,7 @@ const useAutoCapture = ({
     isCaptured,
     loaded,
     mediaStream,
-    onCapture,
+    onComplete,
     onStatusChange,
     outlineHeight,
     outlineWidth,

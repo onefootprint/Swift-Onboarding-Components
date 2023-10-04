@@ -2,12 +2,13 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
-import { useTimeout } from 'usehooks-ts';
+import { useCountdown, useTimeout } from 'usehooks-ts';
 
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 import type { CaptureKind } from '../../utils/state-machine';
 import CaptureButton from './components/capture-button';
+import CountdownTimer from './components/countdown-timer';
 import Feedback from './components/feedback';
 import Flash from './components/flash';
 import type { OutlineKind } from './components/overlay';
@@ -23,6 +24,8 @@ import getOutlineDimensions from './utils/get-outline-dimensions';
 import getVideoHeight from './utils/get-video-height';
 
 export type DeviceKind = 'mobile' | 'desktop';
+const AUTOCAPTURE_TIMER_START_VAL = 3;
+const AUTOCAPTURE_TIMER_INTERVAL = 1000; // in milliseconds
 
 type CameraProps = {
   onCapture: (image: string, capturKind: CaptureKind) => void;
@@ -52,11 +55,18 @@ const Camera = ({
   const [videoHeight, setVideoHeight] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFlashing, setIsFlashing] = useState(false);
+  const [startCaptureTimer, setStartCaptureTimer] = useState(false);
+  const [autoCaptureTimerVal, { startCountdown, stopCountdown }] = useCountdown(
+    {
+      countStart: AUTOCAPTURE_TIMER_START_VAL,
+      intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
+    },
+  );
   const [autocaptureFeedback, setAutocaptureFeedback] = useState<
     string | undefined
   >();
   const [isImageProcessing, setIsImageProcessing] = useState(false);
-  const [shouldDetect, setShouldDetect] = useState(true); // TOD O: Completely remove the use of this hook by moving the image processing to the processing component
+  const [shouldDetect, setShouldDetect] = useState(true); // TODO: Completely remove the use of this hook by moving the image processing to the processing component
   const [shouldShowInstructions, setShouldShowInstruction] = useState(true);
   const [canCapture, setCanCapture] = useState(true);
   const getImageStringFromVideo = useGetImageString();
@@ -164,13 +174,26 @@ const Camera = ({
     context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
   };
 
+  useEffect(() => {
+    if (autoCaptureTimerVal <= 0) {
+      stopCountdown();
+      handleClick('auto');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoCaptureTimerVal]);
+
+  const onAutoDetectionComplete = () => {
+    setStartCaptureTimer(true);
+    startCountdown();
+  };
+
   useAutoCapture({
     videoRef,
     canvasRef,
     mediaStream,
     outlineWidth,
     outlineHeight,
-    onCapture: () => handleClick('auto'),
+    onComplete: onAutoDetectionComplete,
     onStatusChange: setAutocaptureFeedback,
     autocaptureKind,
     shouldDetect,
@@ -242,6 +265,11 @@ const Camera = ({
                   onUpload={onImageUpload}
                   onComplete={onUploadComplete}
                 />
+              )}
+              {startCaptureTimer && (
+                <TimerContainer deviceKind={deviceKind}>
+                  <CountdownTimer current={autoCaptureTimerVal} start={3} />
+                </TimerContainer>
               )}
             </>
           ) : (
@@ -360,6 +388,19 @@ const ProcessingContainer = styled.div`
     justify-content: center;
     align-items: center;
     background-color: ${theme.backgroundColor.primary};
+  `}
+`;
+
+const TimerContainer = styled.div<{ deviceKind: DeviceKind }>`
+  ${({ theme, deviceKind }) => css`
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: ${deviceKind === 'mobile' ? theme.spacing[11] : theme.spacing[6]};
+    border: none;
+    background: none;
   `}
 `;
 
