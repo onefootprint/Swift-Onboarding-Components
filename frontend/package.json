@@ -45,8 +45,19 @@
     "turbo": "^1.10.14",
     "webpack": "^5.76.0"
   },
+  "overrides": {
+    "@onefootprint/e2e": {
+      "xml2js": "^0.6.0"
+    },
+    "bifrost": {
+      "@tensorflow/tfjs-core": {
+        "node-fetch": "^2.6.7"
+      }
+    }
+  },
   "resolutions": {
-    "@onefootprint/e2e/jimp/@jimp/plugins/@jimp/plugin-print/load-bmfont/parse-bmfont-xml/xml2js": "0.6.0"
+    "**/jimp/**/xml2js": "^0.6.0",
+    "**/face-api.js/@tensorflow/tfjs-core/node-fetch": "^2.6.7"
   },
   "lint-staged": {
     "*.{jsx,js,ts,tsx}": [
