@@ -56,7 +56,6 @@ const Init = () => {
       console.error('Found empty auth token while updating d2p');
       return;
     }
-
     // Tell the api that d2p is in progress now
     updateD2PStatusMutation.mutate(
       {
@@ -105,7 +104,7 @@ const Init = () => {
             },
           });
 
-          if (status === D2PStatus.waiting) {
+          if (status === D2PStatus.waiting || status === D2PStatus.inProgress) {
             updateD2PStatus();
           } else if (
             status === D2PStatus.completed ||
@@ -144,7 +143,6 @@ const Init = () => {
           orgId,
           publicKey: key,
         });
-
         if (!state.done) {
           send({
             type: 'initContextUpdated',
