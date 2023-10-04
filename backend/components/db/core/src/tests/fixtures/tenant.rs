@@ -13,6 +13,7 @@ pub fn create(conn: &mut TxnPgConn) -> Tenant {
         logo_url: None,
         sandbox_restricted: false,
         is_prod_ob_config_restricted: false,
+        is_prod_kyb_playbook_restricted: false,
         domain: Some("Test domain".to_owned()),
         allow_domain_access: false,
     };
@@ -32,6 +33,7 @@ pub fn create_with_keys(
         logo_url: None,
         sandbox_restricted: false,
         is_prod_ob_config_restricted: false,
+        is_prod_kyb_playbook_restricted: false,
         domain: Some("Test domain".to_owned()),
         allow_domain_access: false,
     };
@@ -57,6 +59,7 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         is_demo_tenant: false,
         pinned_api_version: None,
         is_prod_ob_config_restricted: false,
+        is_prod_kyb_playbook_restricted: false,
         domain: None,
         allow_domain_access: false,
         supported_auth_methods: None,

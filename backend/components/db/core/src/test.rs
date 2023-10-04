@@ -98,6 +98,7 @@ mod test {
             workos_id: None,
             sandbox_restricted: true,
             is_prod_ob_config_restricted: true,
+            is_prod_kyb_playbook_restricted: true,
             domain: None,
             allow_domain_access: false,
         };

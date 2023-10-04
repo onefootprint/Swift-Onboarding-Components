@@ -210,6 +210,7 @@ async fn create_tenant(
         logo_url: None,
         sandbox_restricted: true,
         is_prod_ob_config_restricted: true,
+        is_prod_kyb_playbook_restricted: true,
         domain,
         allow_domain_access: false, // false by default on creation, has to become true manually with PATCH /org
     };

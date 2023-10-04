@@ -10,7 +10,7 @@ use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::{CipKind, EnhancedAml, TenantId};
+use newtypes::{CipKind, DataIdentifierDiscriminant, EnhancedAml, TenantId};
 use newtypes::{CollectedData as CD, Iso3166TwoDigitCountryCode};
 use newtypes::{CollectedDataOption as CDO, EnhancedAmlOption};
 use paperclip::actix::Apiv2Schema;
@@ -373,8 +373,17 @@ pub async fn post(
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
-    if is_live && tenant.is_prod_ob_config_restricted {
-        return Err(TenantError::CannotCreateProdObConfigs.into());
+    let is_kyc = must_collect_data
+        .iter()
+        .all(|d| d.parent().data_identifier_kind() != DataIdentifierDiscriminant::Business);
+    let is_kyb = must_collect_data
+        .iter()
+        .any(|d| d.parent().data_identifier_kind() == DataIdentifierDiscriminant::Business);
+    if is_live && tenant.is_prod_ob_config_restricted && is_kyc {
+        return Err(TenantError::CannotCreateProdKycPlaybook.into());
+    }
+    if is_live && tenant.is_prod_kyb_playbook_restricted && is_kyb {
+        return Err(TenantError::CannotCreateProdKybPlaybook.into());
     }
 
     // Hard coded for now until we expose in playbooks. TODO: could maybe have "tenant defaults" expressed in our code where we could map tenants to default invariants for them

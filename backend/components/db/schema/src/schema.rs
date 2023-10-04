@@ -750,6 +750,7 @@ table! {
         allow_domain_access -> Bool,
         supported_auth_methods -> Nullable<Array<Text>>,
         app_clip_experience_id -> Text,
+        is_prod_kyb_playbook_restricted -> Bool,
     }
 }
 

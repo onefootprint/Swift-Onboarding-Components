@@ -43,8 +43,10 @@ pub enum TenantError {
     MissingCdosForCip(Csv<CollectedDataOption>, CipKind),
     #[error("Cannot provide an HTTP body alongside an idempotency ID - behavior would be undefined if the user already exists.")]
     CannotProvideBodyAndIdempotencyId,
-    #[error("You are not configured to create production onboarding configurations. Feel free to continue in sandbox, or contact us to enable.")]
-    CannotCreateProdObConfigs,
+    #[error("You are not configured to create production KYC playbooks. Feel free to continue in sandbox, or contact us to enable.")]
+    CannotCreateProdKycPlaybook,
+    #[error("You are not configured to create production KYB playbooks. Feel free to continue in sandbox, or contact us to enable.")]
+    CannotCreateProdKybPlaybook,
     #[error("Invalid onboarding configuration for Vault. The following fields need to be authorized for read access: {0}")]
     MissingCanAccessCdos(Csv<CollectedDataOption>),
     #[error("Invalid onboarding configuration for Vault. {0}")]
