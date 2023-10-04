@@ -15,6 +15,8 @@ const mainDIs: Partial<Record<DocumentDI, SupportedIdDocTypes>> = {
   [DocumentDI.latestWorkPermitFront]: SupportedIdDocTypes.workPermit,
   [DocumentDI.latestResidenceDocumentFront]:
     SupportedIdDocTypes.residenceDocument,
+  [DocumentDI.latestVoterIdentificationFront]:
+    SupportedIdDocTypes.voterIdentification,
 };
 
 const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
@@ -101,6 +103,20 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.residenceDocumentRefNumber,
     DocumentDI.residenceDocumentNationality,
     DocumentDI.residenceDocumentClassifiedDocumentType,
+  ],
+  [SupportedIdDocTypes.voterIdentification]: [
+    DocumentDI.voterIdentificationFullName,
+    DocumentDI.voterIdentificationDOB,
+    DocumentDI.voterIdentificationGender,
+    DocumentDI.voterIdentificationFullAddress,
+    DocumentDI.voterIdentificationDocumentNumber,
+    DocumentDI.voterIdentificationIssuedAt,
+    DocumentDI.voterIdentificationExpiresAt,
+    DocumentDI.voterIdentificationIssuingState,
+    DocumentDI.voterIdentificationIssuingCountry,
+    DocumentDI.voterIdentificationRefNumber,
+    DocumentDI.voterIdentificationNationality,
+    DocumentDI.voterIdentificationClassifiedDocumentType,
   ],
 };
 

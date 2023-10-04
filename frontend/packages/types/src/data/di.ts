@@ -148,6 +148,22 @@ export enum DocumentDI {
   workPermitRefNumber = 'document.permit.ref_number',
   workPermitNationality = 'document.permit.nationality',
   workPermitClassifiedDocumentType = 'document.permit.classifed_document_type',
+
+  latestVoterIdentificationFront = 'document.voter_identification.front.latest_upload',
+  latestVoterIdentificationBack = 'document.voter_identification.back.latest_upload',
+  latestVoterIdentificationSelfie = 'document.voter_identification.selfie.latest_upload',
+  voterIdentificationFullName = 'document.voter_identification.full_name',
+  voterIdentificationDOB = 'document.voter_identification.dob',
+  voterIdentificationGender = 'document.voter_identification.gender',
+  voterIdentificationFullAddress = 'document.voter_identification.full_address',
+  voterIdentificationDocumentNumber = 'document.voter_identification.document_number',
+  voterIdentificationIssuedAt = 'document.voter_identification.issued_at',
+  voterIdentificationExpiresAt = 'document.voter_identification.expires_at',
+  voterIdentificationIssuingState = 'document.voter_identification.issuing_state',
+  voterIdentificationIssuingCountry = 'document.voter_identification.issuing_country',
+  voterIdentificationRefNumber = 'document.voter_identification.ref_number',
+  voterIdentificationNationality = 'document.voter_identification.nationality',
+  voterIdentificationClassifiedDocumentType = 'document.voter_identification.classifed_document_type',
 }
 
 export type VersionedDocumentDI<Version extends string = string> =
@@ -230,7 +246,19 @@ export type VersionedDocumentDI<Version extends string = string> =
   | `${DocumentDI.workPermitIssuingCountry}:${Version}`
   | `${DocumentDI.workPermitRefNumber}:${Version}`
   | `${DocumentDI.workPermitNationality}:${Version}`
-  | `${DocumentDI.workPermitClassifiedDocumentType}:${Version}`;
+  | `${DocumentDI.workPermitClassifiedDocumentType}:${Version}`
+  | `${DocumentDI.voterIdentificationFullName}:${Version}`
+  | `${DocumentDI.voterIdentificationDOB}:${Version}`
+  | `${DocumentDI.voterIdentificationGender}:${Version}`
+  | `${DocumentDI.voterIdentificationFullAddress}:${Version}`
+  | `${DocumentDI.voterIdentificationDocumentNumber}:${Version}`
+  | `${DocumentDI.voterIdentificationIssuedAt}:${Version}`
+  | `${DocumentDI.voterIdentificationExpiresAt}:${Version}`
+  | `${DocumentDI.voterIdentificationIssuingState}:${Version}`
+  | `${DocumentDI.voterIdentificationIssuingCountry}:${Version}`
+  | `${DocumentDI.voterIdentificationRefNumber}:${Version}`
+  | `${DocumentDI.voterIdentificationNationality}:${Version}`
+  | `${DocumentDI.voterIdentificationClassifiedDocumentType}:${Version}`;
 
 export enum CardDIField {
   name = 'name',

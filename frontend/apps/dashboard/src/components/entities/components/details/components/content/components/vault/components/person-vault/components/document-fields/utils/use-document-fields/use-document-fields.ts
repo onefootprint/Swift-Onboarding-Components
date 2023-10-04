@@ -129,6 +129,27 @@ const useDocumentFields = () => {
         DocumentDI.workPermitClassifiedDocumentType,
       ],
     },
+    {
+      main: DocumentDI.latestVoterIdentificationFront,
+      label: t(DocumentDI.latestVoterIdentificationFront),
+      dis: [
+        DocumentDI.latestVoterIdentificationFront,
+        DocumentDI.latestVoterIdentificationBack,
+        DocumentDI.latestVoterIdentificationSelfie,
+        DocumentDI.voterIdentificationFullName,
+        DocumentDI.voterIdentificationDOB,
+        DocumentDI.voterIdentificationGender,
+        DocumentDI.voterIdentificationFullAddress,
+        DocumentDI.voterIdentificationDocumentNumber,
+        DocumentDI.voterIdentificationIssuedAt,
+        DocumentDI.voterIdentificationExpiresAt,
+        DocumentDI.voterIdentificationIssuingState,
+        DocumentDI.voterIdentificationIssuingCountry,
+        DocumentDI.voterIdentificationRefNumber,
+        DocumentDI.voterIdentificationNationality,
+        DocumentDI.voterIdentificationClassifiedDocumentType,
+      ],
+    },
   ];
 
   return fields;

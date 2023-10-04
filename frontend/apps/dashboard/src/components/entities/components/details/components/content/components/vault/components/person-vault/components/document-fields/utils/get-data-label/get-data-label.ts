@@ -14,6 +14,7 @@ const getDataLabel = (
     .replace(`document.${SupportedIdDocTypes.visa}.`, '')
     .replace(`document.${SupportedIdDocTypes.workPermit}.`, '')
     .replace(`document.${SupportedIdDocTypes.residenceDocument}.`, '')
+    .replace(`document.${SupportedIdDocTypes.voterIdentification}.`, '')
     .replace(`:${activeDocumentVersion}`, '');
 
 export default getDataLabel;

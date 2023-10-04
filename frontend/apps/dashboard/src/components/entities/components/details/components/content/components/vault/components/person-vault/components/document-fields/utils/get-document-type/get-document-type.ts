@@ -22,6 +22,9 @@ const getDocumentType = (di: DocumentDI) => {
   if (di.includes(SupportedIdDocTypes.workPermit)) {
     return SupportedIdDocTypes.workPermit;
   }
+  if (di.includes(SupportedIdDocTypes.voterIdentification)) {
+    return SupportedIdDocTypes.voterIdentification;
+  }
   return undefined;
 };
 

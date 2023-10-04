@@ -39,7 +39,8 @@
     "passport": "Passport",
     "visa": "Visa",
     "permit": "Work permit / EAD card",
-    "residence_document": "Residence card / Green card"
+    "residence_document": "Residence card / Green card",
+    "voter_identification": "Voter identification"
   },
   "di": {
     "id": {
@@ -250,6 +251,36 @@
         "document_number": "Work permit / EAD card document number",
         "ref_number": "Work permit / EAD card reference number",
         "nationality": "Work permit / EAD card nationality"
+      },
+      "voter_identification": {
+        "front": {
+          "image": "Voter identification",
+          "latest_upload": "Voter identification",
+          "mime_type": "Voter identification MIME type"
+        },
+        "back": {
+          "image": "Voter identification back",
+          "latest_upload": "Voter identification back",
+          "mime_type": "Voter identification back MIME type"
+        },
+        "selfie": {
+          "image": "Selfie",
+          "latest_upload": "Selfie",
+          "mime_type": "Selfie MIME type"
+        },
+        "number": "Voter identification number",
+        "expiration": "Voter identification expiration",
+        "dob": "Voter identification DOB",
+        "issuing_state": "Voter identification issuing state",
+        "issuing_country": "Voter identification issuing country",
+        "expires_at": "Voter identification expires at",
+        "issued_at": "Voter identification issued at",
+        "full_address": "Voter identification full address",
+        "gender": "Voter identification gender",
+        "full_name": "Voter identification full name",
+        "document_number": "Voter identification document number",
+        "ref_number": "Voter identification reference number",
+        "nationality": "Voter identification nationality"
       }
     },
     "business": {
@@ -309,6 +340,7 @@
     "visa": "Visa",
     "permit": "Work permit / EAD card",
     "residence_document": "Residence card / Green card",
+    "voter_identification": "Voter identification",
     "business_name": "Business name",
     "business_tin": "Taxpayer Identification Number (TIN)",
     "business_address": "Registered business address",
@@ -759,6 +791,7 @@
             "residence_document.title": "Residence card / Green card and selfie",
             "permit.title": "Work permit / EAD card and selfie",
             "visa.title": "Visa and selfie",
+            "voter_identification.title": "Voter identification",
             "session-selector": {
               "title": "Session",
               "session": "Session"
@@ -807,7 +840,8 @@
                 "passport": "passport",
                 "residence_document": "Residence card / Green card",
                 "permit": "Work permit / EAD card",
-                "visa": "Visa"
+                "visa": "Visa",
+                "voter_identification": "Voter identification"
               },
               "failure-reasons": {
                 "doc_type_mismatch": "Document type didn't match.",
@@ -1493,6 +1527,7 @@
               "visa": "Visa",
               "residence_document": "Residence card",
               "work_permit": "Work permit",
+              "voter_identification": "Voter identification",
               "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
               "no-id-doc-selected": "You must select at least one ID document type."
             }
@@ -1592,6 +1627,7 @@
         "visa": "Visa",
         "residence-document": "Residence card",
         "permit": "Work permit",
+        "voter_identification": "Voter identification",
         "ssn": "SSN",
         "ssn4": "Last 4",
         "ssn9": "Full",
