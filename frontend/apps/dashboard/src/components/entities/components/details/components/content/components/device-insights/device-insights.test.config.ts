@@ -23,7 +23,7 @@ export const biometricCred: Liveness = {
   insight,
   source: LivenessSource.webauthnAttestation,
   linkedAttestations: [],
-  kind: LivenessKind.sms,
+  kind: LivenessKind.passkey,
 };
 
 export const livenessDataFixture = [biometricCred];

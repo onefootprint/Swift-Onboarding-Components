@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { LivenessKind } from '@onefootprint/types';
 import React from 'react';
 import { Error } from 'src/components';
 
@@ -14,7 +15,7 @@ const DeviceInsights = ({ entity }: ContentProps) => {
   const { t } = useTranslation('pages.entity.device-insights');
   const { error, data, isSuccess } = useCurrentEntityAuthEvents();
   const onboardingInsightEvent = entity.insightEvent;
-  const biometricCred = data?.[0];
+  const biometricCred = data?.find(e => e.kind === LivenessKind.passkey);
   const attestation = biometricCred?.linkedAttestations.at(0);
   const deviceInfo = {
     appClip: attestation?.deviceType === 'ios',
