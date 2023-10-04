@@ -50,6 +50,15 @@ const useFaceDetection = () => {
 
     if (!result) return FaceStatus.detecting;
     const { detection } = result;
+    if (!detection || !detection.box) return FaceStatus.detecting;
+    const {
+      box: { width: detectionBoxWidth, height: detectionBoxHeight },
+    } = detection;
+    if (!detectionBoxWidth || !detectionBoxHeight) {
+      console.warn('FaceApi detection box has null or zero dimensions');
+      return FaceStatus.detecting;
+    }
+
     const resizedDetections = resizeResults(detection, {
       width,
       height,
