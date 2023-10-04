@@ -47,7 +47,6 @@ export * from './org-create-api-key';
 export * from './org-member-response';
 export * from './org-onboarding-configs-create';
 export * from './org-onboarding-configs-update';
-export * from './send-socure-device-session-d';
 export * from './session-validate';
 export * from './signup-challenge';
 export * from './skip-liveness';

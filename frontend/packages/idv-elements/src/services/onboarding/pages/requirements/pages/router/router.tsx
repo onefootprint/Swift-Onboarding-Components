@@ -2,7 +2,6 @@ import { useLogStateMachine } from '@onefootprint/dev-tools';
 import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
-import DeviceSignals from '../../../../../../components/device-signals';
 import {
   CollectKybData,
   CollectKycData,
@@ -69,131 +68,107 @@ const Router = ({ onDone }: RouterProps) => {
     return <CheckRequirements />;
   }
   if (state.matches('additionalInfoRequired')) {
-    return (
-      <DeviceSignals page="additional-info-required" fpAuthToken={authToken}>
-        <AdditionalInfoRequired />
-      </DeviceSignals>
-    );
+    return <AdditionalInfoRequired />;
   }
   if (state.matches('kybData') && kyb) {
     return (
-      <DeviceSignals page="kyb-data" fpAuthToken={authToken}>
-        <CollectKybData
-          context={{
-            authToken,
-            device,
-            customData: {
-              kybRequirement: kyb,
-              kycRequirement: kyc,
-              kycBootstrapData,
-              userFound,
-              config,
-            },
-          }}
-          onDone={handleRequirementCompleted}
-        />
-      </DeviceSignals>
+      <CollectKybData
+        context={{
+          authToken,
+          device,
+          customData: {
+            kybRequirement: kyb,
+            kycRequirement: kyc,
+            kycBootstrapData,
+            userFound,
+            config,
+          },
+        }}
+        onDone={handleRequirementCompleted}
+      />
     );
   }
   if (state.matches('kycData') && kyc) {
     return (
-      <DeviceSignals page="kyc-data" fpAuthToken={authToken}>
-        <CollectKycData
-          context={{
-            authToken,
-            device,
-            customData: {
-              requirement: kyc,
-              bootstrapData: kycBootstrapData,
-              userFound,
-              config,
-            },
-          }}
-          onDone={handleRequirementCompleted}
-        />
-      </DeviceSignals>
+      <CollectKycData
+        context={{
+          authToken,
+          device,
+          customData: {
+            requirement: kyc,
+            bootstrapData: kycBootstrapData,
+            userFound,
+            config,
+          },
+        }}
+        onDone={handleRequirementCompleted}
+      />
     );
   }
   if (state.matches('investorProfile')) {
     return (
-      <DeviceSignals page="investor-profile" fpAuthToken={authToken}>
-        <InvestorProfile
-          context={{
-            authToken,
-            device,
-            customData: {
-              showTransition: !!collectedKycData,
-            },
-          }}
-          onDone={handleRequirementCompleted}
-        />
-      </DeviceSignals>
+      <InvestorProfile
+        context={{
+          authToken,
+          device,
+          customData: {
+            showTransition: !!collectedKycData,
+          },
+        }}
+        onDone={handleRequirementCompleted}
+      />
     );
   }
   if (state.matches('transfer')) {
     return (
-      <DeviceSignals page="transfer" fpAuthToken={authToken}>
-        <Transfer
-          context={{
-            authToken,
-            device,
-            customData: {
-              config,
-              missingRequirements: {
-                liveness,
-                idDoc,
-              },
-              idDocOutcome,
+      <Transfer
+        context={{
+          authToken,
+          device,
+          customData: {
+            config,
+            missingRequirements: {
+              liveness,
+              idDoc,
             },
-          }}
-          onDone={handleRequirementCompleted}
-        />
-      </DeviceSignals>
+            idDocOutcome,
+          },
+        }}
+        onDone={handleRequirementCompleted}
+      />
     );
   }
   if (state.matches('liveness')) {
     return (
-      <DeviceSignals page="liveness" fpAuthToken={authToken}>
-        <Liveness
-          context={{
-            authToken,
-            device,
-          }}
-          onDone={handleRequirementCompleted}
-        />
-      </DeviceSignals>
+      <Liveness
+        context={{
+          authToken,
+          device,
+        }}
+        onDone={handleRequirementCompleted}
+      />
     );
   }
   if (state.matches('idDoc') && idDoc) {
     return (
-      <DeviceSignals page="id-doc" fpAuthToken={authToken}>
-        <IdDoc
-          context={{
-            authToken,
-            device,
-            customData: {
-              requirement: idDoc,
-              sandboxOutcome: idDocOutcome,
-            },
-          }}
-          onDone={handleRequirementCompleted}
-        />
-      </DeviceSignals>
+      <IdDoc
+        context={{
+          authToken,
+          device,
+          customData: {
+            requirement: idDoc,
+            sandboxOutcome: idDocOutcome,
+          },
+        }}
+        onDone={handleRequirementCompleted}
+      />
     );
   }
   if (state.matches('authorize')) {
-    return (
-      <DeviceSignals page="authorize" fpAuthToken={authToken}>
-        <Authorize onDone={handleRequirementCompleted} />
-      </DeviceSignals>
-    );
+    return <Authorize onDone={handleRequirementCompleted} />;
   }
   if (state.matches('process')) {
-    return (
-      <DeviceSignals page="process" fpAuthToken={authToken}>
-        <Process onDone={handleRequirementCompleted} />
-      </DeviceSignals>
-    );
+    return <Process onDone={handleRequirementCompleted} />;
   }
 
   return null;

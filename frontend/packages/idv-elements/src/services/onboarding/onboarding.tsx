@@ -2,6 +2,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
+import DeviceSignals from '../../components/device-signals';
 import { L10nContextProvider } from '../../components/l10n-provider';
 import OnboardingMachineProvider from './components/machine-provider';
 import configureI18next from './config/initializers/react-i18next';
@@ -15,6 +16,7 @@ const Onboarding = ({ onDone, l10n, ...args }: OnboardingProps) => (
       <QueryClientProvider client={queryClient}>
         <OnboardingMachineProvider args={args}>
           <Router onDone={onDone} />
+          <DeviceSignals fpAuthToken={args.authToken} />
         </OnboardingMachineProvider>
       </QueryClientProvider>
     </L10nContextProvider>

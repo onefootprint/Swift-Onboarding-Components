@@ -145,10 +145,6 @@ export type {
   OrgOnboardingConfigUpdateResponse,
 } from './org-onboarding-configs-update';
 export type {
-  SendSocureDeviceSessionIdRequest,
-  SendSocureDeviceSessionIdResponse,
-} from './send-socure-device-session-d';
-export type {
   StytchTelemetryRequest,
   StytchTelemetryResponse,
 } from './send-stytch-telemetry';

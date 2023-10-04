@@ -104,8 +104,6 @@ export type {
   ProcessRequirement,
   RegisterPasskeyRequirement,
   RequirementForKind,
-  SendSocureDeviceSessionIdRequest,
-  SendSocureDeviceSessionIdResponse,
   SessionValidateRequest,
   SessionValidateResponse,
   SignupChallengeRequest,
