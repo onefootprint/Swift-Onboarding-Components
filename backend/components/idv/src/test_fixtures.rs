@@ -287,7 +287,8 @@ pub fn fingerprint_server_api_fake_event() -> serde_json::Value {
       }
     })
 }
-pub fn experian_cross_core_response() -> serde_json::Value {
+pub fn experian_cross_core_response(ssn_result_code: Option<&str>) -> serde_json::Value {
+    let ssn_result_code = ssn_result_code.unwrap_or("EA");
     serde_json::json!({
         "responseHeader": {
             "requestType": "PreciseIdOnly",
@@ -344,7 +345,7 @@ pub fn experian_cross_core_response() -> serde_json::Value {
                             "fraudSolutions": {
                                 "response": {
                                     "products": {
-                                        "preciseIDServer": experian_precise_id_response("656", None, None),
+                                        "preciseIDServer": experian_precise_id_response("656", None, None, Some(ssn_result_code)),
                                         "customerManagement": {
                                             "version": "1.00",
                                             "reportDate": "03062023",
@@ -428,7 +429,7 @@ pub fn experian_cross_core_response() -> serde_json::Value {
                         },
                         {
                             "name": "pmConsumerIDVerificationResult",
-                            "value": "Y"
+                            "value": ssn_result_code
                         },
                         {
                             "name": "pmDateOfBirthMatchResult",
@@ -651,7 +652,9 @@ pub fn experian_precise_id_response(
     score: &str,
     precise_match_version: Option<&str>,
     precise_id_model_version: Option<&str>,
+    ssn_result_code: Option<&str>,
 ) -> serde_json::Value {
+    let ssn_result_code = ssn_result_code.unwrap_or("EA");
     serde_json::json!({
         "sessionID": "YMWK2SXF855BNZGM01HDWMW2.pidd4v-2303060915341255630306",
         "header": {
@@ -840,7 +843,7 @@ pub fn experian_precise_id_response(
                 "summary": {
                     "verificationResult": {
                         "value": "",
-                        "code": "EA"
+                        "code": ssn_result_code
                     },
                     "deceasedResult": {
                         "value": "",

@@ -64,6 +64,8 @@ pub enum BoolFlag<'a> {
     TwilioIsPreferredSmsVendor,
     #[strum(to_string = "UseIncodeDemoCredentialsInLivemode")]
     UseIncodeDemoCredentialsInLivemode(&'a TenantId),
+    #[strum(to_string = "IsKycWaterfallOnRuleFailureEnabled")]
+    IsKycWaterfallOnRuleFailureEnabled(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -103,6 +105,7 @@ impl<'a> BoolFlag<'a> {
             Self::TwilioIsPreferredSmsVendor => None,
             Self::DisableSelfieChecking(k) => Some(k.to_string()),
             Self::UseIncodeDemoCredentialsInLivemode(k) => Some(k.to_string()),
+            Self::IsKycWaterfallOnRuleFailureEnabled(k) => Some(k.to_string()),
         }
     }
 
@@ -138,6 +141,7 @@ impl<'a> BoolFlag<'a> {
             Self::TwilioIsPreferredSmsVendor => true,
             Self::DisableSelfieChecking(_) => false,
             Self::UseIncodeDemoCredentialsInLivemode(_) => false,
+            Self::IsKycWaterfallOnRuleFailureEnabled(_) => false,
         }
     }
 }

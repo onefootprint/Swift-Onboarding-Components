@@ -52,7 +52,7 @@ fn fixture_response_for_vendor_api(vendor_api: VendorAPI) -> ApiResult<VendorRes
             })
         }
         VendorAPI::ExperianPreciseId => {
-            let v = idv::test_fixtures::experian_cross_core_response();
+            let v = idv::test_fixtures::experian_cross_core_response(None);
             Ok(VendorResponse {
                 response: ParsedResponse::ExperianPreciseID(serde_json::value::from_value(v.clone())?),
                 raw_response: v.into(),

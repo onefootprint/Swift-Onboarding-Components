@@ -199,6 +199,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                     group: Kyc,
                 }
             } else {
+                // TODO: make kyc_vendor_results a singular kyc_vendor_result and probably can skip this map stuff? could optimize that later
+                // and consolidate this into one method for VendorResult -> risk signals
                 let (results_map, ids_map) =
                     build_vendor_response_map_from_vendor_results(kyc_vendor_results)?;
                 create_risk_signals_from_vendor_results((&results_map, &ids_map), vw.clone(), obc.clone())?

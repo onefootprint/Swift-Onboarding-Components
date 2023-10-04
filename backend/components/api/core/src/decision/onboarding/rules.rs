@@ -20,12 +20,24 @@ use super::{
     WaterfallOnboardingRulesDecisionOutput,
 };
 
+#[derive(Clone)]
 pub struct KycRuleExecutionConfig {
     pub include_doc: bool,
     pub document_only: bool,
     pub skip_kyc: bool,
 }
 
+impl KycRuleExecutionConfig {
+    pub fn for_kyc_only() -> Self {
+        Self {
+            include_doc: false,
+            document_only: false,
+            skip_kyc: false,
+        }
+    }
+}
+
+#[derive(Clone)]
 pub struct KycRuleGroup {
     pub kyc_rules: Vec<Rule<Vec<FootprintReasonCode>>>,
     pub doc_rules: Vec<Rule<Vec<FootprintReasonCode>>>,

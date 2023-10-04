@@ -79,6 +79,13 @@ async fn pass(state: &mut State, user_kind: UserKind) {
                 .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
                 .return_once(move |_| true);
 
+            // TODO: fix this up later sorry in a rush
+            mock_ff_client
+                .expect_flag()
+                .times(1)
+                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
+                .return_const(false);
+
             mock_idology(state, WithQualifier(None));
             mock_incode(state, WithHit(vec![]));
         }
@@ -236,6 +243,13 @@ async fn pass_then_watchlist_hit(
                 .expect_flag()
                 .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
                 .return_once(move |_| true);
+
+            // TODO: fix this up later sorry in a rush
+            mock_ff_client
+                .expect_flag()
+                .times(1)
+                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
+                .return_const(false);
 
             mock_idology(state, WithQualifier(None));
             mock_incode(state, WithHit(vec![AmlKind::Ofac, AmlKind::Am]));
@@ -439,6 +453,13 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
                 .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
                 .return_once(move |_| true);
 
+            // TODO: fix this up later sorry in a rush
+            mock_ff_client
+                .expect_flag()
+                .times(1)
+                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
+                .return_const(false);
+
             mock_idology(
                 state,
                 WithQualifier(Some("resultcode.first.name.does.not.match".to_owned())),
@@ -616,6 +637,13 @@ async fn fail(state: &mut State, user_kind: UserKind) {
                 .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
                 .return_once(move |_| true);
 
+            // TODO: fix this up later sorry in a rush
+            mock_ff_client
+                .expect_flag()
+                .times(1)
+                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
+                .return_const(false);
+
             mock_idology(
                 state,
                 WithQualifier(Some("resultcode.ssn.does.not.match".to_owned())),
@@ -773,6 +801,13 @@ async fn redo_and_pass(
                 .expect_flag()
                 .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
                 .return_once(move |_| true);
+
+            // TODO: fix this up later sorry in a rush
+            mock_ff_client
+                .expect_flag()
+                .times(1)
+                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
+                .return_const(false);
 
             mock_idology(state, WithQualifier(None));
             mock_incode(state, WithHit(vec![]));

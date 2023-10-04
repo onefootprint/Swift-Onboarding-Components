@@ -1,6 +1,12 @@
 use std::collections::HashMap;
 
 use crate::{
+    decision::{
+        self,
+        features::risk_signals::{risk_signal_group_struct::Kyc, RiskSignalsForDecision},
+        onboarding::rules::{KycRuleExecutionConfig, KycRuleGroup},
+        rule::rule_sets,
+    },
     errors::ApiResult,
     utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
     ApiErrorKind, State,
@@ -9,8 +15,10 @@ use db::models::{
     decision_intent::DecisionIntent, ob_configuration::ObConfiguration, scoped_vault::ScopedVault,
     verification_request::VerificationRequest, verification_result::VerificationResult,
 };
+use feature_flag::BoolFlag;
 use idv::VendorResponse;
-use newtypes::{ObConfigurationKey, VendorAPI, WorkflowId};
+use itertools::Itertools;
+use newtypes::{VendorAPI, WorkflowId};
 use std::future::Future;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
@@ -18,6 +26,7 @@ use strum_macros::EnumIter;
 use super::{
     get_vendor_apis_for_verification_requests, make_request,
     tenant_vendor_control::TenantVendorControl,
+    vendor_api,
     vendor_result::{HydratedVerificationResult, RequestAndMaybeHydratedResult, VendorResult},
     VendorAPIError,
 };
@@ -66,7 +75,7 @@ pub async fn run_kyc_waterfall(
     let svid = di.scoped_vault_id.clone();
     let diid = di.id.clone();
     let wf_id = wf_id.clone();
-    let (latest_results, tenant_id, vw, ob_configuration_key) = state
+    let (latest_results, tenant_id, vw, obc) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
@@ -76,14 +85,19 @@ pub async fn run_kyc_waterfall(
 
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
 
-            let ob_configuration_key: ObConfigurationKey = ObConfiguration::get(conn, &wf_id)?.0.key;
+            let obc = ObConfiguration::get(conn, &wf_id)?.0;
 
-            Ok((latest_results, sv.tenant_id, vw, ob_configuration_key))
+            Ok((latest_results, sv.tenant_id, vw, obc))
         })
         .await??;
-
-    let tvc =
-        TenantVendorControl::new(tenant_id, &state.db_pool, &state.config, &state.enclave_client).await?;
+    let ob_configuration_key = obc.key.clone();
+    let tvc = TenantVendorControl::new(
+        tenant_id.clone(),
+        &state.db_pool,
+        &state.config,
+        &state.enclave_client,
+    )
+    .await?;
 
     let latest_results =
         VendorResult::hydrate_vendor_results(latest_results, &state.enclave_client, &vw.vault.e_private_key)
@@ -103,16 +117,41 @@ pub async fn run_kyc_waterfall(
         "run_kyc_waterfall starting waterfall_loop"
     );
 
-    waterfall_loop(waterfall_vec, |vendor_api| {
-        make_request::make_idv_vendor_call_save_vreq_vres(
-            state,
-            &tvc,
-            &sv_id,
-            &di_id,
-            ob_configuration_key.clone(),
-            vendor_api,
-        )
-    })
+    let rule_config = if state
+        .feature_flag_client
+        .flag(BoolFlag::IsKycWaterfallOnRuleFailureEnabled(&tenant_id))
+    {
+        WaterfallRuleConfig::Enabled {
+            // TODO: rework HasRuleGroup and instead get rules based on OBC and use that here instead of hardcoding to rule_sets::kyc::kyc_rules(). And split kyc vs aml vs doc rules so we can get just the configured kyc rules here.
+            // or mb we have separate rules for waterfall determination
+            // ^ TODO: dont waterfall if rule failure is ssn_not_provided/phone_not_provided
+            rule_group: KycRuleGroup {
+                kyc_rules: rule_sets::kyc::kyc_rules(),
+                doc_rules: vec![],
+                aml_rules: vec![],
+            },
+            rule_config: KycRuleExecutionConfig::for_kyc_only(),
+            vw,
+            obc,
+        }
+    } else {
+        WaterfallRuleConfig::Disabled
+    };
+
+    waterfall_loop(
+        waterfall_vec,
+        |vendor_api| {
+            make_request::make_idv_vendor_call_save_vreq_vres(
+                state,
+                &tvc,
+                &sv_id,
+                &di_id,
+                ob_configuration_key.clone(),
+                vendor_api,
+            )
+        },
+        rule_config,
+    )
     .await
 }
 
@@ -120,7 +159,9 @@ pub async fn run_kyc_waterfall(
 async fn waterfall_loop<F, Fut>(
     mut waterfall_vec: Vec<(VendorAPI, Option<RequestAndMaybeHydratedResult>)>,
     make_vendor_call: F,
+    rule_config: WaterfallRuleConfig,
 ) -> ApiResult<Vec<VendorResult>>
+// TODO: refactor to just return a singular VendorResult
 where
     F: Fn(VendorAPI) -> Fut,
     Fut: Future<
@@ -136,11 +177,12 @@ where
     // If this case is hit, that really means that we complted the waterfall successfully but then crashed before completing `on_commit` and advancing the workflow
     let success_responses = get_successful_vendor_responses(waterfall_vec.clone());
     if !success_responses.is_empty() {
+        // TODO: now that we are potentially waterfalling on rule failure, if we crash midway and then restart and the lastest call was a non-error but rule failing response, then we'll just return here instead of waterfalling like we might be needing to do.
         tracing::info!(
             success_responses_len = success_responses.len(),
             "[waterfall_loop] success_response already exists, returning"
         );
-        return Ok(success_responses);
+        return Ok(success_responses.as_slice()[success_responses.len() - 1..].to_vec());
     }
 
     let mut i = 0;
@@ -154,9 +196,18 @@ where
         let vr = waterfall_vec.get(i).cloned();
         let Some((vendor_api, req_res)) = vr else {
             // we have exhausted the waterfall of vendors to try
-            return Err(ApiErrorKind::VendorRequestsFailed.into());
+            // ugh this sucks but kinda painted myself in a corner here, TODO: refactor/rewrite waterfall_loop so its cleaner now that we've added in rule failure waterfalling    
+            // we've exhausted vendors to try but the latest (or some) vendor we did try may have had a successful (but rule failing) response and so we want to return that and have the user fail rather than throw an error
+            let final_vendor_responses = get_successful_vendor_responses(waterfall_vec);
+            if final_vendor_responses.is_empty() {
+                tracing::info!("[waterfall_loop] exhausted vendors and no non-error vendor response was received, erroring");
+                return Err(ApiErrorKind::VendorRequestsFailed.into());
+            } else {
+                tracing::info!("[waterfall_loop] exhausted vendors but returning latest non-error vendor response");
+                return Ok(final_vendor_responses.as_slice()[final_vendor_responses.len() - 1..].to_vec());
+            }
 		};
-        match next_action(&req_res, have_attempted_call) {
+        match next_action(&req_res, have_attempted_call, rule_config.clone()) {
             Action::Done => {
                 tracing::info!(?vendor_api, "[waterfall_loop] Done");
                 break;
@@ -183,11 +234,13 @@ where
             }
         }
     }
-
     // return all successful VendorResponse's (although atm this is probably just 1)
-    Ok(get_successful_vendor_responses(waterfall_vec))
+    let final_vendor_responses = get_successful_vendor_responses(waterfall_vec);
+    tracing::info!(final_vendor_responses_len=?final_vendor_responses.len(), "[waterfall_loop] loop finished, returning successful vendor response");
+    Ok(final_vendor_responses.as_slice()[final_vendor_responses.len() - 1..].to_vec())
 }
 
+#[tracing::instrument(skip_all)]
 fn get_successful_vendor_responses(
     waterfall_vec: Vec<(VendorAPI, Option<RequestAndMaybeHydratedResult>)>,
 ) -> Vec<VendorResult> {
@@ -204,7 +257,12 @@ enum Action {
 }
 
 #[allow(clippy::collapsible_match)]
-fn next_action(req_res: &Option<RequestAndMaybeHydratedResult>, have_attempted_call: bool) -> Action {
+#[tracing::instrument(skip_all)]
+fn next_action(
+    req_res: &Option<RequestAndMaybeHydratedResult>,
+    have_attempted_call: bool,
+    rule_config: WaterfallRuleConfig,
+) -> Action {
     match req_res {
         Some(vreq_vres) => match &vreq_vres.vres {
             Some(res) => {
@@ -220,9 +278,29 @@ fn next_action(req_res: &Option<RequestAndMaybeHydratedResult>, have_attempted_c
                         Action::TryNextVendor
                     }
                 } else {
-                    // We have a vreq with a successful vres so we are done and should make no further calls
-                    // later, we might also execute rules or other logic to determine if we should waterfall even in the face of a non-error response
-                    Action::Done
+                    // We have a vreq with a successful vres
+                    // if we have waterfalling on rule failure enabled, then we should execute rules and determine the next action based on that. If not, we can just return Action::Done
+
+                    let Some(vr) = vreq_vres.clone().into_vendor_result() else {
+                        // this should only be None if is_error = true so this case shouldn't be possible. Should rework HydratedVerificationResult and such to better represent this but for now just do this to be safe
+                        return Action::TryNextVendor;
+                    };
+
+                    match rule_config {
+                        WaterfallRuleConfig::Disabled => Action::Done,
+                        WaterfallRuleConfig::Enabled {
+                            rule_group,
+                            rule_config,
+                            vw,
+                            obc,
+                        } => {
+                            // mb unnecessary and could `?` here but for now to be a bit safer, just log error and default to `Done` if there is an error in rule eval
+                            match eval_rules(vr, rule_group, rule_config, vw, obc) {
+                                Ok(action) => action,
+                                Err(_) => Action::Done,
+                            }
+                        }
+                    }
                 }
             }
             // We have a vreq with no accompanying vres. Theoretically means we crashed before saving the vres. We should just make a brand new call and save a new vreq+vres
@@ -233,10 +311,63 @@ fn next_action(req_res: &Option<RequestAndMaybeHydratedResult>, have_attempted_c
     }
 }
 
+#[tracing::instrument(skip_all)]
+fn eval_rules(
+    res: VendorResult,
+    rule_group: KycRuleGroup,
+    rule_config: KycRuleExecutionConfig,
+    vw: VaultWrapper,
+    obc: ObConfiguration,
+) -> ApiResult<Action> {
+    // this does a lot of unnecessary stuff and has a lot of layers of unnecessary indirection but unfortunately this is the safest way to produce risk signals here without diverging too much from how other code paths do this
+    let (results_map, ids_map) =
+        vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results(&vec![res])?;
+    let rsg = decision::features::risk_signals::create_risk_signals_from_vendor_results::<Kyc>(
+        (&results_map, &ids_map),
+        vw,
+        obc,
+    )?;
+    let rsfd = RiskSignalsForDecision {
+        kyc: Some(rsg.clone()),
+        doc: None,
+        kyb: None,
+        aml: None,
+    };
+
+    let decision_output = rule_group.evaluate(rsfd, rule_config)?.final_kyc_decision()?;
+    tracing::info!(
+       rules_triggered=%decision::rule::rules_to_string(&decision_output.rules_triggered),
+       rules_not_triggered=%decision::rule::rules_to_string(&decision_output.rules_not_triggered),
+       create_manual_review=%decision_output.decision.create_manual_review,
+       decision=%decision_output.decision.decision_status,
+       reason_codes=%rsg.footprint_reason_codes.iter().map(|r| r.0.to_string()).join(","),
+       footprint_reason_codes=?rsg.footprint_reason_codes,
+       "kyc_waterfall rule evaluation"
+    );
+
+    match decision_output.decision.decision_status {
+        newtypes::DecisionStatus::Fail | newtypes::DecisionStatus::StepUp => Ok(Action::TryNextVendor),
+        newtypes::DecisionStatus::Pass => Ok(Action::Done),
+    }
+}
+
+#[derive(Clone)]
+#[allow(clippy::large_enum_variant)]
+enum WaterfallRuleConfig {
+    Disabled,
+    Enabled {
+        rule_group: KycRuleGroup,
+        rule_config: KycRuleExecutionConfig,
+        vw: VaultWrapper,     // needed for risk signal generation
+        obc: ObConfiguration, // needed for risk signal generation
+    },
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::decision::state::test_utils;
+    use crate::decision::state::test_utils::WithSsnResultCode;
     use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
     use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use feature_flag::MockFeatureFlagClient;
@@ -251,8 +382,12 @@ mod tests {
 
     enum VR {
         ShouldntCall,
-        Success,
+        Success(Qualifiers),
         Error,
+    }
+    enum Qualifiers {
+        None,
+        SsnDoesNotMatch,
     }
     struct ExperianResponse(VR);
     struct IdologyResponse(VR);
@@ -265,6 +400,7 @@ mod tests {
 
     struct Run(ExperianResponse, IdologyResponse, ExpectedResult);
 
+    // Vendor Error Handling
     #[test_state_case(
         ExperianEnabled(false),
         IdologyEnabled(false),
@@ -275,7 +411,7 @@ mod tests {
     #[test_state_case(
         ExperianEnabled(false),
         IdologyEnabled(true),
-        Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::Success), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
+        Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
         Run(ExperianResponse(VR::ShouldntCall),IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
         ; "Idology only, call succeeds"
     )]
@@ -290,13 +426,13 @@ mod tests {
         ExperianEnabled(false),
         IdologyEnabled(true),
         Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Success), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
         ; "Idology only, call errors, re-rerun succeeds"
     )]
     #[test_state_case(
         ExperianEnabled(true),
         IdologyEnabled(false),
-        Run(ExperianResponse(VR::Success), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
+        Run(ExperianResponse(VR::Success(Qualifiers::None)), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
         Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
         ; "Experian only, call succeeds"
     )]
@@ -311,44 +447,74 @@ mod tests {
         ExperianEnabled(true),
         IdologyEnabled(false),
         Run(ExperianResponse(VR::Error), IdologyResponse(VR::ShouldntCall), ExpectedResult::ErrVendorRequestsFailed) ,
-        Run(ExperianResponse(VR::Success), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
+        Run(ExperianResponse(VR::Success(Qualifiers::None)), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
         ; "Experian only, call errors, re-run succeeds"
     )]
     #[test_state_case(
         ExperianEnabled(true),
         IdologyEnabled(true),
-        Run(ExperianResponse(VR::Success), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
+        Run(ExperianResponse(VR::Success(Qualifiers::None)), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
         Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
         ; "Both, Experian succeeds"
     )]
     #[test_state_case(
         ExperianEnabled(true),
         IdologyEnabled(true),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
         Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
-        ; "Both, Experian fails, Idology succeeds"
+        ; "Both, Experian errors, Idology succeeds"
     )]
     #[test_state_case(
         ExperianEnabled(true),
         IdologyEnabled(true),
         Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::Success), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
-        ; "Both, Experian fails, Idology fails, re-run Experian succeeds"
+        Run(ExperianResponse(VR::Success(Qualifiers::None)), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
+        ; "Both, Experian errors, Idology errors, re-run Experian succeeds"
     )]
     #[test_state_case(
         ExperianEnabled(true),
         IdologyEnabled(true),
         Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
-        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
-        ; "Both, Experian fails, Idology fails, re-run Experian fails Idology succeeds"
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
+        ; "Both, Experian errors, Idology errors, re-run Experian errors Idology succeeds"
     )]
     #[test_state_case(
         ExperianEnabled(true),
         IdologyEnabled(true),
         Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
         Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed)
-        ; "Both, Experian fails, Idology fails, re-run Experian fails Idology fails"
+        ; "Both, Experian errors, Idology errors, re-run Experian errors Idology errors"
     )]
+    // Rule failure handling
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
+        ; "Both vendors, Experian fails rules, Idology passes rules"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), IdologyResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
+        ; "Both vendors, Experian fails rules, Idology fails rules"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), IdologyResponse(VR::Error), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian)),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
+        ; "Both vendors, Experian fails rules, Idology errors"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success(Qualifiers::SsnDoesNotMatch)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology)),
+        Run(ExperianResponse(VR::ShouldntCall), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
+        ; "Both vendors, Experian errors, Idology fails rules"
+    )]
+    // TODO: rule failures + error handling? :o , maybe 3 runs??
     #[tokio::test]
     async fn test_run_kyc_waterfall(
         state: &mut State,
@@ -426,12 +592,23 @@ mod tests {
         mock_ff_client.expect_flag().return_const(true);
         match idology_response.0 {
             VR::ShouldntCall => (),
-            VR::Success => test_utils::mock_idology(state, test_utils::WithQualifier(None)),
+            VR::Success(qualifiers) => match qualifiers {
+                Qualifiers::None => test_utils::mock_idology(state, test_utils::WithQualifier(None)),
+                Qualifiers::SsnDoesNotMatch => test_utils::mock_idology(
+                    state,
+                    test_utils::WithQualifier(Some("resultcode.ssn.does.not.match".to_owned())),
+                ),
+            },
             VR::Error => test_utils::mock_idology_error(state),
         };
         match experian_response.0 {
             VR::ShouldntCall => (),
-            VR::Success => test_utils::mock_experian(state),
+            VR::Success(qualifiers) => match qualifiers {
+                Qualifiers::None => test_utils::mock_experian(state, WithSsnResultCode(None)),
+                Qualifiers::SsnDoesNotMatch => {
+                    test_utils::mock_experian(state, WithSsnResultCode(Some("CY")))
+                }
+            },
             VR::Error => test_utils::mock_experian_error(state),
         };
         state.set_ff_client(Arc::new(mock_ff_client));
@@ -477,7 +654,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(vreq.vendor, expected_vendor);
+        assert_eq!(expected_vendor, vreq.vendor);
         assert!(!vres.is_error);
 
         match expected_vendor {

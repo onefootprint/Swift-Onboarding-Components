@@ -305,7 +305,7 @@ pub fn save_onboarding_decision(
     Ok(())
 }
 
-fn log_rule_evaluation(wf: &Workflow, rule_output: &OnboardingRulesDecisionOutput, msg: &str) {
+pub fn log_rule_evaluation(wf: &Workflow, rule_output: &OnboardingRulesDecisionOutput, msg: &str) {
     tracing::info!(
        rules_triggered=%rule::rules_to_string(&rule_output.rules_triggered),
        rules_not_triggered=%rule::rules_to_string(&rule_output.rules_not_triggered),

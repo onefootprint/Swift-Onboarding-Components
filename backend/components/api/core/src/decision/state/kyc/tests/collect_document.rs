@@ -79,6 +79,13 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
                 .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
                 .return_once(move |_| true);
 
+            // TODO: fix this up later sorry in a rush
+            mock_ff_client
+                .expect_flag()
+                .times(1)
+                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
+                .return_const(false);
+
             // KYC Passes
             mock_idology(state, WithQualifier(None));
 

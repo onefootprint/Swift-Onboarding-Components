@@ -2,11 +2,15 @@ use crate::experian::cross_core::response::CrossCoreAPIResponse;
 use crate::experian::ExperianCrossCoreResponse;
 use newtypes::PiiJsonValue;
 
-pub fn create_response() -> ExperianCrossCoreResponse {
-    let r: CrossCoreAPIResponse =
-        serde_json::from_value(crate::test_fixtures::experian_cross_core_response()).unwrap();
+pub fn create_response(ssn_result_code: Option<&str>) -> ExperianCrossCoreResponse {
+    let fuck = crate::test_fixtures::experian_cross_core_response(ssn_result_code);
+    // println!("fuck: {:#?}", fuck);
+    let r: CrossCoreAPIResponse = serde_json::from_value(fuck.clone()).unwrap();
+    // println!("r: {:#?}", r);
+    let _fuck2 = serde_json::to_value(&r).unwrap();
+    // println!("fuck2: {:#?}", fuck2);
     ExperianCrossCoreResponse {
-        raw_response: PiiJsonValue::from(serde_json::to_value(&r).unwrap()),
+        raw_response: PiiJsonValue::from(fuck),
         parsed_response: r,
     }
 }

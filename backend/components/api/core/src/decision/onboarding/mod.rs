@@ -42,9 +42,9 @@ pub enum OnboardingRulesDecision {
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct WaterfallOnboardingRulesDecisionOutput {
-    kyc_decision: DecisionResult,
-    doc_decision: DecisionResult,
-    aml_decision: DecisionResult,
+    pub kyc_decision: DecisionResult,
+    pub doc_decision: DecisionResult,
+    pub aml_decision: DecisionResult,
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]
