@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import {
+  IdDocImageProcessingError,
   type IdDocImageTypes,
   type SubmitDocResponse,
-  IdDocImageProcessingError,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';

@@ -58,7 +58,7 @@ describe('<BasicDataForm />', () => {
     await userEvent.click(continueButton);
 
     await waitFor(() => {
-      expect(onSubmit).toBeCalledWith({
+      expect(onSubmit).toHaveBeenCalledWith({
         'business.dba': undefined,
         'business.name': 'Acme Inc.',
         'business.phone_number': '+1 (659) 453-9494',
@@ -95,7 +95,7 @@ describe('<BasicDataForm />', () => {
       await userEvent.click(continueButton);
 
       await waitFor(() => {
-        expect(onSubmit).toBeCalledWith({
+        expect(onSubmit).toHaveBeenCalledWith({
           [BusinessDI.name]: 'Acme Inc.',
           [BusinessDI.doingBusinessAs]: 'Acme',
           [BusinessDI.tin]: '12-9876543',
@@ -126,7 +126,7 @@ describe('<BasicDataForm />', () => {
       await userEvent.click(continueButton);
 
       await waitFor(() => {
-        expect(onSubmit).toBeCalledWith({
+        expect(onSubmit).toHaveBeenCalledWith({
           [BusinessDI.name]: 'Acme Inc.',
           [BusinessDI.tin]: '98-7654321',
         });
@@ -144,7 +144,7 @@ describe('<BasicDataForm />', () => {
 
       await userEvent.click(continueButton);
       await waitFor(() => {
-        expect(onSubmit).not.toBeCalled();
+        expect(onSubmit).not.toHaveBeenCalled();
       });
       await waitFor(() => {
         expect(
@@ -207,7 +207,7 @@ describe('<BasicDataForm />', () => {
       });
 
       await waitFor(() => {
-        expect(onSubmit).toBeCalledTimes(0);
+        expect(onSubmit).toHaveBeenCalledTimes(0);
       });
     });
   });

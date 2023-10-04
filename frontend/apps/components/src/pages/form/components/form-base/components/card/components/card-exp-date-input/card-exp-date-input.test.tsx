@@ -70,7 +70,7 @@ describe('CardExpDateInput', () => {
         value: '01/20',
         label: customLabel,
       });
-      userEvent.tab();
+      await userEvent.tab();
       await waitFor(() => {
         expect(screen.getByLabelText(customLabel)).toHaveStyle({
           borderColor: 'var(--fp-base-inputs-base-hint-error)',

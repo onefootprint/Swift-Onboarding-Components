@@ -140,7 +140,7 @@ describe('<Idv />', () => {
           });
 
           await waitFor(() => {
-            expect(onComplete).toBeCalledWith(validationToken);
+            expect(onComplete).toHaveBeenCalledWith(validationToken);
           });
         });
 
@@ -158,14 +158,17 @@ describe('<Idv />', () => {
           });
 
           await waitFor(() => {
-            expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+            expect(onComplete).toHaveBeenCalledWith(
+              validationToken,
+              closeDelay,
+            );
           });
           await checkComplete();
 
           const linkButton = screen.getByText('Return to site');
           expect(linkButton).toBeInTheDocument();
           await userEvent.click(linkButton);
-          expect(onClose).toBeCalled();
+          expect(onClose).toHaveBeenCalled();
         });
         it.skip('can onboard directly after identify if already authorized', async () => {
           const onComplete = jest.fn();
@@ -182,7 +185,10 @@ describe('<Idv />', () => {
 
           await checkComplete();
           await waitFor(() => {
-            expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+            expect(onComplete).toHaveBeenCalledWith(
+              validationToken,
+              closeDelay,
+            );
           });
         });
       });
@@ -249,7 +255,7 @@ describe('<Idv />', () => {
         await authorizeData();
         await checkComplete();
         await waitFor(() => {
-          expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+          expect(onComplete).toHaveBeenCalledWith(validationToken, closeDelay);
         });
       });
     });
@@ -322,7 +328,7 @@ describe('<Idv />', () => {
         await authorizeData();
         await checkComplete();
         await waitFor(() => {
-          expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+          expect(onComplete).toHaveBeenCalledWith(validationToken, closeDelay);
         });
       });
 
@@ -353,7 +359,7 @@ describe('<Idv />', () => {
 
         await authorizeData();
         await waitFor(() => {
-          expect(onComplete).toBeCalledWith(validationToken);
+          expect(onComplete).toHaveBeenCalledWith(validationToken);
         });
       });
 
@@ -448,7 +454,7 @@ describe('<Idv />', () => {
         await authorizeData();
         await checkComplete();
         await waitFor(() => {
-          expect(onComplete).toBeCalledWith(validationToken, closeDelay);
+          expect(onComplete).toHaveBeenCalledWith(validationToken, closeDelay);
         });
       });
     });

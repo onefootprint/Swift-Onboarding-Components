@@ -43,13 +43,13 @@ describe('<FootprintButton />', () => {
   });
 
   describe('when the button is disabled', () => {
-    it('should NOT fire an event when pressing', () => {
+    it('should NOT fire an event when pressing', async () => {
       const onClickMockFn = jest.fn();
       renderFootprintButton({
         onClick: onClickMockFn,
         disabled: true,
       });
-      userEvent.click(screen.getByText('Verify with Footprint'));
+      await userEvent.click(screen.getByText('Verify with Footprint'));
       expect(onClickMockFn).not.toHaveBeenCalled();
     });
   });

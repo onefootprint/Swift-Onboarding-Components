@@ -20,7 +20,7 @@ describe('usePropsFromUrl', () => {
 
     const { result } = renderHook(() => usePropsFromUrl(onSuccess));
     expect(result.current).toBe(undefined);
-    expect(onSuccess).toBeCalledWith({
+    expect(onSuccess).toHaveBeenCalledWith({
       l10n: undefined,
       options: {},
       userData: {},
@@ -37,7 +37,7 @@ describe('usePropsFromUrl', () => {
     const { result } = renderHook(() => usePropsFromUrl(onSuccess));
 
     expect(result.current).toBe(undefined);
-    expect(onSuccess).toBeCalledWith({
+    expect(onSuccess).toHaveBeenCalledWith({
       l10n: undefined,
       options: {},
       userData: {},
@@ -55,7 +55,7 @@ describe('usePropsFromUrl', () => {
     const { result } = renderHook(() => usePropsFromUrl(onSuccess));
 
     expect(result.current).toBe(undefined);
-    expect(onSuccess).toBeCalledWith({
+    expect(onSuccess).toHaveBeenCalledWith({
       l10n: {},
       options: {},
       userData: {},
@@ -72,7 +72,7 @@ describe('usePropsFromUrl', () => {
     const onSuccess = jest.fn();
     const { result } = renderHook(() => usePropsFromUrl(onSuccess));
     expect(result.current).toBe(undefined);
-    expect(onSuccess).toBeCalledWith({
+    expect(onSuccess).toHaveBeenCalledWith({
       userData: {
         'id.address_line1': 'string',
         'id.address_line2': 'string',
@@ -107,7 +107,7 @@ describe('usePropsFromUrl', () => {
     const onSuccess = jest.fn();
     const { result } = renderHook(() => usePropsFromUrl(onSuccess));
     expect(result.current).toBe(undefined);
-    expect(onSuccess).toBeCalledWith({
+    expect(onSuccess).toHaveBeenCalledWith({
       userData: {
         'id.email': 'a@b.com',
         'id.phone_number': '5555550100',
@@ -142,7 +142,7 @@ describe('usePropsFromUrl', () => {
     const onSuccess = jest.fn();
     const { result } = renderHook(() => usePropsFromUrl(onSuccess));
     expect(result.current).toBe(undefined);
-    expect(onSuccess).toBeCalledWith({
+    expect(onSuccess).toHaveBeenCalledWith({
       userData: {
         'id.email': 'a@b.com',
         'id.phone_number': '5555550100',

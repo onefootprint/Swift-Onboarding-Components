@@ -180,7 +180,7 @@ describe('IdentitySection', () => {
       await userEvent.click(revealButton);
 
       await waitFor(() => {
-        expect(mockGenerateBiometricResponseImpl).toBeCalled();
+        expect(mockGenerateBiometricResponseImpl).toHaveBeenCalled();
       });
 
       await waitFor(() => {

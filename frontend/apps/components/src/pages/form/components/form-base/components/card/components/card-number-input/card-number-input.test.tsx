@@ -70,7 +70,7 @@ describe('<CardNumberInput />', () => {
       renderInteractiveInput();
       const input = getCardNumberInput();
       await userEvent.type(input, '1111');
-      userEvent.tab();
+      await userEvent.tab();
       await waitFor(() => {
         const errorMessage = screen.getByText('Invalid card number');
         expect(errorMessage).toBeInTheDocument();
@@ -87,7 +87,7 @@ describe('<CardNumberInput />', () => {
       renderInteractiveInput({ invalidMessage: customInvalidMessage });
       const input = getCardNumberInput();
       await userEvent.type(input, '1111');
-      userEvent.tab();
+      await userEvent.tab();
       await waitFor(() => {
         const errorMessage = screen.getByText(customInvalidMessage);
         expect(errorMessage).toBeInTheDocument();

@@ -107,7 +107,7 @@ describe.skip('<ResidentialAddress />', () => {
       await userEvent.click(continueButton);
 
       await waitFor(() => {
-        expect(onComplete).toBeCalledWith({
+        expect(onComplete).toHaveBeenCalledWith({
           [IdDI.addressLine1]: {
             value: '345 Harrison Ave',
           },
@@ -207,7 +207,7 @@ describe.skip('<ResidentialAddress />', () => {
         await userEvent.click(continueButton);
 
         await waitFor(() => {
-          expect(onComplete).toBeCalledWith({
+          expect(onComplete).toHaveBeenCalledWith({
             [IdDI.addressLine1]: {
               value: '19 de Septiembre 79',
             },

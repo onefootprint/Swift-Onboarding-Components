@@ -26,7 +26,7 @@ describe('getCountryCode', () => {
     ${'ab-cd'} | ${'CD'}
     ${'ab_CD'} | ${'CD'}
     ${'ab_cd'} | ${'CD'}
-  `(`it should return $output`, ({ locale, output }) => {
+  `(`should return $output`, ({ locale, output }) => {
     expect(getCountryCode(locale)).toBe(output);
   });
 });
@@ -35,7 +35,7 @@ describe('getNationalNumber', () => {
     prefix       | value             | output
     ${'prefix-'} | ${'prefix-value'} | ${'value'}
     ${'prefix_'} | ${'prefix_value'} | ${'value'}
-  `(`it remove prefix from $value`, ({ prefix, value, output }) => {
+  `(`remove prefix from $value`, ({ prefix, value, output }) => {
     expect(getNationalNumber(prefix, value)).toBe(output);
   });
 });

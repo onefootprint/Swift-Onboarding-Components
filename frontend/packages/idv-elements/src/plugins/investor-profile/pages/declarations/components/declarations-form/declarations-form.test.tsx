@@ -48,7 +48,7 @@ describe('<DeclarationsForm />', () => {
       const button = screen.getByRole('button', {
         name: 'Choose file to upload',
       });
-      userEvent.click(button);
+      await userEvent.click(button);
 
       const fileInput = screen.getByTestId(
         'file-upload-input',
@@ -59,7 +59,7 @@ describe('<DeclarationsForm />', () => {
       await userEvent.upload(fileInput, file);
 
       const submitButton = screen.getByRole('button', { name: 'Continue' });
-      userEvent.click(submitButton);
+      await userEvent.click(submitButton);
 
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalledWith(
@@ -94,7 +94,7 @@ describe('<DeclarationsForm />', () => {
       const button = screen.getByRole('button', {
         name: 'Choose file to upload',
       });
-      userEvent.click(button);
+      await userEvent.click(button);
 
       const fileInput = screen.getByTestId(
         'file-upload-input',
@@ -105,7 +105,7 @@ describe('<DeclarationsForm />', () => {
       await userEvent.upload(fileInput, file);
 
       const submitButton = screen.getByRole('button', { name: 'Continue' });
-      userEvent.click(submitButton);
+      await userEvent.click(submitButton);
 
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalledWith(
@@ -147,7 +147,7 @@ describe('<DeclarationsForm />', () => {
       await userEvent.type(politicalOrganization, 'The White House');
 
       const submitButton = screen.getByRole('button', { name: 'Continue' });
-      userEvent.click(submitButton);
+      await userEvent.click(submitButton);
 
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalledWith({

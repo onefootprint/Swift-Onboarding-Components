@@ -13,8 +13,8 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import {
-  type ResidencyFormData,
   CountryRestriction,
+  type ResidencyFormData,
 } from '@/playbooks/utils/machine/types';
 
 export type ResidencyProps = {

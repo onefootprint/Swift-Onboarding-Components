@@ -45,10 +45,10 @@ describe('<Button />', () => {
   });
 
   describe('when the button is disabled', () => {
-    it('should NOT fire an event when pressing', () => {
+    it('should NOT fire an event when pressing', async () => {
       const onClickMockFn = jest.fn();
       renderButton({ onClick: onClickMockFn, children: 'foo', disabled: true });
-      userEvent.click(screen.getByText('foo'));
+      await userEvent.click(screen.getByText('foo'));
       expect(onClickMockFn).not.toHaveBeenCalled();
     });
   });

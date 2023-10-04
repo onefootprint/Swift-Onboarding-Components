@@ -134,7 +134,7 @@ describe('<Form />', () => {
     expect(continueButton).toBeInTheDocument();
     await userEvent.click(continueButton);
     await waitFor(() => {
-      expect(onSubmit).toBeCalledWith([
+      expect(onSubmit).toHaveBeenCalledWith([
         {
           [BeneficialOwnerDataAttribute.firstName]: 'John',
           [BeneficialOwnerDataAttribute.middleName]: 'Middle',
@@ -178,7 +178,7 @@ describe('<Form />', () => {
 
     await userEvent.click(continueButton);
     await waitFor(() => {
-      expect(onSubmit).toBeCalledWith([
+      expect(onSubmit).toHaveBeenCalledWith([
         {
           [BeneficialOwnerDataAttribute.firstName]: 'John',
           [BeneficialOwnerDataAttribute.middleName]: 'Middle',
@@ -219,7 +219,7 @@ describe('<Form />', () => {
         expect(continueButton).toBeInTheDocument();
 
         await userEvent.click(continueButton);
-        expect(onSubmit).not.toBeCalled();
+        expect(onSubmit).not.toHaveBeenCalled();
 
         await waitFor(() => {
           const error = screen.getByText(
@@ -310,7 +310,7 @@ describe('<Form />', () => {
 
         const continueButton = screen.getByRole('button', { name: 'Continue' });
         await userEvent.click(continueButton);
-        expect(onSubmit).not.toBeCalled();
+        expect(onSubmit).not.toHaveBeenCalled();
 
         await waitFor(() => {
           const error = screen.getByText('Ownership stake total exceeds 100%');
@@ -340,7 +340,7 @@ describe('<Form />', () => {
         const continueButton = screen.getByRole('button', { name: 'Continue' });
         await userEvent.click(continueButton);
         await waitFor(() => {
-          expect(onSubmit).toBeCalledWith([
+          expect(onSubmit).toHaveBeenCalledWith([
             {
               [BeneficialOwnerDataAttribute.firstName]: 'John',
               [BeneficialOwnerDataAttribute.middleName]: undefined,

@@ -288,7 +288,7 @@ describe('getRequestData', () => {
         },
         true,
       ),
-    ).toThrowError();
+    ).toThrow();
 
     expect(() =>
       getRequestData(
@@ -311,7 +311,7 @@ describe('getRequestData', () => {
         },
         true,
       ),
-    ).toThrowError();
+    ).toThrow();
   });
 
   it('does not error if state or zip fields are missing for international addresses', () => {
@@ -346,7 +346,7 @@ describe('getRequestData', () => {
         },
         true,
       ),
-    ).toThrowError();
+    ).toThrow();
 
     // Missing state / zip fields
     expect(() =>
@@ -379,7 +379,7 @@ describe('getRequestData', () => {
         },
         true,
       ),
-    ).not.toThrowError();
+    ).not.toThrow();
 
     // Missing state / zip fields
     expect(() =>
@@ -412,7 +412,7 @@ describe('getRequestData', () => {
         },
         true,
       ),
-    ).not.toThrowError();
+    ).not.toThrow();
   });
 
   it('removes decrypted values if they form full cdos', () => {

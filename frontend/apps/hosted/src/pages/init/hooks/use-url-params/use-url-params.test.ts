@@ -28,7 +28,7 @@ describe('useUrlParams', () => {
     const onError = jest.fn();
     renderUseParseUrl({ onSuccess, onError });
     await waitFor(() => {
-      expect(onError).not.toBeCalled();
+      expect(onError).not.toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(onSuccess).toHaveBeenCalledWith({

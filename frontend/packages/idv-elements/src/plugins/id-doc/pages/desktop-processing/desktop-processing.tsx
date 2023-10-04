@@ -2,9 +2,9 @@ import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import {
+  IdDocImageProcessingError,
   type IdDocImageTypes,
   type SubmitDocResponse,
-  IdDocImageProcessingError,
 } from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';

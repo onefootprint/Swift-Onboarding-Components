@@ -109,7 +109,7 @@ describe('<TextArea />', () => {
     });
 
     describe('when it is disabled', () => {
-      it('should not trigger onChangeText event', () => {
+      it('should not trigger onChangeText event', async () => {
         const onChangeTextMockFn = jest.fn();
         renderTextArea({
           disabled: true,
@@ -118,7 +118,7 @@ describe('<TextArea />', () => {
         });
 
         const textarea = screen.getByLabelText('Textarea');
-        userEvent.type(textarea, 'foo');
+        await userEvent.type(textarea, 'foo');
         expect(onChangeTextMockFn).not.toHaveBeenCalled();
       });
     });

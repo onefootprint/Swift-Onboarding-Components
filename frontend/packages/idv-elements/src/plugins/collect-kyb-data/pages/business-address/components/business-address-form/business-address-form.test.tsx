@@ -92,7 +92,7 @@ describe('<BusinessAddressForm />', () => {
     await userEvent.click(continueButton);
 
     await waitFor(() => {
-      expect(onSubmit).toBeCalled();
+      expect(onSubmit).toHaveBeenCalled();
     });
   });
 });
