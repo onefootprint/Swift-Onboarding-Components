@@ -255,7 +255,7 @@ pub(in crate::user) async fn handle_incode_request(
     let id_doc_id = identity_document_id.clone();
     let disable_selfie = state
         .feature_flag_client
-        .flag(feature_flag::BoolFlag::DisableSelfieChecking);
+        .flag(feature_flag::BoolFlag::DisableSelfieChecking(&tenant_id));
     // Initialize our state machine
     let ctx = IncodeContext {
         di_id: decision_intent_id.clone(),

@@ -231,7 +231,7 @@ impl IncodeStateMachine {
         let docv_data = build_docv_data_from_identity_doc(state, id_doc.id.clone()).await?;
         let disable_selfie = state
             .feature_flag_client
-            .flag(feature_flag::BoolFlag::DisableSelfieChecking);
+            .flag(feature_flag::BoolFlag::DisableSelfieChecking(&obc.tenant_id));
 
         let ctx = IncodeContext {
             di_id: di.id.clone(),

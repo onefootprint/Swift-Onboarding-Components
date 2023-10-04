@@ -24,7 +24,7 @@ pub enum BoolFlag<'a> {
     #[strum(to_string = "DisableAllSocureIdvCalls")]
     DisableAllSocure,
     #[strum(to_string = "DisableSelfieChecking")]
-    DisableSelfieChecking,
+    DisableSelfieChecking(&'a TenantId),
     #[strum(to_string = "CanCleanUpPhoneNumber")]
     CanCleanUpPhoneNumber(&'a PiiString),
     #[strum(to_string = "CanCleanUpTenant")]
@@ -99,7 +99,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisallowDriverLicensePermits(k) => Some(k.to_string()),
             Self::EnableIncodeWatchlistCheckInNonProd(k) => Some(k.to_string()),
             Self::TwilioIsPreferredSmsVendor => None,
-            Self::DisableSelfieChecking => None,
+            Self::DisableSelfieChecking(k) => Some(k.to_string()),
         }
     }
 
@@ -133,7 +133,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisallowDriverLicensePermits(_) => false,
             Self::EnableIncodeWatchlistCheckInNonProd(_) => false,
             Self::TwilioIsPreferredSmsVendor => true,
-            Self::DisableSelfieChecking => false,
+            Self::DisableSelfieChecking(_) => false,
         }
     }
 }
