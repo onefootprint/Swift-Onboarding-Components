@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
+import styled from '@onefootprint/styled';
 import React from 'react';
-import media from 'styled-media-query';
 
+import Stack from '../stack';
 import type { RadioSelectOptionFields } from './components/radio-select-option';
 import RadioSelectOption from './components/radio-select-option';
 
@@ -10,40 +10,50 @@ export type RadioSelectProps = {
   value?: string;
   onChange?: (value: string) => void;
   testID?: string;
+  size?: 'compact' | 'default';
 };
 
-const RadioSelect = ({ options, value, onChange, testID }: RadioSelectProps) =>
+const RadioSelect = ({
+  options,
+  value,
+  onChange,
+  testID,
+  size,
+}: RadioSelectProps) =>
   options.length > 0 ? (
-    <OptionsContainer data-testid={testID}>
+    <OptionsContainer testID={testID} direction="column" gap={3}>
       {options.map(
-        ({ title, description, IconComponent, value: optionValue }) => (
+        ({
+          title,
+          description,
+          IconComponent,
+          value: optionValue,
+          disabled,
+          disabledHint,
+        }) => (
           <RadioSelectOption
             key={optionValue}
             value={optionValue}
             title={title}
             description={description}
             IconComponent={IconComponent}
+            disabled={disabled}
+            disabledHint={disabledHint}
             onClick={() => {
               onChange?.(optionValue);
             }}
             selected={optionValue === value}
+            size={size}
           />
         ),
       )}
     </OptionsContainer>
   ) : null;
 
-const OptionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    gap: ${theme.spacing[3]};
-
-    ${media.greaterThan(`medium`)`
-      gap: ${theme.spacing[3]};
-    `}
-  `}
+const OptionsContainer = styled(Stack)`
+  span {
+    width: 100%;
+  }
 `;
 
 export default RadioSelect;

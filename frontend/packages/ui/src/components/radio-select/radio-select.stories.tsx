@@ -1,4 +1,9 @@
-import { IcoBook16, IcoHelp16 } from '@onefootprint/icons';
+import {
+  IcoBook16,
+  IcoBook24,
+  IcoHelp16,
+  IcoHelp24,
+} from '@onefootprint/icons';
 import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
@@ -25,18 +30,46 @@ export default {
   },
 } as Meta;
 
-const options = [
+const defaultOptions = [
   {
     title: 'Item 1',
     description: 'Description 1',
-    IconComponent: IcoBook16,
+    IconComponent: IcoBook24,
     value: 'Item 1',
   },
   {
     title: 'Item 2',
     description: 'Description 2',
+    IconComponent: IcoHelp24,
+    value: 'Item 2',
+  },
+  {
+    title: 'Item 3',
+    description: 'Description 3',
+    IconComponent: IcoBook24,
+    value: 'Item 3',
+    disabled: true,
+    disabledHint: 'Disabled hint',
+  },
+];
+
+const compactOptions = [
+  {
+    title: 'Item 1',
+    IconComponent: IcoBook16,
+    value: 'Item 1',
+  },
+  {
+    title: 'Item 2',
     IconComponent: IcoHelp16,
     value: 'Item 2',
+  },
+  {
+    title: 'Item 3',
+    IconComponent: IcoBook16,
+    value: 'Item 3',
+    disabled: true,
+    disabledHint: 'Disabled hint',
   },
 ];
 
@@ -44,9 +77,9 @@ const Template: Story<RadioSelectProps> = ({
   value = 'Item 1',
   onChange,
   testID,
+  size,
 }: RadioSelectProps) => {
   const [selectedValue, setSelectedValue] = useState(value);
-
   const handleChange = (newValue: string) => {
     setSelectedValue(newValue);
     onChange?.(newValue);
@@ -54,16 +87,25 @@ const Template: Story<RadioSelectProps> = ({
 
   return (
     <RadioSelect
-      options={options}
+      options={size === 'compact' ? compactOptions : defaultOptions}
       value={selectedValue}
       onChange={handleChange}
       testID={testID}
+      size={size}
     />
   );
 };
 
-export const Base = Template.bind({});
-Base.args = {
+export const Default = Template.bind({});
+Default.args = {
   onChange: console.log, // eslint-disable-line no-console
   testID: 'radio-select-test-id',
+  size: 'default',
+};
+
+export const Compact = Template.bind({});
+Compact.args = {
+  onChange: console.log, // eslint-disable-line no-console
+  testID: 'radio-select-test-id',
+  size: 'compact',
 };

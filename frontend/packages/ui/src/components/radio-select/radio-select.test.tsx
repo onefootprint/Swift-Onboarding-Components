@@ -48,7 +48,7 @@ describe('<RadioSelect />', () => {
         value: 'Item 2',
       });
       const option = screen.getByLabelText('Item 2') as HTMLButtonElement;
-      expect((option as any).selected).toBeTruthy();
+      expect(option).toHaveAttribute('aria-selected', 'true');
     });
 
     describe('when clicking on an option', () => {

@@ -12,20 +12,28 @@ const radioSelect: RadioSelect = {
   borderRadius: borderRadius.default,
   borderWidth: borderWidth[1],
   borderColor: borderColor.tertiary,
-  color: textColor.accent,
+  color: textColor.primary,
   hover: {
     default: {
       bg: surfaceColor[3],
       borderColor: borderColor.primary,
+      color: textColor.primary,
     },
     selected: {
       bg: surfaceColor[2],
       borderColor: borderColor.tertiary,
+      color: textColor.primary,
     },
   },
   selected: {
+    color: textColor.accent,
     bg: surfaceColor[1],
     borderColor: borderColor.secondary,
+  },
+  disabled: {
+    color: textColor.quaternary,
+    bg: surfaceColor[1],
+    borderColor: borderColor.tertiary,
   },
   components: {
     icon: {
@@ -35,6 +43,9 @@ const radioSelect: RadioSelect = {
       },
       selected: {
         bg: backgroundColor.accent,
+      },
+      disabled: {
+        bg: backgroundColor.secondary,
       },
     },
   },
