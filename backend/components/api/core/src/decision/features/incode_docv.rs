@@ -123,7 +123,8 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
         .unzip();
     let barcode_check_failed = barcode_crosscheck_results.iter().any(|(fail,_)| *fail);
     let barcode_check_passed = barcode_crosscheck_results.iter().any(|(_, pass)| *pass);
-    let barcode_checks_ran = barcode_check_passed || barcode_check_failed;
+    let barcode_decoded = id_test_frcs.contains(&FootprintReasonCode::DocumentBarcodeCouldBeRead);
+    let barcode_checks_ran = (barcode_check_passed || barcode_check_failed) && barcode_decoded;
 
     let barcode_frc = if barcode_checks_ran {
         if barcode_check_failed {
@@ -689,8 +690,7 @@ mod tests {
                 DocumentDobCheckDigitDoesNotMatch,
                 DocumentSexCrosscheckDoesNotMatch, 
                 DocumentExpirationCheckDigitDoesNotMatch, 
-                DocumentNumberCrosscheckDoesNotMatch,
-                DocumentBarcodeContentDoesNotMatch,
+                DocumentNumberCrosscheckDoesNotMatch, // barcode stuff is weird here
             ], true; "everything fails")]
         #[test_case(
             DocTestOpts {
@@ -730,7 +730,6 @@ mod tests {
                 DocumentSexCrosscheckMatches, 
                 DocumentExpirationCheckDigitMatches, 
                 DocumentNumberCrosscheckMatches,
-                DocumentBarcodeContentDoesNotMatch
             ], true; "mix of things")]
             #[test_case(
                 DocTestOpts::default(),
@@ -778,16 +777,24 @@ mod tests {
         assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
 
         // partial fail
-        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode: Fail, cross_checks: Ok, ..Default::default()});
+        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode_content: Fail, barcode: Ok, cross_checks: Ok, ..Default::default()});
+        let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
+        let frcs = super::reason_codes_from_score_response(&parsed, false);
+        assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
+        assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
+
+        // read ok, but cross checks fail
+        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode_content: Ok, barcode: Ok, cross_checks: Fail, ..Default::default()});
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
         let frcs = super::reason_codes_from_score_response(&parsed, false);
         assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
 
-        // full fail
-        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode: Fail, cross_checks: Fail, ..Default::default()});
-        let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
-        let frcs = super::reason_codes_from_score_response(&parsed, false);
-        assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
+         // wasn't read
+         let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode_content: Fail, barcode: Fail, cross_checks: Fail, ..Default::default()});
+         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
+         let frcs = super::reason_codes_from_score_response(&parsed, false);
+         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
+         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
     }
 
     fn only_id_tests_for_ones_that_have_frcs_from_parsed(parsed: FetchScoresResponse) -> HashMap<IncodeTest, IncodeStatus> {

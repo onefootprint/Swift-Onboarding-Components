@@ -1,7 +1,7 @@
 use crate::{FootprintReasonCode as FRC, IdDocKind};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::Display;
-use strum_macros::{EnumString, EnumIter};
+use strum_macros::{EnumIter, EnumString};
 
 #[derive(Clone)]
 pub struct IncodeRCH {
@@ -27,7 +27,6 @@ impl IncodeRCH {
             fail_code: fail,
         }
     }
-    
 }
 
 macro_rules! incode_reason_code_enum {
@@ -284,10 +283,12 @@ impl IncodeTest {
             | IncodeTest::BirthDateCheckDigit
             | IncodeTest::ExpirationDateCheckDigit
             | IncodeTest::CompositeCheckDigit
+            | IncodeTest::TwoDBarcodeContent
+            | IncodeTest::Barcode2DDetected
             | IncodeTest::LastNameMatch => false,
-            
+
             // Tests relating to checking MRZ/Barcode against OCR
-            | IncodeTest::BirthDateCrosscheck
+            IncodeTest::BirthDateCrosscheck
             | IncodeTest::ExpirationDateCrosscheck
             | IncodeTest::SexCrosscheck
             | IncodeTest::FullNameCrosscheck
@@ -295,16 +296,14 @@ impl IncodeTest {
             | IncodeTest::DocumentNumberCrosscheck
             | IncodeTest::PersonalNumberCrosscheck
             | IncodeTest::DocumentTypeSideCrosscheck
-            | IncodeTest::DDReferenceNumberCrosscheck 
-            // My hope is that incode wouldn't pass the other crosscehcks if these fail,
-            // but lets just be careful
-            | IncodeTest::TwoDBarcodeContent
-            | IncodeTest::Barcode2DDetected => true,
+            | IncodeTest::DDReferenceNumberCrosscheck => true,
         }
     }
 }
 
-#[derive(Display, Debug, Clone, EnumString, Eq, PartialEq, Hash, DeserializeFromStr, SerializeDisplay, EnumIter)]
+#[derive(
+    Display, Debug, Clone, EnumString, Eq, PartialEq, Hash, DeserializeFromStr, SerializeDisplay, EnumIter,
+)]
 pub enum IncodeDocumentType {
     #[strum(serialize = "Unknown")]
     Unknown,
@@ -373,7 +372,6 @@ pub enum IncodeDocumentRestriction {
     ConservativeSharpness,
 }
 
-
 #[cfg(test)]
 mod tests {
     use strum::IntoEnumIterator;
@@ -384,7 +382,18 @@ mod tests {
 
     #[test]
     fn test_we_added_incode_kind_to_id_doc_kind_mapping() {
-        let incode_doc_types_mapped_to_our_doc_types: Vec<IdDocKind> = IncodeDocumentType::iter().filter_map(|dt| IdDocKind::try_from(&dt).ok()).collect();
-        IdDocKind::iter().for_each(|doc_kind| assert!(incode_doc_types_mapped_to_our_doc_types.contains(&doc_kind), "{}", format!("Make sure you add {} to TryFrom<&'a IncodeDocumentType> for IdDocKind", doc_kind)))
+        let incode_doc_types_mapped_to_our_doc_types: Vec<IdDocKind> = IncodeDocumentType::iter()
+            .filter_map(|dt| IdDocKind::try_from(&dt).ok())
+            .collect();
+        IdDocKind::iter().for_each(|doc_kind| {
+            assert!(
+                incode_doc_types_mapped_to_our_doc_types.contains(&doc_kind),
+                "{}",
+                format!(
+                    "Make sure you add {} to TryFrom<&'a IncodeDocumentType> for IdDocKind",
+                    doc_kind
+                )
+            )
+        })
     }
 }

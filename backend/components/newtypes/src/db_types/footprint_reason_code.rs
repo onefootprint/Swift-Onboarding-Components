@@ -656,7 +656,7 @@ footprint_reason_code_enum! {
         DocumentOcrSuccessful,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document barcode illegible", severity = SignalSeverity::Medium,  description = "The reading and extracting of the barcode on the back of the document failed."]
+        #[note = "Document barcode could not be read", severity = SignalSeverity::Medium,  description = "The reading and extracting of the barcode on the back of the document failed."]
         DocumentBarcodeCouldNotBeRead,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
