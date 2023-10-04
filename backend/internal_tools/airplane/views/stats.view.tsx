@@ -62,6 +62,18 @@ const Stats = () => {
           `}
         ></OverviewCard>
         <GraphCard
+          title={'Portable IDs this week'}
+          query={`
+          SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
+          INNER JOIN vault on scoped_vault.vault_id = vault.id
+          INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
+          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 't'
+          GROUP BY "day"
+          ORDER BY "day" DESC LIMIT 7) r 
+          ORDER BY "day" ASC;
+        `}
+        ></GraphCard>
+        <GraphCard
           title={'Not (yet) Portable IDs this week'}
           query={`
           SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
@@ -124,7 +136,7 @@ const GraphCard = ({ title, query }) => {
         ) : error ? (
           <Text color="error">{error.message}</Text>
         ) : (
-          <Chart type="line" data={output} />
+          <Chart type="bar" data={output} />
         )}
       </Stack>
     </Card>
