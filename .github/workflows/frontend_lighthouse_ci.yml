@@ -30,7 +30,6 @@ env:
 
 jobs:
   install-dependencies:
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'lighthouse-on') }}
     name: 'Install dependencies'
     runs-on: ubuntu-latest
     steps:
