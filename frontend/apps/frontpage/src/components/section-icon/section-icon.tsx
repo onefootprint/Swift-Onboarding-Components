@@ -23,9 +23,9 @@ const Container = styled.div<{ isOnDarkSection?: boolean }>`
   ${({ theme, isOnDarkSection }) => css`
     width: 48px;
     height: 48px;
-    background-color: ${isOnDarkSection
-      ? primitives.Gray800
-      : theme.backgroundColor.secondary};
+    background-color: ${
+      isOnDarkSection ? primitives.Gray800 : theme.backgroundColor.secondary
+    };
     border-radius: 12px;
     display: flex;
     align-items: center;

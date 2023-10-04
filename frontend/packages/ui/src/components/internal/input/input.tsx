@@ -144,10 +144,9 @@ const StyledField = styled(Field)<{ $sx: SXStyles }>`
       padding-right: ${theme.spacing[7]};
     }
   `}
-  ${({ $sx }) =>
-    css`
-      ${$sx};
-    `}
+  ${({ $sx }) => css`
+    ${$sx};
+  `}
 `;
 
 export default BaseInput;

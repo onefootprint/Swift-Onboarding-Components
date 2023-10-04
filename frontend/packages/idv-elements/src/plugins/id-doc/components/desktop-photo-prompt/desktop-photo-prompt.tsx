@@ -67,9 +67,8 @@ const DesktopPhotoPrompt = ({
 
     const { processedImageFile, mimeType } = processingResult;
 
-    const imageString = await convertImageFileToStrippedBase64(
-      processedImageFile,
-    );
+    const imageString =
+      await convertImageFileToStrippedBase64(processedImageFile);
     if (!imageString) {
       onProcessingDone();
       handleUploadError([IdDocImageUploadError.unknownUploadError]);

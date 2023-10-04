@@ -96,7 +96,8 @@ const Center = styled.div<{ diameter?: number }>`
         ${primitives.Gray800} 100%
       ),
       ${primitives.Gray1000};
-    box-shadow: 0.3px 0.5px 0px 0px rgba(255, 255, 255, 0.1) inset,
+    box-shadow:
+      0.3px 0.5px 0px 0px rgba(255, 255, 255, 0.1) inset,
       -0.3px -0.5px 0px 0px rgba(255, 255, 255, 0.4) inset,
       1px 1px 4px 0px ${primitives.Gray1000} inset;
   `}

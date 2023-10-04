@@ -33,8 +33,8 @@ const DataCollection = ({
   const documentsAsString =
     docScanForOptionalSsn ||
     mustCollectData.filter(scopes => scopes.includes('document'))?.[0];
-  const idDocKinds = Object.values(SupportedIdDocTypes).filter(docType =>
-    documentsAsString?.includes(docType),
+  const idDocKinds = Object.values(SupportedIdDocTypes).filter(
+    docType => documentsAsString?.includes(docType),
   );
   const selfie = !!documentsAsString?.includes('selfie');
 
