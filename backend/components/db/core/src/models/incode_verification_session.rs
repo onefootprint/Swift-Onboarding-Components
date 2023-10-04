@@ -111,7 +111,7 @@ impl IncodeVerificationSession {
             state: IncodeVerificationSessionState::StartOnboarding,
             incode_configuration_id: configuration_id,
             identity_document_id,
-            kind: kind.clone(),
+            kind,
             latest_failure_reasons: vec![],
             ignored_failure_reasons: vec![],
         };
@@ -159,7 +159,7 @@ impl IncodeVerificationSession {
             res.state,
             res.identity_document_id.clone(),
             res.latest_failure_reasons.clone(),
-            res.kind.clone(),
+            res.kind,
         )?;
 
         Ok(res)
