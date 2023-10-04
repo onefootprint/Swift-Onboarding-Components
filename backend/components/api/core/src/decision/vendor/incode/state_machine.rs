@@ -41,6 +41,7 @@ pub struct IncodeContext {
     pub tenant_id: TenantId,
     pub ff_client: Arc<dyn FeatureFlagClient>,
     pub failed_attempts_for_side: i64,
+    pub disable_selfie: bool,
 }
 
 impl IncodeState {
@@ -228,6 +229,9 @@ impl IncodeStateMachine {
             .await?;
 
         let docv_data = build_docv_data_from_identity_doc(state, id_doc.id.clone()).await?;
+        let disable_selfie = state
+            .feature_flag_client
+            .flag(feature_flag::BoolFlag::DisableSelfieChecking);
 
         let ctx = IncodeContext {
             di_id: di.id.clone(),
@@ -241,6 +245,7 @@ impl IncodeStateMachine {
             tenant_id: obc.tenant_id.clone(),
             ff_client: state.feature_flag_client.clone(),
             failed_attempts_for_side: 0, // !! this is the one thing that is hard coded here that would differ from the existing code path that inits a IVS. We could have this method pass in DocumentSide and calculate this for real and then also call this init method from /upload and consolidate code paths
+            disable_selfie,
         };
         let is_sandbox = id_doc.fixture_result.is_some();
         let should_collect_selfie = doc_req.should_collect_selfie && !id_doc.should_skip_selfie();

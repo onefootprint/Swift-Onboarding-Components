@@ -177,11 +177,20 @@ impl AuthenticatedIncodeClientAdapter {
             .headers(self.client_adapter.default_headers.clone())
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?
-            .json()
-            .await?;
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        Ok(response)
+        let (cl, s) = (response.content_length(), response.status());
+
+        let json = match response.json().await {
+            Ok(j) => Ok(j),
+            Err(e) => {
+                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+
+                Err(e)
+            }
+        }?;
+
+        Ok(json)
     }
 
     pub async fn add_privacy_consent(
@@ -250,11 +259,20 @@ impl AuthenticatedIncodeClientAdapter {
             .json(&request)
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?
-            .json()
-            .await?;
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        Ok(response)
+        let (cl, s) = (response.content_length(), response.status());
+
+        let json = match response.json().await {
+            Ok(j) => Ok(j),
+            Err(e) => {
+                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+
+                Err(e)
+            }
+        }?;
+
+        Ok(json)
     }
 
     pub async fn fetch_scores(
@@ -269,11 +287,20 @@ impl AuthenticatedIncodeClientAdapter {
             .headers(self.client_adapter.default_headers.clone())
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?
-            .json()
-            .await?;
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        Ok(response)
+        let (cl, s) = (response.content_length(), response.status());
+
+        let json = match response.json().await {
+            Ok(j) => Ok(j),
+            Err(e) => {
+                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+
+                Err(e)
+            }
+        }?;
+
+        Ok(json)
     }
 
     pub async fn fetch_ocr(
@@ -288,15 +315,23 @@ impl AuthenticatedIncodeClientAdapter {
             .headers(self.client_adapter.default_headers.clone())
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?
-            .json()
-            .await?;
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        Ok(response)
+        let (cl, s) = (response.content_length(), response.status());
+
+        let json = match response.json().await {
+            Ok(j) => Ok(j),
+            Err(e) => {
+                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+
+                Err(e)
+            }
+        }?;
+
+        Ok(json)
     }
 
     // Note: should be called _after_ selfie, front, back and process-id
-    #[allow(unused)]
     pub async fn process_face(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
@@ -309,11 +344,20 @@ impl AuthenticatedIncodeClientAdapter {
             .headers(self.client_adapter.default_headers.clone())
             .send()
             .await
-            .map_err(|err| IncodeError::SendError(err.to_string()))?
-            .json()
-            .await?;
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
 
-        Ok(response)
+        let (cl, s) = (response.content_length(), response.status());
+
+        let json = match response.json().await {
+            Ok(j) => Ok(j),
+            Err(e) => {
+                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+
+                Err(e)
+            }
+        }?;
+
+        Ok(json)
     }
 
     async fn get_onboarding_status(

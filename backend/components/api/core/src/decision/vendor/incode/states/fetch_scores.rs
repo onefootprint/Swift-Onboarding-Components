@@ -127,7 +127,7 @@ impl IncodeStateTransition for FetchScores {
             self.ocr_response,
             self.score_response,
             self.vault_data,
-            session.kind.requires_selfie(),
+            session.kind.requires_selfie() && !ctx.disable_selfie,
             self.ocr_verification_result_id,
             self.score_verification_result_id,
         )?;

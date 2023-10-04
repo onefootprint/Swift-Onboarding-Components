@@ -253,6 +253,9 @@ pub(in crate::user) async fn handle_incode_request(
     let sv_id = doc_request.scoped_vault_id.clone();
     let vault_id = vault.id.clone();
     let id_doc_id = identity_document_id.clone();
+    let disable_selfie = state
+        .feature_flag_client
+        .flag(feature_flag::BoolFlag::DisableSelfieChecking);
     // Initialize our state machine
     let ctx = IncodeContext {
         di_id: decision_intent_id.clone(),
@@ -266,6 +269,7 @@ pub(in crate::user) async fn handle_incode_request(
         tenant_id: tenant_id.clone(),
         ff_client,
         failed_attempts_for_side: failed_attempts_for_side.unwrap_or(0),
+        disable_selfie,
     };
     let machine = IncodeStateMachine::init(
         state,
