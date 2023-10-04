@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { DEBUG_HANDOFF_URL, IS_DEV } from '@/domains/idv/config/constants';
+import { DEBUG_HANDOFF_URL, IS_DEV } from '@/config/constants';
 
 const getToken = (url?: string) => {
   if (!url) {

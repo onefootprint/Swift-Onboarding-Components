@@ -2,7 +2,7 @@ import {
   DEBUG_HANDOFF_URL,
   IS_DEV,
   REVIEW_AUTH_TOKEN,
-} from '@/domains/idv/config/constants';
+} from '@/config/constants';
 
 import useURL from './use-url';
 
