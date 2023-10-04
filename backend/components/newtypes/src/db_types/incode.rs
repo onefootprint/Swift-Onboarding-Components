@@ -132,7 +132,8 @@ impl IncodeFailureReason {
             | IncodeFailureReason::SelfieImageSizeUnsupported
             | IncodeFailureReason::SelfieImageOrientationIncorrect
             | IncodeFailureReason::SelfieBadImageCompression
-            | IncodeFailureReason::UnableToAlignDocument => true,
+            | IncodeFailureReason::UnableToAlignDocument
+            | IncodeFailureReason::UnknownDocumentType => true,
             _ => self.reason_code().is_some(),
         }
     }
