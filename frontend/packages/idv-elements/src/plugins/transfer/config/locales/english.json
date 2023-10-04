@@ -18,27 +18,23 @@
     },
     "desktop": {
       "qr-register": {
+        "subtitle": "We've sent you a link to your phone number. Please open it and follow the prompts.",
         "liveness": {
-          "title": "Liveness check",
-          "subtitle": "We need to verify that you're a real person.",
-          "instructions": "Use your camera app or QR code reader on your mobile device and we'll use biometrics to verify it."
+          "title": "Liveness check"
         },
         "id-doc": {
-          "title": "Scan or upload your ID",
-          "subtitle": "We need to some more information about your identity.",
-          "instructions": "Use your camera app or QR code reader on your mobile device, so you can use it take a photo of your ID."
+          "title": "Scan or upload your ID"
         },
         "liveness-with-id-doc": {
-          "title": "Liveness check & ID document",
-          "subtitle": "We need to use your mobile device to verify that you're a real person and check an ID document.",
-          "instructions": "Use your camera app or QR code reader on your mobile device and we'll continue from there."
-        },
-        "qr-code": {
-          "instructions": "Make sure the QR code is clearly visible on your device's screen. When authenticated, this page automatically updates."
+          "title": "Liveness check & ID document"
         },
         "sms": {
-          "instructions": "Alternatively, we can send you a link to your phone and you can continue from there.",
-          "cta": "Send a link to phone"
+          "cta": "Resend link",
+          "subtitleWithCount_one": "Please wait {{count}} second...",
+          "subtitleWithCount_other": "Please wait {{count}} seconds..."
+        },
+        "qr-code": {
+          "instructions": "Alternatively, you can also scan this QR code with your phone to continue."
         },
         "continue-on-desktop": {
           "title": "Don't own a smartphone?",
