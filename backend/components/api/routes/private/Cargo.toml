@@ -20,6 +20,7 @@ feature_flag = { path = "../../../feature_flag" }
 webhooks = { path = "../../../webhooks" }
 billing = { path = "../../../billing" }
 api_wire_types = { path = "../../wire_types" }
+api_route_hosted = { path = "../hosted" }
 
 actix-web = { workspace = true }
 log = "0.4.14"

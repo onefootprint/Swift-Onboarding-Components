@@ -8,6 +8,7 @@ mod identify;
 pub mod onboarding;
 mod user;
 use api_core::*;
+pub use user::documents::upload::handle_incode_request;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     user::routes(config);

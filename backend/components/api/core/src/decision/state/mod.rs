@@ -137,6 +137,7 @@ pub async fn run_incode_machine_and_workflow(
     let wfid = ww.workflow_id.clone();
     let ivs = state
         .db_pool
+        // TODO this doesn't have to be a latest - there's only one active per workflow
         .db_query(move |conn| IncodeVerificationSession::latest_for_workflow(conn, &wfid))
         .await??;
 

@@ -34,6 +34,8 @@ pub struct IncodeVerificationSession {
     /// Not used by application code anywhere, just used for debugging
     pub latest_failure_reasons: Vec<IncodeFailureReason>,
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
+    // When set, this IVS was replaced with a re-run via the manual private endpoint
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -130,6 +132,16 @@ impl IncodeVerificationSession {
         Ok(res)
     }
 
+    #[tracing::instrument("IncodeVerificationSession::deactivate", skip_all)]
+    pub fn deactivate(conn: &mut TxnPgConn, id: &IncodeVerificationSessionId) -> DbResult<()> {
+        diesel::update(incode_verification_session::table)
+            .filter(incode_verification_session::id.eq(id))
+            .set(incode_verification_session::deactivated_at.eq(Utc::now()))
+            .execute(conn.conn())?;
+
+        Ok(())
+    }
+
     #[tracing::instrument("IncodeVerificationSession::update", skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
@@ -154,14 +166,15 @@ impl IncodeVerificationSession {
     }
 
     fn query(id: IncodeSessionIdentifier) -> BoxedQuery<Pg> {
-        match id {
+        let query = match id {
             IncodeSessionIdentifier::Id(id) => incode_verification_session::table
                 .filter(incode_verification_session::id.eq(id))
                 .into_boxed(),
             IncodeSessionIdentifier::IdDoc(id) => incode_verification_session::table
                 .filter(incode_verification_session::identity_document_id.eq(id))
                 .into_boxed(),
-        }
+        };
+        query.filter(incode_verification_session::deactivated_at.is_null())
     }
 
     #[tracing::instrument("IncodeVerificationSession::get", skip_all)]
@@ -182,6 +195,7 @@ impl IncodeVerificationSession {
                 incode_verification_session::table
                     .on(incode_verification_session::identity_document_id.eq(identity_document::id)),
             )
+            .filter(incode_verification_session::deactivated_at.is_null())
             .order_by(incode_verification_session::created_at.desc())
             .select(incode_verification_session::all_columns)
             .first(conn)

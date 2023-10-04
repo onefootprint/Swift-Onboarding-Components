@@ -4,7 +4,7 @@ mod access_events;
 mod attest_device;
 mod authorized_orgs;
 mod consent;
-mod documents;
+pub mod documents;
 mod email;
 mod passkey;
 mod token;

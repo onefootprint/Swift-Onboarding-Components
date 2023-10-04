@@ -1,4 +1,5 @@
 mod decrypt;
+mod incode;
 mod risk;
 mod task;
 mod token_reveal;
@@ -17,6 +18,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(task::execute_tasks)
         .service(task::create_task)
         .service(task::create_overdue_watchlist_check_tasks)
+        .service(incode::rerun_machine)
         .service(workflow::create_workflow)
         .service(workflow::proceed)
         .service(token_reveal::post)

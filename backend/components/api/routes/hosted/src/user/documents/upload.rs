@@ -236,7 +236,7 @@ pub async fn post(
 }
 
 #[allow(clippy::too_many_arguments)]
-pub(in crate::user) async fn handle_incode_request(
+pub async fn handle_incode_request(
     state: &State,
     identity_document_id: IdentityDocumentId,
     tenant_id: TenantId,

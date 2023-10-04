@@ -355,6 +355,7 @@ table! {
         kind -> Text,
         latest_failure_reasons -> Array<Text>,
         ignored_failure_reasons -> Array<Text>,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 

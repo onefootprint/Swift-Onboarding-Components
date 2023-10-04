@@ -136,7 +136,18 @@ impl IncodeFailureReason {
 }
 
 #[derive(
-    Debug, Display, Clone, Eq, PartialEq, AsExpression, FromSqlRow, EnumString, EnumIter, AsRefStr, JsonSchema,
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    Eq,
+    PartialEq,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    EnumIter,
+    AsRefStr,
+    JsonSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
