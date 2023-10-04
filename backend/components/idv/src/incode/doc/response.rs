@@ -390,6 +390,8 @@ impl APIResponseToIncodeError for AddSelfieResponse {
             3009 => vec![IncodeFailureReason::SelfieImageOrientationIncorrect],
             3010 => vec![IncodeFailureReason::SelfieBadImageCompression],
             500 => vec![IncodeFailureReason::UnexpectedErrorOccurred],
+            // hack to just proceed
+            6000 => vec![],
             _ => vec![IncodeFailureReason::UnexpectedErrorOccurred],
         };
 

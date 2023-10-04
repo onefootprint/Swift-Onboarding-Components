@@ -36,7 +36,7 @@ impl IncodeStateTransition for AddSelfie {
                 tracing::error!(e=%e, selfie_disabled=ctx.disable_selfie, "error adding selfie");
 
                 if ctx.disable_selfie {
-                    Ok(vec![IncodeFailureReason::UnexpectedErrorOccurred])
+                    Ok(vec![])
                 } else {
                     Err(e)
                 }
