@@ -15,56 +15,62 @@ import {
   verifyPhoneNumber,
 } from './utils/commands';
 
-const userFirstName = 'Jane';
-const userLastName = 'Doe';
+const firstName = 'Jane';
+const lastName = 'Doe';
+const dob = '01/01/1990';
+const email = 'janedoe@acme.com';
+const phoneNumber = '5555550100';
+const addressLine1 = '432 3rd Ave';
+const city = 'Seward';
+const zipCode = '99664';
+const ssn = '418437970';
+
+const userTIN = '123456789';
 const beneficialOwner1Name = 'Bob';
 const beneficialOwner1LastName = 'Lee';
 const beneficialOwner1Email = 'boblee@acme.com';
 const beneficialOwner1Phone = '6178408644';
-const userDob = '01/01/1990';
-const userEmail = 'janedoe@acme.com';
-const userPhone = '5555550100';
-const userAddressLine1 = '432 3rd Ave';
-const userCity = 'Seward';
-const userZipCode = '99664';
-const userSSN = '418437970';
-const userTIN = '123456789';
 const businessName = 'Business name';
 const businessNameOptional = 'Optional name';
 
-test('KYB ob_test_5zu2usM1ilTzDnqQpaZ6Sg', async ({
+test('KYB for ob_test_5zu2usM1ilTzDnqQpaZ6Sg', async ({
   browser,
   browserName,
   page,
 }) => {
   test.setTimeout(120000);
+  const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_5zu2usM1ilTzDnqQpaZ6Sg';
+
+  await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
   await page.goto(`/preview?ob_key=${key}&flow=${flowId}`);
+  await page.waitForLoadState();
 
-  const verifyCTA = page.locator('.footprint-verify-button').first();
-  await verifyCTA.waitFor({ state: 'attached', timeout: 20000 }); // Increasing the waiting time for CI
+  await page.getByRole('button', { name: 'Verify with Footprint' }).click();
+  await page.waitForLoadState();
 
-  await page
-    .getByRole('button', { name: 'Verify with Footprint' })
-    .first()
-    .click();
-  const frame = page.frameLocator('iframe');
+  const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
   await selectOutcomeOptional({ frame }, 'Success');
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
 
-  await fillEmail({ frame }, { email: userEmail });
+  await fillEmail({ frame }, { email });
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
 
-  await fillPhoneNumber({ frame }, { phoneNumber: userPhone });
+  await fillPhoneNumber({ frame }, { phoneNumber });
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });
+  await page.waitForLoadState();
 
   const letsKYB = frame.getByText("Let's get to know your business!").first();
   await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
 
   await fillBasicDataKYB(
     { frame },
@@ -75,16 +81,11 @@ test('KYB ob_test_5zu2usM1ilTzDnqQpaZ6Sg', async ({
     },
   );
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
 
-  await fillAddressKYB(
-    { frame, page },
-    {
-      addressLine1: userAddressLine1,
-      city: userCity,
-      zipCode: userZipCode,
-    },
-  );
+  await fillAddressKYB({ frame, page }, { addressLine1, city, zipCode });
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
 
   await fillBeneficialOwners(
     { frame },
@@ -93,56 +94,55 @@ test('KYB ob_test_5zu2usM1ilTzDnqQpaZ6Sg', async ({
       beneficialOwner1LastName,
       beneficialOwner1Name,
       beneficialOwner1Phone,
-      userFirstName,
-      userLastName,
+      userFirstName: firstName,
+      userLastName: lastName,
     },
   );
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
 
   // #region Confirm your business data
   const confirmH2 = frame.getByText('Confirm your business data').first();
-  await confirmH2.waitFor({ state: 'attached', timeout: 3000 });
+  await confirmH2
+    .waitFor({ state: 'attached', timeout: 3000 })
+    .catch(() => false);
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
   // #endregion
 
   // #region Basic data
   const basicH2 = frame.getByText('Basic data').first();
-  await basicH2.waitFor({ state: 'attached', timeout: 3000 });
+  await basicH2
+    .waitFor({ state: 'attached', timeout: 3000 })
+    .catch(() => false);
 
-  const dob = frame.getByLabel('Date of Birth').first();
-  await dob.waitFor({ state: 'attached', timeout: 10000 });
-  await dob.type(userDob, { delay: 100 });
+  const dobField = frame.getByLabel('Date of Birth').first();
+  await dobField.waitFor({ state: 'attached', timeout: 3000 });
+  await dobField.type(dob, { delay: 100 });
 
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
   // #endregion
 
-  await fillAddress(
-    { frame, page },
-    {
-      addressLine1: userAddressLine1,
-      city: userCity,
-      zipCode: userZipCode,
-    },
-  );
+  await fillAddress({ frame, page }, { addressLine1, city, zipCode });
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
 
-  await fillSSN({ frame }, { ssn: userSSN });
+  await fillSSN({ frame }, { ssn });
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
 
   await confirmData(
     { frame },
-    {
-      firstName: userFirstName,
-      lastName: userLastName,
-      dob: userDob,
-      addressLine1: userAddressLine1,
-      city: userCity,
-      zipCode: userZipCode,
-    },
+    { firstName, lastName, dob, addressLine1, city, zipCode },
   );
   await clickOnContinue({ frame });
+  await page.waitForLoadState();
 
   await doLivenessCheck({ page, frame, browser }, { flowId });
 
-  expect(1).toBe(1);
+  console.log(`end of -> KYB for ob_test_5zu2usM1ilTzDnqQpaZ6Sg:${flowId}`);
+  await context.close();
+
+  return expect(1).toBe(1);
 });

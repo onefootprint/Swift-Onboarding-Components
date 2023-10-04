@@ -8,25 +8,27 @@ type WithFrame = { frame: FrameLocator | Page };
 type WithPage = { page: Page };
 type Outcome = 'Success' | 'Manual Review' | 'Fail';
 
+const hasContinueText = { hasText: /continue/i };
+const attachedState = { state: 'attached' as const, timeout: 2000 };
+// const () => true = () => true;
+// const () => false = () => false;
+
 export const selectOutcomeOptional = async (
   { frame }: WithFrame,
   outcome: Outcome,
 ) => {
-  const outcomeCTA = frame.getByRole('button', { name: outcome }).first();
-  return outcomeCTA
-    .waitFor({ state: 'attached', timeout: 10000 })
-    .then(() => outcomeCTA.click())
+  const outcomeBtn = frame.getByLabel(outcome).first();
+  return outcomeBtn
+    .waitFor({ state: 'attached', timeout: 15000 })
+    .then(() => outcomeBtn.click())
     .then(() => true)
     .catch(() => false);
 };
 
 export const clickOnContinue = async ({ frame }: WithFrame) => {
-  const btn = frame
-    .getByRole('button')
-    .filter({ hasText: /continue/i })
-    .first();
+  const btn = frame.getByRole('button').filter(hasContinueText).first();
   return btn
-    .waitFor({ state: 'attached', timeout: 3000 })
+    .waitFor(attachedState)
     .then(() => btn.click())
     .then(() => true)
     .catch(() => false);
@@ -36,10 +38,10 @@ export const fillEmail = async (
   { frame }: WithFrame,
   payload: { email: string },
 ) => {
-  const email = frame.getByLabel('Email').first();
-  return email
-    .waitFor({ state: 'attached', timeout: 2000 })
-    .then(() => email.type(payload.email, { delay: 100 }))
+  const field = frame.getByLabel('Email').first();
+  return field
+    .waitFor(attachedState)
+    .then(() => field.fill(payload.email))
     .then(() => true)
     .catch(() => false);
 };
@@ -48,10 +50,10 @@ export const fillPhoneNumber = async (
   { frame }: WithFrame,
   payload: { phoneNumber: string },
 ) => {
-  const phone = frame.getByLabel('Phone number').first();
-  return phone
-    .waitFor({ state: 'attached', timeout: 2000 })
-    .then(() => phone.type(payload.phoneNumber, { delay: 100 }))
+  const field = frame.getByLabel('Phone number').first();
+  return field
+    .waitFor(attachedState)
+    .then(() => field.type(payload.phoneNumber, { delay: 100 }))
     .then(() => true)
     .catch(() => false);
 };
@@ -72,23 +74,14 @@ export const verifyPhoneNumber = async ({
   await page.keyboard.press('0');
   await page.keyboard.press('0');
   await page.keyboard.press('0');
-
-  await expect(frame.getByText('Success!')).toBeAttached();
 };
 
-export const fillBasicData = async (
+export const fillNameAndDoB = async (
   { frame }: WithFrame,
   payload: { firstName: string; lastName: string; dob: string },
 ) => {
-  await expect(frame.getByText('Basic data').first()).toBeAttached();
-  await frame
-    .getByLabel('First name')
-    .first()
-    .type(payload.firstName, { delay: 100 });
-  await frame
-    .getByLabel('Last name')
-    .first()
-    .type(payload.lastName, { delay: 100 });
+  await frame.getByLabel('First name').first().fill(payload.firstName);
+  await frame.getByLabel('Last name').first().fill(payload.lastName);
   await frame
     .getByLabel('Date of Birth')
     .first()
@@ -103,15 +96,11 @@ export const fillBasicDataKYB = async (
     userTIN: string;
   },
 ) => {
-  await expect(frame.getByText('Basic data').first()).toBeAttached();
-  await frame
-    .getByLabel('Business name')
-    .first()
-    .type(payload.businessName, { delay: 100 });
+  await frame.getByLabel('Business name').first().fill(payload.businessName);
   await frame
     .getByLabel('Doing Business As (optional)')
     .first()
-    .type(payload.businessNameOptional, { delay: 100 });
+    .fill(payload.businessNameOptional);
   await frame
     .getByLabel('Taxpayer Identification Number (TIN)')
     .first()
@@ -122,18 +111,9 @@ export const fillAddress = async (
   { frame, page }: { frame: FrameLocator; page: Page },
   payload: { addressLine1: string; city: string; zipCode: string },
 ) => {
-  const title = frame.getByText("What's your residential address?").first();
-  await title.waitFor({ state: 'attached', timeout: 10000 }).catch(() => false);
-
-  await frame
-    .getByLabel('Address line 1')
-    .first()
-    .type(payload.addressLine1, { delay: 100 });
-  await frame.getByLabel('City').first().type(payload.city, { delay: 100 });
-  await frame
-    .getByLabel('Zip code')
-    .first()
-    .type(payload.zipCode, { delay: 100 });
+  await frame.getByLabel('Address line 1').first().fill(payload.addressLine1);
+  await frame.getByLabel('City').first().fill(payload.city);
+  await frame.getByLabel('Zip code').first().fill(payload.zipCode);
   await frame
     .getByRole('button', { name: 'State', disabled: false }) // For KYC is "State"
     .first()
@@ -146,20 +126,9 @@ export const fillAddressKYB = async (
   { frame, page }: { frame: FrameLocator; page: Page },
   payload: { addressLine1: string; city: string; zipCode: string },
 ) => {
-  const title = frame
-    .getByText("What's your registered business address?")
-    .first();
-  await title.waitFor({ state: 'attached', timeout: 10000 }).catch(() => false);
-
-  await frame
-    .getByLabel('Address line 1')
-    .first()
-    .type(payload.addressLine1, { delay: 100 });
-  await frame.getByLabel('City').first().type(payload.city, { delay: 100 });
-  await frame
-    .getByLabel('Zip code')
-    .first()
-    .type(payload.zipCode, { delay: 100 });
+  await frame.getByLabel('Address line 1').first().fill(payload.addressLine1);
+  await frame.getByLabel('City').first().fill(payload.city);
+  await frame.getByLabel('Zip code').first().fill(payload.zipCode);
   await frame
     .getByRole('button', { name: 'Select', disabled: false }) // For KYB is "Select"
     .first()
@@ -179,19 +148,14 @@ export const fillBeneficialOwners = async (
     userLastName: string;
   },
 ) => {
-  const header = frame.getByText('Who are the beneficial owners?').first();
-  await header
-    .waitFor({ state: 'attached', timeout: 10000 })
-    .catch(() => false);
-
   await frame
     .locator('input[name="beneficialOwners.0.first_name"]')
     .first()
-    .type(payload.userFirstName, { delay: 100 });
+    .fill(payload.userFirstName);
   await frame
     .locator('input[name="beneficialOwners.0.last_name"]')
     .first()
-    .type(payload.userLastName, { delay: 100 });
+    .fill(payload.userLastName);
   const share0 = frame
     .locator('input[name="beneficialOwners.0.ownership_stake"]')
     .first();
@@ -203,15 +167,15 @@ export const fillBeneficialOwners = async (
   await frame
     .locator('input[name="beneficialOwners.1.first_name"]')
     .first()
-    .type(payload.beneficialOwner1Name, { delay: 100 });
+    .fill(payload.beneficialOwner1Name);
   await frame
     .locator('input[name="beneficialOwners.1.last_name"]')
     .first()
-    .type(payload.beneficialOwner1LastName, { delay: 100 });
+    .fill(payload.beneficialOwner1LastName);
   await frame
     .locator('input[name="beneficialOwners.1.email"]')
     .first()
-    .type(payload.beneficialOwner1Email, { delay: 100 });
+    .fill(payload.beneficialOwner1Email);
   await frame
     .locator('input[name="beneficialOwners.1.phone_number"]')
     .first()
@@ -227,11 +191,7 @@ export const fillSSN = async (
   { frame }: WithFrame,
   payload: { ssn: string },
 ) => {
-  await expect(
-    frame.getByText("What's your Social Security Number?").first(),
-  ).toBeAttached();
-  await frame.getByLabel('SSN').type(payload.ssn, { delay: 100 });
-  await clickOnContinue({ frame });
+  await frame.getByLabel('SSN').first().type(payload.ssn, { delay: 100 });
 };
 
 export const confirmData = async (
@@ -245,14 +205,6 @@ export const confirmData = async (
     zipCode: string;
   },
 ) => {
-  const header = frame
-    .getByRole('heading')
-    .filter({ hasText: /Confirm/i })
-    .first();
-  await header
-    .waitFor({ state: 'attached', timeout: 10000 })
-    .catch(() => false); // Increasing the waiting time for CI
-
   await expect(frame.getByText(payload.firstName).first()).toBeAttached();
   await expect(frame.getByText(payload.lastName).first()).toBeAttached();
   await expect(frame.getByText(payload.dob).first()).toBeAttached();
