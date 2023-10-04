@@ -1,0 +1,27 @@
+slug: query_onboardings
+name: query_onboardings
+parameters:
+  - name: tenant
+    slug: tenant
+    type: shorttext
+    description: tenant_id or part of a tenant name or leave bank for all tenants
+    required: false
+  - name: start_datetime
+    slug: start_datetime
+    type: datetime
+    description: start datetime ISO8601 (yyyy-mm-ddThh:mm:ss.mmmZ) (leave blank to ignore filtering)
+    required: false
+  - name: end_datetime
+    slug: end_datetime
+    type: datetime
+    description: start datetime ISO8601 (yyyy-mm-ddThh:mm:ss.mmmZ) (leave blank to ignore filtering)
+    required: false
+sql:
+  resource: 'prod_ro_db'
+  entrypoint: query_onboardings.sql
+  queryArgs:
+    q: ?
+    tenant: '{{params.tenant}}'
+    start_datetime: '{{params.start_datetime}}'
+    end_datetime: '{{params.end_datetime}}'
+

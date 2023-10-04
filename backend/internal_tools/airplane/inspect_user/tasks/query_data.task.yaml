@@ -1,0 +1,12 @@
+slug: query_data
+name: query_data
+parameters:
+  - name: fp_id
+    slug: fp_id
+    type: shorttext
+    description: fp_id
+sql:
+  resource: 'prod_ro_db'
+  entrypoint: query_data.sql
+  queryArgs:
+    fp_id: '{{params.fp_id}}'
