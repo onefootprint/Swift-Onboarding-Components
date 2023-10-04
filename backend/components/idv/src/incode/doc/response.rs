@@ -784,6 +784,29 @@ mod tests {
             ]
         );
 
+        let raw_response_with_failure = serde_json::json!({
+            "sharpness": 100,
+            "glare": 100,
+            "horizontalResolution": 0,
+            "classification": false,
+            "typeOfId": "DriversLicense",
+            "issueYear": 2016,
+            "issueName": "USA DriversLicense ENHANCED_DRIVERS_LICENSE_UNDER21",
+            "sessionStatus": "Alive",
+            "failReason": "UNABLE_TO_ALIGN_DOCUMENT"
+        });
+
+        let parsed: AddSideResponse = serde_json::from_value(raw_response_with_failure).unwrap();
+        // disallow permits
+        let failures = parsed.failure_reasons(vec![IncodeDocumentRestriction::NoDriverLicensePermit]);
+        assert_eq!(
+            failures,
+            vec![
+                IncodeFailureReason::UnableToAlignDocument,
+                IncodeFailureReason::DriversLicensePermitNotAllowed
+            ]
+        );
+
         // No failure
         let raw_response = serde_json::json!({
             "sharpness": 100,

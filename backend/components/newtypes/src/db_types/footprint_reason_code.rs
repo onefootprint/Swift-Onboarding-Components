@@ -785,6 +785,10 @@ footprint_reason_code_enum! {
         DocumentPhotoIsNotPaperCapture,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document image is badly aligned", severity = SignalSeverity::High,  description = "Document image alignment was unable to be corrected and image tamper checks were unable to be processed."]
+        DocumentAlignmentFailed,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document visible photo features are not verified", severity = SignalSeverity::Medium,  description = "The visible photo features of the document were not verified"]
         DocumentVisiblePhotoFeaturesNotVerified,
 

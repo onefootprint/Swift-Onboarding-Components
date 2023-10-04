@@ -226,11 +226,11 @@ fn normalize_pii(p: &PiiString) -> PiiString {
 fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintReasonCode, (bool, bool))> {
     let (t, s) = value;
     let frc_helper: Option<IncodeRCH> = t.into();
-    frc_helper.map(|f| {
+    frc_helper.and_then(|f| {
         if s == &IncodeStatus::Fail {
-            (f.fail_code, (t.is_crosscheck(), false))
+            f.fail_code.map(|c| (c, (t.is_crosscheck(), false)))
         } else {
-            (f.ok_code,  (false, t.is_crosscheck()))
+            f.ok_code.map(|c| (c,  (false, t.is_crosscheck())))
         }
     })
 }

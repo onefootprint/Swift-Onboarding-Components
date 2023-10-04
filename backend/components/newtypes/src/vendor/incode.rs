@@ -6,9 +6,9 @@ use strum_macros::{EnumString, EnumIter};
 #[derive(Clone)]
 pub struct IncodeRCH {
     // If the test passes, what FRC should we show
-    pub ok_code: FRC,
+    pub ok_code: Option<FRC>,
     // If the test fails, what FRC should be produced
-    pub fail_code: FRC,
+    pub fail_code: Option<FRC>,
     // TODO: If the test is not present, what FRC should be produced?
     // For example, if incode can't read the barcode, none of the tests for crosschecks are performed
     // but we should still return an FRC
@@ -16,10 +16,18 @@ pub struct IncodeRCH {
 impl IncodeRCH {
     pub fn new(ok: FRC, fail: FRC) -> Self {
         Self {
+            ok_code: Some(ok),
+            fail_code: Some(fail),
+        }
+    }
+
+    pub fn new_with_optional(ok: Option<FRC>, fail: Option<FRC>) -> Self {
+        Self {
             ok_code: ok,
             fail_code: fail,
         }
     }
+    
 }
 
 macro_rules! incode_reason_code_enum {
@@ -90,7 +98,7 @@ incode_reason_code_enum! {
         // Alignment:
         // the picture is badly aligned and the correcting algorithm for alignment and cropping could not correct it for processing, and also when cropped captured image of ID  is near the edges.
         #[ser = "alignment"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new_with_optional(None, Some(FRC::DocumentAlignmentFailed)))]
         Alignment,
         // Technology to identify and reject fake IDs (Credentials not issued by government authority).
         // ML model that can detect patterns that differs from the original ones. For example: slight difference in layout of the ID, different font or font size.
