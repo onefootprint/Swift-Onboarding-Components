@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   Badge,
@@ -8,7 +9,7 @@ import {
   Divider,
   Typography,
 } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import type { AMLFormData } from '@/playbooks/utils/machine/types';
@@ -22,12 +23,21 @@ export type AMLProps = {
 
 const AML = ({ defaultValues, isLoading, onBack, onSubmit }: AMLProps) => {
   const { t, allT } = useTranslation('pages.playbooks.dialog.aml');
+  const [showError, setShowError] = useState(false);
   const { handleSubmit, register, watch } = useForm<AMLFormData>({
     defaultValues,
   });
   const isAmlChecked = watch('enhancedAml');
+  const ofac = watch('ofac');
+  const pep = watch('pep');
+  const adverseMedia = watch('adverseMedia');
+  const isMissingSelection = !!isAmlChecked && !ofac && !pep && !adverseMedia;
 
-  const submit = (formData: AMLFormData) => {
+  const handleBeforeSubmit = (formData: AMLFormData) => {
+    if (isMissingSelection) {
+      setShowError(true);
+      return;
+    }
     onSubmit(formData);
   };
 
@@ -44,7 +54,7 @@ const AML = ({ defaultValues, isLoading, onBack, onSubmit }: AMLProps) => {
           {t('subtitle')}
         </Typography>
       </Header>
-      <Form onSubmit={handleSubmit(submit)}>
+      <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
         <Box sx={{ gap: 5, display: 'flex', flexDirection: 'column' }}>
           <Checkbox
             label={t('aml.label')}
@@ -79,6 +89,14 @@ const AML = ({ defaultValues, isLoading, onBack, onSubmit }: AMLProps) => {
             </>
           )}
         </Box>
+        {isMissingSelection && showError && (
+          <ErrorContainer>
+            <IcoWarning16 color="error" />
+            <Typography variant="body-3" color="error">
+              {t('missing-selection')}
+            </Typography>
+          </ErrorContainer>
+        )}
         <ButtonContainer>
           <Button
             disabled={isLoading}
@@ -110,6 +128,14 @@ const Container = styled.div`
     width: 520px;
     white-space: pre-wrap;
   `};
+`;
+
+const ErrorContainer = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    gap: ${theme.spacing[3]};
+  `}
 `;
 
 const Header = styled.div`

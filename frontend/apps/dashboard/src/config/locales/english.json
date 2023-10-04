@@ -1582,6 +1582,7 @@
           "title": "AML monitoring",
           "subtitle": "You can optionally add Anti-money Laundering (AML) monitoring to your onboarding flow.",
           "recommended": "Recommended",
+          "missing-selection": "You must choose one of OFAC, PEP or Adverse Media.",
           "aml": {
             "label": "AML monitoring",
             "hint": "Continuous monitoring, governmental watchlists, PEP and adverse media"
