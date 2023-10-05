@@ -769,19 +769,19 @@ footprint_reason_code_enum! {
         DocumentNotFakeImage,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document image is an image of a screen", severity = SignalSeverity::High,  description = "The image of the document is picture of a document on a screen"]
+        #[note = "Document image possibly an image of a screen", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being a picture of a document on a screen"]
         DocumentPhotoIsScreenCapture,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document image is not an image of a screen", severity = SignalSeverity::Info,  description = "The image of the document is not a picture of a document on a screen"]
+        #[note = "Document image is not an image of a screen", severity = SignalSeverity::Info,  description = "The image of the document has no evidence or appearances of being a picture of a document on a screen"]
         DocumentPhotoIsNotScreenCapture,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document is printed on paper", severity = SignalSeverity::High,  description = "The image of the document is printed on paper"]
+        #[note = "Document possibly printed on paper", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being printed on paper"]
         DocumentPhotoIsPaperCapture,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document is not printed on paper", severity = SignalSeverity::Info,  description = "The image of the document is not printed on paper"]
+        #[note = "Document is not printed on paper", severity = SignalSeverity::Info,  description = "The image of the document has no evidence or appearances of being printed on paper"]
         DocumentPhotoIsNotPaperCapture,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
