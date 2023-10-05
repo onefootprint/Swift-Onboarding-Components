@@ -35,6 +35,19 @@ impl FileUpload {
     }
 }
 
+pub fn mime_type_to_extension(mime_type: &str) -> Option<&'static str> {
+    match mime_type {
+        "image/png" => Some("png"),
+        "image/svg+xml" => Some("svg"),
+        "image/jpeg" => Some("jpg"),
+        "image/gif" => Some("gif"),
+        "image/heic" => Some("heic"),
+        "application/pdf" => Some("pdf"),
+        "application/json" => Some("json"),
+        _ => None,
+    }
+}
+
 pub async fn handle_file_upload(
     payload: &mut Multipart,
     request: &HttpRequest,

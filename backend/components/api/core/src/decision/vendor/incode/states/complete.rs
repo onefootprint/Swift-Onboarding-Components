@@ -9,6 +9,7 @@ use crate::decision::vendor::incode::state_machine::IncodeContext;
 use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
 use crate::errors::AssertionError;
+use crate::utils::file_upload::mime_type_to_extension;
 use crate::utils::vault_wrapper::NewDocument;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -67,10 +68,14 @@ fn vault_complete_images(
         .images(conn, true)?
         .into_iter()
         .map(|u| {
+            let mime_type = vw
+                .get_mime_type(DocumentKind::Image(dk, u.side))
+                .unwrap_or("image/png");
+            let file_extension = mime_type_to_extension(mime_type).unwrap_or("png");
             let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
             NewDocument {
-                mime_type: "image/png".to_string(),
-                filename: format!("{}.png", kind),
+                mime_type: mime_type.to_owned(),
+                filename: format!("{}.{}", kind, file_extension),
                 kind,
                 e_data_key: u.e_data_key,
                 s3_url: u.s3_url,
