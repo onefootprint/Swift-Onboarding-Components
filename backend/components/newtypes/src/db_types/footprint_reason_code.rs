@@ -809,7 +809,7 @@ footprint_reason_code_enum! {
         DocumentSelfieDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Unexpected document type provided", severity = SignalSeverity::Low,  description = "The document uploaded was classified as a different type of document than was selected to be uploaded by the user."]
+        #[note = "Unexpected document type provided", severity = SignalSeverity::High,  description = "The document uploaded was classified as a different type of document than was selected to be uploaded by the user."]
         DocumentTypeMismatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
@@ -817,7 +817,7 @@ footprint_reason_code_enum! {
         DocumentUnknownCountryCode,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Unexpected document country code", severity = SignalSeverity::Low,  description = "The country issuing the uploaded document does not match the selected country."]
+        #[note = "Unexpected document country code", severity = SignalSeverity::High,  description = "The country issuing the uploaded document does not match the selected country."]
         DocumentCountryCodeMismatch,
 
         #[scope = SignalScope::Selfie, additional_scopes = vec![], match_level = None]
