@@ -92,7 +92,7 @@ pub async fn post(
                 // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
                 new_scopes.push(UserAuthScope::Business(biz_wf.scoped_vault_id));
             }
-            let data = user_auth.data.clone().session_with_added_scopes(new_scopes);
+            let data = user_auth.data.clone().session_with_added_scopes(new_scopes)?;
             user_auth.update_session(conn, &session_key, data)?;
 
             Ok(wf)

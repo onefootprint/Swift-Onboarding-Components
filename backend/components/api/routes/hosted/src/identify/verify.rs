@@ -10,7 +10,7 @@ use crate::utils::liveness::WebauthnConfig;
 use crate::utils::session::AuthSession;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::auth::session::user::{AuthFactor, UserSession};
+use api_core::auth::session::user::{AuthFactor, UserSession, UserSessionArgs};
 use api_core::auth::session::UpdateSession;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
@@ -147,34 +147,49 @@ pub async fn post(
             let sensitive_scope =
                 matches!(auth_factor, AuthFactor::Passkey(_)).then_some(UserAuthScope::SensitiveProfile);
 
-            let (auth_token, scoped_vault_id) = if let Some(user_auth) = user_auth {
-                // If you provided an existing auth token, add the warranted scopes
+            // Determine whether to issue onboardig scopes or my1fp scopes
+            let (args, scopes, duration, scoped_vault_id) = if let Some(ob_pk_auth) = ob_pk_auth {
+                let obc_id = ob_pk_auth.ob_config().id.clone();
+                let (su_id, scopes) = onboarding_scopes(conn, ob_pk_auth, &uv_id, session_id)?;
+                let duration = Duration::hours(1); // Onboarding is shorter
+                let sb_id = scopes
+                    .iter()
+                    .flatten()
+                    .filter_map(|s| match s {
+                        UserAuthScope::Business(sb_id) => Some(sb_id.clone()),
+                        _ => None,
+                    })
+                    .next();
+                let args = UserSessionArgs {
+                    su_id: Some(su_id.clone()),
+                    sb_id,
+                    obc_id: Some(obc_id),
+                    wf_id: None,
+                };
+                (args, scopes, duration, Some(su_id))
+            } else {
+                let scopes = vec![Some(UserAuthScope::BasicProfile)];
+                // TODO we currently infer that a token is for my1fp just because ob config auth
+                // isn't provided - but with step up, there are also some auths here that have no
+                // ob config auth but are also not my1fp
+                let duration = Duration::hours(8); // Issue my1fp token for a long time
+                let args = UserSessionArgs::default();
+                (args, scopes, duration, None)
+            };
+            let scopes = scopes.into_iter().chain([sensitive_scope]).flatten().collect();
+
+            let auth_token = if let Some(user_auth) = user_auth {
+                // Add the scopes / args to the existing auth token
                 let user_auth = user_auth.check_guard(Any)?;
                 let token = user_auth.auth_token.clone();
-                let data = user_auth.data.clone().session_with_added_scopes_and_auth(
-                    sensitive_scope.into_iter().collect(),
-                    Some(auth_factor),
-                );
-                let scoped_vault_id = user_auth.scoped_user_id();
+                let data = user_auth.data.clone().update(args, scopes, Some(auth_factor))?;
                 user_auth.update_session(conn, &session_key, data)?;
-                (token, scoped_vault_id)
+                token
             } else {
-                // Otherwise, create a new token with the scopes for bifrost or my1fp
-                let (new_token_scopes, duration, scoped_vault_id) = if let Some(ob_pk_auth) = ob_pk_auth {
-                    let (sv_id, scopes) = onboarding_scopes(conn, ob_pk_auth, &uv_id, session_id)?;
-                    let duration = Duration::minutes(30); // Onboarding is pretty short
-                    (scopes.into_iter(), duration, Some(sv_id))
-                } else {
-                    let scopes = vec![Some(UserAuthScope::BasicProfile)].into_iter();
-                    let duration = Duration::hours(8); // Issue my1fp token for a long time
-                    (scopes, duration, None)
-                };
-
-                // Create the auth token for this user
-                let scopes = new_token_scopes.chain([sensitive_scope]).flatten().collect();
-                let data = UserSession::make(uv_id.clone(), scopes, vec![auth_factor]);
+                // Otherwise, create a new token with these scopes / args
+                let data = UserSession::make(uv_id.clone(), args, scopes, vec![auth_factor])?;
                 let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-                (token, scoped_vault_id)
+                token
             };
 
             // record the new auth event

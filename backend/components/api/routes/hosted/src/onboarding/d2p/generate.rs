@@ -7,6 +7,7 @@ use crate::utils::session::JsonSession;
 use crate::utils::session::{AuthSession, HandoffRecord};
 use crate::State;
 use api_core::auth::IsGuardMet;
+use api_core::errors::ApiResult;
 use api_wire_types::{D2pGenerateRequest, D2pGenerateResponse};
 use chrono::{Duration, Utc};
 use newtypes::D2pSessionStatus;
@@ -35,11 +36,11 @@ pub async fn handler(
     let session_sealing_key = state.session_sealing_key.clone();
     let auth_token = state
         .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
+        .db_query(move |conn| -> ApiResult<_> {
             let expires_in = Duration::minutes(30);
             let data = user_auth
                 .data
-                .session_with_added_scopes(vec![UserAuthScope::Handoff]);
+                .session_with_added_scopes(vec![UserAuthScope::Handoff])?;
             let (auth_token, _) = AuthSession::create_sync(conn, &session_sealing_key, data, expires_in)?;
             // Also keep track of the status of the handoff session. We use a JsonSession keyed on
             // a hash of the auth token so both handoff clients can look up the status

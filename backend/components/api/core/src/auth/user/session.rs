@@ -9,13 +9,13 @@ use super::{UserAuthGuard, UserAuthScope};
 use crate::{
     auth::{
         session::{
-            user::{AuthFactor, UserSession},
+            user::{AuthFactor, UserSession, UserSessionArgs},
             AllowSessionUpdate, AuthSessionData, ExtractableAuthSession,
         },
         user::UserAuth,
         AuthError, IsGuardMet, SessionContext,
     },
-    errors::ApiError,
+    errors::{ApiError, ApiResult},
 };
 use feature_flag::FeatureFlagClient;
 
@@ -25,6 +25,10 @@ pub struct UserSessionContext {
     pub scopes: Vec<UserAuthScope>,
     /// the auth method that was used
     pub auth_factors: Vec<AuthFactor>,
+    pub(super) su_id: Option<ScopedVaultId>,
+    pub(super) sb_id: Option<ScopedVaultId>,
+    pub(super) obc_id: Option<ObConfigurationId>,
+    pub(super) wf_id: Option<WorkflowId>,
 }
 
 impl UserSessionContext {
@@ -45,15 +49,17 @@ impl UserAuth for UserSessionContext {
 impl AllowSessionUpdate for UserSessionContext {}
 
 impl UserSessionContext {
-    pub fn session_with_added_scopes(self, new_scopes: Vec<UserAuthScope>) -> AuthSessionData {
-        self.session_with_added_scopes_and_auth(new_scopes, None)
+    pub fn session_with_added_scopes(self, new_scopes: Vec<UserAuthScope>) -> ApiResult<AuthSessionData> {
+        self.update(UserSessionArgs::default(), new_scopes, None)
     }
 
-    pub fn session_with_added_scopes_and_auth(
+    pub fn update(
         self,
+        new_args: UserSessionArgs,
         new_scopes: Vec<UserAuthScope>,
         new_auth_factor: Option<AuthFactor>,
-    ) -> AuthSessionData {
+    ) -> ApiResult<AuthSessionData> {
+        // Merge args, scopes, and auth factors and create a new session with these merged fields
         let new_scope_kinds = new_scopes.iter().map(UserAuthGuard::from).collect_vec();
         let new_scopes = self.scopes
             .into_iter()
@@ -61,6 +67,7 @@ impl UserSessionContext {
             .filter(|x| !new_scope_kinds.contains(&UserAuthGuard::from(x)))
             // And replace it with the new scope
             .chain(new_scopes.into_iter())
+            .unique()
             .collect();
 
         let new_factors = if let Some(auth_factor) = new_auth_factor {
@@ -68,25 +75,37 @@ impl UserSessionContext {
         } else {
             self.auth_factors
         };
-        UserSession::make(self.user.id, new_scopes, new_factors)
+
+        let args = UserSessionArgs {
+            su_id: new_args.su_id.or(self.su_id),
+            sb_id: new_args.sb_id.or(self.sb_id),
+            obc_id: new_args.obc_id.or(self.obc_id),
+            wf_id: new_args.wf_id.or(self.wf_id),
+        };
+        UserSession::make(self.user.id, args, new_scopes, new_factors)
     }
 
     /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboarding` scope on this
     /// session, if exists
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
-        self.scopes
+        // TODO rm
+        let legacy_sv_id = self
+            .scopes
             .iter()
             .filter_map(|x| match x {
                 UserAuthScope::OrgOnboarding { id, .. } => Some(id.clone()),
                 _ => None,
             })
-            .next()
+            .next();
+        self.su_id.clone().or(legacy_sv_id)
     }
 
-    /// Extracts the ob_configuration_id from the `UserAuthScope::OrgOnboarding` scope on this
+    /// Extracts the ob_configuration_id from the `UserAuthScope::OnboardingConfig` scope on this
     /// session, if exists
     pub fn ob_configuration_id(&self) -> Option<ObConfigurationId> {
-        self.scopes
+        // TODO rm
+        let legacy_obc_id = self
+            .scopes
             .iter()
             .filter_map(|x| match x {
                 UserAuthScope::OrgOnboarding {
@@ -94,17 +113,20 @@ impl UserSessionContext {
                 } => ob_configuration_id.clone(),
                 _ => None,
             })
-            .next()
+            .next();
+        self.obc_id.clone().or(legacy_obc_id)
     }
 
     pub fn workflow_id(&self) -> Option<WorkflowId> {
-        self.scopes
+        let legacy_wf_id = self
+            .scopes
             .iter()
             .filter_map(|x| match x {
                 UserAuthScope::Workflow { wf_id } => Some(wf_id.clone()),
                 _ => None,
             })
-            .next()
+            .next();
+        self.wf_id.clone().or(legacy_wf_id)
     }
 }
 
@@ -135,18 +157,31 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
     ) -> Result<Self, ApiError> {
         match value {
             AuthSessionData::User(data) => {
-                let vault = Vault::get(conn, &data.user_vault_id)?;
+                let UserSession {
+                    user_vault_id,
+                    su_id,
+                    sb_id,
+                    wf_id,
+                    obc_id,
+                    scopes,
+                    auth_factors,
+                } = data;
+                let vault = Vault::get(conn, &user_vault_id)?;
                 if !vault.is_portable {
                     return Err(AuthError::NonPortableVault.into());
                 }
                 if vault.kind != VaultKind::Person {
                     return Err(AuthError::NonPersonVault.into());
                 }
-                tracing::info!(user_vault_id=%data.user_vault_id, "user session authenticated");
+                tracing::info!(user_vault_id=%user_vault_id, "user session authenticated");
                 let data = UserSessionContext {
                     user: vault,
-                    scopes: data.scopes,
-                    auth_factors: data.auth_factors,
+                    su_id,
+                    sb_id,
+                    wf_id,
+                    obc_id,
+                    scopes,
+                    auth_factors,
                 };
                 Ok(ParsedUserSessionContext(data))
             }

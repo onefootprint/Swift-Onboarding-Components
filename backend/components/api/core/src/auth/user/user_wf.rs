@@ -127,14 +127,16 @@ impl CheckUserWfAuthContext {
     /// Extracts the business vault_id from the `UserAuthScope::Business` scope on this session, if
     /// exists
     pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
-        self.user_session
+        let legacy_sb_id = self
+            .user_session
             .scopes
             .iter()
             .filter_map(|x| match x {
                 UserAuthScope::Business(id) => Some(id.clone()),
                 _ => None,
             })
-            .next()
+            .next();
+        self.user_session.sb_id.clone().or(legacy_sb_id)
     }
 
     /// Extracts the business workflow from the `UserAuthScope::Business` scope on this session,

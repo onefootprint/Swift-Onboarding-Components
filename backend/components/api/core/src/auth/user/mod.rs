@@ -9,7 +9,7 @@ mod user_wf;
 pub use user_wf::*;
 
 #[derive(
-    serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Apiv2Schema, EnumDiscriminants,
+    serde::Serialize, serde::Deserialize, PartialEq, Eq, Hash, Debug, Clone, Apiv2Schema, EnumDiscriminants,
 )]
 #[strum_discriminants(name(UserAuthGuard))]
 #[strum_discriminants(derive(Apiv2Schema, serde_with::SerializeDisplay, strum_macros::Display, Hash))]
@@ -19,10 +19,19 @@ pub use user_wf::*;
 // WARNING: changing this could break existing user auth sessions
 pub enum UserAuthScope {
     SignUp,
+    /// DEPRECATED
+    /// TODO: rm this when all sessions using it have expired
     OrgOnboarding {
         id: ScopedVaultId,
         ob_configuration_id: Option<ObConfigurationId>,
     },
+    /// Deprecated
+    /// TODO: rm this when all sessions using it have expired
+    Workflow {
+        wf_id: WorkflowId,
+    },
+    /// Deprecated
+    /// TODO: rm this when all sessions using it have expired
     Business(ScopedVaultId),
     // We don't currently issue a token with this - was for my1fp
     BasicProfile,
@@ -32,9 +41,6 @@ pub enum UserAuthScope {
     /// This scope should never be issued to a token - it is used to gate certain actions that
     /// should never be done by a user
     Never,
-    Workflow {
-        wf_id: WorkflowId,
-    },
 }
 
 /// A helper trait to extract a user vault id on combined types

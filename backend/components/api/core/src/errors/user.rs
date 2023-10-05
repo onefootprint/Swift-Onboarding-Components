@@ -24,4 +24,6 @@ pub enum UserError {
     FixtureNumberInLive,
     #[error("Cannot provide sandbox data in live mode or live data in sandbox mode.")]
     SandboxMismatch,
+    #[error("Invalid auth session: {0}")]
+    InvalidAuthSession(String),
 }

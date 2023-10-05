@@ -8,6 +8,7 @@ use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::session::user::AuthFactor;
 use api_core::auth::session::user::UserSession;
+use api_core::auth::session::user::UserSessionArgs;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
@@ -141,14 +142,21 @@ pub async fn post(
             // Create an auth token for this workflow that we will send to the user
             let scopes = vec![
                 UserAuthScope::SignUp,
-                UserAuthScope::Workflow { wf_id: wf.id },
+                // TODO rm
+                UserAuthScope::Workflow { wf_id: wf.id.clone() },
                 UserAuthScope::OrgOnboarding {
-                    id: wf.scoped_vault_id,
-                    ob_configuration_id: wf.ob_configuration_id,
+                    id: wf.scoped_vault_id.clone(),
+                    ob_configuration_id: wf.ob_configuration_id.clone(),
                 },
             ];
             let duration = Duration::days(1);
-            let data = UserSession::make(sv.vault_id, scopes, vec![AuthFactor::Sms]);
+            let args = UserSessionArgs {
+                su_id: Some(wf.scoped_vault_id),
+                wf_id: Some(wf.id),
+                obc_id: wf.ob_configuration_id,
+                ..Default::default()
+            };
+            let data = UserSession::make(sv.vault_id, args, scopes, vec![AuthFactor::Sms])?;
             let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((vw, auth_token))
         })
