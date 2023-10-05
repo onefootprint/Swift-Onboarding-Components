@@ -413,3 +413,29 @@ letter, as in below:
 | -------------------- | --------- | -------------------------------------------------------------------- |
 | `showCompletionPage` | `boolean` | Render a pre-built completion page at the end of the onboarding flow |
 | `showLogo`           | `boolean` | Show company logo at the top of the modal                            |
+
+## Localization configuration
+
+### Setting the Locale
+
+Footprint also supports localization settings, you can use the `l10n` (localization) option and specify the desired locale.
+
+For example, if your audience is in Mexico, you can set the locale to "es-MX" (Spanish - Mexico), Your locale helps Footprint format dates and numbers and adapt to cultural conventions.
+
+```typescript
+import footprint from '@onefootprint/footprint-js';
+
+const publicKey = 'ob_test_VMooXd04EUlnu3AvMYKjMW';
+const l10n = {
+  locale: 'es-MX',
+};
+
+const component = footprint.init({ kind: 'verify', publicKey, l10n });
+component.render();
+```
+
+### Available options
+
+| Option field | Type             |
+| ------------ | ---------------- |
+| `locale`     | `en-US`, `es-MX` |
