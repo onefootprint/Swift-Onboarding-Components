@@ -220,7 +220,10 @@ impl SmsClient {
         destination: &PhoneNumber,
         url: String,
     ) -> ApiResult<SecondsBeforeRetry> {
-        let message_body = PiiString::from(format!("Continue account verification using this link: {}", url));
+        let message_body = PiiString::from(format!(
+            "Continue account verification on your phone using this link: {}",
+            url
+        ));
 
         self.send_message(state, message_body, destination, rate_limit::D2P_LINK)
             .await?;
