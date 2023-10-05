@@ -18,11 +18,7 @@ type PhotoCaptureProps = {
   outlineHeightRatio: number; // with respect to the video width (not height)
   cameraKind: CameraKind;
   outlineKind: OutlineKind;
-  onComplete: (
-    imageString: string,
-    mimeType: string,
-    captureKind?: CaptureKind,
-  ) => void;
+  onComplete: (imageFile: File, captureKind?: CaptureKind) => void;
   autocaptureKind: AutocaptureKind;
   deviceKind: DeviceKind;
 };
@@ -39,8 +35,7 @@ const PhotoCapture = ({
   const { t } = useTranslation('components.photo-capture');
   const [, send] = useIdDocMachine();
   const [image, setImage] = useState<string | null>(null);
-  const { processImageUrl, convertImageFileToStrippedBase64 } =
-    useProcessImage();
+  const { processImageUrl } = useProcessImage();
   const [isLoading, setIsLoading] = useState(false);
   const [captureKind, setCaptureKind] = useState<CaptureKind>();
 
@@ -57,8 +52,8 @@ const PhotoCapture = ({
     }
 
     setIsLoading(true);
-    const processingResult = await processImageUrl(image);
-    if (!processingResult) {
+    const processedImageFile = await processImageUrl(image);
+    if (!processedImageFile) {
       // An error occurred, directly prompt user to re-take the image
       setIsLoading(false);
       handleRetake();
@@ -68,21 +63,8 @@ const PhotoCapture = ({
       return;
     }
 
-    const { processedImageFile, mimeType } = processingResult;
-
-    const imageString =
-      await convertImageFileToStrippedBase64(processedImageFile);
-    if (!imageString) {
-      setIsLoading(false);
-      handleRetake();
-      console.warn(
-        'Captured image could not be stringified - retaking the image',
-      );
-      return;
-    }
-
     setIsLoading(false);
-    onComplete(imageString, mimeType, captureKind);
+    onComplete(processedImageFile, captureKind);
   };
 
   const handleError = () => {

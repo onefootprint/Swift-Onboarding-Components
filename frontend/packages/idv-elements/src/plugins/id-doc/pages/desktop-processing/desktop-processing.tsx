@@ -92,13 +92,12 @@ const DeskTopProcessing = () => {
       return;
     }
 
-    const { imageString, mimeType, captureKind } = image;
+    const { imageFile, captureKind } = image;
 
     submitDocMutation.mutate(
       {
         authToken,
-        image: imageString,
-        mimeType,
+        image: imageFile,
         side: currSide,
         id,
         meta: {

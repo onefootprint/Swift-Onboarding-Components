@@ -12,16 +12,11 @@ const SelfiePhoto = () => {
   const { t } = useTranslation('pages.selfie-photo');
   const [, send] = useIdDocMachine();
 
-  const onComplete = (
-    imageString: string,
-    mimeType: string,
-    captureKind?: CaptureKind,
-  ) =>
+  const onComplete = (imageFile: File, captureKind?: CaptureKind) =>
     send({
       type: 'receivedImage',
       payload: {
-        imageString,
-        mimeType,
+        imageFile,
         captureKind,
       },
     });

@@ -66,8 +66,9 @@ export const initialContextDL: MachineContext = {
   },
   id: 'testID',
   image: {
-    imageString: 'image',
-    mimeType: 'image/png',
+    imageFile: new File(['foo'], 'foo.txt', {
+      type: 'text/plain',
+    }),
   },
 };
 
@@ -129,10 +130,36 @@ export const initialContextDLSelfie: MachineContext = {
   currSide: IdDocImageTypes.selfie,
 };
 
-export const withSubmitDoc = () => {
+export const withSubmitDocFront = () => {
   mockRequest({
     method: 'post',
-    path: '/hosted/user/documents/testID/upload',
+    path: '/hosted/user/documents/testID/upload/front',
+    statusCode: 200,
+    response: {
+      errors: [],
+      nextSideToCollect: null,
+      isRetryLimitExceeded: false,
+    },
+  });
+};
+
+export const withSubmitDocBack = () => {
+  mockRequest({
+    method: 'post',
+    path: '/hosted/user/documents/testID/upload/back',
+    statusCode: 200,
+    response: {
+      errors: [],
+      nextSideToCollect: null,
+      isRetryLimitExceeded: false,
+    },
+  });
+};
+
+export const withSubmitDocSelfie = () => {
+  mockRequest({
+    method: 'post',
+    path: '/hosted/user/documents/testID/upload/selfie',
     statusCode: 200,
     response: {
       errors: [],

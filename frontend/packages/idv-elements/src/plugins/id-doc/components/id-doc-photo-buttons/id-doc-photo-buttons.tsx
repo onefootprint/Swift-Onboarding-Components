@@ -7,15 +7,14 @@ import useProcessImage from '../../hooks/use-process-image';
 import { useIdDocMachine } from '../machine-provider';
 
 type IdDocPhotoButtonsProp = {
-  onComplete: (imageString: string, mimeType: string) => void;
+  onComplete: (imageFile: File) => void;
 };
 
 const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
   const { t } = useTranslation('components.id-doc-photo-upload-buttons');
   const [, send] = useIdDocMachine();
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const { processImageFile, convertImageFileToStrippedBase64 } =
-    useProcessImage();
+  const { processImageFile } = useProcessImage();
 
   const [isLoading, setIsLoading] = useState(false);
   const [captureMethod, setCaptureMethod] = useState<
@@ -36,8 +35,8 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
       return;
     }
 
-    const processingResult = await processImageFile(files[0]);
-    if (!processingResult) {
+    const processedImageFile = await processImageFile(files[0]);
+    if (!processedImageFile) {
       console.error(
         'Image upload failed. Uploaded image could not be processed',
       );
@@ -45,19 +44,7 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
       return;
     }
 
-    const { processedImageFile, mimeType } = processingResult;
-
-    const imageString =
-      await convertImageFileToStrippedBase64(processedImageFile);
-    if (!imageString) {
-      onProcessingDone();
-      console.error(
-        'Image upload failed. Uploaded image could not be stringified',
-      );
-      return;
-    }
-
-    onComplete(imageString, mimeType);
+    onComplete(processedImageFile);
     onProcessingDone();
   };
 

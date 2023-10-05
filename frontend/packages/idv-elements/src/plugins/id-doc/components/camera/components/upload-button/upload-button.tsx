@@ -15,8 +15,7 @@ type UploadButtonProps = {
 const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
   const [, send] = useIdDocMachine();
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const { processImageFile, convertImageFileToStrippedBase64 } =
-    useProcessImage();
+  const { processImageFile } = useProcessImage();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,17 +33,8 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
       return;
     }
 
-    const processingResult = await processImageFile(files[0]);
-    if (!processingResult) {
-      onProcessingDone();
-      return;
-    }
-
-    const { processedImageFile, mimeType } = processingResult;
-
-    const imageString =
-      await convertImageFileToStrippedBase64(processedImageFile);
-    if (!imageString) {
+    const processedImageFile = await processImageFile(files[0]);
+    if (!processedImageFile) {
       onProcessingDone();
       return;
     }
@@ -52,8 +42,7 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
     send({
       type: 'receivedImage',
       payload: {
-        imageString,
-        mimeType,
+        imageFile: processedImageFile,
       },
     });
     onProcessingDone();

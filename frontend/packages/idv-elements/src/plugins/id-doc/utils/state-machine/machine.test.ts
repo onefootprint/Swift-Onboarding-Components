@@ -7,6 +7,7 @@ import {
   argsRegularMobile,
   processingErrors,
   requirement,
+  testFile,
   uploadErrors,
 } from './machine.test.config';
 
@@ -111,15 +112,13 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
       ]);
       expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
-        imageString: 'image',
-        mimeType: 'image/png',
+        imageFile: testFile,
       });
 
       state = machine.send({
@@ -137,15 +136,13 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
       ]);
       expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
-        imageString: 'image',
-        mimeType: 'image/png',
+        imageFile: testFile,
       });
 
       state = machine.send({
@@ -165,15 +162,13 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
       ]);
       expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
-        imageString: 'image',
-        mimeType: 'image/png',
+        imageFile: testFile,
       });
 
       state = machine.send({
@@ -226,15 +221,13 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
       ]);
       expect(state.value).toEqual('processingDesktop');
       expect(state.context.image).toEqual({
-        imageString: 'image',
-        mimeType: 'image/png',
+        imageFile: testFile,
       });
 
       state = machine.send({
@@ -249,15 +242,13 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
       ]);
       expect(state.value).toEqual('processingDesktop');
       expect(state.context.image).toEqual({
-        imageString: 'image',
-        mimeType: 'image/png',
+        imageFile: testFile,
       });
 
       state = machine.send({
@@ -272,15 +263,13 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
       ]);
       expect(state.value).toEqual('processingDesktop');
       expect(state.context.image).toEqual({
-        imageString: 'image',
-        mimeType: 'image/png',
+        imageFile: testFile,
       });
 
       state = machine.send({
@@ -324,8 +313,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -358,8 +346,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -376,8 +363,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -413,8 +399,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -431,8 +416,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -465,8 +449,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -478,8 +461,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -533,8 +515,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -579,8 +560,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -615,8 +595,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -651,8 +630,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -684,8 +662,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -746,8 +723,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -788,8 +764,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -867,8 +842,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {
@@ -897,8 +871,7 @@ describe('Id Doc Machine Tests', () => {
         {
           type: 'receivedImage',
           payload: {
-            imageString: 'image',
-            mimeType: 'image/png',
+            imageFile: testFile,
           },
         },
         {

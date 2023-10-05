@@ -2,9 +2,8 @@ import type { IdDocImageProcessingError, IdDocImageTypes } from '../data';
 
 export type SubmitDocRequest = {
   authToken: string;
-  image: string;
+  image: File;
   side: string;
-  mimeType: string;
   id: string;
   meta: {
     manual?: boolean;

@@ -14,7 +14,7 @@ type IdDocPhotoRetryPromptProps = {
   countryName: string;
   imageType: IdDocImageTypes.front | IdDocImageTypes.back;
   errors: IdDocImageErrorType[];
-  onComplete: (imageString: string, mimeType: string) => void;
+  onComplete: (imageFile: File) => void;
 };
 
 const IdDocPhotoRetryPrompt = ({

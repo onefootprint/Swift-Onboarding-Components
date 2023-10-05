@@ -21,7 +21,7 @@ export type MachineContext = {
   authToken: string;
   device: DeviceInfo;
   requirement: IdDocRequirement;
-  image?: { imageString: string; mimeType: string; captureKind?: CaptureKind };
+  image?: { imageFile: File; captureKind?: CaptureKind };
   currSide?: IdDocImageTypes;
   idDoc: {
     type?: SupportedIdDocTypes;
@@ -54,8 +54,7 @@ export type MachineEvents =
   | {
       type: 'receivedImage';
       payload: {
-        imageString: string;
-        mimeType: string;
+        imageFile: File;
         captureKind?: CaptureKind;
       };
     }

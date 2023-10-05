@@ -88,3 +88,7 @@ export const processingErrors = [
 export const uploadErrors = [
   { errorType: IdDocImageUploadError.fileTypeNotAllowed },
 ];
+
+export const testFile = new File(['foo'], 'foo.txt', {
+  type: 'text/plain',
+});

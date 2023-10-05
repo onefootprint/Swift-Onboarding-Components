@@ -311,8 +311,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         }),
         assignImage: assign((context, event) => {
           context.image = {
-            imageString: event.payload.imageString,
-            mimeType: event.payload.mimeType,
+            imageFile: event.payload.imageFile,
             captureKind: event.payload.captureKind,
           };
           return context;

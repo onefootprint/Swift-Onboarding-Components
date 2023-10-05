@@ -41,8 +41,7 @@ const DesktopPhotoPrompt = ({
   const { t } = useTranslation('components.desktop-photo-prompt');
   const [, send] = useIdDocMachine();
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const { processImageFile, convertImageFileToStrippedBase64 } =
-    useProcessImage();
+  const { processImageFile } = useProcessImage();
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,8 +54,8 @@ const DesktopPhotoPrompt = ({
   const handleImage = async (file: File) => {
     setIsLoading(true);
     setHasError(false);
-    const processingResult = await processImageFile(file);
-    if (!processingResult) {
+    const processedImageFile = await processImageFile(file);
+    if (!processedImageFile) {
       onProcessingDone();
       handleUploadError([IdDocImageUploadError.unknownUploadError]);
       console.error(
@@ -65,24 +64,10 @@ const DesktopPhotoPrompt = ({
       return;
     }
 
-    const { processedImageFile, mimeType } = processingResult;
-
-    const imageString =
-      await convertImageFileToStrippedBase64(processedImageFile);
-    if (!imageString) {
-      onProcessingDone();
-      handleUploadError([IdDocImageUploadError.unknownUploadError]);
-      console.error(
-        'Image upload failed on desktop. Uploaded image could not be stringified',
-      );
-      return;
-    }
-
     send({
       type: 'receivedImage',
       payload: {
-        imageString,
-        mimeType,
+        imageFile: processedImageFile,
       },
     });
     onProcessingDone();

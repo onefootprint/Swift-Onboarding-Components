@@ -14,7 +14,9 @@ import {
   initialContextPassport,
   initialContextVisa,
   initialContextWorkPermit,
-  withSubmitDoc,
+  withSubmitDocBack,
+  withSubmitDocFront,
+  withSubmitDocSelfie,
 } from './desktop-processing.test.config';
 
 const renderDesktopProcessing = (context: MachineContext) =>
@@ -23,7 +25,7 @@ const renderDesktopProcessing = (context: MachineContext) =>
 describe('<DesktopProcessing />', () => {
   describe('Contains all the UI elements', () => {
     beforeEach(() => {
-      withSubmitDoc();
+      withSubmitDocFront();
     });
     it('Contains the title', () => {
       renderDesktopProcessing(initialContextDL);
@@ -46,7 +48,7 @@ describe('<DesktopProcessing />', () => {
 
   describe('Contains the correct doc type in the title', () => {
     beforeEach(() => {
-      withSubmitDoc();
+      withSubmitDocFront();
     });
     it('DL', () => {
       renderDesktopProcessing(initialContextDL);
@@ -87,7 +89,7 @@ describe('<DesktopProcessing />', () => {
 
   describe('Contains the correct country in the subtitle', () => {
     beforeEach(() => {
-      withSubmitDoc();
+      withSubmitDocFront();
     });
     it('US', () => {
       renderDesktopProcessing(initialContextDL);
@@ -103,16 +105,15 @@ describe('<DesktopProcessing />', () => {
   });
 
   describe('Contains the correct side in the title', () => {
-    beforeEach(() => {
-      withSubmitDoc();
-    });
     it('Back side', () => {
+      withSubmitDocBack();
       renderDesktopProcessing(initialContextDLBack);
       const title = screen.getByText("Driver's license · Back side");
       expect(title).toBeInTheDocument();
     });
 
     it('Selfie', () => {
+      withSubmitDocSelfie();
       renderDesktopProcessing(initialContextDLSelfie);
       const title = screen.getByText('Selfie');
       expect(title).toBeInTheDocument();
