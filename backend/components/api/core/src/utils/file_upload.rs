@@ -1,5 +1,5 @@
 use crate::errors::file_upload::FileUploadError;
-use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use bytes::BytesMut;
@@ -14,7 +14,6 @@ pub struct FileUpload {
     pub bytes: PiiBytes,
     pub mime_type: String,
     pub filename: String,
-    pub file_extension: String,
 }
 
 impl std::fmt::Debug for FileUpload {
@@ -22,25 +21,15 @@ impl std::fmt::Debug for FileUpload {
         f.debug_struct("FileUpload")
             .field("mime_type", &self.mime_type)
             .field("filename", &self.filename)
-            .field("file_extension", &self.file_extension)
             .finish()
     }
 }
 
 impl FileUpload {
     pub fn new_simple(pii: PiiBytes, name: String, mime: &str) -> Self {
-        let file_extension = match mime {
-            "image/png" => "png",
-            "image/svg+xml" => "svg",
-            "image/jpeg" => "jpg",
-            "application/pdf" => "pdf",
-            _ => "bin",
-        };
-
         Self {
             bytes: pii,
             mime_type: mime.to_string(),
-            file_extension: file_extension.to_string(),
             filename: name,
         }
     }
@@ -49,9 +38,9 @@ impl FileUpload {
 pub async fn handle_file_upload(
     payload: &mut Multipart,
     request: &HttpRequest,
-    allowed_mime_types: Vec<Mime>,
+    restrict_to_mime_types: Option<Vec<Mime>>,
     max_allowed_file_size_in_bytes: usize,
-) -> Result<FileUpload, ApiError> {
+) -> ApiResult<FileUpload> {
     let request_content_length: usize =
         crate::utils::headers::get_required_header(CONTENT_LENGTH.as_str(), request.headers())?
             .parse()
@@ -79,18 +68,11 @@ pub async fn handle_file_upload(
         .clone();
     let mime_type = mime.to_string();
 
-    let file_extension = allowed_mime_types
-        .contains(&mime)
-        .then_some(match mime_type.as_str() {
-            "image/png" => Some("png"),
-            "image/svg+xml" => Some("svg"),
-            "image/jpeg" => Some("jpg"),
-            "application/pdf" => Some("pdf"),
-            _ => None,
-        })
-        .flatten()
-        .ok_or(FileUploadError::InvalidMimeType)?
-        .to_string();
+    if let Some(allowed_mime_types) = restrict_to_mime_types {
+        if !allowed_mime_types.contains(&mime) {
+            return Err(FileUploadError::InvalidMimeType.into());
+        }
+    }
 
     let mut bytes = BytesMut::new();
     while let Some(chunk) = item.next().await {
@@ -107,7 +89,6 @@ pub async fn handle_file_upload(
     Ok(FileUpload {
         bytes,
         mime_type,
-        file_extension,
         filename,
     })
 }

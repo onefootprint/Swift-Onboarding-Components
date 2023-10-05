@@ -1,4 +1,5 @@
 use actix_multipart::Multipart;
+use api_core::errors::file_upload::FileUploadError;
 use db::models::tenant::{Tenant, UpdateTenant};
 use paperclip::actix::{self, api_v2_operation, web, web::HttpRequest, web::Json};
 
@@ -28,7 +29,7 @@ pub async fn put(
     let file = file_upload::handle_file_upload(
         &mut payload,
         &request,
-        vec![mime::IMAGE_PNG, mime::IMAGE_SVG, mime::IMAGE_JPEG],
+        Some(vec![mime::IMAGE_PNG, mime::IMAGE_SVG, mime::IMAGE_JPEG]),
         MAX_IMAGE_SIZE_BYTES,
     )
     .await?;
@@ -43,11 +44,19 @@ pub async fn put(
     // note: ol = 'org logo'
     // Open Qs:
     //  - maybe we should name the file by the hash of the contents? (to avoid dupes / collisions)
+    let file_extension = match file.mime_type.as_ref() {
+        "image/png" => Some("png"),
+        "image/svg+xml" => Some("svg"),
+        "image/jpeg" => Some("jpg"),
+        "application/pdf" => Some("pdf"),
+        _ => None,
+    }
+    .ok_or(FileUploadError::InvalidMimeType)?;
     let file_name = format!(
         "ol/{}/{}.{}",
         tenant_url_friendly_hash,
         crypto::random::gen_random_alphanumeric_code(22),
-        file.file_extension
+        file_extension
     );
 
     let logo_url = format!("{}/{}", state.config.assets_cdn_origin, &file_name);

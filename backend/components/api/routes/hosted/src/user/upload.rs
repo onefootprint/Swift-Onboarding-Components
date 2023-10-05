@@ -29,7 +29,7 @@ pub async fn post(
     let file = file_upload::handle_file_upload(
         &mut payload,
         &request,
-        kind.accepted_mime_types(),
+        Some(kind.accepted_mime_types()),
         MAX_DOC_SIZE_BYTES,
     )
     .await?;

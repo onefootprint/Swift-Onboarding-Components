@@ -27,6 +27,13 @@ pub fn get_header(name: &str, req: &HeaderMap) -> Option<String> {
     req.get(name).and_then(|h| h.to_str().ok()).map(|s| s.to_string())
 }
 
+pub fn get_bool_header(name: &str, req: &HeaderMap) -> Option<bool> {
+    req.get(name)
+        .and_then(|h| h.to_str().ok())
+        .map(|s| s.to_string())
+        .map(|h| h == "true")
+}
+
 pub fn get_required_header(name: &'static str, req: &HeaderMap) -> ApiResult<String> {
     req.get(name)
         .and_then(|h| h.to_str().ok())

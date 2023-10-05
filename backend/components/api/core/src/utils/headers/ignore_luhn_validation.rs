@@ -1,4 +1,4 @@
-use super::get_header;
+use super::get_bool_header;
 use actix_web::{http::header::HeaderMap, FromRequest};
 use derive_more::Deref;
 use futures_util::Future;
@@ -14,9 +14,7 @@ impl IgnoreLuhnValidation {
     const HEADER_NAME: &str = "x-fp-ignore-luhn-validation";
 
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
-        let allow_extra_fields = get_header(Self::HEADER_NAME, headers)
-            .map(|h| h == "true")
-            .unwrap_or_default();
+        let allow_extra_fields = get_bool_header(Self::HEADER_NAME, headers).unwrap_or_default();
         Self(allow_extra_fields)
     }
 }

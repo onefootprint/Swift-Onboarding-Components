@@ -6,6 +6,8 @@ use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
+use actix_multipart::Multipart;
+use actix_web::HttpRequest;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::vendor;
@@ -14,10 +16,11 @@ use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete}
 use api_core::decision::vendor::incode::{get_config_id, IncodeContext, IncodeStateMachine};
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
-use api_core::utils::file_upload::FileUpload;
+use api_core::utils::file_upload::{handle_file_upload, FileUpload};
+use api_core::utils::headers::get_bool_header;
 use api_core::utils::large_json::LargeJson;
 use api_core::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VwArgs};
-use api_wire_types::{CreateIdentityDocumentUploadRequest, DocumentImageError, DocumentResponse};
+use api_wire_types::{CreateIdentityDocumentUploadRequest, DocumentImageError, DocumentResponse, UploadMeta};
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
 use db::models::document_upload::{DocumentUpload, NewDocumentUploadArgs};
@@ -37,6 +40,63 @@ use newtypes::{
 use newtypes::{ScopedVaultId, VendorAPI, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
 
+use actix_web::{http::header::HeaderMap, FromRequest};
+use futures_util::Future;
+use paperclip::actix::Apiv2Schema;
+use std::pin::Pin;
+
+#[derive(Debug, Apiv2Schema)]
+// TODO barcodes? wouldn't be great to send in header bc has PII?
+pub struct MetaHeaders(UploadMeta);
+
+impl MetaHeaders {
+    const IS_INSTANT_APP_HEADER_NAME: &str = "x-fp-is-instant-app";
+    const IS_APP_CLIP_HEADER_NAME: &str = "x-fp-is-app-clip";
+    const IS_MANUAL_HEADER_NAME: &str = "x-fp-is-manual";
+
+    pub fn parse_from_request(headers: &HeaderMap) -> Self {
+        let is_instant_app = get_bool_header(Self::IS_INSTANT_APP_HEADER_NAME, headers);
+        let is_app_clip = get_bool_header(Self::IS_APP_CLIP_HEADER_NAME, headers);
+        let is_manual = get_bool_header(Self::IS_MANUAL_HEADER_NAME, headers);
+        Self(UploadMeta {
+            is_instant_app,
+            is_app_clip,
+            manual: is_manual,
+        })
+    }
+}
+
+impl FromRequest for MetaHeaders {
+    type Error = crate::ApiError;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
+
+    fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+        let headers = MetaHeaders::parse_from_request(req.headers());
+        Box::pin(async move { Ok(headers) })
+    }
+}
+
+#[api_v2_operation(
+    description = "Create a new identity document for this user's outstanding document request",
+    tags(Hosted)
+)]
+#[actix::post("/hosted/user/documents/{id}/upload/{side}")]
+pub async fn post_multipart(
+    state: web::Data<State>,
+    user_auth: UserWfAuthContext,
+    args: web::Path<(IdentityDocumentId, DocumentSide)>,
+    mut payload: Multipart,
+    request: HttpRequest,
+    meta_headers: MetaHeaders,
+) -> JsonApiResponse<DocumentResponse> {
+    let (document_id, side) = args.into_inner();
+    let file = handle_file_upload(&mut payload, &request, None, 5_242_880).await?;
+
+    let meta = meta_headers.0;
+    let result = post_inner(state, user_auth, document_id, side, file, Some(meta)).await?;
+    Ok(result)
+}
+
 #[api_v2_operation(
     description = "Create a new identity document for this user's outstanding document request",
     tags(Hosted)
@@ -49,11 +109,7 @@ pub async fn post(
     request: LargeJson<CreateIdentityDocumentUploadRequest, 5_242_880>,
 ) -> JsonApiResponse<DocumentResponse> {
     tracing::info!("Starting handler");
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
-    user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
-    let wf = user_auth.workflow();
-    let wf_id = wf.id.clone();
-    let document_id: IdentityDocumentId = document_id.into_inner();
+    let document_id = document_id.into_inner();
     tracing::info!("Before unpacking request");
     let CreateIdentityDocumentUploadRequest {
         image,
@@ -63,7 +119,27 @@ pub async fn post(
         meta,
     } = request.0;
     tracing::info!("After unpacking request");
+    let image_bytes = image.try_decode_base64().map_err(crypto::Error::from)?;
+    // TODO filename here changed. does it matter?
+    // let filename = format!("{}", di);
+    let filename = format!("{}.{}", document_id, side);
+    let file = FileUpload::new_simple(image_bytes, filename, &mime_type);
+    let result = post_inner(state, user_auth, document_id, side, file, meta).await?;
+    Ok(result)
+}
 
+async fn post_inner(
+    state: web::Data<State>,
+    user_auth: UserWfAuthContext,
+    document_id: IdentityDocumentId,
+    side: DocumentSide,
+    file: FileUpload,
+    meta: Option<UploadMeta>,
+) -> JsonApiResponse<DocumentResponse> {
+    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
+    let wf = user_auth.workflow();
+    let wf_id = wf.id.clone();
     let su_id = user_auth.scoped_user.id.clone();
     let (id_doc, doc_request, uvw, user_consent, obc) = state
         .db_pool
@@ -90,8 +166,6 @@ pub async fn post(
     // Upload the image to s3
     let di = DataIdentifier::from(DocumentKind::LatestUpload(id_doc.document_type, side));
     let su_id = user_auth.scoped_user.id.clone();
-    let image_bytes = image.try_decode_base64().map_err(crypto::Error::from)?;
-    let file = FileUpload::new_simple(image_bytes, format!("{}", di), &mime_type);
     let (e_data_key, s3_url) =
         seal_file_and_upload_to_s3(&state, &file, di.clone(), user_auth.user(), &su_id).await?;
 
@@ -114,8 +188,15 @@ pub async fn post(
             // Vault the images under latest uploads
 
             let source = DataLifetimeSource::Hosted;
-            let (d, seqno) =
-                uvw.put_document_unsafe(conn, di, mime_type, file.filename, e_data_key, s3_url, source)?;
+            let (d, seqno) = uvw.put_document_unsafe(
+                conn,
+                di,
+                file.mime_type,
+                file.filename,
+                e_data_key,
+                s3_url,
+                source,
+            )?;
             let args = NewDocumentUploadArgs {
                 document_id: id_doc.id.clone(),
                 side,

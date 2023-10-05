@@ -1,6 +1,6 @@
 use std::pin::Pin;
 
-use super::get_header;
+use super::{get_bool_header, get_header};
 use actix_web::{http::header::HeaderMap, FromRequest};
 use futures_util::Future;
 use newtypes::{SessionId, Uuid};
@@ -27,9 +27,8 @@ impl TelemetryHeaders {
             .unwrap_or(None)
             .map(|uuid| uuid.to_string())
             .map(SessionId::from);
-        let is_integration_test_req = get_header(Self::INTEGRATION_TESTS_HEADER_NAME, headers)
-            .map(|h| h == "true")
-            .unwrap_or_default();
+        let is_integration_test_req =
+            get_bool_header(Self::INTEGRATION_TESTS_HEADER_NAME, headers).unwrap_or_default();
         Self {
             session_id,
             is_integration_test_req,
