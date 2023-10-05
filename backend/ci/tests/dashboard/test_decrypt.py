@@ -5,6 +5,7 @@ from tests.utils import (
     post,
 )
 from tests.bifrost_client import BifrostClient
+from tests.utils import compare_b64_contents
 
 
 def test_tenant_decrypt(sandbox_user):
@@ -68,17 +69,11 @@ def test_tenant_document_decrypt_no_permissions(sandbox_user):
     )
 
 
-def test_tenant_selfie_decrypt(
+def test_tenant_image_decrypt(
     sandbox_tenant,
     twilio,
     doc_request_sandbox_ob_config,
 ):
-    from tests.image_fixtures import (
-        test_image_dl_front,
-        test_image_dl_back,
-        test_image_dl_selfie,
-    )
-
     bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
     user = bifrost.run()
 
@@ -98,9 +93,14 @@ def test_tenant_selfie_decrypt(
         sandbox_tenant.sk.key,
     )
 
-    assert resp["document.drivers_license.front.image"] == test_image_dl_front
-    assert resp["document.drivers_license.back.image"] == test_image_dl_back
-    assert resp["document.drivers_license.selfie.image"] == test_image_dl_selfie
+    tests = [
+        ("document.drivers_license.front.image", "drivers_license.front.png"),
+        ("document.drivers_license.back.image", "drivers_license.back.png"),
+        ("document.drivers_license.selfie.image", "drivers_license.selfie.png"),
+    ]
+    for di, file_name in tests:
+        assert compare_b64_contents(resp[di], file_name)
+
     assert resp["document.drivers_license.front.mime_type"] == "image/png"
 
     access_event = latest_access_event_for(user.fp_id, sandbox_tenant)

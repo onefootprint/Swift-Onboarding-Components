@@ -1,5 +1,3 @@
-import base64
-import requests
 import pytest
 from tests.dashboard.utils import latest_access_event_for
 from tests.utils import (
@@ -8,8 +6,8 @@ from tests.utils import (
     get_raw,
 )
 
-from tests.image_fixtures import test_image_dl_front
 from tests.bifrost_client import BifrostClient
+from tests.utils import compare_contents, compare_b64_contents, multipart_file
 
 
 @pytest.fixture(scope="session")
@@ -50,8 +48,6 @@ def test_tenant_document_get_decrypt(user_with_documents):
 
 
 def test_tenant_document_decrypt(user_with_documents):
-    from tests.image_fixtures import test_image_dl_front
-
     tenant = user_with_documents.tenant
     fields = [
         "document.drivers_license.front.latest_upload",
@@ -68,8 +64,13 @@ def test_tenant_document_decrypt(user_with_documents):
 
     resp = post(f"users/{user_with_documents.fp_id}/vault/decrypt", data, tenant.sk.key)
 
-    assert resp["document.drivers_license.front.latest_upload"] == test_image_dl_front
-    assert resp["document.drivers_license.front.image"] == test_image_dl_front
+    assert compare_b64_contents(
+        resp["document.drivers_license.front.latest_upload"],
+        "drivers_license.front.png",
+    )
+    assert compare_b64_contents(
+        resp["document.drivers_license.front.image"], "drivers_license.front.png"
+    )
     # These OCR values come from TEST_ONLY_FIXTURE
     assert resp["document.drivers_license.document_number"] == "Y12341234"
     assert resp["document.drivers_license.issuing_state"] == "CALIFORNIA"
@@ -81,8 +82,6 @@ def test_tenant_document_decrypt(user_with_documents):
 
 
 def test_tenant_document_decrypt_download(user_with_documents):
-    from tests.image_fixtures import test_image_dl_front
-
     tenant = user_with_documents.tenant
     fields = [
         "document.drivers_license.front.image",
@@ -95,13 +94,12 @@ def test_tenant_document_decrypt_download(user_with_documents):
 
     body = post(f"users/{user_with_documents.fp_id}/client_token", data, tenant.sk.key)
     token = body["token"]
-    print(token)
 
     # Make raw request since the downloaded content is not json
     response = get_raw(f"users/vault/decrypt/{token}")
     assert response.headers.get("content-disposition") == "attachment"
     assert response.headers.get("content-type") == "image/png"
-    assert response.content == base64.b64decode(test_image_dl_front)
+    assert compare_contents(response.content, "drivers_license.front.png")
 
     access_event = latest_access_event_for(user_with_documents.fp_id, tenant)
     assert set(access_event["targets"]) == set(fields)
@@ -131,7 +129,7 @@ def test_get_entity_documents_uploaded_via_api(sandbox_tenant):
         f"users/{fp_id}/vault/document.drivers_license.front.image/upload",
         None,
         sandbox_tenant.sk.key,
-        raw_data=base64.b64decode(test_image_dl_front),
+        files=multipart_file("drivers_license.front.png", "img/png"),
     )
 
     body = get(f"entities/{fp_id}/documents", None, *sandbox_tenant.db_auths)
@@ -145,8 +143,6 @@ def test_get_entity_documents_uploaded_via_api(sandbox_tenant):
 
 
 def test_decrypt_historical(user_with_documents):
-    from tests.image_fixtures import test_image_dl_front
-
     tenant = user_with_documents.tenant
     fp_id = user_with_documents.fp_id
     body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
@@ -171,10 +167,13 @@ def test_decrypt_historical(user_with_documents):
     }
     body = post(f"users/{user_with_documents.fp_id}/vault/decrypt", data, tenant.sk.key)
 
-    assert body["document.drivers_license.front.latest_upload"] == test_image_dl_front
-    assert (
-        body[f"document.drivers_license.front.latest_upload:{front_version}"]
-        == test_image_dl_front
+    assert compare_b64_contents(
+        body["document.drivers_license.front.latest_upload"],
+        "drivers_license.front.png",
+    )
+    assert compare_b64_contents(
+        body[f"document.drivers_license.front.latest_upload:{front_version}"],
+        "drivers_license.front.png",
     )
     # Version before created version should be empty
     assert (

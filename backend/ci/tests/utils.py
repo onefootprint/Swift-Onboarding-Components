@@ -548,3 +548,11 @@ def multipart_file(filename, mime_type):
 def file_contents(filename):
     with open(file_path(filename), "rb") as f:
         return f.read()
+
+
+def compare_b64_contents(base64_encoded, file_name):
+    return file_contents(file_name) == base64.b64decode(base64_encoded)
+
+
+def compare_contents(value, file_name):
+    return file_contents(file_name) == value

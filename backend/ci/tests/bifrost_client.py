@@ -9,7 +9,6 @@ from tests.constants import (
     IP_DATA,
     CDO_TO_DIS,
     EMAIL,
-    DOCUMENT_DATA,
     FIXTURE_PHONE_NUMBER,
 )
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -106,9 +105,17 @@ class BifrostClient:
             **ID_DATA,
             **BUSINESS_DATA,
             **IP_DATA,
-            **DOCUMENT_DATA,
             "document.finra_compliance_letter": multipart_file(
                 "example_pdf.pdf", "application/pdf"
+            ),
+            "document.drivers_license.front.image": multipart_file(
+                "drivers_license.front.png", "img/png"
+            ),
+            "document.drivers_license.back.image": multipart_file(
+                "drivers_license.back.png", "img/png"
+            ),
+            "document.drivers_license.selfie.image": multipart_file(
+                "drivers_license.selfie.png", "img/png"
             ),
             "id.ssn9": _gen_random_ssn(),
             "business.name": business_name,
@@ -262,12 +269,20 @@ class BifrostClient:
 
         # Upload the documents consecutively in separate requests
         for i, side in enumerate(sides):
-            data = dict(
-                image=self.data[f"document.drivers_license.{side}.image"],
-                side=side,
-                mime_type="image/png",
+            file = self.data[f"document.drivers_license.{side}.image"]
+            headers = {
+                "x-fp-is-app-clip": "true",
+                "x-fp-is-instant-app": "false",
+                "x-fp-is-mobile": "true",
+                # TODO do we need mime type?
+            }
+            body = post(
+                f"hosted/user/documents/{doc_id}/upload/{side}",
+                None,
+                self.auth_token,
+                files=file,
+                addl_headers=headers,
             )
-            body = post(f"hosted/user/documents/{doc_id}/upload", data, self.auth_token)
             next_side = sides[i + 1] if i + 1 < len(sides) else None
             assert body["next_side_to_collect"] == next_side
             assert not body["errors"]
