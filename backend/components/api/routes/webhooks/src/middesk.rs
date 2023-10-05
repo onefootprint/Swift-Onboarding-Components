@@ -19,16 +19,16 @@ async fn handle_webhook(
 
     match res {
         Ok(_) => {}
-        Err(error) => {
+        Err(err) => {
             // We are sometimes getting extraneous webhooks for businesses we've already completed verification for. For these cases
             // we still want to log the error, but we want to return a 200 response to middesk doesn't keep retrying the webhook
             if matches!(
-                error.kind(),
+                err.kind(),
                 ApiErrorKind::MiddeskError(MiddeskError::UnexpectedState(MiddeskStatesKind::Complete, _, _))
             ) {
-                tracing::error!(?error, "Received webhook for completed middesk_request");
+                tracing::error!(?err, "Received webhook for completed middesk_request");
             } else {
-                Err(error)?;
+                Err(err)?;
             }
         }
     }

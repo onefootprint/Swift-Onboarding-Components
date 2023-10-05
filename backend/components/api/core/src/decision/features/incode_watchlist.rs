@@ -142,8 +142,8 @@ pub fn type_to_frc(s: String) -> Option<FootprintReasonCode> {
             }
             frc
         }
-        Err(e) => {
-            tracing::error!(error=?e, s=s, "Could not parse IncodeWatchlistType");
+        Err(err) => {
+            tracing::error!(?err, s = s, "Could not parse IncodeWatchlistType");
             None
         }
     }

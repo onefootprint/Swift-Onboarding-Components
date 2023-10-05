@@ -71,8 +71,8 @@ pub async fn post(
             })
             .await;
 
-        if let Err(e) = db_res {
-            tracing::error!(error = ?e, "error saving fingerprint result")
+        if let Err(err) = db_res {
+            tracing::error!(?err, "error saving fingerprint result")
         }
     });
 

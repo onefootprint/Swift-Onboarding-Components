@@ -40,12 +40,12 @@ pub async fn post(
     let res = state.vendor_clients.stytch_lookup.make_request(req).await;
     let res = match res {
         Ok(res) => Either::Left(res),
-        Err(e) => match e {
-            idv::stytch::error::Error::ErrorWithResponse(e) => {
-                tracing::error!(error=?e, "Stytch error response");
-                Either::Right(e.response.clone())
+        Err(err) => match err {
+            idv::stytch::error::Error::ErrorWithResponse(err) => {
+                tracing::error!(?err, "Stytch error response");
+                Either::Right(err.response.clone())
             }
-            _ => Err(ApiError::from(idv::Error::from(e)))?,
+            _ => Err(ApiError::from(idv::Error::from(err)))?,
         },
     };
 

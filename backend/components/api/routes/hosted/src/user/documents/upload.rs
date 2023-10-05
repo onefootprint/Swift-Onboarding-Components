@@ -368,8 +368,8 @@ pub async fn handle_incode_request(
     let (machine_state_name, retry_reasons) =
         match machine.run(&state.db_pool, &state.vendor_clients.incode).await {
             Ok((machine, retry_reasons)) => (machine.state.name(), retry_reasons),
-            Err(e) => {
-                tracing::error!(error=%e.error, "IncodeMachineError");
+            Err(err) => {
+                tracing::error!(?err, "IncodeMachineError");
 
                 state
                     .db_pool

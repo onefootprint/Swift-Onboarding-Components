@@ -32,13 +32,13 @@ impl IncodeStateTransition for AddSelfie {
 
         let failure_reasons = match add_selfie_inner(db_pool, clients, ctx, session, selfie_image).await {
             Ok(reasons) => Ok(reasons),
-            Err(e) => {
-                tracing::error!(e=%e, selfie_disabled=ctx.disable_selfie, "error adding selfie");
+            Err(err) => {
+                tracing::error!(?err, selfie_disabled = ctx.disable_selfie, "error adding selfie");
 
                 if ctx.disable_selfie {
                     Ok(vec![])
                 } else {
-                    Err(e)
+                    Err(err)
                 }
             }
         }?;

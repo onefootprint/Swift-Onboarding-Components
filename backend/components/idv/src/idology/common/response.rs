@@ -33,8 +33,8 @@ impl IDologyQualifiers {
                 let idology_reason_code = IDologyReasonCode::from_str(parsed_idology_qualifier.key.as_str());
                 match idology_reason_code {
                     Ok(i) => Some((parsed_idology_qualifier, i)),
-                    Err(e) => {
-                        tracing::error!(error=%e, "Error parsing IdologyReasonCode");
+                    Err(err) => {
+                        tracing::error!(?err, "Error parsing IdologyReasonCode");
                         None
                     }
                 }
@@ -64,8 +64,8 @@ impl IDologyQualifiers {
             .into_iter()
             .flat_map(|p| match p {
                 Ok(q) => Some(q),
-                Err(e) => {
-                    tracing::error!(error=%e, "Error parsing Idology qualifiers");
+                Err(err) => {
+                    tracing::error!(?err, "Error parsing Idology qualifiers");
                     None
                 }
             })

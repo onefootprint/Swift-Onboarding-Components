@@ -72,8 +72,8 @@ impl Restriction {
                 .map(PaWatchlistHit::try_from)
                 .filter_map(|r| match r {
                     Ok(h) => Some(h),
-                    Err(e) => {
-                        tracing::error!(error=?e, "Error parsing Idology watchlist hit");
+                    Err(err) => {
+                        tracing::error!(?err, "Error parsing Idology watchlist hit");
                         None
                     }
                 })

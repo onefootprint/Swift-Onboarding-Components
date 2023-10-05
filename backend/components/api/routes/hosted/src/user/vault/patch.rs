@@ -136,11 +136,11 @@ pub async fn patch(
             .into_iter()
             .find(|(di, _)| di == &DataIdentifier::from(IDK::Email))
         {
-            if let Err(e) = send_email_challenge(&state, &tenant.id, ci.id, &email.email).await {
+            if let Err(err) = send_email_challenge(&state, &tenant.id, ci.id, &email.email).await {
                 // For now, we don't want to block vault updates on these async email verifications.
                 // We don't do anything with them today. But maybe we'll want to be more strict
                 // about this in the future
-                tracing::error!(e=%e, "Unable to send async email verification email");
+                tracing::error!(?err, "Unable to send async email verification email");
             }
         }
     }

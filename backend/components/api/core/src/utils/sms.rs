@@ -112,7 +112,7 @@ impl SmsClient {
         let client = self.clone();
         tokio::spawn(async move {
             let _ = client._send_message(message_body, e164).await.map_err(|err| {
-                tracing::error!(error=?err, "Failed to send SMS message");
+                tracing::error!(?err, "Failed to send SMS message");
             });
         });
         Ok(())
@@ -128,8 +128,12 @@ impl SmsClient {
         } else {
             self._send_pinpoint(&message_body, &destination).await
         };
-        if let Err(e) = res {
-            tracing::error!(prefer_twilio = prefer_twilio, e=%e, "Moving on to fallback SMS vendor");
+        if let Err(err) = res {
+            tracing::error!(
+                prefer_twilio = prefer_twilio,
+                ?err,
+                "Moving on to fallback SMS vendor"
+            );
             // If there was an error, waterfall to the secondary vendor
             if prefer_twilio {
                 self._send_pinpoint(&message_body, &destination).await?;

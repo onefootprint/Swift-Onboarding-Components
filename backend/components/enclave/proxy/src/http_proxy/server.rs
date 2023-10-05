@@ -76,8 +76,8 @@ pub async fn run(config: Config) -> Result<(), std::io::Error> {
 #[derive(Debug, Clone)]
 struct EnclavePoolErrorSink;
 impl bb8::ErrorSink<crate::Error> for EnclavePoolErrorSink {
-    fn sink(&self, error: crate::Error) {
-        tracing::error!(target: "enclave_pool_error", error=?error, "enclave connection pool error");
+    fn sink(&self, err: crate::Error) {
+        tracing::error!(target: "enclave_pool_error", ?err, "enclave connection pool error");
     }
 
     fn boxed_clone(&self) -> Box<(dyn bb8::ErrorSink<crate::Error> + 'static)> {

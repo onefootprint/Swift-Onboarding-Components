@@ -156,9 +156,9 @@ impl VendorResult {
                             verification_result_id: result.id,
                         })
                     }
-                    Err(error) => {
+                    Err(err) => {
                         tracing::error!(
-                            ?error,
+                            ?err,
                             verification_result_id=%result.id,
                             vendor_api=%request.vendor_api,
                             "Error in deserializing vendor response, deserialize_from_vendor_api"

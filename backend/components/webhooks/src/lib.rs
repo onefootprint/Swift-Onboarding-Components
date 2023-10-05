@@ -101,7 +101,7 @@ impl WebhookClient for WebhookServiceClient {
                 .send_event_to_tenant(tenant, event, idempotency_key)
                 .await
                 .map_err(|err| {
-                    tracing::error!(error=?err, "failed to send webhook event");
+                    tracing::error!(?err, "failed to send webhook event");
                 });
         });
     }

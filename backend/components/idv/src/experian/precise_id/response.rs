@@ -105,8 +105,8 @@ impl PreciseIDAPIResponse {
 
                             match res {
                                 c @ Ok(_) => c.ok(),
-                                Err(e) => {
-                                    tracing::error!(code=%c, error=?e, "could not parse response code for experian");
+                                Err(err) => {
+                                    tracing::error!(code=%c, ?err, "could not parse response code for experian");
                                     None
                                 }
                             }

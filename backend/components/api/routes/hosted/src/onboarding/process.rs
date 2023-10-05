@@ -106,8 +106,8 @@ pub async fn post(
             }
             RunIncodeMachineAndWorkflowResult::WorkflowRan => {}
         },
-        Err(error) => {
-            tracing::error!(?error, "Error running incode machine or workflow in /process")
+        Err(err) => {
+            tracing::error!(?err, "Error running incode machine or workflow in /process")
         }
     }
 
@@ -149,7 +149,7 @@ async fn run_kyb_if_needed(state: &State, user_auth: CheckUserWfAuthContext) -> 
             let _ = ww
                 .run(state, WorkflowActions::Authorize(Authorize {}))
                 .await
-                .map_err(|e| tracing::error!(error=?e, "Error running Authorize on KYB workflow"));
+                .map_err(|err| tracing::error!(?err, "Error running Authorize on KYB workflow"));
         }
 
         // Refresh the wf since it may have changed above
@@ -168,8 +168,8 @@ async fn run_kyb_if_needed(state: &State, user_auth: CheckUserWfAuthContext) -> 
                 Ok(ww) => {
                     tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran KYB workflow BoKycCompleted");
                 }
-                Err(e) => {
-                    tracing::error!(error=?e, "Error running BoKycCompleted on KYB workflow");
+                Err(err) => {
+                    tracing::error!(?err, "Error running BoKycCompleted on KYB workflow");
                 }
             };
         }

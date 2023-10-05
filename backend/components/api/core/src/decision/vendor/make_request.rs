@@ -49,8 +49,8 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
         vendor_api,
     ).await?;
 
-    if let Err(error) = vendor_result.as_ref() {
-        tracing::error!(?error, "Error making vendor call");
+    if let Err(err) = vendor_result.as_ref() {
+        tracing::error!(?err, "Error making vendor call");
     }
 
     let sv_id = sv_id.clone();
@@ -511,14 +511,14 @@ pub async fn make_vendor_requests(
 
             match res {
                 Ok(vr) => Ok((reqs[idx].clone(), vr)),
-                Err(e) => {
+                Err(err) => {
                     tracing::error!(
-                        error = ?e,
-                        vendor_api = %e.vendor_api,
+                        ?err,
+                        vendor_api = %err.vendor_api,
                         log_msg
                     );
 
-                    Err((reqs[idx].clone(), ApiError::from(e))) // TODO: no need to wrap in ApiError
+                    Err((reqs[idx].clone(), ApiError::from(err))) // TODO: no need to wrap in ApiError
                 }
             }
         })

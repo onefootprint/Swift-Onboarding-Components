@@ -166,7 +166,7 @@ pub enum ExperianErrorCode {
     /// End User is required
     #[serde(rename = "711")]
     E711,
-    /// Other Precise ID system error
+    ///   Precise ID system error
     #[serde(rename = "720")]
     E720,
     // TODO: Also get json not well formed R0102 in the response header, but not in the docs anywhere /shrug

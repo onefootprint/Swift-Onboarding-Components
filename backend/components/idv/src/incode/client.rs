@@ -155,10 +155,10 @@ impl AuthenticatedIncodeClientAdapter {
 
         let json = match response.json().await {
             Ok(j) => Ok(j),
-            Err(e) => {
-                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+            Err(err) => {
+                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
 
-                Err(e)
+                Err(err)
             }
         }?;
 
@@ -183,10 +183,10 @@ impl AuthenticatedIncodeClientAdapter {
 
         let json = match response.json().await {
             Ok(j) => Ok(j),
-            Err(e) => {
-                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+            Err(err) => {
+                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
 
-                Err(e)
+                Err(err)
             }
         }?;
 
@@ -265,10 +265,10 @@ impl AuthenticatedIncodeClientAdapter {
 
         let json = match response.json().await {
             Ok(j) => Ok(j),
-            Err(e) => {
-                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+            Err(err) => {
+                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
 
-                Err(e)
+                Err(err)
             }
         }?;
 
@@ -293,10 +293,10 @@ impl AuthenticatedIncodeClientAdapter {
 
         let json = match response.json().await {
             Ok(j) => Ok(j),
-            Err(e) => {
-                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+            Err(err) => {
+                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
 
-                Err(e)
+                Err(err)
             }
         }?;
 
@@ -321,10 +321,10 @@ impl AuthenticatedIncodeClientAdapter {
 
         let json = match response.json().await {
             Ok(j) => Ok(j),
-            Err(e) => {
-                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+            Err(err) => {
+                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
 
-                Err(e)
+                Err(err)
             }
         }?;
 
@@ -350,10 +350,10 @@ impl AuthenticatedIncodeClientAdapter {
 
         let json = match response.json().await {
             Ok(j) => Ok(j),
-            Err(e) => {
-                tracing::error!(http_status=%s, content_length=?cl, err_msg=%e.to_string(), "error parsing incode response as json");
+            Err(err) => {
+                tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
 
-                Err(e)
+                Err(err)
             }
         }?;
 

@@ -174,7 +174,7 @@ pub fn send_email_challenge_non_blocking(
             .send_email_otp_verify_email(email2, code, tenant_url)
             .await
             .map_err(|err| {
-                tracing::error!(error=?err, "Failed to send email challenge");
+                tracing::error!(?err, "Failed to send email challenge");
             });
     });
 

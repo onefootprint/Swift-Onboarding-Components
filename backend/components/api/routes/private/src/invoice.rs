@@ -183,10 +183,10 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
         .billing_client
         .generate_draft_invoice(info)
         .await
-        .map_err(|e| {
+        .map_err(|err| {
             // Log error since the request only fails with a single tenant's error message
-            tracing::error!(error=?e, tenant_id = %tenant.id, "Couldn't bill tenant");
-            e
+            tracing::error!(?err, tenant_id = %tenant.id, "Couldn't bill tenant");
+            err
         })?;
     Ok(())
 }

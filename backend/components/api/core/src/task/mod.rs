@@ -45,7 +45,7 @@ pub fn poll_and_execute_tasks_non_blocking(state: State, limit: i64, kind: Optio
         let _ = poll_and_execute_tasks(&state, limit, kind)
             .await
             .map_err(|err| {
-                tracing::error!(error=?err, kind=?kind, "poll_and_execute_tasks_non_blocking failed to execute 1 or more tasks");
+                tracing::error!(?err, kind=?kind, "poll_and_execute_tasks_non_blocking failed to execute 1 or more tasks");
             });
     };
 
@@ -80,9 +80,9 @@ pub async fn poll_and_execute_tasks(
                 tracing::info!(task_id=%t.id, "Task completed successfully");
                 None
             }
-            Err(e) => {
-                tracing::error!(error=?e, task_id=%t.id, num_attempts=t.num_attempts, "Task failed");
-                Some(format!("{:?}", e))
+            Err(err) => {
+                tracing::error!(?err, task_id=%t.id, num_attempts=t.num_attempts, "Task failed");
+                Some(format!("{:?}", err))
             }
         };
         let task_new_status = task_result_to_status(t, task_result);

@@ -69,7 +69,7 @@ impl LexisClient {
                 tracing::info!("LexisClient success");
             }
             Err(ref err) => {
-                tracing::error!(error = ?err, "LexisClient error");
+                tracing::error!(?err, "LexisClient error");
                 // TODO: write grafana/es alerts off of these
             }
         }
