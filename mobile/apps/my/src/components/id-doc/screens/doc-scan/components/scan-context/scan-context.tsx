@@ -1,5 +1,6 @@
 import { CountryRecord, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { createContext } from 'react';
+import type { PhotoFile } from 'react-native-vision-camera';
 
 const ScanContext = createContext<{
   country: CountryRecord;
@@ -7,7 +8,7 @@ const ScanContext = createContext<{
   isSuccess: boolean;
   errors: string[];
   isLoading: boolean;
-  onSubmit: (image: string, meta: Record<string, boolean>) => void;
+  onSubmit: (image: PhotoFile, meta: Record<string, boolean>) => void;
   onBack: () => void;
   onResetErrors: () => void;
 }>({

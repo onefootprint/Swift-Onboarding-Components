@@ -1198,11 +1198,6 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
-"@bam.tech/react-native-image-resizer@^3.0.5":
-  version "3.0.7"
-  resolved "https://registry.yarnpkg.com/@bam.tech/react-native-image-resizer/-/react-native-image-resizer-3.0.7.tgz#4e762399af7ba4eea4136d85b51b4eb49b699564"
-  integrity sha512-TRYfjuaEOQjrGkj9736kW5A3xgyuVD5B2HlhPHvgVn0nM4zjPDLbjTqjId15hQCBNK6Udapcgvfb8lWlwcr7Gw==
-
 "@bcoe/v8-coverage@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
@@ -9670,19 +9665,17 @@ react-native-svg@^13.14.0, react-native-svg@^13.9.0:
     css-select "^5.1.0"
     css-tree "^1.1.3"
 
-react-native-vision-camera@^3.1.0:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-3.2.2.tgz#ef28b108fab2bf34d90ea4d7f18cdb5323a77b49"
-  integrity sha512-zGxW7RnOwWHB1jWkOqzfE1t5wrZfamUgyT0W+c7n8eEdF9d2CvXDonjKalblZMYv2NhxJwg9AYdpA7pxfvBlvQ==
+react-native-vision-camera@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-vision-camera/-/react-native-vision-camera-3.1.0.tgz#c98d1c87580fa17f6dab9e03de1394bc9ba9e473"
+  integrity sha512-Aq7xmqZxw7JXxB49bthhSVuy9SxwOMxageOmFfw6cbF5aSAAFuDx7FwuI5eqeOelz+5VYnge2ehVu4Al9Pjc6A==
   dependencies:
     string-hash-64 "^1.0.3"
 
-react-native-worklets-core@^0.2.0:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/react-native-worklets-core/-/react-native-worklets-core-0.2.1.tgz#d30cd779eb31d21f889517524249b13759746bb3"
-  integrity sha512-ezKjljddT4V1Ble3b+mF8XL02OpJfaHApH4XtxxhMoP/G/0Eplp0bAI7qI+SnIIPYVTEL66/kzMAYiXbcC00Ug==
-  dependencies:
-    string-hash-64 "^1.0.3"
+react-native-worklets-core@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-worklets-core/-/react-native-worklets-core-0.2.0.tgz#6dae14c40fdaf709d5d54851cc24d5deaecfd4a1"
+  integrity sha512-gxpfl3KnoRmDtBBVs08K7Ru3xaOrBTGXKQtcjwDzgIcaiNhPfKiJdUz1AIa3SX+M2I/f/7fgWK2W9OFYae/AzA==
 
 react-native@0.71.13, react-native@^0.71.10, react-native@^0.71.11, react-native@^0.71.7:
   version "0.71.13"

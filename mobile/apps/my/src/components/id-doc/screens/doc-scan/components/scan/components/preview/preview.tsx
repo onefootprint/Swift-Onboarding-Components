@@ -18,7 +18,6 @@ import { useScanContext } from '../../../scan-context';
 import type { ScanPicture, ScanSize } from '../../scan.types';
 import Errors from './components/errors';
 import { DEFAULT_HEIGHT, LARGE_HEIGHT } from './preview.constants';
-import encodeImagePath from './utils/encode-image-path';
 import sanitizeImagePath from './utils/sanitize-image-path';
 
 type PreviewProps = {
@@ -46,8 +45,7 @@ const Preview = ({
 
   const handleSubmit = async () => {
     if (!picture.photo) return;
-    const encodedImage = await encodeImagePath(picture.photo.path);
-    onSubmit(encodedImage, picture.meta);
+    onSubmit(picture.photo, picture.meta);
   };
 
   const handleRetakeAfterError = () => {

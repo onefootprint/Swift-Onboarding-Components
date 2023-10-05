@@ -7,27 +7,21 @@ import { AUTH_HEADER } from '@/config/constants';
 
 const uploadDoc = async ({
   authToken,
+  data,
   docId,
-  side,
-  image,
-  mimeType,
   meta,
+  side,
 }: UploadDocRequest) => {
   const response = await request<UploadDocResponse>({
     method: 'POST',
-    url: `/hosted/user/documents/${docId}/upload`,
-    data: {
-      image,
-      side,
-      mimeType,
-      meta: {
-        ...meta,
-        isAppClip: Platform.OS === 'ios',
-        isInstantApp: Platform.OS === 'android',
-      },
-    },
+    url: `/hosted/user/documents/${docId}/upload/${side}`,
+    data,
     headers: {
       [AUTH_HEADER]: authToken,
+      'content-type': 'multipart/form-data',
+      'x-fp-is-manual': meta.manual,
+      'x-fp-is-app-clip': Platform.OS === 'ios',
+      'x-fp-is-instant-app': Platform.OS === 'android',
     },
   });
 

@@ -8,11 +8,10 @@ export enum UploadDocumentSide {
 
 export type UploadDocRequest = {
   authToken: string;
+  data: FormData;
   docId: string;
-  side?: UploadDocumentSide;
-  image: string;
-  mimeType: string;
   meta: Record<string, any>;
+  side?: UploadDocumentSide;
 };
 
 export type UploadDocResponse = {

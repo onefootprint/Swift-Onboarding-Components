@@ -6,6 +6,7 @@ import {
   UploadDocumentSide,
 } from '@onefootprint/types';
 import React, { useEffect, useMemo, useState } from 'react';
+import type { PhotoFile } from 'react-native-vision-camera';
 
 import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
 import useTranslation from '@/hooks/use-translation';
@@ -65,17 +66,26 @@ const DocScan = ({
     setErrors([]);
   };
 
-  const handleSubmit = (image: string, meta: Record<string, boolean>) => {
+  const handleSubmit = (
+    photoFile: PhotoFile,
+    meta: Record<string, boolean>,
+  ) => {
     if (isPreview) {
       onDone(getPreviewNextSide(side, type));
     } else {
+      const data = new FormData();
+      // @ts-ignore
+      data.append('file', {
+        name: 'file.jpg',
+        type: 'image/jpeg',
+        uri: photoFile.path,
+      });
       uploadMutation.mutate(
         {
           authToken,
+          data,
           docId,
-          image,
           meta,
-          mimeType: 'image/jpeg',
           side,
         },
         {

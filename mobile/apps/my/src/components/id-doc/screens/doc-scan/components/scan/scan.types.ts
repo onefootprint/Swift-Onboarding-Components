@@ -1,4 +1,4 @@
-import { PhotoFile } from 'react-native-vision-camera';
+import type { PhotoFile } from 'react-native-vision-camera';
 
 export type ScanType = 'front' | 'back';
 
