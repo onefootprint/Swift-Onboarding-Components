@@ -55,6 +55,28 @@ risk_signal_agg as (
     'attested_device_fraud_duplicate_risk_medium',
     'attested_device_fraud_duplicate_risk_high')
   group by 1
+),
+latest_doc as (
+  select
+    distinct on (wf.id) 
+    wf.id wf_id, ivs.incode_session_id, ivs.latest_failure_reasons, id.document_type
+  from workflows wf 
+  left join document_request dr on dr.workflow_id = wf.id
+  left join identity_document id on id.request_id = dr.id
+  left join incode_verification_session ivs on ivs.identity_document_id = id.id 
+  order by wf.id, id.created_at desc
+),
+all_doc_errors as (
+  select wf_id, array_agg(distinct(latest_failure_reasons)) doc_failure_reasons
+  from (
+    select
+      wf.id wf_id, unnest(ivs.latest_failure_reasons) latest_failure_reasons
+    from workflows wf 
+    left join document_request dr on dr.workflow_id = wf.id
+    left join identity_document id on id.request_id = dr.id
+    left join incode_verification_session ivs on ivs.identity_document_id = id.id 
+  ) t
+  group by 1
 )
 
 select 
@@ -65,19 +87,17 @@ select
     'https://dashboard.onefootprint.com/users/' || wf.fp_id user_dash,
     
 	case 
-  		when ivs.incode_session_id is not null
-  		then 'https://dashboard.incode.com/single-session/' || cast(ivs.incode_session_id as varchar) 
+  		when doc.incode_session_id is not null
+  		then 'https://dashboard.incode.com/single-session/' || cast(doc.incode_session_id as varchar) 
         end inc_link,
 	rsa.bad_rs,
+  doc.document_type,
+  doc_err.doc_failure_reasons
 
-    ivs.latest_failure_reasons,
-	id.document_type
-	
 from workflows wf 
 left join onboarding_decision obd 
 	on (obd.workflow_id = wf.id and obd.actor->>'kind' = 'footprint')
-left join document_request dr on dr.workflow_id = wf.id
-left join identity_document id on id.request_id = dr.id
-left join incode_verification_session ivs on ivs.identity_document_id = id.id 
+left join latest_doc doc on doc.wf_id = wf.id
+left join all_doc_errors doc_err on doc_err.wf_id = wf.id
 left join risk_signal_agg rsa on rsa.wf_id = wf.id 
 order by 1 desc
