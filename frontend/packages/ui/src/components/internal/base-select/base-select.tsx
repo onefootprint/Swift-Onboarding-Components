@@ -1,8 +1,9 @@
 import styled, { useTheme } from '@onefootprint/styled';
-import React, { useCallback, useId, useState } from 'react';
+import React, { useCallback, useId, useRef, useState } from 'react';
 import { usePopper } from 'react-popper';
 import type { OptionProps } from 'react-select';
 import ReactSelect from 'react-select';
+import { useOnClickOutside } from 'usehooks-ts';
 
 import { createTypography } from '../../../utils/mixins';
 import type { LabelTooltipProps } from '../../label';
@@ -70,6 +71,11 @@ const BaseSelect = <Option extends BaseSelectOption>({
     modifiers,
   });
   const isSearchable = options.length > 7;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const handleClickOutside = () => {
+    closeDropdown();
+  };
+  useOnClickOutside(containerRef, handleClickOutside);
 
   const closeDropdown = () => {
     setOpen(false);
@@ -90,7 +96,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   );
 
   return (
-    <Container data-testid={testID} className="fp-dropdown">
+    <Container data-testid={testID} className="fp-dropdown" ref={containerRef}>
       {label && (
         <Label tooltip={labelTooltip} htmlFor={id}>
           {label}
