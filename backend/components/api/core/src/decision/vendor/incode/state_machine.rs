@@ -42,6 +42,8 @@ pub struct IncodeContext {
     pub ff_client: Arc<dyn FeatureFlagClient>,
     pub failed_attempts_for_side: i64,
     pub disable_selfie: bool,
+    /// When true, the machine is running specifically inside the private, manual incode re-run endpoint
+    pub is_re_run: bool,
 }
 
 impl IncodeState {
@@ -212,7 +214,7 @@ impl IncodeStateMachine {
         Ok((machine, failure_reasons))
     }
 
-    // TODO:: use this from /upload as well?
+    // TODO:: use this from /upload as well? be careful on is_re_run param below if so
     #[tracing::instrument(skip_all)]
     pub async fn init_from_existing(state: &State, ivs: IncodeVerificationSession) -> ApiResult<Self> {
         let idi = ivs.identity_document_id.clone();
@@ -254,6 +256,7 @@ impl IncodeStateMachine {
             ff_client: state.feature_flag_client.clone(),
             failed_attempts_for_side: 0, // !! this is the one thing that is hard coded here that would differ from the existing code path that inits a IVS. We could have this method pass in DocumentSide and calculate this for real and then also call this init method from /upload and consolidate code paths
             disable_selfie,
+            is_re_run: false,
         };
         let is_sandbox = id_doc.fixture_result.is_some();
         let should_collect_selfie = doc_req.should_collect_selfie && !id_doc.should_skip_selfie();

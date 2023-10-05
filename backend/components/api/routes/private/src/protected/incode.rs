@@ -19,6 +19,12 @@ use newtypes::{DecisionIntentKind, IncodeVerificationSessionId};
 #[derive(Debug, serde::Deserialize)]
 pub struct Request {
     id: IncodeVerificationSessionId,
+    /// Often when re-running an incode machine, the last run failed. In this case, all of the
+    /// DocumentUploads for the final side will be marked as failed and you may have to manually
+    /// mark one as not failed for it to be picked up by the machine by setting its deactivated_at
+    /// to null and failure_reasons to an emptyarray.
+    /// Be aware that this will change the display in the dashboard
+    i_acknowledge_that_i_re_enabled_my_upload: Option<bool>,
 }
 
 #[post("/private/incode/re_run")]
@@ -32,7 +38,15 @@ pub async fn rerun_machine(
         auth.check_guard(TenantGuard::ManualReview)?;
     }
 
-    let Request { id } = request.into_inner();
+    let Request {
+        id,
+        i_acknowledge_that_i_re_enabled_my_upload,
+    } = request.into_inner();
+    if !i_acknowledge_that_i_re_enabled_my_upload.unwrap_or_default() {
+        return Err(
+            AssertionError("Please acknowledge that you re-enabled the relevant DocumentUpload").into(),
+        );
+    }
 
     let (id_doc, dr, su, vault, di) = state
         .db_pool
@@ -70,6 +84,7 @@ pub async fn rerun_machine(
         &dr.workflow_id,
         state.feature_flag_client.clone(),
         Some(0),
+        true,
     )
     .await?;
     ResponseData::ok(response).json()

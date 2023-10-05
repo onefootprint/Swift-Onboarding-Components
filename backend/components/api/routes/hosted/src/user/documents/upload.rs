@@ -296,6 +296,7 @@ async fn post_inner(
             &wf_id2,
             state.feature_flag_client.clone(),
             failed_attempts_for_side,
+            false,
         )
         .await?
     } else {
@@ -329,6 +330,7 @@ pub async fn handle_incode_request(
     workflow_id: &WorkflowId,
     ff_client: Arc<dyn FeatureFlagClient>,
     failed_attempts_for_side: Option<i64>,
+    is_re_run: bool,
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
     let sv_id = doc_request.scoped_vault_id.clone();
@@ -351,6 +353,7 @@ pub async fn handle_incode_request(
         ff_client,
         failed_attempts_for_side: failed_attempts_for_side.unwrap_or(0),
         disable_selfie,
+        is_re_run,
     };
     let machine = IncodeStateMachine::init(
         state,

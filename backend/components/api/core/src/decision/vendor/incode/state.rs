@@ -150,8 +150,11 @@ where
                     // Count if we have failed too many times
                     let exceeded_max_attempts =
                         ctx.failed_attempts_for_side + 1 >= DocumentUpload::MAX_ATTEMPTS_PER_SIDE;
+                    // Retry if we haven't exceeded max attempts AND this isn't a re-run flow.
+                    // Re-run flows aren't interactive, so we should never retry, which breaks out of the machine
+                    let should_retry = !exceeded_max_attempts && !ctx.is_re_run;
 
-                    let (result, deactivate) = if !exceeded_max_attempts {
+                    let (result, deactivate) = if should_retry {
                         // We haven't reached the max attempts - stay in the current state.
                         // But, only return the unhandled_failure_reasons to the client
                         (
