@@ -16,6 +16,4 @@ export type Organization = {
   domain: string | null;
   allowDomainAccess: boolean;
   isDomainAlreadyClaimed: boolean | null;
-  isProdKycPlaybookRestricted: boolean;
-  isProdKybPlaybookRestricted: boolean;
 };

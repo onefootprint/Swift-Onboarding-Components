@@ -1,6 +1,5 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
-import { asAdminUserWithOrg } from 'src/config/tests';
 
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
@@ -38,79 +37,5 @@ describe('<WhoToOnboard />', () => {
     expect(
       screen.queryByRole('button', { name: 'Back' }),
     ).not.toBeInTheDocument();
-  });
-
-  describe('when in sandbox', () => {
-    it('all options should be enabled', async () => {
-      asAdminUserWithOrg({
-        isLive: false,
-        isProdKybPlaybookRestricted: true,
-        isProdKycPlaybookRestricted: true,
-      });
-
-      const onSubmit = jest.fn();
-      renderWhoToOnboard({ onSubmit });
-
-      expect(screen.getByText('Onboard people')).not.toHaveAttribute(
-        'disabled',
-      );
-      expect(
-        screen.getByText('Onboard businesses and their beneficial owners'),
-      ).not.toHaveAttribute('disabled');
-    });
-  });
-
-  describe('when in live mode', () => {
-    it('KYB disabled when KYB restricted', async () => {
-      asAdminUserWithOrg({
-        isLive: true,
-        isProdKybPlaybookRestricted: true,
-        isProdKycPlaybookRestricted: false,
-      });
-
-      const onSubmit = jest.fn();
-      renderWhoToOnboard({ onSubmit });
-
-      expect(screen.getByText('Onboard people')).not.toHaveAttribute(
-        'disabled',
-      );
-      expect(
-        screen.getByText('Onboard businesses and their beneficial owners'),
-      ).toHaveAttribute('disabled');
-    });
-
-    it('both disabled when both restricted', async () => {
-      asAdminUserWithOrg({
-        isLive: true,
-        isProdKybPlaybookRestricted: true,
-        isProdKycPlaybookRestricted: true,
-      });
-
-      const onSubmit = jest.fn();
-      renderWhoToOnboard({ onSubmit });
-
-      expect(screen.getByText('Onboard people')).toHaveAttribute('disabled');
-      expect(
-        screen.getByText('Onboard businesses and their beneficial owners'),
-      ).toHaveAttribute('disabled');
-    });
-
-    it('both enabled when no restrictions', async () => {
-      asAdminUserWithOrg({
-        isLive: true,
-        isProdKybPlaybookRestricted: false,
-        isProdKycPlaybookRestricted: false,
-      });
-
-      const onSubmit = jest.fn();
-      renderWhoToOnboard({ onSubmit });
-
-      expect(screen.getByText('Onboard people')).not.toHaveAttribute(
-        'disabled',
-      );
-      expect(
-        screen.getByText('Onboard businesses and their beneficial owners'),
-      ).not.toHaveAttribute('disabled');
-    });
   });
 });

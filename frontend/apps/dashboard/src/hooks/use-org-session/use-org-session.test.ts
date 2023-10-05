@@ -21,8 +21,6 @@ describe('useOrgSession', () => {
       isSandboxRestricted: false,
       logoUrl: null,
       name: 'Acme',
-      isProdKybPlaybookRestricted: false,
-      isProdKycPlaybookRestricted: false,
     });
   });
 

@@ -22,8 +22,6 @@ export const orgFixture: Organization = {
   domain: null,
   allowDomainAccess: false,
   isDomainAlreadyClaimed: false,
-  isProdKybPlaybookRestricted: false,
-  isProdKycPlaybookRestricted: false,
 };
 
 export const RolesFixture: Role[] = [
