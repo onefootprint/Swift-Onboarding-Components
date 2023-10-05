@@ -71,7 +71,7 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 |f: &Vec<FootprintReasonCode>| {
                     f.iter().any(|rc| {
                         vec![
-                            FootprintReasonCode::DocumentTypeMismatch,
+                            // FootprintReasonCode::DocumentTypeMismatch, // TODO: temporarily turning this off while we improve our handling of users selecting wrong, but supportable, doc types https://linear.app/footprint/issue/FP-6277
                             FootprintReasonCode::DocumentUnknownCountryCode,
                             FootprintReasonCode::DocumentCountryCodeMismatch,
                         ]
