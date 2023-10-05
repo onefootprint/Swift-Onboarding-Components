@@ -23,6 +23,10 @@ type PrimitiveData = Record<string, string | number | boolean>;
 
 // Allow the apps to set custom context data like tenant name or bifrost session id etc. that can be emitted with each item.
 const identify = (context: PrimitiveData) => {
+  if (!IS_LOGGING_ENABLED) {
+    return;
+  }
+
   const sessionId = getSessionId();
   LogRocket.identify(sessionId, context);
 };
@@ -52,6 +56,10 @@ const checkDeviceInfo = async (): Promise<PrimitiveData> => {
 };
 
 const registerErrorHandlers = () => {
+  if (!IS_LOGGING_ENABLED) {
+    return;
+  }
+
   window.addEventListener(
     'unhandledrejection',
     (event: PromiseRejectionEvent) => {
@@ -164,7 +172,11 @@ const setup = (appName: string) => {
 };
 
 const info = (...args: any[]) => {
-  LogRocket.log(...args);
+  if (!IS_LOGGING_ENABLED) {
+    return;
+  }
+
+  LogRocket.info(...args);
 };
 
 const warn = (message: string, location?: string) => {
@@ -172,12 +184,7 @@ const warn = (message: string, location?: string) => {
     return;
   }
 
-  LogRocket.captureMessage(message, {
-    tags: {
-      level: 'warning',
-      location: location ?? '',
-    },
-  });
+  LogRocket.warn(message, location);
 };
 
 const error = (message: string, location?: string) => {
@@ -185,12 +192,7 @@ const error = (message: string, location?: string) => {
     return;
   }
 
-  LogRocket.captureMessage(message, {
-    tags: {
-      level: 'error',
-      location: location ?? '',
-    },
-  });
+  LogRocket.error(message, location);
 };
 
 const track = (eventName: string, customData: PrimitiveData) => {

@@ -135,8 +135,8 @@ const PinVerification = ({
       {
         onSuccess: handlePinValidationSucceeded,
         onError: (error: unknown) => {
-          console.error('Failed to verify pin:', getErrorMessage(error));
-          Logger.error(`Failed to verify pin: ${getErrorMessage(error)}`);
+          console.warn('Failed to verify pin:', getErrorMessage(error));
+          Logger.warn(`Failed to verify pin: ${getErrorMessage(error)}`);
           showRequestErrorToast(error);
         },
       },
