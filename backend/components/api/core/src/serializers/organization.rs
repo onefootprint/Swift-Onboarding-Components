@@ -46,6 +46,8 @@ impl
             company_size,
             domain,
             allow_domain_access,
+            is_prod_ob_config_restricted,
+            is_prod_kyb_playbook_restricted,
             ..
         } = t;
         Self {
@@ -60,6 +62,8 @@ impl
             // These fields are only conditionally serialized in some endpoints
             is_domain_already_claimed: is_domain_already_claimed.map(|i| i.0),
             is_auth_method_supported: is_auth_method_supported.map(|i| i.0),
+            is_prod_kyc_playbook_restricted: is_prod_ob_config_restricted,
+            is_prod_kyb_playbook_restricted,
         }
     }
 }

@@ -1,0 +1,1 @@
+ALTER TABLE tenant ALTER COLUMN is_prod_kyb_playbook_restricted DROP DEFAULT;
