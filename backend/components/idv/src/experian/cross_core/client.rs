@@ -190,6 +190,8 @@ impl ExperianClientAdapter {
                     let err = Error::UserNamePasswordError;
                     tracing::error!(?err, error_code=%"709", "send_precise_id_request error");
                     Err(err)
+                } else if codes.contains(&"720".to_string()) {
+                    Err(Error::UnknownError)
                 } else {
                     Ok(())
                 }
@@ -201,10 +203,14 @@ impl ExperianClientAdapter {
         Ok(response)
     }
 
+    #[tracing::instrument]
     fn should_retry(error: &Error) -> bool {
         matches!(
             error,
-            Error::JwtTokenNeedsRefresh | Error::UnknownError | Error::UserNamePasswordError
+            Error::JwtTokenNeedsRefresh
+                | Error::UnknownError
+                | Error::UserNamePasswordError
+                | Error::ReqwestError(_)
         )
     }
 
