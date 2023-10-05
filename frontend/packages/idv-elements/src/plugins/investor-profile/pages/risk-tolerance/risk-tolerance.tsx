@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import {
   InvestorProfileDI,
   InvestorProfileRiskTolerance,
@@ -31,6 +32,10 @@ const RiskTolerance = () => {
       onError: (error: unknown) => {
         console.error(
           `Encountered error while speculatively syncing data on investor profile risk tolerance page: ${error}`,
+        );
+        Logger.error(
+          `Encountered error while speculatively syncing data on investor profile risk tolerance page: ${error}`,
+          'investor-profile-risk-tolerance',
         );
       },
     });

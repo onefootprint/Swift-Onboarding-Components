@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
@@ -32,6 +33,10 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
     if (!files?.length) {
       onProcessingDone();
       console.error('Image upload failed. No image files detected');
+      Logger.error(
+        'Image upload failed. No image files detected',
+        'id-doc-photo-buttons',
+      );
       return;
     }
 
@@ -39,6 +44,10 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
     if (!processedImageFile) {
       console.error(
         'Image upload failed. Uploaded image could not be processed',
+      );
+      Logger.error(
+        'Image upload failed. Uploaded image could not be processed',
+        'id-doc-photo-buttons',
       );
       onProcessingDone();
       return;

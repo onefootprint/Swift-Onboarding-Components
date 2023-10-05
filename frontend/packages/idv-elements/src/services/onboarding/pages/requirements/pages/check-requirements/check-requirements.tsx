@@ -1,8 +1,8 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
-import * as LogRocket from 'logrocket';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -37,6 +37,10 @@ const CheckRequirements = () => {
             'Error while initiating onboarding.',
             getErrorMessage(err),
           );
+          Logger.error(
+            `Error while initiating onboarding. ${getErrorMessage(err)}`,
+            'onboarding-check-requirements',
+          );
           setError(true);
         },
       },
@@ -44,7 +48,7 @@ const CheckRequirements = () => {
   });
 
   const handleOnboardingStatus = (response: OnboardingStatusResponse) => {
-    LogRocket.log('checkRequirements', response);
+    Logger.info('checkRequirements', response);
 
     const payload = computeRequirementsToShow(
       !!isTransfer,
@@ -62,6 +66,12 @@ const CheckRequirements = () => {
     console.error(
       'Error while checking requirements from onboarding status',
       getErrorMessage(err),
+    );
+    Logger.error(
+      `Error while checking requirements from onboarding status: ${getErrorMessage(
+        err,
+      )}`,
+      'onboarding-check-requirements',
     );
     setError(true);
   };

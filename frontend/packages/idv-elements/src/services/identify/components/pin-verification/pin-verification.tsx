@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
@@ -63,6 +64,10 @@ const PinVerification = ({
       console.error(
         'Found empty email while sending registering email for new user',
       );
+      Logger.error(
+        'Found empty email while sending registering email for new user',
+        'pin-verification',
+      );
       return;
     }
 
@@ -73,6 +78,10 @@ const PinVerification = ({
           console.error(
             'Failed email verification request:',
             getErrorMessage(error),
+          );
+          Logger.error(
+            `Failed email verification request: ${getErrorMessage(error)}`,
+            'pin-verification',
           );
         },
         onSettled: () => {
@@ -88,6 +97,10 @@ const PinVerification = ({
     if (!authToken) {
       console.error(
         'Received empty auth token from successful challenge pin verification.',
+      );
+      Logger.error(
+        'Received empty auth token from successful challenge pin verification.',
+        'pin-verification',
       );
       return;
     }
@@ -106,6 +119,7 @@ const PinVerification = ({
   const verifyPin = (pin: string) => {
     if (!challengeData) {
       console.error('No challenge data found after completing pin');
+      Logger.error('No challenge data found after completing pin');
       return;
     }
 
@@ -122,6 +136,7 @@ const PinVerification = ({
         onSuccess: handlePinValidationSucceeded,
         onError: (error: unknown) => {
           console.error('Failed to verify pin:', getErrorMessage(error));
+          Logger.error(`Failed to verify pin: ${getErrorMessage(error)}`);
           showRequestErrorToast(error);
         },
       },
@@ -138,6 +153,10 @@ const PinVerification = ({
       console.error(
         'Received biometric challenge after requesting login challenge',
       );
+      Logger.error(
+        'Received biometric challenge after requesting login challenge',
+        'pin-verification',
+      );
       return;
     }
 
@@ -150,11 +169,19 @@ const PinVerification = ({
       console.error(
         'Cannot initiate signup challenge challenge without obConfigAuth',
       );
+      Logger.error(
+        'Cannot initiate signup challenge challenge without obConfigAuth',
+        'pin-verification',
+      );
       return;
     }
     if ('authToken' in identifier) {
       console.error(
         'Cannot initiate signup challenge challenge with an authToken',
+      );
+      Logger.error(
+        'Cannot initiate signup challenge challenge with an authToken',
+        'pin-verification',
       );
       return;
     }
@@ -171,6 +198,10 @@ const PinVerification = ({
           console.error(
             'Failed to initiate signup challenge:',
             getErrorMessage(error),
+          );
+          Logger.error(
+            `Failed to initiate signup challenge: ${getErrorMessage(error)}`,
+            'pin-verification',
           );
           showRequestErrorToast(error);
         },
@@ -195,6 +226,10 @@ const PinVerification = ({
             'Failed to initiate login challenge:',
             getErrorMessage(error),
           );
+          Logger.error(
+            `Failed to initiate login challenge: ${getErrorMessage(error)}`,
+            'pin-verification',
+          );
           showRequestErrorToast(error);
         },
       },
@@ -204,6 +239,7 @@ const PinVerification = ({
   const initiateChallenge = () => {
     if (!identifier) {
       console.error('No identifier found while initiating challenge');
+      Logger.error('No identifier found while initiating challenge');
       return;
     }
 

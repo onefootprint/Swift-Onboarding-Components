@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 
@@ -26,11 +27,19 @@ const useSyncEmail = () => {
       console.error(
         'Found empty email while syncing email from collect-kyc-data.',
       );
+      Logger.error(
+        'Found empty email while syncing email from collect-kyc-data.',
+        'collect-kyc-data',
+      );
       return;
     }
     if (!authToken) {
       console.error(
         'Found empty auth token while syncing email from collect-kyc-data.',
+      );
+      Logger.error(
+        'Found empty auth token while syncing email from collect-kyc-data.',
+        'collect-kyc-data',
       );
       return;
     }
@@ -44,6 +53,10 @@ const useSyncEmail = () => {
           console.error(
             'Failed email verification request from collect-kyc-data: ',
             getErrorMessage(error),
+          );
+          Logger.error(
+            'Failed email verification request from collect-kyc-data: ',
+            'collect-kyc-data',
           );
           onError?.(error);
         },

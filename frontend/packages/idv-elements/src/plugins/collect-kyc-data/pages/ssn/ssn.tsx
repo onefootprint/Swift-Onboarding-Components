@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
@@ -73,6 +74,10 @@ const SSN = ({
       onError: (error: string) => {
         console.error(
           `Error while saving data on kyc residential-address page ${error}`,
+        );
+        Logger.error(
+          `Error while saving data on kyc residential-address page ${error}`,
+          'kyc-ssn',
         );
       },
     });

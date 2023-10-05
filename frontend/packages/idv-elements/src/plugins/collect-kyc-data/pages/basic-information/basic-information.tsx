@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -81,6 +82,10 @@ const BasicInformation = ({
       onError: (error: string) => {
         console.error(
           `Speculatively vaulting data failed in kyc basic-information page. ${error}`,
+        );
+        Logger.error(
+          `Speculatively vaulting data failed in kyc basic-information page. ${error}`,
+          'kyc-basic-information',
         );
       },
     });

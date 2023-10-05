@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   CollectedKycDataOption,
@@ -98,6 +99,12 @@ const useDecryptKycData = ({
             )}) for KYC`,
             getErrorMessage(error),
           );
+          Logger.error(
+            `useDecryptKycData failed to decrypt user data (${fields.join(
+              ', ',
+            )}) for KYC, ${getErrorMessage(error)}`,
+            'kyc-confirm',
+          );
           onError(error);
         },
       },
@@ -112,6 +119,12 @@ const useDecryptKycData = ({
         console.error(
           'useDecryptKycData failed to fetch user token info',
           getErrorMessage(error),
+        );
+        Logger.error(
+          `useDecryptKycData failed to fetch user token info, ${getErrorMessage(
+            error,
+          )}`,
+          'kyc-confirm',
         );
         onError(error);
       },

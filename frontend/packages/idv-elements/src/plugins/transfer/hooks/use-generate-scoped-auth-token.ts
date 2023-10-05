@@ -1,5 +1,5 @@
 import { useAppearance } from '@onefootprint/appearance';
-import { getSessionId } from '@onefootprint/dev-tools';
+import { getSessionId, Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   D2PGenerateResponse,
@@ -57,6 +57,12 @@ const useGenerateScopedAuthToken = ({
               device?.type ?? 'NA'
             } device type`,
             getErrorMessage(error),
+          );
+          Logger.warn(
+            `Error while generating d2p token in transfer plugin on ${
+              device?.type ?? 'NA'
+            } device type. ${getErrorMessage(error)}`,
+            'transfer',
           );
         },
       },

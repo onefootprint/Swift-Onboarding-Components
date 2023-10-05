@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
@@ -25,12 +26,22 @@ const DesktopConsent = () => {
   const submitConsent = () => {
     const consentInfo = consentRef.current?.getConsentInfo();
     if (!authToken || consentMutation.isLoading || !consentInfo) {
-      if (!authToken)
+      if (!authToken) {
         console.error("Could not submit consent - auth token doesn't exist");
-      if (!consentInfo)
+        Logger.error(
+          "Could not submit consent - auth token doesn't exist",
+          'consent-desktop',
+        );
+      }
+      if (!consentInfo) {
         console.error(
           'Could not submit consent - consent language is empty or undefined',
         );
+        Logger.error(
+          'Could not submit consent - consent language is empty or undefined',
+          'consent-desktop',
+        );
+      }
       return;
     }
 
@@ -47,6 +58,10 @@ const DesktopConsent = () => {
         onError: err => {
           console.error(
             `Could not submit consent language. Error: ${getErrorMessage(err)}`,
+          );
+          Logger.error(
+            `Could not submit consent language. Error: ${getErrorMessage(err)}`,
+            'consent-desktop',
           );
           requestErrorToast(err);
         },

@@ -1,10 +1,12 @@
 import {
+  Logger,
   useLogStateMachine,
   useObserveCollector,
 } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
 import { AppErrorBoundary, useGetD2PStatus } from '@onefootprint/idv-elements';
+import { getErrorMessage } from '@onefootprint/request';
 import type { GetD2PResponse } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import * as LogRocket from 'logrocket';
@@ -60,6 +62,13 @@ const Router = ({ variant }: RouterProps) => {
           'Fetching d2p status failed with error, likely indicating expired session:',
           error,
         );
+        Logger.warn(
+          `Fetching d2p status failed with error, likely indicating expired session: ${getErrorMessage(
+            error,
+          )}`,
+          'handoff-router',
+        );
+
         if (!state.done) {
           send({
             type: 'statusReceived',

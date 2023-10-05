@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type {
@@ -60,6 +61,10 @@ const DesktopPhotoPrompt = ({
       handleUploadError([IdDocImageUploadError.unknownUploadError]);
       console.error(
         'Image upload failed on desktop mode. Uploaded image could not be processed',
+      );
+      Logger.error(
+        'Image upload failed on desktop mode. Uploaded image could not be processed',
+        'desktop-photo-prompt',
       );
       return;
     }

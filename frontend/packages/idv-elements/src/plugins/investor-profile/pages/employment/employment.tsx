@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDollar40, IcoUser40 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
@@ -39,6 +40,10 @@ const Employment = () => {
       onError: (error: unknown) => {
         console.error(
           `Encountered error while speculatively syncing data on investor-profile employment page ${error}`,
+        );
+        Logger.error(
+          `Encountered error while speculatively syncing data on investor-profile employment page ${error}`,
+          'investor-profile-employment',
         );
       },
     });

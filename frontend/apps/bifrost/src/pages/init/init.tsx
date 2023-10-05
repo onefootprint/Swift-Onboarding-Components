@@ -1,4 +1,4 @@
-import { getSessionId, useObserveCollector } from '@onefootprint/dev-tools';
+import { Logger, useObserveCollector } from '@onefootprint/dev-tools';
 import {
   InitShimmer,
   useGetOnboardingConfig,
@@ -9,7 +9,6 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
-import * as LogRocket from 'logrocket';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
@@ -21,7 +20,6 @@ const Init = () => {
   const tenantPk = useTenantPublicKey();
   const [, send] = useBifrostMachine();
   const observeCollector = useObserveCollector();
-  const sessionId = getSessionId();
   const obConfigAuth = tenantPk
     ? { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk }
     : undefined;
@@ -31,7 +29,7 @@ const Init = () => {
     {
       onSuccess: (config: PublicOnboardingConfig) => {
         const { orgName, orgId, key } = config;
-        LogRocket.identify(sessionId, {
+        Logger.identify({
           orgName,
           orgId,
           publicKey: key,
@@ -48,10 +46,10 @@ const Init = () => {
         });
       },
       onError: error => {
-        console.error(
-          'Fetching onboarding config in bifrost init failed with error:',
-          getErrorMessage(error),
-        );
+        const errorMessage = `Fetching onboarding config in bifrost init failed with error: 
+        ${getErrorMessage(error)}`;
+        console.error(errorMessage);
+        Logger.error(errorMessage, 'bifrost-init');
         send({
           type: 'configRequestFailed',
         });

@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { useToast } from '@onefootprint/ui';
 
@@ -50,6 +51,7 @@ const useHandleCameraError = () => {
       showErrorToast(t('other-error'));
     }
     console.error(`Camera error: ${err}`);
+    Logger.error(`Camera error: ${err}`, 'camera');
   };
 };
 

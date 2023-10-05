@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
@@ -28,6 +29,10 @@ const InvestmentGoals = () => {
       onError: (error: unknown) => {
         console.error(
           `Encountered error while speculatively syncing data on investor profile investment goals page: ${error}`,
+        );
+        Logger.error(
+          `Encountered error while speculatively syncing data on investor profile investment goals page: ${error}`,
+          'investor-profile-investment-goals',
         );
       },
     });

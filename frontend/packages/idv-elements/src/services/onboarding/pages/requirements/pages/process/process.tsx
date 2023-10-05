@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
@@ -32,6 +33,12 @@ const Process = ({ onDone }: ProcessProps) => {
           console.error(
             'Error while processing onboarding on authorize page',
             getErrorMessage(error),
+          );
+          Logger.error(
+            `Error while processing onboarding on authorize page. ${getErrorMessage(
+              error,
+            )}`,
+            'onboarding-process',
           );
         },
       },

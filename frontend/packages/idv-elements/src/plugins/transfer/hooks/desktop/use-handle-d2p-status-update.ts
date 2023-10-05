@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import type { GetD2PResponse } from '@onefootprint/types';
 import { D2PStatus } from '@onefootprint/types';
@@ -33,6 +34,10 @@ const useHandleD2PStatusUpdate = () => {
     console.warn(
       'Encountered error while polling for status on transfer plugin on desktop, likely indicating expired session.',
       getErrorMessage(error),
+    );
+    Logger.warn(
+      'Encountered error while polling for status on transfer plugin on desktop, likely indicating expired session.',
+      'transfer-desktop',
     );
     send({
       type: 'statusPollingErrored',

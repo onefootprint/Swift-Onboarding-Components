@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
@@ -145,6 +146,10 @@ const IdentitySection = () => {
             'Decrypting SSN after step up failed in kyc confirm page',
             getErrorMessage(error),
           );
+          Logger.error(
+            'Decrypting SSN after step up failed in kyc confirm page',
+            'kyc-confirm',
+          );
           showRequestErrorToast(error);
         },
       },
@@ -165,6 +170,10 @@ const IdentitySection = () => {
         'useStepUp hook in kyc confirm page failed',
         getErrorMessage(error),
       );
+      Logger.error(
+        `useStepUp hook in kyc confirm page failed, ${getErrorMessage(error)}`,
+        'kyc-confirm',
+      );
       showRequestErrorToast(error);
     },
   });
@@ -178,6 +187,10 @@ const IdentitySection = () => {
     } else {
       console.error(
         'Attempted to reveal SSN on confirm page when step up is not available',
+      );
+      Logger.error(
+        'Attempted to reveal SSN on confirm page when step up is not available',
+        'kyc-confirm',
       );
     }
   };

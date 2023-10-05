@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
@@ -30,6 +31,12 @@ const Unavailable = () => {
           console.error(
             'Error while skipping liveness in liveness unavailable page.',
             getErrorMessage(error),
+          );
+          Logger.error(
+            `Error while skipping liveness in liveness unavailable page: ${getErrorMessage(
+              error,
+            )}`,
+            'liveness-unavailable',
           );
         },
       },

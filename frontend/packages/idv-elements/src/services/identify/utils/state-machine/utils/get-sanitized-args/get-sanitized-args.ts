@@ -1,3 +1,5 @@
+import { Logger } from '@onefootprint/dev-tools';
+
 import type { IdentifyMachineArgs } from '../../machine';
 import type { MachineContext } from '../../types';
 
@@ -13,6 +15,10 @@ const getSanitizedArgs = ({
   if (!obConfigAuth && !initialAuthToken) {
     console.error(
       'Error initializing Identify machine: obConfigAuth must be provided if initialAuthToken is absent',
+    );
+    Logger.error(
+      'Error initializing Identify machine: obConfigAuth must be provided if initialAuthToken is absent',
+      'identify',
     );
   }
   return {

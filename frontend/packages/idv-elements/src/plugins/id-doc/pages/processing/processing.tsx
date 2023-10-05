@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import {
@@ -42,6 +43,7 @@ const Processing = () => {
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
       console.error('Image upload retry limit exceeded');
+      Logger.error('Image upload retry limit exceeded', 'processing');
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === state.context.currSide) {
       send({
@@ -77,15 +79,15 @@ const Processing = () => {
   useEffectOnce(() => {
     if (!image || !authToken || !type || !country || !currSide || !id) {
       setIsMissingRequirements(true);
-      console.error(
-        `Mobile web flow - id-doc image could not be processed due to missing requirements. Requirements - image: ${
-          image ? 'OK' : 'undefined'
-        }, auth token: ${authToken ? 'OK' : 'undefined'}, doc type: ${
-          type ? 'OK' : 'undefined'
-        }, country: ${country ? 'OK' : 'undefined'}, current side: ${
-          currSide ? 'OK' : 'undefined'
-        }, id: ${id ? 'OK' : 'undefined'}`,
-      );
+      const error = `Mobile web flow - id-doc image could not be processed due to missing requirements. Requirements - image: ${
+        image ? 'OK' : 'undefined'
+      }, auth token: ${authToken ? 'OK' : 'undefined'}, doc type: ${
+        type ? 'OK' : 'undefined'
+      }, country: ${country ? 'OK' : 'undefined'}, current side: ${
+        currSide ? 'OK' : 'undefined'
+      }, id: ${id ? 'OK' : 'undefined'}`;
+      console.error(error);
+      Logger.error(error, 'processing');
       return;
     }
 
@@ -108,6 +110,12 @@ const Processing = () => {
             `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
               err,
             )}`,
+          );
+          Logger.error(
+            `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
+              err,
+            )}`,
+            'processing',
           );
           handleSubmitDocError(err);
         },

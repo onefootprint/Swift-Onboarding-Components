@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
@@ -118,12 +119,20 @@ const Camera = ({
   const handleClick = (captureKind: CaptureKind) => {
     if (!canvasRef.current || !videoRef.current) {
       console.error('Video ref or canvas not initialized for camera capture');
+      Logger.error(
+        `Video ref or canvas not initialized for camera capture for capture kind: ${captureKind}`,
+        'camera',
+      );
       return;
     }
 
     const context = canvasRef.current.getContext('2d');
     if (!context) {
       console.error('Canvas context is undefined for camera capture');
+      Logger.error(
+        `Canvas context is undefined for camera capture for capture kind: ${captureKind}`,
+        'camera',
+      );
       return;
     }
 
@@ -164,11 +173,13 @@ const Camera = ({
   const clearCanvas = () => {
     if (!canvasRef.current) {
       console.warn('Canvas could not be cleared. Ref undefined');
+      Logger.warn('Canvas could not be cleared. Ref undefined', 'camera');
       return;
     }
     const context = canvasRef.current.getContext('2d');
     if (!context) {
       console.warn('Canvas could not be cleared. Context undefined');
+      Logger.warn('Canvas could not be cleared. Context undefined', 'camera');
       return;
     }
     context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);

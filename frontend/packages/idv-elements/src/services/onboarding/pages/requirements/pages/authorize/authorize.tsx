@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
@@ -88,6 +89,12 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
             'Error while processing onboarding on authorize page',
             getErrorMessage(error),
           );
+          Logger.error(
+            `Error while processing onboarding on authorize page: ${getErrorMessage(
+              error,
+            )}`,
+            'onboarding-authorize',
+          );
         },
       },
     );
@@ -102,6 +109,12 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
           console.error(
             'Error while authorizing onboarding on authorize page',
             getErrorMessage(error),
+          );
+          Logger.error(
+            `Error while authorizing onboarding on authorize page: ${getErrorMessage(
+              error,
+            )}`,
+            'onboarding-authorize',
           );
           toast.show({
             title: t('onboarding-complete-error.title'),

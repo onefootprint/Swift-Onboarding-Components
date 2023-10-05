@@ -1,4 +1,4 @@
-import { useObserveCollector } from '@onefootprint/dev-tools';
+import { Logger, useObserveCollector } from '@onefootprint/dev-tools';
 import type { DeviceInfo } from '@onefootprint/idv-elements';
 import {
   InitShimmer,
@@ -46,6 +46,10 @@ const Init = () => {
         console.error(
           'Fetching onboarding config in IDV init page failed with error:',
           getErrorMessage(error),
+        );
+        Logger.error(
+          'Fetching onboarding config in IDV init page failed',
+          'idv-init',
         );
         send({
           type: 'configRequestFailed',

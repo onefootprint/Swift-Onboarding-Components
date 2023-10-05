@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { Box, Button } from '@onefootprint/ui';
@@ -34,6 +35,10 @@ const Register = () => {
           console.error(
             'Failed to register passkeys for user',
             getErrorMessage(error),
+          );
+          Logger.error(
+            `Failed to register passkeys for user: ${getErrorMessage(error)}`,
+            'liveness-register',
           );
           send({ type: 'failed' });
         },

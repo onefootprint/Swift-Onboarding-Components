@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import type { State } from 'xstate';
 
+import Logger from '../../utils/logger';
 import { useObserveCollector } from '../use-observe-collector';
 
 const useLogStateMachine = (name: string, state: any) => {
@@ -10,6 +11,11 @@ const useLogStateMachine = (name: string, state: any) => {
     // For now, only log the state value, the actions and whether done to prevent leaking PII.
     // We might expand this later
     const stateData = (state as State<any, any>).toJSON();
+    Logger.track(`${name}-${state.value}`, {
+      name,
+      value: state.value,
+      done: !!stateData.done,
+    });
     observeCollector.log('state-machine', {
       name,
       state: {

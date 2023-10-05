@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
@@ -28,7 +29,12 @@ const Init = () => {
       `Kyc init page failed to decrypt data fields (${populatedCdos.join(
         ', ',
       )}) requested.`,
-      getErrorMessage(err),
+    );
+    Logger.error(
+      `Kyc init page failed to decrypt data fields (${populatedCdos.join(
+        ', ',
+      )}) requested. ${getErrorMessage(err)}`,
+      'kyc-init',
     );
     send({
       type: 'initialized',

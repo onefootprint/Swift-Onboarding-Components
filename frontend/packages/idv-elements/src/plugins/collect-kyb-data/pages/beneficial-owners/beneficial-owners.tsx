@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import type { BeneficialOwner } from '@onefootprint/types';
 import {
@@ -64,8 +65,12 @@ const BeneficialOwners = ({
     };
 
     const handleError = (error: string) => {
-      /* eslint-disable-line no-console */ console.error(
+      console.error(
         `Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`,
+      );
+      Logger.error(
+        `Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`,
+        'kyb-beneficial-owners',
       );
     };
 

@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useEffect, useState } from 'react';
 
 import usePropsFromParent from './hooks/use-props-from-parent';
@@ -46,6 +47,10 @@ const useProps = (onSuccess: (props: BifrostProps) => void) => {
   };
   const handleTimeout = () => {
     if (!urlProps) {
+      Logger.warn(
+        'Getting props from url timed out on bifrost while the url prop is also empty.',
+        'birost-use-props',
+      );
       console.warn(
         'Getting provider prop from parent iFrame timed out on bifrost while the url prop is also empty.',
       );

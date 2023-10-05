@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { Box } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -48,6 +49,10 @@ const PhotoCapture = ({
       console.warn(
         'Captured image could not be confirmed and submitted - retaking the image',
       );
+      Logger.warn(
+        'Captured image could not be confirmed and submitted - retaking the image',
+        'photo-capture',
+      );
       return;
     }
 
@@ -59,6 +64,10 @@ const PhotoCapture = ({
       handleRetake();
       console.warn(
         'Captured image could not be processed - retaking the image',
+      );
+      Logger.warn(
+        'Captured image could not be processed - retaking the image',
+        'photo-capture',
       );
       return;
     }

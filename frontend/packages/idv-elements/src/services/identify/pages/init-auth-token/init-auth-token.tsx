@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import { UserTokenScope } from '@onefootprint/types';
 import React from 'react';
@@ -44,6 +45,12 @@ const InitAuthToken = ({ authToken }: InitAuthTokenProps) => {
         'Identifying user by auth token failed in init-auth-token page in identify',
         getErrorMessage(e),
       );
+      Logger.error(
+        `Identifying user by auth token failed in init-auth-token page in identify ${getErrorMessage(
+          e,
+        )}`,
+        'identify-init-auth-token',
+      );
     }
     send({ type: 'authTokenInvalid' });
   };
@@ -64,6 +71,10 @@ const InitAuthToken = ({ authToken }: InitAuthTokenProps) => {
         console.error(
           'Fetching token in InitAuthToken failed with error:',
           getErrorMessage(error),
+        );
+        Logger.error(
+          'Fetching token in InitAuthToken failed',
+          'identify-init-auth-token',
         );
         send({ type: 'authTokenInvalid' });
       },

@@ -33,7 +33,6 @@
     "@onefootprint/test-utils": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
-    "@sentry/nextjs": "^7.58.1",
     "axios": "^1.2.1",
     "axios-case-converter": "^0.9.0",
     "base64url": "^3.0.1",

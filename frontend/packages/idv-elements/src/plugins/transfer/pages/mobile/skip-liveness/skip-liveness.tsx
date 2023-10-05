@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
@@ -28,6 +29,12 @@ const SkipLiveness = () => {
               device.hasSupportForWebauthn ? 'available' : 'none'
             }`,
             getErrorMessage(error),
+          );
+          Logger.error(
+            `Error while skipping liveness on transfer plugin running on mobile. Webauthn availability: ${
+              device.hasSupportForWebauthn ? 'available' : 'none'
+            }`,
+            'transfer-skip-liveness',
           );
         },
       },

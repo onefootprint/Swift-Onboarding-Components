@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
@@ -128,6 +129,12 @@ const IdDocCountryAndTypeContainer = ({
             `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error: ${getErrorMessage(
               err,
             )}`,
+          );
+          Logger.error(
+            `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error: ${getErrorMessage(
+              err,
+            )}`,
+            'id-doc-country-and-type-container',
           );
           requestErrorToast(err);
         },

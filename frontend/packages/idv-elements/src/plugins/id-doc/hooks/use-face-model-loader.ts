@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import constate from 'constate';
 import { nets } from 'face-api.js';
 import { useState } from 'react';
@@ -25,6 +26,7 @@ const useFaceModelLoader = ({ selfieRequired }: FaceModelLoaderType) => {
           })
           .catch(err => {
             console.error(`Error loading the face models: ${err}`);
+            Logger.error(`Error loading the face models: ${err}`, 'id-doc');
           });
       }
     };

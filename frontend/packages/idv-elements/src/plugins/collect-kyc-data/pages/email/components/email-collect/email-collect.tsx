@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { IdDI } from '@onefootprint/types';
@@ -59,6 +60,12 @@ const EmailCollect = ({
         console.error(
           'Error while speculatively syncing email on kyc email-collect page',
           getErrorMessage(error),
+        );
+        Logger.error(
+          `Error while speculatively syncing email on kyc email-collect page, ${getErrorMessage(
+            error,
+          )}`,
+          'kyc-email-collect',
         );
       },
     });

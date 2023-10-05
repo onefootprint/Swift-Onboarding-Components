@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
@@ -41,6 +42,10 @@ const BusinessAddress = ({
     const handleError = (error: string) => {
       console.error(
         `Speculatively vaulting data failed in kyb business-address page: ${error}`,
+      );
+      Logger.error(
+        `Speculatively vaulting data failed in kyb business-address page: ${error}`,
+        'kyb-business-address',
       );
     };
 

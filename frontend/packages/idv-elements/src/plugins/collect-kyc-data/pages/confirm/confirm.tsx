@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { IdDI } from '@onefootprint/types';
@@ -43,6 +44,10 @@ const Confirm = () => {
       },
       onError: (error: string) => {
         console.error(`Vaulting data on kyc confirm page failed: ${error}`);
+        Logger.error(
+          `Vaulting data on kyc confirm page failed: ${error}`,
+          'kyc-confirm',
+        );
       },
     });
   };
@@ -68,6 +73,10 @@ const Confirm = () => {
         console.error(
           'Speculatively sycing email data on kyc confirm page failed.',
           getErrorMessage(error),
+        );
+        Logger.error(
+          'Speculatively sycing email data on kyc confirm page failed.',
+          'kyc-confirm',
         );
         showRequestErrorToast(error);
       },

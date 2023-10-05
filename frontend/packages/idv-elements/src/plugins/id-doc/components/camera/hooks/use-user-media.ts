@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useEffect, useState } from 'react';
 
 import useHandleCameraError from '../../../hooks/use-handle-camera-error';
@@ -16,6 +17,10 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
         setMediaStream(stream);
       } catch (err) {
         console.error(`Could not initialize media stream. Error: ${err}`);
+        Logger.error(
+          `Could not initialize media stream. Error: ${err}`,
+          'camera',
+        );
         onCameraError(err);
         onError?.();
       }

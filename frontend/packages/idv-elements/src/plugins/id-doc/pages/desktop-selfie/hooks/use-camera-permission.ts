@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useState } from 'react';
 import { useEffectOnce, useInterval } from 'usehooks-ts';
 
@@ -31,6 +32,10 @@ const useCameraPermission = () => {
 
         console.warn(
           `Error while retrieving camera permission. Error: ${error.name}`,
+        );
+        Logger.warn(
+          `Error while retrieving camera permission. Error: ${error.name}`,
+          'desktop-selfie',
         );
       });
   });

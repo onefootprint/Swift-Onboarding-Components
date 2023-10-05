@@ -1,5 +1,5 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import { Logger, ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import {
   configureFootprint,
   FootprintProvider,
@@ -14,16 +14,11 @@ import React from 'react';
 
 import { BifrostMachineProvider } from '../components/bifrost-machine-provider';
 import { GOOGLE_MAPS_KEY } from '../config/constants';
-import {
-  configureLogRocket,
-  configureSentry,
-} from '../config/initializers/logger';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 
 const footprint = configureFootprint();
-configureSentry();
-configureLogRocket();
+Logger.setup('bifrost');
 configureReactI18next();
 
 const App = ({ Component, pageProps }: AppProps) => {

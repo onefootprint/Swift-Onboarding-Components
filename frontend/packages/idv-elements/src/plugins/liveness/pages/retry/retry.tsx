@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
@@ -35,6 +36,12 @@ const Retry = () => {
             'Failed to skip liveness after retrying registering passkeys',
             getErrorMessage(error),
           );
+          Logger.error(
+            `Failed to skip liveness after retrying registering passkeys: ${getErrorMessage(
+              error,
+            )}`,
+            'liveness-retry',
+          );
         },
       },
     );
@@ -56,6 +63,12 @@ const Retry = () => {
           console.error(
             'Failed to register passkeys for user while retrying',
             getErrorMessage(error),
+          );
+          Logger.error(
+            `Failed to register passkeys for user while retrying: ${getErrorMessage(
+              error,
+            )}`,
+            'liveness-retry',
           );
           send({ type: 'failed' });
         },

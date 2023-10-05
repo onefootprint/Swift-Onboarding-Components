@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import {
   detectSingleFace,
   matchDimensions,
@@ -56,6 +57,10 @@ const useFaceDetection = () => {
     } = detection;
     if (!detectionBoxWidth || !detectionBoxHeight) {
       console.warn('FaceApi detection box has null or zero dimensions');
+      Logger.warn(
+        'FaceApi detection box has null or zero dimensions',
+        'use-face-detection',
+      );
       return FaceStatus.detecting;
     }
 

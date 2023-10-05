@@ -1,11 +1,10 @@
-import { getSessionId, useObserveCollector } from '@onefootprint/dev-tools';
+import { Logger, useObserveCollector } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { useGetOnboardingConfig } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
 import { Shimmer } from '@onefootprint/ui';
-import * as LogRocket from 'logrocket';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
@@ -17,7 +16,6 @@ const Init = () => {
   const { obConfigAuth, authToken } = state.context;
   const showRequestError = useRequestErrorToast();
   const observeCollector = useObserveCollector();
-  const sessionId = getSessionId();
 
   useParseUrl({
     onSuccess: (
@@ -34,6 +32,7 @@ const Init = () => {
     },
     onError: (error: string) => {
       console.error(error);
+      Logger.error(error, 'hosted-init');
       send({
         type: 'invalidUrlReceived',
       });
@@ -57,6 +56,10 @@ const Init = () => {
           'Hosted app init page fetching business details failed:',
           getErrorMessage(error),
         );
+        Logger.error(
+          'Hosted app init page fetching business details failed',
+          'hosted-init',
+        );
         showRequestError(error);
         send({
           type: 'invalidUrlReceived',
@@ -73,10 +76,10 @@ const Init = () => {
           config: onboardingConfig,
         });
         const { orgName, orgId, key } = onboardingConfig;
-        LogRocket.identify(sessionId, {
+        Logger.identify({
           orgName,
           orgId,
-          key,
+          publicKey: key,
         });
 
         send({
@@ -91,6 +94,10 @@ const Init = () => {
         console.error(
           'Hosted app init page fetching onboarding config failed:',
           getErrorMessage(error),
+        );
+        Logger.error(
+          'Hosted app init page fetching onboarding config failed',
+          'hosted-init',
         );
         showRequestError(error);
         send({

@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import {
   BusinessDI,
@@ -44,8 +45,12 @@ const BasicData = ({
     };
 
     const handleError = (error: string) => {
-      /* eslint-disable-line no-console */ console.error(
+      console.error(
         `Speculatively vaulting data failed in kyb basic-data page: ${error}`,
+      );
+      Logger.error(
+        `Speculatively vaulting data failed in kyb basic-data page: ${error}`,
+        'kyb-basic-data',
       );
     };
 

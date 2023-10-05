@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, UsLegalStatus } from '@onefootprint/types';
@@ -103,6 +104,10 @@ const LegalStatus = ({
       onError: (error: unknown) => {
         console.error(
           `Error while saving data on kyc legal status page: ${error}`,
+        );
+        Logger.error(
+          `Error while saving data on kyc legal status page: ${error}`,
+          'kyc-legal-status',
         );
       },
     });

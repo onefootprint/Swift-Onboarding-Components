@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import { DocumentDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
@@ -53,6 +54,12 @@ const Declarations = () => {
                 'Encountered error while uploading declarations files',
                 getErrorMessage(error),
               );
+              Logger.error(
+                `Encountered error while uploading declarations files: ${getErrorMessage(
+                  error,
+                )}`,
+                'investor-profile-declarations',
+              );
             },
           },
         );
@@ -60,6 +67,10 @@ const Declarations = () => {
       onError: (error: string) => {
         console.error(
           `Encountered error while vaulting data on investor profile declarations page ${error}`,
+        );
+        Logger.error(
+          `Encountered error while vaulting data on investor profile declarations page: ${error}`,
+          'investor-profile-declarations',
         );
       },
     });
@@ -78,6 +89,10 @@ const Declarations = () => {
       onError: (error: unknown) => {
         console.error(
           `Encountered error while speculatively saving data on investor profile declarations page: ${error}`,
+        );
+        Logger.error(
+          `Encountered error while speculatively saving data on investor profile declarations page: ${error}`,
+          'investor-profile-declarations',
         );
       },
     });

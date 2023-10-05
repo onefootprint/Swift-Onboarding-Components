@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useToast } from '@onefootprint/ui';
 import imageCompression from 'browser-image-compression';
 
@@ -19,6 +20,10 @@ const useProcessImage = () => {
   const handleError = (step: ImageProcessingStepError, error?: unknown) => {
     if (error) {
       console.error(error);
+      Logger.error(
+        typeof error === 'string' ? error : JSON.stringify(error),
+        'use-process-image',
+      );
     }
     toast.show({
       title: 'Uh-oh',
@@ -41,6 +46,10 @@ const useProcessImage = () => {
     }
     if (!file) {
       console.error('Image files undefined after image compression');
+      Logger.error(
+        'Image files undefined after image compression',
+        'use-process-image',
+      );
       return undefined;
     }
 

@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import type { FootprintProps } from '@onefootprint/footprint-js';
 import {
   FootprintPrivateEvent,
@@ -75,6 +76,10 @@ class IframeAdapter implements FootprintClient {
     } else {
       console.warn(
         `Footprint.js must be initialized in order to dispatch the event "${eventName}"`,
+      );
+      Logger.warn(
+        `Footprint.js must be initialized in order to dispatch the event "${eventName}"`,
+        'bifrost-iframe-adapter',
       );
     }
   }

@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoFaceid24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
@@ -32,6 +33,10 @@ const Biometric = () => {
       console.error(
         'No successful identifier found while initiating login biometric challenge',
       );
+      Logger.error(
+        'No successful identifier found while initiating login biometric challenge',
+        'biometric-challenge',
+      );
       return;
     }
 
@@ -51,6 +56,12 @@ const Biometric = () => {
             'Error while requesting login biometric challenge',
             getErrorMessage(error),
           );
+          Logger.error(
+            `Error while requesting login biometric challenge: ${getErrorMessage(
+              error,
+            )}`,
+            'biometric-challenge',
+          );
           showRequestErrorToast(error);
         },
       },
@@ -68,6 +79,10 @@ const Biometric = () => {
       console.error(
         'Received sms challenge after requesting login biometric challenge',
       );
+      Logger.error(
+        'Received sms challenge after requesting login biometric challenge',
+        'biometric-challenge',
+      );
       return;
     }
     if (!biometricChallengeJson || !challengeToken) {
@@ -82,6 +97,12 @@ const Biometric = () => {
       );
     } catch (e) {
       console.error(e);
+      Logger.error(
+        `Unable to generate biometric challenge response ${
+          typeof e === 'string' ? e : JSON.stringify(e)
+        }`,
+        'biometric-challenge',
+      );
     }
 
     if (!challengeResponse) {
@@ -110,6 +131,12 @@ const Biometric = () => {
           console.error(
             'Error while verifying biometric challenge',
             getErrorMessage(error),
+          );
+          Logger.error(
+            `Error while verifying biometric challenge: ${getErrorMessage(
+              error,
+            )}`,
+            'biometric-challenge',
           );
           setIsRetry(true);
         },

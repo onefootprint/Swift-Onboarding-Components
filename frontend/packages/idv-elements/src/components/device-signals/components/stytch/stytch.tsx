@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/dev-tools';
 import { IS_SERVER } from '@onefootprint/global-constants';
 import Script from 'next/script';
 import React from 'react';
@@ -39,6 +40,10 @@ const Stytch = ({ fpAuthToken }: StytchProps) => {
     } else {
       console.warn(
         'Stytch public token not available. Skipping sending Stytch telemetry',
+      );
+      Logger.warn(
+        'Stytch public token not available. Skipping sending Stytch telemetry',
+        'device-signals',
       );
     }
   };

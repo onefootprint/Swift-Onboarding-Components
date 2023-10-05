@@ -1,4 +1,4 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
+import { Logger, useLogStateMachine } from '@onefootprint/dev-tools';
 import type { L10n } from '@onefootprint/footprint-js';
 import {
   AppErrorBoundary,
@@ -57,6 +57,12 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
         console.warn(
           'Validating user session failed with error: ',
           getErrorMessage(error),
+        );
+        Logger.warn(
+          `Validating user session failed with error: ${getErrorMessage(
+            error,
+          )}`,
+          'idv-router',
         );
       },
     },

@@ -1,4 +1,4 @@
-import { getSessionId, useObserveCollector } from '@onefootprint/dev-tools';
+import { Logger, useObserveCollector } from '@onefootprint/dev-tools';
 import {
   NavigationHeader,
   useGetD2PStatus,
@@ -11,7 +11,6 @@ import styled from '@onefootprint/styled';
 import type { GetD2PResponse } from '@onefootprint/types';
 import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
-import * as LogRocket from 'logrocket';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
@@ -20,7 +19,6 @@ const Init = () => {
   const { authToken = '' } = state.context;
   const updateD2PStatusMutation = useUpdateD2PStatus();
   const observeCollector = useObserveCollector();
-  const sessionId = getSessionId();
 
   useParseHandoffUrl({
     onSuccess: (authTokenFromUrl: string) => {
@@ -35,6 +33,7 @@ const Init = () => {
     },
     onError: () => {
       console.error('Parsing handoff URL failed on init page');
+      Logger.error('Parsing handoff URL failed on init page', 'handoff-init');
     },
   });
 
@@ -46,14 +45,13 @@ const Init = () => {
       opener,
       bifrostSessionId,
     });
-    LogRocket.identify(sessionId, {
-      bifrostSessionId,
-    });
+    Logger.identify({ opener, bifrostSessionId });
   };
 
   const updateD2PStatus = () => {
     if (!authToken) {
       console.error('Found empty auth token while updating d2p');
+      Logger.error('Found empty auth token while updating d2p', 'handoff-init');
       return;
     }
     // Tell the api that d2p is in progress now
@@ -74,6 +72,12 @@ const Init = () => {
           }
         },
         onError(error: unknown) {
+          Logger.warn(
+            `Updating the d2p status to in progress failed: ${getErrorMessage(
+              error,
+            )}`,
+            'handoff-init',
+          );
           console.warn(
             'Updating the d2p status to in progress failed: ',
             getErrorMessage(error),
@@ -125,6 +129,12 @@ const Init = () => {
           'Fetching d2p status failed on handoff init page:',
           getErrorMessage(error),
         );
+        Logger.warn(
+          `Fetching d2p status failed on handoff init page: ${getErrorMessage(
+            error,
+          )}`,
+          'handoff-init',
+        );
       },
     },
   });
@@ -138,7 +148,7 @@ const Init = () => {
           config: obConfiguration,
         });
         const { orgName, orgId, key } = obConfiguration;
-        LogRocket.identify(sessionId, {
+        Logger.identify({
           orgName,
           orgId,
           publicKey: key,
@@ -156,6 +166,12 @@ const Init = () => {
         console.error(
           'Fetching onboarding status failed on handoff init page:',
           getErrorMessage(error),
+        );
+        Logger.warn(
+          `Fetching onboarding status failed on handoff init page: ${getErrorMessage(
+            error,
+          )}`,
+          'handoff-init',
         );
       },
     },

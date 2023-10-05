@@ -1,3 +1,5 @@
+import { Logger } from '@onefootprint/dev-tools';
+import { getErrorMessage } from '@onefootprint/request';
 import type { Identifier } from '@onefootprint/types';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -17,23 +19,29 @@ const InitBootstrap = () => {
   const identifyMutation = useIdentify();
 
   const tryIdentifier = async (identifier: Identifier) => {
-    try {
-      const authTokenIdentify = await identifyMutation.mutateAsync({
+    const authTokenIdentify = await identifyMutation
+      .mutateAsync({
         obConfigAuth,
         sandboxId,
         identifier,
+      })
+      .catch((error: unknown) => {
+        Logger.error(
+          `Identifying user by auth token failed in in identify ${getErrorMessage(
+            error,
+          )}`,
+          'identify-init-bootstrap',
+        );
       });
 
-      if (authTokenIdentify.userFound) {
-        return {
-          successfulIdentifier: identifier,
-          hasSyncablePassKey: !!authTokenIdentify.hasSyncablePassKey,
-          availableChallengeKinds: authTokenIdentify.availableChallengeKinds,
-        };
-      }
-    } catch (e) {
-      console.error(e);
+    if (authTokenIdentify?.userFound) {
+      return {
+        successfulIdentifier: identifier,
+        hasSyncablePassKey: !!authTokenIdentify.hasSyncablePassKey,
+        availableChallengeKinds: authTokenIdentify.availableChallengeKinds,
+      };
     }
+
     return undefined;
   };
 
