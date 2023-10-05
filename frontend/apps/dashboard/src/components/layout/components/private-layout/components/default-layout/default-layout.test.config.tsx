@@ -13,6 +13,8 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
     isAuthMethodSupported: true,
+    isProdKybPlaybookRestricted: false,
+    isProdKycPlaybookRestricted: false,
   },
   {
     id: '_private_it_org_3',
@@ -25,6 +27,8 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
     isAuthMethodSupported: false,
+    isProdKybPlaybookRestricted: false,
+    isProdKycPlaybookRestricted: false,
   },
 ];
 

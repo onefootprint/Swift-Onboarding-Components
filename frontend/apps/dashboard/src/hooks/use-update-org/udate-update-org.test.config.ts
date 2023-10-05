@@ -11,6 +11,8 @@ export const organizationFixture: Organization = {
   domain: null,
   allowDomainAccess: false,
   isDomainAlreadyClaimed: false,
+  isProdKybPlaybookRestricted: false,
+  isProdKycPlaybookRestricted: false,
 };
 
 export const withUpdateOrg = (newOrg: Partial<Organization>) =>

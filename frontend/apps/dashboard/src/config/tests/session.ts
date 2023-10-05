@@ -20,6 +20,8 @@ const baseOrg: OrgSession = {
   logoUrl: null,
   isSandboxRestricted: false,
   isLive: false,
+  isProdKybPlaybookRestricted: false,
+  isProdKycPlaybookRestricted: false,
 };
 
 const baseMeta = {
@@ -95,6 +97,20 @@ export const asAdminUserInSandboxAndRestricted = () => {
         ...baseOrg,
         isSandboxRestricted: true,
         isLive: false,
+      },
+      meta: baseMeta,
+    },
+  });
+};
+
+export const asAdminUserWithOrg = (orgArgs: Partial<OrgSession>) => {
+  useStore.setState({
+    data: {
+      auth: '1',
+      user: baseUser,
+      org: {
+        ...baseOrg,
+        ...orgArgs,
       },
       meta: baseMeta,
     },
