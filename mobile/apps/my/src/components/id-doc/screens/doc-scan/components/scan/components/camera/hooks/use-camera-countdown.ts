@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react';
 import haptic from '@/utils/haptic';
 
 const COUNTDOWN_SECONDS = 4;
-const TICK_INTERVAL = 1000;
+const TICK_INTERVAL = 850;
 const NOT_DETECTED_TOLERANCE = 300;
 
 let timerId: NodeJS.Timeout = null;
 let notDetectedTimerId: NodeJS.Timeout = null;
 
-const usePhotoCountdown = (object: any, onDone: () => void) => {
+const useCameraCountdown = (object: any, onDone: () => void) => {
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
 
   const reset = () => {
@@ -66,4 +66,4 @@ const usePhotoCountdown = (object: any, onDone: () => void) => {
   };
 };
 
-export default usePhotoCountdown;
+export default useCameraCountdown;
