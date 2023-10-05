@@ -23,8 +23,7 @@ const getScrubbedPhoneNumber = ({
     }
     const countryCode = match[1] ? match[1] : '';
     const number = match[2];
-    const scrubbed = number.replace(/\d(?!\d{0,1}$)/g, '•');
-    return countryCode + scrubbed;
+    return countryCode + number;
   }
 
   const challengePhone = challengeData?.scrubbedPhoneNumber;

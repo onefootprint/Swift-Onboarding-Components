@@ -7,10 +7,6 @@ import UAParser from 'ua-parser-js';
 import { useEffectOnce, useEventListener } from 'usehooks-ts';
 
 import getSessionId from '../../utils/session-id';
-import {
-  getClickedElementContextInPage,
-  getClickedElementInfo,
-} from './utils/get-click-element-info';
 import getErrorEventInfo from './utils/get-error-event-info';
 import getNavigatorProperties from './utils/get-navigator-properties';
 import sendObservePayload from './utils/send-observe-payload';
@@ -177,16 +173,6 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
       passive: true,
     },
   );
-
-  useEventListener('click', (e: MouseEvent) => {
-    if (!(e.target instanceof HTMLElement)) {
-      return;
-    }
-    log('click', {
-      item: getClickedElementInfo(e.target),
-      pageContext: getClickedElementContextInPage(e.target),
-    });
-  });
 
   // Allow the apps to set custom context data like tenant name or bifrost session id etc. that can be emitted with each item.
   const setAppContext = (data?: Record<string, any>) => {

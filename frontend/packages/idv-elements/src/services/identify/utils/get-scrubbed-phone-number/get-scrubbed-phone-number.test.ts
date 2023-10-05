@@ -39,7 +39,7 @@ describe('getScrubbedPhoneNumber', () => {
           challengeKind: ChallengeKind.sms,
         },
       }),
-    ).toBe('+1 (•••) •••-••91');
+    ).toBe('+1 (123) 456-7891');
 
     expect(
       getScrubbedPhoneNumber({
@@ -50,7 +50,7 @@ describe('getScrubbedPhoneNumber', () => {
           challengeKind: ChallengeKind.sms,
         },
       }),
-    ).toBe('+1 (•••) •••-••90');
+    ).toBe('+1 (123) 456-7890');
 
     expect(
       getScrubbedPhoneNumber({
@@ -61,7 +61,7 @@ describe('getScrubbedPhoneNumber', () => {
           challengeKind: ChallengeKind.sms,
         },
       }),
-    ).toBe('+55 •••••••••50');
+    ).toBe('+55 48988124050');
   });
 
   it('converts scrubbed phone number challenge data to right format', () => {
@@ -85,6 +85,6 @@ describe('getScrubbedPhoneNumber', () => {
           scrubbedPhoneNumber: '+1 (***) ***-**90',
         },
       }),
-    ).toBe('+1 (•••) •••-••90');
+    ).toBe('+1 (123) 456-7890');
   });
 });

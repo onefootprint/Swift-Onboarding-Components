@@ -45,7 +45,7 @@ const Form = ({
       data-pending={!!isPending}
     >
       {title && (
-        <Typography variant="body-2" color="secondary" as="h3">
+        <Typography isPrivate variant="body-2" color="secondary" as="h3">
           {title}
         </Typography>
       )}
