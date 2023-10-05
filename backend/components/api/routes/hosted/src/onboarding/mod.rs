@@ -2,8 +2,8 @@ use std::{str::FromStr, sync::Arc};
 
 use crate::utils::vault_wrapper::{Business, Person, VaultWrapper, VwArgs};
 use api_core::{
-    auth::user::CheckUserWfAuthContext,
-    errors::{business::BusinessError, ApiResult},
+    auth::{user::CheckUserWfAuthContext, AuthError},
+    errors::ApiResult,
     utils::vault_wrapper::DecryptUncheckedResult,
     State,
 };
@@ -317,10 +317,7 @@ fn get_requirement_inner(
                 .must_collect(DID::Business)
                 .then(|| -> ApiResult<_> {
                     // Use the bvw to determine which fields still need to be collected
-                    let sb_id = args
-                        .sb_id
-                        .clone()
-                        .ok_or(BusinessError::NotAllowedWithoutBusiness)?;
+                    let sb_id = args.sb_id.clone().ok_or(AuthError::MissingBusiness)?;
                     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb_id))?;
                     let RequirementProgress {
                         populated_attributes,

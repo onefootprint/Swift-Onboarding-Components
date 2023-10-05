@@ -143,8 +143,8 @@ pub async fn post(
             let scopes = vec![
                 UserAuthScope::SignUp,
                 // TODO rm
-                UserAuthScope::Workflow { wf_id: wf.id.clone() },
-                UserAuthScope::OrgOnboarding {
+                UserAuthScope::DeprecatedWorkflow { wf_id: wf.id.clone() },
+                UserAuthScope::DeprecatedOrgOnboarding {
                     id: wf.scoped_vault_id.clone(),
                     ob_configuration_id: wf.ob_configuration_id.clone(),
                 },

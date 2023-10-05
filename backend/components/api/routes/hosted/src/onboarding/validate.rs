@@ -26,7 +26,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     state: web::Data<State>,
 ) -> JsonApiResponse<HostedValidateResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
 
     // Verify there are no unmet requirements
     let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;

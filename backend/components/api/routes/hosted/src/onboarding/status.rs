@@ -15,7 +15,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
 
     let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
     let all_requirements = reqs

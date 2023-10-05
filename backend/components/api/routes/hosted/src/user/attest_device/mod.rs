@@ -45,7 +45,7 @@ pub async fn post_challenge(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<DeviceAttestationChallengeResponse> {
-    let _ = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let _ = user_auth.check_guard(UserAuthGuard::SignUp)?;
     let GetDeviceAttestationChallengeRequest { device_type } = request.into_inner();
 
     // we need the server to generate a one-time use challenge
@@ -81,7 +81,7 @@ pub async fn post_attestation(
     user_auth: UserAuthContext,
     insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     let CreateDeviceAttestationRequest {
         attestation,
         state: sealed_state,

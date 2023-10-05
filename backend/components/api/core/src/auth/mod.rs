@@ -51,6 +51,8 @@ pub enum AuthError {
     MissingUserPermission(String),
     #[error("Not allowed: requires one of the following scopes: {0}")]
     MissingScope(Csv<UserAuthGuard>),
+    #[error("Not allowed without business")]
+    MissingBusiness,
     #[error("Not allowed: required permission is missing: {0}")]
     MissingTenantPermission(String),
     #[error("Not allowed: insufficient permissions to decrypt attributes: {0}")]

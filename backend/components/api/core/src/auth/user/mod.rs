@@ -21,18 +21,24 @@ pub enum UserAuthScope {
     SignUp,
     /// DEPRECATED
     /// TODO: rm this when all sessions using it have expired
-    OrgOnboarding {
+    #[serde(rename = "OrgOnboarding")]
+    #[strum_discriminants(strum(serialize = "OrgOnboarding"))]
+    DeprecatedOrgOnboarding {
         id: ScopedVaultId,
         ob_configuration_id: Option<ObConfigurationId>,
     },
     /// Deprecated
     /// TODO: rm this when all sessions using it have expired
-    Workflow {
+    #[serde(rename = "Workflow")]
+    #[strum_discriminants(strum(serialize = "Workflow"))]
+    DeprecatedWorkflow {
         wf_id: WorkflowId,
     },
     /// Deprecated
     /// TODO: rm this when all sessions using it have expired
-    Business(ScopedVaultId),
+    #[serde(rename = "Business")]
+    #[strum_discriminants(strum(serialize = "Business"))]
+    DeprecatedBusiness(ScopedVaultId),
     // We don't currently issue a token with this - was for my1fp
     BasicProfile,
     SensitiveProfile,
@@ -58,7 +64,7 @@ mod test {
     fn test_serialize() {
         let expected_parsed = vec![
             UserAuthScope::SignUp,
-            UserAuthScope::Workflow {
+            UserAuthScope::DeprecatedWorkflow {
                 wf_id: WorkflowId::test_data("FLERP".to_owned()),
             },
         ];

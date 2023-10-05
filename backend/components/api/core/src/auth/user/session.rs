@@ -85,7 +85,7 @@ impl UserSessionContext {
         UserSession::make(self.user.id, args, new_scopes, new_factors)
     }
 
-    /// Extracts the scoped_user_id from the `UserAuthScope::OrgOnboarding` scope on this
+    /// Extracts the scoped_user_id from the `UserAuthScope::DeprecatedOrgOnboarding` scope on this
     /// session, if exists
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
         // TODO rm
@@ -93,7 +93,7 @@ impl UserSessionContext {
             .scopes
             .iter()
             .filter_map(|x| match x {
-                UserAuthScope::OrgOnboarding { id, .. } => Some(id.clone()),
+                UserAuthScope::DeprecatedOrgOnboarding { id, .. } => Some(id.clone()),
                 _ => None,
             })
             .next();
@@ -108,7 +108,7 @@ impl UserSessionContext {
             .scopes
             .iter()
             .filter_map(|x| match x {
-                UserAuthScope::OrgOnboarding {
+                UserAuthScope::DeprecatedOrgOnboarding {
                     ob_configuration_id, ..
                 } => ob_configuration_id.clone(),
                 _ => None,
@@ -122,11 +122,23 @@ impl UserSessionContext {
             .scopes
             .iter()
             .filter_map(|x| match x {
-                UserAuthScope::Workflow { wf_id } => Some(wf_id.clone()),
+                UserAuthScope::DeprecatedWorkflow { wf_id } => Some(wf_id.clone()),
                 _ => None,
             })
             .next();
         self.wf_id.clone().or(legacy_wf_id)
+    }
+
+    pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
+        let legacy_sb_id = self
+            .scopes
+            .iter()
+            .filter_map(|x| match x {
+                UserAuthScope::DeprecatedBusiness(id) => Some(id.clone()),
+                _ => None,
+            })
+            .next();
+        self.sb_id.clone().or(legacy_sb_id)
     }
 }
 

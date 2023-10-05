@@ -48,7 +48,7 @@ pub async fn post(
     state: web::Data<State>,
     request: OptionalJson<ProcessRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     let fixture_result = request.into_inner().map(|r| r.fixture_result);
 
     // Verify there are no unmet requirements

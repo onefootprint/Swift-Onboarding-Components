@@ -33,7 +33,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     telemetry_headers: TelemetryHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     let StytchTelemetryRequest { telemetry_id } = request.into_inner();
 
     let req = StytchLookupRequest { telemetry_id };

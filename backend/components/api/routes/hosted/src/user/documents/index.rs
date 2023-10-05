@@ -27,7 +27,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     request: web::Json<CreateIdentityDocumentRequest>,
 ) -> JsonApiResponse<CreateIdentityDocumentResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let CreateIdentityDocumentRequest {
         document_type,

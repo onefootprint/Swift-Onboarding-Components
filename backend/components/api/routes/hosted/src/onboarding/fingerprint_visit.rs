@@ -19,7 +19,7 @@ pub async fn post(
     telemetry_headers: TelemetryHeaders,
     request: Json<FingerprintVisitRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
 
     let FingerprintVisitRequest {
         visitor_id,

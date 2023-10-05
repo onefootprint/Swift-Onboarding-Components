@@ -63,14 +63,14 @@ impl ExtractableAuthSession for ParsedUserWfSession {
             <ParsedUserSessionContext as ExtractableAuthSession>::try_load_session(value, conn, ff_client)?.0;
 
         let Some(scoped_user_id) = user_session.scoped_user_id() else {
-            return Err(AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
+            return Err(AuthError::MissingScope(vec![UserAuthGuard::DeprecatedOrgOnboarding].into()))?;
         };
 
         // Confirm that the onboarding in the auth token belongs to the user
         let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &user_session.user.id))?;
 
         let Some(workflow_id) = user_session.workflow_id() else {
-            return Err(AuthError::MissingScope(vec![UserAuthGuard::Workflow].into()))?;
+            return Err(AuthError::MissingScope(vec![UserAuthGuard::DeprecatedWorkflow].into()))?;
         };
         let workflow = Workflow::get(conn, &workflow_id)?;
         let tenant = Tenant::get(conn, &scoped_user.tenant_id)?;
@@ -124,22 +124,11 @@ impl UserWfAuthContext {
 }
 
 impl CheckUserWfAuthContext {
-    /// Extracts the business vault_id from the `UserAuthScope::Business` scope on this session, if
-    /// exists
     pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
-        let legacy_sb_id = self
-            .user_session
-            .scopes
-            .iter()
-            .filter_map(|x| match x {
-                UserAuthScope::Business(id) => Some(id.clone()),
-                _ => None,
-            })
-            .next();
-        self.user_session.sb_id.clone().or(legacy_sb_id)
+        self.user_session.scoped_business_id()
     }
 
-    /// Extracts the business workflow from the `UserAuthScope::Business` scope on this session,
+    /// Extracts the business workflow from the `UserAuthScope::DeprecatedBusiness` scope on this session,
     /// if exists
     pub fn business_workflow(&self, conn: &mut PgConn) -> ApiResult<Option<Workflow>> {
         let Some(sb_id) = self.scoped_business_id() else {
@@ -177,8 +166,6 @@ impl UserWfSession {
             return Err(AuthError::WorkflowDeactivated(guard).into());
         }
         let allowed_guards = self.workflow.state.allowed_guards();
-        // TODO make sure we don't fail to add email when the vault is created - auth tokens don't
-        // have a workflow when they are first created
         if !allowed_guards.contains(&guard) {
             Err(AuthError::MissingWorkflowGuard(guard).into())
         } else {

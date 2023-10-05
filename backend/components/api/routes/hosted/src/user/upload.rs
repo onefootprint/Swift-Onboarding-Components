@@ -23,7 +23,7 @@ pub async fn post(
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let kind = DocumentKind::try_from(document_identifier.into_inner())?;
 
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     // Specifically check for AddData permission here since this is used only for investor profile
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let file = file_upload::handle_file_upload(

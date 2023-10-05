@@ -136,7 +136,7 @@ async fn post_inner(
     file: FileUpload,
     meta: Option<UploadMeta>,
 ) -> JsonApiResponse<DocumentResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let wf = user_auth.workflow();
     let wf_id = wf.id.clone();

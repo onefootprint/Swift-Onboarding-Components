@@ -6,6 +6,7 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::vault_wrapper::{Business, VaultWrapper};
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
+use api_core::auth::AuthError;
 use api_core::errors::business::BusinessError;
 use api_core::errors::AssertionError;
 use api_core::types::ResponseData;
@@ -31,14 +32,12 @@ pub async fn post_validate(
     user_auth: UserWfAuthContext,
     request: Json<RawDataRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::Business)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let mut request = request.into_inner();
+    let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
     if let Some(kyced_bos) = request.remove(&BDK::KycedBeneficialOwners.into()) {
-        let sb_id = user_auth
-            .scoped_business_id()
-            .ok_or(BusinessError::NotAllowedWithoutBusiness)?;
-        let new_kyced_bos = augment_bos(&state, sb_id, kyced_bos).await?;
+        let new_kyced_bos = augment_bos(&state, sb_id.clone(), kyced_bos).await?;
         request.insert(BDK::KycedBeneficialOwners.into(), new_kyced_bos);
     }
 
@@ -48,9 +47,6 @@ pub async fn post_validate(
     let bvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let sb_id = user_auth
-                .scoped_business_id()
-                .ok_or(BusinessError::NotAllowedWithoutBusiness)?;
             let bvw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;
             Ok(bvw)
         })
@@ -71,11 +67,9 @@ pub async fn patch(
     request: Json<RawDataRequest>,
     user_auth: UserWfAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::Business)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
-    let sb_id = user_auth
-        .scoped_business_id()
-        .ok_or(BusinessError::NotAllowedWithoutBusiness)?;
+    let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
 
     let mut request = request.into_inner();
     if let Some(kyced_bos) = request.remove(&BDK::KycedBeneficialOwners.into()) {

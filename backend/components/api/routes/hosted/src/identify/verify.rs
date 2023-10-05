@@ -156,7 +156,7 @@ pub async fn post(
                     .iter()
                     .flatten()
                     .filter_map(|s| match s {
-                        UserAuthScope::Business(sb_id) => Some(sb_id.clone()),
+                        UserAuthScope::DeprecatedBusiness(sb_id) => Some(sb_id.clone()),
                         _ => None,
                     })
                     .next();
@@ -249,7 +249,7 @@ fn onboarding_scopes(
             bo.add_user_vault_id(conn, &uv.id)?;
         }
         // TODO this scope will give the secondary BO perms to update the business vault
-        Some(UserAuthScope::Business(scoped_business.id))
+        Some(UserAuthScope::DeprecatedBusiness(scoped_business.id))
     } else {
         None
     };
@@ -258,7 +258,7 @@ fn onboarding_scopes(
         su.id.clone(),
         vec![
             Some(UserAuthScope::SignUp),
-            Some(UserAuthScope::OrgOnboarding {
+            Some(UserAuthScope::DeprecatedOrgOnboarding {
                 id: su.id,
                 ob_configuration_id: Some(obc.id.clone()),
             }),

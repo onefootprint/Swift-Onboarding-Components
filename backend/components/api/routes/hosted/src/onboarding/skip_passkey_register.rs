@@ -25,7 +25,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     insights: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
 
     state

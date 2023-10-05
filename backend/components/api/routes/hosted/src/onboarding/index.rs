@@ -9,7 +9,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
-use api_core::auth::IsGuardMet;
+use api_core::auth::session::user::UserSessionArgs;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::onboarding::NewBusinessVaultArgs;
@@ -30,11 +30,11 @@ pub async fn post(
     user_auth: UserAuthContext,
     insights: InsightHeaders,
 ) -> JsonApiResponse<OnboardingResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::OrgOnboarding)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
 
     let scoped_user_id = user_auth
         .scoped_user_id()
-        .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::OrgOnboarding].into()))?;
+        .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::SignUp].into()))?;
     let uv_id = user_auth.user_vault_id().clone();
     let obc_id = user_auth.ob_configuration_id();
     let (scoped_user, ob_config, tenant) = state
@@ -51,7 +51,7 @@ pub async fn post(
     // TODO don't always create a new business vault - once we have portable businesses,
     // we should display to the client an ability to select the business they want to use
     let should_create_new_business_vault = ob_config.must_collect(DataIdentifierDiscriminant::Business)
-        && !UserAuthGuard::Business.is_met(&user_auth.scopes);
+        && user_auth.scoped_business_id().is_none();
     let maybe_new_biz_args = if should_create_new_business_vault {
         // If we're going to make a new business vault,
         let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
@@ -84,15 +84,20 @@ pub async fn post(
             if user_auth.workflow_id().is_none() {
                 // No need to add the workflow scope if we already have one from a redo flow
                 // TODO: one day we should just have the client not hit this endpoint for redo flows
-                new_scopes.push(UserAuthScope::Workflow { wf_id: wf.id.clone() });
+                new_scopes.push(UserAuthScope::DeprecatedWorkflow { wf_id: wf.id.clone() });
             }
 
             // If the ob config has business fields, create a business vault, scoped vault, and ob
-            if let Some(biz_wf) = biz_wf {
+            if let Some(biz_wf) = biz_wf.as_ref() {
                 // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
-                new_scopes.push(UserAuthScope::Business(biz_wf.scoped_vault_id));
+                new_scopes.push(UserAuthScope::DeprecatedBusiness(biz_wf.scoped_vault_id.clone()));
             }
-            let data = user_auth.data.clone().session_with_added_scopes(new_scopes)?;
+            let args = UserSessionArgs {
+                wf_id: user_auth.workflow_id().is_none().then_some(wf.id.clone()),
+                sb_id: biz_wf.map(|wf| wf.scoped_vault_id),
+                ..Default::default()
+            };
+            let data = user_auth.data.clone().update(args, new_scopes, None)?;
             user_auth.update_session(conn, &session_key, data)?;
 
             Ok(wf)
