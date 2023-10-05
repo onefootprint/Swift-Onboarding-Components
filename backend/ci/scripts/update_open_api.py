@@ -139,14 +139,24 @@ def get_apis(open_api_spec, tag):
 if __name__ == "__main__":
     # If running this script, actually output the new open api spec
     BASE_URL = os.environ.get("TEST_URL") or "https://api.onefootprint.com"
+    FRONTEND_DIR = os.environ.get("FRONTEND_DIR")
+    path = (
+        f"{FRONTEND_DIR}/apps/docs/src/pages/api-reference/assets"
+        if FRONTEND_DIR
+        else "out"
+    )
+    os.makedirs(path, exist_ok=True)
+
     open_api_spec = requests.get(f"{BASE_URL}/docs-spec-v3").json()
-    os.makedirs("out", exist_ok=True)
+
     public_open_api_spec = get_apis(open_api_spec, "PublicApi")
-    with open("out/API Docs.json", "w") as f:
-        f.write(json.dumps(public_open_api_spec))
+    file_name = "api-docs.json" if FRONTEND_DIR else "API Docs.json"
+    with open(f"{path}/{file_name}", "w") as f:
+        f.write(json.dumps(public_open_api_spec, indent=4))
         f.close()
+
     preview_open_api_spec = get_apis(open_api_spec, "Preview")
-    os.makedirs("out", exist_ok=True)
-    with open("out/API Preview Docs.json", "w") as f:
-        f.write(json.dumps(preview_open_api_spec))
+    file_name = "api-preview-docs.json" if FRONTEND_DIR else "API Preview Docs.json"
+    with open(f"{path}/{file_name}", "w") as f:
+        f.write(json.dumps(preview_open_api_spec, indent=4))
         f.close()

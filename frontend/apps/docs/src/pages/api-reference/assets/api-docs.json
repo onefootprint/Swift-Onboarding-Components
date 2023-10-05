@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "cd614bb8d821f5119abb91cc7ea9f434ac7d891f"
+        "version": "9531d9d4d33f94bd3d9aa1f26ab057b28b2a28e2"
     },
     "servers": [
         {
@@ -2555,12 +2555,12 @@
             "CreateOnboardingSessionRequest": {
                 "type": "object",
                 "properties": {
-                    "onboarding_config_id": {
+                    "key": {
                         "type": "string"
                     }
                 },
                 "required": [
-                    "onboarding_config_id"
+                    "key"
                 ]
             },
             "DecryptRequest": {
