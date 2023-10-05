@@ -2,7 +2,6 @@ use crate::auth::session::UpdateSession;
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthGuard;
-use crate::auth::user::UserAuthScope;
 use crate::auth::AuthError;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
@@ -78,26 +77,13 @@ pub async fn post(
                 maybe_new_biz_args,
             )?;
 
-            // update Auth scopes
-            let mut new_scopes = vec![];
-
-            if user_auth.workflow_id().is_none() {
-                // No need to add the workflow scope if we already have one from a redo flow
-                // TODO: one day we should just have the client not hit this endpoint for redo flows
-                new_scopes.push(UserAuthScope::DeprecatedWorkflow { wf_id: wf.id.clone() });
-            }
-
-            // If the ob config has business fields, create a business vault, scoped vault, and ob
-            if let Some(biz_wf) = biz_wf.as_ref() {
-                // Update the auth session in the DB to have the business scope, giving permission to perform other operations in onboarding.
-                new_scopes.push(UserAuthScope::DeprecatedBusiness(biz_wf.scoped_vault_id.clone()));
-            }
+            // Update auth token with new identifiers
             let args = UserSessionArgs {
                 wf_id: user_auth.workflow_id().is_none().then_some(wf.id.clone()),
                 sb_id: biz_wf.map(|wf| wf.scoped_vault_id),
                 ..Default::default()
             };
-            let data = user_auth.data.clone().update(args, new_scopes, None)?;
+            let data = user_auth.data.clone().update(args, vec![], None)?;
             user_auth.update_session(conn, &session_key, data)?;
 
             Ok(wf)

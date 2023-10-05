@@ -140,15 +140,7 @@ pub async fn post(
             };
             UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;
             // Create an auth token for this workflow that we will send to the user
-            let scopes = vec![
-                UserAuthScope::SignUp,
-                // TODO rm
-                UserAuthScope::DeprecatedWorkflow { wf_id: wf.id.clone() },
-                UserAuthScope::DeprecatedOrgOnboarding {
-                    id: wf.scoped_vault_id.clone(),
-                    ob_configuration_id: wf.ob_configuration_id.clone(),
-                },
-            ];
+            let scopes = vec![UserAuthScope::SignUp];
             let duration = Duration::days(1);
             let args = UserSessionArgs {
                 su_id: Some(wf.scoped_vault_id),

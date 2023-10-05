@@ -150,23 +150,16 @@ pub async fn post(
             // Determine whether to issue onboardig scopes or my1fp scopes
             let (args, scopes, duration, scoped_vault_id) = if let Some(ob_pk_auth) = ob_pk_auth {
                 let obc_id = ob_pk_auth.ob_config().id.clone();
-                let (su_id, scopes) = onboarding_scopes(conn, ob_pk_auth, &uv_id, session_id)?;
+                let (su_id, sb_id) = onboarding_identifiers(conn, ob_pk_auth, &uv_id, session_id)?;
                 let duration = Duration::hours(1); // Onboarding is shorter
-                let sb_id = scopes
-                    .iter()
-                    .flatten()
-                    .filter_map(|s| match s {
-                        UserAuthScope::DeprecatedBusiness(sb_id) => Some(sb_id.clone()),
-                        _ => None,
-                    })
-                    .next();
                 let args = UserSessionArgs {
                     su_id: Some(su_id.clone()),
                     sb_id,
                     obc_id: Some(obc_id),
+                    // wf_id will be added later in POST /hosted/onboarding
                     wf_id: None,
                 };
-                (args, scopes, duration, Some(su_id))
+                (args, vec![Some(UserAuthScope::SignUp)], duration, Some(su_id))
             } else {
                 let scopes = vec![Some(UserAuthScope::BasicProfile)];
                 // TODO we currently infer that a token is for my1fp just because ob config auth
@@ -222,13 +215,13 @@ pub enum ChallengeContext {
     Email(VaultContext),
 }
 
-/// Determines the auth scopes to issue to allow a user to complete onboarding
-fn onboarding_scopes(
+/// Determines the identifiers to add to the auth token to allow a user to complete onboarding
+fn onboarding_identifiers(
     conn: &mut TxnPgConn,
     ob_pk_auth: ObConfigAuth,
     uv_id: &VaultId,
     session_id: Option<SessionId>,
-) -> ApiResult<(ScopedVaultId, Vec<Option<UserAuthScope>>)> {
+) -> ApiResult<(ScopedVaultId, Option<ScopedVaultId>)> {
     let obc = ob_pk_auth.ob_config();
     // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
     // created with an ob config
@@ -236,7 +229,7 @@ fn onboarding_scopes(
     let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone(), session_id)?;
 
     // If we verified with a BoSessionAuth, update the corresponding BO
-    let bo_scope = if let Some(bo) = ob_pk_auth.business_owner() {
+    let sb_id = if let Some(bo) = ob_pk_auth.business_owner() {
         let bo = BusinessOwner::lock(conn, &bo.id)?.into_inner();
         let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &obc.tenant_id))?;
         if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
@@ -248,24 +241,13 @@ fn onboarding_scopes(
             // If no uv_id on the BO, add it
             bo.add_user_vault_id(conn, &uv.id)?;
         }
-        // TODO this scope will give the secondary BO perms to update the business vault
-        Some(UserAuthScope::DeprecatedBusiness(scoped_business.id))
+        // TODO this will give the secondary BO perms to update the business vault
+        Some(scoped_business.id)
     } else {
         None
     };
 
-    Ok((
-        su.id.clone(),
-        vec![
-            Some(UserAuthScope::SignUp),
-            Some(UserAuthScope::DeprecatedOrgOnboarding {
-                id: su.id,
-                ob_configuration_id: Some(obc.id.clone()),
-            }),
-            // Business owner scope, if any
-            bo_scope,
-        ],
-    ))
+    Ok((su.id, sb_id))
 }
 
 fn validate_biometric_challenge(

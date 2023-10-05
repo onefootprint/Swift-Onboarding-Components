@@ -50,7 +50,6 @@ impl UserSession {
         scopes: Vec<UserAuthScope>,
         auth_factors: Vec<AuthFactor>,
     ) -> ApiResult<AuthSessionData> {
-        // TODO Enable this validation when we deprecate the old scopes
         /*
         if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && args.su_id.is_none() {
             return Err(UserError::InvalidAuthSession(

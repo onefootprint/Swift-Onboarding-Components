@@ -128,8 +128,7 @@ impl CheckUserWfAuthContext {
         self.user_session.scoped_business_id()
     }
 
-    /// Extracts the business workflow from the `UserAuthScope::DeprecatedBusiness` scope on this session,
-    /// if exists
+    /// Get the business workflow associated with this auth token, if any
     pub fn business_workflow(&self, conn: &mut PgConn) -> ApiResult<Option<Workflow>> {
         let Some(sb_id) = self.scoped_business_id() else {
             return Ok(None);
