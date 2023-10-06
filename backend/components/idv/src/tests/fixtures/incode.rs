@@ -38,7 +38,7 @@ pub fn watchlist_result_response(list_types: Vec<String>) -> IncodeResponse<Watc
             hits: Some(vec![Hit {
                 score: Some(3.3),
                 is_whitelisted: None,
-                match_types: None,
+                match_types: Some(vec!["name_exact".to_string()]),
                 match_type_details: None,
                 doc: Some(Doc {
                     aka: None,

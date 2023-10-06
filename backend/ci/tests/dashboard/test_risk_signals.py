@@ -32,7 +32,7 @@ def test_aml(sandbox_tenant, twilio, alpaca_kyc_ob_config):
             )
             assert len(aml["hits"]) == 1
             assert aml["hits"][0]["name"] == "Piip Penguin"
-            assert aml["hits"][0]["match_types"] == ["aka_exact"]
+            assert aml["hits"][0]["match_types"] == ["name_exact"]
             assert sorted(aml["hits"][0]["fields"].items()) == sorted(
                 {
                     "Original Country Text": "Kenya, South Sudan, Sudan, Tanzania, United States",

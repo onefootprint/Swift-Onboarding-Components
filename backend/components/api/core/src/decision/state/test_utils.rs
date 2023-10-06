@@ -188,7 +188,7 @@ pub async fn query_risk_signals(
 
 pub struct WithHit(pub Vec<AmlKind>);
 pub fn mock_incode(state: &mut State, with_hit: WithHit) {
-    let lists = with_hit
+    let lists: Vec<String> = with_hit
         .0
         .into_iter()
         .map(|k| match k {

@@ -161,6 +161,8 @@ pub fn get_hits(res: &WatchlistResultResponse) -> Vec<Hit> {
 
     hits.into_iter()
         .filter(|h| h.score.map(|s| s < SCORE_THRESHOLD_FOR_HIT).unwrap_or(false))
+        // for now, also only consider it a hit if `name_exact`, for a bit more precision
+        .filter(|h| h.match_types.as_ref().map(|t| t.contains(&"name_exact".to_string())).unwrap_or(false))
         .collect()
 }
 
@@ -200,24 +202,27 @@ mod test {
         )
     }
 
-    #[test_case(vec![(55.0, vec!["pep", "sanction"])] => Vec::<FootprintReasonCode>::new())]
-    #[test_case(vec![(1.7, vec!["pep", "sanction"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
-    #[test_case(vec![(1.7, vec!["pep"]), (1.8, vec!["sanction"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
-    #[test_case(vec![(1.7, vec!["pep"]), (1.8, vec!["sanction"]), (1.9, vec!["sanction"]), (2.0, vec!["sanction", "pep"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
-    #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"]), (1.8, vec!["sanction"])] => vec![FootprintReasonCode::AdverseMediaHit, FootprintReasonCode::WatchlistHitOfac])]
-
-    fn test_reason_codes_from_watchlist_result(hits: Vec<(f32, Vec<&str>)>) -> Vec<FootprintReasonCode> {
+    #[test_case(vec![TestHit(55.0, vec!["pep", "sanction"], vec!["name_exact"])] => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![TestHit(1.7, vec!["pep", "sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case(vec![TestHit(1.7, vec!["pep"], vec!["name_exact"]), TestHit(1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case(vec![TestHit(1.7, vec!["pep"], vec!["name_exact"]), TestHit(1.8, vec!["sanction"], vec!["name_exact"]), TestHit(1.9, vec!["sanction"], vec!["name_exact"]), TestHit(2.0, vec!["sanction", "pep"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case(vec![TestHit(1.7, vec!["adverse-media-v2-terrorism"], vec!["name_exact"]), TestHit(1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::AdverseMediaHit, FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case(vec![TestHit(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), TestHit(1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case(vec![TestHit(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), TestHit(1.8, vec!["sanction"], vec!["equivalent_name"])] => Vec::<FootprintReasonCode>::new())]
+    fn test_reason_codes_from_watchlist_result(hits: Vec<TestHit>) -> Vec<FootprintReasonCode> {
         let res = make_watchlist_res(hits);
         reason_codes_from_watchlist_result(&res)
     }
 
-    fn make_watchlist_res(hits: Vec<(f32, Vec<&str>)>) -> WatchlistResultResponse {
+    struct TestHit<'a>(f32, Vec<&'a str>, Vec<&'a str>);
+
+    fn make_watchlist_res(hits: Vec<TestHit>) -> WatchlistResultResponse {
         let hits = hits
             .into_iter()
-            .map(|(score, types)| Hit {
-                score: Some(score),
+            .map(|h| Hit {
+                score: Some(h.0),
                 is_whitelisted: None,
-                match_types: None,
+                match_types: Some(h.2.into_iter().map(String::from).collect()),
                 match_type_details: None,
                 doc: Some(Doc {
                     aka: None,
@@ -227,7 +232,7 @@ mod test {
                     media: None,
                     name: None,
                     sources: None,
-                    types: Some(types.into_iter().map(String::from).collect()),
+                    types: Some(h.1.into_iter().map(String::from).collect()),
                 }),
             })
             .collect::<Vec<_>>();

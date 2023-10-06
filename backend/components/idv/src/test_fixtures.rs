@@ -6455,7 +6455,7 @@ pub fn incode_watchlist_result_response_yes_hits() -> serde_json::Value {
                         "is_whitelisted": false,
                         "match_types":
                         [
-                            "aka_exact"
+                            "name_exact"
                         ],
                         "match_types_details": [],
                         "score": 1.7
