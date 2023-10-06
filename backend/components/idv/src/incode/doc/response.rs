@@ -38,23 +38,16 @@ pub struct AddSideResponse {
 // https://onefootprint.slack.com/archives/C0514LEFUCS/p1692735019118229
 // Only for US atm
 // No documentation for these enum values
-const DRIVERS_LICENSE_PERMIT_IDENTIFIERS: [&str; 16] = [
-    "DRIVER_LICENSE_UNDER21",
+const DRIVERS_LICENSE_PERMIT_IDENTIFIERS: [&str; 9] = [
     "LEARNERS_PERMIT",
     "LEARNERS_PERMIT_UNDER21",
-    "DRIVERS_LICENSE_UNDER21",
     "PROVISIONAL_DRIVERS_LICENSE_UNDER21",
-    "ENHANCED_DRIVERS_LICENSE",
     "PROVISIONAL_DRIVERS_LICENSE",
     "INTERMEDIATE_DRIVERS_LICENSE_UNDER21",
-    "TEMPORARY_DRIVERS_LICENSE",
     "JUNIOR_DRIVERS_LICENSE",
-    "ENHANCED_DRIVER_LICENSE",
-    "ENHANCED_DRIVERS_LICENSE_UNDER21",
     "JUNIOR_OPERATORS_LICENSE_UNDER21",
     "ENHANCED_LEARNERS_PERMIT_UNDER21",
     "ENHANCED_PROVISIONAL_DRIVERS_LICENSE_UNDER21",
-    "ENHANCED_DRIVER_LICENSE_UNDER21",
 ];
 
 impl AddSideResponse {
@@ -776,15 +769,9 @@ mod tests {
         });
 
         let parsed: AddSideResponse = serde_json::from_value(raw_response_with_failure).unwrap();
-        // disallow permits
+        // disallow permits, but it's not a permit
         let failures = parsed.failure_reasons(vec![IncodeDocumentRestriction::NoDriverLicensePermit]);
-        assert_eq!(
-            failures,
-            vec![
-                IncodeFailureReason::WrongDocumentSide,
-                IncodeFailureReason::DriversLicensePermitNotAllowed
-            ]
-        );
+        assert_eq!(failures, vec![IncodeFailureReason::WrongDocumentSide,]);
 
         let raw_response_with_failure = serde_json::json!({
             "sharpness": 100,
@@ -793,7 +780,7 @@ mod tests {
             "classification": false,
             "typeOfId": "DriversLicense",
             "issueYear": 2016,
-            "issueName": "USA DriversLicense ENHANCED_DRIVERS_LICENSE_UNDER21",
+            "issueName": "USA DriversLicense LEARNERS_PERMIT_UNDER21",
             "sessionStatus": "Alive",
             "failReason": "UNABLE_TO_ALIGN_DOCUMENT"
         });
