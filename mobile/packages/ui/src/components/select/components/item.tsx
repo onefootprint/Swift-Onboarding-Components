@@ -3,7 +3,6 @@ import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
 
 import { Box } from '../../box';
-import { Flag } from '../../flag';
 import { Pressable } from '../../pressable';
 import { Typography } from '../../typography';
 
@@ -11,11 +10,9 @@ type ItemProps = {
   label: string;
   onPress: () => void;
   selected: boolean;
-  // TODO: FIX
-  value: any;
 };
 
-const Item = ({ value, label, selected, onPress }: ItemProps) => {
+const Item = ({ label, selected, onPress }: ItemProps) => {
   const [active, setActive] = useState(false);
 
   return (
@@ -26,10 +23,7 @@ const Item = ({ value, label, selected, onPress }: ItemProps) => {
       withImpact
     >
       <ItemContainer active={active}>
-        <Box flexDirection="row" gap={4}>
-          <Flag code={value} />
-          <Label variant="body-4">{label}</Label>
-        </Box>
+        <Label variant="body-4">{label}</Label>
         <Box>{selected ? <IcoCheck24 /> : null}</Box>
       </ItemContainer>
     </Pressable>

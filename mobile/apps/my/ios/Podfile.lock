@@ -15,6 +15,12 @@ PODS:
     - hermes-engine/Pre-built (= 0.71.13)
   - hermes-engine/Pre-built (0.71.13)
   - libevent (2.1.12)
+  - Mixpanel-swift (4.1.3):
+    - Mixpanel-swift/Complete (= 4.1.3)
+  - Mixpanel-swift/Complete (4.1.3)
+  - MixpanelReactNative (2.3.1):
+    - Mixpanel-swift (= 4.1.3)
+    - React-Core
   - RCT-Folly (2021.07.22.00):
     - boost
     - DoubleConversion
@@ -427,6 +433,7 @@ DEPENDENCIES:
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
+  - MixpanelReactNative (from `../../../node_modules/mixpanel-react-native`)
   - RCT-Folly (from `../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../../../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../../../node_modules/react-native/Libraries/TypeSafety`)
@@ -462,7 +469,7 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
   - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
-  - "RNFlashList (from `../node_modules/@shopify/flash-list`)"
+  - "RNFlashList (from `../../../node_modules/@shopify/flash-list`)"
   - RNReactNativeHapticFeedback (from `../../../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
@@ -475,6 +482,7 @@ SPEC REPOS:
   trunk:
     - fmt
     - libevent
+    - Mixpanel-swift
     - Sentry
     - SentryPrivate
 
@@ -491,6 +499,8 @@ EXTERNAL SOURCES:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
     :podspec: "../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
+  MixpanelReactNative:
+    :path: "../../../node_modules/mixpanel-react-native"
   RCT-Folly:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -560,7 +570,7 @@ EXTERNAL SOURCES:
   RNDeviceInfo:
     :path: "../../../node_modules/react-native-device-info"
   RNFlashList:
-    :path: "../node_modules/@shopify/flash-list"
+    :path: "../../../node_modules/@shopify/flash-list"
   RNReactNativeHapticFeedback:
     :path: "../../../node_modules/react-native-haptic-feedback"
   RNReanimated:
@@ -585,6 +595,8 @@ SPEC CHECKSUMS:
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   hermes-engine: 8b9dc37355d2e12879267382f4256afd356349a1
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
+  Mixpanel-swift: d7c7c6a2f7c65f735af3cb4746ed61a5aab0e551
+  MixpanelReactNative: 07c808338a1eb69b0c9077668e3acfb0b2dd6689
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: c20235648eeb64a874f55459ceae6b081956318d
   RCTTypeSafety: ca004f1fe0b76f7936f7fe7dfd761a4386cf72f5

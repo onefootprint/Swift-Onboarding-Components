@@ -11,6 +11,7 @@ import configureSentry from './config/initializers/sentry';
 import Idv from './domains/idv';
 import Preview from './domains/preview';
 import useShouldOpenIdv from './hooks/use-should-open-idv';
+import AnalyticsProvider from './utils/analytics';
 
 configureReactI18next();
 configureSentry();
@@ -28,7 +29,9 @@ const IdvApp = () => {
     </QueryClientProvider>
   ) : (
     <QueryClientProvider client={queryClient}>
-      <Idv onLoad={handleLoad} linkingUrl={linkingUrl} />
+      <AnalyticsProvider>
+        <Idv onLoad={handleLoad} linkingUrl={linkingUrl} />
+      </AnalyticsProvider>
     </QueryClientProvider>
   );
 };

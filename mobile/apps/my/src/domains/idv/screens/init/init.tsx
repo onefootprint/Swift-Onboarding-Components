@@ -2,6 +2,12 @@ import { D2PStatusUpdate } from '@onefootprint/types';
 import { Container, LoadingIndicator } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 
+import {
+  AnalyticsEvents,
+  AnalyticsTimeEvents,
+  useAnalytics,
+} from '@/utils/analytics';
+
 import useUpdateD2PStatus from '../../hooks/use-update-d2p-status';
 
 export type InitProps = {
@@ -11,10 +17,14 @@ export type InitProps = {
 };
 
 const Init = ({ authToken, onSuccess, onError }) => {
+  const analytics = useAnalytics();
   const updateD2PStatusMutation = useUpdateD2PStatus();
 
   useEffect(() => {
     if (!authToken) return;
+    analytics.track(AnalyticsEvents.Started);
+    analytics.timeEvent(AnalyticsTimeEvents.handoff);
+
     updateD2PStatusMutation.mutate(
       { authToken, status: D2PStatusUpdate.inProgress },
       {

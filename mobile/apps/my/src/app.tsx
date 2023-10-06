@@ -11,6 +11,7 @@ import Idv from './domains/idv';
 import Preview from './domains/preview';
 import Wallet from './domains/wallet';
 import useShouldOpenIdv from './hooks/use-should-open-idv';
+import AnalyticsProvider from './utils/analytics';
 
 configureSentry();
 
@@ -29,7 +30,9 @@ const App = () => {
   ) : (
     <QueryClientProvider client={queryClient}>
       {shouldOpen ? (
-        <Idv onLoad={handleLoad} linkingUrl={linkingUrl} />
+        <AnalyticsProvider>
+          <Idv onLoad={handleLoad} linkingUrl={linkingUrl} />
+        </AnalyticsProvider>
       ) : (
         <Wallet onLoad={handleLoad} />
       )}

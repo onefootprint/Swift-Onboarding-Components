@@ -6,6 +6,8 @@ import { IdDocRequirement } from '@onefootprint/types';
 import { useMachine } from '@xstate/react';
 import React, { useEffect } from 'react';
 
+import { AnalyticsEvents, useAnalytics } from '@/utils/analytics';
+
 import DocScan from './screens/doc-scan';
 import DocSelection from './screens/doc-selection';
 import TooManyAttempts from './screens/too-many-attempts';
@@ -20,12 +22,16 @@ export type IdDocProps = {
 const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
   const [state, send] = useMachine(() => createMachine(requirement));
   const { currentSide, collectingDocumentMeta } = state.context;
+  const analytics = useAnalytics();
   const country = getCountryFromCode(
     collectingDocumentMeta?.countryCode ?? DEFAULT_COUNTRY.value,
   );
 
   useEffect(() => {
     if (state.done) {
+      analytics.track(AnalyticsEvents.IdDocCompleted, {
+        result: 'success',
+      });
       onDone();
     }
   }, [state, onDone]);

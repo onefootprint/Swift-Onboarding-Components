@@ -2,7 +2,6 @@ import { COUNTRIES, CountryRecord } from '@onefootprint/global-constants';
 import React from 'react';
 
 import { Box } from '../box';
-import { Flag } from '../flag';
 import { Select, SelectOption } from '../select';
 import { Typography } from '../typography';
 
@@ -36,7 +35,6 @@ const CountrySelect = ({
       renderTrigger={(placeholder, selectedOption) => {
         return selectedOption ? (
           <Box gap={4} flexDirection="row" center>
-            <Flag code={selectedOption.value} />
             <Typography
               variant="body-4"
               color={disabled ? 'quaternary' : 'primary'}

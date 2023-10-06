@@ -127,7 +127,6 @@ const Picker = <T extends BaseOption = BaseOption<string>>({
                 label={item.label}
                 onPress={() => onChange?.(item)}
                 selected={value?.value === item.value}
-                value={item.value}
               />
             );
           }}

@@ -9,7 +9,6 @@ export * from './dismiss-keyboard';
 export * from './divider';
 export * from './fade-in';
 export * from './feedback-button';
-export * from './flag';
 export * from './hint';
 export * from './icon-button';
 export * from './image';

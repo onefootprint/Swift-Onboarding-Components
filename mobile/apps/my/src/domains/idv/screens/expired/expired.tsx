@@ -1,10 +1,16 @@
 import { Container, Typography } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
+import { AnalyticsEvents, useAnalytics } from '@/utils/analytics';
 
 const Expired = () => {
   const { t } = useTranslation('screens.expired');
+  const analytics = useAnalytics();
+
+  useEffect(() => {
+    analytics.track(AnalyticsEvents.Ended, { result: 'expired' });
+  }, []);
 
   return (
     <Container center>

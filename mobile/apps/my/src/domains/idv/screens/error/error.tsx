@@ -1,10 +1,16 @@
 import { Container, Typography } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
+import { AnalyticsEvents, useAnalytics } from '@/utils/analytics';
 
 const Error = () => {
   const { t } = useTranslation('screens.error');
+  const analytics = useAnalytics();
+
+  useEffect(() => {
+    analytics.track(AnalyticsEvents.Ended, { result: 'error' });
+  }, []);
 
   return (
     <Container center>
