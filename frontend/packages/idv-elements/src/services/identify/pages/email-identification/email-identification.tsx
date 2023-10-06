@@ -29,6 +29,10 @@ const EmailIdentification = () => {
 
   const handleSubmit = (formData: FormData) => {
     const { email: emailFromForm } = formData;
+    if (identifyMutation.isLoading) {
+      return;
+    }
+
     identifyMutation.mutate(
       {
         identifier: { email: emailFromForm },

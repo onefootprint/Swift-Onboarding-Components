@@ -49,8 +49,9 @@ const PinVerification = ({
   const identifyVerifyMutation = useIdentifyVerify();
   const userEmailMutation = useUserEmail();
   const [isSuccess, setSuccess] = useState(false);
-  const [isResend, setResend] = useState(false);
-  const isPending = loginChallengeMutation.isLoading || !challengeData;
+  const isLoading =
+    loginChallengeMutation.isLoading || signupChallengeMutation.isLoading;
+  const isPending = isLoading || !challengeData;
   const isVerifying =
     identifyVerifyMutation.isLoading || userEmailMutation.isLoading;
 
@@ -258,7 +259,6 @@ const PinVerification = ({
   };
 
   const handleResend = () => {
-    setResend(true);
     initiateChallenge();
   };
 
@@ -276,7 +276,7 @@ const PinVerification = ({
       onComplete={verifyPin}
       resendDisabledUntil={challengeData?.retryDisabledUntil}
       onResend={handleResend}
-      isResendLoading={isResend && loginChallengeMutation.isLoading}
+      isResendLoading={isLoading}
     />
   );
 };

@@ -13,6 +13,7 @@ export type PinInputProps = {
   hint?: string;
   onComplete: (value: string) => void;
   testID?: string;
+  disabled?: boolean;
 };
 
 const PinInput = ({
@@ -20,6 +21,7 @@ const PinInput = ({
   hint,
   onComplete,
   testID,
+  disabled,
 }: PinInputProps) => {
   const [enteredPin, setEnteredPin] = useState<string[]>([]);
   const pinInputs = usePinInputRefs(INPUT_FIELDS_COUNT);
@@ -85,14 +87,14 @@ const PinInput = ({
       <PinContainer>
         {pins.map((pinPosition, pinIndex) => {
           const key = pinIndex;
-          const isDisabled = pinIndex > enteredPin.length;
+          const isIndexDisabled = pinIndex > enteredPin.length;
           return (
             <Pin
               /** Do not change/remove these classes */
               className="fp-pin-input fp-custom-appearance"
               hasError={hasError}
               inputMode="numeric"
-              isDisabled={isDisabled}
+              isDisabled={disabled || isIndexDisabled}
               key={key}
               onChange={handleChange(pinIndex)}
               onKeyDown={handleKeyDown(pinIndex)}

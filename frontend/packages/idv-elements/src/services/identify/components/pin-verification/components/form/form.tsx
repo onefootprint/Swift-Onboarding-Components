@@ -50,6 +50,7 @@ const Form = ({
         </Typography>
       )}
       <PinInput
+        disabled={isPending}
         onComplete={onComplete}
         hasError={hasError}
         hint={hasError ? t('error') : undefined}
