@@ -271,6 +271,7 @@ impl ApiError {
                     return err.json_message();
                 }
             }
+            Twilio(e) => return ErrorMessage::String(e.message()),
             Database(e) => return ErrorMessage::String(e.message()),
             _ => {}
         };
