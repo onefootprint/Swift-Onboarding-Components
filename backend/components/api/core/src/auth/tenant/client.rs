@@ -11,7 +11,10 @@ use db::{models::tenant::Tenant, PgConn};
 use futures_util::Future;
 use itertools::Itertools;
 use newtypes::{DataIdentifier, DataLifetimeSource, FpId, PiiString, TenantApiKeyId};
-use paperclip::actix::Apiv2Security;
+use paperclip::{
+    actix::Apiv2Security,
+    v2::models::{DataType, DefaultSchemaRaw, Parameter, ParameterIn},
+};
 use std::{pin::Pin, sync::Arc};
 use tracing_actix_web::RootSpan;
 
@@ -44,8 +47,22 @@ pub type ClientTenantAuthContext = SessionContext<ParsedClientTenantData>;
 /// header
 pub struct PathClientTenantAuthContext(pub ClientTenantAuthContext);
 
-impl paperclip::v2::schema::Apiv2Schema for PathClientTenantAuthContext {}
+impl paperclip::v2::schema::Apiv2Schema for PathClientTenantAuthContext {
+    fn name() -> Option<String> {
+        Some("token".to_string())
+    }
 
+    fn header_parameter_schema() -> Vec<Parameter<DefaultSchemaRaw>> {
+        vec![Parameter {
+            name: "token".to_owned(),
+            in_: ParameterIn::Path,
+            required: true,
+            data_type: Some(DataType::String),
+            description: Some("Short-lived client token with `decrypt_download` permissions to download a single piece of vaulted data.".to_string()),
+            ..Default::default()
+        }]
+    }
+}
 impl paperclip::actix::OperationModifier for PathClientTenantAuthContext {}
 
 impl actix_web::FromRequest for PathClientTenantAuthContext {

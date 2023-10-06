@@ -37,21 +37,21 @@ const TEN_MB: usize = 10 * 1024 * 1024;
 #[tracing::instrument(skip(state, body))]
 #[route_alias(
     actix::post(
-        "/users/{fp_id}/vault/{data_identifier}/upload",
+        "/users/{fp_id}/vault/{identifier}/upload",
         description = "Updates data in a user vault.",
         tags(Users, Vault, PublicApi)
     ),
     actix::post(
-        "/businesses/{fp_bid}/vault/{data_identifier}/upload",
+        "/businesses/{fp_bid}/vault/{identifier}/upload",
         description = "Updates data in a business vault.",
-        tags(Businesses, Vault, PublicApi)
+        tags(Businesses, Vault, Private)
     )
 )]
 #[api_v2_operation(
     description = "Works for either person or business entities. Updates data in a vault.",
     tags(Entities, Vault, Private)
 )]
-#[actix::post("/entities/{fp_id}/vault/{data_identifier}/upload")]
+#[actix::post("/entities/{fp_id}/vault/{identifier}/upload")]
 pub async fn post(
     state: web::Data<State>,
     path: Path<(FpId, DataIdentifier)>,
