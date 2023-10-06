@@ -91,6 +91,7 @@ impl Client {
 
     /// send an sms message
     pub async fn send_message(&self, destination: PiiString, body: PiiString) -> crate::response::Result<Message> {
+        // TODO need to tell the caller that this failed
         let retry_strategy = ExponentialBackoff::from_millis(10)        
         .map(jitter) // add jitter
         .take(2); // limit to 2 retries
@@ -136,33 +137,70 @@ impl Client {
         }
 
         // Wait for 5s for the message to be delivered. If it doesn't deliver, error
-        let message_uri = message.uri.clone();
-        let retry_strategy = FixedInterval::from_millis(1000)
-            .map(jitter)
-            .take(5);
-        Retry::spawn(retry_strategy, move || {
-            self.check_status(message_uri.clone())
-        })
-        .await?;
+        self.check_status(message.uri.clone()).await?;
         Ok(message)
     }
 
     async fn check_status(&self, message_uri: String) -> crate::response::Result<Message> {
-        let url = format!("https://api.twilio.com{}", message_uri);
+        // We want to check every 500ms for 5s if there's been an error/success.
+        let retry_strategy = FixedInterval::from_millis(500)
+            .map(jitter)
+            .take(10);
+        let result = Retry::spawn(retry_strategy, move || {
+            self._check_status_inner(message_uri.clone())
+        })
+        .await;
 
+        match result {
+            // Determinate success
+            Ok(Ok(message)) => Ok(message),
+            // Determinate error encountered
+            Ok(Err(e)) => Err(e),
+            // We stayed in an indeterminate state for all attempts
+            Err(message) => {
+                if matches!(message.status, Status::Sent) {
+                    // If the message is still in state Sent after 5s, don't error.
+                    // This could still techncally transition to either Delivered or Undelivered,
+                    // so it's indeterminate. But I figure it's unlikely retrying will get the
+                    // result faster
+                    Ok(message)
+                } else {
+                    Err(Error::NotDelivered(message.status, message.error_code))
+                }
+            }
+        }
+    }
+
+    /// Fetch the message from twilio.
+    /// Returns Ok only when the result is determinate and we don't need to continue polling.
+    /// Returns an Err if we want to retry and fetch again.
+    async fn _check_status_inner(&self, message_uri: String) -> Result<Result<Message, Error>, Message> {
+        let message = match self._get_message(message_uri).await {
+            Ok(message) => message,
+            // Determinate failure
+            Err(err) => return Ok(Err(err)),
+        };
+        if matches!(message.status, Status::Undelivered | Status::Failed) {
+            // Determinate failure
+            return Ok(Err(Error::DeliveryFailed(message.status, message.error_code)));
+        };
+        if matches!(message.status, Status::Delivered) {
+            // Determinate success
+            return Ok(Ok(message));
+        }
+        // Indeterminate result. Continue polling.
+        // Sent can sometimes transition into Undelivered
+        Err(message)
+    }
+
+    async fn _get_message(&self, message_uri: String) -> crate::response::Result<Message> {
+        let url = format!("https://api.twilio.com{}", message_uri);
         let response = self
             .request_builder(Method::GET, url)
             .send()
             .await?;
 
-        let message: Message = decode_response(response).await?;
-        if matches!(message.status, Status::Undelivered | Status::Failed) {
-            return Err(Error::DeliveryFailed(message.status, message.error_code));
-        }
-        if !matches!(message.status, Status::Delivered | Status::Sent) {
-            return Err(Error::NotDelivered(message.status, message.error_code));
-        }
-
+        let message = decode_response(response).await?;
         Ok(message)
     }
 }
