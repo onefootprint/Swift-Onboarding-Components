@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::{UserAuth, UserAuthGuard};
+use super::UserAuth;
 use db::{
     models::{
         ob_configuration::ObConfiguration,
@@ -62,16 +62,14 @@ impl ExtractableAuthSession for ParsedUserWfSession {
         let user_session =
             <ParsedUserSessionContext as ExtractableAuthSession>::try_load_session(value, conn, ff_client)?.0;
 
-        let Some(scoped_user_id) = user_session.scoped_user_id() else {
-            return Err(AuthError::MissingScope(vec![UserAuthGuard::DeprecatedOrgOnboarding].into()))?;
-        };
+        let scoped_user_id = user_session
+            .scoped_user_id()
+            .ok_or(AuthError::MissingScopedUser)?;
 
         // Confirm that the onboarding in the auth token belongs to the user
         let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &user_session.user.id))?;
 
-        let Some(workflow_id) = user_session.workflow_id() else {
-            return Err(AuthError::MissingScope(vec![UserAuthGuard::DeprecatedWorkflow].into()))?;
-        };
+        let workflow_id = user_session.workflow_id().ok_or(AuthError::MissingWorkflow)?;
         let workflow = Workflow::get(conn, &workflow_id)?;
         let tenant = Tenant::get(conn, &scoped_user.tenant_id)?;
 

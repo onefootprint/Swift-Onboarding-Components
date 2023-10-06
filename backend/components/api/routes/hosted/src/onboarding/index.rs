@@ -31,9 +31,7 @@ pub async fn post(
 ) -> JsonApiResponse<OnboardingResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
 
-    let scoped_user_id = user_auth
-        .scoped_user_id()
-        .ok_or_else(|| AuthError::MissingScope(vec![UserAuthGuard::SignUp].into()))?;
+    let scoped_user_id = user_auth.scoped_user_id().ok_or(AuthError::MissingScopedUser)?;
     let uv_id = user_auth.user_vault_id().clone();
     let obc_id = user_auth.ob_configuration_id();
     let (scoped_user, ob_config, tenant) = state

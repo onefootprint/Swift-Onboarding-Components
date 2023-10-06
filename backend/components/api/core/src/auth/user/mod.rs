@@ -1,4 +1,4 @@
-use newtypes::{ObConfigurationId, ScopedVaultId, VaultId, WorkflowId};
+use newtypes::VaultId;
 use paperclip::actix::Apiv2Schema;
 
 mod session;
@@ -19,26 +19,6 @@ pub use user_wf::*;
 // WARNING: changing this could break existing user auth sessions
 pub enum UserAuthScope {
     SignUp,
-    /// DEPRECATED
-    /// TODO: rm this when all sessions using it have expired
-    #[serde(rename = "OrgOnboarding")]
-    #[strum_discriminants(strum(serialize = "OrgOnboarding"))]
-    DeprecatedOrgOnboarding {
-        id: ScopedVaultId,
-        ob_configuration_id: Option<ObConfigurationId>,
-    },
-    /// Deprecated
-    /// TODO: rm this when all sessions using it have expired
-    #[serde(rename = "Workflow")]
-    #[strum_discriminants(strum(serialize = "Workflow"))]
-    DeprecatedWorkflow {
-        wf_id: WorkflowId,
-    },
-    /// Deprecated
-    /// TODO: rm this when all sessions using it have expired
-    #[serde(rename = "Business")]
-    #[strum_discriminants(strum(serialize = "Business"))]
-    DeprecatedBusiness(ScopedVaultId),
     // We don't currently issue a token with this - was for my1fp
     BasicProfile,
     SensitiveProfile,
@@ -64,17 +44,15 @@ mod test {
     fn test_serialize() {
         let expected_parsed = vec![
             UserAuthScope::SignUp,
-            UserAuthScope::DeprecatedWorkflow {
-                wf_id: WorkflowId::test_data("FLERP".to_owned()),
-            },
+            UserAuthScope::BasicProfile,
+            UserAuthScope::Handoff,
         ];
 
         // Obviously should be able to deserialize OrgOnboarding into OrgOnboarding
-        let modern_value_str = "[\"SignUp\",{\"Workflow\":{\"wf_id\":\"FLERP\"}}]";
+        let modern_value_str = "[\"SignUp\",\"BasicProfile\",\"Handoff\"]";
         let modern_value: Vec<UserAuthScope> = serde_json::de::from_str(modern_value_str).unwrap();
         assert_eq!(modern_value, expected_parsed);
 
-        // When serializing, should serialize into OrgOnboarding rather than OrgOnboardingInit
         let serialized = serde_json::ser::to_string(&modern_value).unwrap();
         assert_eq!(serialized, modern_value_str)
     }

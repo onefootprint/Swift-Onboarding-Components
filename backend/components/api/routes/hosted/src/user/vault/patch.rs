@@ -42,9 +42,7 @@ async fn parse_auth(
     } else {
         let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
         let user = user_auth.user.clone();
-        let su_id = user_auth.scoped_user_id().ok_or(AuthError::MissingScope(
-            vec![UserAuthGuard::DeprecatedOrgOnboarding].into(),
-        ))?;
+        let su_id = user_auth.scoped_user_id().ok_or(AuthError::MissingScopedUser)?;
         let su_id2 = su_id.clone();
         let tenant = state
             .db_pool

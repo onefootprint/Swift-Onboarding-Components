@@ -1,7 +1,4 @@
-use newtypes::output::Csv;
 use thiserror::Error;
-
-use self::user::UserAuthGuard;
 
 pub mod custodian;
 pub mod session;
@@ -49,10 +46,12 @@ pub enum AuthError {
     SandboxRestricted,
     #[error("Not allowed: required permission is missing: {0}")]
     MissingUserPermission(String),
-    #[error("Not allowed: requires one of the following scopes: {0}")]
-    MissingScope(Csv<UserAuthGuard>),
     #[error("Not allowed without business")]
     MissingBusiness,
+    #[error("Not allowed without workflow")]
+    MissingWorkflow,
+    #[error("Not allowed without scoped user")]
+    MissingScopedUser,
     #[error("Not allowed: required permission is missing: {0}")]
     MissingTenantPermission(String),
     #[error("Not allowed: insufficient permissions to decrypt attributes: {0}")]

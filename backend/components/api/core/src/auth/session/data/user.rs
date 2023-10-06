@@ -6,6 +6,7 @@ use newtypes::WebauthnCredentialId;
 use newtypes::WorkflowId;
 
 use crate::auth::user::UserAuthScope;
+use crate::errors::user::UserError;
 use crate::errors::ApiResult;
 
 use super::AuthSessionData;
@@ -50,14 +51,12 @@ impl UserSession {
         scopes: Vec<UserAuthScope>,
         auth_factors: Vec<AuthFactor>,
     ) -> ApiResult<AuthSessionData> {
-        /*
         if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && args.su_id.is_none() {
             return Err(UserError::InvalidAuthSession(
                 "Cannot create session with SignUp scope without su_id".into(),
             )
             .into());
         }
-        */
         let UserSessionArgs {
             su_id,
             sb_id,

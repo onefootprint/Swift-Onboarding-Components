@@ -85,60 +85,20 @@ impl UserSessionContext {
         UserSession::make(self.user.id, args, new_scopes, new_factors)
     }
 
-    /// Extracts the scoped_user_id from the `UserAuthScope::DeprecatedOrgOnboarding` scope on this
-    /// session, if exists
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
-        // TODO rm
-        let legacy_sv_id = self
-            .scopes
-            .iter()
-            .filter_map(|x| match x {
-                UserAuthScope::DeprecatedOrgOnboarding { id, .. } => Some(id.clone()),
-                _ => None,
-            })
-            .next();
-        self.su_id.clone().or(legacy_sv_id)
+        self.su_id.clone()
     }
 
-    /// Extracts the ob_configuration_id from the `UserAuthScope::OnboardingConfig` scope on this
-    /// session, if exists
     pub fn ob_configuration_id(&self) -> Option<ObConfigurationId> {
-        // TODO rm
-        let legacy_obc_id = self
-            .scopes
-            .iter()
-            .filter_map(|x| match x {
-                UserAuthScope::DeprecatedOrgOnboarding {
-                    ob_configuration_id, ..
-                } => ob_configuration_id.clone(),
-                _ => None,
-            })
-            .next();
-        self.obc_id.clone().or(legacy_obc_id)
+        self.obc_id.clone()
     }
 
     pub fn workflow_id(&self) -> Option<WorkflowId> {
-        let legacy_wf_id = self
-            .scopes
-            .iter()
-            .filter_map(|x| match x {
-                UserAuthScope::DeprecatedWorkflow { wf_id } => Some(wf_id.clone()),
-                _ => None,
-            })
-            .next();
-        self.wf_id.clone().or(legacy_wf_id)
+        self.wf_id.clone()
     }
 
     pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
-        let legacy_sb_id = self
-            .scopes
-            .iter()
-            .filter_map(|x| match x {
-                UserAuthScope::DeprecatedBusiness(id) => Some(id.clone()),
-                _ => None,
-            })
-            .next();
-        self.sb_id.clone().or(legacy_sb_id)
+        self.sb_id.clone()
     }
 }
 
