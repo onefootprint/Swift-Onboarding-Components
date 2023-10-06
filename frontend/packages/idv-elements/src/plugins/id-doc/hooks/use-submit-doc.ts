@@ -21,6 +21,9 @@ const submitDoc = async (payload: SubmitDocRequest) => {
   return response.data;
 };
 
-const useSubmitDoc = () => useMutation(submitDoc);
+const useSubmitDoc = () =>
+  useMutation(submitDoc, {
+    retry: 3,
+  });
 
 export default useSubmitDoc;
