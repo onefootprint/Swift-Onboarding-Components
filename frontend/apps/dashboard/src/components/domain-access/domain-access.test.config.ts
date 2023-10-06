@@ -11,6 +11,8 @@ export const orgAllowDomainFixture: Organization = {
   domain: 'footprint.com',
   allowDomainAccess: false,
   isDomainAlreadyClaimed: false,
+  isProdKybPlaybookRestricted: false,
+  isProdKycPlaybookRestricted: false,
 };
 
 export const orgEnabledAllowDomainAccessFixture: Organization = {
@@ -23,6 +25,8 @@ export const orgEnabledAllowDomainAccessFixture: Organization = {
   domain: 'footprint.com',
   allowDomainAccess: true,
   isDomainAlreadyClaimed: false,
+  isProdKybPlaybookRestricted: false,
+  isProdKycPlaybookRestricted: false,
 };
 
 export const orgDomainAlreadyClaimed: Organization = {
@@ -35,6 +39,8 @@ export const orgDomainAlreadyClaimed: Organization = {
   domain: 'footprint.com',
   allowDomainAccess: false,
   isDomainAlreadyClaimed: true,
+  isProdKybPlaybookRestricted: false,
+  isProdKycPlaybookRestricted: false,
 };
 
 export const withOrgUpdate = () =>

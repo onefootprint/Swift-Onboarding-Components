@@ -4,6 +4,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Button, RadioSelect, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import useSession from 'src/hooks/use-session';
 
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
@@ -18,6 +19,9 @@ type FormData = {
 
 const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
   const { t, allT } = useTranslation('pages.playbooks.dialog.who-to-onboard');
+  const {
+    data: { org },
+  } = useSession();
   const kind = PlaybookKind.Unknown ? PlaybookKind.Kyc : defaultKind;
   const { handleSubmit, control } = useForm<FormData>({
     defaultValues: { kind },
@@ -50,12 +54,16 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
                   description: t('kyc.description'),
                   value: PlaybookKind.Kyc,
                   IconComponent: IcoUsers24,
+                  disabled: org?.isLive && org?.isProdKycPlaybookRestricted,
+                  disabledHint: t('kyc.disabled-tooltip'),
                 },
                 {
                   title: t('kyb.title'),
                   description: t('kyb.description'),
                   value: PlaybookKind.Kyb,
                   IconComponent: IcoStore24,
+                  disabled: org?.isLive && org?.isProdKybPlaybookRestricted,
+                  disabledHint: t('kyb.disabled-tooltip'),
                 },
               ]}
               value={field.value}

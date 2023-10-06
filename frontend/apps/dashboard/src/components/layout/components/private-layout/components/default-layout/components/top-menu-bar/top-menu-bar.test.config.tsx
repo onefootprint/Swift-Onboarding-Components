@@ -18,6 +18,8 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
     isAuthMethodSupported: true,
+    isProdKybPlaybookRestricted: false,
+    isProdKycPlaybookRestricted: false,
   },
   {
     id: '_private_it_org_2',
@@ -30,6 +32,8 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
     isAuthMethodSupported: false,
+    isProdKybPlaybookRestricted: false,
+    isProdKycPlaybookRestricted: false,
   },
   {
     id: '_private_it_org_3',
@@ -42,6 +46,8 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
     isAuthMethodSupported: true,
+    isProdKybPlaybookRestricted: false,
+    isProdKycPlaybookRestricted: false,
   },
   {
     id: '_private_it_org_4',
@@ -54,6 +60,8 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
     isAuthMethodSupported: true,
+    isProdKybPlaybookRestricted: false,
+    isProdKycPlaybookRestricted: false,
   },
   {
     id: '_private_it_org_5',
@@ -66,6 +74,8 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
     isAuthMethodSupported: true,
+    isProdKybPlaybookRestricted: false,
+    isProdKycPlaybookRestricted: false,
   },
   {
     id: '_private_it_org_6',
@@ -78,6 +88,8 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
     isAuthMethodSupported: true,
+    isProdKybPlaybookRestricted: false,
+    isProdKycPlaybookRestricted: false,
   },
   {
     id: '_private_it_org_7',
@@ -90,6 +102,8 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
     isAuthMethodSupported: true,
+    isProdKybPlaybookRestricted: false,
+    isProdKycPlaybookRestricted: false,
   },
 ];
 
@@ -113,9 +127,7 @@ export const withOrgAuthRolesError = () =>
     path: '/org/auth/roles',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      error: { message: 'Something went wrong' },
     },
   });
 
@@ -149,6 +161,8 @@ export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
     domain: null,
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
+    isProdKybPlaybookRestricted: false,
+    isProdKycPlaybookRestricted: false,
   },
 };
 

@@ -1402,11 +1402,13 @@
           "subtitle": "This helps us better recommend which data to collect.",
           "kyc": {
             "title": "Onboard people",
-            "description": "Know Your Customer (KYC) is the obligation of banks, businesses, and other financial institutions to identify and authenticate a person's identity before doing business with them."
+            "description": "Know Your Customer (KYC) is the obligation of banks, businesses, and other financial institutions to identify and authenticate a person's identity before doing business with them.",
+            "disabled-tooltip": "You are not configured to create production KYC playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
           },
           "kyb": {
             "title": "Onboard businesses and their beneficial owners",
-            "description": "Know Your Business (KYB) is the obligation to verify the identity of any entity that you do business with."
+            "description": "Know Your Business (KYB) is the obligation to verify the identity of any entity that you do business with.",
+            "disabled-tooltip": "You are not configured to create production KYB playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
           }
         },
         "residency": {
