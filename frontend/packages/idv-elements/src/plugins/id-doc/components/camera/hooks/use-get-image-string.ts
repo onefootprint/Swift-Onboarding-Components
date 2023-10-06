@@ -54,7 +54,7 @@ const useGetImageString = () => {
       canvasRef.current?.clientHeight,
     );
 
-    if (loaded && cv && autocaptureKind === 'document') {
+    if (loaded && cv && !autocaptureKind) {
       const src = cv.imread(canvasRef.current);
       const sharpenedImage = sharpenImage(cv, src, true);
       cv.imshow(canvasRef.current, sharpenedImage);
