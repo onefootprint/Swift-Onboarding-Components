@@ -31,10 +31,6 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
     onSubmit({ kind: data.kind });
   };
 
-  console.log(org);
-  console.log('KYC disabled', org?.isLive && org?.isProdKycPlaybookRestricted);
-  console.log('KYB disabled', org?.isLive && org?.isProdKybPlaybookRestricted);
-
   return (
     <Container>
       <Header>
