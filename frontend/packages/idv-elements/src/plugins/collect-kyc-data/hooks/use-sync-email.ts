@@ -44,6 +44,10 @@ const useSyncEmail = () => {
       return;
     }
 
+    if (userEmailMutation.isLoading) {
+      return;
+    }
+
     userEmailMutation.mutate(
       { data: { email }, authToken, speculative },
       {

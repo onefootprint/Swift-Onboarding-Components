@@ -80,6 +80,11 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
       onDone();
       return;
     }
+
+    if (processMutation.isLoading) {
+      return;
+    }
+
     processMutation.mutate(
       { authToken },
       {
@@ -101,6 +106,10 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   };
 
   const handleClick = () => {
+    if (onboardingAuthorizeMutation.isLoading) {
+      return;
+    }
+
     onboardingAuthorizeMutation.mutate(
       { authToken },
       {

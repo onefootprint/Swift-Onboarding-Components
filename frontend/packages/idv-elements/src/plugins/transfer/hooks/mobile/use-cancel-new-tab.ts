@@ -11,7 +11,7 @@ const useCancelNewTab = () => {
   const updateD2PStatusMutation = useUpdateD2PStatus();
 
   return () => {
-    if (!scopedAuthToken) {
+    if (!scopedAuthToken || updateD2PStatusMutation.isLoading) {
       return;
     }
     tab?.close();

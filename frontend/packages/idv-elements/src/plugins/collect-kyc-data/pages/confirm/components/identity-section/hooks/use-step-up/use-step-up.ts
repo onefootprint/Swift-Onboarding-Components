@@ -132,6 +132,10 @@ const useStepUp = ({
       return;
     }
 
+    if (identifyVerifyMutation.isLoading) {
+      return;
+    }
+
     identifyVerifyMutation.mutate(
       {
         challengeResponse,
@@ -174,6 +178,10 @@ const useStepUp = ({
       onError?.(
         `Cannot execute step up on current device. ${device.type} device kind, has support for webauthn: ${device.hasSupportForWebauthn}`,
       );
+      return;
+    }
+
+    if (loginChallengeMutation.isLoading) {
       return;
     }
 

@@ -72,6 +72,10 @@ const PinVerification = ({
       return;
     }
 
+    if (userEmailMutation.isLoading) {
+      return;
+    }
+
     userEmailMutation.mutate(
       { data: { email }, authToken },
       {
@@ -121,6 +125,10 @@ const PinVerification = ({
     if (!challengeData) {
       console.error('No challenge data found after completing pin');
       Logger.error('No challenge data found after completing pin');
+      return;
+    }
+
+    if (identifyVerifyMutation.isLoading) {
       return;
     }
 
@@ -187,6 +195,10 @@ const PinVerification = ({
       return;
     }
 
+    if (signupChallengeMutation.isLoading) {
+      return;
+    }
+
     signupChallengeMutation.mutate(
       {
         ...identifier,
@@ -211,6 +223,10 @@ const PinVerification = ({
   };
 
   const initiateLoginChallenge = () => {
+    if (loginChallengeMutation.isLoading) {
+      return;
+    }
+
     loginChallengeMutation.mutate(
       {
         identifier,

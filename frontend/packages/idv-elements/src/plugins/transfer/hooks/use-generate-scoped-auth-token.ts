@@ -35,7 +35,7 @@ const useGenerateScopedAuthToken = ({
     const isMobile = device?.type === 'mobile';
     const redirectUrl = isMobile ? window.location.href : undefined;
 
-    if (!authToken) {
+    if (!authToken || d2pGenerateMutation.isLoading) {
       return;
     }
     d2pGenerateMutation.mutate(

@@ -40,6 +40,10 @@ const Biometric = () => {
       return;
     }
 
+    if (loginChallengeMutation.isLoading) {
+      return;
+    }
+
     loginChallengeMutation.mutate(
       {
         identifier: successfulIdentifier,
@@ -107,6 +111,10 @@ const Biometric = () => {
 
     if (!challengeResponse) {
       setIsRunningWebauthn(false);
+      return;
+    }
+
+    if (identifyVerifyMutation.isLoading) {
       return;
     }
 

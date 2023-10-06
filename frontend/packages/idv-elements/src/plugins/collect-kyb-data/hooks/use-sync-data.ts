@@ -35,6 +35,10 @@ const useSyncData = () => {
       return;
     }
 
+    if (businessDataMutation.isLoading) {
+      return;
+    }
+
     businessDataMutation.mutate(
       {
         data,

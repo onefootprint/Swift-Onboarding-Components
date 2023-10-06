@@ -46,7 +46,7 @@ const QRRegister = () => {
 
   const d2pSmsMutation = useD2PSms();
   const handleSendLinkToPhone = () => {
-    if (!scopedAuthToken || !url) {
+    if (!scopedAuthToken || !url || d2pSmsMutation.isLoading) {
       return;
     }
     d2pSmsMutation.mutate(

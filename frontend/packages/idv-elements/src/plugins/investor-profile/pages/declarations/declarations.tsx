@@ -39,6 +39,10 @@ const Declarations = () => {
           return;
         }
 
+        if (uploadFileMutation.isLoading) {
+          return;
+        }
+
         uploadFileMutation.mutate(
           {
             file: files[0],

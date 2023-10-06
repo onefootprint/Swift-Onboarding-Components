@@ -40,6 +40,10 @@ const useSyncData = () => {
       return;
     }
 
+    if (investorProfileDataMutation.isLoading) {
+      return;
+    }
+
     investorProfileDataMutation.mutate(
       {
         data,

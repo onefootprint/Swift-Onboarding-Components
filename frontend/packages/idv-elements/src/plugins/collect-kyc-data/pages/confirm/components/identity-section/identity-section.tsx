@@ -134,6 +134,10 @@ const IdentitySection = () => {
       return;
     }
 
+    if (decryptUserMutation.isLoading) {
+      return;
+    }
+
     decryptUserMutation.mutate(
       {
         authToken: stepUpAuthToken,

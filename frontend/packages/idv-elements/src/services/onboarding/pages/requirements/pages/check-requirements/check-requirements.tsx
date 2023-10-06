@@ -26,7 +26,7 @@ const CheckRequirements = () => {
 
   useEffectOnce(() => {
     // Only initialize the onboarding once at the start (before fetching the requirements)
-    if (onboardingInitialized) {
+    if (onboardingInitialized || onboardingMutation.isLoading) {
       return;
     }
     onboardingMutation.mutate(

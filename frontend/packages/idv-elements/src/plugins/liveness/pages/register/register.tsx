@@ -19,7 +19,7 @@ const Register = () => {
   const biometricInitMutation = useBiometricInit();
 
   const handleClick = () => {
-    if (!authToken) {
+    if (!authToken || biometricInitMutation.isLoading) {
       return;
     }
 

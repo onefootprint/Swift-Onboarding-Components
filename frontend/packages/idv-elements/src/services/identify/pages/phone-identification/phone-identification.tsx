@@ -31,6 +31,10 @@ const PhoneIdentification = () => {
 
   const handleSubmit = (formData: FormData) => {
     const phoneFromForm = formData.phoneNumber;
+    if (identifyMutation.isLoading) {
+      return;
+    }
+
     // First we try to identify the user via phone number before sending any challenges
     identifyMutation.mutate(
       {

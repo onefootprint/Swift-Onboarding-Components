@@ -15,6 +15,10 @@ const Validate = () => {
   const { isError } = onboardingValidateMutation;
 
   useEffectOnce(() => {
+    if (onboardingValidateMutation.isLoading) {
+      return;
+    }
+
     onboardingValidateMutation.mutate(
       { authToken },
       {

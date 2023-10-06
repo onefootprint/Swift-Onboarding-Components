@@ -51,7 +51,9 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
 
     const { consentLanguageText, mlConsent } = consentInfo;
 
-    if (consentMutation.isLoading) return;
+    if (consentMutation.isLoading) {
+      return;
+    }
 
     consentMutation.mutate(
       { consentLanguageText, mlConsent, authToken },

@@ -22,7 +22,7 @@ const Retry = () => {
   const skipLivenessMutation = useSkipLiveness();
 
   const handleSkip = () => {
-    if (!authToken) {
+    if (!authToken || skipLivenessMutation.isLoading) {
       return;
     }
     skipLivenessMutation.mutate(
@@ -48,7 +48,7 @@ const Retry = () => {
   };
 
   const handleRetry = () => {
-    if (!authToken) {
+    if (!authToken || biometricInitMutation.isLoading) {
       return;
     }
     biometricInitMutation.mutate(

@@ -39,6 +39,9 @@ const useSyncData = () => {
       onError?.('Found empty auth token while syncing kyc data fields.');
       return;
     }
+    if (userDataMutation.isLoading) {
+      return;
+    }
 
     try {
       const data = getRequestData(locale, rawData, requirement, !speculative);

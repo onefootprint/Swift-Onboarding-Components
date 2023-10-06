@@ -88,6 +88,10 @@ const useDecryptKycData = ({
       return;
     }
 
+    if (decryptUserMutation.isLoading) {
+      return;
+    }
+
     decryptUserMutation.mutate(
       { fields, authToken },
       {
