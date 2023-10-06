@@ -18,6 +18,8 @@ pub enum ChallengeError {
     LoginChallengeUserNotFound,
     #[error("Provide one user identifier to initiate a challenge")]
     OnlyOneIdentifier,
+    #[error("Must provide at least one identifier to initiate a signup challenge")]
+    NoIdentifier,
     #[error("Onboarding config does not allow challenge kind = {0}")]
     ChallengeKindNotAllowed(String),
 }

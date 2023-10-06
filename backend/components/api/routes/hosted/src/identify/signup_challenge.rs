@@ -14,20 +14,9 @@ use newtypes::PhoneNumber;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-#[serde(untagged)]
-pub enum SignupChallengeRequest {
-    Phone(SignupChallengeRequestPhone),
-    Email(SignupChallengeRequestEmail),
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct SignupChallengeRequestPhone {
-    phone_number: PhoneNumber,
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct SignupChallengeRequestEmail {
-    email: Email,
+pub struct SignupChallengeRequest {
+    phone_number: Option<PhoneNumber>,
+    email: Option<Email>,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -48,12 +37,14 @@ pub async fn post(
     // When provided, creates a sandbox user with the given suffix
     sandbox_id: SandboxId,
 ) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
-    let challenge_data: ApiResult<UserChallengeData> = match request.into_inner() {
-        SignupChallengeRequest::Phone(req) => {
+    let SignupChallengeRequest { phone_number, email } = request.into_inner();
+    let challenge_data: ApiResult<UserChallengeData> = match (phone_number, email) {
+        (Some(phone_number), email) => {
             let tenant = ob_context.as_ref().map(|obc| obc.tenant());
+            let email = email.map(|e| e.email);
             let (challenge_state_data, time_before_retry_s) = state
                 .sms_client
-                .send_challenge_non_blocking(&state, tenant, &req.phone_number, sandbox_id.0)
+                .send_challenge_non_blocking(&state, tenant, &phone_number, email, sandbox_id.0)
                 .await?;
 
             let challenge_state = ChallengeState {
@@ -68,13 +59,13 @@ pub async fn post(
             let challenge_data = UserChallengeData {
                 challenge_kind: ChallengeKind::Sms,
                 challenge_token,
-                scrubbed_phone_number: Some(req.phone_number.last_two()),
+                scrubbed_phone_number: Some(phone_number.last_two()),
                 biometric_challenge_json: None,
                 time_before_retry_s: time_before_retry_s.num_seconds(),
             };
             Ok(challenge_data)
         }
-        SignupChallengeRequest::Email(req) => {
+        (None, Some(email)) => {
             let auth = ob_context.as_ref().ok_or(OnboardingError::MissingObPkAuth)?;
             let obc = auth.ob_config();
             let tenant = auth.tenant();
@@ -86,7 +77,7 @@ pub async fn post(
             };
 
             let challenge_data =
-                identify::send_email_challenge_non_blocking(&state, &req.email, tenant, sandbox_id.0)?;
+                identify::send_email_challenge_non_blocking(&state, &email, tenant, sandbox_id.0)?;
 
             let challenge_state = ChallengeState { data: challenge_data };
 
@@ -105,6 +96,7 @@ pub async fn post(
             };
             Ok(challenge_data)
         }
+        (None, None) => return Err(ChallengeError::NoIdentifier.into()),
     };
 
     Ok(Json(ResponseData {

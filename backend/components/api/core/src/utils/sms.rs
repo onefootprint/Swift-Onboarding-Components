@@ -232,6 +232,8 @@ impl SmsClient {
         state: &State,
         tenant: Option<&Tenant>,
         destination: &PhoneNumber,
+        // For signup challenges. Used to initialize the vault with an email
+        email: Option<PiiString>,
         sandbox_id: Option<SandboxId>,
     ) -> ApiResult<(PhoneChallengeState, SecondsBeforeRetry)> {
         // Send non-blocking to prevent us from returning the challenge data to the frontend while
@@ -268,6 +270,7 @@ impl SmsClient {
         Ok((
             PhoneChallengeState {
                 phone_number: destination.e164(),
+                email,
                 sandbox_id,
                 h_code: sha256(code.as_bytes()).to_vec(),
             },
@@ -324,6 +327,7 @@ pub struct BoSessionSmsInfo<'a> {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhoneChallengeState {
     pub phone_number: PiiString,
+    pub email: Option<PiiString>,
     pub sandbox_id: Option<SandboxId>,
     pub h_code: Vec<u8>,
 }
