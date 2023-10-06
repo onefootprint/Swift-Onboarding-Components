@@ -48,6 +48,7 @@ pub fn mime_type_to_extension(mime_type: &str) -> Option<&'static str> {
     }
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn handle_file_upload(
     payload: &mut Multipart,
     request: &HttpRequest,

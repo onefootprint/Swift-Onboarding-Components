@@ -2,27 +2,10 @@ use crate::export_schema;
 use newtypes::{
     idology::IdologyImageCaptureErrors, DocumentScanDeviceType, DocumentSide, IdDocKind,
     IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason,
-    Iso3166TwoDigitCountryCode, PiiString,
+    Iso3166TwoDigitCountryCode,
 };
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
-
-#[derive(Debug, Apiv2Schema, serde::Deserialize)]
-pub struct CreateIdentityDocumentUploadRequest {
-    /// base64 standard encoded image bytes
-    pub image: PiiString,
-    pub side: DocumentSide,
-    pub mime_type: String,
-    pub meta: Option<UploadMeta>,
-}
-
-#[derive(Debug, Apiv2Schema, serde::Deserialize)]
-pub struct UploadMeta {
-    pub is_instant_app: Option<bool>,
-    pub is_app_clip: Option<bool>,
-    /// When true, photo was taken manually
-    pub manual: Option<bool>,
-}
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct CreateIdentityDocumentRequest {

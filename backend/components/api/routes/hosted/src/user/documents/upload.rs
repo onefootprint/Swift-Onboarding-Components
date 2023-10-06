@@ -16,11 +16,10 @@ use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete}
 use api_core::decision::vendor::incode::{get_config_id, IncodeContext, IncodeStateMachine};
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
-use api_core::utils::file_upload::{handle_file_upload, FileUpload};
+use api_core::utils::file_upload::handle_file_upload;
 use api_core::utils::headers::get_bool_header;
-use api_core::utils::large_json::LargeJson;
 use api_core::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VwArgs};
-use api_wire_types::{CreateIdentityDocumentUploadRequest, DocumentImageError, DocumentResponse, UploadMeta};
+use api_wire_types::{DocumentImageError, DocumentResponse};
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
 use db::models::document_upload::{DocumentUpload, NewDocumentUploadArgs};
@@ -47,7 +46,12 @@ use std::pin::Pin;
 
 #[derive(Debug, Apiv2Schema)]
 // TODO barcodes? wouldn't be great to send in header bc has PII?
-pub struct MetaHeaders(UploadMeta);
+pub struct MetaHeaders {
+    pub is_instant_app: Option<bool>,
+    pub is_app_clip: Option<bool>,
+    /// When true, photo was taken manually
+    pub is_manual: Option<bool>,
+}
 
 impl MetaHeaders {
     const IS_INSTANT_APP_HEADER_NAME: &str = "x-fp-is-instant-app";
@@ -58,11 +62,11 @@ impl MetaHeaders {
         let is_instant_app = get_bool_header(Self::IS_INSTANT_APP_HEADER_NAME, headers);
         let is_app_clip = get_bool_header(Self::IS_APP_CLIP_HEADER_NAME, headers);
         let is_manual = get_bool_header(Self::IS_MANUAL_HEADER_NAME, headers);
-        Self(UploadMeta {
+        Self {
             is_instant_app,
             is_app_clip,
-            manual: is_manual,
-        })
+            is_manual,
+        }
     }
 }
 
@@ -81,61 +85,17 @@ impl FromRequest for MetaHeaders {
     tags(Hosted)
 )]
 #[actix::post("/hosted/user/documents/{id}/upload/{side}")]
-pub async fn post_multipart(
+pub async fn post(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
     args: web::Path<(IdentityDocumentId, DocumentSide)>,
     mut payload: Multipart,
     request: HttpRequest,
-    meta_headers: MetaHeaders,
+    meta: MetaHeaders,
 ) -> JsonApiResponse<DocumentResponse> {
-    let (document_id, side) = args.into_inner();
     let file = handle_file_upload(&mut payload, &request, None, 5_242_880).await?;
 
-    let meta = meta_headers.0;
-    let result = post_inner(state, user_auth, document_id, side, file, Some(meta)).await?;
-    Ok(result)
-}
-
-#[api_v2_operation(
-    description = "Create a new identity document for this user's outstanding document request",
-    tags(Hosted)
-)]
-#[actix::post("/hosted/user/documents/{id}/upload")]
-pub async fn post(
-    state: web::Data<State>,
-    user_auth: UserWfAuthContext,
-    document_id: web::Path<IdentityDocumentId>,
-    request: LargeJson<CreateIdentityDocumentUploadRequest, 5_242_880>,
-) -> JsonApiResponse<DocumentResponse> {
-    tracing::info!("Starting handler");
-    let document_id = document_id.into_inner();
-    tracing::info!("Before unpacking request");
-    let CreateIdentityDocumentUploadRequest {
-        image,
-        side,
-        mime_type,
-        // TODO vault the barcode
-        meta,
-    } = request.0;
-    tracing::info!("After unpacking request");
-    let image_bytes = image.try_decode_base64().map_err(crypto::Error::from)?;
-    // TODO filename here changed. does it matter?
-    // let filename = format!("{}", di);
-    let filename = format!("{}.{}", document_id, side);
-    let file = FileUpload::new_simple(image_bytes, filename, &mime_type);
-    let result = post_inner(state, user_auth, document_id, side, file, meta).await?;
-    Ok(result)
-}
-
-async fn post_inner(
-    state: web::Data<State>,
-    user_auth: UserWfAuthContext,
-    document_id: IdentityDocumentId,
-    side: DocumentSide,
-    file: FileUpload,
-    meta: Option<UploadMeta>,
-) -> JsonApiResponse<DocumentResponse> {
+    let (document_id, side) = args.into_inner();
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let wf = user_auth.workflow();
@@ -203,9 +163,9 @@ async fn post_inner(
                 s3_url: d.s3_url,
                 e_data_key: d.e_data_key,
                 created_seqno: seqno,
-                is_instant_app: meta.as_ref().and_then(|m| m.is_instant_app),
-                is_app_clip: meta.as_ref().and_then(|m| m.is_app_clip),
-                is_manual: meta.as_ref().and_then(|m| m.manual),
+                is_instant_app: meta.is_instant_app,
+                is_app_clip: meta.is_app_clip,
+                is_manual: meta.is_manual,
             };
             DocumentUpload::create(conn, args)?;
             let existing_sides = id_doc
