@@ -834,35 +834,35 @@ footprint_reason_code_enum! {
 
         // OCR matching
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "OCR name does not match input", severity = SignalSeverity::Medium,  description = "The OCR name does not match the name that was input."]
+        #[note = "Document name does not match input", severity = SignalSeverity::Medium,  description = "The document name does not match the name that was input."]
         DocumentOcrNameDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "OCR name matches input", severity = SignalSeverity::Info,  description = "The OCR name matches the name that was input."]
+        #[note = "Document name matches input", severity = SignalSeverity::Info,  description = "The document name matches the name that was input."]
         DocumentOcrNameMatches,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "OCR first name does not match input", severity = SignalSeverity::Medium,  description = "The OCR first name does not match the name that was input."]
+        #[note = "Document first name does not match input", severity = SignalSeverity::Medium,  description = "The document first name does not match the name that was input."]
         DocumentOcrFirstNameDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "OCR first name matches input", severity = SignalSeverity::Info,  description = "The OCR first name matches the name that was input."]
+        #[note = "Document first name matches input", severity = SignalSeverity::Info,  description = "The document first name matches the name that was input."]
         DocumentOcrFirstNameMatches,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "OCR last name does not match input", severity = SignalSeverity::Medium,  description = "The OCR last name does not match the name that was input."]
+        #[note = "Document last name does not match input", severity = SignalSeverity::Medium,  description = "The document last name does not match the name that was input."]
         DocumentOcrLastNameDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "OCR last name matches input", severity = SignalSeverity::Info,  description = "The OCR last name matches the name that was input."]
+        #[note = "Document last name matches input", severity = SignalSeverity::Info,  description = "The document last name matches the name that was input."]
         DocumentOcrLastNameMatches,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "OCR DOB does not match input", severity = SignalSeverity::Medium,  description = "The OCR DOB does not match the DOB that was input."]
+        #[note = "Document DOB does not match input", severity = SignalSeverity::Medium,  description = "The document DOB does not match the DOB that was input."]
         DocumentOcrDobDoesNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
-        #[note = "OCR DOB matches input", severity = SignalSeverity::Info,  description = "The OCR DOB matches the DOB that was input."]
+        #[note = "Document DOB matches input", severity = SignalSeverity::Info,  description = "The document DOB matches the DOB that was input."]
         DocumentOcrDobMatches,
 
         // Cross Checks
