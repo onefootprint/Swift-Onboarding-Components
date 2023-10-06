@@ -5,6 +5,7 @@ import React from 'react';
 
 import SecuredByFootprint from '../secured-by-footprint';
 import FooterActions from './components/footer-actions';
+import NitroLock from './components/nitro-lock';
 
 type FootprintFooterProps = {
   hideOnDesktop?: boolean;
@@ -16,7 +17,7 @@ type Link = { label: string; href: string };
 const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
   const links: Link[] = [
     {
-      label: 'Privacy Policy',
+      label: 'Privacy',
       href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
     },
   ];
@@ -31,8 +32,8 @@ const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
   return (
     <FootprintFooterContainer hideOnDesktop={hideOnDesktop}>
       <SecuredByFootprint />
-
       <LinksContainer>
+        <NitroLock />
         {links.map(({ href, label }) => (
           <li key={label}>
             <a href={href} target="_blank" rel="noreferrer">
