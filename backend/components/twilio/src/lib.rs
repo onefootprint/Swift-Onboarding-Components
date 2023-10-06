@@ -2,18 +2,18 @@ use std::time::Duration;
 
 use newtypes::PiiString;
 use request::send_message::SendMessage;
-use reqwest_tracing::TracingMiddleware;
-use reqwest::{Method, IntoUrl};
+use reqwest::{IntoUrl, Method};
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_middleware::RequestBuilder;
+use reqwest_tracing::TracingMiddleware;
 use response::{decode_response, lookup::LookupResponse, message::Message};
 
 pub mod error;
 pub mod request;
 pub mod response;
 
+use tokio_retry::strategy::jitter;
 use tokio_retry::strategy::FixedInterval;
-use tokio_retry::strategy::{jitter, ExponentialBackoff};
 use tokio_retry::Retry;
 
 use crate::error::Error;
@@ -67,10 +67,7 @@ impl Client {
     pub async fn validate_phone_number(&self, phone_number: &str) -> crate::response::Result<LookupResponse> {
         let url = format!("https://lookups.twilio.com/v1/PhoneNumbers/{phone_number}");
 
-        let response = self
-            .request_builder(Method::GET, url)
-            .send()
-            .await?;
+        let response = self.request_builder(Method::GET, url).send().await?;
 
         decode_response(response).await
     }
@@ -79,32 +76,14 @@ impl Client {
     pub async fn lookup_v2(&self, phone_number: &str) -> crate::response::Result<serde_json::Value> {
         let url = format!("https://lookups.twilio.com/v2/PhoneNumbers/{phone_number}?Fields=caller_name,sim_swap,call_forwarding,live_activity,line_type_intelligence");
 
-        let response = self
-            .request_builder(Method::GET, url)
-            .send()
-            .await?;
+        let response = self.request_builder(Method::GET, url).send().await?;
 
         let twilio_response = decode_response(response).await?;
 
         Ok(twilio_response)
     }
 
-    /// send an sms message
-    pub async fn send_message(&self, destination: PiiString, body: PiiString) -> crate::response::Result<Message> {
-        // TODO need to tell the caller that this failed
-        let retry_strategy = ExponentialBackoff::from_millis(10)        
-        .map(jitter) // add jitter
-        .take(2); // limit to 2 retries
-
-        let result = Retry::spawn(retry_strategy, move || {
-            self.send_message_internal(destination.clone(), body.clone())
-        })
-        .await?;
-
-        Ok(result)
-    }
-
-    async fn send_message_internal(
+    pub async fn send_message(
         &self,
         destination: PiiString,
         body: PiiString,
@@ -120,7 +99,7 @@ impl Client {
             body: body.leak_to_string(),
             to: destination.leak_to_string(),
             from: self.from_number.to_string(),
-            validity_period: VALIDITY_PERIOD_SECS as u64 // dont send the message after TTL
+            validity_period: VALIDITY_PERIOD_SECS as u64, // dont send the message after TTL
         };
 
         let response = self
@@ -143,9 +122,7 @@ impl Client {
 
     async fn check_status(&self, message_uri: String) -> crate::response::Result<Message> {
         // We want to check every 500ms for 5s if there's been an error/success.
-        let retry_strategy = FixedInterval::from_millis(500)
-            .map(jitter)
-            .take(10);
+        let retry_strategy = FixedInterval::from_millis(500).map(jitter).take(10);
         let result = Retry::spawn(retry_strategy, move || {
             self._check_status_inner(message_uri.clone())
         })
@@ -195,10 +172,7 @@ impl Client {
 
     async fn _get_message(&self, message_uri: String) -> crate::response::Result<Message> {
         let url = format!("https://api.twilio.com{}", message_uri);
-        let response = self
-            .request_builder(Method::GET, url)
-            .send()
-            .await?;
+        let response = self.request_builder(Method::GET, url).send().await?;
 
         let message = decode_response(response).await?;
         Ok(message)

@@ -4,10 +4,12 @@ use crate::{
     errors::{challenge::ChallengeError, user::UserError, ApiError, ApiResult},
     State,
 };
+use async_trait::async_trait;
 use chrono::{Duration, Utc};
 use crypto::sha256;
 use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
+use itertools::Itertools;
 use newtypes::SandboxId;
 use newtypes::{PhoneNumber, PiiString};
 
@@ -25,6 +27,69 @@ pub struct SmsClient {
     /// AWS pinpoint SMS client
     pinpoint_client: aws_sdk_pinpointsmsvoicev2::Client,
     ff_client: LaunchDarklyFeatureFlagClient,
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum SmsVendorKind {
+    Twilio,
+    Pinpoint,
+}
+
+#[derive(Clone, Copy)]
+struct Message<'a> {
+    message: &'a PiiString,
+    destination: &'a PiiString,
+    client: &'a SmsClient,
+}
+
+struct Twilio<'a>(Message<'a>);
+
+struct Pinpoint<'a>(Message<'a>);
+
+#[async_trait]
+trait SmsVendor: Send + Sync {
+    async fn send(&self) -> ApiResult<()>;
+    fn vendor(&self) -> SmsVendorKind;
+}
+
+#[async_trait]
+impl<'a> SmsVendor for Twilio<'a> {
+    #[tracing::instrument("Twilio::send", skip_all)]
+    async fn send(&self) -> ApiResult<()> {
+        self.0
+            .client
+            .twilio_client
+            .send_message(self.0.destination.clone(), self.0.message.clone())
+            .await?;
+        Ok(())
+    }
+
+    fn vendor(&self) -> SmsVendorKind {
+        SmsVendorKind::Twilio
+    }
+}
+
+#[async_trait]
+impl<'a> SmsVendor for Pinpoint<'a> {
+    #[tracing::instrument("Pinpoint::send", skip_all)]
+    async fn send(&self) -> ApiResult<()> {
+        self
+            .0
+            .client
+            .pinpoint_client
+            .send_text_message()
+            // TODO change number based on environment
+            .origination_identity("+17655634600".to_owned())
+            .destination_phone_number(self.0.destination.leak_to_string())
+            .message_body(self.0.message.leak_to_string())
+            .send()
+            .await?;
+        Ok(())
+    }
+
+    fn vendor(&self) -> SmsVendorKind {
+        SmsVendorKind::Pinpoint
+    }
 }
 
 impl SmsClient {
@@ -121,48 +186,41 @@ impl SmsClient {
     /// Sends the message_body to the provided destination, choosing which vendor to use if any
     #[tracing::instrument("SmsClient::_send_message", skip_all)]
     async fn _send_message(&self, message_body: PiiString, destination: PiiString) -> ApiResult<()> {
-        // TODO can clean this up a lot in the future
-        let prefer_twilio = self.ff_client.flag(BoolFlag::TwilioIsPreferredSmsVendor);
-        let res = if prefer_twilio {
-            self._send_twilio(&message_body, &destination).await
-        } else {
-            self._send_pinpoint(&message_body, &destination).await
+        let message = Message {
+            client: self,
+            message: &message_body,
+            destination: &destination,
         };
-        if let Err(err) = res {
-            tracing::error!(
-                prefer_twilio = prefer_twilio,
-                ?err,
-                "Moving on to fallback SMS vendor"
-            );
-            // If there was an error, waterfall to the secondary vendor
-            if prefer_twilio {
-                self._send_pinpoint(&message_body, &destination).await?;
-            } else {
-                self._send_twilio(&message_body, &destination).await?;
+        let vendors: Vec<Box<dyn SmsVendor>> = vec![
+            // Two twilios because we want to try twilio twice before falling back to pinpoint
+            Box::new(Twilio(message)),
+            Box::new(Twilio(message)),
+            Box::new(Pinpoint(message)),
+        ];
+        let preferred_vendor = if self.ff_client.flag(BoolFlag::TwilioIsPreferredSmsVendor) {
+            SmsVendorKind::Twilio
+        } else {
+            SmsVendorKind::Pinpoint
+        };
+        let ordered_vendors = vendors
+            .into_iter()
+            // The clients matching the preferred vendor will be put at the top of the list
+            .sorted_by_key(|v| v.vendor() != preferred_vendor)
+            .collect_vec();
+
+        // Iterate through vendors in the order of preference, trying each one until we get a
+        // successful response or reach the end of our vendors
+        let mut err = None;
+        for vendor in ordered_vendors {
+            err = match vendor.send().await {
+                Ok(_) => return Ok(()),
+                Err(e) => Some(e),
             };
+            tracing::error!(?preferred_vendor, ?err, "Moving on to next SMS vendor");
         }
-        Ok(())
-    }
-
-    #[tracing::instrument("SmsClient::_send_twilio", skip_all)]
-    async fn _send_twilio(&self, message_body: &PiiString, destination: &PiiString) -> ApiResult<()> {
-        self.twilio_client
-            .send_message(destination.clone(), message_body.clone())
-            .await?;
-        Ok(())
-    }
-
-    #[tracing::instrument("SmsClient::_send_pinpoint", skip_all)]
-    async fn _send_pinpoint(&self, message_body: &PiiString, destination: &PiiString) -> ApiResult<()> {
-        self
-            .pinpoint_client
-            .send_text_message()
-            // TODO change number based on environment
-            .origination_identity("+17655634600".to_owned())
-            .destination_phone_number(destination.leak_to_string())
-            .message_body(message_body.leak_to_string())
-            .send()
-            .await?;
+        if let Some(err) = err {
+            return Err(err);
+        }
         Ok(())
     }
 }
