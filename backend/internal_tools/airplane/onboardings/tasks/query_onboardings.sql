@@ -53,7 +53,14 @@ risk_signal_agg as (
     'watchlist_hit_pep',
     'adverse_media_hit',
     'attested_device_fraud_duplicate_risk_medium',
-    'attested_device_fraud_duplicate_risk_high')
+    'attested_device_fraud_duplicate_risk_high',
+    'document_barcode_could_not_be_read',
+    'document_expired',
+    'document_upload_failed',
+    'document_type_mismatch',
+    'document_unknown_country_code',
+    'document_country_code_mismatch'
+    )
   group by 1
 ),
 latest_doc as (
@@ -100,4 +107,6 @@ left join onboarding_decision obd
 left join latest_doc doc on doc.wf_id = wf.id
 left join all_doc_errors doc_err on doc_err.wf_id = wf.id
 left join risk_signal_agg rsa on rsa.wf_id = wf.id 
-order by 1 desc
+where 
+   (obd.status = :status or ''||:status is null or :status = '')
+order by completed_at desc

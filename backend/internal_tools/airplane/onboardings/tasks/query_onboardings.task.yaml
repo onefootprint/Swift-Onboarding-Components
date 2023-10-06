@@ -16,6 +16,11 @@ parameters:
     type: datetime
     description: start datetime ISO8601 (yyyy-mm-ddThh:mm:ss.mmmZ) (leave blank to ignore filtering)
     required: false
+  - name: status
+    slug: status
+    type: shorttext
+    description: pass, fail, incomplete, pending
+    required: false
 sql:
   resource: 'prod_ro_db'
   entrypoint: query_onboardings.sql
@@ -24,4 +29,5 @@ sql:
     tenant: '{{params.tenant}}'
     start_datetime: '{{params.start_datetime}}'
     end_datetime: '{{params.end_datetime}}'
+    status: '{{params.status}}'
 

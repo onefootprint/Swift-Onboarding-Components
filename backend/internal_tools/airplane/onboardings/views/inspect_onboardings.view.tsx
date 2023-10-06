@@ -18,6 +18,9 @@ const Onboardings = () => {
   const endDateTimeSearch = useComponentState('endDateTime');
   const [endDateTime] = useDebounce(endDateTimeSearch.value, 1000);
 
+  const statusSearch = useComponentState<TextInputState>();
+  const [status] = useDebounce(statusSearch.value, 500);
+
   return (
     <Stack>
       <TextInput
@@ -34,7 +37,7 @@ const Onboardings = () => {
         label="End datetime"
         placeholder="leave blank for no filter on end time"
       />
-
+      <TextInput id={statusSearch.id} label="Enter a status to filter to" />
       <Stack>
         <Table
           id="query_onboardings"
@@ -46,6 +49,7 @@ const Onboardings = () => {
               tenant: tenant,
               start_datetime: startDateTime,
               end_datetime: endDateTime,
+              status: status,
             },
           }}
           columns={[
