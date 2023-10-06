@@ -1,14 +1,15 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled from '@onefootprint/styled';
+import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes } from '@onefootprint/types';
 import { Box, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 export type LoadingProps = {
   imageType: IdDocImageTypes;
+  showSlowConnectionMessage?: boolean;
 };
 
-const Loading = ({ imageType }: LoadingProps) => {
+const Loading = ({ imageType, showSlowConnectionMessage }: LoadingProps) => {
   const { t } = useTranslation('components.loading');
 
   return (
@@ -31,9 +32,12 @@ const Loading = ({ imageType }: LoadingProps) => {
         </Typography>
         <Typography
           variant="body-4"
-          sx={{ textAlign: 'center', color: 'tertiary' }}
+          sx={{
+            textAlign: 'center',
+            color: showSlowConnectionMessage ? 'error' : 'tertiary',
+          }}
         >
-          {t('subtitle')}
+          {showSlowConnectionMessage ? t('slow-connection') : t('subtitle')}
         </Typography>
       </Box>
     </Container>
@@ -41,9 +45,12 @@ const Loading = ({ imageType }: LoadingProps) => {
 };
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: ${theme.spacing[6]};
+  `}
 `;
 
 export default Loading;

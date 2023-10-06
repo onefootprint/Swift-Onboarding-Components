@@ -9,7 +9,7 @@ import {
 } from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { useEffectOnce } from 'usehooks-ts';
+import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
 import { NavigationHeader } from '../../../../components';
 import DesktopHeader from '../../components/desktop-header';
@@ -21,12 +21,16 @@ import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useSubmitDoc from '../../hooks/use-submit-doc';
 
+const SLOW_CONNECTION_MESSAGE_TIMEOUT = 10000;
+
 const DeskTopProcessing = () => {
   const { t } = useTranslation('pages.desktop-processing');
   const [state, send] = useIdDocMachine();
   const submitDocMutation = useSubmitDoc();
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
   const [nextSide, setNextSide] = useState<IdDocImageTypes | undefined>();
+  const [showSlowConnectionMessage, setShowSlowConnectionMessage] =
+    useState(false);
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
 
@@ -126,6 +130,16 @@ const DeskTopProcessing = () => {
     );
   });
 
+  useTimeout(
+    () => {
+      if (submitDocMutation.isSuccess) {
+        return;
+      }
+      setShowSlowConnectionMessage(true);
+    },
+    submitDocMutation.isLoading ? SLOW_CONNECTION_MESSAGE_TIMEOUT : null,
+  );
+
   const handleNextStep = () => {
     send({
       type: 'processingSucceeded',
@@ -158,7 +172,12 @@ const DeskTopProcessing = () => {
       <DesktopHeader type={type} country={country} imageType={currSide} />
       <FeedbackContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         <IdDocAnimation
-          loadingComponent={<Loading imageType={currSide} />}
+          loadingComponent={
+            <Loading
+              imageType={currSide}
+              showSlowConnectionMessage={showSlowConnectionMessage}
+            />
+          }
           successComponent={
             <Success
               imageType={currSide}

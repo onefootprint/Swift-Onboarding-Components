@@ -80,7 +80,8 @@
         "processing-back": "Processing image",
         "processing-selfie": "Processing your selfie"
       },
-      "subtitle": "This can take a few seconds"
+      "subtitle": "This can take a few seconds",
+      "slow-connection": "Your internet connection seems unstable. The upload might take longer than usual."
     },
     "error": {
       "title-front": "We couldn't process your image",

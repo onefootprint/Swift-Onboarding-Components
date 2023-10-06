@@ -8,7 +8,7 @@ import {
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { useEffectOnce } from 'usehooks-ts';
+import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
 import IdDocAnimation from '../../components/id-doc-animation';
 import Loading from '../../components/loading';
@@ -18,6 +18,8 @@ import Success from '../../components/success';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useSubmitDoc from '../../hooks/use-submit-doc';
 
+const SLOW_CONNECTION_MESSAGE_TIMEOUT = 10000;
+
 const Processing = () => {
   const { t } = useTranslation('pages.processing');
   const [state, send] = useIdDocMachine();
@@ -25,6 +27,8 @@ const Processing = () => {
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
   const [nextSide, setNextSide] = useState<IdDocImageTypes | undefined>();
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
+  const [showSlowConnectionMessage, setShowSlowConnectionMessage] =
+    useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
 
   const {
@@ -123,6 +127,16 @@ const Processing = () => {
     );
   });
 
+  useTimeout(
+    () => {
+      if (submitDocMutation.isSuccess) {
+        return;
+      }
+      setShowSlowConnectionMessage(true);
+    },
+    submitDocMutation.isLoading ? SLOW_CONNECTION_MESSAGE_TIMEOUT : null,
+  );
+
   const onSuccessComplete = () => {
     send({
       type: 'processingSucceeded',
@@ -151,7 +165,12 @@ const Processing = () => {
 
   return (
     <IdDocAnimation
-      loadingComponent={<Loading imageType={currSide} />}
+      loadingComponent={
+        <Loading
+          imageType={currSide}
+          showSlowConnectionMessage={showSlowConnectionMessage}
+        />
+      }
       successComponent={
         <Success
           imageType={currSide}

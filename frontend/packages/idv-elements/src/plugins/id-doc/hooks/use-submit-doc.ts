@@ -16,14 +16,12 @@ const submitDoc = async (payload: SubmitDocRequest) => {
       'x-fp-is-manual': meta.manual,
       'Content-Type': 'multipart/form-data',
     },
+    timeout: 180000,
   });
 
   return response.data;
 };
 
-const useSubmitDoc = () =>
-  useMutation(submitDoc, {
-    retry: 3,
-  });
+const useSubmitDoc = () => useMutation(submitDoc);
 
 export default useSubmitDoc;
