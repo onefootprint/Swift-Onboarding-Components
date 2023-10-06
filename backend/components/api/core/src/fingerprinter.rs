@@ -3,6 +3,7 @@ use async_trait::async_trait;
 use aws_sdk_kms::types::Blob;
 use crypto::sha256;
 use db::models::vault::Vault;
+use itertools::Itertools;
 use newtypes::{
     fingerprinter::{FingerprintScopable, FingerprintScope, Fingerprinter, GlobalFingerprintKind},
     secret_api_key::ApiKeyFingerprinter,
@@ -73,11 +74,15 @@ impl ApiKeyFingerprinter for State {
 impl Fingerprinter for State {
     type Error = crate::ApiError;
 
-    async fn compute_fingerprints<S: FingerprintScopable + Send + Sync>(
+    async fn compute_fingerprints<T: Send, S: FingerprintScopable + Send + Sync>(
         &self,
-        data: &[(S, &PiiString)],
-    ) -> Result<Vec<Fingerprint>, Self::Error> {
-        Ok(self.enclave_client.batch_fingerprint(data).await?)
+        data: Vec<(T, S, &PiiString)>,
+    ) -> Result<Vec<(T, Fingerprint)>, Self::Error> {
+        let (identifiers, values_to_fp): (Vec<_>, Vec<_>) =
+            data.into_iter().map(|(id, s, v)| (id, (s, v))).unzip();
+        let fps = self.enclave_client.batch_fingerprint(&values_to_fp).await?;
+        let results = identifiers.into_iter().zip(fps).collect();
+        Ok(results)
     }
 }
 
@@ -123,8 +128,14 @@ impl State {
                     .into_iter()
                     .flatten()
                     .zip(std::iter::repeat(&data))
+                    .map(|(s, v)| ((), s, v))
                     .collect();
-                let sh_datas = self.compute_fingerprints(&fps).await?;
+                let sh_datas = self
+                    .compute_fingerprints(fps)
+                    .await?
+                    .into_iter()
+                    .map(|(_, fp)| fp)
+                    .collect_vec();
                 self.db_pool
                     .db_query(move |conn| Vault::find_portable(conn, &sh_datas, sandbox_id))
                     .await??

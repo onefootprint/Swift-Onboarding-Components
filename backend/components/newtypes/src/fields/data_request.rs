@@ -196,20 +196,19 @@ impl<T> DataRequest<T> {
         fingerprinter: &F,
         tenant_id: &TenantId,
     ) -> Result<DataRequest<Fingerprints>, F::Error> {
-        let (data, dis): (Vec<_>, Vec<DataIdentifier>) = self
+        let data: Vec<_> = self
             .data
             .iter()
             .filter_map(|(di, pii)| {
                 di.is_fingerprintable()
-                    .then_some((((di, tenant_id), pii), di.clone()))
+                    .then_some((di.clone(), (di, tenant_id), pii))
             })
-            .unzip();
+            .collect();
 
-        let fingerprints = fingerprinter.compute_fingerprints(data.as_slice()).await?;
+        let fingerprints = fingerprinter.compute_fingerprints(data).await?;
 
-        let fingerprints = dis
+        let fingerprints = fingerprints
             .into_iter()
-            .zip(fingerprints)
             .map(|(kind, fingerprint)| FingerprintRequest {
                 kind,
                 fingerprint,
@@ -232,20 +231,19 @@ impl<T> DataRequest<T> {
     ) -> Result<DataRequest<Fingerprints>, F::Error> {
         let data_to_fingerprint = if !is_fixture {
             GlobalFingerprintKind::iter()
-                .filter_map(|g| self.data.get(&g.data_identifier()).map(|pii| (g, pii)))
+                .filter_map(|g| {
+                    let di = g.data_identifier();
+                    self.data.get(&di).map(|pii| (di, g, pii))
+                })
                 .collect::<Vec<_>>()
         } else {
             vec![]
         };
 
-        let global_fingperprints = fingerprinter
-            .compute_fingerprints(data_to_fingerprint.as_slice())
-            .await?;
+        let global_fingerprints = fingerprinter.compute_fingerprints(data_to_fingerprint).await?;
 
-        let fingerprints = data_to_fingerprint
+        let fingerprints = global_fingerprints
             .into_iter()
-            .map(|(g, _)| g.data_identifier())
-            .zip(global_fingperprints)
             .map(|(kind, fingerprint)| FingerprintRequest {
                 fingerprint,
                 kind,

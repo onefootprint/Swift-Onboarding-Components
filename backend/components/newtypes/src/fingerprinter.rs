@@ -103,10 +103,10 @@ impl TryFrom<DataIdentifier> for GlobalFingerprintKind {
 pub trait Fingerprinter: std::marker::Sync {
     type Error: From<crate::Error>;
 
-    async fn compute_fingerprints<S: FingerprintScopable + Send + Sync>(
+    async fn compute_fingerprints<T: Send + Sync, S: FingerprintScopable + Send + Sync>(
         &self,
-        data: &[(S, &PiiString)],
-    ) -> Result<Vec<Fingerprint>, Self::Error>;
+        data: Vec<(T, S, &PiiString)>,
+    ) -> Result<Vec<(T, Fingerprint)>, Self::Error>;
 
     async fn compute_fingerprint<S: FingerprintScopable + Send + Sync>(
         &self,
@@ -114,11 +114,12 @@ pub trait Fingerprinter: std::marker::Sync {
         data: &PiiString,
     ) -> Result<Fingerprint, Self::Error> {
         Ok(self
-            .compute_fingerprints(&[(id, data)])
+            .compute_fingerprints(vec![((), id, data)])
             .await?
             .into_iter()
             .next()
-            .ok_or(crate::Error::Custom("missing fingerprints".into()))?)
+            .ok_or(crate::Error::Custom("missing fingerprints".into()))?
+            .1)
     }
 
     /// Helper to compute fingperirnts tied to a tenant id
@@ -127,11 +128,19 @@ pub trait Fingerprinter: std::marker::Sync {
         data: &[(DataIdentifier, &PiiString)],
         tenant_id: TenantId,
     ) -> Result<Vec<Fingerprint>, Self::Error> {
-        let scopable: Vec<_> = data.iter().map(|(di, pii)| ((di, &tenant_id), *pii)).collect();
+        let scopable: Vec<_> = data
+            .iter()
+            .map(|(di, pii)| ((), (di, &tenant_id), *pii))
+            .collect();
 
-        let fp = self.compute_fingerprints(&scopable).await?;
+        let fps = self
+            .compute_fingerprints(scopable)
+            .await?
+            .into_iter()
+            .map(|(_, fp)| fp)
+            .collect();
 
-        Ok(fp)
+        Ok(fps)
     }
 }
 
