@@ -82,5 +82,14 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
             name: RuleName::DocumentCollectionErrored,
             action: Action::ManualReview,
         },
+        Rule {
+            rule: {
+                |f: &Vec<FootprintReasonCode>| {
+                    f.contains(&FootprintReasonCode::DocumentIsPermitOrProvisionalLicense)
+                }
+            },
+            name: RuleName::DocumentWasLearnerPermit,
+            action: Action::ManualReview,
+        },
     ]
 }

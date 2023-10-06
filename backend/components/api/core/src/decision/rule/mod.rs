@@ -43,6 +43,7 @@ pub enum RuleName {
     SelfieDoesNotMatch,
     DocumentUploadFailed,
     DocumentCollectionErrored,
+    DocumentWasLearnerPermit,
     #[cfg(test)]
     Test(String),
     BusinessWatchlistHit,

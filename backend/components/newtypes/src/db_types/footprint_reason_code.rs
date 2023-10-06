@@ -820,6 +820,10 @@ footprint_reason_code_enum! {
         #[note = "Unexpected document country code", severity = SignalSeverity::High,  description = "The country issuing the uploaded document does not match the selected country."]
         DocumentCountryCodeMismatch,
 
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document is a learner's permit or provisional driver's license", severity = SignalSeverity::High,  description = "The document provided was a provisional license or learner's permit"]
+        DocumentIsPermitOrProvisionalLicense,
+
         #[scope = SignalScope::Selfie, additional_scopes = vec![], match_level = None]
         #[note = "Selfie was skipped", severity = SignalSeverity::High,  description = "Although requested, selfie image was not captured because the user completed the onboarding on a device that did not have a camera available"]
         DocumentSelfieWasSkipped,
