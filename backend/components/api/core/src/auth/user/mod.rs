@@ -36,8 +36,6 @@ pub trait UserAuth {
 
 #[cfg(test)]
 mod test {
-    use newtypes::WorkflowId;
-
     use super::UserAuthScope;
 
     #[test]

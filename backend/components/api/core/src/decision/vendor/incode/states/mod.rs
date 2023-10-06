@@ -44,7 +44,7 @@ mod process_face;
 pub use process_face::*;
 
 use super::state::IncodeStateTransition;
-use super::IncodeContext;
+use super::{validate_doc_type_is_allowed, IncodeContext};
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
@@ -233,6 +233,7 @@ pub async fn save_incode_fixtures(
 }
 
 /// Parses the IdDocKind from the response. Returns an Err IncodeFailureReason if we can't parse
+#[tracing::instrument(skip(ctx))]
 fn parse_type_of_id(
     ctx: &IncodeContext,
     type_of_id: Option<&IncodeDocumentType>,
@@ -245,18 +246,6 @@ fn parse_type_of_id(
         .document_type
         .ok_or(AssertionError("Docv data has no document_type"))?;
 
-    let Some(type_of_id) = type_of_id else {
-        return Ok(Err(IncodeFailureReason::UnknownDocumentType));
-    };
-    let Ok(id_doc_kind) = IdDocKind::try_from(type_of_id) else {
-        return Ok(Err(IncodeFailureReason::UnsupportedDocumentType));
-    };
-    if id_doc_kind != expected_doc_type {
-        return Ok(Err(IncodeFailureReason::DocTypeMismatch));
-    }
-
-    // Validate the country code what the client told us (and what we validated against the
-    // doc request)
     let expected_country: Iso3166TwoDigitCountryCode = Iso3166TwoDigitCountryCode::from_str(
         ctx.docv_data
             .country_code
@@ -265,11 +254,28 @@ fn parse_type_of_id(
             .leak(),
     )?;
 
+    let Some(type_of_id) = type_of_id else {
+        return Ok(Err(IncodeFailureReason::UnknownDocumentType));
+    };
+    let Ok(id_doc_kind) = IdDocKind::try_from(type_of_id) else {
+        return Ok(Err(IncodeFailureReason::UnsupportedDocumentType));
+    };
+    if id_doc_kind != expected_doc_type
+        && validate_doc_type_is_allowed(&ctx.obc, id_doc_kind, ctx.vault_country, expected_country).is_err()
+    {
+        // only throw DocTypeMismatch if the Incode doc type and the user specified doc type do not match AND the Incode doc type is not supportable according to the Tenant's OBC
+        return Ok(Err(IncodeFailureReason::DocTypeMismatch));
+    }
+
+    // Validate the country code what the client told us (and what we validated against the
+    // doc request)
+
     let Some(provided_country) = country_code.and_then(|i| Iso3166ThreeDigitCountryCode::from_str(i.leak()).ok()).map(Iso3166TwoDigitCountryCode::from) else {
         return Ok(Err(IncodeFailureReason::UnknownCountryCode));
     };
 
     if expected_country != provided_country && id_doc_kind != IdDocKind::Passport {
+        // TODO: maybe also check if here expected_country is allowed by OBC?
         return Ok(Err(IncodeFailureReason::CountryCodeMismatch));
     }
     Ok(Ok(id_doc_kind))

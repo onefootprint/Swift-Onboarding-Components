@@ -15,7 +15,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::IdentityDocument;
-use db::models::vault::Vault;
+use db::models::ob_configuration::ObConfiguration;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::WorkflowGuard;
@@ -39,11 +39,10 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let t_id = user_auth.scoped_user.tenant_id.clone();
-    let vault = user_auth.user().clone();
     let wf = user_auth.workflow();
     let su_id = user_auth.scoped_user.id.clone();
     let wf_id = wf.id.clone();
-    let (di, id_doc, dr, failed_attempts, uvw, missing_sides, should_collect_selfie) = state
+    let (di, id_doc, dr, failed_attempts, uvw, missing_sides, should_collect_selfie, obc) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let di = DecisionIntent::get_or_create_for_workflow(
@@ -52,6 +51,7 @@ pub async fn post(
                 &wf_id,
                 DecisionIntentKind::DocScan,
             )?;
+            let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
             let (id_doc, dr) = IdentityDocument::get(conn, &doc_id)?;
             // TODO this logic is brittle. Should improve this logic to get the number of failed
             // attempts for the side of the incode machine.
@@ -85,6 +85,7 @@ pub async fn post(
                 uvw,
                 missing_sides,
                 should_collect_selfie,
+                obc,
             ))
         })
         .await?;
@@ -99,8 +100,9 @@ pub async fn post(
             &state,
             id_doc.id,
             t_id,
+            obc,
             di.id,
-            vault,
+            &uvw,
             dr,
             is_sandbox,
             should_collect_selfie,
@@ -134,8 +136,9 @@ pub async fn handle_incode_request(
     state: &State,
     identity_document_id: IdentityDocumentId,
     tenant_id: TenantId,
+    obc: ObConfiguration,
     decision_intent_id: DecisionIntentId,
-    vault: Vault,
+    uvw: &VaultWrapper<Person>,
     doc_request: DocumentRequest,
     is_sandbox: bool,
     should_collect_selfie: bool,
@@ -145,8 +148,9 @@ pub async fn handle_incode_request(
     is_re_run: bool,
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
+    let vault_country = uvw.get_decrypted_country(state).await?;
     let sv_id = doc_request.scoped_vault_id.clone();
-    let vault_id = vault.id.clone();
+    let vault_id = uvw.vault.id.clone();
     let id_doc_id = identity_document_id.clone();
     let disable_selfie = state
         .feature_flag_client
@@ -157,8 +161,10 @@ pub async fn handle_incode_request(
         sv_id: sv_id.clone(),
         id_doc_id: identity_document_id,
         wf_id: workflow_id.clone(),
-        vault,
+        obc: obc.clone(),
+        vault: uvw.vault.clone(),
         docv_data,
+        vault_country,
         doc_request_id: doc_request.id,
         enclave_client: state.enclave_client.clone(),
         tenant_id: tenant_id.clone(),

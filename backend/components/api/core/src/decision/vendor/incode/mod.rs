@@ -2,10 +2,14 @@ mod state;
 mod state_machine;
 pub mod states;
 
-use newtypes::{IncodeConfigurationId, TenantId};
+use db::models::ob_configuration::ObConfiguration;
+use newtypes::{output::Csv, IdDocKind, IncodeConfigurationId, Iso3166TwoDigitCountryCode, TenantId};
 pub use state_machine::*;
 
-use crate::State;
+use crate::{
+    errors::{onboarding::OnboardingError, ApiResult},
+    State,
+};
 
 #[cfg(test)]
 mod images;
@@ -34,4 +38,25 @@ pub fn get_config_id(
     };
 
     IncodeConfigurationId::from(id.leak_to_string())
+}
+
+// TODO: better home for this?
+pub fn validate_doc_type_is_allowed(
+    obc: &ObConfiguration,
+    document_type: IdDocKind,
+    residential_country: Option<Iso3166TwoDigitCountryCode>,
+    country_code: Iso3166TwoDigitCountryCode,
+) -> ApiResult<()> {
+    let document_to_country_mapping = obc.supported_country_mapping_for_document(residential_country);
+    let Some(allowed_doc_types) = document_to_country_mapping.get(&country_code) else {
+        // this country is not in our available countries
+        return Err(OnboardingError::UnsupportedDocumentCountryForDocumentType(Csv::from(document_to_country_mapping.keys().cloned().collect::<Vec<_>>())).into())
+    };
+
+    // Validate that we support this doc type for the given country
+    if !allowed_doc_types.contains(&document_type) {
+        Err(OnboardingError::UnsupportedDocumentType(Csv::from(allowed_doc_types.clone())).into())
+    } else {
+        Ok(())
+    }
 }

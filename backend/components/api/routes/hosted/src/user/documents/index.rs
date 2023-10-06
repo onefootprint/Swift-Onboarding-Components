@@ -4,6 +4,7 @@ use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
+use api_core::decision;
 use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::{VaultWrapper, Person, VwArgs};
 use api_wire_types::{CreateIdentityDocumentRequest, CreateIdentityDocumentResponse};
@@ -12,10 +13,8 @@ use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use feature_flag::BoolFlag;
-use newtypes::output::Csv;
-use newtypes::{WorkflowGuard, Iso3166TwoDigitCountryCode, IdentityDocumentFixtureResult};
+use newtypes::{WorkflowGuard, IdentityDocumentFixtureResult};
 use paperclip::actix::{self, api_v2_operation, web};
-use newtypes::IdentityDataKind as IDK;
 
 #[api_v2_operation(
     description = "Create a new identity document for this user's outstanding document request",
@@ -49,8 +48,8 @@ pub async fn post(
             Ok(uvw)
         })
         .await??;
-    let decrypted_values = uvw.decrypt_unchecked(&state.enclave_client, &[IDK::Country.into()]).await?;
-    let residential_country = decrypted_values.get(&IDK::Country.into()).and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
+
+    let residential_country = uvw.get_decrypted_country(&state).await?;
 
     let id_doc = state
         .db_pool
@@ -59,19 +58,14 @@ pub async fn post(
             let doc_request =
                 DbDocumentRequest::get(conn, &wf_id)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
 
-            let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
-            
-            let document_to_country_mapping = obc.supported_country_mapping_for_document(residential_country);
-            let Some(allowed_doc_types) = document_to_country_mapping.get(&country_code) else {
-                // this country is not in our available countries
-                return Err(OnboardingError::UnsupportedDocumentCountryForDocumentType(Csv::from(document_to_country_mapping.keys().cloned().collect::<Vec<_>>())).into())
-            };
-            
-            // Validate that we support this doc type for the given country
-            if !allowed_doc_types.contains(&document_type) {
-                return Err(OnboardingError::UnsupportedDocumentType(Csv::from(allowed_doc_types.clone())).into());
-            }
-            
+            let (obc, _) = ObConfiguration::get(conn, &wf_id)?;         
+            decision::vendor::incode::validate_doc_type_is_allowed(
+                &obc,
+                document_type,
+                residential_country,
+                country_code,
+            )?;
+
             if let Some(fixture_result) = fixture_result {
                 // Check we're in sandbox
                 let vault = Vault::get(conn, &su_id)?;

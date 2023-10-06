@@ -8,11 +8,13 @@ use api_core::{
     },
     errors::{ApiResult, AssertionError},
     types::{JsonApiResponse, ResponseData},
+    utils::vault_wrapper::{VaultWrapper, VwArgs},
 };
 use api_wire_types::DocumentResponse;
 use db::models::{
     decision_intent::DecisionIntent, identity_document::IdentityDocument,
-    incode_verification_session::IncodeVerificationSession, scoped_vault::ScopedVault, vault::Vault,
+    incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
+    scoped_vault::ScopedVault,
 };
 use newtypes::{DecisionIntentKind, IncodeVerificationSessionId};
 
@@ -48,14 +50,15 @@ pub async fn rerun_machine(
         );
     }
 
-    let (id_doc, dr, su, vault, di) = state
+    let (id_doc, dr, su, di, uvw, obc) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let old_session =
                 IncodeVerificationSession::get(conn, &id)?.ok_or(AssertionError("No session found"))?;
             let (id_doc, dr) = IdentityDocument::get(conn, &old_session.identity_document_id)?;
             let su = ScopedVault::get(conn, &dr.workflow_id)?;
-            let vault = Vault::get(conn, &su.vault_id)?;
+            let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&su.id))?;
+            let (obc, _) = ObConfiguration::get(conn, &dr.workflow_id)?;
             // TODO mark the latest DocumentUpload as not deactivated. Right now this needs to be done manually
             let di =
                 DecisionIntent::create(conn, DecisionIntentKind::DocScan, &su.id, Some(&dr.workflow_id))?;
@@ -68,7 +71,7 @@ pub async fn rerun_machine(
                 old_session.incode_configuration_id.clone(),
                 old_session.kind,
             )?;
-            Ok((id_doc, dr, su, vault, di))
+            Ok((id_doc, dr, su, di, uvw, obc))
         })
         .await?;
 
@@ -76,8 +79,9 @@ pub async fn rerun_machine(
         &state,
         id_doc.id,
         su.tenant_id,
+        obc,
         di.id,
-        vault,
+        &uvw,
         dr.clone(),
         !su.is_live,
         dr.should_collect_selfie,

@@ -10,7 +10,7 @@ use db::{DbError, DbPool};
 use newtypes::email::Email;
 use newtypes::{
     BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, ContactInfoKind, IdentityDataKind as IDK,
-    KycedBusinessOwnerData, PhoneNumber, PiiString, TenantId,
+    Iso3166TwoDigitCountryCode, KycedBusinessOwnerData, PhoneNumber, PiiString, TenantId,
 };
 use std::str::FromStr;
 
@@ -85,6 +85,18 @@ impl<Type> VaultWrapper<Type> {
         self.decrypt_verified_contact_info(state, ContactInfoKind::Email)
             .await
             .and_then(|e| Email::from_str(e.leak()).map_err(ApiError::from))
+    }
+
+    pub async fn get_decrypted_country(
+        &self,
+        state: &State,
+    ) -> ApiResult<Option<Iso3166TwoDigitCountryCode>> {
+        let decrypted_values = self
+            .decrypt_unchecked(&state.enclave_client, &[IDK::Country.into()])
+            .await?;
+        Ok(decrypted_values
+            .get(&IDK::Country.into())
+            .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok()))
     }
 }
 

@@ -22,7 +22,7 @@ use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DecisionIntentId, DecisionIntentKind, DocVData, DocumentRequestId, IdentityDocumentId,
     IncodeConfigurationId, IncodeFailureReason, IncodeVerificationSessionKind,
-    IncodeVerificationSessionState, ScopedVaultId, TenantId, WorkflowId,
+    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, WorkflowId,
 };
 
 pub type IsReady = bool;
@@ -34,8 +34,10 @@ pub struct IncodeContext {
     pub sv_id: ScopedVaultId,
     pub id_doc_id: IdentityDocumentId,
     pub wf_id: WorkflowId,
+    pub obc: ObConfiguration,
     pub vault: Vault,
     pub docv_data: DocVData,
+    pub vault_country: Option<Iso3166TwoDigitCountryCode>,
     pub doc_request_id: DocumentRequestId,
     pub enclave_client: EnclaveClient,
     pub tenant_id: TenantId,
@@ -239,6 +241,7 @@ impl IncodeStateMachine {
             .await?;
 
         let docv_data = build_docv_data_from_identity_doc(state, id_doc.id.clone()).await?;
+        let vault_country = uvw.get_decrypted_country(state).await?;
         let disable_selfie = state
             .feature_flag_client
             .flag(feature_flag::BoolFlag::DisableSelfieChecking(&obc.tenant_id));
@@ -248,8 +251,10 @@ impl IncodeStateMachine {
             sv_id: doc_req.scoped_vault_id.clone(),
             id_doc_id: id_doc.id.clone(),
             wf_id: doc_req.workflow_id.clone(),
+            obc: obc.clone(),
             vault: uvw.vault,
             docv_data,
+            vault_country,
             doc_request_id: doc_req.id,
             enclave_client: state.enclave_client.clone(),
             tenant_id: obc.tenant_id.clone(),

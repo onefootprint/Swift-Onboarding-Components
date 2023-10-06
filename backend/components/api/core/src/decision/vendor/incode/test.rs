@@ -68,7 +68,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
             ..Default::default()
         }
     };
-    let (tenant, wf, uv, su, _) =
+    let (tenant, wf, uv, su, obc) =
         create_kyc_user_and_wf(&state.db_pool, &state.enclave_client, obc_opts, None).await;
     let wf_id = wf.id.clone();
     let wf_id2 = wf.id.clone();
@@ -109,13 +109,17 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         country_code: Some(PiiString::from("USA")),
         ..Default::default()
     };
+    let vault_country = Some(newtypes::Iso3166TwoDigitCountryCode::US);
+
     let ctx = IncodeContext {
         di_id: di.id.clone(),
         sv_id: su.id.clone(),
         id_doc_id: id_doc.id.clone(),
         wf_id: wf_id2,
+        obc: obc.clone(),
         vault: uv.clone(),
         docv_data,
+        vault_country,
         doc_request_id: id_doc.request_id,
         enclave_client: state.enclave_client.clone(),
         tenant_id: tenant.id.clone(),
@@ -309,7 +313,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
             ..Default::default()
         }
     };
-    let (tenant, wf, uv, su, _) =
+    let (tenant, wf, uv, su, obc) =
         create_kyc_user_and_wf(&state.db_pool, &state.enclave_client, obc_opts, None).await;
     let wf_id = wf.id.clone();
     let wf_id2 = wf.id.clone();
@@ -350,13 +354,17 @@ async fn test_fail(state: &State, is_selfie: bool) {
         country_code: Some(PiiString::from("USA")),
         ..Default::default()
     };
+    let vault_country = Some(newtypes::Iso3166TwoDigitCountryCode::US);
+
     let ctx = IncodeContext {
         di_id: di.id.clone(),
         sv_id: su.id.clone(),
         id_doc_id: id_doc.id.clone(),
         wf_id: wf_id2,
         vault: uv.clone(),
+        obc: obc.clone(),
         docv_data,
+        vault_country,
         doc_request_id: id_doc.request_id.clone(),
         enclave_client: state.enclave_client.clone(),
         tenant_id: tenant.id.clone(),
