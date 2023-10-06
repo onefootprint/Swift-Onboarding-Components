@@ -20,10 +20,29 @@ export type OpenCVType = Exclude<
 const contouringThreshold = 177;
 const contouringMaxPixelVal = 200; // The value that will be assigned to the pixels that exceed threshold value
 
+const BLUR_THRESHOLD = 25; // From trial and error
+
 export enum CardCaptureStatus {
   OK = 'ok',
   detecting = 'detecting',
 }
+
+const isImageBlurry = (cv: OpenCVType, src: Mat) => {
+  const dst = new cv.Mat();
+  const men = new cv.Mat();
+  const menO = new cv.Mat();
+
+  cv.cvtColor(src, src, cv.COLOR_RGB2GRAY, 0);
+  cv.Laplacian(src, dst, cv.CV_64F, 1, 1, 0, cv.BORDER_DEFAULT);
+  cv.meanStdDev(dst, menO, men);
+  const isBlurry = men.data64F[0] < BLUR_THRESHOLD;
+
+  dst.delete();
+  men.delete();
+  menO.delete();
+
+  return isBlurry;
+};
 
 export const sharpenImage = (
   cv: OpenCVType,
@@ -240,6 +259,8 @@ export const detectCardStatus = (
   startParamIndex: number,
   batchSize: number,
 ) => {
+  if (isImageBlurry(cv, src))
+    return { status: CardCaptureStatus.detecting, paramIndex: -1 };
   for (
     let i = startParamIndex;
     i < Math.min(params.length, startParamIndex + batchSize);

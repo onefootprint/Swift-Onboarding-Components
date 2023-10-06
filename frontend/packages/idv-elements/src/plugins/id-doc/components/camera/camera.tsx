@@ -159,7 +159,7 @@ const Camera = ({
       mediaStream,
       desiredImageWidth,
       desiredImageHeight,
-      shouldSharpen: false,
+      autocaptureKind,
     });
 
     if (imageString) {

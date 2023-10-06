@@ -3,6 +3,7 @@ import type { MutableRefObject } from 'react';
 
 import getSourceDimensions from '../utils/get-source-dimensions';
 import { sharpenImage } from '../utils/graphics-utils/graphics-processing-utils';
+import type { AutocaptureKind } from './use-auto-capture';
 
 type GetImageStringProps = {
   context: CanvasRenderingContext2D;
@@ -11,7 +12,7 @@ type GetImageStringProps = {
   mediaStream: MediaStream | null;
   desiredImageWidth: number;
   desiredImageHeight: number;
-  shouldSharpen: boolean;
+  autocaptureKind: AutocaptureKind;
 };
 
 const useGetImageString = () => {
@@ -24,7 +25,7 @@ const useGetImageString = () => {
     mediaStream,
     desiredImageWidth,
     desiredImageHeight,
-    shouldSharpen,
+    autocaptureKind,
   }: GetImageStringProps) => {
     if (!videoRef.current || !canvasRef.current) return null;
 
@@ -53,7 +54,7 @@ const useGetImageString = () => {
       canvasRef.current?.clientHeight,
     );
 
-    if (loaded && cv && shouldSharpen) {
+    if (loaded && cv && autocaptureKind === 'document') {
       const src = cv.imread(canvasRef.current);
       const sharpenedImage = sharpenImage(cv, src, true);
       cv.imshow(canvasRef.current, sharpenedImage);
