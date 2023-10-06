@@ -104,6 +104,11 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
                   <IcoInfo16 />
                 </Tooltip>
               )}
+              {!getFailureReasons(upload) && upload.isExtraCompressed && (
+                <Tooltip alignment="end" text={t('extra-compressed')}>
+                  <IcoInfo16 />
+                </Tooltip>
+              )}
             </Title>
             <HoverableImage
               isSuccess={upload.failureReasons.length === 0}

@@ -9,6 +9,7 @@ export type DocumentUpload = {
   failureReasons: string[];
   side: IdDocImageTypes;
   timestamp: string;
+  isExtraCompressed: boolean;
 };
 
 export enum UploadSource {

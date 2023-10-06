@@ -828,6 +828,7 @@
               "success": "successfully uploaded",
               "failed": "upload failed",
               "image-alt": "Upload image",
+              "extra-compressed": "We detected the user's internet connection was slow and further compressed the image.",
               "uploaded-from": "Uploaded via",
               "upload-source": {
                 "mobile": "mobile",

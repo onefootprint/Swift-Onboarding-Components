@@ -28,6 +28,7 @@ export const idCardMobile: Document = {
       failureReasons: [],
       side: IdDocImageTypes.front,
       timestamp: '2022-05-06T06:12:00.000Z',
+      isExtraCompressed: false,
     },
   ],
 };
@@ -47,6 +48,7 @@ export const idCardDesktop: Document = {
       failureReasons: [],
       side: IdDocImageTypes.front,
       timestamp: '2022-05-06T06:12:00.000Z',
+      isExtraCompressed: false,
     },
   ],
 };
@@ -66,6 +68,7 @@ export const idCardApi: Document = {
       failureReasons: [],
       side: IdDocImageTypes.front,
       timestamp: '2022-05-06T06:12:00.000Z',
+      isExtraCompressed: false,
     },
   ],
 };
@@ -85,18 +88,21 @@ export const successfulIDCardDocument: Document = {
       failureReasons: [],
       side: IdDocImageTypes.front,
       timestamp: '2022-05-06T06:12:00.000Z',
+      isExtraCompressed: false,
     },
     {
       version: 676,
       failureReasons: [],
       side: IdDocImageTypes.back,
       timestamp: '2022-05-08T03:16:00.000Z',
+      isExtraCompressed: false,
     },
     {
       version: 677,
       failureReasons: [],
       side: IdDocImageTypes.selfie,
       timestamp: '2022-05-09T05:27:00.000Z',
+      isExtraCompressed: false,
     },
   ],
 };
@@ -116,18 +122,21 @@ export const failedIdCardDocument: Document = {
       failureReasons: ['reason'],
       side: IdDocImageTypes.front,
       timestamp: '2022-05-06T06:12:00.000Z',
+      isExtraCompressed: false,
     },
     {
       version: 676,
       failureReasons: ['reason'],
       side: IdDocImageTypes.back,
       timestamp: '2022-05-08T03:16:00.000Z',
+      isExtraCompressed: false,
     },
     {
       version: 677,
       failureReasons: ['reason'],
       side: IdDocImageTypes.selfie,
       timestamp: '2022-05-09T05:27:00.000Z',
+      isExtraCompressed: false,
     },
   ],
 };
