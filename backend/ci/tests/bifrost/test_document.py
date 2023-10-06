@@ -175,12 +175,17 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     # Upload the documents consecutively in separate requests
     sides = ["front", "back"]
     for i, side in enumerate(sides):
-        body = post(
+        headers = {
+            "x-fp-process-separately": "true",
+        }
+        post(
             f"hosted/user/documents/{doc_id}/upload/{side}",
             None,
             bifrost.auth_token,
             files=bifrost.data[f"document.drivers_license.{side}.image"],
+            addl_headers=headers,
         )
+        body = post(f"hosted/user/documents/{doc_id}/process", None, bifrost.auth_token)
         next_side = sides[i + 1] if i + 1 < len(sides) else None
         assert body["next_side_to_collect"] == next_side
         assert not body["errors"]

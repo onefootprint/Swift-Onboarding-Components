@@ -274,14 +274,17 @@ class BifrostClient:
                 "x-fp-is-app-clip": "true",
                 "x-fp-is-instant-app": "false",
                 "x-fp-is-mobile": "true",
-                # TODO do we need mime type?
+                "x-fp-process-separately": "true",
             }
-            body = post(
+            post(
                 f"hosted/user/documents/{doc_id}/upload/{side}",
                 None,
                 self.auth_token,
                 files=file,
                 addl_headers=headers,
+            )
+            body = post(
+                f"hosted/user/documents/{doc_id}/process", None, self.auth_token
             )
             next_side = sides[i + 1] if i + 1 < len(sides) else None
             assert body["next_side_to_collect"] == next_side
