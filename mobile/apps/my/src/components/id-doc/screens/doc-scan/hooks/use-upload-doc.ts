@@ -19,7 +19,7 @@ const uploadDoc = async ({
     headers: {
       [AUTH_HEADER]: authToken,
       'content-type': 'multipart/form-data',
-      'x-fp-is-manual': meta.manual,
+      'x-fp-is-manual': meta.manual || false,
       'x-fp-is-app-clip': Platform.OS === 'ios',
       'x-fp-is-instant-app': Platform.OS === 'android',
     },

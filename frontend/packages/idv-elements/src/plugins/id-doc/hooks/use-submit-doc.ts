@@ -13,7 +13,9 @@ const submitDoc = async (payload: SubmitDocRequest) => {
     data: formData,
     headers: {
       [AUTH_HEADER]: authToken,
-      'x-fp-is-manual': meta.manual,
+      'x-fp-is-manual': meta.manual || false,
+      'x-fp-is-app-clip': false,
+      'x-fp-is-instant-app': false,
       'Content-Type': 'multipart/form-data',
     },
     timeout: 180000,
