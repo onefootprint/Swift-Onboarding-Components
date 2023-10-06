@@ -39,7 +39,6 @@ const ApiReference = () => {
 const Layout = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
-
     width: 100vw;
     height: 100vh;
 

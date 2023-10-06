@@ -20,6 +20,7 @@ export type NavigationSection = {
 export type NavigationSubsection = {
   method: 'post' | 'get' | 'put' | 'delete' | 'patch';
   entities: string;
+  path: string;
   slug: string;
   id: string;
 };

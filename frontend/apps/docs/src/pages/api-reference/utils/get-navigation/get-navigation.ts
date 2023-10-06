@@ -14,6 +14,7 @@ const getNavigation = (data: any) => {
     const subsections = methods.map(method => ({
       method,
       entities,
+      path,
       id: `${joinedEntities}-${method}${client}`,
       slug: `#${joinedEntities}-${method}${client}`,
     }));

@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoCode216, IcoFlask16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   createFontStyles,
@@ -49,25 +50,33 @@ const PageNav = ({ navigation, navigationPreviewSection }: PageNavProps) => {
         id="nav-container"
       >
         <nav>
-          <SectionTitle>{t('sections.footprint-api')}</SectionTitle>
+          <SectionTitle>
+            <IcoCode216 color="tertiary" />
+            {t('sections.footprint-api')}
+          </SectionTitle>
           {navigation.map(({ title, subsections }) => (
             <div key={title}>
               <NavigationSectionTitle>{title}</NavigationSectionTitle>
-              {subsections.map(({ method, entities, id }) => (
+              {subsections.map(({ method, path, id }) => (
                 <NavigationScrollLink key={id} id={id}>
-                  {t(`navigation.methods.${method}`)} {entities}
+                  <Method>{method}</Method>
+                  <Entities>{path}</Entities>
                 </NavigationScrollLink>
               ))}
             </div>
           ))}
           <Divider />
-          <SectionTitle>{t('sections.footprint-api-preview')}</SectionTitle>
+          <SectionTitle>
+            <IcoFlask16 color="tertiary" />
+            {t('sections.footprint-api-preview')}
+          </SectionTitle>
           {navigationPreviewSection?.map(({ title, subsections }) => (
             <div key={title}>
               <NavigationSectionTitle>{title}</NavigationSectionTitle>
-              {subsections.map(({ method, entities, id }) => (
+              {subsections.map(({ method, path, id }) => (
                 <NavigationScrollLink key={id} id={id}>
-                  {t(`navigation.methods.${method}`)} {entities}
+                  <Method>{method}</Method>
+                  <Entities>{path}</Entities>
                 </NavigationScrollLink>
               ))}
             </div>
@@ -79,16 +88,6 @@ const PageNav = ({ navigation, navigationPreviewSection }: PageNavProps) => {
   );
 };
 
-const SectionTitle = styled.h3`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-1')};
-    color: ${theme.color.primary};
-    padding: ${theme.spacing[6]} ${theme.spacing[3]} ${theme.spacing[4]}
-      ${theme.spacing[4]};
-    text-transform: uppercase;
-  `}
-`;
-
 const PageNavContainer = styled.aside`
   ${({ theme }) => css`
     display: none;
@@ -99,12 +98,25 @@ const PageNavContainer = styled.aside`
       background: ${theme.backgroundColor.primary};
       border-right: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
       height: 100vh;
+      width: var(--page-aside-nav-api-reference-width);
       left: 0;
       top: 0;
       position: relative;
-      width: var(--page-aside-nav-api-reference-width);
       grid-area: nav;
     `};
+  `}
+`;
+
+const SectionTitle = styled.h3`
+  ${({ theme }) => css`
+    ${createFontStyles('caption-1')};
+    color: ${theme.color.primary};
+    padding: ${theme.spacing[6]} ${theme.spacing[3]} ${theme.spacing[4]}
+      ${theme.spacing[3]};
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing[3]};
   `}
 `;
 
@@ -133,6 +145,29 @@ const Header = styled.header<{ isScrolled: boolean }>`
     padding: ${theme.spacing[6]};
     border-bottom: ${theme.borderWidth[1]} solid
       ${isScrolled ? theme.borderColor.tertiary : 'transparent'};
+  `}
+`;
+
+const Method = styled.span`
+  ${({ theme }) => css`
+    ${createFontStyles('snippet-2')};
+    color: ${theme.color.secondary};
+    text-transform: uppercase;
+    margin-right: ${theme.spacing[2]};
+  `}
+`;
+
+const Entities = styled.p`
+  ${({ theme }) => css`
+    ${createFontStyles('snippet-2')};
+    color: ${theme.color.tertiary};
+    display: inline-block;
+    text-transform: lowercase;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 100%;
+    margin: 0;
   `}
 `;
 

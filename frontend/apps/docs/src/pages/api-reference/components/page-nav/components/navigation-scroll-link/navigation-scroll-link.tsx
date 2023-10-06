@@ -1,5 +1,4 @@
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { Link } from 'react-scroll';
 
@@ -22,9 +21,8 @@ const NavigationScrollLink = ({ id, children }: NavigationScrollLinkProps) => (
 
 const ScrollLink = styled(Link)`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')};
     border-radius: ${theme.borderRadius.default};
-    display: block;
+    display: flex;
     margin-bottom: ${theme.spacing[2]};
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     text-decoration: none;

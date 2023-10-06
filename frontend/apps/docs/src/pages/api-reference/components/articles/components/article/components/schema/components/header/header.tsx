@@ -21,11 +21,11 @@ const Header = ({ title, type, isRequired, isInBrackets }: HeaderProps) => {
         <Type>{type}</Type>
       </Column>
 
-      {isRequired && (
-        <>
-          <Separator>·</Separator>
-          <Required>{t('required')}</Required>
-        </>
+      <Separator>·</Separator>
+      {isRequired ? (
+        <RequiredType data-required="true">{t('required')}</RequiredType>
+      ) : (
+        <RequiredType>{t('optional')}</RequiredType>
       )}
     </StyledStack>
   );
@@ -81,9 +81,13 @@ const Type = styled.div`
   `}
 `;
 
-const Required = styled.div`
+const RequiredType = styled.div`
   ${({ theme }) => css`
-    color: ${theme.color.warning};
+    color: ${theme.color.quaternary};
+
+    &[data-required='true'] {
+      color: ${theme.color.warning};
+    }
   `}
 `;
 
