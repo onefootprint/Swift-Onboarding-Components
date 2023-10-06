@@ -108,6 +108,7 @@ jobs:
       PR_NUMBER: ${{ github.event.number }}
       TEST_URL: 'http://localhost:8000'
       EXPECTED_SERVER_VERSION: ${{ github.sha }}
+      INTEGRATION_TEST_PHONE_NUMBER: '+17605178879'
     if: success()
     steps:
       - name: Install libpq + libssl
@@ -181,6 +182,12 @@ jobs:
               attempt_counter=$(($attempt_counter+1))
               sleep 10
           done
+
+          # We pass the integration test number in explicitly - remove the one we use locally
+          cat .env | grep -v INTEGRATION_TEST_PHONE_NUMBER > .env2
+          rm .env
+          mv .env2 .env
+
           cd ci
           set -o pipefail
           pytest tests/ 2>&1 | tee integration_test_output.txt
