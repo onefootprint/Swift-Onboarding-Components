@@ -18,7 +18,7 @@ import Success from '../../components/success';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useSubmitDoc from '../../hooks/use-submit-doc';
 
-const SLOW_CONNECTION_MESSAGE_TIMEOUT = 10000;
+const SLOW_CONNECTION_MESSAGE_TIMEOUT = 15000;
 
 const Processing = () => {
   const { t } = useTranslation('pages.processing');

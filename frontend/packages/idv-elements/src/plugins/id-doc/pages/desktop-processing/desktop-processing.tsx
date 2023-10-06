@@ -21,7 +21,7 @@ import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useSubmitDoc from '../../hooks/use-submit-doc';
 
-const SLOW_CONNECTION_MESSAGE_TIMEOUT = 10000;
+const SLOW_CONNECTION_MESSAGE_TIMEOUT = 15000;
 
 const DeskTopProcessing = () => {
   const { t } = useTranslation('pages.desktop-processing');
