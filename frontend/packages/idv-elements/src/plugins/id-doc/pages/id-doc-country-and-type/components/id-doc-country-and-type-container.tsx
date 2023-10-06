@@ -113,6 +113,10 @@ const IdDocCountryAndTypeContainer = ({
     const selectedCountry =
       getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value;
     const hasWebcam = await detectWebcam();
+    if (submitDocTypeMutation.isLoading) {
+      return;
+    }
+
     submitDocTypeMutation.mutate(
       {
         authToken,
@@ -188,7 +192,11 @@ const IdDocCountryAndTypeContainer = ({
         )}
       </InputsContainer>
       {options.length > 0 && (
-        <Button fullWidth onClick={handleSubmit}>
+        <Button
+          fullWidth
+          onClick={handleSubmit}
+          loading={submitDocTypeMutation.isLoading}
+        >
           {t('form.cta')}
         </Button>
       )}
