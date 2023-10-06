@@ -13,7 +13,7 @@ const renderWhoToOnboard = ({ onSubmit }: WhoToOnboardProps) =>
 describe('<WhoToOnboard />', () => {
   beforeEach(() => {
     asAdminUserWithOrg({
-      isLive: true,
+      isLive: false,
       isProdKybPlaybookRestricted: true,
       isProdKycPlaybookRestricted: true,
     });
@@ -21,6 +21,8 @@ describe('<WhoToOnboard />', () => {
   it('should submit KYC correctly', async () => {
     const onSubmit = jest.fn();
     renderWhoToOnboard({ onSubmit });
+    const option = screen.getByText('Onboard people');
+    await userEvent.click(option);
     const submit = screen.getByRole('button', { name: 'Next' });
     await userEvent.click(submit);
     expect(onSubmit).toHaveBeenCalledWith({ kind: PlaybookKind.Kyc });
