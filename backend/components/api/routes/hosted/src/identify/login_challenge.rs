@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use super::{BiometricChallengeState, ChallengeKind, UserChallengeData};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::onboarding::OnboardingError;
@@ -20,6 +22,7 @@ use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::VaultId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
+use tokio::sync::oneshot;
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 
@@ -97,6 +100,8 @@ pub async fn post(
         ck => ck,
     };
 
+    let (tx, rx) = oneshot::channel();
+
     let (challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =
         match challenge_kind {
             ChallengeKind::Biometric => {
@@ -109,7 +114,7 @@ pub async fn post(
             ChallengeKind::Sms => {
                 let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
                 let (challenge_state, time_before_retry_s) = twilio_client
-                    .send_challenge_non_blocking(&state, tenant, &phone_number, None, sandbox_id)
+                    .send_challenge_non_blocking(&state, tenant, &phone_number, None, sandbox_id, tx)
                     .await?;
                 let challenge_data = ChallengeData::Sms(challenge_state);
                 (
@@ -134,6 +139,18 @@ pub async fn post(
                 )
             }
         };
+
+    // Wait for two seconds to see if the background task that is sending the challenge
+    // asynchronously either (1) completes or (2) sends us an error.
+    match tokio::time::timeout(Duration::from_secs(2), rx).await {
+        Ok(Ok(err)) => return Err(err),
+        // The sender has been dropped. The message was sent successfully, or this was an email
+        // challenge
+        Ok(Err(_)) => (),
+        // The 2s timeout has been reached and we'll return a successful response assuming the
+        // background task will deliver the message
+        Err(_) => (),
+    }
 
     let challenge_state = ChallengeState {
         data: challenge_state_data,

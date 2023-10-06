@@ -8,10 +8,11 @@ pub enum Error {
     ReqwestMiddleware(#[from] reqwest_middleware::Error),
     #[error("{0}")]
     Request(#[from] reqwest::Error),
-    #[error("Delivery failed: {0}. Error: {1:?}")]
+    // TODO see if we can provide more information based on the twilio error status here
+    #[error("Message delivery failed")]
     DeliveryFailed(Status, Option<i64>),
-    #[error("Not delivered: {0}: Error: {1:?}")]
-    NotDelivered(Status, Option<i64>),
+    #[error("Message unable to be delivered.")]
+    NotDeliveredAfterTimeout(Status, Option<i64>),
     #[error("{0}")]
     Api(ApiErrorResponse),
     #[error("{0}")]

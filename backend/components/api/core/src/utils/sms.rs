@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use tokio::sync::oneshot::Sender;
 
 use crate::{
     errors::{challenge::ChallengeError, user::UserError, ApiError, ApiResult},
@@ -148,7 +149,7 @@ impl SmsClient {
         .enforce_and_update()
         .await?;
         let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
-        self._send_message(message_body, destination.e164()).await?;
+        self._send_message(message_body, destination.e164(), None).await?;
         Ok(())
     }
 
@@ -159,6 +160,7 @@ impl SmsClient {
         message_body: PiiString,
         destination: &PhoneNumber,
         rate_limit_scope: &str,
+        tx: Sender<ApiError>,
     ) -> ApiResult<()> {
         if destination.is_fixture_phone_number() {
             // Don't rate limit or send SMS messages to the fixture phone number
@@ -176,16 +178,24 @@ impl SmsClient {
         let e164 = destination.e164();
         let client = self.clone();
         tokio::spawn(async move {
-            let _ = client._send_message(message_body, e164).await.map_err(|err| {
-                tracing::error!(?err, "Failed to send SMS message");
-            });
+            let _ = client
+                ._send_message(message_body, e164, Some(tx))
+                .await
+                .map_err(|err| {
+                    tracing::error!(?err, "Failed to send SMS message");
+                });
         });
         Ok(())
     }
 
     /// Sends the message_body to the provided destination, choosing which vendor to use if any
     #[tracing::instrument("SmsClient::_send_message", skip_all)]
-    async fn _send_message(&self, message_body: PiiString, destination: PiiString) -> ApiResult<()> {
+    async fn _send_message(
+        &self,
+        message_body: PiiString,
+        destination: PiiString,
+        mut tx: Option<Sender<ApiError>>,
+    ) -> ApiResult<()> {
         let message = Message {
             client: self,
             message: &message_body,
@@ -212,11 +222,22 @@ impl SmsClient {
         // successful response or reach the end of our vendors
         let mut err = None;
         for vendor in ordered_vendors {
-            err = match vendor.send().await {
+            let e = match vendor.send().await {
                 Ok(_) => return Ok(()),
-                Err(e) => Some(e),
+                Err(e) => e,
             };
-            tracing::error!(?preferred_vendor, ?err, "Moving on to next SMS vendor");
+            tracing::error!(?preferred_vendor, ?e, "Moving on to next SMS vendor");
+            err = if let Some(tx) = tx.take() {
+                // After the first error is encountered, pass the error back on the channel in
+                // case someone is listening
+                // Don't raise error from sending since it's possible the receiver has hung up
+                let r = tx.send(e);
+                r.err()
+            } else {
+                // After the first error, just save the err in ram to raise after all vendors
+                // have been tried
+                Some(e)
+            }
         }
         if let Some(err) = err {
             return Err(err);
@@ -235,6 +256,8 @@ impl SmsClient {
         // For signup challenges. Used to initialize the vault with an email
         email: Option<PiiString>,
         sandbox_id: Option<SandboxId>,
+        // Sender for any errors received
+        tx: Sender<ApiError>,
     ) -> ApiResult<(PhoneChallengeState, SecondsBeforeRetry)> {
         // Send non-blocking to prevent us from returning the challenge data to the frontend while
         // we wait for twilio latency
@@ -264,7 +287,7 @@ impl SmsClient {
             PiiString::from(format!("Your verification code for Footprint is {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
         };
 
-        self.send_message_non_blocking(state, message_body, destination, rate_limit::SMS_CHALLENGE)
+        self.send_message_non_blocking(state, message_body, destination, rate_limit::SMS_CHALLENGE, tx)
             .await?;
 
         Ok((

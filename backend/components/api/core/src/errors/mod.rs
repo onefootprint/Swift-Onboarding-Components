@@ -299,11 +299,12 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::HandoffError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::Twilio(e) => match e {
-                TwilioError::Request(_)
-                | TwilioError::ReqwestMiddleware(_)
-                | TwilioError::DeliveryFailed(_, _)
-                | TwilioError::NotDelivered(_, _)
-                | TwilioError::SerdeJson(_) => StatusCode::INTERNAL_SERVER_ERROR,
+                TwilioError::Request(_) | TwilioError::ReqwestMiddleware(_) | TwilioError::SerdeJson(_) => {
+                    StatusCode::INTERNAL_SERVER_ERROR
+                }
+                TwilioError::DeliveryFailed(_, _) | TwilioError::NotDeliveredAfterTimeout(_, _) => {
+                    StatusCode::BAD_REQUEST
+                }
                 TwilioError::Api(e) => match e.status {
                     400 => StatusCode::BAD_REQUEST,
                     _ => StatusCode::INTERNAL_SERVER_ERROR,

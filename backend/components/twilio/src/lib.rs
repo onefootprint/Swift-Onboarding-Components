@@ -142,7 +142,10 @@ impl Client {
                     // result faster
                     Ok(message)
                 } else {
-                    Err(Error::NotDelivered(message.status, message.error_code))
+                    Err(Error::NotDeliveredAfterTimeout(
+                        message.status,
+                        message.error_code,
+                    ))
                 }
             }
         }

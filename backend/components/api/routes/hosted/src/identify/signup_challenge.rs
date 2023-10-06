@@ -7,11 +7,12 @@ use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::ApiResult;
 use api_core::utils::headers::SandboxId;
 use newtypes::email::Email;
 use newtypes::PhoneNumber;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
+use std::time::Duration;
+use tokio::sync::oneshot;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct SignupChallengeRequest {
@@ -38,13 +39,14 @@ pub async fn post(
     sandbox_id: SandboxId,
 ) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
     let SignupChallengeRequest { phone_number, email } = request.into_inner();
-    let challenge_data: ApiResult<UserChallengeData> = match (phone_number, email) {
+    let (tx, rx) = oneshot::channel();
+    let challenge_data = match (phone_number, email) {
         (Some(phone_number), email) => {
             let tenant = ob_context.as_ref().map(|obc| obc.tenant());
             let email = email.map(|e| e.email);
             let (challenge_state_data, time_before_retry_s) = state
                 .sms_client
-                .send_challenge_non_blocking(&state, tenant, &phone_number, email, sandbox_id.0)
+                .send_challenge_non_blocking(&state, tenant, &phone_number, email, sandbox_id.0, tx)
                 .await?;
 
             let challenge_state = ChallengeState {
@@ -56,14 +58,13 @@ pub async fn post(
                 data: challenge_state,
             }
             .seal(&state.challenge_sealing_key)?;
-            let challenge_data = UserChallengeData {
+            UserChallengeData {
                 challenge_kind: ChallengeKind::Sms,
                 challenge_token,
                 scrubbed_phone_number: Some(phone_number.last_two()),
                 biometric_challenge_json: None,
                 time_before_retry_s: time_before_retry_s.num_seconds(),
-            };
-            Ok(challenge_data)
+            }
         }
         (None, Some(email)) => {
             let auth = ob_context.as_ref().ok_or(OnboardingError::MissingObPkAuth)?;
@@ -87,21 +88,31 @@ pub async fn post(
             }
             .seal(&state.challenge_sealing_key)?;
 
-            let challenge_data = UserChallengeData {
+            UserChallengeData {
                 challenge_kind: ChallengeKind::Email,
                 challenge_token,
                 scrubbed_phone_number: None,
                 biometric_challenge_json: None,
                 time_before_retry_s: state.config.time_s_between_sms_challenges,
-            };
-            Ok(challenge_data)
+            }
         }
         (None, None) => return Err(ChallengeError::NoIdentifier.into()),
     };
 
+    // Wait for two seconds to see if the background task that is sending the challenge
+    // asynchronously either (1) completes or (2) sends us an error.
+    let result = tokio::time::timeout(Duration::from_secs(2), rx).await;
+    match result {
+        Ok(Ok(err)) => return Err(err),
+        // The sender has been dropped. The message was sent successfully, or this was an email
+        // challenge
+        Ok(Err(_)) => (),
+        // The 2s timeout has been reached and we'll return a successful response assuming the
+        // background task will deliver the message
+        Err(_) => (),
+    }
+
     Ok(Json(ResponseData {
-        data: SignupChallengeResponse {
-            challenge_data: challenge_data?,
-        },
+        data: SignupChallengeResponse { challenge_data },
     }))
 }
