@@ -9,9 +9,9 @@ pub enum Error {
     #[error("{0}")]
     Request(#[from] reqwest::Error),
     // TODO see if we can provide more information based on the twilio error status here
-    #[error("Message delivery failed")]
+    #[error("Delivery failed: {0}. Error: {1:?}")]
     DeliveryFailed(Status, Option<i64>),
-    #[error("Message unable to be delivered.")]
+    #[error("Not delivered: {0}: Error: {1:?}")]
     NotDeliveredAfterTimeout(Status, Option<i64>),
     #[error("{0}")]
     Api(ApiErrorResponse),
