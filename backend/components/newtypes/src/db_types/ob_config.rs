@@ -7,7 +7,8 @@ use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json;
-use strum_macros::{AsRefStr, EnumString};
+use strum::IntoEnumIterator;
+use strum_macros::{AsRefStr, EnumIter, EnumString};
 
 #[derive(
     Eq,
@@ -79,7 +80,64 @@ pub enum EnhancedAmlOption {
         pep: bool,
         adverse_media: bool,
         continuous_monitoring: bool,
+        adverse_media_lists: Option<Vec<AdverseMediaListKind>>,
     },
+}
+
+impl EnhancedAmlOption {
+    pub fn adverse_media_lists(&self) -> Vec<AdverseMediaListKind> {
+        match self {
+            EnhancedAmlOption::No => vec![],
+            EnhancedAmlOption::Yes {
+                ofac: _,
+                pep: _,
+                adverse_media: _,
+                continuous_monitoring: _,
+                adverse_media_lists,
+            } => adverse_media_lists
+                .clone()
+                .unwrap_or(AdverseMediaListKind::default_lists()),
+        }
+    }
+}
+
+#[derive(
+    Eq,
+    PartialEq,
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    EnumIter,
+    AsRefStr,
+    JsonSchema,
+    serde_with::DeserializeFromStr,
+    Serialize,
+)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum AdverseMediaListKind {
+    FinancialCrime,
+    ViolentCrime,
+    SexualCrime,
+    CyberCrime,
+    Terrorism,
+    Fraud,
+    Narcotics,
+    GeneralSerious,
+    GeneralMinor,
+}
+
+impl_enum_str_diesel!(AdverseMediaListKind);
+
+impl AdverseMediaListKind {
+    pub fn default_lists() -> Vec<AdverseMediaListKind> {
+        AdverseMediaListKind::iter().collect()
+    }
 }
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Eq, PartialEq, Apiv2Schema, JsonSchema)]
@@ -98,6 +156,7 @@ impl From<EnhancedAml> for EnhancedAmlOption {
                 pep: value.pep,
                 adverse_media: value.adverse_media,
                 continuous_monitoring: true,
+                adverse_media_lists: value.adverse_media.then(AdverseMediaListKind::default_lists),
             }
         } else {
             EnhancedAmlOption::No
@@ -119,6 +178,7 @@ impl From<EnhancedAmlOption> for EnhancedAml {
                 pep,
                 adverse_media,
                 continuous_monitoring: _,
+                adverse_media_lists: _,
             } => EnhancedAml {
                 enhanced_aml: true,
                 ofac,

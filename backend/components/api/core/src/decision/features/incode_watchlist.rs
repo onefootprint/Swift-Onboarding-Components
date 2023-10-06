@@ -1,6 +1,6 @@
 use idv::incode::watchlist::response::{Hit, WatchlistResultResponse};
 use itertools::Itertools;
-use newtypes::{vendor_reason_code_enum, FootprintReasonCode};
+use newtypes::{vendor_reason_code_enum, AdverseMediaListKind, EnhancedAmlOption, FootprintReasonCode};
 use strum_macros::EnumString;
 
 vendor_reason_code_enum! {
@@ -129,6 +129,42 @@ vendor_reason_code_enum! {
     }
 }
 
+impl IncodeWatchlistType {
+    pub fn from_adverse_media_list_kind(am_list_kind: &AdverseMediaListKind) -> Vec<IncodeWatchlistType> {
+        match am_list_kind {
+            AdverseMediaListKind::FinancialCrime => vec![
+                Self::AdverseMediaFinancialCrime,
+                Self::AdverseMediaV2FinancialAmlCft,
+                Self::AdverseMediaV2GeneralAmlCft,
+                Self::AdverseMediaV2OtherFinancial,
+                Self::AdverseMediaV2Regulatory,
+            ],
+            AdverseMediaListKind::ViolentCrime => vec![
+                Self::AdverseMediaViolentCrime,
+                Self::AdverseMediaV2ViolenceAmlCft,
+                Self::AdverseMediaV2ViolenceNonAmlCft,
+            ],
+            AdverseMediaListKind::SexualCrime => vec![Self::AdverseMediaSexualCrime],
+            AdverseMediaListKind::CyberCrime => vec![Self::AdverseMediaV2Cybercrime],
+            AdverseMediaListKind::Terrorism => {
+                vec![Self::AdverseMediaTerrorism, Self::AdverseMediaV2Terrorism]
+            }
+            AdverseMediaListKind::Fraud => vec![Self::AdverseMediaFraud, Self::AdverseMediaV2FraudLinked],
+            AdverseMediaListKind::Narcotics => {
+                vec![Self::AdverseMediaNarcotics, Self::AdverseMediaV2NarcoticsAmlCft]
+            }
+            AdverseMediaListKind::GeneralSerious => {
+                vec![Self::AdverseMediaV2OtherSerious, Self::AdverseMediaV2Property]
+            }
+            AdverseMediaListKind::GeneralMinor => vec![
+                Self::AdverseMediaGeneral,
+                Self::AdverseMediaV2OtherMinor,
+                Self::AdverseMediaV2FinancialDifficulty,
+            ],
+        }
+    }
+}
+
 // If a Hit's `score` is below this number, we will consider it a true hit. Else we will ignore it for the purposes for producing reason codes
 const SCORE_THRESHOLD_FOR_HIT: f32 = 10.0;
 
@@ -149,8 +185,49 @@ pub fn type_to_frc(s: String) -> Option<FootprintReasonCode> {
     }
 }
 
-// TODO: probably remove filtering on `score` based on last chat w/ Incode
-pub fn get_hits(res: &WatchlistResultResponse) -> Vec<Hit> {
+fn watchlist_types_for_enhanced_aml_opt(enhanced_aml: &EnhancedAmlOption) -> Vec<IncodeWatchlistType> {
+    // i guess itd be better to consolidate this with the FRC macro we have on the type variants huh
+    match enhanced_aml {
+        EnhancedAmlOption::No => vec![],
+        EnhancedAmlOption::Yes {
+            ofac,
+            pep,
+            adverse_media,
+            continuous_monitoring: _,
+            adverse_media_lists: _,
+        } => vec![
+            adverse_media.then(|| {
+                enhanced_aml
+                    .adverse_media_lists()
+                    .iter()
+                    .flat_map(IncodeWatchlistType::from_adverse_media_list_kind)
+                    .collect::<Vec<_>>()
+            }),
+            ofac.then(|| {
+                vec![
+                    IncodeWatchlistType::Sanction,
+                    IncodeWatchlistType::Warning,
+                    IncodeWatchlistType::FitnessProbity,
+                ]
+            }),
+            pep.then(|| {
+                vec![
+                    IncodeWatchlistType::Pep,
+                    IncodeWatchlistType::PepClass1,
+                    IncodeWatchlistType::PepClass2,
+                    IncodeWatchlistType::PepClass3,
+                    IncodeWatchlistType::PepClass4,
+                ]
+            }),
+        ]
+        .into_iter()
+        .flatten()
+        .flatten()
+        .collect(),
+    }
+}
+
+pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption) -> Vec<Hit> {
     let hits = res
         .content
         .as_ref()
@@ -159,15 +236,21 @@ pub fn get_hits(res: &WatchlistResultResponse) -> Vec<Hit> {
         .cloned()
         .unwrap_or_default();
 
+    let watchlist_types = watchlist_types_for_enhanced_aml_opt(enhanced_aml);
+
     hits.into_iter()
         .filter(|h| h.score.map(|s| s < SCORE_THRESHOLD_FOR_HIT).unwrap_or(false))
         // for now, also only consider it a hit if `name_exact`, for a bit more precision
         .filter(|h| h.match_types.as_ref().map(|t| t.contains(&"name_exact".to_string())).unwrap_or(false))
+        .filter(|h| h.doc.as_ref().and_then(|d| d.types.as_ref().map(|ts| ts.iter().any(|t| IncodeWatchlistType::try_from(t.trim()).ok().map(|i| watchlist_types.contains(&i)).unwrap_or(false)))).unwrap_or(false))
         .collect()
 }
 
-pub fn reason_codes_from_watchlist_result(res: &WatchlistResultResponse) -> Vec<FootprintReasonCode> {
-    let unique_types_for_valid_hits = get_hits(res)
+pub fn reason_codes_from_watchlist_result(
+    res: &WatchlistResultResponse,
+    enhanced_aml: &EnhancedAmlOption,
+) -> Vec<FootprintReasonCode> {
+    let unique_types_for_valid_hits = get_hits(res, enhanced_aml)
         .into_iter()
         .flat_map(|h| h.doc.and_then(|d| d.types).unwrap_or_default())
         .unique()
@@ -211,7 +294,38 @@ mod test {
     #[test_case(vec![TestHit(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), TestHit(1.8, vec!["sanction"], vec!["equivalent_name"])] => Vec::<FootprintReasonCode>::new())]
     fn test_reason_codes_from_watchlist_result(hits: Vec<TestHit>) -> Vec<FootprintReasonCode> {
         let res = make_watchlist_res(hits);
-        reason_codes_from_watchlist_result(&res)
+        reason_codes_from_watchlist_result(
+            &res,
+            &EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+            },
+        )
+    }
+
+    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::No => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: false, continuous_monitoring: true, adverse_media_lists: None} => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None} => vec![FootprintReasonCode::AdverseMediaHit])]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![])} => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![AdverseMediaListKind::Narcotics])} => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism", "adverse-media-terrorism"], vec!["adverse-media-v2-terrorism", "adverse-media-v2-cybercrime"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None} => vec![FootprintReasonCode::AdverseMediaHit])]
+    #[test_case(vec![vec!["sanction"], vec!["adverse-media-v2-terrorism", "adverse-media-terrorism"], vec!["adverse-media-v2-terrorism", "adverse-media-v2-cybercrime"]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: None} => vec![FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::AdverseMediaHit])]
+    #[test_case(vec![vec!["adverse-media-v2-terrorism", "adverse-media-violent-crime"], vec!["adverse-media
+    ", "adverse-media-v2-other-serious
+    "]], EnhancedAmlOption::Yes{ofac: true, pep: true, adverse_media: true, continuous_monitoring: true, adverse_media_lists: Some(vec![AdverseMediaListKind::FinancialCrime,AdverseMediaListKind::Fraud])} => Vec::<FootprintReasonCode>::new())]
+    fn test_reason_codes_from_watchlist_result_am_list_filtering(
+        hits: Vec<Vec<&str>>,
+        enhanced_aml: EnhancedAmlOption,
+    ) -> Vec<FootprintReasonCode> {
+        let hits = hits
+            .into_iter()
+            .map(|h| TestHit(1.3, h, vec!["name_exact"]))
+            .collect();
+        let res = make_watchlist_res(hits);
+        reason_codes_from_watchlist_result(&res, &enhanced_aml)
     }
 
     struct TestHit<'a>(f32, Vec<&'a str>, Vec<&'a str>);

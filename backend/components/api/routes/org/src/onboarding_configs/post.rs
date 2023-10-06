@@ -10,7 +10,7 @@ use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::{CipKind, DataIdentifierDiscriminant, EnhancedAml, TenantId};
+use newtypes::{AdverseMediaListKind, CipKind, DataIdentifierDiscriminant, EnhancedAml, TenantId};
 use newtypes::{CollectedData as CD, Iso3166TwoDigitCountryCode};
 use newtypes::{CollectedDataOption as CDO, EnhancedAmlOption};
 use paperclip::actix::Apiv2Schema;
@@ -453,6 +453,7 @@ fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<Enhanced
             pep: true,
             adverse_media: false,
             continuous_monitoring: true,
+            adverse_media_lists: None,
         })
     } else if tenant_id.is_composer() {
         Some(EnhancedAmlOption::Yes {
@@ -460,6 +461,10 @@ fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<Enhanced
             pep: true,
             adverse_media: true,
             continuous_monitoring: false,
+            adverse_media_lists: Some(vec![
+                AdverseMediaListKind::FinancialCrime,
+                AdverseMediaListKind::Fraud,
+            ]),
         })
     } else {
         None

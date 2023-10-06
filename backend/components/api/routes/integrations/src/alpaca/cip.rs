@@ -28,8 +28,8 @@ use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
         document_request::DocumentRequest, insight_event::InsightEvent, manual_review::ManualReview,
-        onboarding_decision::OnboardingDecision, risk_signal::RiskSignal, scoped_vault::ScopedVault,
-        verification_request::VerificationRequest, workflow::Workflow,
+        ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
+        scoped_vault::ScopedVault, verification_request::VerificationRequest, workflow::Workflow,
     },
 };
 use idv::ParsedResponse;
@@ -97,61 +97,65 @@ pub(crate) async fn create_cip_request(
     tenant_id: TenantId,
     is_live: bool,
 ) -> ApiResult<(CipRequest, TenantVw)> {
-    let (uvw, wf, decision, scoped_vault, actor, mr, risk_signals, insight, vres, collected_document) = state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let fp_obd =
-                OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?
-                    .ok_or(CipError::EntityDecisionDoesNotExist)?;
+    let (uvw, wf, decision, scoped_vault, obc, actor, mr, risk_signals, insight, vres, collected_document) =
+        state
+            .db_pool
+            .db_query(move |conn| -> ApiResult<_> {
+                let fp_obd =
+                    OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?
+                        .ok_or(CipError::EntityDecisionDoesNotExist)?;
 
-            let risk_signals = RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
-            let (wf, sv) = Workflow::get_all(conn, &fp_obd.workflow_id)?;
+                let risk_signals =
+                    RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
+                let (wf, sv) = Workflow::get_all(conn, &fp_obd.workflow_id)?;
+                let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
-            let (risk_signals, mr, manual_obd) = match fp_obd.status {
-                DecisionStatus::Pass => (risk_signals, None, None),
-                DecisionStatus::Fail | DecisionStatus::StepUp => {
-                    // footprint decided as fail, see if a manual decision override exists
-                    let (mr, obd_manual) = ManualReview::find_completed(conn, &wf.id)?
-                        .ok_or(CipError::EntityDecisionStatusNotPass)?;
+                let (risk_signals, mr, manual_obd) = match fp_obd.status {
+                    DecisionStatus::Pass => (risk_signals, None, None),
+                    DecisionStatus::Fail | DecisionStatus::StepUp => {
+                        // footprint decided as fail, see if a manual decision override exists
+                        let (mr, obd_manual) = ManualReview::find_completed(conn, &wf.id)?
+                            .ok_or(CipError::EntityDecisionStatusNotPass)?;
 
-                    if obd_manual.status != DecisionStatus::Pass {
-                        return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
+                        if obd_manual.status != DecisionStatus::Pass {
+                            return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
+                        }
+
+                        (risk_signals, Some(mr), Some(obd_manual))
                     }
+                };
 
-                    (risk_signals, Some(mr), Some(obd_manual))
-                }
-            };
+                let collected_document = DocumentRequest::get(conn, &wf.id)?.map(|d| d.should_collect_selfie);
+                let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+                let insight = InsightEvent::get(conn, &wf.id)?;
 
-            let collected_document = DocumentRequest::get(conn, &wf.id)?.map(|d| d.should_collect_selfie);
-            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-            let insight = InsightEvent::get(conn, &wf.id)?;
+                let decision = manual_obd.unwrap_or(fp_obd);
 
-            let decision = manual_obd.unwrap_or(fp_obd);
+                // find the actor either via Manaul OBD or the FP OBD.
+                let actor = saturate_actors(conn, vec![decision.clone()])?
+                    .pop()
+                    .map(|(_, actor)| actor);
 
-            // find the actor either via Manaul OBD or the FP OBD.
-            let actor = saturate_actors(conn, vec![decision.clone()])?
-                .pop()
-                .map(|(_, actor)| actor);
+                let vres = VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(
+                    conn,
+                    sv.id.clone(),
+                )?;
 
-            let vres = VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(
-                conn,
-                sv.id.clone(),
-            )?;
-
-            Ok((
-                uvw,
-                wf,
-                decision,
-                sv,
-                actor,
-                mr,
-                risk_signals,
-                insight,
-                vres,
-                collected_document,
-            ))
-        })
-        .await??;
+                Ok((
+                    uvw,
+                    wf,
+                    decision,
+                    sv,
+                    obc,
+                    actor,
+                    mr,
+                    risk_signals,
+                    insight,
+                    vres,
+                    collected_document,
+                ))
+            })
+            .await??;
 
     let user_vault_private_key = uvw.vault.e_private_key.clone();
     let document_check_created_at = vres
@@ -200,6 +204,7 @@ pub(crate) async fn create_cip_request(
     )?;
     let watchlist = watchlist(
         &scoped_vault,
+        &obc,
         &decision,
         &risk_signals,
         &vendor_results,
@@ -367,6 +372,7 @@ fn identity(
 /// helper for building the alpaca idenity sub-response
 fn watchlist(
     scoped_vault: &ScopedVault,
+    obc: &ObConfiguration,
     decision: &OnboardingDecision,
     risk_signals: &[RiskSignal],
     vres: &[VendorResult],
@@ -429,7 +435,7 @@ fn watchlist(
         };
 
     // For now, we just serialize the raw leaked json blob we get from Incode for each watchlist hit
-    let leaked_hits = decision::features::incode_watchlist::get_hits(&wc)
+    let leaked_hits = decision::features::incode_watchlist::get_hits(&wc, &obc.enhanced_aml())
         .into_iter()
         .map(|h| h.leak());
     let records_json: Vec<PiiJsonValue> = leaked_hits

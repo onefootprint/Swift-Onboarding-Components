@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use db::models::{
     decision_intent::DecisionIntent,
     document_request::{DocumentRequest, NewDocumentRequestArgs},
+    ob_configuration::ObConfiguration,
     risk_signal::{NewRiskSignalInfo, RiskSignal},
     risk_signal_group::RiskSignalGroup,
     vault::Vault,
@@ -447,6 +448,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         // TODO save Risk Signals + determine if we transition to PendingReview or Complete
         let (watchlist_res, vendor_results) = res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
+        let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
@@ -454,7 +456,10 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let wc_reason_codes = match &watchlist_res {
             Either::Left((vres, watchlist_res)) => {
                 let wc_reason_codes =
-                    decision::features::incode_watchlist::reason_codes_from_watchlist_result(watchlist_res);
+                    decision::features::incode_watchlist::reason_codes_from_watchlist_result(
+                        watchlist_res,
+                        &obc.enhanced_aml(),
+                    );
                 wc_reason_codes
                     .into_iter()
                     .map(|r| (r, VendorAPI::IncodeWatchlistCheck, vres.id.clone()))

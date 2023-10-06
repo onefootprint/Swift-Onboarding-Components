@@ -15,19 +15,24 @@ use crate::State;
 use api_core::decision;
 use api_core::decision::vendor::vendor_result::VendorResult;
 use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_wire_types::AmlHit;
 use api_wire_types::AmlHitMedia;
 use api_wire_types::RiskSignalFilters;
+use db::models::decision_intent::DecisionIntent;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::IncludeHidden;
 use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::RequestAndResult;
 use db::models::verification_result::VerificationResult;
+use db::models::workflow::Workflow;
 use db::DbResult;
 use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::EncryptedVaultPrivateKey;
+use newtypes::EnhancedAmlOption;
 use newtypes::FootprintReasonCode;
 use newtypes::FpId;
 use newtypes::PiiJsonValue;
@@ -129,17 +134,22 @@ pub async fn get_detail(
     let is_live = auth.is_live()?;
     let (fp_id, risk_signal_id) = request.into_inner();
 
-    let (rs, vreq_vres_key) = state
+    let (rs, vreq_vres_key_obc) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let rs = RiskSignal::get_tenant_visible(conn, &risk_signal_id, &fp_id, &tenant_id, is_live)?;
             let vreq_vres_key = if rs.reason_code.is_aml() {
                 // we only need to read the vres if it was an Aml risk signal and we need to populate the `aml` portion of the response
                 let v = Vault::get(conn, (&fp_id, &tenant_id, is_live))?;
-                Some((
-                    VerificationResult::get(conn, &rs.verification_result_id)?,
-                    v.e_private_key,
-                ))
+                let (vreq, vres) = VerificationResult::get(conn, &rs.verification_result_id)?;
+                let di = DecisionIntent::get(conn, &vreq.decision_intent_id)?;
+                let wf = Workflow::get(
+                    conn,
+                    &di.workflow_id
+                        .ok_or(AssertionError("Workflow not found for DecisionIntent"))?,
+                )?;
+                let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
+                Some(((vreq, vres), v.e_private_key, obc))
             } else {
                 None
             };
@@ -148,8 +158,8 @@ pub async fn get_detail(
         })
         .await??;
 
-    let aml_detail = if let Some((vreq_vres, key)) = vreq_vres_key {
-        get_aml_hits(&state, vreq_vres, key).await?
+    let aml_detail = if let Some((vreq_vres, key, obc)) = vreq_vres_key_obc {
+        get_aml_hits(&state, &obc.enhanced_aml(), vreq_vres, key).await?
     } else {
         None
     };
@@ -159,6 +169,7 @@ pub async fn get_detail(
 
 async fn get_aml_hits(
     state: &State,
+    enhanced_aml: &EnhancedAmlOption,
     vreq_vres: RequestAndResult,
     private_key: EncryptedVaultPrivateKey,
 ) -> ApiResult<Option<api_wire_types::AmlDetail>> {
@@ -174,7 +185,7 @@ async fn get_aml_hits(
                     .and_then(|c| c.data.as_ref())
                     .and_then(|d| d.share_url.clone());
 
-                let leaked_hits = decision::features::incode_watchlist::get_hits(&wc)
+                let leaked_hits = decision::features::incode_watchlist::get_hits(&wc, enhanced_aml)
                     .into_iter()
                     .map(|h| h.leak());
 

@@ -26,11 +26,11 @@ use feature_flag::MockFeatureFlagClient;
 
 use itertools::Itertools;
 use macros::test_state_case;
-use newtypes::OnboardingStatus;
 use newtypes::{
     AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, ObConfigurationKey, ReviewReason,
     VendorAPI,
 };
+use newtypes::{EnhancedAmlOption, OnboardingStatus};
 use newtypes::{FootprintReasonCode, RiskSignalGroupKind, WorkflowFixtureResult};
 
 use newtypes::WorkflowState;
@@ -212,6 +212,13 @@ async fn pass_then_watchlist_hit(
         ObConfigurationOpts {
             is_live: user_kind.is_live(),
             cip_kind: Some(CipKind::Alpaca),
+            enhanced_aml: EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+            },
             ..Default::default()
         },
         user_kind.fixture_result(),

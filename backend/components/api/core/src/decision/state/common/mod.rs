@@ -323,18 +323,21 @@ pub fn get_aml_risk_signals_from_aml_call(
     watchlist_vres_id: &VerificationResultId,
     watchlist_result_response: &WatchlistResultResponse,
 ) -> RiskSignalGroupStruct<Aml> {
-    let wc_reason_codes =
-        decision::features::incode_watchlist::reason_codes_from_watchlist_result(watchlist_result_response);
+    let wc_reason_codes = decision::features::incode_watchlist::reason_codes_from_watchlist_result(
+        watchlist_result_response,
+        &obc.enhanced_aml(),
+    );
     // only save risk signals of kinds that the enhanced_aml config specifies
     let footprint_reason_codes = wc_reason_codes
         .into_iter()
-        .filter(|r| match obc.enhanced_aml {
+        .filter(|r| match obc.enhanced_aml() {
             EnhancedAmlOption::No => true, //shouldn't happen
             EnhancedAmlOption::Yes {
                 ofac,
                 pep,
                 adverse_media,
                 continuous_monitoring: _,
+                adverse_media_lists: _,
             } => (ofac && r.is_watchlist()) || (pep && r.is_pep()) || (adverse_media && r.is_adverse_media()),
         })
         .map(|r| (r, VendorAPI::IncodeWatchlistCheck, watchlist_vres_id.clone()))

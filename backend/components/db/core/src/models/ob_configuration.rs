@@ -190,6 +190,23 @@ impl ObConfiguration {
     pub fn should_stepup_to_do_for_optional_ssn(&self) -> bool {
         self.document_cdo_for_optional_ssn().is_some()
     }
+
+    // Dumb temporary hack since we use Alpaca Cipkind in some pytets but aren't stricly enforcing that 'if alpaca then enhanced aml'
+    pub fn enhanced_aml(&self) -> EnhancedAmlOption {
+        if matches!(self.cip_kind, Some(CipKind::Alpaca))
+            && matches!(self.enhanced_aml, EnhancedAmlOption::No)
+        {
+            EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+            }
+        } else {
+            self.enhanced_aml.clone()
+        }
+    }
 }
 
 trait SupportedCountriesForDocType {
@@ -550,15 +567,20 @@ impl ObConfiguration {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
     use super::ObConfiguration;
+    use crate::diesel::RunQueryDsl;
     use crate::test_helpers::assert_have_same_elements;
+    use crate::tests::fixtures;
+    use crate::tests::fixtures::ob_configuration::ObConfigurationOpts;
+    use crate::tests::prelude::*;
     use chrono::Utc;
+    use macros::db_test;
+    use newtypes::AdverseMediaListKind;
     use newtypes::{
         ApiKeyStatus, CollectedDataOption, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
         Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, TenantId,
     };
+    use std::str::FromStr;
     use strum::IntoEnumIterator;
     use test_case::test_case;
 
@@ -806,5 +828,71 @@ mod tests {
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()
+    }
+
+    #[db_test]
+    pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut TestPgConn) {
+        let t = fixtures::tenant::create(conn);
+        let obc = fixtures::ob_configuration::create(conn, &t.id, true);
+        assert_eq!(obc.enhanced_aml, EnhancedAmlOption::No);
+        diesel::sql_query(format!(
+            "update ob_configuration set enhanced_aml={} where id = '{}';",
+            r#"'{"data": {"pep": false, "ofac": true, "adverse_media": true, "continuous_monitoring": true}, "kind": "yes"}'"#, obc.id
+        ))
+        .execute(conn.conn())
+        .unwrap();
+        let (obc, _) = ObConfiguration::get(conn, &obc.id).unwrap();
+        assert_eq!(
+            EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: false,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None
+            },
+            obc.enhanced_aml
+        );
+
+        let enhanced_aml = EnhancedAmlOption::Yes {
+            ofac: true,
+            pep: false,
+            adverse_media: true,
+            continuous_monitoring: true,
+            adverse_media_lists: Some(vec![
+                AdverseMediaListKind::FinancialCrime,
+                AdverseMediaListKind::Fraud,
+            ]),
+        };
+        let obc = fixtures::ob_configuration::create_with_opts(
+            conn,
+            &t.id,
+            ObConfigurationOpts {
+                enhanced_aml: enhanced_aml.clone(),
+                ..Default::default()
+            },
+        );
+        assert_eq!(enhanced_aml, obc.enhanced_aml);
+
+        // since im gunna manually set this in PG for Composer, nice to explicitly test here too
+        diesel::sql_query(format!(
+            "update ob_configuration set enhanced_aml={} where id = '{}';",
+            r#"'{"data": {"pep": false, "ofac": true, "adverse_media": true, "continuous_monitoring": true, "adverse_media_lists": ["financial_crime", "fraud"]}, "kind": "yes"}'"#, obc.id
+        ))
+        .execute(conn.conn())
+        .unwrap();
+        let (obc, _) = ObConfiguration::get(conn, &obc.id).unwrap();
+        assert_eq!(
+            EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: false,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: Some(vec![
+                    AdverseMediaListKind::FinancialCrime,
+                    AdverseMediaListKind::Fraud,
+                ]),
+            },
+            obc.enhanced_aml
+        );
     }
 }
