@@ -90,19 +90,14 @@ pub struct IdentityDocumentUpdate {
 }
 
 impl IdentityDocument {
-    #[tracing::instrument("IdentityDocument::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
+    #[tracing::instrument("IdentityDocument::get_or_create", skip_all)]
+    /// Returns the existing IdentityDocument with this args if uploads haven't began. Otherwise
+    /// creates a new IdentityDocument and deactivates the old ones
+    pub fn get_or_create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
         document_request::table
             .filter(document_request::id.eq(&args.request_id))
             .for_no_key_update()
             .get_result::<DocumentRequest>(conn.conn())?;
-        // Mark all existing IdentityDocuments for this DocumentRequest as failed
-        diesel::update(identity_document::table)
-            .filter(identity_document::request_id.eq(&args.request_id))
-            .filter(identity_document::status.eq(IdentityDocumentStatus::Pending))
-            .set(identity_document::status.eq(IdentityDocumentStatus::Failed))
-            .execute(conn.conn())?;
-        // Create a new doc
         let NewIdentityDocumentArgs {
             request_id,
             document_type,
@@ -111,6 +106,33 @@ impl IdentityDocument {
             skip_selfie,
             device_type,
         } = args;
+
+        // See if we can use an existing Pending IdDoc instead of making a new on
+        let existing: Option<Self> = identity_document::table
+            .filter(identity_document::request_id.eq(&request_id))
+            .filter(identity_document::status.eq(IdentityDocumentStatus::Pending))
+            .get_result(conn.conn())
+            .optional()?;
+        if let Some(existing) = existing {
+            let has_no_uploads = existing.images(conn, false)?.is_empty();
+            if existing.document_type == document_type
+                && existing.country_code == country_code.to_string()
+                && existing.fixture_result == fixture_result
+                && existing.skip_selfie == skip_selfie
+                && existing.device_type == device_type
+                && has_no_uploads
+            {
+                return Ok(existing);
+            }
+        }
+
+        // Otherwise, make a new IdDoc
+        // Mark all existing IdentityDocuments for this DocumentRequest as failed
+        diesel::update(identity_document::table)
+            .filter(identity_document::request_id.eq(&request_id))
+            .filter(identity_document::status.eq(IdentityDocumentStatus::Pending))
+            .set(identity_document::status.eq(IdentityDocumentStatus::Failed))
+            .execute(conn.conn())?;
         let new = NewIdentityDocumentRow {
             request_id,
             document_type,
@@ -121,45 +143,10 @@ impl IdentityDocument {
             skip_selfie: skip_selfie.unwrap_or(false),
             device_type,
         };
+        // Create a new doc
         let result = diesel::insert_into(identity_document::table)
             .values(new)
             .get_result(conn.conn())?;
-        Ok(result)
-    }
-
-    // TODO deprecate this
-    #[tracing::instrument("IdentityDocument::get_or_create", skip_all)]
-    pub fn get_or_create(conn: &mut TxnPgConn, args: NewIdentityDocumentArgs) -> DbResult<Self> {
-        let existing_doc = identity_document::table
-            .filter(identity_document::request_id.eq(&args.request_id))
-            .get_result(conn.conn())
-            .optional()?;
-        let result = if let Some(existing_doc) = existing_doc {
-            existing_doc
-        } else {
-            // Create a new doc
-            let NewIdentityDocumentArgs {
-                request_id,
-                document_type,
-                country_code,
-                fixture_result,
-                skip_selfie,
-                device_type,
-            } = args;
-            let new = NewIdentityDocumentRow {
-                request_id,
-                document_type,
-                country_code,
-                created_at: Utc::now(),
-                status: IdentityDocumentStatus::Pending,
-                fixture_result,
-                skip_selfie: skip_selfie.unwrap_or(false),
-                device_type,
-            };
-            diesel::insert_into(identity_document::table)
-                .values(new)
-                .get_result(conn.conn())?
-        };
         Ok(result)
     }
 

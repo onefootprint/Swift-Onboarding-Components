@@ -108,7 +108,7 @@ pub async fn post(
                 device_type
             };
 
-            let id_doc = IdentityDocument::create(conn, args)?;
+            let id_doc = IdentityDocument::get_or_create(conn, args)?;
             Ok(id_doc)
         })
         .await?;

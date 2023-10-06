@@ -43,7 +43,7 @@ def test_upload_documents(doc_request_sandbox_ob_config, twilio):
     }
     post("hosted/user/documents", data, bifrost.auth_token)
 
-    # Running bifrost should create a new identity document upload session
+    # Running bifrost should inherit the already-created DL session
     user = bifrost.run()
     fp_id = user.fp_id
     assert any(r["kind"] == "collect_document" for r in bifrost.handled_requirements)
@@ -51,7 +51,7 @@ def test_upload_documents(doc_request_sandbox_ob_config, twilio):
     tenant = bifrost.ob_config.tenant
     body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
     assert len([i for i in body if i["kind"] == "id_card"]) == 1
-    assert len([i for i in body if i["kind"] == "drivers_license"]) == 2
+    assert len([i for i in body if i["kind"] == "drivers_license"]) == 1
 
     users_docs = get(f"users/{fp_id}/documents", None, *tenant.db_auths)
     assert users_docs[0]["document_type"] == "drivers_license"
@@ -177,6 +177,61 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     for i, side in enumerate(sides):
         headers = {
             "x-fp-process-separately": "true",
+        }
+        post(
+            f"hosted/user/documents/{doc_id}/upload/{side}",
+            None,
+            bifrost.auth_token,
+            files=bifrost.data[f"document.drivers_license.{side}.image"],
+            addl_headers=headers,
+        )
+        post(f"hosted/user/documents/{doc_id}/process", None, bifrost.auth_token)
+    # now check what fields we have to authorize
+    status = bifrost.get_status()
+    fields_to_authorize = get_requirement_from_requirements(
+        "authorize", status["all_requirements"], is_met=True
+    )["fields_to_authorize"]
+    collected_fields_to_authorize = fields_to_authorize["collected_data"]
+    document_types_to_authorize = fields_to_authorize["document_types"]
+    assert "document_and_selfie" not in collected_fields_to_authorize
+    assert document_types_to_authorize == ["drivers_license"]
+
+    # Finish bifrost
+    bifrost.run()
+
+
+def test_upload_apis(doc_request_sandbox_ob_config, twilio):
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
+    # consent
+    consent_data = {"consent_language_text": "I consent"}
+    post("hosted/user/consent", consent_data, bifrost.auth_token)
+
+    # Make sure re-posting yields same doc ID
+    data = {
+        "document_type": "id_card",
+        "country_code": "US",
+        "device_type": "desktop",
+    }
+    body = post("hosted/user/documents", data, bifrost.auth_token)
+    doc_id = body["id"]
+    body = post("hosted/user/documents", data, bifrost.auth_token)
+    assert body["id"] == doc_id
+
+    # Now, make a drivers_license session. Should have a different ID
+    data = {
+        "document_type": "drivers_license",
+        "country_code": "US",
+        "device_type": "desktop",
+    }
+    body = post("hosted/user/documents", data, bifrost.auth_token)
+    assert body["id"] != doc_id
+    doc_id = body["id"]
+
+    # Upload the documents consecutively in separate requests
+    sides = ["front", "back", "selfie"]
+    for i, side in enumerate(sides):
+        headers = {
+            "x-fp-process-separately": "true",
             "x-fp-is-extra-compressed": "true" if side == "front" else "false",
         }
         post(
@@ -190,22 +245,11 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
         next_side = sides[i + 1] if i + 1 < len(sides) else None
         assert body["next_side_to_collect"] == next_side
         assert not body["errors"]
-    # now check what fields we have to authorize
-    status = bifrost.get_status()
-    fields_to_authorize = get_requirement_from_requirements(
-        "authorize", status["all_requirements"], is_met=True
-    )["fields_to_authorize"]
-    collected_fields_to_authorize = fields_to_authorize["collected_data"]
-    document_types_to_authorize = fields_to_authorize["document_types"]
 
-    # we didn't authorize selfie
-    # TODO: i think this should authorize document but not doc + selfie. will check with frontend
-    assert "document_and_selfie" not in collected_fields_to_authorize
-    assert document_types_to_authorize == ["drivers_license"]
-
-    # finish bifrost
+    # Finish bifrost
     user = bifrost.run()
 
+    # Test decryption APIs
     tenant = user.tenant
     fp_id = user.fp_id
     body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
