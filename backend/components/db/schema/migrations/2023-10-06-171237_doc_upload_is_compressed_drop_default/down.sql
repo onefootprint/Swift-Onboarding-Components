@@ -1,0 +1,1 @@
+ALTER TABLE document_upload ALTER COLUMN is_extra_compressed SET DEFAULT 'f';

@@ -64,6 +64,7 @@ impl DbToApi<DocumentUpload> for api_wire_types::DocumentUpload {
             side,
             version: created_seqno,
             failure_reasons,
+            is_extra_compressed: upload.is_extra_compressed,
         }
     }
 }
@@ -96,6 +97,7 @@ impl DbToApi<(DocumentSide, DataLifetime)> for api_wire_types::DocumentUpload {
             side,
             version: dl.created_seqno,
             failure_reasons: vec![],
+            is_extra_compressed: false,
         }
     }
 }

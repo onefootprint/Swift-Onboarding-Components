@@ -177,6 +177,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     for i, side in enumerate(sides):
         headers = {
             "x-fp-process-separately": "true",
+            "x-fp-is-extra-compressed": "true" if side == "front" else "false",
         }
         post(
             f"hosted/user/documents/{doc_id}/upload/{side}",
@@ -209,3 +210,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     fp_id = user.fp_id
     body = get(f"entities/{fp_id}/documents", None, *tenant.db_auths)
     assert all([d["upload_source"] == "desktop" for d in body])
+    # We set is_extra_compressed for the front of this document
+    assert all(
+        [d["is_extra_compressed"] == (d["side"] == "front") for d in body[0]["uploads"]]
+    )
