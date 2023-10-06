@@ -11,7 +11,7 @@ const renderWhoToOnboard = ({ onSubmit }: WhoToOnboardProps) =>
   customRender(<WhoToOnboard onSubmit={onSubmit} />);
 
 describe('<WhoToOnboard />', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     asAdminUserWithOrg({
       isLive: true,
       isProdKybPlaybookRestricted: true,
