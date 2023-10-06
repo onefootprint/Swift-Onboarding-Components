@@ -45,6 +45,7 @@ pub struct MetaHeaders {
     /// When true, photo was taken manually
     pub is_manual: Option<bool>,
     pub process_separately: Option<bool>,
+    pub is_extra_compressed: bool,
 }
 
 impl MetaHeaders {
@@ -52,17 +53,20 @@ impl MetaHeaders {
     const IS_APP_CLIP_HEADER_NAME: &str = "x-fp-is-app-clip";
     const IS_MANUAL_HEADER_NAME: &str = "x-fp-is-manual";
     const PROCESS_SEPARATELY_HEADER_NAME: &str = "x-fp-process-separately";
+    const IS_EXTRA_COMPRESSED: &str = "x-fp-is-extra-compressed";
 
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
         let is_instant_app = get_bool_header(Self::IS_INSTANT_APP_HEADER_NAME, headers);
         let is_app_clip = get_bool_header(Self::IS_APP_CLIP_HEADER_NAME, headers);
         let is_manual = get_bool_header(Self::IS_MANUAL_HEADER_NAME, headers);
         let process_separately = get_bool_header(Self::PROCESS_SEPARATELY_HEADER_NAME, headers);
+        let is_extra_compressed = get_bool_header(Self::IS_EXTRA_COMPRESSED, headers).unwrap_or(false);
         Self {
             is_instant_app,
             is_app_clip,
             is_manual,
             process_separately,
+            is_extra_compressed,
         }
     }
 }
@@ -163,6 +167,7 @@ pub async fn post(
                 is_instant_app: meta.is_instant_app,
                 is_app_clip: meta.is_app_clip,
                 is_manual: meta.is_manual,
+                is_extra_compressed: meta.is_extra_compressed,
             };
             DocumentUpload::create(conn, args)?;
             let existing_sides = id_doc

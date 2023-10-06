@@ -38,6 +38,10 @@ pub struct DocumentUpload {
     /// Client-provided (so cannot always be trusted) flag that tells if the upload was captured
     /// manually
     pub is_manual: Option<bool>,
+    /// Client-provided (so cannot always be trusted) flag that tells if the upload was compressed
+    /// more than normal. We do this when we detect the user has a poor internet connection.
+    /// The results for this upload may be worse
+    pub is_extra_compressed: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -53,6 +57,7 @@ struct NewDocumentUploadRow {
     is_instant_app: Option<bool>,
     is_app_clip: Option<bool>,
     is_manual: Option<bool>,
+    is_extra_compressed: bool,
 }
 
 #[derive(Debug, AsChangeset)]
@@ -72,6 +77,7 @@ pub struct NewDocumentUploadArgs {
     pub is_instant_app: Option<bool>,
     pub is_app_clip: Option<bool>,
     pub is_manual: Option<bool>,
+    pub is_extra_compressed: bool,
 }
 
 impl DocumentUpload {
@@ -90,6 +96,7 @@ impl DocumentUpload {
             is_instant_app,
             is_app_clip,
             is_manual,
+            is_extra_compressed,
         } = args;
         // Deactivate existing upload, if any
         // TODO this kind of silently replaces an old image, but maybe we don't want to allow this...
@@ -108,6 +115,7 @@ impl DocumentUpload {
             is_instant_app,
             is_app_clip,
             is_manual,
+            is_extra_compressed,
         };
         let result = diesel::insert_into(document_upload::table)
             .values(new)

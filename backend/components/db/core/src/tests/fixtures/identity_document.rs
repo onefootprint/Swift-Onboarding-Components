@@ -32,6 +32,7 @@ pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> Id
         is_instant_app: None,
         is_app_clip: None,
         is_manual: None,
+        is_extra_compressed: false,
     };
     DocumentUpload::create(conn, args).unwrap();
     doc

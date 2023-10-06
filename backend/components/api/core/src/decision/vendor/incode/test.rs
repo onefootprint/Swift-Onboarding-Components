@@ -417,6 +417,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
                 is_instant_app: None,
                 is_app_clip: None,
                 is_manual: None,
+                is_extra_compressed: false,
             };
             let back_args = NewDocumentUploadArgs {
                 document_id: doc.id,
@@ -427,6 +428,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
                 is_instant_app: None,
                 is_app_clip: None,
                 is_manual: None,
+                is_extra_compressed: false,
             };
             DocumentUpload::create(conn, front_args).unwrap();
             DocumentUpload::create(conn, back_args).unwrap();
