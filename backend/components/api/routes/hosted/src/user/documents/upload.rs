@@ -251,6 +251,7 @@ pub async fn post(
         };
         return ResponseData::ok(response).json();
     }
+    tracing::info!("Performing process inside upload endpoint");
     let response = if let Some((di, doc_request, id_doc_id, failed_attempts_for_side)) = created_reqs {
         // Not sandbox - make our request to vendors!
         let t_id = user_auth.scoped_user.tenant_id.clone();
