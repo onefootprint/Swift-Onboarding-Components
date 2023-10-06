@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use super::{BiometricChallengeState, ChallengeKind, UserChallengeData};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::onboarding::OnboardingError;
@@ -17,12 +15,12 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::headers::SandboxId;
+use api_core::utils::sms::rx_background_error;
 use api_wire_types::IdentifyId;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::VaultId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
-use tokio::sync::oneshot;
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 
@@ -100,24 +98,29 @@ pub async fn post(
         ck => ck,
     };
 
-    let (tx, rx) = oneshot::channel();
-
-    let (challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =
+    let (rx, challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =
         match challenge_kind {
             ChallengeKind::Biometric => {
                 // NOTE: it's possible we don't have a phone number, so don't fail here outright
                 let phone_number = uvw.get_decrypted_verified_primary_phone_optional(&state).await?;
                 let challenge = initiate_biometric_challenge_for_user(&state, &uvw.vault.id, creds).await?;
                 let challenge_data = ChallengeData::Passkey(challenge.state);
-                (challenge_data, 0, phone_number, Some(challenge.challenge_json))
+                (
+                    None,
+                    challenge_data,
+                    0,
+                    phone_number,
+                    Some(challenge.challenge_json),
+                )
             }
             ChallengeKind::Sms => {
                 let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
-                let (challenge_state, time_before_retry_s) = twilio_client
-                    .send_challenge_non_blocking(&state, tenant, &phone_number, None, sandbox_id, tx)
+                let (rx, challenge_state, time_before_retry_s) = twilio_client
+                    .send_challenge_non_blocking(&state, tenant, &phone_number, None, sandbox_id)
                     .await?;
                 let challenge_data = ChallengeData::Sms(challenge_state);
                 (
+                    Some(rx),
                     challenge_data,
                     time_before_retry_s.num_seconds(),
                     Some(phone_number),
@@ -132,6 +135,7 @@ pub async fn post(
                     identify::send_email_challenge_non_blocking(&state, &email, tenant, sandbox_id)?;
 
                 (
+                    None,
                     challenge_data,
                     state.config.time_s_between_sms_challenges,
                     None,
@@ -140,16 +144,8 @@ pub async fn post(
             }
         };
 
-    // Wait for two seconds to see if the background task that is sending the challenge
-    // asynchronously either (1) completes or (2) sends us an error.
-    match tokio::time::timeout(Duration::from_secs(2), rx).await {
-        Ok(Ok(err)) => return Err(err),
-        // The sender has been dropped. The message was sent successfully, or this was an email
-        // challenge
-        Ok(Err(_)) => (),
-        // The 2s timeout has been reached and we'll return a successful response assuming the
-        // background task will deliver the message
-        Err(_) => (),
+    if let Some(rx) = rx {
+        rx_background_error(rx, 2).await?;
     }
 
     let challenge_state = ChallengeState {

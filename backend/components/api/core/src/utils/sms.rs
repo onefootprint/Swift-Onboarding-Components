@@ -1,5 +1,5 @@
 use std::fmt::Debug;
-use tokio::sync::oneshot::Sender;
+use tokio::sync::oneshot::{self, Receiver, Sender};
 
 use crate::{
     errors::{challenge::ChallengeError, user::UserError, ApiError, ApiResult},
@@ -232,6 +232,9 @@ impl SmsClient {
                 // case someone is listening
                 // Don't raise error from sending since it's possible the receiver has hung up
                 let r = tx.send(e);
+                if r.is_ok() {
+                    tracing::info!("Sent error to caller. But not necessarily return from API");
+                }
                 r.err()
             } else {
                 // After the first error, just save the err in ram to raise after all vendors
@@ -256,9 +259,7 @@ impl SmsClient {
         // For signup challenges. Used to initialize the vault with an email
         email: Option<PiiString>,
         sandbox_id: Option<SandboxId>,
-        // Sender for any errors received
-        tx: Sender<ApiError>,
-    ) -> ApiResult<(PhoneChallengeState, SecondsBeforeRetry)> {
+    ) -> ApiResult<(Receiver<ApiError>, PhoneChallengeState, SecondsBeforeRetry)> {
         // Send non-blocking to prevent us from returning the challenge data to the frontend while
         // we wait for twilio latency
         if destination.is_fixture_phone_number() && sandbox_id.is_none() {
@@ -287,10 +288,14 @@ impl SmsClient {
             PiiString::from(format!("Your verification code for Footprint is {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
         };
 
+        // Oneshot channel to send an error back from async message sending
+        let (tx, rx) = oneshot::channel();
+
         self.send_message_non_blocking(state, message_body, destination, rate_limit::SMS_CHALLENGE, tx)
             .await?;
 
         Ok((
+            rx,
             PhoneChallengeState {
                 phone_number: destination.e164(),
                 email,
@@ -407,6 +412,28 @@ pub mod rate_limit {
                 })
                 .await??;
 
+            Ok(())
+        }
+    }
+}
+
+#[tracing::instrument(skip_all)]
+/// Wait for the provided timeout_s to see if the background task asynchronously either
+/// (1) completes or (2) sends us an error.
+pub async fn rx_background_error(rx: Receiver<ApiError>, timeout_s: u64) -> ApiResult<()> {
+    match tokio::time::timeout(std::time::Duration::from_secs(timeout_s), rx).await {
+        Ok(Ok(err)) => {
+            tracing::info!("Error received");
+            Err(err)
+        }
+        Ok(Err(_)) => {
+            tracing::info!("Sender has been dropped. Message successfully sent");
+            Ok(())
+        }
+        Err(_) => {
+            // The timeout has been reached and we'll return a successful response assuming the
+            // background task just continue successfully
+            tracing::info!("Timeout reached without receiving an error");
             Ok(())
         }
     }
