@@ -30,7 +30,8 @@ LIVE_PHONE_NUMBER = get_secret("INTEGRATION_TEST_PHONE_NUMBER")
 # However, users created with this phone number can never be identified at another tenant.
 FIXTURE_PHONE_NUMBER = "+15555550100"
 
-EMAIL = "footprint.user.dev3@gmail.com"
+live_phone_number_hash = hash(LIVE_PHONE_NUMBER)
+EMAIL = f"footprint.user.dev+{live_phone_number_hash}@gmail.com"
 CUSTODIAN_KEY = get_secret("CUSTODIAN_KEY") or "onefootprint"
 
 CUSTODIAN_AUTH = CustodianAuth(CUSTODIAN_KEY)
