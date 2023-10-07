@@ -91,6 +91,25 @@ const Stats = () => {
           id="verif_rate"
           title="Verification Rate"
           defaultPageSize={25}
+          rowActions={tenant => (
+            <Stack>
+              <Button
+                variant="subtle"
+                compact
+                onClick={() => {
+                  window.open(
+                    `${
+                      process.env.DASHBOARD_URL ??
+                      'https://dashboard.onefootprint.com'
+                    }/assume?tenantId=${tenant.row.id}`,
+                    '_BLANK',
+                  );
+                }}
+              >
+                Assume
+              </Button>
+            </Stack>
+          )}
           task={{
             slug: 'dbquery',
             params: {
@@ -175,6 +194,9 @@ export default airplane.view(
     slug: 'stats_ui',
     name: 'Statistics',
     description: 'View high-level user/customer statistics',
+    envVars: {
+      DASHBOARD_URL: { config: 'DASHBOARD_URL' },
+    },
   },
   Stats,
 );
