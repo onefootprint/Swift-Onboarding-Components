@@ -86,6 +86,33 @@ const Stats = () => {
 
         `}
         ></GraphCard>
+
+        <Table
+          id="verif_rate"
+          title="Verification Rate"
+          defaultPageSize={25}
+          task={{
+            slug: 'dbquery',
+            params: {
+              query: `
+              select 
+              t.id, 
+              t.name,
+              sum(cast(sv.status != 'incomplete' as int)) as completed,
+              ROUND(sum(cast(sv.status = 'pass' as int)) * 1.00 / sum(cast(sv.status != 'incomplete' as int)), 2) as pass_rate,
+              sum(cast(sv.status = 'pass' as int)) as passes,
+              sum(cast(sv.status = 'fail' as int)) as fails,
+              sum(cast(sv.status = 'incomplete' as int)) as incompletes
+            from scoped_vault sv
+            join tenant t on t.id = sv.tenant_id
+            where sv._created_at > '2023-09-24'
+              and t.is_demo_tenant='f'
+              and sv.is_live
+            group by 1,2
+          `,
+            },
+          }}
+        ></Table>
       </Stack>
     </Stack>
   );
