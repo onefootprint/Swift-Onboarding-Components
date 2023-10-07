@@ -222,23 +222,26 @@ impl Workflow {
             VaultKind::Business => KybConfig {}.into(),
         };
 
-        // Check if an active or completed workflow exists for this ob config
-        let wf = workflow::table
+        // Check if an active or completed workflow exists for this ob config.
+        // An existing workflow (that we'd inherit) has to be _either_ active OR already
+        // completed.
+        // We want a user to be able to make a new workflow for the same OBC if the last
+        // one was incomplete and deactivated.
+        // But we don't want them to make a new workflow for the same OBC if they already
+        // completed the last one.
+        let active_wf = workflow::table
             .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
             .filter(workflow::ob_configuration_id.eq(&ob_configuration_id))
-            .filter(
-                // An existing workflow (that we'd inherit) has to be _either_ active OR already
-                // completed.
-                // We want a user to be able to make a new workflow for the same OBC if the last
-                // one was incomplete and deactivated.
-                // But we don't want them to make a new workflow for the same OBC if they already
-                // completed the last one.
-                workflow::deactivated_at
-                    .is_null()
-                    .or(not(workflow::completed_at.is_null())),
-            )
+            .filter(workflow::deactivated_at.is_null())
             .first(conn.conn())
             .optional()?;
+        let complete_wf = workflow::table
+            .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
+            .filter(workflow::ob_configuration_id.eq(&ob_configuration_id))
+            .filter(not(workflow::completed_at.is_null()))
+            .first(conn.conn())
+            .optional()?;
+        let wf = active_wf.or(complete_wf);
         if let Some(wf) = wf {
             return Ok((wf, false));
         }
