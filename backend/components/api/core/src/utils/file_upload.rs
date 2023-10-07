@@ -93,6 +93,7 @@ pub async fn handle_file_upload(
         let chunk = chunk.map_err(FileUploadError::from)?;
         bytes.extend(chunk);
 
+        tracing::info!(size=%bytes.len(), "Handling chunk");
         if bytes.len() > request_content_length {
             return Err(FileUploadError::FileTooLarge(max_allowed_file_size_in_bytes))?;
         }
