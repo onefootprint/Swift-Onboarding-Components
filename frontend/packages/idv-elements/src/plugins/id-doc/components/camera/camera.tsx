@@ -57,12 +57,13 @@ const Camera = ({
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFlashing, setIsFlashing] = useState(false);
   const [startCaptureTimer, setStartCaptureTimer] = useState(false);
-  const [autoCaptureTimerVal, { startCountdown, stopCountdown }] = useCountdown(
-    {
-      countStart: AUTOCAPTURE_TIMER_START_VAL,
-      intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
-    },
-  );
+  const [
+    autoCaptureTimerVal,
+    { startCountdown, stopCountdown, resetCountdown },
+  ] = useCountdown({
+    countStart: AUTOCAPTURE_TIMER_START_VAL,
+    intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
+  });
   const [autocaptureFeedback, setAutocaptureFeedback] = useState<
     string | undefined
   >();
@@ -70,6 +71,7 @@ const Camera = ({
   const [shouldDetect, setShouldDetect] = useState(true); // TODO: Completely remove the use of this hook by moving the image processing to the processing component
   const [shouldShowInstructions, setShouldShowInstruction] = useState(true);
   const [canCapture, setCanCapture] = useState(true);
+  const [isCaptured, setIsCaptured] = useState(false);
   const getImageStringFromVideo = useGetImageString();
 
   const mediaStream = useUserMedia(cameraKind, onError);
@@ -163,6 +165,7 @@ const Camera = ({
     });
 
     if (imageString) {
+      setIsCaptured(true);
       onCapture(imageString, captureKind);
     } else {
       setCanCapture(true); // if the no picture was taken successfully, reenable the capture button
@@ -198,6 +201,11 @@ const Camera = ({
     startCountdown();
   };
 
+  const resetTimer = () => {
+    resetCountdown();
+    setStartCaptureTimer(false);
+  };
+
   useAutoCapture({
     videoRef,
     canvasRef,
@@ -209,6 +217,8 @@ const Camera = ({
     autocaptureKind,
     shouldDetect,
     shouldShowInstructions,
+    isCaptured,
+    onReset: resetTimer,
   });
 
   const onImageUpload = () => {
@@ -279,7 +289,10 @@ const Camera = ({
               )}
               {startCaptureTimer && (
                 <TimerContainer deviceKind={deviceKind}>
-                  <CountdownTimer current={autoCaptureTimerVal} start={3} />
+                  <CountdownTimer
+                    current={autoCaptureTimerVal}
+                    start={AUTOCAPTURE_TIMER_START_VAL}
+                  />
                 </TimerContainer>
               )}
             </>

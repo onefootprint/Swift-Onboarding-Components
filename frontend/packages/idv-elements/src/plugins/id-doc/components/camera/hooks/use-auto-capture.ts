@@ -1,7 +1,7 @@
 import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { useTimeout } from 'usehooks-ts';
+import { useCountdown, useTimeout } from 'usehooks-ts';
 
 import getSourceDimensions from '../utils/get-source-dimensions';
 import {
@@ -33,6 +33,8 @@ const DOC_DETECTION_PARAMS_BATCH_SIZE = 1;
 // This delay will make sure that there is some time to focus before autocapture
 const AUTOCAPTURE_DELAY = 3000;
 
+const STATUS_CHANGE_DELAY = 150; // We wait 150 ms before we change the status from ok to not-ok
+
 export type AutocaptureKind = 'document' | 'face';
 
 type AutoCaptureProps = {
@@ -46,6 +48,8 @@ type AutoCaptureProps = {
   shouldShowInstructions: boolean;
   onStatusChange: (currStatus: string | undefined) => void;
   autocaptureKind: AutocaptureKind;
+  isCaptured: boolean;
+  onReset: () => void;
 };
 
 const useAutoCapture = ({
@@ -59,6 +63,8 @@ const useAutoCapture = ({
   autocaptureKind,
   shouldShowInstructions,
   shouldDetect,
+  isCaptured,
+  onReset,
 }: AutoCaptureProps) => {
   const successCount = useRef(0);
   const rearrangedParams = useRef({ params, currentIndex: 0 });
@@ -67,11 +73,34 @@ const useAutoCapture = ({
   );
   const videoSize = useSize(videoRef);
   const { getFaceStatus } = useFaceDetection();
-  const [isCaptured, setIsCaptured] = useState(false);
   const { cv, loaded } = useOpenCv();
   const [shouldAutocapture, setShouldAutocapture] = useState(false);
+  const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] =
+    useState(false);
+  const [waitVal, { startCountdown, resetCountdown }] = useCountdown({
+    countStart: 3, // This is an arbitray value - basically we want a few counts to countdown from and complete the countdown in STATUS_CHANGE_DELAY time
+    intervalMs: STATUS_CHANGE_DELAY / 3,
+  });
 
+  // We are taking a timer based approach to change status to not-ok
+  // This is because we don't want the alogithm to be too sensitive - we want the algorithm wait a little before changing the status to not-ok
+  // We are using STATUS_CHANGE_DELAY as the padding time
+  // We start countdown when we detect a not-ok status, and allow the not-ok status take effect after STATUS_CHANGE_DELAY ms if and only if
+  // every detection within the delay time was not-ok as well. If we had an ok detection within the STATUS_CHANGE_DELAY time, we reset the timer
   useTimeout(() => setShouldAutocapture(true), AUTOCAPTURE_DELAY);
+  useEffect(() => {
+    if (waitVal === 0) {
+      if (
+        (autocaptureKind === 'face' && pastStatus.current !== FaceStatus.OK) ||
+        (autocaptureKind === 'document' &&
+          pastStatus.current !== CardCaptureStatus.OK)
+      ) {
+        if (!shouldShowInstructions) onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
+        successCount.current = 0;
+        onReset();
+      }
+    }
+  });
 
   useEffect(() => {
     // Bring the selected param to the front
@@ -161,24 +190,29 @@ const useAutoCapture = ({
         );
 
         if (cardCaptureStatus === CardCaptureStatus.OK) {
-          successCount.current += 1;
           rearrangedParams.current = rearrangeParams(
             paramIndex,
             rearrangedParams.current.params,
           );
-          if (!shouldShowInstructions) onStatusChange(CardCaptureStatus.OK);
         } else {
           const currIndex = rearrangedParams.current.currentIndex;
           const totalParams = rearrangedParams.current.params.length;
           let newIndex = currIndex + DOC_DETECTION_PARAMS_BATCH_SIZE;
           if (newIndex >= totalParams) newIndex = 0;
           rearrangedParams.current.currentIndex = newIndex;
-          if (pastStatus.current === cardCaptureStatus) {
-            if (!shouldShowInstructions) onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
-          }
         }
-        if (rearrangedParams.current.currentIndex === 0)
-          pastStatus.current = cardCaptureStatus; // We only update the past status if it did one complete pass through the params or succeeded in detection
+        // if (rearrangedParams.current.currentIndex === 0) {
+        // We only update the past status if it did one complete pass through the params or succeeded in detection
+        if (cardCaptureStatus === CardCaptureStatus.OK) {
+          successCount.current += 1;
+          if (!shouldShowInstructions) onStatusChange(CardCaptureStatus.OK);
+          resetCountdown(); // If we had an ok detection within the STATUS_CHANGE_DELAY time
+          setStatusChangeDelayTimeRunning(false);
+        } else if (!statusChangeDelayRunning) {
+          startCountdown(); // We start countdown when we detect a not-ok status
+          setStatusChangeDelayTimeRunning(true);
+        }
+        pastStatus.current = cardCaptureStatus;
       } else if (autocaptureKind === 'face') {
         const faceStatus = await getFaceStatus(
           videoRef.current,
@@ -189,8 +223,11 @@ const useAutoCapture = ({
         if (faceStatus === FaceStatus.OK) {
           successCount.current += 1;
           if (!shouldShowInstructions) onStatusChange(FaceStatus.OK);
-        } else if (pastStatus.current === faceStatus) {
-          if (!shouldShowInstructions) onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
+          resetCountdown(); // If we had an ok detection within the STATUS_CHANGE_DELAY time
+          setStatusChangeDelayTimeRunning(false);
+        } else if (!statusChangeDelayRunning) {
+          startCountdown(); // We start countdown when we detect a not-ok status
+          setStatusChangeDelayTimeRunning(true);
         }
         pastStatus.current = faceStatus;
       }
@@ -201,13 +238,13 @@ const useAutoCapture = ({
         if (shouldAutocapture) detectAndCapture();
         if (successCount.current >= REQUIRED_SUCCESSES) {
           onComplete();
-          clearInterval(id);
-          setIsCaptured(true);
         }
+        if (isCaptured) clearInterval(id);
       },
       autocaptureKind === 'face' ? SELFIE_CHECK_INTERVAL : undefined, // Since we are checking params in small batches, we don't want to delay more than what it requires to performs the detection. So, we use undefined delay for doc capture
     );
     return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     autocaptureKind,
     canvasRef,
@@ -217,12 +254,14 @@ const useAutoCapture = ({
     loaded,
     mediaStream,
     onComplete,
+    onReset,
     onStatusChange,
     outlineHeight,
     outlineWidth,
     shouldAutocapture,
     shouldDetect,
     shouldShowInstructions,
+    statusChangeDelayRunning,
     videoRef,
     videoSize,
   ]);
