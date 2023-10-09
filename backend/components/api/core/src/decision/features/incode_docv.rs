@@ -209,7 +209,7 @@ fn reason_codes_from_matching(first_name_matches: Option<bool>, last_name_matche
 }
 
 
-fn pii_strings_match_name_normalized(name1: &PiiString, name2: &PiiString) -> bool {
+pub fn pii_strings_match_name_normalized(name1: &PiiString, name2: &PiiString) -> bool {
     // deunicode is guaranteed to only produce 0-127 ascii chars
     let normalized_name1 = convert_unicode_and_remove_non_alphabetic_chars(&deunicode::deunicode(name1.leak()).into());
     let normalized_name2 = convert_unicode_and_remove_non_alphabetic_chars(&deunicode::deunicode(name2.leak()).into());

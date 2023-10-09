@@ -3,6 +3,8 @@ use itertools::Itertools;
 use newtypes::{vendor_reason_code_enum, AdverseMediaListKind, EnhancedAmlOption, FootprintReasonCode};
 use strum_macros::EnumString;
 
+use super::incode_docv::pii_strings_match_name_normalized;
+
 vendor_reason_code_enum! {
     #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, Hash)]
     #[serde(try_from = "&str")]
@@ -229,6 +231,10 @@ fn watchlist_types_for_enhanced_aml_opt(enhanced_aml: &EnhancedAmlOption) -> Vec
 }
 
 pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption) -> Vec<Hit> {
+    let search_term = res
+        .content
+        .as_ref()
+        .and_then(|c| c.data.as_ref().and_then(|d| d.search_term.clone()));
     let hits = res
         .content
         .as_ref()
@@ -243,6 +249,17 @@ pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption)
         .filter(|h| h.score.map(|s| s < SCORE_THRESHOLD_FOR_HIT).unwrap_or(false))
         // for now, also only consider it a hit if `name_exact`, for a bit more precision
         .filter(|h| h.match_types.as_ref().map(|t| t.contains(&"name_exact".to_string())).unwrap_or(false))
+        // CA's logic for determine hits/what it calls "name_exact" matches is still very low precision. In particular, this returns many hits where parts of the names are ordered differently in our search term vs the found hit or the found hit has additional names that the search term does not. Unclear what default settings most tenants would want here or how CA/Incode typically suggest mitigating these sorts of factors but for now as a quick patch we manually confirm here that our searched name exactly matches the found hit's name
+        .filter(|h| h.doc.as_ref().and_then(|d| d.name.as_ref().map(|n| 
+            match &search_term {
+                Some(st) => pii_strings_match_name_normalized(&st.clone().into(), &n.clone().into()),
+                None => {
+                    // if for some crazy reason the response doesn't have `search_term` (should never happen), we "fail open" by not filtering out any hits
+                    tracing::error!("WatchlistResultResponse with missing `search_term`");
+                    true
+                },
+            }
+        )).unwrap_or(false))
         .filter(|h| h.doc.as_ref().and_then(|d| d.types.as_ref().map(|ts| ts.iter().any(|t| IncodeWatchlistType::try_from(t.trim()).ok().map(|i| watchlist_types.contains(&i)).unwrap_or(false)))).unwrap_or(false))
         .collect()
 }
@@ -286,16 +303,20 @@ mod test {
         )
     }
 
-    #[test_case(vec![TestHit(55.0, vec!["pep", "sanction"], vec!["name_exact"])] => Vec::<FootprintReasonCode>::new())]
-    #[test_case(vec![TestHit(1.7, vec!["pep", "sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
-    #[test_case(vec![TestHit(1.7, vec!["pep"], vec!["name_exact"]), TestHit(1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
-    #[test_case(vec![TestHit(1.7, vec!["pep"], vec!["name_exact"]), TestHit(1.8, vec!["sanction"], vec!["name_exact"]), TestHit(1.9, vec!["sanction"], vec!["name_exact"]), TestHit(2.0, vec!["sanction", "pep"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
-    #[test_case(vec![TestHit(1.7, vec!["adverse-media-v2-terrorism"], vec!["name_exact"]), TestHit(1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::AdverseMediaHit, FootprintReasonCode::WatchlistHitOfac])]
-    #[test_case(vec![TestHit(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), TestHit(1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitOfac])]
-    #[test_case(vec![TestHit(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), TestHit(1.8, vec!["sanction"], vec!["equivalent_name"])] => Vec::<FootprintReasonCode>::new())]
-    #[test_case(vec![TestHit(1.7, vec!["warning", "fitness-probity"], vec!["name_exact"])] => Vec::<FootprintReasonCode>::new())]
-    fn test_reason_codes_from_watchlist_result(hits: Vec<TestHit>) -> Vec<FootprintReasonCode> {
-        let res = make_watchlist_res(hits);
+    #[test_case(vec![(55.0, vec!["pep", "sanction"], vec!["name_exact"])] => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![(1.7, vec!["pep", "sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case(vec![(1.7, vec!["pep"], vec!["name_exact"]), (1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case(vec![(1.7, vec!["pep"], vec!["name_exact"]), (1.8, vec!["sanction"], vec!["name_exact"]), (1.9, vec!["sanction"], vec!["name_exact"]), (2.0, vec!["sanction", "pep"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["name_exact"]), (1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::AdverseMediaHit, FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), (1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), (1.8, vec!["sanction"], vec!["equivalent_name"])] => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![(1.7, vec!["warning", "fitness-probity"], vec!["name_exact"])] => Vec::<FootprintReasonCode>::new())]
+    fn test_reason_codes_from_watchlist_result<'a>(hits: Vec<(f32, Vec<&'a str>, Vec<&'a str>)>) -> Vec<FootprintReasonCode> {
+        let hits = hits
+        .into_iter()
+        .map(|h| TestHit{score:h.0, types: h.1, match_types: h.2, name: "Bob Boberto"})
+        .collect();
+        let res = make_watchlist_res("Bob Boberto", hits);
         reason_codes_from_watchlist_result(
             &res,
             &EnhancedAmlOption::Yes {
@@ -324,21 +345,49 @@ mod test {
     ) -> Vec<FootprintReasonCode> {
         let hits = hits
             .into_iter()
-            .map(|h| TestHit(1.3, h, vec!["name_exact"]))
+            .map(|h| TestHit{score:1.3, types: h, match_types: vec!["name_exact"], name: "Bob Boberto"})
             .collect();
-        let res = make_watchlist_res(hits);
+        let res = make_watchlist_res("Bob Boberto", hits);
         reason_codes_from_watchlist_result(&res, &enhanced_aml)
     }
 
-    struct TestHit<'a>(f32, Vec<&'a str>, Vec<&'a str>);
+    #[test_case("Bob Boberto", vec![("Bob Boberto", "sanction")] => vec![FootprintReasonCode::WatchlistHitOfac])]
+    #[test_case("Bob Boberto", vec![("Bob Billy Boberto", "sanction")] => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Boberto Bob", "sanction")] => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction")] => Vec::<FootprintReasonCode>::new())]
+    #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")] => vec![FootprintReasonCode::WatchlistHitPep])]
+    fn test_reason_codes_from_watchlist_result_exact_name_matching(search_term: &str, hit_name_types: Vec<(&str, &str)>) -> Vec<FootprintReasonCode> {
+        let hits = hit_name_types
+        .into_iter()
+        .map(|(name, typ)| TestHit{score:1.3, types: vec![typ], match_types: vec!["name_exact"], name})
+        .collect();
+        let res = make_watchlist_res(search_term, hits);
+        reason_codes_from_watchlist_result(
+            &res,
+            &EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+            },
+        )
+    }
 
-    fn make_watchlist_res(hits: Vec<TestHit>) -> WatchlistResultResponse {
+    struct TestHit<'a>{
+        score: f32, 
+        types: Vec<&'a str>, 
+        match_types: Vec<&'a str>,
+        name: &'a str,
+    }
+
+    fn make_watchlist_res(search_term: &str, hits: Vec<TestHit>) -> WatchlistResultResponse {
         let hits = hits
             .into_iter()
             .map(|h| Hit {
-                score: Some(h.0),
+                score: Some(h.score),
                 is_whitelisted: None,
-                match_types: Some(h.2.into_iter().map(String::from).collect()),
+                match_types: Some(h.match_types.into_iter().map(String::from).collect()),
                 match_type_details: None,
                 doc: Some(Doc {
                     aka: None,
@@ -346,9 +395,9 @@ mod test {
                     id: None,
                     last_updated_utc: None,
                     media: None,
-                    name: None,
+                    name: Some(h.name.into()),
                     sources: None,
-                    types: Some(h.1.into_iter().map(String::from).collect()),
+                    types: Some(h.types.into_iter().map(String::from).collect()),
                 }),
             })
             .collect::<Vec<_>>();
@@ -365,7 +414,7 @@ mod test {
                     assignee_id: None,
                     match_status: None,
                     risk_level: None,
-                    search_term: None,
+                    search_term: Some(search_term.into()),
                     total_hits: None,
                     total_matches: None,
                     updated_at: None,
