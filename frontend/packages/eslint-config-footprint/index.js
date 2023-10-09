@@ -23,6 +23,30 @@ module.exports = {
   },
   plugins: ['@typescript-eslint', 'simple-import-sort', 'import'],
   rules: {
+    '@next/next/no-html-link-for-pages': 'off',
+    '@typescript-eslint/consistent-type-imports': 'error',
+    '@typescript-eslint/no-use-before-define': 'off',
+    'class-methods-use-this': [0],
+    'import/first': 'error',
+    'import/newline-after-import': 'error',
+    'import/no-duplicates': 'error',
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'no-console': ['error', { allow: ['warn', 'error'] }],
+    'no-restricted-exports': 'off',
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector:
+          "CallExpression[callee.object.name='console'][callee.property.name!=/^(log|warn|error|info|trace)$/]",
+        message: 'Unexpected property on console object was called',
+      },
+    ],
+    'no-use-before-define': 'off',
+    'react/display-name': 'off',
+    'react/function-component-definition': [
+      2,
+      { namedComponents: 'arrow-function' },
+    ],
     'react/jsx-props-no-spreading': [
       'error',
       {
@@ -53,32 +77,11 @@ module.exports = {
         ],
       },
     ],
-    'no-use-before-define': 'off',
-    '@typescript-eslint/no-use-before-define': 'off',
-    '@typescript-eslint/consistent-type-imports': 'error',
-    'react/display-name': 'off',
+
     'react/prop-types': 'off',
     'react/require-default-props': 'off',
-    'class-methods-use-this': [0],
-    'react/function-component-definition': [
-      2,
-      {
-        namedComponents: 'arrow-function',
-      },
-    ],
-    'no-restricted-exports': 'off',
-    'import/no-extraneous-dependencies': [
-      'error',
-      {
-        devDependencies: true,
-      },
-    ],
-    'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
-    'import/first': 'error',
-    'import/newline-after-import': 'error',
-    'import/no-duplicates': 'error',
-    '@next/next/no-html-link-for-pages': 'off',
+    'simple-import-sort/imports': 'error',
   },
   overrides: [
     {
