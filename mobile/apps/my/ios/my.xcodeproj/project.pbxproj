@@ -16,6 +16,10 @@
 		27CCBF5E8F304ED1BA117BF6 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = B7493E88A62E45E5B4677E8E /* AppDelegate.mm */; };
 		3E461D99554A48A4959DE609 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* LaunchScreen.storyboard */; };
 		466FB29480ED45F29313B597 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D70DCF0218B413A89B9CE9C /* main.m */; };
+		560558582AD4A53700ACA193 /* DocumentDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C22CFB0FA604E9CB244C293 /* DocumentDetection.m */; };
+		560558592AD4A53700ACA193 /* DocumentDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D35B31474B4EABA7F3BCCC /* DocumentDetection.swift */; };
+		5605585A2AD4A56700ACA193 /* BarcodeDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DB45A0E423D42A3A60B4F49 /* BarcodeDetection.m */; };
+		5605585B2AD4A56700ACA193 /* BarcodeDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9656CF332E9645429672C9A0 /* BarcodeDetection.swift */; };
 		565E890C2AC76BB000EB3CEE /* DocumentDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C22CFB0FA604E9CB244C293 /* DocumentDetection.m */; };
 		565E890D2AC76BB000EB3CEE /* DocumentDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D35B31474B4EABA7F3BCCC /* DocumentDetection.swift */; };
 		565E890E2AC76BB000EB3CEE /* BarcodeDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DB45A0E423D42A3A60B4F49 /* BarcodeDetection.m */; };
@@ -34,20 +38,16 @@
 		5673E5CB2A9E6F5A009ED260 /* DeviceAttestationBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 5673E5CA2A9E6F5A009ED260 /* DeviceAttestationBridge.m */; };
 		5673E5CC2A9E6F5A009ED260 /* DeviceAttestationBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 5673E5CA2A9E6F5A009ED260 /* DeviceAttestationBridge.m */; };
 		5B02D5BA96E4428ABC097AB8 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */; };
-		742511AFB30446589F2435FE /* DocumentDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D35B31474B4EABA7F3BCCC /* DocumentDetection.swift */; };
 		75ABE281253AF18AF6387B17 /* libPods-myClip.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 429C1D27522F17395A052B9C /* libPods-myClip.a */; };
 		78130D6617B542B38CAA1DC3 /* DMSans-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F4DC3E575BC04DCA98CAB985 /* DMSans-Bold.otf */; };
 		7A7369C3766E46B1BBE0DDA2 /* My App Clip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 5EB82C7A0D6D44B0B1406AE4 /* My App Clip.app */; };
-		86F086FA74EE4FC9B1D7DCB6 /* DocumentDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C22CFB0FA604E9CB244C293 /* DocumentDetection.m */; };
 		91B1B46AC6184BA0B75A5C48 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 87F4B5E7EE654F87A3F34AEF /* Images.xcassets */; };
-		9376BC27410C4BD5B5932749 /* BarcodeDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DB45A0E423D42A3A60B4F49 /* BarcodeDetection.m */; };
 		B50387702A853025007F5CA6 /* DMSans-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F4DC3E575BC04DCA98CAB985 /* DMSans-Bold.otf */; };
 		B50387712A853025007F5CA6 /* DMSans-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF08964EF5E0422BB72A7633 /* DMSans-Medium.otf */; };
 		B50387722A853025007F5CA6 /* DMSans-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 1B5E3EF874FF4C01A02EEAC2 /* DMSans-Regular.otf */; };
 		BDE4A917F16F4ECFB42020A7 /* DMSans-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 1B5E3EF874FF4C01A02EEAC2 /* DMSans-Regular.otf */; };
 		D0303F0D1EA740CCA15BC2EA /* FaceDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = E3023FBA62F94699A126702B /* FaceDetection.m */; };
 		E8A0349889725C489EC852F9 /* libPods-my.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9482AF3688EAE9C50FB69B5A /* libPods-my.a */; };
-		EF4FF2E79EB347118B376CB1 /* BarcodeDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9656CF332E9645429672C9A0 /* BarcodeDetection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -607,6 +607,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5605585A2AD4A56700ACA193 /* BarcodeDetection.m in Sources */,
+				5605585B2AD4A56700ACA193 /* BarcodeDetection.swift in Sources */,
+				560558582AD4A53700ACA193 /* DocumentDetection.m in Sources */,
+				560558592AD4A53700ACA193 /* DocumentDetection.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				5673E5C82A9E6F3C009ED260 /* DeviceAttestation.swift in Sources */,
@@ -614,10 +618,6 @@
 				5673E5B32A9E1477009ED260 /* Attestation.swift in Sources */,
 				5B02D5BA96E4428ABC097AB8 /* noop-file.swift in Sources */,
 				5673E5B92A9E14A9009ED260 /* Keychain.swift in Sources */,
-				86F086FA74EE4FC9B1D7DCB6 /* DocumentDetection.m in Sources */,
-				742511AFB30446589F2435FE /* DocumentDetection.swift in Sources */,
-				9376BC27410C4BD5B5932749 /* BarcodeDetection.m in Sources */,
-				EF4FF2E79EB347118B376CB1 /* BarcodeDetection.swift in Sources */,
 				D0303F0D1EA740CCA15BC2EA /* FaceDetection.m in Sources */,
 				0C4CBDE860C54EBAA075E8C0 /* FaceDetection.swift in Sources */,
 			);

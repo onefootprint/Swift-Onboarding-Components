@@ -12,11 +12,10 @@
 
 @implementation BarcodeDetectionPlugin (FrameProcessorPluginLoader)
 
-+ (void)load
-{
++ (void)initialize {
   [FrameProcessorPluginRegistry addFrameProcessorPlugin:@"detectBarcodes"
-                                        withInitializer:^FrameProcessorPlugin*(NSDictionary* options) {
-    return [[BarcodeDetectionPlugin alloc] initWithOptions:options];
+                                        withInitializer:^FrameProcessorPlugin* _Nonnull(NSDictionary* _Nullable options) {
+    return [[BarcodeDetectionPlugin alloc] init];
   }];
 }
 

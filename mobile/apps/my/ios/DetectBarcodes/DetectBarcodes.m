@@ -1,5 +1,7 @@
+#import <Foundation/Foundation.h>
 #import <VisionCamera/FrameProcessorPlugin.h>
 #import <VisionCamera/FrameProcessorPluginRegistry.h>
+#import <VisionCamera/Frame.h>
 
 #if __has_include("my/my-Swift.h")
 #import "my/my-Swift.h"
@@ -12,7 +14,7 @@
 
 @implementation DetectBarcodesPlugin (FrameProcessorPluginLoader)
 
-+ (void)load
++ (void)initialize
 {
   [FrameProcessorPluginRegistry addFrameProcessorPlugin:@"detectBarcodes"
                                         withInitializer:^FrameProcessorPlugin*(NSDictionary* options) {
