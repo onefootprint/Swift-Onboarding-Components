@@ -83,34 +83,52 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
     // 
     // We check for the existence of this at the vendor call layer, but our decisioning relies most heavily on the score (for now)
     // and we should not proceed if we don't have it
-    let document_score_code = if res
-        .document_score().1.unwrap_or(IncodeStatus::Fail) == IncodeStatus::Fail
-    {
-        vec![FootprintReasonCode::DocumentNotVerified]
-    } else {
-        vec![FootprintReasonCode::DocumentVerified]
-    };
+    let document_score_code = match res
+        .document_score().1 {
+            Some(s) => if s == IncodeStatus::Fail {
+                vec![FootprintReasonCode::DocumentNotVerified]
+            } else {
+                vec![FootprintReasonCode::DocumentVerified]
+            },
+            None => {
+                tracing::error!("missing incode score");
+                vec![FootprintReasonCode::DocumentNotVerified]
+            }
+
+        };
+    
 
     // OCR
     // TODO: if this happens, would we not be able to retrieve OCR from incode?
     //  should we just not vault it if OCR confidence isn't high?
     //  would overall score always be failure then?
-    let ocr_code = if res
-        .id_ocr_confidence().1.unwrap_or(IncodeStatus::Fail) == IncodeStatus::Fail
-    {
-        vec![FootprintReasonCode::DocumentOcrNotSuccessful]
-    } else {
-        vec![FootprintReasonCode::DocumentOcrSuccessful]
+    let ocr_code = match res
+        .id_ocr_confidence().1 {
+           Some(s) => if s == IncodeStatus::Fail {
+            vec![FootprintReasonCode::DocumentOcrNotSuccessful]
+        } else {
+            vec![FootprintReasonCode::DocumentOcrSuccessful]
+        },
+        None => {
+            tracing::error!("missing incode ocr score");
+            vec![FootprintReasonCode::DocumentOcrNotSuccessful]
+        }
     };
+   
     
     // only populate reason code if we collected a selfie
     let selfie_code = if expect_selfie {
-        if res.selfie_match().1.unwrap_or(IncodeStatus::Fail)  == IncodeStatus::Fail
-        {
-            vec![FootprintReasonCode::DocumentSelfieDoesNotMatch]
-        } else {
-            vec![FootprintReasonCode::DocumentSelfieMatches]
-        }
+        match res.selfie_match().1 {
+            Some(s) => if s == IncodeStatus::Fail {
+                vec![FootprintReasonCode::DocumentSelfieDoesNotMatch]
+            } else {
+                vec![FootprintReasonCode::DocumentSelfieMatches]
+            },
+            None => {
+                tracing::error!("missing incode selfie score");
+                vec![FootprintReasonCode::DocumentSelfieDoesNotMatch]
+            }
+        }    
     } else {
         vec![]
     };
