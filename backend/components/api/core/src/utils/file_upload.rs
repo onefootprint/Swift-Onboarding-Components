@@ -2,7 +2,7 @@ use crate::errors::file_upload::FileUploadError;
 use crate::errors::ApiResult;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
-use bytes::BytesMut;
+use bytes::{BufMut, BytesMut};
 use futures_util::StreamExt as _;
 
 use mime::Mime;
@@ -88,15 +88,18 @@ pub async fn handle_file_upload(
         }
     }
 
-    let mut bytes = BytesMut::new();
+    let mut bytes = BytesMut::with_capacity(request_content_length);
+
     while let Some(chunk) = item.next().await {
         let chunk = chunk.map_err(FileUploadError::from)?;
-        bytes.extend(chunk);
+        let chunk_size = chunk.len();
 
-        tracing::info!(size=%bytes.len(), "Handling chunk");
-        if bytes.len() > request_content_length {
+        if bytes.len() + chunk_size > request_content_length {
             return Err(FileUploadError::FileTooLarge(max_allowed_file_size_in_bytes))?;
         }
+
+        bytes.put(chunk);
+        tracing::info!(buffer_size=%bytes.len(), chunk_size=%chunk_size, "Handled chunk");
     }
 
     let bytes = PiiBytes::new(bytes.to_vec());
