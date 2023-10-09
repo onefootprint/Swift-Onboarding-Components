@@ -9,43 +9,30 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use db::TxnPgConn;
-use newtypes::email::Email;
+use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest, FingerprintScopeKind,
-    PhoneNumber, PiiString, SandboxId, SessionId,
+    DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
+    FingerprintScopeKind, PhoneNumber, PiiString, SandboxId, SessionId,
 };
 use newtypes::{IdentityDataKind as IDK, VaultKind};
 use newtypes::{Locked, ValidateArgs};
-use std::collections::{HashMap, HashSet};
 
-pub enum AuthedData {
-    Phone(PhoneNumber),
-    Email(Email),
+/// Represents pieces of data that will be added to the vault upon its creation
+pub struct InitialVaultData {
+    pub is_verified: bool,
+    pub di: DI,
+    pub value: PiiString,
+    pub global_sh: Fingerprint,
+    pub tenant_sh: Option<Fingerprint>,
 }
 
-impl From<&AuthedData> for DataIdentifier {
-    fn from(value: &AuthedData) -> Self {
-        match value {
-            AuthedData::Phone(_) => IDK::PhoneNumber,
-            AuthedData::Email(_) => IDK::Email,
+impl InitialVaultData {
+    fn is_fixture(&self) -> ApiResult<bool> {
+        if self.di != DI::from(IDK::PhoneNumber) {
+            return Ok(false);
         }
-        .into()
-    }
-}
-
-impl AuthedData {
-    pub fn is_fixture(&self) -> bool {
-        match self {
-            AuthedData::Phone(p) => p.is_fixture_phone_number(),
-            AuthedData::Email(_) => false,
-        }
-    }
-
-    pub fn data(&self) -> PiiString {
-        match self {
-            AuthedData::Phone(p) => p.e164(),
-            AuthedData::Email(e) => e.to_piistring(),
-        }
+        let is_fixture = PhoneNumber::parse(self.value.clone())?.is_fixture_phone_number();
+        Ok(is_fixture)
     }
 }
 
@@ -58,9 +45,7 @@ impl VaultWrapper<Person> {
         conn: &mut TxnPgConn,
         keypair: VaultKeyPair,
         ob_config: ObConfiguration,
-        authed_data: AuthedData,
-        global_sh: Fingerprint,
-        tenant_sh: Fingerprint,
+        initial_data: Vec<InitialVaultData>,
         sandbox_id: Option<SandboxId>,
         session_id: Option<SessionId>,
     ) -> ApiResult<(Locked<Vault>, ScopedVault)> {
@@ -68,9 +53,33 @@ impl VaultWrapper<Person> {
         if ob_config.is_live != sandbox_id.is_none() {
             return Err(UserError::SandboxMismatch.into());
         }
-        if ob_config.is_live && authed_data.is_fixture() {
+        let is_fixture_data = initial_data
+            .iter()
+            .map(|d| d.is_fixture())
+            .collect::<ApiResult<Vec<_>>>()?
+            .into_iter()
+            .any(|x| x);
+        if ob_config.is_live && is_fixture_data {
             return Err(UserError::FixtureNumberInLive.into());
         }
+
+        if initial_data
+            .iter()
+            .any(|d| !matches!(d.di, DI::Id(IDK::PhoneNumber) | DI::Id(IDK::Email)))
+        {
+            return Err(
+                AssertionError("Cannot create vault with initial data other than phone/email").into(),
+            );
+        }
+        let verified_dis = initial_data.iter().filter(|d| d.is_verified).collect_vec();
+        if verified_dis.len() > 1 {
+            return Err(AssertionError("Can only create vault with 1 piece of verified info").into());
+        }
+        let verified_di = verified_dis
+            .into_iter()
+            .next()
+            .map(|d| d.di.clone())
+            .ok_or(AssertionError("Must create vault with 1 piece of verified info"))?;
 
         // Create the UV and SU
         let (public_key, e_private_key) = keypair;
@@ -80,7 +89,7 @@ impl VaultWrapper<Person> {
             is_live: ob_config.is_live, // Must derive is_live from the ob config used to create it
             is_portable: true,
             kind: VaultKind::Person,
-            is_fixture: authed_data.is_fixture(),
+            is_fixture: is_fixture_data,
             sandbox_id,
         };
         let uv = Vault::create(conn, new_user_vault)?;
@@ -90,36 +99,47 @@ impl VaultWrapper<Person> {
         // to add data to the vault
         let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
 
-        // Add the phone number to the vault since it was used to create it
-        let data = HashMap::from_iter([((&authed_data).into(), authed_data.data())].into_iter());
+        // Add the phone number and/or email to the vault
+        let data = initial_data
+            .iter()
+            .map(|d| (d.di.clone(), d.value.clone()))
+            .collect();
         let request =
             DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(ob_config.is_live))?;
-        let request = request.manual_fingerprints(HashSet::from_iter(
-            [
-                // Don't create a globally-scoped fingerprint for our fixture phone number, otherwise
-                // these test users' data will become portable across tenants
-                (!uv.is_fixture).then_some(FingerprintRequest {
-                    kind: (&authed_data).into(),
-                    fingerprint: global_sh,
-                    scope: FingerprintScopeKind::Global,
-                }),
-                Some(FingerprintRequest {
-                    kind: (&authed_data).into(),
-                    fingerprint: tenant_sh,
-                    scope: FingerprintScopeKind::Tenant,
-                }),
-            ]
+        let fingerprints = initial_data
             .into_iter()
-            .flatten(),
-        ));
+            .map(|d| -> ApiResult<_> {
+                Ok(vec![
+                    // Don't create a globally-scoped fingerprint for our fixture phone number,
+                    // otherwise these test users' data will become portable across tenants
+                    (!(d.is_fixture()?)).then_some(FingerprintRequest {
+                        kind: d.di.clone(),
+                        fingerprint: d.global_sh,
+                        scope: FingerprintScopeKind::Global,
+                    }),
+                    d.tenant_sh.map(|tenant_sh| FingerprintRequest {
+                        kind: d.di,
+                        fingerprint: tenant_sh,
+                        scope: FingerprintScopeKind::Tenant,
+                    }),
+                ])
+            })
+            .collect::<ApiResult<Vec<_>>>()?
+            .into_iter()
+            .flatten()
+            .flatten()
+            .collect();
+        let request = request.manual_fingerprints(fingerprints);
         let source = DataLifetimeSource::Hosted;
         let PatchDataResult { new_ci, seqno } = uvw.patch_data(conn, request, source)?;
         // Immediately mark the phone as verified and portablized since it was proven to be owned
         // by the user in order to create this vault
         let (_, ci) = new_ci
             .into_iter()
-            .find(|(d, _)| d == &DataIdentifier::from(&authed_data))
+            .find(|(d, _)| d == &verified_di)
             .ok_or(AssertionError("No CI made with new vault"))?;
+        // Mark the verified piece of data as verified, and portablize it so it can be used to
+        // log into other tenants
         ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
         DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
 
