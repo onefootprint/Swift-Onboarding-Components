@@ -15,10 +15,7 @@ export interface Alert {
 }
 
 /// Generally higher-latency HTTP requests that we want to have a higher alert threshold
-const LATENT_HTTP_ROUTES = [
-  '/hosted/user/documents/{id}/upload',
-  '/hosted/user/documents/{id}/upload/{side}',
-];
+const LATENT_HTTP_ROUTES = ['/hosted/user/documents/{id}/upload/{side}'];
 
 /// Note, add alert runbooks at: https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25
 const staticAlerts: Alert[] = [
@@ -199,7 +196,7 @@ const staticAlerts: Alert[] = [
         {
           column: 'duration_ms',
           op: '>=',
-          value: 30000,
+          value: 60000,
         },
         {
           column: 'http.route',
