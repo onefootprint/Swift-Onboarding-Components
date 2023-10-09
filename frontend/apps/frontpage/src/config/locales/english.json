@@ -621,201 +621,96 @@
       "html-title": "Footprint - Pricing",
       "cta": "Get started",
       "hero": {
-        "micro-title": "Unlike bad actors, we have nothing to hide.",
-        "title": "Our radical approach to pricing: minimize your spend."
+        "title": "Secure onboarding at lightning speed and minimum cost",
+        "subtitle": "Next-gen encryption infrastructure to offload compliance, risk, and cost."
       },
-      "labels": {
-        "coming-soon": "Coming soon",
-        "contact-us": "Contact us"
-      },
-      "units": {
-        "dollar": "$",
-        "verification": "verification",
-        "person": "person",
-        "year": "year",
-        "month": "month",
-        "business": "business",
-        "scan": "scan",
-        "active-user": "active user"
-      },
-      "core-plan": {
-        "promo": {
-          "title": "For a limited time: recoup the cost of your KYC!",
-          "cta": "Learn more",
-          "dialog": {
-            "title": "Recoup the cost of your KYC",
-            "content": "We'll give back a rebate of the cost to do a standard KYC the next time that same person does a one-click KYC on another platform. \n \n By virtue of you simply onboarding your users, you'll get back the money to use on any Footprint products. \n \n Assume you onboard 100,000 users who are new to Footprint and they later sign up for other products using Footprint. Then, you will get $50K back that will be applied to your future Footprint bills."
-          }
-        },
-        "micro-title": "Core",
-        "title": "KYC + PII Security",
-        "subtitle": "Next-gen encryption infrastructure to offload compliance, risk, and cost.",
-        "price-table": {
-          "KYC": {
-            "title": "KYC"
+      "identify": {
+        "title": "Identify users",
+        "subtitle": "Charged per onboard",
+        "items": {
+          "kyc": {
+            "title": "Standard KYC (Know Your Customer)",
+            "subtitle": "When an existing Footprint user creates a new account with you with only one click."
           },
-          "pii-storage": {
-            "title": "PII Storage"
+          "id-verification": {
+            "title": "Document Verification (IDV)",
+            "subtitle": "Drivers license or passport"
           },
-          "one-click-KYC": {
-            "title": "One-click KYC",
-            "details": "Improve your drop-off by 50–70%",
-            "cta": "More details",
-            "label": "Coming soon",
-            "dialog": {
-              "title": "One-click KYC",
-              "content": "Standard KYC means a user has to fill out a form because they have not been previously seen by Footprint. One-click KYC is when a user who is already on Footprint creates an account in another product. Returning Footprint users can sign up for new products using just their email address and biometrics. \n \n Companies report drop-off of north of 50% when users have to fill in a KYC flow. Due to the lift in conversion and extra LTV of the net new customers we bring in through replacing the form with one-click, we charge a premium."
-            }
-          }
-        },
-        "features": {
-          "title": "Includes:",
-          "nitro-enclaves": "Vaulting in managed Nitro Enclaves",
-          "isolated-compute": "Isolated compute environments for processing PII",
-          "encryption-and-tokenization": "Encryption and tokenization APIs",
-          "access-control": "Fine-grained access control",
-          "audit-logs": "Automatically generated audit logs",
-          "idv-kyc": "Full IDV + KYC checks",
-          "face-id": "Market leading biometrics (e.g. FaceID, TouchID, etc.)",
-          "dashboard": "Dashboard that brings together your KYC + PII storage",
-          "one-click": "Supports one-click KYC",
-          "step-up-verification": "Automatic step-up verification if needed",
-          "ofac": "OFAC/Criminal watchlists"
-        },
-        "one-click-kyc": {
-          "label": "Plus:",
-          "title": "One-click KYC",
-          "details": "Any user who is already on Footprint will be able to create an account in your platform and allow access to their PII with only one click."
-        },
-        "cta": "Get started"
-      },
-      "add-ons": {
-        "micro-title": "Add-ons",
-        "title": "Customize your plan",
-        "features": {
+          "one-click": {
+            "title": "One-click KYC"
+          },
           "kyb": {
-            "title": "KYB"
+            "title": "KYB (Know Your Business)",
+            "subtitle": "Middesk also available for KYB"
           },
-          "non-identity-data-vaulting": {
-            "title": "Non-identity data vaulting",
-            "details": "Unlimited tokens & decryptions"
+          "hosted": {
+            "title": "Hosted onboarding without KYC/KYB"
           },
-          "drivers-license": {
-            "title": "Driver's license scan"
+          "app-clip": {
+            "title": "App Clip / Instant App risk signals"
           },
-          "continuous-ofac": {
-            "title": "Continuous OFAC monitoring"
+          "behavioral": {
+            "title": "Behavioral signals"
           },
-          "embedded-onboarding": {
-            "title": "Embedded onboarding"
+          "email": {
+            "title": "Email age"
+          }
+        }
+      },
+      "secure": {
+        "title": "Secure users’ data",
+        "subtitle": "Priced per active user per month",
+        "items": {
+          "pii": {
+            "title": "Secure PII Storage"
+          },
+          "custom": {
+            "title": "Custom data vaulting",
+            "subtitle": "Unlimited tokens and decryptions"
           },
           "vault-proxy": {
             "title": "Vault Proxy",
-            "details": "Process transactions without handling sensitive card data"
-          },
-          "auth": {
-            "title": "Auth",
-            "label": "Coming soon"
+            "subtitle": "Process transactions without handling sensitive card data"
           }
         }
       },
-      "calculator": {
-        "title": "Estimate your cost",
-        "rows": {
-          "kyc": "KYC",
-          "kyb": "KYB",
-          "pii-storage": "PII storage",
-          "non-identity-data-vaulting": "Non-identity data vaulting",
-          "vault-proxy": "Vault proxy",
-          "drivers-license-scan": "Driver's license scan",
-          "total": "Total cost",
-          "per-month": "per month",
-          "auth": "Auth",
-          "embedded-onboarding": "Embedded onboarding"
-        },
-        "units": {
-          "verifications": "verifications",
-          "month": "month",
-          "persons": "persons",
-          "scans": "scans",
-          "active-user": "active user"
-        },
-        "banners": {
-          "recoup": {
-            "title": "And you can recoup 100% of the cost the first year!",
-            "cta": "More details",
-            "link": "/"
+      "aml": {
+        "title": "AML monitoring",
+        "subtitle": "Priced annually per user",
+        "items": {
+          "ofac": {
+            "title": "Continuous OFAC monitoring",
+            "subtitle": "Unlimited calls per year"
           },
-          "custom-pricing": {
-            "title": "With more than 10,000+ verifications per month you get custom pricing",
-            "cta": "Contact us",
-            "link": "/"
+          "media": {
+            "title": "Adverse media",
+            "subtitle": "Requires continuous OFAC monitoring"
+          },
+          "email": {
+            "title": "Email age"
           }
         }
       },
-      "big-customer-banner": {
-        "title": "Need more than 10k verifications per month?",
-        "details": "We have a special pricing for you!",
-        "cta": "Contact us"
-      },
-      "faq": {
-        "title": "Frequently asked questions",
-        "questions": {
-          "one-click-kyc-difference": {
-            "title": "What is the difference between standard KYC and one-click KYC?",
-            "content": [
-              "Standard KYC means a user has to fill out a form because they have not been previously seen by Footprint. One-click KYC is when a user who is already on Footprint creates an account for a second+ time, which requires them filling in their email and then FaceID automatically launching."
-            ]
+      "auth": {
+        "title": "Auth",
+        "subtitle": "Priced per active user per month",
+        "items": {
+          "passkeys": {
+            "title": "Auth with Passkeys"
           },
-          "one-click-charge": {
-            "title": "Why do you charge more for one-click?",
-            "content": [
-              "We charge $2.00 for the one-click. This is because companies report drop-off of north of 50% when users have to fill in a KYC flow. Due to the lift in conversion and extra LTV of the net new customers we bring in through replacing the form with one-click, we charge a premium."
-            ]
+          "sms": {
+            "title": "SMS and Email verification"
           },
-          "how-to-recoup": {
-            "title": "How do I recoup the cost of KYC?",
-            "content": [
-              "To be even more aligned with our early users, we will give you a rebate back of the cost to do standard KYC the next time that same person does a one-click KYC on another platform. If you onboard 100,000 people who are new to Footprint, you’ll spend $50,000, and you’ll get all of that back to apply to future KYC when those people one-click for the first time elsewhere. "
-            ]
-          },
-          "competitor-pricing": {
-            "title": "How does this compare to competitor pricing? ",
-            "content": [
-              "Most companies in our space actually don’t disclose pricing. Seriously. Stripe Identity to its credit does, and other than that Persona is the only company with a pricing page (though it does not mention any actual dollar amounts). This is purposeful—these companies charge complexity and add-on features you actually don’t need. Their incentives are for you to pay the most for each verification, because their business model revolves around verifying the individual moment-in-time. Anecdotally, our customers tell us we are much more affordable."
-            ]
-          },
-          "step-up-pricing": {
-            "title": "Do you charge for step-up verification?",
-            "content": [
-              "Part of the beauty of Footprint is we automatically know when to step up during KYC. We charge $1 if we need to scan a driver’s license, and will then work with each customer to discuss if they would like to move to further document verification or KBAs. "
-            ]
-          },
-          "failure-charge": {
-            "title": "Do you charge if the KYC fails?",
-            "content": [
-              "Nope. Our goal will always be to get good actors on your platform. We are aligned with our customers' goals, so we don't make money from fails in the flow or a bevy of fraudulent actors we reject."
-            ]
-          },
-          "business-model": {
-            "title": "What is Footprint’s business model?",
-            "content": [
-              "We operate a bit differently. We don’t want to make money by making verifications unnecessarily expensive. It’s why we give away biometric checks (e.g. FaceID, TouchID, etc) for free, and actually don’t recommend doing a driver’s license scan in many instances. While we’d be happy to make more money by doing a fairly simple task such as that scan, it really isn’t worth the money in most cases and adds unfortunate friction. Our business model has two core tenets to work: \n 1. Democratize access to a best-in-class comprehensive security suite (with encryption, vaulting, access control, and audit logs), and \n 2. Work toward a one-click future of identity. We charge accordingly."
-            ]
-          },
-          "disclose-pricing": {
-            "title": "Why do you disclose pricing?",
-            "content": [
-              "Given our mission of bringing back trust and transparency to the Internet, we proudly display our pricing below, and genuine business model above. The pricing may change a bit over time, but we’ll update it here. For each user that does a standard KYC through you, we will give you the cost back each of the next three times they do a one-click KYC. That means you’ll recoup the cost of everyone you “onboard” to our network. Talk about aligned incentives :)."
-            ]
-          },
-          "drivers-license-scans": {
-            "title": "Do you support driver’s license scans?",
-            "content": [
-              "Yes. We offer the ability to do a scan and selfie check for an extra $1 per verification, and will do a KBA for an extra $1.50. Our goal is to not do this unless your internal compliance team requires this, or if we can not make a confident pass decision without doing so. Unlike others in the space, our default is to not charge the extra dollar to do the DL scan."
-            ]
+          "social": {
+            "title": "Social log in"
           }
         }
+      },
+      "banner": {
+        "title": "Bundle and save",
+        "subtitle": "If you use 2 or more services (eg: Onboarding and Security) you'll enjoy great discounts. Reach out to us to know more.",
+        "schedule-call": "Schedule a call",
+        "get-started": "Get started"
       }
     },
     "compare": {
