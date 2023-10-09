@@ -28,7 +28,7 @@ const Passkeys = ({ authToken, onDone }: PasskeysProps) => {
   };
 
   const handleError = (error: unknown) => {
-    analytics.track(AnalyticsEvents.PasskeyRegistrationError, {
+    analytics.track(AnalyticsEvents.PasskeyRegistrationFailed, {
       message: getErrorMessage(error),
     });
     send({ type: 'failed' });
