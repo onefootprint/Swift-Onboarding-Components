@@ -15,6 +15,7 @@ pub fn create(conn: &mut TxnPgConn) -> Tenant {
         is_prod_ob_config_restricted: false,
         is_prod_kyb_playbook_restricted: false,
         domain: Some("Test domain".to_owned()),
+        domains: vec!["Test domain".to_owned()],
         allow_domain_access: false,
     };
     Tenant::create(conn, new_tenant).expect("Couldn't create tenant")
@@ -35,6 +36,7 @@ pub fn create_with_keys(
         is_prod_ob_config_restricted: false,
         is_prod_kyb_playbook_restricted: false,
         domain: Some("Test domain".to_owned()),
+        domains: vec!["Test domain".to_owned()],
         allow_domain_access: false,
     };
 
@@ -64,5 +66,6 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         allow_domain_access: false,
         supported_auth_methods: None,
         app_clip_experience_id: AppClipExperienceId::test_data("test".into()),
+        domains: vec![],
     }
 }

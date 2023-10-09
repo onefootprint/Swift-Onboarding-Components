@@ -12,6 +12,7 @@ pub struct Organization {
     pub website_url: Option<String>,
     pub company_size: Option<CompanySize>,
     pub domain: Option<String>,
+    pub domains: Vec<String>,
     pub allow_domain_access: bool,
     // Only serialize in the GET /org response
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -94,12 +94,13 @@ mod test {
             name: "test_tenant".to_owned(),
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
             public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
-            logo_url: None,
             workos_id: None,
+            logo_url: None,
             sandbox_restricted: true,
             is_prod_ob_config_restricted: true,
             is_prod_kyb_playbook_restricted: true,
             domain: None,
+            domains: vec![],
             allow_domain_access: false,
         };
         pool.db_transaction(|conn| Tenant::create(conn, tenant))

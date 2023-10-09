@@ -45,6 +45,7 @@ impl
             website_url,
             company_size,
             domain,
+            domains,
             allow_domain_access,
             is_prod_ob_config_restricted,
             is_prod_kyb_playbook_restricted,
@@ -58,6 +59,7 @@ impl
             website_url,
             company_size,
             domain,
+            domains,
             allow_domain_access,
             // These fields are only conditionally serialized in some endpoints
             is_domain_already_claimed: is_domain_already_claimed.map(|i| i.0),

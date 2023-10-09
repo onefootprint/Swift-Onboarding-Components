@@ -43,6 +43,7 @@ pub struct Tenant {
     pub pinned_api_version: Option<i32>,
     // When true, don't allow creating KYC playbooks in prod
     pub is_prod_ob_config_restricted: bool,
+    // TODO deprecate
     pub domain: Option<String>,
     pub allow_domain_access: bool,
     /// When None, any method is allowed. When Some, only specified methods are allowed.
@@ -51,6 +52,7 @@ pub struct Tenant {
     pub app_clip_experience_id: AppClipExperienceId,
     // When true, don't allow creating KYB playbooks in prod
     pub is_prod_kyb_playbook_restricted: bool,
+    pub domains: Vec<String>,
 }
 
 impl Tenant {
@@ -89,8 +91,10 @@ pub struct NewTenant {
     pub sandbox_restricted: bool,
     pub is_prod_ob_config_restricted: bool,
     pub is_prod_kyb_playbook_restricted: bool,
+    // TODO deprecate
     pub domain: Option<String>,
     pub allow_domain_access: bool,
+    pub domains: Vec<String>,
 }
 
 /// Allows creating with an application-generated TenantId rather than db-generated
@@ -105,8 +109,10 @@ pub struct NewIntegrationTestTenant {
     pub is_demo_tenant: bool,
     pub is_prod_ob_config_restricted: bool,
     pub is_prod_kyb_playbook_restricted: bool,
+    // TODO deprecate
     pub domain: Option<String>,
     pub allow_domain_access: bool,
+    pub domains: Vec<String>,
 }
 
 impl Tenant {
