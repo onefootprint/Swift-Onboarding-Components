@@ -206,8 +206,9 @@ fn watchlist_types_for_enhanced_aml_opt(enhanced_aml: &EnhancedAmlOption) -> Vec
             ofac.then(|| {
                 vec![
                     IncodeWatchlistType::Sanction,
-                    IncodeWatchlistType::Warning,
-                    IncodeWatchlistType::FitnessProbity,
+                    // TODO: turning these off now as a quick patch to improve precision. Getting clarity from CA on what exactly these entail and if `sanction` is sufficient for most general OFAC needs
+                    // IncodeWatchlistType::Warning,
+                    // IncodeWatchlistType::FitnessProbity,
                 ]
             }),
             pep.then(|| {
@@ -292,6 +293,7 @@ mod test {
     #[test_case(vec![TestHit(1.7, vec!["adverse-media-v2-terrorism"], vec!["name_exact"]), TestHit(1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::AdverseMediaHit, FootprintReasonCode::WatchlistHitOfac])]
     #[test_case(vec![TestHit(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), TestHit(1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitOfac])]
     #[test_case(vec![TestHit(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), TestHit(1.8, vec!["sanction"], vec!["equivalent_name"])] => Vec::<FootprintReasonCode>::new())]
+    #[test_case(vec![TestHit(1.7, vec!["warning", "fitness-probity"], vec!["name_exact"])] => Vec::<FootprintReasonCode>::new())]
     fn test_reason_codes_from_watchlist_result(hits: Vec<TestHit>) -> Vec<FootprintReasonCode> {
         let res = make_watchlist_res(hits);
         reason_codes_from_watchlist_result(
