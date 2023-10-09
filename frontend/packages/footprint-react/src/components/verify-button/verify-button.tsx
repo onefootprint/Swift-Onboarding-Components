@@ -25,6 +25,7 @@ const VerifyButton = ({
   options,
   dialogVariant,
   testID,
+  l10n,
 }: VerifyButtonProps) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
@@ -41,6 +42,7 @@ const VerifyButton = ({
       publicKey,
       userData,
       options,
+      l10n,
     });
     component.render();
   };
