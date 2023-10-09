@@ -28,6 +28,9 @@ const uploadDoc = async ({
   return response.data;
 };
 
-const useUploadDoc = () => useMutation(uploadDoc);
+const useUploadDoc = () =>
+  useMutation(uploadDoc, {
+    retry: 3,
+  });
 
 export default useUploadDoc;
