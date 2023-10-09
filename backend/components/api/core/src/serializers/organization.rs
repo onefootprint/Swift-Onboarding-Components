@@ -44,7 +44,6 @@ impl
             sandbox_restricted,
             website_url,
             company_size,
-            domain,
             domains,
             allow_domain_access,
             is_prod_ob_config_restricted,
@@ -58,7 +57,8 @@ impl
             is_sandbox_restricted: sandbox_restricted,
             website_url,
             company_size,
-            domain,
+            // For backwards compatibility until the client starts displaying multiple domains
+            domain: domains.first().cloned(),
             domains,
             allow_domain_access,
             // These fields are only conditionally serialized in some endpoints

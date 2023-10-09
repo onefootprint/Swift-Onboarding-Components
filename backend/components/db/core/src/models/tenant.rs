@@ -43,8 +43,6 @@ pub struct Tenant {
     pub pinned_api_version: Option<i32>,
     // When true, don't allow creating KYC playbooks in prod
     pub is_prod_ob_config_restricted: bool,
-    // TODO deprecate
-    pub domain: Option<String>,
     pub allow_domain_access: bool,
     /// When None, any method is allowed. When Some, only specified methods are allowed.
     pub supported_auth_methods: Option<Vec<WorkosAuthMethod>>,
@@ -52,6 +50,8 @@ pub struct Tenant {
     pub app_clip_experience_id: AppClipExperienceId,
     // When true, don't allow creating KYB playbooks in prod
     pub is_prod_kyb_playbook_restricted: bool,
+    /// We only allow specifying a single domain at creation, but additional domains can be added
+    /// manually in case the tenant has more than one
     pub domains: Vec<String>,
 }
 
@@ -91,8 +91,6 @@ pub struct NewTenant {
     pub sandbox_restricted: bool,
     pub is_prod_ob_config_restricted: bool,
     pub is_prod_kyb_playbook_restricted: bool,
-    // TODO deprecate
-    pub domain: Option<String>,
     pub allow_domain_access: bool,
     pub domains: Vec<String>,
 }
@@ -109,8 +107,6 @@ pub struct NewIntegrationTestTenant {
     pub is_demo_tenant: bool,
     pub is_prod_ob_config_restricted: bool,
     pub is_prod_kyb_playbook_restricted: bool,
-    // TODO deprecate
-    pub domain: Option<String>,
     pub allow_domain_access: bool,
     pub domains: Vec<String>,
 }
@@ -225,10 +221,10 @@ impl Tenant {
         Ok(res)
     }
 
-    #[tracing::instrument("Tenant::get_tenant_by_domain", skip_all)]
-    pub fn get_tenant_by_domain(conn: &mut PgConn, domain: &String) -> DbResult<Option<Tenant>> {
+    #[tracing::instrument("Tenant::get_tenant_by_domains", skip_all)]
+    pub fn get_tenant_by_domains(conn: &mut PgConn, domains: Vec<String>) -> DbResult<Option<Tenant>> {
         let res = tenant::table
-            .filter(tenant::domain.eq(domain))
+            .filter(tenant::domains.overlaps_with(domains))
             .filter(tenant::allow_domain_access.eq(true))
             .first(conn)
             .optional()?;
@@ -237,10 +233,11 @@ impl Tenant {
 
     #[tracing::instrument("Tenant::is_domain_already_claimed", skip_all)]
     /// Returns true if the domain is already claimed
-    pub fn is_domain_already_claimed(conn: &mut PgConn, domain: Option<String>) -> DbResult<bool> {
-        let result = match domain.as_ref() {
-            Some(domain) => Self::get_tenant_by_domain(conn, domain)?.is_some(),
-            None => false,
+    pub fn is_domain_already_claimed(conn: &mut PgConn, domains: Vec<String>) -> DbResult<bool> {
+        let result = if !domains.is_empty() {
+            Self::get_tenant_by_domains(conn, domains)?.is_some()
+        } else {
+            false
         };
         Ok(result)
     }

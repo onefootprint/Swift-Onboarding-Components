@@ -180,7 +180,7 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
         // Check if tenant exists. If so, automatically add new tenant user
         let tenant = state
             .db_pool
-            .db_query(move |conn| Tenant::get_tenant_by_domain(conn, &domain))
+            .db_query(move |conn| Tenant::get_tenant_by_domains(conn, vec![domain]))
             .await??;
         if let Some(tenant) = tenant {
             return Ok((tenant, false));
@@ -211,7 +211,6 @@ async fn create_tenant(
         sandbox_restricted: true,
         is_prod_ob_config_restricted: true,
         is_prod_kyb_playbook_restricted: true,
-        domain: domain.clone(),
         domains: domain.into_iter().collect(),
         allow_domain_access: false, // false by default on creation, has to become true manually with PATCH /org
     };

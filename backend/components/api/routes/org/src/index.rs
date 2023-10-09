@@ -24,10 +24,10 @@ pub async fn get(
     let auth = auth.check_guard(TenantGuard::Read)?; // No permissions needed to access this endpoint
     let tenant = auth.tenant().clone();
 
-    let domain = tenant.domain.clone();
+    let domains = tenant.domains.clone();
     let is_domain_already_claimed = state
         .db_pool
-        .db_query(move |conn| Tenant::is_domain_already_claimed(conn, domain))
+        .db_query(move |conn| Tenant::is_domain_already_claimed(conn, domains))
         .await??;
 
     Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db((
@@ -59,7 +59,7 @@ async fn patch(
         allow_domain_access,
     } = request.into_inner();
 
-    if allow_domain_access == Some(true) && tenant.domain.is_none() {
+    if allow_domain_access == Some(true) && tenant.domains.is_empty() {
         return Err(TenantError::ValidationError("Tenant has no associated domain".to_string()).into());
     }
 

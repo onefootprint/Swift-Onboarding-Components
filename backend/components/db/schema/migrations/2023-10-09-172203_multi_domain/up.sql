@@ -1,2 +1,1 @@
--- TODO rm default
 ALTER TABLE tenant ADD COLUMN domains TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];
