@@ -135,6 +135,7 @@ impl From<&Action> for DecisionStatus {
             Action::StepUp => DecisionStatus::StepUp,
             Action::ManualReview => DecisionStatus::Fail,
             Action::Fail => DecisionStatus::Fail,
+            Action::PassWithManualReview => DecisionStatus::Pass,
         }
     }
 }
@@ -143,7 +144,7 @@ impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
     fn from(result: OnboardingEvaluationResult) -> Self {
         // If we no rules that triggered, we consider that a pass
         let (decision_status, create_manual_review) = match result.triggered_action.as_ref() {
-            Some(a) => (a.into(), a == &Action::ManualReview),
+            Some(a) => (a.into(), a.should_create_review()),
             None => (DecisionStatus::Pass, false),
         };
 

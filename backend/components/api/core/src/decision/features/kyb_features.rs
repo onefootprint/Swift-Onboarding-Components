@@ -52,15 +52,15 @@ impl FeatureVector for KybFeatureVector {
 
         let eval_result = rule::rules_engine::evaluate_onboarding_rules(middesk_rules, self);
 
-        let decision_status = match eval_result.triggered_action {
+        let (create_manual_review, decision_status) = match eval_result.triggered_action {
             Some(a) => match a {
-                Action::StepUp => DecisionStatus::Fail,
-                Action::ManualReview => DecisionStatus::Fail,
-                Action::Fail => DecisionStatus::Fail,
+                Action::StepUp => (true, DecisionStatus::Fail),
+                Action::ManualReview => (true, DecisionStatus::Fail),
+                Action::Fail => (true, DecisionStatus::Fail),
+                Action::PassWithManualReview => (true, DecisionStatus::Pass),
             },
-            None => DecisionStatus::Pass,
+            None => (false, DecisionStatus::Pass),
         };
-        let create_manual_review = decision_status == DecisionStatus::Fail;
 
         let kyb_decision = OnboardingRulesDecisionOutput {
             decision: Decision {

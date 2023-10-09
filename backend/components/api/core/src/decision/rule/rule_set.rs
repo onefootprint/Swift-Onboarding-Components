@@ -4,9 +4,16 @@ use super::{RuleName, RuleSetName};
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub enum Action {
     /// ORDERING MATTERS!!!
+    PassWithManualReview,
     StepUp,
     ManualReview,
     Fail,
+}
+
+impl Action {
+    pub fn should_create_review(&self) -> bool {
+        matches!(self, Self::PassWithManualReview | Self::ManualReview)
+    }
 }
 
 /// A rule is just a named wrapper around a fn that takes a T and returns a bool
@@ -105,6 +112,8 @@ mod tests {
         rule_set.evaluate(&input_data)
     }
 
+    #[test_case(Action::StepUp, Action::PassWithManualReview  => Ordering::Greater)]
+    #[test_case(Action::ManualReview, Action::PassWithManualReview  => Ordering::Greater)]
     #[test_case(Action::ManualReview, Action::StepUp => Ordering::Greater)]
     #[test_case(Action::Fail, Action::ManualReview => Ordering::Greater)]
     fn test_cmp_action_ordering(s1: Action, s2: Action) -> Ordering {

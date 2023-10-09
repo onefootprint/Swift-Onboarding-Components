@@ -72,6 +72,7 @@ pub enum DocumentOutcome {
     Success,
     Failure,
     DocUploadFailed,
+    PassWithManualReview,
 }
 impl DocumentOutcome {
     pub fn footprint_reason_code(&self) -> Option<FootprintReasonCode> {
@@ -79,6 +80,9 @@ impl DocumentOutcome {
             DocumentOutcome::Success => Some(FootprintReasonCode::DocumentVerified),
             DocumentOutcome::Failure => Some(FootprintReasonCode::DocumentNotVerified),
             DocumentOutcome::DocUploadFailed => Some(FootprintReasonCode::DocumentUploadFailed),
+            DocumentOutcome::PassWithManualReview => {
+                Some(FootprintReasonCode::DocumentIsPermitOrProvisionalLicense)
+            }
         }
     }
 
@@ -88,6 +92,23 @@ impl DocumentOutcome {
 
     pub fn doc_failed_for_some_reason(&self) -> bool {
         matches!(self, Self::DocUploadFailed | Self::Failure)
+    }
+
+    pub fn expected_onboarding_decision(&self) -> OnboardingStatus {
+        match self {
+            DocumentOutcome::Success => OnboardingStatus::Pass,
+            DocumentOutcome::Failure => OnboardingStatus::Fail,
+            DocumentOutcome::DocUploadFailed => OnboardingStatus::Fail,
+            DocumentOutcome::PassWithManualReview => OnboardingStatus::Pass,
+        }
+    }
+    pub fn expect_manual_review(&self) -> bool {
+        match self {
+            DocumentOutcome::Success => false,
+            DocumentOutcome::Failure => false,
+            DocumentOutcome::DocUploadFailed => true,
+            DocumentOutcome::PassWithManualReview => true,
+        }
     }
 }
 #[derive(Clone, Copy, Debug)]

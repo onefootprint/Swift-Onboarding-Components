@@ -89,7 +89,7 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 }
             },
             name: RuleName::DocumentWasLearnerPermit,
-            action: Action::ManualReview,
+            action: Action::PassWithManualReview,
         },
     ]
 }

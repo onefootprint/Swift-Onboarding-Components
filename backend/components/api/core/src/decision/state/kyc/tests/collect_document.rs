@@ -30,6 +30,7 @@ use std::sync::Arc;
 #[test_state_case(UserKind::Live, Failure)]
 #[test_state_case(UserKind::Live, DocUploadFailed)]
 #[test_state_case(UserKind::Sandbox(newtypes::WorkflowFixtureResult::DocumentDecision), Failure)]
+#[test_state_case(UserKind::Live, PassWithManualReview)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: DocumentOutcome) {
     // DATA SETUP
@@ -48,6 +49,12 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
     let doc_upload_failed = doc_outcome == DocUploadFailed;
+    let doc_passed_with_review = doc_outcome == PassWithManualReview;
+    let expected_status = if doc_passed_with_review {
+        DecisionStatus::Pass
+    } else {
+        DecisionStatus::Fail
+    };
 
     // MOCKING
     let mut mock_ff_client = MockFeatureFlagClient::new();
@@ -120,7 +127,6 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
 
     let rs_kyc = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
     assert!(!rs_kyc.is_empty());
-    // hidden at this time, until decision
     assert!(rs_kyc.iter().all(|r| !r.hidden));
     let risk_signals_for_doc = query_risk_signals(state, &svid, RiskSignalGroupKind::Doc).await;
 
@@ -130,10 +136,12 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     // Expect Webhook
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Fail))],
+        vec![OnboardingStatusChanged(ExpectedStatus(
+            doc_outcome.expected_onboarding_decision(),
+        ))],
         vec![OnboardingCompleted(
-            ExpectedStatus(OnboardingStatus::Fail),
-            ExpectedRequiresManualReview(doc_upload_failed),
+            ExpectedStatus(doc_outcome.expected_onboarding_decision()),
+            ExpectedRequiresManualReview(doc_outcome.expect_manual_review()),
         )],
     );
 
@@ -146,7 +154,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
-    assert!(obd.status == DecisionStatus::Fail);
+    assert!(obd.status == expected_status);
     if expect_committed {
         assert!(obd.seqno.is_some());
     } else {
@@ -154,8 +162,8 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     }
 
     assert!(matches!(obd.actor, DbActor::Footprint));
-    assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
-    if doc_upload_failed {
+    assert_eq!(doc_outcome.expected_onboarding_decision(), wf.status.unwrap());
+    if doc_outcome.expect_manual_review() {
         assert!(mr.is_some());
     } else {
         assert!(mr.is_none());
@@ -174,9 +182,13 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
                     Some((VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches)),
                     Some((VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches)),
                     // TODO: assert doc upload failed RS when we have it
-                    (!doc_upload_failed).then_some((
+                    (!(doc_upload_failed || doc_passed_with_review)).then_some((
                         VendorAPI::IncodeFetchScores,
                         FootprintReasonCode::DocumentNotVerified,
+                    )),
+                    (doc_passed_with_review).then_some((
+                        VendorAPI::IncodeFetchScores,
+                        FootprintReasonCode::DocumentIsPermitOrProvisionalLicense, // not really future proof
                     )),
                     (doc_upload_failed.then_some((
                         VendorAPI::IncodeFetchScores,
@@ -192,7 +204,9 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
             );
 
             // redo document
-            redo_document_and_pass(state, user_kind, &wf, &obd, &tenant.id, risk_signals_for_doc).await
+            if !doc_passed_with_review {
+                redo_document_and_pass(state, user_kind, &wf, &obd, &tenant.id, risk_signals_for_doc).await
+            }
         }
     }
 }
