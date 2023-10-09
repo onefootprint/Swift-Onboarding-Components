@@ -1,11 +1,8 @@
-use crate::State;
+use crate::{ProtectedAuth, State};
 use actix_web::{post, web, web::Json};
 use api_core::decision::vendor;
+use api_core::types::{JsonApiResponse, ResponseData};
 use api_core::ApiErrorKind;
-use api_core::{
-    auth::tenant::{CheckTenantGuard, FirmEmployeeAssumeAuthContext, TenantGuard},
-    types::{JsonApiResponse, ResponseData},
-};
 use db::models::{vault::Vault, verification_result::VerificationResult};
 use db::DbResult;
 use newtypes::{PiiJsonValue, VerificationResultId};
@@ -25,11 +22,8 @@ pub struct DecryptVresResponse {
 pub async fn post(
     state: web::Data<State>,
     request: Json<DecryptVresRequest>,
-    auth: FirmEmployeeAssumeAuthContext,
+    _: ProtectedAuth,
 ) -> JsonApiResponse<DecryptVresResponse> {
-    // Basically, make sure only "Risk ops" employees can hit this API
-    auth.check_guard(TenantGuard::ManualReview)?;
-
     let DecryptVresRequest { vres_id } = request.into_inner();
 
     let (vres, uv) = state

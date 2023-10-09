@@ -1,14 +1,14 @@
 use std::str::FromStr;
 
-use crate::auth::session::{AuthSessionData, UpdateSession};
-use crate::auth::tenant::{GetFirmEmployee, TenantSessionAuth};
-use crate::auth::AuthError;
 use crate::errors::ApiResult;
 use crate::types::{JsonApiResponse, ResponseData};
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use actix_web::{post, web, web::Json};
 use api_core::auth::session::tenant::FirmEmployeeSession;
+use api_core::auth::session::{AuthSessionData, UpdateSession};
+use api_core::auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard};
+use api_core::auth::AuthError;
 use db::models::tenant::Tenant;
 use newtypes::{OrgMemberEmail, TenantId, INTEGRATION_TEST_USER_EMAIL};
 
@@ -20,11 +20,12 @@ struct AssumeRequest {
 #[post("/private/assume")]
 async fn post(
     state: web::Data<State>,
-    auth: TenantSessionAuth,
+    auth: FirmEmployeeAuthContext,
     request: Json<AssumeRequest>,
 ) -> JsonApiResponse<api_wire_types::Organization> {
-    let auth_method = auth.auth_method();
-    let firm_employee = auth.firm_employee_user()?;
+    let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
+    let auth_method = auth.auth_method;
+    let firm_employee = auth.tenant_user.clone();
     let session_sealing_key = state.session_sealing_key.clone();
     let tenant_id = request.into_inner().tenant_id;
 

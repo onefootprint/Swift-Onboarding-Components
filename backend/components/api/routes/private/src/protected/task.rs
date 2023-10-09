@@ -1,4 +1,4 @@
-use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
+use crate::auth::ProtectedAuth;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::{task, State};
@@ -18,7 +18,7 @@ pub struct ExecuteTasksRequest {
 #[post("/private/protected/task/execute_tasks")]
 async fn execute_tasks(
     state: web::Data<State>,
-    _: ProtectedCustodianAuthContext,
+    _: ProtectedAuth,
     request: Json<ExecuteTasksRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
     let ExecuteTasksRequest { num_tasks } = request.into_inner();
@@ -39,7 +39,7 @@ pub struct CreateTasksResponse {
 #[post("/private/protected/task/create_task")]
 async fn create_task(
     state: web::Data<State>,
-    _: ProtectedCustodianAuthContext,
+    _: ProtectedAuth,
     request: Json<CreateTaskRequest>,
 ) -> actix_web::Result<Json<ResponseData<CreateTasksResponse>>, ApiError> {
     let CreateTaskRequest { task_data } = request.into_inner();
@@ -66,7 +66,7 @@ pub struct CreateOverdueWatchlistCheckTasksResponse {
 #[post("/private/protected/task/create_overdue_watchlist_check_tasks")]
 async fn create_overdue_watchlist_check_tasks(
     state: web::Data<State>,
-    _: ProtectedCustodianAuthContext,
+    _: ProtectedAuth,
     request: Json<CreateOverdueWatchlistCheckTasksRequest>,
 ) -> actix_web::Result<Json<ResponseData<CreateOverdueWatchlistCheckTasksResponse>>, ApiError> {
     let CreateOverdueWatchlistCheckTasksRequest { tenant_id } = request.into_inner();

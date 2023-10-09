@@ -7,7 +7,7 @@ mod workflow;
 
 use actix_web::web;
 
-use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
+use crate::auth::ProtectedAuth;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -26,6 +26,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
 }
 
 #[actix_web::get("/private/protected/check")]
-async fn check(_: ProtectedCustodianAuthContext) -> &'static str {
+async fn check(_: ProtectedAuth) -> &'static str {
     "ok"
 }

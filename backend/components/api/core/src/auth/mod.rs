@@ -62,6 +62,8 @@ pub enum AuthError {
     CannotCreateMultipleHandoffTokens,
     #[error("Not allowed: user is not a firm employee")]
     NotFirmEmployee,
+    #[error("Not allowed: user is not a risk ops firm employee")]
+    NotRiskOpsFirmEmployee,
     #[error("Not allowed: ob config doesn't require collecting business")]
     BusinessNotRequired,
     #[error("Cannot log in as a non-portable vault")]

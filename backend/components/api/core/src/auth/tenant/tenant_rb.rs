@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
+use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
 use crate::{
     auth::{
         session::{tenant::TenantRbSession, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
@@ -155,17 +155,6 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
 
     fn source(&self) -> DataLifetimeSource {
         DataLifetimeSource::Tenant
-    }
-}
-
-impl GetFirmEmployee for TenantRbAuthContext {
-    fn firm_employee_user(&self) -> ApiResult<TenantUser> {
-        let tenant_user = self.0.tenant_user.clone();
-        if !tenant_user.is_firm_employee {
-            // TODO should we hide these errors with 404s?
-            return Err(AuthError::NotFirmEmployee.into());
-        }
-        Ok(tenant_user)
     }
 }
 

@@ -16,6 +16,8 @@ mod firm_employee_assume;
 pub use self::firm_employee_assume::*;
 mod client;
 pub use client::*;
+mod firm_employee;
+pub use firm_employee::*;
 
 use super::Any;
 use super::AuthError;

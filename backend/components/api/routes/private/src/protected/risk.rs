@@ -1,4 +1,4 @@
-use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
+use crate::auth::ProtectedAuth;
 use crate::decision::vendor;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::errors::{ApiError, ApiResult};
@@ -81,7 +81,7 @@ impl From<OnboardingRulesDecisionOutput> for DecisionOutput {
 #[actix_web::post("/private/protected/risk/make_vendor_calls")]
 async fn make_vendor_calls(
     state: web::Data<State>,
-    _: ProtectedCustodianAuthContext,
+    _: ProtectedAuth,
     request: Json<MakeVendorCallsRequest>,
 ) -> actix_web::Result<Json<ResponseData<MakeVendorCallsResponse>>, ApiError> {
     let MakeVendorCallsRequest { wf_id, vendor_api } = request.into_inner();
@@ -161,7 +161,7 @@ pub struct MakeDecisionResponse {
 #[post("/private/protected/risk/make_decision")]
 async fn make_decision(
     state: web::Data<State>,
-    _: ProtectedCustodianAuthContext,
+    _: ProtectedAuth,
     request: Json<MakeDecisionRequest>,
 ) -> actix_web::Result<Json<ResponseData<MakeDecisionResponse>>, ApiError> {
     let MakeDecisionRequest { tenant_id, fp_id } = request.into_inner();
@@ -251,7 +251,7 @@ pub struct ShadowRunResult {
 #[post("/private/protected/risk/shadow_run_vendor_calls_and_decisioning")]
 async fn shadow_run(
     state: web::Data<State>,
-    _: ProtectedCustodianAuthContext,
+    _: ProtectedAuth,
     request: Json<ShadowRunRequest>,
 ) -> actix_web::Result<Json<ResponseData<ShadowRunResult>>, ApiError> {
     let ShadowRunRequest { wf_id, vendor_api } = request.into_inner();

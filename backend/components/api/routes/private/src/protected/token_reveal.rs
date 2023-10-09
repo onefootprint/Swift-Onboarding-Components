@@ -1,12 +1,7 @@
-use crate::State;
+use crate::{auth::ProtectedAuth, State};
 use actix_web::{post, web, web::Json};
 use api_core::{
-    auth::{
-        protected_custodian::ProtectedCustodianAuthContext,
-        session::AuthSessionData,
-        tenant::{CheckTenantGuard, FirmEmployeeAssumeAuthContext, TenantGuard},
-        Either,
-    },
+    auth::session::AuthSessionData,
     types::{JsonApiResponse, ResponseData},
     ApiErrorKind,
 };
@@ -35,13 +30,8 @@ pub enum SessionKind {
 pub async fn post(
     state: web::Data<State>,
     request: Json<RevealRequest>,
-    auth: Either<ProtectedCustodianAuthContext, FirmEmployeeAssumeAuthContext>,
+    _: ProtectedAuth,
 ) -> JsonApiResponse<RevealResponse> {
-    if let Either::Right(auth) = auth {
-        // Basically, make sure only "Risk ops" employees can hit this API
-        auth.check_guard(TenantGuard::ManualReview)?;
-    }
-
     let RevealRequest { token } = request.into_inner();
 
     let token_hash = token.id();

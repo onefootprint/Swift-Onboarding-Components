@@ -1,6 +1,4 @@
-use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
-use crate::auth::tenant::{GetFirmEmployee, TenantRbAuthContext};
-use crate::auth::Either;
+use crate::auth::ProtectedAuth;
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
@@ -28,12 +26,8 @@ struct CreateInvoiceRequest {
 async fn post(
     state: web::Data<State>,
     request: web::Json<CreateInvoiceRequest>,
-    auth: Either<TenantRbAuthContext, ProtectedCustodianAuthContext>,
+    _: ProtectedAuth,
 ) -> JsonApiResponse<EmptyResponse> {
-    if let Either::Left(tenant_rb) = auth {
-        // Make sure only firm employees can hit this endpoint
-        tenant_rb.firm_employee_user()?;
-    }
     let CreateInvoiceRequest {
         tenant_id,
         billing_date,
@@ -60,13 +54,8 @@ struct CreateInvoicesRequest {
 async fn post_all(
     state: web::Data<State>,
     request: Option<web::Json<CreateInvoicesRequest>>,
-    auth: Either<TenantRbAuthContext, ProtectedCustodianAuthContext>,
+    _: ProtectedAuth,
 ) -> JsonApiResponse<EmptyResponse> {
-    if let Either::Left(tenant_rb) = auth {
-        // Make sure only firm employees can hit this endpoint
-        tenant_rb.firm_employee_user()?;
-    }
-
     let tenants = state.db_pool.db_query(Tenant::list_billable).await??;
 
     // Subtract 8 hours so we always generate the invoice for last month

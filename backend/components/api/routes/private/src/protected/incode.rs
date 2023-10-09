@@ -1,11 +1,6 @@
-use crate::State;
+use crate::{auth::ProtectedAuth, State};
 use actix_web::{post, web, web::Json};
 use api_core::{
-    auth::{
-        protected_custodian::ProtectedCustodianAuthContext,
-        tenant::{CheckTenantGuard, FirmEmployeeAssumeAuthContext, TenantGuard},
-        Either,
-    },
     errors::{ApiResult, AssertionError},
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::{VaultWrapper, VwArgs},
@@ -33,13 +28,8 @@ pub struct Request {
 pub async fn rerun_machine(
     state: web::Data<State>,
     request: Json<Request>,
-    auth: Either<ProtectedCustodianAuthContext, FirmEmployeeAssumeAuthContext>,
+    _: ProtectedAuth,
 ) -> JsonApiResponse<DocumentResponse> {
-    if let Either::Right(auth) = auth {
-        // Basically, make sure only "Risk ops" employees can hit this API
-        auth.check_guard(TenantGuard::ManualReview)?;
-    }
-
     let Request {
         id,
         i_acknowledge_that_i_re_enabled_my_upload,

@@ -1,10 +1,7 @@
-use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
-use crate::State;
+use crate::{ProtectedAuth, State};
 use actix_web::{post, web, web::Json};
-use api_core::auth::tenant::{CheckTenantGuard, FirmEmployeeAssumeAuthContext, TenantGuard};
-use api_core::auth::Either;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::traits::Workflow as TWorkflow;
 use api_core::decision::state::{WorkflowActionsKind, WorkflowWrapper};
@@ -30,7 +27,7 @@ pub struct CreateWorkflowResponse {
 #[post("/private/protected/workflow/create_workflow")]
 async fn create_workflow(
     state: web::Data<State>,
-    _: ProtectedCustodianAuthContext,
+    _: ProtectedAuth,
     request: Json<CreateWorkflowRequest>,
 ) -> actix_web::Result<Json<ResponseData<CreateWorkflowResponse>>, ApiError> {
     let CreateWorkflowRequest {
@@ -80,14 +77,9 @@ pub struct ProceedResponse {
 #[post("/private/protected/workflow/proceed")]
 async fn proceed(
     state: web::Data<State>,
-    auth: Either<ProtectedCustodianAuthContext, FirmEmployeeAssumeAuthContext>,
+    _: ProtectedAuth,
     request: Json<ProceedRequest>,
 ) -> actix_web::Result<Json<ResponseData<ProceedResponse>>, ApiError> {
-    if let Either::Right(auth) = auth {
-        // Basically, make sure only "Risk ops" employees can hit this API
-        auth.check_guard(TenantGuard::ManualReview)?;
-    }
-
     let ProceedRequest {
         wf_id,
         wf_action_kind,

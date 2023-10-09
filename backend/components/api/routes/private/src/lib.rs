@@ -8,6 +8,9 @@ mod test_tenant;
 
 pub use api_core::*;
 
+mod auth;
+pub(crate) use auth::*;
+
 pub fn configure(config: &mut web::ServiceConfig) {
     config
         .service(cleanup::post)

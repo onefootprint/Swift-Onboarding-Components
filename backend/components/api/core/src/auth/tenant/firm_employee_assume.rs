@@ -31,22 +31,22 @@ pub struct FirmEmployeeAssumeAuth {
     pub(super) auth_method: WorkosAuthMethod,
 }
 
-/// Nests a private FirmEmployeeAuth and implements traits required to extract this session from an
+/// Nests a private FirmEmployeeAssumeAuth and implements traits required to extract this session from an
 /// actix request.
-/// Notably, this struct isn't very useful since the entire nested FirmEmployeeAuth is hidden. If you
+/// Notably, this struct isn't very useful since the entire nested FirmEmployeeAssumeAuth is hidden. If you
 /// want to do something useful, you likely have to enforce permissions by calling
-/// `check_permissions`, which will give you the more useful nested FirmEmployeeAuth
+/// `check_permissions`, which will give you the more useful nested FirmEmployeeAssumeAuth
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
     alias = "Firm Employee Assume Token",
     in = "header",
     name = "X-Fp-Dashboard-Authorization",
-    description = "Short-lived auth token for a firm-employee dashboard user."
+    description = "Short-lived auth token for a firm-employee dashboard user assuming a tenant."
 )]
 pub struct ParsedFirmEmployeeAssumeAuth(pub(super) FirmEmployeeAssumeAuth);
 
-/// A shorthand for the extractor for a firm employee assumd auth session
+/// A shorthand for the extractor for an auth session in which a firm employee has assumed anther tenant
 pub type FirmEmployeeAssumeAuthContext = SessionContext<ParsedFirmEmployeeAssumeAuth>;
 
 impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
@@ -72,14 +72,14 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
         }
         let tenant = Tenant::get(conn, &data.tenant_id)?;
         // Firm employee session _always_ has RO role
-        // This is the magic of the FirmEmployeeAuthContet: firm employees only ever have read
+        // This is the magic of the FirmEmployeeAssumeAuthContet: firm employees only ever have read
         // permissions for other tenants
         let kind = TenantRoleKind::DashboardUser;
         let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, kind)?;
 
         let is_risk_ops = ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
 
-        tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee");
+        tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee in assume session");
         Ok(Self(FirmEmployeeAssumeAuth {
             tenant,
             tenant_user,
@@ -106,7 +106,7 @@ impl GetFirmEmployee for FirmEmployeeAssumeAuthContext {
     }
 }
 
-// Allow calling SessionContext<T>::update for T=ParsedFirmEmployeeAuth, only for mutating a token to be used
+// Allow calling SessionContext<T>::update for T=ParsedFirmEmployeeAssumeAuth, only for mutating a token to be used
 // for impersonation
 impl AllowSessionUpdate for ParsedFirmEmployeeAssumeAuth {}
 
