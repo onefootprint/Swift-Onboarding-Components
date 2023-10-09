@@ -841,10 +841,10 @@
   dependencies:
     "@pulumi/pulumi" "^3.0.0"
 
-"@pulumi/tailscale@0.12.2":
-  version "0.12.2"
-  resolved "https://registry.yarnpkg.com/@pulumi/tailscale/-/tailscale-0.12.2.tgz#48641150cd2893a7598afd5a6c5ad996a2cd84e4"
-  integrity sha512-eDzXu4I7awua494d6is9nwV/8G56dTI4oL53G/WTqWtl1ezVHb+v6bKxMrcPvhhYGugbIhK56ECWPiqg9k5gJg==
+"@pulumi/tailscale@0.13.2":
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/@pulumi/tailscale/-/tailscale-0.13.2.tgz#3621c0a251c7cece41813986dc4297cd6b846b65"
+  integrity sha512-7SPfvxUbrmM9SbNPzSt9nsb6VGHo1kv/Vdz4Z0gWDuliDmL04i7pvHrGpRUngNsYeuMhGZ/+SgWbwPKQJ6wqKg==
   dependencies:
     "@pulumi/pulumi" "^3.0.0"
 
