@@ -76,12 +76,18 @@
     },
     "loading": {
       "title": {
-        "processing-front": "Processing image",
-        "processing-back": "Processing image",
-        "processing-selfie": "Processing your selfie"
+        "process-front": "Processing image...",
+        "process-back": "Processing image...",
+        "process-selfie": "Processing selfie...",
+        "upload-front": "Uploading image...",
+        "upload-back": "Uploading image..",
+        "upload-selfie": "Uploading selfie...",
+        "analyze-front": "Analyzing image...",
+        "analyze-back": "Analyzing image...",
+        "analyze-selfie": "Analyzing selfie..."
       },
       "subtitle": "This can take a few seconds",
-      "slow-connection": "Your internet connection seems unstable. The upload might take longer than usual."
+      "slow-connection": "Your internet connection seems unstable. This might take longer than usual."
     },
     "error": {
       "title-front": "We couldn't process your image",

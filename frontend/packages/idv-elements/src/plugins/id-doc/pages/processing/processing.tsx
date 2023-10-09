@@ -1,11 +1,8 @@
 import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import {
-  IdDocImageProcessingError,
-  type IdDocImageTypes,
-  type SubmitDocResponse,
-} from '@onefootprint/types';
+import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
+import { IdDocImageProcessingError } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
@@ -16,6 +13,7 @@ import NextSide from '../../components/next-side';
 import RetryLimitExceeded from '../../components/retry-limit-exceeded';
 import Success from '../../components/success';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import useProcessDoc from '../../hooks/use-process-doc';
 import useSubmitDoc from '../../hooks/use-submit-doc';
 
 const SLOW_CONNECTION_MESSAGE_TIMEOUT = 15000;
@@ -24,12 +22,14 @@ const Processing = () => {
   const { t } = useTranslation('pages.processing');
   const [state, send] = useIdDocMachine();
   const submitDocMutation = useSubmitDoc();
+  const processDocMutation = useProcessDoc();
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
   const [nextSide, setNextSide] = useState<IdDocImageTypes | undefined>();
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
   const [showSlowConnectionMessage, setShowSlowConnectionMessage] =
     useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
+  const [step, setStep] = useState<'upload' | 'analyze'>('upload');
 
   const {
     idDoc: { type, country },
@@ -39,15 +39,16 @@ const Processing = () => {
     id,
   } = state.context;
 
-  const handleSubmitDocSuccess = (data: SubmitDocResponse) => {
+  const handleProcessDocSuccess = (data: ProcessDocResponse) => {
     const { errors, nextSideToCollect, isRetryLimitExceeded } = data;
 
     // If we are staying on the same side, we show error
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      console.error('Image upload retry limit exceeded');
-      Logger.error('Image upload retry limit exceeded', 'processing');
+      const errorMessage = `Image upload retry limit exceeded. Side: ${currSide}, doc id: ${id}`;
+      console.error(errorMessage);
+      Logger.error(errorMessage, 'processing');
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === state.context.currSide) {
       send({
@@ -66,7 +67,7 @@ const Processing = () => {
     }
   };
 
-  const handleSubmitDocError = (err: unknown) => {
+  const handleError = (err: unknown) => {
     send({
       type: 'processingErrored',
       payload: {
@@ -80,6 +81,42 @@ const Processing = () => {
     });
   };
 
+  const handleProcessDocError = (error: unknown) => {
+    const errorMessage = `Error while processing id-doc image ${id}: ${getErrorMessage(
+      error,
+    )}`;
+    console.error(errorMessage);
+    Logger.error(errorMessage, 'processing');
+    handleError(error);
+  };
+
+  const handleSubmitDocError = (error: unknown) => {
+    const errorMessage = `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
+      error,
+    )}`;
+    console.error(errorMessage);
+    Logger.error(errorMessage, 'processing');
+    handleError(error);
+  };
+
+  const handleSubmitDocSuccess = () => {
+    if (!id) {
+      return;
+    }
+    setStep('analyze');
+
+    processDocMutation.mutate(
+      {
+        authToken,
+        id,
+      },
+      {
+        onSuccess: handleProcessDocSuccess,
+        onError: handleProcessDocError,
+      },
+    );
+  };
+
   useEffectOnce(() => {
     if (!image || !authToken || !type || !country || !currSide || !id) {
       setIsMissingRequirements(true);
@@ -89,14 +126,13 @@ const Processing = () => {
         type ? 'OK' : 'undefined'
       }, country: ${country ? 'OK' : 'undefined'}, current side: ${
         currSide ? 'OK' : 'undefined'
-      }, id: ${id ? 'OK' : 'undefined'}`;
+      }, id: ${id || 'undefined'}`;
       console.error(error);
       Logger.error(error, 'processing');
       return;
     }
 
     const { imageFile, captureKind } = image;
-
     submitDocMutation.mutate(
       {
         authToken,
@@ -109,32 +145,21 @@ const Processing = () => {
       },
       {
         onSuccess: handleSubmitDocSuccess,
-        onError: err => {
-          console.error(
-            `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
-              err,
-            )}`,
-          );
-          Logger.error(
-            `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
-              err,
-            )}`,
-            'processing',
-          );
-          handleSubmitDocError(err);
-        },
+        onError: handleSubmitDocError,
       },
     );
   });
 
+  const isLoading = submitDocMutation.isLoading || processDocMutation.isLoading;
+  const isSuccess = submitDocMutation.isSuccess && processDocMutation.isSuccess;
   useTimeout(
     () => {
-      if (submitDocMutation.isSuccess) {
+      if (isSuccess) {
         return;
       }
       setShowSlowConnectionMessage(true);
     },
-    submitDocMutation.isLoading ? SLOW_CONNECTION_MESSAGE_TIMEOUT : null,
+    isLoading ? SLOW_CONNECTION_MESSAGE_TIMEOUT : null,
   );
 
   const onSuccessComplete = () => {
@@ -158,15 +183,14 @@ const Processing = () => {
       </Typography>
     );
   }
-
   if (retryLimitExceeded) return <RetryLimitExceeded />;
-
   if (!type || !currSide) return null;
 
   return (
     <IdDocAnimation
       loadingComponent={
         <Loading
+          step={step}
           imageType={currSide}
           showSlowConnectionMessage={showSlowConnectionMessage}
         />

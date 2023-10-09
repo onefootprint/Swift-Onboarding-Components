@@ -17,6 +17,7 @@ const submitDoc = async (payload: SubmitDocRequest) => {
       'x-fp-is-app-clip': false,
       'x-fp-is-instant-app': false,
       'Content-Type': 'multipart/form-data',
+      'x-fp-process-separately': true,
     },
     timeout: 180000,
   });

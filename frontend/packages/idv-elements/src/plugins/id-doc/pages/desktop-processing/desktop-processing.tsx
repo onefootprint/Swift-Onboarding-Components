@@ -2,11 +2,8 @@ import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
-import {
-  IdDocImageProcessingError,
-  type IdDocImageTypes,
-  type SubmitDocResponse,
-} from '@onefootprint/types';
+import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
+import { IdDocImageProcessingError } from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
@@ -19,6 +16,7 @@ import RetryLimitExceeded from '../../components/retry-limit-exceeded';
 import Success from '../../components/success';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+import useProcessDoc from '../../hooks/use-process-doc';
 import useSubmitDoc from '../../hooks/use-submit-doc';
 
 const SLOW_CONNECTION_MESSAGE_TIMEOUT = 15000;
@@ -27,12 +25,14 @@ const DeskTopProcessing = () => {
   const { t } = useTranslation('pages.desktop-processing');
   const [state, send] = useIdDocMachine();
   const submitDocMutation = useSubmitDoc();
+  const processDocMutation = useProcessDoc();
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
   const [nextSide, setNextSide] = useState<IdDocImageTypes | undefined>();
   const [showSlowConnectionMessage, setShowSlowConnectionMessage] =
     useState(false);
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
+  const [step, setStep] = useState<'upload' | 'analyze'>('upload');
 
   const {
     idDoc: { type, country },
@@ -42,15 +42,16 @@ const DeskTopProcessing = () => {
     id,
   } = state.context;
 
-  const handleSubmitDocSuccess = (data: SubmitDocResponse) => {
+  const handleProcessDocSuccess = (data: ProcessDocResponse) => {
     const { errors, nextSideToCollect, isRetryLimitExceeded } = data;
 
     // If we are staying on the same side, we show error
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      console.error('Image upload retry limit exceeded');
-      Logger.error('Image upload retry limit exceeded', 'desktop-processing');
+      const errorMessage = `Image upload retry limit exceeded. Side: ${currSide}, doc id: ${id}`;
+      console.error(errorMessage);
+      Logger.error(errorMessage, 'desktop-processing');
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === state.context.currSide) {
       send({
@@ -69,7 +70,7 @@ const DeskTopProcessing = () => {
     }
   };
 
-  const handleSubmitDocError = (err: unknown) => {
+  const handleError = (err: unknown) => {
     send({
       type: 'processingErrored',
       payload: {
@@ -83,10 +84,46 @@ const DeskTopProcessing = () => {
     });
   };
 
+  const handleProcessDocError = (error: unknown) => {
+    const errorMessage = `Error while processing id-doc image ${id}: ${getErrorMessage(
+      error,
+    )}`;
+    console.error(errorMessage);
+    Logger.error(errorMessage, 'processing');
+    handleError(error);
+  };
+
+  const handleSubmitDocError = (error: unknown) => {
+    const errorMessage = `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
+      error,
+    )}`;
+    console.error(errorMessage);
+    Logger.error(errorMessage, 'processing');
+    handleError(error);
+  };
+
+  const handleSubmitDocSuccess = () => {
+    if (!id) {
+      return;
+    }
+    setStep('analyze');
+
+    processDocMutation.mutate(
+      {
+        authToken,
+        id,
+      },
+      {
+        onSuccess: handleProcessDocSuccess,
+        onError: handleProcessDocError,
+      },
+    );
+  };
+
   useEffectOnce(() => {
     if (!image || !authToken || !type || !country || !currSide || !id) {
       setIsMissingRequirements(true);
-      const error = `Mobile web flow - id-doc image could not be processed due to missing requirements. Requirements - image: ${
+      const error = `Desktop web flow - id-doc image could not be processed due to missing requirements. Requirements - image: ${
         image ? 'OK' : 'undefined'
       }, auth token: ${authToken ? 'OK' : 'undefined'}, doc type: ${
         type ? 'OK' : 'undefined'
@@ -99,7 +136,6 @@ const DeskTopProcessing = () => {
     }
 
     const { imageFile, captureKind } = image;
-
     submitDocMutation.mutate(
       {
         authToken,
@@ -112,32 +148,21 @@ const DeskTopProcessing = () => {
       },
       {
         onSuccess: handleSubmitDocSuccess,
-        onError: err => {
-          console.error(
-            `Id-doc image submit failed on desktop flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
-              err,
-            )}`,
-          );
-          Logger.error(
-            `Id-doc image submit failed on desktop flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
-              err,
-            )}`,
-            'desktop-processing',
-          );
-          handleSubmitDocError(err);
-        },
+        onError: handleSubmitDocError,
       },
     );
   });
 
+  const isLoading = submitDocMutation.isLoading || processDocMutation.isLoading;
+  const isSuccess = submitDocMutation.isSuccess && processDocMutation.isSuccess;
   useTimeout(
     () => {
-      if (submitDocMutation.isSuccess) {
+      if (isSuccess) {
         return;
       }
       setShowSlowConnectionMessage(true);
     },
-    submitDocMutation.isLoading ? SLOW_CONNECTION_MESSAGE_TIMEOUT : null,
+    isLoading ? SLOW_CONNECTION_MESSAGE_TIMEOUT : null,
   );
 
   const handleNextStep = () => {
@@ -148,22 +173,13 @@ const DeskTopProcessing = () => {
   };
 
   if (isMissingRequirements) {
-    console.error(
-      'Desktop flow - id-doc image could not be processed due to missing requirements',
-    );
-    Logger.error(
-      'Desktop flow - id-doc image could not be processed due to missing requirements',
-      'desktop-processing',
-    );
     return (
       <Typography variant="label-1" color="error" sx={{ textAlign: 'center' }}>
         {t('missing-requirement-error')}
       </Typography>
     );
   }
-
   if (retryLimitExceeded) return <RetryLimitExceeded />;
-
   if (!type || !currSide) return null;
 
   return (
@@ -174,6 +190,7 @@ const DeskTopProcessing = () => {
         <IdDocAnimation
           loadingComponent={
             <Loading
+              step={step}
               imageType={currSide}
               showSlowConnectionMessage={showSlowConnectionMessage}
             />

@@ -101,6 +101,8 @@ export type {
   OrgOnboardingConfigCreateResponse,
   OrgOnboardingConfigUpdateRequest,
   OrgOnboardingConfigUpdateResponse,
+  ProcessDocRequest,
+  ProcessDocResponse,
   ProcessRequirement,
   RegisterPasskeyRequirement,
   RequirementForKind,

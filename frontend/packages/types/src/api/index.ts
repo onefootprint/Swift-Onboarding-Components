@@ -144,6 +144,7 @@ export type {
   OrgOnboardingConfigUpdateRequest,
   OrgOnboardingConfigUpdateResponse,
 } from './org-onboarding-configs-update';
+export type { ProcessDocRequest, ProcessDocResponse } from './process-doc';
 export type {
   StytchTelemetryRequest,
   StytchTelemetryResponse,

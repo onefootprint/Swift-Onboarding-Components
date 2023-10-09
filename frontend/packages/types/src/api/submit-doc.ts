@@ -1,5 +1,3 @@
-import type { IdDocImageProcessingError, IdDocImageTypes } from '../data';
-
 export type SubmitDocRequest = {
   authToken: string;
   image: File;
@@ -10,8 +8,4 @@ export type SubmitDocRequest = {
   };
 };
 
-export type SubmitDocResponse = {
-  errors: IdDocImageProcessingError[];
-  nextSideToCollect: IdDocImageTypes;
-  isRetryLimitExceeded: boolean;
-};
+export type SubmitDocResponse = {};

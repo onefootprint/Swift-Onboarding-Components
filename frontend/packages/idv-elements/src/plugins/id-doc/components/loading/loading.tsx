@@ -4,12 +4,19 @@ import type { IdDocImageTypes } from '@onefootprint/types';
 import { Box, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 
+type Step = 'process' | 'upload' | 'analyze';
+
 export type LoadingProps = {
   imageType: IdDocImageTypes;
+  step: Step;
   showSlowConnectionMessage?: boolean;
 };
 
-const Loading = ({ imageType, showSlowConnectionMessage }: LoadingProps) => {
+const Loading = ({
+  imageType,
+  step,
+  showSlowConnectionMessage,
+}: LoadingProps) => {
   const { t } = useTranslation('components.loading');
 
   return (
@@ -28,7 +35,7 @@ const Loading = ({ imageType, showSlowConnectionMessage }: LoadingProps) => {
           variant="label-1"
           sx={{ marginTop: 5, textAlign: 'center' }}
         >
-          {t(`title.processing-${imageType}`)}
+          {t(`title.${step}-${imageType}`)}
         </Typography>
         <Typography
           variant="body-4"
