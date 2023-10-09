@@ -437,7 +437,7 @@ impl AuthenticatedIncodeClientAdapter {
             first_name,
             sur_name: last_name,
             birth_year: dob_year.map(|s| s.leak().parse::<f32>()).transpose()?,
-            fuzziness: None, //TODO: figure out how we want to set this
+            fuzziness: Some(0.1),
         };
 
         let response = footprint_http_client
