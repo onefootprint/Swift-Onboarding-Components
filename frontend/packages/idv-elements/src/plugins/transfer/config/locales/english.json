@@ -31,7 +31,11 @@
         "sms": {
           "cta": "Resend link",
           "subtitleWithCount_one": "Please wait {{count}} second...",
-          "subtitleWithCount_other": "Please wait {{count}} seconds..."
+          "subtitleWithCount_other": "Please wait {{count}} seconds...",
+          "error": {
+            "title": "Sorry, something went wrong!",
+            "description": "Please try resending the link to your phone number."
+          }
         },
         "qr-code": {
           "instructions": "Alternatively, you can also scan this QR code with your phone to continue."

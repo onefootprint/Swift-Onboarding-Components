@@ -2,7 +2,14 @@ import { useCountdown, useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone224 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { D2PGenerateResponse } from '@onefootprint/types';
-import { Button, Divider, Shimmer, Stack, Typography } from '@onefootprint/ui';
+import {
+  Button,
+  Divider,
+  Shimmer,
+  Stack,
+  Typography,
+  useToast,
+} from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import QRCode from 'react-qr-code';
 import { useEffectOnce } from 'usehooks-ts';
@@ -26,6 +33,7 @@ const QR_CODE_SIZE = 110;
 const QRRegister = () => {
   const { t } = useTranslation('pages.desktop.qr-register');
   const translationSource = useTranslationSourceForRequirements();
+  const toast = useToast();
 
   const [state, send] = useDesktopMachine();
   const { authToken, device, config, scopedAuthToken, idDocOutcome } =
@@ -54,6 +62,15 @@ const QRRegister = () => {
       {
         onSuccess() {
           disableAndCountdown();
+        },
+        onError() {
+          setIsDisabled(false);
+          setSeconds(0);
+          toast.show({
+            title: t('sms.error.title'),
+            description: t('sms.error.description'),
+            variant: 'error',
+          });
         },
       },
     );
