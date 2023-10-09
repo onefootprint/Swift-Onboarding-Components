@@ -72,17 +72,24 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
           <IcoUpload24 />
           <Typography variant="label-2">{t(`title`)}</Typography>
         </LabelContainer>
-        <DocumentUploadContainer>
-          <IcoInfo16 color="info" />
-          <Typography
-            color="info"
-            variant="body-4"
-            sx={{ whiteSpace: 'nowrap' }}
-          >
-            {`${t('uploaded-from')} ${t(`upload-source.${uploadSource}`)}`}
-          </Typography>
-        </DocumentUploadContainer>
+        {!!uploadsSortedByDate.length && (
+          <DocumentUploadContainer>
+            <IcoInfo16 color="info" />
+            <Typography
+              color="info"
+              variant="body-4"
+              sx={{ whiteSpace: 'nowrap' }}
+            >
+              {`${t('uploaded-from')} ${t(`upload-source.${uploadSource}`)}`}
+            </Typography>
+          </DocumentUploadContainer>
+        )}
       </Header>
+      {!uploadsSortedByDate.length && (
+        <Row>
+          <Typography variant="body-3">{t('no-uploads')}</Typography>
+        </Row>
+      )}
       {uploadsSortedByDate.map((upload, i) => (
         <Row key={upload.timestamp}>
           <Time>
