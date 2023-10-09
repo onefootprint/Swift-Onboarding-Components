@@ -136,6 +136,10 @@ impl IncodeFailureReason {
             _ => None,
         }
     }
+
+    pub fn can_proceed_immediately_if_present(&self) -> bool {
+        matches!(self, Self::DriversLicensePermitNotAllowed)
+    }
 }
 
 #[derive(

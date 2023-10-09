@@ -139,10 +139,23 @@ where
                     .clone()
                     .into_iter()
                     .filter(|r| !session.ignored_failure_reasons.contains(r))
+                    .filter(|r| !r.can_proceed_immediately_if_present()) // this is getting complicated...
                     .collect_vec();
 
                 let (step_result, next_state, new_ignore_reasons) = if unhandled_failure_reasons.is_empty() {
-                    (StepResult::Ready, default_next_state, None)
+                    // add immediately proceed reasons to session so we generate FRCs in `complete.rs`
+                    let immediately_proceed_ignore_reasons: Vec<IncodeFailureReason> = all_failure_reasons
+                        .iter()
+                        .filter(|r| r.can_proceed_immediately_if_present())
+                        .cloned()
+                        .collect();
+                    let ignore_reasons = if immediately_proceed_ignore_reasons.is_empty() {
+                        None
+                    } else {
+                        Some(immediately_proceed_ignore_reasons)
+                    };
+
+                    (StepResult::Ready, default_next_state, ignore_reasons)
                 } else {
                     // Some unhandled errors - decide how to proceed.
                     // We'll either retry the current state, or ignore the errors and move to the next state
