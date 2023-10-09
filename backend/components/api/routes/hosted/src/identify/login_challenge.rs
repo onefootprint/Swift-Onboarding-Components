@@ -15,6 +15,7 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::utils::headers::SandboxId;
+use api_core::utils::headers::TelemetryHeaders;
 use api_core::utils::sms::rx_background_error;
 use api_wire_types::IdentifyId;
 use crypto::serde_cbor;
@@ -51,6 +52,7 @@ pub async fn post(
     // When provided, is used to identify the currently authed user. Will generate a challenge
     // for the authed user
     user_auth: Option<UserAuthContext>,
+    telemetry_headers: TelemetryHeaders,
 ) -> actix_web::Result<Json<ResponseData<LoginChallengeResponse>>, ApiError> {
     let tenant = ob_context.as_ref().map(|obc| obc.tenant());
 
@@ -115,8 +117,9 @@ pub async fn post(
             }
             ChallengeKind::Sms => {
                 let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
+                let s_id = telemetry_headers.session_id;
                 let (rx, challenge_state, time_before_retry_s) = twilio_client
-                    .send_challenge_non_blocking(&state, tenant, &phone_number, None, sandbox_id)
+                    .send_challenge_non_blocking(&state, tenant, &phone_number, None, sandbox_id, s_id)
                     .await?;
                 let challenge_data = ChallengeData::Sms(challenge_state);
                 (

@@ -7,7 +7,7 @@ use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::utils::headers::SandboxId;
+use api_core::utils::headers::{SandboxId, TelemetryHeaders};
 use api_core::utils::sms::rx_background_error;
 use newtypes::email::Email;
 use newtypes::PhoneNumber;
@@ -36,15 +36,17 @@ pub async fn post(
     ob_context: Option<ObConfigAuth>,
     // When provided, creates a sandbox user with the given suffix
     sandbox_id: SandboxId,
+    telemetry_headers: TelemetryHeaders,
 ) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
     let SignupChallengeRequest { phone_number, email } = request.into_inner();
     let (rx, challenge_data) = match (phone_number, email) {
         (Some(phone_number), email) => {
             let tenant = ob_context.as_ref().map(|obc| obc.tenant());
             let email = email.map(|e| e.email);
+            let s_id = telemetry_headers.session_id;
             let (rx, challenge_state_data, time_before_retry_s) = state
                 .sms_client
-                .send_challenge_non_blocking(&state, tenant, &phone_number, email, sandbox_id.0)
+                .send_challenge_non_blocking(&state, tenant, &phone_number, email, sandbox_id.0, s_id)
                 .await?;
 
             let challenge_state = ChallengeState {

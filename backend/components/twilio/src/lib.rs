@@ -109,6 +109,7 @@ impl Client {
             .await?;
 
         let message: Message = decode_response(response).await?;
+        tracing::info!(sid=%message.sid, "Sent twilio message");
 
         // fatal delivery here, abort
         if matches!(message.status, Status::Undelivered | Status::Failed) {

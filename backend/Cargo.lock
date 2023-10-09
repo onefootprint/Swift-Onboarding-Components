@@ -8019,6 +8019,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-retry",
+ "tracing",
 ]
 
 [[package]]

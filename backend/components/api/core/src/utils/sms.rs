@@ -11,8 +11,8 @@ use crypto::sha256;
 use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use itertools::Itertools;
-use newtypes::SandboxId;
 use newtypes::{PhoneNumber, PiiString};
+use newtypes::{SandboxId, SessionId};
 
 use self::rate_limit::RateLimit;
 
@@ -149,7 +149,8 @@ impl SmsClient {
         .enforce_and_update()
         .await?;
         let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
-        self._send_message(message_body, destination.e164(), None).await?;
+        self._send_message(message_body, destination.e164(), None, None)
+            .await?;
         Ok(())
     }
 
@@ -161,6 +162,7 @@ impl SmsClient {
         destination: &PhoneNumber,
         rate_limit_scope: &str,
         tx: Sender<ApiError>,
+        session_id: Option<SessionId>,
     ) -> ApiResult<()> {
         if destination.is_fixture_phone_number() {
             // Don't rate limit or send SMS messages to the fixture phone number
@@ -179,7 +181,7 @@ impl SmsClient {
         let client = self.clone();
         tokio::spawn(async move {
             let _ = client
-                ._send_message(message_body, e164, Some(tx))
+                ._send_message(message_body, e164, Some(tx), session_id)
                 .await
                 .map_err(|err| {
                     tracing::error!(?err, "Failed to send SMS message");
@@ -189,12 +191,14 @@ impl SmsClient {
     }
 
     /// Sends the message_body to the provided destination, choosing which vendor to use if any
-    #[tracing::instrument("SmsClient::_send_message", skip_all)]
+    #[tracing::instrument("SmsClient::_send_message", skip(self, message_body, destination, tx))]
     async fn _send_message(
         &self,
         message_body: PiiString,
         destination: PiiString,
         mut tx: Option<Sender<ApiError>>,
+        // Optional for logging
+        session_id: Option<SessionId>,
     ) -> ApiResult<()> {
         let message = Message {
             client: self,
@@ -259,6 +263,7 @@ impl SmsClient {
         // For signup challenges. Used to initialize the vault with an email
         email: Option<PiiString>,
         sandbox_id: Option<SandboxId>,
+        session_id: Option<SessionId>,
     ) -> ApiResult<(Receiver<ApiError>, PhoneChallengeState, SecondsBeforeRetry)> {
         // Send non-blocking to prevent us from returning the challenge data to the frontend while
         // we wait for twilio latency
@@ -291,8 +296,15 @@ impl SmsClient {
         // Oneshot channel to send an error back from async message sending
         let (tx, rx) = oneshot::channel();
 
-        self.send_message_non_blocking(state, message_body, destination, rate_limit::SMS_CHALLENGE, tx)
-            .await?;
+        self.send_message_non_blocking(
+            state,
+            message_body,
+            destination,
+            rate_limit::SMS_CHALLENGE,
+            tx,
+            session_id,
+        )
+        .await?;
 
         Ok((
             rx,
