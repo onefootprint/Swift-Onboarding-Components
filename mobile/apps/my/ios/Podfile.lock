@@ -282,7 +282,7 @@ PODS:
     - ReactCommon/turbomodule/core
   - react-native-splash-screen (3.3.0):
     - React-Core
-  - react-native-worklets-core (0.2.0):
+  - react-native-worklets-core (0.2.2):
     - React
     - React-callinvoker
     - React-Core
@@ -418,7 +418,7 @@ PODS:
   - Sentry/HybridSDK (8.11.0):
     - SentryPrivate (= 8.11.0)
   - SentryPrivate (8.11.0)
-  - VisionCamera (3.1.0):
+  - VisionCamera (3.3.1):
     - React
     - React-callinvoker
     - React-Core
@@ -469,7 +469,7 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
   - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
-  - "RNFlashList (from `../../../node_modules/@shopify/flash-list`)"
+  - "RNFlashList (from `../node_modules/@shopify/flash-list`)"
   - RNReactNativeHapticFeedback (from `../../../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
@@ -570,7 +570,7 @@ EXTERNAL SOURCES:
   RNDeviceInfo:
     :path: "../../../node_modules/react-native-device-info"
   RNFlashList:
-    :path: "../../../node_modules/@shopify/flash-list"
+    :path: "../node_modules/@shopify/flash-list"
   RNReactNativeHapticFeedback:
     :path: "../../../node_modules/react-native-haptic-feedback"
   RNReanimated:
@@ -614,7 +614,7 @@ SPEC CHECKSUMS:
   react-native-passkey: 29ff814a83dfd4311478498e71a801dce68043ac
   react-native-safe-area-context: 39c2d8be3328df5d437ac1700f4f3a4f75716acc
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
-  react-native-worklets-core: 7ad416a8965086b98b07964f7f6932560a54a14c
+  react-native-worklets-core: 81629f0e2629a63336221a8e6a60aaa5cdbd1bf9
   React-perflogger: 431a655960a02f01257d631b2a9bfbb02fd21064
   React-RCTActionSheet: 38c8d496d0faa63013d16f709e10a3acf6b5f100
   React-RCTAnimation: 6da4d599f3262ed8021433ddd96de45ac9e731b1
@@ -639,9 +639,9 @@ SPEC CHECKSUMS:
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
   Sentry: 39d57e691e311bdb73bc1ab5bbebbd6bc890050d
   SentryPrivate: 48712023cdfd523735c2edb6b06bedf26c4730a3
-  VisionCamera: 5716d5c3f2e5cbcf0e58e30e91b09b2fbb1f12ef
+  VisionCamera: f649cd0c0fa6266f1cd5e0787a7c9583ca143b3a
   Yoga: 135109c9b8c5d1a8af3a58d21cd4c7aa7f3bf555
 
-PODFILE CHECKSUM: 3d8feaf910a4db56fb30d6b77d9c0b7f427f38f6
+PODFILE CHECKSUM: 9ccdc7d352535b1f0b24fe8ce9711e2b1989a8c3
 
 COCOAPODS: 1.12.1
