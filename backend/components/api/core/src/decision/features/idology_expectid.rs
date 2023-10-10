@@ -88,10 +88,9 @@ impl IDologyFeatures {
             reason_codes
         } else if !id_located {
             // Important Note: When Idology does not locate an id, they do not provide additional match related signals specifying how identity attributes match.
-            // But, to keep things consistent and be more understandable to our customers, we generate NoMatch reason codes, as this is a reasonable explanation for "not locating".
             reason_codes
                 .into_iter()
-                .chain(Self::id_not_located_codes(dob_submitted, ssn_submitted).into_iter())
+                .chain(vec![FootprintReasonCode::IdNotLocated].into_iter())
                 .collect()
         } else {
             // If ID was located, continue with the logic to add in match codes
@@ -172,19 +171,6 @@ impl IDologyFeatures {
         };
 
         footprint_reason_codes.into_iter().unique().collect()
-    }
-
-    fn id_not_located_codes(dob_submitted: bool, ssn_submitted: bool) -> Vec<FootprintReasonCode> {
-        [
-            ssn_submitted.then_some(FootprintReasonCode::SsnDoesNotMatch),
-            dob_submitted.then_some(FootprintReasonCode::DobDoesNotMatch),
-            Some(FootprintReasonCode::AddressDoesNotMatch),
-            Some(FootprintReasonCode::NameDoesNotMatch),
-            Some(FootprintReasonCode::IdNotLocated),
-        ]
-        .into_iter()
-        .flatten()
-        .collect()
     }
 
     fn qualifier_reason_codes(qualifiers: Option<&IDologyQualifiers>) -> Vec<FootprintReasonCode> {
@@ -290,9 +276,9 @@ mod test {
         IDologyFeatures::qualifier_reason_codes(resp.response.qualifiers.as_ref())
     }
 
-    #[test_case("result.no.match", false, json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop, SsnDoesNotMatch, DobDoesNotMatch, AddressDoesNotMatch, NameDoesNotMatch, IdNotLocated])]
+    #[test_case("result.no.match", false, json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop, IdNotLocated])]
     #[test_case("result.match", false, json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop, AddressMatches, DobMatches, SsnMatches, NameMatches])]
-    #[test_case("result.match", true, json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop, WatchlistHitOfac, AddressMatches,DobMatches,  SsnMatches, NameMatches])]
+    #[test_case("result.match", true, json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop, WatchlistHitOfac, AddressMatches,DobMatches, SsnMatches, NameMatches])]
     #[test_case("result.match", false, construct_matching_qualifier(MatchLevel::Exact) => vec![AddressMatches, DobMatches, SsnMatches, NameMatches])]
     #[test_case("result.match", false, construct_matching_qualifier(MatchLevel::Partial) => vec![AddressStreetNameDoesNotMatch, NameFirstDoesNotMatch, SsnDoesNotMatchWithin1Digit, DobMobDoesNotMatch, AddressPartiallyMatches, DobPartialMatch, SsnPartiallyMatches, NamePartiallyMatches])]
     #[test_case("result.match", false, construct_matching_qualifier(MatchLevel::NoMatch) => vec![AddressDoesNotMatch, NameFirstDoesNotMatch, NameLastDoesNotMatch, SsnDoesNotMatch, DobMobDoesNotMatch, DobYobDoesNotMatch, DobDoesNotMatch, NameDoesNotMatch])]
@@ -312,7 +298,7 @@ mod test {
     #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), true, false => vec![AddressMatches, DobMatches, NameMatches])]
     #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), false, true => vec![AddressMatches, SsnMatches, NameMatches])]
     #[test_case("result.match", construct_matching_qualifier(MatchLevel::Exact), false, false => vec![AddressMatches, NameMatches])]
-    #[test_case("result.no.match", json!({}), false, false => vec![AddressDoesNotMatch, NameDoesNotMatch, IdNotLocated])] // qualif not used
+    #[test_case("result.no.match", json!({}), false, false => vec![ IdNotLocated])] // qualif not used
     fn test_dob_ssn_filtering(
         result_key: &str,
         qualifier: serde_json::Value,
