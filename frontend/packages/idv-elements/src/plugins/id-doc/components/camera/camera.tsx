@@ -26,7 +26,7 @@ import getVideoHeight from './utils/get-video-height';
 
 export type DeviceKind = 'mobile' | 'desktop';
 const AUTOCAPTURE_TIMER_START_VAL = 3;
-const AUTOCAPTURE_TIMER_INTERVAL = 1000; // in milliseconds
+const AUTOCAPTURE_TIMER_INTERVAL = 850; // in milliseconds
 
 type CameraProps = {
   onCapture: (image: string, capturKind: CaptureKind) => void;
