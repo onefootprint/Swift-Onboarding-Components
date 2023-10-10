@@ -24,7 +24,7 @@ members = [
     "components/privacy_pass",
     "components/webhooks",
     "components/integrations/alpaca",
-    "components/selfie",
+    "components/selfie_doc",
     "external_tools/ditto",
     "external_tools/hooky",
     "internal_tools/scripts/workos",

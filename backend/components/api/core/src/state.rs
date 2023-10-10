@@ -20,6 +20,7 @@ use idv::{
     stytch::client::StytchClient,
 };
 
+use selfie_doc::AwsSelfieDocClient;
 use webhooks::WebhookClient;
 use workos::{ApiKey, WorkOs};
 
@@ -74,6 +75,7 @@ pub struct State {
     pub fingerprintjs_client: FingerprintJSClient,
     pub vendor_clients: VendorClients,
     pub metrics: Metrics,
+    pub aws_selfie_doc_client: AwsSelfieDocClient,
 }
 impl State {
     /// initialize global state in test context
@@ -134,6 +136,7 @@ impl State {
             client: kms_client,
             key_id: config.signing_root_key_id.clone(),
         };
+        let aws_selfie_doc_client = AwsSelfieDocClient::new(&shared_config);
 
         let workos_client = WorkOs::new(&ApiKey::from(config.workos_api_key.as_str()));
 
@@ -252,6 +255,7 @@ impl State {
             fingerprintjs_client,
             vendor_clients,
             metrics,
+            aws_selfie_doc_client,
         }
     }
 

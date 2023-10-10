@@ -549,6 +549,22 @@ function createTaskContainerRole(
               ],
             }),
           },
+          {
+            name: 'rekognition_textract_permissions',
+            policy: JSON.stringify({
+              Version: '2012-10-17',
+              Statement: [
+                {
+                  Action: [
+                    'rekognition:*',
+                    'textract:*'
+                  ],
+                  Effect: 'Allow',
+                  Resource: '*',
+                },
+              ],
+            }),
+          },
           // Add in our s3 Policies to inlinePolicies
         ].concat(s3Policies),
       });

@@ -1,0 +1,84 @@
+//! Temporary tool to analyze selfie + doc comparison and over
+
+use crate::{auth::ProtectedAuth, State};
+use actix_web::{get, web};
+use api_core::{
+    errors::ApiResult,
+    types::{JsonApiResponse, ResponseData},
+    utils::vault_wrapper::{EnclaveDecryptOperation, Pii, VaultWrapper},
+    ApiErrorKind,
+};
+use db::models::scoped_vault::ScopedVault;
+use newtypes::{DataIdentifier, FpId};
+
+#[derive(Debug, serde::Deserialize)]
+pub struct CompareAnalyzeRequest {
+    fp_id: FpId,
+    document_id: DataIdentifier,
+    selfie_id: DataIdentifier,
+}
+
+#[derive(Debug, serde::Serialize)]
+pub struct ComparisonAndDocOcrResult {
+    comparison_result: selfie_doc::compare::CompareResult,
+    analyzed_id: selfie_doc::analyze_id::AnalyzeIdResult,
+}
+
+#[get("/private/protected/aws_selfie_doc")]
+pub async fn post(
+    state: web::Data<State>,
+    request: web::Json<CompareAnalyzeRequest>,
+    _: ProtectedAuth,
+) -> JsonApiResponse<ComparisonAndDocOcrResult> {
+    let CompareAnalyzeRequest {
+        fp_id,
+        document_id,
+        selfie_id,
+    } = request.into_inner();
+
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let sv = ScopedVault::get(
+                conn,
+                db::models::scoped_vault::ScopedVaultIdentifier::SuperAdminView { fp_id: &fp_id },
+            )?;
+            VaultWrapper::<api_core::utils::vault_wrapper::Any>::build_for_tenant(conn, &sv.id)
+        })
+        .await??;
+
+    let doc_id_op: EnclaveDecryptOperation = document_id.into();
+    let selfie_id_op: EnclaveDecryptOperation = selfie_id.into();
+
+    let results = uvw
+        .fn_decrypt_unchecked_raw(
+            &state.enclave_client,
+            vec![doc_id_op.clone(), selfie_id_op.clone()],
+        )
+        .await?;
+
+    let doc_pii_bytes = match results.get(&doc_id_op).ok_or(ApiErrorKind::ResourceNotFound)? {
+        Pii::Bytes(bytes) => bytes,
+        _ => return Err(ApiErrorKind::AssertionError("unexpected pii type".into()))?,
+    };
+    let selfie_pii_bytes = match results.get(&selfie_id_op).ok_or(ApiErrorKind::ResourceNotFound)? {
+        Pii::Bytes(bytes) => bytes,
+        _ => return Err(ApiErrorKind::AssertionError("unexpected pii type".into()))?,
+    };
+
+    let comparison_result = state
+        .aws_selfie_doc_client
+        .compare_doc_to_selfie(doc_pii_bytes, selfie_pii_bytes, None)
+        .await?;
+
+    let analyzed_id = state
+        .aws_selfie_doc_client
+        .extract_document_data(doc_pii_bytes)
+        .await?;
+
+    ResponseData::ok(ComparisonAndDocOcrResult {
+        comparison_result,
+        analyzed_id,
+    })
+    .json()
+}

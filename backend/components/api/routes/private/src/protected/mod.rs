@@ -1,3 +1,4 @@
+mod aws_selfie_doc;
 mod decrypt;
 mod incode;
 mod risk;
