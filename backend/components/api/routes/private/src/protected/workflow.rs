@@ -3,7 +3,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
 use actix_web::{post, web, web::Json};
-use api_core::auth::tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard};
+use api_core::auth::tenant::{CheckTenantGuard, FirmEmployeeAssumeAuthContext, TenantGuard};
 use api_core::auth::Either;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::traits::Workflow as TWorkflow;
@@ -80,7 +80,7 @@ pub struct ProceedResponse {
 #[post("/private/protected/workflow/proceed")]
 async fn proceed(
     state: web::Data<State>,
-    auth: Either<ProtectedCustodianAuthContext, FirmEmployeeAuthContext>,
+    auth: Either<ProtectedCustodianAuthContext, FirmEmployeeAssumeAuthContext>,
     request: Json<ProceedRequest>,
 ) -> actix_web::Result<Json<ResponseData<ProceedResponse>>, ApiError> {
     if let Either::Right(auth) = auth {

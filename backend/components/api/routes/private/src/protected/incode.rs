@@ -3,7 +3,7 @@ use actix_web::{post, web, web::Json};
 use api_core::{
     auth::{
         protected_custodian::ProtectedCustodianAuthContext,
-        tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard},
+        tenant::{CheckTenantGuard, FirmEmployeeAssumeAuthContext, TenantGuard},
         Either,
     },
     errors::{ApiResult, AssertionError},
@@ -33,7 +33,7 @@ pub struct Request {
 pub async fn rerun_machine(
     state: web::Data<State>,
     request: Json<Request>,
-    auth: Either<ProtectedCustodianAuthContext, FirmEmployeeAuthContext>,
+    auth: Either<ProtectedCustodianAuthContext, FirmEmployeeAssumeAuthContext>,
 ) -> JsonApiResponse<DocumentResponse> {
     if let Either::Right(auth) = auth {
         // Basically, make sure only "Risk ops" employees can hit this API

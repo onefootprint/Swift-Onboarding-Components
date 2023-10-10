@@ -71,7 +71,7 @@ class Endpoint:
         security = [
             security
             for security in self._path_info.get("security") or []
-            if not any(k == "Firm Employee Token" for k in security)
+            if not any(k == "Firm Employee Assume Token" for k in security)
         ]
         assert not any(
             "firm" in k.lower() for s in security for k in s

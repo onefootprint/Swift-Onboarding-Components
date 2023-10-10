@@ -4,7 +4,7 @@ use api_core::{
     auth::{
         protected_custodian::ProtectedCustodianAuthContext,
         session::AuthSessionData,
-        tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard},
+        tenant::{CheckTenantGuard, FirmEmployeeAssumeAuthContext, TenantGuard},
         Either,
     },
     types::{JsonApiResponse, ResponseData},
@@ -35,7 +35,7 @@ pub enum SessionKind {
 pub async fn post(
     state: web::Data<State>,
     request: Json<RevealRequest>,
-    auth: Either<ProtectedCustodianAuthContext, FirmEmployeeAuthContext>,
+    auth: Either<ProtectedCustodianAuthContext, FirmEmployeeAssumeAuthContext>,
 ) -> JsonApiResponse<RevealResponse> {
     if let Either::Right(auth) = auth {
         // Basically, make sure only "Risk ops" employees can hit this API

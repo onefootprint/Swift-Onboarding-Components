@@ -3,7 +3,7 @@ use actix_web::{post, web, web::Json};
 use api_core::decision::vendor;
 use api_core::ApiErrorKind;
 use api_core::{
-    auth::tenant::{CheckTenantGuard, FirmEmployeeAuthContext, TenantGuard},
+    auth::tenant::{CheckTenantGuard, FirmEmployeeAssumeAuthContext, TenantGuard},
     types::{JsonApiResponse, ResponseData},
 };
 use db::models::{vault::Vault, verification_result::VerificationResult};
@@ -25,7 +25,7 @@ pub struct DecryptVresResponse {
 pub async fn post(
     state: web::Data<State>,
     request: Json<DecryptVresRequest>,
-    auth: FirmEmployeeAuthContext,
+    auth: FirmEmployeeAssumeAuthContext,
 ) -> JsonApiResponse<DecryptVresResponse> {
     // Basically, make sure only "Risk ops" employees can hit this API
     auth.check_guard(TenantGuard::ManualReview)?;

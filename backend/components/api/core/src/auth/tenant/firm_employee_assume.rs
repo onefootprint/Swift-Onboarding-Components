@@ -23,7 +23,7 @@ use paperclip::actix::Apiv2Security;
 #[derive(Debug, Clone)]
 /// Represents all tenant info identified by a workos session token. This struct is hydrated from
 /// the DB using the information on the FirmEmployeeSession
-pub struct FirmEmployeeAuth {
+pub struct FirmEmployeeAssumeAuth {
     tenant: Tenant,
     tenant_user: TenantUser,
     role: TenantRole,
@@ -39,17 +39,17 @@ pub struct FirmEmployeeAuth {
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
-    alias = "Firm Employee Token",
+    alias = "Firm Employee Assume Token",
     in = "header",
     name = "X-Fp-Dashboard-Authorization",
     description = "Short-lived auth token for a firm-employee dashboard user."
 )]
-pub struct ParsedFirmEmployeeAuth(pub(super) FirmEmployeeAuth);
+pub struct ParsedFirmEmployeeAssumeAuth(pub(super) FirmEmployeeAssumeAuth);
 
-/// A shorthand for the extractor for a firm employee auth session
-pub type FirmEmployeeAuthContext = SessionContext<ParsedFirmEmployeeAuth>;
+/// A shorthand for the extractor for a firm employee assumd auth session
+pub type FirmEmployeeAssumeAuthContext = SessionContext<ParsedFirmEmployeeAssumeAuth>;
 
-impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
+impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Dashboard-Authorization"]
     }
@@ -80,7 +80,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         let is_risk_ops = ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
 
         tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee");
-        Ok(Self(FirmEmployeeAuth {
+        Ok(Self(FirmEmployeeAssumeAuth {
             tenant,
             tenant_user,
             role,
@@ -95,7 +95,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
     }
 }
 
-impl GetFirmEmployee for FirmEmployeeAuthContext {
+impl GetFirmEmployee for FirmEmployeeAssumeAuthContext {
     fn firm_employee_user(&self) -> ApiResult<TenantUser> {
         let tu = &self.0.tenant_user;
         if !tu.is_firm_employee {
@@ -108,9 +108,9 @@ impl GetFirmEmployee for FirmEmployeeAuthContext {
 
 // Allow calling SessionContext<T>::update for T=ParsedFirmEmployeeAuth, only for mutating a token to be used
 // for impersonation
-impl AllowSessionUpdate for ParsedFirmEmployeeAuth {}
+impl AllowSessionUpdate for ParsedFirmEmployeeAssumeAuth {}
 
-impl FirmEmployeeAuth {
+impl FirmEmployeeAssumeAuth {
     fn token_scopes(&self) -> Vec<TenantScope> {
         // TODO check if there's a header that approves write access
         let extra_permissions_for_user = if self.is_risk_ops {
@@ -132,7 +132,7 @@ impl FirmEmployeeAuth {
     }
 }
 
-impl CanCheckTenantGuard for FirmEmployeeAuthContext {
+impl CanCheckTenantGuard for FirmEmployeeAssumeAuthContext {
     fn token_scopes(&self) -> Vec<TenantScope> {
         self.0.token_scopes()
     }
@@ -142,7 +142,7 @@ impl CanCheckTenantGuard for FirmEmployeeAuthContext {
     }
 }
 
-impl TenantAuth for SessionContext<FirmEmployeeAuth> {
+impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
     fn is_live(&self) -> ApiResult<bool> {
         // TODO dedupe this logic
         let is_live: Option<bool> = self
@@ -182,7 +182,7 @@ impl TenantAuth for SessionContext<FirmEmployeeAuth> {
 #[cfg(test)]
 mod test {
     use super::super::CanCheckTenantGuard;
-    use super::{FirmEmployeeAuth, ParsedFirmEmployeeAuth};
+    use super::{FirmEmployeeAssumeAuth, ParsedFirmEmployeeAssumeAuth};
     use crate::auth::session::tenant::FirmEmployeeSession;
     use crate::auth::{session::AuthSessionData, SessionContext};
     use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
@@ -209,14 +209,14 @@ mod test {
             tenant_id: tenant.id.clone(),
             auth_method: WorkosAuthMethod::GoogleOauth,
         });
-        let data = FirmEmployeeAuth {
+        let data = FirmEmployeeAssumeAuth {
             tenant,
             tenant_user,
             role,
             is_risk_ops,
             auth_method: WorkosAuthMethod::GoogleOauth,
         };
-        let data = ParsedFirmEmployeeAuth(data);
+        let data = ParsedFirmEmployeeAssumeAuth(data);
         let auth = SessionContext::create_fixture(data, session_data);
         auth.token_scopes()
     }

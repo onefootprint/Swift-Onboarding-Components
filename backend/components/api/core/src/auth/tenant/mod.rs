@@ -12,8 +12,8 @@ use newtypes::WorkosAuthMethod;
 pub use secret_key::*;
 mod tenant_rb;
 pub use self::tenant_rb::*;
-mod firm_employee;
-pub use self::firm_employee::*;
+mod firm_employee_assume;
+pub use self::firm_employee_assume::*;
 mod client;
 pub use client::*;
 
@@ -29,7 +29,7 @@ use crate::errors::ApiResult;
 use crate::State;
 use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
 
-pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAuthContext>;
+pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAssumeAuthContext>;
 
 pub type AnyTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, TenantSessionAuth>;
 
