@@ -37,5 +37,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(trigger::post)
         .service(kyc::post)
         .service(risk_signals::get_detail)
+        .service(risk_signals::decrypt_aml_hits)
         .service(auth_events::get);
 }

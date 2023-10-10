@@ -25,8 +25,8 @@ impl DbToApi<RiskSignal> for api_wire_types::RiskSignal {
     }
 }
 
-impl DbToApi<(RiskSignal, Option<api_wire_types::AmlDetail>)> for api_wire_types::RiskSignalDetail {
-    fn from_db((rs, aml): (RiskSignal, Option<api_wire_types::AmlDetail>)) -> Self {
+impl DbToApi<(RiskSignal, bool)> for api_wire_types::RiskSignalDetail {
+    fn from_db((rs, has_aml_hits): (RiskSignal, bool)) -> Self {
         let RiskSignal {
             id,
             onboarding_decision_id,
@@ -44,7 +44,7 @@ impl DbToApi<(RiskSignal, Option<api_wire_types::AmlDetail>)> for api_wire_types
             severity: reason_code.severity(),
             scopes: reason_code.scopes(),
             timestamp: created_at,
-            aml,
+            has_aml_hits,
         }
     }
 }

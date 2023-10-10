@@ -27,7 +27,7 @@ pub struct RiskSignalDetail {
     pub severity: SignalSeverity,
     pub scopes: Vec<SignalScope>,
     pub timestamp: chrono::DateTime<Utc>,
-    pub aml: Option<AmlDetail>,
+    pub has_aml_hits: bool,
 }
 
 export_schema!(RiskSignalDetail);

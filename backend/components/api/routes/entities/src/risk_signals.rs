@@ -38,7 +38,8 @@ use newtypes::FpId;
 use newtypes::PiiJsonValue;
 use newtypes::RiskSignalId;
 
-use paperclip::actix::{api_v2_operation, get, web};
+use newtypes::TenantId;
+use paperclip::actix::{api_v2_operation, get, post, web};
 
 type RiskSignalsListResponse = Vec<api_wire_types::RiskSignal>;
 
@@ -134,6 +135,46 @@ pub async fn get_detail(
     let is_live = auth.is_live()?;
     let (fp_id, risk_signal_id) = request.into_inner();
 
+    let (rs, aml_detail) =
+        get_risk_signal_and_maybe_aml_detail(&state, risk_signal_id, fp_id, tenant_id, is_live).await?;
+    let has_aml_hits = aml_detail.is_some();
+
+    ResponseData::ok(api_wire_types::RiskSignalDetail::from_db((rs, has_aml_hits))).json()
+}
+
+#[api_v2_operation(
+    description = "Decrypts structured information about the AML hits for a AML risk signal.",
+    tags(Entities, Private)
+)]
+#[post("/entities/{fp_id}/decrypt_aml_hits/{signal_id}")]
+pub async fn decrypt_aml_hits(
+    state: web::Data<State>,
+    request: web::Path<(FpId, RiskSignalId)>,
+    auth: TenantSessionAuth,
+) -> JsonApiResponse<api_wire_types::AmlDetail> {
+    let auth = auth.check_guard(TenantGuard::Read)?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
+    let (fp_id, risk_signal_id) = request.into_inner();
+
+    // TODO: assert decrypt permissions + write AccessEvent. maybe just shoehorn into existing structs as (FirstName, MiddleName, LastName, Dob) or need to rework some of this stuff to not be so DI dependent
+
+    let (_rs, aml_detail) =
+        get_risk_signal_and_maybe_aml_detail(&state, risk_signal_id, fp_id, tenant_id, is_live).await?;
+    let Some(aml_detail) = aml_detail else {
+        Err(AssertionError("No AML hit data for risk signal"))?
+    };
+
+    ResponseData::ok(aml_detail).json()
+}
+
+async fn get_risk_signal_and_maybe_aml_detail(
+    state: &State,
+    risk_signal_id: RiskSignalId,
+    fp_id: FpId,
+    tenant_id: TenantId,
+    is_live: bool,
+) -> ApiResult<(RiskSignal, Option<api_wire_types::AmlDetail>)> {
     let (rs, vreq_vres_key_obc) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -159,12 +200,12 @@ pub async fn get_detail(
         .await??;
 
     let aml_detail = if let Some((vreq_vres, key, obc)) = vreq_vres_key_obc {
-        get_aml_hits(&state, &obc.enhanced_aml(), vreq_vres, key).await?
+        get_aml_hits(state, &obc.enhanced_aml(), vreq_vres, key).await?
     } else {
         None
     };
 
-    ResponseData::ok(api_wire_types::RiskSignalDetail::from_db((rs, aml_detail))).json()
+    Ok((rs, aml_detail))
 }
 
 async fn get_aml_hits(

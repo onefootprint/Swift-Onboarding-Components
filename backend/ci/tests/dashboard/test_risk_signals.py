@@ -1,7 +1,7 @@
 from tests.constants import FIXTURE_PHONE_NUMBER
 from tests.utils import _gen_random_n_digit_number
 from tests.bifrost_client import BifrostClient
-from tests.utils import get
+from tests.utils import get, post
 from tests.integrations.test_alpaca import alpaca_kyc_ob_config
 
 
@@ -18,14 +18,24 @@ def test_aml(sandbox_tenant, twilio, alpaca_kyc_ob_config):
     risk_signals = get(
         f"entities/{user.fp_id}/risk_signals", None, sandbox_tenant.sk.key
     )
+    assert set(["watchlist_hit_ofac", "adverse_media_hit"]) <= set(
+        [rs["reason_code"] for rs in risk_signals]
+    )
     for risk_signal in risk_signals:
         rs = get(
             f"entities/{user.fp_id}/risk_signals/{risk_signal['id']}",
             None,
             *sandbox_tenant.db_auths,
         )
-        aml = rs["aml"]
+
         if rs["reason_code"] in ["watchlist_hit_ofac", "adverse_media_hit"]:
+            assert rs["has_aml_hits"] == True
+
+            aml = post(
+                f"entities/{user.fp_id}/decrypt_aml_hits/{risk_signal['id']}",
+                None,
+                *sandbox_tenant.db_auths,
+            )
             assert (
                 aml["share_url"]
                 == "https://app.eu.complyadvantage.com/public/search/abc/123"
@@ -67,4 +77,4 @@ def test_aml(sandbox_tenant, twilio, alpaca_kyc_ob_config):
                 }.items()
             )
         else:
-            assert aml is None
+            assert rs["has_aml_hits"] == False
