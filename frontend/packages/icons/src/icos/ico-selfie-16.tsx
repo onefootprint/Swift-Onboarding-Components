@@ -36,7 +36,7 @@ const IcoSelfie16 = ({
         height={12.518}
         rx={2.347}
         stroke={theme.color[color]}
-        strokeWidth={1.174}
+        strokeWidth={1.4}
       />
     </svg>
   );

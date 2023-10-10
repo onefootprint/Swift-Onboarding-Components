@@ -24,7 +24,7 @@ const IcoFilter16 = ({
       <path
         d="M14.25 1.75H1.75l3.933 4.916c.244.305.377.685.377 1.077v5.645c0 .476.386.862.862.862h2.156a.862.862 0 0 0 .862-.862V7.743c0-.392.133-.772.378-1.077L14.25 1.75Z"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
+        strokeWidth={1.4}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
