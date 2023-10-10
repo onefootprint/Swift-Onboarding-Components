@@ -92,7 +92,7 @@ incode_reason_code_enum! {
         // this is done relative to all of footprint's sessions. If a tenant is having issues with duplicate fraud/malicious actors
         // we should provision them their own environment so the checks are on a smaller surface area and more signalful
         #[ser = "idAlreadyUsedCheck"]
-        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentSelfieNotUsedWithDifferentInformation, FRC::DocumentSelfieUsedWithDifferentInformation))]
+        #[footprint_reason_code = Some(IncodeRCH::new_with_optional(None, Some(FRC::DocumentSelfieUsedWithDifferentInformation)))]
         IdAlreadyUsedCheck,
         // Alignment:
         // the picture is badly aligned and the correcting algorithm for alignment and cropping could not correct it for processing, and also when cropped captured image of ID  is near the edges.
