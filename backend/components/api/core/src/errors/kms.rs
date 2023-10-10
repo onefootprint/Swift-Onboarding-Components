@@ -1,10 +1,4 @@
-use aws_sdk_kms::{
-    error::{
-        GenerateDataKeyPairWithoutPlaintextError, GenerateDataKeyWithoutPlaintextError, GenerateMacError,
-        VerifyMacError,
-    },
-    types::SdkError as KmsSdkError,
-};
+use aws_sdk_kms::{error::SdkError as KmsSdkError, operation::{generate_data_key_pair_without_plaintext::GenerateDataKeyPairWithoutPlaintextError, generate_data_key_without_plaintext::GenerateDataKeyWithoutPlaintextError, generate_mac::GenerateMacError, verify_mac::VerifyMacError}};
 use thiserror::Error;
 
 #[derive(Debug, Error)]

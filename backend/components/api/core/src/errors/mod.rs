@@ -3,7 +3,9 @@ use actix_web::{
     http::StatusCode,
 };
 
-use aws_sdk_pinpointsmsvoicev2::{error::SendTextMessageError, types::SdkError as SmsSdkError};
+use aws_sdk_pinpointsmsvoicev2::{
+    error::SdkError as SmsSdkError, operation::send_text_message::SendTextMessageError,
+};
 use db::errors::DbError;
 use newtypes::{output::Csv, ContactInfoKind, DataIdentifier, ErrorMessage, Uuid};
 use paperclip::actix::api_v2_errors;

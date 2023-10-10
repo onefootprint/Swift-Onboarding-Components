@@ -1,8 +1,7 @@
-use aws_sdk_kms::error::DecryptError;
-use aws_sdk_kms::types::{Blob, SdkError};
-use aws_types::config::Config;
+use aws_sdk_kms::error::SdkError;
+use aws_sdk_kms::operation::decrypt::DecryptError;
 use aws_types::region::Region;
-
+use aws_types::SdkConfig;
 use thiserror::Error;
 
 use crate::KmsCredentials;
@@ -24,18 +23,18 @@ pub struct Client {
 
 impl Client {
     pub fn new(kms_creds: KmsCredentials) -> Result<Self, Error> {
-        let creds = aws_types::Credentials::new(
+        let creds = aws_sdk_kms::config::Credentials::new(
             kms_creds.key_id,
             kms_creds.secret_key,
             kms_creds.session_token,
             None,
             "simulated",
         );
-        let mut config = Config::builder();
+        let mut config = SdkConfig::builder();
         config.set_region(Region::new(kms_creds.region));
-        config.set_credentials_provider(Some(aws_types::credentials::SharedCredentialsProvider::new(
-            creds,
-        )));
+        config.set_credentials_provider(Some(
+            aws_credential_types::provider::SharedCredentialsProvider::new(creds),
+        ));
         let config = config.build();
         let kms_client = aws_sdk_kms::Client::new(&config);
         Ok(Self { kms_client })
@@ -47,7 +46,7 @@ impl Client {
         let out = self
             .kms_client
             .decrypt()
-            .ciphertext_blob(Blob::new(ciphertext))
+            .ciphertext_blob(aws_sdk_kms::primitives::Blob::new(ciphertext))
             .send()
             .await?;
 

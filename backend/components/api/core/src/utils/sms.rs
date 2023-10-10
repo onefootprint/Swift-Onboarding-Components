@@ -1,3 +1,4 @@
+use aws_credential_types::provider::SharedCredentialsProvider;
 use std::fmt::Debug;
 use tokio::sync::oneshot::{self, Receiver, Sender};
 
@@ -106,16 +107,14 @@ impl SmsClient {
         // TODO stop hardcoding this
         // TODO also change the sending number based on environment
         let pinpoint_config = aws_config::SdkConfig::builder()
-            .region(aws_sdk_kms::Region::new("us-east-1"))
-            .credentials_provider(aws_types::credentials::SharedCredentialsProvider::new(
-                aws_sdk_kms::Credentials::new(
-                    "AKIA3U5XRCZONUEXET7L",
-                    "RviyM0Yn3rYHnQK/mhC5Wb9DxWubx5rr1efqzB1p",
-                    None,
-                    None,
-                    "pinpoint_static",
-                ),
-            ))
+            .region(aws_types::region::Region::new("us-east-1"))
+            .credentials_provider(SharedCredentialsProvider::new(aws_credential_types::Credentials::new(
+                "AKIA3U5XRCZONUEXET7L",
+                "RviyM0Yn3rYHnQK/mhC5Wb9DxWubx5rr1efqzB1p",
+                None,
+                None,
+                "pinpoint_static",
+            )))
             .build();
         let pinpoint_client = aws_sdk_pinpointsmsvoicev2::Client::new(&pinpoint_config);
         Self {

@@ -1,6 +1,6 @@
 use api_wire_types::IdentifyId;
 use async_trait::async_trait;
-use aws_sdk_kms::types::Blob;
+use aws_sdk_kms::primitives::Blob;
 use crypto::sha256;
 use db::models::vault::Vault;
 use itertools::Itertools;
@@ -30,7 +30,7 @@ impl AwsHmacClient {
             .client
             .verify_mac()
             .key_id(&self.key_id)
-            .mac_algorithm(aws_sdk_kms::model::MacAlgorithmSpec::HmacSha512)
+            .mac_algorithm(aws_sdk_kms::types::MacAlgorithmSpec::HmacSha512)
             .message(Blob::new(data))
             .mac(Blob::new(signature))
             .send()
@@ -47,7 +47,7 @@ impl AwsHmacClient {
         let result = self
             .client
             .generate_mac()
-            .mac_algorithm(aws_sdk_kms::model::MacAlgorithmSpec::HmacSha512)
+            .mac_algorithm(aws_sdk_kms::types::MacAlgorithmSpec::HmacSha512)
             .key_id(&self.key_id)
             .message(Blob::new(data))
             .send()

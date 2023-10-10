@@ -1,5 +1,13 @@
-use aws_sdk_s3::model::{CompletedMultipartUpload, CompletedPart, Delete, ObjectIdentifier};
-use aws_sdk_s3::types::ByteStream;
+use aws_sdk_s3::operation::abort_multipart_upload::AbortMultipartUploadError;
+use aws_sdk_s3::operation::complete_multipart_upload::CompleteMultipartUploadError;
+use aws_sdk_s3::operation::create_multipart_upload::CreateMultipartUploadError;
+use aws_sdk_s3::operation::delete_objects::DeleteObjectsError;
+use aws_sdk_s3::operation::get_object::GetObjectError;
+use aws_sdk_s3::operation::list_buckets::ListBucketsError;
+use aws_sdk_s3::operation::put_object::PutObjectError;
+use aws_sdk_s3::operation::upload_part::UploadPartError;
+use aws_sdk_s3::primitives::ByteStream;
+use aws_sdk_s3::types::{CompletedMultipartUpload, CompletedPart, Delete, ObjectIdentifier};
 use bytes::{Bytes, BytesMut};
 use futures::StreamExt;
 use thiserror::Error;
@@ -62,7 +70,7 @@ impl S3Client {
         mime: Option<&str>,
     ) -> Result<String, S3Error>
     where
-        aws_sdk_s3::types::ByteStream: std::convert::From<T>,
+        ByteStream: std::convert::From<T>,
     {
         let body: ByteStream = ByteStream::from(object);
 
@@ -231,21 +239,21 @@ impl S3Client {
 #[derive(Debug, Error)]
 pub enum S3Error {
     #[error("List error")]
-    ListBuckets(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::ListBucketsError>),
+    ListBuckets(#[from] aws_sdk_s3::error::SdkError<ListBucketsError>),
     #[error("Delete objects error")]
-    DeleteObjects(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::DeleteObjectsError>),
+    DeleteObjects(#[from] aws_sdk_s3::error::SdkError<DeleteObjectsError>),
     #[error("Put object error")]
-    PutObject(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::PutObjectError>),
+    PutObject(#[from] aws_sdk_s3::error::SdkError<PutObjectError>),
     #[error("Create multipart upload error")]
-    CreateMultipartUpload(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::CreateMultipartUploadError>),
+    CreateMultipartUpload(#[from] aws_sdk_s3::error::SdkError<CreateMultipartUploadError>),
     #[error("Abort multipart error")]
-    AbortMultipartUpload(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::AbortMultipartUploadError>),
+    AbortMultipartUpload(#[from] aws_sdk_s3::error::SdkError<AbortMultipartUploadError>),
     #[error("Upload multipart error")]
-    UploadPart(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::UploadPartError>),
+    UploadPart(#[from] aws_sdk_s3::error::SdkError<UploadPartError>),
     #[error("Complete multipart error")]
-    CompleteUpload(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::CompleteMultipartUploadError>),
+    CompleteUpload(#[from] aws_sdk_s3::error::SdkError<CompleteMultipartUploadError>),
     #[error("Get object error")]
-    GetObject(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::GetObjectError>),
+    GetObject(#[from] aws_sdk_s3::error::SdkError<GetObjectError>),
     #[error("Not found")]
     BucketNotFound,
     #[error("URL parsing error")]

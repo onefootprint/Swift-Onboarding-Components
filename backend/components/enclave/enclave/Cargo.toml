@@ -11,7 +11,7 @@ doctest = false
 
 [features]
 default = ["simulate"]
-simulate = ["aws-types", "aws-config", "aws-sdk-kms"]
+simulate = ["aws-types", "aws-config", "aws-sdk-kms", "aws-credential-types"]
 nitro = ["tokio-vsock"]
 
 
@@ -33,6 +33,7 @@ crypto = { path = "../crypto" }
 rpc = { path = "../rpc" }
 
 
-aws-types = { version = "0.8", optional = true }
-aws-config = { version = "0.8", optional = true }
-aws-sdk-kms = { version = "0.8", optional = true }
+aws-types = { workspace = true, optional = true }
+aws-config = { workspace = true, optional = true }
+aws-sdk-kms = { workspace = true, optional = true }
+aws-credential-types = { workspace = true, optional = true }
