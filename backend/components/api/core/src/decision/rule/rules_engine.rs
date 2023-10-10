@@ -1,9 +1,9 @@
-use newtypes::{FootprintReasonCode, VendorAPI};
+use newtypes::{FootprintReasonCode, RuleAction, RuleName, VendorAPI};
 
 use crate::decision::{onboarding::FeatureSet, rule::RULE_LOG_LINE};
 
 use super::{
-    rule_set::{Action, Rule, RuleEvaluationSummary, RuleSet, RuleSetResult},
+    rule_set::{Rule, RuleEvaluationSummary, RuleSet, RuleSetResult},
     *,
 };
 
@@ -12,7 +12,7 @@ where
     T: FeatureSet + Clone,
 {
     let evaluated_ruleset = ruleset.evaluate(rule_input);
-    let triggered_action = evaluated_ruleset.action.clone();
+    let triggered_action = evaluated_ruleset.action;
 
     // Log evaluation of a single rule set
     log_ruleset_evaluation(&evaluated_ruleset, rule_input.vendor_apis());
@@ -41,7 +41,7 @@ pub fn evaluate_reason_code_rules(
     let (rules_triggered, rules_not_triggered): (Vec<_>, Vec<_>) = evaluated.partition(|r| r.triggered);
 
     // overall action for the rule set
-    let action_for_rule_set = rules_triggered.iter().map(|r| r.action.clone()).max();
+    let action_for_rule_set = rules_triggered.iter().map(|r| r.action).max();
 
     // Build a struct that represents the result of evaluating the rule set
     let evaluated_ruleset = RuleSetResult {
@@ -50,7 +50,7 @@ pub fn evaluate_reason_code_rules(
         rules_not_triggered,
         action: action_for_rule_set,
     };
-    let triggered_action = evaluated_ruleset.action.clone();
+    let triggered_action = evaluated_ruleset.action;
 
     // Log evaluation of a single rule set
     log_ruleset_evaluation(&evaluated_ruleset, vendor_apis.clone());
@@ -82,7 +82,7 @@ where
         .collect();
 
     // Take the max action across all rulesets we evalauted
-    let triggered_action = evaluated_rulesets.iter().filter_map(|r| r.action.clone()).max();
+    let triggered_action = evaluated_rulesets.iter().filter_map(|r| r.action).max();
 
     let rules_triggered = evaluated_rulesets
         .iter()
@@ -107,8 +107,8 @@ fn log_ruleset_evaluation(rule_set_result: &RuleSetResult, vendor_apis: Vec<Vend
     tracing::info!(
         action=?rule_set_result.action,
         vendor_api=format!("{:?}", vendor_apis),
-        rules_triggered_fail=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == Action::Fail).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
-        rules_triggered_steup=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == Action::StepUp).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
+        rules_triggered_fail=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == RuleAction::Fail).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
+        rules_triggered_steup=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == RuleAction::StepUp).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
         rules_not_triggered=%super::rules_to_string(&rule_set_result.rules_not_triggered.iter().map(|r| r.name.clone()).collect::<Vec<RuleName>>()),
         RULE_LOG_LINE
     )
@@ -119,7 +119,7 @@ fn log_ruleset_evaluation(rule_set_result: &RuleSetResult, vendor_apis: Vec<Vend
 pub struct OnboardingEvaluationResult {
     pub rules_triggered: Vec<RuleName>,
     pub rules_not_triggered: Vec<RuleName>,
-    pub triggered_action: Option<Action>,
+    pub triggered_action: Option<RuleAction>,
     pub vendor_apis: Vec<VendorAPI>,
 }
 
@@ -137,7 +137,7 @@ mod tests {
                 RuleName::Test("test.length_gt_3".into()),
             ],
             rules_not_triggered: vec![RuleName::Test("test.world".into())],
-            triggered_action: Some(Action::Fail),
+            triggered_action: Some(RuleAction::Fail),
             vendor_apis: features.vendor_apis(),
         };
         let result = evaluate_onboarding_rules(vec![test_ruleset_a(), test_ruleset_b()], &features);

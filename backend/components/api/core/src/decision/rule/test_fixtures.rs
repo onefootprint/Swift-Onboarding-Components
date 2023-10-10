@@ -1,10 +1,10 @@
-use newtypes::{FootprintReasonCode, VerificationResultId};
+use newtypes::{FootprintReasonCode, RuleAction, RuleName, VerificationResultId};
 
 use crate::decision::onboarding::FeatureSet;
 
 use super::{
-    rule_set::{Action, Rule, RuleSet},
-    RuleName, RuleSetName,
+    rule_set::{Rule, RuleSet},
+    RuleSetName,
 };
 
 #[derive(Clone)]
@@ -45,13 +45,13 @@ pub fn test_ruleset_a() -> RuleSet<TestFeatures> {
     let hello_rule: Rule<TestFeatures> = Rule {
         name: RuleName::Test("test.hello".into()),
         rule: { |t| t.name == *"hello" },
-        action: Action::Fail,
+        action: RuleAction::Fail,
     };
 
     let length_rule: Rule<TestFeatures> = Rule {
         name: RuleName::Test("test.length_gt_3".into()),
         rule: { |t| t.name.len() > 3 },
-        action: Action::StepUp,
+        action: RuleAction::StepUp,
     };
 
     RuleSet {
@@ -63,7 +63,7 @@ pub fn test_ruleset_b() -> RuleSet<TestFeatures> {
     let world_rule: Rule<TestFeatures> = Rule {
         name: RuleName::Test("test.world".into()),
         rule: { |t| t.name == *"world" },
-        action: Action::Fail,
+        action: RuleAction::Fail,
     };
 
     RuleSet {

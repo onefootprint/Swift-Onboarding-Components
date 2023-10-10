@@ -1,8 +1,8 @@
 use crate::decision::{
     features::idology_expectid::IDologyFeatures,
-    rule::{rule_set::Action, rule_sets::kyc::idology_rule_set, rules_engine::evaluate_onboarding_rules},
+    rule::{rule_sets::kyc::idology_rule_set, rules_engine::evaluate_onboarding_rules},
 };
-use newtypes::{FootprintReasonCode, VerificationResultId};
+use newtypes::{FootprintReasonCode, RuleAction, VerificationResultId};
 use std::str::FromStr;
 use test_case::test_case;
 
@@ -14,16 +14,16 @@ fn idology_features(fp_reason_codes: Vec<FootprintReasonCode>) -> IDologyFeature
 }
 
 // if no id located, we fail.
-#[test_case(idology_features(vec![FootprintReasonCode::IdNotLocated]) => Some(Action::Fail))]
+#[test_case(idology_features(vec![FootprintReasonCode::IdNotLocated]) => Some(RuleAction::Fail))]
 // High watchlist score
-#[test_case(idology_features(vec![FootprintReasonCode::WatchlistHitOfac]) => Some(Action::ManualReview))]
-#[test_case(idology_features(vec![FootprintReasonCode::SubjectDeceased]) => Some(Action::Fail))]
+#[test_case(idology_features(vec![FootprintReasonCode::WatchlistHitOfac]) => Some(RuleAction::ManualReview))]
+#[test_case(idology_features(vec![FootprintReasonCode::SubjectDeceased]) => Some(RuleAction::Fail))]
 // SSN rules
-#[test_case(idology_features(vec![FootprintReasonCode::SsnDoesNotMatch]) => Some(Action::Fail))]
+#[test_case(idology_features(vec![FootprintReasonCode::SsnDoesNotMatch]) => Some(RuleAction::Fail))]
 #[test_case(idology_features(vec![FootprintReasonCode::SsnDoesNotMatchWithin1Digit]) => None)]
-#[test_case(idology_features(vec![FootprintReasonCode::SsnLocatedIsInvalid]) => Some(Action::Fail))]
-#[test_case(idology_features(vec![FootprintReasonCode::SsnIssuedPriorToDob]) => Some(Action::Fail))]
+#[test_case(idology_features(vec![FootprintReasonCode::SsnLocatedIsInvalid]) => Some(RuleAction::Fail))]
+#[test_case(idology_features(vec![FootprintReasonCode::SsnIssuedPriorToDob]) => Some(RuleAction::Fail))]
 
-fn test_idology_base_rule_set(idology_features: IDologyFeatures) -> Option<Action> {
+fn test_idology_base_rule_set(idology_features: IDologyFeatures) -> Option<RuleAction> {
     evaluate_onboarding_rules(vec![idology_rule_set()], &idology_features).triggered_action
 }

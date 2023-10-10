@@ -1,10 +1,7 @@
 use crate::decision::features::kyb_features::KybFeatureVector;
 
-use crate::decision::rule::{
-    rule_set::{Action, Rule, RuleSet},
-    RuleName,
-};
-use newtypes::{DecisionStatus, FootprintReasonCode, RuleSetName};
+use crate::decision::rule::rule_set::{Rule, RuleSet};
+use newtypes::{DecisionStatus, FootprintReasonCode, RuleAction, RuleName, RuleSetName};
 
 pub fn bos_pass_kyc_rule_set() -> RuleSet<KybFeatureVector> {
     let rules = vec![Rule {
@@ -15,7 +12,7 @@ pub fn bos_pass_kyc_rule_set() -> RuleSet<KybFeatureVector> {
             }
         },
         name: RuleName::BoNonPassingKyc,
-        action: Action::Fail,
+        action: RuleAction::Fail,
     }];
 
     RuleSet {
@@ -35,14 +32,14 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
                 }
             },
             name: RuleName::BusinessWatchlistHit,
-            action: Action::Fail,
+            action: RuleAction::Fail,
         },
         Rule {
             rule: {
                 |f: &KybFeatureVector| !f.footprint_reason_codes.contains(&FootprintReasonCode::TinMatch)
             },
             name: RuleName::NoTinMatch,
-            action: Action::Fail,
+            action: RuleAction::Fail,
         },
         Rule {
             rule: {
@@ -57,7 +54,7 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
                 }
             },
             name: RuleName::NoBusinessNameMatch,
-            action: Action::Fail,
+            action: RuleAction::Fail,
         },
         Rule {
             rule: {
@@ -73,7 +70,7 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
                 }
             },
             name: RuleName::NoBusinessAddressMatch,
-            action: Action::Fail,
+            action: RuleAction::Fail,
         },
     ];
 
@@ -98,10 +95,10 @@ mod tests {
 
     #[test_case(middesk_features(vec![FootprintReasonCode::TinMatch, FootprintReasonCode::BusinessNameMatch, FootprintReasonCode::BusinessAddressMatch]) => None; "everything matches")]
     #[test_case(middesk_features(vec![FootprintReasonCode::TinMatch, FootprintReasonCode::BusinessNameSimilarMatch, FootprintReasonCode::BusinessAddressCloseMatch]) => None; "everything closely matches")]
-    #[test_case(middesk_features(vec![FootprintReasonCode::TinMatch, FootprintReasonCode::BusinessNameSimilarMatch, FootprintReasonCode::BusinessAddressDoesNotMatch]) => Some(Action::Fail); "biz address doesn't match")]
-    #[test_case(middesk_features(vec![FootprintReasonCode::BusinessNameMatch, FootprintReasonCode::BusinessAddressMatch]) => Some(Action::Fail); "no tin match")]
-    #[test_case(middesk_features(vec![FootprintReasonCode::TinMatch, FootprintReasonCode::BusinessNameMatch, FootprintReasonCode::BusinessAddressMatch, FootprintReasonCode::BusinessNameWatchlistHit]) => Some(Action::Fail); "watchlist hit")]
-    fn test_middesk_base_rule_set(kyb_fv: KybFeatureVector) -> Option<Action> {
+    #[test_case(middesk_features(vec![FootprintReasonCode::TinMatch, FootprintReasonCode::BusinessNameSimilarMatch, FootprintReasonCode::BusinessAddressDoesNotMatch]) => Some(RuleAction::Fail); "biz address doesn't match")]
+    #[test_case(middesk_features(vec![FootprintReasonCode::BusinessNameMatch, FootprintReasonCode::BusinessAddressMatch]) => Some(RuleAction::Fail); "no tin match")]
+    #[test_case(middesk_features(vec![FootprintReasonCode::TinMatch, FootprintReasonCode::BusinessNameMatch, FootprintReasonCode::BusinessAddressMatch, FootprintReasonCode::BusinessNameWatchlistHit]) => Some(RuleAction::Fail); "watchlist hit")]
+    fn test_middesk_base_rule_set(kyb_fv: KybFeatureVector) -> Option<RuleAction> {
         rules_engine::evaluate_onboarding_rules(vec![middesk_base_rule_set()], &kyb_fv).triggered_action
     }
 }

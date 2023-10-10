@@ -1,17 +1,16 @@
 use db::models::onboarding_decision::OnboardingDecision;
-use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI};
+use newtypes::{DecisionStatus, FootprintReasonCode, RuleAction, RuleName, VendorAPI};
 
 use crate::decision::features::kyb_features::KybFeatureVector;
 use crate::decision::features::risk_signals::risk_signal_group_struct::Kyb;
 use crate::decision::onboarding::FeatureVector;
 use crate::decision::rule::rule_set::Rule;
 use crate::decision::rule::rule_sets::RiskSignalRuleEvaluator;
-use crate::decision::rule::RuleName;
 use crate::errors::ApiResult;
 
 use crate::decision::{
     features::risk_signals::{RiskSignalGroupStruct, RiskSignalsForDecision},
-    rule::{rule_set::Action, rule_sets, rules_engine::OnboardingEvaluationResult},
+    rule::{rule_sets, rules_engine::OnboardingEvaluationResult},
     RuleError,
 };
 
@@ -120,22 +119,11 @@ impl KycRuleGroup {
                 OnboardingEvaluationResult {
                     rules_triggered: vec![RuleName::DocumentUploadFailed],
                     rules_not_triggered: vec![],
-                    triggered_action: Some(Action::ManualReview),
+                    triggered_action: Some(RuleAction::ManualReview),
                     vendor_apis: vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOcr],
                 }
                 .into()
             }
-        }
-    }
-}
-
-impl From<&Action> for DecisionStatus {
-    fn from(value: &Action) -> Self {
-        match value {
-            Action::StepUp => DecisionStatus::StepUp,
-            Action::ManualReview => DecisionStatus::Fail,
-            Action::Fail => DecisionStatus::Fail,
-            Action::PassWithManualReview => DecisionStatus::Pass,
         }
     }
 }

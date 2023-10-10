@@ -1,14 +1,11 @@
-use newtypes::{FootprintReasonCode, RuleSetName};
+use newtypes::{FootprintReasonCode, RuleAction, RuleName, RuleSetName};
 
 use crate::decision::{
     features::{
         experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures,
     },
     onboarding::FeatureSet,
-    rule::{
-        rule_set::{Action, Rule, RuleSet},
-        RuleName,
-    },
+    rule::rule_set::{Rule, RuleSet},
 };
 
 use super::kyc::{experian_base_rules, idology_base_rules};
@@ -60,7 +57,7 @@ fn alpaca_field_validation_rules<T: FeatureSet>() -> Vec<Rule<T>> {
                 }
             },
             name: RuleName::SsnDoesNotMatch,
-            action: Action::Fail,
+            action: RuleAction::Fail,
         },
         Rule {
             rule: {
@@ -73,7 +70,7 @@ fn alpaca_field_validation_rules<T: FeatureSet>() -> Vec<Rule<T>> {
                 }
             },
             name: RuleName::AddressDoesNotMatch,
-            action: Action::StepUp,
+            action: RuleAction::StepUp,
         },
         Rule {
             rule: {
@@ -83,7 +80,7 @@ fn alpaca_field_validation_rules<T: FeatureSet>() -> Vec<Rule<T>> {
                 }
             },
             name: RuleName::NameDoesNotMatch,
-            action: Action::StepUp,
+            action: RuleAction::StepUp,
         },
         Rule {
             rule: {
@@ -93,7 +90,7 @@ fn alpaca_field_validation_rules<T: FeatureSet>() -> Vec<Rule<T>> {
                 }
             },
             name: RuleName::DobDoesNotMatch,
-            action: Action::StepUp,
+            action: RuleAction::StepUp,
         },
     ]
 }
@@ -117,7 +114,7 @@ fn field_validation_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 }
             },
             name: RuleName::SsnDoesNotMatch,
-            action: Action::Fail,
+            action: RuleAction::Fail,
         },
         Rule {
             rule: {
@@ -128,17 +125,17 @@ fn field_validation_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 }
             },
             name: RuleName::AddressDoesNotMatch,
-            action: Action::StepUp,
+            action: RuleAction::StepUp,
         },
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| !f.contains(&FootprintReasonCode::NameMatches) },
             name: RuleName::NameDoesNotMatch,
-            action: Action::StepUp,
+            action: RuleAction::StepUp,
         },
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| !f.contains(&FootprintReasonCode::DobMatches) },
             name: RuleName::DobDoesNotMatch,
-            action: Action::StepUp,
+            action: RuleAction::StepUp,
         },
     ]
 }

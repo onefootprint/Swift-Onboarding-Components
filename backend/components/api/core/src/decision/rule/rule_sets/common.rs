@@ -1,12 +1,6 @@
-use newtypes::FootprintReasonCode;
+use newtypes::{FootprintReasonCode, RuleAction, RuleName};
 
-use crate::decision::{
-    onboarding::FeatureSet,
-    rule::{
-        rule_set::{Action, Rule},
-        RuleName,
-    },
-};
+use crate::decision::{onboarding::FeatureSet, rule::rule_set::Rule};
 
 pub fn watchlist_hit_rule<T: FeatureSet + Clone>() -> Rule<T> {
     Rule {
@@ -23,7 +17,7 @@ pub fn watchlist_hit_rule<T: FeatureSet + Clone>() -> Rule<T> {
             }
         },
         name: RuleName::WatchlistHit,
-        action: Action::ManualReview,
+        action: RuleAction::ManualReview,
     }
 }
 
@@ -43,17 +37,17 @@ pub fn aml_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 }
             },
             name: RuleName::WatchlistHit,
-            action: Action::ManualReview,
+            action: RuleAction::ManualReview,
         },
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::WatchlistHitPep) },
             name: RuleName::PepHit,
-            action: Action::ManualReview,
+            action: RuleAction::ManualReview,
         },
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::AdverseMediaHit) },
             name: RuleName::AdverseMediaHit,
-            action: Action::ManualReview,
+            action: RuleAction::ManualReview,
         },
     ]
 }

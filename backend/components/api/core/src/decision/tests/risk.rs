@@ -2,8 +2,8 @@ use crate::decision::features::risk_signals::risk_signal_group_struct::{Aml, Kyc
 use crate::decision::features::risk_signals::{RiskSignalGroupStruct, RiskSignalsForDecision};
 use crate::decision::onboarding::rules::{KycRuleExecutionConfig, KycRuleGroup};
 use crate::decision::onboarding::Decision;
-use crate::decision::{onboarding::OnboardingRulesDecisionOutput, rule::rule_sets, rule::RuleName};
-use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI, VerificationResultId};
+use crate::decision::{onboarding::OnboardingRulesDecisionOutput, rule::rule_sets};
+use newtypes::{DecisionStatus, FootprintReasonCode, RuleName, VendorAPI, VerificationResultId};
 use std::str::FromStr;
 use test_case::test_case;
 

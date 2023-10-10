@@ -1,11 +1,10 @@
 use std::cmp::Ordering;
 
 use enum_dispatch::enum_dispatch;
-use newtypes::{DecisionStatus, FootprintReasonCode, VendorAPI};
+use newtypes::{DecisionStatus, FootprintReasonCode, RuleName, VendorAPI};
 
 use crate::errors::ApiResult;
 
-use super::rule::RuleName;
 pub mod rules;
 
 #[derive(Eq, Debug, Clone)]

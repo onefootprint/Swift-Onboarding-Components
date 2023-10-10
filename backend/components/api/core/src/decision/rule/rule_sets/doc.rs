@@ -1,10 +1,8 @@
 use crate::decision::{
     features::incode_docv::IncodeDocumentFeatures,
-    rule::{
-        rule_set::{Action, Rule, RuleSet},
-        RuleName,
-    },
+    rule::rule_set::{Rule, RuleSet},
 };
+use newtypes::{RuleAction, RuleName};
 
 use newtypes::{FootprintReasonCode, RuleSetName};
 
@@ -18,7 +16,7 @@ pub fn incode_base_rules() -> Vec<Rule<IncodeDocumentFeatures>> {
                 }
             },
             name: RuleName::DocumentNotVerified,
-            action: Action::Fail,
+            action: RuleAction::Fail,
         },
         Rule {
             rule: {
@@ -29,7 +27,7 @@ pub fn incode_base_rules() -> Vec<Rule<IncodeDocumentFeatures>> {
                 }
             },
             name: RuleName::SelfieDoesNotMatch,
-            action: Action::Fail,
+            action: RuleAction::Fail,
         },
     ]
 }
@@ -49,7 +47,7 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentNotVerified) },
             name: RuleName::DocumentNotVerified,
-            action: Action::Fail,
+            action: RuleAction::Fail,
         },
         Rule {
             rule: {
@@ -59,12 +57,12 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 }
             },
             name: RuleName::SelfieDoesNotMatch,
-            action: Action::Fail,
+            action: RuleAction::Fail,
         },
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentUploadFailed) },
             name: RuleName::DocumentUploadFailed,
-            action: Action::ManualReview,
+            action: RuleAction::ManualReview,
         },
         Rule {
             rule: {
@@ -80,7 +78,7 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 }
             },
             name: RuleName::DocumentCollectionErrored,
-            action: Action::ManualReview,
+            action: RuleAction::ManualReview,
         },
         Rule {
             rule: {
@@ -89,7 +87,7 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 }
             },
             name: RuleName::DocumentWasLearnerPermit,
-            action: Action::PassWithManualReview,
+            action: RuleAction::PassWithManualReview,
         },
     ]
 }
