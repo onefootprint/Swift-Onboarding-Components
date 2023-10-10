@@ -1,0 +1,1 @@
+ALTER TABLE insight_event ADD COLUMN session_id TEXT;

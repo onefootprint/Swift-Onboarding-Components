@@ -113,6 +113,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             forwarded_proto: _,
             http_version: _,
             tls: _,
+            session_id: _,
         } = InsightHeaders::parse_from_request(request.headers());
 
         let TelemetryHeaders {

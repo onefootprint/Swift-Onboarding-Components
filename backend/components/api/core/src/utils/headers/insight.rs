@@ -7,7 +7,7 @@ use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
-use super::get_header;
+use super::{get_header, TelemetryHeaders};
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize)]
 pub struct InsightHeaders {
@@ -34,6 +34,7 @@ pub struct InsightHeaders {
     pub forwarded_proto: Option<String>,
     pub http_version: Option<String>,
     pub tls: Option<String>,
+    pub session_id: Option<String>,
 }
 
 impl FromRequest for InsightHeaders {
@@ -51,6 +52,7 @@ impl InsightHeaders {
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
         let ip_address = get_header("cloudfront-viewer-address", headers)
             .and_then(|s| s.parse::<SocketAddr>().map(|s| s.ip().to_string()).ok());
+        let session_id = get_header(TelemetryHeaders::SESSION_HEADER_NAME, headers);
 
         InsightHeaders {
             ip_address,
@@ -76,6 +78,7 @@ impl InsightHeaders {
             forwarded_proto: get_header("cloudfront-forwarded-proto", headers),
             http_version: get_header("cloudfront-viewer-http-version", headers),
             tls: get_header("cloudfront-viewer-tls", headers),
+            session_id,
         }
     }
 }
@@ -116,6 +119,7 @@ impl From<InsightHeaders> for CreateInsightEvent {
             forwarded_proto,
             http_version,
             tls,
+            session_id,
         } = i;
 
         let latitude = latitude.and_then(|lat| lat.parse().ok());
@@ -152,6 +156,7 @@ impl From<InsightHeaders> for CreateInsightEvent {
             forwarded_proto,
             http_version,
             tls,
+            session_id,
         }
     }
 }
