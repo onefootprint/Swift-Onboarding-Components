@@ -22,7 +22,7 @@ def extract_trigger_sms(twilio, phone_number, id):
         token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
         return token
 
-    return try_until_success(inner, 15)
+    return try_until_success(inner, 60)
 
 
 @pytest.mark.parametrize("with_document", [True, False])

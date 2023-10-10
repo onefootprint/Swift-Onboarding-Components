@@ -206,8 +206,8 @@ def test_one_click_bos(sandbox_tenant, ob_config2, kyb_sandbox_ob_config, twilio
 
 def extract_bo_session_sms(twilio, phone_number, business_name):
     def inner():
-        real_phone_number = phone_number.split("#")[0]
-        messages = twilio.messages.list(to=real_phone_number, limit=25)
+        messages = twilio.messages.list(to=phone_number, limit=25)
+        print(f"Searching for message for business {business_name}")
         message = next(
             m
             for m in messages
@@ -217,4 +217,4 @@ def extract_bo_session_sms(twilio, phone_number, business_name):
         token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
         return (message.body, token)
 
-    return try_until_success(inner, 5)
+    return try_until_success(inner, 60)

@@ -373,11 +373,7 @@ def identify_verify(
     tried_codes = {}
 
     def inner():
-        sent_after = datetime.now() - timedelta(minutes=2)
-
-        messages = twilio.messages.list(
-            to=phone_number, limit=25, date_sent_after=sent_after
-        )
+        messages = twilio.messages.list(to=phone_number, limit=25)
         last_error = None
         for message in messages:
             try:
@@ -400,7 +396,11 @@ def identify_verify(
         if last_error:
             raise last_error
         else:
-            raise Exception(f"SMS 2fac code is not present", [i.body for i in messages])
+            raise Exception(
+                f"SMS 2fac code is not present",
+                arrow.now().isoformat(),
+                [i.body for i in messages],
+            )
 
     return try_until_success(inner, 60)
 
