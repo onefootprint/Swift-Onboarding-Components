@@ -36,15 +36,10 @@ risk_signal_agg as (
   inner join latest_rsgs rsg on rs.risk_signal_group_id = rsg.rsg_id
   where rs.reason_code in (
     'id_not_located',
-    'ssn_does_not_match',
-    'ssn_not_provided',
     'subject_deceased',
     'address_input_is_po_box',
     'dob_located_coppa_alert',
-    'ssn_input_is_invalid',
-    'ssn_located_is_invalid',
     'multiple_records_found',
-    'ssn_issued_prior_to_bob',
     'watchlist_hit_pep',
     'document_not_verified',
     'document_selfie_does_not_match',
@@ -59,8 +54,21 @@ risk_signal_agg as (
     'document_upload_failed',
     'document_type_mismatch',
     'document_unknown_country_code',
-    'document_country_code_mismatch'
-    )
+    'document_country_code_mismatch',
+    'id_flagged',
+    'ssn_issued_prior_to_dob',
+    'ssn_not_available',
+    'ssn_partially_matches',
+    'ssn_does_not_match',
+    'ssn_does_not_match_within1_digit',
+    'ssn_input_is_itin',
+    'ssn_located_is_itin',
+    'ssn_input_tied_to_multiple_names',
+    'ssn_input_is_invalid',
+    'ssn_located_is_invalid',
+    'ssn_not_provided',
+    'document_is_permit_or_provisional_license'
+  )
   group by 1
 ),
 latest_doc as (
