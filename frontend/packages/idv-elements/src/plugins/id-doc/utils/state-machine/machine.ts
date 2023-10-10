@@ -37,8 +37,12 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
                 actions: ['assignCountryAndType', 'assignId', 'resetSide'],
               },
               {
+                target: 'frontImageDesktop',
+                cond: context => !context.requirement.shouldCollectConsent,
+                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+              },
+              {
                 target: 'consentDesktop',
-                cond: context => context.device.type !== 'mobile',
                 actions: ['assignCountryAndType', 'assignId', 'resetSide'],
               },
             ],

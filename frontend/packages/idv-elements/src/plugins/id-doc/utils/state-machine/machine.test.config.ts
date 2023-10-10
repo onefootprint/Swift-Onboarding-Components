@@ -42,7 +42,7 @@ export const argsRegularMobile: MachineContext = {
     type: 'mobile',
   },
   currSide: IdDocImageTypes.front,
-  requirement: { ...requirement },
+  requirement: JSON.parse(JSON.stringify(requirement)),
   idDoc: {},
   supportedCountryAndDocTypes: {
     US: [
@@ -58,6 +58,9 @@ export const argsRegularMobile: MachineContext = {
   },
 };
 
+export const getArgsRegularMobile = () =>
+  JSON.parse(JSON.stringify(argsRegularMobile));
+
 export const argsRegularDesktop: MachineContext = {
   authToken: 'token',
   device: {
@@ -65,7 +68,7 @@ export const argsRegularDesktop: MachineContext = {
     type: 'desktop',
   },
   currSide: IdDocImageTypes.front,
-  requirement: { ...requirement },
+  requirement: JSON.parse(JSON.stringify(requirement)),
   idDoc: {},
   supportedCountryAndDocTypes: {
     US: [
@@ -80,6 +83,9 @@ export const argsRegularDesktop: MachineContext = {
     ],
   },
 };
+
+export const getArgsRegularDesktop = () =>
+  JSON.parse(JSON.stringify(argsRegularDesktop));
 
 export const processingErrors = [
   { errorType: IdDocImageProcessingError.countryCodeMismatch },

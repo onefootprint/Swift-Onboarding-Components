@@ -3,10 +3,9 @@ import { interpret } from 'xstate';
 
 import createIdDocMachine from './machine';
 import {
-  argsRegularDesktop,
-  argsRegularMobile,
+  getArgsRegularDesktop,
+  getArgsRegularMobile,
   processingErrors,
-  requirement,
   testFile,
   uploadErrors,
 } from './machine.test.config';
@@ -15,7 +14,7 @@ describe('Id Doc Machine Tests', () => {
   describe('Auto transition to the correct state after initState', () => {
     it('Should transition to country and doc type select state for mobile', () => {
       const machine = interpret(
-        createIdDocMachine(argsRegularMobile),
+        createIdDocMachine(getArgsRegularMobile()),
       ).onTransition(state => {
         expect(state.value).toEqual('countryAndType');
       });
@@ -24,7 +23,7 @@ describe('Id Doc Machine Tests', () => {
     });
     it('Should transition to country and doc type select state for desktop', () => {
       const machine = interpret(
-        createIdDocMachine(argsRegularDesktop),
+        createIdDocMachine(getArgsRegularDesktop()),
       ).onTransition(state => {
         expect(state.value).toEqual('countryAndType');
       });
@@ -35,7 +34,7 @@ describe('Id Doc Machine Tests', () => {
 
   describe('Transitions to the correct state after country and doc', () => {
     it('Should transition frontImageMobile state for mobile', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
       const state = machine.send({
@@ -49,7 +48,7 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('frontImageMobile');
     });
     it('Should transition to consentDesktop state for desktop', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularDesktop }));
+      const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
       machine.start();
 
       const state = machine.send({
@@ -66,7 +65,7 @@ describe('Id Doc Machine Tests', () => {
 
   describe('Full flow test with image upload and navigate back', () => {
     it('Can execute the the full mobile flow properly', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
       let state = machine.send({
@@ -181,7 +180,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Can execute the the full desktop flow properly', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularDesktop }));
+      const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
       machine.start();
 
       let state = machine.send({
@@ -284,7 +283,7 @@ describe('Id Doc Machine Tests', () => {
 
   describe('Additional tests', () => {
     it('Can retry image upload when upload fails and update errors on desktop', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularDesktop }));
+      const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
       machine.start();
 
       let state = machine.send([
@@ -328,7 +327,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Can retry image upload when processing fails and update errors on desktop', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularDesktop }));
+      const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
       machine.start();
 
       let state = machine.send([
@@ -378,7 +377,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Can retry image upload when processing fails and update errors on mobile', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
       let state = machine.send([
@@ -430,8 +429,8 @@ describe('Id Doc Machine Tests', () => {
       expect(state.context.errors).toEqual([]);
     });
 
-    it('Can select a different doc type from retry state desktop ans resets image side', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularDesktop }));
+    it('Can select a different doc type from retry state desktop and resets image side', () => {
+      const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
       machine.start();
 
       let state = machine.send([
@@ -494,7 +493,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Can select a different doc type from retry state mobile', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
       let state = machine.send([
@@ -539,7 +538,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Allows uploading any side/selfie based nextSideToCollect out of order on mobile', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
       const state = machine.send([
@@ -574,7 +573,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Allows uploading any side/selfie based nextSideToCollect out of order on desktop', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularDesktop }));
+      const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
       machine.start();
 
       const state = machine.send([
@@ -609,7 +608,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Can terminate the flow after any side upload on mobile', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
       const state = machine.send([
@@ -644,7 +643,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Can terminate the flow after any side upload on desktop', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularDesktop }));
+      const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
       machine.start();
 
       const state = machine.send([
@@ -676,7 +675,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Goes back to front image if camera errored', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
       const state = machine.send([
@@ -702,7 +701,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Goes back to back image if camera errored', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
       const state = machine.send([
@@ -743,7 +742,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Goes back to selfie prompt if camera errored', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
       const state = machine.send([
@@ -786,8 +785,7 @@ describe('Id Doc Machine Tests', () => {
     it('Does not start front image capture if consent was not provided', () => {
       const machine = interpret(
         createIdDocMachine({
-          ...argsRegularMobile,
-          requirement: { ...requirement, shouldCollectConsent: true },
+          ...getArgsRegularMobile(),
         }),
       );
       machine.start();
@@ -821,7 +819,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Terminate the flow when retry limit exceeds on mobile', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularMobile }));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
       const state = machine.send([
@@ -853,7 +851,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Terminate the flow when retry limit exceeds on desktop', () => {
-      const machine = interpret(createIdDocMachine({ ...argsRegularDesktop }));
+      const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
       machine.start();
 
       const state = machine.send([
