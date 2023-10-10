@@ -1,7 +1,7 @@
 //! Temporary tool to analyze selfie + doc comparison and over
 
 use crate::{auth::ProtectedAuth, State};
-use actix_web::{get, web};
+use actix_web::{post, web};
 use api_core::{
     errors::ApiResult,
     types::{JsonApiResponse, ResponseData},
@@ -24,7 +24,7 @@ pub struct ComparisonAndDocOcrResult {
     analyzed_id: selfie_doc::analyze_id::AnalyzeIdResult,
 }
 
-#[get("/private/protected/aws_selfie_doc")]
+#[post("/private/protected/aws_selfie_doc")]
 pub async fn post(
     state: web::Data<State>,
     request: web::Json<CompareAnalyzeRequest>,

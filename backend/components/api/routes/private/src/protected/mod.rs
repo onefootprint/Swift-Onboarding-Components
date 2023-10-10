@@ -23,7 +23,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(workflow::create_workflow)
         .service(workflow::proceed)
         .service(token_reveal::post)
-        .service(decrypt::post);
+        .service(decrypt::post)
+        .service(aws_selfie_doc::post);
 }
 
 #[actix_web::get("/private/protected/check")]
