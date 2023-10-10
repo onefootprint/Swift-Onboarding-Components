@@ -1797,6 +1797,7 @@
           "declarations": {
             "title": "Do any of the following apply to you or a member of your immediate family?",
             "options": {
+              "none": "None",
               "affiliated_with_us_broker": "Affiliated or work with the US registered broker-dealer or FINRA",
               "senior_executive": "Senior executive at or a 10% or greater shareholder of a publicly traded company",
               "senior_political_figure": "I'm a senior political figure"
