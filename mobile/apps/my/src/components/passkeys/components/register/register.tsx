@@ -3,6 +3,7 @@ import { Box, Button, Container, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 import useRegisterBiometric from '../../hooks/use-register-biometric';
 import Success from '../success';
@@ -17,8 +18,10 @@ export type RegisterProps = {
 const Register = ({ authToken, onSuccess, onError }: RegisterProps) => {
   const { t } = useTranslation('components.passkeys.register');
   const registerBiometric = useRegisterBiometric();
+  const analytics = useAnalytics();
 
   const handlePress = () => {
+    analytics.track(Events.PasskeysRegistrationStarted);
     registerBiometric.mutate(authToken, { onSuccess, onError });
   };
 

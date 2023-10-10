@@ -25,7 +25,9 @@ const App = () => {
 
   return isPreview ? (
     <QueryClientProvider client={queryClient}>
-      <Preview isDemo={isDemo} isDebug={isDebug} />
+      <AnalyticsProvider>
+        <Preview isDemo={isDemo} isDebug={isDebug} />
+      </AnalyticsProvider>
     </QueryClientProvider>
   ) : (
     <QueryClientProvider client={queryClient}>

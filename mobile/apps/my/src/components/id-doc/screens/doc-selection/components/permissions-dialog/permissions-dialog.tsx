@@ -4,6 +4,7 @@ import { Linking } from 'react-native';
 import { Camera, CameraPermissionStatus } from 'react-native-vision-camera';
 
 import useTranslation from '@/hooks/use-translation';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 type PermissionsDialogProps = {
   onContinue: () => void;
@@ -23,6 +24,7 @@ const PermissionsDialog = ({
   );
   const isNonDetermined =
     permissions === 'not-determined' || permissions === 'denied';
+  const analytics = useAnalytics();
 
   const setInitialPermissions = async () => {
     try {
@@ -39,22 +41,28 @@ const PermissionsDialog = ({
     try {
       const response = await Camera.requestCameraPermission();
       if (response === 'granted') {
+        analytics.track(Events.DocCameraPermissionsGranted);
         onContinue();
       }
-
+      if (response === 'denied') {
+        analytics.track(Events.DocCameraPermissionsDenied);
+      }
       // TODO: add fallback for denied, speciallly for android
     } catch (error) {}
   };
 
   const handleOpenSettings = () => {
+    analytics.track(Events.DocCameraSettingsOpened);
     Linking.openSettings();
   };
 
   const handleClose = () => {
+    analytics.track(Events.DocCameraPermissionsClosed);
     setOpen(false);
   };
 
   const handlePress = () => {
+    analytics.track(Events.DocCameraPermissionsOpened);
     setOpen(true);
   };
 

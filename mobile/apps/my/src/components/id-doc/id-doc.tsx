@@ -6,7 +6,7 @@ import { IdDocRequirement } from '@onefootprint/types';
 import { useMachine } from '@xstate/react';
 import React, { useEffect } from 'react';
 
-import { AnalyticsEvents, useAnalytics } from '@/utils/analytics';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 import DocScan from './screens/doc-scan';
 import DocSelection from './screens/doc-selection';
@@ -29,7 +29,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
 
   useEffect(() => {
     if (state.done) {
-      analytics.track(AnalyticsEvents.IdDocCompleted, {
+      analytics.track(Events.IdDocCompleted, {
         result: 'success',
       });
       onDone();
@@ -39,6 +39,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
   if (state.matches('tooManyAttempts')) {
     return <TooManyAttempts />;
   }
+
   if (state.matches('docSelection')) {
     return (
       <DocSelection
@@ -79,6 +80,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
           send('retryLimitExceeded');
         }}
         onConsentCompleted={() => {
+          analytics.track(Events.DocConsentAccepted);
           send('consentCompleted');
         }}
         side={currentSide}

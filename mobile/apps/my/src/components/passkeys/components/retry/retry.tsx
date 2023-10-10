@@ -3,6 +3,7 @@ import { Box, Button, Container, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 import useRegisterBiometric from '../../hooks/use-register-biometric';
 import Success from '../success';
@@ -18,8 +19,10 @@ const Retry = ({ authToken, onSkip, onSuccess }: RetryProps) => {
   const { t } = useTranslation('components.passkeys.retry');
   const registerBiometric = useRegisterBiometric();
   const mutation = useSkipPasskeys();
+  const analytics = useAnalytics();
 
   const handleSkip = () => {
+    analytics.track(Events.PasskeysRegistrationRetried);
     mutation.mutate(
       { authToken },
       {

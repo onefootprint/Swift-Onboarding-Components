@@ -1,2 +1,2 @@
 export { default, useAnalytics } from './analytics';
-export { AnalyticsEvents, AnalyticsTimeEvents } from './analytics.constants';
+export { AnalyticsTimeEvents, Events } from './analytics.constants';

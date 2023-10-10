@@ -2,14 +2,14 @@ import { Container, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
-import { AnalyticsEvents, useAnalytics } from '@/utils/analytics';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 const Canceled = () => {
   const { t } = useTranslation('screens.canceled');
   const analytics = useAnalytics();
 
   useEffect(() => {
-    analytics.track(AnalyticsEvents.Ended, { result: 'canceled' });
+    analytics.track(Events.Ended, { result: 'canceled' });
   }, []);
 
   return (

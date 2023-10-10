@@ -1,4 +1,4 @@
-export enum AnalyticsEvents {
+export enum Events {
   // Funnel
   Started = 'Started',
   PasskeyCompleted = 'Passkeys completed',
@@ -10,33 +10,28 @@ export enum AnalyticsEvents {
   PasskeysRegistrationRetried = 'Passkeys registration retried',
   PasskeyRegistrationSucceeded = 'Passkeys registration succeeded',
   PasskeyRegistrationFailed = 'Passkeys registration failed',
+  PasskeyRegistrationSkipped = 'Passkeys registration skipped',
 
   // Documents
-  DocCountrySelectOpened = 'Doc country select opened',
-  DocCountrySelectChange = 'Doc country select changed',
-  DocCountrySelectClosed = 'Doc country select closed',
+  DocSelectionSubmitted = 'Doc type and country submitted',
+  DocSelectionSubmittedFailed = 'Doc type and country submitted failed',
+  DocSelectionSubmittedSucceeded = 'Doc type and country submitted succeeded',
 
-  DocCountrySubmitted = 'Doc country submitted',
+  // Camera permissions
+  DocCameraPermissionsOpened = 'Doc Camera permission opened',
   DocCameraPermissionsClosed = 'Doc Camera permission closed',
-  DocCameraPermissionsContinued = 'Doc Camera permission continued',
+  DocCameraPermissionsGranted = 'Doc Camera permission granted',
+  DocCameraPermissionsDenied = 'Doc Camera permission denied',
   DocCameraSettingsOpened = 'Doc Camera settings opened',
 
+  // Consent
   DocConsentAccepted = 'Doc Consent accepted',
 
-  DocFrontPageSubmitted = 'Doc front submitted',
-  DocFrontFailed = 'Doc front failed',
-  DocFrontRestarted = 'Doc front restarted',
-  DocFrontSucceeded = 'Doc front succeeded',
-
-  DocBackPageSubmitted = 'Doc back submitted',
-  DocBackFailed = 'Doc back failed',
-  DocBackRestarted = 'Doc back restarted',
-  DocBackSucceeded = 'Doc back succeeded',
-
-  DocSelfiePageSubmitted = 'Doc selfie submitted',
-  DocSelfieFailed = 'Doc selfie failed',
-  DocSelfieRestarted = 'Doc selfie restarted',
-  DocSelfieSucceeded = 'Doc selfie succeeded',
+  // Upload
+  DocUploaded = 'Doc uploaded',
+  DocUploadFailed = 'Doc upload failed',
+  DocUploadSucceeded = 'Doc upload succeeded',
+  DocUploadRestarted = 'Doc upload restarted',
 }
 
 export enum AnalyticsTimeEvents {

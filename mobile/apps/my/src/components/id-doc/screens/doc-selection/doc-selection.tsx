@@ -1,4 +1,5 @@
 import { CountryRecord, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
+import { getErrorMessage } from '@onefootprint/request';
 import {
   CountryCode,
   IdDocRequirement,
@@ -19,6 +20,7 @@ import ScrollLayout from '@/components/scroll-layout';
 import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
 import useApp from '@/domains/idv/hooks/use-app';
 import useTranslation from '@/hooks/use-translation';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 import getSupportedCountryByCode from '../../utils/get-supported-country-by-code';
 import useSubmitDocType from '../doc-scan/hooks/use-submit-doc-type';
@@ -57,6 +59,7 @@ const DocSelection = ({
   const [docType, setDocType] = useState<SupportedIdDocTypes>(
     defaultType || docTypeOptions[0].value,
   );
+  const analytics = useAnalytics();
 
   const oneCountrySupported =
     Object.keys(supportedCountryAndDocTypes).length === 1;
@@ -75,6 +78,11 @@ const DocSelection = ({
   };
 
   const handleSubmit = () => {
+    analytics.track(Events.DocSelectionSubmitted, {
+      docType,
+      countryCode: country.value,
+    });
+
     if (authToken === PREVIEW_AUTH_TOKEN) {
       onSubmit(country.value, docType, '1234512345');
     } else {
@@ -87,7 +95,13 @@ const DocSelection = ({
         },
         {
           onSuccess(response) {
+            analytics.track(Events.DocSelectionSubmittedSucceeded);
             onSubmit(country.value, docType, response.id);
+          },
+          onError(error) {
+            analytics.track(Events.DocSelectionSubmittedFailed, {
+              message: getErrorMessage(error),
+            });
           },
         },
       );

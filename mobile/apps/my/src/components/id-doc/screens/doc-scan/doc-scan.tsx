@@ -10,6 +10,7 @@ import type { PhotoFile } from 'react-native-vision-camera';
 
 import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
 import useTranslation from '@/hooks/use-translation';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 import DefaultDocument from './components/default-document';
 import DriversLicense from './components/drivers-license';
@@ -53,6 +54,7 @@ const DocScan = ({
   const { shouldCollectConsent } = requirement;
   const isPreview = PREVIEW_AUTH_TOKEN === authToken;
   const uploadMutation = useUploadDoc();
+  const analytics = useAnalytics();
 
   useEffect(() => {
     setTimeout(() => {
@@ -91,6 +93,13 @@ const DocScan = ({
         {
           onSuccess: response => {
             if (response.errors.length > 0) {
+              analytics.track(Events.DocUploadFailed, {
+                side,
+                type,
+                docId,
+                error: response.errors,
+              });
+
               const documentType = allT(`id-doc.${type}`);
               const docSide = allT(`side.${side}`);
               setErrors(
@@ -106,12 +115,24 @@ const DocScan = ({
                 onRetryLimitExceeded();
               }
             } else {
+              analytics.track(Events.DocUploadSucceeded, {
+                side,
+                type,
+                docId,
+              });
+
               setTimeout(() => {
                 onDone(response.nextSideToCollect);
               }, 1500);
             }
           },
           onError: (error: unknown) => {
+            analytics.track(Events.DocUploadFailed, {
+              side,
+              type,
+              docId,
+              error: getErrorMessage(error),
+            });
             setErrors([getErrorMessage(error)]);
           },
         },

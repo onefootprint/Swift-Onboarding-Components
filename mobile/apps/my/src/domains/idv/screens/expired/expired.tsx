@@ -2,14 +2,14 @@ import { Container, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
-import { AnalyticsEvents, useAnalytics } from '@/utils/analytics';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 const Expired = () => {
   const { t } = useTranslation('screens.expired');
   const analytics = useAnalytics();
 
   useEffect(() => {
-    analytics.track(AnalyticsEvents.Ended, { result: 'expired' });
+    analytics.track(Events.Ended, { result: 'expired' });
   }, []);
 
   return (

@@ -2,7 +2,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
-import { AnalyticsEvents, useAnalytics } from '@/utils/analytics';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 import Register from './components/register';
 import Retry from './components/retry';
@@ -18,17 +18,21 @@ const Passkeys = ({ authToken, onDone }: PasskeysProps) => {
   const analytics = useAnalytics();
 
   const handleSuccess = (deviceResponseJson: string) => {
-    analytics.track(AnalyticsEvents.PasskeyCompleted, { result: 'success' });
+    analytics.track(Events.PasskeyRegistrationSucceeded);
+    // TODO: Analytics deprecate
+    analytics.track(Events.PasskeyCompleted, { result: 'success' });
     onDone(deviceResponseJson);
   };
 
   const handleSkip = () => {
-    analytics.track(AnalyticsEvents.PasskeyCompleted, { result: 'skip' });
+    // TODO: Analytics deprecate
+    // TODO: Deprecate
+    analytics.track(Events.PasskeyCompleted, { result: 'skip' });
     onDone(null);
   };
 
   const handleError = (error: unknown) => {
-    analytics.track(AnalyticsEvents.PasskeyRegistrationFailed, {
+    analytics.track(Events.PasskeyRegistrationFailed, {
       message: getErrorMessage(error),
     });
     send({ type: 'failed' });

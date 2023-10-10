@@ -4,11 +4,7 @@ import { Container, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 
 import useTranslation from '@/hooks/use-translation';
-import {
-  AnalyticsEvents,
-  AnalyticsTimeEvents,
-  useAnalytics,
-} from '@/utils/analytics';
+import { AnalyticsTimeEvents, Events, useAnalytics } from '@/utils/analytics';
 
 import useUpdateD2PStatus from '../../hooks/use-update-d2p-status';
 
@@ -18,7 +14,7 @@ const Completed = ({ authToken }) => {
   const analytics = useAnalytics();
 
   useEffect(() => {
-    analytics.track(AnalyticsEvents.Ended, { result: 'success' });
+    analytics.track(Events.Ended, { result: 'success' });
     analytics.timeEvent(AnalyticsTimeEvents.handoff);
 
     updateD2PStatusMutation.mutate({

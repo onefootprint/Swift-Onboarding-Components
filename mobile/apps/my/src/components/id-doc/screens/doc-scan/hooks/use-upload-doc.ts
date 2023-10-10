@@ -23,6 +23,7 @@ const uploadDoc = async ({
       'x-fp-is-app-clip': Platform.OS === 'ios',
       'x-fp-is-instant-app': Platform.OS === 'android',
     },
+    timeout: 180000,
   });
 
   return response.data;

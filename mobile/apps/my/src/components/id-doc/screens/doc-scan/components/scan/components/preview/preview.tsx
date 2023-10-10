@@ -13,6 +13,7 @@ import BackButton from '@/components/back-button';
 import Header from '@/components/header';
 import ScrollLayout from '@/components/scroll-layout';
 import useTranslation from '@/hooks/use-translation';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 import { useScanContext } from '../../../scan-context';
 import type { ScanPicture, ScanSize } from '../../scan.types';
@@ -42,6 +43,7 @@ const Preview = ({
     useScanContext();
   const showActionButtons = !isError && !isSuccess;
   const imageHeight = size === 'default' ? DEFAULT_HEIGHT : LARGE_HEIGHT;
+  const analytics = useAnalytics();
 
   const handleSubmit = async () => {
     if (!picture.photo) return;
@@ -49,6 +51,7 @@ const Preview = ({
   };
 
   const handleRetakeAfterError = () => {
+    analytics.track(Events.DocUploadRestarted);
     onResetErrors();
     onReset();
   };
