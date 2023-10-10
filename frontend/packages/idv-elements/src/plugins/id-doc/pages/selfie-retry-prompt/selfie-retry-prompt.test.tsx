@@ -13,7 +13,7 @@ describe('<SelfieRetryPrompt />', () => {
   it('Contains the correct error messages', () => {
     renderSelfieRetryPrompt(contextWithSelfieErrors);
     const error1 = screen.getByText(
-      'Your selfie had image glare. Please adjust the lighting and try again.',
+      'Your selfie had too much glare. Please adjust the lighting and try again.',
     );
     expect(error1).toBeInTheDocument();
   });

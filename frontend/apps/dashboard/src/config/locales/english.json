@@ -861,7 +861,7 @@
                 "selfie_face_not_found": "We could not detect a face in the selfie.",
                 "selfie_low_confidence": "We could not verify the selfie.",
                 "selfie_too_dark": "Your image was too dark.",
-                "selfie_glare": "Your selfie had image glare.",
+                "selfie_glare": "Your selfie had too much glare.",
                 "selfie_has_lenses": "We detected glasses in the selfie.",
                 "selfie_has_face_mask": "We detected a face mask in the selfie.",
                 "selfie_blurry": "Your selfie was too blurry.",

@@ -28,7 +28,7 @@ describe('<DesktopSelfieRetry />', () => {
     renderDesktopSelfieRetry(initialContextWithErrors);
 
     const error = screen.getByText(
-      'Your selfie had image glare. Please adjust the lighting and try again.',
+      'Your selfie had too much glare. Please adjust the lighting and try again.',
     );
 
     expect(error).toBeInTheDocument();
