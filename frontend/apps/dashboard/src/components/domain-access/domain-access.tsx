@@ -48,6 +48,10 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
     />
   );
 
+  if (!org.domains) {
+    return null;
+  }
+
   return (
     <Container data-testid="domain-access">
       <HeaderContainer>
@@ -71,12 +75,14 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
           </Typography>
           &nbsp;
           <Typography color="secondary" variant="label-3">
-            {org.domain}
+            {org.domains.join(', ')}
           </Typography>
         </EnableSubContainer>
         {disableTogle ? (
           <Tooltip
-            text={t('toggle.domain-already-claimed', { domain: org.domain })}
+            text={t('toggle.domain-already-claimed', {
+              domain: org.domains.join(', '),
+            })}
           >
             {toggle}
           </Tooltip>

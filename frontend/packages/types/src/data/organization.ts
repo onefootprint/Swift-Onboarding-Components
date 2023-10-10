@@ -13,7 +13,7 @@ export type Organization = {
   websiteUrl: string | null;
   companySize: OrganizationSize | null;
   isSandboxRestricted: boolean;
-  domain: string | null;
+  domains: string[];
   allowDomainAccess: boolean;
   isDomainAlreadyClaimed: boolean | null;
   isProdKycPlaybookRestricted: boolean;

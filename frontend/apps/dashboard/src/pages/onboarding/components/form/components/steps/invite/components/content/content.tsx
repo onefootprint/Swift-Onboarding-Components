@@ -77,7 +77,7 @@ const Content = ({
             <InviteFields index={index} key={field.id} roles={roles} />
           ))}
           <AddButton onClick={handleAddMore} />
-          {org.domain && <DomainAccess org={org} />}
+          {!!org.domains.length && <DomainAccess org={org} />}
           {shouldShowError && <Error>{t('form.errors.invalid')}</Error>}
           <ButtonContainer>
             <Button

@@ -25,7 +25,7 @@ const TeamRoles = () => {
   const tabs = [
     { label: t('tabs.members'), value: TabName.members },
     { label: t('tabs.roles'), value: TabName.roles },
-    ...(orgQuery.data?.domain
+    ...(orgQuery.data?.domains.length
       ? [{ label: t('tabs.access'), value: TabName.domainAccess }]
       : []),
   ];

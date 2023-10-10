@@ -8,7 +8,7 @@ export const organizationFixture: Organization = {
   isSandboxRestricted: false,
   websiteUrl: 'https://acme.com',
   companySize: null,
-  domain: null,
+  domains: [],
   allowDomainAccess: false,
   isDomainAlreadyClaimed: false,
   isProdKybPlaybookRestricted: false,

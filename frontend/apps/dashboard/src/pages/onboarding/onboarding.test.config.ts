@@ -19,7 +19,7 @@ export const orgFixture: Organization = {
   isSandboxRestricted: false,
   websiteUrl: null,
   companySize: null,
-  domain: null,
+  domains: [],
   allowDomainAccess: false,
   isDomainAlreadyClaimed: false,
   isProdKybPlaybookRestricted: false,
