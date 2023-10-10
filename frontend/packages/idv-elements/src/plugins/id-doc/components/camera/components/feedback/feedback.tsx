@@ -8,17 +8,28 @@ type FeedbackProps = {
 
 const Feedback = ({ children }: FeedbackProps) => (
   <Container>
-    <Typography variant="label-4" color="quinary">
-      {children}
-    </Typography>
+    <FeedbackText>
+      <Typography variant="label-4" color="quinary">
+        {children}
+      </Typography>
+    </FeedbackText>
   </Container>
 );
 
 const Container = styled.div`
   ${({ theme }) => css`
-    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: absolute;
     top: ${theme.spacing[7]};
+    width: 100%;
+  `}
+`;
+
+const FeedbackText = styled.div`
+  ${({ theme }) => css`
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1;
     padding: ${theme.spacing[3]} ${theme.spacing[4]} ${theme.spacing[3]}
       ${theme.spacing[4]};

@@ -20,11 +20,12 @@ export type OpenCVType = Exclude<
 const contouringThreshold = 177;
 const contouringMaxPixelVal = 200; // The value that will be assigned to the pixels that exceed threshold value
 
-const BLUR_THRESHOLD = 25; // From trial and error
+const BLUR_THRESHOLD = 20; // From trial and error
 
 export enum CardCaptureStatus {
   OK = 'ok',
   detecting = 'detecting',
+  blurry = 'blurry',
 }
 
 const isImageBlurry = (cv: OpenCVType, src: Mat) => {
@@ -262,10 +263,7 @@ export const detectCardStatus = (
   startParamIndex: number,
   batchSize: number,
 ) => {
-  if (isImageBlurry(cv, src)) {
-    src.delete();
-    return { status: CardCaptureStatus.detecting, paramIndex: -1 };
-  }
+  const isBlurry = isImageBlurry(cv, src);
   for (
     let i = startParamIndex;
     i < Math.min(params.length, startParamIndex + batchSize);
@@ -310,6 +308,7 @@ export const detectCardStatus = (
     contours.delete();
     if (possibleCards.length === 1) {
       src.delete(); // now we can clean the src
+      if (isBlurry) return { status: CardCaptureStatus.blurry, paramIndex: -1 };
       return { status: CardCaptureStatus.OK, paramIndex: i };
     }
   }

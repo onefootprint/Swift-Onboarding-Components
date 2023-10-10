@@ -97,6 +97,8 @@ const useAutoCapture = ({
       ) {
         if (!shouldShowInstructions) onStatusChange(pastStatus.current); // We remove the "hold still" message that corresponds to "OK" status only if we get two consecutive non-OK status
         successCount.current = 0;
+        resetCountdown();
+        setStatusChangeDelayTimeRunning(false);
         onReset();
       }
     }

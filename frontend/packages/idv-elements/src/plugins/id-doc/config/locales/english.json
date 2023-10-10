@@ -152,7 +152,8 @@
           "detecting": "Detecting . . .",
           "face-too-far": "Face is too far from the camera",
           "face-outside-the-frame": "Face is outside the frame outline",
-          "head-not-straight": "Face is tilted or looking other way"
+          "head-not-straight": "Face is tilted or looking other way",
+          "blurry": "Image is blurry, find better lighting or move your camera"
         }
       },
       "guidelines": {
