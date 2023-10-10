@@ -44,7 +44,7 @@ const Container = styled.div`
     justify-content: center;
     width: 100%;
     gap: ${theme.spacing[3]};
-    text-align: center;
+    align-items: center;
   `}
 `;
 
