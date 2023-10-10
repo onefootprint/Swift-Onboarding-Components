@@ -7,12 +7,16 @@ import imageCompression from 'browser-image-compression';
 */
 
 const QUALITY = 90;
-const MAX_SIZE_MB = 5;
+const MAX_SIZE_MB = 1;
+const COMPRESS_EXTRA_MAX_SIZE_MB = 0.3;
 
 // Input: Non-HEIC Image File. Output: Compressed JPEG Image File.
-const compressImage = async (imageFile: File): Promise<File | undefined> => {
+const compressImage = async (
+  imageFile: File,
+  compressExtra?: boolean,
+): Promise<File | undefined> => {
   const options = {
-    maxSizeMB: MAX_SIZE_MB,
+    maxSizeMB: compressExtra ? COMPRESS_EXTRA_MAX_SIZE_MB : MAX_SIZE_MB,
     intialQuality: QUALITY,
     useWebWorker: true,
     fileType: 'image/jpeg',

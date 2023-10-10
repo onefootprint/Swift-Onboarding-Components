@@ -13,7 +13,8 @@ type UploadButtonProps = {
 };
 
 const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
-  const [, send] = useIdDocMachine();
+  const [state, send] = useIdDocMachine();
+  const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
   const { processImageFile } = useProcessImage();
 
@@ -33,7 +34,10 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
       return;
     }
 
-    const processedImageFile = await processImageFile(files[0]);
+    const processedImageFile = await processImageFile(
+      files[0],
+      hasBadConnectivity,
+    );
     if (!processedImageFile) {
       onProcessingDone();
       return;

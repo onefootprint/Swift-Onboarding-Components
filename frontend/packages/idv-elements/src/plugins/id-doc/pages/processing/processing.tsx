@@ -37,6 +37,7 @@ const Processing = () => {
     authToken,
     currSide,
     id,
+    hasBadConnectivity,
   } = state.context;
 
   const handleProcessDocSuccess = (data: ProcessDocResponse) => {
@@ -137,6 +138,7 @@ const Processing = () => {
       {
         authToken,
         image: imageFile,
+        extraCompress: hasBadConnectivity,
         side: currSide,
         id,
         meta: {

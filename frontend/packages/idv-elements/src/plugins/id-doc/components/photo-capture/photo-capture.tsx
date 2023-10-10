@@ -34,7 +34,8 @@ const PhotoCapture = ({
   deviceKind,
 }: PhotoCaptureProps) => {
   const { t } = useTranslation('components.photo-capture');
-  const [, send] = useIdDocMachine();
+  const [state, send] = useIdDocMachine();
+  const { hasBadConnectivity } = state.context;
   const [image, setImage] = useState<string | null>(null);
   const { processImageUrl } = useProcessImage();
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +58,7 @@ const PhotoCapture = ({
     }
 
     setIsLoading(true);
-    const processedImageFile = await processImageUrl(image);
+    const processedImageFile = await processImageUrl(image, hasBadConnectivity);
     if (!processedImageFile) {
       // An error occurred, directly prompt user to re-take the image
       setIsLoading(false);

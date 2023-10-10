@@ -9,6 +9,7 @@ const IdDocBackPhotoRetry = () => {
   const [state, send] = useIdDocMachine();
   const {
     idDoc: { type, country },
+    errors,
   } = state.context;
 
   if (!type || !country) {
@@ -32,7 +33,7 @@ const IdDocBackPhotoRetry = () => {
       countryName={countryName ?? country}
       imageType={IdDocImageTypes.back}
       onComplete={handleComplete}
-      errors={state.context.errors || []}
+      errors={errors || []}
     />
   );
 };

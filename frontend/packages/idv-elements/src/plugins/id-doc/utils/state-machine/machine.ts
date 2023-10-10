@@ -1,7 +1,9 @@
-import { IdDocImageTypes } from '@onefootprint/types';
+import {
+  IdDocImageProcessingError,
+  IdDocImageTypes,
+} from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import { NextSideTargetsDesktop, NextSideTargetsMobile } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
@@ -14,7 +16,8 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: initState ?? 'init',
       context: { ...args },
       states: {
@@ -241,17 +244,17 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
               {
                 target: 'frontImageRetryMobile',
                 cond: context => context.currSide === 'front',
-                actions: 'assignIdDocImageErrors',
+                actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
               {
                 target: 'backImageRetryMobile',
                 cond: context => context.currSide === 'back',
-                actions: 'assignIdDocImageErrors',
+                actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
               {
                 target: 'selfieImageRetryMobile',
                 cond: context => context.currSide === 'selfie',
-                actions: 'assignIdDocImageErrors',
+                actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
             ],
             retryLimitExceeded: {
@@ -266,17 +269,17 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
               {
                 target: 'frontImageRetryDesktop',
                 cond: context => context.currSide === 'front',
-                actions: 'assignIdDocImageErrors',
+                actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
               {
                 target: 'backImageRetryDesktop',
                 cond: context => context.currSide === 'back',
-                actions: 'assignIdDocImageErrors',
+                actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
               {
                 target: 'selfieImageRetryDesktop',
                 cond: context => context.currSide === 'selfie',
-                actions: 'assignIdDocImageErrors',
+                actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
             ],
             retryLimitExceeded: {
@@ -314,6 +317,16 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             imageFile: event.payload.imageFile,
             captureKind: event.payload.captureKind,
           };
+          return context;
+        }),
+        assignHasBadConnectivity: assign((context, event) => {
+          if (
+            event.payload.errors.find(
+              e => e.errorType === IdDocImageProcessingError.networkError,
+            )
+          ) {
+            context.hasBadConnectivity = true;
+          }
           return context;
         }),
         assignIdDocImageErrors: assign((context, event) => {

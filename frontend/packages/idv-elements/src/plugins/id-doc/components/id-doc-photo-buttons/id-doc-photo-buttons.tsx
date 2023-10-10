@@ -13,7 +13,8 @@ type IdDocPhotoButtonsProp = {
 
 const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
   const { t } = useTranslation('components.id-doc-photo-upload-buttons');
-  const [, send] = useIdDocMachine();
+  const [state, send] = useIdDocMachine();
+  const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
   const { processImageFile } = useProcessImage();
 
@@ -40,7 +41,10 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
       return;
     }
 
-    const processedImageFile = await processImageFile(files[0]);
+    const processedImageFile = await processImageFile(
+      files[0],
+      hasBadConnectivity,
+    );
     if (!processedImageFile) {
       console.error(
         'Image upload failed. Uploaded image could not be processed',

@@ -4,7 +4,7 @@ import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const submitDoc = async (payload: SubmitDocRequest) => {
-  const { authToken, image, side, id, meta } = payload;
+  const { authToken, image, side, id, meta, extraCompress } = payload;
   const formData = new FormData();
   formData.set('upload', image);
   const response = await request<SubmitDocResponse>({
@@ -13,6 +13,7 @@ const submitDoc = async (payload: SubmitDocRequest) => {
     data: formData,
     headers: {
       [AUTH_HEADER]: authToken,
+      'x-fp-is-extra-compressed': extraCompress,
       'x-fp-is-manual': meta.manual || false,
       'x-fp-is-app-clip': false,
       'x-fp-is-instant-app': false,

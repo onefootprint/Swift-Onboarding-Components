@@ -15,6 +15,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignConsent: 'consentReceived';
     assignCountryAndType: 'receivedCountryAndType';
+    assignHasBadConnectivity: 'processingErrored';
     assignId: 'receivedCountryAndType';
     assignIdDocImageErrors: 'processingErrored' | 'uploadErrored';
     assignImage: 'receivedImage';

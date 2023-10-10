@@ -33,6 +33,7 @@ export type MachineContext = {
   supportedCountryAndDocTypes: Partial<
     Record<CountryCode, SupportedIdDocTypes[]>
   >;
+  hasBadConnectivity?: boolean;
 };
 
 export type ProccessingSucceededEvent = {

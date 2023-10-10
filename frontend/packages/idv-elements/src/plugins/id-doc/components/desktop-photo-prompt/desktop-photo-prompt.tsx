@@ -40,7 +40,8 @@ const DesktopPhotoPrompt = ({
   errors,
 }: DesktopPhotoPromptProps) => {
   const { t } = useTranslation('components.desktop-photo-prompt');
-  const [, send] = useIdDocMachine();
+  const [state, send] = useIdDocMachine();
+  const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
   const { processImageFile } = useProcessImage();
   const [hasError, setHasError] = useState(false);
@@ -55,7 +56,7 @@ const DesktopPhotoPrompt = ({
   const handleImage = async (file: File) => {
     setIsLoading(true);
     setHasError(false);
-    const processedImageFile = await processImageFile(file);
+    const processedImageFile = await processImageFile(file, hasBadConnectivity);
     if (!processedImageFile) {
       onProcessingDone();
       handleUploadError([IdDocImageUploadError.unknownUploadError]);

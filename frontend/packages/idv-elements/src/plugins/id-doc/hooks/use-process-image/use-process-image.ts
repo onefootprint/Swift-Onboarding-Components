@@ -31,13 +31,16 @@ const useProcessImage = () => {
     });
   };
 
-  const processImageFile = async (file: File) => {
-    const output = await runProcessFileScript(file);
+  const processImageFile = async (file: File, compressExtra?: boolean) => {
+    const output = await runProcessFileScript(file, compressExtra);
 
     return output;
   };
 
-  const processImageUrl = async (url: string): Promise<File | undefined> => {
+  const processImageUrl = async (
+    url: string,
+    compressExtra?: boolean,
+  ): Promise<File | undefined> => {
     let file;
     try {
       file = await imageCompression.getFilefromDataUrl(url, 'imageFileName');
@@ -53,13 +56,14 @@ const useProcessImage = () => {
       return undefined;
     }
 
-    const output = await runProcessFileScript(file);
+    const output = await runProcessFileScript(file, compressExtra);
 
     return output;
   };
 
   const runProcessFileScript = async (
     file: File,
+    compressExtra?: boolean,
   ): Promise<File | undefined> => {
     let converted;
     try {
@@ -87,7 +91,7 @@ const useProcessImage = () => {
 
     let compressed;
     try {
-      compressed = await compressImage(resized);
+      compressed = await compressImage(resized, compressExtra);
     } catch (e) {
       handleError(ImageProcessingStepError.compress, e);
       return undefined;
