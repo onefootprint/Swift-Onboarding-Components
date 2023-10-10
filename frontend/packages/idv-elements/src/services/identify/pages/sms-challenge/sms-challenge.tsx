@@ -2,11 +2,10 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { ChallengeData } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
-import { LinkButton } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
-import LegalFooter from '../../components/legal-footer';
+import DifferentAccount from '../../components/different-account';
 import PinVerification from '../../components/pin-verification';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import { getCanChallengeBiometrics } from '../../utils/biometrics';
@@ -89,14 +88,7 @@ const SmsChallenge = () => {
         preferredChallengeKind={ChallengeKind.sms}
         identifier={successfulIdentifier ?? { phoneNumber }}
       />
-      {isBootstrap && (
-        <>
-          <LinkButton onClick={handleLoginWithDifferent}>
-            {t('login-with-different-account')}
-          </LinkButton>
-          <LegalFooter />
-        </>
-      )}
+      {isBootstrap && <DifferentAccount onClick={handleLoginWithDifferent} />}
     </Container>
   );
 };

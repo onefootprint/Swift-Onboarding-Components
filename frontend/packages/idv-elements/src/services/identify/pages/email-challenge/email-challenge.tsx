@@ -1,11 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
-import { LinkButton } from '@onefootprint/ui';
 import React from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
-import LegalFooter from '../../components/legal-footer';
+import DifferentAccount from '../../components/different-account';
 import { useIdentifyMachine } from '../../components/machine-provider';
 import PinVerification from '../../components/pin-verification';
 
@@ -57,14 +56,7 @@ const EmailChallenge = () => {
         preferredChallengeKind={ChallengeKind.email}
         identifier={{ email }}
       />
-      {isBootstrap && (
-        <>
-          <LinkButton onClick={handleLoginWithDifferent}>
-            {t('login-with-different-account')}
-          </LinkButton>
-          <LegalFooter />
-        </>
-      )}
+      {isBootstrap && <DifferentAccount onClick={handleLoginWithDifferent} />}
     </Container>
   );
 };

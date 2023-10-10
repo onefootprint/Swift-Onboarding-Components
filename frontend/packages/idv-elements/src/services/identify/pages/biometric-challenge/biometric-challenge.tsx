@@ -1,11 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
-import { Button, Divider, LinkButton } from '@onefootprint/ui';
+import { Button, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
-import LegalFooter from '../../components/legal-footer';
+import DifferentAccount from '../../components/different-account';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import Biometric from './components/biometric';
 
@@ -39,50 +38,34 @@ const BiometricChallenge = () => {
   };
 
   return (
-    <Container>
+    <Stack direction="column" gap={7} align="center" justify="center">
       <ChallengeHeader
         shouldShowBack={!isBootstrap && !hasInitialAuthToken}
         title={title}
         subtitle={subtitle}
       />
-      <Biometric />
-      <StyledDivider />
-      <Button
-        fullWidth
-        variant="secondary"
-        onClick={handleChangeChallenge}
-        prefixIcon={IcoSmartphone24}
+      <Stack
+        direction="column"
+        gap={5}
+        align="center"
+        justify="center"
+        sx={{
+          width: '100%',
+        }}
       >
-        {t('login-with-sms')}
-      </Button>
-      {isBootstrap && (
-        <>
-          <LinkButton onClick={handleLoginWithDifferent}>
-            {t('login-with-different-account')}
-          </LinkButton>
-          <LegalFooter />
-        </>
-      )}
-    </Container>
+        <Biometric />
+        <Button
+          fullWidth
+          variant="secondary"
+          onClick={handleChangeChallenge}
+          prefixIcon={IcoSmartphone24}
+        >
+          {t('login-with-sms')}
+        </Button>
+      </Stack>
+      {isBootstrap && <DifferentAccount onClick={handleLoginWithDifferent} />}
+    </Stack>
   );
 };
-
-const StyledDivider = styled(Divider)`
-  ${({ theme }) => css`
-    border-style: dashed;
-    border-color: ${theme.borderColor.tertiary};
-    background: none;
-  `}
-`;
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: ${theme.spacing[7]};
-  `}
-`;
 
 export default BiometricChallenge;
