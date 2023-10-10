@@ -139,7 +139,7 @@ footprint_reason_code_enum! {
         CreditMoreThan3InquiriesInLast30Days,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Name, SignalScope::Dob, SignalScope::Address], match_level = None]
-        #[note = "Credit established before SSN issue date", severity = SignalSeverity::Medium,  description = "Credit was established for this consumer before the input SSN's issue date"]
+        #[note = "Credit established before SSN issue date", severity = SignalSeverity::Low,  description = "Credit was established for this consumer before the input SSN's issue date"]
         CreditEstablishedBeforeSSNDate,
 
         // ~~~~~~~~~ Address ~~~~~~~~~~~~~~~
@@ -602,11 +602,11 @@ footprint_reason_code_enum! {
         SsnIssuedPriorToDob,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
-        #[note = "SSN issue date cannot be verified", severity = SignalSeverity::Medium,  description = "The issues date of the SSN provided on cannot be verified by the Social Security Administration (SSA)"]
+        #[note = "SSN issue date cannot be verified", severity = SignalSeverity::Medium,  description = "The issues date of the SSN provided on cannot be verified by the Social Security Administration (SSA). This will be the case for any SSN issued after 2011, so this is common for person who immigrated to the US after 2011 or persons who are young."]
         SsnIssueDateCannotBeVerified,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
-        #[note = "The issue date for the SSN located for this consumer cannot be verified", severity = SignalSeverity::Medium,  description = "The issue date of the best on-file SSN cannot be verified by the Social Security Administration (SSA)"]
+        #[note = "The issue date for the SSN located for this consumer cannot be verified", severity = SignalSeverity::Medium,  description = "The issue date of the best on-file SSN cannot be verified by the Social Security Administration (SSA). This will be the case for any SSN issued after 2011, so this is common for person who immigrated to the US after 2011 or persons who are young."]
         SsnLocatedIssueDateCannotBeVerified,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
