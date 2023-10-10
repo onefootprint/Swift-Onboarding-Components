@@ -98,3 +98,19 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
         }
     }
 }
+
+impl DbToApi<ScopedVault> for api_wire_types::SuperAdminEntity {
+    fn from_db(target: ScopedVault) -> Self {
+        let ScopedVault {
+            fp_id,
+            is_live,
+            tenant_id,
+            ..
+        } = target;
+        Self {
+            id: fp_id,
+            is_live,
+            tenant_id,
+        }
+    }
+}

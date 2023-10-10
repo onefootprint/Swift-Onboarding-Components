@@ -2,6 +2,7 @@ use actix_web::web;
 
 mod assume;
 mod cleanup;
+mod entities;
 mod invoice;
 mod protected;
 mod test_tenant;
@@ -15,6 +16,7 @@ pub fn configure(config: &mut web::ServiceConfig) {
     config
         .service(cleanup::post)
         .service(assume::post)
+        .service(entities::get)
         .service(test_tenant::post)
         .service(invoice::post)
         .service(invoice::post_all);

@@ -26,4 +26,12 @@ pub struct Entity {
     pub requires_manual_review: bool,
 }
 
+#[derive(Debug, Clone, Serialize, JsonSchema, Apiv2Schema)]
+#[schemars(rename_all = "camelCase")]
+pub struct SuperAdminEntity {
+    pub id: FpId,
+    pub is_live: bool,
+    pub tenant_id: TenantId,
+}
+
 export_schema!(Entity);

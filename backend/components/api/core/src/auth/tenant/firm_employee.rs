@@ -36,7 +36,7 @@ pub struct FirmEmployeeAuth {
 )]
 pub struct ParsedFirmEmployeeAuth(pub(super) FirmEmployeeAuth);
 
-/// A shorthand for the extractor for a firm employee assumd auth session
+/// A shorthand for the extractor for a firm employee auth session
 pub type FirmEmployeeAuthContext = SessionContext<ParsedFirmEmployeeAuth>;
 
 impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
