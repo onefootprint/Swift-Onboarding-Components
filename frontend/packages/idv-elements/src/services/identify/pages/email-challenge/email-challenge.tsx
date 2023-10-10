@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
+import { LinkButton } from '@onefootprint/ui';
 import React from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
@@ -37,6 +38,12 @@ const EmailChallenge = () => {
     }, SUCCESS_EVENT_DELAY_MS);
   };
 
+  const handleLoginWithDifferent = () => {
+    send({
+      type: 'identifyReset',
+    });
+  };
+
   return (
     <Container>
       <ChallengeHeader
@@ -50,7 +57,14 @@ const EmailChallenge = () => {
         preferredChallengeKind={ChallengeKind.email}
         identifier={{ email }}
       />
-      {isBootstrap && <LegalFooter />}
+      {isBootstrap && (
+        <>
+          <LinkButton onClick={handleLoginWithDifferent}>
+            {t('login-with-different-account')}
+          </LinkButton>
+          <LegalFooter />
+        </>
+      )}
     </Container>
   );
 };

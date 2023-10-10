@@ -232,6 +232,10 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               target: 'success',
               actions: ['assignAuthToken'],
             },
+            identifyReset: {
+              target: 'emailIdentification',
+              actions: ['reset'],
+            },
             navigatedToPrevPage: [
               {
                 target: 'biometricChallenge',
@@ -282,6 +286,10 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             challengeSucceeded: {
               target: 'success',
               actions: ['assignAuthToken'],
+            },
+            identifyReset: {
+              target: 'emailIdentification',
+              actions: ['reset'],
             },
             navigatedToPrevPage: {
               target: 'emailIdentification',
@@ -348,6 +356,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
           context.identify = {
             sandboxId: context.identify.sandboxId,
           };
+          context.bootstrapData = {};
           context.challenge = {};
           return context;
         }),

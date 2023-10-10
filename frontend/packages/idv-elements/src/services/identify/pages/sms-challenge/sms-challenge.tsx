@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { ChallengeData } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
+import { LinkButton } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
@@ -60,6 +61,12 @@ const SmsChallenge = () => {
     }, SUCCESS_EVENT_DELAY_MS);
   };
 
+  const handleLoginWithDifferent = () => {
+    send({
+      type: 'identifyReset',
+    });
+  };
+
   const handleReceiveChallengeData = (data: ChallengeData) => {
     setChallengeData(data);
   };
@@ -82,7 +89,14 @@ const SmsChallenge = () => {
         preferredChallengeKind={ChallengeKind.sms}
         identifier={successfulIdentifier ?? { phoneNumber }}
       />
-      {isBootstrap && <LegalFooter />}
+      {isBootstrap && (
+        <>
+          <LinkButton onClick={handleLoginWithDifferent}>
+            {t('login-with-different-account')}
+          </LinkButton>
+          <LegalFooter />
+        </>
+      )}
     </Container>
   );
 };
