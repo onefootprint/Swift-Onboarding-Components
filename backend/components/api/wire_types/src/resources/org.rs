@@ -11,7 +11,6 @@ pub struct Organization {
     pub is_sandbox_restricted: bool,
     pub website_url: Option<String>,
     pub company_size: Option<CompanySize>,
-    pub domain: Option<String>,
     pub domains: Vec<String>,
     pub allow_domain_access: bool,
     // Only serialize in the GET /org response
