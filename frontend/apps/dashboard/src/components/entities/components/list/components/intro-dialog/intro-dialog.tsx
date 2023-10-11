@@ -57,7 +57,7 @@ const IntroDialog = () => {
           {t('dialog.subtitle')}
         </Typography>
       </Title>
-      <Box sx={{ marginBottom: 6 }} />
+      <Box marginBottom={6} />
       <Steps>
         <Step>
           <Typography variant="label-3">{t('dialog.step-1.number')}</Typography>

@@ -8,7 +8,7 @@ import {
   IcoUsers16,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, Container, Tab, Tabs, Toggle, Tooltip } from '@onefootprint/ui';
+import { Container, Stack, Tab, Tabs, Toggle, Tooltip } from '@onefootprint/ui';
 import { omit } from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -77,7 +77,7 @@ const Nav = () => {
           ))}
           <ManualReviewNavigator />
         </Tabs>
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Stack justify="center">
           <Tooltip
             disabled={!userWouldBeRedirected && sandbox.canToggle}
             text={
@@ -96,7 +96,7 @@ const Nav = () => {
               onChange={toggleSandboxMode}
             />
           </Tooltip>
-        </Box>
+        </Stack>
       </Container>
     </NavContainer>
   );

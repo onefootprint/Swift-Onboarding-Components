@@ -22,7 +22,7 @@ const Complete = () => {
       ) : (
         <>
           <IcoCheckCircle40 color="success" />
-          <Box sx={{ marginBottom: 4 }} />
+          <Box marginBottom={4} />
           <HeaderTitle
             sx={{ display: 'flex', flexDirection: 'column', gap: 4, zIndex: 3 }}
             title={t('title')}

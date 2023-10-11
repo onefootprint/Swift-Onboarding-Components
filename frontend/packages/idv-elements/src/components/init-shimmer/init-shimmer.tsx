@@ -3,12 +3,12 @@ import { Box, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 
 const InitShimmer = () => (
-  <Box testID="init-shimmer" sx={{ paddingTop: 7 }}>
+  <Box testID="init-shimmer" paddingTop={7}>
     <TitleContainer>
       <Title />
       <Subtitle />
     </TitleContainer>
-    <Box sx={{ marginBottom: 7 }}>
+    <Box marginBottom={7}>
       <Label />
       <Input />
     </Box>

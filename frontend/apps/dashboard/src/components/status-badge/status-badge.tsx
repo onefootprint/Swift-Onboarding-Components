@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoEye16, IcoWarningSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { EntityStatus } from '@onefootprint/types';
-import { Badge, Box, Tooltip, Typography } from '@onefootprint/ui';
+import { Badge, Stack, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import getBadgeVariantByStatus from '../entities/utils';
@@ -35,20 +35,17 @@ const StatusBadge = ({
           </IconContainer>
         )}
       </Badge>
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+      <Stack gap={2} align="center">
         {isOnWatchlist && (
           <>
             <Tooltip text={watchlistLabel} disabled={shouldShowWatchlistLabel}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginLeft: watchlistLabel ? 5 : 2,
-                }}
+              <Stack
+                align="center"
+                marginLeft={watchlistLabel ? 5 : 2}
                 testID="watchlistFailIcon"
               >
                 <IcoEye16 color="error" />
-              </Box>
+              </Stack>
             </Tooltip>
             {shouldShowWatchlistLabel && (
               <Typography variant="caption-2" color="error">
@@ -57,7 +54,7 @@ const StatusBadge = ({
             )}
           </>
         )}
-      </Box>
+      </Stack>
     </StatusContainer>
   );
 };

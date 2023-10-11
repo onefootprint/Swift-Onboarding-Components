@@ -1,8 +1,8 @@
 import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import Box from '../box';
 import Button from '../button';
+import Stack from '../stack';
 import Toast from './toast';
 import type { ToastProps } from './toast.types';
 import { useToast } from './toast-provider';
@@ -100,10 +100,10 @@ const Template: Story<ToastProps> = ({
   };
 
   return (
-    <Box sx={{ display: 'flex', gap: 4 }}>
+    <Stack gap={4}>
       <Button onClick={handleOpenToast}>Open toast</Button>
       <Button onClick={handleCloseToast}>Close toast</Button>
-    </Box>
+    </Stack>
   );
 };
 

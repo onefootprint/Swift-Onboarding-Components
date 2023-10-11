@@ -20,7 +20,7 @@ const BusinessProfile = () => {
         title={t('header.title')}
         subtitle={t('header.subtitle')}
       />
-      <Box sx={{ marginBottom: 5 }}>
+      <Box marginBottom={5}>
         <StyledDivider />
       </Box>
       <Container aria-busy={isLoading} aria-live="polite">

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoQuoteLeft16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, LinkButton, Typography } from '@onefootprint/ui';
+import { Box, LinkButton, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import TruncatedText from '@/entities/components/details/components/truncated-text';
@@ -49,8 +49,8 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
           {timestamp}
         </Typography>
       </Header>
-      <Box sx={{ display: 'flex' }}>
-        <Box as="span" sx={{ width: 'fit-content' }}>
+      <Stack>
+        <Box as="span" width="fit-content">
           <IcoQuoteLeft16 />
         </Box>
         <TruncatedText
@@ -62,7 +62,7 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
             color: 'secondary',
           }}
         />
-      </Box>
+      </Stack>
     </Container>
   ) : null;
 };

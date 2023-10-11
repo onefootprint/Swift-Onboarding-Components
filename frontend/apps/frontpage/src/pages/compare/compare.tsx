@@ -31,11 +31,11 @@ const Compare = () => {
           <Typography color="secondary" variant="body-1" as="p">
             {t('hero.subtitle')}
           </Typography>
-          <Box sx={{ marginBottom: 4 }} />
+          <Box marginBottom={4} />
           <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
             {t('hero.cta')}
           </LinkButton>
-          <Box sx={{ marginBottom: 10 }} />
+          <Box marginBottom={10} />
         </HeroContainer>
         <NarrowContainer>
           <Typography color="secondary" variant="body-1" as="p">
@@ -43,7 +43,7 @@ const Compare = () => {
           </Typography>
           <ComparisonTable />
         </NarrowContainer>
-        <Box sx={{ marginBottom: 10 }} />
+        <Box marginBottom={10} />
         <Typography variant="display-2" sx={{ textAlign: 'center' }}>
           {t('why-footptint.title')}
         </Typography>

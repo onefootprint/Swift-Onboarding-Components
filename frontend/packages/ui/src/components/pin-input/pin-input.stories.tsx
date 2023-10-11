@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Box from '../box';
 import LinkButton from '../link-button';
 import LoadingIndicator from '../loading-indicator';
+import Stack from '../stack';
 import Typography from '../typography';
 import type { PinInputProps } from './pin-input';
 import PinInput from './pin-input';
@@ -55,29 +56,26 @@ const Template: Story<PinInputProps> = ({
   };
 
   return (
-    <Box
-      sx={{
-        alignItems: 'center',
-        borderRadius: 'compact',
-        display: 'flex',
-        elevation: 2,
-        flexDirection: 'column',
-        height: '240px',
-        justifyContent: 'center',
-        width: '500px',
-      }}
+    <Stack
+      align="center"
+      borderRadius="compact"
+      direction="column"
+      height="240px"
+      justify="center"
+      width="500px"
+      elevation={2}
     >
-      <Box sx={{ marginBottom: 3 }}>
+      <Box marginBottom={3}>
         <Typography variant="heading-2" color="primary">
           Welcome back! 🎉
         </Typography>
       </Box>
-      <Box sx={{ marginBottom: 8 }}>
+      <Box marginBottom={8}>
         <Typography variant="body-2" color="secondary">
           Enter the 6-digit code sent to your phone
         </Typography>
       </Box>
-      <Box sx={{ marginBottom: 8 }}>
+      <Box marginBottom={8}>
         {loading ? (
           <LoadingIndicator />
         ) : (
@@ -92,7 +90,7 @@ const Template: Story<PinInputProps> = ({
       <Box>
         <LinkButton size="compact">Resend code</LinkButton>
       </Box>
-    </Box>
+    </Stack>
   );
 };
 

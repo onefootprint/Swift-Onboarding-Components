@@ -4,7 +4,7 @@ import React from 'react';
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';
-import Box from '../box';
+import Stack from '../stack';
 import type { InlineAlertVariant } from './inline-alert.types';
 import { createVariantStyles, getIconForVariant } from './inline-alert.utils';
 
@@ -19,14 +19,9 @@ const InlineAlert = ({ children, variant = 'info', sx }: InlineAlertProps) => {
   const sxStyles = useSX(sx);
   return (
     <InlineAlertContainer sx={sxStyles} role="alert" variant={variant}>
-      <Box
-        sx={{
-          display: 'flex',
-          marginRight: 3,
-        }}
-      >
+      <Stack marginRight={3}>
         <IconComponent color={variant} />
-      </Box>
+      </Stack>
       <ContentContainer variant={variant}>{children}</ContentContainer>
     </InlineAlertContainer>
   );

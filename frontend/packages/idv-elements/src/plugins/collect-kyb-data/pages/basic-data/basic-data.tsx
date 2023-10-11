@@ -5,6 +5,7 @@ import {
   CollectedKybDataOption,
   CollectedKybDataOptionToRequiredAttributes,
 } from '@onefootprint/types';
+import { Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -83,7 +84,7 @@ const BasicData = ({
     .flat() as (BusinessDI.phoneNumber | BusinessDI.website)[];
 
   return (
-    <>
+    <Stack direction="column" gap={7}>
       {!hideHeader && (
         <>
           <CollectKybDataNavigationHeader />
@@ -103,7 +104,7 @@ const BasicData = ({
         ctaLabel={ctaLabel}
         config={config}
       />
-    </>
+    </Stack>
   );
 };
 

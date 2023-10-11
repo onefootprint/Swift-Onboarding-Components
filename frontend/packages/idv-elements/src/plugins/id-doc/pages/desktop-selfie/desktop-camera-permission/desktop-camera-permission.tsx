@@ -28,7 +28,7 @@ const DesktopCameraPermission = ({
         {permissionState === 'undetected' ? (
           <LoadingIndicator />
         ) : (
-          <Box sx={{ paddingLeft: 9, paddingRight: 9 }}>
+          <Box paddingLeft={9} paddingRight={9}>
             <Typography variant="label-2" sx={{ textAlign: 'center' }}>
               {t('title')}
             </Typography>

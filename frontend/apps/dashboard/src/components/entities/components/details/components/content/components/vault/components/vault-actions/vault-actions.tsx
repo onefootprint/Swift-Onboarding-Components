@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Box, Button, Portal, Tooltip } from '@onefootprint/ui';
+import { Button, Portal, Stack, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
@@ -29,7 +29,7 @@ const DecryptControls = ({ entity }: DecryptControlsProps) => {
     <Portal selector={HEADER_ACTIONS_SELECTOR}>
       {controls.isIdle && (
         <Tooltip disabled={canDecrypt} text={t('not-allowed')}>
-          <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+          <Stack gap={3} align="center">
             <Button
               disabled={!canDecrypt}
               onClick={controls.start}
@@ -40,18 +40,18 @@ const DecryptControls = ({ entity }: DecryptControlsProps) => {
             </Button>
             <ManualReview />
             <Actions />
-          </Box>
+          </Stack>
         </Tooltip>
       )}
       {controls.inProgress && (
-        <Box sx={{ display: 'flex', gap: 3 }}>
+        <Stack gap={3}>
           <Button size="small" variant="secondary" onClick={controls.cancel}>
             {allT('cancel')}
           </Button>
           <Button form={VAULT_FORM_ID} size="small" type="submit">
             {allT('next')}
           </Button>
-        </Box>
+        </Stack>
       )}
       <ReasonDialog
         loading={controls.isLoading}

@@ -23,7 +23,7 @@ const Webhooks = () => {
           <Typography variant="body-3">{t('header.subtitle')}</Typography>
         </Box>
       </Header>
-      <Box sx={{ marginY: 5 }} />
+      <Box marginTop={5} marginBottom={5} />
       {data && <Content data={data} />}
       {error && <Error message={getErrorMessage(error)} />}
       {isLoading && <WebhooksPortalLoading />}

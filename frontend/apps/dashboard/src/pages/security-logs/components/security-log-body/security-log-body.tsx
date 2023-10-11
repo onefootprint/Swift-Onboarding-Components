@@ -48,8 +48,8 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
             Device/OS
           </Typography>
           <Box
+            overflow="hidden"
             sx={{
-              overflow: 'hidden',
               gridArea: '2 / 4 / span 2 / span 1',
             }}
           >
@@ -67,7 +67,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
       </div>
     )}
     <div>
-      <Box sx={{ marginBottom: 5 }}>
+      <Box marginBottom={5}>
         <Typography variant="body-3">Reason</Typography>
       </Box>
       <Typography variant="body-3">{accessEvent.reason || '-'}</Typography>

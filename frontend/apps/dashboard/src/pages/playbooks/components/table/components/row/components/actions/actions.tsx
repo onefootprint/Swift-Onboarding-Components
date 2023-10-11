@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Box, Dropdown } from '@onefootprint/ui';
+import { Dropdown, Stack } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
@@ -37,7 +37,7 @@ const Actions = ({ playbook }: ActionsProps) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+    <Stack justify="flex-end">
       <Dropdown.Root>
         <PermissionGate
           scopeKind={RoleScopeKind.onboardingConfiguration}
@@ -74,7 +74,7 @@ const Actions = ({ playbook }: ActionsProps) => {
       <Status playbook={playbook} key={status} ref={statusRef} />
       <EditName playbook={playbook} ref={editNameRef} key={name} />
       <CopyLink playbook={playbook} ref={copyLinkRef} />
-    </Box>
+    </Stack>
   );
 };
 

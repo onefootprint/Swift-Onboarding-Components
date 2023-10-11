@@ -22,7 +22,7 @@ const ProxyConfigs = () => {
         <SectionHeader title={t('title')} subtitle={t('subtitle')}>
           <Create />
         </SectionHeader>
-        <Box sx={{ marginY: 5 }} />
+        <Box marginTop={5} marginBottom={5} />
         <Table data={data} errorMessage={errorMessage} isLoading={isLoading} />
         <Details />
       </Box>

@@ -30,7 +30,7 @@ const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
       <Typography variant="label-2" sx={{ marginBottom: 5 }}>
         {t('title')}
       </Typography>
-      <Box sx={{ display: 'grid', gap: 7 }}>
+      <Box gap={7} sx={{ display: 'grid' }}>
         <TextInput
           autoFocus
           hasError={!!formState.errors.name}

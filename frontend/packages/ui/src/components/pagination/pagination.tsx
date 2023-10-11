@@ -1,8 +1,8 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import Box from '../box';
 import Button from '../button';
+import Stack from '../stack';
 import Typography from '../typography';
 
 export type PaginationProps = {
@@ -31,10 +31,8 @@ const Pagination = ({
   );
 
   return (
-    <Box
-      sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 5 }}
-    >
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+    <Stack justify="space-between" marginTop={5}>
+      <Stack align="center">
         {totalNumResults ? (
           <Typography variant="body-3" color="secondary">
             Showing {lowerBoundShownResults} to {upperBoundShownResults} of{' '}
@@ -45,7 +43,7 @@ const Pagination = ({
             No results
           </Typography>
         )}
-      </Box>
+      </Stack>
       <ButtonContainer>
         <Button
           disabled={!hasPrevPage}
@@ -64,7 +62,7 @@ const Pagination = ({
           Next
         </Button>
       </ButtonContainer>
-    </Box>
+    </Stack>
   );
 };
 

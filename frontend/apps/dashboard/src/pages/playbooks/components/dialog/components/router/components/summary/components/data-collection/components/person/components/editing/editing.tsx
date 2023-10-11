@@ -160,7 +160,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
               />
               {showSsnDocStepUp && (
                 <LeftSpacing>
-                  <Box sx={{ marginY: 5 }}>
+                  <Box marginTop={5} marginBottom={5}>
                     <Divider variant="secondary" />
                   </Box>
                   <Checkbox
@@ -175,7 +175,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                   />
                   {shouldStepUpIdDoc && (
                     <Box>
-                      <Box sx={{ marginY: 5 }}>
+                      <Box marginTop={5} marginBottom={5}>
                         <Divider variant="secondary" />
                       </Box>
                       <IdDocPicker unselectedIDDoc={unselectedIDDoc} />
@@ -217,7 +217,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
         />
         {shouldCollectIdDoc && (
           <Box>
-            <Box sx={{ marginBottom: 5 }}>
+            <Box marginBottom={5}>
               <Divider variant="secondary" />
             </Box>
             <IdDocPicker unselectedIDDoc={unselectedIDDoc} />

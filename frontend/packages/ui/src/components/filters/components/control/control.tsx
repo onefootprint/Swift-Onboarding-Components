@@ -56,11 +56,7 @@ const Control = ({ control, onChange }: ControlProps) => {
   };
 
   return (
-    <Box
-      ref={setReferenceElement}
-      aria-busy={loading}
-      sx={{ position: 'relative' }}
-    >
+    <Box ref={setReferenceElement} position="relative" aria-busy={loading}>
       {hasSelectedOptions ? (
         <PillGroup>
           <ClearPill onClick={clear}>{label}</ClearPill>

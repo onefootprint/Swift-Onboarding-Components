@@ -1,6 +1,12 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
-import { Box, Container, LinkButton, Typography } from '@onefootprint/ui';
+import {
+  Box,
+  Container,
+  LinkButton,
+  Stack,
+  Typography,
+} from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import PostContent from 'src/components/post-content';
@@ -46,7 +52,7 @@ const Post = ({ post }: PostProps) => {
       <article>
         <Container>
           <WritingLayout>
-            <Box sx={{ marginBottom: 8 }}>
+            <Box marginBottom={8}>
               <Link href="/library" passHref legacyBehavior>
                 <LinkButton
                   iconPosition="left"
@@ -58,13 +64,7 @@ const Post = ({ post }: PostProps) => {
               </Link>
             </Box>
             <header>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
+              <Stack justify="space-between" align="center">
                 <PostInfo
                   publishedAt={formatDateWithLongMonth(
                     new Date(post.published_at),
@@ -83,7 +83,7 @@ const Post = ({ post }: PostProps) => {
                   title={post.og_title}
                   url={`https://www.onefootprint.com/library/${post.slug}`}
                 />
-              </Box>
+              </Stack>
               <Typography variant="display-2" as="h1" sx={{ marginY: 9 }}>
                 {post.title}
               </Typography>

@@ -25,11 +25,9 @@ const PenguinBanner = ({
       direction="column"
       align="center"
       gap={10}
-      sx={{
-        marginTop: 11,
-        marginBottom: 12,
-        maxWidth: '90%',
-      }}
+      marginTop={11}
+      marginBottom={12}
+      maxWidth="90%"
     >
       <Image
         src="/pricing/banner.png"

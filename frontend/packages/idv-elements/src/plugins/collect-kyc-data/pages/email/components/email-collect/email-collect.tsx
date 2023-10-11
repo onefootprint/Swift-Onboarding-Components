@@ -84,7 +84,7 @@ const EmailCollect = ({
         </>
       )}
       <form onSubmit={handleSubmit(onSubmitForm)}>
-        <Box sx={{ marginBottom: 7 }}>
+        <Box marginBottom={7}>
           <TextInput
             data-private
             type="email"

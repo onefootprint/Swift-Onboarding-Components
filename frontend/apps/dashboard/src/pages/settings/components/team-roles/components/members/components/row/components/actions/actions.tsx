@@ -9,6 +9,7 @@ import {
   createFontStyles,
   Dialog,
   Dropdown,
+  Stack,
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -54,12 +55,7 @@ const Actions = ({ member }: ActionsProps) => {
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-      }}
-    >
+    <Stack justify="flex-end">
       <Dropdown.Root>
         <PermissionGate
           scopeKind={RoleScopeKind.orgSettings}
@@ -109,7 +105,7 @@ const Actions = ({ member }: ActionsProps) => {
           </Typography>
         </Dialog>
       </Box>
-    </Box>
+    </Stack>
   );
 };
 

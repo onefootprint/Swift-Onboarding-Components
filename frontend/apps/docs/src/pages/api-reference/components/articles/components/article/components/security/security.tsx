@@ -29,7 +29,7 @@ const Security = ({ type }: SecurityProps) => {
           <Description>
             {securityComponentContent[type].description}
             <br />
-            <Box as="span" sx={{ display: 'inline-block' }}>
+            <Box as="span" display="inline-block">
               {t('what-is-api-key')}{' '}
               <CodeInline disabled>
                 {securityComponentContent[type].name}

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Box from '../box';
 import Button from '../button';
 import Divider from '../divider';
+import Stack from '../stack';
 import type { StepperProps } from './stepper';
 import Stepper from './stepper';
 
@@ -53,10 +54,10 @@ const Template: Story<StepperProps> = ({
           onChange?.(newValue);
         }}
       />
-      <Box sx={{ marginTop: 6 }}>
+      <Box marginTop={6}>
         <Divider />
       </Box>
-      <Box sx={{ display: 'flex', gap: 2, marginTop: 7 }}>
+      <Stack gap={2} marginTop={7}>
         <Button
           size="small"
           onClick={() => {
@@ -98,7 +99,7 @@ const Template: Story<StepperProps> = ({
         >
           Next
         </Button>
-      </Box>
+      </Stack>
     </Box>
   );
 };

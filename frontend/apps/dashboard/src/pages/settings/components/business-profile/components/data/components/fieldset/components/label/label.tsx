@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoPencil16 } from '@onefootprint/icons';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Box, IconButton, Typography } from '@onefootprint/ui';
+import { IconButton, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
@@ -17,15 +17,7 @@ const Label = ({ children, cta }: LabelProps) => {
   const { t } = useTranslation('pages.settings.business-profile');
 
   return (
-    <Box
-      sx={{
-        alignItems: 'center',
-        display: 'flex',
-        gap: 3,
-        height: '32px',
-        marginBottom: 2,
-      }}
-    >
+    <Stack align="center" gap={3} height="32px" marginBottom={2}>
       <Typography variant="label-3" color="tertiary">
         {children}
       </Typography>
@@ -39,7 +31,7 @@ const Label = ({ children, cta }: LabelProps) => {
           </IconButton>
         </PermissionGate>
       )}
-    </Box>
+    </Stack>
   );
 };
 

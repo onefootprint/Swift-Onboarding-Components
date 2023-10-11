@@ -12,13 +12,13 @@ const DesktopLayoutSheet = () => (
   <SplitContainer>
     <ScrollingContent>
       <OnboardNewCustomers />
-      <Box sx={{ marginBottom: 15 }} />
+      <Box marginBottom={15} />
       <Confidence />
-      <Box sx={{ marginBottom: 15 }} />
+      <Box marginBottom={15} />
       <OnboardingExperience />
-      <Box sx={{ marginBottom: 15 }} />
+      <Box marginBottom={15} />
       <AppClip />
-      <Box sx={{ marginBottom: 15 }} />
+      <Box marginBottom={15} />
     </ScrollingContent>
     <StickyRail />
   </SplitContainer>

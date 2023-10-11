@@ -35,13 +35,11 @@ const Template: Story<ContainerProps> = ({
 }: Partial<ContainerProps>) => (
   <Container as={as} testID={testID}>
     <Box
-      sx={{
-        width: '100%',
-        backgroundColor: 'tertiary',
-        height: '100vh',
-        borderRadius: 'compact',
-        padding: 6,
-      }}
+      width="100%"
+      height="100vh"
+      backgroundColor="tertiary"
+      borderRadius="compact"
+      padding={6}
     >
       <Typography variant="label-1" color="quaternary">
         {children}

@@ -55,7 +55,7 @@ const IdDocPicker = ({ unselectedIDDoc }: IdDocPickerProps) => {
       </Grid>
       {idDocKind?.length > 0 && (
         <>
-          <Box sx={{ marginY: 5 }}>
+          <Box marginTop={5} marginBottom={5}>
             <Divider variant="secondary" />
           </Box>
           <Checkbox

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Box, LoadingIndicator, Typography } from '@onefootprint/ui';
+import { LoadingIndicator, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const Verifying = () => {
@@ -8,16 +8,9 @@ const Verifying = () => {
 
   return (
     <Container>
-      <Box
-        sx={{
-          width: '40px',
-          height: '40px',
-          justifyContent: 'center',
-          display: 'flex',
-        }}
-      >
+      <Stack justify="center" width="40px" height="40px">
         <LoadingIndicator />
-      </Box>
+      </Stack>
       <Typography variant="label-3">{t('verifying')}</Typography>
     </Container>
   );

@@ -124,13 +124,13 @@ const PhotoCapture = ({
   return image ? (
     <>
       {deviceKind === 'desktop' && (
-        <Box sx={{ marginBottom: 7 }}>
+        <Box marginBottom={7}>
           <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
           <HeaderTitle title={title.preview} />
         </Box>
       )}
       {deviceKind === 'mobile' && (
-        <Box sx={{ marginBottom: 7 }}>
+        <Box marginBottom={7}>
           <NavigationHeader button={{ variant: 'back', onBack }} />
           <HeaderTitle title={title.preview} subtitle={subtitle?.preview} />
         </Box>
@@ -147,7 +147,7 @@ const PhotoCapture = ({
   ) : (
     <>
       {deviceKind === 'desktop' && (
-        <Box sx={{ marginBottom: 7 }}>
+        <Box marginBottom={7}>
           <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
           <HeaderTitle title={title.camera} subtitle={subtitle?.camera} />
         </Box>

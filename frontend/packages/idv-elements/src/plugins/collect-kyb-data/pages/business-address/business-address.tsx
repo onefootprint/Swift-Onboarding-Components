@@ -1,6 +1,7 @@
 import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { BusinessDI } from '@onefootprint/types';
+import { Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -71,7 +72,7 @@ const BusinessAddress = ({
   };
 
   return (
-    <>
+    <Stack direction="column" gap={5}>
       {!hideHeader && (
         <>
           <CollectKybDataNavigationHeader />
@@ -89,7 +90,7 @@ const BusinessAddress = ({
         isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
       />
-    </>
+    </Stack>
   );
 };
 

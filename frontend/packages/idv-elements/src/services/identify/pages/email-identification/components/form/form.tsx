@@ -26,7 +26,7 @@ const Form = ({ defaultEmail, isLoading, onSubmit }: FormProps) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Box sx={{ marginBottom: 7 }}>
+      <Box marginBottom={7}>
         <TextInput
           data-private
           hasError={hasError}

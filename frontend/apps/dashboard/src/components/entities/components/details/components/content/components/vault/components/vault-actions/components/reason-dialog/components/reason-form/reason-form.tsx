@@ -88,7 +88,7 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
         )}
       />
       {showCustomReason && (
-        <Box sx={{ marginTop: 4 }}>
+        <Box marginTop={4}>
           <TextArea
             hasError={!!errors.customReason}
             hint={
@@ -99,7 +99,7 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
           />
         </Box>
       )}
-      <Box sx={{ marginTop: 7, marginBottom: 7 }}>
+      <Box marginTop={7} marginBottom={7}>
         <Divider />
       </Box>
       <Typography variant="body-3" color="tertiary">

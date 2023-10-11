@@ -2,7 +2,7 @@ import { COUNTRIES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckSmall16, IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, Button, media, Tooltip, Typography } from '@onefootprint/ui';
+import { Button, media, Stack, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import SEO from '../../components/seo';
@@ -46,9 +46,9 @@ const SupportedIdDocuments = () => {
                 text={t('table-headers.id-card.tooltip')}
                 position="bottom"
               >
-                <Box sx={{ display: 'flex' }}>
+                <Stack>
                   <IcoInfo16 color="secondary" />
-                </Box>
+                </Stack>
               </Tooltip>
             </HeaderCell>
             <HeaderCell>

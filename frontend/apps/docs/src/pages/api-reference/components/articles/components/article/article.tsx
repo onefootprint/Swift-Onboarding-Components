@@ -47,7 +47,7 @@ const Article = ({
                 <Security key={type} type={type as SecurityTypes} />
               )),
             )}
-            <Box sx={{ marginY: 2 }} />
+            <Box marginTop={2} marginBottom={2} />
             <Schema>
               {parameters && <Parameters parameters={parameters} />}
               {requestBody && <RequestBody requestBody={requestBody} />}

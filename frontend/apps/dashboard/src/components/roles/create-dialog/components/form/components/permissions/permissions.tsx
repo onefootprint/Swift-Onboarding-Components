@@ -55,7 +55,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
 
   return (
     <>
-      <Box sx={{ marginBottom: 5 }}>
+      <Box marginBottom={5}>
         <Typography variant="label-2">{t('form.permissions.title')}</Typography>
       </Box>
       <ToggleContainer>

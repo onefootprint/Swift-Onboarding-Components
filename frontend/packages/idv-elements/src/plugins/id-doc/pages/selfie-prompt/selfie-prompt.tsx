@@ -6,7 +6,7 @@ import {
   IcoSun24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, Button } from '@onefootprint/ui';
+import { Button, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import InfoBox from '../../../../components/info-box';
@@ -26,14 +26,7 @@ const SelfiePrompt = () => {
   return (
     <FadeInContainer>
       <PromptContainer>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 8,
-          }}
-        >
+        <Stack direction="column" align="center" gap={8}>
           <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
           <InfoBox
             items={[
@@ -58,7 +51,7 @@ const SelfiePrompt = () => {
             ]}
             variant="default"
           />
-        </Box>
+        </Stack>
         <StickyBottomBox>
           <Button fullWidth onClick={handleClick}>
             {t('cta')}

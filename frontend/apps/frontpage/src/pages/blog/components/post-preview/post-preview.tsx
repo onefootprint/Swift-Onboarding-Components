@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { Box, media, Typography } from '@onefootprint/ui';
+import { media, Stack, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -56,12 +56,11 @@ const PostPreview = ({
             {title}
           </Typography>
         </Header>
-        <Box
+        <Stack
+          direction="column"
+          justify="space-between"
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
             flexGrow: 1,
-            justifyContent: 'space-between',
           }}
         >
           <Body>
@@ -69,7 +68,7 @@ const PostPreview = ({
               {excerpt}
             </Typography>
           </Body>
-        </Box>
+        </Stack>
         <Footer authors={authors} publishedAt={publishedAt} />
       </Content>
     </StyledLink>

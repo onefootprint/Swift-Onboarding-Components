@@ -57,7 +57,8 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
         />
         <AnimatedContainer
           isExpanded={triggerKind === TriggerKind.IdDocument}
-          sx={{ marginLeft: 8, marginTop: 4 }}
+          marginLeft={8}
+          marginTop={4}
         >
           <Checkbox
             label={t('form.id-photo.collect-selfie')}

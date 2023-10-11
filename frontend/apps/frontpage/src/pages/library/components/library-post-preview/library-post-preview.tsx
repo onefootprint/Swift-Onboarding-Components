@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { Box, media, Typography } from '@onefootprint/ui';
+import { media, Stack, Typography } from '@onefootprint/ui';
 import Image from 'next/legacy/image';
 import Link from 'next/link';
 import React from 'react';
@@ -49,14 +49,7 @@ const LibraryPostPreview = ({
             {title}
           </Typography>
         </Header>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            flexGrow: 1,
-            justifyContent: 'space-between',
-          }}
-        >
+        <Stack direction="column" justify="space-between" flexGrow={1}>
           <Body>
             <Typography color="secondary" variant="body-2">
               {excerpt}
@@ -73,7 +66,7 @@ const LibraryPostPreview = ({
               {author.name} | <time>{publishedAt}</time>
             </Typography>
           </Footer>
-        </Box>
+        </Stack>
       </Content>
     </StyledLink>
   </Container>

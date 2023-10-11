@@ -58,7 +58,7 @@ const Ending = () => {
           >
             {t('new-approach.description')}
           </Typography>
-          <Box sx={{ marginBottom: 5 }} />
+          <Box marginBottom={5} />
           <FeaturesContainer>
             <TitleContainer>
               <IcoShield40 />

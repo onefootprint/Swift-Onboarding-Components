@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, Typography } from '@onefootprint/ui';
+import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 export type InfoBoxProps = {
@@ -15,12 +15,8 @@ const InfoBox = ({ items, variant }: InfoBoxProps) => (
         <IconContainer>
           <Icon color="primary" />
         </IconContainer>
-        <Box>
-          <Typography
-            color="primary"
-            sx={{ marginBottom: variant === 'default' ? 3 : 2 }}
-            variant="label-3"
-          >
+        <Stack direction="column" gap={variant === 'default' ? 3 : 2}>
+          <Typography color="primary" variant="label-3">
             {title}
           </Typography>
           {description && (
@@ -28,7 +24,7 @@ const InfoBox = ({ items, variant }: InfoBoxProps) => (
               {description}
             </Typography>
           )}
-        </Box>
+        </Stack>
       </Item>
     ))}
   </Container>

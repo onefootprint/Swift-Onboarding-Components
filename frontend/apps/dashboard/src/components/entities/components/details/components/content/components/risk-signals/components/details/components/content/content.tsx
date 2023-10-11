@@ -9,7 +9,7 @@ type ContentProps = {
 };
 
 const Content = ({ riskSignal }: ContentProps) => (
-  <Box sx={{ marginBottom: 9 }}>
+  <Box marginBottom={9}>
     <Overview
       description={riskSignal.description}
       scopes={riskSignal.scopes}

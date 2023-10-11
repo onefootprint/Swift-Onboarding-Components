@@ -1,5 +1,5 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
-import { Box, ScrollArea } from '@onefootprint/ui';
+import { ScrollArea, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import Container from '../../../container';
@@ -50,9 +50,9 @@ const FormDialog = ({
         )
       }
     >
-      <Box sx={{ flexGrow: 1 }}>
+      <Stack flexGrow={1}>
         <ScrollArea>{children}</ScrollArea>
-      </Box>
+      </Stack>
     </Container>
   );
 };

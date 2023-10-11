@@ -55,12 +55,12 @@ const UploadFiles = ({ onChange }: UploadFilesProps) => {
 
   return (
     <Box
+      backgroundColor="secondary"
+      padding={5}
+      borderRadius="default"
+      gap={5}
       sx={{
-        backgroundColor: 'secondary',
-        padding: 5,
-        borderRadius: 'default',
         display: 'grid',
-        gap: 5,
       }}
     >
       <Box>

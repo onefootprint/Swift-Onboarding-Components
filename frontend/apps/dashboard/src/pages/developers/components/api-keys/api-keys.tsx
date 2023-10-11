@@ -26,12 +26,12 @@ const ApiKeys = () => {
           </Button>
         </PermissionGate>
       </SectionHeader>
-      <Box sx={{ marginTop: 5, marginBottom: 7 }}>
+      <Box marginTop={5} marginBottom={7}>
         <Divider />
       </Box>
       <Table />
       <CreateDialog open={isCreateDialogOpen} onClose={closeCreateDialog} />
-      <Box sx={{ marginTop: 9 }} />
+      <Box marginTop={9} />
       <Roles />
     </section>
   );

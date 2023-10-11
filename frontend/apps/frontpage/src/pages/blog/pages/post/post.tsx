@@ -2,10 +2,10 @@ import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
-  Box,
   Container,
   LinkButton,
   media,
+  Stack,
   Typography,
 } from '@onefootprint/ui';
 import Link from 'next/link';
@@ -63,13 +63,7 @@ const Post = ({ post }: PostProps) => {
               </LinkButton>
             </BackButtonLink>
             <header>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
+              <Stack justify="space-between" align="center">
                 <PostInfo
                   publishedAt={formatDateWithLongMonth(
                     new Date(post.published_at),
@@ -88,7 +82,7 @@ const Post = ({ post }: PostProps) => {
                   title={post.og_title}
                   url={`https://www.onefootprint.com/blog/${post.slug}`}
                 />
-              </Box>
+              </Stack>
               <Typography variant="display-2" as="h1" sx={{ marginY: 9 }}>
                 {post.title}
               </Typography>

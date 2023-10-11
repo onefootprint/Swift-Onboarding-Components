@@ -3,10 +3,10 @@ import { IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   Badge,
-  Box,
   Button,
   Checkbox,
   Divider,
+  Stack,
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -55,7 +55,7 @@ const AML = ({ defaultValues, isLoading, onBack, onSubmit }: AMLProps) => {
         </Typography>
       </Header>
       <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
-        <Box sx={{ gap: 5, display: 'flex', flexDirection: 'column' }}>
+        <Stack gap={5} direction="column">
           <Checkbox
             label={t('aml.label')}
             hint={t('aml.hint')}
@@ -88,7 +88,7 @@ const AML = ({ defaultValues, isLoading, onBack, onSubmit }: AMLProps) => {
               </Typography>
             </>
           )}
-        </Box>
+        </Stack>
         {isMissingSelection && showError && (
           <ErrorContainer>
             <IcoWarning16 color="error" />

@@ -6,7 +6,7 @@ import {
   isVaultDataEmpty,
   isVaultDataEncrypted,
 } from '@onefootprint/types';
-import { Box, Typography } from '@onefootprint/ui';
+import { Box, Stack, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { FieldOrPlaceholder } from 'src/components';
@@ -58,7 +58,7 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
   };
 
   const renderLabel = (businessOwner: BusinessOwner) => (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    <Stack align="center" gap={2}>
       <Typography variant="body-3" color="tertiary">
         {label}
       </Typography>
@@ -73,7 +73,7 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
           </Typography>
         </>
       )}
-    </Box>
+    </Stack>
   );
 
   const boHintText = (businessOwner: BusinessOwner) => {

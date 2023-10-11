@@ -32,7 +32,7 @@ const Settings = () => {
           checked={theme === 'dark'}
         />
       </Header>
-      <Box sx={{ marginBottom: 10 }}>
+      <Box marginBottom={10}>
         <BusinessProfile />
       </Box>
       <Box>

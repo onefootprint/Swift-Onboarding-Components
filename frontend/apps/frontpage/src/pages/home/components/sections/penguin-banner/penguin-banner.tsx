@@ -2,11 +2,11 @@ import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
-  Box,
   Button,
   Container,
   createFontStyles,
   media,
+  Stack,
 } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -38,14 +38,7 @@ const PenguinBanner = () => {
           width={365}
           alt={t('alt-img')}
         />
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 9,
-            alignItems: 'center',
-          }}
-        >
+        <Stack direction="column" gap={9} align="center">
           <Title>{t('title')}</Title>
           <Buttons>
             <Link href={`${DASHBOARD_BASE_URL}/sign-up`}>
@@ -55,7 +48,7 @@ const PenguinBanner = () => {
               {t('book-demo')}
             </Button>
           </Buttons>
-        </Box>
+        </Stack>
       </StyledContainer>
       <ContactDialog
         url={GET_FORM_URL}

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
-import { Box, Typography } from '@onefootprint/ui';
+import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import Timeline from 'src/components/timeline';
 
@@ -26,18 +26,12 @@ const ValidationItems = () => {
 
   if (isError) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          marginLeft: 13,
-        }}
-      >
+      <Stack marginLeft={13} align="center">
         <IcoWarning16 />
         <Typography variant="body-3" sx={{ marginLeft: 2 }}>
           {getErrorMessage(error)}
         </Typography>
-      </Box>
+      </Stack>
     );
   }
   if (isLoading) {

@@ -21,13 +21,13 @@ const CountryPicker = ({
   onClick,
 }: CountryPickerProps) => (
   <Button onClick={onClick} type="button" disabled={disabled}>
-    <Box sx={{ marginLeft: 4 }}>
+    <Box marginLeft={4}>
       <Flag code={code} />
     </Box>
-    <Box sx={{ marginLeft: 2 }}>
+    <Box marginLeft={2}>
       <DropdownIndicator />
     </Box>
-    <Box sx={{ marginLeft: 3 }}>{prefix}</Box>
+    <Box marginLeft={3}>{prefix}</Box>
   </Button>
 );
 

@@ -14,7 +14,7 @@ const SecurityLogHeader = ({ accessEvent }: SecurityLogHeaderProps) => (
     justify="flex-start"
     flexWrap="wrap"
     gap={2}
-    sx={{ marginTop: 2 }}
+    marginTop={2}
   >
     <FieldTagList targets={accessEvent.targets} />
     <Typography variant="body-3">

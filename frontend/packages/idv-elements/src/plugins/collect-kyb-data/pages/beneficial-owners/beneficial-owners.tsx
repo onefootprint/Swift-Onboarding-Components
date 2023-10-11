@@ -7,6 +7,7 @@ import {
   CollectedKybDataOption,
   IdDI,
 } from '@onefootprint/types';
+import { Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -103,7 +104,7 @@ const BeneficialOwners = ({
   ];
 
   return (
-    <>
+    <Stack direction="column" gap={5}>
       {!hideHeader && (
         <>
           <CollectKybDataNavigationHeader />
@@ -123,7 +124,7 @@ const BeneficialOwners = ({
         requireMultiKyc={requireMultiKyc}
         config={config}
       />
-    </>
+    </Stack>
   );
 };
 

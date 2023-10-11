@@ -4,7 +4,7 @@ import type {
   PreviousWatchlistChecksEventData,
   WatchlistCheckEventData,
 } from '@onefootprint/types';
-import { Box, Typography } from '@onefootprint/ui';
+import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import Timeline from 'src/components/timeline';
 
@@ -31,7 +31,7 @@ const WatchlistCheckEventsDrawerContent = ({
           <Typography variant="label-3" testID="watchlist-check-event-header">
             {t('title')}
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2 }}>
+          <Stack gap={2}>
             <Typography variant="body-4" color="tertiary">
               {`${new Date(timestamp).toLocaleString('en-us', {
                 month: '2-digit',
@@ -45,7 +45,7 @@ const WatchlistCheckEventsDrawerContent = ({
                 minute: 'numeric',
               })}
             </Typography>
-          </Box>
+          </Stack>
         </HeaderContainer>
       ),
       bodyComponent: (

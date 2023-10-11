@@ -1,23 +1,12 @@
 import styled, { css } from '@onefootprint/styled';
-import type { AriaRole } from 'react';
 import React, { forwardRef } from 'react';
 
-import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
+import { createFontStyles } from '../../utils/mixins';
+import type { BoxProps, BoxPropsStyles } from './box.types';
+import { getBorders, getMargin, getPadding } from './box.utils';
 
 type BoxTag = 'div' | 'section' | 'article' | 'aside' | 'span' | 'main';
-
-export type BoxProps = {
-  'aria-busy'?: boolean;
-  ariaLabel?: string;
-  as?: BoxTag;
-  children?: React.ReactNode;
-  id?: string;
-  role?: AriaRole;
-  sx?: SXStyleProps;
-  testID?: string;
-  className?: string;
-};
 
 const Box = forwardRef<HTMLElement, BoxProps>(
   (
@@ -28,9 +17,10 @@ const Box = forwardRef<HTMLElement, BoxProps>(
       children,
       id,
       role,
-      sx,
       testID,
       className,
+      sx,
+      ...props
     }: BoxProps,
     ref: any,
   ) => {
@@ -46,6 +36,8 @@ const Box = forwardRef<HTMLElement, BoxProps>(
         sx={sxStyles}
         role={role}
         className={className}
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        {...props}
       >
         {children}
       </StyledBox>
@@ -53,11 +45,34 @@ const Box = forwardRef<HTMLElement, BoxProps>(
   },
 );
 
-const StyledBox = styled('div').attrs<{ as: BoxTag }>(({ as }) => ({
+const StyledBox = styled('div').attrs<{ as: BoxTag }>(({ as, ...props }) => ({
   as,
-}))<{ sx: SXStyles }>`
-  ${({ sx }) => css`
+  ...props,
+}))<BoxPropsStyles>`
+  ${({ theme, sx, ...props }) => css`
     ${sx}
+    ${getBorders(props as BoxProps, theme)};
+    padding: ${getPadding(props as BoxProps, theme)};
+    margin: ${getMargin(props as BoxProps, theme)};
+    ${props.fontStyle && createFontStyles(props.fontStyle)};
+    box-shadow: ${props.elevation ? theme.elevation[props.elevation] : 'none'};
+    background-color: ${(props.backgroundColor &&
+      theme.backgroundColor[props.backgroundColor]) ||
+    (props.surfaceColor && theme.surfaceColor[props.surfaceColor])};
+    position: ${props.position || 'relative'};
+    display: ${props.display};
+    text-align: ${props.textAlign};
+    border-radius: ${props.borderRadius};
+    width: ${props.width};
+    height: ${props.height};
+    overflow: ${props.overflow};
+    min-with: ${props.minWidth};
+    min-height: ${props.minHeight};
+    max-width: ${props.maxWidth};
+    max-height: ${props.maxHeight};
+    visibility: ${props.visibility};
+    overflow: ${props.overflow};
+    gap: ${props.gap ? theme.spacing[props.gap] : '0'};
   `}
 `;
 

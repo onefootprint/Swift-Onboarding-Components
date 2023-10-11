@@ -9,7 +9,7 @@ type ArticleHeaderProps = {
 };
 
 const ArticleHeader = ({ title, subtitle }: ArticleHeaderProps) => (
-  <Box sx={{ marginBottom: 8 }}>
+  <Box marginBottom={8}>
     <H1>{title}</H1>
     <Typography color="tertiary" variant="label-3">
       {subtitle}

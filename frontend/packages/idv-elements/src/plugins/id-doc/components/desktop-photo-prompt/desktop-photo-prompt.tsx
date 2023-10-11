@@ -10,7 +10,7 @@ import {
   IdDocImageProcessingError,
   IdDocImageUploadError,
 } from '@onefootprint/types';
-import { Box, Button, media, Typography } from '@onefootprint/ui';
+import { Box, Button, media, Stack, Typography } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
@@ -121,7 +121,7 @@ const DesktopPhotoPrompt = ({
         onUploadError={handleUploadError}
       >
         {isRetry && (
-          <Box sx={{ paddingLeft: 6, paddingRight: 6 }}>
+          <Box paddingLeft={6} paddingRight={6}>
             <Error
               errors={
                 errors ?? [
@@ -140,14 +140,14 @@ const DesktopPhotoPrompt = ({
         )}
         {!isRetry && !isLoading && (
           <>
-            <Box sx={{ display: 'flex' }}>
+            <Stack>
               <Typography variant="label-2" color="accent">
                 {t('upload-link-button.title')}
               </Typography>
               <Typography variant="body-2" sx={{ color: 'quaternary' }}>
                 &nbsp;{t('drag-drop-text.line-1')}
               </Typography>
-            </Box>
+            </Stack>
             <Typography variant="body-2" sx={{ color: 'quaternary' }}>
               {t('drag-drop-text.line-2')}
             </Typography>

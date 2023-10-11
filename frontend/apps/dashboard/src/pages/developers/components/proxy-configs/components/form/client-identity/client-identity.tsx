@@ -38,7 +38,7 @@ const ClientIdentity = ({ id, onSubmit, values }: StepProps) => {
           {...register('clientIdentity.certificate')}
         />
       </UploadFile>
-      <Box sx={{ marginY: 7 }}>
+      <Box marginBottom={7} marginTop={7}>
         <Divider />
       </Box>
       <UploadFile

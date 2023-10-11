@@ -1,19 +1,14 @@
-import { Box, Shimmer } from '@onefootprint/ui';
+import { Box, Shimmer, Stack } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 
 const Loading = () => (
   <Box as="section" testID="match-signal-loading">
     {[...Array(5).keys()].map(value => (
       <Fragment key={value}>
-        <Box
-          sx={{
-            marginBottom: 2,
-            marginLeft: 13,
-          }}
-        >
+        <Box marginBottom={2} marginLeft={13}>
           <Header />
         </Box>
-        <Box sx={{ marginBottom: 4, marginLeft: 13 }}>
+        <Box marginBottom={4} marginLeft={13}>
           <Content />
         </Box>
       </Fragment>
@@ -22,10 +17,10 @@ const Loading = () => (
 );
 
 const Header = () => (
-  <Box sx={{ gap: 2, display: 'flex', justifyContent: 'space-between' }}>
+  <Stack gap={2} justify="space-between">
     <Shimmer sx={{ height: '25px', width: '150px' }} />
     <Shimmer sx={{ height: '25px', width: '150px' }} />
-  </Box>
+  </Stack>
 );
 
 const Content = () => (

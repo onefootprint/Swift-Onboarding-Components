@@ -9,6 +9,7 @@ import {
   Divider,
   IconButton,
   LinkButton,
+  Stack,
   Typography,
 } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
@@ -62,13 +63,7 @@ const UploadFile = ({
 
   return (
     <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          marginBottom: 4,
-          justifyContent: 'space-between',
-        }}
-      >
+      <Stack marginBottom={4} justify="space-between">
         <Label htmlFor={id}>
           <IconComponent />
           {label}
@@ -78,14 +73,8 @@ const UploadFile = ({
             {t('remove')}
           </LinkButton>
         )}
-      </Box>
-      <Box
-        sx={{
-          backgroundColor: 'secondary',
-          padding: 5,
-          borderRadius: 'default',
-        }}
-      >
+      </Stack>
+      <Box backgroundColor="secondary" padding={5} borderRadius="default">
         <Box>
           <Button
             fullWidth
@@ -98,41 +87,27 @@ const UploadFile = ({
         </Box>
         {fileName ? (
           <>
-            <Box sx={{ marginY: 5 }}>
+            <Box marginTop={5} marginBottom={5}>
               <Divider />
             </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
+            <Stack align="center" justify="space-between">
               <Box>
                 <Typography variant="body-3">{fileName}</Typography>
               </Box>
               <IconButton aria-label={t('remove')} onClick={handleRemove}>
                 <IcoTrash16 color="error" />
               </IconButton>
-            </Box>
+            </Stack>
           </>
         ) : (
           <>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'row',
-                gap: 3,
-                marginY: 5,
-              }}
-            >
+            <Stack align="center" gap={3} marginTop={5} marginBottom={5}>
               <Divider />
               <Typography color="quaternary" variant="body-4">
                 {t('or')}
               </Typography>
               <Divider />
-            </Box>
+            </Stack>
             {children}
           </>
         )}

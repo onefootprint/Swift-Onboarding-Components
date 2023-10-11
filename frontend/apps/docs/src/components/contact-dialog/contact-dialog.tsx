@@ -55,7 +55,7 @@ const ContactDialog = ({ url, open, onClose }: ContactDialogProps) => {
       {submitFormMutation.isError && (
         <>
           <InlineAlert variant="error">{t('submit-error.title')}</InlineAlert>
-          <Box sx={{ marginBottom: 5 }} />
+          <Box marginBottom={5} />
         </>
       )}
       <Form onSubmit={handleSubmit} />

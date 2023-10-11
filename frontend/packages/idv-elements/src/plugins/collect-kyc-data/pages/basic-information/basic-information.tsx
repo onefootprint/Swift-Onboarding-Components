@@ -92,15 +92,11 @@ const BasicInformation = ({
   };
 
   return (
-    <>
+    <Stack direction="column" gap={7}>
       {hideHeader ? null : (
         <>
           <NavigationHeader />
-          <HeaderTitle
-            title={t('title')}
-            subtitle={t('subtitle')}
-            sx={{ marginBottom: 7 }}
-          />
+          <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         </>
       )}
       <FormProvider {...methods}>
@@ -119,7 +115,7 @@ const BasicInformation = ({
           />
         </Form>
       </FormProvider>
-    </>
+    </Stack>
   );
 };
 

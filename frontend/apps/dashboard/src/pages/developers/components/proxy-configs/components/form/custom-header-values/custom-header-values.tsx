@@ -5,6 +5,7 @@ import {
   Checkbox,
   Grid,
   LinkButton,
+  Stack,
   TextInput,
   Typography,
 } from '@onefootprint/ui';
@@ -45,7 +46,7 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
       <FormGrid>
         {fields.map((field, index) => (
           <Box key={field.id}>
-            <Box sx={{ marginBottom: 5 }}>
+            <Box marginBottom={5}>
               <Grid.Row>
                 <Grid.Column col={6}>
                   <TextInput
@@ -64,13 +65,7 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
                 </Grid.Column>
               </Grid.Row>
             </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
+            <Stack align="center" justify="space-between">
               <Checkbox
                 label={t('secret.label')}
                 {...register(`headers.${index}.secret`)}
@@ -84,7 +79,7 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
                   {t('remove')}
                 </LinkButton>
               )}
-            </Box>
+            </Stack>
           </Box>
         ))}
       </FormGrid>

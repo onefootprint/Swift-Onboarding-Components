@@ -3,10 +3,10 @@ import React from 'react';
 
 const Loading = () => (
   <Box testID="business-profile-loading">
-    <Box sx={{ marginBottom: 9 }}>
+    <Box marginBottom={9}>
       <Avatar />
     </Box>
-    <Box sx={{ display: 'grid', gap: 2 }}>
+    <Box sx={{ display: 'grid' }} gap={2}>
       <Label />
       <Value />
     </Box>

@@ -14,11 +14,7 @@ const FieldValidationDetails = () => {
   return (
     <>
       <Stack align="center" justify="center" gap={2}>
-        <Stack
-          align="center"
-          justify="center"
-          sx={{ marginLeft: 2, marginRight: 2 }}
-        >
+        <Stack align="center" justify="center" marginLeft={2} marginRight={2}>
           ·
         </Stack>
         <LinkButton

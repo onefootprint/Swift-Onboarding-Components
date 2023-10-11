@@ -8,6 +8,7 @@ import useSX from '../../hooks/use-sx';
 import { createTypography } from '../../utils/mixins';
 import Box from '../box';
 import LoadingIndicator from '../loading-indicator';
+import Stack from '../stack';
 import type { ButtonSize, ButtonVariant } from './button.types';
 
 export type ButtonProps = {
@@ -50,19 +51,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const sxStyles = useSX(sx);
 
     const getContent = () => (
-      <Box
+      <Stack
         as="span"
-        sx={{
-          visibility: loading ? 'hidden' : 'visible',
-          display: 'flex',
-          gap: 3,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
+        justify="center"
+        align="center"
+        gap={3}
+        visibility={loading ? 'hidden' : 'visible'}
       >
         {PrefixIcon && <PrefixIcon color={iconColor} />}
         {children}
-      </Box>
+      </Stack>
     );
 
     return (
@@ -85,12 +83,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         variant={variant}
       >
         {getContent()}
-        <Box
-          sx={{
-            visibility: loading ? 'visible' : 'hidden',
-            position: 'absolute',
-          }}
-        >
+        <Box visibility={loading ? 'visible' : 'hidden'} position="absolute">
           <LoadingIndicator
             aria-label={loadingAriaLabel}
             color={variant === 'primary' ? 'quinary' : 'primary'}

@@ -25,7 +25,7 @@ const Verify = () => {
   return (
     <Container>
       <Inner>
-        <Box sx={{ marginBottom: 8 }}>
+        <Box marginBottom={8}>
           <LogoFpDefault />
         </Box>
         {verifyMutation.isLoading && <VerifyLoading />}

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import type { IdDocImageTypes } from '@onefootprint/types';
-import { Box, Typography } from '@onefootprint/ui';
+import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTimeout } from 'usehooks-ts';
 
@@ -21,14 +21,12 @@ const NextSide = ({ nextSideImageType, onComplete }: NextSideProps) => {
   }, TRANSITION_DELAY_DEFAULT);
 
   return (
-    <Box
-      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-    >
+    <Stack direction="column" align="center">
       <Icon />
       <Typography variant="label-1" sx={{ marginTop: 5, textAlign: 'center' }}>
         {t(nextSideImageType)}
       </Typography>
-    </Box>
+    </Stack>
   );
 };
 

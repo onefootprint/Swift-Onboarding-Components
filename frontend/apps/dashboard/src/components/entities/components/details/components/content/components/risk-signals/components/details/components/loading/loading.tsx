@@ -1,10 +1,10 @@
-import { Box, Grid, Shimmer } from '@onefootprint/ui';
+import { Box, Grid, Shimmer, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
   <Box testID="risk-signal-details-loading" aria-busy>
-    <Box id="overview-shimmer" sx={{ marginBottom: 9 }}>
-      <Box id="overview-title" sx={{ marginBottom: 6 }}>
+    <Box id="overview-shimmer" marginBottom={9}>
+      <Box id="overview-title" marginBottom={6}>
         <Shimmer
           sx={{
             width: '71px',
@@ -12,8 +12,8 @@ const Loading = () => (
           }}
         />
       </Box>
-      <Box id="data-vendor" sx={{ marginBottom: 7 }}>
-        <Box sx={{ marginBottom: 2 }}>
+      <Box id="data-vendor" marginBottom={7}>
+        <Box marginBottom={2}>
           <Shimmer
             sx={{
               width: '87px',
@@ -32,8 +32,8 @@ const Loading = () => (
       </Box>
       <Grid.Row>
         <Grid.Column col={6}>
-          <Box id="severity" sx={{ marginBottom: 7 }}>
-            <Box sx={{ marginBottom: 2 }}>
+          <Box id="severity" marginBottom={7}>
+            <Box marginBottom={2}>
               <Shimmer
                 sx={{
                   width: '58px',
@@ -52,8 +52,8 @@ const Loading = () => (
           </Box>
         </Grid.Column>
         <Grid.Column col={6}>
-          <Box id="scope" sx={{ marginBottom: 7 }}>
-            <Box sx={{ marginBottom: 2 }}>
+          <Box id="scope" marginBottom={7}>
+            <Box marginBottom={2}>
               <Shimmer
                 sx={{
                   width: '45px',
@@ -72,8 +72,8 @@ const Loading = () => (
           </Box>
         </Grid.Column>
       </Grid.Row>
-      <Box id="note" sx={{ marginBottom: 6 }}>
-        <Box sx={{ marginBottom: 2 }}>
+      <Box id="note" marginBottom={6}>
+        <Box marginBottom={2}>
           <Shimmer
             sx={{
               width: '34px',
@@ -90,8 +90,8 @@ const Loading = () => (
           />
         </Box>
       </Box>
-      <Box id="note-details" sx={{ marginBottom: 7 }}>
-        <Box sx={{ marginBottom: 2 }}>
+      <Box id="note-details" marginBottom={7}>
+        <Box marginBottom={2}>
           <Shimmer
             sx={{
               width: '86px',
@@ -109,8 +109,8 @@ const Loading = () => (
         </Box>
       </Box>
     </Box>
-    <Box id="related-signals-shimmer" sx={{ marginBottom: 9 }}>
-      <Box id="related-signals-title-shimmer" sx={{ marginBottom: 6 }}>
+    <Box id="related-signals-shimmer" marginBottom={9}>
+      <Box id="related-signals-title-shimmer" marginBottom={6}>
         <Shimmer
           sx={{
             width: '112px',
@@ -128,14 +128,11 @@ const Loading = () => (
       </Box>
     </Box>
     <Box id="raw-response-shimmer">
-      <Box
+      <Stack
         id="raw-response-title-shimmer"
-        sx={{
-          marginBottom: 6,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
+        align="center"
+        justify="space-between"
+        marginBottom={6}
       >
         <Box>
           <Shimmer
@@ -153,7 +150,7 @@ const Loading = () => (
             }}
           />
         </Box>
-      </Box>
+      </Stack>
       <Box>
         <Shimmer
           sx={{

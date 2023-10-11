@@ -1,6 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { IdentifyResponse } from '@onefootprint/types';
+import { Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
@@ -76,18 +77,20 @@ const PhoneIdentification = () => {
 
   return (
     <>
-      <Header
-        showLogo={showLogo}
-        orgName={orgName}
-        logoUrl={logoUrl ?? undefined}
-      />
-      <EmailPreview email={email} onChange={handleChangeEmail} />
-      <Form
-        onSubmit={handleSubmit}
-        isLoading={isLoading}
-        defaultPhone={phoneNumber}
-        validator={validatePhone}
-      />
+      <Stack direction="column" gap={8}>
+        <Header
+          showLogo={showLogo}
+          orgName={orgName}
+          logoUrl={logoUrl ?? undefined}
+        />
+        <EmailPreview email={email} onChange={handleChangeEmail} />
+        <Form
+          onSubmit={handleSubmit}
+          isLoading={isLoading}
+          defaultPhone={phoneNumber}
+          validator={validatePhone}
+        />
+      </Stack>
       <SandboxOutcomeFooter sandboxId={sandboxId} />
     </>
   );

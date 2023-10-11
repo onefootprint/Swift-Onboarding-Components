@@ -1,26 +1,31 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import type { SXStyleProps } from '@onefootprint/ui';
+import type { BoxProps } from '@onefootprint/ui';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 
-type AnimatedContainerProps = {
+type AnimatedContainerProps = BoxProps & {
   isExpanded: boolean;
   children: React.ReactNode;
-  sx?: SXStyleProps;
 };
 
 const AnimatedContainer = ({
   isExpanded,
   children,
-  sx,
+  marginLeft,
+  marginTop,
 }: AnimatedContainerProps) => {
   const [animate] = useAutoAnimate<HTMLDivElement>();
   return (
     <Box
       ref={animate}
-      sx={{ display: isExpanded ? 'flex' : 'none', flexDirection: 'column' }}
+      display={isExpanded ? 'flex' : 'none'}
+      flexDirection="column"
     >
-      {isExpanded && <Box sx={sx}>{children}</Box>}
+      {isExpanded && (
+        <Box marginLeft={marginLeft} marginTop={marginTop}>
+          {children}
+        </Box>
+      )}
     </Box>
   );
 };

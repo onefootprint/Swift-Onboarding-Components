@@ -152,7 +152,6 @@ const QRRegister = () => {
             <QRCode size={QR_CODE_SIZE} value={url} />
           )}
         </Stack>
-
         <Divider variant="secondary" />
         <ContinueOnDesktop />
       </Container>

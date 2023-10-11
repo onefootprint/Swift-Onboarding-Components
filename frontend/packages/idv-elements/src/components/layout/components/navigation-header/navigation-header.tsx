@@ -120,8 +120,7 @@ const NavigationHeader = ({
   const shouldShowClose = button?.variant === 'close' && !!onClose;
   const shouldShowBack = button?.variant === 'back' && !shouldShowClose;
 
-  if (!shouldShowBack && !shouldShowClose)
-    return <Box sx={{ paddingTop: 7 }} />;
+  if (!shouldShowBack && !shouldShowClose) return <Box paddingTop={7} />;
 
   return (
     <Portal selector={NAVIGATION_HEADER_PORTAL_SELECTOR}>

@@ -3,6 +3,7 @@ import React from 'react';
 
 import Box from '../box';
 import Button from '../button';
+import Stack from '../stack';
 import Typography from '../typography';
 
 type OnlyIcon = {
@@ -35,22 +36,13 @@ const EmptyState = ({
   title,
   testID,
 }: EmptyStateProps) => (
-  <Box
-    testID={testID}
-    sx={{
-      alignItems: 'center',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      textAlign: 'center',
-    }}
-  >
+  <Stack testID={testID} align="center" justify="center" direction="column">
     {Icon && (
-      <Box sx={{ marginBottom: 7 }}>
+      <Box marginBottom={7}>
         <Icon color="error" />
       </Box>
     )}
-    {renderHeader && <Box sx={{ marginBottom: 9 }}>{renderHeader()}</Box>}
+    {renderHeader && <Box marginBottom={7}>{renderHeader()}</Box>}
     <Typography variant="label-1" sx={{ marginBottom: 4 }}>
       {title}
     </Typography>
@@ -62,7 +54,7 @@ const EmptyState = ({
         {cta.label}
       </Button>
     )}
-  </Box>
+  </Stack>
 );
 
 export default EmptyState;

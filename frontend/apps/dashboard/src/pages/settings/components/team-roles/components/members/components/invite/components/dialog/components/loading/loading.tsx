@@ -1,20 +1,20 @@
-import { Box, Shimmer } from '@onefootprint/ui';
+import { Shimmer, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
-  <Box testID="members-roles-loading" sx={{ width: '100%' }}>
-    <Box sx={{ display: 'flex', gap: 4, marginBottom: 5 }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+  <Stack testID="members-roles-loading" width="100%">
+    <Stack direction="column" gap={4} marginBottom={5}>
+      <Stack direction="column" gap={3}>
         <EmailLabel />
         <EmailInput />
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      </Stack>
+      <Stack direction="column" gap={3}>
         <RoleLabel />
         <RoleInput />
-      </Box>
-    </Box>
+      </Stack>
+    </Stack>
     <AddMoreButton />
-  </Box>
+  </Stack>
 );
 
 const EmailLabel = () => <Shimmer sx={{ height: '20px', width: '93px' }} />;

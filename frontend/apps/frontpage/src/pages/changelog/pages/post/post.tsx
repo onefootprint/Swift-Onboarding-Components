@@ -6,6 +6,7 @@ import {
   Container,
   LinkButton,
   media,
+  Stack,
   Typography,
 } from '@onefootprint/ui';
 import Image from 'next/image';
@@ -68,7 +69,7 @@ const PostPage = ({ post }: PostProps) => {
               {t('go-back')}
             </LinkButton>
           </Link>
-          <Box sx={{ marginBottom: 8 }} />
+          <Box marginBottom={8} />
           <ImageContainer>
             <Image
               src={post.feature_image}
@@ -77,15 +78,7 @@ const PostPage = ({ post }: PostProps) => {
               alt={post.feature_image_alt || post.title}
             />
           </ImageContainer>
-          <Box
-            sx={{
-              marginTop: 8,
-              marginBottom: 8,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 4,
-            }}
-          >
+          <Stack marginTop={8} marginBottom={8} gap={4} direction="column">
             <Typography variant="label-3" color="tertiary">
               {formattedDate}
             </Typography>
@@ -94,7 +87,7 @@ const PostPage = ({ post }: PostProps) => {
               authorName={post.primary_author.name}
               authorImg={post.primary_author.profile_image}
             />
-          </Box>
+          </Stack>
           {post.html && <HtmlContent html={post.html} />}
         </PostContainer>
       </Container>

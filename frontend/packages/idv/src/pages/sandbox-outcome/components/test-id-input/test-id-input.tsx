@@ -61,7 +61,7 @@ const TestIdInput = () => {
         </Tooltip>
       </InputTitle>
       <InputControls>
-        <Box sx={{ width: '100%' }}>
+        <Box width="100%">
           <TextInput
             hasError={!!errors.testID}
             placeholder={t('test-id.placeholder')}

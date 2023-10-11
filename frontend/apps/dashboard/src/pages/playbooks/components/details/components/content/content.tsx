@@ -1,5 +1,5 @@
 import type { OnboardingConfig } from '@onefootprint/types';
-import { Box } from '@onefootprint/ui';
+import { Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import Basics from './components/basics';
@@ -10,10 +10,10 @@ type ContentProps = {
 };
 
 const Content = ({ playbook }: ContentProps) => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+  <Stack direction="column" gap={9}>
     <Basics playbook={playbook} />
     <CollectionAndScopes playbook={playbook} />
-  </Box>
+  </Stack>
 );
 
 export default Content;

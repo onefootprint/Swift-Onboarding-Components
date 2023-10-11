@@ -125,7 +125,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
 
     return (
       <Box {...comboBoxProps}>
-        <Box ref={setReferenceElement} sx={{ position: 'relative' }}>
+        <Box ref={setReferenceElement} position="relative">
           <Input
             {...props}
             {...toggleButtonProps}

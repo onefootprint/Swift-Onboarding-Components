@@ -14,28 +14,28 @@ import {
 
 const Content = () => (
   <Box as="section" testID="entity-content">
-    <Box sx={{ marginBottom: 7 }}>
+    <Box marginBottom={7}>
       <Banner />
     </Box>
-    <Box sx={{ marginBottom: 7 }}>
+    <Box marginBottom={7}>
       <Breadcrumb />
     </Box>
     <Box>
       <PinnedNotes />
     </Box>
-    <Box sx={{ marginBottom: 5 }}>
+    <Box marginBottom={5}>
       <Header />
     </Box>
-    <Box sx={{ marginBottom: 5 }}>
+    <Box marginBottom={5}>
       <Divider />
     </Box>
-    <Box sx={{ marginBottom: 9 }}>
+    <Box marginBottom={9}>
       <Vault />
     </Box>
-    <Box sx={{ marginBottom: 9 }}>
+    <Box marginBottom={9}>
       <AuditTrail />
     </Box>
-    <Box sx={{ marginBottom: 9 }}>
+    <Box marginBottom={9}>
       <RiskSignals />
     </Box>
     <DeviceInsights />

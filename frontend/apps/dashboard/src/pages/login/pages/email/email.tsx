@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { OrgAuthMagicLinkRequest } from '@onefootprint/types';
-import { Box, Button, TextInput, Typography } from '@onefootprint/ui';
+import { Button, Stack, TextInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -49,20 +49,12 @@ const EmailLogin = () => {
       <Container>
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Inner>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 7,
-                flexDirection: 'column',
-              }}
-            >
+            <Stack align="center" justify="center" gap={7} direction="column">
               <ThemedLogoFpDefault />
               <Typography variant="label-1" color="primary">
                 {t('title')}
               </Typography>
-            </Box>
+            </Stack>
             <TextInput
               hasError={!!errors.email}
               hint={errors?.email?.message}

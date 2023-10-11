@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Button, Pagination, Typography } from '@onefootprint/ui';
+import { Button, Pagination, Stack, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import PermissionGate from 'src/components/permission-gate';
@@ -59,7 +59,7 @@ const Playbooks = () => {
           {!hasHadPlaybook && <WaveAnimation width={140} />}
         </Wrapper>
       </HeaderContainer>
-      <TableContainer>
+      <Stack direction="column">
         <Table
           data={response?.data}
           errorMessage={errorMessage}
@@ -76,7 +76,7 @@ const Playbooks = () => {
             totalNumResults={response.meta.count}
           />
         )}
-      </TableContainer>
+      </Stack>
       <Details />
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </Container>
@@ -98,12 +98,6 @@ const Container = styled.div`
     flex-direction: column;
     gap: ${theme.spacing[8]};
   `};
-`;
-
-const TableContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0;
 `;
 
 const HeaderContainer = styled.div`

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
-import { LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import styled from 'styled-components';
 
 import useDesktopMachine from '../../../../../hooks/desktop/use-desktop-machine';
 
@@ -27,7 +27,7 @@ const ContinueOnDesktop = () => {
   };
 
   return (
-    <Container>
+    <Container align="center" justify="center" gap={3}>
       <Typography variant="body-3" color="tertiary">
         {t('continue-on-desktop.title')}
       </Typography>
@@ -38,14 +38,8 @@ const ContinueOnDesktop = () => {
   );
 };
 
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    gap: ${theme.spacing[3]};
-    align-items: center;
-  `}
+const Container = styled(Stack)`
+  width: 100%;
 `;
 
 export default ContinueOnDesktop;

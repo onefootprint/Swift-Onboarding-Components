@@ -6,7 +6,7 @@ import React from 'react';
 const InvalidUrl = () => {
   const { t } = useTranslation('pages.invalid-url');
   return (
-    <Box sx={{ paddingTop: 8 }}>
+    <Box paddingTop={8}>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
     </Box>
   );

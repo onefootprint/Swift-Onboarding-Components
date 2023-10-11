@@ -43,7 +43,7 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       <Content data-private={isPrivate} data-testid={testID}>
         {children}
       </Content>
-      <Stack align="center" justify="center" sx={{ marginLeft: 4 }}>
+      <Stack align="center" justify="center" marginLeft={4}>
         <IcoChevronDown16 color={disabled ? 'tertiary' : 'primary'} />
       </Stack>
     </BaseSelectTriggerContainer>

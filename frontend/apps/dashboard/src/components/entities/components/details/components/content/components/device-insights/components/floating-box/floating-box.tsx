@@ -8,7 +8,7 @@ import {
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { EntityKind } from '@onefootprint/types';
-import { Box, Typography } from '@onefootprint/ui';
+import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { displayForUserAgent, icoForUserAgent } from 'src/utils/user-agent';
 
@@ -88,7 +88,8 @@ const FloatingBox = ({
                 <Typography variant="body-3" color="tertiary">
                   {t('biometrics')}
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+
+                <Stack align="center" gap={3}>
                   {hasBiometrics ? (
                     <>
                       <IcoCheckCircle16 color="success" />
@@ -104,66 +105,38 @@ const FloatingBox = ({
                       </Typography>
                     </>
                   )}
-                </Box>
+                </Stack>
               </Row>
               {deviceInfo.instantApp && (
                 <Row role="row" aria-label={t('instant-app.label')}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 2,
-                    }}
-                  >
+                  <Stack direction="row" align="center" gap={2}>
                     <Typography variant="body-3" color="tertiary">
                       {t('instant-app.label')}
                     </Typography>
                     <AboutAppClipAndInstantApp kind="instant-app" />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 3,
-                    }}
-                  >
+                  </Stack>
+                  <Stack direction="row" align="center" gap={3}>
                     <IcoBolt16 />
                     <Typography variant="body-3" isPrivate>
                       {t('instant-app.yes')}
                     </Typography>
-                  </Box>
+                  </Stack>
                 </Row>
               )}
               {deviceInfo.appClip && (
                 <Row role="row" aria-label={t('app-clip.label')}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 2,
-                    }}
-                  >
+                  <Stack direction="row" align="center" gap={2}>
                     <Typography variant="body-3" color="tertiary">
                       {t('app-clip.label')}
                     </Typography>
                     <AboutAppClipAndInstantApp kind="app-clip" />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 3,
-                    }}
-                  >
+                  </Stack>
+                  <Stack direction="row" align="center" gap={3}>
                     <IcoAppclip16 />
                     <Typography variant="body-3" isPrivate>
                       {t('app-clip.yes')}
                     </Typography>
-                  </Box>
+                  </Stack>
                 </Row>
               )}
             </>

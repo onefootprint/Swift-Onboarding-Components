@@ -22,10 +22,12 @@ const HeaderTitle = ({
   icon: Icon,
 }: HeaderTitleProps) => (
   <Stack
+    textAlign="center"
     direction="column"
     align="center"
     gap={3}
-    sx={{ textAlign: 'center', ...sx }}
+    // @ts-ignore fix this later
+    sx={{ ...sx }}
   >
     {Icon && (
       <IconContainer>
@@ -51,6 +53,7 @@ const IconContainer = styled.div`
     border-radius: ${theme.borderRadius.full};
     display: flex;
     justify-content: center;
+    background-color: ${theme.backgroundColor.secondary};
     align-items: center;
     background-color: ${theme.backgroundColor.secondary};
   `}

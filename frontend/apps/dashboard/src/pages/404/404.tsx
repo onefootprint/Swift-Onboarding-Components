@@ -7,7 +7,7 @@ const Page404 = () => {
   const { t } = useTranslation('pages.404');
 
   return (
-    <Box sx={{ marginTop: 12 }}>
+    <Box marginTop={12}>
       <EmptyState
         title={t('title')}
         description={t('description')}

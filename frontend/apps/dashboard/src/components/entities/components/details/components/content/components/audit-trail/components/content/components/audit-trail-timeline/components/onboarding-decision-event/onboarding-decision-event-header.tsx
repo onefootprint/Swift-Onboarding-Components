@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import type { OnboardingDecisionEventData } from '@onefootprint/types';
 import { ActorKind, DecisionStatus } from '@onefootprint/types';
-import { Box, Typography } from '@onefootprint/ui';
+import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import Actor from '../actor';
@@ -39,7 +39,7 @@ const OnboardingDecisionEventHeader = ({
     !isVerified && source.kind === ActorKind.footprint;
 
   return (
-    <Box sx={{ gap: 2 }}>
+    <Stack direction="row" gap={2}>
       <Typography
         variant="label-3"
         color={color}
@@ -50,7 +50,7 @@ const OnboardingDecisionEventHeader = ({
         <Actor actor={source} />
       </Typography>
       {showFieldValidationDetails && <FieldValidationDetails />}
-    </Box>
+    </Stack>
   );
 };
 

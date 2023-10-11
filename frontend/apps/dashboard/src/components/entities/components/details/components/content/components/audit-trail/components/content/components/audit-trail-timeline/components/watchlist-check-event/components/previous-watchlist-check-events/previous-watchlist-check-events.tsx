@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { PreviousWatchlistChecksEventData } from '@onefootprint/types';
-import { Box, Drawer, LinkButton, Typography } from '@onefootprint/ui';
+import { Drawer, LinkButton, Stack, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import WatchlistCheckEventsDrawerContent from './components/watchlist-check-events-drawer-content';
@@ -20,7 +20,7 @@ const PreviousWatchlistCheckEvents = ({
   const hasPreviousWatchlistChecks = data.length > 0;
   return hasPreviousWatchlistChecks ? (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Stack align="center">
         <Typography variant="label-3" sx={{ marginLeft: 2, marginRight: 2 }}>
           &middot;
         </Typography>
@@ -32,7 +32,7 @@ const PreviousWatchlistCheckEvents = ({
         >
           {t('previous-checks-button.label')}
         </LinkButton>
-      </Box>
+      </Stack>
       <Drawer
         open={isDrawerOpen}
         title="Watchlist checks"

@@ -52,7 +52,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
       <Typography variant="label-2" sx={{ marginBottom: 5 }}>
         {t('title')}
       </Typography>
-      <Box sx={{ marginBottom: 8 }}>
+      <Box marginBottom={8}>
         <FormControl>
           <FormLabel htmlFor="method">{t('content-type.label')}</FormLabel>
           <NativeSelect
@@ -73,7 +73,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
           <FormGrid>
             {fields.map((field, index) => (
               <Box key={field.id}>
-                <Box sx={{ display: 'grid', gap: 5, marginBottom: 3 }}>
+                <Box sx={{ display: 'grid' }} gap={5} marginBottom={3}>
                   <FormControl>
                     <FormLabel htmlFor={`token-${index}`}>
                       {t('vaulting-rules.token.label')}

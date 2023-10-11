@@ -68,7 +68,7 @@ const Form = ({
   return (
     <FormProvider {...formMethods}>
       <form id="roles-form" onSubmit={handleSubmit(handleAfterSubmit)}>
-        <Box sx={{ marginBottom: 8 }}>
+        <Box marginBottom={8}>
           <TextInput
             autoFocus
             hasError={!!errors.name}

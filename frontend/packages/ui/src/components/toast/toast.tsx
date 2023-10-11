@@ -4,6 +4,7 @@ import React from 'react';
 
 import Box from '../box';
 import LinkButton from '../link-button';
+import Stack from '../stack';
 import Typography from '../typography';
 import type { ToastProps } from './toast.types';
 
@@ -21,7 +22,7 @@ const Toast = ({
     <Box>
       <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
     </Box>
-    <Box sx={{ flexGrow: 1 }}>
+    <Stack flexGrow={1}>
       <Typography
         color={variant === 'error' ? 'error' : 'primary'}
         variant="label-3"
@@ -33,11 +34,7 @@ const Toast = ({
         {description}
       </Typography>
       {cta && (
-        <Box
-          sx={{
-            marginTop: 4,
-          }}
-        >
+        <Box marginTop={4}>
           <LinkButton
             onClick={() => {
               onClose?.();
@@ -49,7 +46,7 @@ const Toast = ({
           </LinkButton>
         </Box>
       )}
-    </Box>
+    </Stack>
     <button
       aria-label={closeAriaLabel}
       onClick={onClose}

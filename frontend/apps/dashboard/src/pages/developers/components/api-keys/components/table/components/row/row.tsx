@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ApiKey } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Badge, Box, Dropdown } from '@onefootprint/ui';
+import { Badge, Dropdown, Stack } from '@onefootprint/ui';
 import React from 'react';
 import PermissionGate from 'src/components/permission-gate';
 import usePermissions from 'src/hooks/use-permissions';
@@ -42,12 +42,7 @@ const Row = ({ apiKey }: RowProps) => {
         )}
       </td>
       <td>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-          }}
-        >
+        <Stack justify="flex-end">
           <Dropdown.Root>
             <PermissionGate
               scopeKind={RoleScopeKind.apiKeys}
@@ -66,7 +61,7 @@ const Row = ({ apiKey }: RowProps) => {
               </Dropdown.Item>
             </Dropdown.Content>
           </Dropdown.Root>
-        </Box>
+        </Stack>
       </td>
     </>
   );

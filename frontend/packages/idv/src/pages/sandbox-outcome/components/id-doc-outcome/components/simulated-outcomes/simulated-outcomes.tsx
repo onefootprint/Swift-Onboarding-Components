@@ -45,7 +45,7 @@ const SimulatedOutcomes = ({
         control={control}
         name="outcomes.idDocOutcome"
         render={({ field }) => (
-          <Box sx={{ marginLeft: allowRealOutcome ? 7 : 0, paddingLeft: 2 }}>
+          <Box marginLeft={allowRealOutcome ? 7 : 0} paddingLeft={2}>
             <OutcomeSelect
               options={[
                 {

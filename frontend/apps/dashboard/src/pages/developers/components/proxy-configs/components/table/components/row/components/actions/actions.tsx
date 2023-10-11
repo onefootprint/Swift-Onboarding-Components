@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ProxyConfig } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Box, Dropdown } from '@onefootprint/ui';
+import { Dropdown, Stack } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import PermissionGate from 'src/components/permission-gate';
 
@@ -30,7 +30,7 @@ const Actions = ({ proxyConfig }: ActionsProps) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+    <Stack justify="flex-end">
       <Dropdown.Root>
         <PermissionGate
           scopeKind={RoleScopeKind.manageVaultProxy}
@@ -60,7 +60,7 @@ const Actions = ({ proxyConfig }: ActionsProps) => {
       </Dropdown.Root>
       <Status proxyConfig={proxyConfig} ref={statusRef} />
       <Remove proxyConfig={proxyConfig} ref={removeRef} />
-    </Box>
+    </Stack>
   );
 };
 

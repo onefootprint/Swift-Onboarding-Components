@@ -36,7 +36,6 @@ const EmailCard = styled.div`
     border-radius: ${theme.borderRadius.default};
     display: flex;
     gap: ${theme.spacing[4]};
-    margin-bottom: ${theme.spacing[8]};
     padding: ${theme.spacing[5]};
     p {
       overflow: hidden;

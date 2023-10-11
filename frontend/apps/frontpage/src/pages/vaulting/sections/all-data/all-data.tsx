@@ -48,7 +48,7 @@ const AllData = () => {
         </Title>
       </TitleContainer>
       <SectionSubtitle maxWidth={500}>{t('subtitle')}</SectionSubtitle>
-      <Box sx={{ marginBottom: 8 }} />
+      <Box marginBottom={8} />
       <DesktopImageGrid isDecrypted={isDecrypted} />
       <MobileImageGrid isDecrypted={isDecrypted} />
     </Container>

@@ -1,5 +1,5 @@
 import { isVaultDataDecrypted } from '@onefootprint/types';
-import { Box } from '@onefootprint/ui';
+import { Box, Stack } from '@onefootprint/ui';
 import React from 'react';
 import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
 
@@ -24,7 +24,7 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
   const fields = useDocumentFields();
 
   return vault ? (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <Stack gap={4} direction="column">
       {fields.map(field => {
         if (!entity.attributes.includes(field.main)) {
           return null;
@@ -55,7 +55,7 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
           </Box>
         );
       })}
-    </Box>
+    </Stack>
   ) : null;
 };
 export default DocumentFields;
