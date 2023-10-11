@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.5.0
+
+### Minor Changes
+
+- 5249e151d: Added locale to component interfaces
+
 ## 3.4.0
 
 ### Minor Changes
