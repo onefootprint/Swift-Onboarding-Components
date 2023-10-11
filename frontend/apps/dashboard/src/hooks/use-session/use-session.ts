@@ -93,7 +93,10 @@ const useSession = () => {
     await refreshPermissions(session.auth);
   };
 
-  const refreshPermissions = async (authToken: string) => {
+  const refreshPermissions = async (
+    authToken: string,
+    org?: Partial<OrgSession>,
+  ) => {
     try {
       const user = await getUser(authToken);
       update({
@@ -104,6 +107,7 @@ const useSession = () => {
         org: {
           ...user.tenant,
           isLive: !user.tenant.isSandboxRestricted,
+          ...org,
         },
       });
     } catch (error: unknown) {
@@ -117,9 +121,9 @@ const useSession = () => {
     }
   };
 
-  const refreshUserPermissions = async () => {
+  const refreshUserPermissions = async (org?: Partial<OrgSession>) => {
     if (!data.auth) return;
-    await refreshPermissions(data.auth);
+    await refreshPermissions(data.auth, org);
   };
 
   const logOut = () => {

@@ -23,11 +23,15 @@ const useEntity = (id: string) => {
   const isReady = useRouter();
   const { authHeaders } = useSession();
 
-  return useQuery(['entity', id], () => getEntity(authHeaders, { id }), {
-    enabled: isReady && !!id,
-    select: (response: GetEntityResponse) =>
-      augmentEntityWithOnboardingInfo(response),
-  });
+  return useQuery(
+    ['entity', id, authHeaders],
+    () => getEntity(authHeaders, { id }),
+    {
+      enabled: isReady && !!id,
+      select: (response: GetEntityResponse) =>
+        augmentEntityWithOnboardingInfo(response),
+    },
+  );
 };
 
 export default useEntity;

@@ -66,6 +66,10 @@ export type {
   GetPinnedAnnotationsResponse,
 } from './get-pinned-annotations';
 export type {
+  GetPrivateEntityRequest,
+  GetPrivateEntityResponse,
+} from './get-private-entity';
+export type {
   GetProxyConfigRequest,
   GetProxyConfigResponse,
 } from './get-proxy-config';

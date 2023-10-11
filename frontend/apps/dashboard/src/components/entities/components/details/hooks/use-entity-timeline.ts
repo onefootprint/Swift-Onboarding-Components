@@ -18,7 +18,7 @@ const useEntityTimeline = (id: string) => {
   const { authHeaders } = useSession();
 
   return useQuery(
-    ['entity', id, 'timeline'],
+    ['entity', id, 'timeline', authHeaders],
     () => getTimeline(id, authHeaders),
     {
       enabled: !!id,

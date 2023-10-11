@@ -25,7 +25,7 @@ const useEntityAuthEvents = (id: string) => {
   const { authHeaders } = useSession();
 
   return useQuery<GetLivenessResponse, RequestError>(
-    ['entity', 'authEvents', id],
+    ['entity', 'authEvents', id, authHeaders],
     () => getAuthEvents({ id }, authHeaders),
     {
       enabled: !!id,

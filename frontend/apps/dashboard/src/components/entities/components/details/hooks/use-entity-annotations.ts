@@ -30,7 +30,7 @@ const useEntityAnnotations = (id: string) => {
   const { formatDateWithTime } = useIntl();
 
   return useQuery<Annotation[]>(
-    ['entity', id, 'annotations'],
+    ['entity', id, 'annotations', authHeaders],
     () => getPinnedAnnotations({ entityId: id }, authHeaders),
     {
       enabled: !!id,

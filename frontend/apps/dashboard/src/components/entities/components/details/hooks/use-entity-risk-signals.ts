@@ -28,7 +28,7 @@ const useEntityRiskSignals = (id: string) => {
   const { authHeaders } = useSession();
 
   return useQuery(
-    ['entity', id, 'risk-signals', filters.requestParams],
+    ['entity', id, 'risk-signals', filters.requestParams, authHeaders],
     () => getRiskSignals({ ...filters.requestParams, id }, authHeaders),
     { enabled: !!id, keepPreviousData: true },
   );

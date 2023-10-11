@@ -2,10 +2,10 @@ import { Box } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
+import useAssumeTenant from 'src/hooks/use-assume-tenant';
 import useSession from 'src/hooks/use-session';
 
 import Loading from '../auth/components/loading';
-import useAssumeTenant from './hooks/use-assume-tenant';
 
 const Assume = () => {
   const router = useRouter();
