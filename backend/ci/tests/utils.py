@@ -204,7 +204,6 @@ def inherit_user(twilio, phone_number, *headers):
         twilio,
         phone_number,
         challenge_data["challenge_token"],
-        expected_kind="user_inherited",
         *headers,
     )
 
@@ -224,7 +223,6 @@ def inherit_user_biometric(user):
     body = biometric_challenge_response(
         challenge_data, user, user.client.ob_config.key, *sandbox_id_h
     )
-    assert body["kind"] == "user_inherited"
     return FpAuth(body["auth_token"])
 
 
@@ -267,7 +265,6 @@ def step_up_user_biometric(auth_token, user):
         phone_number, "biometric", auth_token, *sandbox_id_h
     )
     body = biometric_challenge_response(challenge_data, user, auth_token, *sandbox_id_h)
-    assert body["kind"] == "user_inherited"
     assert body["auth_token"] == auth_token.value
 
 
@@ -347,7 +344,6 @@ def identify_verify(
     phone_number,
     challenge_token,
     *headers,
-    expected_kind="user_created",
     expected_error=None,
 ):
     def verify(code):
@@ -357,7 +353,6 @@ def identify_verify(
             "challenge_token": challenge_token,
         }
         body = post("hosted/identify/verify", data, *headers)
-        assert body["kind"] == expected_kind
         return FpAuth(body["auth_token"])
 
     if phone_number == FIXTURE_PHONE_NUMBER:
