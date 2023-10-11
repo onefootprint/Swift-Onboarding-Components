@@ -22,7 +22,8 @@ impl RawDataRequest {
             .filter_map(|di| {
                 let err = match di {
                     DataIdentifier::Document(k) => match k {
-                        DocumentKind::OcrData(_, _) => None, // allow vaulting OCR data
+                        DocumentKind::OcrData(_, _) => None,  // allow vaulting OCR data
+                        DocumentKind::Barcodes(_, _) => None, // allow vaulting barcodes
                         _ => Some(ValidationError::CannotVaultDocument.into()),
                     },
                     _ => None,

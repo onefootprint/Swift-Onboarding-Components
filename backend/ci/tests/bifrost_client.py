@@ -251,7 +251,6 @@ class BifrostClient:
 
     def handle_collect_document(self, requirement):
         """Add identity documents to vault"""
-
         if requirement["should_collect_consent"]:
             consent_data = {"consent_language_text": "I consent"}
             post("hosted/user/consent", consent_data, self.auth_token)
@@ -289,6 +288,17 @@ class BifrostClient:
             next_side = sides[i + 1] if i + 1 < len(sides) else None
             assert body["next_side_to_collect"] == next_side
             assert not body["errors"]
+
+        # Also upload the barcodes
+        data = {
+            "document.drivers_license.back.barcodes": [
+                dict(
+                    kind="pdf417",
+                    content="@ANSI 6360050101DL00300201DLDAQ102245737DAASAMPLE,DRIVER,CREDENTIAL,DAG 1500 PARK STDAICOLUMBIADAJSCDAK292012731 DARD DAS DAT DAU600DAW200DAY DAZ DBA20190928DBB19780928DBC1DBD20091026DBG2DBH1",
+                )
+            ]
+        }
+        patch("hosted/user/vault", data, self.auth_token)
 
     def handle_liveness(self):
         """Register the passkey credential"""
