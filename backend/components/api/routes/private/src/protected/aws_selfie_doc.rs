@@ -1,5 +1,7 @@
 //! Temporary tool to analyze selfie + doc comparison and over
 
+use std::collections::HashMap;
+
 use crate::{auth::ProtectedAuth, State};
 use actix_web::{post, web};
 use api_core::{
@@ -10,6 +12,7 @@ use api_core::{
 };
 use db::models::scoped_vault::ScopedVault;
 use newtypes::{DataIdentifier, FpId};
+use selfie_doc::analyze_id::AnalyzeIdResult;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct CompareAnalyzeRequest {
@@ -21,7 +24,7 @@ pub struct CompareAnalyzeRequest {
 #[derive(Debug, serde::Serialize)]
 pub struct ComparisonAndDocOcrResult {
     comparison_result: selfie_doc::compare::CompareResult,
-    analyzed_id: selfie_doc::analyze_id::AnalyzeIdResult,
+    analyzed_id_scores: HashMap<String, f32>,
 }
 
 #[post("/private/protected/aws_selfie_doc")]
@@ -78,7 +81,10 @@ pub async fn post(
 
     ResponseData::ok(ComparisonAndDocOcrResult {
         comparison_result,
-        analyzed_id,
+        analyzed_id_scores: match analyzed_id {
+            AnalyzeIdResult::FoundIdentityDocumentMetadata(m) => m.scores(),
+            _ => HashMap::new(),
+        },
     })
     .json()
 }

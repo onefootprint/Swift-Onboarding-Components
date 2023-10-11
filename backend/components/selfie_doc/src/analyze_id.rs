@@ -17,6 +17,10 @@ pub struct AnalyzeIdMetadata {
 }
 
 impl AnalyzeIdMetadata {
+    pub fn scores(&self) -> HashMap<String, f32> {
+        self.values.iter().map(|(k,v)| (k.clone(), v.value_confidence)).collect()
+    }
+
     pub fn dob(&self) -> Option<&IdFieldValue> {
         self.values.get("DATE_OF_BIRTH")
     }
