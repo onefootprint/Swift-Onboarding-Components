@@ -6,7 +6,7 @@ use db_schema::schema::{
 };
 use diesel::{pg::Pg, prelude::*};
 use newtypes::{
-    IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeFailureReason,
+    DocumentSide, IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeFailureReason,
     IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
     IncodeVerificationSessionState, WorkflowId,
 };
@@ -219,5 +219,16 @@ impl<'a> From<&'a IncodeVerificationSessionId> for IncodeSessionIdentifier<'a> {
 impl<'a> From<&'a IdentityDocumentId> for IncodeSessionIdentifier<'a> {
     fn from(id: &'a IdentityDocumentId) -> Self {
         Self::IdDoc(id)
+    }
+}
+
+impl IncodeVerificationSession {
+    pub fn side_from_session(&self) -> Option<DocumentSide> {
+        match self.state {
+            IncodeVerificationSessionState::AddFront => Some(DocumentSide::Front),
+            IncodeVerificationSessionState::AddBack => Some(DocumentSide::Back),
+            IncodeVerificationSessionState::AddSelfie => Some(DocumentSide::Selfie),
+            _ => None,
+        }
     }
 }

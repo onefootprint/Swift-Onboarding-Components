@@ -15,6 +15,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::IdentityDocument;
+use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
@@ -51,15 +52,19 @@ pub async fn post(
                 &wf_id,
                 DecisionIntentKind::DocScan,
             )?;
+
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
             let (id_doc, dr) = IdentityDocument::get(conn, &doc_id)?;
-            // TODO this logic is brittle. Should improve this logic to get the number of failed
-            // attempts for the side of the incode machine.
-            // Right now just gets failed attempts for the furthest side
-            let attempts_for_side = DocumentUpload::count_failed_attempts(conn, &id_doc.id)?
-                .into_iter()
-                .max_by_key(|(side, _)| *side)
-                .map(|(_, count)| count);
+            let side_from_session: Option<DocumentSide> = IncodeVerificationSession::get(conn, &id_doc.id)?
+                .and_then(|session| session.side_from_session());
+            let attempts_for_side = if let Some(side) = side_from_session {
+                DocumentUpload::count_failed_attempts(conn, &id_doc.id)?
+                    .iter()
+                    .filter_map(|(s, n)| (side == *s).then_some(*n))
+                    .next()
+            } else {
+                None
+            };
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
             let should_collect_selfie = dr.should_collect_selfie && !id_doc.should_skip_selfie();
             let existing_sides = id_doc
