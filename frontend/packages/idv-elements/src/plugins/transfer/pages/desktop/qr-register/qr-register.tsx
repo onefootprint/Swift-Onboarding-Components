@@ -28,7 +28,7 @@ import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-
 import ContinueOnDesktop from './components/continue-on-desktop';
 
 const COUNTER_SECONDS = 10;
-const QR_CODE_SIZE = 110;
+const QR_CODE_SIZE = 130;
 
 const QRRegister = () => {
   const { t } = useTranslation('pages.desktop.qr-register');
@@ -121,7 +121,6 @@ const QRRegister = () => {
           subtitle={t('subtitle')}
           icon={IcoSmartphone224}
         />
-
         <Stack direction="column" align="center" gap={3}>
           <Button
             variant="secondary"
@@ -140,7 +139,6 @@ const QRRegister = () => {
             </Typography>
           )}
         </Stack>
-
         <Divider variant="secondary" />
         <Stack direction="column" align="center" gap={5}>
           <Typography variant="body-2" color="secondary">

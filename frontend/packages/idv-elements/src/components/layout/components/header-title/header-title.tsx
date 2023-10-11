@@ -47,11 +47,12 @@ const IconContainer = styled.div`
   ${({ theme }) => css`
     height: ${theme.spacing[8]};
     width: ${theme.spacing[8]};
-    border: ${theme.borderWidth[1]} solid ${theme.color.secondary};
+    border: 1.5px solid ${theme.color.secondary};
     border-radius: ${theme.borderRadius.full};
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: ${theme.backgroundColor.secondary};
   `}
 `;
 
