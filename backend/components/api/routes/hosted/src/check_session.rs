@@ -2,9 +2,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 
 use crate::State;
-use api_core::auth::{
-    session::check::CheckSessionContext,
-};
+use api_core::auth::session::check::CheckSessionContext;
 
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};

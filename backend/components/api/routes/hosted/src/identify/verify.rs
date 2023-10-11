@@ -46,15 +46,7 @@ pub struct VerifyRequest {
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum VerifyKind {
-    UserCreated,
-    UserInherited,
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct VerifyResponse {
-    kind: VerifyKind,
     auth_token: SessionAuthToken,
 }
 
@@ -124,24 +116,23 @@ pub async fn post(
 
     let config = state.config.clone();
     let session_key = state.session_sealing_key.clone();
-    let (auth_token, user_kind) = state
+    let auth_token = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (uv_id, user_kind, auth_factor, event_kind, passkey_cred_id) = match challenge_data {
+            let (uv_id, auth_factor, event_kind, passkey_cred_id) = match challenge_data {
                 ChallengeContext::Sms(ctx) => {
-                    let (tok, uk) = validate(conn, ctx, &challenge_response)?;
-                    (tok, uk, AuthFactor::Sms, AuthEventKind::Sms, None)
+                    let tok = validate(conn, ctx, &challenge_response)?;
+                    (tok, AuthFactor::Sms, AuthEventKind::Sms, None)
                 }
                 ChallengeContext::Email(ctx) => {
-                    let (tok, uk) = validate(conn, ctx, &challenge_response)?;
-                    (tok, uk, AuthFactor::Email, AuthEventKind::Email, None)
+                    let tok = validate(conn, ctx, &challenge_response)?;
+                    (tok, AuthFactor::Email, AuthEventKind::Email, None)
                 }
                 ChallengeContext::Passkey(context) => {
-                    let (tok, uk, cred) =
+                    let (tok, cred) =
                         validate_biometric_challenge(conn, &config, context, &challenge_response)?;
                     (
                         tok,
-                        uk,
                         AuthFactor::Passkey(cred.clone()),
                         AuthEventKind::Passkey,
                         Some(cred),
@@ -203,15 +194,12 @@ pub async fn post(
             }
             .create(conn.conn())?;
 
-            Ok((auth_token, user_kind))
+            Ok(auth_token)
         })
         .await?;
 
     Ok(Json(ResponseData {
-        data: VerifyResponse {
-            kind: user_kind,
-            auth_token,
-        },
+        data: VerifyResponse { auth_token },
     }))
 }
 
@@ -260,7 +248,7 @@ fn validate_biometric_challenge(
     config: &Config,
     challenge_state: BiometricChallengeState,
     challenge_response: &str,
-) -> ApiResult<(VaultId, VerifyKind, WebauthnCredentialId)> {
+) -> ApiResult<(VaultId, WebauthnCredentialId)> {
     // Decode and validate the response to the biometric challenge
     let webauthn = WebauthnConfig::new(config);
     let auth_resp = serde_json::from_str(challenge_response)?;
@@ -278,11 +266,7 @@ fn validate_biometric_challenge(
         credential.update_backup_state(conn)?;
     }
 
-    Ok((
-        challenge_state.user_vault_id,
-        VerifyKind::UserInherited,
-        credential.id,
-    ))
+    Ok((challenge_state.user_vault_id, credential.id))
 }
 
 pub struct VaultContext {
@@ -352,11 +336,7 @@ async fn make_vault_context(
     })
 }
 
-fn validate(
-    conn: &mut TxnPgConn,
-    ctx: VaultContext,
-    challenge_response: &str,
-) -> Result<(VaultId, VerifyKind), ApiError> {
+fn validate(conn: &mut TxnPgConn, ctx: VaultContext, challenge_response: &str) -> Result<VaultId, ApiError> {
     if ctx.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
     };
@@ -371,13 +351,13 @@ fn validate(
 
     let existing_user = Vault::find_portable(conn, &fps_to_search, ctx.sandbox_id.clone())?;
     let result = match existing_user {
-        Some(uv) => (uv.id, VerifyKind::UserInherited),
+        Some(uv) => uv.id,
         None => {
             // The user does not exist. Create a new user vault.
             // Must have ob_info to create a new user vault
             let obc = ctx.obc.ok_or(OnboardingError::MissingObPkAuth)?;
             let (uv, _) = VaultWrapper::create_user_vault(conn, ctx.keypair, obc, ctx.data, ctx.sandbox_id)?;
-            (uv.into_inner().id, VerifyKind::UserCreated)
+            uv.into_inner().id
         }
     };
     Ok(result)
