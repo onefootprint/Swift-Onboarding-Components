@@ -1,4 +1,4 @@
-use super::utils;
+use super::utils::{self, validate_state};
 use super::{Error, VResult};
 use crate::email::Email;
 use crate::{
@@ -17,7 +17,7 @@ impl Validate for BDK {
         self,
         value: PiiJsonValue,
         args: ValidateArgs,
-        _: &AllData,
+        all_data: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
         let value = match self {
             BDK::Name => value.as_string()?,
@@ -28,7 +28,7 @@ impl Validate for BDK {
             BDK::AddressLine1 => value.as_string()?,
             BDK::AddressLine2 => value.as_string()?,
             BDK::City => value.as_string()?,
-            BDK::State => value.as_string()?,
+            BDK::State => validate_state(value.as_string()?, all_data.get(&BDK::Country.into()))?,
             BDK::Zip => utils::clean_and_validate_zip(value.as_string()?)?,
             BDK::Country => utils::clean_and_validate_country(value.as_string()?)?,
             BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?,

@@ -1,3 +1,5 @@
+// This is in sync with a backend enum - don't change these values without changing the bakend
+// validation too
 const states = [
   {
     label: 'Alabama',

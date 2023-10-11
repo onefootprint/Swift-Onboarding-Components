@@ -1,5 +1,5 @@
 use super::{Error, VResult};
-use crate::{Iso3166TwoDigitCountryCode, PiiJsonValue, PiiString};
+use crate::{Iso3166TwoDigitCountryCode, PiiJsonValue, PiiString, UsState};
 use regex::Regex;
 use serde::de::DeserializeOwned;
 use std::str::FromStr;
@@ -66,4 +66,17 @@ where
     let parsed_value = value.deserialize_maybe_str()?;
     let value = f(parsed_value)?;
     Ok(value)
+}
+
+pub(super) fn validate_state(
+    value: PiiString,
+    provided_country: Option<&PiiJsonValue>,
+) -> VResult<PiiString> {
+    let us = PiiJsonValue::from_piistring(PiiString::from(Iso3166TwoDigitCountryCode::US));
+    if provided_country == Some(&us) {
+        // Validate state is a US state if the country is US
+        parse_enum::<UsState>(value)
+    } else {
+        Ok(value)
+    }
 }

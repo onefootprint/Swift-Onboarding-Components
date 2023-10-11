@@ -32,6 +32,9 @@ pub use data_identifier::*;
 pub mod handoff_metadata;
 pub use handoff_metadata::*;
 
+mod us_states;
+pub use us_states::*;
+
 mod b64;
 pub use b64::Base64Data;
 pub use b64::Base64EncodedString;

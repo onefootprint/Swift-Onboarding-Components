@@ -107,6 +107,38 @@ def test_data_validation(tenant, key, value, expected_error):
     post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
 
 
+@pytest.mark.parametrize(
+    "data,should_succeed",
+    [
+        [{"id.state": "CA", "id.country": "US"}, True],
+        [{"id.state": "California", "id.country": "US"}, False],
+        [{"id.state": "Yucatan", "id.country": "MX"}, True],
+    ],
+)
+def test_multi_value_validation(tenant, data, should_succeed):
+    # Can't create the user inline with invalid data
+    post("users/", data, tenant.sk.key, status_code=200 if should_succeed else 400)
+
+    body = post("users/", None, tenant.sk.key)
+    user = body
+    fp_id = user["id"]
+    assert fp_id
+
+    # Validate endpoint should also fail
+    post(
+        f"users/{fp_id}/vault/validate",
+        data,
+        tenant.sk.key,
+        status_code=200 if should_succeed else 400,
+    )
+    patch(
+        f"users/{fp_id}/vault",
+        data,
+        tenant.sk.key,
+        status_code=200 if should_succeed else 400,
+    )
+
+
 def test_ignore_card_validation(tenant):
     body = post("users/", None, tenant.sk.key)
     fp_id = body["id"]

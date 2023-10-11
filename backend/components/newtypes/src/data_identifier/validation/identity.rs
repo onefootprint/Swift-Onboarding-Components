@@ -1,4 +1,4 @@
-use super::utils;
+use super::utils::{self, validate_state};
 use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
 use crate::{
@@ -15,7 +15,7 @@ impl Validate for IDK {
         self,
         value: PiiJsonValue,
         args: ValidateArgs,
-        _: &AllData,
+        all_data: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
         // Generally don't want anything to be empty
         let value = match self {
@@ -27,7 +27,7 @@ impl Validate for IDK {
             IDK::AddressLine1 => validate_address(value.as_string()?, args.for_bifrost)?,
             IDK::AddressLine2 => value.as_string()?,
             IDK::City => value.as_string()?,
-            IDK::State => value.as_string()?, // maybe we'll want to validate state based on country some day
+            IDK::State => validate_state(value.as_string()?, all_data.get(&IDK::Country.into()))?,
             IDK::Zip => utils::clean_and_validate_zip(value.as_string()?)?,
             IDK::Country => utils::clean_and_validate_country(value.as_string()?)?,
             IDK::Email => clean_and_validate_email(value.as_string()?)?,
