@@ -3,7 +3,6 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnContinue,
   confirmData,
-  doLivenessCheck,
   fillAddress,
   fillEmail,
   fillNameAndDoB,
@@ -103,8 +102,6 @@ test('KYC.Investor', async ({ browserName, page, browser }) => {
     .then(() => true)
     .catch(() => false);
   await page.waitForLoadState();
-
-  await doLivenessCheck({ page, frame, browser }, { flowId });
 
   console.log(`end of -> KYC.Investor:${flowId}`);
   await context.close();

@@ -2,7 +2,6 @@ import { expect, test } from '@playwright/test';
 
 import {
   confirmData,
-  doLivenessCheck,
   fillSSN,
   clickOnContinue,
   fillAddress,
@@ -138,8 +137,6 @@ test('KYB for ob_test_5zu2usM1ilTzDnqQpaZ6Sg', async ({
   );
   await clickOnContinue({ frame });
   await page.waitForLoadState();
-
-  await doLivenessCheck({ page, frame, browser }, { flowId });
 
   console.log(`end of -> KYB for ob_test_5zu2usM1ilTzDnqQpaZ6Sg:${flowId}`);
   await context.close();

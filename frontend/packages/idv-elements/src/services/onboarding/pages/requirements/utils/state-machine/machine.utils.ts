@@ -7,6 +7,10 @@ type MachineTarget = {
   cond: (context: MachineContext) => boolean;
 };
 
+const isDocKind = (x: unknown) => x === OnboardingRequirementKind.idDoc;
+const isLivenessKind = (x: unknown) =>
+  x === OnboardingRequirementKind.registerPasskey;
+
 // NOTE: the ordering of these targets actually dictates the order in which requirements are
 // handled by the frontend
 export const RequirementTargets: MachineTarget[] = [
@@ -119,7 +123,7 @@ const shouldShowProcess = (context: MachineContext) => {
   );
 };
 
-const shouldRunTransfer = (context: MachineContext) => {
+const shouldRunTransfer = (context: MachineContext): boolean => {
   const {
     onboardingContext: {
       device: { type },
@@ -127,20 +131,20 @@ const shouldRunTransfer = (context: MachineContext) => {
       config: { isNoPhoneFlow },
     },
     didRunTransfer,
+    requirements,
   } = context;
-  if (didRunTransfer || isNoPhoneFlow) {
-    return false;
-  }
-  const nextReqIsLiveness =
-    context.requirements[0]?.kind === OnboardingRequirementKind.registerPasskey;
-  const nextReqIsIdDoc =
-    context.requirements[0]?.kind === OnboardingRequirementKind.idDoc;
+  if (didRunTransfer || isNoPhoneFlow) return false;
+  if (isTransfer) return false;
 
-  if (isTransfer) {
-    return false;
-  }
+  const firstKind = requirements[0]?.kind;
+  const nextRequirementIsLiveness = isLivenessKind(firstKind);
+  const nextRequirementIsIdDoc = isDocKind(firstKind);
+
   if (type === 'mobile') {
-    return nextReqIsLiveness;
+    return nextRequirementIsLiveness;
   }
-  return nextReqIsIdDoc || nextReqIsLiveness;
+
+  const hasPendingDoc = requirements.some(x => !x.isMet && isDocKind(x.kind));
+
+  return nextRequirementIsIdDoc || (nextRequirementIsLiveness && hasPendingDoc);
 };

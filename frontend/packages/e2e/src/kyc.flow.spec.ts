@@ -3,7 +3,6 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnContinue,
   confirmData,
-  doLivenessCheck,
   fillAddress,
   fillNameAndDoB,
   fillEmail,
@@ -80,8 +79,6 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK', async ({
   );
   await clickOnContinue({ frame });
   await page.waitForLoadState();
-
-  await doLivenessCheck({ page, frame, browser }, { flowId });
 
   console.log(`end of -> KYC for env.NEXT_PUBLIC_E2E_TENANT_PK:${flowId}`);
   await context.close();
