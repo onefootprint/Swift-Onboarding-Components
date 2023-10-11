@@ -89,7 +89,6 @@ export {
   SupportedIdDocTypes,
 } from './id-doc-type';
 export type { EmailOrPhoneIdentifier, Identifier } from './identifier';
-export { default as IdentifyUserKind } from './identify-user-kind';
 export type { InsightEvent } from './insight-event';
 export {
   InvestorProfileAnnualIncome,

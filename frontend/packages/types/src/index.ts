@@ -313,7 +313,6 @@ export {
   IdDocOutcomes,
   IdDocRegionality,
   IdDocStatus,
-  IdentifyUserKind,
   InvestorProfileAnnualIncome,
   InvestorProfileDeclaration,
   InvestorProfileDI,

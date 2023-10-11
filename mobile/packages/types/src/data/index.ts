@@ -32,7 +32,6 @@ export { default as IdDocImageError } from './id-doc-image-error-incode';
 export * from './id-doc-info';
 export * from './id-doc-type';
 export * from './identifier';
-export { default as IdentifyUserKind } from './identify-user-kind';
 export * from './insight-event';
 export * from './investor-data-attribute';
 export * from './investor-profile-data';

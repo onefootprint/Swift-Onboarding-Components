@@ -14,7 +14,6 @@ const identifyVerify = async (
   const { isApple, ...data } = payload;
   if (isApple) {
     return {
-      kind: 'user_inherited',
       authToken: 'tok_apple',
     };
   }

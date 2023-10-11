@@ -1,5 +1,4 @@
 import { ObConfigAuth } from '../data';
-import IdentifyUserKind from '../data/identify-user-kind';
 
 export type IdentifyVerifyRequest = {
   challengeResponse: string; // either biometric response or the 6 code digit sent via sms
@@ -8,6 +7,5 @@ export type IdentifyVerifyRequest = {
 };
 
 export type IdentifyVerifyResponse = {
-  kind: IdentifyUserKind;
   authToken: string;
 };
