@@ -91,7 +91,8 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
             | DataIdentifier::Document(DocumentKind::LatestUpload(_, DocumentSide::Front))
             | DataIdentifier::Document(DocumentKind::LatestUpload(_, DocumentSide::Back))
             | DataIdentifier::Document(DocumentKind::OcrData(_, _))
-            | DataIdentifier::Document(DocumentKind::MimeType(_, _)) => {
+            | DataIdentifier::Document(DocumentKind::MimeType(_, _))
+            | DataIdentifier::Document(DocumentKind::Barcodes(_, _)) => {
                 let can_decrypt = token_scopes.contains(&TenantScope::DecryptDocument)
                     || token_scopes.contains(&TenantScope::DecryptDocumentAndSelfie);
                 Right(can_decrypt)

@@ -1,9 +1,12 @@
 use std::collections::HashMap;
 
-use crate::{CollectedDataOption, DataIdentifier, NtResult, PiiJsonValue, PiiString, ValidateArgs};
+use crate::{
+    CollectedDataOption, DataIdentifier, NtResult, PiiJsonValue, PiiString, PiiValueKind, ValidateArgs,
+};
 
 mod business;
 mod card;
+mod document;
 mod identity;
 mod investor_profile;
 mod utils;
@@ -88,6 +91,8 @@ pub enum Error {
     CannotReplaceData,
     #[error("Expected string value, received JSON value.")]
     ExpectedStringFormat,
+    #[error("Expected {0} value, received {1} value.")]
+    IncorrectDataType(PiiValueKind, PiiValueKind),
 }
 
 pub type VResult<T> = Result<T, Error>;

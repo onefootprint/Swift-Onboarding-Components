@@ -9,6 +9,31 @@ use crate::{PiiBytes, PiiString, VResult, VaultDataFormat};
 #[serde(transparent)]
 pub struct PiiJsonValue(pub(super) serde_json::Value);
 
+/// Discriminants for serde_json::Value
+#[derive(Debug, strum_macros::Display, Eq, PartialEq)]
+#[strum(serialize_all = "PascalCase")]
+pub enum PiiValueKind {
+    Null,
+    Bool,
+    Number,
+    String,
+    Array,
+    Object,
+}
+
+impl<'a> From<&'a PiiJsonValue> for PiiValueKind {
+    fn from(value: &'a PiiJsonValue) -> Self {
+        match value.0 {
+            serde_json::Value::Null => Self::Null,
+            serde_json::Value::Bool(_) => Self::Bool,
+            serde_json::Value::Number(_) => Self::Number,
+            serde_json::Value::String(_) => Self::String,
+            serde_json::Value::Array(_) => Self::Array,
+            serde_json::Value::Object(_) => Self::Object,
+        }
+    }
+}
+
 impl PiiJsonValue {
     /// Extracts the PiiString value from self, IF self is a Value::String variant
     pub fn as_string(self) -> VResult<PiiString> {
