@@ -81,7 +81,7 @@ describe('<IdDocCountryAndType/>', () => {
       const passport = screen.getByText('Passport');
       expect(passport).toBeInTheDocument();
 
-      const visa = screen.getByText('Visa');
+      const visa = screen.getByText('Government-issued visa');
       expect(visa).toBeInTheDocument();
 
       const residenceCard = screen.getByText('Residence card / Green card');
