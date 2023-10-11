@@ -47,7 +47,7 @@ const Form = () => {
     subscribeSave();
   });
 
-  if (!props || !clientTokenFields.data) {
+  if (!props) {
     return <Loading />;
   }
 
@@ -55,21 +55,28 @@ const Form = () => {
     footprintProvider.send(FootprintPublicEvent.canceled);
   };
 
-  const handleClose = () => {
-    footprintProvider.send(FootprintPublicEvent.closed);
-  };
+  const handleClose =
+    variant === 'inline'
+      ? undefined
+      : () => {
+          footprintProvider.send(FootprintPublicEvent.closed);
+        };
 
   const isValid = arePropsValid(props);
-  const { vaultFields, expiresAt } = clientTokenFields.data;
-  const hasPermissions = validateClientTokenFields(type, vaultFields);
-  const isExpired = checkIsExpired(expiresAt);
+  const { vaultFields, expiresAt } = clientTokenFields.data || {};
+  const hasPermissions = vaultFields
+    ? validateClientTokenFields(type, vaultFields)
+    : true;
+  const isExpired = clientTokenFields.isLoading
+    ? false
+    : checkIsExpired(expiresAt);
   if (!isValid || !hasPermissions || isExpired) {
     return <Invalid onClose={handleClose} />;
   }
 
   const handleSave = async (formData: FormData) => {
     const cardAlias = getCardAlias(vaultFields);
-    if (!cardAlias) {
+    if (!cardAlias || isExpired) {
       return;
     }
 
@@ -120,7 +127,7 @@ const Form = () => {
       title={title}
       type={type}
       variant={variant}
-      isLoading={usersVaultMutation.isLoading}
+      isLoading={clientTokenFields.isLoading || usersVaultMutation.isLoading}
       hideFootprintLogo={options?.hideFootprintLogo}
       hideButtons={options?.hideButtons}
       onSave={handleSave}

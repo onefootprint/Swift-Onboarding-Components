@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
+import styled, { css } from '@onefootprint/styled';
 import { IconButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 
@@ -25,14 +25,19 @@ const Invalid = ({ onClose }: InvalidProps) => {
         )
       }
     >
-      <Typography as="h2" color="primary" variant="heading-3">
+      <Typography
+        as="h2"
+        color="primary"
+        variant="heading-3"
+        sx={{ textAlign: 'center' }}
+      >
         {t('title')}
       </Typography>
       <Typography
         variant="body-2"
         color="secondary"
         as="h3"
-        sx={{ marginTop: 3, marginBottom: 7 }}
+        sx={{ marginTop: 3, marginBottom: 7, textAlign: 'center' }}
       >
         {t('subtitle')}
       </Typography>
@@ -41,8 +46,10 @@ const Invalid = ({ onClose }: InvalidProps) => {
 };
 
 const CloseButton = styled.div`
-  position: absolute;
-  left: 0;
+  ${({ theme }) => css`
+    position: absolute;
+    left: ${theme.spacing[3]};
+  `}
 `;
 
 export default Invalid;

@@ -36,26 +36,13 @@ const validateClientTokenFields = (
   type: FootprintFormType,
   vaultFields?: string[],
 ) => {
-  if (!vaultFields?.length) {
-    console.error(
-      "The auth token doesn't have permissions to collect any fields.",
-    );
-    return false;
-  }
-
   const collectedFields = FieldsByVariant[type];
-  const vaultFieldNames = vaultFields.map(field => getCardDIField(field));
+  const vaultFieldNames =
+    vaultFields?.map(field => getCardDIField(field)) || [];
   const hasPermissions = collectedFields.every(
     field => field && vaultFieldNames.includes(field),
   );
 
-  if (!hasPermissions) {
-    console.error(
-      `The auth token does not have permissions to access the required fields for ${type} secure form, allowed fields: ${vaultFields.join(
-        ', ',
-      )}.`,
-    );
-  }
   return hasPermissions;
 };
 
