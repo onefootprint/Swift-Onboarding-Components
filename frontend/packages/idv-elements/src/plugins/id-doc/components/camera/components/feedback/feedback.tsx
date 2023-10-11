@@ -2,12 +2,15 @@ import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
+import type { DeviceKind } from '../../camera';
+
 type FeedbackProps = {
   children: string;
+  deviceKind: DeviceKind;
 };
 
-const Feedback = ({ children }: FeedbackProps) => (
-  <Container>
+const Feedback = ({ children, deviceKind }: FeedbackProps) => (
+  <Container deviceKind={deviceKind}>
     <FeedbackText>
       <Typography variant="label-4" color="quinary">
         {children}
@@ -16,13 +19,13 @@ const Feedback = ({ children }: FeedbackProps) => (
   </Container>
 );
 
-const Container = styled.div`
-  ${({ theme }) => css`
+const Container = styled.div<{ deviceKind: DeviceKind }>`
+  ${({ theme, deviceKind }) => css`
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: ${theme.spacing[7]};
+    top: ${deviceKind === 'mobile' ? theme.spacing[11] : theme.spacing[3]};
     width: 100%;
   `}
 `;

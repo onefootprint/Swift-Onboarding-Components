@@ -1,4 +1,4 @@
-import { IDV_BODY_CONTENT_CONTAINER_ID } from '../../../../../components/layout/components/content/components/body';
+import { IDV_BODY_CONTENT_CONTAINER_ID } from '../../../../../components/layout/components/content';
 
 const getVideoHeight = () => {
   const idvBodyElementsContainer = document.getElementById(

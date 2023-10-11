@@ -2,17 +2,16 @@ import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
-import { Button, Divider } from '@onefootprint/ui';
-import React, { useRef, useState } from 'react';
+import { Button } from '@onefootprint/ui';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { NavigationHeader } from '../../../../components';
+import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
+import { LAYOUT_CONTAINER_ID } from '../../../../components/layout/constants';
 import type { ImageConsentHandler } from '../../components/image-consent';
 import ImageConsent from '../../components/image-consent';
 import useConsent from '../../hooks/use-consent';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-
-const DEFAULT_CONTENT_HEIGHT = 400;
-const SCROLL_OFFSET = 10; // We enable the button is the user scrolled with the 10px of the bottom of the content
 
 const DesktopConsent = () => {
   const { t } = useTranslation('pages.desktop-consent');
@@ -22,6 +21,31 @@ const DesktopConsent = () => {
   const requestErrorToast = useRequestErrorToast();
   const consentRef = useRef<ImageConsentHandler>(null);
   const [fullyScrolled, setFullyScrolled] = useState(false);
+
+  const observeBottomIntersection = () => {
+    const container = document.getElementById(LAYOUT_CONTAINER_ID);
+    const bottom = document.getElementById('consent-bottom');
+    if (!container || !bottom) return;
+    const intersectionObserver = new IntersectionObserver(
+      entries =>
+        entries.forEach(entry => {
+          if (entry.isIntersecting) setFullyScrolled(true);
+        }),
+      {
+        root: container,
+      },
+    );
+    intersectionObserver.observe(bottom);
+  };
+
+  useEffect(() => {
+    observeBottomIntersection();
+  }, []);
+
+  useLayoutEffect(() => {
+    const layoutContainer = document.getElementById(LAYOUT_CONTAINER_ID);
+    if (layoutContainer?.scrollTo) layoutContainer.scrollTo(0, 0);
+  }, []);
 
   const submitConsent = () => {
     const consentInfo = consentRef.current?.getConsentInfo();
@@ -76,31 +100,14 @@ const DesktopConsent = () => {
     });
   };
 
-  const CONTENT_HEIGHT = Math.min(
-    DEFAULT_CONTENT_HEIGHT,
-    (window?.innerHeight ?? 0) * 0.6,
-  ); // If the window height is smaller than 540px, we will use 80% of the window height
-
-  const handleScroll = (e: React.UIEvent<HTMLElement>) => {
-    const target = e.target as HTMLElement;
-    const isBottom =
-      target.scrollHeight - target.scrollTop <=
-      target.clientHeight + SCROLL_OFFSET; // 10px allowed offset
-    if (!fullyScrolled) setFullyScrolled(isBottom);
-  };
-
   return (
-    <Container>
+    <>
       <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
-      <ConsentBody
-        onScroll={handleScroll}
-        height={CONTENT_HEIGHT}
-        aria-label="consent-body"
-      >
+      <ConsentBody aria-label="consent-body">
         <ImageConsent ref={consentRef} />
       </ConsentBody>
-      <Divider />
-      <SubmitButtonContainer>
+      <div id="consent-bottom" />
+      <StickyBottomBox>
         <Button
           fullWidth
           onClick={submitConsent}
@@ -112,27 +119,15 @@ const DesktopConsent = () => {
             ? t('submit-button.enabled-title')
             : t('submit-button.disabled-title')}
         </Button>
-      </SubmitButtonContainer>
-    </Container>
+      </StickyBottomBox>
+    </>
   );
 };
 
-const Container = styled.div``;
-
-const ConsentBody = styled.div<{ height: number }>`
-  ${({ theme, height }) => css`
-    padding: ${theme.spacing[5]};
-    height: ${height}px;
-    overflow-y: auto;
-  `}
-`;
-
-const SubmitButtonContainer = styled.div`
+const ConsentBody = styled.div`
   ${({ theme }) => css`
-    display: flex;
-    margin-top: ${theme.spacing[5]};
-    margin-left: ${theme.spacing[5]};
-    margin-right: ${theme.spacing[5]};
+    padding: ${theme.spacing[3]} ${theme.spacing[3]}
+      calc(-1 * ${theme.spacing[3]});
   `}
 `;
 

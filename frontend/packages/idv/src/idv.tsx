@@ -1,6 +1,5 @@
 import type { L10n } from '@onefootprint/footprint-js';
 import { createGlobalStyle } from '@onefootprint/styled';
-import { media } from '@onefootprint/ui';
 import Script from 'next/script';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
@@ -30,12 +29,8 @@ const App = ({ l10n, ...props }: AppProps) => (
 
 const GlobalStyle = createGlobalStyle`
   html {
-    --navigation-header-height: 65px;
+    --navigation-header-height: 56px;
     --loading-container-min-height: 188px;
-
-    ${media.greaterThan('md')`
-      --navigation-header-height: 57px;
-    `}
   }
 
   body {

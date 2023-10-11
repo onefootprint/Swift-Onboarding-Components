@@ -9,7 +9,7 @@ import type { Options } from './types';
 
 export const BIFROST_CONTAINER_ID = 'bifrost-container-id';
 
-type LayoutProps = {
+export type LayoutProps = {
   variant?: FootprintVariant;
   children: React.ReactNode;
   options?: Options;

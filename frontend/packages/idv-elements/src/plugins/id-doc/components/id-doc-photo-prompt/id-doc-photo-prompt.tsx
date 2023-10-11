@@ -16,6 +16,7 @@ import React, { useState } from 'react';
 
 import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
+import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import getImageSideLabel from '../../utils/get-image-side-label';
 import FadeInContainer from '../fade-in-container';
@@ -100,9 +101,11 @@ const IdDocPhotoPrompt = ({
             variant="default"
           />
         )}
-        <Button fullWidth onClick={handleTake}>
-          {t('continue')}
-        </Button>
+        <StickyBottomBox>
+          <Button fullWidth onClick={handleTake}>
+            {t('continue')}
+          </Button>
+        </StickyBottomBox>
         <ConsentMobile
           open={consentVisible}
           onClose={handleClose}

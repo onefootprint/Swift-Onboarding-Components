@@ -1,8 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Button } from '@onefootprint/ui';
+import { Button, media } from '@onefootprint/ui';
 import React from 'react';
 
+import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import type { DeviceKind } from '../camera/camera';
 import type { CameraKind } from '../camera/utils/get-camera-options';
 
@@ -35,25 +36,27 @@ const Preview = ({
           data-device-kind={deviceKind}
         />
       </PreviewContainer>
-      <ButtonsContainer data-device-kind={deviceKind}>
-        <Button
-          fullWidth
-          onClick={onConfirm}
-          variant="primary"
-          loading={isLoading}
-          disabled={isLoading}
-        >
-          {t('confirm')}
-        </Button>
-        <Button
-          fullWidth
-          onClick={onRetake}
-          variant="secondary"
-          disabled={isLoading}
-        >
-          {t('retake')}
-        </Button>
-      </ButtonsContainer>
+      <StickyBottomBox>
+        <ButtonsContainer data-device-kind={deviceKind}>
+          <Button
+            fullWidth
+            onClick={onConfirm}
+            variant="primary"
+            loading={isLoading}
+            disabled={isLoading}
+          >
+            {t('confirm')}
+          </Button>
+          <Button
+            fullWidth
+            onClick={onRetake}
+            variant="secondary"
+            disabled={isLoading}
+          >
+            {t('retake')}
+          </Button>
+        </ButtonsContainer>
+      </StickyBottomBox>
     </Container>
   );
 };
@@ -65,27 +68,21 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: center;
     width: 100%;
-    height: 100%;
-    row-gap: ${theme.spacing[5]};
+
+    margin-bottom: calc(-1 * ${theme.spacing[8]});
+
+    ${media.lessThan('md')`
+      padding: 0 ${theme.spacing[3]}; 
+    `}
   `}
 `;
 
 const PreviewContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    width: 100%;
-    flex-grow: 1;
-
-    &[data-device-kind='mobile'] {
-      margin-bottom: ${theme.spacing[8]};
-    }
-
-    &[data-device-kind='desktop'] {
-      margin-bottom: ${theme.spacing[3]};
-    }
-  `}
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  flex-grow: 1;
 `;
 
 const ButtonsContainer = styled.div`

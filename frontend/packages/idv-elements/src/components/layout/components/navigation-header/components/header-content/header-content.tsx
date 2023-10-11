@@ -8,7 +8,7 @@ const HeaderContent = styled.div`
     justify-content: center;
     align-items: center;
     padding: ${theme.spacing[5]} 0;
-    min-height: ${theme.spacing[10]};
+    height: var(--navigation-header-height);
 
     ${media.greaterThan('md')`
       padding:  ${theme.spacing[4]} 0;

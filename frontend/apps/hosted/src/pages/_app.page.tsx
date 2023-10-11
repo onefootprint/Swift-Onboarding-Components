@@ -1,7 +1,6 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
 import { Logger, ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { createGlobalStyle, css } from '@onefootprint/styled';
-import { media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import React from 'react';
@@ -32,13 +31,8 @@ const App = ({ Component, pageProps }: AppProps) => (
 
 const GlobalStyle = createGlobalStyle`
   html {
-    --navigation-header-height: 65px;
+    --navigation-header-height: 56px;
     --loading-container-min-height: 188px;
-    
-    ${media.greaterThan('md')`
-       --navigation-header-height: 57px;
-       --loading-container-min-width: 432px;
-    `}
   }
 
   ${({ theme }) => css`

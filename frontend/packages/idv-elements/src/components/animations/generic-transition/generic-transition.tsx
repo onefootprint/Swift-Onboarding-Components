@@ -97,7 +97,8 @@ const AnimationWrapper = styled(motion.div)<{
     justify-content: center;
     width: 100%;
     gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[6]};
+    padding: ${theme.spacing[3]};
+    padding-top: ${theme.spacing[9]};
     align-items: center;
     overflow: hidden;
     background-color: ${isSecondaryBackground
@@ -127,6 +128,9 @@ const FeedbackIconContainer = styled(motion.div)<{
 `;
 
 const Icons = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
   isolation: isolate;
   width: 60px;

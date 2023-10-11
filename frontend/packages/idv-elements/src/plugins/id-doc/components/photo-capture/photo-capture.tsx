@@ -1,9 +1,12 @@
 import { Logger } from '@onefootprint/dev-tools';
-import { useTranslation } from '@onefootprint/hooks';
 import { Box } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 
-import { HeaderTitle, NavigationHeader } from '../../../../components';
+import {
+  HeaderTitle,
+  NavigationHeader,
+  useLayoutOptions,
+} from '../../../../components';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image';
 import type { CaptureKind } from '../../utils/state-machine';
@@ -14,6 +17,11 @@ import type { AutocaptureKind } from '../camera/hooks/use-auto-capture';
 import type { CameraKind } from '../camera/utils/get-camera-options';
 import Preview from '../preview';
 
+type HeaderTextType = {
+  camera: string;
+  preview: string;
+};
+
 type PhotoCaptureProps = {
   outlineWidthRatio: number; // with respect to the video width
   outlineHeightRatio: number; // with respect to the video width (not height)
@@ -22,6 +30,9 @@ type PhotoCaptureProps = {
   onComplete: (imageFile: File, captureKind?: CaptureKind) => void;
   autocaptureKind: AutocaptureKind;
   deviceKind: DeviceKind;
+  onBack?: () => void;
+  title: HeaderTextType;
+  subtitle?: Partial<HeaderTextType>;
 };
 
 const PhotoCapture = ({
@@ -32,14 +43,36 @@ const PhotoCapture = ({
   onComplete,
   autocaptureKind,
   deviceKind,
+  onBack,
+  title,
+  subtitle,
 }: PhotoCaptureProps) => {
-  const { t } = useTranslation('components.photo-capture');
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity } = state.context;
   const [image, setImage] = useState<string | null>(null);
   const { processImageUrl } = useProcessImage();
   const [isLoading, setIsLoading] = useState(false);
   const [captureKind, setCaptureKind] = useState<CaptureKind>();
+  const {
+    footer: { set: updateFooter },
+  } = useLayoutOptions();
+
+  useLayoutEffect(() => {
+    if (deviceKind !== 'mobile') {
+      return () => {};
+    }
+    // Only hide footer when we are in camera mode
+    if (image) {
+      updateFooter({ visible: true });
+    } else {
+      updateFooter({ visible: false });
+    }
+
+    return () => {
+      // Reset footer visibility when unmounting just in case
+      updateFooter({ visible: true });
+    };
+  }, [image, deviceKind, updateFooter]);
 
   const handleRetake = () => {
     setImage(null);
@@ -92,8 +125,14 @@ const PhotoCapture = ({
     <>
       {deviceKind === 'desktop' && (
         <Box sx={{ marginBottom: 7 }}>
-          <NavigationHeader />
-          <HeaderTitle title={t('desktop-selfie.header.preview.title')} />
+          <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+          <HeaderTitle title={title.preview} />
+        </Box>
+      )}
+      {deviceKind === 'mobile' && (
+        <Box sx={{ marginBottom: 7 }}>
+          <NavigationHeader button={{ variant: 'back', onBack }} />
+          <HeaderTitle title={title.preview} subtitle={subtitle?.preview} />
         </Box>
       )}
       <Preview
@@ -109,12 +148,23 @@ const PhotoCapture = ({
     <>
       {deviceKind === 'desktop' && (
         <Box sx={{ marginBottom: 7 }}>
-          <NavigationHeader />
-          <HeaderTitle
-            title={t('desktop-selfie.header.camera.title')}
-            subtitle={t('desktop-selfie.header.camera.subtitle')}
-          />
+          <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+          <HeaderTitle title={title.camera} subtitle={subtitle?.camera} />
         </Box>
+      )}
+      {deviceKind === 'mobile' && (
+        <NavigationHeader
+          button={{ variant: 'back', onBack, color: 'quinary' }}
+          content={{
+            kind: 'static',
+            title: title.camera,
+          }}
+          style={{
+            fontColor: 'quinary',
+            backgroundVariant: 'dark-glass',
+          }}
+          position="floating"
+        />
       )}
       <Camera
         onCapture={handleCapture}

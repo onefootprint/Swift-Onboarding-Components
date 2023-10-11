@@ -3,7 +3,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
 import { IdDocImageProcessingError } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { Box, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
@@ -189,34 +189,44 @@ const Processing = () => {
   if (!type || !currSide) return null;
 
   return (
-    <IdDocAnimation
-      loadingComponent={
-        <Loading
-          step={step}
-          imageType={currSide}
-          showSlowConnectionMessage={showSlowConnectionMessage}
-        />
-      }
-      successComponent={
-        <Success
-          imageType={currSide}
-          docType={type}
-          onComplete={
-            mode === 'success' && !nextSide ? onSuccessComplete : undefined
-          }
-        />
-      }
-      nextSideComponent={
-        nextSide && (
-          <NextSide
-            nextSideImageType={nextSide}
-            onComplete={onNextSideComplete}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+      }}
+    >
+      <IdDocAnimation
+        loadingComponent={
+          <Loading
+            step={step}
+            imageType={currSide}
+            showSlowConnectionMessage={showSlowConnectionMessage}
           />
-        )
-      }
-      mode={mode}
-      hasNextSide={!!nextSide}
-    />
+        }
+        successComponent={
+          <Success
+            imageType={currSide}
+            docType={type}
+            onComplete={
+              mode === 'success' && !nextSide ? onSuccessComplete : undefined
+            }
+          />
+        }
+        nextSideComponent={
+          nextSide && (
+            <NextSide
+              nextSideImageType={nextSide}
+              onComplete={onNextSideComplete}
+            />
+          )
+        }
+        mode={mode}
+        hasNextSide={!!nextSide}
+      />
+    </Box>
   );
 };
 

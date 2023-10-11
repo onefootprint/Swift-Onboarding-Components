@@ -36,7 +36,7 @@ const DesktopSelfieRetry = () => {
 
   return (
     <>
-      <NavigationHeader />
+      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
       <Container>
         <DesktopHeader
           type={type}
@@ -66,6 +66,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[7]};
+    padding-bottom: ${theme.spacing[5]};
   `}
 `;
 

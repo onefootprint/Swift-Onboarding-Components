@@ -10,7 +10,6 @@ import {
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { imageIcons } from '../../constants/image-types';
 import getImageSideLabel from '../../utils/get-image-side-label';
@@ -61,7 +60,6 @@ const Error = ({
 
   return (
     <Container>
-      <NavigationHeader />
       <FeedbackIcon
         imageIcon={{ component: imageIcons[imageType], color: 'error' }}
         statusIndicator={{

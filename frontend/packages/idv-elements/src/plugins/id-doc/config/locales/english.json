@@ -181,19 +181,6 @@
         "description": "We noticed it's taking you a while to trigger the automatic capture, so you can now take the picture manually."
       }
     },
-    "photo-capture": {
-      "desktop-selfie": {
-        "header": {
-          "camera": {
-            "title": "Take a selfie",
-            "subtitle": "Place your face within the frame"
-          },
-          "preview": {
-            "title": "Confirm selfie"
-          }
-        }
-      }
-    },
     "preview": {
       "retake": "Retake",
       "confirm": "Confirm"
@@ -250,24 +237,52 @@
     },
     "front-photo-capture": {
       "title": {
-        "driversLicense": "Driver's license · Front side",
-        "idCard": "ID card · Front side",
-        "passport": "Passport · Photo page",
-        "visa": "Visa · Photo page",
-        "workPermit": "EAD card · Front side",
-        "residenceDocument": "Green card · Front side",
-        "voterIdentification": "Voter identification · Front side"
+        "camera": {
+          "driversLicense": "Driver's license · Front side",
+          "idCard": "ID card · Front side",
+          "passport": "Passport · Photo page",
+          "visa": "Visa · Photo page",
+          "workPermit": "EAD card · Front side",
+          "residenceDocument": "Green card · Front side",
+          "voterIdentification": "Voter identification · Front side"
+        },
+        "preview": {
+          "driversLicense": "Driver's license",
+          "idCard": "ID card",
+          "passport": "Passport",
+          "visa": "Visa",
+          "workPermit": "EAD card",
+          "residenceDocument": "Green card",
+          "voterIdentification": "Voter identification"
+        }
+      },
+      "subtitle": {
+        "preview": "Front side"
       }
     },
     "back-photo-capture": {
       "title": {
-        "driversLicense": "Driver's license · Back side",
-        "idCard": "ID card · Back side",
-        "passport": "Passport · Photo page",
-        "visa": "Visa · Photo page",
-        "workPermit": "EAD card · Back side",
-        "residenceDocument": "Green card · Back side",
-        "voterIdentification": "Voter identification · Back side"
+        "camera": {
+          "driversLicense": "Driver's license · Back side",
+          "idCard": "ID card · Back side",
+          "passport": "Passport · Photo page",
+          "visa": "Visa · Photo page",
+          "workPermit": "EAD card · Back side",
+          "residenceDocument": "Green card · Back side",
+          "voterIdentification": "Voter identification · Back side"
+        },
+        "preview": {
+          "driversLicense": "Driver's license",
+          "idCard": "ID card",
+          "passport": "Passport",
+          "visa": "Visa",
+          "workPermit": "EAD card",
+          "residenceDocument": "Green card",
+          "voterIdentification": "Voter identification"
+        }
+      },
+      "subtitle": {
+        "preview": "Back side"
       }
     },
     "selfie-photo-prompt": {
@@ -312,6 +327,15 @@
         "title": "Allow access to your camera",
         "subtitle": "Please give permission to this website so we can use your camera to take your selfie.",
         "take-selfie": "Take a selfie"
+      },
+      "header": {
+        "title": {
+          "camera": "Take a selfie",
+          "preview": "Confirm selfie"
+        },
+        "subtitle": {
+          "camera": "Place your face within the frame"
+        }
       }
     },
     "desktop-selfie-retry": {

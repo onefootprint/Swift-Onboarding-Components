@@ -17,7 +17,7 @@ const DesktopBackPhoto = () => {
 
   return (
     <>
-      <NavigationHeader />
+      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
       <DesktopPhotoPrompt
         imageType={IdDocImageTypes.back}
         type={type}

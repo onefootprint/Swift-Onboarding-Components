@@ -13,7 +13,7 @@ type SandboxBannerProps = {
 const SandboxBanner = forwardRef<SandboxBannerHandler, SandboxBannerProps>(
   ({ hideOnDesktop }, ref) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const getHeight = () => containerRef.current?.offsetHeight ?? 0;
+    const getHeight = () => containerRef.current?.clientHeight ?? 0;
 
     useImperativeHandle(
       ref,

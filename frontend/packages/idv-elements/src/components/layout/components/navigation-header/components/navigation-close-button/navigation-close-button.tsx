@@ -1,3 +1,4 @@
+import type { Color } from '@onefootprint/design-tokens';
 import { IcoClose24 } from '@onefootprint/icons';
 import { IconButton, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
@@ -9,10 +10,12 @@ type NavigationCloseButtonProps = Omit<
   'variant'
 > & {
   onClose?: () => void;
+  color?: Color;
 };
 const NavigationCloseButton = ({
   onClose,
   confirmClose,
+  color,
 }: NavigationCloseButtonProps) => {
   const confirmationDialog = useConfirmationDialog();
 
@@ -41,7 +44,7 @@ const NavigationCloseButton = ({
       onClick={handleClick}
       testID="navigation-close-button"
     >
-      <IcoClose24 />
+      <IcoClose24 color={color} />
     </IconButton>
   );
 };

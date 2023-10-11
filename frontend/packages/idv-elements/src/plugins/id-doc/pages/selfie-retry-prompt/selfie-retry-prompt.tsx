@@ -49,6 +49,9 @@ const PromptContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[7]};
+    align-items: center;
+    justify-content: center;
+    height: 100%;
   `}
 `;
 

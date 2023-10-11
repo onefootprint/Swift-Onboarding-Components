@@ -4,7 +4,7 @@ import { useGetOnboardingConfig } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
-import { Shimmer } from '@onefootprint/ui';
+import { media, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
@@ -142,6 +142,10 @@ const Container = styled.div`
     row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
+
+    ${media.greaterThan('md')`
+      padding-top: ${theme.spacing[7]}; 
+    `}
   `}
 `;
 

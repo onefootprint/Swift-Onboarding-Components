@@ -35,6 +35,7 @@ const Container = styled.div`
     row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
+    padding-top: ${theme.spacing[8]};
   `}
 `;
 

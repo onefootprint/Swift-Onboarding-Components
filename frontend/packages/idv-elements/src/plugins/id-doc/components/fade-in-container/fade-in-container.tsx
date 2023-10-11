@@ -1,17 +1,22 @@
 import { motion } from 'framer-motion';
 import React from 'react';
+import styled from 'styled-components';
 
 type FadeInConatinerProps = {
   children: React.ReactNode;
 };
 
 const FadeInContainer = ({ children }: FadeInConatinerProps) => (
-  <motion.div
+  <Container
     initial={{ opacity: 0 }}
     animate={{ opacity: 1, transition: { type: 'tween', duration: 0.7 } }}
   >
     {children}
-  </motion.div>
+  </Container>
 );
+
+const Container = styled(motion.div)`
+  height: 100%;
+`;
 
 export default FadeInContainer;

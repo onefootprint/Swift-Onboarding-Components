@@ -1,6 +1,6 @@
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
-import { Box } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { NavigationHeader } from '../../../../components';
 import type { IdDocImageErrorType } from '../../utils/state-machine';
@@ -34,8 +34,11 @@ const IdDocPhotoRetryPrompt = ({
 
   return (
     <FadeInContainer>
-      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+      <NavigationHeader
+        button={{ variant: 'back', onBack: handleClickBack }}
+        position="floating"
+      />
+      <PromptContainer>
         <Error
           imageType={imageType}
           errors={errors}
@@ -43,8 +46,19 @@ const IdDocPhotoRetryPrompt = ({
           countryName={countryName}
         />
         <IdDocPhotoButtons onComplete={onComplete} />
-      </Box>
+      </PromptContainer>
     </FadeInContainer>
   );
 };
+
+const PromptContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[7]};
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  `}
+`;
 export default IdDocPhotoRetryPrompt;

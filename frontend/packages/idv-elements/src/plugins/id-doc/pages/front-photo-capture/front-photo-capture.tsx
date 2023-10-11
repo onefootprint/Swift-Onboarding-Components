@@ -2,7 +2,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
-import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import PhotoCapture from '../../components/photo-capture/photo-capture';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import type { CaptureKind } from '../../utils/state-machine';
@@ -46,24 +45,21 @@ const FrontPhotoCapture = () => {
   };
 
   return (
-    <>
-      <NavigationHeader
-        button={{ variant: 'back', onBack: handleClickBack }}
-        content={{
-          kind: 'static',
-          title: t(`title.${translationIndex[docType]}`),
-        }}
-      />
-      <PhotoCapture
-        outlineHeightRatio={ID_OUTLINE_HEIGHT_RATIO}
-        outlineWidthRatio={ID_OUTLINE_WIDTH_RATIO}
-        cameraKind="back"
-        outlineKind="full-frame"
-        onComplete={onComplete}
-        autocaptureKind="document"
-        deviceKind="mobile"
-      />
-    </>
+    <PhotoCapture
+      outlineHeightRatio={ID_OUTLINE_HEIGHT_RATIO}
+      outlineWidthRatio={ID_OUTLINE_WIDTH_RATIO}
+      cameraKind="back"
+      outlineKind="full-frame"
+      onComplete={onComplete}
+      autocaptureKind="document"
+      deviceKind="mobile"
+      title={{
+        camera: t(`title.camera.${translationIndex[docType]}`),
+        preview: t(`title.preview.${translationIndex[docType]}`),
+      }}
+      subtitle={{ preview: t(`subtitle.preview`) }}
+      onBack={handleClickBack}
+    />
   );
 };
 

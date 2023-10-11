@@ -53,7 +53,7 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
 
       ${media.greaterThan('md')`
         height: auto;
-        max-height: calc(100% - (2 * ${theme.spacing[9]}));
+        max-height: min(720px, calc(100% - (2 * ${theme.spacing[9]})));
         width: 480px;
       `}
     }

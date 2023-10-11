@@ -4,11 +4,12 @@ import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
 import { IdDocImageProcessingError } from '@onefootprint/types';
-import { Button, Typography } from '@onefootprint/ui';
+import { Button, media, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
 import { NavigationHeader } from '../../../../components';
+import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import DesktopHeader from '../../components/desktop-header';
 import IdDocAnimation from '../../components/id-doc-animation';
 import Loading from '../../components/loading';
@@ -186,7 +187,7 @@ const DeskTopProcessing = () => {
 
   return (
     <Container>
-      <NavigationHeader />
+      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
       <DesktopHeader type={type} country={country} imageType={currSide} />
       <FeedbackContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         <IdDocAnimation
@@ -208,9 +209,15 @@ const DeskTopProcessing = () => {
           hasNextSide={false} // Although we might have next side, we don't want to show it in the animation for desktop
         />
       </FeedbackContainer>
-      <Button fullWidth disabled={mode === 'loading'} onClick={handleNextStep}>
-        {t('continue')}
-      </Button>
+      <StickyBottomBox>
+        <Button
+          fullWidth
+          disabled={mode === 'loading'}
+          onClick={handleNextStep}
+        >
+          {t('continue')}
+        </Button>
+      </StickyBottomBox>
     </Container>
   );
 };
@@ -220,6 +227,11 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[7]};
+    margin-bottom: calc(-1 * ${theme.spacing[8]});
+
+    ${media.lessThan('md')`
+      padding: 0 ${theme.spacing[3]}; 
+    `}
   `}
 `;
 

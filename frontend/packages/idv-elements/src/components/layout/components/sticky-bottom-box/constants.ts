@@ -1,0 +1,2 @@
+export const BOTTOM_ACTION_BOX_PORTAL_ID = 'bottom-action-box';
+export const BOTTOM_ACTION_BOX_PORTAL_SELECTOR = `#${BOTTOM_ACTION_BOX_PORTAL_ID}`;

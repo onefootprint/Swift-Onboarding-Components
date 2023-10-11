@@ -1,8 +1,10 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import styled, { css } from '@onefootprint/styled';
 import { media, Typography } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
+import useResizeObserver from 'use-resize-observer';
 
+import { useLayoutOptions } from '../layout-options-provider';
 import SecuredByFootprint from '../secured-by-footprint';
 import FooterActions from './components/footer-actions';
 import NitroLock from './components/nitro-lock';
@@ -15,6 +17,20 @@ type FootprintFooterProps = {
 type Link = { label: string; href: string };
 
 const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
+  const {
+    footer: { options, set: updateFooterOptions },
+  } = useLayoutOptions();
+  const { visible: footerVisible, position: footerPosition } = options;
+  const { ref, height } = useResizeObserver({
+    box: 'border-box',
+  });
+
+  useEffect(() => {
+    if (!footerVisible) updateFooterOptions({ height: 0 });
+    else updateFooterOptions({ height: height ?? 0 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [height]);
+
   const links: Link[] = [
     {
       label: 'Privacy',
@@ -30,7 +46,12 @@ const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
   }
 
   return (
-    <FootprintFooterContainer hideOnDesktop={hideOnDesktop}>
+    <FootprintFooterContainer
+      hideOnDesktop={hideOnDesktop}
+      isSticky={footerPosition === 'sticky'}
+      isVisible={footerVisible}
+      ref={ref}
+    >
       <SecuredByFootprint />
       <LinksContainer>
         <NitroLock />
@@ -53,15 +74,26 @@ const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
 
 const FootprintFooterContainer = styled.footer<{
   hideOnDesktop?: boolean;
+  isSticky: boolean;
+  isVisible: boolean;
 }>`
-  ${({ theme }) => css`
+  ${({ theme, isSticky }) => css`
     display: flex;
     justify-content: space-between;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
     flex: 0;
+    position: ${isSticky ? 'sticky' : 'relative'};
+    bottom: ${isSticky ? 0 : undefined};
+    z-index: ${isSticky ? theme.zIndex.sticky : 1};
     background-color: ${theme.backgroundColor.secondary};
     border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
+
+  ${({ isVisible }) =>
+    !isVisible &&
+    css`
+      display: none;
+    `}
 
   ${({ hideOnDesktop }) =>
     !!hideOnDesktop &&

@@ -1,16 +1,9 @@
 import styled, { css } from '@onefootprint/styled';
-import { Box, Portal, Shimmer } from '@onefootprint/ui';
+import { Box, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 
-import { NAVIGATION_HEADER_PORTAL_SELECTOR } from '../layout';
-
 const InitShimmer = () => (
-  <Box testID="init-shimmer">
-    <Portal selector={NAVIGATION_HEADER_PORTAL_SELECTOR} removeContent>
-      <HeaderContainer>
-        <CloseButton />
-      </HeaderContainer>
-    </Portal>
+  <Box testID="init-shimmer" sx={{ paddingTop: 7 }}>
     <TitleContainer>
       <Title />
       <Subtitle />
@@ -23,14 +16,6 @@ const InitShimmer = () => (
     <TermsOfService />
   </Box>
 );
-
-const HeaderContainer = styled.div`
-  display: flex;
-  height: 57px;
-  align-items: center;
-`;
-
-const CloseButton = () => <Shimmer sx={{ width: '24px', height: '24px' }} />;
 
 const TitleContainer = styled.div`
   ${({ theme }) => css`

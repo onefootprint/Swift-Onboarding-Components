@@ -21,6 +21,7 @@ import React, { useState } from 'react';
 
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
+import StickyBottomBox from '../../../../../components/layout/components/sticky-bottom-box/sticky-bottom-box';
 import { useIdDocMachine } from '../../../components/machine-provider';
 import { getCountryFromCode } from '../../../utils/get-country-from-code';
 import useOptionsByDocType from '../hooks/use-options-by-doc-type';
@@ -155,7 +156,13 @@ const IdDocCountryAndTypeContainer = ({
 
   return (
     <Container>
-      <NavigationHeader />
+      <NavigationHeader
+        button={
+          device.type !== 'mobile'
+            ? { variant: 'close', confirmClose: true }
+            : undefined
+        }
+      />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <InputsContainer>
         <CountrySelect
@@ -192,13 +199,11 @@ const IdDocCountryAndTypeContainer = ({
         )}
       </InputsContainer>
       {options.length > 0 && (
-        <Button
-          fullWidth
-          onClick={handleSubmit}
-          loading={submitDocTypeMutation.isLoading}
-        >
-          {t('form.cta')}
-        </Button>
+        <StickyBottomBox>
+          <Button fullWidth onClick={handleSubmit}>
+            {t('form.cta')}
+          </Button>
+        </StickyBottomBox>
       )}
     </Container>
   );
@@ -226,7 +231,6 @@ const Container = styled.div`
     row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
-    margin-top: calc(-1 * ${theme.spacing[4]});
   `}
 `;
 

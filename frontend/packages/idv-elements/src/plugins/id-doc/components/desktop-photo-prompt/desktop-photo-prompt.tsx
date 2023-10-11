@@ -10,9 +10,10 @@ import {
   IdDocImageProcessingError,
   IdDocImageUploadError,
 } from '@onefootprint/types';
-import { Box, Button, Typography } from '@onefootprint/ui';
+import { Box, Button, media, Typography } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 
+import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import useProcessImage from '../../hooks/use-process-image';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
@@ -160,13 +161,15 @@ const DesktopPhotoPrompt = ({
           onChange={handleImageUpload}
         />
       </DraggableInputField>
-      <Button
-        fullWidth
-        disabled={isLoading}
-        onClick={isRetry ? handleUpload : handleError}
-      >
-        {isRetry ? t('choose-different-file') : t('continue')}
-      </Button>
+      <StickyBottomBox>
+        <Button
+          fullWidth
+          disabled={isLoading}
+          onClick={isRetry ? handleUpload : handleError}
+        >
+          {isRetry ? t('choose-different-file') : t('continue')}
+        </Button>
+      </StickyBottomBox>
     </Container>
   );
 };
@@ -176,6 +179,11 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[7]};
+    margin-bottom: calc(-1 * ${theme.spacing[8]});
+
+    ${media.lessThan('md')`
+      padding: 0 ${theme.spacing[3]}; 
+    `}
   `}
 `;
 
