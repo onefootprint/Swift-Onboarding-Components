@@ -12,7 +12,7 @@ use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
     DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
-    FingerprintScopeKind, PhoneNumber, PiiString, SandboxId, SessionId,
+    FingerprintScopeKind, PhoneNumber, PiiString, SandboxId,
 };
 use newtypes::{IdentityDataKind as IDK, VaultKind};
 use newtypes::{Locked, ValidateArgs};
@@ -47,7 +47,6 @@ impl VaultWrapper<Person> {
         ob_config: ObConfiguration,
         initial_data: Vec<InitialVaultData>,
         sandbox_id: Option<SandboxId>,
-        session_id: Option<SessionId>,
     ) -> ApiResult<(Locked<Vault>, ScopedVault)> {
         // Verify that the ob config is_live matches the user vault
         if ob_config.is_live != sandbox_id.is_none() {
@@ -93,7 +92,7 @@ impl VaultWrapper<Person> {
             sandbox_id,
         };
         let uv = Vault::create(conn, new_user_vault)?;
-        let su = ScopedVault::get_or_create(conn, &uv, ob_config.id, session_id)?;
+        let su = ScopedVault::get_or_create(conn, &uv, ob_config.id, None)?;
 
         // This performs some superfluous DB queries to rebuild the UVW, but allows us to share code
         // to add data to the vault

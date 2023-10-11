@@ -135,6 +135,7 @@ impl ScopedVault {
         conn: &mut TxnPgConn,
         uv: &Locked<Vault>,
         ob_configuration_id: ObConfigurationId,
+        // TODO rm
         session_id: Option<SessionId>,
     ) -> DbResult<Self> {
         // Get the ob config to do some validation before we make the SV

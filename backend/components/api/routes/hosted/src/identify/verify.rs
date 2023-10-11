@@ -18,7 +18,7 @@ use api_core::config::Config;
 use api_core::errors::business::BusinessError;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::AssertionError;
-use api_core::utils::headers::{InsightHeaders, TelemetryHeaders};
+use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::InitialVaultData;
 use chrono::{Duration, Utc};
 use crypto::sha256;
@@ -34,8 +34,7 @@ use itertools::Itertools;
 use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::{
     AuthEventKind, DataIdentifier, EncryptedVaultPrivateKey, Fingerprinter, IdentityDataKind as IDK,
-    PiiString, SandboxId, ScopedVaultId, SessionAuthToken, SessionId, VaultId, VaultPublicKey,
-    WebauthnCredentialId,
+    PiiString, SandboxId, ScopedVaultId, SessionAuthToken, VaultId, VaultPublicKey, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -74,7 +73,6 @@ pub async fn post(
     // When provided, augments the existing user_auth token with the scopes gained from the challenge
     user_auth: Option<UserAuthContext>,
     insight_headers: InsightHeaders,
-    telemetry_headers: TelemetryHeaders,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let VerifyRequest {
@@ -83,7 +81,6 @@ pub async fn post(
     } = request.into_inner();
     let challenge_state =
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
-    let session_id = telemetry_headers.session_id;
 
     // Generate fingerprints and keypairs async if needed
     let challenge_data = match challenge_state.data {
@@ -132,11 +129,11 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let (uv_id, user_kind, auth_factor, event_kind, passkey_cred_id) = match challenge_data {
                 ChallengeContext::Sms(ctx) => {
-                    let (tok, uk) = validate(conn, ctx, &challenge_response, session_id.clone())?;
+                    let (tok, uk) = validate(conn, ctx, &challenge_response)?;
                     (tok, uk, AuthFactor::Sms, AuthEventKind::Sms, None)
                 }
                 ChallengeContext::Email(ctx) => {
-                    let (tok, uk) = validate(conn, ctx, &challenge_response, session_id.clone())?;
+                    let (tok, uk) = validate(conn, ctx, &challenge_response)?;
                     (tok, uk, AuthFactor::Email, AuthEventKind::Email, None)
                 }
                 ChallengeContext::Passkey(context) => {
@@ -159,7 +156,7 @@ pub async fn post(
             // Determine whether to issue onboardig scopes or my1fp scopes
             let (args, scopes, duration, scoped_vault_id) = if let Some(ob_pk_auth) = ob_pk_auth {
                 let obc_id = ob_pk_auth.ob_config().id.clone();
-                let (su_id, sb_id) = onboarding_identifiers(conn, ob_pk_auth, &uv_id, session_id)?;
+                let (su_id, sb_id) = onboarding_identifiers(conn, ob_pk_auth, &uv_id)?;
                 let duration = Duration::hours(1); // Onboarding is shorter
                 let args = UserSessionArgs {
                     su_id: Some(su_id.clone()),
@@ -229,13 +226,12 @@ fn onboarding_identifiers(
     conn: &mut TxnPgConn,
     ob_pk_auth: ObConfigAuth,
     uv_id: &VaultId,
-    session_id: Option<SessionId>,
 ) -> ApiResult<(ScopedVaultId, Option<ScopedVaultId>)> {
     let obc = ob_pk_auth.ob_config();
     // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
     // created with an ob config
     let uv = Vault::lock(conn, uv_id)?;
-    let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone(), session_id)?;
+    let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone(), None)?;
 
     // If we verified with a BoSessionAuth, update the corresponding BO
     let sb_id = if let Some(bo) = ob_pk_auth.business_owner() {
@@ -360,7 +356,6 @@ fn validate(
     conn: &mut TxnPgConn,
     ctx: VaultContext,
     challenge_response: &str,
-    session_id: Option<SessionId>,
 ) -> Result<(VaultId, VerifyKind), ApiError> {
     if ctx.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
@@ -381,14 +376,7 @@ fn validate(
             // The user does not exist. Create a new user vault.
             // Must have ob_info to create a new user vault
             let obc = ctx.obc.ok_or(OnboardingError::MissingObPkAuth)?;
-            let (uv, _) = VaultWrapper::create_user_vault(
-                conn,
-                ctx.keypair,
-                obc,
-                ctx.data,
-                ctx.sandbox_id,
-                session_id,
-            )?;
+            let (uv, _) = VaultWrapper::create_user_vault(conn, ctx.keypair, obc, ctx.data, ctx.sandbox_id)?;
             (uv.into_inner().id, VerifyKind::UserCreated)
         }
     };
