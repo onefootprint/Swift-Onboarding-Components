@@ -15,16 +15,11 @@ const EmailChallenge = () => {
   const { t } = useTranslation('pages.email-challenge');
   const [state, send] = useIdentifyMachine();
   const {
-    config: { orgName: tenantName },
     bootstrapData,
     identify: { userFound, email = '' },
   } = state.context;
   const isBootstrap = !!bootstrapData?.email;
   const title = userFound ? t('welcome-back-title') : t('title');
-  const subtitle =
-    isBootstrap && userFound
-      ? t('bootstrap-subtitle', { tenantName })
-      : t('subtitle');
 
   const handleChallengeSuceed = (authToken: string) => {
     setTimeout(() => {
@@ -45,11 +40,7 @@ const EmailChallenge = () => {
 
   return (
     <Container>
-      <ChallengeHeader
-        shouldShowBack={!isBootstrap}
-        title={title}
-        subtitle={subtitle}
-      />
+      <ChallengeHeader shouldShowBack={!isBootstrap} title={title} />
       <PinVerification
         title={t('prompt', { email })}
         onChallengeSucceed={handleChallengeSuceed}

@@ -19,7 +19,6 @@ const SmsChallenge = () => {
   const [state, send] = useIdentifyMachine();
   const [challengeData, setChallengeData] = useState<ChallengeData>();
   const {
-    config: { orgName: tenantName },
     initialAuthToken,
     bootstrapData,
     challenge,
@@ -29,10 +28,6 @@ const SmsChallenge = () => {
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
   const hasInitialAuthToken = !!initialAuthToken;
   const title = userFound ? t('welcome-back-title') : t('title');
-  const subtitle =
-    isBootstrap && userFound
-      ? t('bootstrap-subtitle', { tenantName })
-      : t('subtitle');
 
   // Either scrub the phone number collected from the previous steps, or use the
   // challenge data scrubbed number
@@ -76,11 +71,7 @@ const SmsChallenge = () => {
 
   return (
     <Container>
-      <ChallengeHeader
-        shouldShowBack={shouldShowBack}
-        title={title}
-        subtitle={subtitle}
-      />
+      <ChallengeHeader shouldShowBack={shouldShowBack} title={title} />
       <PinVerification
         title={formTitle}
         onReceiveChallenge={handleReceiveChallengeData}

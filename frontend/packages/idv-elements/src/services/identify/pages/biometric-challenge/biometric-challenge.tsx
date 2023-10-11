@@ -11,18 +11,9 @@ import Biometric from './components/biometric';
 const BiometricChallenge = () => {
   const { t } = useTranslation('pages.biometric-challenge');
   const [state, send] = useIdentifyMachine();
-  const {
-    config: { orgName: tenantName },
-    initialAuthToken,
-    bootstrapData,
-    identify: { userFound },
-  } = state.context;
+  const { initialAuthToken, bootstrapData } = state.context;
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
   const title = t('title');
-  const subtitle =
-    isBootstrap && userFound
-      ? t('bootstrap-subtitle', { tenantName })
-      : t('subtitle');
   const hasInitialAuthToken = !!initialAuthToken;
 
   const handleLoginWithDifferent = () => {
@@ -42,7 +33,6 @@ const BiometricChallenge = () => {
       <ChallengeHeader
         shouldShowBack={!isBootstrap && !hasInitialAuthToken}
         title={title}
-        subtitle={subtitle}
       />
       <Stack
         direction="column"

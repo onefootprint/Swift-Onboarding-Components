@@ -512,13 +512,11 @@ describe('<Idv />', () => {
       withLoginChallenge(ChallengeKind.sms);
       withIdentifyVerify();
 
-      renderIdv({
-        authToken: 'token',
-      });
+      renderIdv({ authToken: 'token' });
 
       await waitFor(() => {
         expect(
-          screen.getByText('Validate your identity to continue.'),
+          screen.getByText(/Enter the 6-digit code sent to/i),
         ).toBeInTheDocument();
       });
     });

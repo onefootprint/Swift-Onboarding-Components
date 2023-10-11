@@ -70,8 +70,6 @@
       "label": "SMS",
       "title": "Verify your phone number",
       "welcome-back-title": "Welcome back! 🎉",
-      "bootstrap-subtitle": "We found a Footprint account with the information you provided to {{tenantName}}. Validate your identity to continue.",
-      "subtitle": "Validate your identity to continue.",
       "prompt-with-phone": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
       "prompt-without-phone": "Enter the 6-digit code sent to your phone."
     },
@@ -79,8 +77,6 @@
       "label": "Email",
       "title": "Verify your email",
       "welcome-back-title": "Welcome back! 🎉",
-      "bootstrap-subtitle": "We found a Footprint account with the information you provided to {{tenantName}}. Validate your identity to continue.",
-      "subtitle": "Validate your identity to continue.",
       "prompt": "Enter the 6-digit code sent to {{email}}."
     },
     "biometric-challenge": {
@@ -90,8 +86,6 @@
       "cta": "Launch passkey",
       "cta-retry": "Retry passkey",
       "title": "Welcome back! 🎉",
-      "subtitle": "Validate your identity to continue.",
-      "bootstrap-subtitle": "We found a Footprint account with the information you provided to {{tenantName}}. Validate your identity to continue.",
       "login-with-sms": "Login with SMS"
     }
   }
