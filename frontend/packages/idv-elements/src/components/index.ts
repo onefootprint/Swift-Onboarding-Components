@@ -14,10 +14,11 @@ export { default as InitShimmer } from './init-shimmer';
 export type {
   HeaderTitleProps,
   NavigationHeaderBackButtonProps,
-  NavigationHeaderButtonProps,
   NavigationHeaderCloseButtonProps,
   NavigationHeaderDynamicContent,
+  NavigationHeaderLeftButtonProps,
   NavigationHeaderProps,
+  NavigationHeaderRightButtonProps,
   NavigationHeaderStaticContent,
   SandboxBannerHandler,
 } from './layout';

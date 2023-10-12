@@ -187,7 +187,7 @@ const DeskTopProcessing = () => {
 
   return (
     <Container>
-      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+      <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <DesktopHeader type={type} country={country} imageType={currSide} />
       <FeedbackContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         <IdDocAnimation

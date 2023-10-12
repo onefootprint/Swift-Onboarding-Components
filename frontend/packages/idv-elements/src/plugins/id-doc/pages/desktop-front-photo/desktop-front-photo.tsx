@@ -23,7 +23,9 @@ const DesktopFrontPhoto = () => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
+      <NavigationHeader
+        leftButton={{ variant: 'back', onBack: handleClickBack }}
+      />
       <DesktopPhotoPrompt
         imageType={IdDocImageTypes.front}
         type={type}

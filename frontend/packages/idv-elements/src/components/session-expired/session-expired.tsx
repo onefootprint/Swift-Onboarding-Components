@@ -13,7 +13,7 @@ const SessionExpired = ({ onRestart }: SessionExpiredProps) => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+      <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <EmptyState
         description={t('description')}
         title={t('title')}

@@ -35,7 +35,10 @@ const IdDocPhotoRetryPrompt = ({
 
   return (
     <FadeInContainer>
-      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
+      <NavigationHeader
+        leftButton={{ variant: 'back', onBack: handleClickBack }}
+        position="floating"
+      />
       <PromptContainer
         direction="column"
         gap={7}

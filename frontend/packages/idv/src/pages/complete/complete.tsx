@@ -16,7 +16,7 @@ const Complete = () => {
 
   return (
     <Container>
-      <NavigationHeader button={{ variant: 'close' }} />
+      <NavigationHeader leftButton={{ variant: 'close' }} />
       {isLoading ? (
         <LoadingIndicator />
       ) : (

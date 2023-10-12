@@ -25,7 +25,9 @@ const ConfirmContinueOnDesktop = () => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'back', onBack: handleMobile }} />
+      <NavigationHeader
+        leftButton={{ variant: 'back', onBack: handleMobile }}
+      />
       <Container>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <InlineAlert variant="warning" sx={{ textAlign: 'left' }}>

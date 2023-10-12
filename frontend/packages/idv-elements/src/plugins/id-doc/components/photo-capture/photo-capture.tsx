@@ -125,13 +125,15 @@ const PhotoCapture = ({
     <>
       {deviceKind === 'desktop' && (
         <Box marginBottom={7}>
-          <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+          <NavigationHeader
+            leftButton={{ variant: 'close', confirmClose: true }}
+          />
           <HeaderTitle title={title.preview} />
         </Box>
       )}
       {deviceKind === 'mobile' && (
         <Box marginBottom={7}>
-          <NavigationHeader button={{ variant: 'back', onBack }} />
+          <NavigationHeader leftButton={{ variant: 'back', onBack }} />
           <HeaderTitle title={title.preview} subtitle={subtitle?.preview} />
         </Box>
       )}
@@ -148,13 +150,15 @@ const PhotoCapture = ({
     <>
       {deviceKind === 'desktop' && (
         <Box marginBottom={7}>
-          <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+          <NavigationHeader
+            leftButton={{ variant: 'close', confirmClose: true }}
+          />
           <HeaderTitle title={title.camera} subtitle={subtitle?.camera} />
         </Box>
       )}
       {deviceKind === 'mobile' && (
         <NavigationHeader
-          button={{ variant: 'back', onBack, color: 'quinary' }}
+          leftButton={{ variant: 'back', onBack, color: 'quinary' }}
           content={{
             kind: 'static',
             title: title.camera,

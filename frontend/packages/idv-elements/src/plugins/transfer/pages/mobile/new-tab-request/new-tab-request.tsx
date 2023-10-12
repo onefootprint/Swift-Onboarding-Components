@@ -53,7 +53,7 @@ const NewTabRequest = () => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+      <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <Container>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <Button

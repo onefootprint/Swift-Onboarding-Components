@@ -9,10 +9,11 @@ export {
 } from './components/layout-options-provider';
 export type {
   NavigationHeaderBackButtonProps,
-  NavigationHeaderButtonProps,
   NavigationHeaderCloseButtonProps,
   NavigationHeaderDynamicContent,
+  NavigationHeaderLeftButtonProps,
   NavigationHeaderProps,
+  NavigationHeaderRightButtonProps,
   NavigationHeaderStaticContent,
 } from './components/navigation-header';
 export {

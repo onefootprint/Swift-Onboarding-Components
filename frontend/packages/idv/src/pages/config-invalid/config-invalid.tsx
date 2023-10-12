@@ -7,7 +7,7 @@ const ConfigInvalid = () => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'close' }} />
+      <NavigationHeader leftButton={{ variant: 'close' }} />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
     </>
   );

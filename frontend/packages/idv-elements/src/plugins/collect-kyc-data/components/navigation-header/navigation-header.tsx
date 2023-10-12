@@ -20,7 +20,7 @@ const NavigationHeader = () => {
 
   return (
     <FootprintNavigationHeader
-      button={{
+      leftButton={{
         confirmClose: shouldShowCloseButton,
         onBack: shouldShowCloseButton ? undefined : handleBackButtonClick,
         variant: shouldShowCloseButton ? 'close' : 'back',

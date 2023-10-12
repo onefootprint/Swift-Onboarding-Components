@@ -11,6 +11,7 @@ import HeaderContent from './components/header-content';
 import NavigationBackButton from './components/navigation-back-button';
 import NavigationCloseButton from './components/navigation-close-button';
 import NavigationHeaderTitle from './components/navigation-header-title';
+import NavigationIconButton from './components/navigation-icon-button';
 import { NAVIGATION_HEADER_PORTAL_SELECTOR } from './constants';
 import useContainerHasScroll from './hooks/use-container-has-scroll';
 import type {
@@ -19,10 +20,11 @@ import type {
 } from './types';
 
 const NavigationHeader = ({
-  button,
+  leftButton,
   style,
   content,
   position,
+  rightButton,
 }: NavigationHeaderProps) => {
   const {
     onClose,
@@ -117,26 +119,47 @@ const NavigationHeader = ({
     intersectionObserver.observe(headerTitle);
   };
 
-  const shouldShowClose = button?.variant === 'close' && !!onClose;
-  const shouldShowBack = button?.variant === 'back' && !shouldShowClose;
+  const shouldShowClose = leftButton?.variant === 'close' && !!onClose;
+  const shouldShowBack = leftButton?.variant === 'back' && !shouldShowClose;
 
   if (!shouldShowBack && !shouldShowClose) return <Box paddingTop={7} />;
 
   return (
     <Portal selector={NAVIGATION_HEADER_PORTAL_SELECTOR}>
       <HeaderContent ref={isStatic ? null : measuredRef}>
-        <ButtonContainer position={position} data-scrolling={hasScroll}>
+        <ButtonContainer
+          headerPosition={position}
+          data-scrolling={hasScroll}
+          data-button-position="left"
+        >
           {shouldShowClose && (
             <NavigationCloseButton
-              confirmClose={button.confirmClose}
+              confirmClose={leftButton.confirmClose}
               onClose={onClose}
-              color={button.color}
+              color={leftButton.color}
             />
           )}
           {shouldShowBack && (
-            <NavigationBackButton onBack={button.onBack} color={button.color} />
+            <NavigationBackButton
+              onBack={leftButton.onBack}
+              color={leftButton.color}
+            />
           )}
         </ButtonContainer>
+        {rightButton && (
+          <ButtonContainer
+            headerPosition={position}
+            data-scrolling={hasScroll}
+            data-button-position="right"
+          >
+            <NavigationIconButton
+              icon={rightButton.icon}
+              onClick={rightButton.onClick}
+              color={rightButton.color}
+              label={rightButton.label}
+            />
+          </ButtonContainer>
+        )}
         <NavigationHeaderTitle
           title={isStatic ? staticTitle : dynamicTitle}
           fontVariant={titleFontVariant}
@@ -148,18 +171,22 @@ const NavigationHeader = ({
 };
 
 const ButtonContainer = styled.div<{
-  position?: NavigationHeaderPositionTypes;
+  headerPosition?: NavigationHeaderPositionTypes;
 }>`
-  ${({ theme }) => css`
-    position: absolute;
-    top: ${theme.spacing[5]};
-    left: 0;
-    isolation: isolate;
-    z-index: 1;
-  `}
+  position: absolute;
+  isolation: isolate;
+  z-index: 1;
 
-  ${({ position, theme }) =>
-    position === 'button-only' &&
+  &[data-button-position='left'] {
+    left: 0;
+  }
+
+  &[data-button-position='right'] {
+    right: 0;
+  }
+
+  ${({ headerPosition, theme }) =>
+    headerPosition === 'button-only' &&
     css`
       background-color: ${theme.backgroundColor.primary};
       border-radius: ${theme.borderRadius.full};

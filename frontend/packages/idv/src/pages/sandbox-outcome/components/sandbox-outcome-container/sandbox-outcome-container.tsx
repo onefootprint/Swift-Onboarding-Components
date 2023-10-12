@@ -41,7 +41,7 @@ export const SandboxOutcomeContainer = ({
 
   return (
     <Box>
-      <NavigationHeader button={{ variant: 'close' }} />
+      <NavigationHeader leftButton={{ variant: 'close' }} />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <FormProvider {...formMethods}>
         <Form onSubmit={handleSubmit(onSubmit)}>

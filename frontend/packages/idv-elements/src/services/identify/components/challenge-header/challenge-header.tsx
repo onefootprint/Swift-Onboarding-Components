@@ -27,7 +27,7 @@ const ChallengeHeader = ({ title, shouldShowBack }: ChallengeHeaderProps) => {
   return (
     <>
       <NavigationHeader
-        button={
+        leftButton={
           shouldShowBack
             ? { variant: 'back', onBack: handleBack }
             : { variant: 'close' }

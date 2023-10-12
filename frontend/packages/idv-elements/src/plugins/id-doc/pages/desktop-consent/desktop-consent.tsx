@@ -102,7 +102,9 @@ const DesktopConsent = () => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
+      <NavigationHeader
+        leftButton={{ variant: 'back', onBack: handleClickBack }}
+      />
       <ConsentBody aria-label="consent-body">
         <ImageConsent ref={consentRef} />
       </ConsentBody>

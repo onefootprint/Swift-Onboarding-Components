@@ -36,7 +36,7 @@ const DesktopSelfieRetry = () => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+      <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <Container>
         <DesktopHeader
           type={type}

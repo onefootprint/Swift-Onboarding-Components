@@ -14,7 +14,7 @@ const Error = ({ resetErrorBoundary }: ErrorProps) => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+      <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <EmptyState
         description={t('description')}
         iconComponent={IcoForbid40}

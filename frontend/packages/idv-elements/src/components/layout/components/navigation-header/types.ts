@@ -1,4 +1,5 @@
 import type { Color, FontVariant } from '@onefootprint/design-tokens';
+import type { Icon } from '@onefootprint/icons';
 
 export type NavigationHeaderBGVariant =
   | 'primary'
@@ -18,7 +19,7 @@ export type NavigationHeaderStaticContent = {
   title?: string; // Renders the title text directly in the nav header
 };
 
-export type NavigationHeaderButtonProps =
+export type NavigationHeaderLeftButtonProps =
   | NavigationHeaderBackButtonProps
   | NavigationHeaderCloseButtonProps;
 
@@ -32,6 +33,13 @@ export type NavigationHeaderCloseButtonProps = {
   variant: 'close';
   confirmClose?: boolean;
   color?: Color;
+};
+
+export type NavigationHeaderRightButtonProps = {
+  icon: Icon;
+  onClick?: () => void;
+  color?: Color;
+  label?: string;
 };
 
 // We will keep adding new props here as the design demands
@@ -48,7 +56,8 @@ export type NavigationHeaderPositionTypes =
   | 'button-only';
 
 export type NavigationHeaderProps = {
-  button?: NavigationHeaderButtonProps; // defaults to no button. TODO: keeping for backward compatibility, remove once all the components have been replaced we the new props (corresponding new prop is leftButton)
+  leftButton?: NavigationHeaderLeftButtonProps; // defaults to no button.
+  rightButton?: NavigationHeaderRightButtonProps; // defaults to no button.
   content?: NavigationHeaderDynamicContent | NavigationHeaderStaticContent; // Defaults to dynamic
   position?: NavigationHeaderPositionTypes;
   style?: Style;

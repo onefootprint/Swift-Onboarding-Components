@@ -4,10 +4,11 @@ export type {
   HeaderTitleProps,
   InfoBoxProps,
   NavigationHeaderBackButtonProps,
-  NavigationHeaderButtonProps,
   NavigationHeaderCloseButtonProps,
   NavigationHeaderDynamicContent,
+  NavigationHeaderLeftButtonProps,
   NavigationHeaderProps,
+  NavigationHeaderRightButtonProps,
   NavigationHeaderStaticContent,
   SandboxBannerHandler,
 } from './components';

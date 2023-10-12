@@ -157,7 +157,7 @@ const IdDocCountryAndTypeContainer = ({
   return (
     <Container>
       <NavigationHeader
-        button={
+        leftButton={
           device.type !== 'mobile'
             ? { variant: 'close', confirmClose: true }
             : undefined

@@ -26,7 +26,9 @@ const IdDocFrontPhoto = () => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'back', onBack: handleClickBack }} />
+      <NavigationHeader
+        leftButton={{ variant: 'back', onBack: handleClickBack }}
+      />
       <IdDocPhotoPrompt
         showGuidelines
         imageType={IdDocImageTypes.front}

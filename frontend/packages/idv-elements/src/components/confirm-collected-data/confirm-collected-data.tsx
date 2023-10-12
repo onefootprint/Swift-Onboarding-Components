@@ -28,7 +28,7 @@ const ConfirmCollectedData = ({
 }: ConfirmCollectedDataProps) => (
   <>
     <NavigationHeader
-      button={{ variant: headerVariant, onBack: onClickPrev }}
+      leftButton={{ variant: headerVariant, onBack: onClickPrev }}
     />
     <Stack gap={7} direction="column">
       <HeaderTitle title={title} subtitle={subtitle} />

@@ -139,7 +139,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     <Error />
   ) : (
     <Container>
-      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+      <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <HeaderTitle
         title={t('title')}
         subtitle={t('subtitle', { tenantName })}

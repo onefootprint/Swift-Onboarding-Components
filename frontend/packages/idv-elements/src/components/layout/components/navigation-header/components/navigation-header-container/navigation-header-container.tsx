@@ -139,9 +139,10 @@ const Header = styled.header<{
       width: ${buttonOnly ? 0 : `${width}px`};
     `}
 
-  ${({ theme, hasScroll, buttonOnly }) =>
+  ${({ theme, hasScroll, buttonOnly, position }) =>
     hasScroll &&
     !buttonOnly &&
+    position !== 'relative' &&
     css`
       border-bottom: 1px solid ${theme.borderColor.tertiary};
 

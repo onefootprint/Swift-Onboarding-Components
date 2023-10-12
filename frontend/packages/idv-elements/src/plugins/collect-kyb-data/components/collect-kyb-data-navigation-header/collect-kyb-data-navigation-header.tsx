@@ -13,7 +13,7 @@ const CollectKybDataNavigationHeader = () => {
 
   return (
     <NavigationHeader
-      button={{
+      leftButton={{
         confirmClose: shouldShowCloseButton,
         onBack: shouldShowCloseButton ? undefined : handleBackButtonClick,
         variant: shouldShowCloseButton ? 'close' : 'back',

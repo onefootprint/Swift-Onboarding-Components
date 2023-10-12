@@ -17,7 +17,7 @@ const EditDataContainerDesktop = ({
 }: EditDataContainerDesktopProps) => (
   <>
     <NavigationHeader
-      button={{ variant: 'back', onBack: onClickPrev }}
+      leftButton={{ variant: 'back', onBack: onClickPrev }}
       content={{ kind: 'static', title }}
     />
     <StyledDivider />

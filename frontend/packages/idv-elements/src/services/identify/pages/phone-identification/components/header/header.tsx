@@ -24,7 +24,7 @@ const Header = ({ showLogo, orgName, logoUrl }: HeaderProps) => {
   return (
     <>
       <NavigationHeader
-        button={{
+        leftButton={{
           variant: 'back',
           onBack: handleNavToPrevPage,
         }}

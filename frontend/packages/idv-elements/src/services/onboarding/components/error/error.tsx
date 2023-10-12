@@ -11,7 +11,7 @@ const Error = () => {
 
   return (
     <Container>
-      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
+      <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <TitleContainer>
         <IcoForbid40 color="error" />
         <Typography variant="heading-3">{t('title')}</Typography>

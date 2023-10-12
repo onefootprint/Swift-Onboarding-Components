@@ -16,7 +16,7 @@ const Header = ({ showLogo, orgName, logoUrl }: HeaderProps) => {
   const { t } = useTranslation('pages.email-identification.header');
   return (
     <>
-      <NavigationHeader button={{ variant: 'close' }} />
+      <NavigationHeader leftButton={{ variant: 'close' }} />
       <ContentHeader>
         {showLogo && orgName && <Logo orgName={orgName} logoUrl={logoUrl} />}
         <HeaderTitle

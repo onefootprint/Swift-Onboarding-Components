@@ -5,9 +5,10 @@ export {
 export { default } from './navigation-header';
 export type {
   NavigationHeaderBackButtonProps,
-  NavigationHeaderButtonProps,
   NavigationHeaderCloseButtonProps,
   NavigationHeaderDynamicContent,
+  NavigationHeaderLeftButtonProps,
   NavigationHeaderProps,
+  NavigationHeaderRightButtonProps,
   NavigationHeaderStaticContent,
 } from './types';
