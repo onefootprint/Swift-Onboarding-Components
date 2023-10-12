@@ -21,7 +21,11 @@ export type MachineContext = {
   authToken: string;
   device: DeviceInfo;
   requirement: IdDocRequirement;
-  image?: { imageFile: File; captureKind?: CaptureKind };
+  image?: {
+    imageFile: File;
+    captureKind?: CaptureKind;
+    extraCompressed?: boolean;
+  };
   currSide?: IdDocImageTypes;
   idDoc: {
     type?: SupportedIdDocTypes;
@@ -57,6 +61,7 @@ export type MachineEvents =
       payload: {
         imageFile: File;
         captureKind?: CaptureKind;
+        extraCompressed?: boolean;
       };
     }
   | {

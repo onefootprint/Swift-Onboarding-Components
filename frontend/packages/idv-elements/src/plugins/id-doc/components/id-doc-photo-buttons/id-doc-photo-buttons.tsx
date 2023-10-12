@@ -8,7 +8,7 @@ import useProcessImage from '../../hooks/use-process-image';
 import { useIdDocMachine } from '../machine-provider';
 
 type IdDocPhotoButtonsProp = {
-  onComplete: (imageFile: File) => void;
+  onComplete: (imageFile: File, extraCompressed: boolean) => void;
 };
 
 const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
@@ -41,11 +41,8 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
       return;
     }
 
-    const processedImageFile = await processImageFile(
-      files[0],
-      hasBadConnectivity,
-    );
-    if (!processedImageFile) {
+    const processResult = await processImageFile(files[0], hasBadConnectivity);
+    if (!processResult) {
       console.error(
         'Image upload failed. Uploaded image could not be processed',
       );
@@ -56,8 +53,9 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
       onProcessingDone();
       return;
     }
+    const { file, extraCompressed } = processResult;
 
-    onComplete(processedImageFile);
+    onComplete(file, extraCompressed);
     onProcessingDone();
   };
 

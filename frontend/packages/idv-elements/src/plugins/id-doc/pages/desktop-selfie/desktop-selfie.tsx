@@ -14,11 +14,16 @@ const DesktopSelfie = () => {
   const [, send] = useIdDocMachine();
   const permissionState = useCameraPermission();
 
-  const onComplete = (imageFile: File, captureKind?: CaptureKind) =>
+  const onComplete = (
+    imageFile: File,
+    extraCompressed: boolean,
+    captureKind?: CaptureKind,
+  ) =>
     send({
       type: 'receivedImage',
       payload: {
         imageFile,
+        extraCompressed,
         captureKind,
       },
     });

@@ -18,11 +18,12 @@ const IdDocFrontPhotoRetry = () => {
 
   const countryName = getCountryFromCode(country)?.label;
 
-  const handleComplete = (imageFile: File) => {
+  const handleComplete = (imageFile: File, extraCompressed: boolean) => {
     send({
       type: 'receivedImage',
       payload: {
         imageFile,
+        extraCompressed,
       },
     });
   };

@@ -41,7 +41,6 @@ const DeskTopProcessing = () => {
     authToken,
     currSide,
     id,
-    hasBadConnectivity,
   } = state.context;
 
   const handleProcessDocSuccess = (data: ProcessDocResponse) => {
@@ -137,12 +136,12 @@ const DeskTopProcessing = () => {
       return;
     }
 
-    const { imageFile, captureKind } = image;
+    const { imageFile, extraCompressed, captureKind } = image;
     submitDocMutation.mutate(
       {
         authToken,
         image: imageFile,
-        extraCompress: hasBadConnectivity,
+        extraCompress: extraCompressed,
         side: currSide,
         id,
         meta: {

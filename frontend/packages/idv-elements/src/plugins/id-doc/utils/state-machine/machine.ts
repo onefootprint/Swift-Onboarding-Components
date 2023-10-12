@@ -320,6 +320,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           context.image = {
             imageFile: event.payload.imageFile,
             captureKind: event.payload.captureKind,
+            extraCompressed: event.payload.extraCompressed,
           };
           return context;
         }),

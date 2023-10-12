@@ -34,11 +34,8 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
       return;
     }
 
-    const processedImageFile = await processImageFile(
-      files[0],
-      hasBadConnectivity,
-    );
-    if (!processedImageFile) {
+    const processResult = await processImageFile(files[0], hasBadConnectivity);
+    if (!processResult) {
       onProcessingDone();
       return;
     }
@@ -46,7 +43,8 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
     send({
       type: 'receivedImage',
       payload: {
-        imageFile: processedImageFile,
+        imageFile: processResult.file,
+        extraCompressed: processResult.extraCompressed,
       },
     });
     onProcessingDone();

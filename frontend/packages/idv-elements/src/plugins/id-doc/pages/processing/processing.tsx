@@ -37,7 +37,6 @@ const Processing = () => {
     authToken,
     currSide,
     id,
-    hasBadConnectivity,
   } = state.context;
 
   const handleProcessDocSuccess = (data: ProcessDocResponse) => {
@@ -133,12 +132,12 @@ const Processing = () => {
       return;
     }
 
-    const { imageFile, captureKind } = image;
+    const { imageFile, extraCompressed, captureKind } = image;
     submitDocMutation.mutate(
       {
         authToken,
         image: imageFile,
-        extraCompress: hasBadConnectivity,
+        extraCompress: extraCompressed,
         side: currSide,
         id,
         meta: {

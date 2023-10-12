@@ -2,7 +2,9 @@ import { Logger } from '@onefootprint/dev-tools';
 import { useToast } from '@onefootprint/ui';
 import imageCompression from 'browser-image-compression';
 
-import compressImage from './utils/compress-image';
+import compressImage, {
+  COMPRESS_EXTRA_MAX_SIZE_MB,
+} from './utils/compress-image';
 import convertHEICImage from './utils/convert-heic-image';
 import imageFileToStrippedBase64 from './utils/image-file-to-stripped-base64';
 import resizeImage from './utils/resize-image';
@@ -13,6 +15,8 @@ enum ImageProcessingStepError {
   compress = 'Error while compressing image',
   other = 'Unknown Error',
 }
+
+type ProcessedImageFile = { file: File; extraCompressed: boolean };
 
 const useProcessImage = () => {
   const toast = useToast();
@@ -31,16 +35,16 @@ const useProcessImage = () => {
     });
   };
 
-  const processImageFile = async (file: File, compressExtra?: boolean) => {
-    const output = await runProcessFileScript(file, compressExtra);
+  const processImageFile = async (file: File, extraCompress?: boolean) => {
+    const output = await runProcessFileScript(file, extraCompress);
 
     return output;
   };
 
   const processImageUrl = async (
     url: string,
-    compressExtra?: boolean,
-  ): Promise<File | undefined> => {
+    extraCompress?: boolean,
+  ): Promise<ProcessedImageFile | undefined> => {
     let file;
     try {
       file = await imageCompression.getFilefromDataUrl(url, 'imageFileName');
@@ -56,15 +60,15 @@ const useProcessImage = () => {
       return undefined;
     }
 
-    const output = await runProcessFileScript(file, compressExtra);
+    const output = await runProcessFileScript(file, extraCompress);
 
     return output;
   };
 
   const runProcessFileScript = async (
     file: File,
-    compressExtra?: boolean,
-  ): Promise<File | undefined> => {
+    extraCompress?: boolean,
+  ): Promise<ProcessedImageFile | undefined> => {
     let converted;
     try {
       converted = await convertHEICImage(file);
@@ -91,7 +95,7 @@ const useProcessImage = () => {
 
     let compressed;
     try {
-      compressed = await compressImage(resized, compressExtra);
+      compressed = await compressImage(resized, extraCompress);
     } catch (e) {
       handleError(ImageProcessingStepError.compress, e);
       return undefined;
@@ -101,7 +105,13 @@ const useProcessImage = () => {
       return undefined;
     }
 
-    return compressed;
+    return {
+      file: compressed,
+      extraCompressed:
+        resized.size > compressed.size &&
+        !!extraCompress &&
+        compressed.size <= COMPRESS_EXTRA_MAX_SIZE_MB,
+    };
   };
 
   const convertImageFileToStrippedBase64 = async (

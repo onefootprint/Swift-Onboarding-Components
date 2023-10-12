@@ -57,8 +57,8 @@ const DesktopPhotoPrompt = ({
   const handleImage = async (file: File) => {
     setIsLoading(true);
     setHasError(false);
-    const processedImageFile = await processImageFile(file, hasBadConnectivity);
-    if (!processedImageFile) {
+    const processResult = await processImageFile(file, hasBadConnectivity);
+    if (!processResult) {
       onProcessingDone();
       handleUploadError([IdDocImageUploadError.unknownUploadError]);
       console.error(
@@ -74,7 +74,8 @@ const DesktopPhotoPrompt = ({
     send({
       type: 'receivedImage',
       payload: {
-        imageFile: processedImageFile,
+        imageFile: processResult.file,
+        extraCompressed: processResult.extraCompressed,
       },
     });
     onProcessingDone();

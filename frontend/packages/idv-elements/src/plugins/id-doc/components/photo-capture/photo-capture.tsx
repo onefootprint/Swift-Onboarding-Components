@@ -27,7 +27,11 @@ type PhotoCaptureProps = {
   outlineHeightRatio: number; // with respect to the video width (not height)
   cameraKind: CameraKind;
   outlineKind: OutlineKind;
-  onComplete: (imageFile: File, captureKind?: CaptureKind) => void;
+  onComplete: (
+    imageFile: File,
+    extraCompressed: boolean,
+    captureKind?: CaptureKind,
+  ) => void;
   autocaptureKind: AutocaptureKind;
   deviceKind: DeviceKind;
   onBack?: () => void;
@@ -91,8 +95,8 @@ const PhotoCapture = ({
     }
 
     setIsLoading(true);
-    const processedImageFile = await processImageUrl(image, hasBadConnectivity);
-    if (!processedImageFile) {
+    const processResult = await processImageUrl(image, hasBadConnectivity);
+    if (!processResult) {
       // An error occurred, directly prompt user to re-take the image
       setIsLoading(false);
       handleRetake();
@@ -107,7 +111,8 @@ const PhotoCapture = ({
     }
 
     setIsLoading(false);
-    onComplete(processedImageFile, captureKind);
+    const { file, extraCompressed } = processResult;
+    onComplete(file, extraCompressed, captureKind);
   };
 
   const handleError = () => {
