@@ -1,18 +1,23 @@
+export const getId = (method: string, path: string) => {
+  const elements = path.split('/').map(element => element.replace(/_/g, '-'));
+  const filteredElements = elements
+    .filter(
+      element =>
+        element !== '' && !element.startsWith('{') && !element.endsWith('}'),
+    )
+    .map(e => e.replace('_', '-'));
+  const joinedElements = filteredElements.join('-');
+  const client = path.startsWith('/users/vault') ? '-client' : '';
+  return `${method}-${joinedElements}${client}`;
+};
+
 const getArticles = (data: any) => {
   const paths = Object.keys(data.paths);
   const articles = paths.map(path => {
-    const elements = path.split('/').map(element => element.replace(/_/g, ' '));
-    const filteredElements = elements.filter(
-      element =>
-        element !== '' && !element.startsWith('{') && !element.endsWith('}'),
-    );
-    const joinedEntities = filteredElements.join('-');
-    const client = path.startsWith('/users/{fp_id}/vault') ? '-client' : '';
     const articlesInPath = Object.keys(data.paths[path]).map(methodEntry => {
       const method = methodEntry;
-      const id = `${joinedEntities}-${method}${client}`;
       const content = { ...data.paths[path][methodEntry] };
-
+      const id = getId(method, path);
       return { path, method, id, content };
     });
     return articlesInPath;

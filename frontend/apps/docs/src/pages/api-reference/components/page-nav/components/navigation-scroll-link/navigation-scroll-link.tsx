@@ -13,6 +13,7 @@ const NavigationScrollLink = ({ id, children }: NavigationScrollLinkProps) => (
     containerId="articles-container"
     hashSpy
     spy
+    data-id={id}
     to={encodeURIComponent(id)}
   >
     {children}
