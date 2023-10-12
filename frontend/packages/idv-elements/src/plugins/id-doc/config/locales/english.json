@@ -203,32 +203,25 @@
         },
         "type": {
           "passport": {
-            "title": "Passport",
-            "description": "Photo page"
+            "title": "Passport"
           },
           "idCard": {
-            "title": "Identity card",
-            "description": "Front & back"
+            "title": "Identity card"
           },
           "driversLicense": {
-            "title": "Driver's license",
-            "description": "Front & back"
+            "title": "Driver's license"
           },
           "visa": {
-            "title": "Government-issued visa",
-            "description": "Photo page"
+            "title": "Government-issued visa"
           },
           "workPermit": {
-            "title": "Work permit / EAD card",
-            "description": "Front & back"
+            "title": "Work permit / EAD card"
           },
           "residenceDocument": {
-            "title": "Residence card / Green card",
-            "description": "Front & back"
+            "title": "Residence card / Green card"
           },
           "voterIdentification": {
-            "title": "Voter identification",
-            "description": "Front"
+            "title": "Voter identification"
           }
         },
         "not-supported": "Sorry, we don't support IDs for your country yet.",

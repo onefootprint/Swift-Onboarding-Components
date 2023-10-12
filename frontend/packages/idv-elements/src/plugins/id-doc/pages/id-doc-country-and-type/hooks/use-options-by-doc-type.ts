@@ -20,7 +20,6 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
   if (supportedDocumentTypes?.includes(SupportedIdDocTypes.passport)) {
     optionsByDocType[SupportedIdDocTypes.passport] = {
       title: t('form.type.passport.title'),
-      description: t('form.type.passport.description'),
       IconComponent: IcoPassport24,
       value: SupportedIdDocTypes.passport,
     };
@@ -28,7 +27,6 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
   if (supportedDocumentTypes?.includes(SupportedIdDocTypes.driversLicense)) {
     optionsByDocType[SupportedIdDocTypes.driversLicense] = {
       title: t('form.type.driversLicense.title'),
-      description: t('form.type.driversLicense.description'),
       IconComponent: IcoCar24,
       value: SupportedIdDocTypes.driversLicense,
     };
@@ -36,7 +34,6 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
   if (supportedDocumentTypes?.includes(SupportedIdDocTypes.idCard)) {
     optionsByDocType[SupportedIdDocTypes.idCard] = {
       title: t('form.type.idCard.title'),
-      description: t('form.type.idCard.description'),
       IconComponent: IcoIdCard24,
       value: SupportedIdDocTypes.idCard,
     };
@@ -44,7 +41,6 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
   if (supportedDocumentTypes?.includes(SupportedIdDocTypes.visa)) {
     optionsByDocType[SupportedIdDocTypes.visa] = {
       title: t('form.type.visa.title'),
-      description: t('form.type.visa.description'),
       IconComponent: IcoVisaPassport24,
       value: SupportedIdDocTypes.visa,
     };
@@ -52,7 +48,6 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
   if (supportedDocumentTypes?.includes(SupportedIdDocTypes.workPermit)) {
     optionsByDocType[SupportedIdDocTypes.workPermit] = {
       title: t('form.type.workPermit.title'),
-      description: t('form.type.workPermit.description'),
       IconComponent: IcoWork24,
       value: SupportedIdDocTypes.workPermit,
     };
@@ -60,7 +55,6 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
   if (supportedDocumentTypes?.includes(SupportedIdDocTypes.residenceDocument)) {
     optionsByDocType[SupportedIdDocTypes.residenceDocument] = {
       title: t('form.type.residenceDocument.title'),
-      description: t('form.type.residenceDocument.description'),
       IconComponent: IcoGreenCard24,
       value: SupportedIdDocTypes.residenceDocument,
     };
@@ -70,7 +64,6 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
   ) {
     optionsByDocType[SupportedIdDocTypes.voterIdentification] = {
       title: t('form.type.voterIdentification.title'),
-      description: t('form.type.voterIdentification.description'),
       IconComponent: IcoVoter24,
       value: SupportedIdDocTypes.voterIdentification,
     };

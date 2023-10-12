@@ -188,6 +188,7 @@ const IdDocCountryAndTypeContainer = ({
             options={options}
             onChange={handleDocTypeChange}
             testID="doc-selector"
+            size="compact"
           />
         ) : (
           <Typography
