@@ -8,6 +8,7 @@ import { Divider, Toggle, Tooltip, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import PermissionGate from 'src/components/permission-gate';
 import useUpdateOrg from 'src/hooks/use-update-org';
+import createStringList from 'src/utils/create-string-list';
 
 export type DomainAccessProps = {
   org: Organization;
@@ -75,13 +76,13 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
           </Typography>
           &nbsp;
           <Typography color="secondary" variant="label-3">
-            {org.domains.join(', ')}
+            {createStringList(org.domains)}
           </Typography>
         </EnableSubContainer>
         {disableTogle ? (
           <Tooltip
             text={t('toggle.domain-already-claimed', {
-              domain: org.domains.join(', '),
+              domain: createStringList(org.domains),
             })}
           >
             {toggle}

@@ -6,6 +6,7 @@ const createStringList = (
   finalConnector?: string,
 ) => {
   const conn = connector ?? ', ';
+  // TODO oxford comma!
   const finalConn = finalConnector ?? ' and ';
 
   const list: string[] = [];
