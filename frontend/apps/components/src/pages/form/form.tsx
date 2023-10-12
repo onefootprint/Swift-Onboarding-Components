@@ -47,7 +47,7 @@ const Form = () => {
     subscribeSave();
   });
 
-  if (!props) {
+  if (!props || !clientTokenFields.data) {
     return <Loading />;
   }
 
@@ -55,21 +55,14 @@ const Form = () => {
     footprintProvider.send(FootprintPublicEvent.canceled);
   };
 
-  const handleClose =
-    variant === 'inline'
-      ? undefined
-      : () => {
-          footprintProvider.send(FootprintPublicEvent.closed);
-        };
+  const handleClose = () => {
+    footprintProvider.send(FootprintPublicEvent.closed);
+  };
 
   const isValid = arePropsValid(props);
-  const { vaultFields, expiresAt } = clientTokenFields.data || {};
-  const hasPermissions = vaultFields
-    ? validateClientTokenFields(type, vaultFields)
-    : true;
-  const isExpired = clientTokenFields.isLoading
-    ? false
-    : checkIsExpired(expiresAt);
+  const { vaultFields, expiresAt } = clientTokenFields.data;
+  const hasPermissions = validateClientTokenFields(type, vaultFields);
+  const isExpired = checkIsExpired(expiresAt);
   if (!isValid || !hasPermissions || isExpired) {
     if (!hasPermissions) {
       console.error('Auth token is missing permissions to store to vault');
@@ -82,10 +75,6 @@ const Form = () => {
 
   const handleSave = async (formData: FormData) => {
     const cardAlias = getCardAlias(vaultFields);
-    if (isExpired) {
-      console.error('Client auth token is expired, cannot save to vault');
-      return;
-    }
     if (!cardAlias) {
       console.error(
         'Cannot extract cardAlias from auth token. Please verify auth token has correct fields set on it.',
@@ -140,7 +129,7 @@ const Form = () => {
       title={title}
       type={type}
       variant={variant}
-      isLoading={clientTokenFields.isLoading || usersVaultMutation.isLoading}
+      isLoading={usersVaultMutation.isLoading}
       hideFootprintLogo={options?.hideFootprintLogo}
       hideButtons={options?.hideButtons}
       onSave={handleSave}
