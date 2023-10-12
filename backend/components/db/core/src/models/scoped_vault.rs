@@ -18,8 +18,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus, ScopedVaultId, SessionId,
-    TenantId, VaultCreatedInfo, VaultId, WorkflowId,
+    DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus, ScopedVaultId, TenantId,
+    VaultCreatedInfo, VaultId, WorkflowId,
 };
 
 /// Creates a unique identifier specific to each onboarding configuration.
@@ -39,10 +39,6 @@ pub struct ScopedVault {
     /// Denormalized from the user vault just to make querying easier
     pub is_live: bool,
     pub status: Option<OnboardingStatus>,
-    /// Client-provided identifier during the request that created this ScopedVault. Other HTTP
-    /// requests in the same session have the same ID. This is useful to search logs for this
-    /// scoped vault
-    pub session_id: Option<SessionId>,
     /// Denormalized column to track which vaults are billable for PII storage. True when
     ///   (1) the ScopedVault was created via API as a non-portable user OR
     ///   (2) the ScopedVault has an authorized onboarding
@@ -58,7 +54,6 @@ struct NewScopedVault {
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
     is_live: bool,
-    session_id: Option<SessionId>,
     is_billable: bool,
 }
 
@@ -135,8 +130,6 @@ impl ScopedVault {
         conn: &mut TxnPgConn,
         uv: &Locked<Vault>,
         ob_configuration_id: ObConfigurationId,
-        // TODO rm
-        session_id: Option<SessionId>,
     ) -> DbResult<Self> {
         // Get the ob config to do some validation before we make the SV
         let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
@@ -165,7 +158,6 @@ impl ScopedVault {
             start_timestamp: Utc::now(),
             tenant_id: ob_config.tenant_id,
             is_live: ob_config.is_live,
-            session_id,
             // All vaults created via bifrost start as non-billable. They are marked billable as
             // soon as they have an authorized workflow
             is_billable: false,
@@ -200,7 +192,6 @@ impl ScopedVault {
                 tenant_id,
                 is_live: uv.is_live,
                 vault_id: uv.id.clone(),
-                session_id: None,
                 // All vaults created via API are billable
                 is_billable: true,
             };

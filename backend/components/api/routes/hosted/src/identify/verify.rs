@@ -219,7 +219,7 @@ fn onboarding_identifiers(
     // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
     // created with an ob config
     let uv = Vault::lock(conn, uv_id)?;
-    let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone(), None)?;
+    let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone())?;
 
     // If we verified with a BoSessionAuth, update the corresponding BO
     let sb_id = if let Some(bo) = ob_pk_auth.business_owner() {

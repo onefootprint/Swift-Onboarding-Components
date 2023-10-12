@@ -92,7 +92,7 @@ impl VaultWrapper<Person> {
             sandbox_id,
         };
         let uv = Vault::create(conn, new_user_vault)?;
-        let su = ScopedVault::get_or_create(conn, &uv, ob_config.id, None)?;
+        let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
 
         // This performs some superfluous DB queries to rebuild the UVW, but allows us to share code
         // to add data to the vault
