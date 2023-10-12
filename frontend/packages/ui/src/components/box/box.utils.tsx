@@ -21,7 +21,7 @@ export const getPadding = (props: BoxProps, theme: Theme) => {
     `;
   }
   if (props.padding) {
-    return `${props.padding}`;
+    return `${theme.spacing[props.padding]}`;
   }
   return '0';
 };
@@ -54,12 +54,12 @@ export const getBorders = (props: BoxProps, theme: Theme) => {
     props.borderWidth &&
     props.borderColor
   ) {
-    return `border-${props.borderPosition}: ${props.borderWidth} solid ${
-      props.borderColor && theme.borderColor[props.borderColor]
-    };`;
+    return `border-${props.borderPosition}:  ${
+      theme.borderWidth[props.borderWidth]
+    } solid ${props.borderColor && theme.borderColor[props.borderColor]};`;
   }
   if (props.borderWidth && props.borderColor) {
-    return `border: ${props.borderWidth} solid ${
+    return `border: ${theme.borderWidth[props.borderWidth]} solid ${
       props.borderColor && theme.borderColor[props.borderColor]
     };`;
   }
