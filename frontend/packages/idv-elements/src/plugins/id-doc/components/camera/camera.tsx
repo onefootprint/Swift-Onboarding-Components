@@ -220,12 +220,9 @@ const Camera = ({
     setShouldDetect(false);
   };
 
-  const onUploadComplete = (imageString?: string, mimeType?: string) => {
+  const onUploadComplete = () => {
     setIsImageProcessing(false);
     setShouldDetect(true);
-    if (!imageString || !mimeType) {
-      console.error('Image upload failed. No image or mimetype detected');
-    }
   };
 
   return (

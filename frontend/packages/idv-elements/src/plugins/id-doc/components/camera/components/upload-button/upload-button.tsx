@@ -9,7 +9,7 @@ const BUTTON_RADIUS = 56;
 
 type UploadButtonProps = {
   onUpload: () => void;
-  onComplete: (imageString?: string, mimeType?: string) => void;
+  onComplete: () => void;
 };
 
 const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
@@ -20,9 +20,9 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const onProcessingDone = (imageString?: string, mimeType?: string) => {
+  const onProcessingDone = () => {
     setIsLoading(false);
-    onComplete(imageString, mimeType);
+    onComplete();
   };
 
   const handleImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
