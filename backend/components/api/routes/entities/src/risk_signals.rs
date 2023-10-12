@@ -16,6 +16,7 @@ use api_core::decision;
 use api_core::decision::vendor::vendor_result::VendorResult;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
+use api_core::telemetry::RootSpan;
 use api_wire_types::AmlHit;
 use api_wire_types::AmlHitMedia;
 use api_wire_types::RiskSignalFilters;
@@ -45,15 +46,23 @@ type RiskSignalsListResponse = Vec<api_wire_types::RiskSignal>;
 
 #[api_v2_operation(
     description = "Lists the risk signals for a footprint user.",
-    tags(Entities, Preview)
+    tags(Entities, Private)
 )]
 #[get("/entities/{fp_id}/risk_signals")]
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FpId>,
     filters: web::Query<RiskSignalFilters>,
+    // TODO remove SecretTenantAuthContext here when everyone has migrated to the new GET /users/<>/risk_signals API
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    root_span: RootSpan,
 ) -> JsonApiResponse<RiskSignalsListResponse> {
+    // Some tracing to track when tenants have stopped using this API
+    if let Either::Right(_) = &auth {
+        root_span.record("meta", "tenant_api_key_auth");
+    } else {
+        root_span.record("meta", "dashboard_auth");
+    }
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "abc816c87f91d02bdf84b28e405dcaa5e67c33e3"
+        "version": "9a97a6b83e93dc4ecdba41370bbe3bf3eab02a22"
     },
     "servers": [
         {
@@ -82,112 +82,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/GetFieldValidationResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    },
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
-        "/entities/{fp_id}/risk_signals": {
-            "get": {
-                "tags": [
-                    "Entities",
-                    "Preview"
-                ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nLists the risk signals for a footprint user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    },
-                    {
-                        "in": "query",
-                        "name": "description",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "scope",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "name",
-                                    "dob",
-                                    "ssn",
-                                    "address",
-                                    "street_address",
-                                    "city",
-                                    "state",
-                                    "zip",
-                                    "country",
-                                    "email",
-                                    "phone_number",
-                                    "ip_address",
-                                    "device",
-                                    "native_device",
-                                    "document",
-                                    "selfie",
-                                    "business_address",
-                                    "business_name",
-                                    "business_phone_number",
-                                    "business_website",
-                                    "business_tin",
-                                    "beneficial_owners",
-                                    "business_dba"
-                                ]
-                            }
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "severity",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "info",
-                                    "low",
-                                    "medium",
-                                    "high"
-                                ]
-                            }
-                        },
-                        "style": "form"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/RiskSignal"
-                                    }
                                 }
                             }
                         }
@@ -462,6 +356,109 @@
                     {
                         "Dashboard Token": []
                     },
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/risk_signals": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nLists the risk signals for a Footprint user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "description",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "scope",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "name",
+                                    "dob",
+                                    "ssn",
+                                    "address",
+                                    "street_address",
+                                    "city",
+                                    "state",
+                                    "zip",
+                                    "country",
+                                    "email",
+                                    "phone_number",
+                                    "ip_address",
+                                    "device",
+                                    "native_device",
+                                    "document",
+                                    "selfie",
+                                    "business_address",
+                                    "business_name",
+                                    "business_phone_number",
+                                    "business_website",
+                                    "business_tin",
+                                    "beneficial_owners",
+                                    "business_dba"
+                                ]
+                            }
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "severity",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "info",
+                                    "low",
+                                    "medium",
+                                    "high"
+                                ]
+                            }
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RiskSignal"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
                     {
                         "Secret API Key": []
                     }
