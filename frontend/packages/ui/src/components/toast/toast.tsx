@@ -2,7 +2,6 @@ import { IcoCloseSmall16, IcoInfo16 } from '@onefootprint/icons';
 import styled, { css, keyframes } from '@onefootprint/styled';
 import React from 'react';
 
-import Box from '../box';
 import LinkButton from '../link-button';
 import Stack from '../stack';
 import Typography from '../typography';
@@ -18,33 +17,46 @@ const Toast = ({
   title,
   variant = 'default',
 }: ToastProps) => (
-  <ToastContainer role="alert" data-leaving={leaving} data-testid={testID}>
-    <Box>
+  <ToastContainer
+    role="alert"
+    data-leaving={leaving}
+    data-testid={testID}
+    gap={3}
+    align="start"
+  >
+    <Stack align="center" justify="center" marginTop={1}>
       <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
-    </Box>
-    <Stack flexGrow={1}>
-      <Typography
-        color={variant === 'error' ? 'error' : 'primary'}
-        variant="label-3"
-        sx={{ marginBottom: 2 }}
-      >
-        {title}
-      </Typography>
-      <Typography color="tertiary" variant="body-3">
-        {description}
-      </Typography>
+    </Stack>
+    <Stack
+      flexGrow={1}
+      align="start"
+      justify="flex-start"
+      height="fit-content"
+      direction="column"
+      gap={4}
+    >
+      <Stack direction="column">
+        <Typography
+          color={variant === 'error' ? 'error' : 'primary'}
+          variant="label-3"
+          sx={{ marginBottom: 2 }}
+        >
+          {title}
+        </Typography>
+        <Typography color="tertiary" variant="body-3">
+          {description}
+        </Typography>
+      </Stack>
       {cta && (
-        <Box marginTop={4}>
-          <LinkButton
-            onClick={() => {
-              onClose?.();
-              cta.onClick?.();
-            }}
-            size="compact"
-          >
-            {cta.label}
-          </LinkButton>
-        </Box>
+        <LinkButton
+          onClick={() => {
+            onClose?.();
+            cta.onClick?.();
+          }}
+          size="compact"
+        >
+          {cta.label}
+        </LinkButton>
       )}
     </Stack>
     <button
@@ -73,18 +85,14 @@ const slideOut = keyframes`
   }
 `;
 
-const ToastContainer = styled.div`
+const ToastContainer = styled(Stack)`
   ${({ theme }) => css`
     transform: translateX(380px);
     width: 380px;
-    align-items: flex-start;
     background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[2]};
-    display: flex;
-    flex-direction: row;
-    gap: ${theme.spacing[3]};
     padding: ${theme.spacing[4]};
 
     &[data-leaving='true'] {
