@@ -1,7 +1,7 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import { RoleKind } from '@onefootprint/types';
 import React from 'react';
-import { withProxyConfigs } from 'src/pages/developers/components/proxy-configs/proxy-config.test.config';
+import { withProxyConfigs } from 'src/pages/proxy-configs/proxy-config.test.config';
 
 import type { FormProps } from './form';
 import Form from './form';

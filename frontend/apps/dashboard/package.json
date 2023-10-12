@@ -28,6 +28,7 @@
     "@onefootprint/styled": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
+    "@radix-ui/react-navigation-menu": "^1.1.4",
     "@radix-ui/react-select": "^1.2.0",
     "@rive-app/react-canvas": "^3.0.53",
     "@sentry/browser": "^7.28.1",

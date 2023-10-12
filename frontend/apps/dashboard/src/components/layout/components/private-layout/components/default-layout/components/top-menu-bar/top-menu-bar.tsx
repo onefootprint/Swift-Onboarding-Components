@@ -1,83 +1,79 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import type { GetAuthRoleResponse } from '@onefootprint/types';
-import { Container } from '@onefootprint/ui';
+import { Stack, Toggle, Tooltip } from '@onefootprint/ui';
+import { omit } from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import useAssumeAuthRole from 'src/hooks/use-assume-auth-role';
-import useAuthRoles from 'src/hooks/use-auth-roles';
-import useSession from 'src/hooks/use-session';
-
-import NavDropdown from './components/nav-dropdown';
+import useOrgSession from 'src/hooks/use-org-session';
 
 const TopMenuBar = () => {
   const { t } = useTranslation('components.private-layout.nav');
-  const { dangerouslyCastedData, logIn } = useSession();
-  const assumeRoleMutation = useAssumeAuthRole();
-  const showErrorToast = useRequestErrorToast();
+
+  const { sandbox } = useOrgSession();
+
+  const tooltipInfoText = sandbox.isSandbox
+    ? t('sandbox-mode.tooltip-info.sandbox')
+    : t('sandbox-mode.tooltip-info.live');
+
+  const toggleSandboxMode = () => {
+    if (router.pathname.startsWith('/users')) {
+      router.push({
+        pathname: '/users',
+        query: omit(router.query, ['id', 'cursor']),
+      });
+    } else if (router.pathname.startsWith('/businesses')) {
+      router.push({
+        pathname: '/businesses',
+        query: omit(router.query, ['id', 'cursor']),
+      });
+    }
+    sandbox.toggle();
+  };
   const router = useRouter();
-  const {
-    isLoading,
-    error: tenantsError,
-    data: unorderedTenants,
-  } = useAuthRoles(dangerouslyCastedData.auth);
-  const currTenantId = dangerouslyCastedData.org.id;
 
-  const moveTenantToFront = (
-    tenants: GetAuthRoleResponse,
-    targetTenantId: string,
-  ) => {
-    if (!Array.isArray(tenants) || tenants.length === 0) {
-      return tenants;
-    }
-    const currTenantIndex = tenants.findIndex(
-      tenant => tenant.id === targetTenantId,
-    );
-    if (currTenantIndex === -1) {
-      return tenants;
-    }
-    const currTenant = tenants[currTenantIndex];
-    const remainingTenants = tenants.filter(
-      (_, index) => index !== currTenantIndex,
-    );
-    return [currTenant, ...remainingTenants];
-  };
-  const tenants = moveTenantToFront(unorderedTenants ?? [], currTenantId);
-
-  const onAssumeTenant = (tenantId: string) => {
-    const authToken = dangerouslyCastedData.auth;
-    assumeRoleMutation.mutate(
-      { tenantId, authToken },
-      {
-        async onSuccess() {
-          await logIn({ auth: authToken });
-          router.reload();
-        },
-        onError: showErrorToast,
-      },
-    );
-  };
-
+  const userWouldBeRedirected =
+    router.pathname.startsWith('/users/[id]') ||
+    router.pathname.startsWith('/businesses/[id]');
   return (
-    <Container>
+    <Container direction="row" justify="space-between" align="center">
       <Link href="/users" aria-label={t('users')}>
         <Footprint>
           <ThemedLogoFpCompact color="primary" />
         </Footprint>
       </Link>
-      <NavDropdown
-        isLoading={isLoading}
-        tenants={tenants}
-        currTenantId={currTenantId}
-        onAssumeTenant={onAssumeTenant}
-        user={dangerouslyCastedData.user}
-        tenantsError={tenantsError}
-      />
+      <Tooltip
+        disabled={!userWouldBeRedirected && sandbox.canToggle}
+        text={
+          userWouldBeRedirected
+            ? tooltipInfoText
+            : t('sandbox-mode.tooltip-disabled')
+        }
+        alignment="end"
+        position="bottom"
+      >
+        <Toggle
+          size="compact"
+          checked={sandbox.isSandbox}
+          disabled={!sandbox.canToggle}
+          label={t('sandbox-mode.label')}
+          onChange={toggleSandboxMode}
+        />
+      </Tooltip>
     </Container>
   );
 };
+
+const Container = styled(Stack)`
+  ${({ theme }) => css`
+    padding: 0 ${theme.spacing[7]};
+    background-color: ${theme.backgroundColor.primary};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    width: 100%;
+    min-height: 48px;
+  `};
+`;
 
 const Footprint = styled.i`
   ${({ theme }) => css`

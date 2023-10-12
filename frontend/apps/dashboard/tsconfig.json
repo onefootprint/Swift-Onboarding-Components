@@ -7,7 +7,7 @@
     "baseUrl": ".",
     "paths": {
       "src/*": ["./src/*"],
-      "@/proxy-configs/*": ["./src/pages/developers/components/proxy-configs/*"],
+      "@/proxy-configs/*": ["src/pages/proxy-configs/*"],
       "@/entities/*": ["./src/components/entities/*"],
       "@/entity/*": ["./src/components/entities/components/details/*"],
       "@/playbooks/*": ["./src/pages/playbooks/*"],

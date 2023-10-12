@@ -58,11 +58,11 @@ const List = ({
       onRowClick={handleRowClick}
       onSearchChange={handleSearchChange}
     >
-      <Typography variant="heading-3" sx={{ marginBottom: subtitle ? 2 : 5 }}>
+      <Typography variant="heading-2" sx={{ marginBottom: subtitle ? 2 : 5 }}>
         {title}
       </Typography>
       {subtitle && (
-        <Typography variant="body-2" sx={{ marginBottom: 7 }}>
+        <Typography variant="body-2" color="secondary" sx={{ marginBottom: 7 }}>
           {subtitle}
         </Typography>
       )}

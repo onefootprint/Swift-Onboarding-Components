@@ -44,6 +44,7 @@ const SandboxBanner = () => {
 const SandboxBannerContainer = styled.div`
   ${({ theme }) => css`
     border-bottom: 1px solid ${theme.borderColor.tertiary};
+    width: 100%;
 
     button {
       padding: 0;

@@ -11,7 +11,7 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
-import { withProxyConfigs } from 'src/pages/developers/components/proxy-configs/proxy-config.test.config';
+import { withProxyConfigs } from 'src/pages/proxy-configs/proxy-config.test.config';
 
 import type { RowProps } from './row';
 import Row from './row';

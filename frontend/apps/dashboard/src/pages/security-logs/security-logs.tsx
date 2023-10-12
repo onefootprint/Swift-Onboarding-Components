@@ -55,7 +55,7 @@ const SecurityLogs = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
+      <Typography variant="heading-2" sx={{ marginBottom: 5 }}>
         {t('header.title')}
       </Typography>
       <FiltersContainer>

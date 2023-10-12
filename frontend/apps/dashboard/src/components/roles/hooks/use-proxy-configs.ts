@@ -6,8 +6,7 @@ import type {
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
-
-import { QUERY_KEY } from '@/proxy-configs/constants';
+import { QUERY_KEY } from 'src/pages/proxy-configs/constants';
 
 const getProxyConfigs = async (
   authHeaders: AuthHeaders,

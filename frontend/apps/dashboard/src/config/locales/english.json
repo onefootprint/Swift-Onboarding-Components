@@ -394,12 +394,15 @@
       "nav": {
         "users": "Users",
         "businesses": "Businesses",
-        "security-logs": "Security Logs",
-        "playbooks": "Playbooks",
+        "security-logs": "Security logs",
         "developers": "Developers",
         "settings": "Settings",
         "manual-reviews": "Manual reviews",
-        "log-out": "Log out",
+        "playbooks": "Playbooks",
+        "api-keys": "API keys",
+        "proxy-configs": "Vault proxy",
+        "webhooks": "Webhooks",
+        "configure": "Configure",
         "sandbox-mode": {
           "label": "Sandbox mode",
           "tooltip-info": {
@@ -420,7 +423,8 @@
           "errors": {
             "auth-method-not-supported": "{{tenantName}} has disabled the ability to log in using this auth method. Please retry using another method."
           }
-        }
+        },
+        "log-out": "Log out"
       },
       "mode-switcher": {
         "live-to-sandbox": {
@@ -1238,6 +1242,546 @@
         "see-less": "See less"
       }
     },
+    "manual-review": {
+      "page-title": "Footprint | Manual Review",
+      "header": {
+        "title": "Pending manual reviews",
+        "subtitle": "Users that need to be manually reviewed to either be onboarded or able to keep using your service."
+      },
+      "table": {
+        "aria-label": "Manual review table",
+        "empty-state": "No pending manual reviews",
+        "header": {
+          "name": "Name",
+          "token": "Footprint Token",
+          "status": "Status",
+          "email": "Email",
+          "pending-since": "Pending since",
+          "reason": "Reason"
+        }
+      }
+    },
+    "users": {
+      "page-title": "Footprint | Users",
+      "header": {
+        "title": "Users"
+      },
+      "table": {
+        "aria-label": "Users table",
+        "search-placeholder": "Search by name, email or phone number...",
+        "empty-state": "No users found",
+        "header": {
+          "name": "Name",
+          "token": "Footprint Token",
+          "status": "KYC status",
+          "email": "Email",
+          "ssn": "SSN",
+          "phone-number": "Phone number",
+          "start": "Date"
+        },
+        "row": {
+          "status": {
+            "on-watchlist": "This user is on a watchlist"
+          }
+        }
+      }
+    },
+    "user": {
+      "page-title": "Footprint | User",
+      "header": {
+        "title": "User"
+      },
+      "vault": {
+        "basic": {
+          "title": "Basic data"
+        },
+        "identity": {
+          "title": "Identity data"
+        },
+        "address": {
+          "title": "Address data"
+        },
+        "us-legal-status": {
+          "title": "Legal status in the U.S.",
+          "status": {
+            "options": {
+              "citizen": "Citizen",
+              "permanent_resident": "Green Card/permanent resident",
+              "visa": "Visa"
+            }
+          },
+          "visa-kind": {
+            "e1": "E-1",
+            "e2": "E-2",
+            "e3": "E-3",
+            "f1": "F-1",
+            "g4": "G-4",
+            "h1b": "H-1B",
+            "l1": "L-1",
+            "o1": "O-1",
+            "tn1": "TN-1",
+            "other": "Other"
+          }
+        },
+        "documents": {
+          "title": "ID documents & Selfie"
+        },
+        "cards": {
+          "title": "Payment card data"
+        },
+        "custom": {
+          "title": "Custom data"
+        },
+        "investor-profile": {
+          "title": "Investor profile data",
+          "employment-status": {
+            "title": "What's your employment status?",
+            "options": {
+              "employed": "Employed",
+              "unemployed": "Unemployed",
+              "retired": "Retired",
+              "student": "Student"
+            }
+          },
+          "occupation": {
+            "title": "What's your occupation?"
+          },
+          "annual-income": {
+            "title": "What's your annual income?",
+            "options": {
+              "le25k": "Under $25,000",
+              "gt25k_le50k": "$25,001 - $50,000",
+              "gt50k_le100k": "$50,001 - $100,000",
+              "gt100k_le200k": "$100,001 - $200,000",
+              "gt200k_le300k": "$200,001 - $300,000",
+              "gt300k_le500k": "$300,001 - $500,000",
+              "gt500k_le1200k": "$500,001 - $1,200,000",
+              "gt1200k": "$1,200,001+"
+            }
+          },
+          "net-worth": {
+            "title": "What's your net worth?",
+            "options": {
+              "le50k": "Under $50,000",
+              "gt50k_le100k": "$50,001 - $100,000",
+              "gt100k_le200k": "$100,001 - $200,000",
+              "gt200k_le500k": "$200,001 - $500,000",
+              "gt500k_le1m": "$500,001 - $1,000,000",
+              "gt1m_le5m": "$1,000,001 - $5,000,000",
+              "gt5m": "$5,000,001+"
+            }
+          },
+          "investment-goals": {
+            "title": "What are your investment goals?",
+            "options": {
+              "growth": "Growth",
+              "income": "Income",
+              "preserve_capital": "Preserve capital",
+              "speculation": "Speculation",
+              "diversification": "Diversification",
+              "other": "Other"
+            }
+          },
+          "risk-tolerance": {
+            "title": "How would you describe your risk tolerance?",
+            "options": {
+              "conservative": "Conservative",
+              "moderate": "Moderate",
+              "aggressive": "Aggressive"
+            }
+          },
+          "declarations": {
+            "title": "Do any of the following apply to you or a member of your immediate family?",
+            "options": {
+              "none": "None",
+              "affiliated_with_us_broker": "Affiliated or work with the US registered broker-dealer or FINRA",
+              "senior_executive": "Senior executive at or a 10% or greater shareholder of a publicly traded company",
+              "senior_political_figure": "I'm a senior political figure"
+            }
+          },
+          "compliance_letter": {
+            "title": "Finra compliance letter"
+          }
+        },
+        "id-documents-and-selfie": {
+          "title": "ID documents & Selfie"
+        }
+      }
+    },
+    "businesses": {
+      "page-title": "Footprint | Businesses",
+      "header": {
+        "title": "Businesses"
+      },
+      "table": {
+        "aria-label": "Businesses table",
+        "search-placeholder": "Search by name...",
+        "empty-state": "No businesses found",
+        "header": {
+          "name": "Name",
+          "token": "Footprint Token",
+          "status": "KYB status",
+          "submitted-by": "Submitted by (beneficial owner)",
+          "start": "Date"
+        },
+        "row": {
+          "status": {
+            "on-watchlist": "This business is on a watchlist"
+          }
+        }
+      }
+    },
+    "business": {
+      "page-title": "Footprint | Business",
+      "header": {
+        "title": "Business"
+      },
+      "vault": {
+        "basic": {
+          "title": "Basic data"
+        },
+        "bos": {
+          "title": "Beneficial owners",
+          "link": "View profile",
+          "hint": {
+            "primary": "Owns {{stake}}%  of the business & submitted the business information",
+            "primary_no_stake": "Submitted the business information",
+            "secondary": "Owns {{stake}}% of the business"
+          }
+        },
+        "address": {
+          "title": "Registered business address"
+        }
+      }
+    },
+    "security-logs": {
+      "page-title": "Footprint | Security logs",
+      "header": {
+        "title": "Security logs"
+      },
+      "filters": {
+        "attributes": {
+          "id": {
+            "label": "Personal data",
+            "basic": {
+              "title": "Basic data"
+            },
+            "identity": {
+              "title": "Identity data"
+            },
+            "address": {
+              "title": "Address data"
+            },
+            "legal-status": {
+              "title": "Legal status data"
+            }
+          },
+          "business": {
+            "label": "Business data",
+            "basic": {
+              "title": "Basic data"
+            },
+            "address": {
+              "title": "Address data"
+            }
+          }
+        },
+        "date-range": {
+          "label": "Date"
+        }
+      }
+    },
+    "settings": {
+      "page-title": "Footprint | Settings",
+      "header": {
+        "title": "Settings",
+        "theme": "Theme"
+      },
+      "business-profile": {
+        "header": {
+          "title": "Business profile",
+          "subtitle": "Manage your business details"
+        },
+        "not-allowed": "You are not allowed to manage the organization",
+        "add": "Add {{label}}",
+        "edit": "Edit {{label}}",
+        "logo": {
+          "cta": "Change logo",
+          "not-allowed": "You are not allowed to change the organization logo"
+        },
+        "name": {
+          "label": "Company name",
+          "form": {
+            "placeholder": "Acme Bank",
+            "errors": {
+              "required": "Please enter a name"
+            }
+          }
+        },
+        "website": {
+          "label": "Website",
+          "form": {
+            "placeholder": "https://acme.com",
+            "errors": {
+              "required": "Please enter a website"
+            }
+          }
+        }
+      },
+      "team-roles": {
+        "header": {
+          "title": "Members & Roles",
+          "subtitle": "Manage who is a member of your team and their roles"
+        },
+        "tabs": {
+          "members": "Members",
+          "roles": "Roles",
+          "access": "Domain access"
+        }
+      },
+      "members": {
+        "table": {
+          "aria-label": "Table of organization members",
+          "header": {
+            "email": "Email",
+            "lastActive": "Last Active",
+            "role": "Role"
+          },
+          "pending-invite": "Pending",
+          "actions": {
+            "aria-label": "Open actions for member {{email}}",
+            "not-allowed": "You are not allowed to change teammates",
+            "remove": {
+              "cta": "Remove",
+              "confirmation": {
+                "title": "Remove team member",
+                "description": "You’re about to remove <b>{{name}}</b> from your team. Are you sure?"
+              },
+              "notification": {
+                "success": {
+                  "title": "Team member removed",
+                  "description": "{{email}} has been removed from the team."
+                },
+                "error": {
+                  "title": "Error removing team member"
+                }
+              }
+            }
+          },
+          "empty-state": "No members found"
+        },
+        "filters": {
+          "role": {
+            "label": "Role"
+          }
+        },
+        "invite": {
+          "title": "Invite teammates",
+          "not-allowed": "You are not allowed to invite teammates",
+          "form": {
+            "email": {
+              "label": "Email address",
+              "placeholder": "jane.doe@acme.com",
+              "errors": {
+                "required": "Please enter an email"
+              }
+            },
+            "role": {
+              "label": "Role",
+              "placeholder": "Select",
+              "errors": {
+                "required": "Please select a role"
+              }
+            },
+            "errors": {
+              "invalid": "Please complete the fields above."
+            }
+          },
+          "notification": {
+            "success": {
+              "title_one": "Invitation sent successfully.",
+              "description_one": "The user will receive an email with instructions to join the organization.",
+              "title_other": "Invitations sent successfully.",
+              "description_other": "The users will receive an email with instructions to join the organization."
+            },
+            "error": {
+              "title_one": "Invitation wasn't sent",
+              "title_other": "Invitations weren't sent"
+            }
+          }
+        },
+        "edit-role": {
+          "aria-label": "Change {{email}} role",
+          "scopes": {
+            "admin": "Access to everything",
+            "read": "Read-only"
+          },
+          "notifications": {
+            "error": {
+              "title": "Error updating role"
+            }
+          }
+        }
+      },
+      "roles": {
+        "table": {
+          "aria-label": "Table of organization roles",
+          "header": {
+            "role": "Role",
+            "active-users": "Active users",
+            "active-api-keys": "Active API keys",
+            "created": "Created at",
+            "permissions": "Permissions"
+          },
+          "empty-state": "No roles found",
+          "actions": {
+            "aria-label": "Open actions for role {{name}}",
+            "not-allowed": "You are not allowed to manage roles",
+            "remove": "Delete role",
+            "edit": "Edit role"
+          }
+        },
+        "create": {
+          "title": "Create role",
+          "not-allowed": "You are not allowed to add roles",
+          "notifications": {
+            "success": {
+              "title": "Role created",
+              "description": "Role {{name}} was created successfully."
+            },
+            "error": {
+              "title": "Error creating role"
+            }
+          }
+        },
+        "edit": {
+          "title": "Edit role",
+          "notifications": {
+            "success": {
+              "title": "Role updated",
+              "description": "Role {{name}} was updated successfully."
+            },
+            "error": {
+              "title": "Error updating role"
+            }
+          }
+        },
+        "remove": {
+          "confirmation": {
+            "title": "Delete role",
+            "description": "You’re about to delete the role <b>{{name}}</b>. Are you sure?"
+          },
+          "errors": {
+            "num-active-users": {
+              "title": "Role can't be deleted",
+              "description_one": "One user is assigned to this role. Please assign those users to a different role.",
+              "description_other": "{{count}} users are assigned to this role. Please assign those users to a different role."
+            },
+            "num-active-api-keys": {
+              "title": "Role can't be deleted",
+              "description_one": "One API key is active on this role. Please assign a different role to this API key.",
+              "description_other": "{{count}} API keys are active on this role. Please assign different roles to these API keys."
+            }
+          },
+          "feedback": {
+            "success": {
+              "title": "Role deleted",
+              "description": "{{name}} role has been deleted."
+            },
+            "error": {
+              "title": "Error removing role"
+            }
+          }
+        },
+        "form": {
+          "name": {
+            "label": "Name",
+            "placeholder": "Customer support",
+            "errors": {
+              "required": "Please enter a name"
+            }
+          },
+          "permissions": {
+            "title": "Permissions"
+          },
+          "proxy-configs": {
+            "label": "Allowed proxy configs",
+            "errors": {
+              "required": "Must select at least one proxy configuration"
+            }
+          },
+          "decrypt": {
+            "label": "Decrypt data",
+            "errors": {
+              "required": "Must select at least one permissible attribute"
+            }
+          },
+          "decrypt-attributes": {
+            "label": "Permissible attributes"
+          }
+        },
+        "scopes": {
+          "admin": "Everything",
+          "decrypt_fields_one": "Decrypt {{field}}",
+          "decrypt_fields_other": "Decrypt {{count}} fields",
+          "read": "Read-only",
+          "onboarding_configuration": "Manage Playbooks",
+          "api_keys": "Manage API keys",
+          "manage_vault_proxy": "Manage vault proxy configurations",
+          "invoke_vault_proxy_options": {
+            "all": "All",
+            "jit": "Just-in-time proxy"
+          },
+          "invoke_vault_proxy": {
+            "checkbox": "Invoke vault proxy",
+            "all": "Invoke all vault proxies",
+            "jit": "Invoke just-in-time proxy",
+            "one": "Invoke one vault proxy",
+            "other": "Invoke {{ count }} vault proxies"
+          },
+          "cip_integration": "Make CIP proxy requests",
+          "org_settings": "Modify organization settings",
+          "manual_review": "Perform manual review",
+          "write_entities": "Create and update users",
+          "trigger_kyc": "Manually initiate KYC",
+          "decrypt_all": "Everything",
+          "decrypt_custom": "Custom attributes",
+          "decrypt_documents": "Documents",
+          "onboarding": "Onboarding",
+          "manage_webhooks": "Manage webhook configuration",
+          "decrypt": {
+            "all": "Everything",
+            "name": "Full name",
+            "email": "Email",
+            "phone_number": "Phone number",
+            "ssn9": "SSN",
+            "ssn4": "SSN (last 4)",
+            "dob": "Date of birth",
+            "documents": "Documents",
+            "full_address": "Address",
+            "custom": "Custom attributes",
+            "us_legal_status": "Legal status in the U.S.",
+            "investor_profile": "Broker questions (Investor profile)",
+            "card": "Card data"
+          },
+          "hints": {
+            "read": "Basic read-only access",
+            "playbooks": "Create and update Playbooks",
+            "api_keys": "Add, edit, and decrypt secret API keys and their roles",
+            "manage_vault_proxy": "Create and update vault proxy configurations",
+            "invoke_vault_proxy": "Invoke the specified vault proxies",
+            "cip_integration": "Forward identity data to a CIP integration",
+            "org_settings": "Update org settings, roles, and users",
+            "manual_review": "Make new decisions, add annotations, re-trigger KYC",
+            "write_entities": "Create new vaults and update existing vaults' information",
+            "trigger_kyc": "Run KYC checks on an existing vaulted user",
+            "onboarding": "Create short-lived onboarding sessions, validate tokens from Footprint.js",
+            "manage_webhooks": "Configure webhook endpoints",
+            "decrypt": "Decrypt the specified attributes"
+          }
+        }
+      }
+    },
     "playbooks": {
       "page-title": "Footprint | Playbooks",
       "header": {
@@ -1646,671 +2190,89 @@
         "international-country-restrictions": "International country restrictions"
       }
     },
-    "manual-review": {
-      "page-title": "Footprint | Manual Review",
-      "header": {
-        "title": "Pending manual reviews",
-        "subtitle": "Users that need to be manually reviewed to either be onboarded or able to keep using your service."
-      },
-      "table": {
-        "aria-label": "Manual review table",
-        "empty-state": "No pending manual reviews",
-        "header": {
-          "name": "Name",
-          "token": "Footprint Token",
-          "status": "Status",
-          "email": "Email",
-          "pending-since": "Pending since",
-          "reason": "Reason"
-        }
-      }
-    },
-    "users": {
-      "page-title": "Footprint | Users",
-      "header": {
-        "title": "Users"
-      },
-      "table": {
-        "aria-label": "Users table",
-        "search-placeholder": "Search by name, email or phone number...",
-        "empty-state": "No users found",
-        "header": {
-          "name": "Name",
-          "token": "Footprint Token",
-          "status": "KYC status",
-          "email": "Email",
-          "ssn": "SSN",
-          "phone-number": "Phone number",
-          "start": "Date"
-        },
-        "row": {
-          "status": {
-            "on-watchlist": "This user is on a watchlist"
-          }
-        }
-      }
-    },
-    "user": {
-      "page-title": "Footprint | User",
-      "header": {
-        "title": "User"
-      },
-      "vault": {
-        "basic": {
-          "title": "Basic data"
-        },
-        "identity": {
-          "title": "Identity data"
-        },
-        "address": {
-          "title": "Address data"
-        },
-        "us-legal-status": {
-          "title": "Legal status in the U.S.",
-          "status": {
-            "options": {
-              "citizen": "Citizen",
-              "permanent_resident": "Green Card/permanent resident",
-              "visa": "Visa"
-            }
-          },
-          "visa-kind": {
-            "e1": "E-1",
-            "e2": "E-2",
-            "e3": "E-3",
-            "f1": "F-1",
-            "g4": "G-4",
-            "h1b": "H-1B",
-            "l1": "L-1",
-            "o1": "O-1",
-            "tn1": "TN-1",
-            "other": "Other"
-          }
-        },
-        "documents": {
-          "title": "ID documents & Selfie"
-        },
-        "cards": {
-          "title": "Payment card data"
-        },
-        "custom": {
-          "title": "Custom data"
-        },
-        "investor-profile": {
-          "title": "Investor profile data",
-          "employment-status": {
-            "title": "What's your employment status?",
-            "options": {
-              "employed": "Employed",
-              "unemployed": "Unemployed",
-              "retired": "Retired",
-              "student": "Student"
-            }
-          },
-          "occupation": {
-            "title": "What's your occupation?"
-          },
-          "annual-income": {
-            "title": "What's your annual income?",
-            "options": {
-              "le25k": "Under $25,000",
-              "gt25k_le50k": "$25,001 - $50,000",
-              "gt50k_le100k": "$50,001 - $100,000",
-              "gt100k_le200k": "$100,001 - $200,000",
-              "gt200k_le300k": "$200,001 - $300,000",
-              "gt300k_le500k": "$300,001 - $500,000",
-              "gt500k_le1200k": "$500,001 - $1,200,000",
-              "gt1200k": "$1,200,001+"
-            }
-          },
-          "net-worth": {
-            "title": "What's your net worth?",
-            "options": {
-              "le50k": "Under $50,000",
-              "gt50k_le100k": "$50,001 - $100,000",
-              "gt100k_le200k": "$100,001 - $200,000",
-              "gt200k_le500k": "$200,001 - $500,000",
-              "gt500k_le1m": "$500,001 - $1,000,000",
-              "gt1m_le5m": "$1,000,001 - $5,000,000",
-              "gt5m": "$5,000,001+"
-            }
-          },
-          "investment-goals": {
-            "title": "What are your investment goals?",
-            "options": {
-              "growth": "Growth",
-              "income": "Income",
-              "preserve_capital": "Preserve capital",
-              "speculation": "Speculation",
-              "diversification": "Diversification",
-              "other": "Other"
-            }
-          },
-          "risk-tolerance": {
-            "title": "How would you describe your risk tolerance?",
-            "options": {
-              "conservative": "Conservative",
-              "moderate": "Moderate",
-              "aggressive": "Aggressive"
-            }
-          },
-          "declarations": {
-            "title": "Do any of the following apply to you or a member of your immediate family?",
-            "options": {
-              "none": "None",
-              "affiliated_with_us_broker": "Affiliated or work with the US registered broker-dealer or FINRA",
-              "senior_executive": "Senior executive at or a 10% or greater shareholder of a publicly traded company",
-              "senior_political_figure": "I'm a senior political figure"
-            }
-          },
-          "compliance_letter": {
-            "title": "Finra compliance letter"
-          }
-        },
-        "id-documents-and-selfie": {
-          "title": "ID documents & Selfie"
-        }
-      }
-    },
-    "businesses": {
-      "page-title": "Footprint | Businesses",
-      "header": {
-        "title": "Businesses"
-      },
-      "table": {
-        "aria-label": "Businesses table",
-        "search-placeholder": "Search by name...",
-        "empty-state": "No businesses found",
-        "header": {
-          "name": "Name",
-          "token": "Footprint Token",
-          "status": "KYB status",
-          "submitted-by": "Submitted by (beneficial owner)",
-          "start": "Date"
-        },
-        "row": {
-          "status": {
-            "on-watchlist": "This business is on a watchlist"
-          }
-        }
-      }
-    },
-    "business": {
-      "page-title": "Footprint | Business",
-      "header": {
-        "title": "Business"
-      },
-      "vault": {
-        "basic": {
-          "title": "Basic data"
-        },
-        "bos": {
-          "title": "Beneficial owners",
-          "link": "View profile",
-          "hint": {
-            "primary": "Owns {{stake}}%  of the business & submitted the business information",
-            "primary_no_stake": "Submitted the business information",
-            "secondary": "Owns {{stake}}% of the business"
-          }
-        },
-        "address": {
-          "title": "Registered business address"
-        }
-      }
-    },
-    "security-logs": {
-      "page-title": "Footprint | Security logs",
-      "header": {
-        "title": "Security logs"
-      },
-      "filters": {
-        "attributes": {
-          "id": {
-            "label": "Personal data",
-            "basic": {
-              "title": "Basic data"
-            },
-            "identity": {
-              "title": "Identity data"
-            },
-            "address": {
-              "title": "Address data"
-            },
-            "legal-status": {
-              "title": "Legal status data"
-            }
-          },
-          "business": {
-            "label": "Business data",
-            "basic": {
-              "title": "Basic data"
-            },
-            "address": {
-              "title": "Address data"
-            }
-          }
-        },
-        "date-range": {
-          "label": "Date"
-        }
-      }
-    },
-    "developers": {
-      "page-title": "Footprint | Developers",
-      "dialog-test-onboarding": {
-        "heading": "Test Playbook",
-        "title": "One last recommendation:",
-        "subtitle": "Test your Playbook to see how it looks and feels",
-        "step-1": {
-          "number": "1",
-          "title": "Go through your new Playbook",
-          "subtitle": "You'll create a new user and see how the onboarding process will look like in your product."
-        },
-        "step-2": {
-          "number": "2",
-          "title": "See onboarded users' details",
-          "subtitle": "When users complete onboardings, they will appear on the 'Users' page. You can select a specific user and decrypt their data afterwards."
-        },
-        "cta": "Test Playbook",
-        "cancel": "Cancel"
-      },
-      "header": {
-        "title": "Developers",
-        "subtitle": {
-          "live": "You're viewing live keys. Enable sandbox mode to view test keys.",
-          "sandbox": "You're viewing test keys. Disable sandbox mode to view live keys."
-        },
-        "toggle-sandbox": {
-          "label": "Sandbox mode",
-          "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
-        }
-      },
-      "tabs": {
-        "api-keys": "API Keys",
-        "webhooks": "Webhooks",
-        "proxy-configs": "Vault proxy configurations"
-      },
-      "api-keys": {
-        "roles": {
-          "header": {
-            "title": "API Key Access Roles",
-            "subtitle": "Configure fine-grained permissions for your API keys.",
-            "cta": "Create role",
-            "cta-not-allowed": "You're not allowed to create API key roles"
-          }
-        },
-        "header": {
-          "title": "Secret API Keys",
-          "subtitle": "These are like passwords. Keep them safe.",
-          "cta": "Create secret key",
-          "cta-not-allowed": "You're not allowed to create API keys"
-        },
-        "create": {
-          "title": "Create secret key",
-          "form": {
-            "name": {
-              "label": "Secret key name",
-              "placeholder": "Secret key",
-              "errors": {
-                "required": "Please enter a name for your secret key."
-              }
-            },
-            "access-control": {
-              "name": "Access control",
-              "label": "Access control",
-              "placeholder": "Select role",
-              "errors": {
-                "required": "Please select a role."
-              }
-            }
-          },
-          "cta": {
-            "label": "Create",
-            "aria-label": "Creating secret key..."
-          },
-          "feedback": {
-            "success": {
-              "title": "Success",
-              "description": "Secret key created successfully."
-            }
-          },
-          "cancel": "Cancel"
-        },
-        "table": {
-          "aria-label": "Secret API keys table",
-          "loading": {
-            "aria-label": "Loading api keys..."
-          },
-          "edit-role": {
-            "aria-label": "Edit role"
-          },
-          "header": {
-            "name": "Name",
-            "secret-key": "Secret key",
-            "last-used": "Last used",
-            "created": "Created",
-            "status": "Status",
-            "access-control": {
-              "title": "Access control"
-            }
-          },
-          "manage": {
-            "aria-label": "Manage secret key",
-            "not-allowed": "You're not allowed to manage API keys",
-            "reveal": {
-              "show": "Reveal secret key",
-              "hide": "Hide secret key"
-            },
-            "status": {
-              "enable": "Enable secret key",
-              "disable": "Disable secret key"
-            }
-          },
-          "empty-state": "No secret keys"
-        }
-      },
-      "webhooks": {
-        "header": {
-          "title": "Webhooks",
-          "subtitle": "Setup webhooks to receive updates when events happen in Footprint.",
-          "not-allowed": "You're not allowed to create or modify webhooks"
-        },
-        "loading": "Loading..."
-      }
-    },
-    "settings": {
-      "page-title": "Footprint | Settings",
-      "header": {
-        "title": "Settings",
-        "theme": "Theme"
-      },
-      "business-profile": {
-        "header": {
-          "title": "Business profile",
-          "subtitle": "Manage your business details"
-        },
-        "not-allowed": "You are not allowed to manage the organization",
-        "add": "Add {{label}}",
-        "edit": "Edit {{label}}",
-        "logo": {
-          "cta": "Change logo",
-          "not-allowed": "You are not allowed to change the organization logo"
-        },
-        "name": {
-          "label": "Company name",
-          "form": {
-            "placeholder": "Acme Bank",
-            "errors": {
-              "required": "Please enter a name"
-            }
-          }
-        },
-        "website": {
-          "label": "Website",
-          "form": {
-            "placeholder": "https://acme.com",
-            "errors": {
-              "required": "Please enter a website"
-            }
-          }
-        }
-      },
-      "team-roles": {
-        "header": {
-          "title": "Members & Roles",
-          "subtitle": "Manage who is a member of your team and their roles"
-        },
-        "tabs": {
-          "members": "Members",
-          "roles": "Roles",
-          "access": "Domain access"
-        }
-      },
-      "members": {
-        "table": {
-          "aria-label": "Table of organization members",
-          "header": {
-            "email": "Email",
-            "lastActive": "Last Active",
-            "role": "Role"
-          },
-          "pending-invite": "Pending",
-          "actions": {
-            "aria-label": "Open actions for member {{email}}",
-            "not-allowed": "You are not allowed to change teammates",
-            "remove": {
-              "cta": "Remove",
-              "confirmation": {
-                "title": "Remove team member",
-                "description": "You’re about to remove <b>{{name}}</b> from your team. Are you sure?"
-              },
-              "notification": {
-                "success": {
-                  "title": "Team member removed",
-                  "description": "{{email}} has been removed from the team."
-                },
-                "error": {
-                  "title": "Error removing team member"
-                }
-              }
-            }
-          },
-          "empty-state": "No members found"
-        },
-        "filters": {
-          "role": {
-            "label": "Role"
-          }
-        },
-        "invite": {
-          "title": "Invite teammates",
-          "not-allowed": "You are not allowed to invite teammates",
-          "form": {
-            "email": {
-              "label": "Email address",
-              "placeholder": "jane.doe@acme.com",
-              "errors": {
-                "required": "Please enter an email"
-              }
-            },
-            "role": {
-              "label": "Role",
-              "placeholder": "Select",
-              "errors": {
-                "required": "Please select a role"
-              }
-            },
-            "errors": {
-              "invalid": "Please complete the fields above."
-            }
-          },
-          "notification": {
-            "success": {
-              "title_one": "Invitation sent successfully.",
-              "description_one": "The user will receive an email with instructions to join the organization.",
-              "title_other": "Invitations sent successfully.",
-              "description_other": "The users will receive an email with instructions to join the organization."
-            },
-            "error": {
-              "title_one": "Invitation wasn't sent",
-              "title_other": "Invitations weren't sent"
-            }
-          }
-        },
-        "edit-role": {
-          "aria-label": "Change {{email}} role",
-          "scopes": {
-            "admin": "Access to everything",
-            "read": "Read-only"
-          },
-          "notifications": {
-            "error": {
-              "title": "Error updating role"
-            }
-          }
-        }
-      },
+    "api-keys": {
+      "section-title": "API keys",
       "roles": {
-        "table": {
-          "aria-label": "Table of organization roles",
-          "header": {
-            "role": "Role",
-            "active-users": "Active users",
-            "active-api-keys": "Active API keys",
-            "created": "Created at",
-            "permissions": "Permissions"
-          },
-          "empty-state": "No roles found",
-          "actions": {
-            "aria-label": "Open actions for role {{name}}",
-            "not-allowed": "You are not allowed to manage roles",
-            "remove": "Delete role",
-            "edit": "Edit role"
-          }
-        },
-        "create": {
-          "title": "Create role",
-          "not-allowed": "You are not allowed to add roles",
-          "notifications": {
-            "success": {
-              "title": "Role created",
-              "description": "Role {{name}} was created successfully."
-            },
-            "error": {
-              "title": "Error creating role"
-            }
-          }
-        },
-        "edit": {
-          "title": "Edit role",
-          "notifications": {
-            "success": {
-              "title": "Role updated",
-              "description": "Role {{name}} was updated successfully."
-            },
-            "error": {
-              "title": "Error updating role"
-            }
-          }
-        },
-        "remove": {
-          "confirmation": {
-            "title": "Delete role",
-            "description": "You’re about to delete the role <b>{{name}}</b>. Are you sure?"
-          },
-          "errors": {
-            "num-active-users": {
-              "title": "Role can't be deleted",
-              "description_one": "One user is assigned to this role. Please assign those users to a different role.",
-              "description_other": "{{count}} users are assigned to this role. Please assign those users to a different role."
-            },
-            "num-active-api-keys": {
-              "title": "Role can't be deleted",
-              "description_one": "One API key is active on this role. Please assign a different role to this API key.",
-              "description_other": "{{count}} API keys are active on this role. Please assign different roles to these API keys."
-            }
-          },
-          "feedback": {
-            "success": {
-              "title": "Role deleted",
-              "description": "{{name}} role has been deleted."
-            },
-            "error": {
-              "title": "Error removing role"
-            }
-          }
-        },
+        "header": {
+          "title": "API key access roles",
+          "subtitle": "Configure fine-grained permissions for your API keys.",
+          "cta": "Create role",
+          "cta-not-allowed": "You're not allowed to create API key roles"
+        }
+      },
+      "header": {
+        "title": "Secret API Keys",
+        "subtitle": "These are like passwords. Keep them safe.",
+        "cta": "Create secret key",
+        "cta-not-allowed": "You're not allowed to create API keys"
+      },
+      "create": {
+        "title": "Create secret key",
         "form": {
           "name": {
-            "label": "Name",
-            "placeholder": "Customer support",
+            "label": "Secret key name",
+            "placeholder": "Secret key",
             "errors": {
-              "required": "Please enter a name"
+              "required": "Please enter a name for your secret key."
             }
           },
-          "permissions": {
-            "title": "Permissions"
-          },
-          "proxy-configs": {
-            "label": "Allowed proxy configs",
+          "access-control": {
+            "name": "Access control",
+            "label": "Access control",
+            "placeholder": "Select role",
             "errors": {
-              "required": "Must select at least one proxy configuration"
+              "required": "Please select a role."
             }
-          },
-          "decrypt": {
-            "label": "Decrypt data",
-            "errors": {
-              "required": "Must select at least one permissible attribute"
-            }
-          },
-          "decrypt-attributes": {
-            "label": "Permissible attributes"
           }
         },
-        "scopes": {
-          "admin": "Everything",
-          "decrypt_fields_one": "Decrypt {{field}}",
-          "decrypt_fields_other": "Decrypt {{count}} fields",
-          "read": "Read-only",
-          "onboarding_configuration": "Manage Playbooks",
-          "api_keys": "Manage API keys",
-          "manage_vault_proxy": "Manage vault proxy configurations",
-          "invoke_vault_proxy_options": {
-            "all": "All",
-            "jit": "Just-in-time proxy"
-          },
-          "invoke_vault_proxy": {
-            "checkbox": "Invoke vault proxy",
-            "all": "Invoke all vault proxies",
-            "jit": "Invoke just-in-time proxy",
-            "one": "Invoke one vault proxy",
-            "other": "Invoke {{ count }} vault proxies"
-          },
-          "cip_integration": "Make CIP proxy requests",
-          "org_settings": "Modify organization settings",
-          "manual_review": "Perform manual review",
-          "write_entities": "Create and update users",
-          "trigger_kyc": "Manually initiate KYC",
-          "decrypt_all": "Everything",
-          "decrypt_custom": "Custom attributes",
-          "decrypt_documents": "Documents",
-          "onboarding": "Onboarding",
-          "manage_webhooks": "Manage webhook configuration",
-          "decrypt": {
-            "all": "Everything",
-            "name": "Full name",
-            "email": "Email",
-            "phone_number": "Phone number",
-            "ssn9": "SSN",
-            "ssn4": "SSN (last 4)",
-            "dob": "Date of birth",
-            "documents": "Documents",
-            "full_address": "Address",
-            "custom": "Custom attributes",
-            "us_legal_status": "Legal status in the U.S.",
-            "investor_profile": "Broker questions (Investor profile)",
-            "card": "Card data"
-          },
-          "hints": {
-            "read": "Basic read-only access",
-            "playbooks": "Create and update Playbooks",
-            "api_keys": "Add, edit, and decrypt secret API keys and their roles",
-            "manage_vault_proxy": "Create and update vault proxy configurations",
-            "invoke_vault_proxy": "Invoke the specified vault proxies",
-            "cip_integration": "Forward identity data to a CIP integration",
-            "org_settings": "Update org settings, roles, and users",
-            "manual_review": "Make new decisions, add annotations, re-trigger KYC",
-            "write_entities": "Create new vaults and update existing vaults' information",
-            "trigger_kyc": "Run KYC checks on an existing vaulted user",
-            "onboarding": "Create short-lived onboarding sessions, validate tokens from Footprint.js",
-            "manage_webhooks": "Configure webhook endpoints",
-            "decrypt": "Decrypt the specified attributes"
+        "cta": {
+          "label": "Create",
+          "aria-label": "Creating secret key..."
+        },
+        "feedback": {
+          "success": {
+            "title": "Success",
+            "description": "Secret key created successfully."
           }
-        }
+        },
+        "cancel": "Cancel"
+      },
+      "table": {
+        "aria-label": "Secret API keys table",
+        "loading": {
+          "aria-label": "Loading api keys..."
+        },
+        "edit-role": {
+          "aria-label": "Edit role"
+        },
+        "header": {
+          "name": "Name",
+          "secret-key": "Secret key",
+          "last-used": "Last used",
+          "created": "Created",
+          "status": "Status",
+          "access-control": {
+            "title": "Access control"
+          }
+        },
+        "manage": {
+          "aria-label": "Manage secret key",
+          "not-allowed": "You're not allowed to manage API keys",
+          "reveal": {
+            "show": "Reveal secret key",
+            "hide": "Hide secret key"
+          },
+          "status": {
+            "enable": "Enable secret key",
+            "disable": "Disable secret key"
+          }
+        },
+        "empty-state": "No secret keys"
       }
     },
     "proxy-configs": {
       "page-title": "Footprint | Vault Proxy",
+      "section-title": "Vault Proxy",
       "title": "Vault Proxy configurations",
       "subtitle": "Manage your vault proxy configurations",
       "status": {
@@ -2533,6 +2495,43 @@
           }
         }
       }
+    },
+    "dialog-test-onboarding": {
+      "heading": "Test Playbook",
+      "title": "One last recommendation:",
+      "subtitle": "Test your Playbook to see how it looks and feels",
+      "step-1": {
+        "number": "1",
+        "title": "Go through your new Playbook",
+        "subtitle": "You'll create a new user and see how the onboarding process will look like in your product."
+      },
+      "step-2": {
+        "number": "2",
+        "title": "See onboarded users' details",
+        "subtitle": "When users complete onboardings, they will appear on the 'Users' page. You can select a specific user and decrypt their data afterwards."
+      },
+      "cta": "Test Playbook",
+      "cancel": "Cancel"
+    },
+    "header": {
+      "title": "Developers",
+      "subtitle": {
+        "live": "You're viewing live keys. Enable sandbox mode to view test keys.",
+        "sandbox": "You're viewing test keys. Disable sandbox mode to view live keys."
+      },
+      "toggle-sandbox": {
+        "label": "Sandbox mode",
+        "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
+      }
+    },
+    "webhooks": {
+      "section-title": "Webhooks",
+      "header": {
+        "title": "Webhooks",
+        "subtitle": "Setup webhooks to receive updates when events happen in Footprint.",
+        "not-allowed": "You're not allowed to create or modify webhooks"
+      },
+      "loading": "Loading..."
     }
   }
 }

@@ -40,8 +40,10 @@ const Playbooks = () => {
       </Head>
       <HeaderContainer>
         <Title>
-          <Typography variant="heading-3">{t('header.title')}</Typography>
-          <Typography variant="body-2">{t('header.subtitle')}</Typography>
+          <Typography variant="heading-2">{t('header.title')}</Typography>
+          <Typography variant="body-2" color="secondary">
+            {t('header.subtitle')}
+          </Typography>
         </Title>
         <Wrapper>
           <PermissionGate
