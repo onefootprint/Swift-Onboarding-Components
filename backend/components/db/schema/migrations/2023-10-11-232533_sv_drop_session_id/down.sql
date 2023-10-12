@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault ADD COLUMN session_id TEXT;
