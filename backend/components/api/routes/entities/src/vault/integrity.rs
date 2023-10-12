@@ -2,6 +2,7 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::telemetry::RootSpan;
 use api_core::types::ResponseData;
 use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
@@ -45,6 +46,7 @@ pub async fn post(
     request: Json<IntegrityRequest>,
     auth: SecretTenantAuthContext,
     insights: InsightHeaders,
+    root_span: RootSpan,
 ) -> JsonApiResponse<IntegrityResponse> {
     // TODO: should we add a separate guard for checking integrity?
     // This is incorrect - won't change though since we are deprecating this soon
@@ -64,7 +66,7 @@ pub async fn post(
 
     let fp_id = path.into_inner();
 
-    let Json(response) = super::decrypt::post_inner(&state, fp_id, req, auth, insights).await?;
+    let Json(response) = super::decrypt::post_inner(&state, fp_id, req, auth, insights, root_span).await?;
     let response = IntegrityResponse::from(response.data.map);
     ResponseData::ok(response).json()
 }

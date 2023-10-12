@@ -9,6 +9,7 @@ use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::proxy::filter_function_to_transform;
+use api_core::telemetry::RootSpan;
 use api_core::utils::vault_wrapper::{bulk_decrypt, BulkDecryptReq, EnclaveDecryptOperation, TenantVw};
 use api_wire_types::DecryptResponse;
 use db::models::insight_event::CreateInsightEvent;
@@ -128,7 +129,7 @@ pub struct DONOTUSEClientDecryptRequest {
     transforms: Option<Vec<FilterFunctionStr>>,
 }
 
-#[tracing::instrument(skip(state, auth))]
+#[tracing::instrument(skip(state, auth, root_span))]
 #[route_alias(
     post(
         "/users/{fp_id}/vault/decrypt",
@@ -152,16 +153,17 @@ pub async fn post(
     request: Json<DecryptRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
+    root_span: RootSpan,
 ) -> JsonApiResponse<DecryptResponse> {
     let request = request.into_inner();
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
 
-    let result = post_inner(&state, path.into_inner(), request, auth, insights).await?;
+    let result = post_inner(&state, path.into_inner(), request, auth, insights, root_span).await?;
     Ok(result)
 }
 
-#[tracing::instrument(skip(state, auth))]
+#[tracing::instrument(skip(state, auth, root_span))]
 #[route_alias(post(
     "/users/vault/decrypt",
     tags(Client, Vault, Users, PublicApi),
@@ -177,6 +179,7 @@ pub async fn post_client(
     request: Json<ClientDecryptRequest>,
     auth: ClientTenantAuthContext,
     insights: InsightHeaders,
+    root_span: RootSpan,
 ) -> JsonApiResponse<DecryptResponse> {
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
@@ -202,7 +205,7 @@ pub async fn post_client(
     // TODO would be really cool if we could share the handler - the only difference is one gets
     // the fp_id from the path while the other gets it from the token. could we make an extractor
     // for this?
-    let result = post_inner(&state, fp_id, request, Box::new(auth), insights).await?;
+    let result = post_inner(&state, fp_id, request, Box::new(auth), insights, root_span).await?;
     Ok(result)
 }
 
@@ -212,6 +215,7 @@ pub(super) async fn post_inner(
     request: DecryptRequest,
     auth: Box<dyn TenantAuth>,
     insights: InsightHeaders,
+    root_span: RootSpan,
 ) -> JsonApiResponse<DecryptResponse> {
     let DecryptRequest {
         fields,
@@ -219,6 +223,12 @@ pub(super) async fn post_inner(
         filters,
         transforms,
     } = request;
+
+    // Record the fields being decrypted
+    root_span.record(
+        "meta",
+        Csv::from(fields.iter().cloned().collect_vec()).to_string(),
+    );
 
     // Parse transforms to apply. We're still supprting a legacy format for now
     let transforms = if filters.is_some() && transforms.is_none() {
