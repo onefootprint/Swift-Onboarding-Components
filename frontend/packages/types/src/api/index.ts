@@ -20,6 +20,10 @@ export type {
 export type { D2PGenerateRequest, D2PGenerateResponse } from './d2p-generate';
 export type { D2PSmsRequest, D2PSmsResponse } from './d2p-sms';
 export type { DecryptRequest, DecryptResponse } from './decrypt';
+export type {
+  DecryptRiskSignalAmlHitsRequest,
+  DecryptRiskSignalAmlHitsResponse,
+} from './decrypt-risk-signal-aml-hits';
 export type { DecryptUserRequest, DecryptUserResponse } from './decrypt-user';
 export type {
   EntitiesVaultDecryptRequest,

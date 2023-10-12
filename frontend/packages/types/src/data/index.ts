@@ -10,6 +10,7 @@ export type {
   ActorOrganization,
 } from './actor';
 export { ActorKind } from './actor';
+export type { AmlDetail, AmlHit, AmlHitMedia } from './aml-detail';
 export type { Annotation, AnnotationSource } from './annotation';
 export type { ApiKey } from './api-key';
 export type { BeneficialOwner } from './beneficial-owner';
