@@ -1,6 +1,5 @@
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
 
 export const createLivenessMachine = () =>
@@ -12,7 +11,8 @@ export const createLivenessMachine = () =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {},
       states: {
@@ -24,9 +24,12 @@ export const createLivenessMachine = () =>
                 actions: 'assignContext',
                 cond: (context, event) => {
                   const {
+                    isTransfer,
                     device: { type, hasSupportForWebauthn },
                   } = event.payload;
-                  return type === 'mobile' && !!hasSupportForWebauthn;
+                  return (
+                    !!isTransfer && type === 'mobile' && !!hasSupportForWebauthn
+                  );
                 },
               },
               {
@@ -75,6 +78,7 @@ export const createLivenessMachine = () =>
       actions: {
         assignContext: assign((context, event) => ({
           ...context,
+          isTransfer: event.payload.isTransfer,
           authToken: event.payload.authToken,
           device: event.payload.device,
         })),

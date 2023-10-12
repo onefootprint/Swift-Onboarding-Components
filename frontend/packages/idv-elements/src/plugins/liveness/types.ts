@@ -1,3 +1,7 @@
 import type { BasePluginProps } from '../base-plugin';
 
-export type LivenessProps = BasePluginProps<{}>;
+type LivenessContext = {
+  isTransfer?: boolean;
+};
+
+export type LivenessProps = BasePluginProps<LivenessContext>;

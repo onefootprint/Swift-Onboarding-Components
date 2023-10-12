@@ -15,12 +15,13 @@ const i18n = configureI18next();
 
 const App = ({ context, onDone }: LivenessProps) => {
   const [, send] = useLivenessMachine();
-  const { authToken, device } = context;
+  const { authToken, device, isTransfer } = context;
 
   useEffectOnce(() => {
     send({
       type: 'receivedContext',
       payload: {
+        isTransfer,
         authToken,
         device,
       },

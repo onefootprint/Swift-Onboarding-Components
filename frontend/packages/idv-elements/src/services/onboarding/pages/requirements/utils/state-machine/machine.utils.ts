@@ -141,7 +141,7 @@ const shouldRunTransfer = (context: MachineContext): boolean => {
   const nextRequirementIsIdDoc = isDocKind(firstKind);
 
   if (type === 'mobile') {
-    return nextRequirementIsLiveness;
+    return false; // TODO: this used to do transfer for liveness req, revive when flexcar browser issue is fixed
   }
 
   const hasPendingDoc = requirements.some(x => !x.isMet && isDocKind(x.kind));

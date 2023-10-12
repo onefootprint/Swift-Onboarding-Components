@@ -31,6 +31,7 @@ const Router = ({ onDone }: RouterProps) => {
       config,
       device,
       idDocOutcome,
+      isTransfer,
     },
     collectedKycData,
     requirements,
@@ -142,6 +143,7 @@ const Router = ({ onDone }: RouterProps) => {
     return (
       <Liveness
         context={{
+          isTransfer,
           authToken,
           device,
         }}

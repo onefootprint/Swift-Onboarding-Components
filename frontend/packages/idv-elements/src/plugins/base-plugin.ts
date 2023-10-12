@@ -3,6 +3,7 @@ import type { DeviceInfo } from '../hooks/ui/use-device-info';
 export type PluginContext<T> = {
   authToken: string;
   customData?: T;
+  isTransfer?: boolean;
   device: DeviceInfo;
 };
 
