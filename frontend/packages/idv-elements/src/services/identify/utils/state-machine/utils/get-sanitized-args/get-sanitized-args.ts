@@ -1,5 +1,4 @@
-import { Logger } from '@onefootprint/dev-tools';
-
+import Logger from '../../../../../../utils/logger';
 import type { IdentifyMachineArgs } from '../../machine';
 import type { MachineContext } from '../../types';
 

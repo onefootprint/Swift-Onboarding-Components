@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import { ChallengeKind, UserTokenScope } from '@onefootprint/types';
 import { useState } from 'react';
@@ -6,6 +5,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { useUserToken } from '../../../../../../../../hooks/api';
 import type { DeviceInfo } from '../../../../../../../../hooks/ui/use-device-info';
+import Logger from '../../../../../../../../utils/logger';
 import useIdentify from './hooks/use-identify';
 import type { IdentifyVerifyResponse } from './hooks/use-identify-verify';
 import useIdentifyVerify from './hooks/use-identify-verify';

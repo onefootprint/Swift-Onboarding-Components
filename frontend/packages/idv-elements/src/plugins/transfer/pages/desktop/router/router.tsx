@@ -1,6 +1,6 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
+import useLogStateMachine from '../../../../../hooks/ui/use-log-state-machine';
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 import ConfirmContinueOnDesktop from '../confirm-continue-on-desktop';
 import QRCodeScanned from '../qr-code-scanned';

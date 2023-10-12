@@ -1,8 +1,8 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import { D2PStatusUpdate } from '@onefootprint/types';
 
 import { useUpdateD2PStatus } from '../../../../hooks';
+import Logger from '../../../../utils/logger';
 import useMobileMachine from './use-mobile-machine';
 
 const useCancelNewTab = () => {

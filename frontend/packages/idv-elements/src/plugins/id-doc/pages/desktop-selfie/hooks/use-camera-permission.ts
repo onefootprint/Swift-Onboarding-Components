@@ -1,6 +1,7 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useState } from 'react';
 import { useEffectOnce, useInterval } from 'usehooks-ts';
+
+import Logger from '../../../../../utils/logger';
 
 export type CameraPermissionState = 'undetected' | 'notAllowed' | 'allowed';
 const PERMISSION_CHECK_INTERVAL = 100;

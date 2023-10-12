@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
@@ -14,6 +13,7 @@ import React from 'react';
 
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
+import Logger from '../../../../../../utils/logger';
 import Error from '../../../../components/error';
 import {
   isDocCdo,

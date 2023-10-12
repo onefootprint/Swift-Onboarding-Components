@@ -1,8 +1,8 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import type { GetD2PResponse } from '@onefootprint/types';
 import { D2PStatus } from '@onefootprint/types';
 
+import Logger from '../../../../utils/logger';
 import useDesktopMachine from './use-desktop-machine';
 
 const useHandleD2PStatusUpdate = () => {

@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import {
   BusinessDI,
@@ -9,6 +8,7 @@ import { Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
+import Logger from '../../../../utils/logger';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';

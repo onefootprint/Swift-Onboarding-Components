@@ -1,10 +1,10 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
+import Logger from '../../../../utils/logger';
 import getCurrentStepFromMissingAttributes from '../../components/navigation-header/utils/current-step-from-missing-attributes';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';

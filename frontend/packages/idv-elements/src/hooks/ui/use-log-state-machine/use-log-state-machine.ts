@@ -1,8 +1,8 @@
+import { useObserveCollector } from '@onefootprint/dev-tools/src/hooks/use-observe-collector';
 import { useEffect } from 'react';
 import type { State } from 'xstate';
 
-import Logger from '../../utils/logger';
-import { useObserveCollector } from '../use-observe-collector';
+import Logger from '../../../utils/logger';
 
 const useLogStateMachine = (name: string, state: any) => {
   const observeCollector = useObserveCollector();

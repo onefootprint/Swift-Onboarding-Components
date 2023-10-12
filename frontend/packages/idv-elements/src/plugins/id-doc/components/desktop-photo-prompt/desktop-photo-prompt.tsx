@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type {
@@ -14,6 +13,7 @@ import { Box, Button, media, Stack, Typography } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
+import Logger from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import useProcessImage from '../../hooks/use-process-image';
 import { getCountryFromCode } from '../../utils/get-country-from-code';

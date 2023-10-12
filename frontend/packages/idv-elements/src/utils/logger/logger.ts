@@ -1,11 +1,10 @@
+import { getSessionId } from '@onefootprint/dev-tools';
 import { IS_BROWSER, IS_PROD } from '@onefootprint/global-constants';
 import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
 // @ts-ignore
 import * as setupLogRocketReact from 'logrocket-react';
 import UAParser from 'ua-parser-js';
-
-import getSessionId from '../session-id';
 
 const BASE_URL_DOMAIN = 'onefootprint.com';
 const LOG_ROCKET_ORG_ID = 'lrswdg/footprint-bifrost-prod';

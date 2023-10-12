@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { LoadingIndicator, media } from '@onefootprint/ui';
@@ -6,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useCountdown, useTimeout } from 'usehooks-ts';
 
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
+import Logger from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 import type { CaptureKind } from '../../utils/state-machine';

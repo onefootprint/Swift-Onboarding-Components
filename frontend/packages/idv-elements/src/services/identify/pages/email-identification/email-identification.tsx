@@ -1,10 +1,10 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
+import Logger from '../../../../utils/logger';
 import LegalFooter from '../../components/legal-footer';
 import { useIdentifyMachine } from '../../components/machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';

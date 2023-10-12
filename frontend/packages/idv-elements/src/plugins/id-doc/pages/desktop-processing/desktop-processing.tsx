@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
@@ -8,8 +7,9 @@ import { Button, media, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
-import { NavigationHeader } from '../../../../components';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
+import Logger from '../../../../utils/logger';
 import DesktopHeader from '../../components/desktop-header';
 import IdDocAnimation from '../../components/id-doc-animation';
 import Loading from '../../components/loading';

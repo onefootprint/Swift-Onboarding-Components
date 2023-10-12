@@ -1,6 +1,6 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
+import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import Register from '../register';
 import Retry from '../retry';

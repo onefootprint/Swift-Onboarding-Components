@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
@@ -14,6 +13,7 @@ import {
   Section,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
+import Logger from '../../../../../../utils/logger';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useDecryptUser from '../../../../hooks/use-decrypt-user';
 import type { KycData } from '../../../../utils/data-types';

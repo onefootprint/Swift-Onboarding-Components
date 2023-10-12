@@ -1,13 +1,11 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import {
-  useLogStateMachine,
-  useObserveCollector,
-} from '@onefootprint/dev-tools';
+import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
 import {
   AppErrorBoundary,
   useFootprintProvider,
+  useLogStateMachine,
 } from '@onefootprint/idv-elements';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import * as LogRocket from 'logrocket';

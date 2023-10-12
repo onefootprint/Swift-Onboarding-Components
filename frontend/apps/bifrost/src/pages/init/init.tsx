@@ -1,6 +1,7 @@
-import { Logger, useObserveCollector } from '@onefootprint/dev-tools';
+import { useObserveCollector } from '@onefootprint/dev-tools';
 import {
   InitShimmer,
+  Logger,
   useGetOnboardingConfig,
 } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';

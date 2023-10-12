@@ -1,4 +1,4 @@
-import { Logger } from '@onefootprint/dev-tools';
+import { Logger } from '@onefootprint/idv-elements';
 
 const getParsedProps = (props: string) => {
   let parsedProps;

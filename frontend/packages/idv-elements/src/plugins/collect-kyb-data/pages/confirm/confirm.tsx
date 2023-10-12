@@ -1,8 +1,8 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
+import Logger from '../../../../utils/logger';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import BasicDataSection from './components/basic-data-section';

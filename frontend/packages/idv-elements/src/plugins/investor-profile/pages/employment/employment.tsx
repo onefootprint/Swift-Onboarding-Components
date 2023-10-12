@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDollar40, IcoUser40 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
@@ -6,6 +5,7 @@ import { InvestorProfileDI } from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import GenericTransition from '../../../../components/animations/generic-transition';
+import Logger from '../../../../utils/logger';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';

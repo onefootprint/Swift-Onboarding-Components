@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import type { Identifier } from '@onefootprint/types';
 import React from 'react';
@@ -6,6 +5,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import InitShimmer from '../../../../components/init-shimmer';
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
+import Logger from '../../../../utils/logger';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import validateBootstrapData from './utils/validate-bootstrap-data';
 

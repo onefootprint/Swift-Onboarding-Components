@@ -1,4 +1,4 @@
-import { Logger } from '@onefootprint/dev-tools';
+import { Logger } from '@onefootprint/idv-elements';
 import { useEffect, useState } from 'react';
 
 import usePropsFromParent from './hooks/use-props-from-parent';

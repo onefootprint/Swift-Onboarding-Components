@@ -1,6 +1,6 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
+import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import BasicInformation from '../basic-information';
 import Confirm from '../confirm';

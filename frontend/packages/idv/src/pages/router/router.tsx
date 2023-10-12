@@ -1,10 +1,11 @@
-import { Logger, useLogStateMachine } from '@onefootprint/dev-tools';
 import type { L10n } from '@onefootprint/footprint-js';
 import {
   AppErrorBoundary,
   Identify,
+  Logger,
   Onboarding,
   SessionExpired,
+  useLogStateMachine,
 } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import { SessionStatus } from '@onefootprint/types';

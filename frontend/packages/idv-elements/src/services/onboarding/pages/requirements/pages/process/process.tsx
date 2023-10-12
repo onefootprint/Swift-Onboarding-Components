@@ -1,10 +1,10 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
+import Logger from '../../../../../../utils/logger';
 import Error from '../../../../components/error';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
 import useOnboardingProcess from '../../hooks/use-onboarding-process';

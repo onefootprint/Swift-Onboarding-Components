@@ -23,5 +23,6 @@ export {
   checkDeviceInfo,
   useCreateHandoffUrl,
   useDeviceInfo,
+  useLogStateMachine,
   useParseHandoffUrl,
 } from './ui';

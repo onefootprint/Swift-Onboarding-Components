@@ -1,8 +1,8 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { IS_SERVER } from '@onefootprint/global-constants';
 import Script from 'next/script';
 import React from 'react';
 
+import Logger from '../../../../utils/logger';
 import useTelemetryRequest from './hooks/use-send-telemetry';
 import STYTCH_PUBLIC_TOKEN from './stytch.constants';
 

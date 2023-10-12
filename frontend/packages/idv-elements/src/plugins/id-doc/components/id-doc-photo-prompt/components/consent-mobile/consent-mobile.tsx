@@ -1,8 +1,8 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import React, { useRef } from 'react';
 
+import Logger from '../../../../../../utils/logger';
 import useConsent from '../../../../hooks/use-consent';
 import useIdDocMachine from '../../../../hooks/use-id-doc-machine';
 import type { ImageConsentHandler } from '../../../image-consent';

@@ -1,5 +1,6 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
-import { Logger, ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import { Logger } from '@onefootprint/idv-elements';
 import { createGlobalStyle, css } from '@onefootprint/styled';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';

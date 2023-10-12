@@ -1,10 +1,10 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import { UserTokenScope } from '@onefootprint/types';
 import React from 'react';
 
 import { InitShimmer } from '../../../../components';
 import { useIdentify, useUserToken } from '../../../../hooks';
+import Logger from '../../../../utils/logger';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 
 type InitAuthTokenProps = {

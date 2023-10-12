@@ -1,11 +1,12 @@
-import {
-  Logger,
-  useLogStateMachine,
-  useObserveCollector,
-} from '@onefootprint/dev-tools';
+import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import Idv from '@onefootprint/idv';
-import { AppErrorBoundary, useGetD2PStatus } from '@onefootprint/idv-elements';
+import {
+  AppErrorBoundary,
+  Logger,
+  useGetD2PStatus,
+  useLogStateMachine,
+} from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import type { GetD2PResponse } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';

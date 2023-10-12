@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
@@ -10,6 +9,7 @@ import {
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
+import Logger from '../../../../utils/logger';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import { imageIcons } from '../../constants/image-types';
 import getImageSideLabel from '../../utils/get-image-side-label';

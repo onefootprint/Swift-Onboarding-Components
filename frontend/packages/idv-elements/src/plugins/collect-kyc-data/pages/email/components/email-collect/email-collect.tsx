@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { IdDI } from '@onefootprint/types';
@@ -8,6 +7,7 @@ import { useForm } from 'react-hook-form';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
+import Logger from '../../../../../../utils/logger';
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useSyncEmail from '../../../../hooks/use-sync-email';

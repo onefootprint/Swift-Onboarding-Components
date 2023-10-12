@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
@@ -22,6 +21,7 @@ import React, { useState } from 'react';
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../../components/layout/components/sticky-bottom-box/sticky-bottom-box';
+import Logger from '../../../../../utils/logger';
 import { useIdDocMachine } from '../../../components/machine-provider';
 import { getCountryFromCode } from '../../../utils/get-country-from-code';
 import useOptionsByDocType from '../hooks/use-options-by-doc-type';

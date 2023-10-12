@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoFaceid24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
@@ -9,6 +8,7 @@ import React, { useState } from 'react';
 
 import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-identify-verify';
 import useLoginChallenge from '../../../../../../hooks/api/hosted/identify/use-login-challenge';
+import Logger from '../../../../../../utils/logger';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import { getBiometricChallengeResponse } from '../../../../utils/biometrics';
 

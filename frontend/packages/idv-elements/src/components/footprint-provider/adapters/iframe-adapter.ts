@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import type { FootprintProps } from '@onefootprint/footprint-js';
 import {
   FootprintPrivateEvent,
@@ -7,6 +6,7 @@ import {
 import Postmate from '@onefootprint/postmate';
 import type { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 
+import Logger from '../../../utils/logger';
 import type { CompletePayload, FootprintClient } from '../types';
 import { LegacyFootprintInternalEvent } from '../types';
 import EventEmitter from '../utils/event-emitter/event-emmiter';

@@ -1,13 +1,13 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-import { NavigationHeader } from '../../../../components';
+import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import { LAYOUT_CONTAINER_ID } from '../../../../components/layout/constants';
+import Logger from '../../../../utils/logger';
 import type { ImageConsentHandler } from '../../components/image-consent';
 import ImageConsent from '../../components/image-consent';
 import useConsent from '../../hooks/use-consent';

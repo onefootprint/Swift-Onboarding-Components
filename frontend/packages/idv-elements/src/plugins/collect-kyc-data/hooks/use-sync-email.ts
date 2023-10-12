@@ -1,8 +1,8 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 
 import { useUserEmail } from '../../../hooks';
+import Logger from '../../../utils/logger';
 
 type SyncEmailArgs = {
   authToken?: string;

@@ -1,7 +1,7 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
 import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
+import useLogStateMachine from '../../../../../../hooks/ui/use-log-state-machine';
 import {
   CollectKybData,
   CollectKycData,

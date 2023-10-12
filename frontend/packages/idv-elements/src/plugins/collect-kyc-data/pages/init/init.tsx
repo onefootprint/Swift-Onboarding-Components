@@ -1,9 +1,9 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 
+import Logger from '../../../../utils/logger';
 import { useCollectKycDataMachine } from '../../components/machine-provider';
 import type { KycData } from '../../utils/data-types';
 import useDecryptKycData from './hooks/use-decrypt-kyc-data/use-decrypt-kyc-data';

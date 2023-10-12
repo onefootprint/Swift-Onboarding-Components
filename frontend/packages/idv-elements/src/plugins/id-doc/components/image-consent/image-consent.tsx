@@ -5,7 +5,7 @@ import Link from 'next/link';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans } from 'react-i18next';
 
-import { HeaderTitle } from '../../../../components';
+import HeaderTitle from '../../../../components/layout/components/header-title';
 
 export type ImageConsentHandler = {
   getConsentInfo: () => { consentLanguageText: string; mlConsent: boolean };

@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
@@ -7,6 +6,7 @@ import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useGetOnboardingStatus } from '../../../../../../hooks/api';
+import Logger from '../../../../../../utils/logger';
 import Error from '../../../../components/error';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import useOnboarding from './hooks/use-onboarding';

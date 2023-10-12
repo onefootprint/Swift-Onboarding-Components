@@ -1,6 +1,6 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
+import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
 import { useOnboardingMachine } from '../../components/machine-provider';
 import Requirements from '../requirements';
 import Validate from '../validate';

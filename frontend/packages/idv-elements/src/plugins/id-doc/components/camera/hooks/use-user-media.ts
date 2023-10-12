@@ -1,6 +1,6 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useEffect, useState } from 'react';
 
+import Logger from '../../../../../utils/logger';
 import useHandleCameraError from '../../../hooks/use-handle-camera-error';
 import type { CameraKind } from '../utils/get-camera-options';
 import getCameraOptions from '../utils/get-camera-options';

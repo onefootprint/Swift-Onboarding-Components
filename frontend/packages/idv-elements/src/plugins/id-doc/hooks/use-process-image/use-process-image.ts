@@ -1,7 +1,7 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useToast } from '@onefootprint/ui';
 import imageCompression from 'browser-image-compression';
 
+import Logger from '../../../../utils/logger';
 import compressImage, {
   COMPRESS_EXTRA_MAX_SIZE_MB,
 } from './utils/compress-image';

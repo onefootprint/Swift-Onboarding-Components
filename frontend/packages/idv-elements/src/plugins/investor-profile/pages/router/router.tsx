@@ -1,6 +1,6 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
+import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import Declarations from '../declarations';
 import Employment from '../employment';

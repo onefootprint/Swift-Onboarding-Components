@@ -1,6 +1,6 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
+import useLogStateMachine from '../../../../../hooks/ui/use-log-state-machine';
 import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 import NewTabProcessing from '../new-tab-processing';
 import NewTabRequest from '../new-tab-request';

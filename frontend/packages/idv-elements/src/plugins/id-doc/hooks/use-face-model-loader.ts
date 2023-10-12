@@ -1,8 +1,9 @@
-import { Logger } from '@onefootprint/dev-tools';
 import constate from 'constate';
 import { nets } from 'face-api.js';
 import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
+
+import Logger from '../../../utils/logger';
 
 type FaceModelLoaderType = {
   selfieRequired: boolean;

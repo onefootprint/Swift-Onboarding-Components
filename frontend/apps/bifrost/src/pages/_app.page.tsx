@@ -1,8 +1,9 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
-import { Logger, ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import {
   configureFootprint,
   FootprintProvider,
+  Logger,
 } from '@onefootprint/idv-elements';
 import { createGlobalStyle } from '@onefootprint/styled';
 import { QueryClientProvider } from '@tanstack/react-query';

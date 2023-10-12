@@ -1,7 +1,7 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { useToast } from '@onefootprint/ui';
 
+import Logger from '../../../utils/logger';
 import { useMissingPermissionsSheet } from '../components/missing-permissions-sheet';
 
 const useHandleCameraError = () => {

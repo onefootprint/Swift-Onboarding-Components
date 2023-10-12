@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   CollectedKycDataOption,
@@ -7,6 +6,7 @@ import type {
 import { CdoToAllDisMap, IdDI, UserTokenScope } from '@onefootprint/types';
 
 import useUserToken from '../../../../../../hooks/api/hosted/user/use-user-token';
+import Logger from '../../../../../../utils/logger';
 import useDecryptUser from '../../../../hooks/use-decrypt-user';
 import type { KycData } from '../../../../utils/data-types';
 

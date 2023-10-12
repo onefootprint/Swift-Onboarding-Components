@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { LoadingIndicator } from '@onefootprint/ui';
@@ -7,6 +6,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { NavigationHeader } from '../../../../../components';
 import { useSkipLiveness } from '../../../../../hooks';
+import Logger from '../../../../../utils/logger';
 import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 
 const SkipLiveness = () => {

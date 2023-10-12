@@ -1,6 +1,6 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
 import React, { useEffect } from 'react';
 
+import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import BackPhotoCapture from '../back-photo-capture';
 import DesktopBackPhoto from '../desktop-back-photo';

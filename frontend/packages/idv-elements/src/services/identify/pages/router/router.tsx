@@ -1,7 +1,7 @@
-import { useLogStateMachine } from '@onefootprint/dev-tools';
 import type { IdDocOutcomes } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
+import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
 import type { IdentifyProps } from '../../types';
 import AuthTokenInvalid from '../auth-token-invalid';

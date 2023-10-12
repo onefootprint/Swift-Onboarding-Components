@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
@@ -7,6 +6,7 @@ import { Box, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
+import Logger from '../../../../utils/logger';
 import IdDocAnimation from '../../components/id-doc-animation';
 import Loading from '../../components/loading';
 import NextSide from '../../components/next-side';

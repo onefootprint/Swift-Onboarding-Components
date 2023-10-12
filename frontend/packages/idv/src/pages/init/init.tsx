@@ -1,7 +1,8 @@
-import { Logger, useObserveCollector } from '@onefootprint/dev-tools';
+import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { DeviceInfo } from '@onefootprint/idv-elements';
 import {
   InitShimmer,
+  Logger,
   useDeviceInfo,
   useGetOnboardingConfig,
 } from '@onefootprint/idv-elements';

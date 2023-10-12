@@ -50,6 +50,7 @@ export {
   useIdentify,
   useIdentifyVerify,
   useLoginChallenge,
+  useLogStateMachine,
   useOnboarding,
   useOnboardingAuthorize,
   useOnboardingValidate,
@@ -71,4 +72,9 @@ export {
 } from './plugins';
 export { Identify, Onboarding } from './services';
 export type { BootstrapProps } from './utils';
-export { DesignSystemProvider, default as media, withProvider } from './utils';
+export {
+  DesignSystemProvider,
+  Logger,
+  default as media,
+  withProvider,
+} from './utils';

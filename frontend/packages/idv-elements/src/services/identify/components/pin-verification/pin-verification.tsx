@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
@@ -16,6 +15,7 @@ import useIdentifyVerify from '../../../../hooks/api/hosted/identify/use-identif
 import useLoginChallenge from '../../../../hooks/api/hosted/identify/use-login-challenge';
 import useSignupChallenge from '../../../../hooks/api/hosted/identify/use-signup-challenge';
 import useUserEmail from '../../../../hooks/api/hosted/user/use-user-email';
+import Logger from '../../../../utils/logger';
 import { useIdentifyMachine } from '../machine-provider';
 import Form from './components/form';
 

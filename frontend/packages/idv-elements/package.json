@@ -59,14 +59,16 @@
     "use-places-autocomplete": "^4.0.0",
     "use-resize-observer": "^9.1.0",
     "usehooks-ts": "2.7.2",
-    "xstate": "^4.37.1"
+    "xstate": "^4.37.1",
+    "@sentry/nextjs": "^7.58.1",
+    "logrocket-react": "^5.0.1",
+    "@sentry/browser": "^7.28.1"
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
     "@rive-app/react-canvas": "^3.0.35",
     "@types/lodash": "^4.14.191",
-    "@types/logrocket-react": "^3.0.1",
     "@types/styled-components": "^5.1.26",
     "@types/ua-parser-js": "^0.7.36",
     "eslint-config-footprint": "*",
@@ -76,7 +78,8 @@
     "react-dom": "18.2.0",
     "tsconfig": "*",
     "typescript": "4.9.5",
-    "webpack": "*"
+    "webpack": "*",
+    "@types/logrocket-react": "^3.0.1"
   },
   "peerDependencies": {
     "next": "13.x",

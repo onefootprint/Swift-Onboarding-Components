@@ -1,5 +1,6 @@
-import { Logger, useObserveCollector } from '@onefootprint/dev-tools';
+import { useObserveCollector } from '@onefootprint/dev-tools';
 import {
+  Logger,
   NavigationHeader,
   useGetD2PStatus,
   useGetOnboardingStatus,

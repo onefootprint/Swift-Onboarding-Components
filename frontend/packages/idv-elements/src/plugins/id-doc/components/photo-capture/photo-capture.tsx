@@ -1,4 +1,3 @@
-import { Logger } from '@onefootprint/dev-tools';
 import { Box } from '@onefootprint/ui';
 import React, { useLayoutEffect, useState } from 'react';
 
@@ -7,6 +6,7 @@ import {
   NavigationHeader,
   useLayoutOptions,
 } from '../../../../components';
+import Logger from '../../../../utils/logger';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image';
 import type { CaptureKind } from '../../utils/state-machine';
