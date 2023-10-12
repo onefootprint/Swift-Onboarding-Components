@@ -5,7 +5,6 @@ use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_wire_types::RiskSignalFilters;
 use db::models::risk_signal::IncludeHidden;
 use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
@@ -16,7 +15,7 @@ use newtypes::FpId;
 
 use paperclip::actix::{api_v2_operation, get, web};
 
-type RiskSignalsListResponse = Vec<api_wire_types::RiskSignal>;
+type RiskSignalsListResponse = Vec<api_wire_types::PublicRiskSignal>;
 
 #[api_v2_operation(
     description = "Lists the risk signals for a Footprint user.",
@@ -26,7 +25,6 @@ type RiskSignalsListResponse = Vec<api_wire_types::RiskSignal>;
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FpId>,
-    filters: web::Query<RiskSignalFilters>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<RiskSignalsListResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
@@ -52,45 +50,13 @@ pub async fn get(
                 None
             }
         })
-        .collect();
-
-    // TODO this is fine to do in RAM when there aren't many signals. Will be harder with pagination.
-    // Maybe we should store the note, severity, and scopes in the DB
-    let signals = filter_and_sort(signals, filters.into_inner());
-    let signals = signals
-        .into_iter()
-        .map(api_wire_types::RiskSignal::from_db)
-        .collect();
-
-    ResponseData::ok(signals).json()
-}
-
-fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<RiskSignal> {
-    signals
-        .into_iter()
-        .filter(|signal| {
-            let rc = signal.reason_code.clone();
-            if !filters.scope.is_empty() && !rc.scopes().iter().any(|x| filters.scope.contains(x)) {
-                return false;
-            }
-            if !filters.severity.is_empty() && !filters.severity.contains(&rc.severity()) {
-                return false;
-            }
-            if let Some(ref description) = filters.description {
-                if !rc
-                    .description()
-                    .to_ascii_lowercase()
-                    .contains(&description.to_ascii_lowercase())
-                {
-                    return false;
-                }
-            }
-            true
-        })
         .sorted_by(|s1, s2| {
             let s1 = s1.reason_code.severity();
             let s2 = s2.reason_code.severity();
             s1.cmp(&s2).reverse()
-        })
-        .collect()
+        });
+
+    let signals = signals.map(api_wire_types::PublicRiskSignal::from_db).collect();
+
+    ResponseData::ok(signals).json()
 }
