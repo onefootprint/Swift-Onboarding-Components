@@ -87,7 +87,7 @@ const NavigationHeader = ({
     }
     const containerRect = container.getBoundingClientRect();
     const headerContentRect = header.getBoundingClientRect();
-    const rootMargin = headerContentRect.bottom - containerRect.top;
+    const rootMargin = Math.abs(headerContentRect.bottom - containerRect.top);
     if (!rootMargin) {
       return;
     }

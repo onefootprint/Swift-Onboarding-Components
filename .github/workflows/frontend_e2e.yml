@@ -59,7 +59,7 @@ jobs:
 
       - name: Install Playwright dependencies [chromium]
         working-directory: ./frontend
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium webkit
 
       - name: Get Vercel bifrost preview_url
         uses: zentered/vercel-preview-url@v1.1.9
