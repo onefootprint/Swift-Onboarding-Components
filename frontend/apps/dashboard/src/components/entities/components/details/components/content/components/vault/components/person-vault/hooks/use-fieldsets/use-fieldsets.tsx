@@ -139,6 +139,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
       title: t('investor-profile.title'),
       iconComponent: IcoDollar24,
       fields: [
+        { di: InvestorProfileDI.employmentStatus },
         { di: InvestorProfileDI.occupation },
         { di: InvestorProfileDI.annualIncome },
         { di: InvestorProfileDI.netWorth },
@@ -146,6 +147,10 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
         { di: InvestorProfileDI.riskTolerance },
         { di: DocumentDI.finraComplianceLetter },
         { di: InvestorProfileDI.declarations },
+        { di: InvestorProfileDI.brokerageFirmEmployer },
+        { di: InvestorProfileDI.seniorExecutiveSymbols },
+        { di: InvestorProfileDI.familyMemberNames },
+        { di: InvestorProfileDI.politicalOrganization },
         { di: DocumentDI.finraComplianceLetter },
       ],
     },
