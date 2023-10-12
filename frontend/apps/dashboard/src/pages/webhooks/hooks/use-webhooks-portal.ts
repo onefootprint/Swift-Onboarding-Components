@@ -20,6 +20,7 @@ const getWebhookPortal = async ({ authHeaders }: GetWebhooksPortalRequest) => {
     url: '/org/webhook_portal',
     headers: authHeaders,
   });
+
   return response;
 };
 
@@ -29,9 +30,6 @@ const useWebhookPortal = () => {
   return useQuery<GetWebhooksPortalResponse, RequestError>(
     ['webhook-portal', authHeaders],
     () => getWebhookPortal({ authHeaders }),
-    {
-      select: response => response,
-    },
   );
 };
 

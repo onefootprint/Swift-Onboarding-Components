@@ -17,7 +17,7 @@ const ApiKeys = () => {
     <section data-testid="api-keys-section">
       <Stack align="center" justify="space-between" marginBottom={7}>
         <Stack direction="column" gap={2}>
-          <Typography variant="heading-2">{t('section-title')}</Typography>
+          <Typography variant="heading-2">{t('header.title')}</Typography>
           <Typography variant="body-2" color="secondary">
             {t('header.subtitle')}
           </Typography>

@@ -18,15 +18,15 @@ const ProxyConfigs = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Stack
+        align="center"
         direction="row"
         justify="space-between"
-        align="center"
         marginBottom={7}
       >
         <Stack direction="column" gap={2}>
-          <Typography variant="heading-2">{t('section-title')}</Typography>
+          <Typography variant="heading-2">{t('header.title')}</Typography>
           <Typography variant="body-2" color="secondary">
-            {t('subtitle')}
+            {t('header.subtitle')}
           </Typography>
         </Stack>
         <Create />

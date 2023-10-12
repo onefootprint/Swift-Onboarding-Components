@@ -2191,7 +2191,7 @@
       }
     },
     "api-keys": {
-      "section-title": "API keys",
+      "page-title": "Footprint | Api keys",
       "roles": {
         "header": {
           "title": "API key access roles",
@@ -2272,9 +2272,10 @@
     },
     "proxy-configs": {
       "page-title": "Footprint | Vault Proxy",
-      "section-title": "Vault Proxy",
-      "title": "Vault Proxy configurations",
-      "subtitle": "Manage your vault proxy configurations",
+      "header": {
+        "title": "Vault Proxy configurations",
+        "subtitle": "Manage your vault proxy configurations"
+      },
       "status": {
         "enabled": "Enabled",
         "disabled": "Disabled"
@@ -2496,6 +2497,15 @@
         }
       }
     },
+    "webhooks": {
+      "page-title": "Footprint | Webhooks",
+      "header": {
+        "title": "Webhooks",
+        "subtitle": "Setup webhooks to receive updates when events happen in Footprint.",
+        "not-allowed": "You're not allowed to create or modify webhooks"
+      },
+      "loading": "Loading..."
+    },
     "dialog-test-onboarding": {
       "heading": "Test Playbook",
       "title": "One last recommendation:",
@@ -2512,26 +2522,6 @@
       },
       "cta": "Test Playbook",
       "cancel": "Cancel"
-    },
-    "header": {
-      "title": "Developers",
-      "subtitle": {
-        "live": "You're viewing live keys. Enable sandbox mode to view test keys.",
-        "sandbox": "You're viewing test keys. Disable sandbox mode to view live keys."
-      },
-      "toggle-sandbox": {
-        "label": "Sandbox mode",
-        "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
-      }
-    },
-    "webhooks": {
-      "section-title": "Webhooks",
-      "header": {
-        "title": "Webhooks",
-        "subtitle": "Setup webhooks to receive updates when events happen in Footprint.",
-        "not-allowed": "You're not allowed to create or modify webhooks"
-      },
-      "loading": "Loading..."
     }
   }
 }
