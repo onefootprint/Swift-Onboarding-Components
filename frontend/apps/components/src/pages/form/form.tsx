@@ -71,12 +71,25 @@ const Form = () => {
     ? false
     : checkIsExpired(expiresAt);
   if (!isValid || !hasPermissions || isExpired) {
+    if (!hasPermissions) {
+      console.error('Auth token is missing permissions to store to vault');
+    }
+    if (isExpired) {
+      console.error('Client auth token is expired, cannot save to vault');
+    }
     return <Invalid onClose={handleClose} />;
   }
 
   const handleSave = async (formData: FormData) => {
     const cardAlias = getCardAlias(vaultFields);
-    if (!cardAlias || isExpired) {
+    if (isExpired) {
+      console.error('Client auth token is expired, cannot save to vault');
+      return;
+    }
+    if (!cardAlias) {
+      console.error(
+        'Cannot extract cardAlias from auth token. Please verify auth token has correct fields set on it.',
+      );
       return;
     }
 
