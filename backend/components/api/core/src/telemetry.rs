@@ -1,3 +1,7 @@
+use std::pin::Pin;
+
+use actix_web::FromRequest;
+use futures_util::Future;
 use opentelemetry::global;
 use opentelemetry::sdk::metrics::controllers::BasicController;
 use opentelemetry::sdk::metrics::selectors;
@@ -91,7 +95,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
 
         let InsightHeaders {
             ip_address,
-            city,
+            city: _,
             country,
             region_name: _,
             latitude,
@@ -133,11 +137,12 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             fp_id = tracing::field::Empty,
             tenant_user_id = tracing::field::Empty,
             vault_id = tracing::field::Empty,
+            // Free-form data to be added by individual APIs if they choose
+            meta = tracing::field::Empty,
             route,
             ip_address,
             latitude,
             longitude,
-            city,
             country,
             user_agent,
             session_id,
@@ -155,3 +160,31 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         DefaultRootSpanBuilder::on_request_end(span, outcome)
     }
 }
+
+/// Wrapper around tracing_actix_web::RootSpan that also implements paperclip Apiv2Schema
+#[derive(derive_more::Deref)]
+pub struct RootSpan(#[deref] tracing_actix_web::RootSpan);
+
+impl FromRequest for RootSpan {
+    type Error = <tracing_actix_web::RootSpan as FromRequest>::Error;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
+
+    fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
+        let root_span = <tracing_actix_web::RootSpan as FromRequest>::from_request(req, payload);
+        Box::pin(async move {
+            let root_span = root_span.await?;
+            Ok(Self(root_span))
+        })
+    }
+}
+
+impl paperclip::v2::schema::Apiv2Schema for RootSpan {
+    fn name() -> Option<String> {
+        Some("RootSpan".to_string())
+    }
+    fn description() -> &'static str {
+        "Wrapper around tracing_actix_web::RootSpan that also implements paperclip Apiv2Schema"
+    }
+}
+
+impl paperclip::actix::OperationModifier for RootSpan {}

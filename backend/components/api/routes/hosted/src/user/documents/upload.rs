@@ -12,6 +12,7 @@ use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::vendor;
 use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
+use api_core::telemetry::RootSpan;
 use api_core::types::JsonApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
 use api_core::utils::headers::get_bool_header;
@@ -38,7 +39,6 @@ use paperclip::actix::{self, api_v2_operation, web};
 use std::pin::Pin;
 
 #[derive(Debug, Apiv2Schema)]
-// TODO barcodes? wouldn't be great to send in header bc has PII?
 pub struct MetaHeaders {
     pub is_instant_app: Option<bool>,
     pub is_app_clip: Option<bool>,
@@ -93,6 +93,7 @@ pub async fn post(
     mut payload: Multipart,
     request: HttpRequest,
     meta: MetaHeaders,
+    root_span: RootSpan,
 ) -> JsonApiResponse<DocumentResponse> {
     let file = handle_file_upload(&mut payload, &request, None, 5_242_880).await?;
 
@@ -248,6 +249,9 @@ pub async fn post(
         .into_iter()
         .find(|s| missing_sides.contains(s));
     if meta.process_separately.unwrap_or_default() {
+        // Tracing so we can query for when no requests are being sent with the old API
+        tracing::info!("Processing separately");
+        root_span.record("meta", "process_separately");
         // Bogus response - the client isn't reading it anymore
         let response = DocumentResponse {
             next_side_to_collect,
@@ -256,6 +260,7 @@ pub async fn post(
         };
         return ResponseData::ok(response).json();
     }
+    root_span.record("meta", "not_process_separately");
     tracing::info!("Performing process inside upload endpoint");
     let response = if let Some((di, doc_request, id_doc_id, failed_attempts_for_side)) = created_reqs {
         // Not sandbox - make our request to vendors!
