@@ -10,9 +10,9 @@ const Path = ({ type, url }: PathProps) => {
   const assignVariant = () => {
     switch (type) {
       case 'post':
-        return 'neutral';
-      case 'get':
         return 'success';
+      case 'get':
+        return 'neutral';
       case 'delete':
         return 'error';
       case 'patch':
