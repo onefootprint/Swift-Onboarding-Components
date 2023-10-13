@@ -11,7 +11,7 @@ use super::watchlist_check::WatchlistCheck;
 use super::workflow::Workflow;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
 use db_schema::schema::scoped_vault::{self};
 use diesel::dsl::{count_distinct, not};
 use diesel::prelude::*;
@@ -43,6 +43,9 @@ pub struct ScopedVault {
     ///   (1) the ScopedVault was created via API as a non-portable user OR
     ///   (2) the ScopedVault has an authorized onboarding
     pub is_billable: bool,
+    /// Last time we logged a hosted API interacted with this scoped vault. Vaults touched recently
+    /// are considered in progress if their KYC status is still incomplete
+    pub last_heartbeat_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -55,6 +58,7 @@ struct NewScopedVault {
     start_timestamp: DateTime<Utc>,
     is_live: bool,
     is_billable: bool,
+    last_heartbeat_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Default, AsChangeset)]
@@ -161,6 +165,7 @@ impl ScopedVault {
             // All vaults created via bifrost start as non-billable. They are marked billable as
             // soon as they have an authorized workflow
             is_billable: false,
+            last_heartbeat_at: Utc::now(),
         };
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
@@ -194,6 +199,7 @@ impl ScopedVault {
                 vault_id: uv.id.clone(),
                 // All vaults created via API are billable
                 is_billable: true,
+                last_heartbeat_at: Utc::now(),
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)
@@ -323,6 +329,17 @@ impl ScopedVault {
             .filter(scoped_vault::id.eq(id))
             .set(update)
             .execute(conn)?;
+        Ok(())
+    }
+
+    pub fn set_heartbeat(&self, conn: &mut PgConn) -> DbResult<()> {
+        // To reduce frequency of writes, only set the heartbeat if it's >3 mins old
+        if Utc::now() - self.last_heartbeat_at > Duration::minutes(3) {
+            diesel::update(scoped_vault::table)
+                .filter(scoped_vault::id.eq(&self.id))
+                .set(scoped_vault::last_heartbeat_at.eq(Utc::now()))
+                .execute(conn)?;
+        }
         Ok(())
     }
 }

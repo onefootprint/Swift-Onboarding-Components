@@ -68,6 +68,7 @@ impl ExtractableAuthSession for ParsedUserWfSession {
 
         // Confirm that the onboarding in the auth token belongs to the user
         let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &user_session.user.id))?;
+        scoped_user.set_heartbeat(conn)?;
 
         let workflow_id = user_session.workflow_id().ok_or(AuthError::MissingWorkflow)?;
         let workflow = Workflow::get(conn, &workflow_id)?;

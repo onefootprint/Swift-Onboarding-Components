@@ -646,6 +646,7 @@ table! {
         is_live -> Bool,
         status -> Nullable<Text>,
         is_billable -> Bool,
+        last_heartbeat_at -> Timestamptz,
     }
 }
 
