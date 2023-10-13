@@ -8,10 +8,10 @@ const ContentSecurityPolicy = `
   form-action 'self';
   frame-ancestors 'self';
   frame-src 'self' *.onefootprint.com vercel.live;
-  img-src 'self' data: assets.vercel.com vercel.live vercel.com;
+  img-src 'self' data: assets.vercel.com vercel.live vercel.com cdn.jsdelivr.net;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com;
-  style-src 'self' 'unsafe-inline' fonts.googleapis.com;
+  style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;
 `;
 

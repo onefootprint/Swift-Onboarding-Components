@@ -7,20 +7,8 @@ export type FlagProps = {
   testID?: string;
 };
 
-const Flag = ({ code, testID, className }: FlagProps) => (
-  <svg
-    className={className}
-    data-testid={testID}
-    width={20}
-    height={15}
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-  >
-    <use xlinkHref={`#flag-${code.toLowerCase()}`} />
-  </svg>
+const Flag = ({ code, testID, className = '' }: FlagProps) => (
+  <div className={`fp-f f-${code} ${className}`} data-testid={testID} />
 );
 
-export default process.env.NODE_ENV === 'test'
-  ? (_: FlagProps) => null // eslint-disable-line @typescript-eslint/no-unused-vars
-  : Flag;
+export default Flag;

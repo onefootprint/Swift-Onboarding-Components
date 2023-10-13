@@ -10,10 +10,10 @@ const ContentSecurityPolicy = `
   form-action 'self';
   frame-ancestors 'self';
   frame-src 'self' vercel.live;
-  img-src 'self' data: assets.vercel.com vercel.live vercel.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net;
+  img-src 'self' data: assets.vercel.com vercel.live vercel.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net cdn.jsdelivr.net;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com maps.googleapis.com fpnpmcdn.net js.dvnfo.com cdn.jsdelivr.net docs.opencv.org elements.stytch.com https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://cdn.ingest-lr.com;
-  style-src 'self' 'unsafe-inline' fonts.googleapis.com;
+  style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;
 `;
 

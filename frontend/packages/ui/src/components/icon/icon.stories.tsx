@@ -1,5 +1,4 @@
 import themes from '@onefootprint/design-tokens';
-import { flags } from '@onefootprint/flags';
 import { IcoChevronDown16, icos } from '@onefootprint/icons';
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import React from 'react';
@@ -37,28 +36,6 @@ export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({
               </Box>
               <Typography variant="body-2" color="primary">
                 {iconName}
-              </Typography>
-            </Stack>
-            <hr />
-          </>
-        );
-      })}
-    </Box>
-    <Box>
-      <Typography color="primary" variant="heading-2" sx={{ marginBottom: 3 }}>
-        Flags
-      </Typography>
-      {Object.keys(flags).map(flagName => {
-        // @ts-ignore
-        const IcoComponent = flags[flagName];
-        return (
-          <>
-            <Stack align="center" marginBottom={2}>
-              <Box minWidth="32px">
-                <IcoComponent color={color} testID={testID} />
-              </Box>
-              <Typography variant="body-2" color="primary">
-                {flagName}
               </Typography>
             </Stack>
             <hr />

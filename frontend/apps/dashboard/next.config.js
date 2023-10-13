@@ -10,11 +10,11 @@ const DevContentSecurityPolicy = `
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-ancestors 'self';
-  frame-src 'self' vercel.live https://app.svix.com calendly.com ;
+  frame-src 'self' vercel.live https://app.svix.com calendly.com cdn.jsdelivr.net;
   img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com;
-  style-src 'self' 'unsafe-inline' fonts.googleapis.com;
+  style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;
 `;
 
@@ -29,7 +29,7 @@ const ProdContentSecurityPolicy = `
   img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com;
-  style-src 'self' 'unsafe-inline' fonts.googleapis.com;
+  style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;
 `;
 

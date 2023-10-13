@@ -24,7 +24,6 @@
   "dependencies": {
     "@formkit/auto-animate": "^1.0.0-beta.5",
     "@onefootprint/design-tokens": "*",
-    "@onefootprint/flags": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/jest-presets": "*",
