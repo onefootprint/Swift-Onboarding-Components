@@ -66,7 +66,7 @@ ID_DATA = {
     "id.dob": "1995-12-25",
     "id.address_line1": "1 Footprint Way",
     "id.address_line2": "PO Box Wallaby Way",
-    "id.city": "Enclave",
+    "id.city": "Enclave ",  # white space should be removed
     "id.state": "NY",
     "id.zip": "10009",
     "id.country": "US",

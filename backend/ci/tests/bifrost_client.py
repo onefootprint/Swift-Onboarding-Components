@@ -143,6 +143,7 @@ class BifrostClient:
     def decrypted_data(self):
         return {
             **self.data,
+            "id.city": self.data["id.city"].strip(),
             "id.ssn4": self.data["id.ssn9"][-4:],
             "id.email": self.data["id.email"].split("#")[0],
             "id.phone_number": self.data["id.phone_number"]

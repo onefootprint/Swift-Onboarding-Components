@@ -84,6 +84,14 @@ impl PiiJsonValue {
         };
         Ok(result)
     }
+
+    /// If self is a String type, trim excess whitespace
+    pub fn trim_whitespace(self) -> Self {
+        match self {
+            Self(serde_json::Value::String(s)) => Self(serde_json::Value::String(s.trim().to_string())),
+            v => v,
+        }
+    }
 }
 
 impl PiiString {

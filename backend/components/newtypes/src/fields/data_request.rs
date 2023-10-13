@@ -146,12 +146,20 @@ impl DataRequest<()> {
 
         // Clean and validate each individual piece of data
         let all_data = map.clone();
-        let (cleaned_data, errors): (Vec<_>, HashMap<_, _>) =
-            map.into_iter()
-                .partition_map(|(k, v)| match k.clone().validate(v, args, &all_data) {
-                    Ok(v) => Left(v),
-                    Err(err) => Right((k, err)),
-                });
+        let (cleaned_data, errors): (Vec<_>, HashMap<_, _>) = map
+            .into_iter()
+            .map(|(k, v)| {
+                // For fields added via bifrost, trim unnecessary whitespaces
+                if args.for_bifrost && matches!(k, DataIdentifier::Id(_) | DataIdentifier::Business(_)) {
+                    (k, v.trim_whitespace())
+                } else {
+                    (k, v)
+                }
+            })
+            .partition_map(|(k, v)| match k.clone().validate(v, args, &all_data) {
+                Ok(v) => Left(v),
+                Err(err) => Right((k, err)),
+            });
         if !errors.is_empty() {
             return Err(DataValidationError::FieldValidationError(errors).into());
         }

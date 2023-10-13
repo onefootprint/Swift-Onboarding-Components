@@ -55,7 +55,7 @@ def test_decrypt_basic(sandbox_user_real_phone, auth_token):
     data = dict(fields=BASIC_FIELDS)
     body = post("/hosted/user/vault/decrypt", data, auth_token)
     for k in BASIC_FIELDS:
-        assert body[k] == sandbox_user_real_phone.client.data[k]
+        assert body[k] == sandbox_user_real_phone.client.decrypted_data[k]
 
     for f in SENSITIVE_FIELDS:
         data = dict(fields=[f])
