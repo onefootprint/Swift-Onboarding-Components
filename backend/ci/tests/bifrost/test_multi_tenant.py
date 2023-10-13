@@ -154,21 +154,22 @@ def test_cant_decrypt_unrequested_portable(dual_onboarded_user, foo_sandbox_tena
     # Now, we shouldn't be able to decrypt nationality or ssn9 since they weren't requested by foo_sandbox_tenant
     fp_id = dual_onboarded_user.foo_fp_id
 
+    # Even though the nationality and ssn9 exist, this tenant isn't able to see it
     data = dict(fields=["id.nationality"], reason="Hello")
-    post(
+    body = post(
         f"entities/{fp_id}/vault/decrypt",
         data,
         *foo_sandbox_tenant.db_auths,
-        status_code=401,
     )
+    assert body["id.nationality"] is None
 
     data = dict(fields=["id.ssn9"], reason="Hello")
-    post(
+    body = post(
         f"entities/{fp_id}/vault/decrypt",
         data,
         *foo_sandbox_tenant.db_auths,
-        status_code=401,
     )
+    assert body["id.ssn9"] is None
 
     # But, ssn4 is visible
     data = dict(fields=["id.ssn4"], reason="Hello")

@@ -37,10 +37,15 @@ pub async fn bulk_decrypt<'a, TKey, T>(
 where
     TKey: Eq + std::hash::Hash + 'static + Clone,
 {
-    for r in requests.values() {
-        let dis = r.targets.iter().map(|op| &op.identifier).collect_vec();
-        r.vw.check_ob_config_access(dis)?;
-    }
+    let requests = requests
+        .into_iter()
+        .map(|(k, r)| -> ApiResult<_> {
+            let BulkDecryptReq { vw, targets } = r;
+            let targets = r.vw.check_ob_config_access(targets)?;
+            let req = BulkDecryptReq { vw, targets };
+            Ok((k, req))
+        })
+        .collect::<ApiResult<Vec<_>>>()?;
 
     let decrypt_requests = requests
         .iter()

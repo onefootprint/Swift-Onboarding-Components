@@ -121,15 +121,6 @@ def test_middle_name(sandbox_tenant, twilio, middle_name, can_access_name):
     user = bifrost.run()
 
     # test decrypt permissions
-    if (
-        can_access_name or middle_name is None
-    ):  # if you don't have permission to decrypt a DI but its not set, we just return null instead of throwing a permission error
-        expected_decrypt_error = None
-    else:
-        expected_decrypt_error = (
-            f"Not allowed: insufficient permissions to decrypt attributes: {di}"
-        )
-
     res = post(
         f"/users/{user.fp_id}/vault/decrypt",
         dict(
@@ -137,13 +128,12 @@ def test_middle_name(sandbox_tenant, twilio, middle_name, can_access_name):
             fields=[di],
         ),
         sandbox_tenant.sk.key,
-        status_code=200 if expected_decrypt_error is None else 401,
     )
 
-    if expected_decrypt_error:
-        assert res["error"]["message"] == expected_decrypt_error
-    else:
+    if can_access_name:
         assert res[di] == middle_name
+    else:
+        assert res[di] is None
 
     # assert that /users/ includes id.middle_name cause why not
     res = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)

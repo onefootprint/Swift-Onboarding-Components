@@ -1,27 +1,23 @@
 use super::TenantVw;
-use crate::auth::AuthError;
 use crate::utils::vault_wrapper::decrypt::{EnclaveDecryptOperation, Pii};
 use crate::{errors::ApiResult, State};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use itertools::Itertools;
-use newtypes::{AccessEventKind, AccessEventPurpose, DataIdentifier, DbActor};
+use newtypes::{AccessEventKind, AccessEventPurpose, DbActor};
 use std::collections::HashMap;
 
 impl<Type> TenantVw<Type> {
-    // Before decrypting, asserts that the requested fields are decryptable by this VW
-    pub(super) fn check_ob_config_access(&self, ids: Vec<&DataIdentifier>) -> ApiResult<()> {
-        let cannot_access = ids
+    /// Before decrypting, filter out fields are not decryptable by the ob configs on this VW.
+    pub(super) fn check_ob_config_access(
+        &self,
+        targets: Vec<EnclaveDecryptOperation>,
+    ) -> ApiResult<Vec<EnclaveDecryptOperation>> {
+        let can_access = targets
             .into_iter()
-            .filter(|x| self.has_field((*x).clone()))
-            .filter(|x| !self.can_decrypt((*x).clone()))
+            .filter(|x| !self.has_field((x.identifier).clone()) || self.can_decrypt(x.identifier.clone()))
             .collect_vec();
-        if !cannot_access.is_empty() {
-            let cannot_access_fields_str = cannot_access.into_iter().map(|x| x.to_string()).join(", ");
-            return Err(AuthError::MissingDecryptPermission(cannot_access_fields_str).into());
-        }
-
-        Ok(())
+        Ok(can_access)
     }
 
     /// like `fn_decrypt` but raw bytes or string result
@@ -35,8 +31,7 @@ impl<Type> TenantVw<Type> {
         targets: Vec<EnclaveDecryptOperation>,
         purpose: AccessEventPurpose,
     ) -> ApiResult<HashMap<EnclaveDecryptOperation, Pii>> {
-        let dis = targets.iter().map(|op| &op.identifier).collect();
-        self.check_ob_config_access(dis)?;
+        let targets = self.check_ob_config_access(targets)?;
         let results = self
             .fn_decrypt_unchecked_raw(&state.enclave_client, targets)
             .await?;

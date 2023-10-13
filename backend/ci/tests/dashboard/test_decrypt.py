@@ -38,13 +38,12 @@ def test_tenant_decrypt_no_permissions(sandbox_user):
         "fields": ["id.dob"],
         "reason": "Not doing a hecking decrypt",
     }
-    post(
+    body = post(
         f"entities/{sandbox_user.fp_id}/vault/decrypt",
         data,
         tenant.sk.key,
-        # Uh oh - we should be checking ensure_scope_allows_access
-        status_code=401,
     )
+    assert body["id.dob"] is None
 
 
 #########################
@@ -61,12 +60,12 @@ def test_tenant_document_decrypt_no_permissions(sandbox_user):
     body = get(f"entities/{sandbox_user.fp_id}", None, *tenant.db_auths)
     assert not "id.dob" in body["decryptable_attributes"]
 
-    post(
+    body = post(
         f"users/{sandbox_user.fp_id}/vault/decrypt",
         data,
         tenant.sk.key,
-        status_code=401,
     )
+    assert body["id.dob"] is None
 
 
 def test_tenant_image_decrypt(

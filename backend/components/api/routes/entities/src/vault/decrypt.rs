@@ -274,7 +274,7 @@ pub(super) async fn post_inner(
         })
         .await??;
 
-    let decrypt_reqs = version_to_targets
+    let reqs = version_to_targets
         .clone()
         .into_iter()
         .map(|(v, targets)| -> ApiResult<_> {
@@ -285,7 +285,7 @@ pub(super) async fn post_inner(
     let insight = CreateInsightEvent::from(insights);
     let actor = auth.actor().into();
     let purpose = AccessEventPurpose::Api;
-    let mut decrypted_results = bulk_decrypt(state, decrypt_reqs, insight, reason, actor, purpose)
+    let mut decrypted_results = bulk_decrypt(state, reqs, insight, reason, actor, purpose)
         .await?
         .into_iter()
         .collect::<HashMap<_, _>>();
