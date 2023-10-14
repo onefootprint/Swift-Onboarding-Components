@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 
+const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
+const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
+
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
   connect-src 'self' localhost:8000 vitals.vercel-insights.com vercel.live *.ingest.sentry.io *.onefootprint.com maps.googleapis.com *.pusher.com wss://*.pusher.com 189225732777.collect.observeinc.com; 
@@ -41,7 +44,7 @@ const securityHeaders = [
   },
 ];
 
-module.exports = {
+const nextConfig = {
   productionBrowserSourceMaps: true,
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   reactStrictMode: false,
@@ -68,3 +71,11 @@ module.exports = {
     '@onefootprint/appearance',
   ],
 };
+
+if (IS_OUTPUT_STANDALONE) {
+  nextConfig.output = 'standalone';
+}
+
+module.exports = IS_ANALYZE_ACTIVE
+  ? require('@next/bundle-analyzer')({ enabled: true })(nextConfig)
+  : nextConfig;
