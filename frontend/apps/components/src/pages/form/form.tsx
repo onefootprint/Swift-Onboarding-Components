@@ -7,7 +7,7 @@ import {
 import { getErrorMessage } from '@onefootprint/request';
 import { CardDIField } from '@onefootprint/types';
 import type { GetServerSideProps } from 'next';
-import React, { useRef } from 'react';
+import React, { Suspense, useRef } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useFootprintProvider } from '../../components/footprint-provider';
@@ -124,18 +124,20 @@ const Form = () => {
   };
 
   return (
-    <FormBase
-      ref={formBaseRef}
-      title={title}
-      type={type}
-      variant={variant}
-      isLoading={usersVaultMutation.isLoading}
-      hideFootprintLogo={options?.hideFootprintLogo}
-      hideButtons={options?.hideButtons}
-      onSave={handleSave}
-      onCancel={handleCancel}
-      onClose={handleClose}
-    />
+    <Suspense fallback={null}>
+      <FormBase
+        ref={formBaseRef}
+        title={title}
+        type={type}
+        variant={variant}
+        isLoading={usersVaultMutation.isLoading}
+        hideFootprintLogo={options?.hideFootprintLogo}
+        hideButtons={options?.hideButtons}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        onClose={handleClose}
+      />
+    </Suspense>
   );
 };
 
