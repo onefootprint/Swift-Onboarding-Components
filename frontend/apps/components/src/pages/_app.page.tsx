@@ -1,5 +1,4 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { createGlobalStyle } from '@onefootprint/styled';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
@@ -25,18 +24,12 @@ const App = ({ Component, pageProps }: AppProps) => {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <ObserveCollectorProvider appName="components">
-          <AppearanceProvider
-            appearance={appearance}
-            theme={theme}
-            rules={rules}
-          >
-            <GlobalStyle />
-            <FootprintProvider client={footprint}>
-              <Component {...pageProps} />
-            </FootprintProvider>
-          </AppearanceProvider>
-        </ObserveCollectorProvider>
+        <AppearanceProvider appearance={appearance} theme={theme} rules={rules}>
+          <GlobalStyle />
+          <FootprintProvider client={footprint}>
+            <Component {...pageProps} />
+          </FootprintProvider>
+        </AppearanceProvider>
       </QueryClientProvider>
       <Script
         src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&callback=Function.prototype`}
