@@ -78,7 +78,7 @@ async fn patch(
 
     // some basic validation on allowed origins
     if is_live && urls.iter().any(|url| url.scheme() != "https") {
-        return Err(TenantError::AllowedOriginsMustBeHttpsInLive)?;
+        Err(TenantError::AllowedOriginsMustBeHttpsInLive)?;
     }
 
     let TenantClientConfig {

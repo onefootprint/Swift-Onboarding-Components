@@ -16,7 +16,7 @@ pub fn idology_rule_set() -> RuleSet<IDologyFeatures> {
 
     let all_rules = hard_fail_rules
         .into_iter()
-        .chain(alpaca_field_validation_rules::<IDologyFeatures>().into_iter())
+        .chain(alpaca_field_validation_rules::<IDologyFeatures>())
         .collect();
 
     RuleSet {
@@ -30,7 +30,7 @@ pub fn experian_rule_set() -> RuleSet<ExperianFeatures> {
 
     let all_rules = hard_fail_rules
         .into_iter()
-        .chain(alpaca_field_validation_rules::<ExperianFeatures>().into_iter())
+        .chain(alpaca_field_validation_rules::<ExperianFeatures>())
         .collect();
 
     RuleSet {
@@ -100,7 +100,7 @@ fn alpaca_field_validation_rules<T: FeatureSet>() -> Vec<Rule<T>> {
 pub fn alpaca_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
     super::kyc::kyc_rules()
         .into_iter()
-        .chain(field_validation_rules().into_iter())
+        .chain(field_validation_rules())
         .collect()
 }
 #[allow(dead_code)]

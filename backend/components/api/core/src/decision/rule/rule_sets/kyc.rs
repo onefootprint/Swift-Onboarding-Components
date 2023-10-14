@@ -205,7 +205,7 @@ pub fn kyc_rules() -> Vec<Rule<Vec<FRC>>> {
 
     // TODO: rm once we have transitioned to RSG<AML>
     kyc.into_iter()
-        .chain(super::common::aml_rules().into_iter())
+        .chain(super::common::aml_rules())
         .collect()
 }
 #[cfg(test)]
@@ -245,8 +245,7 @@ mod tests {
                 RuleName::CoppaAlert,
                 // potential watchlist hits
                 RuleName::WatchlistHit,
-            ]
-            .into_iter(),
+            ],
         );
 
         let rules = HashSet::from_iter(idology_rule_set().rules.into_iter().map(|r| r.name));

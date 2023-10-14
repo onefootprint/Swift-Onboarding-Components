@@ -120,9 +120,9 @@ jobs:
           path: |
             ~/docker-cache
             ./backend/target
-          key: ${{ runner.os }}-cargo-cache-docker-1-70-${{ hashFiles('backend/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-cache-docker-1-73-${{ hashFiles('backend/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-cache-docker-1-70
+            ${{ runner.os }}-cargo-cache-docker-1-73
 
       - name: Restore docker cache
         run: |

@@ -173,7 +173,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Kyc> {
 
                 f.footprint_reason_codes
                     .into_iter()
-                    .chain(user_input_risk_signals.clone().into_iter())
+                    .chain(user_input_risk_signals.clone())
                     .filter(|r| !r.is_aml()) // Filter out AML reason codes!
                     .map(|r| (r, VendorAPI::IdologyExpectId, vres.to_owned()))
                     .collect()
@@ -186,7 +186,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Kyc> {
 
                 f.footprint_reason_codes
                     .into_iter()
-                    .chain(user_input_risk_signals.clone().into_iter())
+                    .chain(user_input_risk_signals.clone())
                     .filter(|r| !r.is_aml()) // Filter out AML reason codes!
                     .map(|r| (r, VendorAPI::ExperianPreciseId, vres.to_owned()))
                     .collect()
@@ -197,7 +197,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Kyc> {
         RiskSignalGroupStruct {
             footprint_reason_codes: idology_features
                 .into_iter()
-                .chain(experian_features.into_iter())
+                .chain(experian_features)
                 .collect(),
             group: Kyc,
         }
@@ -241,7 +241,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Aml> {
         RiskSignalGroupStruct {
             footprint_reason_codes: idology_features
                 .into_iter()
-                .chain(experian_features.into_iter())
+                .chain(experian_features)
                 .collect(),
             group: Aml,
         }
@@ -360,8 +360,8 @@ impl TryFrom<RiskSignalsForDecision> for IDologyFeatures {
     type Error = crate::decision::Error;
 
     fn try_from(signals: RiskSignalsForDecision) -> Result<Self, Self::Error> {
-        let kyc_reason_codes = signals.kyc.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
-        let aml_reason_codes = signals.aml.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
+        let kyc_reason_codes = signals.kyc.map(|s| s.footprint_reason_codes).unwrap_or_default();
+        let aml_reason_codes = signals.aml.map(|s| s.footprint_reason_codes).unwrap_or_default();
 
         let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = kyc_reason_codes
             .into_iter()
@@ -394,12 +394,12 @@ impl TryFrom<RiskSignalsForDecision> for ExperianFeatures {
     type Error = crate::decision::Error;
 
     fn try_from(signals: RiskSignalsForDecision) -> Result<Self, Self::Error> {
-        let kyc_reason_codes = signals.kyc.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
-        let aml_reason_codes = signals.aml.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
+        let kyc_reason_codes = signals.kyc.map(|s| s.footprint_reason_codes).unwrap_or_default();
+        let aml_reason_codes = signals.aml.map(|s| s.footprint_reason_codes).unwrap_or_default();
 
         let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = kyc_reason_codes
             .into_iter()
-            .chain(aml_reason_codes.into_iter())
+            .chain(aml_reason_codes)
             .filter_map(|(frc, vendor_api, verification_result_id)| {
                 if vendor_api == VendorAPI::ExperianPreciseId {
                     Some((frc, verification_result_id))
@@ -428,8 +428,8 @@ impl TryFrom<RiskSignalsForDecision> for IncodeDocumentFeatures {
     type Error = crate::decision::Error;
 
     fn try_from(signals: RiskSignalsForDecision) -> Result<Self, Self::Error> {
-        let doc_reason_codes = signals.doc.map(|s| s.footprint_reason_codes).unwrap_or(vec![]);
-        let apis = vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOcr];
+        let doc_reason_codes = signals.doc.map(|s| s.footprint_reason_codes).unwrap_or_default();
+        let apis = [VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOcr];
 
         let (footprint_reason_codes, mut verification_result_ids): (Vec<_>, Vec<_>) = doc_reason_codes
             .into_iter()

@@ -716,11 +716,9 @@ fn get_review_reasons(wc_reason_codes: &[FootprintReasonCode], collected_doc: bo
         .iter()
         .any(|rs| rs == &FootprintReasonCode::AdverseMediaHit);
 
-    let wl_hit = vec![
-        FootprintReasonCode::WatchlistHitOfac,
+    let wl_hit = [FootprintReasonCode::WatchlistHitOfac,
         FootprintReasonCode::WatchlistHitNonSdn,
-        FootprintReasonCode::WatchlistHitPep,
-    ]
+        FootprintReasonCode::WatchlistHitPep]
     .iter()
     .any(|r| wc_reason_codes.contains(r));
 

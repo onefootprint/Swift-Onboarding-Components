@@ -320,7 +320,7 @@ impl ValidatedIdvData {
 /// CC requires a JWT auth token (TTL 30m), and these credentials are used in the request to get a token
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
-pub(self) struct CrossCoreAuthTokenCredentials {
+ struct CrossCoreAuthTokenCredentials {
     pub(super) username: PiiString,
     pub(super) password: PiiString,
     pub(super) client_id: PiiString,
@@ -331,7 +331,7 @@ pub(self) struct CrossCoreAuthTokenCredentials {
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
 
-pub(self) struct CrossCoreRequestCredentials {
+ struct CrossCoreRequestCredentials {
     pid_username: PiiString,
     pid_password: Base64EncodedString,
 }

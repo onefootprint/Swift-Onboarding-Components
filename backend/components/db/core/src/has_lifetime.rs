@@ -50,7 +50,7 @@ pub trait HasLifetime {
                     .ok_or(DbError::RelatedObjectNotFound)
             })
             .collect::<DbResult<Vec<_>>>()?;
-        let results = uv_ids.into_iter().zip(results.into_iter()).into_group_map();
+        let results = uv_ids.into_iter().zip(results).into_group_map();
         Ok(results)
     }
 

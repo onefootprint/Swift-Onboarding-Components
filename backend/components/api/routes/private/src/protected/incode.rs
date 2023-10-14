@@ -1,9 +1,10 @@
-use crate::{auth::ProtectedAuth, State};
+use crate::auth::ProtectedAuth;
 use actix_web::{post, web, web::Json};
 use api_core::{
     errors::{ApiResult, AssertionError},
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::{VaultWrapper, VwArgs},
+    State,
 };
 use api_wire_types::DocumentResponse;
 use db::models::{

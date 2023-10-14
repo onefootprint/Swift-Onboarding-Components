@@ -292,7 +292,7 @@ impl Complete {
 
         // Then add some extracted OCR data to the vault.
         let ocr_data = ocr_data(fetch_ocr_response, dk);
-        let data = HashMap::from_iter(ocr_data.into_iter().chain(id_data.into_iter()));
+        let data = HashMap::from_iter(ocr_data.into_iter().chain(id_data));
         let data = DataRequest::clean_and_validate_str(data, validate_args)?;
         let data = data.no_fingerprints();
         let source = DataLifetimeSource::Ocr;

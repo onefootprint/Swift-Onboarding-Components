@@ -68,11 +68,9 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
             rule: {
                 |f: &Vec<FootprintReasonCode>| {
                     f.iter().any(|rc| {
-                        vec![
-                            FootprintReasonCode::DocumentTypeMismatch,
+                        [FootprintReasonCode::DocumentTypeMismatch,
                             FootprintReasonCode::DocumentUnknownCountryCode,
-                            FootprintReasonCode::DocumentCountryCodeMismatch,
-                        ]
+                            FootprintReasonCode::DocumentCountryCodeMismatch]
                         .contains(rc)
                     })
                 }

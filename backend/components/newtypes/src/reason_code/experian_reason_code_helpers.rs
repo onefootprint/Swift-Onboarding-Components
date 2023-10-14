@@ -62,7 +62,7 @@ impl NameGrouping {
                     vec![FootprintReasonCode::NamePartiallyMatches]
                 };
 
-                first.chain(last).chain(overall_frc.into_iter()).collect()
+                first.chain(last).chain(overall_frc).collect()
             }
             NameGrouping::FullName(ml) => Self::FirstAndLast((ml, ml)).codes(),
             NameGrouping::FullNameSimple(ml) => match ml {
@@ -170,7 +170,7 @@ impl AddressGrouping {
                     _ => vec![],
                 };
 
-                codes.into_iter().chain(overall.into_iter()).collect()
+                codes.into_iter().chain(overall).collect()
             }
             AddressGrouping::AddressExactExcept(e) => {
                 let except_attributes: Vec<AddressAttribute> = e.iter().map(|(a, _)| a).cloned().collect();
@@ -188,7 +188,7 @@ impl AddressGrouping {
                 except_codes
                     .chain(rest_codes)
                     // this is always partial for overall address
-                    .chain(vec![FootprintReasonCode::AddressPartiallyMatches].into_iter())
+                    .chain(vec![FootprintReasonCode::AddressPartiallyMatches])
                     .collect()
             }
 

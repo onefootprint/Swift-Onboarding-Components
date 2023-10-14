@@ -1,5 +1,3 @@
-use paperclip::actix::web;
-
 mod access_events;
 mod api_keys;
 mod authn;
