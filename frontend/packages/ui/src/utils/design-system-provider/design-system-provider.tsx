@@ -179,6 +179,8 @@ const GlobalStyle = createGlobalStyle`
  `}
 `;
 
+// TODO: Move flags to a dedicated CDN
+// https://github.com/rafaelmotta/footprint-flags
 const DesignSystemProvider = ({ children, theme }: BootstrapProps) => (
   <ThemeProvider theme={theme}>
     <GlobalStyle />
