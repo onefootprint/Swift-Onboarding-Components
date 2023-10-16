@@ -45,8 +45,8 @@ pub async fn put(
     // note: ol = 'org logo'
     // Open Qs:
     //  - maybe we should name the file by the hash of the contents? (to avoid dupes / collisions)
-    let file_extension =
-        mime_type_to_extension(file.mime_type.as_ref()).ok_or(FileUploadError::InvalidMimeType)?;
+    let file_extension = mime_type_to_extension(file.mime_type.as_ref())
+        .ok_or(FileUploadError::InvalidMimeType(file.mime_type.clone()))?;
     let file_name = format!(
         "ol/{}/{}.{}",
         tenant_url_friendly_hash,

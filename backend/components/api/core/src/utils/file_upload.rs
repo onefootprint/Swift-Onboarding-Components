@@ -84,7 +84,7 @@ pub async fn handle_file_upload(
 
     if let Some(allowed_mime_types) = restrict_to_mime_types {
         if !allowed_mime_types.contains(&mime) {
-            return Err(FileUploadError::InvalidMimeType.into());
+            return Err(FileUploadError::InvalidMimeType(mime.to_string()).into());
         }
     }
 

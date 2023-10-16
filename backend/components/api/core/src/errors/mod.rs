@@ -160,9 +160,9 @@ pub enum ApiErrorKind {
     VaultProxyError(#[from] proxy::VaultProxyError),
     #[error("Decision error: {0}")]
     DecisionError(#[from] crate::decision::Error),
-    #[error("image upload error: {0}")]
+    #[error("{0}")]
     FileUploadError(#[from] file_upload::FileUploadError),
-    #[error("internal webhook error")]
+    #[error("Internal webhook error")]
     WebhooksError(#[from] webhooks::Error),
     #[error("MiddeskError: {0}")]
     MiddeskError(#[from] middesk::MiddeskError),
