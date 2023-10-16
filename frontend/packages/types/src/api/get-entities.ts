@@ -1,4 +1,4 @@
-import type { Entity, EntityKind, OnboardingStatus } from '../data';
+import type { ApiEntityStatus, Entity, EntityKind } from '../data';
 
 export type GetEntitiesRequest = {
   kind?: EntityKind;
@@ -11,4 +11,4 @@ export type GetEntitiesRequest = {
   requires_manual_review?: string;
 };
 
-export type GetEntitiesResponse = Entity<OnboardingStatus | undefined>[];
+export type GetEntitiesResponse = Entity<ApiEntityStatus | undefined>[];

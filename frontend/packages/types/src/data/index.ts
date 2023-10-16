@@ -67,6 +67,7 @@ export type { Document, DocumentUpload } from './document-type';
 export { UploadSource } from './document-type';
 export type { Entity, EntityVault } from './entity';
 export {
+  ApiEntityStatus,
   augmentEntityWithOnboardingInfo,
   EntityKind,
   EntityStatus,

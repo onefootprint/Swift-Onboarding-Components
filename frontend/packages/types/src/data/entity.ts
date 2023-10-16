@@ -4,7 +4,6 @@ import type { DataIdentifier } from './di';
 import { DocumentDI, InvestorProfileDI } from './di';
 import type { EntityCard } from './entity-cards';
 import type { InsightEvent } from './insight-event';
-import type OnboardingStatus from './onboarding-status';
 import type { WatchlistCheckEventData } from './timeline';
 import type { VaultValue } from './vault';
 
@@ -17,12 +16,21 @@ export enum EntityKind {
   person = 'person',
 }
 
+export enum ApiEntityStatus {
+  pass = 'pass',
+  fail = 'fail',
+  pending = 'pending',
+  incomplete = 'incomplete',
+  inProgress = 'in_progress',
+}
+
 /// This type doesn't actually exist on the backend - it is a frontend-only representation of the
 /// status of an entity.
-/// Realistically, all but the `none` status exist on the backend as OnboardingStatuses
+/// Realistically, all but the `none` status exist on the backend as EntityStatuses
 export enum EntityStatus {
   failed = 'fail',
   incomplete = 'incomplete',
+  inProgress = 'in_progress',
   pending = 'pending',
   pass = 'pass',
   none = 'none', // Onboarding hasn't started for this vault
@@ -74,14 +82,14 @@ export const hasEntityDocuments = (entity: Entity) => {
 };
 
 export const augmentEntityWithOnboardingInfo = (
-  entity: Entity<OnboardingStatus | undefined>,
+  entity: Entity<ApiEntityStatus | undefined>,
 ) => ({
   ...entity,
   status: getEntityStatus(entity),
 });
 
 const getEntityStatus = (
-  entity: Entity<OnboardingStatus | undefined>,
+  entity: Entity<ApiEntityStatus | undefined>,
 ): EntityStatus =>
   entity.status
     ? (entity.status as unknown as EntityStatus)

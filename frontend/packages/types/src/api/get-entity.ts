@@ -1,7 +1,7 @@
-import type { Entity, OnboardingStatus } from '../data';
+import type { ApiEntityStatus, Entity } from '../data';
 
 export type GetEntityRequest = {
   id: string;
 };
 
-export type GetEntityResponse = Entity<OnboardingStatus | undefined>;
+export type GetEntityResponse = Entity<ApiEntityStatus | undefined>;

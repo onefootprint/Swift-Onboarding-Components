@@ -5,6 +5,7 @@ const statusToVariant: Record<EntityStatus, UIState> = {
   [EntityStatus.pass]: 'success',
   [EntityStatus.failed]: 'error',
   [EntityStatus.incomplete]: 'warning',
+  [EntityStatus.inProgress]: 'warning',
   [EntityStatus.pending]: 'warning',
   [EntityStatus.none]: 'neutral',
 };

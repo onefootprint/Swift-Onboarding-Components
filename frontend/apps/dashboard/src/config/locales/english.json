@@ -30,6 +30,7 @@
     "fail": "Failed",
     "none": "None",
     "incomplete": "Incomplete",
+    "in_progress": "In progress",
     "pending": "Pending"
   },
   "id_document": {
@@ -706,7 +707,7 @@
           "options": {
             "verified": "Verified",
             "failed": "Failed",
-            "incomplete": "Incomplete",
+            "incomplete": "Unfinished",
             "none": "None"
           }
         },

@@ -27,7 +27,7 @@ const StatusBadge = ({
 
   return (
     <StatusContainer>
-      <Badge variant={badgeVariant}>
+      <Badge variant={badgeVariant} sx={{ whiteSpace: 'nowrap' }}>
         {t(status)}
         {requiresManualReview && (
           <IconContainer>
