@@ -51,7 +51,7 @@ const Tooltip = ({
           <TriggerContainer>{children}</TriggerContainer>
         </TooltipPrimitive.Trigger>
         {(open || controlledOpen) && !disabled ? (
-          <TooltipContainer side={position} align={alignment} sideOffset={8}>
+          <TooltipContainer side={position} align={alignment} sideOffset={4}>
             {text}
           </TooltipContainer>
         ) : null}
@@ -70,7 +70,7 @@ const TooltipContainer = styled(TooltipPrimitive.Content)`
     max-width: 300px;
     min-width: fit-content;
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
-    text-align: center;
+    text-align: left;
     z-index: ${theme.zIndex.tooltip};
     will-change: opacity;
     text-transform: initial;
