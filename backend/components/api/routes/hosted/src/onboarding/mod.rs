@@ -153,7 +153,7 @@ fn is_cdo_met<Type>(
             match legal_status {
                 Some(UsLegalStatus::Citizen) => (),
                 Some(UsLegalStatus::PermanentResident) => {
-                    required_dis.extend([IDK::Nationality.into(), IDK::Citizenships.into()]);
+                    required_dis.extend([IDK::Nationality.into(), IDK::Citizenships.into()].into_iter());
                 }
                 Some(UsLegalStatus::Visa) => {
                     let addl_dis = [
@@ -162,7 +162,7 @@ fn is_cdo_met<Type>(
                         IDK::VisaKind.into(),
                         IDK::VisaExpirationDate.into(),
                     ];
-                    required_dis.extend(addl_dis);
+                    required_dis.extend(addl_dis.into_iter());
                 }
                 None => (),
             }
@@ -174,7 +174,7 @@ fn is_cdo_met<Type>(
             if country.map(|c| c.is_us_including_territories()).unwrap_or(false) {
                 // US addresses always require City, State, and Zip
                 let addl_dis = [IDK::City.into(), IDK::State.into(), IDK::Zip.into()];
-                required_dis.extend(addl_dis);
+                required_dis.extend(addl_dis.into_iter());
             }
             // Non-US addresses will have the full address in AddressLine1 and as many other
             // fields extracted as possible

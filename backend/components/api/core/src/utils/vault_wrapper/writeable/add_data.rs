@@ -161,7 +161,7 @@ mod test {
             data: Vec<(DataIdentifier, PiiString)>,
             create_fingerprints: bool,
         ) -> ApiResult<Vec<NewContactInfo>> {
-            let data = HashMap::from_iter(data);
+            let data = HashMap::from_iter(data.into_iter());
             let request =
                 DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(self.vault.is_live))?;
             // Add fingerprints for ID data

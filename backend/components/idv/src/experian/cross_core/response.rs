@@ -131,7 +131,7 @@ impl CrossCoreAPIResponse {
                     .filter_map(|e| e.response_code.clone())
                     .collect::<Vec<_>>()
             })
-            .unwrap_or_default()
+            .unwrap_or(vec![])
     }
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]

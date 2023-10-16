@@ -69,7 +69,7 @@ impl CreateOnboardingConfigurationRequest {
             .collect::<ApiResult<HashMap<_, _>>>()
         };
 
-        let optional_data = self.optional_data.clone().unwrap_or_default();
+        let optional_data = self.optional_data.clone().unwrap_or(vec![]);
         let unallowed_optional_data_cdos: Vec<_> = optional_data
             .iter()
             .filter(|cdo| !Self::ALLOWED_OPTIONAL_FIELDS.contains(cdo))

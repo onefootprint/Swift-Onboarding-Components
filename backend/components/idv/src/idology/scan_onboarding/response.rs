@@ -40,8 +40,8 @@ pub struct ScanOnboardingResponse {
 
 impl ScanOnboardingResponse {
     pub fn capture_result(&self) -> Result<IdologyScanOnboardingCaptureResult, IdologyError::Error> {
-        let Some(ref result) = self.capture_result else {
-            return Err(IdologyError::Error::NoStatusFound);
+        let Some(ref result) =  self.capture_result else {
+            return Err(IdologyError::Error::NoStatusFound)
         };
 
         IdologyScanOnboardingCaptureResult::try_from(result.key.as_str())
@@ -55,8 +55,8 @@ impl ScanOnboardingResponse {
     }
 
     pub fn capture_decision(&self) -> Result<IdologyScanOnboardingCaptureDecision, IdologyError::Error> {
-        let Some(ref result) = self.capture_decision else {
-            return Err(IdologyError::Error::NoStatusFound);
+        let Some(ref result) =  self.capture_decision else {
+            return Err(IdologyError::Error::NoStatusFound)
         };
 
         IdologyScanOnboardingCaptureDecision::try_from(result.key.as_str())
@@ -74,7 +74,9 @@ impl ScanOnboardingResponse {
 
     // Construct api request related errors and image upload related errors
     pub fn error(&self) -> Option<(Option<RequestError>, Vec<IdologyImageCaptureErrors>)> {
-        let err = self.error.clone()?;
+        let Some(err) = self.error.clone() else {
+            return None
+        };
 
         match err {
             serde_json::Value::String(_) => {

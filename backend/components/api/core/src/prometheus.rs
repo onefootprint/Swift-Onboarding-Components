@@ -19,10 +19,10 @@ pub fn init(config: &Config) -> PrometheusMetrics {
             gethostname().into_string().expect("Cannot extract host name"),
         ),
     ]);
-    
-    PrometheusMetricsBuilder::new("api")
+    let prometheus = PrometheusMetricsBuilder::new("api")
         .endpoint(&format!("/{}", &config.service_config.metrics_endpoint_path))
         .const_labels(labels)
         .build()
-        .expect("Failed to initialize prometheus client")
+        .expect("Failed to initialize prometheus client");
+    prometheus
 }

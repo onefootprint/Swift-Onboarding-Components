@@ -121,7 +121,7 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
             .flat_map(|cdo| cdo.data_identifiers())
             .flatten()
             .collect();
-        let can_access = accessible_data.is_superset(&HashSet::from_iter(identifiers));
+        let can_access = accessible_data.is_superset(&HashSet::from_iter(identifiers.into_iter()));
         // Next, check if we can decrypt custom + id documents
         let can_access_other = other.into_iter().all(|v| v);
         can_access && can_access_other

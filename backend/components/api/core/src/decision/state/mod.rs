@@ -5,7 +5,7 @@ use thiserror::Error;
 
 use crate::{errors::ApiResult, State};
 
-use self::kyb::KybState;
+use self::{actions::WorkflowActions, kyb::KybState};
 
 pub mod actions;
 pub use actions::*;

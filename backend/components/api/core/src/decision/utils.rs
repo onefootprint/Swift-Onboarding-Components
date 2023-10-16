@@ -131,7 +131,7 @@ pub fn create_document_verification_request(
     // As of now, we only support 1 vendor for sending documents too
     if vendor_api != VendorAPI::IdologyScanOnboarding {
         let msg = format!("cannot send document request to {}", vendor_api);
-        Err(ApiErrorKind::AssertionError(msg))?;
+        return Err(ApiErrorKind::AssertionError(msg))?;
     }
 
     VerificationRequest::create_document_verification_request(
@@ -203,9 +203,11 @@ pub fn is_in_radius_from_ip_to_zip(
     insight_event: &InsightEvent,
     radius_in_meters: i32,
 ) -> Option<bool> {
-    let (ie_lat, ie_long) = insight_event
+    let Some((ie_lat, ie_long)) = insight_event
         .latitude
-        .and_then(|lat| insight_event.longitude.map(|long| (lat, long)))?;
+        .and_then(|lat| insight_event.longitude.map(|long| (lat, long))) else {
+            return None
+        };
     let zip_code_location = Location::new(zip_code.latitude, zip_code.longitude);
     let insight_event_location = Location::new(ie_lat, ie_long);
 

@@ -28,7 +28,7 @@ impl ExperianSandboxTestCase {
             // in sandbox we just don't send phone or email to experian
             // 1) it always is collected in bifrost
             // 2) none of the experian test cases include it, so we should never send it.
-            if !is_production && [IdentityDataKind::PhoneNumber, IdentityDataKind::Email].contains(&idk) {
+            if !is_production && vec![IdentityDataKind::PhoneNumber, IdentityDataKind::Email].contains(&idk) {
                 true
             } else {
                 self.get_normalized(idk) == data_to_match.get_normalized(idk)

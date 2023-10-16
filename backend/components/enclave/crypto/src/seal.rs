@@ -62,7 +62,7 @@ impl EciesP256Sha256AesGcmSealed {
 fn x963_kdf_sha256_32(shared_key: &[u8], shared_info: &[u8]) -> [u8; 32] {
     // we only need one round
     let counter: Vec<u8> = vec![0, 0, 0, 1];
-    let input = [shared_key, &counter, shared_info].concat();
+    let input = vec![shared_key, &counter, shared_info].concat();
 
     let mut hasher = Sha256::new();
     hasher.update(&input);

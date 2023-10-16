@@ -1,15 +1,18 @@
+use actix_web::web;
+
 mod assume;
-mod auth;
 mod cleanup;
 mod entities;
 mod invoice;
 mod protected;
 mod test_tenant;
 
-pub use self::auth::ProtectedAuth;
-pub use api_core::State;
+pub use api_core::*;
 
-pub fn configure(config: &mut actix_web::web::ServiceConfig) {
+mod auth;
+pub(crate) use auth::*;
+
+pub fn configure(config: &mut web::ServiceConfig) {
     config
         .service(cleanup::post)
         .service(assume::post)

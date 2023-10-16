@@ -45,8 +45,10 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
             rule: {
                 |f: &KybFeatureVector| {
                     !f.footprint_reason_codes.iter().any(|rc| {
-                        [FootprintReasonCode::BusinessNameMatch,
-                            FootprintReasonCode::BusinessNameSimilarMatch]
+                        vec![
+                            FootprintReasonCode::BusinessNameMatch,
+                            FootprintReasonCode::BusinessNameSimilarMatch,
+                        ]
                         .contains(rc)
                     })
                 }
@@ -58,9 +60,11 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
             rule: {
                 |f: &KybFeatureVector| {
                     !f.footprint_reason_codes.iter().any(|rc| {
-                        [FootprintReasonCode::BusinessAddressMatch,
+                        vec![
+                            FootprintReasonCode::BusinessAddressMatch,
                             FootprintReasonCode::BusinessAddressCloseMatch,
-                            FootprintReasonCode::BusinessAddressSimilarMatch]
+                            FootprintReasonCode::BusinessAddressSimilarMatch,
+                        ]
                         .contains(rc)
                     })
                 }

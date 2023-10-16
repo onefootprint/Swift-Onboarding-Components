@@ -121,16 +121,16 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
         .precise_id_response()
         .ok()
         .and_then(|p| p.score().ok().and_then(score_to_reason_code).map(|frc| vec![frc]))
-        .unwrap_or_default();
+        .unwrap_or(vec![]);
 
     fraud_shield_reason_codes
         .into_iter()
         .chain(dob_reason_codes)
-        .chain(name_and_address_reason_codes)
-        .chain(ssn_reason_codes)
-        .chain(watchlist_codes)
-        .chain(phone_codes)
-        .chain(score_code)
+        .chain(name_and_address_reason_codes.into_iter())
+        .chain(ssn_reason_codes.into_iter())
+        .chain(watchlist_codes.into_iter())
+        .chain(phone_codes.into_iter())
+        .chain(score_code.into_iter())
         .unique()
         .collect()
 }

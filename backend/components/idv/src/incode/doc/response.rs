@@ -176,8 +176,8 @@ impl FetchScoresResponse {
 
         photo_sec_tests
             .into_iter()
-            .chain(id_specific_tests)
-            .chain(custom_field_tests)
+            .chain(id_specific_tests.into_iter())
+            .chain(custom_field_tests.into_iter())
             .filter_map(|test| {
                 let (key, status) = match (test.key, test.status) {
                     (Some(key), Some(status)) => (

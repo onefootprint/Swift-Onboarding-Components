@@ -1,4 +1,10 @@
 use crate::auth::ProtectedAuth;
+use crate::decision::vendor;
+use crate::decision::vendor::vendor_result::VendorResult;
+use crate::errors::{ApiError, ApiResult};
+use crate::types::response::ResponseData;
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
+use crate::{decision, State};
 use actix_web::post;
 use actix_web::web::{self, Json};
 use api_core::decision::engine;
@@ -9,16 +15,10 @@ use api_core::decision::features::risk_signals::{
 };
 use api_core::decision::onboarding::rules::KycRuleExecutionConfig;
 use api_core::decision::onboarding::{rules::KycRuleGroup, Decision, OnboardingRulesDecisionOutput};
-use api_core::decision::vendor;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::decision::vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results;
-use api_core::decision::vendor::vendor_result::VendorResult;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::AssertionError;
-use api_core::errors::{ApiError, ApiResult};
-use api_core::types::response::ResponseData;
-use api_core::utils::vault_wrapper::{VaultWrapper, VwArgs};
-use api_core::{decision, State};
 use api_core::{task, ApiErrorKind};
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
@@ -72,8 +72,8 @@ impl From<OnboardingRulesDecisionOutput> for DecisionOutput {
         Self {
             decision_status,
             create_manual_review,
-            rules_triggered: api_core::decision::rule::rules_to_string(&rules_triggered),
-            rules_not_triggered: api_core::decision::rule::rules_to_string(&rules_not_triggered),
+            rules_triggered: crate::decision::rule::rules_to_string(&rules_triggered),
+            rules_not_triggered: crate::decision::rule::rules_to_string(&rules_not_triggered),
         }
     }
 }
@@ -130,7 +130,7 @@ async fn make_vendor_calls(
     .await?;
     let rule_group = KycRuleGroup::default();
     let rules_output =
-        api_core::decision::engine::calculate_decision(vendor_results.clone(), vw, obc, rule_group)?;
+        crate::decision::engine::calculate_decision(vendor_results.clone(), vw, obc, rule_group)?;
 
     let (request_ids, response_ids): (Vec<VerificationRequestId>, Vec<VerificationResultId>) = vendor_results
         .into_iter()

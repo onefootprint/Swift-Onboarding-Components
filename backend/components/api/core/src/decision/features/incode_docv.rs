@@ -75,7 +75,7 @@ pub fn footprint_reason_codes(
     let score_reason_codes = reason_codes_from_score_response(&scores, expect_selfie);
     let ocr_reason_codes = reason_codes_from_ocr_response(&ocr, vault_data);
 
-    Ok(score_reason_codes.into_iter().chain(ocr_reason_codes).collect())
+    Ok(score_reason_codes.into_iter().chain(ocr_reason_codes.into_iter()).collect())
 }
 
 pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie: bool) -> Vec<FootprintReasonCode> {
@@ -162,11 +162,11 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
     ].into_iter().flatten().collect();
 
     document_score_code.into_iter()
-        .chain(ocr_code)
-        .chain(selfie_code)
-        .chain(id_test_frcs)
-        .chain(face_codes)
-        .chain(barcode_frc)
+        .chain(ocr_code.into_iter())
+        .chain(selfie_code.into_iter())
+        .chain(id_test_frcs.into_iter())
+        .chain(face_codes.into_iter())
+        .chain(barcode_frc.into_iter())
         .collect()
 }
 
@@ -336,7 +336,7 @@ impl ParsedIncodeNames {
         if let Some(mrz_full_name) = name.machine_readable_full_name {
             let mrz_full_name: PiiString = mrz_full_name.leak_to_string().trim().to_owned().into();
             // if the mrz full name matches the Incode given first/middle/last breakdown, then we can just use Incode's name parsing here (which may be better if they use context of the doc or something more intelligent than splitting on strings?)
-            let all = [first_name_from_first_name_field.clone(), middle_name_from_middle_name_field.clone(), last_name.clone()].iter().flatten().map(|s| s.leak()).join(" ");
+            let all = vec![first_name_from_first_name_field.clone(), middle_name_from_middle_name_field.clone(), last_name.clone()].iter().flatten().map(|s| s.leak()).join(" ");
             let (first_name, middle_name, last_name) = if all.to_lowercase() == mrz_full_name.leak_to_string().to_lowercase() {
                 (first_name_from_first_name_field, middle_name_from_middle_name_field, last_name)
             } else {

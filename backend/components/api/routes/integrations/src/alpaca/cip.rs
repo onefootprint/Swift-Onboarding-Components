@@ -350,7 +350,7 @@ fn identity(
         == Some(MatchLevel::Exact);
     let tax_id_result = CipResult::clear(tax_id);
 
-    let any_consider = [matched_address_result, dob_result, tax_id_result]
+    let any_consider = vec![matched_address_result, dob_result, tax_id_result]
         .iter()
         .any(|r| matches!(r, CipResult::Consider));
     let overall_result = CipResult::clear(!any_consider);
@@ -398,7 +398,7 @@ fn watchlist(
         .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::AdverseMediaHit);
     let adverse_media_result = CipResult::clear(!adverse_media);
 
-    let any_consider = [pep_result, ofac_result, sanctions_result, adverse_media_result]
+    let any_consider = vec![pep_result, ofac_result, sanctions_result, adverse_media_result]
         .iter()
         .any(|r| matches!(r, CipResult::Consider));
     let overall_result = CipResult::clear(!any_consider);
@@ -592,7 +592,7 @@ impl<'a> DocumentCipResultHelper<'a> {
 
         let dob = CipResult::clear(self.frcs.contains(&FootprintReasonCode::DocumentOcrDobMatches));
 
-        let any_consider = [first, last, dob]
+        let any_consider = vec![first, last, dob]
             .iter()
             .any(|r| matches!(r, CipResult::Consider));
         let overall_result = CipResult::clear(!any_consider);
@@ -614,7 +614,7 @@ impl<'a> DocumentCipResultHelper<'a> {
         // we error upstream if not
         let supported_document = CipResult::Clear;
 
-        let any_consider = [image_quality, supported_document]
+        let any_consider = vec![image_quality, supported_document]
             .iter()
             .any(|r| matches!(r, CipResult::Consider));
 

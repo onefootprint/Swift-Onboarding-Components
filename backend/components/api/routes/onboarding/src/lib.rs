@@ -1,3 +1,5 @@
+use paperclip::actix::web;
+
 pub mod session;
 
 pub use api_core::*;

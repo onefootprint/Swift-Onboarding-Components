@@ -66,7 +66,7 @@ impl UserSessionContext {
             // Filter out any old scope of the same type
             .filter(|x| !new_scope_kinds.contains(&UserAuthGuard::from(x)))
             // And replace it with the new scope
-            .chain(new_scopes)
+            .chain(new_scopes.into_iter())
             .unique()
             .collect();
 

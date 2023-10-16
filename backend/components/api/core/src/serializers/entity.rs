@@ -52,7 +52,7 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             .into_iter()
             .filter(|di| di.store_plaintext())
             .flat_map(|di| vw.get_p_data(di.clone()).map(|p_data| (di, p_data.clone())))
-            .chain(decrypted_attrs)
+            .chain(decrypted_attrs.into_iter())
             .collect();
 
         let Vault {

@@ -24,7 +24,7 @@ impl ClientCertificateKey {
 
     /// parses PEM encoded X509 cert chain + pkcs8 PEM private key
     pub fn parse_cert_and_key(cert: &[u8], key: &[u8]) -> Result<ClientCertificateKey, VaultProxyError> {
-        let cert_and_key = [cert, &[b'\n'], key].concat();
+        let cert_and_key = vec![cert, &[b'\n'], key].concat();
 
         let identity =
             reqwest::Identity::from_pem(&cert_and_key).map_err(VaultProxyError::ClientIdentityCertificate)?;
