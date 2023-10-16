@@ -33,9 +33,9 @@ pub enum OnboardingStatus {
     Pass,
     /// Failed one or more check
     Fail,
-    /// The user aborted the onboarding flow and we don't have enough information to make a decision.
+    /// The user has not yet finished entering all information
     Incomplete,
-    /// Waiting for user input or a decision
+    /// All required data has been collected. We are waiting for a firm decision
     Pending,
 }
 

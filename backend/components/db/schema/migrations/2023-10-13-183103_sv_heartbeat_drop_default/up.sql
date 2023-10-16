@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault ALTER COLUMN last_heartbeat_at DROP DEFAULT;

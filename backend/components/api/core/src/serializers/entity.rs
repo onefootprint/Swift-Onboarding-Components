@@ -8,11 +8,13 @@ use crate::{
         vault_wrapper::{Any, TenantVw},
     },
 };
+use api_wire_types::EntityStatus;
+use chrono::{Duration, Utc};
 use db::models::{
     scoped_vault::{ScopedVault, SerializableEntity},
     vault::Vault,
 };
-use newtypes::{DataIdentifier, PiiString};
+use newtypes::{DataIdentifier, OnboardingStatus, PiiString};
 use std::collections::HashMap;
 
 pub type EntityDetail<'a> = (SerializableEntity, &'a TenantVw<Any>, &'a Box<dyn TenantAuth>);
@@ -60,11 +62,12 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             ..
         } = vw.vault.clone();
 
+        let status = status_from_sv(&sv);
+
         let ScopedVault {
             fp_id,
             start_timestamp,
             ordering_id,
-            status,
             ..
         } = sv;
 
@@ -95,6 +98,22 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             status,
             insight_event: insight_event.map(api_wire_types::InsightEvent::from_db),
             requires_manual_review,
+        }
+    }
+}
+
+fn status_from_sv(sv: &ScopedVault) -> Option<EntityStatus> {
+    match sv.status {
+        None => None,
+        Some(OnboardingStatus::Pass) => Some(EntityStatus::Pass),
+        Some(OnboardingStatus::Fail) => Some(EntityStatus::Fail),
+        Some(OnboardingStatus::Pending) => Some(EntityStatus::Pending),
+        Some(OnboardingStatus::Incomplete) => {
+            if Utc::now() - sv.last_heartbeat_at < Duration::minutes(5) {
+                Some(EntityStatus::InProgress)
+            } else {
+                Some(EntityStatus::Incomplete)
+            }
         }
     }
 }

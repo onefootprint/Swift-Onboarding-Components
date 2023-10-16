@@ -1,6 +1,13 @@
 use std::collections::HashMap;
 
-use crate::*;
+use crate::{util::export_schema, InsightEvent, WatchlistCheck};
+use chrono::{DateTime, Utc};
+use newtypes::{DataIdentifier, FpId, PiiString, SandboxId, TenantId, VaultKind};
+use paperclip::actix::Apiv2Schema;
+use schemars::JsonSchema;
+use serde::Serialize;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum_macros::EnumString;
 
 /// Details for a specific Entity
 #[derive(Debug, Clone, Serialize, JsonSchema, Apiv2Schema)]
@@ -21,9 +28,31 @@ pub struct Entity {
     /// The list of attributes that are allowed to be decrypted by the authed user
     pub decryptable_attributes: Vec<DataIdentifier>,
     // These are a representation of the associated workflows
-    pub status: Option<OnboardingStatus>,
+    pub status: Option<EntityStatus>,
     pub insight_event: Option<InsightEvent>,
     pub requires_manual_review: bool,
+}
+
+/// Mostly just OnboardingStatus but with other statuses that don't exist in OnboardingStatus
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    DeserializeFromStr,
+    SerializeDisplay,
+    Apiv2Schema,
+    EnumString,
+    strum_macros::Display,
+    JsonSchema,
+)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum EntityStatus {
+    Pass,
+    Fail,
+    Incomplete,
+    InProgress,
+    Pending,
 }
 
 #[derive(Debug, Clone, Serialize, JsonSchema, Apiv2Schema)]
