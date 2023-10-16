@@ -24,10 +24,10 @@
     }
   },
   "ending": {
-    "html-title": "Your identity is safe now.",
+    "html-title": "Your identity is safe.",
     "description": "Next time you see the Footprint button, you can be certain your data is protected.",
     "chip": "Meet your new Footprint vault",
-    "title": "Your identity is safe now.",
+    "title": "Your identity is safe.",
     "subtitle": "The next time you see the Footprint button, you can be certain your data is protected.",
     "new-approach": {
       "title": "A new approach to privacy.",
