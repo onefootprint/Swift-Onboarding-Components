@@ -16,8 +16,8 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     BusinessDataKind as BDK, CollectedDataOption, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource,
-    DataRequest, FingerprintRequest, FingerprintScopeKind, Fingerprints, IdentityDataKind as IDK,
-    ScopedVaultId, ValidationError, VaultDataFormat,
+    DataRequest, FingerprintRequest, Fingerprints, IdentityDataKind as IDK, ScopedVaultId, ValidationError,
+    VaultDataFormat,
 };
 
 /// DataRequest that has been validated through a UserVaultWrapper
@@ -168,11 +168,9 @@ impl ValidatedDataRequest {
                         kind: kind.clone(),
                         sh_data: fingerprint,
                         lifetime_id: vd.lifetime_id.clone(),
-                        // Don't make sandbox fingerprints unique since one phone number can be used
-                        // to make multiple sandbox vaults.
-                        is_unique: user_vault.is_live
-                            && scope == FingerprintScopeKind::Global
-                            && kind.globally_unique(),
+                        // All fingerprints will start as not unique. Phone number fingerprints
+                        // will be marked as unique once the contact info is verified
+                        is_unique: false,
                         scope,
                         version: newtypes::FingerprintVersion::current(),
                     })

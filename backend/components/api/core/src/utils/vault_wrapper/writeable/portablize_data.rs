@@ -5,6 +5,7 @@ use crate::utils::vault_wrapper::Person;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::VerificationLevel;
 use db::models::data_lifetime::DataLifetime;
+use db::models::fingerprint::Fingerprint;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::user_timeline::UserTimeline;
@@ -182,13 +183,20 @@ impl WriteableVw<Person> {
     /// Mark the provided CI as verified.
     pub fn on_otp_verified(self, conn: &mut TxnPgConn, di: DataIdentifier) -> ApiResult<()> {
         let lifetime = self
-            .get_lifetime(di)
+            .get_lifetime(di.clone())
             .ok_or(AssertionError("No lifetime for CI"))?;
         let ci = ContactInfo::get(conn, &lifetime.id)?;
         if !ci.is_otp_verified {
             ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
             let seqno = DataLifetime::get_next_seqno(conn)?;
             DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
+
+            // Don't make sandbox fingerprints unique since one phone number can be used
+            // to make multiple sandbox vaults.
+            if self.vault.is_live && di.globally_unique() {
+                // Mark the global fingerprint as unique.
+                Fingerprint::mark_global_unique(conn, &ci.lifetime_id)?;
+            }
         }
         let update = ScopedVaultUpdate {
             show_in_search: Some(true),

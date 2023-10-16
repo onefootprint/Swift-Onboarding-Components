@@ -55,6 +55,16 @@ impl Fingerprint {
         Ok(())
     }
 
+    #[tracing::instrument("Fingerprint::create", skip_all)]
+    pub fn mark_global_unique(conn: &mut TxnPgConn, lifetime_id: &DataLifetimeId) -> DbResult<()> {
+        diesel::update(fingerprint::table)
+            .filter(fingerprint::lifetime_id.eq(lifetime_id))
+            .filter(fingerprint::scope.eq(FingerprintScopeKind::Global))
+            .set(fingerprint::is_unique.eq(true))
+            .execute(conn.conn())?;
+        Ok(())
+    }
+
     // for tests
     #[tracing::instrument("Fingerprint::_list_for_scoped_vault", skip_all)]
     pub fn _list_for_scoped_vault(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
