@@ -13,12 +13,11 @@ fn create_onboarding_rules_decision_output(
     expected_should_commit: bool,
     expected_triggered_rules: Vec<RuleName>,
 ) -> OnboardingRulesDecisionOutput {
-    let base = rule_sets::kyc::idology_rule_set()
-        .rules
+    let all_non_triggering_rules = rule_sets::kyc::kyc_rules()
         .into_iter()
-        .map(|r| r.name);
-
-    let all_non_triggering_rules = base.filter(|r| !expected_triggered_rules.contains(r)).collect();
+        .map(|r| r.name)
+        .filter(|r| !expected_triggered_rules.contains(r))
+        .collect();
 
     OnboardingRulesDecisionOutput {
         decision: Decision {

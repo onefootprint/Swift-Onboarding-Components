@@ -12,10 +12,6 @@ mod utils;
 
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
-mod rules;
-
-#[allow(clippy::unwrap_used)]
-#[cfg(test)]
 mod requirements;
 
 #[allow(clippy::unwrap_used)]
