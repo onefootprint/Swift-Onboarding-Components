@@ -1,3 +1,4 @@
+import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
 import React from 'react';
 
@@ -8,7 +9,18 @@ export type FlagProps = {
 };
 
 const Flag = ({ code, testID, className = '' }: FlagProps) => (
-  <div className={`fp-f f-${code} ${className}`} data-testid={testID} />
+  <NotAnimatedFlagShimmer
+    className={`fp-f f-${code} ${className}`}
+    data-testid={testID}
+  />
 );
+
+const NotAnimatedFlagShimmer = styled.div`
+  ${({ theme }) => css`
+    width: 20px;
+    height: 15px;
+    background-color: ${theme.backgroundColor.senary};
+  `}
+`;
 
 export default Flag;

@@ -29,7 +29,7 @@ module.exports = {
               { resourceType: 'other', budget: 2 }, //         1.2 KiB
               { resourceType: 'media', budget: 1 }, //         0.0 KiB
             ],
-            resourceCounts: [{ resourceType: 'third-party', budget: 5 }],
+            resourceCounts: [{ resourceType: 'third-party', budget: 7 }],
           },
         ],
       },
