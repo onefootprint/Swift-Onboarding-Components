@@ -13,6 +13,7 @@ import {
 import React from 'react';
 import usePermissions from 'src/hooks/use-permissions';
 
+import Hits from './components/hits';
 import ProtectedDetails from './components/protected-details';
 import useCachedRiskSignalAmlHint from './hooks/use-cached-risk-signal-aml-hint';
 import useRiskSignalAmlHits from './hooks/use-risk-signal-aml-hits';
@@ -75,12 +76,13 @@ const Matches = ({ riskSignalId }: MatchesProps) => {
             iconPosition="right"
             href={aml.shareUrl}
             target="_blank"
-            sx={{ marginTop: 5 }}
+            sx={{ marginTop: 5, marginBottom: 5 }}
           >
             {t('source-url.read-full-report')}
           </LinkButton>
         </>
       )}
+      {aml?.hits && aml.hits.length > 0 && <Hits hits={aml.hits} />}
     </MatchesSection>
   );
 };

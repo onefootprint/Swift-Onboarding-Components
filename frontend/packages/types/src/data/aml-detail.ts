@@ -6,7 +6,7 @@ export type AmlDetail = {
 export type AmlHit = {
   name: string | null;
   matchTypes: string[] | null;
-  fields: Object | null;
+  fields: Record<string, string> | null;
   media: AmlHitMedia[] | null;
 };
 

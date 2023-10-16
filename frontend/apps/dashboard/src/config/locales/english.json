@@ -1213,6 +1213,12 @@
             "source-url": {
               "label": "Source URL",
               "read-full-report": "Read full match report"
+            },
+            "hits": {
+              "media": {
+                "label": "Relevant media",
+                "value": "See more"
+              }
             }
           }
         }
