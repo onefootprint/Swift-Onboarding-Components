@@ -12,7 +12,7 @@ use crypto::sha256;
 use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use itertools::Itertools;
-use newtypes::{PhoneNumber, PiiString};
+use newtypes::{PhoneNumber, PiiString, VaultId};
 use newtypes::{SandboxId, SessionId};
 
 use self::rate_limit::RateLimit;
@@ -259,8 +259,7 @@ impl SmsClient {
         state: &State,
         tenant: Option<&Tenant>,
         destination: &PhoneNumber,
-        // For signup challenges. Used to initialize the vault with an email
-        email: Option<PiiString>,
+        vault_id: VaultId,
         sandbox_id: Option<SandboxId>,
         session_id: Option<SessionId>,
     ) -> ApiResult<(Receiver<ApiError>, PhoneChallengeState, SecondsBeforeRetry)> {
@@ -309,7 +308,8 @@ impl SmsClient {
             rx,
             PhoneChallengeState {
                 phone_number: destination.e164(),
-                email,
+                email: None,
+                vault_id: Some(vault_id),
                 sandbox_id,
                 h_code: sha256(code.as_bytes()).to_vec(),
             },
@@ -365,9 +365,12 @@ pub struct BoSessionSmsInfo<'a> {
 /// Phone number challenge in-progress state
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhoneChallengeState {
+    // TODO rm
     pub phone_number: PiiString,
     pub email: Option<PiiString>,
     pub sandbox_id: Option<SandboxId>,
+    // TODO make non-optional
+    pub vault_id: Option<VaultId>,
     pub h_code: Vec<u8>,
 }
 

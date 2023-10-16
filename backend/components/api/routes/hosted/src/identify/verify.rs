@@ -16,25 +16,26 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
-use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::AssertionError;
 use api_core::utils::headers::InsightHeaders;
-use api_core::utils::vault_wrapper::InitialVaultData;
+use api_core::utils::vault_wrapper::{InitialVaultData, Person, VaultContext};
 use chrono::{Duration, Utc};
 use crypto::sha256;
+use db::errors::OptionalExtension;
 use db::models::auth_event::NewAuthEvent;
 use db::models::business_owner::BusinessOwner;
+use db::models::contact_info::ContactInfo;
+use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::{ScopedVault, ScopedVaultUpdate};
 use db::models::vault::Vault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::{
-    AuthEventKind, DataIdentifier, EncryptedVaultPrivateKey, Fingerprinter, IdentityDataKind as IDK,
-    PiiString, SandboxId, ScopedVaultId, SessionAuthToken, VaultId, VaultPublicKey, WebauthnCredentialId,
+    AuthEventKind, DataIdentifier, Fingerprinter, IdentityDataKind as IDK, PiiString, SandboxId,
+    ScopedVaultId, SessionAuthToken, VaultId, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -87,16 +88,9 @@ pub async fn post(
             .into_iter()
             .flatten()
             .collect_vec();
-            let vault_context = make_vault_context(
-                &state,
-                ob_pk_auth.as_ref(),
-                data,
-                sandbox_id,
-                challenge_state.h_code.clone(),
-            )
-            .await?;
+            let vault_context = make_vault_context(&state, ob_pk_auth.as_ref(), data, sandbox_id).await?;
 
-            ChallengeContext::Sms(vault_context)
+            ChallengeContext::Sms(challenge_state.vault_id, vault_context, challenge_state.h_code)
         }
         ChallengeData::Passkey(challenge_state) => ChallengeContext::Passkey(challenge_state),
         ChallengeData::Email(challenge_state) => {
@@ -106,11 +100,10 @@ pub async fn post(
                 ob_pk_auth.as_ref(),
                 data,
                 challenge_state.sandbox_id.clone(),
-                challenge_state.h_code.clone(),
             )
             .await?;
 
-            ChallengeContext::Email(vault_context)
+            ChallengeContext::Email(challenge_state.vault_id, vault_context, challenge_state.h_code)
         }
     };
 
@@ -120,12 +113,12 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let (uv_id, auth_factor, event_kind, passkey_cred_id) = match challenge_data {
-                ChallengeContext::Sms(ctx) => {
-                    let tok = validate(conn, ctx, &challenge_response)?;
+                ChallengeContext::Sms(v_id, ctx, h_code) => {
+                    let tok = validate(conn, v_id, h_code, ctx, &challenge_response)?;
                     (tok, AuthFactor::Sms, AuthEventKind::Sms, None)
                 }
-                ChallengeContext::Email(ctx) => {
-                    let tok = validate(conn, ctx, &challenge_response)?;
+                ChallengeContext::Email(v_id, ctx, h_code) => {
+                    let tok = validate(conn, v_id, h_code, ctx, &challenge_response)?;
                     (tok, AuthFactor::Email, AuthEventKind::Email, None)
                 }
                 ChallengeContext::Passkey(context) => {
@@ -204,9 +197,9 @@ pub async fn post(
 }
 
 pub enum ChallengeContext {
-    Sms(VaultContext),
+    Sms(Option<VaultId>, VaultContext, Vec<u8>),
     Passkey(BiometricChallengeState),
-    Email(VaultContext),
+    Email(Option<VaultId>, VaultContext, Vec<u8>),
 }
 
 /// Determines the identifiers to add to the auth token to allow a user to complete onboarding
@@ -269,22 +262,13 @@ fn validate_biometric_challenge(
     Ok((challenge_state.user_vault_id, credential.id))
 }
 
-pub struct VaultContext {
-    pub h_code: Vec<u8>,
-    pub data: Vec<InitialVaultData>,
-    pub keypair: (VaultPublicKey, EncryptedVaultPrivateKey),
-    pub sandbox_id: Option<SandboxId>,
-    pub obc: Option<ObConfiguration>,
-}
-
 type IsVerified = bool;
 
-async fn make_vault_context(
+pub(super) async fn make_vault_context(
     state: &State,
     ob_pk_auth: Option<&ObConfigAuth>,
     initial_data: Vec<(IsVerified, DataIdentifier, PiiString)>,
     sandbox_id: Option<SandboxId>,
-    h_code: Vec<u8>,
 ) -> ApiResult<VaultContext> {
     // TODO this keypair won't always be used... but helps to generate this proactively.
     let keypair = state.enclave_client.generate_sealed_keypair().await?;
@@ -328,7 +312,6 @@ async fn make_vault_context(
         })
         .collect::<ApiResult<Vec<_>>>()?;
     Ok(VaultContext {
-        h_code,
         data,
         keypair,
         sandbox_id,
@@ -336,8 +319,15 @@ async fn make_vault_context(
     })
 }
 
-fn validate(conn: &mut TxnPgConn, ctx: VaultContext, challenge_response: &str) -> Result<VaultId, ApiError> {
-    if ctx.h_code != sha256(challenge_response.as_bytes()).to_vec() {
+fn validate(
+    conn: &mut TxnPgConn,
+    // TODO make not optional
+    vault_id: Option<VaultId>,
+    h_code: Vec<u8>,
+    ctx: VaultContext,
+    challenge_response: &str,
+) -> Result<VaultId, ApiError> {
+    if h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
     };
 
@@ -349,16 +339,51 @@ fn validate(conn: &mut TxnPgConn, ctx: VaultContext, challenge_response: &str) -
         .flatten()
         .collect_vec();
 
-    let existing_user = Vault::find_portable(conn, &fps_to_search, ctx.sandbox_id.clone())?;
-    let result = match existing_user {
-        Some(uv) => uv.id,
-        None => {
-            // The user does not exist. Create a new user vault.
-            // Must have ob_info to create a new user vault
-            let obc = ctx.obc.ok_or(OnboardingError::MissingObPkAuth)?;
-            let (uv, _) = VaultWrapper::create_user_vault(conn, ctx.keypair, obc, ctx.data, ctx.sandbox_id)?;
-            uv.into_inner().id
-        }
+    // Or if auth token is provided, use it here. We'll eventually deprecate the codepath that
+    // make vaults here
+
+    let Some(vault_id) = vault_id else {
+        // We are on the old flow. Get or create the user
+        let existing_user = Vault::find_portable(conn, &fps_to_search, ctx.sandbox_id.clone())?;
+        let result = match existing_user {
+            Some(uv) => uv.id,
+            None => {
+                // The user does not exist. Create a new user vault.
+                // Must have ob_info to create a new user vault
+                let (uv, _) = VaultWrapper::create_user_vault(conn, ctx)?;
+                uv.into_inner().id
+            }
+        };
+        return Ok(result);
     };
-    Ok(result)
+
+    // We're on the new codepath where the vault was pre-created in the signup challenge.
+    if let Some(obc) = ctx.obc.as_ref() {
+        let sv = ScopedVault::get(conn, (&vault_id, &obc.tenant_id)).optional()?;
+        if let Some(sv) = sv {
+            // For bifrost logins that already have a SV (likely created in the signup challenge),
+            // we can mark the contact info as OTP verified
+            let update = ScopedVaultUpdate {
+                show_in_search: Some(true),
+                ..ScopedVaultUpdate::default()
+            };
+            ScopedVault::update(conn, &sv.id, update)?;
+            let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &sv.id)?;
+            let verified_ci = ctx
+                .data
+                .iter()
+                .find(|f| f.is_verified)
+                .ok_or(AssertionError("No piece of verified CI"))?;
+            let lifetime = vw
+                .get_lifetime(verified_ci.di.clone())
+                .ok_or(AssertionError("No lifetime for CI"))?;
+            if lifetime.portablized_seqno.is_none() {
+                let seqno = DataLifetime::get_next_seqno(conn)?;
+                let ci = ContactInfo::get(conn, &lifetime.id)?;
+                VaultWrapper::on_otp_verified(conn, &ci, seqno)?;
+            }
+        }
+    }
+
+    Ok(vault_id)
 }

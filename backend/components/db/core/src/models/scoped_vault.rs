@@ -69,6 +69,7 @@ struct NewScopedVault {
 pub struct ScopedVaultUpdate {
     pub status: Option<OnboardingStatus>,
     pub is_billable: Option<bool>,
+    pub show_in_search: Option<bool>,
 }
 
 pub enum ScopedVaultIdentifier<'a> {
@@ -327,7 +328,12 @@ impl ScopedVault {
 
     #[tracing::instrument("ScopedVault::update", skip_all)]
     pub fn update(conn: &mut PgConn, id: &ScopedVaultId, update: ScopedVaultUpdate) -> DbResult<()> {
-        if update.is_billable.is_none() && update.status.is_none() {
+        let ScopedVaultUpdate {
+            is_billable,
+            status,
+            show_in_search,
+        } = &update;
+        if is_billable.is_none() && status.is_none() && show_in_search.is_none() {
             return Ok(());
         }
         diesel::update(scoped_vault::table)

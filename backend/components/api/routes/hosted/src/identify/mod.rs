@@ -58,8 +58,11 @@ pub struct BiometricChallengeState {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct EmailChallengeState {
+    // TODO rm
     pub email: PiiString,
     pub sandbox_id: Option<SandboxId>,
+    // TODO make non-optional
+    pub vault_id: Option<VaultId>,
     pub h_code: Vec<u8>,
 }
 
@@ -150,6 +153,7 @@ async fn get_user_challenge_context(
 pub fn send_email_challenge_non_blocking(
     state: &State,
     email: &Email,
+    vault_id: VaultId,
     tenant: &Tenant,
     sandbox_id: Option<SandboxId>, // pointless pass through for now, but may use later with a fixture email
 ) -> ApiResult<ChallengeData> {
@@ -180,6 +184,7 @@ pub fn send_email_challenge_non_blocking(
 
     Ok(ChallengeData::Email(EmailChallengeState {
         email: email.email.clone(),
+        vault_id: Some(vault_id),
         sandbox_id,
         h_code,
     }))

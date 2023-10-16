@@ -129,3 +129,22 @@ impl DbError {
         self.to_string()
     }
 }
+
+pub trait OptionalExtension<T, E> {
+    fn optional(self) -> Result<Option<T>, E>;
+}
+
+impl<T> OptionalExtension<T, DbError> for Result<T, DbError> {
+    fn optional(self) -> Result<Option<T>, DbError> {
+        match self {
+            Ok(v) => Ok(Some(v)),
+            Err(e) => {
+                if e.is_not_found() {
+                    Ok(None)
+                } else {
+                    Err(e)
+                }
+            }
+        }
+    }
+}

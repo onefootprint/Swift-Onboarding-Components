@@ -249,6 +249,7 @@ impl Vault {
 
             // in this case, more than 1 vault have non-verified claims for this email address
             // so we cannot be sure which user vault we are trying to identify
+            // TODO add actual information so we can debug this
             tracing::info!("found more than one vault for fingerprint");
             return Ok(None);
         }

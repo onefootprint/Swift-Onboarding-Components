@@ -54,6 +54,7 @@ pub async fn post(
     user_auth: Option<UserAuthContext>,
     telemetry_headers: TelemetryHeaders,
 ) -> actix_web::Result<Json<ResponseData<LoginChallengeResponse>>, ApiError> {
+    // TODO do we want to make this more similar to signup_challenge and have it return an unauthed token?
     let tenant = ob_context.as_ref().map(|obc| obc.tenant());
 
     // clean phone number
@@ -87,6 +88,7 @@ pub async fn post(
 
     // If we need to create a challenge, extract the phone number for the user
     let sandbox_id = uvw.vault.sandbox_id.clone();
+    let vault_id = uvw.vault.id.clone();
 
     let challenge_kind = match preferred_challenge_kind {
         // Fall back to SMS if the user requested webauthn but doesn't have any creds
@@ -119,7 +121,7 @@ pub async fn post(
                 let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
                 let s_id = telemetry_headers.session_id;
                 let (rx, challenge_state, time_before_retry_s) = twilio_client
-                    .send_challenge_non_blocking(&state, tenant, &phone_number, None, sandbox_id, s_id)
+                    .send_challenge_non_blocking(&state, tenant, &phone_number, vault_id, sandbox_id, s_id)
                     .await?;
                 let challenge_data = ChallengeData::Sms(challenge_state);
                 (
@@ -134,8 +136,9 @@ pub async fn post(
                 let email = uvw.get_decrypted_verified_email(&state).await?;
                 let tenant = tenant.ok_or(OnboardingError::MissingObPkAuth)?;
 
-                let challenge_data =
-                    identify::send_email_challenge_non_blocking(&state, &email, tenant, sandbox_id)?;
+                let challenge_data = identify::send_email_challenge_non_blocking(
+                    &state, &email, vault_id, tenant, sandbox_id,
+                )?;
 
                 (
                     None,

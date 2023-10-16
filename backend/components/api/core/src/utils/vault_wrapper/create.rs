@@ -1,5 +1,6 @@
 use super::{Any, PatchDataResult, Person, VaultWrapper};
 use crate::enclave_client::VaultKeyPair;
+use crate::errors::onboarding::OnboardingError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiResult, AssertionError};
 use db::models::contact_info::{ContactInfo, VerificationLevel};
@@ -11,11 +12,18 @@ use db::models::vault::Vault;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
-    FingerprintScopeKind, PhoneNumber, PiiString, SandboxId,
+    DataIdentifier as DI, DataLifetimeSeqno, DataLifetimeSource, DataRequest, Fingerprint,
+    FingerprintRequest, FingerprintScopeKind, PhoneNumber, PiiString, SandboxId,
 };
 use newtypes::{IdentityDataKind as IDK, VaultKind};
 use newtypes::{Locked, ValidateArgs};
+
+pub struct VaultContext {
+    pub data: Vec<InitialVaultData>,
+    pub keypair: VaultKeyPair,
+    pub sandbox_id: Option<SandboxId>,
+    pub obc: Option<ObConfiguration>,
+}
 
 /// Represents pieces of data that will be added to the vault upon its creation
 pub struct InitialVaultData {
@@ -37,19 +45,67 @@ impl InitialVaultData {
 }
 
 impl VaultWrapper<Person> {
-    /// Custom util function to create a user vault, its phone number, and optionally associate it
-    /// with a provided ob_config
-    #[allow(clippy::too_many_arguments)]
+    /// Custom util function to create a user vault with its phone/email and scoped vault
+    /// TODO deprecate
     #[tracing::instrument("VaultWrapper::create_user_vault", skip_all)]
     pub fn create_user_vault(
         conn: &mut TxnPgConn,
-        keypair: VaultKeyPair,
-        ob_config: ObConfiguration,
-        initial_data: Vec<InitialVaultData>,
-        sandbox_id: Option<SandboxId>,
+        ctx: VaultContext,
     ) -> ApiResult<(Locked<Vault>, ScopedVault)> {
+        let verified_dis = ctx.data.iter().filter(|d| d.is_verified).collect_vec();
+        if verified_dis.len() > 1 {
+            return Err(AssertionError("Can only create vault with 1 piece of verified info").into());
+        }
+        let verified_di = verified_dis
+            .into_iter()
+            .next()
+            .map(|d| d.di.clone())
+            .ok_or(AssertionError("Must create vault with 1 piece of verified info"))?;
+
+        let (uv, su, patch_result) = Self::create_unverified(conn, ctx)?;
+        let PatchDataResult { new_ci, seqno } = patch_result;
+
+        let (_, ci) = new_ci
+            .into_iter()
+            .find(|(d, _)| d == &verified_di)
+            .ok_or(AssertionError("No CI made with new vault"))?;
+        // Mark the verified piece of data as verified, and portablize it so it can be used to
+        // log into other tenants
+        Self::on_otp_verified(conn, &ci, seqno)?;
+
+        Ok((uv, su))
+    }
+
+    /// Mark the provided CI as verified.
+    /// Must be done in a locked txn.
+    /// TODO can eventually move to be a method on self when we get rid of the legacy codepath
+    pub fn on_otp_verified(
+        conn: &mut TxnPgConn,
+        ci: &ContactInfo,
+        seqno: DataLifetimeSeqno,
+    ) -> ApiResult<()> {
+        ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
+        DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
+        Ok(())
+    }
+
+    /// Custom util function to create a user vault with its phone/email and scoped vault. The
+    /// contact info will remain unverified
+    #[tracing::instrument("VaultWrapper::create_unverified", skip_all)]
+    pub fn create_unverified(
+        conn: &mut TxnPgConn,
+        ctx: VaultContext,
+    ) -> ApiResult<(Locked<Vault>, ScopedVault, PatchDataResult)> {
+        let VaultContext {
+            data: initial_data,
+            keypair,
+            sandbox_id,
+            obc,
+        } = ctx;
+        // Must have ob_info to create a new user vault
+        let obc = obc.ok_or(OnboardingError::MissingObPkAuth)?;
         // Verify that the ob config is_live matches the user vault
-        if ob_config.is_live != sandbox_id.is_none() {
+        if obc.is_live != sandbox_id.is_none() {
             return Err(UserError::SandboxMismatch.into());
         }
         let is_fixture_data = initial_data
@@ -58,7 +114,7 @@ impl VaultWrapper<Person> {
             .collect::<ApiResult<Vec<_>>>()?
             .into_iter()
             .any(|x| x);
-        if ob_config.is_live && is_fixture_data {
+        if obc.is_live && is_fixture_data {
             return Err(UserError::FixtureNumberInLive.into());
         }
 
@@ -70,29 +126,20 @@ impl VaultWrapper<Person> {
                 AssertionError("Cannot create vault with initial data other than phone/email").into(),
             );
         }
-        let verified_dis = initial_data.iter().filter(|d| d.is_verified).collect_vec();
-        if verified_dis.len() > 1 {
-            return Err(AssertionError("Can only create vault with 1 piece of verified info").into());
-        }
-        let verified_di = verified_dis
-            .into_iter()
-            .next()
-            .map(|d| d.di.clone())
-            .ok_or(AssertionError("Must create vault with 1 piece of verified info"))?;
 
         // Create the UV and SU
         let (public_key, e_private_key) = keypair;
         let new_user_vault = NewVaultArgs {
             e_private_key,
             public_key,
-            is_live: ob_config.is_live, // Must derive is_live from the ob config used to create it
+            is_live: obc.is_live, // Must derive is_live from the ob config used to create it
             is_portable: true,
             kind: VaultKind::Person,
             is_fixture: is_fixture_data,
             sandbox_id,
         };
         let uv = Vault::create(conn, new_user_vault)?;
-        let su = ScopedVault::get_or_create(conn, &uv, ob_config.id)?;
+        let su = ScopedVault::get_or_create(conn, &uv, obc.id)?;
 
         // This performs some superfluous DB queries to rebuild the UVW, but allows us to share code
         // to add data to the vault
@@ -103,8 +150,7 @@ impl VaultWrapper<Person> {
             .iter()
             .map(|d| (d.di.clone(), d.value.clone()))
             .collect();
-        let request =
-            DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(ob_config.is_live))?;
+        let request = DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(obc.is_live))?;
         let fingerprints = initial_data
             .into_iter()
             .map(|d| -> ApiResult<_> {
@@ -130,18 +176,8 @@ impl VaultWrapper<Person> {
             .collect();
         let request = request.manual_fingerprints(fingerprints);
         let source = DataLifetimeSource::Hosted;
-        let PatchDataResult { new_ci, seqno } = uvw.patch_data(conn, request, source)?;
-        // Immediately mark the phone as verified and portablized since it was proven to be owned
-        // by the user in order to create this vault
-        let (_, ci) = new_ci
-            .into_iter()
-            .find(|(d, _)| d == &verified_di)
-            .ok_or(AssertionError("No CI made with new vault"))?;
-        // Mark the verified piece of data as verified, and portablize it so it can be used to
-        // log into other tenants
-        ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
-        DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
+        let result = uvw.patch_data(conn, request, source)?;
 
-        Ok((uv, su))
+        Ok((uv, su, result))
     }
 }

@@ -263,6 +263,7 @@ impl Workflow {
         let update = ScopedVaultUpdate {
             status: new_status,
             is_billable,
+            ..ScopedVaultUpdate::default()
         };
         ScopedVault::update(conn, &sv.id, update)?;
 
