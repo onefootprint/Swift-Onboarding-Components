@@ -1198,6 +1198,22 @@
             "severity": "Severity",
             "scopes": "Scopes",
             "description": "Description"
+          },
+          "matches": {
+            "protected-details": {
+              "title": "Protected details",
+              "description": "For security reasons, this section requires you to explicitly decrypt these details.",
+              "message": "You don't have permission to decrypt this data. <admin>Contact admin</admin> if you need to access this information.",
+              "button": "Decrypt watchlist results",
+              "error": {
+                "title": "Sorry, something went wrong!",
+                "description": "Decryption failed. Please try again."
+              }
+            },
+            "source-url": {
+              "label": "Source URL",
+              "read-full-report": "Read full match report"
+            }
           }
         }
       },

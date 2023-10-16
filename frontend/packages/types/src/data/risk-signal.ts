@@ -16,4 +16,5 @@ export type RiskSignal = {
   scopes: RiskSignalAttribute[];
   severity: RiskSignalSeverity;
   timestamp: string;
+  hasAmlHits: boolean;
 };

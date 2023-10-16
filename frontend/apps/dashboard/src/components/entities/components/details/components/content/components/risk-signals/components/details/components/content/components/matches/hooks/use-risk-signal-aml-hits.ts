@@ -3,7 +3,7 @@ import type {
   DecryptRiskSignalAmlHitsRequest,
   DecryptRiskSignalAmlHitsResponse,
 } from '@onefootprint/types';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
@@ -25,9 +25,22 @@ const decryptRiskSignalAmlHits = async ({
 const useRiskSignalAmlHits = () => {
   const { authHeaders } = useSession();
   const entityId = useEntityId();
-  return useMutation((riskSignalId: string) =>
-    decryptRiskSignalAmlHits({ authHeaders, entityId, riskSignalId }),
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation(
+    (riskSignalId: string) =>
+      decryptRiskSignalAmlHits({ authHeaders, entityId, riskSignalId }),
+    {
+      onSuccess: (response, riskSignalId: string) => {
+        queryClient.setQueryData(
+          ['entity', entityId, 'risk-signals', riskSignalId, 'aml-hits'],
+          response,
+        );
+      },
+    },
   );
+
+  return mutation;
 };
 
 export default useRiskSignalAmlHits;

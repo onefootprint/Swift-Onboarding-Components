@@ -13,6 +13,7 @@ export const riskSignalsFixture: RiskSignal[] = [
       "The consumer's phone number could be tied to an answering service, page, or VoIP.",
     onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
     timestamp: '2022-10-24T21:56:12.682238Z',
+    hasAmlHits: false,
   },
   {
     id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
@@ -24,6 +25,7 @@ export const riskSignalsFixture: RiskSignal[] = [
     severity: RiskSignalSeverity.Low,
     scopes: [RiskSignalAttribute.email],
     timestamp: '2022-10-24T21:56:12.682238Z',
+    hasAmlHits: false,
   },
 ];
 

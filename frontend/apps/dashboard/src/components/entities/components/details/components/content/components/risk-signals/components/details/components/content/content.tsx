@@ -1,7 +1,9 @@
+import styled from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
-import { Box } from '@onefootprint/ui';
+import { Divider } from '@onefootprint/ui';
 import React from 'react';
 
+import Matches from './components/matches';
 import Overview from './components/overview';
 
 type ContentProps = {
@@ -9,13 +11,25 @@ type ContentProps = {
 };
 
 const Content = ({ riskSignal }: ContentProps) => (
-  <Box marginBottom={9}>
+  <ContentContainer>
     <Overview
       description={riskSignal.description}
       scopes={riskSignal.scopes}
       severity={riskSignal.severity}
     />
-  </Box>
+    {riskSignal.hasAmlHits && (
+      <>
+        <Divider />
+        <Matches riskSignalId={riskSignal.id} />
+      </>
+    )}
+  </ContentContainer>
 );
+
+const ContentContainer = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
 
 export default Content;

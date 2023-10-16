@@ -14,6 +14,7 @@ export const riskSignalDetailsFixture: RiskSignal = {
   severity: RiskSignalSeverity.Low,
   scopes: [RiskSignalAttribute.phoneNumber, RiskSignalAttribute.dob],
   timestamp: '2022-10-24T21:56:12.682238Z',
+  hasAmlHits: false,
 };
 
 export const withRiskSignalDetails = () =>

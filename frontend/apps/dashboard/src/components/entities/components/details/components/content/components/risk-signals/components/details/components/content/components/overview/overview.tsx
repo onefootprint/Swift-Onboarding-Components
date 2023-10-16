@@ -61,7 +61,7 @@ const Fieldset = styled.fieldset`
     display: flex;
     flex-direction: column;
 
-    > div:not(:last-child) {
+    > div {
       margin-bottom: ${theme.spacing[7]};
     }
   `}
