@@ -1,18 +1,16 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import {
   FootprintFormType,
-  FootprintPrivateEvent,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import { getErrorMessage } from '@onefootprint/request';
 import { CardDIField } from '@onefootprint/types';
 import type { GetServerSideProps } from 'next';
-import React, { Suspense, useRef } from 'react';
-import { useEffectOnce } from 'usehooks-ts';
+import React, { Suspense } from 'react';
 
 import { useFootprintProvider } from '../../components/footprint-provider';
 import useProps from '../../components/footprint-provider/hooks/use-props';
-import type { FormBaseHandler, FormData } from './components/form-base';
+import type { FormData } from './components/form-base';
 import FormBase from './components/form-base';
 import Invalid from './components/invalid';
 import Loading from './components/loading';
@@ -26,7 +24,6 @@ import validateClientTokenFields from './utils/validate-client-token-fields';
 
 const Form = () => {
   const footprintProvider = useFootprintProvider();
-  const formBaseRef = useRef<FormBaseHandler>(null);
   const props = useProps<FootprintFormDataProps>();
   const {
     authToken = '',
@@ -38,19 +35,6 @@ const Form = () => {
   const usersVaultMutation = useUsersVault();
   const clientTokenFields = useClientTokenFields(authToken);
 
-  const subscribeSave = () =>
-    footprintProvider.on(FootprintPrivateEvent.formSaved, () => {
-      formBaseRef.current?.save();
-    });
-
-  useEffectOnce(() => {
-    subscribeSave();
-  });
-
-  if (!props || !clientTokenFields.data) {
-    return <Loading />;
-  }
-
   const handleCancel = () => {
     footprintProvider.send(FootprintPublicEvent.canceled);
   };
@@ -59,21 +43,12 @@ const Form = () => {
     footprintProvider.send(FootprintPublicEvent.closed);
   };
 
-  const isValid = arePropsValid(props);
-  const { vaultFields, expiresAt } = clientTokenFields.data;
-  const hasPermissions = validateClientTokenFields(type, vaultFields);
-  const isExpired = checkIsExpired(expiresAt);
-  if (!isValid || !hasPermissions || isExpired) {
-    if (!hasPermissions) {
-      console.error('Auth token is missing permissions to store to vault');
-    }
-    if (isExpired) {
-      console.error('Client auth token is expired, cannot save to vault');
-    }
-    return <Invalid onClose={handleClose} />;
-  }
-
   const handleSave = async (formData: FormData) => {
+    if (!clientTokenFields.data) {
+      console.error('Cannot save to vault without client token fields');
+      return;
+    }
+    const { vaultFields } = clientTokenFields.data;
     const cardAlias = getCardAlias(vaultFields);
     if (!cardAlias) {
       console.error(
@@ -123,10 +98,24 @@ const Form = () => {
     );
   };
 
-  return (
-    <Suspense fallback={null}>
+  const renderContent = () => {
+    if (!clientTokenFields.data) return null;
+    const isValid = arePropsValid(props);
+    const { vaultFields, expiresAt } = clientTokenFields.data;
+    const hasPermissions = validateClientTokenFields(type, vaultFields);
+    const isExpired = checkIsExpired(expiresAt);
+    if (!isValid || !hasPermissions || isExpired) {
+      if (!hasPermissions) {
+        console.error('Auth token is missing permissions to store to vault');
+      }
+      if (isExpired) {
+        console.error('Client auth token is expired, cannot save to vault');
+      }
+      return <Invalid onClose={handleClose} />;
+    }
+
+    return (
       <FormBase
-        ref={formBaseRef}
         title={title}
         type={type}
         variant={variant}
@@ -137,6 +126,14 @@ const Form = () => {
         onCancel={handleCancel}
         onClose={handleClose}
       />
+    );
+  };
+
+  return (
+    <Suspense fallback={<Loading />}>
+      {(!props || clientTokenFields.isLoading) && <Loading />}
+      {clientTokenFields.isError && <Invalid onClose={handleClose} />}
+      {clientTokenFields.data && renderContent()}
     </Suspense>
   );
 };
