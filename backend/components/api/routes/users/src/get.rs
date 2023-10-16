@@ -35,6 +35,7 @@ pub async fn get(
         search,
         fp_id,
         kind: Some(VaultKind::Person),
+        only_visible: true,
         ..ScopedVaultListQueryParams::default()
     };
     let cursor = pagination.cursor;

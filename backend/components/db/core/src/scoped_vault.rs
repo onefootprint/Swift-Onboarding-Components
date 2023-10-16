@@ -28,6 +28,8 @@ pub struct ScopedVaultListQueryParams<TSearch = (PiiString, Vec<Fingerprint>)> {
     pub requires_manual_review: Option<bool>,
     pub watchlist_hit: Option<bool>,
     pub kind: Option<VaultKind>,
+    /// Temporary - only show vaults that are visible to be shown in search
+    pub only_visible: bool,
 }
 
 impl ScopedVaultListQueryParams {
@@ -43,6 +45,7 @@ impl ScopedVaultListQueryParams {
             requires_manual_review,
             watchlist_hit,
             kind,
+            only_visible,
         } = self;
 
         let matching_vaults = if let Some((search, fingerprints)) = search.as_ref() {
@@ -63,6 +66,7 @@ impl ScopedVaultListQueryParams {
             requires_manual_review,
             watchlist_hit,
             kind,
+            only_visible,
         };
         Ok(result)
     }
@@ -82,6 +86,10 @@ macro_rules! list_query {
             .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
             .filter(scoped_vault::is_live.eq($params.is_live))
             .into_boxed();
+
+        if $params.only_visible {
+            query = query.filter(scoped_vault::show_in_search.eq(true));
+        }
 
         // Filter on whether user is in manual review
         if let Some(requires_manual_review) = $params.requires_manual_review {

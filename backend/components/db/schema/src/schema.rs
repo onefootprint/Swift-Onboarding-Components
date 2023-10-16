@@ -647,6 +647,7 @@ table! {
         status -> Nullable<Text>,
         is_billable -> Bool,
         last_heartbeat_at -> Timestamptz,
+        show_in_search -> Bool,
     }
 }
 

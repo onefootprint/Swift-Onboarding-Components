@@ -43,6 +43,8 @@ pub async fn get(
         timestamp_lte: None,
         timestamp_gte: None,
         kind: None,
+        // Show these entities in detail view
+        only_visible: false,
     };
     let (entity, vw) = state
         .db_pool

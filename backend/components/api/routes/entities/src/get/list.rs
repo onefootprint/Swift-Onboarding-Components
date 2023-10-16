@@ -66,6 +66,7 @@ pub async fn get(
         timestamp_lte,
         timestamp_gte,
         kind,
+        only_visible: true,
     };
     let (scoped_vaults, mut entities, vws, count) = state
         .db_pool

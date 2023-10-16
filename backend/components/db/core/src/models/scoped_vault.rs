@@ -46,6 +46,8 @@ pub struct ScopedVault {
     /// Last time we logged a hosted API interacted with this scoped vault. Vaults touched recently
     /// are considered in progress if their KYC status is still incomplete
     pub last_heartbeat_at: DateTime<Utc>,
+    /// Temporary flag that will hide users without verified credentials from search
+    pub show_in_search: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -59,6 +61,7 @@ struct NewScopedVault {
     is_live: bool,
     is_billable: bool,
     last_heartbeat_at: DateTime<Utc>,
+    show_in_search: bool,
 }
 
 #[derive(Debug, Clone, Default, AsChangeset)]
@@ -166,6 +169,7 @@ impl ScopedVault {
             // soon as they have an authorized workflow
             is_billable: false,
             last_heartbeat_at: Utc::now(),
+            show_in_search: true,
         };
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
@@ -200,6 +204,7 @@ impl ScopedVault {
                 // All vaults created via API are billable
                 is_billable: true,
                 last_heartbeat_at: Utc::now(),
+                show_in_search: true,
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)
