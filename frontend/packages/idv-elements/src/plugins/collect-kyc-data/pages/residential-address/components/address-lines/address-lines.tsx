@@ -82,7 +82,7 @@ const AddressLines = () => {
         placeholder={t('address-line-1.placeholder')}
         {...register('addressLine1', {
           required: true,
-          pattern: /^(?!p\.?o\.?\s?box).*$/i,
+          pattern: /^(?!p\.?o\.?\s*?(?:box)?\s*?[0-9]+?).*$/i,
         })}
       />
       <TextInput

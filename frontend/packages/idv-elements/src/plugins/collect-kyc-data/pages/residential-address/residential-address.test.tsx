@@ -28,7 +28,7 @@ const renderResidentialAddress = (
     </TestWrapper>,
   );
 
-describe.skip('<ResidentialAddress />', () => {
+describe('<ResidentialAddress />', () => {
   beforeEach(() => {
     createGoogleMapsSpy();
     getPlacePredictions.mockClear();
@@ -36,6 +36,70 @@ describe.skip('<ResidentialAddress />', () => {
   });
 
   describe('When in US only flow', () => {
+    describe('when address is not a PO box', () => {
+      it.each`
+        address
+        ${'2343 Adams Street'}
+        ${'Main Street 343'}
+      `(`for $address should not show error`, async ({ address }) => {
+        const initialContext = getInitialContext({
+          data: {
+            [IdDI.addressLine1]: {
+              value: address,
+            },
+          },
+        });
+
+        renderResidentialAddress(initialContext);
+        const continueButton = screen.getByRole('button', { name: 'Continue' });
+        await userEvent.click(continueButton);
+
+        await waitFor(() => {
+          expect(
+            screen.queryByText(
+              'Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)',
+            ),
+          ).toBeNull();
+        });
+      });
+    });
+
+    describe('when address is a PO box', () => {
+      it.each`
+        poBoxAddress
+        ${'PO123'}
+        ${'PO 223'}
+        ${'PO. 23423'}
+        ${'P.O. 3432'}
+        ${'P.O.3432'}
+        ${'PO Box 123'}
+        ${'P.O. box 232'}
+        ${'p.o. BOX 2323'}
+        ${'pobox 234'}
+        ${'pobox12321'}
+      `(`for $poBoxAddress should show error`, async ({ poBoxAddress }) => {
+        const initialContext = getInitialContext({
+          data: {
+            [IdDI.addressLine1]: {
+              value: poBoxAddress,
+            },
+          },
+        });
+
+        renderResidentialAddress(initialContext);
+        const continueButton = screen.getByRole('button', { name: 'Continue' });
+        await userEvent.click(continueButton);
+
+        await waitFor(() => {
+          expect(
+            screen.getByText(
+              'Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)',
+            ),
+          ).toBeInTheDocument();
+        });
+      });
+    });
+
     it('should show disabled country picker with US as default value', () => {
       const initialContext = getInitialContext();
       renderResidentialAddress(initialContext);
@@ -59,6 +123,14 @@ describe.skip('<ResidentialAddress />', () => {
       const initialContext = getInitialContext();
       renderResidentialAddress(initialContext);
 
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Only addresses in United States of America are accepted',
+          ),
+        ).toBeInTheDocument();
+      });
+
       const continueButton = screen.getByRole('button', { name: 'Continue' });
       await userEvent.click(continueButton);
 
@@ -72,7 +144,9 @@ describe.skip('<ResidentialAddress />', () => {
 
       expect(screen.getByText('City cannot be empty')).toBeInTheDocument();
       expect(screen.getByText('State cannot be empty')).toBeInTheDocument();
-      expect(screen.getByText('Zip code cannot be empty')).toBeInTheDocument();
+      expect(
+        screen.getByText('Zip code cannot be empty or is invalid'),
+      ).toBeInTheDocument();
     });
 
     it('should allow bootstrapping data', async () => {
@@ -252,6 +326,12 @@ describe.skip('<ResidentialAddress />', () => {
           supportedCountries: ['MX'],
         });
         renderResidentialAddress(initialContext);
+
+        await waitFor(() => {
+          expect(
+            screen.getByText('Only addresses in Mexico are accepted'),
+          ).toBeInTheDocument();
+        });
 
         const continueButton = screen.getByRole('button', { name: 'Continue' });
         await userEvent.click(continueButton);

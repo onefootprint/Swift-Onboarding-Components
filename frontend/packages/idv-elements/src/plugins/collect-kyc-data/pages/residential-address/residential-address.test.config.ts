@@ -20,7 +20,7 @@ type GetInitialContextArgs = {
 const getInitialContext = ({
   data,
   allowInternationalResidents = false,
-  supportedCountries,
+  supportedCountries = ['US'],
 }: GetInitialContextArgs = {}): MachineContext => ({
   authToken: 'token',
   device: {
