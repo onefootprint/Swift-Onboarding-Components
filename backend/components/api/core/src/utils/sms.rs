@@ -108,13 +108,15 @@ impl SmsClient {
         // TODO also change the sending number based on environment
         let pinpoint_config = aws_config::SdkConfig::builder()
             .region(aws_types::region::Region::new("us-east-1"))
-            .credentials_provider(SharedCredentialsProvider::new(aws_credential_types::Credentials::new(
-                "AKIA3U5XRCZONUEXET7L",
-                "RviyM0Yn3rYHnQK/mhC5Wb9DxWubx5rr1efqzB1p",
-                None,
-                None,
-                "pinpoint_static",
-            )))
+            .credentials_provider(SharedCredentialsProvider::new(
+                aws_credential_types::Credentials::new(
+                    "AKIA3U5XRCZONUEXET7L",
+                    "RviyM0Yn3rYHnQK/mhC5Wb9DxWubx5rr1efqzB1p",
+                    None,
+                    None,
+                    "pinpoint_static",
+                ),
+            ))
             .build();
         let pinpoint_client = aws_sdk_pinpointsmsvoicev2::Client::new(&pinpoint_config);
         Self {
@@ -183,7 +185,7 @@ impl SmsClient {
                 ._send_message(message_body, e164, Some(tx), session_id)
                 .await
                 .map_err(|err| {
-                    tracing::error!(?err, "Failed to send SMS message");
+                    tracing::warn!(?err, "Failed to send SMS message");
                 });
         });
         Ok(())
