@@ -27,7 +27,7 @@ const Badge = styled.span.attrs<BadgeProps>(({ testID }) => ({
     justify-content: center;
     align-items: center;
     width: min-content;
-    sx=${sx};
+    ${sx};
   `}
 `;
 
