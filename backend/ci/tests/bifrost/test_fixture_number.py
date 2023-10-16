@@ -15,8 +15,7 @@ def ob_config2(sandbox_tenant, must_collect_data):
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
 
-@pytest.mark.parametrize("use_phone", [True, False])
-def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant, twilio, use_phone):
+def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant, twilio):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
 
@@ -33,18 +32,21 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant, twilio, use_p
     ]
 
     # User exists now, but shouldn't be able to find it without exact tenant auth
-    if use_phone:
-        identifier = dict(phone_number=bifrost.data["id.phone_number"])
-    else:
-        identifier = dict(email=bifrost.data["id.email"])
-
-    data = dict(identifier=identifier)
-    body = post("hosted/identify", data, sandbox_id_h)
-    assert not body["user_found"]
-    body = post("hosted/identify", data, tenant.default_ob_config.key, sandbox_id_h)
-    assert not body["user_found"]
-    body = post("hosted/identify", data, ob_config2.key, sandbox_id_h)
-    assert body["user_found"]
+    identifiers = [
+        dict(phone_number=bifrost.data["id.phone_number"]),
+        dict(email=bifrost.data["id.email"]),
+    ]
+    for identifier in identifiers:
+        print(identifier)
+        data = dict(identifier=identifier)
+        # We're finding here. We make a global fingerprint earlier now? but it shouldn't be portablized
+        # Ahhhh, we shouldn't be making global fingerprint for fixture number vault!
+        body = post("hosted/identify", data, sandbox_id_h)
+        assert not body["user_found"]
+        body = post("hosted/identify", data, tenant.default_ob_config.key, sandbox_id_h)
+        assert not body["user_found"]
+        body = post("hosted/identify", data, ob_config2.key, sandbox_id_h)
+        assert body["user_found"]
 
     bifrost2 = BifrostClient.inherit(
         sandbox_tenant.default_ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id

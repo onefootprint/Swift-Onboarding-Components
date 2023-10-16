@@ -40,12 +40,11 @@ def no_phone_user(skip_phone_obc):
         *headers,
     )
 
-    bifrost = BifrostClient(
+    bifrost = BifrostClient.raw_auth(
         skip_phone_obc,
         FpAuth(res["auth_token"]),
         FIXTURE_PHONE_NUMBER,
         sandbox_id,
-        True,
     )
     return bifrost.run()
 
@@ -77,9 +76,8 @@ def test_new_user(skip_phone_obc):
 
     auth_token = FpAuth(res["auth_token"])
 
-    # TODO: should probably give BifrostClient a concept of skip phone but this works for now
-    bifrost = BifrostClient(
-        skip_phone_obc, auth_token, FIXTURE_PHONE_NUMBER, _gen_random_sandbox_id(), True
+    bifrost = BifrostClient.raw_auth(
+        skip_phone_obc, auth_token, FIXTURE_PHONE_NUMBER, _gen_random_sandbox_id()
     )
 
     reqs = bifrost.get_status()["all_requirements"]

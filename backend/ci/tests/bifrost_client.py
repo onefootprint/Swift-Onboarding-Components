@@ -35,7 +35,7 @@ class BifrostClient:
         """
         Create an instance of BifrostClient that uses the provided auth token.
         """
-        return BifrostClient(ob_config, auth_token, phone_number, sandbox_id, True)
+        return BifrostClient(ob_config, auth_token, phone_number, sandbox_id)
 
     def inherit(
         ob_config, twilio, phone_number, sandbox_id, override_ob_config_auth=None
@@ -46,7 +46,7 @@ class BifrostClient:
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id_header = [SandboxId(sandbox_id)] if sandbox_id else []
         auth = inherit_user(twilio, phone_number, ob_config_auth, *sandbox_id_header)
-        return BifrostClient(ob_config, auth, phone_number, sandbox_id, True)
+        return BifrostClient(ob_config, auth, phone_number, sandbox_id)
 
     def create(
         ob_config,
@@ -61,11 +61,12 @@ class BifrostClient:
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id_header = [SandboxId(sandbox_id)] if sandbox_id else []
+        email = override_email or EMAIL
         auth_token = create_user(
-            twilio, phone_number, ob_config_auth, *sandbox_id_header
+            twilio, phone_number, email, ob_config_auth, *sandbox_id_header
         )
         return BifrostClient(
-            ob_config, auth_token, phone_number, sandbox_id, False, override_email
+            ob_config, auth_token, phone_number, sandbox_id, override_email
         )
 
     def new(ob_config, twilio, override_ob_config_auth=None):
@@ -75,11 +76,9 @@ class BifrostClient:
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id = _gen_random_sandbox_id()
         auth_token = create_user(
-            twilio, FIXTURE_PHONE_NUMBER, ob_config_auth, SandboxId(sandbox_id)
+            twilio, FIXTURE_PHONE_NUMBER, EMAIL, ob_config_auth, SandboxId(sandbox_id)
         )
-        return BifrostClient(
-            ob_config, auth_token, FIXTURE_PHONE_NUMBER, sandbox_id, False
-        )
+        return BifrostClient(ob_config, auth_token, FIXTURE_PHONE_NUMBER, sandbox_id)
 
     def __init__(
         self,
@@ -87,7 +86,6 @@ class BifrostClient:
         auth_token,
         phone_number,
         sandbox_id,
-        is_inherited,
         override_email=None,
     ):
         self.ob_config = ob_config
@@ -128,13 +126,6 @@ class BifrostClient:
 
         # Keep track of biometric credentials created
         self.webauthn_device = SoftWebauthnDevice()
-
-        # Add email data before even initializing the onboarding, which we do on the client side.
-        # Inherited users will already have an email
-        if not is_inherited:
-            email_data = {"id.email": self.data["id.email"]}
-            post("/hosted/user/vault/validate", email_data, self.auth_token)
-            patch("/hosted/user/vault", email_data, self.auth_token)
 
         # Initialize the onboarding
         self.initialize_onboarding()

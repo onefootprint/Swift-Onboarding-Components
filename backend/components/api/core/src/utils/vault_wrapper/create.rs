@@ -122,9 +122,9 @@ impl VaultWrapper<Person> {
             .into_iter()
             .map(|d| -> ApiResult<_> {
                 Ok(vec![
-                    // Don't create a globally-scoped fingerprint for our fixture phone number,
-                    // otherwise these test users' data will become portable across tenants
-                    (!(d.is_fixture()?)).then_some(FingerprintRequest {
+                    // Don't create a globally-scoped fingerprint for vaults made with our fixture
+                    // number, otherwise these test users' data will become portable across tenants
+                    (!(is_fixture_data)).then_some(FingerprintRequest {
                         kind: d.di.clone(),
                         fingerprint: d.global_sh,
                         scope: FingerprintScopeKind::Global,

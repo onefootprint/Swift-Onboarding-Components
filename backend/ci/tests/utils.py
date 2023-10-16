@@ -10,6 +10,7 @@ from tests.headers import SandboxId
 from tests.types import ObConfiguration, SecretApiKey, Tenant
 from tests.headers import DashboardAuth, FpAuth, IsLive
 from tests.constants import (
+    EMAIL,
     CUSTODIAN_AUTH,
     TEST_URL,
     FIXTURE_PHONE_NUMBER,
@@ -400,10 +401,10 @@ def identify_verify(
     return try_until_success(inner, 60)
 
 
-def create_user(twilio, phone_number, *headers) -> str:
+def create_user(twilio, phone_number, email, *headers) -> str:
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
-        data = dict(phone_number=phone_number)
+        data = dict(phone_number=phone_number, email=email)
         body = post("hosted/identify/signup_challenge", data, *headers)
         return body["challenge_data"]["challenge_token"]
 

@@ -7,7 +7,7 @@ from tests.utils import (
     create_ob_config,
     _gen_random_sandbox_id,
 )
-from tests.constants import FIXTURE_PHONE_NUMBER
+from tests.constants import FIXTURE_PHONE_NUMBER, EMAIL
 from tests.headers import (
     PublishableOnboardingKey,
     SandboxId,
@@ -107,7 +107,7 @@ def test_config_create(sandbox_tenant, twilio):
 
     sandbox_id = _gen_random_sandbox_id()
     auth_token = create_user(
-        twilio, FIXTURE_PHONE_NUMBER, ob_config_key, SandboxId(sandbox_id)
+        twilio, FIXTURE_PHONE_NUMBER, EMAIL, ob_config_key, SandboxId(sandbox_id)
     )
     post("hosted/onboarding", None, ob_config_key, auth_token)
 
@@ -284,11 +284,10 @@ def test_config_create(sandbox_tenant, twilio):
                 optional_data=[],
                 can_access_data=[],
                 allow_international_residents=False,
-                allow_us_residents = False,
+                allow_us_residents=False,
             ),
             "Validation error: Must set one of allow_us_residents or allow_international_residents to true",
         ),
-
         (
             dict(
                 must_collect_data=[
@@ -301,12 +300,11 @@ def test_config_create(sandbox_tenant, twilio):
                 optional_data=[],
                 can_access_data=[],
                 allow_international_residents=True,
-                allow_us_territory_residents = True,
-                allow_us_residents = True,
+                allow_us_territory_residents=True,
+                allow_us_residents=True,
             ),
             "Validation error: Specifying allow_us_territory_residents with allow_international_residents is redundant",
         ),
-
     ],
 )
 def test_config_create_validation(sandbox_tenant, config_data, expected_error):
