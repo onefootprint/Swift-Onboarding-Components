@@ -39,8 +39,8 @@ const button: Button = {
         color: textColor.quinary,
       },
       disabled: {
-        bg: textColor.quaternary,
-        color: primaryBtnBackgroundColor.disabled,
+        bg: primaryBtnBackgroundColor.disabled,
+        color: textColor.quaternary,
         borderColor: 'transparent',
       },
     },
