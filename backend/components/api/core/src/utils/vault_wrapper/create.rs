@@ -3,6 +3,7 @@ use crate::enclave_client::VaultKeyPair;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiResult, AssertionError};
+use crate::telemetry::RootSpan;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::{ScopedVault, ScopedVaultUpdate};
 use db::models::vault::NewVaultArgs;
@@ -48,6 +49,7 @@ impl VaultWrapper<Person> {
     pub fn create_unverified(
         conn: &mut TxnPgConn,
         ctx: VaultContext,
+        root_span: RootSpan,
     ) -> ApiResult<(Locked<Vault>, ScopedVault, PatchDataResult)> {
         let VaultContext {
             data: initial_data,
@@ -100,6 +102,11 @@ impl VaultWrapper<Person> {
             show_in_search: Some(false),
         };
         ScopedVault::update(conn, &su.id, update)?;
+
+        // Record some properties on the root span
+        root_span.record("tenant_id", su.tenant_id.to_string());
+        root_span.record("fp_id", su.fp_id.to_string());
+        root_span.record("vault_id", su.vault_id.to_string());
 
         // This performs some superfluous DB queries to rebuild the UVW, but allows us to share code
         // to add data to the vault

@@ -12,6 +12,7 @@ use api_core::{
     },
     errors::challenge::ChallengeError,
     fingerprinter::VaultIdentifier,
+    telemetry::RootSpan,
     utils::headers::SandboxId,
 };
 use api_wire_types::IdentifyRequest;
@@ -42,6 +43,7 @@ pub async fn post(
     // When provided, is used to identify the currently authed user. Will generate a challenge
     // for the authed user
     user_auth: Option<UserAuthContext>,
+    root_span: RootSpan,
 ) -> actix_web::Result<Json<ResponseData<IdentifyResponse>>, ApiError> {
     let IdentifyRequest { identifier } = request.into_inner();
 
@@ -57,18 +59,19 @@ pub async fn post(
 
     // Look up existing user vault by identifier
     let t_id = ob_context.as_ref().map(|obc| &obc.tenant().id);
-    let (_, creds, kinds) = if let Some(ctx) = get_user_challenge_context(&state, identifier, t_id).await? {
-        ctx
-    } else {
-        // The user vault doesn't exist. Just return that the user wasn't found
-        return Ok(Json(ResponseData {
-            data: IdentifyResponse {
-                user_found: false,
-                available_challenge_kinds: None,
-                has_syncable_pass_key: false,
-            },
-        }));
-    };
+    let (_, creds, kinds) =
+        if let Some(ctx) = get_user_challenge_context(&state, identifier, t_id, root_span).await? {
+            ctx
+        } else {
+            // The user vault doesn't exist. Just return that the user wasn't found
+            return Ok(Json(ResponseData {
+                data: IdentifyResponse {
+                    user_found: false,
+                    available_challenge_kinds: None,
+                    has_syncable_pass_key: false,
+                },
+            }));
+        };
 
     let available_challenge_kinds: Option<Vec<ChallengeKind>> = Some(kinds);
 

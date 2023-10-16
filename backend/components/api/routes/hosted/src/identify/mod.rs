@@ -4,6 +4,7 @@ pub mod login_challenge;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::errors::ApiResult;
 use api_core::fingerprinter::VaultIdentifier;
+use api_core::telemetry::RootSpan;
 use api_core::utils::sms::PhoneEmailChallengeState;
 use db::models::tenant::Tenant;
 use db::models::webauthn_credential::WebauthnCredential;
@@ -90,11 +91,12 @@ impl ChallengeState {
 }
 
 #[allow(clippy::type_complexity)]
-#[tracing::instrument(skip(state))]
+#[tracing::instrument(skip(state, root_span))]
 async fn get_user_challenge_context(
     state: &web::Data<State>,
     identifier: VaultIdentifier,
     t_id: Option<&TenantId>,
+    root_span: RootSpan,
 ) -> Result<Option<(VaultWrapper<Person>, Vec<WebauthnCredential>, Vec<ChallengeKind>)>, ApiError> {
     // Look up existing user vault by identifier
     let existing_user = if let Some(existing_user) = state.find_vault(identifier, t_id).await? {
@@ -102,6 +104,13 @@ async fn get_user_challenge_context(
     } else {
         return Ok(None);
     };
+
+    // Record some properties on the root span
+    if let Some(t_id) = t_id.as_ref() {
+        root_span.record("tenant_id", t_id.to_string());
+        // TODO add fp_id?
+    }
+    root_span.record("vault_id", existing_user.id.to_string());
 
     let (uvw, creds) = state
         .db_pool

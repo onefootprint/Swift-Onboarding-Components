@@ -16,6 +16,7 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
+use api_core::telemetry::RootSpan;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::Person;
 use chrono::{Duration, Utc};
@@ -61,6 +62,7 @@ pub async fn post(
     // When provided, augments the existing user_auth token with the scopes gained from the challenge
     user_auth: Option<UserAuthContext>,
     insight_headers: InsightHeaders,
+    root_span: RootSpan,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let VerifyRequest {
@@ -95,6 +97,9 @@ pub async fn post(
                 }
             };
 
+            // Record some properties on the root span
+            root_span.record("vault_id", uv_id.to_string());
+
             // If you authed with passkey, you also get SensitiveProfile
             let sensitive_scope =
                 matches!(auth_factor, AuthFactor::Passkey(_)).then_some(UserAuthScope::SensitiveProfile);
@@ -102,16 +107,18 @@ pub async fn post(
             // Determine whether to issue onboardig scopes or my1fp scopes
             let (args, scopes, duration, scoped_vault_id) = if let Some(ob_pk_auth) = ob_pk_auth {
                 let obc_id = ob_pk_auth.ob_config().id.clone();
-                let (su_id, sb_id) = onboarding_identifiers(conn, ob_pk_auth, &uv_id)?;
+                let (su, sb_id) = onboarding_identifiers(conn, ob_pk_auth, &uv_id)?;
                 let duration = Duration::hours(1); // Onboarding is shorter
                 let args = UserSessionArgs {
-                    su_id: Some(su_id.clone()),
+                    su_id: Some(su.id.clone()),
                     sb_id,
                     obc_id: Some(obc_id),
                     // wf_id will be added later in POST /hosted/onboarding
                     wf_id: None,
                 };
-                (args, vec![Some(UserAuthScope::SignUp)], duration, Some(su_id))
+                root_span.record("fp_id", su.fp_id.to_string());
+                root_span.record("tenant_id", su.tenant_id.to_string());
+                (args, vec![Some(UserAuthScope::SignUp)], duration, Some(su.id))
             } else {
                 let scopes = vec![Some(UserAuthScope::BasicProfile)];
                 // TODO we currently infer that a token is for my1fp just because ob config auth
@@ -163,7 +170,7 @@ fn onboarding_identifiers(
     conn: &mut TxnPgConn,
     ob_pk_auth: ObConfigAuth,
     uv_id: &VaultId,
-) -> ApiResult<(ScopedVaultId, Option<ScopedVaultId>)> {
+) -> ApiResult<(ScopedVault, Option<ScopedVaultId>)> {
     let obc = ob_pk_auth.ob_config();
     // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
     // created with an ob config. This will create a SU when we are one-clicking onto this tenant
@@ -189,7 +196,7 @@ fn onboarding_identifiers(
         None
     };
 
-    Ok((su.id, sb_id))
+    Ok((su, sb_id))
 }
 
 fn validate_biometric_challenge(

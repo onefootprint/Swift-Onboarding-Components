@@ -14,6 +14,7 @@ use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::fingerprinter::VaultIdentifier;
+use api_core::telemetry::RootSpan;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::headers::TelemetryHeaders;
 use api_core::utils::sms::rx_background_error;
@@ -53,6 +54,7 @@ pub async fn post(
     // for the authed user
     user_auth: Option<UserAuthContext>,
     telemetry_headers: TelemetryHeaders,
+    root_span: RootSpan,
 ) -> actix_web::Result<Json<ResponseData<LoginChallengeResponse>>, ApiError> {
     // TODO do we want to make this more similar to signup_challenge and have it return an unauthed token?
     let tenant = ob_context.as_ref().map(|obc| obc.tenant());
@@ -78,13 +80,14 @@ pub async fn post(
 
     // Look up existing user vault by identifier
     let t_id = tenant.map(|t| &t.id);
-    let (uvw, creds, _) =
-        if let Some(user_challenge_context) = get_user_challenge_context(&state, identifier, t_id).await? {
-            user_challenge_context
-        } else {
-            // The user vault doesn't exist. Just return that the user wasn't found
-            return Err(ChallengeError::LoginChallengeUserNotFound.into());
-        };
+    let (uvw, creds, _) = if let Some(user_challenge_context) =
+        get_user_challenge_context(&state, identifier, t_id, root_span).await?
+    {
+        user_challenge_context
+    } else {
+        // The user vault doesn't exist. Just return that the user wasn't found
+        return Err(ChallengeError::LoginChallengeUserNotFound.into());
+    };
 
     // If we need to create a challenge, extract the phone number for the user
     let sandbox_id = uvw.vault.sandbox_id.clone();

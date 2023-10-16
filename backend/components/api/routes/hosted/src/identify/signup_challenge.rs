@@ -7,6 +7,7 @@ use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::{ApiResult, AssertionError};
+use api_core::telemetry::RootSpan;
 use api_core::utils::headers::{SandboxId, TelemetryHeaders};
 use api_core::utils::sms::rx_background_error;
 use api_core::utils::vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper};
@@ -40,6 +41,7 @@ pub async fn post(
     // When provided, creates a sandbox user with the given suffix
     sandbox_id: SandboxId,
     telemetry_headers: TelemetryHeaders,
+    root_span: RootSpan,
 ) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
     let SignupChallengeRequest { phone_number, email } = request.into_inner();
 
@@ -59,7 +61,7 @@ pub async fn post(
     let uv = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (uv, _, _) = VaultWrapper::create_unverified(conn, ctx)?;
+            let (uv, _, _) = VaultWrapper::create_unverified(conn, ctx, root_span)?;
             Ok(uv.into_inner())
         })
         .await?;
