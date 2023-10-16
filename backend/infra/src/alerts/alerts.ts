@@ -167,7 +167,7 @@ const staticAlerts: Alert[] = [
   },
   {
     name: 'Extra Latent HTTP request',
-    description: 'HTTP request took longer than 25s',
+    description: 'HTTP request took longer than 60s',
     datasetName: 'fpc-api',
     runbookUrl:
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#1430bed953954300827cc3a07777a84f',
