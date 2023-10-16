@@ -21,6 +21,12 @@ use super::session::{JsonSession, RateLimitRecord};
 
 pub type SecondsBeforeRetry = Duration;
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct PhoneEmailChallengeState {
+    pub vault_id: VaultId,
+    pub h_code: Vec<u8>,
+}
+
 #[derive(Clone)]
 pub struct SmsClient {
     duration_between_challenges: Duration,
@@ -264,7 +270,7 @@ impl SmsClient {
         vault_id: VaultId,
         sandbox_id: Option<SandboxId>,
         session_id: Option<SessionId>,
-    ) -> ApiResult<(Receiver<ApiError>, PhoneChallengeState, SecondsBeforeRetry)> {
+    ) -> ApiResult<(Receiver<ApiError>, PhoneEmailChallengeState, SecondsBeforeRetry)> {
         // Send non-blocking to prevent us from returning the challenge data to the frontend while
         // we wait for twilio latency
         if destination.is_fixture_phone_number() && sandbox_id.is_none() {
@@ -306,17 +312,11 @@ impl SmsClient {
         )
         .await?;
 
-        Ok((
-            rx,
-            PhoneChallengeState {
-                phone_number: destination.e164(),
-                email: None,
-                vault_id: Some(vault_id),
-                sandbox_id,
-                h_code: sha256(code.as_bytes()).to_vec(),
-            },
-            self.duration_between_challenges,
-        ))
+        let state = PhoneEmailChallengeState {
+            vault_id,
+            h_code: sha256(code.as_bytes()).to_vec(),
+        };
+        Ok((rx, state, self.duration_between_challenges))
     }
 
     #[tracing::instrument(skip_all)]
@@ -362,18 +362,6 @@ pub struct BoSessionSmsInfo<'a> {
     /// The tenant name
     pub org_name: &'a str,
     pub url: PiiString,
-}
-
-/// Phone number challenge in-progress state
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct PhoneChallengeState {
-    // TODO rm
-    pub phone_number: PiiString,
-    pub email: Option<PiiString>,
-    pub sandbox_id: Option<SandboxId>,
-    // TODO make non-optional
-    pub vault_id: Option<VaultId>,
-    pub h_code: Vec<u8>,
 }
 
 pub mod rate_limit {

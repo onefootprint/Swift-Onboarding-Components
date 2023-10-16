@@ -1,4 +1,4 @@
-use super::BiometricChallengeState;
+use super::{BiometricChallengeState, PhoneEmailChallengeState};
 use crate::auth::ob_config::ObConfigAuth;
 use crate::auth::user::UserAuthScope;
 use crate::errors::challenge::ChallengeError;
@@ -16,26 +16,21 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
-use api_core::errors::AssertionError;
 use api_core::utils::headers::InsightHeaders;
-use api_core::utils::vault_wrapper::{InitialVaultData, Person, VaultContext};
+use api_core::utils::vault_wrapper::Person;
 use chrono::{Duration, Utc};
 use crypto::sha256;
 use db::errors::OptionalExtension;
 use db::models::auth_event::NewAuthEvent;
 use db::models::business_owner::BusinessOwner;
-use db::models::contact_info::ContactInfo;
-use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::scoped_vault::{ScopedVault, ScopedVaultUpdate};
+use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
-use itertools::Itertools;
-use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::{
-    AuthEventKind, DataIdentifier, Fingerprinter, IdentityDataKind as IDK, PiiString, SandboxId,
-    ScopedVaultId, SessionAuthToken, VaultId, WebauthnCredentialId,
+    AuthEventKind, DataIdentifier, IdentityDataKind as IDK, ScopedVaultId, SessionAuthToken, VaultId,
+    WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -70,60 +65,27 @@ pub async fn post(
     // Note: Challenge::unseal checks for challenge token expiry as well
     let VerifyRequest {
         challenge_token,
-        challenge_response,
+        challenge_response: c_response,
     } = request.into_inner();
     let challenge_state =
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
-
-    // Generate fingerprints and keypairs async if needed
-    let challenge_data = match challenge_state.data {
-        ChallengeData::Sms(challenge_state) => {
-            let sandbox_id = challenge_state.sandbox_id.clone();
-            let data = vec![
-                Some((true, IDK::PhoneNumber.into(), challenge_state.phone_number)),
-                challenge_state
-                    .email
-                    .map(|email| (false, IDK::Email.into(), email)),
-            ]
-            .into_iter()
-            .flatten()
-            .collect_vec();
-            let vault_context = make_vault_context(&state, ob_pk_auth.as_ref(), data, sandbox_id).await?;
-
-            ChallengeContext::Sms(challenge_state.vault_id, vault_context, challenge_state.h_code)
-        }
-        ChallengeData::Passkey(challenge_state) => ChallengeContext::Passkey(challenge_state),
-        ChallengeData::Email(challenge_state) => {
-            let data = vec![(true, IDK::Email.into(), challenge_state.email)];
-            let vault_context = make_vault_context(
-                &state,
-                ob_pk_auth.as_ref(),
-                data,
-                challenge_state.sandbox_id.clone(),
-            )
-            .await?;
-
-            ChallengeContext::Email(challenge_state.vault_id, vault_context, challenge_state.h_code)
-        }
-    };
 
     let config = state.config.clone();
     let session_key = state.session_sealing_key.clone();
     let auth_token = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (uv_id, auth_factor, event_kind, passkey_cred_id) = match challenge_data {
-                ChallengeContext::Sms(v_id, ctx, h_code) => {
-                    let tok = validate(conn, v_id, h_code, ctx, &challenge_response)?;
+            let (uv_id, auth_factor, event_kind, passkey_cred_id) = match challenge_state.data {
+                ChallengeData::Sms(s) => {
+                    let tok = validate(conn, s, ob_pk_auth.as_ref(), &c_response, IDK::PhoneNumber.into())?;
                     (tok, AuthFactor::Sms, AuthEventKind::Sms, None)
                 }
-                ChallengeContext::Email(v_id, ctx, h_code) => {
-                    let tok = validate(conn, v_id, h_code, ctx, &challenge_response)?;
+                ChallengeData::Email(s) => {
+                    let tok = validate(conn, s, ob_pk_auth.as_ref(), &c_response, IDK::Email.into())?;
                     (tok, AuthFactor::Email, AuthEventKind::Email, None)
                 }
-                ChallengeContext::Passkey(context) => {
-                    let (tok, cred) =
-                        validate_biometric_challenge(conn, &config, context, &challenge_response)?;
+                ChallengeData::Passkey(context) => {
+                    let (tok, cred) = validate_biometric_challenge(conn, &config, context, &c_response)?;
                     (
                         tok,
                         AuthFactor::Passkey(cred.clone()),
@@ -196,12 +158,6 @@ pub async fn post(
     }))
 }
 
-pub enum ChallengeContext {
-    Sms(Option<VaultId>, VaultContext, Vec<u8>),
-    Passkey(BiometricChallengeState),
-    Email(Option<VaultId>, VaultContext, Vec<u8>),
-}
-
 /// Determines the identifiers to add to the auth token to allow a user to complete onboarding
 fn onboarding_identifiers(
     conn: &mut TxnPgConn,
@@ -210,7 +166,7 @@ fn onboarding_identifiers(
 ) -> ApiResult<(ScopedVaultId, Option<ScopedVaultId>)> {
     let obc = ob_pk_auth.ob_config();
     // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
-    // created with an ob config
+    // created with an ob config. This will create a SU when we are one-clicking onto this tenant
     let uv = Vault::lock(conn, uv_id)?;
     let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone())?;
 
@@ -262,126 +218,27 @@ fn validate_biometric_challenge(
     Ok((challenge_state.user_vault_id, credential.id))
 }
 
-type IsVerified = bool;
-
-pub(super) async fn make_vault_context(
-    state: &State,
-    ob_pk_auth: Option<&ObConfigAuth>,
-    initial_data: Vec<(IsVerified, DataIdentifier, PiiString)>,
-    sandbox_id: Option<SandboxId>,
-) -> ApiResult<VaultContext> {
-    // TODO this keypair won't always be used... but helps to generate this proactively.
-    let keypair = state.enclave_client.generate_sealed_keypair().await?;
-
-    let global_sh_data = initial_data
-        .iter()
-        .map(|(_, di, v)| -> ApiResult<_> {
-            Ok((di.clone(), GlobalFingerprintKind::try_from(di.clone())?, v))
-        })
-        .collect::<ApiResult<Vec<_>>>()?;
-    let global_sh = state.compute_fingerprints(global_sh_data).await?;
-
-    let tenant_sh = if let Some(ob_pk_auth) = ob_pk_auth.as_ref() {
-        let tenant_sh_data = initial_data
-            .iter()
-            .map(|(_, di, v)| (di.clone(), (di, &ob_pk_auth.tenant().id), v))
-            .collect_vec();
-        // If we are in identify for a specific tenant, also compute tenant-scoped FP
-        state.compute_fingerprints(tenant_sh_data).await?
-    } else {
-        vec![]
-    };
-
-    let data = initial_data
-        .into_iter()
-        .map(|(is_verified, di, value)| -> ApiResult<_> {
-            Ok(InitialVaultData {
-                global_sh: global_sh
-                    .iter()
-                    .filter_map(|(x, fp)| (x == &di).then_some(fp.clone()))
-                    .next()
-                    .ok_or(AssertionError("No global fingerprint"))?,
-                tenant_sh: tenant_sh
-                    .iter()
-                    .filter_map(|(x, fp)| (x == &di).then_some(fp.clone()))
-                    .next(),
-                is_verified,
-                di,
-                value,
-            })
-        })
-        .collect::<ApiResult<Vec<_>>>()?;
-    Ok(VaultContext {
-        data,
-        keypair,
-        sandbox_id,
-        obc: ob_pk_auth.map(|obc| obc.ob_config().clone()),
-    })
-}
-
 fn validate(
     conn: &mut TxnPgConn,
-    // TODO make not optional
-    vault_id: Option<VaultId>,
-    h_code: Vec<u8>,
-    ctx: VaultContext,
+    challenge_state: PhoneEmailChallengeState,
+    ob_pk_auth: Option<&ObConfigAuth>,
     challenge_response: &str,
+    di: DataIdentifier,
 ) -> Result<VaultId, ApiError> {
+    let PhoneEmailChallengeState { h_code, vault_id } = challenge_state;
     if h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::IncorrectPin.into());
     };
 
-    let fps_to_search = ctx
-        .data
-        .iter()
-        .filter(|d| d.is_verified)
-        .flat_map(|d| vec![Some(d.global_sh.clone()), d.tenant_sh.clone()])
-        .flatten()
-        .collect_vec();
-
-    // Or if auth token is provided, use it here. We'll eventually deprecate the codepath that
-    // make vaults here
-
-    let Some(vault_id) = vault_id else {
-        // We are on the old flow. Get or create the user
-        let existing_user = Vault::find_portable(conn, &fps_to_search, ctx.sandbox_id.clone())?;
-        let result = match existing_user {
-            Some(uv) => uv.id,
-            None => {
-                // The user does not exist. Create a new user vault.
-                // Must have ob_info to create a new user vault
-                let (uv, _) = VaultWrapper::create_user_vault(conn, ctx)?;
-                uv.into_inner().id
-            }
-        };
-        return Ok(result);
-    };
-
     // We're on the new codepath where the vault was pre-created in the signup challenge.
-    if let Some(obc) = ctx.obc.as_ref() {
-        let sv = ScopedVault::get(conn, (&vault_id, &obc.tenant_id)).optional()?;
+    if let Some(obc) = ob_pk_auth {
+        let tenant_id = &obc.tenant().id;
+        let sv = ScopedVault::get(conn, (&vault_id, tenant_id)).optional()?;
         if let Some(sv) = sv {
             // For bifrost logins that already have a SV (likely created in the signup challenge),
             // we can mark the contact info as OTP verified
-            let update = ScopedVaultUpdate {
-                show_in_search: Some(true),
-                ..ScopedVaultUpdate::default()
-            };
-            ScopedVault::update(conn, &sv.id, update)?;
             let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &sv.id)?;
-            let verified_ci = ctx
-                .data
-                .iter()
-                .find(|f| f.is_verified)
-                .ok_or(AssertionError("No piece of verified CI"))?;
-            let lifetime = vw
-                .get_lifetime(verified_ci.di.clone())
-                .ok_or(AssertionError("No lifetime for CI"))?;
-            if lifetime.portablized_seqno.is_none() {
-                let seqno = DataLifetime::get_next_seqno(conn)?;
-                let ci = ContactInfo::get(conn, &lifetime.id)?;
-                VaultWrapper::on_otp_verified(conn, &ci, seqno)?;
-            }
+            vw.on_otp_verified(conn, di)?;
         }
     }
 

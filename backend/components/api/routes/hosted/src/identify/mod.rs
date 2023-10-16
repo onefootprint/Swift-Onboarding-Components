@@ -4,7 +4,7 @@ pub mod login_challenge;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::errors::ApiResult;
 use api_core::fingerprinter::VaultIdentifier;
-use api_core::utils::sms::PhoneChallengeState;
+use api_core::utils::sms::PhoneEmailChallengeState;
 use db::models::tenant::Tenant;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::email::Email;
@@ -56,16 +56,6 @@ pub struct BiometricChallengeState {
     pub non_synced_cred_ids: Vec<Base64UrlSafeData>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct EmailChallengeState {
-    // TODO rm
-    pub email: PiiString,
-    pub sandbox_id: Option<SandboxId>,
-    // TODO make non-optional
-    pub vault_id: Option<VaultId>,
-    pub h_code: Vec<u8>,
-}
-
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(identify::post)
@@ -81,10 +71,10 @@ pub struct ChallengeState {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, EnumDiscriminants)]
 pub enum ChallengeData {
-    Sms(PhoneChallengeState),
+    Sms(PhoneEmailChallengeState),
     #[serde(alias = "Biometric")] // TODO: drop this alias after challenges expire
     Passkey(BiometricChallengeState),
-    Email(EmailChallengeState),
+    Email(PhoneEmailChallengeState),
 }
 
 impl ChallengeState {
@@ -182,10 +172,8 @@ pub fn send_email_challenge_non_blocking(
             });
     });
 
-    Ok(ChallengeData::Email(EmailChallengeState {
-        email: email.email.clone(),
-        vault_id: Some(vault_id),
-        sandbox_id,
+    Ok(ChallengeData::Email(PhoneEmailChallengeState {
+        vault_id,
         h_code,
     }))
 }

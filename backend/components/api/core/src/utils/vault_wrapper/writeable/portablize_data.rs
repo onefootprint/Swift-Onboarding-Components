@@ -2,7 +2,11 @@ use super::WriteableVw;
 use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
+use db::models::contact_info::ContactInfo;
+use db::models::contact_info::VerificationLevel;
 use db::models::data_lifetime::DataLifetime;
+use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::user_timeline::UserTimeline;
 use db::TxnPgConn;
 use newtypes::CollectedDataOption;
@@ -173,6 +177,25 @@ impl WriteableVw<Person> {
         UserTimeline::bulk_portablize(conn, &scoped_vault_id, DbUserTimelineEventKind::DataCollected)?;
 
         Ok(seqno)
+    }
+
+    /// Mark the provided CI as verified.
+    pub fn on_otp_verified(self, conn: &mut TxnPgConn, di: DataIdentifier) -> ApiResult<()> {
+        let lifetime = self
+            .get_lifetime(di)
+            .ok_or(AssertionError("No lifetime for CI"))?;
+        let ci = ContactInfo::get(conn, &lifetime.id)?;
+        if !ci.is_otp_verified {
+            ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
+            let seqno = DataLifetime::get_next_seqno(conn)?;
+            DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
+        }
+        let update = ScopedVaultUpdate {
+            show_in_search: Some(true),
+            ..ScopedVaultUpdate::default()
+        };
+        ScopedVault::update(conn, &self.scoped_vault_id, update)?;
+        Ok(())
     }
 }
 

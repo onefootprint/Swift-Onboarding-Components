@@ -3,17 +3,14 @@ use crate::enclave_client::VaultKeyPair;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::user::UserError;
 use crate::errors::{ApiResult, AssertionError};
-use db::models::contact_info::{ContactInfo, VerificationLevel};
-use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::{ScopedVault, ScopedVaultUpdate};
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use db::TxnPgConn;
-use itertools::Itertools;
 use newtypes::{
-    DataIdentifier as DI, DataLifetimeSeqno, DataLifetimeSource, DataRequest, Fingerprint,
-    FingerprintRequest, FingerprintScopeKind, PhoneNumber, PiiString, SandboxId,
+    DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
+    FingerprintScopeKind, OnboardingStatus, PhoneNumber, PiiString, SandboxId,
 };
 use newtypes::{IdentityDataKind as IDK, VaultKind};
 use newtypes::{Locked, ValidateArgs};
@@ -45,50 +42,6 @@ impl InitialVaultData {
 }
 
 impl VaultWrapper<Person> {
-    /// Custom util function to create a user vault with its phone/email and scoped vault
-    /// TODO deprecate
-    #[tracing::instrument("VaultWrapper::create_user_vault", skip_all)]
-    pub fn create_user_vault(
-        conn: &mut TxnPgConn,
-        ctx: VaultContext,
-    ) -> ApiResult<(Locked<Vault>, ScopedVault)> {
-        let verified_dis = ctx.data.iter().filter(|d| d.is_verified).collect_vec();
-        if verified_dis.len() > 1 {
-            return Err(AssertionError("Can only create vault with 1 piece of verified info").into());
-        }
-        let verified_di = verified_dis
-            .into_iter()
-            .next()
-            .map(|d| d.di.clone())
-            .ok_or(AssertionError("Must create vault with 1 piece of verified info"))?;
-
-        let (uv, su, patch_result) = Self::create_unverified(conn, ctx)?;
-        let PatchDataResult { new_ci, seqno } = patch_result;
-
-        let (_, ci) = new_ci
-            .into_iter()
-            .find(|(d, _)| d == &verified_di)
-            .ok_or(AssertionError("No CI made with new vault"))?;
-        // Mark the verified piece of data as verified, and portablize it so it can be used to
-        // log into other tenants
-        Self::on_otp_verified(conn, &ci, seqno)?;
-
-        Ok((uv, su))
-    }
-
-    /// Mark the provided CI as verified.
-    /// Must be done in a locked txn.
-    /// TODO can eventually move to be a method on self when we get rid of the legacy codepath
-    pub fn on_otp_verified(
-        conn: &mut TxnPgConn,
-        ci: &ContactInfo,
-        seqno: DataLifetimeSeqno,
-    ) -> ApiResult<()> {
-        ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
-        DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
-        Ok(())
-    }
-
     /// Custom util function to create a user vault with its phone/email and scoped vault. The
     /// contact info will remain unverified
     #[tracing::instrument("VaultWrapper::create_unverified", skip_all)]
@@ -140,6 +93,13 @@ impl VaultWrapper<Person> {
         };
         let uv = Vault::create(conn, new_user_vault)?;
         let su = ScopedVault::get_or_create(conn, &uv, obc.id)?;
+        // Since this vault is created for the first time here, it starts as billable, incomplete, and hidden from search
+        let update = ScopedVaultUpdate {
+            is_billable: Some(true),
+            status: Some(OnboardingStatus::Incomplete),
+            show_in_search: Some(false),
+        };
+        ScopedVault::update(conn, &su.id, update)?;
 
         // This performs some superfluous DB queries to rebuild the UVW, but allows us to share code
         // to add data to the vault

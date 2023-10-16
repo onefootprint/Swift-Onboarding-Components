@@ -1,5 +1,4 @@
 use super::{ChallengeKind, UserChallengeData};
-use crate::identify::verify::make_vault_context;
 use crate::identify::{self, ChallengeData};
 use crate::types::response::ResponseData;
 use crate::utils::challenge::Challenge;
@@ -7,13 +6,14 @@ use crate::State;
 use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::challenge::ChallengeError;
-use api_core::errors::ApiResult;
+use api_core::errors::{ApiResult, AssertionError};
 use api_core::utils::headers::{SandboxId, TelemetryHeaders};
 use api_core::utils::sms::rx_background_error;
-use api_core::utils::vault_wrapper::VaultWrapper;
-use db::models::scoped_vault::{ScopedVault, ScopedVaultUpdate};
+use api_core::utils::vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper};
+use itertools::Itertools;
 use newtypes::email::Email;
-use newtypes::{IdentityDataKind as IDK, OnboardingStatus, PhoneNumber};
+use newtypes::fingerprinter::GlobalFingerprintKind;
+use newtypes::{DataIdentifier, Fingerprinter, IdentityDataKind as IDK, PhoneNumber, PiiString};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -59,13 +59,7 @@ pub async fn post(
     let uv = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (uv, su, _) = VaultWrapper::create_unverified(conn, ctx)?;
-            let update = ScopedVaultUpdate {
-                is_billable: Some(true),
-                status: Some(OnboardingStatus::Incomplete),
-                show_in_search: Some(false),
-            };
-            ScopedVault::update(conn, &su.id, update)?;
+            let (uv, _, _) = VaultWrapper::create_unverified(conn, ctx)?;
             Ok(uv.into_inner())
         })
         .await?;
@@ -137,4 +131,61 @@ pub async fn post(
     Ok(Json(ResponseData {
         data: SignupChallengeResponse { challenge_data },
     }))
+}
+
+type IsVerified = bool;
+
+async fn make_vault_context(
+    state: &State,
+    ob_pk_auth: Option<&ObConfigAuth>,
+    initial_data: Vec<(IsVerified, DataIdentifier, PiiString)>,
+    sandbox_id: Option<newtypes::SandboxId>,
+) -> ApiResult<VaultContext> {
+    // TODO this keypair won't always be used... but helps to generate this proactively.
+    let keypair = state.enclave_client.generate_sealed_keypair().await?;
+
+    let global_sh_data = initial_data
+        .iter()
+        .map(|(_, di, v)| -> ApiResult<_> {
+            Ok((di.clone(), GlobalFingerprintKind::try_from(di.clone())?, v))
+        })
+        .collect::<ApiResult<Vec<_>>>()?;
+    let global_sh = state.compute_fingerprints(global_sh_data).await?;
+
+    let tenant_sh = if let Some(ob_pk_auth) = ob_pk_auth.as_ref() {
+        let tenant_sh_data = initial_data
+            .iter()
+            .map(|(_, di, v)| (di.clone(), (di, &ob_pk_auth.tenant().id), v))
+            .collect_vec();
+        // If we are in identify for a specific tenant, also compute tenant-scoped FP
+        state.compute_fingerprints(tenant_sh_data).await?
+    } else {
+        vec![]
+    };
+
+    let data = initial_data
+        .into_iter()
+        .map(|(is_verified, di, value)| -> ApiResult<_> {
+            Ok(InitialVaultData {
+                global_sh: global_sh
+                    .iter()
+                    .filter_map(|(x, fp)| (x == &di).then_some(fp.clone()))
+                    .next()
+                    .ok_or(AssertionError("No global fingerprint"))?,
+                tenant_sh: tenant_sh
+                    .iter()
+                    .filter_map(|(x, fp)| (x == &di).then_some(fp.clone()))
+                    .next(),
+                is_verified,
+                di,
+                value,
+            })
+        })
+        .collect::<ApiResult<Vec<_>>>()?;
+    Ok(VaultContext {
+        data,
+        keypair,
+        sandbox_id,
+        obc: ob_pk_auth.map(|obc| obc.ob_config().clone()),
+    })
 }

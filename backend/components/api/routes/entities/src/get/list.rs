@@ -50,6 +50,7 @@ pub async fn get(
         search,
         timestamp_lte,
         timestamp_gte,
+        show_all,
     } = filters.into_inner();
 
     let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
@@ -66,7 +67,7 @@ pub async fn get(
         timestamp_lte,
         timestamp_gte,
         kind,
-        only_visible: true,
+        only_visible: !show_all.unwrap_or_default(),
     };
     let (scoped_vaults, mut entities, vws, count) = state
         .db_pool

@@ -14,6 +14,7 @@ pub struct ListEntitiesRequest {
     pub search: Option<PiiString>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
+    pub show_all: Option<bool>,
 }
 
 export_schema!(ListEntitiesRequest);
