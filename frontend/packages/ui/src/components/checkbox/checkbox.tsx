@@ -4,7 +4,7 @@ import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 
 import { createFontStyles } from '../../utils/mixins';
-import Box from '../box';
+import Stack from '../stack';
 import { createCheckedStyled, createPseudoStyles } from './checkbox.utils';
 
 export type CheckboxProps = {
@@ -49,7 +49,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const id = possibleId || internalId;
 
     return (
-      <Box>
+      <Stack direction="column">
         <Label
           aria-describedby={hint && `${id}-hint`}
           data-testid={testID}
@@ -88,7 +88,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             {hint}
           </Hint>
         )}
-      </Box>
+      </Stack>
     );
   },
 );
@@ -102,7 +102,7 @@ const Label = styled.label<Pick<CheckboxProps, 'hasError'>>`
     gap: ${theme.spacing[4]};
 
     input {
-      margin-top: ${theme.spacing[1]};
+      margin-top: ${theme.spacing[2]};
       margin-bottom: ${theme.spacing[1]};
     }
   `}
