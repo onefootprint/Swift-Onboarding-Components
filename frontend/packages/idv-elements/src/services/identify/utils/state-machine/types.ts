@@ -1,4 +1,5 @@
 import type {
+  ChallengeData,
   ChallengeKind,
   IdDocOutcomes,
   Identifier,
@@ -30,6 +31,7 @@ export type IdentifyResult = {
 };
 
 export type MachineChallengeContext = {
+  challengeData?: ChallengeData;
   hasSyncablePassKey?: boolean;
   availableChallengeKinds?: ChallengeKind[];
   authToken?: string;
@@ -67,6 +69,10 @@ export type MachineEvents =
       };
     }
   | { type: 'identifyReset' }
+  | {
+      type: 'challengeReceived';
+      payload: ChallengeData;
+    }
   | {
       type: 'challengeSucceeded';
       payload: {

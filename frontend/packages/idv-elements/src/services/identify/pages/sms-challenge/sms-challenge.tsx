@@ -1,8 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import type { ChallengeData } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
 import DifferentAccount from '../../components/different-account';
@@ -17,11 +16,10 @@ const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 0 : 1500;
 const SmsChallenge = () => {
   const { t } = useTranslation('pages.sms-challenge');
   const [state, send] = useIdentifyMachine();
-  const [challengeData, setChallengeData] = useState<ChallengeData>();
   const {
     initialAuthToken,
     bootstrapData,
-    challenge,
+    challenge: { challengeData, hasSyncablePassKey, availableChallengeKinds },
     device,
     identify: { phoneNumber = '', successfulIdentifier, userFound },
   } = state.context;
@@ -61,20 +59,19 @@ const SmsChallenge = () => {
     });
   };
 
-  const handleReceiveChallengeData = (data: ChallengeData) => {
-    setChallengeData(data);
-  };
-
   const shouldShowBack =
     (!isBootstrap && !hasInitialAuthToken) ||
-    getCanChallengeBiometrics(challenge, device);
+    getCanChallengeBiometrics(
+      availableChallengeKinds,
+      hasSyncablePassKey,
+      device,
+    );
 
   return (
     <Container>
       <ChallengeHeader shouldShowBack={shouldShowBack} title={title} />
       <PinVerification
         title={formTitle}
-        onReceiveChallenge={handleReceiveChallengeData}
         onChallengeSucceed={handleChallengeSuceed}
         preferredChallengeKind={ChallengeKind.sms}
         identifier={successfulIdentifier ?? { phoneNumber }}

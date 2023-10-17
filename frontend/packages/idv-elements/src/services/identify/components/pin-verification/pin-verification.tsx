@@ -21,7 +21,6 @@ import Form from './components/form';
 
 type PinVerificationProps = {
   title: string;
-  onReceiveChallenge?: (challenge: ChallengeData) => void;
   onChallengeSucceed: (authToken: string) => void;
   preferredChallengeKind: ChallengeKind;
   identifier: Identifier;
@@ -29,23 +28,26 @@ type PinVerificationProps = {
 
 const PinVerification = ({
   title,
-  onReceiveChallenge,
   onChallengeSucceed,
   preferredChallengeKind,
   identifier,
 }: PinVerificationProps) => {
   const { t } = useTranslation('components.pin-verification');
-  const [state] = useIdentifyMachine();
+  const [state, send] = useIdentifyMachine();
   const {
     identify: { email, userFound, sandboxId },
+    challenge: { challengeData: data },
     obConfigAuth,
   } = state.context;
-  const [challengeData, setChallengeData] = useState<ChallengeData>();
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
 
   const loginChallengeMutation = useLoginChallenge();
   const signupChallengeMutation = useSignupChallenge();
+  const challengeData: ChallengeData | undefined =
+    data ||
+    loginChallengeMutation.data?.challengeData ||
+    signupChallengeMutation.data?.challengeData;
   const identifyVerifyMutation = useIdentifyVerify();
   const userEmailMutation = useUserEmail();
   const [isSuccess, setSuccess] = useState(false);
@@ -169,8 +171,10 @@ const PinVerification = ({
       return;
     }
 
-    onReceiveChallenge?.(payload.challengeData);
-    setChallengeData(payload.challengeData);
+    send({
+      type: 'challengeReceived',
+      payload: payload.challengeData,
+    });
   };
 
   const initiateSignupChallenge = () => {
@@ -274,12 +278,34 @@ const PinVerification = ({
     });
   };
 
+  const getShouldRequestNewChallenge = () => {
+    const hasPreferredChallengeKind =
+      challengeData?.challengeKind === preferredChallengeKind;
+    if (!hasPreferredChallengeKind) {
+      return true;
+    }
+    const isRetryDisabled =
+      challengeData?.retryDisabledUntil &&
+      challengeData.retryDisabledUntil > new Date();
+    if (isRetryDisabled) {
+      return false;
+    }
+    return true;
+  };
+
   const handleResend = () => {
-    initiateChallenge();
+    const shouldResend = getShouldRequestNewChallenge();
+    if (shouldResend) {
+      initiateChallenge();
+    }
   };
 
   useEffectOnce(() => {
-    initiateChallenge();
+    // Initiate a challenge if there is no challenge data or it is stale
+    const shouldInitiateChallenge = getShouldRequestNewChallenge();
+    if (shouldInitiateChallenge) {
+      initiateChallenge();
+    }
   });
 
   return (

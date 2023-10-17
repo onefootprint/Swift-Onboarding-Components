@@ -67,15 +67,16 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               {
                 target: 'biometricChallenge',
                 actions: ['assignIdentifySuccessResult'],
-                cond: (context, event) =>
-                  !!getCanChallengeBiometrics(
-                    {
-                      hasSyncablePassKey: event.payload.hasSyncablePassKey,
-                      availableChallengeKinds:
-                        event.payload.availableChallengeKinds,
-                    },
-                    context.device,
-                  ),
+                cond: (context, event) => {
+                  const { device } = context;
+                  const { availableChallengeKinds, hasSyncablePassKey } =
+                    event.payload;
+                  return !!getCanChallengeBiometrics(
+                    availableChallengeKinds,
+                    hasSyncablePassKey,
+                    device,
+                  );
+                },
               },
               {
                 target: 'smsChallenge',
@@ -135,15 +136,16 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               {
                 target: 'biometricChallenge',
                 actions: ['assignIdentifySuccessResult'],
-                cond: (context, event) =>
-                  !!getCanChallengeBiometrics(
-                    {
-                      hasSyncablePassKey: event.payload.hasSyncablePassKey,
-                      availableChallengeKinds:
-                        event.payload.availableChallengeKinds,
-                    },
-                    context.device,
-                  ),
+                cond: (context, event) => {
+                  const { device } = context;
+                  const { availableChallengeKinds, hasSyncablePassKey } =
+                    event.payload;
+                  return !!getCanChallengeBiometrics(
+                    availableChallengeKinds,
+                    hasSyncablePassKey,
+                    device,
+                  );
+                },
               },
               {
                 target: 'smsChallenge',
@@ -179,15 +181,16 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               {
                 target: 'biometricChallenge',
                 actions: ['assignIdentifySuccessResult'],
-                cond: (context, event) =>
-                  !!getCanChallengeBiometrics(
-                    {
-                      hasSyncablePassKey: event.payload.hasSyncablePassKey,
-                      availableChallengeKinds:
-                        event.payload.availableChallengeKinds,
-                    },
-                    context.device,
-                  ),
+                cond: (context, event) => {
+                  const { device } = context;
+                  const { availableChallengeKinds, hasSyncablePassKey } =
+                    event.payload;
+                  return !!getCanChallengeBiometrics(
+                    availableChallengeKinds,
+                    hasSyncablePassKey,
+                    device,
+                  );
+                },
               },
               {
                 target: 'smsChallenge',
@@ -209,15 +212,16 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               {
                 target: 'biometricChallenge',
                 actions: ['assignIdentifySuccessResult'],
-                cond: (context, event) =>
-                  !!getCanChallengeBiometrics(
-                    {
-                      hasSyncablePassKey: event.payload.hasSyncablePassKey,
-                      availableChallengeKinds:
-                        event.payload.availableChallengeKinds,
-                    },
-                    context.device,
-                  ),
+                cond: (context, event) => {
+                  const { device } = context;
+                  const { availableChallengeKinds, hasSyncablePassKey } =
+                    event.payload;
+                  return !!getCanChallengeBiometrics(
+                    availableChallengeKinds,
+                    hasSyncablePassKey,
+                    device,
+                  );
+                },
               },
               {
                 target: 'smsChallenge',
@@ -228,6 +232,9 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
         },
         smsChallenge: {
           on: {
+            challengeReceived: {
+              actions: ['assignChallengeData'],
+            },
             challengeSucceeded: {
               target: 'success',
               actions: ['assignAuthToken'],
@@ -239,11 +246,17 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             navigatedToPrevPage: [
               {
                 target: 'biometricChallenge',
-                cond: context =>
-                  !!getCanChallengeBiometrics(
-                    context.challenge,
-                    context.device,
-                  ),
+                cond: context => {
+                  const {
+                    device,
+                    challenge: { availableChallengeKinds, hasSyncablePassKey },
+                  } = context;
+                  return !!getCanChallengeBiometrics(
+                    availableChallengeKinds,
+                    hasSyncablePassKey,
+                    device,
+                  );
+                },
               },
               {
                 target: 'phoneIdentification',
@@ -258,6 +271,9 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
         },
         biometricChallenge: {
           on: {
+            challengeReceived: {
+              actions: ['assignChallengeData'],
+            },
             challengeSucceeded: {
               target: 'success',
               actions: ['assignAuthToken'],
@@ -283,6 +299,9 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
         },
         emailChallenge: {
           on: {
+            challengeReceived: {
+              actions: ['assignChallengeData'],
+            },
             challengeSucceeded: {
               target: 'success',
               actions: ['assignAuthToken'],
@@ -311,6 +330,10 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
           if (!email) {
             return context;
           }
+          const isEmailChanged = email && context.identify.email !== email;
+          if (isEmailChanged) {
+            context.challenge.challengeData = undefined;
+          }
           context.identify.email = email;
           return context;
         }),
@@ -318,6 +341,11 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
           const { phoneNumber } = event.payload;
           if (!phoneNumber) {
             return context;
+          }
+          const isPhoneChanged =
+            phoneNumber && context.identify.phoneNumber !== phoneNumber;
+          if (isPhoneChanged) {
+            context.challenge.challengeData = undefined;
           }
           context.identify.phoneNumber = phoneNumber;
           return context;
@@ -333,6 +361,12 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
           } = event.payload;
           context.challenge.hasSyncablePassKey = hasSyncablePassKey;
           context.identify.userFound = userFound;
+          const isEmailChanged = email && context.identify.email !== email;
+          const isPhoneChanged =
+            phoneNumber && context.identify.phoneNumber !== phoneNumber;
+          if (isEmailChanged || isPhoneChanged) {
+            context.challenge.challengeData = undefined;
+          }
           if (email) {
             context.identify.email = email;
           }
@@ -349,6 +383,10 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
         }),
         assignAuthToken: assign((context, event) => {
           context.challenge.authToken = event.payload.authToken;
+          return context;
+        }),
+        assignChallengeData: assign((context, event) => {
+          context.challenge.challengeData = event.payload;
           return context;
         }),
         reset: assign(context => {

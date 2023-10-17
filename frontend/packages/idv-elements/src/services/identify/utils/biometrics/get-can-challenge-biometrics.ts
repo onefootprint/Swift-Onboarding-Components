@@ -1,17 +1,18 @@
 import { ChallengeKind } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
-import type { MachineChallengeContext } from '../state-machine/types';
 
 const getCanChallengeBiometrics = (
-  challengeContext: MachineChallengeContext,
+  availableChallengeKinds?: ChallengeKind[],
+  hasSyncablePassKey?: boolean,
   device?: DeviceInfo,
 ) => {
   if (!device) {
     return false;
   }
-  const hasAvailableBiometricChallenge =
-    challengeContext.availableChallengeKinds?.includes(ChallengeKind.biometric);
+  const hasAvailableBiometricChallenge = availableChallengeKinds?.includes(
+    ChallengeKind.biometric,
+  );
   if (!hasAvailableBiometricChallenge) {
     return false;
   }
@@ -19,7 +20,7 @@ const getCanChallengeBiometrics = (
     return device.hasSupportForWebauthn;
   }
 
-  return device.hasSupportForWebauthn && challengeContext.hasSyncablePassKey;
+  return device.hasSupportForWebauthn && hasSyncablePassKey;
 };
 
 export default getCanChallengeBiometrics;

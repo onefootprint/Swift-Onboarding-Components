@@ -14,6 +14,7 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignAuthToken: 'challengeSucceeded' | 'hasSufficientScopes';
+    assignChallengeData: 'challengeReceived';
     assignEmail: 'identifyFailed';
     assignIdentifySuccessResult: 'identified';
     assignPhone: 'identifyFailed';
