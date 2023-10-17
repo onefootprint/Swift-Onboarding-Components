@@ -108,9 +108,9 @@ pub async fn post(
         true => 5 * 60,
         false => 30 * 60,
     };
-    let max_ttl = if auth.tenant().is_demo_tenant {
-        // Allow our demo tenants to create longer-lived tokens
-        30 * 24 * 60 * 60 // 30d
+    let max_ttl = if auth.tenant().id.is_integration_test_tenant() {
+        // Allow our testing tenants to create longer-lived tokens
+        30 * 24 * 60 * 90 // 30d
     } else {
         24 * 60 * 60 // 1d
     };
