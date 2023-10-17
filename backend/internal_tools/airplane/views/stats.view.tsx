@@ -62,7 +62,8 @@ const Stats = () => {
           `}
         ></OverviewCard>
         <GraphCard
-          title={'Portable IDs this week'}
+          title={'PIDs this week'}
+          transform={null}
           query={`
           SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
           INNER JOIN vault on scoped_vault.vault_id = vault.id
@@ -74,7 +75,55 @@ const Stats = () => {
         `}
         ></GraphCard>
         <GraphCard
+          title={'PIDs this week by Tenant'}
+          transform={data => {
+            let map = {};
+            let tenants = {};
+
+            for (const row of data) {
+              if (map[row.day]) {
+                map[row.day][row.tenant] = row.new_vaults;
+              } else {
+                map[row.day] = { day: row.day, [row.tenant]: row.new_vaults };
+              }
+              tenants[row.tenant] = true;
+            }
+            console.log('map', map);
+            console.log('tenants', tenants);
+
+            for (const [key, _] of Object.entries(map)) {
+              for (const [tenant, _] of Object.entries(tenants)) {
+                if (map[key][tenant]) {
+                } else {
+                  map[key][tenant] = 0;
+                }
+              }
+            }
+
+            let out = Object.values(map);
+            out.sort();
+            return out;
+          }}
+          query={`
+            WITH live_tenants AS (
+              SELECT tenant.id FROM tenant
+              WHERE tenant.sandbox_restricted = false
+            ), vault_counts_per_day AS (
+                SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", tenant.name as "tenant", count(*) as "new_vaults"
+                FROM scoped_vault
+                INNER JOIN vault on scoped_vault.vault_id = vault.id
+                INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
+                WHERE tenant.id IN (SELECT id FROM live_tenants) AND scoped_vault.is_live = true AND vault.is_portable = 't' AND start_timestamp > current_timestamp - '7 days'::interval  
+                GROUP BY 1, 2
+                ORDER BY 1, 2
+              )          
+            SELECT day, tenant, new_vaults from vault_counts_per_day;
+        `}
+        ></GraphCard>
+
+        <GraphCard
           title={'Not (yet) Portable IDs this week'}
+          transform={null}
           query={`
           SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
           INNER JOIN vault on scoped_vault.vault_id = vault.id
@@ -163,7 +212,7 @@ const OverviewCard = ({ title, query }) => {
   );
 };
 
-const GraphCard = ({ title, query }) => {
+const GraphCard = ({ title, query, transform }) => {
   const { output, loading, error } = useTaskQuery({
     slug: 'dbquery',
     params: {
@@ -182,7 +231,11 @@ const GraphCard = ({ title, query }) => {
         ) : error ? (
           <Text color="error">{error.message}</Text>
         ) : (
-          <Chart type="bar" data={output} />
+          <Chart
+            type="bar"
+            xAxis="day"
+            data={transform !== null ? transform(output) : output}
+          />
         )}
       </Stack>
     </Card>
