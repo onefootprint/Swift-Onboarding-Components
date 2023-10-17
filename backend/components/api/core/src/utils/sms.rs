@@ -191,7 +191,7 @@ impl SmsClient {
                 ._send_message(message_body, e164, Some(tx), session_id)
                 .await
                 .map_err(|err| {
-                    tracing::warn!(?err, "Failed to send SMS message");
+                    tracing::error!(?err, "Failed to send SMS message");
                 });
         });
         Ok(())
@@ -237,7 +237,7 @@ impl SmsClient {
                 Ok(_) => return Ok(()),
                 Err(e) => e,
             };
-            tracing::error!(?preferred_vendor, ?e, "Moving on to next SMS vendor");
+            tracing::warn!(?preferred_vendor, ?e, "Moving on to next SMS vendor");
             err = if let Some(tx) = tx.take() {
                 // After the first error is encountered, pass the error back on the channel in
                 // case someone is listening
