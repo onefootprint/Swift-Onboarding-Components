@@ -75,7 +75,7 @@ impl FromRequest for SecretTenantAuthContext {
 
             root_span.record("tenant_id", &tenant.id.to_string());
             root_span.record("api_key_id", &api_key.id.to_string());
-            root_span.record("role.id", &role.id.to_string());
+            root_span.record("is_live", api_key.is_live);
 
             Ok(SecretTenantAuthContext(CheckedSecretTenantAuth {
                 tenant,

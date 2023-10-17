@@ -124,6 +124,7 @@ impl ExtractableAuthSession for ParsedClientTenantData {
         root_span.record("tenant_id", &self.0.tenant.id.to_string());
         root_span.record("fp_id", &self.0.fp_id.to_string());
         root_span.record("api_key_id", &self.0.tenant_api_key_id.to_string());
+        root_span.record("is_live", self.0.is_live);
     }
 }
 

@@ -8,9 +8,7 @@ use crate::{
     errors::ApiResult,
 };
 use db::{
-    models::{
-        business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant,
-    },
+    models::{business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant},
     PgConn,
 };
 use feature_flag::FeatureFlagClient;
@@ -68,5 +66,6 @@ impl ExtractableAuthSession for ParsedBoSession {
 
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
         root_span.record("tenant_id", &self.tenant.id.to_string());
+        root_span.record("is_live", self.ob_config.is_live);
     }
 }

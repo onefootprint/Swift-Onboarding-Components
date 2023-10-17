@@ -124,6 +124,7 @@ impl CanCheckTenantGuard for TenantRbAuthContext {
 
 impl TenantAuth for SessionContext<TenantRbAuth> {
     fn is_live(&self) -> ApiResult<bool> {
+        // TODO dedupe and put on root_span
         let is_live: Option<bool> = self
             .headers
             .0

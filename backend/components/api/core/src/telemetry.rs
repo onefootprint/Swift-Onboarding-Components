@@ -99,7 +99,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             country,
             region_name: _,
             latitude,
-            longitude,
+            longitude: _,
             postal_code: _,
             time_zone: _,
             user_agent,
@@ -133,21 +133,22 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         let span = root_span!(
             request,
             tenant_id = tracing::field::Empty,
-            api_key_id = tracing::field::Empty,
-            fp_id = tracing::field::Empty,
-            tenant_user_id = tracing::field::Empty,
+            fp_id = tracing::field::Empty, // maybe replace with scoped_vault_id, available in more places
             vault_id = tracing::field::Empty,
+            is_live = tracing::field::Empty,
             // Free-form data to be added by individual APIs if they choose
             meta = tracing::field::Empty,
             route,
             ip_address,
-            latitude,
-            longitude,
             country,
             user_agent,
             session_id,
             server_git_hash,
             is_integration_test_req,
+            // I would get rid of these fields next
+            api_key_id = tracing::field::Empty,
+            tenant_user_id = tracing::field::Empty,
+            latitude,
             "Root span"
         );
         span

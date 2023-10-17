@@ -107,6 +107,7 @@ impl VaultWrapper<Person> {
         root_span.record("tenant_id", su.tenant_id.to_string());
         root_span.record("fp_id", su.fp_id.to_string());
         root_span.record("vault_id", su.vault_id.to_string());
+        root_span.record("is_live", su.is_live);
 
         // This performs some superfluous DB queries to rebuild the UVW, but allows us to share code
         // to add data to the vault

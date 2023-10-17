@@ -58,9 +58,8 @@ pub async fn post(
     };
 
     // Look up existing user vault by identifier
-    let t_id = ob_context.as_ref().map(|obc| &obc.tenant().id);
     let (_, creds, kinds) =
-        if let Some(ctx) = get_user_challenge_context(&state, identifier, t_id, root_span).await? {
+        if let Some(ctx) = get_user_challenge_context(&state, identifier, ob_context, root_span).await? {
             ctx
         } else {
             // The user vault doesn't exist. Just return that the user wasn't found

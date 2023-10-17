@@ -57,9 +57,9 @@ pub async fn post(
     root_span: RootSpan,
 ) -> actix_web::Result<Json<ResponseData<LoginChallengeResponse>>, ApiError> {
     // TODO do we want to make this more similar to signup_challenge and have it return an unauthed token?
-    let tenant = ob_context.as_ref().map(|obc| obc.tenant());
+    let tenant = ob_context.as_ref().map(|obc| obc.tenant().clone());
+    let tenant = tenant.as_ref();
 
-    // clean phone number
     let AuthChallengeRequest {
         identifier,
         preferred_challenge_kind,
@@ -79,9 +79,8 @@ pub async fn post(
     let twilio_client = &state.sms_client;
 
     // Look up existing user vault by identifier
-    let t_id = tenant.map(|t| &t.id);
     let (uvw, creds, _) = if let Some(user_challenge_context) =
-        get_user_challenge_context(&state, identifier, t_id, root_span).await?
+        get_user_challenge_context(&state, identifier, ob_context, root_span).await?
     {
         user_challenge_context
     } else {

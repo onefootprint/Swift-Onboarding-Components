@@ -2,17 +2,19 @@
 pub mod identify;
 pub mod login_challenge;
 use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
+use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::ApiResult;
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::telemetry::RootSpan;
 use api_core::utils::sms::PhoneEmailChallengeState;
+use db::errors::OptionalExtension;
+use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::email::Email;
 use newtypes::ContactInfoKind;
 use newtypes::PiiString;
 use newtypes::SandboxId;
-use newtypes::TenantId;
 use strum::EnumDiscriminants;
 pub mod signup_challenge;
 pub mod verify;
@@ -95,10 +97,11 @@ impl ChallengeState {
 async fn get_user_challenge_context(
     state: &web::Data<State>,
     identifier: VaultIdentifier,
-    t_id: Option<&TenantId>,
+    obc: Option<ObConfigAuth>,
     root_span: RootSpan,
 ) -> Result<Option<(VaultWrapper<Person>, Vec<WebauthnCredential>, Vec<ChallengeKind>)>, ApiError> {
     // Look up existing user vault by identifier
+    let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
     let existing_user = if let Some(existing_user) = state.find_vault(identifier, t_id).await? {
         existing_user
     } else {
@@ -106,15 +109,21 @@ async fn get_user_challenge_context(
     };
 
     // Record some properties on the root span
-    if let Some(t_id) = t_id.as_ref() {
-        root_span.record("tenant_id", t_id.to_string());
-        // TODO add fp_id?
-    }
     root_span.record("vault_id", existing_user.id.to_string());
 
     let (uvw, creds) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
+            if let Some(obc) = obc {
+                root_span.record("tenant_id", obc.tenant().id.to_string());
+                root_span.record("is_live", obc.ob_config().is_live);
+                let t_id = &obc.tenant().id;
+                // If there's already a SV for this (user, tenant) pair, log the fp_id
+                if let Some(sv) = ScopedVault::get(conn, (&existing_user.id, t_id)).optional()? {
+                    root_span.record("fp_id", sv.fp_id.to_string());
+                }
+            }
+
             let uvw = VaultWrapper::build(conn, VwArgs::Vault(&existing_user.id))?;
 
             let creds = WebauthnCredential::list(conn, &uvw.vault.id)?;

@@ -118,6 +118,7 @@ pub async fn post(
                 };
                 root_span.record("fp_id", su.fp_id.to_string());
                 root_span.record("tenant_id", su.tenant_id.to_string());
+                root_span.record("is_live", su.is_live);
                 (args, vec![Some(UserAuthScope::SignUp)], duration, Some(su.id))
             } else {
                 let scopes = vec![Some(UserAuthScope::BasicProfile)];

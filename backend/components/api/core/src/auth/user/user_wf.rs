@@ -62,12 +62,10 @@ impl ExtractableAuthSession for ParsedUserWfSession {
         let user_session =
             <ParsedUserSessionContext as ExtractableAuthSession>::try_load_session(value, conn, ff_client)?.0;
 
-        let scoped_user_id = user_session
-            .scoped_user_id()
+        let scoped_user = user_session
+            .scoped_user
+            .clone()
             .ok_or(AuthError::MissingScopedUser)?;
-
-        // Confirm that the onboarding in the auth token belongs to the user
-        let scoped_user = ScopedVault::get(conn, (&scoped_user_id, &user_session.user.id))?;
         scoped_user.set_heartbeat(conn)?;
 
         let workflow_id = user_session.workflow_id().ok_or(AuthError::MissingWorkflow)?;
@@ -96,6 +94,7 @@ impl ExtractableAuthSession for ParsedUserWfSession {
         root_span.record("tenant_id", &self.0.tenant.id.to_string());
         root_span.record("fp_id", &self.0.scoped_user.fp_id.to_string());
         root_span.record("vault_id", &self.0.user_vault_id().to_string());
+        root_span.record("is_live", self.0.scoped_user.is_live);
     }
 }
 

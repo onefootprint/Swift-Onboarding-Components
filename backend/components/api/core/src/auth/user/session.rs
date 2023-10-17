@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use db::{models::vault::Vault, PgConn};
+use db::{
+    models::{scoped_vault::ScopedVault, vault::Vault},
+    PgConn,
+};
 use itertools::Itertools;
 use newtypes::{ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId};
 use paperclip::actix::Apiv2Security;
@@ -25,7 +28,7 @@ pub struct UserSessionContext {
     pub scopes: Vec<UserAuthScope>,
     /// the auth method that was used
     pub auth_factors: Vec<AuthFactor>,
-    pub(super) su_id: Option<ScopedVaultId>,
+    pub(super) scoped_user: Option<ScopedVault>,
     pub(super) sb_id: Option<ScopedVaultId>,
     pub(super) obc_id: Option<ObConfigurationId>,
     pub(super) wf_id: Option<WorkflowId>,
@@ -77,7 +80,7 @@ impl UserSessionContext {
         };
 
         let args = UserSessionArgs {
-            su_id: new_args.su_id.or(self.su_id),
+            su_id: new_args.su_id.or(self.scoped_user.map(|su| su.id)),
             sb_id: new_args.sb_id.or(self.sb_id),
             obc_id: new_args.obc_id.or(self.obc_id),
             wf_id: new_args.wf_id.or(self.wf_id),
@@ -86,7 +89,7 @@ impl UserSessionContext {
     }
 
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
-        self.su_id.clone()
+        self.scoped_user.as_ref().map(|su| su.id.clone())
     }
 
     pub fn ob_configuration_id(&self) -> Option<ObConfigurationId> {
@@ -146,11 +149,16 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     return Err(AuthError::NonPersonVault.into());
                 }
                 tracing::info!(user_vault_id=%user_vault_id, "user session authenticated");
+                let scoped_user = su_id
+                    .as_ref()
+                    // Conservatively confirm that the onboarding in the auth token belongs to the user
+                    .map(|id| ScopedVault::get(conn, (id, &vault.id)))
+                    .transpose()?;
                 let data = UserSessionContext {
                     user: vault,
-                    su_id,
                     sb_id,
                     wf_id,
+                    scoped_user,
                     obc_id,
                     scopes,
                     auth_factors,
@@ -163,6 +171,11 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
 
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
         root_span.record("vault_id", &self.0.user.id.to_string());
+        if let Some(su) = self.0.scoped_user.as_ref() {
+            root_span.record("tenant_id", su.tenant_id.to_string());
+            root_span.record("fp_id", su.fp_id.to_string());
+            root_span.record("is_live", su.is_live);
+        }
     }
 }
 
