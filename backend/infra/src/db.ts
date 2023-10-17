@@ -255,18 +255,29 @@ export async function CreateDB(
     },
   );
 
+  const dbReadOnlySecretName = `/db/url-ro-${clusterIdentifier}`;
+  new aws.ssm.Parameter(
+    `ssm-param-database-conn-readonly-${clusterIdentifier}`,
+    {
+      type: 'SecureString',
+      value: readOnlyDatabaseUrl,
+      name: dbReadOnlySecretName,
+    },
+  );
+
   // Since the jumpbox DB user requires manual setup that we've only done in dev and prod, just use
   // the normal DB user in ephemeral environments
-  let jumpboxSecretName;
+  let jumpboxRwSecretName;
   if (stackMetadata.environment === StackEnvironment.DevEphemeral) {
-    jumpboxSecretName = dbSecretName;
+    jumpboxRwSecretName = dbSecretName;
   } else {
-    jumpboxSecretName = dbJbSecretName;
+    jumpboxRwSecretName = dbJbSecretName;
   }
 
   const jump = await createDbJumpBox(
     clusterIdentifier,
-    jumpboxSecretName,
+    jumpboxRwSecretName,
+    dbReadOnlySecretName,
     coreSecurityGroups.jumpbox,
     vpc,
     provider,
@@ -354,7 +365,8 @@ export type DbJump = {
  */
 async function createDbJumpBox(
   clusterId: string,
-  dbSecretName: string,
+  dbReadWriteUrlSecretName: string,
+  dbReadOnlyUrlSecretName: string,
   securityGroup: awsx.ec2.SecurityGroup,
   vpc: FootprintVpc,
   provider: aws.Provider,
@@ -411,7 +423,12 @@ async function createDbJumpBox(
             {
               Action: ['ssm:GetParameter'],
               Effect: 'Allow',
-              Resource: `arn:aws:ssm:*:*:parameter${dbSecretName}`,
+              Resource: `arn:aws:ssm:*:*:parameter${dbReadWriteUrlSecretName}`,
+            },
+            {
+              Action: ['ssm:GetParameter'],
+              Effect: 'Allow',
+              Resource: `arn:aws:ssm:*:*:parameter${dbReadOnlyUrlSecretName}`,
             },
             {
               Action: ['ssm:GetParameter'],
@@ -538,8 +555,7 @@ sudo systemctl start tailscale_connect.service && sudo systemctl enable tailscal
 ### BEGIN setup db access helper ###
 cat <<'EOF' > db_proxy.sh
 #!/bin/sh
-export DB_SECRET_NAME="${dbSecretName}"
-export DATABASE_URL="$(aws --region us-east-1 ssm get-parameter --name "${dbSecretName}" --with-decryption | jq -r ".Parameter.Value")"
+export DATABASE_URL="$(aws --region us-east-1 ssm get-parameter --name "${dbReadOnlyUrlSecretName}" --with-decryption | jq -r ".Parameter.Value")"
 export DATABASE_HOST="$(echo $DATABASE_URL | cut -d "@" -f2)"
 echo "database=$DATABASE_HOST"
 echo "password=$(echo $DATABASE_URL | cut -d "@" -f1 | cut -d ":" -f3)"
@@ -551,8 +567,14 @@ chmod +x db_proxy.sh
 # setup db connect script
 cat <<'EOF' > connect_db.sh
 #!/bin/sh
-export DB_SECRET_NAME="${dbSecretName}"
-psql $(aws --region us-east-1 ssm get-parameter --name "${dbSecretName}" --with-decryption | jq -r ".Parameter.Value")
+if [[ $* == *--write* ]] 
+then
+  printf "\nWARNING: accessing Read/Write node\n"
+  psql $(aws --region us-east-1 ssm get-parameter --name "${dbReadWriteUrlSecretName}" --with-decryption | jq -r ".Parameter.Value")
+else
+  printf "\nWARNING: accessing READ ONLY node\n"
+  psql $(aws --region us-east-1 ssm get-parameter --name "${dbReadOnlyUrlSecretName}" --with-decryption | jq -r ".Parameter.Value")
+fi
 EOF
 
 chmod +x connect_db.sh`;

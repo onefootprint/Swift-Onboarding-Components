@@ -15,7 +15,7 @@ const MAX_HOST_NAME_LENGTH = 22;
 const TRUNCATE_LENGTH = 12;
 
 export async function LoadDnsConfig(constants: Config): Promise<DnsConfig> {
-  let apiPrefix = constants.domain.prefix;
+  let apiPrefix = constants.domain.prefix.toLowerCase();
 
   if (apiPrefix.length > MAX_HOST_NAME_LENGTH) {
     const hostHash = crypto
