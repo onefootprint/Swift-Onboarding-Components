@@ -1,17 +1,15 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import {
+  InitShimmer,
   Logger,
-  NavigationHeader,
   useGetD2PStatus,
   useGetOnboardingStatus,
   useParseHandoffUrl,
   useUpdateD2PStatus,
 } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
-import styled from '@onefootprint/styled';
 import type { GetD2PResponse } from '@onefootprint/types';
 import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
-import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
@@ -178,20 +176,7 @@ const Init = () => {
     },
   });
 
-  return (
-    <LoadingContainer>
-      <NavigationHeader />
-      <LoadingIndicator />
-    </LoadingContainer>
-  );
+  return <InitShimmer />;
 };
-
-const LoadingContainer = styled.div`
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-`;
 
 export default Init;
