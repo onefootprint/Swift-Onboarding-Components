@@ -26,6 +26,11 @@ INTERGRATION_TESTS_DEFAULT_HEADER = {"x-fp-integration-test": "true"}
 EXPECTED_SERVER_VERSION_GIT_HASH = os.environ.get("EXPECTED_SERVER_VERSION", None)
 
 
+class NotRetryableException(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
 class HttpError(Exception):
     def __init__(
         self,
@@ -188,6 +193,9 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
     while (arrow.now() - start_time).total_seconds() < timeout_s:
         try:
             return fn()
+        except NotRetryableException as e:
+            last_exception = e
+            break
         except Exception as e:
             last_exception = e
         time.sleep(retry_interval_s)
@@ -359,12 +367,17 @@ def identify_verify(
     if phone_number == FIXTURE_PHONE_NUMBER:
         # The code for the fixture number in sandbox is fixed
         try:
-            return verify("000000")
+            result = verify("000000")
         except HttpError as e:
             if expected_error and expected_error in str(e):
                 # The specific error we expected to see was returned from verify - we can exit
                 return
             raise e
+        if result and expected_error:
+            raise NotRetryableException(
+                "Expected error in identify verify but got result:", result
+            )
+        return result
 
     tried_codes = {}
 
@@ -382,12 +395,18 @@ def identify_verify(
                 continue
 
             try:
-                return verify(code)
+                result = verify(code)
             except HttpError as e:
                 if expected_error and expected_error in str(e):
                     # The specific error we expected to see was returned from verify - we can exit
                     return
                 last_error = e
+
+            if result and expected_error:
+                raise NotRetryableException(
+                    "Expected error in identify verify but got result:", result
+                )
+            return result
 
         if last_error:
             raise last_error

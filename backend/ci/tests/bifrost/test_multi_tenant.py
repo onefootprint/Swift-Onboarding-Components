@@ -5,10 +5,8 @@ from tests.utils import (
     patch,
     post,
     create_tenant,
-    inherit_user,
 )
 from tests.bifrost_client import BifrostClient
-from tests.headers import SandboxId
 from tests.constants import TENANT_ID3
 
 
