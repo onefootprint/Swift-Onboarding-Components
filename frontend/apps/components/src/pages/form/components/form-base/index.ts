@@ -1,6 +1,10 @@
 import dynamic from 'next/dynamic';
 
-export type { FormBaseProps, FormData } from './form-base';
+export type {
+  FormBaseProps,
+  FormData,
+  FormVariant as FormSection,
+} from './form-base';
 
 const FormBase = dynamic(() => import('./form-base'), {
   loading: () => null,

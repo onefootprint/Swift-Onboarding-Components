@@ -1,9 +1,7 @@
-import footprint, {
-  FootprintComponentKind,
-  FootprintFormType,
-} from '@onefootprint/footprint-js';
+import type { FootprintFormRef } from '@onefootprint/footprint-js';
+import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
-import { media } from '@onefootprint/ui';
+import { Button, Divider, media } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 
 type DemoFormProps = {
@@ -11,6 +9,8 @@ type DemoFormProps = {
 };
 
 const DemoForm = ({ authToken }: DemoFormProps) => {
+  const [ref, setRef] = React.useState<FootprintFormRef | undefined>();
+
   useEffect(() => {
     if (!authToken) return () => {};
 
@@ -18,9 +18,12 @@ const DemoForm = ({ authToken }: DemoFormProps) => {
       kind: FootprintComponentKind.Form,
       authToken,
       title: 'Add a New Card',
-      type: FootprintFormType.cardAndName,
       variant: 'inline',
       containerId: 'footprint-secure-form',
+      getRef: formRef => {
+        setRef(formRef);
+      },
+      onComplete: () => console.log('complete'),
     });
     component.render();
 
@@ -29,7 +32,20 @@ const DemoForm = ({ authToken }: DemoFormProps) => {
     };
   }, [authToken]);
 
-  return <SecureFormContainer id="footprint-secure-form" />;
+  const triggerSave = async () => {
+    await ref?.save();
+    console.log('saved via ref');
+  };
+
+  return (
+    <>
+      <SecureFormContainer id="footprint-secure-form" />
+      <StyledDivider />
+      <Button variant="secondary" onClick={triggerSave}>
+        Custom Save via Ref
+      </Button>
+    </>
+  );
 };
 
 const SecureFormContainer = styled.div`
@@ -39,9 +55,13 @@ const SecureFormContainer = styled.div`
 
     ${media.greaterThan('md')`
       padding: ${theme.spacing[2]};
-      min-height: 500px;
+      min-height: 400px;
     `}
   `}
+`;
+
+const StyledDivider = styled(Divider)`
+  margin: ${({ theme }) => theme.spacing[4]} 0;
 `;
 
 export default DemoForm;

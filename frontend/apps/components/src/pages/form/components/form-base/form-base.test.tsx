@@ -1,4 +1,3 @@
-import { FootprintFormType } from '@onefootprint/footprint-js';
 import {
   createGoogleMapsSpy,
   getPlacePredictions,
@@ -17,7 +16,7 @@ import FormBase from './form-base';
 describe('<FormBase />', () => {
   const renderFormBase = ({
     title,
-    type,
+    sections = ['card'],
     variant,
     isLoading,
     hideFootprintLogo,
@@ -25,7 +24,7 @@ describe('<FormBase />', () => {
     onSave,
     onCancel,
     onClose,
-  }: FormBaseProps) => {
+  }: Partial<FormBaseProps>) => {
     const footprint = {
       on: jest.fn(),
       send: jest.fn(),
@@ -37,7 +36,7 @@ describe('<FormBase />', () => {
         <FootprintProvider client={footprint}>
           <FormBase
             title={title}
-            type={type}
+            sections={sections}
             variant={variant}
             isLoading={isLoading}
             hideFootprintLogo={hideFootprintLogo}
@@ -116,7 +115,7 @@ describe('<FormBase />', () => {
   describe('when saving the form using the save button', () => {
     it('should trigger onSave if data is valid', async () => {
       const onSave = jest.fn();
-      renderFormBase({ onSave, type: FootprintFormType.cardOnly });
+      renderFormBase({ onSave });
       // Fill card number, cvc and expiration
       await userEvent.type(
         screen.getByRole('textbox', { name: 'Card number' }),
@@ -136,7 +135,7 @@ describe('<FormBase />', () => {
 
     it('should not trigger onSave if form data has errors', async () => {
       const onSave = jest.fn();
-      renderFormBase({ onSave, type: FootprintFormType.cardOnly });
+      renderFormBase({ onSave });
 
       // Try saving empty form
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
@@ -203,7 +202,7 @@ describe('<FormBase />', () => {
 
     it('closing should show confirmation dialog if form state is dirty', async () => {
       const onClose = jest.fn();
-      renderFormBase({ onClose, type: FootprintFormType.cardOnly });
+      renderFormBase({ onClose });
       // Fill card number, cvc and expiration
       await userEvent.type(
         screen.getByRole('textbox', { name: 'Card number' }),
@@ -225,7 +224,7 @@ describe('<FormBase />', () => {
 
     it('canceling should show confirmation dialog if form state is dirty', async () => {
       const onCancel = jest.fn();
-      renderFormBase({ onCancel, type: FootprintFormType.cardOnly });
+      renderFormBase({ onCancel });
       // Fill card number, cvc and expiration
       await userEvent.type(
         screen.getByRole('textbox', { name: 'Card number' }),
@@ -248,14 +247,14 @@ describe('<FormBase />', () => {
 
   describe('when rendering different form types', () => {
     it('should render cardOnly correctly', async () => {
-      renderFormBase({ type: FootprintFormType.cardOnly });
+      renderFormBase({});
       expect(screen.getByText('Card number')).toBeInTheDocument();
       expect(screen.getByText('CVC')).toBeInTheDocument();
       expect(screen.getByText('Expiry date')).toBeInTheDocument();
     });
 
     it('should render cardAndName correctly', async () => {
-      renderFormBase({ type: FootprintFormType.cardAndName });
+      renderFormBase({ sections: ['card', 'name'] });
       expect(screen.getByText('Card number')).toBeInTheDocument();
       expect(screen.getByText('CVC')).toBeInTheDocument();
       expect(screen.getByText('Expiry date')).toBeInTheDocument();
@@ -263,7 +262,7 @@ describe('<FormBase />', () => {
     });
 
     it('should render cardAndNameAndAddress correctly', async () => {
-      renderFormBase({ type: FootprintFormType.cardAndNameAndAddress });
+      renderFormBase({ sections: ['card', 'name', 'fullAddress'] });
       expect(screen.getByText('Card number')).toBeInTheDocument();
       expect(screen.getByText('CVC')).toBeInTheDocument();
       expect(screen.getByText('Expiry date')).toBeInTheDocument();
@@ -277,7 +276,7 @@ describe('<FormBase />', () => {
     });
 
     it('should render cardAndZip correctly', async () => {
-      renderFormBase({ type: FootprintFormType.cardAndZip });
+      renderFormBase({ sections: ['card', 'name', 'partialAddress'] });
       expect(screen.getByText('Card number')).toBeInTheDocument();
       expect(screen.getByText('CVC')).toBeInTheDocument();
       expect(screen.getByText('Expiry date')).toBeInTheDocument();

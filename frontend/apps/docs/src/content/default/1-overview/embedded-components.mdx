@@ -32,7 +32,7 @@ Our embedded form component can help you collect sensitive PII data in your prod
 5. Generate an auth token for collecting data from the backend
 
    - You will need to specify a unique `card_alias` that the data will be stored under since Footprint user vaults support multiple cards. You can find more information on the card aliases [here](https://docs-git-belce-docs.preview.onefootprint.com/vault/apis#payment-cards).
-   - You will need to provide a full list of fields you intend to collect. In the example below, card number, CVC, expiration and billing address zip and country.
+   - You will need to provide a full list of fields you intend to collect. In the example below, card number, CVC, expiration and billing address zip and country. These fields drive the inputs shown on the form.
    - You will also need to specify a time-to-live (TTL) between 1 min and 1 day.
 
 ```bash
@@ -151,11 +151,10 @@ When the user has completed filling the secure collection form on your product, 
 
 ## Available FootprintForm Props
 
-| Variable     | Description                                                                                                                                                                        |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                                                          |
-| `title`      | Optional. A string that will be displayed at the top of the field                                                                                                                  |
-| `type`       | Optional. A FootprintFormType, which can be one of `cardOnly`, `cardAndName`, `cardAndNameAndAddress`, `cardAndZip`. Specifies which fields to collect. Defaults to `cardAndName`. |
-| `variant`    | Optional. One of `modal`, `drawer` or `inline`. Specifies whether the form will be rendered in-line or in a modal.                                                                 |
-| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                                                           |
-| `getRef`     | Optional. A callback that takes one argument `(ref) => {}`. The `ref` object contains a method `save()` that can be called to save the form data (`ref.save()`).                   |     |
+| Variable     | Description                                                                                                                                                      |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                                        |
+| `title`      | Optional. A string that will be displayed at the top of the field                                                                                                |
+| `variant`    | Optional. One of `modal`, `drawer` or `inline`. Specifies whether the form will be rendered in-line or in a modal.                                               |
+| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                                         |
+| `getRef`     | Optional. A callback that takes one argument `(ref) => {}`. The `ref` object contains a method `save()` that can be called to save the form data (`ref.save()`). |     |

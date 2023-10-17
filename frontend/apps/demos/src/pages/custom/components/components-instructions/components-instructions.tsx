@@ -1,8 +1,5 @@
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
-import footprint, {
-  FootprintComponentKind,
-  FootprintFormType,
-} from '@onefootprint/footprint-js';
+import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import styled from '@onefootprint/styled';
 import { useToast } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -44,7 +41,6 @@ const ComponentsInstructions = ({
       variant,
       title,
       appearance,
-      type: FootprintFormType.cardAndZip,
       onComplete: handleComplete,
       onClose: handleClose,
       onCancel: handleClose,

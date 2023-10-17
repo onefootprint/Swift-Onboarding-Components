@@ -74,13 +74,6 @@ export interface RenderProps extends PropsBase {
   containerId: string;
 }
 
-export enum FormType {
-  cardOnly = 'cardOnly',
-  cardAndName = 'cardAndName',
-  cardAndNameAndAddress = 'cardAndNameAndAddress',
-  cardAndZip = 'cardAndZip',
-}
-
 export type FormOptions = {
   hideFootprintLogo?: boolean;
   hideButtons?: boolean;
@@ -94,7 +87,6 @@ export interface FormProps extends PropsBase {
   kind: ComponentKind.Form;
   authToken: string;
   title?: string;
-  type?: FormType;
   containerId?: string; // required for inline variant
   variant?: Variant; // supports all variants, falls back to modal, so optional
   options?: FormOptions;

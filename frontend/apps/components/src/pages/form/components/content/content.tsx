@@ -1,5 +1,4 @@
 import {
-  FootprintFormType,
   FootprintPrivateEvent,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
@@ -15,7 +14,7 @@ import arePropsValid from '../../utils/are-props-valid';
 import checkIsExpired from '../../utils/check-is-expired';
 import convertFormData from '../../utils/convert-form-data';
 import getCardAlias from '../../utils/get-card-alias';
-import validateClientTokenFields from '../../utils/validate-client-token-fields';
+import getFormSectionsFromFields from '../../utils/get-form-sections-from-fields';
 import type { FormData } from '../form-base';
 import FormBase from '../form-base';
 import Invalid from '../invalid';
@@ -24,13 +23,7 @@ const Content = () => {
   const footprintProvider = useFootprintProvider();
   const props = useProps<FootprintFormDataProps>();
 
-  const {
-    authToken = '',
-    title,
-    type = FootprintFormType.cardAndName,
-    variant,
-    options = {},
-  } = props || {};
+  const { authToken = '', title, variant, options = {} } = props || {};
   const { hideFootprintLogo, hideButtons } = options;
   const usersVaultMutation = useUsersVault();
   const clientTokenFields = useClientTokenFields(authToken);
@@ -98,9 +91,9 @@ const Content = () => {
   }
 
   const { vaultFields, expiresAt } = data;
-  const hasPermissions = validateClientTokenFields(type, vaultFields);
-  if (!hasPermissions) {
-    console.error('Auth token is missing permissions to store to vault');
+  const sections = getFormSectionsFromFields(vaultFields);
+  if (!sections.length) {
+    console.error('Auth token is missing fields');
     return <Invalid onClose={handleClose} />;
   }
 
@@ -124,7 +117,7 @@ const Content = () => {
   return (
     <FormBase
       title={title}
-      type={type}
+      sections={sections}
       variant={variant}
       isLoading={usersVaultMutation.isLoading}
       hideFootprintLogo={hideFootprintLogo}

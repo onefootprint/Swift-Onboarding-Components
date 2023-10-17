@@ -1,5 +1,3 @@
-import { FootprintFormType } from '@onefootprint/footprint-js';
-
 import type { FootprintFormDataProps } from '../../types';
 
 const isObject = (obj: any) => typeof obj === 'object';
@@ -12,23 +10,13 @@ const arePropsValid = (
     return false;
   }
 
-  const { authToken, title, type, variant } = props;
+  const { authToken, title, variant } = props;
 
   const isAuthTokenValid = typeof authToken === 'string' && !!authToken;
   if (!isAuthTokenValid) console.error('Valid auth token is required.');
 
   const isTitleValid = typeof title === 'string' || title === undefined;
   if (!isTitleValid) console.error('Title must be a string or undefined.');
-
-  const isTypeValid =
-    type === undefined ||
-    Object.values(FootprintFormType).includes(type as FootprintFormType);
-  if (!isTypeValid)
-    console.error(
-      `Form type has to be one of ${Object.values(FootprintFormType).join(
-        ', ',
-      )} but received: ${type}`,
-    );
 
   const isVariantValid =
     variant === undefined ||
@@ -41,7 +29,7 @@ const arePropsValid = (
       variant,
     );
 
-  return isAuthTokenValid && isTitleValid && isTypeValid && isVariantValid;
+  return isAuthTokenValid && isTitleValid && isVariantValid;
 };
 
 export default arePropsValid;

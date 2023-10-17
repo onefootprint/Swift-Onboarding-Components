@@ -1,4 +1,3 @@
-import { FootprintFormType } from '@onefootprint/footprint-js';
 import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 
@@ -12,12 +11,6 @@ export default {
     title: {
       control: 'text',
       description: 'Display a title text',
-      required: false,
-    },
-    type: {
-      control: 'select',
-      options: Object.values(FootprintFormType),
-      description: 'Type of the form',
       required: false,
     },
     variant: {
@@ -61,7 +54,6 @@ export default {
 
 const Template: Story<FormBaseProps> = ({
   title,
-  type,
   variant,
   onSave,
   onClose,
@@ -71,7 +63,7 @@ const Template: Story<FormBaseProps> = ({
 }: FormBaseProps) => (
   <FormBase
     title={title}
-    type={type}
+    sections={['card', 'name', 'fullAddress']}
     variant={variant}
     onSave={onSave}
     onCancel={onCancel}
@@ -84,7 +76,6 @@ const Template: Story<FormBaseProps> = ({
 export const Base = Template.bind({});
 
 Base.args = {
-  type: FootprintFormType.cardOnly,
   variant: 'modal',
   onSave: console.log, // eslint-disable-line no-console
   onCancel: () => console.log('canceled'), // eslint-disable-line no-console

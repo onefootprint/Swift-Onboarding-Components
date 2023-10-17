@@ -5,6 +5,8 @@ export type ClientTokenRequest = {
   secretKey: string;
   userId: string;
   cardAlias: string;
+  collectName?: boolean;
+  collectPartialAddress?: boolean;
 };
 
 export type ClientTokenResponse = {
@@ -12,7 +14,20 @@ export type ClientTokenResponse = {
 };
 
 const clientToken = async (payload: ClientTokenRequest) => {
-  const { secretKey, userId, cardAlias } = payload;
+  const { secretKey, userId, cardAlias, collectName, collectPartialAddress } =
+    payload;
+  const fields = [
+    `card.${cardAlias}.number`,
+    `card.${cardAlias}.cvc`,
+    `card.${cardAlias}.expiration`,
+  ];
+  if (collectName) {
+    fields.push(`card.${cardAlias}.name`);
+  }
+  if (collectPartialAddress) {
+    fields.push(`card.${cardAlias}.billing_address.country`);
+    fields.push(`card.${cardAlias}.billing_address.zip`);
+  }
   const response = await request<ClientTokenResponse>({
     method: 'POST',
     url: `/users/${userId}/client_token`,
@@ -20,14 +35,7 @@ const clientToken = async (payload: ClientTokenRequest) => {
       'X-Footprint-Secret-Key': secretKey,
     },
     data: {
-      fields: [
-        `card.${cardAlias}.number`,
-        `card.${cardAlias}.cvc`,
-        `card.${cardAlias}.expiration`,
-        `card.${cardAlias}.name`,
-        `card.${cardAlias}.billing_address.zip`,
-        `card.${cardAlias}.billing_address.country`,
-      ],
+      fields,
       scopes: ['vault'],
       ttl: 1800,
     },

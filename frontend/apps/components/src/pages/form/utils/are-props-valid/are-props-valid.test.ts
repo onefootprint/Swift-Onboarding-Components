@@ -18,7 +18,6 @@ describe('arePropsValid', () => {
         authToken: 'token',
         title: 'title',
         variant: 'drawer',
-        type: 'cardOnly',
       }),
     ).toBe(true);
   });
@@ -28,7 +27,6 @@ describe('arePropsValid', () => {
     expect(arePropsValid({})).toBe(false);
     expect(arePropsValid({ authtoken: 1234 })).toBe(false);
     expect(arePropsValid({ title: 1234 })).toBe(false);
-    expect(arePropsValid({ type: '' })).toBe(false);
     expect(arePropsValid({ variant: '' })).toBe(false);
   });
 });

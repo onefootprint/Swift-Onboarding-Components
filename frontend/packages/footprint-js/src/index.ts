@@ -26,10 +26,7 @@ export type {
   L10n,
   SupportedLocale,
 } from './types/components';
-export {
-  ComponentKind as FootprintComponentKind,
-  FormType as FootprintFormType,
-} from './types/components';
+export { ComponentKind as FootprintComponentKind } from './types/components';
 export {
   PrivateEvent as FootprintPrivateEvent,
   PublicEvent as FootprintPublicEvent,

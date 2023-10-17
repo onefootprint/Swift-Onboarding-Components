@@ -2,7 +2,6 @@ export const getReactIntegration =
   () => `import '@onefootprint/footprint-js/dist/footprint-js.css';
 import './app.css';
 import { appearance } from './config';
-import { FootprintFormType } from '@onefootprint/footprint-js';
 import { FootprintForm } from '@onefootprint/footprint-react';
 
 const secretKey = process.env.FOOTPRINT_API_SECRET_KEY;
@@ -16,7 +15,6 @@ const PaymentForm = () => {
   return (
     <FootprintForm
       authToken="tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit" // auth token generated using the Secret API Key on step 5
-      type={FootprintFormType.cardAndZip}
       variant="modal"
       appearance={appearance} // appearance object from step 6
       onSave={onSave}
@@ -38,7 +36,6 @@ export const getVueIntegration = () => `
         kind: 'form',
         authToken: "tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", // auth token generated using the Secret API Key on step 5
         appearance: appearance, // appearance object from step 6
-        type: "cardAndZip",
         variant: "drawer",
         onComplete: handleComplete,
         onClose: handleClose,

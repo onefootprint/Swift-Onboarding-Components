@@ -1,8 +1,5 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
-import {
-  FootprintFormType,
-  FootprintPrivateEvent,
-} from '@onefootprint/footprint-js';
+import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
@@ -22,6 +19,8 @@ import type { NameData } from './components/name';
 import Name from './components/name';
 import Title from './components/title';
 
+export type FormVariant = 'card' | 'name' | 'fullAddress' | 'partialAddress';
+
 export type FormData =
   | CardData
   | (CardData & NameData)
@@ -30,7 +29,7 @@ export type FormData =
 
 export type FormBaseProps = {
   title?: string;
-  type?: FootprintFormType;
+  sections: FormVariant[];
   variant?: FootprintVariant;
   isLoading?: boolean;
   onSave?: (data: FormData) => void;
@@ -44,7 +43,7 @@ const FORM_ID = 'secure-form';
 
 const FormBase = ({
   title,
-  type = FootprintFormType.cardAndName,
+  sections,
   variant = 'modal',
   isLoading,
   onSave,
@@ -58,8 +57,7 @@ const FormBase = ({
   const { t } = useTranslation('pages.secure-form');
   const confirmationDialog = useConfirmationDialog();
   const hasCountry =
-    type === FootprintFormType.cardAndNameAndAddress ||
-    type === FootprintFormType.cardAndZip;
+    sections.includes('fullAddress') || sections.includes('partialAddress');
   const defaultValues = hasCountry ? { country: DEFAULT_COUNTRY } : undefined;
   const methods = useForm<FormData>({ defaultValues });
   const {
@@ -108,6 +106,48 @@ const FormBase = ({
     onSave?.(data);
   };
 
+  if (!sections.length) {
+    return null;
+  }
+
+  const renderSections = () => {
+    const content = [];
+    if (sections.includes('name') || sections.includes('card')) {
+      content.push(
+        <Title
+          key="card-title"
+          label={t('section-title.card-information')}
+          iconComponent={<IcoCreditcard24 />}
+        />,
+      );
+    }
+    if (sections.includes('name')) {
+      content.push(<Name key="name" />);
+    }
+    if (sections.includes('card')) {
+      content.push(<Card key="card" />);
+    }
+    if (
+      sections.includes('fullAddress') ||
+      sections.includes('partialAddress')
+    ) {
+      content.push(<StyledDivider key="address-divider" />);
+      content.push(
+        <Title
+          key="address-title"
+          label={t('section-title.billing-address')}
+          iconComponent={<IcoBuilding24 />}
+        />,
+      );
+    }
+    if (sections.includes('fullAddress')) {
+      content.push(<Address key="address" />);
+    } else if (sections.includes('partialAddress')) {
+      content.push(<PartialAddress key="address" />);
+    }
+    return content;
+  };
+
   return (
     <FormDialog
       title={title}
@@ -132,56 +172,7 @@ const FormBase = ({
     >
       <FormProvider {...methods}>
         <StyledForm id={FORM_ID} onSubmit={handleSubmit(handleBeforeSubmit)}>
-          {type === FootprintFormType.cardOnly && (
-            <>
-              <Title
-                label={t('section-title.card-information')}
-                iconComponent={<IcoCreditcard24 />}
-              />
-              <Card />
-            </>
-          )}
-          {type === FootprintFormType.cardAndName && (
-            <>
-              <Title
-                label={t('section-title.card-information')}
-                iconComponent={<IcoCreditcard24 />}
-              />
-              <Name />
-              <Card />
-            </>
-          )}
-          {type === FootprintFormType.cardAndNameAndAddress && (
-            <>
-              <Title
-                label={t('section-title.card-information')}
-                iconComponent={<IcoCreditcard24 />}
-              />
-              <Name />
-              <Card />
-              <StyledDivider />
-              <Title
-                label={t('section-title.billing-address')}
-                iconComponent={<IcoBuilding24 />}
-              />
-              <Address />
-            </>
-          )}
-          {type === FootprintFormType.cardAndZip && (
-            <>
-              <Title
-                label={t('section-title.card-information')}
-                iconComponent={<IcoCreditcard24 />}
-              />
-              <Card />
-              <StyledDivider />
-              <Title
-                label={t('section-title.billing-address')}
-                iconComponent={<IcoBuilding24 />}
-              />
-              <PartialAddress />
-            </>
-          )}
+          {renderSections()}
         </StyledForm>
       </FormProvider>
     </FormDialog>

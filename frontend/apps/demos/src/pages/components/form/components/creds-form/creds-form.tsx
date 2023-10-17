@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { Button, TextInput } from '@onefootprint/ui';
+import { Button, Checkbox, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import type { ClientTokenResponse } from 'src/hooks/use-client-token';
@@ -9,6 +9,8 @@ type FormData = {
   userId: string;
   secretKey: string;
   cardAlias: string;
+  collectName: boolean;
+  collectPartialAddress: boolean;
 };
 
 type CredsFormProps = {
@@ -23,7 +25,10 @@ const CredsForm = ({ onSubmit }: CredsFormProps) => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
+      userId: 'fp_id_test_9fvIm0T1TiDFzwDCcxtBKL',
       cardAlias: 'primary',
+      collectName: false,
+      collectPartialAddress: false,
     },
   });
 
@@ -46,14 +51,14 @@ const CredsForm = ({ onSubmit }: CredsFormProps) => {
     <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
       <TextInput
         autoFocus
-        label="Footprint User Id"
+        label="Footprint User Id (from prod)"
         placeholder="fp_123456789"
         hasError={!!errors.userId}
         hint={errors?.userId && 'Please enter a valid Footprint user ID'}
         {...register('userId', { required: true })}
       />
       <TextInput
-        label="API Secret Key"
+        label="API Secret Key (from prod)"
         placeholder="sk_123456789"
         hasError={!!errors.secretKey}
         hint={errors?.secretKey && 'Please enter a valid API secret key'}
@@ -65,6 +70,12 @@ const CredsForm = ({ onSubmit }: CredsFormProps) => {
         hasError={!!errors.cardAlias}
         hint={errors?.cardAlias && 'Please enter a valid card alias'}
         {...register('cardAlias', { required: true })}
+      />
+      <Typography variant="body-3">Optional card fields to collect</Typography>
+      <Checkbox label="Name" {...register('collectName')} />
+      <Checkbox
+        label="Partial Address"
+        {...register('collectPartialAddress')}
       />
       <Button loading={clientTokenMutation.isLoading} type="submit">
         Continue

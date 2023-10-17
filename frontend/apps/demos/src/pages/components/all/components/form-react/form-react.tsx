@@ -1,4 +1,3 @@
-import { FootprintFormType } from '@onefootprint/footprint-js';
 import { FootprintForm } from '@onefootprint/footprint-react';
 import styled from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
@@ -24,7 +23,6 @@ const FormReactIntegration = () => {
           <FootprintForm
             variant="modal"
             authToken={COMPONENTS_AUTH_TOKEN ?? ''}
-            type={FootprintFormType.cardAndZip}
             onComplete={() => handleEvent('complete')}
             onCancel={() => handleEvent('cancel')}
             onClose={() => handleEvent('close')}
@@ -34,7 +32,6 @@ const FormReactIntegration = () => {
           <FootprintForm
             variant="drawer"
             authToken={COMPONENTS_AUTH_TOKEN ?? ''}
-            type={FootprintFormType.cardOnly}
             onComplete={() => handleEvent('complete')}
             onCancel={() => handleEvent('cancel')}
             onClose={() => handleEvent('close')}

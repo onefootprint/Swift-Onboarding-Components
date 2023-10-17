@@ -1,8 +1,5 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
-import footprint, {
-  FootprintComponentKind,
-  FootprintFormType,
-} from '@onefootprint/footprint-js';
+import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
@@ -14,7 +11,6 @@ const FormJsIntegration = () => {
       kind: FootprintComponentKind.Form,
       variant,
       authToken: COMPONENTS_AUTH_TOKEN ?? '',
-      type: FootprintFormType.cardAndNameAndAddress,
       containerId,
     });
     component.render();
