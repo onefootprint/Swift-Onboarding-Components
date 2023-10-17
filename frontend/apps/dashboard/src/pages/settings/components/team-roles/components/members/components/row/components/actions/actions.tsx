@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import type { Member } from '@onefootprint/types';
@@ -14,6 +13,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
+import OverflowButton from 'src/components/overflow-button';
 import PermissionGate from 'src/components/permission-gate';
 
 import useRemoveMember from './hooks/use-remove-org-member';
@@ -61,9 +61,7 @@ const Actions = ({ member }: ActionsProps) => {
           scopeKind={RoleScopeKind.orgSettings}
           fallbackText={t('not-allowed')}
         >
-          <Dropdown.Trigger aria-label={t('aria-label', { email })}>
-            <IcoDotsHorizontal24 />
-          </Dropdown.Trigger>
+          <OverflowButton ariaLabel={t('aria-label', { email })} />
         </PermissionGate>
         <Dropdown.Content align="end">
           <Dropdown.Item onSelect={handleRemove} variant="destructive">

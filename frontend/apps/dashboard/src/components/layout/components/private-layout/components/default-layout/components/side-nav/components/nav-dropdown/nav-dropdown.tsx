@@ -1,10 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoDotsHorizontal16, IcoLogOut24 } from '@onefootprint/icons';
+import { IcoLogOut24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Dropdown, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
+import OverflowButton from 'src/components/overflow-button';
 import type { UserSession } from 'src/hooks/use-session';
 
 import TenantsList from './components/tenants-list';
@@ -32,9 +33,7 @@ const NavDropdown = ({
   return (
     <Container>
       <Dropdown.Root>
-        <Dropdown.Trigger aria-label="Account">
-          <IcoDotsHorizontal16 testID="nav-dropdown-button" />
-        </Dropdown.Trigger>
+        <OverflowButton ariaLabel="Account" />
         <Dropdown.Portal>
           <NavDropdownContent align="start" sideOffset={8}>
             <UserDropdownItem>

@@ -63,11 +63,11 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
       width: 24px;
 
       &[data-state='open'] {
-        ${createOverlayBackground('darken-2', 'primary')};
+        background-color: ${theme.backgroundColor.secondary};
       }
 
       &:enabled:hover {
-        ${createOverlayBackground('darken-1', 'primary')};
+        background-color: ${theme.backgroundColor.secondary};
       }
 
       &:disabled {
