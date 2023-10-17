@@ -1,5 +1,12 @@
 # @onefootprint/footprint
 
+## 3.6.0
+
+### Minor Changes
+
+- 933980417: Add l10n support
+- b9915eff4: Form component updates: async save ref method & removed type prop
+
 ## 3.5.0
 
 ### Minor Changes

@@ -2,6 +2,19 @@
 
 ## 6.0.0
 
+### Minor Changes
+
+- b9915eff4: Form component updates: async save ref method & removed type prop
+
+### Patch Changes
+
+- 933980417: Add l10n support
+- Updated dependencies [933980417]
+- Updated dependencies [b9915eff4]
+  - @onefootprint/footprint-js@3.6.0
+
+## 6.0.0
+
 ### Patch Changes
 
 - Updated dependencies [5249e151d]
