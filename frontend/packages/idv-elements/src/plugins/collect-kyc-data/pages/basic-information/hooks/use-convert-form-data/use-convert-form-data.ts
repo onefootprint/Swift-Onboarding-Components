@@ -22,7 +22,7 @@ const useConvertFormData = () => {
   return (formData: FormData) => {
     const convertedData: KycData = {};
     const { firstName, middleName, lastName, dob, nationality } = formData;
-    const hasName = firstName && lastName;
+    const hasName = firstName || middleName || lastName;
 
     if (requiresName && hasName && !isNameDisabled) {
       convertedData[IdDI.firstName] = {

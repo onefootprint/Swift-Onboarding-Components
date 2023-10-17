@@ -199,7 +199,11 @@ export type {
   UpdateProxyConfigResponse,
 } from './update-proxy-config';
 export type { UploadFileRequest, UploadFileResponse } from './upload-file';
-export type { UserDataRequest, UserDataResponse } from './user-data-identity';
+export type {
+  UserDataError,
+  UserDataRequest,
+  UserDataResponse,
+} from './user-data-identity';
 export { ALLOW_EXTRA_FIELDS_HEADER } from './user-data-identity';
 export type { UserDecryptRequest, UserDecryptResponse } from './user-decrypt';
 export type {

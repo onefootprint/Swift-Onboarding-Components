@@ -11,9 +11,9 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import EditableFormButtonContainer from '../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import Logger from '../../../../utils/logger';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
+import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
 import useSyncData from '../../hooks/use-sync-data';
 import allAttributes from '../../utils/all-attributes/all-attributes';
 import getInitialCountry from '../../utils/get-initial-country';
@@ -28,6 +28,13 @@ type BasicInformationProps = {
   ctaLabel?: string;
   onComplete?: () => void;
   onCancel?: () => void;
+};
+
+const fieldByDi: Partial<Record<IdDI, keyof FormData>> = {
+  [IdDI.firstName]: 'firstName',
+  [IdDI.middleName]: 'middleName',
+  [IdDI.lastName]: 'lastName',
+  [IdDI.dob]: 'dob',
 };
 
 const BasicInformation = ({
@@ -67,6 +74,23 @@ const BasicInformation = ({
     },
   });
 
+  const { setError } = methods;
+  const handleSyncDataError = (error: SyncDataFieldErrors) => {
+    Object.entries(error).forEach(([k, message]) => {
+      const di = k as IdDI;
+      const field = fieldByDi[di];
+      if (field) {
+        setError(
+          field,
+          { message },
+          {
+            shouldFocus: true,
+          },
+        );
+      }
+    });
+  };
+
   const onSubmitFormData = (formData: FormData) => {
     const convertedData = convertFormData(formData);
     syncData({
@@ -79,15 +103,7 @@ const BasicInformation = ({
         });
         onComplete?.();
       },
-      onError: (error: string) => {
-        console.error(
-          `Speculatively vaulting data failed in kyc basic-information page. ${error}`,
-        );
-        Logger.error(
-          `Speculatively vaulting data failed in kyc basic-information page. ${error}`,
-          'kyc-basic-information',
-        );
-      },
+      onError: handleSyncDataError,
     });
   };
 

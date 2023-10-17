@@ -80,11 +80,6 @@ const ResidentialAddress = ({
         });
         onComplete?.(convertedData);
       },
-      onError: (error: string) => {
-        console.error(
-          `Error while saving data on kyc residential-address page ${error}`,
-        );
-      },
     });
   };
 

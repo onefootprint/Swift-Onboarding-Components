@@ -8,7 +8,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import EditableFormButtonContainer from '../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import Logger from '../../../../utils/logger';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -100,15 +99,6 @@ const LegalStatus = ({
           payload: convertedData,
         });
         onComplete?.(convertedData);
-      },
-      onError: (error: unknown) => {
-        console.error(
-          `Error while saving data on kyc legal status page: ${error}`,
-        );
-        Logger.error(
-          `Error while saving data on kyc legal status page: ${error}`,
-          'kyc-legal-status',
-        );
       },
     });
   };

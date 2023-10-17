@@ -1,12 +1,14 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { IdDI } from '@onefootprint/types';
+import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
 import Logger from '../../../../utils/logger';
 import getCurrentStepFromMissingAttributes from '../../components/navigation-header/utils/current-step-from-missing-attributes';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
+import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
 import useSyncData from '../../hooks/use-sync-data';
 import useSyncEmail from '../../hooks/use-sync-email';
 import { isMissingEmailAttribute } from '../../utils/missing-attributes';
@@ -24,6 +26,7 @@ const Confirm = () => {
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
   const isLoading = syncEmailMutation.isLoading || syncDataMutation.isLoading;
+  const toast = useToast();
 
   const value = getCurrentStepFromMissingAttributes(
     requirement,
@@ -42,12 +45,18 @@ const Confirm = () => {
           type: 'confirmed',
         });
       },
-      onError: (error: string) => {
-        console.error(`Vaulting data on kyc confirm page failed: ${error}`);
-        Logger.error(
-          `Vaulting data on kyc confirm page failed: ${error}`,
-          'kyc-confirm',
-        );
+      onError: (fieldErrors: SyncDataFieldErrors) => {
+        // We can't show the error messages as hints unless the sub-forms are in edit mode
+        // For simplicity, just show the field names.
+        // Ideally, these errors should be caught in earlier pages anyways (unless bootstrapped)
+        const fields = Object.keys(fieldErrors)
+          .map(di => t(`di.${di}`))
+          .join(', ');
+        toast.show({
+          title: t('errors.invalid-inputs.title'),
+          description: t('errors.invalid-inputs.description', { fields }),
+          variant: 'error',
+        });
       },
     });
   };

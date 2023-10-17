@@ -1,18 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
+import type { UserDataError } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
+import type { AxiosError } from 'axios';
 
 import { useL10nContext } from '../../../../components/l10n-provider';
 import useUserData from '../../../../hooks/api/hosted/user/vault/use-user-data';
+import Logger from '../../../../utils/logger';
 import type { KycData } from '../../utils/data-types';
 import useCollectKycDataMachine from '../use-collect-kyc-data-machine';
 import getRequestData from './utils/get-request-data';
+
+export type SyncDataFieldErrors = UserDataError['error']['message'];
 
 type SyncDataArgs = {
   data: KycData;
   speculative?: boolean;
   onSuccess?: () => void;
-  onError?: (error: string) => void;
+  onError?: (errors: SyncDataFieldErrors) => void;
 };
 
 const useSyncData = () => {
@@ -23,6 +28,11 @@ const useSyncData = () => {
   const locale = l10n?.locale || 'en-US';
   const userDataMutation = useUserData();
   const toast = useToast();
+
+  const logError = (errorMessage: string) => {
+    console.error(errorMessage);
+    Logger.error(errorMessage, 'kyc-use-sync-data');
+  };
 
   const syncData = ({
     data: rawData,
@@ -36,7 +46,7 @@ const useSyncData = () => {
         description: t('empty-auth-token.description'),
         variant: 'error',
       });
-      onError?.('Found empty auth token while syncing kyc data fields.');
+      logError('Found empty auth token while syncing kyc data fields.');
       return;
     }
     if (userDataMutation.isLoading) {
@@ -53,17 +63,23 @@ const useSyncData = () => {
         },
         {
           onSuccess,
-          onError: err => {
-            toast.show({
-              title: t('invalid-inputs.title'),
-              description: t('invalid-inputs.description'),
-              variant: 'error',
-            });
-            onError?.(
-              `Kyc useSyncData encountered error while syncing data${
-                speculative ? ' speculatively' : ''
-              } ${getErrorMessage(err)}`,
-            );
+          onError: (err: unknown) => {
+            const fieldErrors = (err as AxiosError<UserDataError>)?.response
+              ?.data.error.message;
+            if (fieldErrors) {
+              onError?.(fieldErrors);
+            } else {
+              toast.show({
+                title: t('invalid-inputs.title'),
+                description: t('invalid-inputs.description'),
+                variant: 'error',
+              });
+              logError(
+                `Kyc useSyncData encountered error while syncing data${
+                  speculative ? ' speculatively' : ''
+                } ${getErrorMessage(err)}`,
+              );
+            }
           },
         },
       );
@@ -73,7 +89,7 @@ const useSyncData = () => {
         description: t('request-data.description'),
         variant: 'error',
       });
-      onError?.(
+      logError(
         `Unable to generate a valid request data obj because of incomplete/dangling DIs. ${e}`,
       );
     }

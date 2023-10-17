@@ -7,7 +7,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import EditableFormButtonContainer from '../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import Logger from '../../../../utils/logger';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -70,15 +69,6 @@ const SSN = ({
           payload: convertedData,
         });
         onComplete?.();
-      },
-      onError: (error: string) => {
-        console.error(
-          `Error while saving data on kyc residential-address page ${error}`,
-        );
-        Logger.error(
-          `Error while saving data on kyc residential-address page ${error}`,
-          'kyc-ssn',
-        );
       },
     });
   };

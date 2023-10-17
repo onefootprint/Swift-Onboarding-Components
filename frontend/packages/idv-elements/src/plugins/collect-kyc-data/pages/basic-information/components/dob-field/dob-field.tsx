@@ -26,13 +26,17 @@ const DobField = ({ disabled }: DobFieldProps) => {
   };
 
   const getErrorMessage = () => {
-    if (errors.dob) {
-      const validationError = validateDob(getValues('dob'));
-      return errorByValidationError[
-        validationError ?? DobValidationError.INVALID
-      ];
+    if (!errors.dob) {
+      return undefined;
     }
-    return undefined;
+    const { message } = errors.dob;
+    if (message && typeof message === 'string') {
+      return message;
+    }
+    const validationError = validateDob(getValues('dob'));
+    return errorByValidationError[
+      validationError ?? DobValidationError.INVALID
+    ];
   };
 
   return (

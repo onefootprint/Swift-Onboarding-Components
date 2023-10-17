@@ -22,6 +22,10 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
     if (!errors.firstName) {
       return undefined;
     }
+    const { message } = errors.firstName;
+    if (message && typeof message === 'string') {
+      return message;
+    }
     const validationError = validateName(getValues('firstName'));
     if (validationError === NameValidationError.EMPTY) {
       return t('first-name.error.empty');
@@ -36,6 +40,10 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
     if (!errors.middleName) {
       return undefined;
     }
+    const { message } = errors.middleName;
+    if (message && typeof message === 'string') {
+      return message;
+    }
     const validationError = validateName(getValues('middleName'));
     if (validationError === NameValidationError.SPECIAL_CHARS) {
       return t('middle-name.error.special-chars');
@@ -46,6 +54,10 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
   const getLastNameHint = () => {
     if (!errors.lastName) {
       return undefined;
+    }
+    const { message } = errors.lastName;
+    if (message && typeof message === 'string') {
+      return message;
     }
     const validationError = validateName(getValues('lastName'));
     if (validationError === NameValidationError.EMPTY) {
