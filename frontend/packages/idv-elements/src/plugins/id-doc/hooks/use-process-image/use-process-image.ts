@@ -31,7 +31,7 @@ const useProcessImage = () => {
     }
     toast.show({
       title: 'Uh-oh',
-      description: `${step}. Please upload try another image.`,
+      description: `${step}. Please upload another image.`,
     });
   };
 
