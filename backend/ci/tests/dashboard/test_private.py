@@ -18,18 +18,18 @@ def test_super_admin_users(sandbox_user, tenant):
 def test_private_tenants(tenant, sandbox_tenant):
     body = get("private/tenants", None, *tenant.db_auths)
 
-    assert any(i["id"] == tenant.id for i in body)
-    assert any(i["id"] == sandbox_tenant.id for i in body)
+    assert any(i["id"] == tenant.id for i in body["data"])
+    assert any(i["id"] == sandbox_tenant.id for i in body["data"])
 
     # Test filtering search
     body = get("private/tenants", dict(search="Footprint"), *tenant.db_auths)
-    assert len(body) >= 3  # At least all integration testing tenants
-    assert all("footprint" in i["name"].lower() for i in body)
+    assert len(body["data"]) >= 3  # At least all integration testing tenants
+    assert all("footprint" in i["name"].lower() for i in body["data"])
 
     # Test filtering is_live
     body = get("private/tenants", dict(is_live="true"), *tenant.db_auths)
-    assert all(i["is_live"] for i in body)
+    assert all(i["is_live"] for i in body["data"])
 
     # Test filtering has_domains
     body = get("private/tenants", dict(only_with_domains="true"), *tenant.db_auths)
-    assert all(i["domains"] for i in body)
+    assert all(i["domains"] for i in body["data"])

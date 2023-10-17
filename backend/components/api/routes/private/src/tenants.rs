@@ -1,19 +1,22 @@
+use actix_web::web::Json;
 use actix_web::{get, web};
 use api_core::auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard};
 use api_core::errors::ApiResult;
-use api_core::types::{JsonApiResponse, ResponseData};
+use api_core::types::{OffsetPaginatedResponse, OffsetPaginationRequest};
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::PrivateTenantFilters;
 use db::models::tenant::{PrivateTenantFilters as DbPrivateTenantFilters, Tenant};
+use db::OffsetPagination;
 use itertools::Itertools;
 
 #[get("/private/tenants")]
 async fn get(
     state: web::Data<State>,
     auth: FirmEmployeeAuthContext,
+    pagination: web::Query<OffsetPaginationRequest>,
     filters: web::Query<PrivateTenantFilters>,
-) -> JsonApiResponse<Vec<api_wire_types::PrivateTenant>> {
+) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::PrivateTenant>>> {
     auth.check_guard(FirmEmployeeGuard::Any)?;
     let PrivateTenantFilters {
         search,
@@ -36,13 +39,22 @@ async fn get(
         })
         .await??;
 
+    let count = orgs.len();
+    let page = pagination.page;
+    let page_size = pagination.page_size(&state);
+
     let results = orgs
         .into_iter()
         .map(|org| (counts.remove(&org.id), org))
         .map(api_wire_types::PrivateTenant::from_db)
         .sorted_by_key(|org| (org.is_live, org.num_live_vaults, org.created_at))
         .rev()
-        .collect();
+        .skip(page_size * page.unwrap_or_default())
+        .collect_vec();
 
-    ResponseData::ok(results).json()
+    let pagination = OffsetPagination::new(page, page_size);
+    let (results, next_page) = pagination.results(results);
+
+    let result = OffsetPaginatedResponse::ok(results, next_page, count as i64);
+    Ok(Json(result))
 }
