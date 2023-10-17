@@ -54,6 +54,19 @@ const Onboardings = () => {
           }}
           columns={[
             {
+              accessor: 'completed_at',
+              type: 'date',
+            },
+            {
+              accessor: 'status',
+            },
+            {
+              accessor: 'tenant_name',
+            },
+            {
+              accessor: 'fp_id',
+            },
+            {
               accessor: 'assume',
               type: 'link',
               wrap: true, // just straight up doesnt work, love airplane
