@@ -9,6 +9,7 @@ use chrono::{DateTime, Utc};
 use db::models::session::Session;
 use derive_more::Deref;
 use futures_util::Future;
+use http::Method;
 use newtypes::{PiiString, SessionAuthToken};
 use paperclip::actix::OperationModifier;
 use paperclip::v2::models::{DefaultSchemaRaw, Parameter, SecurityScheme};
@@ -77,12 +78,14 @@ where
 
 pub struct RequestInfo {
     pub headers: HeaderMap,
+    pub method: Method,
 }
 
 impl<'a> From<&'a actix_web::HttpRequest> for RequestInfo {
     fn from(value: &'a actix_web::HttpRequest) -> Self {
         Self {
             headers: value.headers().clone(),
+            method: value.method().clone(),
         }
     }
 }

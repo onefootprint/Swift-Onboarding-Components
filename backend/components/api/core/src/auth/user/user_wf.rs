@@ -69,7 +69,6 @@ impl ExtractableAuthSession for ParsedUserWfSession {
             .scoped_user
             .clone()
             .ok_or(AuthError::MissingScopedUser)?;
-        scoped_user.set_heartbeat(conn)?;
 
         let workflow_id = user_session.workflow_id().ok_or(AuthError::MissingWorkflow)?;
         let workflow = Workflow::get(conn, &workflow_id)?;

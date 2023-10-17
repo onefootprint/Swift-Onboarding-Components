@@ -129,7 +129,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
         value: AuthSessionData,
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
-        _: RequestInfo,
+        req: RequestInfo,
     ) -> Result<Self, ApiError> {
         match value {
             AuthSessionData::User(data) => {
@@ -155,6 +155,18 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     // Conservatively confirm that the onboarding in the auth token belongs to the user
                     .map(|id| ScopedVault::get(conn, (id, &vault.id)))
                     .transpose()?;
+
+                if let Some(su) = scoped_user.as_ref() {
+                    // Every few minutes, set the heartbeat when a user auth session authenticates
+                    // as this scoped user. This allows us to track when users are still
+                    // in progress and the last time we've seen the user
+                    if !req.method.is_safe() {
+                        // Only do this in non-read-only API requests so we don't have unintended
+                        // side effects in HTTP GET/OPTIONS/TRACE/HEAD requests
+                        su.set_heartbeat(conn)?;
+                    }
+                }
+
                 let data = UserSessionContext {
                     user: vault,
                     sb_id,
