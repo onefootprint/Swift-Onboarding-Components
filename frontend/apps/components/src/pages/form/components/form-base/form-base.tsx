@@ -53,21 +53,15 @@ const FormBase = ({
   hideFootprintLogo,
   hideButtons,
 }: FormBaseProps) => {
-  const { t } = useTranslation('pages.secure-form');
   const footprintProvider = useFootprintProvider();
+
+  const { t } = useTranslation('pages.secure-form');
   const confirmationDialog = useConfirmationDialog();
   const hasCountry =
     type === FootprintFormType.cardAndNameAndAddress ||
     type === FootprintFormType.cardAndZip;
-
-  const defaultValues = hasCountry
-    ? {
-        country: DEFAULT_COUNTRY,
-      }
-    : undefined;
-  const methods = useForm<FormData>({
-    defaultValues,
-  });
+  const defaultValues = hasCountry ? { country: DEFAULT_COUNTRY } : undefined;
+  const methods = useForm<FormData>({ defaultValues });
   const {
     handleSubmit,
     formState: { isDirty, errors },
@@ -75,7 +69,24 @@ const FormBase = ({
     getValues,
   } = methods;
 
-  const confirmClose = (callback: () => void) => {
+  const triggerSave = () => {
+    trigger();
+    if (Object.values(errors).length > 0) {
+      // There were some errors with inputs, don't trigger saving
+      return;
+    }
+    const data = getValues();
+    onSave?.(data);
+  };
+
+  useEffectOnce(() => {
+    footprintProvider.on(FootprintPrivateEvent.formSaved, triggerSave);
+  });
+
+  const confirmClose = (callback?: () => void) => {
+    if (!callback) {
+      return;
+    }
     if (!isDirty) {
       callback();
       return;
@@ -93,40 +104,9 @@ const FormBase = ({
     });
   };
 
-  const handleSave = () => {
-    trigger();
-    if (Object.values(errors).length > 0) {
-      // There were some errors with inputs, don't trigger saving
-      return;
-    }
-    const data = getValues();
-    onSave?.(data);
-  };
-
   const handleBeforeSubmit = (data: FormData) => {
     onSave?.(data);
   };
-
-  const handleClose = () => {
-    if (onClose) {
-      confirmClose(onClose);
-    }
-  };
-
-  const handleCancel = () => {
-    if (onCancel) {
-      confirmClose(onCancel);
-    }
-  };
-
-  const subscribeSave = () =>
-    footprintProvider.on(FootprintPrivateEvent.formSaved, () => {
-      handleSave();
-    });
-
-  useEffectOnce(() => {
-    subscribeSave();
-  });
 
   return (
     <FormDialog
@@ -142,11 +122,11 @@ const FormBase = ({
         onCancel && {
           label: t('buttons.cancel'),
           type: 'reset',
-          onClick: handleCancel,
+          onClick: () => confirmClose(onCancel),
           disabled: isLoading,
         }
       }
-      onClose={handleClose}
+      onClose={() => confirmClose(onClose)}
       hideFootprintLogo={hideFootprintLogo}
       hideButtons={hideButtons}
     >
@@ -210,6 +190,7 @@ const FormBase = ({
 
 const StyledForm = styled.form`
   ${({ theme }) => css`
+    margin: ${theme.spacing[2]};
     display: grid;
     row-gap: ${theme.spacing[5]};
   `}

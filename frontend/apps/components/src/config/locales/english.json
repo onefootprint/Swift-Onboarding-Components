@@ -77,7 +77,8 @@
       "form-dialog": {
         "loading-aria-label": "Loading",
         "secured-by-footprint": {
-          "label": "Secured by Footprint"
+          "desktop-label": "Secured by Footprint",
+          "mobile-label": "Footprint"
         },
         "header": {
           "close-aria-label": "Close"

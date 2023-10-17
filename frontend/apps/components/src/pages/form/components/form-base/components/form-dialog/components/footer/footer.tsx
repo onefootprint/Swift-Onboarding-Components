@@ -42,6 +42,7 @@ const Footer = ({
           )}
           {primaryButton && (
             <Button
+              testID="primary-button"
               disabled={primaryButton.disabled}
               form={primaryButton.form}
               loading={primaryButton.loading}

@@ -34,6 +34,7 @@ const Content = styled.div`
 
 const Header = styled.header`
   ${({ theme }) => css`
+    margin: 0 ${theme.spacing[2]};
     display: flex;
     align-items: center;
     position: sticky;

@@ -22,12 +22,16 @@ const Header = ({ title, variant, onClose }: HeaderProps) => {
     <>
       {canClose && (
         <CloseContainer>
-          <IconButton aria-label={t('close-aria-label')} onClick={onClose}>
+          <IconButton
+            aria-label={t('close-aria-label')}
+            onClick={onClose}
+            testID="close-button"
+          >
             <IcoClose24 />
           </IconButton>
         </CloseContainer>
       )}
-      {title && <span>{title}</span>}
+      {title && <span data-testid="form-title">{title}</span>}
     </>
   );
 };

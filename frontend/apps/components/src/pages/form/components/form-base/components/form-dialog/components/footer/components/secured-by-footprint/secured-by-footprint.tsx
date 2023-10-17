@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFootprint16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Typography } from '@onefootprint/ui';
+import { media, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const SecuredByFootprint = () => {
@@ -10,29 +10,52 @@ const SecuredByFootprint = () => {
   );
 
   return (
-    <Container>
+    <Container data-testid="secured-by-footprint">
       <IconContainer>
         <IcoFootprint16 />
       </IconContainer>
-      <TextContainer>
+      <MobileTextContainer>
         <Typography variant="caption-1" color="secondary">
-          {t('label')}
+          {t('mobile-label')}
         </Typography>
-      </TextContainer>
+      </MobileTextContainer>
+      <DesktopTextContainer>
+        <Typography variant="caption-1" color="secondary">
+          {t('desktop-label')}
+        </Typography>
+      </DesktopTextContainer>
     </Container>
   );
 };
 
 const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 16px;
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 16px;
+    margin-right: ${theme.spacing[3]};
+  `}
 `;
 
-const TextContainer = styled.div`
+const MobileTextContainer = styled.div`
   ${({ theme }) => css`
     margin-left: ${theme.spacing[2]};
+    display: none;
+
+    ${media.lessThan('sm')`
+      display: flex;
+    `}
+  `}
+`;
+
+const DesktopTextContainer = styled.div`
+  ${({ theme }) => css`
+    margin-left: ${theme.spacing[2]};
+
+    ${media.lessThan('sm')`
+      display: none;
+    `}
   `}
 `;
 

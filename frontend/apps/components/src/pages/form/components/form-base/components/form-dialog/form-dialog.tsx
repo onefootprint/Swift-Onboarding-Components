@@ -1,5 +1,5 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
-import { ScrollArea, Stack } from '@onefootprint/ui';
+import { ScrollArea } from '@onefootprint/ui';
 import React from 'react';
 
 import Container from '../../../container';
@@ -34,6 +34,7 @@ const FormDialog = ({
   return (
     <Container
       testID={testID}
+      data-variant={variant}
       header={
         showHeader && (
           <Header variant={variant} onClose={onClose} title={title} />
@@ -50,9 +51,7 @@ const FormDialog = ({
         )
       }
     >
-      <Stack flexGrow={1}>
-        <ScrollArea>{children}</ScrollArea>
-      </Stack>
+      <ScrollArea>{children}</ScrollArea>
     </Container>
   );
 };

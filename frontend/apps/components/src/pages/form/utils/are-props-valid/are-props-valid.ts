@@ -1,7 +1,6 @@
-/* eslint-disable no-console */
 import { FootprintFormType } from '@onefootprint/footprint-js';
 
-import type { FootprintFormDataProps } from '../types';
+import type { FootprintFormDataProps } from '../../types';
 
 const isObject = (obj: any) => typeof obj === 'object';
 

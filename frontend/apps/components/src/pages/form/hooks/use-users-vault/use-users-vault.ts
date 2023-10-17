@@ -11,7 +11,7 @@ const usersVaultRequest = async (payload: UsersVaultRequest) => {
   const { authToken, data } = payload;
   const response = await requestWithoutCaseConverter<UsersVaultResponse>({
     method: 'PATCH',
-    url: 'users/vault',
+    url: '/users/vault',
     data,
     headers: {
       [AUTH_HEADER]: authToken,

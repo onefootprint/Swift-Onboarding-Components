@@ -87,7 +87,7 @@ export type FormOptions = {
 };
 
 export type FormRef = {
-  save: () => void;
+  save: () => Promise<void>;
 };
 
 export interface FormProps extends PropsBase {

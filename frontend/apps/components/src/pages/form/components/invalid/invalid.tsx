@@ -15,6 +15,7 @@ const Invalid = ({ onClose }: InvalidProps) => {
 
   return (
     <Container
+      testID="invalid-form"
       header={
         onClose && (
           <CloseButton>

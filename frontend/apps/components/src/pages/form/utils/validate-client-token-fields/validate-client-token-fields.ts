@@ -1,8 +1,6 @@
 import { FootprintFormType } from '@onefootprint/footprint-js';
 import { CardDIField } from '@onefootprint/types';
 
-import getCardDIField from './get-card-di-field';
-
 const FieldsByVariant: Record<FootprintFormType, CardDIField[]> = {
   [FootprintFormType.cardOnly]: [
     CardDIField.number,
@@ -32,6 +30,15 @@ const FieldsByVariant: Record<FootprintFormType, CardDIField[]> = {
   ],
 };
 
+const getCardDIField = (di: string): CardDIField | null => {
+  try {
+    const [, , ...field] = di.split('.');
+    return field.join('.') as CardDIField;
+  } catch (e) {
+    return null;
+  }
+};
+
 const validateClientTokenFields = (
   type: FootprintFormType,
   vaultFields?: string[],
@@ -55,8 +62,10 @@ const validateClientTokenFields = (
         ', ',
       )}.`,
     );
+    return false;
   }
-  return hasPermissions;
+
+  return true;
 };
 
 export default validateClientTokenFields;

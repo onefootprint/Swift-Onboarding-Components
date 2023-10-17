@@ -1,6 +1,7 @@
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
+import styled, { css } from '@onefootprint/styled';
 import type { CountrySelectOption } from '@onefootprint/ui';
-import { Grid } from '@onefootprint/ui';
+import { media } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -22,15 +23,25 @@ const PartialAddress = () => {
   };
 
   return (
-    <Grid.Row>
-      <Grid.Column col={6}>
-        <ZipField countryCode={country.value} />
-      </Grid.Column>
-      <Grid.Column col={6}>
-        <CountryField onChange={handleCountryChange} />
-      </Grid.Column>
-    </Grid.Row>
+    <Row columns={2}>
+      <ZipField countryCode={country.value} />
+      <CountryField onChange={handleCountryChange} />
+    </Row>
   );
 };
+
+const Row = styled.div<{ columns: number }>`
+  ${({ columns, theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
+
+    ${media.greaterThan('sm')`
+      display: grid;
+      grid-template-columns: repeat(${columns}, 1fr);
+      gap: ${theme.spacing[4]};
+    `}
+  `}
+`;
 
 export default PartialAddress;
