@@ -1,11 +1,15 @@
 import { IcoCloseSmall16, IcoInfo16 } from '@onefootprint/icons';
 import styled, { css, keyframes } from '@onefootprint/styled';
 import React from 'react';
+import { isMobile } from 'react-device-detect';
 
 import LinkButton from '../link-button';
 import Stack from '../stack';
 import Typography from '../typography';
 import type { ToastProps } from './toast.types';
+
+const DESKTOP_WIDTH = '380px';
+const MOBILE_WIDTH = '90vw';
 
 const Toast = ({
   closeAriaLabel = 'Close',
@@ -23,6 +27,7 @@ const Toast = ({
     data-testid={testID}
     gap={3}
     align="start"
+    width={isMobile ? MOBILE_WIDTH : DESKTOP_WIDTH}
   >
     <Stack align="center" justify="center" marginTop={1}>
       <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
@@ -81,14 +86,14 @@ const slideOut = keyframes`
     transform: translateX(0);
   }
   to {
-    transform: translateX(380px);
+    transform: translateX(${isMobile ? MOBILE_WIDTH : DESKTOP_WIDTH});
   }
 `;
 
-const ToastContainer = styled(Stack)`
-  ${({ theme }) => css`
-    transform: translateX(380px);
-    width: 380px;
+const ToastContainer = styled(Stack)<{ width: string }>`
+  ${({ theme, width }) => css`
+    width: ${width};
+    transform: translateX(${width});
     background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
