@@ -11,4 +11,5 @@ export type SignupChallengeRequest = EmailOrPhoneIdentifier & {
 
 export type SignupChallengeResponse = {
   challengeData: ChallengeData;
+  error?: string;
 };

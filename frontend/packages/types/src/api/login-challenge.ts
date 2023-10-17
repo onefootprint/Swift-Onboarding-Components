@@ -16,4 +16,5 @@ export type LoginChallengeRequest = {
 
 export type LoginChallengeResponse = {
   challengeData: ChallengeData;
+  error?: string;
 };

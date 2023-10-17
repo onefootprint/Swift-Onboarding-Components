@@ -6,6 +6,7 @@ import type {
   Identifier,
   IdentifyVerifyResponse,
   LoginChallengeResponse,
+  SignupChallengeResponse,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -154,18 +155,23 @@ const PinVerification = ({
     );
   };
 
-  const handleRequestChallengeSuccess = (payload: LoginChallengeResponse) => {
+  const handleRequestChallengeSuccess = (
+    payload: LoginChallengeResponse | SignupChallengeResponse,
+  ) => {
     // Check whether is resend, but isResend state might not have updated yet
-    if (challengeData) {
-      showResendConfirmation();
+    if (payload.error) {
+      showRequestErrorToast(payload.error);
+    } else if (challengeData) {
+      toast.show({
+        title: t('toast.success.title'),
+        description: t('toast.success.description'),
+      });
     }
 
     if (payload.challengeData.challengeKind !== preferredChallengeKind) {
-      console.error(
-        'Received biometric challenge after requesting login challenge',
-      );
+      console.error('Received incorrect login challenge kind');
       Logger.error(
-        'Received biometric challenge after requesting login challenge',
+        'Received incorrect login challenge kind',
         'pin-verification',
       );
       return;
@@ -269,13 +275,6 @@ const PinVerification = ({
     } else {
       initiateSignupChallenge();
     }
-  };
-
-  const showResendConfirmation = () => {
-    toast.show({
-      title: t('toast.success.title'),
-      description: t('toast.success.description'),
-    });
   };
 
   const getShouldRequestNewChallenge = () => {

@@ -22,13 +22,14 @@ const signupChallenge = async (payload: SignupChallengeRequest) => {
     },
     headers,
   });
-  const { challengeData } = { ...response.data };
+  const { challengeData, error } = { ...response.data };
   challengeData.retryDisabledUntil = getRetryDisabledUntil(
     challengeData.timeBeforeRetryS ?? 0,
   );
 
   return {
     challengeData,
+    error,
   };
 };
 

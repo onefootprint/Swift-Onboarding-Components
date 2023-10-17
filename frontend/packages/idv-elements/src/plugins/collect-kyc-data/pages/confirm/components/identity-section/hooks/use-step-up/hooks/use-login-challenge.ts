@@ -9,6 +9,7 @@ export type LoginChallengeRequest = {
 
 export type LoginChallengeResponse = {
   challengeData: ChallengeData;
+  error: string;
 };
 
 const loginChallenge = async (payload: LoginChallengeRequest) => {
@@ -23,10 +24,11 @@ const loginChallenge = async (payload: LoginChallengeRequest) => {
       [AUTH_HEADER]: authToken,
     },
   });
-  const { challengeData } = { ...response.data };
+  const { challengeData, error } = { ...response.data };
 
   return {
     challengeData,
+    error,
   };
 };
 
