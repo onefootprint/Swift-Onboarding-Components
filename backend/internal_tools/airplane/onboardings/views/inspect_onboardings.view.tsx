@@ -55,7 +55,7 @@ const Onboardings = () => {
           columns={[
             {
               accessor: 'completed_at',
-              type: 'date',
+              type: 'datetime',
             },
             {
               accessor: 'status',
