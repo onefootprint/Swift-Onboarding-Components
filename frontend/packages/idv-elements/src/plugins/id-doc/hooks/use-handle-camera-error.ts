@@ -19,7 +19,9 @@ const useHandleCameraError = () => {
 
   return (err: unknown) => {
     const error = err as DOMException;
-    if (
+    if (error instanceof TypeError) {
+      showErrorToast(t('undefined-navigator'));
+    } else if (
       error.name === 'NotFoundError' ||
       error.name === 'DevicesNotFoundError'
     ) {

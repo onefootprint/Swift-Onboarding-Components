@@ -7,6 +7,7 @@
       "not-found": "We couldn't find a camera on your device. Please use another device.",
       "already-in-use": "Another application is using your camera, please close the other application and try again.",
       "constraint": "We couldn't find a camera that could be used to take photos. Please use another device.",
+      "undefined-navigator": "Looks like your browser can't open the camera. Please try using a different browser or device.",
       "other-error": "There was an error accessing your camera. Please try again."
     },
     "retry-limit-exceeded": {
