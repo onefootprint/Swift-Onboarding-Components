@@ -68,7 +68,7 @@
     "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
     "@rive-app/react-canvas": "^3.0.35",
-    "@types/lodash": "^4.14.191",
+    "@types/lodash": "^4.14.194",
     "@types/styled-components": "^5.1.26",
     "@types/ua-parser-js": "^0.7.36",
     "eslint-config-footprint": "*",
