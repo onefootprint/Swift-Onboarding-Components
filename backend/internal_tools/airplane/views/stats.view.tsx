@@ -61,6 +61,8 @@ const Stats = () => {
           WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
           `}
         ></OverviewCard>
+      </Stack>
+      <Stack>
         <GraphCard
           title={'PIDs this week'}
           transform={null}
@@ -107,7 +109,7 @@ const Stats = () => {
           query={`
             WITH live_tenants AS (
               SELECT tenant.id FROM tenant
-              WHERE tenant.sandbox_restricted = false
+              WHERE tenant.sandbox_restricted = false AND tenant.id NOT LIKE '_private_it_org_%'
             ), vault_counts_per_day AS (
                 SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", tenant.name as "tenant", count(*) as "new_vaults"
                 FROM scoped_vault
