@@ -11,7 +11,7 @@ pytest==7.2.0
 python-dotenv==0.20.0
 requests==2.31.0
 tomli==2.0.1
-urllib3==1.26.9
+urllib3==1.26.17
 platformdirs==2.5.2
 fido2==0.8.1
 cryptography==39.0.1
