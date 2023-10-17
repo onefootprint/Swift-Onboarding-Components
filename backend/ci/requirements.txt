@@ -14,7 +14,7 @@ tomli==2.0.1
 urllib3==1.26.17
 platformdirs==2.5.2
 fido2==0.8.1
-cryptography==39.0.1
+cryptography==41.0.4
 twilio==7.9.2
 aiohttp==3.8.5
 asyncio==3.4.3
