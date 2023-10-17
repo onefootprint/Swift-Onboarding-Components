@@ -64,7 +64,7 @@ const Stats = () => {
       </Stack>
       <Stack>
         <GraphCard
-          title={'PIDs this week'}
+          title={'PIDs last 30 days'}
           transform={null}
           query={`
           SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
@@ -72,12 +72,12 @@ const Stats = () => {
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
           WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 't'
           GROUP BY "day"
-          ORDER BY "day" DESC LIMIT 7) r 
+          ORDER BY "day" DESC LIMIT 30) r 
           ORDER BY "day" ASC;
         `}
         ></GraphCard>
         <GraphCard
-          title={'PIDs this week by Tenant'}
+          title={'PIDs this week (by org)'}
           transform={data => {
             let map = {};
             let tenants = {};
@@ -124,7 +124,7 @@ const Stats = () => {
         ></GraphCard>
 
         <GraphCard
-          title={'Not (yet) Portable IDs this week'}
+          title={'Not (yet) Portable IDs last 30 days'}
           transform={null}
           query={`
           SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
@@ -132,7 +132,7 @@ const Stats = () => {
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
           WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
           GROUP BY "day"
-          ORDER BY "day" DESC LIMIT 7) r 
+          ORDER BY "day" DESC LIMIT 30) r 
           ORDER BY "day" ASC;
 
         `}
