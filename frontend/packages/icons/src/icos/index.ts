@@ -150,6 +150,8 @@ export { default as IcoFlask24 } from './ico-flask-24';
 export { default as IcoFootprint16 } from './ico-footprint-16';
 export { default as IcoFootprint24 } from './ico-footprint-24';
 export { default as IcoFootprint40 } from './ico-footprint-40';
+export { default as IcoFootprintShield16 } from './ico-footprint-shield-16';
+export { default as IcoFootprintShield24 } from './ico-footprint-shield-24';
 export { default as IcoForbid40 } from './ico-forbid-40';
 export { default as IcoGlobe16 } from './ico-globe-16';
 export { default as IcoGlobe24 } from './ico-globe-24';

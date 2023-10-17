@@ -7,7 +7,6 @@ import useResizeObserver from 'use-resize-observer';
 import { useLayoutOptions } from '../layout-options-provider';
 import SecuredByFootprint from '../secured-by-footprint';
 import FooterActions from './components/footer-actions';
-import NitroLock from './components/nitro-lock';
 
 type FootprintFooterProps = {
   hideOnDesktop?: boolean;
@@ -54,7 +53,6 @@ const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
     >
       <SecuredByFootprint />
       <LinksContainer>
-        <NitroLock />
         {links.map(({ href, label }) => (
           <li key={label}>
             <a href={href} target="_blank" rel="noreferrer">
