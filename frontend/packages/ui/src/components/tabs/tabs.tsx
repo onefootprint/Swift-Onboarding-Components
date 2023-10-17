@@ -1,5 +1,4 @@
 import styled, { css } from '@onefootprint/styled';
-import { motion } from 'framer-motion';
 import React, { useId, useMemo } from 'react';
 
 import { createFontStyles } from '../../utils/mixins';
@@ -23,8 +22,6 @@ const Tabs = ({ variant = 'underlined', children }: TabsProps) => {
         aria-orientation="horizontal"
         data-variant={variant}
         role="tablist"
-        layout
-        layoutRoot
       >
         {children}
       </Container>
@@ -32,7 +29,7 @@ const Tabs = ({ variant = 'underlined', children }: TabsProps) => {
   );
 };
 
-const Container = styled(motion.nav)`
+const Container = styled.nav`
   ${({ theme }) => css`
     display: flex;
 

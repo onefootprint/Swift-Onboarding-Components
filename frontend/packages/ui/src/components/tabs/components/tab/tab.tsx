@@ -1,9 +1,9 @@
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { motion } from 'framer-motion';
 import React, { forwardRef, useContext } from 'react';
 
 import { createFontStyles } from '../../../../utils';
+import Stack from '../../../stack';
 import TabContext from '../context';
 
 export type TabProps = {
@@ -21,7 +21,7 @@ const Tab = forwardRef<HTMLAnchorElement, TabProps>(
     ref,
   ) => {
     const renderedIcon = Icon && <Icon />;
-    const { variant, layoutId } = useContext(TabContext);
+    const { variant } = useContext(TabContext);
 
     return (
       <TabContainer
@@ -33,27 +33,49 @@ const Tab = forwardRef<HTMLAnchorElement, TabProps>(
         ref={ref}
         role="tab"
         tabIndex={0}
+        key={href}
         data-variant={variant}
       >
-        <Label selected={selected} data-variant={variant} className="label">
+        <Label selected={selected} data-variant={variant}>
           {variant === 'pill' && renderedIcon && (
-            <IconContainer selected={selected}>{renderedIcon}</IconContainer>
+            <IconContainer justify="center" align="center" selected={selected}>
+              {renderedIcon}
+            </IconContainer>
           )}
           {children}
         </Label>
-        {selected && (
-          <ActiveMarker layoutId={layoutId} data-variant={variant} />
-        )}
+        {selected && <ActiveMarker data-variant={variant} />}
       </TabContainer>
     );
   },
 );
 
-const IconContainer = styled.div<{ selected: boolean }>`
-  ${({ theme, selected }) => css`
+const TabContainer = styled.div`
+  ${({ theme }) => css`
+    position: relative;
     display: flex;
-    align-items: center;
     justify-content: center;
+    gap: ${theme.spacing[2]};
+    padding: ${theme.spacing[2]} ${theme.spacing[4]};
+    transition: background-color 0.5s ease;
+
+    &[data-variant='underlined'] {
+      margin-right: ${theme.spacing[5]};
+    }
+
+    &[data-variant='pill'] {
+      border-radius: ${theme.borderRadius.full};
+      background-color: ${theme.backgroundColor.transparent};
+
+      &:hover {
+        background-color: ${theme.backgroundColor.senary};
+      }
+    }
+  `}
+`;
+
+const IconContainer = styled(Stack)<{ selected: boolean }>`
+  ${({ theme, selected }) => css`
     width: ${theme.spacing[6]};
     height: ${theme.spacing[6]};
 
@@ -64,12 +86,9 @@ const IconContainer = styled.div<{ selected: boolean }>`
   `}
 `;
 
-const Label = styled.div<{ selected: boolean }>`
+const Label = styled.span<{ selected: boolean }>`
   ${({ theme, selected }) => css`
     ${createFontStyles('body-4')}
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 1;
     gap: ${theme.spacing[2]};
     transition: all 0.5s ease;
@@ -80,44 +99,15 @@ const Label = styled.div<{ selected: boolean }>`
 
     &[data-variant='underlined'] {
       color: ${selected ? theme.color.accent : theme.color.tertiary};
-    }
-  `}
-`;
 
-const TabContainer = styled.a`
-  ${({ theme }) => css`
-    position: relative;
-    display: flex;
-    gap: ${theme.spacing[2]};
-    justify-content: center;
-    padding: ${theme.spacing[2]} ${theme.spacing[4]};
-    transition: background-color 0.5s ease;
-
-    &[data-variant='underlined'] {
-      margin-right: ${theme.spacing[5]};
-
-      @media (hover: hover) {
-        &:hover {
-          .label {
-            color: ${theme.color.secondary};
-          }
-        }
-      }
-    }
-
-    &[data-variant='pill'] {
-      border-radius: ${theme.borderRadius.full};
-      background-color: ${theme.backgroundColor.transparent};
-      @media (hover: hover) {
-        &:hover {
-          background-color: ${theme.backgroundColor.senary};
-        }
+      &:hover {
+        color: ${!selected && theme.color.secondary};
       }
     }
   `}
 `;
 
-const ActiveMarker = styled(motion.div)`
+const ActiveMarker = styled.div`
   ${({ theme }) => css`
     position: absolute;
     bottom: 0;
