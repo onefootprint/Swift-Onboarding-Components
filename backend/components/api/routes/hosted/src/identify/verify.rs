@@ -17,6 +17,7 @@ use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
 use api_core::telemetry::RootSpan;
+use api_core::types::JsonApiResponse;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::Person;
 use chrono::{Duration, Utc};
@@ -63,7 +64,7 @@ pub async fn post(
     user_auth: Option<UserAuthContext>,
     insight_headers: InsightHeaders,
     root_span: RootSpan,
-) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
+) -> JsonApiResponse<VerifyResponse> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let VerifyRequest {
         challenge_token,
@@ -161,9 +162,7 @@ pub async fn post(
         })
         .await?;
 
-    Ok(Json(ResponseData {
-        data: VerifyResponse { auth_token },
-    }))
+    ResponseData::ok(VerifyResponse { auth_token }).json()
 }
 
 /// Determines the identifiers to add to the auth token to allow a user to complete onboarding

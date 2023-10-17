@@ -1,5 +1,4 @@
 use super::ChallengeKind;
-use crate::errors::ApiError;
 use crate::identify::get_user_challenge_context;
 use crate::types::response::ResponseData;
 use crate::State;
@@ -13,6 +12,7 @@ use api_core::{
     errors::challenge::ChallengeError,
     fingerprinter::VaultIdentifier,
     telemetry::RootSpan,
+    types::JsonApiResponse,
     utils::headers::SandboxId,
 };
 use api_wire_types::IdentifyRequest;
@@ -44,7 +44,7 @@ pub async fn post(
     // for the authed user
     user_auth: Option<UserAuthContext>,
     root_span: RootSpan,
-) -> actix_web::Result<Json<ResponseData<IdentifyResponse>>, ApiError> {
+) -> JsonApiResponse<IdentifyResponse> {
     let IdentifyRequest { identifier } = request.into_inner();
 
     // Require one of user_auth or identifier
@@ -76,11 +76,10 @@ pub async fn post(
 
     let has_syncable_pass_key = creds.iter().any(|cred| cred.backup_state);
 
-    Ok(Json(ResponseData {
-        data: IdentifyResponse {
-            user_found: true,
-            available_challenge_kinds,
-            has_syncable_pass_key,
-        },
-    }))
+    let response = IdentifyResponse {
+        user_found: true,
+        available_challenge_kinds,
+        has_syncable_pass_key,
+    };
+    ResponseData::ok(response).json()
 }

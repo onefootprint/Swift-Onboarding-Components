@@ -15,6 +15,7 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::telemetry::RootSpan;
+use api_core::types::JsonApiResponse;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::headers::TelemetryHeaders;
 use api_core::utils::sms::rx_background_error;
@@ -35,6 +36,7 @@ pub struct AuthChallengeRequest {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct LoginChallengeResponse {
     challenge_data: UserChallengeData,
+    error: Option<String>,
 }
 
 #[api_v2_operation(
@@ -55,7 +57,7 @@ pub async fn post(
     user_auth: Option<UserAuthContext>,
     telemetry_headers: TelemetryHeaders,
     root_span: RootSpan,
-) -> actix_web::Result<Json<ResponseData<LoginChallengeResponse>>, ApiError> {
+) -> JsonApiResponse<LoginChallengeResponse> {
     // TODO do we want to make this more similar to signup_challenge and have it return an unauthed token?
     let tenant = ob_context.as_ref().map(|obc| obc.tenant().clone());
     let tenant = tenant.as_ref();
@@ -152,9 +154,11 @@ pub async fn post(
             }
         };
 
-    if let Some(rx) = rx {
-        rx_background_error(rx, 2).await?;
-    }
+    let err = if let Some(rx) = rx {
+        rx_background_error(rx, 2).await.err()
+    } else {
+        None
+    };
 
     let challenge_state = ChallengeState {
         data: challenge_state_data,
@@ -166,17 +170,18 @@ pub async fn post(
     }
     .seal(&state.challenge_sealing_key)?;
 
-    Ok(Json(ResponseData {
-        data: LoginChallengeResponse {
-            challenge_data: UserChallengeData {
-                challenge_kind,
-                challenge_token,
-                scrubbed_phone_number: phone_number.map(|p| p.last_two()),
-                biometric_challenge_json,
-                time_before_retry_s,
-            },
-        },
-    }))
+    let challenge_data = UserChallengeData {
+        challenge_kind,
+        challenge_token,
+        scrubbed_phone_number: phone_number.map(|p| p.last_two()),
+        biometric_challenge_json,
+        time_before_retry_s,
+    };
+    let response = LoginChallengeResponse {
+        challenge_data,
+        error: err.map(|e| e.to_string()),
+    };
+    ResponseData::ok(response).json()
 }
 
 struct BiometricChallenge {

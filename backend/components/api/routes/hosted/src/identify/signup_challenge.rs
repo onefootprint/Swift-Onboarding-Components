@@ -8,6 +8,7 @@ use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::telemetry::RootSpan;
+use api_core::types::JsonApiResponse;
 use api_core::utils::headers::{SandboxId, TelemetryHeaders};
 use api_core::utils::sms::rx_background_error;
 use api_core::utils::vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper};
@@ -26,6 +27,7 @@ pub struct SignupChallengeRequest {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct SignupChallengeResponse {
     challenge_data: UserChallengeData,
+    error: Option<String>,
 }
 
 #[api_v2_operation(
@@ -42,7 +44,7 @@ pub async fn post(
     sandbox_id: SandboxId,
     telemetry_headers: TelemetryHeaders,
     root_span: RootSpan,
-) -> actix_web::Result<Json<ResponseData<SignupChallengeResponse>>, ApiError> {
+) -> JsonApiResponse<SignupChallengeResponse> {
     let SignupChallengeRequest { phone_number, email } = request.into_inner();
 
     let initial_data = vec![
@@ -126,13 +128,17 @@ pub async fn post(
         (None, None) => return Err(ChallengeError::NoIdentifier.into()),
     };
 
-    if let Some(rx) = rx {
-        rx_background_error(rx, 2).await?;
-    }
+    let err = if let Some(rx) = rx {
+        rx_background_error(rx, 2).await.err()
+    } else {
+        None
+    };
 
-    Ok(Json(ResponseData {
-        data: SignupChallengeResponse { challenge_data },
-    }))
+    let response = SignupChallengeResponse {
+        challenge_data,
+        error: err.map(|e| e.to_string()),
+    };
+    ResponseData::ok(response).json()
 }
 
 type IsVerified = bool;
