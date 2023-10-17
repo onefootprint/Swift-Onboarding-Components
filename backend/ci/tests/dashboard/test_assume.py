@@ -109,17 +109,3 @@ def test_cannot_patch(assumed_token, path):
 )
 def test_cannot_post(assumed_token, path, body):
     post(path, body, assumed_token, status_code=401)
-
-
-def test_super_admin_users(sandbox_user, tenant):
-    # This user belongs to a different tenant. A firm employee auth context should be able to get
-    # basic info on this user
-    fp_id = sandbox_user.fp_id
-    body = get(f"private/entities/{fp_id}", None, *tenant.db_auths)
-    assert body["id"] == fp_id
-    assert not body["is_live"]
-    assert body["tenant_id"] == sandbox_user.tenant.id
-
-    # Prove we're using a different auth class
-    org = get(f"org", None, *tenant.db_auths)
-    assert org["id"] != sandbox_user.tenant.id

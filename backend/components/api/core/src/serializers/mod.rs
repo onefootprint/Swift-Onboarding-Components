@@ -1,9 +1,9 @@
 mod access_event;
 mod actor;
 mod annotation;
+mod auth_event;
 mod authorized_org;
 mod business_owner;
-mod auth_event;
 mod document;
 mod entity;
 mod identity_document;
@@ -16,6 +16,7 @@ mod organization;
 mod organization_member;
 mod organization_role;
 mod organization_rolebinding;
+mod private_tenant;
 mod proxy_config;
 mod risk_signal;
 mod secret_api_key;

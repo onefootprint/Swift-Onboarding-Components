@@ -7,6 +7,9 @@ pub use self::risk_signals::*;
 pub mod validate;
 pub use self::validate::*;
 
+mod private_tenants;
+pub use self::private_tenants::*;
+
 pub mod document_request;
 pub use self::document_request::*;
 

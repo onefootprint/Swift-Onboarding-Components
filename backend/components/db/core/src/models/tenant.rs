@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::PgConn;
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -5,6 +7,7 @@ use db_schema::schema::{
     scoped_vault,
     tenant::{self, BoxedQuery},
 };
+use diesel::dsl::count_star;
 use diesel::insertable::CanInsertInSingleQuery;
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -63,6 +66,12 @@ impl Tenant {
     }
 }
 
+pub struct PrivateTenantFilters {
+    pub search: Option<String>,
+    pub is_live: Option<bool>,
+    pub only_with_domains: Option<bool>,
+}
+
 pub enum TenantIdentifier<'a> {
     Id(&'a TenantId),
     ScopedVaultId(&'a ScopedVaultId),
@@ -111,6 +120,11 @@ pub struct NewIntegrationTestTenant {
     pub domains: Vec<String>,
 }
 
+pub struct UserCounts {
+    pub live: i64,
+    pub sandbox: i64,
+}
+
 impl Tenant {
     fn query(id: TenantIdentifier) -> BoxedQuery<Pg> {
         match id {
@@ -141,13 +155,58 @@ impl Tenant {
         Ok(tenant)
     }
 
-    #[tracing::instrument("Tenant::list_live", skip_all)]
+    #[tracing::instrument("Tenant::list_billable", skip_all)]
     pub fn list_billable(conn: &mut PgConn) -> DbResult<Vec<Self>> {
         let results = tenant::table
             .filter(tenant::sandbox_restricted.eq(false))
             .get_results::<Self>(conn)?
             .into_iter()
             .filter(|t| !t.id.is_integration_test_tenant() && !t.is_demo_tenant)
+            .collect();
+        Ok(results)
+    }
+
+    #[tracing::instrument("Tenant::private_list", skip_all)]
+    pub fn private_list(conn: &mut PgConn, filters: PrivateTenantFilters) -> DbResult<Vec<Self>> {
+        let mut query = tenant::table.into_boxed();
+        let PrivateTenantFilters {
+            search,
+            is_live,
+            only_with_domains,
+        } = filters;
+        if let Some(search) = search {
+            query = query.filter(tenant::name.ilike(format!("%{}%", search)));
+        }
+        if let Some(is_live) = is_live {
+            query = query.filter(tenant::sandbox_restricted.eq(!is_live));
+        }
+        let mut results: Vec<Self> = query.get_results(conn)?;
+
+        if let Some(only_with_domains) = only_with_domains {
+            // Doing this filter in RAM because the tenant table is pretty small and diesel doesn't
+            // have a built-in operator or this
+            results.retain(|t| t.domains.is_empty() != only_with_domains);
+        }
+        Ok(results)
+    }
+
+    #[tracing::instrument("Tenant::private_user_counts", skip_all)]
+    /// Count the number of vaults that exist for each tenant
+    pub fn private_user_counts(conn: &mut PgConn) -> DbResult<HashMap<TenantId, UserCounts>> {
+        let results: Vec<((TenantId, bool), i64)> = scoped_vault::table
+            .group_by((scoped_vault::tenant_id, scoped_vault::is_live))
+            .select(((scoped_vault::tenant_id, scoped_vault::is_live), count_star()))
+            .get_results(conn)?;
+        let results = results
+            .into_iter()
+            .into_group_map_by(|((t_id, _), _)| t_id.clone())
+            .into_iter()
+            .map(|(t_id, results)| {
+                let live = results.iter().filter(|((_, l), _)| *l).map(|(_, c)| c).sum();
+                let sandbox = results.iter().filter(|((_, l), _)| !l).map(|(_, c)| c).sum();
+                let counts = UserCounts { live, sandbox };
+                (t_id, counts)
+            })
             .collect();
         Ok(results)
     }
