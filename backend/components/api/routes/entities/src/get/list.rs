@@ -20,6 +20,7 @@ use db::scoped_vault::ScopedVaultListQueryParams;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::FpId;
+use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
@@ -125,6 +126,13 @@ pub async fn parse_search(
         Ok((None, fp_id))
     } else {
         let search_str = search.clean_for_fingerprint();
+        // See if the search string is a phone number and format it properly for fingerprinting
+        let formatted_phone_numbers = vec![
+            PiiString::new(format!("+1{}", search_str.leak())),
+            search_str.clone(),
+        ]
+        .into_iter()
+        .filter_map(|p| PhoneNumber::parse(p).ok().map(|p| p.e164()));
         // Tokenize the search_str string by splitting on `\s`. This handles cases like a user typing in a full name
         let tokenized = search_str
             .clone()
@@ -132,6 +140,7 @@ pub async fn parse_search(
             .split(' ')
             .map(PiiString::from)
             .chain([search_str]) // Re-add the full search_str token
+            .chain(formatted_phone_numbers) // Add formatted phone numbers
             .collect_vec();
         let fut_fingerprints = tokenized
             .into_iter()
