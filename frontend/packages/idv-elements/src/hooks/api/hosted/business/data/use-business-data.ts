@@ -16,18 +16,9 @@ const businessDataRequest = async (payload: BusinessDataRequest) => {
     method = 'PATCH';
     url = '/hosted/business/vault';
   }
-  // Transform the data into the format expected by the API
+  // Don't send null values
   const data = Object.fromEntries(
-    Object.entries(payload.data)
-      // Don't send null values
-      .filter(e => !!e[1])
-      .map(([k, v]) => {
-        // The backend expects stringified objects/arrays
-        if (typeof v === 'object') {
-          return [k, JSON.stringify(v)];
-        }
-        return [k, v];
-      }),
+    Object.entries(payload.data).filter(e => !!e[1]),
   );
 
   const response = await requestWithoutCaseConverter<BusinessDataResponse>({

@@ -4,7 +4,6 @@ import {
   ALLOW_EXTRA_FIELDS_HEADER,
   AUTH_HEADER,
   IdDI,
-  InvestorProfileDI,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
@@ -21,24 +20,10 @@ const userDataRequest = async (payload: UserDataRequest) => {
   }
 
   const data = Object.fromEntries(
-    Object.entries(payload.data)
+    Object.entries(payload.data).filter(
       // Don't send null values
-      .filter(e => !!e[1] && e[0] !== IdDI.phoneNumber && e[0] !== IdDI.email)
-      .map(([k, v]) => {
-        // The backend expects stringified objects/arrays, except for certain DIs we've transitioned
-        const objectAllowedDis: string[] = [
-          IdDI.citizenships,
-          InvestorProfileDI.investmentGoals,
-          InvestorProfileDI.declarations,
-          InvestorProfileDI.seniorExecutiveSymbols,
-          InvestorProfileDI.familyMemberNames,
-        ];
-        const isObjectAllowed = objectAllowedDis.includes(k);
-        if (typeof v === 'object' && !isObjectAllowed) {
-          return [k, JSON.stringify(v)];
-        }
-        return [k, v];
-      }),
+      e => !!e[1] && e[0] !== IdDI.phoneNumber && e[0] !== IdDI.email,
+    ),
   );
 
   if (!Object.entries(data).length) {
