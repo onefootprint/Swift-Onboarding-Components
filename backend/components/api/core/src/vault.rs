@@ -3,6 +3,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
+use crate::telemetry::RootSpan;
 use crate::types::ResponseData;
 use crate::utils::actix::OptionalJson;
 use crate::utils::db2api::DbToApi;
@@ -32,6 +33,7 @@ pub async fn create_non_portable_vault(
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
     vault_kind: VaultKind,
+    root_span: RootSpan,
 ) -> ApiResult<ResponseData<api_wire_types::UserId>> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
@@ -101,6 +103,7 @@ pub async fn create_non_portable_vault(
             Ok(su)
         })
         .await?;
+    root_span.record("fp_id", scoped_user.fp_id.to_string());
 
     Ok(ResponseData::ok(api_wire_types::UserId::from_db(scoped_user)))
 }
