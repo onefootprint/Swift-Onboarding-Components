@@ -36,7 +36,16 @@ def test_upload_documents(doc_request_sandbox_ob_config, twilio):
         "document_type": "id_card",
         "country_code": "US",
     }
-    post("hosted/user/documents", data, bifrost.auth_token)
+    id = post("hosted/user/documents", data, bifrost.auth_token)["id"]
+    consent_data = {"consent_language_text": "I consent"}
+    post("hosted/user/consent", consent_data, bifrost.auth_token)
+    post(
+        f"hosted/user/documents/{id}/upload/front",
+        None,
+        bifrost.auth_token,
+        files=bifrost.data["document.drivers_license.front.image"],
+    )
+
     data = {
         "document_type": "drivers_license",
         "country_code": "US",

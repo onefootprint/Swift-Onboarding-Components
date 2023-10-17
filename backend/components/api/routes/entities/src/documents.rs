@@ -46,7 +46,10 @@ pub async fn get(
                     let images = d.images(conn, false)?;
                     Ok((d, images))
                 })
-                .collect::<ApiResult<Vec<_>>>()?;
+                .collect::<ApiResult<Vec<_>>>()?
+                .into_iter()
+                .filter(|(_, images)| !images.is_empty())
+                .collect_vec();
             // Since some of our tenants are backfilling the ID doc images they already have,
             // we also have to support rendering documents that only exist in the vault
             // (and not in ID docs)
