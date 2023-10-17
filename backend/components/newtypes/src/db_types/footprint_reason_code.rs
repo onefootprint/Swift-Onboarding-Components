@@ -551,11 +551,11 @@ footprint_reason_code_enum! {
         #[note = "Phone located matches phone number provided", severity = SignalSeverity::Info,  description = "The phone number provided matches the phone number on file."]
         PhoneLocatedMatches,
 
-        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
         #[note = "Phone located partially matches phone number provided", severity = SignalSeverity::Low,  description = "The phone number provided partially matches the phone number on file."]
         PhoneLocatedPartiallyMatches,
 
-        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
         #[note = "Phone located does not match phone number provided", severity = SignalSeverity::Low,  description = "The phone number provided does not match the phone number on file."]
         PhoneLocatedDoesNotMatch,
 
