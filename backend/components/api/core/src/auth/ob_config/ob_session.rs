@@ -7,7 +7,7 @@ use db::{
 use paperclip::actix::Apiv2Security;
 
 use crate::auth::{
-    session::{AuthSessionData, ExtractableAuthSession},
+    session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
     SessionContext,
 };
 use crate::{auth::AuthError, errors::ApiError};
@@ -38,6 +38,7 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
         auth_session: AuthSessionData,
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
+        _: RequestInfo,
     ) -> Result<Self, ApiError> {
         let data = match auth_session {
             AuthSessionData::OnboardingSession(data) => data,

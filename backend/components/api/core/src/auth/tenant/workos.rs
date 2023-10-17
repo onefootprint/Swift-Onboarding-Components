@@ -2,7 +2,9 @@ use std::sync::Arc;
 
 use crate::{
     auth::{
-        session::{tenant::WorkOsSession, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
+        session::{
+            tenant::WorkOsSession, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo,
+        },
         AuthError,
     },
     errors::ApiResult,
@@ -36,6 +38,7 @@ impl ExtractableAuthSession for WorkOsSessionData {
         auth_session: AuthSessionData,
         _: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
+        _: RequestInfo,
     ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::WorkOs(data) => {

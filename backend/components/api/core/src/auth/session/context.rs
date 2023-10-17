@@ -22,7 +22,6 @@ pub struct SessionContext<T> {
     #[deref]
     pub data: T,
     pub auth_token: SessionAuthToken,
-    pub headers: MaskedHeaderMap,
     session: AuthSession,
     // prevents external construction
     pub(super) phantom: PhantomData<()>,
@@ -76,12 +75,21 @@ where
     }
 }
 
-#[derive(Clone)]
-pub struct MaskedHeaderMap(pub(in super::super) HeaderMap);
+pub struct RequestInfo {
+    pub headers: HeaderMap,
+}
 
-impl std::fmt::Debug for MaskedHeaderMap {
+impl<'a> From<&'a actix_web::HttpRequest> for RequestInfo {
+    fn from(value: &'a actix_web::HttpRequest) -> Self {
+        Self {
+            headers: value.headers().clone(),
+        }
+    }
+}
+
+impl std::fmt::Debug for RequestInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("<redacted>")
+        f.write_str("RequestInfo <redacted>")
     }
 }
 
@@ -93,7 +101,7 @@ where
         state: web::Data<State>,
         root_span: <RootSpan as FromRequest>::Future,
         auth_token: Option<PiiString>,
-        headers: MaskedHeaderMap,
+        req: RequestInfo,
     ) -> Pin<Box<dyn Future<Output = ApiResult<Self>>>> {
         Box::pin(async move {
             #[allow(clippy::unwrap_used)]
@@ -118,7 +126,7 @@ where
             let parsed_session_data = state
                 .db_pool
                 .db_query(move |conn| {
-                    T::try_load_session(raw_session_data, conn, ff_client)
+                    T::try_load_session(raw_session_data, conn, ff_client, req)
                         .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers, format!("{:?}", e)))
                 })
                 .await??;
@@ -127,7 +135,6 @@ where
             Ok(Self {
                 data: parsed_session_data,
                 auth_token,
-                headers,
                 session,
                 phantom: PhantomData,
             })
@@ -152,8 +159,8 @@ where
             .filter_map(|h| req.headers().get(h))
             .next()
             .and_then(|hv| hv.to_str().map(PiiString::from).ok());
-        let headers = MaskedHeaderMap(req.headers().clone());
-        Self::build(state, root_span, auth_token, headers)
+        let req = RequestInfo::from(req);
+        Self::build(state, root_span, auth_token, req)
     }
 }
 
@@ -165,14 +172,12 @@ impl<A> SessionContext<A> {
         let SessionContext {
             data,
             auth_token,
-            headers,
             session,
             phantom,
         } = self;
         SessionContext {
             data: f(data),
             auth_token,
-            headers,
             session,
             phantom,
         }
@@ -196,7 +201,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use super::{MaskedHeaderMap, SessionContext};
+    use super::SessionContext;
     use crate::{auth::session::AuthSessionData, utils::session::AuthSession};
     use actix_web::http::header::HeaderMap;
     use chrono::Utc;
@@ -215,7 +220,6 @@ mod test {
             Self {
                 data,
                 auth_token,
-                headers: MaskedHeaderMap(map),
                 session,
                 phantom: PhantomData,
             }

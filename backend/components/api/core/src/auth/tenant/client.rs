@@ -1,6 +1,6 @@
 use crate::{
     auth::{
-        session::{tenant::ClientTenantAuth, AuthSessionData, ExtractableAuthSession, MaskedHeaderMap},
+        session::{tenant::ClientTenantAuth, AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError, CanDecrypt, CanVault, IsGuardMet, SessionContext,
     },
     errors::ApiResult,
@@ -73,11 +73,11 @@ impl actix_web::FromRequest for PathClientTenantAuthContext {
         #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
         let root_span = RootSpan::from_request(req, payload);
-        let headers = MaskedHeaderMap(req.headers().clone());
         let auth_token = Some(PiiString::from(req.match_info().query("token")));
+        let req = RequestInfo::from(req);
 
         Box::pin(async move {
-            let auth = ClientTenantAuthContext::build(state, root_span, auth_token, headers).await?;
+            let auth = ClientTenantAuthContext::build(state, root_span, auth_token, req).await?;
             Ok(Self(auth))
         })
     }
@@ -92,6 +92,7 @@ impl ExtractableAuthSession for ParsedClientTenantData {
         auth_session: AuthSessionData,
         conn: &mut PgConn,
         _: Arc<dyn feature_flag::FeatureFlagClient>,
+        _: RequestInfo,
     ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::ClientTenant(data) => {

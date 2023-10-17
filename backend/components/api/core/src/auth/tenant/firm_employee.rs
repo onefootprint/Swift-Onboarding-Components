@@ -1,6 +1,6 @@
 use crate::{
     auth::{
-        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
+        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -48,6 +48,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         auth_session: AuthSessionData,
         conn: &mut PgConn,
         ff_client: Arc<dyn FeatureFlagClient>,
+        _: RequestInfo,
     ) -> ApiResult<Self> {
         // Uniquely, this kind of auth allows extracting the user from two different types of tokens
         let (tenant_user, auth_method) = match auth_session {

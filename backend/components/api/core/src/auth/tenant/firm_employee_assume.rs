@@ -3,7 +3,7 @@ use std::sync::Arc;
 use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
 use crate::{
     auth::{
-        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
+        session::{get_is_live, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -28,6 +28,7 @@ pub struct FirmEmployeeAssumeAuth {
     tenant_user: TenantUser,
     role: TenantRole,
     is_risk_ops: bool,
+    is_live: bool,
     pub(super) auth_method: WorkosAuthMethod,
 }
 
@@ -58,6 +59,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
         auth_session: AuthSessionData,
         conn: &mut PgConn,
         ff_client: Arc<dyn FeatureFlagClient>,
+        req: RequestInfo,
     ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::FirmEmployee(data) => data,
@@ -78,6 +80,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
         let role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, kind)?;
 
         let is_risk_ops = ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
+        let is_live = get_is_live(&req).unwrap_or(!tenant.sandbox_restricted);
 
         tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee in assume session");
         Ok(Self(FirmEmployeeAssumeAuth {
@@ -85,6 +88,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
             tenant_user,
             role,
             is_risk_ops,
+            is_live,
             auth_method: data.auth_method,
         }))
     }
@@ -92,6 +96,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
         root_span.record("tenant_id", &self.0.tenant.id.to_string());
         root_span.record("tenant_user_id", &self.0.tenant_user.id.to_string());
+        root_span.record("is_live", self.0.is_live);
     }
 }
 
@@ -144,22 +149,11 @@ impl CanCheckTenantGuard for FirmEmployeeAssumeAuthContext {
 
 impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
     fn is_live(&self) -> ApiResult<bool> {
-        // TODO dedupe this logic
-        let is_live: Option<bool> = self
-            .headers
-            .0
-            .get("x-is-live".to_owned())
-            .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .and_then(|v| v.trim().parse::<bool>().ok());
-
-        // error if the tenant is sandbox-restricted but is requesting live data
-        let is_sandbox_restricted = self.tenant.sandbox_restricted;
-        if is_sandbox_restricted && is_live == Some(true) {
+        if self.tenant.sandbox_restricted && self.is_live {
+            // error if the tenant is sandbox-restricted but is requesting live data
             return Err(AuthError::SandboxRestricted.into());
         }
-
-        // otherwise return the default of the sent header or live if not restricted
-        Ok(is_live.unwrap_or(!is_sandbox_restricted))
+        Ok(self.is_live)
     }
 
     fn tenant(&self) -> &Tenant {
@@ -214,6 +208,7 @@ mod test {
             tenant_user,
             role,
             is_risk_ops,
+            is_live: true,
             auth_method: WorkosAuthMethod::GoogleOauth,
         };
         let data = ParsedFirmEmployeeAssumeAuth(data);

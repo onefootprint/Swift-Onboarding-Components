@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     auth::{
-        session::{AuthSessionData, ExtractableAuthSession},
+        session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -41,6 +41,7 @@ impl ExtractableAuthSession for ParsedBoSession {
         auth_session: AuthSessionData,
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
+        _: RequestInfo,
     ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::BusinessOwner(data) => data,

@@ -13,7 +13,7 @@ use crate::{
     auth::{
         session::{
             user::{AuthFactor, UserSession, UserSessionArgs},
-            AllowSessionUpdate, AuthSessionData, ExtractableAuthSession,
+            AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo,
         },
         user::UserAuth,
         AuthError, IsGuardMet, SessionContext,
@@ -129,6 +129,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
         value: AuthSessionData,
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
+        _: RequestInfo,
     ) -> Result<Self, ApiError> {
         match value {
             AuthSessionData::User(data) => {

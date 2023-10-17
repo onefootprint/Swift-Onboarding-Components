@@ -3,7 +3,10 @@ use std::sync::Arc;
 use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
 use crate::{
     auth::{
-        session::{tenant::TenantRbSession, AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
+        session::{
+            get_is_live, tenant::TenantRbSession, AllowSessionUpdate, AuthSessionData,
+            ExtractableAuthSession, RequestInfo,
+        },
         AuthError, SessionContext,
     },
     errors::ApiResult,
@@ -28,6 +31,7 @@ pub struct TenantRbAuth {
     tenant_user: TenantUser,
     #[allow(unused)]
     tenant_rolebinding: TenantRolebinding,
+    is_live: bool,
     pub(super) auth_method: WorkosAuthMethod,
 }
 
@@ -71,6 +75,7 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
         auth_session: AuthSessionData,
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
+        req: RequestInfo,
     ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::TenantRb(data) => data,
@@ -79,6 +84,7 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
             }
         };
         let (tu, rb, tr, tenant) = TenantRolebinding::get(conn, &data.tenant_rolebinding_id)?;
+        let is_live = get_is_live(&req).unwrap_or(!tenant.sandbox_restricted);
 
         tracing::info!(tenant_id=%tenant.id, tenant_role_id=%tr.id, tenant_rb_id=%rb.id, tenant_user_id=%tu.id, "authenticated");
 
@@ -87,6 +93,7 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
             tenant_rolebinding: rb,
             tenant_role: tr,
             tenant_user: tu,
+            is_live,
             auth_method: data.auth_method,
         }))
     }
@@ -94,6 +101,7 @@ impl ExtractableAuthSession for ParsedTenantRbAuth {
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
         root_span.record("tenant_id", &self.0.tenant.id.to_string());
         root_span.record("tenant_user_id", &self.0.tenant_user.id.to_string());
+        root_span.record("is_live", self.0.is_live);
     }
 }
 
@@ -124,22 +132,11 @@ impl CanCheckTenantGuard for TenantRbAuthContext {
 
 impl TenantAuth for SessionContext<TenantRbAuth> {
     fn is_live(&self) -> ApiResult<bool> {
-        // TODO dedupe and put on root_span
-        let is_live: Option<bool> = self
-            .headers
-            .0
-            .get("x-is-live".to_owned())
-            .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .and_then(|v| v.trim().parse::<bool>().ok());
-
-        // error if the tenant is sandbox-restricted but is requesting live data
-        let is_sandbox_restricted = self.tenant().sandbox_restricted;
-        if is_sandbox_restricted && is_live == Some(true) {
+        if self.tenant().sandbox_restricted && self.is_live {
+            // error if the tenant is sandbox-restricted but is requesting live data
             return Err(AuthError::SandboxRestricted.into());
         }
-
-        // otherwise return the default of the sent header or live if not restricted
-        Ok(is_live.unwrap_or(!is_sandbox_restricted))
+        Ok(self.is_live)
     }
 
     fn tenant(&self) -> &Tenant {

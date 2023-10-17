@@ -17,7 +17,7 @@ use paperclip::actix::Apiv2Security;
 
 use crate::{
     auth::{
-        session::{AuthSessionData, ExtractableAuthSession},
+        session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError, IsGuardMet, SessionContext,
     },
     errors::{onboarding::OnboardingError, ApiResult},
@@ -57,10 +57,13 @@ impl ExtractableAuthSession for ParsedUserWfSession {
         value: AuthSessionData,
         conn: &mut PgConn,
         ff_client: Arc<dyn FeatureFlagClient>,
+        req: RequestInfo,
     ) -> Result<Self, ApiError> {
         // Since this is derived from a user session, we just grab all the user info
-        let user_session =
-            <ParsedUserSessionContext as ExtractableAuthSession>::try_load_session(value, conn, ff_client)?.0;
+        let user_session = <ParsedUserSessionContext as ExtractableAuthSession>::try_load_session(
+            value, conn, ff_client, req,
+        )?
+        .0;
 
         let scoped_user = user_session
             .scoped_user
