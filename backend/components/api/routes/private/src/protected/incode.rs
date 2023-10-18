@@ -12,7 +12,7 @@ use db::models::{
     incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
     scoped_vault::ScopedVault,
 };
-use newtypes::{DecisionIntentKind, IncodeVerificationSessionId, IncodeVerificationSessionKind};
+use newtypes::{DecisionIntentKind, IncodeVerificationSessionId, IncodeVerificationSessionKind, IncodeEnvironment};
 
 #[derive(Debug, serde::Deserialize)]
 pub struct Request {
@@ -24,6 +24,7 @@ pub struct Request {
     /// Be aware that this will change the display in the dashboard
     i_acknowledge_that_i_re_enabled_my_upload: Option<bool>,
     force_no_selfie: Option<bool>,
+    environment: Option<IncodeEnvironment>
 }
 
 #[post("/private/incode/re_run")]
@@ -36,6 +37,7 @@ pub async fn rerun_machine(
         id,
         i_acknowledge_that_i_re_enabled_my_upload,
         force_no_selfie,
+        environment,
     } = request.into_inner();
     if !i_acknowledge_that_i_re_enabled_my_upload.unwrap_or_default() {
         return Err(
@@ -66,13 +68,12 @@ pub async fn rerun_machine(
                 old_session.kind
             };
             let config_id = old_session.incode_configuration_id.clone();
-            // TODO: override this
             IncodeVerificationSession::create(
                 conn,
                 id_doc.id.clone(),
                 config_id,
                 kind,
-                old_session.incode_environment,
+                environment.or(old_session.incode_environment),
             )?;
             Ok((id_doc, dr, su, di, uvw, obc))
         })

@@ -191,6 +191,7 @@ crate::util::impl_enum_str_diesel!(IncodeVerificationSessionKind);
     AsExpression,
     FromSqlRow,
     EnumString,
+    Deserialize,
     EnumIter,
     AsRefStr,
     macros::SerdeAttr,
