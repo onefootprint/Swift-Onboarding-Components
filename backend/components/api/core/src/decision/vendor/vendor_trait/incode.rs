@@ -432,7 +432,12 @@ impl VendorAPICall<IncodeGetOnboardingStatusRequest, IncodeResponse<GetOnboardin
             AuthenticatedIncodeClientAdapter::new(client, request.credentials.authentication_token)?;
 
         let raw_response = authenticated_client
-            .poll_get_onboarding_status(self, request.session_kind, request.incode_verification_session_id)
+            .poll_get_onboarding_status(
+                self,
+                request.session_kind,
+                request.incode_verification_session_id,
+                request.wait_for_selfie,
+            )
             .await?;
 
         let result = IncodeResponse::<GetOnboardingStatusResponse> {

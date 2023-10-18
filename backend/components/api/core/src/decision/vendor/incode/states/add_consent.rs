@@ -1,5 +1,5 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddSelfie, IncodeStateTransition,
+    map_to_api_err, save_incode_verification_result, IncodeStateTransition, ProcessId,
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::state::{IncodeState, TransitionResult};
@@ -7,13 +7,28 @@ use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::{ApiResult, AssertionError};
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
+use db::models::identity_document::{IdentityDocument, IdentityDocumentUpdate};
 use db::models::user_consent::UserConsent;
 use db::{DbPool, TxnPgConn};
 use idv::incode::doc::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
-use newtypes::VendorAPI;
+use newtypes::{IdentityDocumentId, IdentityDocumentStatus, VendorAPI};
 
 /// Add Consent
 pub struct AddConsent {}
+
+impl AddConsent {
+    pub fn enter(conn: &mut TxnPgConn, id_doc_id: &IdentityDocumentId) -> ApiResult<()> {
+        // Update IdentityDocument to status = complete so we clear the Bifrost req
+        // TODO: we are setting status to complete here but set completed_seqno later- is that gunna cause any problems??
+        // It would actually be nice to write the timeline event, vault the docs, etc here but it sounds like the problem is our DI data model requires us to know the doc type and we can't confirm that until the processing part of the flow is complete
+        let update = IdentityDocumentUpdate {
+            status: Some(IdentityDocumentStatus::Complete),
+            ..Default::default()
+        };
+        IdentityDocument::update(conn, id_doc_id, update)?;
+        Ok(())
+    }
+}
 
 #[async_trait]
 impl IncodeStateTransition for AddConsent {
@@ -23,11 +38,6 @@ impl IncodeStateTransition for AddConsent {
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>> {
-        if ctx.docv_data.selfie_image.is_none() {
-            // Since consent is collected at the same time as the selfie image, don't run if it
-            // isn't provided
-            return Ok(None);
-        };
         let wf_id = ctx.wf_id.clone();
         let consent = db_pool
             .db_query(move |conn| UserConsent::get_for_workflow(conn, &wf_id))
@@ -78,13 +88,14 @@ impl IncodeStateTransition for AddConsent {
         self,
         _: &mut TxnPgConn,
         _: &IncodeContext,
-        _: &VerificationSession,
+        session: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
-        let next = AddSelfie::new();
+        let next = Self::next_state(session);
         Ok(next.into())
     }
 
+    // We always add consent, so if this is a selfie, continue, or poll
     fn next_state(_: &VerificationSession) -> IncodeState {
-        AddSelfie::new()
+        ProcessId::new()
     }
 }

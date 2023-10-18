@@ -1,6 +1,6 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddBack, AddSideResponseHelper, IncodeStateTransition,
-    ProcessId, SaveVerificationResultArgs, VerificationSession,
+    map_to_api_err, save_incode_verification_result, AddBack, AddConsent, AddSelfie, AddSideResponseHelper,
+    IncodeStateTransition, SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::state::{IncodeState, TransitionResult};
 use crate::decision::vendor::incode::IncodeContext;
@@ -118,8 +118,10 @@ impl IncodeStateTransition for AddFront {
     fn next_state(session: &VerificationSession) -> IncodeState {
         if session.document_type.sides().contains(&DocumentSide::Back) {
             AddBack::new()
+        } else if session.kind.requires_selfie() {
+            AddSelfie::new()
         } else {
-            ProcessId::new()
+            AddConsent::new()
         }
     }
 }

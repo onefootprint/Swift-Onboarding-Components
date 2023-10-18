@@ -4,6 +4,7 @@ use std::sync::Arc;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_upload::DocumentUpload;
+use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::verification_request::VerificationRequest;
 
 mod start_onboarding;
@@ -68,6 +69,18 @@ pub struct VerificationSession {
     pub credentials: IncodeCredentialsWithToken,
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
     pub document_type: IdDocKind,
+}
+
+impl VerificationSession {
+    pub fn refresh(self, incode_verification_session: &IncodeVerificationSession) -> Self {
+        Self {
+            id: self.id,
+            kind: self.kind,
+            credentials: self.credentials,
+            ignored_failure_reasons: incode_verification_session.ignored_failure_reasons.clone(),
+            document_type: self.document_type,
+        }
+    }
 }
 
 /// Struct to make sure we handle the different cases of Incode vendor call errors we may see

@@ -7,26 +7,12 @@ use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
-use db::models::identity_document::{IdentityDocument, IdentityDocumentUpdate};
+
 use db::{DbPool, TxnPgConn};
 use idv::incode::doc::IncodeGetOnboardingStatusRequest;
-use newtypes::{IdentityDocumentId, IdentityDocumentStatus, VendorAPI};
+use newtypes::VendorAPI;
 
 pub struct GetOnboardingStatus {}
-
-impl GetOnboardingStatus {
-    pub fn enter(conn: &mut TxnPgConn, id_doc_id: &IdentityDocumentId) -> ApiResult<()> {
-        // Update IdentityDocument to status = complete so we clear the Bifrost req
-        // TODO: we are setting status to complete here but set completed_seqno later- is that gunna cause any problems??
-        // It would actually be nice to write the timeline event, vault the docs, etc here but it sounds like the problem is our DI data model requires us to know the doc type and we can't confirm that until the processing part of the flow is complete
-        let update = IdentityDocumentUpdate {
-            status: Some(IdentityDocumentStatus::Complete),
-            ..Default::default()
-        };
-        IdentityDocument::update(conn, id_doc_id, update)?;
-        Ok(())
-    }
-}
 
 #[async_trait]
 impl IncodeStateTransition for GetOnboardingStatus {
@@ -41,6 +27,10 @@ impl IncodeStateTransition for GetOnboardingStatus {
             credentials: session.credentials.clone(),
             session_kind: session.kind,
             incode_verification_session_id: session.id.clone(),
+            wait_for_selfie: !session
+                .ignored_failure_reasons
+                .iter()
+                .any(|r| r.selfie_processing_failed()),
         };
         let res = clients.incode_get_onboarding_status.make_request(request).await;
 

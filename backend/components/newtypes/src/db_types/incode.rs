@@ -46,13 +46,14 @@ impl IncodeVerificationSessionState {
             Self::StartOnboarding
             | Self::AddFront
             | Self::AddBack
-            | Self::AddConsent
             | Self::AddSelfie
-            | Self::ProcessId
-            | Self::ProcessFace
             | Self::Complete
             | Self::Fail => false,
-            Self::GetOnboardingStatus | Self::FetchScores => true,
+            Self::GetOnboardingStatus
+            | Self::FetchScores
+            | Self::AddConsent
+            | Self::ProcessId
+            | Self::ProcessFace => true,
         }
     }
 }
@@ -138,6 +139,10 @@ impl IncodeFailureReason {
 
     pub fn can_proceed_immediately_if_present(&self) -> bool {
         matches!(self, Self::DriversLicensePermitNotAllowed)
+    }
+
+    pub fn selfie_processing_failed(&self) -> bool {
+        matches!(self, Self::SelfieFaceNotFound)
     }
 }
 

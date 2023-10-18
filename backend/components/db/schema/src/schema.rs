@@ -373,6 +373,7 @@ table! {
         identity_document_id -> Text,
         kind -> Text,
         latest_failure_reasons -> Array<Text>,
+        ignored_failure_reasons -> Array<Text>,
     }
 }
 

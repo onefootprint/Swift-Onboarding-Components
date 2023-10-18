@@ -617,7 +617,7 @@ pub struct GetOnboardingStatusResponse {
     pub onboarding_status: String,
 }
 impl GetOnboardingStatusResponse {
-    pub fn ready(&self, session_kind: &IncodeVerificationSessionKind) -> bool {
+    pub fn ready(&self, session_kind: &IncodeVerificationSessionKind, wait_for_selfie: bool) -> bool {
         match session_kind {
             // When raised it's safe to get scores from the ID Validation Process.  It's also safe to get OCR data
             IncodeVerificationSessionKind::IdDocument => {
@@ -626,8 +626,12 @@ impl GetOnboardingStatusResponse {
             }
             // Safe to get scores for liveness, facial recognition and overall (if the flow is simply IDV/selfie)
             IncodeVerificationSessionKind::Selfie => {
-                (self.onboarding_status == *"FACE_VALIDATION_FINISHED")
-                    || (self.onboarding_status == *"POST_PROCESSING_FINISHED")
+                if wait_for_selfie {
+                    self.onboarding_status == *"FACE_VALIDATION_FINISHED"
+                } else {
+                    (self.onboarding_status == *"ID_VALIDATION_FINISHED")
+                        || (self.onboarding_status == *"POST_PROCESSING_FINISHED")
+                }
             }
         }
     }

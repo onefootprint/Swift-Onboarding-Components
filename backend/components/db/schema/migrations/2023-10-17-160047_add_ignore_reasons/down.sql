@@ -1,0 +1,1 @@
+ALTER TABLE incode_verification_session_event DROP COLUMN ignored_failure_reasons;

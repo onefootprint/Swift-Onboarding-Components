@@ -212,10 +212,19 @@ where
                     all_failure_reasons,
                     new_ignore_reasons,
                 );
-                IncodeVerificationSession::update(conn, &session.id, update)?;
+
+                if matches!(next_state, IncodeState::AddConsent(_)) {
+                    AddConsent::enter(conn, &ctx.id_doc_id)?;
+                }
+
+                let ivs = IncodeVerificationSession::update(conn, &session.id, update)?;
+                // refresh our VerificationSession object that we pass around from IncodeState to IncodeState
+                let session = session.refresh(&ivs);
+
                 Ok((next_state, step_result, ctx, session))
             })
             .await?;
+
         Ok(result)
     }
 }

@@ -365,6 +365,7 @@ impl AuthenticatedIncodeClientAdapter {
         footprint_http_client: &FootprintVendorHttpClient,
         session_kind: IncodeVerificationSessionKind,
         incode_verification_session_id: IncodeVerificationSessionId,
+        wait_for_selfie: bool,
     ) -> Result<serde_json::Value, IncodeError> {
         let url = self.client_adapter.api_url("omni/get/onboarding/status")?;
         let response: serde_json::Value = footprint_http_client
@@ -378,8 +379,8 @@ impl AuthenticatedIncodeClientAdapter {
             .await?;
 
         let parsed: GetOnboardingStatusResponse = serde_json::from_value(response.clone())?;
-        if !parsed.ready(&session_kind) {
-            tracing::info!(status=%parsed.onboarding_status, session_kind=%session_kind, incode_verification_session_id=%incode_verification_session_id, "incode GetOnboardingStatusResponse not ready");
+        if !parsed.ready(&session_kind, wait_for_selfie) {
+            tracing::info!(status=%parsed.onboarding_status, session_kind=%session_kind, incode_verification_session_id=%incode_verification_session_id, wait_for_selfie=wait_for_selfie, "incode GetOnboardingStatusResponse not ready");
             return Err(IncodeError::ResultsNotReady);
         }
 
@@ -396,8 +397,9 @@ impl AuthenticatedIncodeClientAdapter {
         footprint_http_client: &FootprintVendorHttpClient,
         session_kind: IncodeVerificationSessionKind,
         incode_verification_session_id: IncodeVerificationSessionId,
+        wait_for_selfie: bool,
     ) -> Result<serde_json::Value, IncodeError> {
-        let retry_strategy = FixedInterval::from_millis(1000).take(30);
+        let retry_strategy = FixedInterval::from_millis(1000).take(10);
 
         let response = RetryIf::spawn(
             retry_strategy,
@@ -406,6 +408,7 @@ impl AuthenticatedIncodeClientAdapter {
                     footprint_http_client,
                     session_kind.to_owned(),
                     incode_verification_session_id.to_owned(),
+                    wait_for_selfie,
                 )
             },
             Self::session_results_are_not_ready,
@@ -642,6 +645,7 @@ mod tests {
                 &fp_client,
                 IncodeVerificationSessionKind::Selfie,
                 IncodeVerificationSessionId::from("ivs1234".to_string()),
+                true,
             )
             .await;
         assert!(status_res.is_err());
@@ -679,6 +683,7 @@ mod tests {
                 &fp_client,
                 IncodeVerificationSessionKind::Selfie,
                 IncodeVerificationSessionId::from("ivs1234".to_string()),
+                true,
             )
             .await
             .expect("results weren't ready after polling!");

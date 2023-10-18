@@ -1,5 +1,5 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddConsent, GetOnboardingStatus, IncodeStateTransition,
+    map_to_api_err, save_incode_verification_result, GetOnboardingStatus, IncodeStateTransition, ProcessFace,
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::state::IncodeState;
@@ -21,53 +21,52 @@ impl IncodeStateTransition for ProcessId {
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>> {
-        // make the request to incode
-        let request = IncodeProcessIdRequest {
-            credentials: session.credentials.clone(),
-        };
-        let res = clients.incode_process_id.make_request(request).await;
-
-        // Save our result
-        let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeProcessId, ctx);
-        save_incode_verification_result(db_pool, args).await?;
-
-        // Now ensure we don't have an error
-        res.map_err(map_to_api_err)?
-            .result
-            .into_success()
-            .map_err(map_to_api_err)?;
+        process_id_inner(db_pool, clients, ctx, session).await?;
 
         Ok(Some(Self {}))
     }
 
     fn transition(
         self,
-        conn: &mut TxnPgConn,
-        ctx: &IncodeContext,
+        _: &mut TxnPgConn,
+        _: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
-        let next = next_state(session);
-        if matches!(next, IncodeState::GetOnboardingStatus(_)) {
-            GetOnboardingStatus::enter(conn, &ctx.id_doc_id)?;
-        }
+        let next = Self::next_state(session);
         Ok(next.into())
     }
 
     // After processing the ID portion, we move on to selfie if applicable, or start polling for scores
     fn next_state(session: &VerificationSession) -> IncodeState {
         if session.kind.requires_selfie() {
-            AddConsent::new()
+            ProcessFace::new()
         } else {
             GetOnboardingStatus::new()
         }
     }
 }
 
-// After processing the ID portion, we move on to selfie if applicable, or start polling for scores
-fn next_state(session: &VerificationSession) -> IncodeState {
-    if session.kind.requires_selfie() {
-        AddConsent::new()
-    } else {
-        GetOnboardingStatus::new()
-    }
+async fn process_id_inner(
+    db_pool: &DbPool,
+    clients: &IncodeClients,
+    ctx: &IncodeContext,
+    session: &VerificationSession,
+) -> ApiResult<()> {
+    // make the request to incode
+    let request = IncodeProcessIdRequest {
+        credentials: session.credentials.clone(),
+    };
+    let res = clients.incode_process_id.make_request(request).await;
+
+    // Save our result
+    let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeProcessId, ctx);
+    save_incode_verification_result(db_pool, args).await?;
+
+    // Now ensure we don't have an error
+    res.map_err(map_to_api_err)?
+        .result
+        .into_success()
+        .map_err(map_to_api_err)?;
+
+    Ok(())
 }

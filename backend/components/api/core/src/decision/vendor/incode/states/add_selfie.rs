@@ -1,5 +1,5 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeStateTransition, ProcessFace,
+    map_to_api_err, save_incode_verification_result, AddConsent, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
 use crate::decision::vendor::incode::state::{IncodeState, TransitionResult};
@@ -60,7 +60,7 @@ impl IncodeStateTransition for AddSelfie {
     }
 
     fn next_state(_: &VerificationSession) -> IncodeState {
-        ProcessFace::new()
+        AddConsent::new()
     }
 }
 
@@ -101,4 +101,3 @@ async fn add_selfie_inner(
 
     Ok(failure_reasons)
 }
-// DisableSelfieChecking

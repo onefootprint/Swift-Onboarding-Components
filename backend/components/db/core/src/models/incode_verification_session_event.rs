@@ -20,6 +20,7 @@ pub struct IncodeVerificationSessionEvent {
     pub kind: IncodeVerificationSessionKind,
     /// Not used by application code anywhere, just used for debugging
     pub latest_failure_reasons: Vec<IncodeFailureReason>,
+    pub ignored_failure_reasons: Vec<IncodeFailureReason>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -31,10 +32,11 @@ pub struct NewIncodeVerificationSessionEvent {
     pub identity_document_id: IdentityDocumentId,
     pub kind: IncodeVerificationSessionKind,
     pub latest_failure_reasons: Vec<IncodeFailureReason>,
+    pub ignored_failure_reasons: Vec<IncodeFailureReason>,
 }
 
 impl IncodeVerificationSessionEvent {
-    #[tracing::instrument("IncodeVerificationSessionEvent::get", skip_all)]
+    #[tracing::instrument("IncodeVerificationSessionEvent::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
         incode_verification_session_id: IncodeVerificationSessionId,
@@ -42,6 +44,7 @@ impl IncodeVerificationSessionEvent {
         identity_document_id: IdentityDocumentId,
         latest_failure_reasons: Vec<IncodeFailureReason>,
         kind: IncodeVerificationSessionKind,
+        ignored_failure_reasons: Vec<IncodeFailureReason>,
     ) -> DbResult<Self> {
         let new_req = NewIncodeVerificationSessionEvent {
             created_at: Utc::now(),
@@ -50,6 +53,7 @@ impl IncodeVerificationSessionEvent {
             identity_document_id,
             latest_failure_reasons,
             kind,
+            ignored_failure_reasons,
         };
 
         let res = diesel::insert_into(incode_verification_session_event::table)

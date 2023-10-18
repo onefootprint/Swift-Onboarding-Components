@@ -21,36 +21,46 @@ impl IncodeStateTransition for ProcessFace {
         ctx: &IncodeContext,
         session: &VerificationSession,
     ) -> ApiResult<Option<Self>> {
-        // make the request to incode
-        let request = IncodeProcessFaceRequest {
-            credentials: session.credentials.clone(),
-        };
-        let res = clients.incode_process_face.make_request(request).await;
-
-        // Save our result
-        let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeProcessFace, ctx);
-        save_incode_verification_result(db_pool, args).await?;
-
-        // Now ensure we don't have an error
-        res.map_err(map_to_api_err)?
-            .result
-            .into_success()
-            .map_err(map_to_api_err)?;
+        process_face_inner(db_pool, clients, ctx, session).await?;
 
         Ok(Some(Self {}))
     }
 
     fn transition(
         self,
-        conn: &mut TxnPgConn,
-        ctx: &IncodeContext,
-        _: &VerificationSession,
+        _: &mut TxnPgConn,
+        _: &IncodeContext,
+        session: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
-        GetOnboardingStatus::enter(conn, &ctx.id_doc_id)?;
-        Ok(GetOnboardingStatus::new().into())
+        Ok(Self::next_state(session).into())
     }
 
     fn next_state(_: &VerificationSession) -> IncodeState {
         GetOnboardingStatus::new()
     }
+}
+
+pub async fn process_face_inner(
+    db_pool: &DbPool,
+    clients: &IncodeClients,
+    ctx: &IncodeContext,
+    session: &VerificationSession,
+) -> ApiResult<()> {
+    // make the request to incode
+    let request = IncodeProcessFaceRequest {
+        credentials: session.credentials.clone(),
+    };
+    let res = clients.incode_process_face.make_request(request).await;
+
+    // Save our result
+    let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeProcessFace, ctx);
+    save_incode_verification_result(db_pool, args).await?;
+
+    // Now ensure we don't have an error
+    res.map_err(map_to_api_err)?
+        .result
+        .into_success()
+        .map_err(map_to_api_err)?;
+
+    Ok(())
 }

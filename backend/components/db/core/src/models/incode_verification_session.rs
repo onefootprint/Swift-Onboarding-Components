@@ -127,6 +127,7 @@ impl IncodeVerificationSession {
             res.identity_document_id.clone(),
             vec![],
             kind,
+            vec![],
         )?;
 
         Ok(res)
@@ -160,6 +161,7 @@ impl IncodeVerificationSession {
             res.identity_document_id.clone(),
             res.latest_failure_reasons.clone(),
             res.kind,
+            res.ignored_failure_reasons.clone(),
         )?;
 
         Ok(res)
