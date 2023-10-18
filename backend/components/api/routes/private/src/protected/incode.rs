@@ -12,7 +12,7 @@ use db::models::{
     incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
     scoped_vault::ScopedVault,
 };
-use newtypes::{DecisionIntentKind, IncodeVerificationSessionId};
+use newtypes::{DecisionIntentKind, IncodeVerificationSessionId, IncodeVerificationSessionKind};
 
 #[derive(Debug, serde::Deserialize)]
 pub struct Request {
@@ -23,6 +23,7 @@ pub struct Request {
     /// to null and failure_reasons to an emptyarray.
     /// Be aware that this will change the display in the dashboard
     i_acknowledge_that_i_re_enabled_my_upload: Option<bool>,
+    force_no_selfie: Option<bool>,
 }
 
 #[post("/private/incode/re_run")]
@@ -34,12 +35,15 @@ pub async fn rerun_machine(
     let Request {
         id,
         i_acknowledge_that_i_re_enabled_my_upload,
+        force_no_selfie,
     } = request.into_inner();
     if !i_acknowledge_that_i_re_enabled_my_upload.unwrap_or_default() {
         return Err(
             AssertionError("Please acknowledge that you re-enabled the relevant DocumentUpload").into(),
         );
     }
+
+    let force_no_selfie = force_no_selfie.unwrap_or_default();
 
     let (id_doc, dr, su, di, uvw, obc) = state
         .db_pool
@@ -56,12 +60,13 @@ pub async fn rerun_machine(
             // Deactivate the old IVS
             IncodeVerificationSession::deactivate(conn, &old_session.id)?;
             // Make a new IVS
-            IncodeVerificationSession::create(
-                conn,
-                id_doc.id.clone(),
-                old_session.incode_configuration_id.clone(),
-                old_session.kind,
-            )?;
+            let kind = if force_no_selfie {
+                IncodeVerificationSessionKind::IdDocument
+            } else {
+                old_session.kind
+            };
+            let config_id = old_session.incode_configuration_id.clone();
+            IncodeVerificationSession::create(conn, id_doc.id.clone(), config_id, kind)?;
             Ok((id_doc, dr, su, di, uvw, obc))
         })
         .await?;
