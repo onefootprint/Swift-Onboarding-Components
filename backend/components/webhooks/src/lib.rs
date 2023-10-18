@@ -97,16 +97,12 @@ impl WebhookClient for WebhookServiceClient {
         let client = self.clone();
         tokio::spawn(async move {
             // TODO: we may want to support some retry here in the future
-            let _ = client
-                .send_event_to_tenant(tenant, event, idempotency_key)
-                .await
-                .map_err(|err| {
-                    tracing::error!(?err, "failed to send webhook event");
-                });
+            let _ = client.send_event_to_tenant(tenant, event, idempotency_key).await;
         });
     }
 
     /// Send a webhook event to tenant if it's been configured
+    #[tracing::instrument(skip_all, err)]
     async fn send_event_to_tenant(
         &self,
         tenant: WebhookApp,
