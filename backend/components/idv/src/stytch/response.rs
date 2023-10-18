@@ -60,7 +60,7 @@ impl Verdict {
     pub fn reasons(&self) -> Vec<Reason> {
         self.reasons
             .clone()
-            .unwrap_or(vec![])
+            .unwrap_or_default()
             .iter()
             .flat_map(|s| match Reason::try_from(s.as_str()) {
                 Ok(r) => Some(r),

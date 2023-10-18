@@ -7,11 +7,9 @@ pub fn watchlist_hit_rule<T: FeatureSet + Clone>() -> Rule<T> {
         rule: {
             |f: &T| {
                 f.footprint_reason_codes().iter().any(|rc| {
-                    vec![
-                        FootprintReasonCode::WatchlistHitOfac,
+                    [FootprintReasonCode::WatchlistHitOfac,
                         FootprintReasonCode::WatchlistHitNonSdn,
-                        FootprintReasonCode::WatchlistHitPep,
-                    ]
+                        FootprintReasonCode::WatchlistHitPep]
                     .contains(rc)
                 })
             }
@@ -28,10 +26,8 @@ pub fn aml_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
             rule: {
                 |f: &Vec<FootprintReasonCode>| {
                     f.iter().any(|rc| {
-                        vec![
-                            FootprintReasonCode::WatchlistHitOfac,
-                            FootprintReasonCode::WatchlistHitNonSdn,
-                        ]
+                        [FootprintReasonCode::WatchlistHitOfac,
+                            FootprintReasonCode::WatchlistHitNonSdn]
                         .contains(rc)
                     })
                 }

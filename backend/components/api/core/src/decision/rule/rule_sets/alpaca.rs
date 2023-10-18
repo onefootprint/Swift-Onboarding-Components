@@ -5,7 +5,7 @@ use crate::decision::rule::rule_set::Rule;
 pub fn alpaca_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
     super::kyc::kyc_rules()
         .into_iter()
-        .chain(field_validation_rules().into_iter())
+        .chain(field_validation_rules())
         .collect()
 }
 fn field_validation_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {

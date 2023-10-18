@@ -338,7 +338,7 @@ pub(super) fn inner_verify_and_parse_receipt(
         .map(|seq| -> Result<_, AttestationError> {
             let seq = seq.as_sequence()?;
             if seq.len() != 3 {
-                return Err(DeviceCheckError::InvalidReceiptValue)?;
+                Err(DeviceCheckError::InvalidReceiptValue)?;
             }
 
             let typ = seq[0].as_u64()?;

@@ -77,7 +77,7 @@ impl IDologyFeatures {
 
         reason_codes = reason_codes
             .into_iter()
-            .chain(restriction_reason_codes.into_iter())
+            .chain(restriction_reason_codes)
             .collect();
         //
         // Construct final set of codes
@@ -90,7 +90,7 @@ impl IDologyFeatures {
             // Important Note: When Idology does not locate an id, they do not provide additional match related signals specifying how identity attributes match.
             reason_codes
                 .into_iter()
-                .chain(vec![FootprintReasonCode::IdNotLocated].into_iter())
+                .chain(vec![FootprintReasonCode::IdNotLocated])
                 .collect()
         } else {
             // If ID was located, continue with the logic to add in match codes

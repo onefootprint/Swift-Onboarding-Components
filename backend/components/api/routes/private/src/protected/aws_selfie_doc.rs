@@ -2,8 +2,9 @@
 
 use std::collections::HashMap;
 
-use crate::{auth::ProtectedAuth, State};
+use crate::auth::ProtectedAuth;
 use actix_web::{post, web};
+use api_core::State;
 use api_core::{
     errors::ApiResult,
     types::{JsonApiResponse, ResponseData},

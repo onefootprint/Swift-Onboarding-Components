@@ -125,7 +125,7 @@ pub fn get_fixture_reason_codes(
     };
     reason_codes
         .into_iter()
-        .chain(user_input_risk_signals.into_iter())
+        .chain(user_input_risk_signals)
         .map(|r| (r, vendor_api))
         .collect()
 }
@@ -175,7 +175,7 @@ pub fn get_fixture_reason_codes_alpaca(
 
     reason_codes
         .into_iter()
-        .chain(user_input_risk_signals.into_iter())
+        .chain(user_input_risk_signals)
         .map(|r| (r, VendorAPI::IdologyExpectId))
         .collect()
 }

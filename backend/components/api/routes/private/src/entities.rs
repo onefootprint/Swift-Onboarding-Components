@@ -1,7 +1,7 @@
-use crate::errors::ApiResult;
-use crate::types::{JsonApiResponse, ResponseData};
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use api_core::errors::ApiResult;
+use api_core::types::{JsonApiResponse, ResponseData};
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use actix_web::{get, web};
 use api_core::auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard};
 use db::models::scoped_vault::{ScopedVault, ScopedVaultIdentifier};

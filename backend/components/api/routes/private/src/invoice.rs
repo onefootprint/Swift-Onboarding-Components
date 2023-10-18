@@ -1,8 +1,9 @@
 use crate::auth::ProtectedAuth;
-use crate::errors::ApiResult;
-use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::State;
-use actix_web::{post, web};
+use actix_web::post;
+use actix_web::web::{self};
+use api_core::errors::ApiResult;
+use api_core::types::{EmptyResponse, JsonApiResponse};
+use api_core::State;
 use billing::{BillingCounts, BillingInfo};
 use chrono::{Duration, NaiveDate, Utc};
 use db::models::access_event::AccessEvent;
@@ -50,7 +51,7 @@ struct CreateInvoicesRequest {
     billing_date: Option<NaiveDate>,
 }
 
-#[post("/private/invoices")]
+#[actix_web::post("/private/invoices")]
 async fn post_all(
     state: web::Data<State>,
     request: Option<web::Json<CreateInvoicesRequest>>,

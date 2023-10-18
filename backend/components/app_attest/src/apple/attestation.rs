@@ -170,7 +170,7 @@ fn verify_attestation(
 
     // 3/4. Verify nonce (extension with OID 1.2.840.113635.100.8.2)
     // sha256( authData || clientDataHash)
-    let expected_nonce = sha256(&vec![attest.auth_data.as_ref(), client_data_hash.as_ref()].concat());
+    let expected_nonce = sha256(&[attest.auth_data.as_ref(), client_data_hash.as_ref()].concat());
 
     let found_nonce = parse_apple_anonymous_nonce(&cred_cert)?;
     if expected_nonce != found_nonce {
