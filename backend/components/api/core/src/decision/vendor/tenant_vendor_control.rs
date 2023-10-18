@@ -12,7 +12,7 @@ use newtypes::{
         ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials, IncodeCredentials,
         MiddeskCredentials,
     },
-    IdvData, PiiString, TenantId, Vendor, VendorAPI,
+    IdvData, IncodeEnvironment, PiiString, TenantId, Vendor, VendorAPI,
 };
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
@@ -57,11 +57,10 @@ impl TenantVendorControl {
         self.experian_credentials.clone()
     }
 
-    pub fn incode_credentials(&self, is_sandbox: bool) -> IncodeCredentials {
-        if is_sandbox {
-            self.incode_sandbox_credentials.0.clone()
-        } else {
-            self.incode_credentials.clone()
+    pub fn incode_credentials(&self, incode_environment: IncodeEnvironment) -> IncodeCredentials {
+        match incode_environment {
+            IncodeEnvironment::Demo => self.incode_sandbox_credentials.0.clone(),
+            IncodeEnvironment::Production => self.incode_credentials.clone(),
         }
     }
 

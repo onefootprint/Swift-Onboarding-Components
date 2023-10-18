@@ -66,7 +66,14 @@ pub async fn rerun_machine(
                 old_session.kind
             };
             let config_id = old_session.incode_configuration_id.clone();
-            IncodeVerificationSession::create(conn, id_doc.id.clone(), config_id, kind)?;
+            // TODO: override this
+            IncodeVerificationSession::create(
+                conn,
+                id_doc.id.clone(),
+                config_id,
+                kind,
+                old_session.incode_environment,
+            )?;
             Ok((id_doc, dr, su, di, uvw, obc))
         })
         .await?;

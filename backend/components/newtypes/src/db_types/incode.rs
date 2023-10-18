@@ -165,7 +165,6 @@ impl IncodeFailureReason {
 #[diesel(sql_type = Text)]
 pub enum IncodeVerificationSessionKind {
     IdDocument,
-    // TODO: Should this be something like IdDocAndSelfie?
     Selfie,
 }
 
@@ -181,3 +180,27 @@ impl IncodeVerificationSessionKind {
 crate::util::impl_enum_str_diesel!(IncodeVerificationSessionState);
 crate::util::impl_enum_str_diesel!(IncodeFailureReason);
 crate::util::impl_enum_str_diesel!(IncodeVerificationSessionKind);
+
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    Eq,
+    PartialEq,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    EnumIter,
+    AsRefStr,
+    macros::SerdeAttr,
+)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum IncodeEnvironment {
+    Demo,
+    Production,
+}
+
+crate::util::impl_enum_str_diesel!(IncodeEnvironment);

@@ -357,6 +357,7 @@ table! {
         latest_failure_reasons -> Array<Text>,
         ignored_failure_reasons -> Array<Text>,
         deactivated_at -> Nullable<Timestamptz>,
+        incode_environment -> Nullable<Text>,
     }
 }
 

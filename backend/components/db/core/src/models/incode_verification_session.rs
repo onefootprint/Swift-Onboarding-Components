@@ -6,8 +6,8 @@ use db_schema::schema::{
 };
 use diesel::{pg::Pg, prelude::*};
 use newtypes::{
-    DocumentSide, IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeFailureReason,
-    IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
+    DocumentSide, IdentityDocumentId, IncodeAuthorizationToken, IncodeConfigurationId, IncodeEnvironment,
+    IncodeFailureReason, IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
     IncodeVerificationSessionState, WorkflowId,
 };
 
@@ -36,6 +36,7 @@ pub struct IncodeVerificationSession {
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
     // When set, this IVS was replaced with a re-run via the manual private endpoint
     pub deactivated_at: Option<DateTime<Utc>>,
+    pub incode_environment: Option<IncodeEnvironment>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -48,6 +49,7 @@ struct NewIncodeVerificationSession {
     kind: IncodeVerificationSessionKind,
     latest_failure_reasons: Vec<IncodeFailureReason>,
     ignored_failure_reasons: Vec<IncodeFailureReason>,
+    incode_environment: Option<IncodeEnvironment>,
 }
 
 #[derive(Debug, AsChangeset, Default)]
@@ -105,6 +107,7 @@ impl IncodeVerificationSession {
         identity_document_id: IdentityDocumentId,
         configuration_id: IncodeConfigurationId,
         kind: IncodeVerificationSessionKind,
+        incode_environment: Option<IncodeEnvironment>,
     ) -> DbResult<Self> {
         let new_req = NewIncodeVerificationSession {
             created_at: Utc::now(),
@@ -114,6 +117,7 @@ impl IncodeVerificationSession {
             kind,
             latest_failure_reasons: vec![],
             ignored_failure_reasons: vec![],
+            incode_environment,
         };
 
         let res: IncodeVerificationSession = diesel::insert_into(incode_verification_session::table)

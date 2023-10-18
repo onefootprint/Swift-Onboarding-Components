@@ -1,0 +1,1 @@
+ALTER TABLE incode_verification_session DROP COLUMN incode_environment;-- This file should undo anything in `up.sql`

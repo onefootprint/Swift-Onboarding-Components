@@ -21,7 +21,7 @@ use feature_flag::FeatureFlagClient;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DecisionIntentId, DecisionIntentKind, DocVData, DocumentRequestId, IdentityDocumentId,
-    IncodeConfigurationId, IncodeFailureReason, IncodeVerificationSessionKind,
+    IncodeConfigurationId, IncodeEnvironment, IncodeFailureReason, IncodeVerificationSessionKind,
     IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, WorkflowId,
 };
 
@@ -103,7 +103,11 @@ impl IncodeStateMachine {
                 .flag(feature_flag::BoolFlag::UseIncodeDemoCredentialsInLivemode(
                     &tenant_id,
                 ));
-        let use_demo_credentials = is_sandbox || use_demo_creds_in_livemode;
+        let default_environment = if is_sandbox || use_demo_creds_in_livemode {
+            IncodeEnvironment::Demo
+        } else {
+            IncodeEnvironment::Production
+        };
 
         // get incode credentials from TVC
         let tenant_vendor_control =
@@ -128,20 +132,25 @@ impl IncodeStateMachine {
                     };
 
                     // Initialize the incode state
-                    IncodeVerificationSession::create(conn, id_doc_id, config_id, session_kind)?
+                    IncodeVerificationSession::create(
+                        conn,
+                        id_doc_id,
+                        config_id,
+                        session_kind,
+                        Some(default_environment),
+                    )?
                 };
                 Ok(session)
             })
             .await?;
-
+        let credentials = tenant_vendor_control
+            .incode_credentials(session.incode_environment.unwrap_or(default_environment));
         // Run StartOnboarding immediately - it sets up some data that all other states need
         if matches!(session.state, IncodeVerificationSessionState::StartOnboarding) {
-            let credentials = tenant_vendor_control.incode_credentials(use_demo_credentials);
-
             if is_sandbox {
                 tracing::info!(tenant_name=%tenant_vendor_control.tenant_identifier(), sv_id=%ctx.sv_id.clone(), "sandbox incode request");
             }
-            StartOnboarding::run(state, &ctx, session, credentials, configuration_id).await?;
+            StartOnboarding::run(state, &ctx, session, credentials.clone(), configuration_id).await?;
         }
 
         // Refetch the session since it may have changed if we ran the start
@@ -159,7 +168,7 @@ impl IncodeStateMachine {
                 id: session.id,
                 kind: session.kind,
                 credentials: IncodeCredentialsWithToken {
-                    credentials: tenant_vendor_control.incode_credentials(use_demo_credentials),
+                    credentials,
                     authentication_token: token.into(),
                 },
                 ignored_failure_reasons: session.ignored_failure_reasons,
