@@ -19,23 +19,19 @@
   "scripts": {
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "format:fix": "prettier --write \"./**/*.{ts,tsx,md}\"",
-    "generate:tokens": "node ./src/scripts/generate-tokens.js",
     "generate:styles": "node ./src/scripts/generate-styles.js",
+    "generate:tokens": "node ./src/scripts/generate-tokens.js",
     "generate": "yarn generate:tokens && yarn generate:styles",
+    "lint:ci": "eslint src",
     "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
     "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
     "postgenerate": "yarn format:fix && yarn lint:fix",
     "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
-    "@types/color": "^3.0.3",
-    "color": "^4.2.3",
     "csstype": "^3.1.2",
     "eslint-config-footprint": "*",
     "polished": "^4.2.2",
-    "style-dictionary": "^3.7.1",
-    "token-transformer": "^0.0.27",
     "typescript": "4.9.5"
   }
 }

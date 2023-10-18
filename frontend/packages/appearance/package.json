@@ -26,11 +26,10 @@
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
-    "@types/lodash": "^4.14.194",
-    "@types/styled-components": "^5.1.26",
+    "@types/lodash": "^4.14.199",
     "eslint-config-footprint": "*",
-    "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react": "18.2.0",
     "tsconfig": "*",
     "typescript": "4.9.5"
   },
