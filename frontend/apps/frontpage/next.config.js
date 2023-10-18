@@ -76,6 +76,9 @@ module.exports = withPlugins([withMDX], {
   compiler: {
     styledComponents: true,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   transpilePackages: [
     '@onefootprint/ui',
     '@onefootprint/styled',

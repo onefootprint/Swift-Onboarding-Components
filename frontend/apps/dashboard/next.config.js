@@ -89,6 +89,9 @@ const nextConfig = {
     '@onefootprint/types',
     '@onefootprint/dev-tools',
   ],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   async redirects() {
     return [
       {

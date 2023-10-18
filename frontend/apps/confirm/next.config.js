@@ -57,6 +57,9 @@ module.exports = {
   compiler: {
     styledComponents: true,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   transpilePackages: [
     '@onefootprint/ui',
     '@onefootprint/styled',

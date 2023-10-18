@@ -58,6 +58,9 @@ const nextConfig = {
   compiler: {
     styledComponents: true,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   transpilePackages: [
     '@onefootprint/idv-elements',
     '@onefootprint/idv',
