@@ -1,7 +1,7 @@
 import { Dialog } from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import useRouter from 'src/hooks/use-router';
 import useUserSession from 'src/hooks/use-user-session';
 
 import TenantsList from './components/tenants-list';
@@ -10,17 +10,16 @@ const SuperAdmin = () => {
   const { t } = useTranslation('super-admin');
   const user = useUserSession();
   const router = useRouter();
-  const isOpen = router.query.admin === 'true';
   const isFirmEmployee = user.data?.isFirmEmployee;
 
   const handleClose = () => {
-    router.resetQuery();
+    router.push('/');
   };
 
   return (
     <Dialog
       onClose={handleClose}
-      open={isFirmEmployee && isOpen}
+      open={isFirmEmployee}
       size="full-screen"
       title={t('page-title')}
     >

@@ -3,9 +3,9 @@ import { IcoLogOut24, IcoShield24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Dropdown, Typography } from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import React from 'react';
 import OverflowButton from 'src/components/overflow-button';
-import useRouter from 'src/hooks/use-router';
 import type { UserSession } from 'src/hooks/use-session';
 
 import TenantsList from './components/tenants-list';
@@ -27,7 +27,7 @@ const NavDropdown = ({
   const router = useRouter();
 
   const handleAdminMode = () => {
-    router.pushQuery({ admin: true });
+    router.push('/super-admin');
   };
 
   const handleLogout = () => {

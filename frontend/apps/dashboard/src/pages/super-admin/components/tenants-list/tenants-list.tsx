@@ -17,7 +17,7 @@ const TenantsList = () => {
     { text: t('table.header.live-users'), width: '12.5%' },
     { text: t('table.header.sandbox-users'), width: '12.5%' },
     { text: t('table.header.created-at'), width: '15%' },
-    { text: '', width: '15%' },
+    { text: t('table.header.actions'), width: '15%' },
   ];
   const searchPlaceholder = t('table.search-placeholder') || '';
   const emptyState = errorMessage || t('table.empty-state') || '';

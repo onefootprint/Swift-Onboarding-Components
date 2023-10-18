@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Banner } from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import React from 'react';
-import useRouter from 'src/hooks/use-router';
 import useSession from 'src/hooks/use-session';
 
 const AssumeBanner = () => {
@@ -11,7 +11,7 @@ const AssumeBanner = () => {
   const router = useRouter();
 
   const handleSwitch = () => {
-    router.pushQuery({ admin: true });
+    router.push('/super-admin');
   };
 
   const handleLogout = () => {

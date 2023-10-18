@@ -11,14 +11,11 @@
       "id": "Id",
       "live-users": "Live users",
       "sandbox-users": "Sandbox users",
-      "created-at": "Created at"
+      "created-at": "Created at",
+      "actions": "Actions"
     },
     "row": {
-      "assume": "View as Super Admin",
-      "notification": {
-        "title": "Success!",
-        "description": "You are now viewing {{tenantName}} as a Super Admin."
-      }
+      "assume": "View as Super Admin"
     }
   }
 }

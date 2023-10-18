@@ -1,8 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import { Stack } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React, { Suspense } from 'react';
-import SuperAdmin from 'src/components/super-admin';
+import React from 'react';
 
 import AssumeBanner from './components/assume-banner';
 import SandboxBanner from './components/sandbox-banner';
@@ -33,9 +32,6 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => (
       <SideNav />
       <Main>{children}</Main>
     </Content>
-    <Suspense fallback={null}>
-      <SuperAdmin />
-    </Suspense>
   </DefaultLayoutContainer>
 );
 

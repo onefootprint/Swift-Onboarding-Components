@@ -282,11 +282,7 @@ describe('<SideNav />', () => {
             const superAdmin = screen.getByText('Log in as Super Admin');
             await userEvent.click(superAdmin);
 
-            expect(push).toHaveBeenCalledWith(
-              { query: { admin: true } },
-              undefined,
-              { shallow: true },
-            );
+            expect(push).toHaveBeenCalledWith('/super-admin');
           });
         });
       });
