@@ -97,7 +97,6 @@ footprint_reason_code_enum! {
         AsExpression,
         FromSqlRow,
         AsRefStr,
-        JsonSchema,
         PartialEq,
         Eq,
         Ord,
@@ -1321,6 +1320,16 @@ impl FootprintReasonCode {
                 | Self::DocumentRequiresReview
                 | Self::DocumentLowMatchScoreWithSelfie
         )
+    }
+}
+
+impl JsonSchema for FootprintReasonCode {
+    fn schema_name() -> String {
+        "FootprintReasonCode".to_owned()
+    }
+
+    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+        schemars::schema::Schema::Bool(false)
     }
 }
 
