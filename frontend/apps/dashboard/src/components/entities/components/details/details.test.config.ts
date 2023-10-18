@@ -121,7 +121,6 @@ export const timelineFixture: Timeline = [
               CollectedKycDataOption.dob,
               CollectedKycDataOption.ssn4,
             ],
-            mustCollectIdentityDocument: false,
           },
           vendors: [],
         },

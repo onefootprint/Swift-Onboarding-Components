@@ -4,11 +4,7 @@ import type {
   CollectedDataOption,
   OnboardingDecisionEventData,
 } from '@onefootprint/types';
-import {
-  ActorKind,
-  CollectedDocumentDataOption,
-  DecisionStatus,
-} from '@onefootprint/types';
+import { ActorKind, DecisionStatus } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import CdoTagList from 'src/components/cdo-tag-list';
@@ -32,7 +28,7 @@ const OnboardingDecisionEventBody = ({
     decision: {
       source,
       status,
-      obConfiguration: { mustCollectData, mustCollectIdentityDocument },
+      obConfiguration: { mustCollectData },
     },
   } = data;
   const statusStr = t(`decision-status.${status}`);
@@ -43,9 +39,6 @@ const OnboardingDecisionEventBody = ({
 
   if (status === DecisionStatus.pass) {
     const collectedDataOptions: CollectedDataOption[] = [...mustCollectData];
-    if (mustCollectIdentityDocument) {
-      collectedDataOptions.push(CollectedDocumentDataOption.document);
-    }
 
     // const collectedDataLabels = [
     //   ...mustCollectData.map(attr => allT(`cdo.${attr}`)),
@@ -67,7 +60,7 @@ const OnboardingDecisionEventBody = ({
             <Typography variant="body-3" as="span" sx={{ marginRight: 1 }}>
               {statusStr}
             </Typography>
-            <CdoTagList cdos={collectedDataOptions} />
+            <CdoTagList cdos={collectedDataOptions} singleDocument />
             <FieldValidationDetails />
           </Container>
         }

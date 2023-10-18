@@ -186,7 +186,6 @@ export const timelineFixture: Timeline = [
           },
           obConfiguration: {
             mustCollectData: [],
-            mustCollectIdentityDocument: false,
           },
           vendors: [Vendor.idology, Vendor.twilio],
         },

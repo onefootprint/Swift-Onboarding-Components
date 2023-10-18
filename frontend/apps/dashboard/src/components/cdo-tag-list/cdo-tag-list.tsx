@@ -18,6 +18,7 @@ type CdoTagListProps = {
   cdos: (CollectedDataOption | string)[];
   optionalCdos?: (CollectedDataOption | string)[];
   disableSort?: boolean;
+  singleDocument?: boolean;
 };
 
 // We need to clean this up when we re-do the CDO structure in the dashboard
@@ -56,10 +57,11 @@ const CdoTagList = ({
   // https://linear.app/footprint/issue/FP-5714/refactor-cdo-tag-list-components
   optionalCdos = [],
   disableSort,
+  singleDocument,
 }: CdoTagListProps) => {
   const { t } = useTranslation('cdo');
-  const allCdos = getCdos(cdos);
-  const optionalCdosList = getCdos(optionalCdos);
+  const allCdos = getCdos(cdos, !!singleDocument);
+  const optionalCdosList = getCdos(optionalCdos, !!singleDocument);
   const allTagLabels = allCdos.map(cdo => t(cdo));
   const optionalCdosLabels = optionalCdosList.map(
     cdo => `${t(cdo)} ‧ Optional`,

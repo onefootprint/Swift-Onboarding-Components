@@ -6,7 +6,7 @@ const isDocumentDi = (cdo: string) => cdo.startsWith('document');
 const isDocumentAndSelfieDi = (cdo: string) =>
   isDocumentDi(cdo) && cdo.indexOf('selfie') > -1;
 
-const getCdos = (cdos: string[]) => {
+const getCdos = (cdos: string[], singleDocument: boolean) => {
   const documentCdos: string[] = [];
   const otherCdos: string[] = [];
   cdos.forEach(cdo => {
@@ -31,7 +31,14 @@ const getCdos = (cdos: string[]) => {
   }
 
   compositeDocumentCdos.forEach(cdo => {
-    processedDocumentCdos.push(...extractIdDocTypesFromCdo(cdo));
+    if (singleDocument) {
+      // Replace complex document CDOs that contain type information on which documents are
+      // collectible with a generic document CDO.
+      // We'll fix this at some point by stopping to use CDOs for document on the backend...
+      processedDocumentCdos.push('document');
+    } else {
+      processedDocumentCdos.push(...extractIdDocTypesFromCdo(cdo));
+    }
     if (isDocumentAndSelfieDi(cdo)) {
       processedDocumentCdos.push('selfie');
     }
