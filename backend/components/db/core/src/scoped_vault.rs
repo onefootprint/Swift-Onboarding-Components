@@ -80,7 +80,7 @@ macro_rules! list_query {
         // Filter out onboardings that haven't been explicitly authorized by the user - these should
         // not be visible in the dashboard since the tenant doesn't have permissions to view anything
         // about the user
-        use db_schema::schema::{manual_review, scoped_vault, vault, watchlist_check, workflow};
+        use db_schema::schema::{manual_review, scoped_vault, vault, watchlist_check};
         let mut query = scoped_vault::table
             .inner_join(vault::table)
             .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
@@ -95,8 +95,7 @@ macro_rules! list_query {
         if let Some(requires_manual_review) = $params.requires_manual_review {
             let matching_ids = manual_review::table
                 .filter(manual_review::completed_at.is_null())
-                .inner_join(workflow::table)
-                .select(workflow::scoped_vault_id)
+                .select(manual_review::scoped_vault_id)
                 .distinct();
             if requires_manual_review {
                 query = query.filter(scoped_vault::id.eq_any(matching_ids))

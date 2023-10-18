@@ -128,8 +128,13 @@ impl<'a> From<(&'a VaultId, &'a TenantId)> for ScopedVaultIdentifier<'a> {
     }
 }
 
-pub type SerializableWorkflow = (Workflow, Option<InsightEvent>, Option<ManualReview>);
-pub type SerializableEntity = (ScopedVault, Option<WatchlistCheck>, Vec<SerializableWorkflow>);
+pub type SerializableWorkflow = (Workflow, Option<InsightEvent>);
+pub type SerializableEntity = (
+    ScopedVault,
+    Option<WatchlistCheck>,
+    Vec<ManualReview>,
+    Vec<SerializableWorkflow>,
+);
 
 impl ScopedVault {
     /// Used to create a ScopedUser for a portable vault, linked to a specific onboarding configuration
@@ -292,15 +297,19 @@ impl ScopedVault {
             .filter(scoped_vault::id.eq_any(&ids))
             .load(conn)?;
 
+        // Fetch manual reviews separately since there may be multiple for one scoped vault
+        let mut manual_reviews = manual_review::table
+            .filter(manual_review::scoped_vault_id.eq_any(&ids))
+            .filter(manual_review::completed_at.is_null())
+            .get_results::<ManualReview>(conn)?
+            .into_iter()
+            .map(|i| (i.scoped_vault_id.clone(), i))
+            .into_group_map();
+
         // Fetch workflows separately since there may be multiple for one scoped vault
         let mut workflows = workflow::table
             .filter(workflow::scoped_vault_id.eq_any(&ids))
             .left_join(insight_event::table)
-            .left_join(
-                manual_review::table.on(manual_review::workflow_id
-                    .eq(workflow::id)
-                    .and(manual_review::completed_at.is_null())),
-            )
             .get_results::<SerializableWorkflow>(conn)?
             .into_iter()
             .map(|i| (i.0.scoped_vault_id.clone(), i))
@@ -311,7 +320,9 @@ impl ScopedVault {
             .into_iter()
             .map(|i| {
                 let sv_id = i.0.id.clone();
-                let entity = (i.0, i.1, workflows.remove(&sv_id).unwrap_or_default());
+                let manual_reviews = manual_reviews.remove(&sv_id).unwrap_or_default();
+                let workflows = workflows.remove(&sv_id).unwrap_or_default();
+                let entity = (i.0, i.1, manual_reviews, workflows);
                 (sv_id, entity)
             })
             .collect();

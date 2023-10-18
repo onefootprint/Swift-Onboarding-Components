@@ -43,9 +43,10 @@ pub async fn post(
     let tid = tenant_id.clone();
     let wf = state
         .db_pool
-        .db_query(move |conn| -> DbResult<Option<Workflow>> {
+        .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fpid, &tid, is_live))?;
-            Workflow::get_active(conn, &sv.id)
+            let wf = Workflow::get_active(conn, &sv.id)?;
+            Ok(wf)
         })
         .await??;
     let wf = wf.ok_or(OnboardingError::NoWorkflow)?;

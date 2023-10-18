@@ -34,7 +34,7 @@ pub type EntityDetailMore<'a> = (
 
 impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
     fn from_db((entity, vw, auth, decrypted_attrs): EntityDetailMore) -> Self {
-        let (sv, watchlist_check, wfs) = entity;
+        let (sv, watchlist_check, mrs, wfs) = entity;
         let attributes = vw.get_visible_populated_fields();
 
         let auth_scopes = auth.scopes();
@@ -72,11 +72,7 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
         } = sv;
 
         // If the latest Workflow has an uncompleted review
-        let requires_manual_review = wfs
-            .iter()
-            .max_by_key(|(wf, _, _)| wf.created_at)
-            .map(|(_, _, mr)| mr.is_some())
-            .unwrap_or(false);
+        let requires_manual_review = !mrs.is_empty();
 
         let insight_event = wfs
             .into_iter()

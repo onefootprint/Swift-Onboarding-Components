@@ -464,17 +464,20 @@ impl Workflow {
             //
             // Create or clear the manual review if needed
             // MUST do all manual review bookkeeping before sending the webhooks below
-            let existing_review = ManualReview::get_active(conn, &result.id)?;
+            // TODO we really need to better think through how we deal with ManualReviews and
+            // multiple Workflows
+            // For now, just going to mark all ManualReviews for a workflow as complete
+            let existing_reviews = ManualReview::get_active_for_sv(conn, &result.scoped_vault_id)?;
             if let Some(review_reasons) = create_manual_review_reasons {
                 // If the decision requested to create a manual review, this creates one
-                if existing_review.is_none() {
+                if existing_reviews.is_empty() {
                     let sv_id = wf.scoped_vault_id.clone();
                     ManualReview::create(conn, review_reasons, result.id.clone(), sv_id)?;
                 }
             } else {
                 // If there is an outstanding review, creating this override decision clears it.
-                if let Some(manual_review) = existing_review {
-                    manual_review.complete(conn, actor, decision.id)?;
+                for mr in existing_reviews {
+                    mr.complete(conn, actor.clone(), decision.id.clone())?;
                 }
             }
         }
