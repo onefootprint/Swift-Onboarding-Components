@@ -2,25 +2,19 @@
   "name": "@onefootprint/footprint-react-native",
   "private": false,
   "type": "module",
-  "version": "1.1.1",
+  "version": "1.2.0-beta.1",
   "main": "./dist/footprint-react-native.cjs",
   "module": "./dist/footprint-react-native.js",
+  "unpkg": "./dist/footprint-react-native.js",
   "types": "./dist/footprint-react-native.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/footprint-react-native.js",
-      "require": "./dist/footprint-react-native.cjs",
-      "types": "./dist/footprint-react-native.d.ts"
-    }
-  },
   "sideEffects": false,
   "license": "MIT",
   "files": [
-    "dist",
-    "react-native.config.js"
+    "dist"
   ],
   "scripts": {
     "dev": "tsup --watch",
+    "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf node_modules",
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
@@ -42,7 +36,7 @@
   },
   "peerDependencies": {
     "react": "> 17",
-    "react-native": ">= 0.70"
+    "react-native": ">= 0.60"
   },
   "publishConfig": {
     "access": "public"

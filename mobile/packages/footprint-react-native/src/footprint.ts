@@ -43,7 +43,7 @@ const open = async ({
 };
 
 const close = () => {
-  return InAppBrowser.close();
+  // return InAppBrowser.close();
 };
 
 const footprint = {

@@ -11,4 +11,14 @@ export default defineConfig(options => ({
   watch: options.watch,
   minify: !options.watch,
   external: ['react', 'react-native'],
+  outExtension({ format }) {
+    if (format === 'cjs') {
+      return {
+        js: '.cjs',
+      };
+    }
+    return {
+      js: '.js',
+    };
+  },
 }));
